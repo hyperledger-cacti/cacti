@@ -1,0 +1,12 @@
+{
+    "name": "identity",
+    "scripts": {
+        "pool": "docker build -t indy_pool . && docker run -itd -p 9701-9708:9701-9708 --name indy_pool indy_pool",
+        "pool:down": "docker stop indy_pool && docker rm indy_pool"
+    },
+    "dependencies": {
+        "home-dir": "^1.0.0",
+        "indy-sdk": "file:~/src/indy-sdk/wrappers/nodejs",
+        "sleep": "^6.1.0"
+    }
+}

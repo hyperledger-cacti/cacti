@@ -1,0 +1,380 @@
+# The following environment variables are substituted if present
+# * QUORUM_CONSENSUS: default to istanbul
+# * QUORUM_DOCKER_IMAGE: default to quorumengineering/quorum:2.1.1
+# * QUORUM_TX_MANAGER_DOCKER_IMAGE: default to quorumengineering/tessera:0.7.3
+# To use Constellation, set QUORUM_TX_MANAGER_DOCKER_IMAGE to Constellation docker image,
+# e.g.: QUORUM_TX_MANAGER_DOCKER_IMAGE=quorumengineering/constellation:0.3.2 docker-compose up -d
+version: "3.7"
+x-quorum-def:
+  &quorum-def
+  restart: "on-failure"
+  image: "${QUORUM_DOCKER_IMAGE:-quorumengineering/quorum:2.1.1}"
+  expose:
+    - "21000"
+    - "50400"
+  healthcheck:
+    test: ["CMD", "nc", "-z", "localhost:8546"]
+    interval: 3s
+    timeout: 3s
+    retries: 10
+    start_period: 5s
+  labels:
+    com.quorum.consensus: ${QUORUM_CONSENSUS:-istanbul}
+  entrypoint:
+    - /bin/sh
+    - -c
+    - |
+      DDIR=/qdata/dd
+      rm -rf $${DDIR}
+      mkdir -p $${DDIR}/keystore
+      mkdir -p $${DDIR}/geth
+      cp /examples/raft/nodekey$${NODE_ID} $${DDIR}/geth/nodekey
+      cp /examples/keys/key$${NODE_ID} $${DDIR}/keystore/
+      cat /examples/permissioned-nodes.json | sed 's/^\(.*\)@.*\?\(.*\)raftport=5040\([0-9]\)\(.*\)$$/\1@172.16.239.1\3:21000?discport=0\&raftport=50400\4/g' > $${DDIR}/static-nodes.json
+      cp $${DDIR}/static-nodes.json $${DDIR}/permissioned-nodes.json
+      cat $${DDIR}/static-nodes.json
+      GENESIS_FILE="/examples/istanbul-genesis.json"
+      if [ "${QUORUM_CONSENSUS:-istanbul}" == "raft" ]; then
+        GENESIS_FILE="/examples/genesis.json"
+      fi
+      NETWORK_ID=$$(cat $${GENESIS_FILE} | grep chainId | awk -F " " '{print $$2}' | awk -F "," '{print $$1}')
+      GETH_ARGS_raft="--raft --raftport 50400"
+      GETH_ARGS_istanbul="--emitcheckpoints --istanbul.blockperiod 1 --mine --minerthreads 1 --syncmode full"
+      if [ ! -S /qdata/tm/tm.ipc ]; then
+        echo "Waiting for the tx manager to start..."
+        i=1
+        while [ ! -S /qdata/tm/tm.ipc ]; do sleep 20; echo "still waiting for the tx manager ($$i)..."; i=$$((i+1)); done
+        sleep 20
+      fi
+      geth --datadir $${DDIR} init $${GENESIS_FILE}
+      geth \
+        --identity node$${NODE_ID}-${QUORUM_CONSENSUS:-istanbul} \
+        --datadir $${DDIR} \
+        --permissioned \
+        --nodiscover \
+        --verbosity 5 \
+        --networkid $${NETWORK_ID} \
+        --ws \
+        --wsaddr 0.0.0.0 \
+        --wsport 8546 \
+        --wsapi admin,db,eth,debug,miner,net,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-istanbul} \
+        --wsorigins="*" \
+        --port 21000 \
+        --unlock 0 \
+        --password /examples/passwords.txt \
+        $${GETH_ARGS_${QUORUM_CONSENSUS:-istanbul}}
+x-tx-manager-def:
+  &tx-manager-def
+  image: "${QUORUM_TX_MANAGER_DOCKER_IMAGE:-quorumengineering/tessera:0.7.3}"
+  expose:
+    - "9000"
+  restart: "no"
+  healthcheck:
+    test: ["CMD-SHELL", "[ -S /qdata/tm/tm.ipc ] || exit 1"]
+    interval: 3s
+    timeout: 3s
+    retries: 20
+    start_period: 5s
+  entrypoint:
+    - /bin/sh
+    - -c
+    - |
+      DDIR=/qdata/tm
+      rm -rf $${DDIR}
+      mkdir -p $${DDIR}
+      DOCKER_IMAGE="${QUORUM_TX_MANAGER_DOCKER_IMAGE:-quorumengineering/tessera:0.7.3}"
+      TX_MANAGER=$$(echo $${DOCKER_IMAGE} | sed 's/^.*\/\(.*\):.*$$/\1/g')
+      echo "TxManager: $${TX_MANAGER}"
+      case $${TX_MANAGER}
+      in
+        tessera)
+          cp /examples/keys/tm$${NODE_ID}.pub $${DDIR}/tm.pub
+          cp /examples/keys/tm$${NODE_ID}.key $${DDIR}/tm.key
+          cat <<EOF > $${DDIR}/tessera-config.json
+          {
+              "useWhiteList": false,
+              "jdbc": {
+                  "username": "sa",
+                  "password": "",
+                  "url": "jdbc:h2:./$${DDIR}/db;MODE=Oracle;TRACE_LEVEL_SYSTEM_OUT=0"
+              },
+              "server": {
+                  "port": 9000,
+                  "hostName": "http://$$(hostname -i)",
+                  "sslConfig": {
+                      "tls": "OFF",
+                      "generateKeyStoreIfNotExisted": true,
+                      "serverKeyStore": "$${DDIR}/server-keystore",
+                      "serverKeyStorePassword": "quorum",
+                      "serverTrustStore": "$${DDIR}/server-truststore",
+                      "serverTrustStorePassword": "quorum",
+                      "serverTrustMode": "TOFU",
+                      "knownClientsFile": "$${DDIR}/knownClients",
+                      "clientKeyStore": "$${DDIR}/client-keystore",
+                      "clientKeyStorePassword": "quorum",
+                      "clientTrustStore": "$${DDIR}/client-truststore",
+                      "clientTrustStorePassword": "quorum",
+                      "clientTrustMode": "TOFU",
+                      "knownServersFile": "$${DDIR}/knownServers"
+                  }
+              },
+              "peer": [
+                  {
+                      "url": "http://txmanager1:9000"
+                  },
+                  {
+                      "url": "http://txmanager2:9000"
+                  },
+                  {
+                      "url": "http://txmanager3:9000"
+                  },
+                  {
+                      "url": "http://txmanager4:9000"
+                  },
+                  {
+                      "url": "http://txmanager5:9000"
+                  },
+                  {
+                      "url": "http://txmanager6:9000"
+                  },
+                  {
+                      "url": "http://txmanager7:9000"
+                  }
+              ],
+              "keys": {
+                  "passwords": [],
+                  "keyData": [
+                      {
+                          "config": $$(cat $${DDIR}/tm.key),
+                          "publicKey": "$$(cat $${DDIR}/tm.pub)"
+                      }
+                  ]
+              },
+              "alwaysSendTo": [],
+              "unixSocketFile": "$${DDIR}/tm.ipc"
+          }
+      EOF
+          java -Xms128M -Xmx128M -jar /tessera/tessera-app.jar -configfile $${DDIR}/tessera-config.json
+          ;;
+        constellation)
+          echo "socket=\"$${DDIR}/tm.ipc\"\npublickeys=[\"/examples/keys/tm$${NODE_ID}.pub\"]\n" > $${DDIR}/tm.conf
+          constellation-node \
+            --url=http://$$(hostname -i):9000/ \
+            --port=9000 \
+            --socket=$${DDIR}/tm.ipc \
+            --othernodes=http://172.16.239.101:9000/,http://172.16.239.102:9000/,http://172.16.239.103:9000/,http://172.16.239.104:9000/,http://172.16.239.105:9000/ \
+            --publickeys=/examples/keys/tm$${NODE_ID}.pub \
+            --privatekeys=/examples/keys/tm$${NODE_ID}.key \
+            --storage=$${DDIR} \
+            --verbosity=4
+          ;;
+        *)
+          echo "Invalid Transaction Manager"
+          exit 1
+          ;;
+      esac
+services:
+  node1:
+    << : *quorum-def
+    hostname: node1
+    ports:
+      - "22000:8546"
+    volumes:
+      - 1:/qdata
+      - .:/examples:ro
+    depends_on:
+      - txmanager1
+    environment:
+      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+      - NODE_ID=1
+    networks:
+      quorum-examples-net:
+        ipv4_address: 172.16.239.11
+  txmanager1:
+    << : *tx-manager-def
+    hostname: txmanager1
+    volumes:
+      - 1:/qdata
+      - .:/examples:ro
+    networks:
+      quorum-examples-net:
+        ipv4_address: 172.16.239.101
+    environment:
+      - NODE_ID=1
+  node2:
+    << : *quorum-def
+    hostname: node2
+    ports:
+      - "22001:8546"
+    volumes:
+      - 2:/qdata
+      - .:/examples:ro
+    depends_on:
+      - txmanager2
+    environment:
+      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+      - NODE_ID=2
+    networks:
+      quorum-examples-net:
+        ipv4_address: 172.16.239.12
+  txmanager2:
+    << : *tx-manager-def
+    hostname: txmanager2
+    volumes:
+      - 2:/qdata
+      - .:/examples:ro
+    networks:
+      quorum-examples-net:
+        ipv4_address: 172.16.239.102
+    environment:
+      - NODE_ID=2
+  node3:
+    << : *quorum-def
+    hostname: node3
+    ports:
+      - "22002:8546"
+    volumes:
+      - 3:/qdata
+      - .:/examples:ro
+    depends_on:
+      - txmanager3
+    environment:
+      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+      - NODE_ID=3
+    networks:
+      quorum-examples-net:
+        ipv4_address: 172.16.239.13
+  txmanager3:
+    << : *tx-manager-def
+    hostname: txmanager3
+    volumes:
+      - 3:/qdata
+      - .:/examples:ro
+    networks:
+      quorum-examples-net:
+        ipv4_address: 172.16.239.103
+    environment:
+      - NODE_ID=3
+  node4:
+    << : *quorum-def
+    hostname: node4
+    ports:
+      - "22003:8546"
+    volumes:
+      - 4:/qdata
+      - .:/examples:ro
+    depends_on:
+      - txmanager4
+    environment:
+      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+      - NODE_ID=4
+    networks:
+      quorum-examples-net:
+        ipv4_address: 172.16.239.14
+  txmanager4:
+    << : *tx-manager-def
+    hostname: txmanager4
+    volumes:
+      - 4:/qdata
+      - .:/examples:ro
+    networks:
+      quorum-examples-net:
+        ipv4_address: 172.16.239.104
+    environment:
+      - NODE_ID=4
+  # node5:
+  #   << : *quorum-def
+  #   hostname: node5
+  #   ports:
+  #     - "22004:8546"
+  #   volumes:
+  #     - 5:/qdata
+  #     - .:/examples:ro
+  #   depends_on:
+  #     - txmanager5
+  #   environment:
+  #     - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+  #     - NODE_ID=5
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.15
+  # txmanager5:
+  #   << : *tx-manager-def
+  #   hostname: txmanager5
+  #   volumes:
+  #     - 5:/qdata
+  #     - .:/examples:ro
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.105
+  #   environment:
+  #     - NODE_ID=5
+  # node6:
+  #   << : *quorum-def
+  #   hostname: node6
+  #   ports:
+  #     - "22005:8546"
+  #   volumes:
+  #     - 6:/qdata
+  #     - .:/examples:ro
+  #   depends_on:
+  #     - txmanager6
+  #   environment:
+  #     - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+  #     - NODE_ID=6
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.16
+  # txmanager6:
+  #   << : *tx-manager-def
+  #   hostname: txmanager6
+  #   volumes:
+  #     - 6:/qdata
+  #     - .:/examples:ro
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.106
+  #   environment:
+  #     - NODE_ID=6
+  # node7:
+  #   << : *quorum-def
+  #   hostname: node7
+  #   ports:
+  #     - "22006:8546"
+  #   volumes:
+  #     - 7:/qdata
+  #     - .:/examples:ro
+  #   depends_on:
+  #     - txmanager7
+  #   environment:
+  #     - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+  #     - NODE_ID=7
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.17
+  # txmanager7:
+  #   << : *tx-manager-def
+  #   hostname: txmanager7
+  #   volumes:
+  #     - 7:/qdata
+  #     - .:/examples:ro
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.107
+  #   environment:
+  #     - NODE_ID=7
+networks:
+  quorum-examples-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.239.0/24
+volumes:
+  "1":
+  "2":
+  "3":
+  "4":
+  "5":
+  "6":
+  "7":
