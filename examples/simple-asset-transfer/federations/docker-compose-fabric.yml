@@ -1,0 +1,125 @@
+version: "2"
+
+networks:
+    fabric-network:
+        driver: bridge
+        ipam:
+            config:
+              - subnet: 172.20.0.0/20
+                gateway: 172.20.0.1
+
+services:
+  fabric_validator1:
+    image: "federation/validator:latest"
+    environment:
+      CLIENT_REP_ADDR: "tcp://172.20.0.5:7001"
+      PUB_ADDR: "tcp://172.20.0.5:3001"
+      REP_ADDR: "tcp://172.20.0.5:5001"
+      URL: "http://172.20.0.1:4000"
+      PEER_NAME: "peer0.org1.example.com"
+      USER_NAME: "Naima"
+      ORG_NAME: "Org1"
+      DLT_TYPE: "FABRIC"
+      TYPE: "LEADER"
+      API_PORT: 9001
+    mem_limit: 6g
+    networks:
+        fabric-network:
+            ipv4_address: 172.20.0.5
+    expose:
+      - "4000"
+    ports:
+      - "7001:7001"
+      - "3001:3001"
+      - "5001:5001"
+      - "9001:9001"
+      
+  fabric_validator2:
+    image: "federation/validator:latest"
+    environment:
+      CLIENT_REP_ADDR: "tcp://172.20.0.6:7002"
+      PUB_ADDR: "tcp://172.20.0.6:3002"
+      REP_ADDR: "tcp://172.20.0.6:5002"
+      USER_NAME: "Mike"
+      ORG_NAME: "Org1"
+      LEAD_PUB_ADDR: "tcp://172.20.0.5:3001"
+      LEAD_REP_ADDR: "tcp://172.20.0.5:5001"
+      LEAD_CLIENT_REP_ADDR: "tcp://172.20.0.5:7001"
+      URL: "http://172.20.0.1:4000"
+      PEER_NAME: "peer1.org1.example.com"
+      DLT_TYPE: "FABRIC"
+      TYPE: "FOLLOWER"
+      API_PORT: 9002
+    mem_limit: 6g
+    expose:
+      - "4000"
+    ports:
+      - "7002:7002"
+      - "3002:3002"
+      - "5002:5002"
+      - "9002:9002"
+    networks:
+        fabric-network:
+            ipv4_address: 172.20.0.6
+    depends_on:
+      - "fabric_validator1"
+
+  fabric_validator3:
+    image: "federation/validator:latest"
+    environment:
+      CLIENT_REP_ADDR: "tcp://172.20.0.7:7003"
+      PUB_ADDR: "tcp://172.20.0.7:3003"
+      REP_ADDR: "tcp://172.20.0.7:5003"
+      USER_NAME: "Hugo"
+      ORG_NAME: "Org2"
+      LEAD_PUB_ADDR: "tcp://172.20.0.5:3001"
+      LEAD_REP_ADDR: "tcp://172.20.0.5:5001"
+      LEAD_CLIENT_REP_ADDR: "tcp://172.20.0.5:7001"
+      URL: "http://172.20.0.1:4000"
+      PEER_NAME: "peer0.org2.example.com"
+      TYPE: "FOLLOWER"
+      DLT_TYPE: "FABRIC"
+      API_PORT: 9003
+    mem_limit: 6g
+    expose:
+      - "4000"
+    ports:
+      - "7003:7003"
+      - "3003:3003"
+      - "5003:5003"
+      - "9003:9003"
+    networks:
+        fabric-network:
+            ipv4_address: 172.20.0.7
+    depends_on:
+      - "fabric_validator1"
+
+  fabric_validator4:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://172.20.0.8:7004"
+      PUB_ADDR: "tcp://172.20.0.8:3004"
+      REP_ADDR: "tcp://172.20.0.8:5004"
+      USER_NAME: "Luca"
+      ORG_NAME: "Org2"
+      LEAD_PUB_ADDR: "tcp://172.20.0.5:3001"
+      LEAD_REP_ADDR: "tcp://172.20.0.5:5001"
+      LEAD_CLIENT_REP_ADDR: "tcp://172.20.0.5:7001"
+      URL: "http://172.20.0.1:4000"
+      PEER_NAME: "peer1.org2.example.com"
+      DLT_TYPE: "FABRIC"
+      TYPE: "FOLLOWER"
+      API_PORT: 9004
+    mem_limit: 6g
+    expose:
+      - "4000"
+    ports:
+      - "7004:7004"
+      - "3004:3004"
+      - "5004:5004"
+      - "9004:9004"
+    networks:
+        fabric-network:
+            ipv4_address: 172.20.0.8
+    depends_on:
+      - "fabric_validator1"
