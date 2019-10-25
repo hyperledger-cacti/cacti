@@ -10,7 +10,7 @@ networks:
 
 services:
   fabric_validator1:
-    image: "federation/validator:latest"
+    image: "federation/validator"
     environment:
       CLIENT_REP_ADDR: "tcp://172.20.0.5:7001"
       PUB_ADDR: "tcp://172.20.0.5:3001"
@@ -35,7 +35,7 @@ services:
       - "9001:9001"
       
   fabric_validator2:
-    image: "federation/validator:latest"
+    image: "federation/validator"
     environment:
       CLIENT_REP_ADDR: "tcp://172.20.0.6:7002"
       PUB_ADDR: "tcp://172.20.0.6:3002"
@@ -65,7 +65,7 @@ services:
       - "fabric_validator1"
 
   fabric_validator3:
-    image: "federation/validator:latest"
+    image: "federation/validator"
     environment:
       CLIENT_REP_ADDR: "tcp://172.20.0.7:7003"
       PUB_ADDR: "tcp://172.20.0.7:3003"

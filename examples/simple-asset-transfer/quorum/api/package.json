@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "@hyperledger/blockchain-integration-framework",
+  "name": "@hyperledger/blockchain-integration-framework.examples.simple-asset-transfer.quorum-api",
   "license": "Apache-2.0",
   "scripts": {
     "init": "npm-run-all compile deploy reg",
@@ -22,7 +22,6 @@
     "express": "^4.16.4",
     "express-jwt": "^5.3.1",
     "express-validation": "^1.0.2",
-    "express-winston": "^3.1.0",
     "helmet": "^3.16.0",
     "http-status": "^1.3.2",
     "joi": "^14.3.1",
@@ -36,7 +35,7 @@
     "typedarray-to-buffer": "^3.1.5",
     "web3": "1.0.0-beta.37",
     "web3-utils": "1.0.0-beta.37",
-    "winston": "3.1.0",
+    "winston": "^3.2.1",
     "yaeti": "^1.0.2"
   },
   "devDependencies": {
@@ -48,7 +47,7 @@
     "supertest-as-promised": "^4.0.2"
   },
   "engines": {
-    "node": ">=8.9.4",
-    "npm": ">=5.6.0"
+    "node": ">=8.15.0 <9.0",
+    "npm": ">=6.4.1"
   }
 }

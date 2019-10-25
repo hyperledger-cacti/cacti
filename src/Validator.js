@@ -164,12 +164,12 @@ class Validator {
    * @param {object} connector
    * @returns {string}
    */
-  async checkData(type, dataToSign) {
+  async checkData(type, dataToSign, targetDLTType) {
     const typeError = new Error(`Unknown sign protocol: ${type}`);
     switch (type) {
       case `ASSET_ID`:
         try {
-          const asset = await this.blockchainClient.getAsset(dataToSign);
+          const asset = await this.blockchainClient.getAsset(dataToSign, targetDLTType);
           if (asset && asset.locked) {
             const data = JSON.stringify(asset);
             return data;
@@ -199,7 +199,7 @@ class Validator {
   async dataSign(type, dataToSign, targetDLTType) {
     const invalidError = new Error(`request rejected by validator`);
     try {
-      const data = await this.checkData(type, dataToSign);
+      const data = await this.checkData(type, dataToSign, targetDLTType);
       if (data) {
         logger.debug(`Signing the following asset: '${data}'`);
         const signature = await Crypto.signMsg(data, this.privKey, targetDLTType);

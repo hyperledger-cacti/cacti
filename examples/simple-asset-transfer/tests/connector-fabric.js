@@ -284,7 +284,7 @@ describe(`ConnectorFabricExample CreateAsset`, function() {
     };
     chai
       .expect(connector4.createAsset(asset1))
-      .to.eventually.include({ success: true })
+      .to.eventually.include({ assetId: asset1.asset_id })
       .notify(done);
   });
 
@@ -363,7 +363,7 @@ describe(`ConnectorFabricExample LockAsset`, function() {
           `036aaf98c8c07ccef29f43528b8682417b1ddb9e9ca4c427c751a3ea151cfabd90`
         )
       )
-      .to.eventually.include({ success: true })
+      .to.eventually.include({ assetId: asset4.asset_id, locked: true })
       .notify(done);
   });
 
@@ -506,6 +506,54 @@ describe(`ConnectorFabricExample GetAsset`, function() {
     chai
       .expect(connector7.getAsset(asset6.asset_id))
       .be.rejectedWith(TypeError, `invalid peerName provided: 45`)
+      .notify(done);
+  });
+});
+
+describe(`ConnectorFabricExample copyAsset`, function() {
+  const options = config.blockchains.fabric;
+  const connector3 = new ConnectorFabricEx(options);
+
+  before(function() {
+    this.timeout(5000);
+    if (!process.env.BLOCKCHAIN) {
+      this.skip();
+    }
+    const name = `foreignValidatorCopyTest`;
+    const pubkey = `03fd076032614ba907cf03108bfb37840fd7bf4057228d32a7323077bf70144db8`;
+    return connector3.addForeignValidator(pubkey, name);
+  });
+
+  it(`Copy Asset with correct signature`, function(done) {
+    this.skip(); // FixMe: Asset can be copied (created) only once.
+    this.timeout(5000);
+    const pubkey = '03fd076032614ba907cf03108bfb37840fd7bf4057228d32a7323077bf70144db8';
+    const signature =
+      'e16f7b7a4de297fb7c851d5d45275d1bae3d5ad838df2f0e11c8c24dd35e91061f16d9afb79cf93f000db248cbac8913df54d26927e18c5e28cd13ff487446eb';
+    const msg =
+      '{"asset_id":"Asset_DLT_1_1555594708716","dltID":"Accenture_DLT","origin":[{"originDLTId":"DLT100","originAssetId":"Asset_DLT100_1"},{"originDLTId":"DLT200","originAssetId":"Asset_DLT200_1"}],"property1":"value_property_1","property2":"value_property_2","locked":false,"targetDltId":"","receiverPK":""}';
+    const signatures = { [pubkey]: signature };
+    chai
+      .expect(
+        connector3
+          .copyAsset({ numGood: 1, msg, signatures })
+          .catch(err => (err.message.includes('Failed as entity already exists') ? err.message : 'Successfully'))
+      )
+      .to.eventually.contain(`Successfully`)
+      .notify(done);
+  });
+
+  it(`Copy Asset with wrong signature`, function(done) {
+    this.timeout(5000);
+    const pubkey = '03fd076032614ba907cf03108bfb37840fd7bf4057228d32a7323077bf70144db8';
+    const signature =
+      'e16f7b7a4de297fb7c851d5d45275d1bae3d5ad838df2f0e11c8c24dd35e91061f16d9afb79cf93f000db248cbac8913df54d26927e18c5e28cd13ff487446eb';
+    const msg =
+      '{"asset_id":"Asset_DLT_1_1555594708716","dltID":"Accenture_DLT","origin":[{"originDLTId":"DLT100","originAssetId":"Asset_DLT100_1"},{"originDLTId":"DLT200","originAssetId":"Asset_DLT200_1"}],"property1":"value_property_1","property2":"value_property_2","locked":false,"targetDltId":"","receiverPK":""}';
+    const signatures = { [pubkey]: signature };
+    chai
+      .expect(connector3.copyAsset({ numGood: 2, msg, signatures }))
+      .be.rejectedWith(Error, `Good signatures are less then expected`)
       .notify(done);
   });
 });

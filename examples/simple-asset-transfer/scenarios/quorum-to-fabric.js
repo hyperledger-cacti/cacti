@@ -23,20 +23,24 @@ const quorumAsset = conf.assets.quorum;
     const lockedAsset = await connectorQuorum.lockAsset(quorumAsset.assetId, targetDLTId, receiverPubKey);
     logger.info(`Asset has been locked: ${JSON.stringify(lockedAsset)}`);
 
+    const targetDLTType = 'FABRIC';
+
     // Step 2.5 (optional): Query the asset on Quorum
-    const assetInfo = await connectorQuorum.getAsset(quorumAsset.assetId);
-    logger.info(`Asset has been queried: ${JSON.stringify(assetInfo)}`);
+    const assetInfo = await connectorQuorum.getAsset(quorumAsset.assetId, targetDLTType);
+    logger.info(`${targetDLTType} formatted asset has been queried: ${JSON.stringify(assetInfo)}`);
 
     // Step.3 Ask For Signatures to the Quorum federation
-    const targetDLTType = `FABRIC`;
     const multiSignature = await quorumFederationClient.askForSignatures(quorumAsset.assetId, targetDLTType);
     logger.info(`Signatures are:`, JSON.stringify(multiSignature.signatures));
 
-    // Send proof to Fabric side
-
     // Step.4: Verify Signatures on Fabric
-    const result = await connectorFabric.verifyMultisig(multiSignature);
-    logger.info(`Signatures have been verified: ${JSON.stringify(result)}`);
+    const verifications = await connectorFabric.verifyMultisig(multiSignature);
+    logger.info(`Signatures have been verified: ${JSON.stringify(verifications)}`);
+
+    // Step.5 Creating a copy of the exported asset on Fabric
+    const result = await connectorFabric.copyAsset(multiSignature);
+    logger.info(`Asset has been copied: ${JSON.stringify(result)}`);
+
     return;
   } catch (error) {
     logger.info(error);

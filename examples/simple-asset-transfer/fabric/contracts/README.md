@@ -1,9 +1,7 @@
-MYCC smart contract
+WALLET smart contract
 ===================
 
-The contract provides methods to create assets, read their state and lock
-them. Also the contract keeps track of foreign validators and their ECC keys.
-
+The contract provides methods to create assets, read their state and lock them.
 
 `AssetOrigin` structure
 -----------------------
@@ -97,6 +95,12 @@ Takes an array of strings where
 
 On success, the asset is returned as a JSON string.
 
+
+
+MYCC smart contract
+===================
+
+The contract provides methods to keep track of foreign validators and their ECC keys.
 
 `addPubKey` method
 ------------------

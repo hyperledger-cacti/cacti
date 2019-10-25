@@ -36,13 +36,13 @@ class ConnectorQuorum extends Connector {
       this.checkUrl();
       this.checkUserName();
       this.checkPassword();
-      const { token } = await rp({
+      const res = await rp({
         method: `POST`,
         uri: `${this.options.url}/api/v1/auth/login`,
         form: { username: this.options.username, password: this.options.password },
         json: true,
       });
-      return token;
+      return res.token;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -108,6 +108,32 @@ class ConnectorQuorum extends Connector {
         uri: `${this.options.url}/api/v1/actors/verify`,
         auth: { bearer: token },
         form: { message, signatures },
+        json: true,
+      });
+      return res;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Creating a copy of the exported asset in the Quorum ledger
+   * @param {multisig} multisig
+   * @return {result} result - Create info response.
+   */
+  async copyAsset(multisig) {
+    if (!multisig.msg) {
+      throw new ReferenceError(`Multisig message required to verify commitments`);
+    }
+    const message = multisig.msg;
+    const signatures = Object.values(multisig.signatures);
+    try {
+      const token = await this.getAccessToken();
+      const res = await rp({
+        method: `POST`,
+        uri: `${this.options.url}/api/v1/actors/verify-and-create`,
+        auth: { bearer: token },
+        form: { message, signatures, minGood: signatures.length },
         json: true,
       });
       return res;

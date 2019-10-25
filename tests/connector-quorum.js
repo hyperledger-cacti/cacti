@@ -119,6 +119,12 @@ describe(`ConnectorQuorum addForeignValidator`, function() {
     if (!process.env.BLOCKCHAIN) {
       this.skip();
     }
+
+    // Register validator used for signature checking. Ignore exceptions if it
+    // already exist.
+    const pubkey = '0234fae14b0993085d798b964761abd5036376133a79d1b6545b58a1d28fe14a2e';
+    const name = `foreignValidator1`;
+    return connector2.addForeignValidator(pubkey, name).catch(() => {});
   });
 
   it(`Add correct foreign validator`, function(done) {
