@@ -1,0 +1,121 @@
+version: "2"
+
+networks:
+    quorum-network:
+        driver: bridge
+        ipam:
+            config:
+              - subnet: 192.20.0.0/20
+                gateway: 192.20.0.1
+
+services:
+  quorum_validator1:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://192.20.0.2:7005"
+      PUB_ADDR: "tcp://192.20.0.2:3005"
+      REP_ADDR: "tcp://192.20.0.2:5005"
+      URL: "http://192.20.0.1:5050"
+      USER_NAME: "test"
+      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
+      DLT_TYPE: "QUORUM"
+      TYPE: "LEADER"
+      API_PORT: 9005
+    mem_limit: 6g
+    networks:
+        quorum-network:
+            ipv4_address: 192.20.0.2
+    expose:
+      - "5050"
+    ports:
+      - "7005:7005"
+      - "3005:3005"
+      - "5005:5005"
+      - "9005:9005"
+      
+  quorum_validator2:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://192.20.0.3:7006"
+      PUB_ADDR: "tcp://192.20.0.3:3006"
+      REP_ADDR: "tcp://192.20.0.3:5006"
+      LEAD_PUB_ADDR: "tcp://192.20.0.2:3005"
+      LEAD_REP_ADDR: "tcp://192.20.0.2:5005"
+      USER_NAME: "test"
+      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
+      LEAD_CLIENT_REP_ADDR: "tcp://192.20.0.2:7005"
+      URL: "http://192.20.0.1:5051"
+      DLT_TYPE: "QUORUM"
+      TYPE: "FOLLOWER"
+      API_PORT: 9006
+    mem_limit: 6g
+    expose:
+      - "5051"
+    ports:
+      - "7006:7006"
+      - "3006:3006"
+      - "5006:5006"
+      - "9006:9006"
+    networks:
+        quorum-network:
+            ipv4_address: 192.20.0.3
+    depends_on:
+      - "quorum_validator1"
+
+  quorum_validator3:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://192.20.0.4:7007"
+      PUB_ADDR: "tcp://192.20.0.4:3007"
+      REP_ADDR: "tcp://192.20.0.4:5007"
+      LEAD_PUB_ADDR: "tcp://192.20.0.2:3005"
+      LEAD_REP_ADDR: "tcp://192.20.0.2:5005"
+      USER_NAME: "test"
+      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
+      LEAD_CLIENT_REP_ADDR: "tcp://192.20.0.2:7005"
+      URL: "http://192.20.0.1:5052"
+      TYPE: "FOLLOWER"
+      DLT_TYPE: "QUORUM"
+      API_PORT: 9007
+    mem_limit: 6g
+    expose:
+      - "5052"
+    ports:
+      - "7007:7007"
+      - "3007:3007"
+      - "5007:5007"
+      - "9007:9007"
+    networks:
+        quorum-network:
+            ipv4_address: 192.20.0.4
+    depends_on:
+      - "quorum_validator1"
+
+  quorum_validator4:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://192.20.0.5:7008"
+      PUB_ADDR: "tcp://192.20.0.5:3008"
+      REP_ADDR: "tcp://192.20.0.5:5008"
+      LEAD_PUB_ADDR: "tcp://192.20.0.2:3005"
+      LEAD_REP_ADDR: "tcp://192.20.0.2:5005"
+      USER_NAME: "test"
+      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
+      LEAD_CLIENT_REP_ADDR: "tcp://192.20.0.2:7005"
+      URL: "http://192.20.0.1:5053"
+      DLT_TYPE: "QUORUM"
+      TYPE: "FOLLOWER"
+      API_PORT: 9008
+    mem_limit: 6g
+    expose:
+      - "5053"
+    ports:
+      - "7008:7008"
+      - "3008:3008"
+      - "5008:5008"
+      - "9008:9008"
+    networks:
+        quorum-network:
+            ipv4_address: 192.20.0.5
+    depends_on:
+      - "quorum_validator1"

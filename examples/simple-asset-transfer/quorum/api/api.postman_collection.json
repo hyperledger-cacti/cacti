@@ -1,0 +1,314 @@
+{
+	"info": {
+		"_postman_id": "cb3a37b4-efef-468f-aa9a-1dcebce03962",
+		"name": "after-portal",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "/api/auth/v1/login - User Returns token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6335c369-191a-4fad-8639-e4fbbd38a17f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "test",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "74c35ddb-9fc7-4ec8-a7b6-3cd8972a693b",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0760068f-9337-44cb-b703-8eb315470443",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "assets",
+			"item": [
+				{
+					"name": "/api/auth/v1/assets - Create asset",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6335c369-191a-4fad-8639-e4fbbd38a17f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJwYXNzd29yZCI6IkE2NjVBNDU5MjA0MjJGOUQ0MTdFNDg2N0VGREM0RkI4QTA0QTFGM0ZGRjFGQTA3RTk5OEU4NkY3RjdBMjdBRTMiLCJpYXQiOjE1NDc3MTk2NDEsImV4cCI6MTU0ODMyNDQ0MX0.0_9828RZSOPbGdkcpTzXUN_2_dTRkNP6kdTjQkCI3xQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"assetId\": \"123456789\",\r\n  \"origin\": [\r\n    {\r\n      \"originDLTId\": \"DLT100\",\r\n      \"originAssetId\": \"Asset_DLT100_1\"\r\n    },\r\n    {\r\n      \"originDLTId\": \"DLT200\",\r\n      \"originAssetId\": \"Asset_DLT200_1\"\r\n    }\r\n  ],\r\n  \"properties\": {\r\n    \"property1\": \"value_property_1\",\r\n    \"property2\": \"value_property_2\"\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/assets",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"assets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/auth/v1/assets/assetId - Get asset",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6335c369-191a-4fad-8639-e4fbbd38a17f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJwYXNzd29yZCI6IkE2NjVBNDU5MjA0MjJGOUQ0MTdFNDg2N0VGREM0RkI4QTA0QTFGM0ZGRjFGQTA3RTk5OEU4NkY3RjdBMjdBRTMiLCJpYXQiOjE1NDc2NDM2MzgsImV4cCI6MTU0ODI0ODQzOH0.glBAPytuxBTskmVJH6Nt6dptqt73EvWvYGFoNYp12gQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/assets/123456789",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"assets",
+								"123456789"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/auth/v1/assets/assetId - Lock asset",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6335c369-191a-4fad-8639-e4fbbd38a17f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJwYXNzd29yZCI6IkE2NjVBNDU5MjA0MjJGOUQ0MTdFNDg2N0VGREM0RkI4QTA0QTFGM0ZGRjFGQTA3RTk5OEU4NkY3RjdBMjdBRTMiLCJpYXQiOjE1NDc2NDM2MzgsImV4cCI6MTU0ODI0ODQzOH0.glBAPytuxBTskmVJH6Nt6dptqt73EvWvYGFoNYp12gQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"targetDLTId\": \"IBM_DLT\",\r\n  \"receiverPubKey\": \"031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/assets/123456789",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"assets",
+								"123456789"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/auth/v1/assets/assetId - Set property",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6335c369-191a-4fad-8639-e4fbbd38a17f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJwYXNzd29yZCI6IkE2NjVBNDU5MjA0MjJGOUQ0MTdFNDg2N0VGREM0RkI4QTA0QTFGM0ZGRjFGQTA3RTk5OEU4NkY3RjdBMjdBRTMiLCJpYXQiOjE1NDc2NDM2MzgsImV4cCI6MTU0ODI0ODQzOH0.glBAPytuxBTskmVJH6Nt6dptqt73EvWvYGFoNYp12gQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"property1\",\r\n  \"value\": \"test\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/v1/assets/123456789",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"assets",
+								"123456789"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
