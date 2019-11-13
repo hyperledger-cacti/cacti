@@ -1,5 +1,9 @@
 # Hyperledger Blockchain Integration Framework <!-- omit in toc -->
 
+[![Build status]](https://travis-ci.org/hyperledger-labs/blockchain-integration-framework)
+
+[Build status]: https://travis-ci.org/hyperledger-labs/blockchain-integration-framework.svg?branch=master
+
 - [Lab Name](#lab-name)
 - [Short Description](#short-description)
 - [Scope of Lab](#scope-of-lab)
