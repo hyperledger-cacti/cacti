@@ -1,92 +1,14 @@
 Root smart contract
 ===================
 
-The contract provides methods to create assets, read their state and lock
-them. Also the contract keeps track of foreign validators and their ECC keys.
-
-`AssetProperties` structure
----------------------------
-
-    struct AssetProperties {
-        string property1;
-        string property2;
-    }
-
-
-`Asset` structure
------------------
-
-    struct Asset {
-        string assetID;
-        string dltID;
-        string origins;
-        AssetProperties properties;
-        bool locked;
-        string targetDltId;
-        string receiverPK;
-    }
+The contract keeps track of foreign validators (call them Actors) and their
+ECC keys.
 
 
 Constructor
 -----------
 
 Initializes the contract. Takes no parameters. No value is returned.
-
-
-`createAsset` method
---------------------
-
-Creates new asset. May be called only by the owner of this contract.
-
-Takes the following parameters:
-1. `assetID` - a string representing a unique asset ID managed by this contract,
-2. `origins` - a string going directly to `origins` property of the new asset,
-3. `property1` - a string going directly to `property1` property of the new
-   asset's properties,
-3. `property2` - a string going directly to `property2` property of the new
-   asset's properties,
-
-No value is returned.
-
-
-`lockAsset` method
-------------------
-
-Locks the specified asset.
-
-Takes the following parameters:
-1. `assetID` - a string representing the asset being locked,
-2. `targetDltId` is the DLT ID that the asset is locked for. This goes
-   directly to asset's `targetDltID` property.
-3. `receiverPk` and goes to `receiverPK` property of the asset.
-
-No value is returned.
-
-
-`setProperty` method
---------------------
-
-Updates the specified property of the specified asset.
-
-Takes the following parameters:
-1. `assetID` - a string representing the asset being updated,
-2. `propertyName` - a name of the property to be updated and may be one of
-   * "`property1`"
-   * "`property2`"
-3. `propertyValue` - a string value that is assigned to the selected property.
-
-No value is returned.
-
-
-`getAsset` method
------------------
-
-Returns the given asset. Note, that this is a query method that does not make
-any updates.
-
-Takes `assetID` string as its argument.
-
-Returns the Asset structure as an array of fields.
 
 
 `registerActor` method
@@ -185,3 +107,87 @@ No value is returned.
 
 Returns the actor details as saved by the constructor. Note, that this is a
 query method that does not make any updates.
+
+
+Wallet smart contract
+====================
+
+The contract provides methods to create assets, read their state and lock
+them.
+
+`AssetProperties` structure
+---------------------------
+
+    struct AssetProperties {
+        string property1;
+        string property2;
+    }
+
+
+`Asset` structure
+-----------------
+
+    struct Asset {
+        string assetID;
+        string dltID;
+        string origins;
+        AssetProperties properties;
+        bool locked;
+        string targetDltId;
+        string receiverPK;
+    }
+
+`createAsset` method
+--------------------
+
+Creates new asset. May be called only by the owner of this contract.
+
+Takes the following parameters:
+1. `assetID` - a string representing a unique asset ID managed by this contract,
+2. `origins` - a string going directly to `origins` property of the new asset,
+3. `property1` - a string going directly to `property1` property of the new
+   asset's properties,
+3. `property2` - a string going directly to `property2` property of the new
+   asset's properties,
+
+No value is returned.
+
+
+`lockAsset` method
+------------------
+
+Locks the specified asset.
+
+Takes the following parameters:
+1. `assetID` - a string representing the asset being locked,
+2. `targetDltId` is the DLT ID that the asset is locked for. This goes
+   directly to asset's `targetDltID` property.
+3. `receiverPk` and goes to `receiverPK` property of the asset.
+
+No value is returned.
+
+
+`setProperty` method
+--------------------
+
+Updates the specified property of the specified asset.
+
+Takes the following parameters:
+1. `assetID` - a string representing the asset being updated,
+2. `propertyName` - a name of the property to be updated and may be one of
+   * "`property1`"
+   * "`property2`"
+3. `propertyValue` - a string value that is assigned to the selected property.
+
+No value is returned.
+
+
+`getAsset` method
+-----------------
+
+Returns the given asset. Note, that this is a query method that does not make
+any updates.
+
+Takes `assetID` string as its argument.
+
+Returns the Asset structure as an array of fields.

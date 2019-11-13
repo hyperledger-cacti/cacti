@@ -2,6 +2,7 @@ const Validator = require(`@hyperledger/blockchain-integration-framework`).Valid
 const { genKeyFile } = require(`@hyperledger/blockchain-integration-framework`).cryptoUtils;
 const ConnectorFabric = require(`./fabric/connector`);
 const ConnectorQuorum = require(`./quorum/connector`);
+const ConnectorCorda = require(`./corda/connector`);
 
 (async () => {
   const keypair = await genKeyFile(`/federation/keypair`);
@@ -24,15 +25,18 @@ const ConnectorQuorum = require(`./quorum/connector`);
     password: process.env.PASSWORD,
     url: process.env.URL,
     port: process.env.PORT,
-  }
+  };
 
   let connector;
-  switch(validatorOptions.dlType) {
+  switch (validatorOptions.dlType) {
     case `FABRIC`:
       connector = new ConnectorFabric(connectorOptions);
       break;
     case `QUORUM`:
       connector = new ConnectorQuorum(connectorOptions);
+      break;
+    case `CORDA`:
+      connector = new ConnectorCorda(connectorOptions);
       break;
     default:
       throw new Error(`undefined dlType`);

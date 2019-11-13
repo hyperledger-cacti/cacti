@@ -16,6 +16,7 @@ const connectors = `${__dirname}/connectors`;
  *
  * const quorumConnector = connector.QUORUM();
  * const fabricConnector = connector.FABRIC();
+ * const cordaConnector = connector.CORDA();
  *
  * @tutorial connector
  */
@@ -36,6 +37,15 @@ class Connector {
    */
   static get QUORUM() {
     return require(`${connectors}/ConnectorQuorum`); // eslint-disable-line
+  }
+
+  /**
+   * Corda connector initialization
+   * @static
+   * @return {ConnectorCorda} Corda Connector class instance
+   */
+  static get CORDA() {
+    return require(`${connectors}/ConnectorCorda`); // eslint-disable-line
   }
 
   /**

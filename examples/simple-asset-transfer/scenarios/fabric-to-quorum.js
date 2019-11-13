@@ -15,21 +15,13 @@ const fabricAsset = conf.assets.fabric;
   try {
     // Step.1 Create asset on Fabric
     const createdAsset = await connectorFabric.createAsset(fabricAsset);
-    if (!createdAsset.success) {
-      logger.info(`Problem creating asset: ${JSON.stringify(createdAsset)}`);
-    } else {
-      logger.info(`Asset has been created: ${JSON.stringify(createdAsset)}`);
-    }
+    logger.info(`Asset has been created: ${JSON.stringify(createdAsset)}`);
 
     // Step.2: Lock asset on Fabric
     const targetDLTId = `QUORUM_DLT2`;
     const receiverPubKey = `031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b`;
     const lockedAsset = await connectorFabric.lockAsset(fabricAsset.asset_id, targetDLTId, receiverPubKey);
-    if (!lockedAsset.success) {
-      logger.info(`Problem locking asset: ${JSON.stringify(lockedAsset)}`);
-    } else {
-      logger.info(`Asset has been locked: ${JSON.stringify(lockedAsset)}`);
-    }
+    logger.info(`Asset has been locked: ${JSON.stringify(lockedAsset)}`);
 
     // Step 2.5 (optional): Query the asset on Fabric
     const assetInfo = await connectorFabric.getAsset(fabricAsset.asset_id);
@@ -40,11 +32,14 @@ const fabricAsset = conf.assets.fabric;
     const multiSignature = await fabricFederationClient.askForSignatures(fabricAsset.asset_id, targetDLTType);
     logger.info(`Signatures are:`, JSON.stringify(multiSignature.signatures));
 
-    // send proof to Quorum side
-
     // Step.4: Verify Signatures on the Quorum side
-    const result = await connectorQuorum.verifyMultisig(multiSignature);
-    logger.info(`Signatures have been verified: ${JSON.stringify(result)}`);
+    const verifications = await connectorQuorum.verifyMultisig(multiSignature);
+    logger.info(`Signatures have been verified: ${JSON.stringify(verifications)}`);
+
+    // Step.5 Creating a copy of the exported asset on the Quorum side
+    const result = await connectorQuorum.copyAsset(multiSignature);
+    logger.info(`Asset has been copied: ${JSON.stringify(result)}`);
+
     return;
   } catch (error) {
     logger.info(error);

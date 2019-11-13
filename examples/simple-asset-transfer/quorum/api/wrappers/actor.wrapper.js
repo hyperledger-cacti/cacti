@@ -113,6 +113,14 @@ async function verify(message, signatures = []) {
   return rootContract.methods.verify(message, `0x${signs}`).call();
 }
 
+async function verifyAndCreate(message, signatures = [], minGood) {
+  const signs = signatures.map(checkAndTrim).join('');
+  return rootContract.methods.verifyAndCreate(message, `0x${signs}`, minGood).send({
+    from: web3.eth.defaultAccount,
+    gas: 300000000,
+  });
+}
+
 module.exports = {
   registerActor,
   removeActor,
@@ -126,4 +134,5 @@ module.exports = {
   getActorAddressToNameMapping,
   getMyActorDetails,
   verify,
+  verifyAndCreate
 };

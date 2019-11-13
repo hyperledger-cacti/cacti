@@ -8,7 +8,7 @@ version: '2'
 services:
 
   ca.org1.example.com:
-    image: hyperledger/fabric-ca
+    image: hyperledger/fabric-ca:1.4.0
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org1
@@ -25,7 +25,7 @@ services:
     container_name: ca_peerOrg1
 
   ca.org2.example.com:
-    image: hyperledger/fabric-ca
+    image: hyperledger/fabric-ca:1.4.0
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org2
@@ -43,7 +43,7 @@ services:
 
   orderer.example.com:
     container_name: orderer.example.com
-    image: hyperledger/fabric-orderer
+    image: hyperledger/fabric-orderer:1.4.0
     environment:
       - FABRIC_LOGGING_SPEC=debug
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0

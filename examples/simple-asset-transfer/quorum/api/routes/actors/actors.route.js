@@ -19,11 +19,6 @@ router
   .post(validate(actorsValidation.registerActor), asyncErrorHandler(actorsCtrl.registerActor));
 
 router
-  .route('/whoami')
-  /** GET /api/v1/actors/whoami - Get my actor */
-  .get(asyncErrorHandler(actorsCtrl.getMyActor));
-
-router
   .route('/:actorAddress')
   /** GET /api/v1/actors/:actorAddress - Get actor */
   .get(asyncErrorHandler(actorsCtrl.getActorDetails));
@@ -35,6 +30,15 @@ router
     expressJwt({ secret: config.jwtSecret }),
     validate(actorsValidation.verify),
     asyncErrorHandler(actorsCtrl.verify)
+  );
+
+router
+  .route('/verify-and-create')
+  /** POST /api/v1/actors/verify-and-create - Verify signatures and Create asset */
+  .post(
+    expressJwt({ secret: config.jwtSecret }),
+    validate(actorsValidation.verifyAndCreate),
+    asyncErrorHandler(actorsCtrl.verifyAndCreate)
   );
 
 module.exports = router;

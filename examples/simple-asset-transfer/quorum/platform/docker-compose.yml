@@ -60,7 +60,6 @@ x-quorum-def:
         --wsapi admin,db,eth,debug,miner,net,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-istanbul} \
         --wsorigins="*" \
         --port 21000 \
-        --ethstats="node$${NODE_ID}:Strawberry fields forever!@netstats:4040" \
         --unlock 0 \
         --password /examples/passwords.txt \
         $${GETH_ARGS_${QUORUM_CONSENSUS:-istanbul}}
@@ -283,103 +282,87 @@ services:
         ipv4_address: 172.16.239.104
     environment:
       - NODE_ID=4
-  node5:
-    << : *quorum-def
-    hostname: node5
-    ports:
-      - "22004:8546"
-    volumes:
-      - 5:/qdata
-      - .:/examples:ro
-    depends_on:
-      - txmanager5
-    environment:
-      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
-      - NODE_ID=5
-    networks:
-      quorum-examples-net:
-        ipv4_address: 172.16.239.15
-  txmanager5:
-    << : *tx-manager-def
-    hostname: txmanager5
-    volumes:
-      - 5:/qdata
-      - .:/examples:ro
-    networks:
-      quorum-examples-net:
-        ipv4_address: 172.16.239.105
-    environment:
-      - NODE_ID=5
-  node6:
-    << : *quorum-def
-    hostname: node6
-    ports:
-      - "22005:8546"
-    volumes:
-      - 6:/qdata
-      - .:/examples:ro
-    depends_on:
-      - txmanager6
-    environment:
-      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
-      - NODE_ID=6
-    networks:
-      quorum-examples-net:
-        ipv4_address: 172.16.239.16
-  txmanager6:
-    << : *tx-manager-def
-    hostname: txmanager6
-    volumes:
-      - 6:/qdata
-      - .:/examples:ro
-    networks:
-      quorum-examples-net:
-        ipv4_address: 172.16.239.106
-    environment:
-      - NODE_ID=6
-  node7:
-    << : *quorum-def
-    hostname: node7
-    ports:
-      - "22006:8546"
-    volumes:
-      - 7:/qdata
-      - .:/examples:ro
-    depends_on:
-      - txmanager7
-    environment:
-      - PRIVATE_CONFIG=/qdata/tm/tm.ipc
-      - NODE_ID=7
-    networks:
-      quorum-examples-net:
-        ipv4_address: 172.16.239.17
-  txmanager7:
-    << : *tx-manager-def
-    hostname: txmanager7
-    volumes:
-      - 7:/qdata
-      - .:/examples:ro
-    networks:
-      quorum-examples-net:
-        ipv4_address: 172.16.239.107
-    environment:
-      - NODE_ID=7
-  netstats:
-    build:
-      context: netstats
-    ports:
-      - "4040:4040"
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:4040"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
-      start_period: 5s
-    environment:
-      - WS_SECRET=Strawberry fields forever!
-    networks:
-      - quorum-examples-net
-    restart: always
+  # node5:
+  #   << : *quorum-def
+  #   hostname: node5
+  #   ports:
+  #     - "22004:8546"
+  #   volumes:
+  #     - 5:/qdata
+  #     - .:/examples:ro
+  #   depends_on:
+  #     - txmanager5
+  #   environment:
+  #     - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+  #     - NODE_ID=5
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.15
+  # txmanager5:
+  #   << : *tx-manager-def
+  #   hostname: txmanager5
+  #   volumes:
+  #     - 5:/qdata
+  #     - .:/examples:ro
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.105
+  #   environment:
+  #     - NODE_ID=5
+  # node6:
+  #   << : *quorum-def
+  #   hostname: node6
+  #   ports:
+  #     - "22005:8546"
+  #   volumes:
+  #     - 6:/qdata
+  #     - .:/examples:ro
+  #   depends_on:
+  #     - txmanager6
+  #   environment:
+  #     - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+  #     - NODE_ID=6
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.16
+  # txmanager6:
+  #   << : *tx-manager-def
+  #   hostname: txmanager6
+  #   volumes:
+  #     - 6:/qdata
+  #     - .:/examples:ro
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.106
+  #   environment:
+  #     - NODE_ID=6
+  # node7:
+  #   << : *quorum-def
+  #   hostname: node7
+  #   ports:
+  #     - "22006:8546"
+  #   volumes:
+  #     - 7:/qdata
+  #     - .:/examples:ro
+  #   depends_on:
+  #     - txmanager7
+  #   environment:
+  #     - PRIVATE_CONFIG=/qdata/tm/tm.ipc
+  #     - NODE_ID=7
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.17
+  # txmanager7:
+  #   << : *tx-manager-def
+  #   hostname: txmanager7
+  #   volumes:
+  #     - 7:/qdata
+  #     - .:/examples:ro
+  #   networks:
+  #     quorum-examples-net:
+  #       ipv4_address: 172.16.239.107
+  #   environment:
+  #     - NODE_ID=7
 networks:
   quorum-examples-net:
     driver: bridge

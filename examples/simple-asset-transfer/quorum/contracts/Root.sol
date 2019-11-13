@@ -1,28 +1,12 @@
 pragma solidity ^0.5.1;
 
 import "Actor.sol";
+import "WalletProxy.sol";
+import "JsmnSolLib.sol";
 
-contract Root {
-
-    struct AssetProperties {
-        string property1;
-        string property2;
-    }
-
-    struct Asset {
-        string assetID;
-        string dltID;
-        string origins;
-        AssetProperties properties;
-        bool locked;
-        string targetDltId;
-        string receiverPK;
-    }
-
-    mapping (bytes32 => Asset) assetMap;
+contract Root is WalletProxy {
 
     address public owner;
-
     address[] public actors;
     mapping (address => address) public ethToActor;
     mapping (address => address) public ethToFValidator;
@@ -44,7 +28,9 @@ contract Root {
         onlyOwner
     {
         require(ethToActor[_ethAddress] == address(0));
-        address newActor = address(new Actor(_name, _constKey, _ethAddress, _actorType, _host, _port));
+        address newActor = address(
+            new Actor(_name, _constKey, _ethAddress, _actorType, _host, _port)
+        );
         ethToActor[_ethAddress] = newActor;
         if (_actorType == Actor.ActorTypes.FOREIGN_VALIDATOR) {
             ethToFValidator[_ethAddress] = newActor;
@@ -83,51 +69,55 @@ contract Root {
         array.length--;
     }
 
-    function getAsset(string memory assetID) public view returns (
-        string memory dltID,
-        string memory origins,
-        string memory property1,
-        string memory property2,
-        bool locked,
-        string memory targetDltId,
-        string memory receiverPK
+    function parse(
+        string memory message,
+        string memory property,
+        JsmnSolLib.Token[] memory tokens,
+        uint numTokens
     )
+        internal
+        pure
+        returns (string memory)
     {
-        require( bytes(assetMap[sha256(bytes(assetID))].assetID).length != 0 );
-        Asset storage pA = assetMap[sha256(bytes(assetID))];
-        dltID = pA.dltID;
-        origins = pA.origins;
-        property1 = pA.properties.property1;
-        property2 = pA.properties.property2;
-        locked = pA.locked;
-        targetDltId = pA.targetDltId;
-        receiverPK = pA.receiverPK;
-    }
-
-    function createAsset(string memory assetID, string memory origins, string memory property1, string memory property2) public onlyOwner {
-        require(bytes(assetMap[sha256(bytes(assetID))].assetID).length == 0 );
-        assetMap[sha256(bytes(assetID))] = Asset(assetID, "Accenture_DLT", origins, AssetProperties(property1, property2), false, "", "");
-    }
-
-    function lockAsset(string memory assetID, string memory targetDltId, string memory receiverPK) public onlyOwner {
-        require(bytes(assetMap[sha256(bytes(assetID))].assetID).length != 0 );
-        Asset storage pA = assetMap[sha256(bytes(assetID))];
-        pA.locked = true;
-        pA.targetDltId = targetDltId;
-        pA.receiverPK = receiverPK;
-     }
-
-    function setProperty(string memory assetID, string memory propertyName, string memory propertyValue) public onlyOwner {
-        require(bytes(assetMap[sha256(bytes(assetID))].assetID).length != 0);
-        Asset storage pA = assetMap[sha256(bytes(assetID))];
-        if ( sha256(bytes(propertyName)) == sha256(bytes("property1")) ) {
-            pA.properties.property1 = propertyValue;
-        } else {
-            pA.properties.property2 = propertyValue;
+        for (uint i = 1; i < numTokens; ++i) {
+            if (tokens[i].jsmnType == JsmnSolLib.JsmnType.STRING &&
+                0 == JsmnSolLib.strCompare(
+                     property,
+                     JsmnSolLib.getBytes(message, tokens[i].start, tokens[i].end))) {
+                ++i;
+                return JsmnSolLib.getBytes(message, tokens[i].start, tokens[i].end);
+            }
         }
+        require(false, "property not found");
     }
 
-    function verify(string memory message, bytes memory signs) public view returns (bool[] memory) {
+    function verifyAndCreate(string memory message, bytes memory signs, int minGood) public {
+        bool[] memory signcheck = verify(message, signs);
+        for (uint i = 0; i < signcheck.length; ++i) {
+            if (signcheck[i])
+                minGood --;
+        }
+        require(minGood <= 0);
+
+        uint status;
+        uint numTokens;
+        JsmnSolLib.Token[] memory tokens;
+        (status, tokens, numTokens) = JsmnSolLib.parse(message, 30);
+        require(status == 0);
+
+        string memory property1 = parse(message, "property1", tokens, numTokens);
+        string memory property2 = parse(message, "property2", tokens, numTokens);
+        string memory assetId = parse(message, "assetId", tokens, numTokens);
+        string memory origins = parse(message, "origin", tokens, numTokens);
+
+        createAsset(assetId, origins, property1, property2);
+    }
+
+    function verify(string memory message, bytes memory signs)
+        public
+        view
+        returns (bool[] memory)
+    {
         bytes memory sign;
         uint len;
         assembly { len := mload(signs) }
@@ -144,7 +134,12 @@ contract Root {
         return res;
     }
 
-    function recover(string memory message, bytes memory signature) public pure returns (address) {
+    function recover(
+        string memory message, bytes memory signature
+    )
+        public
+        pure
+        returns (address) {
         bytes32 r;
         bytes32 s;
         uint8 v;
