@@ -21,6 +21,12 @@ module.exports = {
       dlType: `FABRIC`,
       url: `http://127.0.0.1:4000`,
     },
+    corda: {
+      username: `test`,
+      password: sha256(`123`).toUpperCase(),
+      dlType: `CORDA`,
+      url: `http://127.0.0.1:10054`,
+    },
   },
   federations: {
     quorum: [`tcp://127.0.0.1:7005`, `tcp://127.0.0.1:7006`, `tcp://127.0.0.1:7007`, `tcp://127.0.0.1:7008`],

@@ -15,7 +15,7 @@ async function getAsset(req, res) {
 
   const asset = await rootWrapper.getAsset(req.params.assetId);
 
-  logger.log('debug', 'createAsset - end %j', asset);
+  logger.log('debug', 'getAsset - end %j', asset);
   return res.json(asset);
 }
 

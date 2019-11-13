@@ -3,12 +3,21 @@
 	"name": "@hyperledger/blockchain-integration-framework.examples.simple-asset-transfer",
 	"dependencies": {
 		"@hyperledger/blockchain-integration-framework": "git+https://github.com/hyperledger-labs/blockchain-integration-framework.git#master",
+		"cookie-parser": "^1.4.4",
+		"express-bearer-token": "^2.4.0",
+		"express-jwt": "^5.3.1",
+		"express-session": "^1.16.2",
+		"request-promise": "^4.2.4",
 		"typedarray-to-buffer": "^3.1.5"
 	},
 	"devDependencies": {
 		"npm-check": "^5.9.0"
 	},
 	"scripts": {
+		"corda:clean": "cd corda && ./gradlew clean && cd ../",
+		"corda:build": "cd corda && ./gradlew build deployNodes deployWeb deployScripts && cd ../",
+		"corda": "cd corda/build/scripts && ./start_corda_components.sh ../../logs && cd ../../../",
+		"corda:down": "cd corda/build/scripts && ./stop_corda_components.sh ../../logs && cd ../../../",
 		"fabric": "cd fabric/scripts && ./start.sh",
 		"fabric:down": "fuser -k -n tcp 4000 && docker-compose -f fabric/artifacts/docker-compose.yaml rm -sf",
 		"fabric:log": "docker-compose -f fabric/artifacts/docker-compose.yaml logs -f",
@@ -19,7 +28,10 @@
 		"fed:quorum": "docker-compose -p federation-quorum -f ./federations/docker-compose-quorum.yml up -d",
 		"fed:quorum:down": "docker-compose -p federation-quorum -f ./federations/docker-compose-quorum.yml rm -sf",
 		"fed:quorum:log": "docker-compose -p federation-quorum -f ./federations/docker-compose-quorum.yml logs -f",
-		"postinstall": "cd fabric/api && npm i",
+		"fed:corda": "docker-compose -p federation-corda -f ./federations/docker-compose-corda.yml up -d",
+		"fed:corda:down": "docker-compose -p federation-corda -f ./federations/docker-compose-corda.yml rm -sf",
+		"fed:corda:log": "docker-compose -p federation-corda -f ./federations/docker-compose-corda.yml logs -f",
+		"install-all": "npm i && cd fabric/api && npm i && cd - && cd quorum/api && npm i",
 		"quorum": "QUORUM_CONSENSUS=raft docker-compose -p quorum -f ./quorum/platform/docker-compose.yml up -d",
 		"quorum:down": "docker-compose -p quorum -f ./quorum/platform/docker-compose.yml rm -sf",
 		"quorum:log": "docker-compose -p quorum -f ./quorum/platform/docker-compose.yml logs -f",
@@ -30,13 +42,17 @@
 		"scenario:share": "cd scenarios && node share-pub-keys.js",
 		"scenario:FtQ": "cd scenarios && node fabric-to-quorum.js",
 		"scenario:QtF": "cd scenarios && node quorum-to-fabric.js",
+		"scenario:CtQ": "cd scenarios && node corda-to-quorum.js",
+		"scenario:CtF": "cd scenarios && node corda-to-fabric.js",
+		"scenario:FtC": "cd scenarios && node fabric-to-corda.js",
+		"scenario:QtC": "cd scenarios && node quorum-to-corda.js",
 		"test": "../../node_modules/.bin/cross-env NODE_ENV=test ../../node_modules/.bin/mocha --ui bdd --reporter spec --colors tests/*.js --recursive --exit",
 		"test:bc": "BLOCKCHAIN=true npm run test",
 		"upgrade-interactive": "npm-check --update"
 	},
 	"private": true,
 	"engines": {
-    "node": ">=8.15.0 <9.0",
-    "npm": ">=6.4.1"
-  }
+		"node": ">=8.15.0 <9.0",
+		"npm": ">=6.4.1"
+	}
 }

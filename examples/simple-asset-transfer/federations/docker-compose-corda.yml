@@ -1,0 +1,113 @@
+version: "2"
+
+networks:
+    corda-network:
+        driver: bridge
+        ipam:
+            config:
+              - subnet: 192.21.0.0/20
+                gateway: 192.21.0.1
+
+services:
+  corda_validator1:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://192.21.0.2:7009"
+      PUB_ADDR: "tcp://192.21.0.2:3009"
+      REP_ADDR: "tcp://192.21.0.2:5009"
+      URL: "http://192.21.0.1:10051"
+      USER_NAME: "test"
+      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
+      DLT_TYPE: "CORDA"
+      TYPE: "LEADER"
+    mem_limit: 6g
+    networks:
+        corda-network:
+            ipv4_address: 192.21.0.2
+    expose:
+      - "10051"
+    ports:
+      - "7009:7009"
+      - "3009:3009"
+      - "5009:5009"
+      
+  corda_validator2:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://192.21.0.3:7010"
+      PUB_ADDR: "tcp://192.21.0.3:3010"
+      REP_ADDR: "tcp://192.21.0.3:5010"
+      LEAD_PUB_ADDR: "tcp://192.21.0.2:3009"
+      LEAD_REP_ADDR: "tcp://192.21.0.2:5009"
+      USER_NAME: "test"
+      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
+      LEAD_CLIENT_REP_ADDR: "tcp://192.21.0.2:7009"
+      URL: "http://192.21.0.1:10052"
+      DLT_TYPE: "CORDA"
+      TYPE: "FOLLOWER"
+    mem_limit: 6g
+    expose:
+      - "10052"
+    ports:
+      - "7010:7010"
+      - "3010:3010"
+      - "5010:5010"
+    networks:
+        corda-network:
+            ipv4_address: 192.21.0.3
+    depends_on:
+      - "corda_validator1"
+
+  corda_validator3:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://192.21.0.4:7011"
+      PUB_ADDR: "tcp://192.21.0.4:3011"
+      REP_ADDR: "tcp://192.21.0.4:5011"
+      LEAD_PUB_ADDR: "tcp://192.21.0.2:3009"
+      LEAD_REP_ADDR: "tcp://192.21.0.2:5009"
+      USER_NAME: "test"
+      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
+      LEAD_CLIENT_REP_ADDR: "tcp://192.21.0.2:7009"
+      URL: "http://192.21.0.1:10053"
+      TYPE: "FOLLOWER"
+      DLT_TYPE: "CORDA"
+    mem_limit: 6g
+    expose:
+      - "10053"
+    ports:
+      - "7011:7011"
+      - "3011:3011"
+      - "5011:5011"
+    networks:
+        corda-network:
+            ipv4_address: 192.21.0.4
+    depends_on:
+      - "corda_validator1"
+
+  corda_validator4:
+    image: "federation/validator"
+    environment:
+      CLIENT_REP_ADDR: "tcp://192.21.0.5:7012"
+      PUB_ADDR: "tcp://192.21.0.5:3012"
+      REP_ADDR: "tcp://192.21.0.5:5012"
+      LEAD_PUB_ADDR: "tcp://192.21.0.2:3009"
+      LEAD_REP_ADDR: "tcp://192.21.0.2:5009"
+      USER_NAME: "test"
+      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
+      LEAD_CLIENT_REP_ADDR: "tcp://192.21.0.2:7009"
+      URL: "http://192.21.0.1:10054"
+      DLT_TYPE: "CORDA"
+      TYPE: "FOLLOWER"
+    mem_limit: 6g
+    expose:
+      - "10054"
+    ports:
+      - "7012:7012"
+      - "3012:3012"
+      - "5012:5012"
+    networks:
+        corda-network:
+            ipv4_address: 192.21.0.5
+    depends_on:
+      - "corda_validator1"

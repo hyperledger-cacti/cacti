@@ -29,17 +29,6 @@ async function getActorDetails(req, res) {
   res.status(200).send(actorDetails);
 }
 
-async function getMyActor(req, res) {
-  logger.log('debug', 'getMyActor - start ');
-  const actorAddress = await actorWrapper.getMyActor();
-  let actorDetails = false;
-  if (actorAddress !== contracts.EMPTY_ADDRESS) {
-    actorDetails = await actorWrapper.getActorDetails(actorAddress);
-  }
-  logger.log('debug', 'getMyActor - end: %j', actorDetails);
-  res.status(200).send(actorDetails);
-}
-
 async function getAllActors(req, res) {
   logger.log('debug', 'getAllActors - start');
   const actorsAddresses = await actorWrapper.getAllActors();
@@ -75,11 +64,28 @@ async function verify(req, res) {
   return res.json(result);
 }
 
+/**
+ * Verify and Create Asset
+ * @property {string} req.body.message - Message hash.
+ * @property {array} req.body.signatures - The array of signatures.
+ * @property {number} req.body.minGood - Minimum number of good signatures.
+ * @returns {Boolean}
+ */
+async function verifyAndCreate(req, res) {
+  logger.log('debug', 'verifyAndCreate - start %j', req.body);
+
+  const { message, signatures, minGood } = req.body;
+  const result = await actorWrapper.verifyAndCreate(message, signatures, minGood || signatures.length);
+
+  logger.log('debug', 'verifyAndCreate - end %s', result);
+  return res.json(result);
+}
+
 module.exports = {
   registerActor,
   getActorDetails,
-  getMyActor,
   getAllActors,
   getAllActorsDetails,
   verify,
+  verifyAndCreate,
 };

@@ -1,9 +1,9 @@
 const crypto = require(`crypto`);
 
 function sha256(toCypher) {
-	const hash = crypto.createHash(`sha256`);
-	hash.update(toCypher);
-	return hash.digest(`hex`);
+  const hash = crypto.createHash(`sha256`);
+  hash.update(toCypher);
+  return hash.digest(`hex`);
 }
 
 module.exports = {
@@ -21,22 +21,18 @@ module.exports = {
       dlType: `FABRIC`,
       url: `http://127.0.0.1:4000`,
     },
+    corda: {
+      username: `test`,
+      password: sha256(`123`).toUpperCase(),
+      dlType: `CORDA`,
+      url: `http://127.0.0.1:10051`,
+    },
   },
   federations: {
-    quorum: [
-      `tcp://127.0.0.1:7005`,
-      `tcp://127.0.0.1:7006`,
-      `tcp://127.0.0.1:7007`,
-      `tcp://127.0.0.1:7008`,
-    ],
-    fabric: [
-      `tcp://127.0.0.1:7001`,
-      `tcp://127.0.0.1:7002`,
-      `tcp://127.0.0.1:7003`,
-      `tcp://127.0.0.1:7004`,
-    ],
-  }
-  ,
+    quorum: [`tcp://127.0.0.1:7005`, `tcp://127.0.0.1:7006`, `tcp://127.0.0.1:7007`, `tcp://127.0.0.1:7008`],
+    fabric: [`tcp://127.0.0.1:7001`, `tcp://127.0.0.1:7002`, `tcp://127.0.0.1:7003`, `tcp://127.0.0.1:7004`],
+    corda: [`tcp://127.0.0.1:7009`, `tcp://127.0.0.1:7010`, `tcp://127.0.0.1:7011`, `tcp://127.0.0.1:7012`],
+  },
   assets: {
     quorum: {
       assetId: `Asset_DLT_1_${Date.now()}`,
@@ -71,6 +67,24 @@ module.exports = {
         property1: `value_property_1`,
         property2: `value_property_2`,
       },
-    }
-  }
-}
+    },
+    corda: {
+      assetId: `Asset_DLT_1_${Date.now()}`,
+      origin: [
+        {
+          originDLTId: `DLT100`,
+          originAssetId: `Asset_DLT100_1`,
+        },
+        {
+          originDLTId: `DLT200`,
+          originAssetId: `Asset_DLT200_1`,
+        },
+      ],
+      properties: {
+        property1: `value_property_1`,
+        property2: `value_property_2`,
+      },
+      async: false
+    },
+  },
+};

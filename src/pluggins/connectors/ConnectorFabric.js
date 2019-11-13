@@ -159,6 +159,45 @@ class ConnectorFabric extends Connector {
       return Promise.reject(error);
     }
   }
+
+  /**
+   * Creating a copy of the exported asset in the Fabric ledger
+   * @param {multisig} multisig
+   * @return {result} result - Create info response.
+   */
+  async copyAsset(multisig) {
+    try {
+      this.checkPeerName(); // checking query parameter before calling the API
+      if (!multisig.msg) {
+        throw new ReferenceError(`Multisig message required to verify commitments`);
+      }
+      const token = await this.getAccessToken();
+      const pubKeys = Object.keys(multisig.signatures);
+      const signedMessages = Object.values(multisig.signatures);
+      const args = [String(multisig.numGood || signedMessages.length), multisig.msg];
+      for (let i = 0; i < pubKeys.length; i += 1) {
+        args.push(pubKeys[i]);
+        args.push(signedMessages[i]);
+      }
+      const res = await rp({
+        method: `POST`,
+        uri: `${this.options.url}/channels/mychannel/chaincodes/mycc`,
+        auth: { bearer: token },
+        body: {
+          fcn: `verifyAndCreate`,
+          args,
+        },
+        json: true,
+      });
+      if (!res.success) {
+        // REFAC standardise outputs
+        throw new Error(JSON.stringify(res));
+      }
+      return res.message;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
 }
 
 module.exports = ConnectorFabric;

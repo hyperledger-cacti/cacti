@@ -3,6 +3,30 @@ const rp = require(`request-promise-native`);
 const { Connector } = require(`@hyperledger/blockchain-integration-framework`);
 
 class MyQuorumConnector extends Connector.QUORUM {
+  static formatAsset(asset, targetDLTType) {
+    switch (targetDLTType) {
+      case 'FABRIC':
+      case 'CORDA':
+        return {
+          asset_id: asset.assetId,
+          dltId: asset.dltID,
+          origin: asset.origin.map(item => ({
+            origin_dlt_id: `DLT100`,
+            origin_asset_id: `Asset_DLT100_1`,
+          })),
+          properties: {
+            property1: asset.property1,
+            property2: asset.property2,
+          },
+          locked: asset.locked,
+          targetDltId: asset.targetDltId,
+          receiverPk: asset.receiverPK,
+        };
+      default:
+        return asset;
+    }
+  }
+
   /**
    * Create Asset
    * @param {object} asset - The Asset.
@@ -83,10 +107,10 @@ class MyQuorumConnector extends Connector.QUORUM {
    * Get asset
    * @param {string} assetId - The Asset ID.
    */
-  async getAsset(assetId) {
+  async getAsset(assetId, targetDLTType = '') {
     try {
       const token = await this.getAccessToken();
-      const res = await rp({
+      const asset = await rp({
         method: `GET`,
         uri: `${this.options.url}/api/v1/assets/${assetId}`,
         auth: {
@@ -94,7 +118,7 @@ class MyQuorumConnector extends Connector.QUORUM {
         },
         json: true,
       });
-      return res;
+      return MyQuorumConnector.formatAsset(asset, targetDLTType);
     } catch (error) {
       return Promise.reject(error);
     }

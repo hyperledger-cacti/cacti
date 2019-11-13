@@ -30,3 +30,9 @@ When running the Fabric client from the Fabric SDK against your Fabric ledger, y
 nano node-module/fabric-client/config/default.json
 ``` 
 increase ``"request-timeout" : 45000,`` l.2
+
+### Installing non-default npm version
+
+Installing Node.js will also install NPM, however it is recommended that you confirm the version of NPM installed. You can upgrade/downgrade the npm tool with the following command:
+
+npm install npm@5.6.0 -g
