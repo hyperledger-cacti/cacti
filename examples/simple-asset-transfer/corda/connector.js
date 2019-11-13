@@ -1,6 +1,6 @@
 const rp = require(`request-promise-native`);
 
-const { Connector } = require(`@hyperledger/blockchain-integration-framework`);
+const { Connector } = require(`@hyperledger-labs/blockchain-integration-framework`);
 
 class MyCordaConnector extends Connector.CORDA {
   static formatAsset(asset, targetDLTType) {

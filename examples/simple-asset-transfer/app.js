@@ -1,5 +1,5 @@
-const Validator = require(`@hyperledger/blockchain-integration-framework`).Validator;
-const { genKeyFile } = require(`@hyperledger/blockchain-integration-framework`).cryptoUtils;
+const Validator = require(`@hyperledger-labs/blockchain-integration-framework`).Validator;
+const { genKeyFile } = require(`@hyperledger-labs/blockchain-integration-framework`).cryptoUtils;
 const ConnectorFabric = require(`./fabric/connector`);
 const ConnectorQuorum = require(`./quorum/connector`);
 const ConnectorCorda = require(`./corda/connector`);

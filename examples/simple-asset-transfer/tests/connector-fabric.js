@@ -7,7 +7,7 @@ const cp = require(`chai-as-promised`);
 
 const ConnectorFabricEx = require(`../fabric/connector`);
 const config = require(`./config`);
-const { Multisig } = require(`@hyperledger/blockchain-integration-framework`);
+const { Multisig } = require(`@hyperledger-labs/blockchain-integration-framework`);
 
 chai.use(cp);
 

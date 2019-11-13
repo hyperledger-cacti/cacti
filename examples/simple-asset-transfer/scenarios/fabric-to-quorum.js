@@ -1,7 +1,7 @@
 const log4js = require(`log4js`);
 const ConnectorQuorum = require(`../quorum/connector.js`);
 const ConnectorFabric = require(`../fabric/connector.js`);
-const Client = require(`@hyperledger/blockchain-integration-framework`).Client;
+const Client = require(`@hyperledger-labs/blockchain-integration-framework`).Client;
 const conf = require(`./config`);
 
 const logger = log4js.getLogger(`fabric-to-quorum`);

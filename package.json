@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "@hyperledger/blockchain-integration-framework",
+  "name": "@hyperledger-labs/blockchain-integration-framework",
   "license": "Apache-2.0",
   "repository": {
     "type": "git"

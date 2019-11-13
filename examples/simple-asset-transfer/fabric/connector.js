@@ -1,5 +1,5 @@
 const rp = require(`request-promise-native`);
-const { Connector } = require(`@hyperledger/blockchain-integration-framework`);
+const { Connector } = require(`@hyperledger-labs/blockchain-integration-framework`);
 
 class MyFabricConnector extends Connector.FABRIC {
 
