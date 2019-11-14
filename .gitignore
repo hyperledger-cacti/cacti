@@ -31,4 +31,4 @@ typings/
 # Introperability App specifics
 examples/simple-asset-transfer/fabric/**/hfc-key-store/
 
-
+bin/
