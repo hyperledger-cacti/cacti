@@ -9,7 +9,7 @@ const secp256k1 = require(`secp256k1`);
 
 const ConnectorQuorumEx = require(`../quorum/connector`);
 const config = require(`./config`);
-const { Multisig } = require(`@hyperledger/blockchain-integration-framework`);
+const { Multisig } = require(`@hyperledger-labs/blockchain-integration-framework`);
 
 chai.use(cp);
 

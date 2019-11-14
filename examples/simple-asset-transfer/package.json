@@ -1,8 +1,8 @@
 {
 	"version": "0.1.0",
-	"name": "@hyperledger/blockchain-integration-framework.examples.simple-asset-transfer",
+	"name": "@hyperledger-labs/blockchain-integration-framework.examples.simple-asset-transfer",
 	"dependencies": {
-		"@hyperledger/blockchain-integration-framework": "git+https://github.com/hyperledger-labs/blockchain-integration-framework.git#master",
+		"@hyperledger-labs/blockchain-integration-framework": "git+https://github.com/hyperledger-labs/blockchain-integration-framework.git#master",
 		"cookie-parser": "^1.4.4",
 		"express-bearer-token": "^2.4.0",
 		"express-jwt": "^5.3.1",

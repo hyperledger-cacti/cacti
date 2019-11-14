@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "@hyperledger/blockchain-integration-framework.examples.simple-asset-transfer.quorum-api",
+  "name": "@hyperledger-labs/blockchain-integration-framework.examples.simple-asset-transfer.quorum-api",
   "license": "Apache-2.0",
   "scripts": {
     "init": "npm-run-all compile deploy reg",
