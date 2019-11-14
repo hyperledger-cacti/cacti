@@ -1,7 +1,7 @@
 pragma solidity ^0.5.1;
 
-import "Actor.sol";
-import "WalletProxy.sol";
+import "./Actor.sol";
+import "./WalletProxy.sol";
 
 contract Root is WalletProxy {
 
