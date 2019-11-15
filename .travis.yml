@@ -4,7 +4,7 @@ node_js:
 
 os: linux
 
-#dist: bionic
+dist: bionic
 
 services:
   - docker
@@ -14,16 +14,4 @@ install:
   - docker-compose --version
 
 script:
-  - npm install
-  - npm run test
-  - cd examples/simple-asset-transfer
-  - npm run fabric
-  - npm run quorum
-  - npm run fed:build
-  - npm run fed:quorum
-  - docker images
-  - while docker ps | grep "starting\|unhealthy"; do sleep 15; echo; date; done
-  - docker ps -a
-  - cd ../..
-#  - npm run test:bc - TODO: fix it, broken now
-
+  - ./tools/ci.sh
