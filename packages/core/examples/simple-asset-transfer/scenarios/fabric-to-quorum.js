@@ -42,7 +42,7 @@ const fabricAsset = conf.assets.fabric;
 
     return;
   } catch (error) {
-    logger.info(error);
+    logger.error(error);
     process.exit(1);
   }
 })();
