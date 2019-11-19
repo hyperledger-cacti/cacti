@@ -10,7 +10,7 @@ class MyQuorumConnector extends Connector.QUORUM {
         return {
           asset_id: asset.assetId,
           dltId: asset.dltID,
-          origin: asset.origin.map(item => ({
+          origin: asset.origin.map(() => ({
             origin_dlt_id: `DLT100`,
             origin_asset_id: `Asset_DLT100_1`,
           })),

@@ -2,7 +2,6 @@ const rp = require(`request-promise-native`);
 const { Connector } = require(`@hyperledger-labs/blockchain-integration-framework`);
 
 class MyFabricConnector extends Connector.FABRIC {
-
   static snakeToCamel(str) {
     return str.replace(/(_\w)/g, m => m[1].toUpperCase());
   }
@@ -14,15 +13,18 @@ class MyFabricConnector extends Connector.FABRIC {
       const isArray = Array.isArray(value);
       acc[newKey] = isArray ? value.map(item => MyFabricConnector.objectKeysSnakeToCamel(item)) : value;
       return acc;
-    }, {})
+    }, {});
   }
 
   static omitDeep(obj, omitKey) {
-    return Object.keys(obj).reduce((acc, key) => {
-      if (key === omitKey) return acc;
-      acc[key] = obj[key];
-      return acc;
-    }, { ...obj[omitKey] })
+    return Object.keys(obj).reduce(
+      (acc, key) => {
+        if (key === omitKey) return acc;
+        acc[key] = obj[key];
+        return acc;
+      },
+      { ...obj[omitKey] }
+    );
   }
 
   static renameKeysByMap(obj, map) {
@@ -32,13 +34,17 @@ class MyFabricConnector extends Connector.FABRIC {
       const isArray = Array.isArray(value);
       acc[newKey] = isArray ? value.map(item => MyFabricConnector.renameKeysByMap(item, map)) : value;
       return acc;
-    }, {})
+    }, {});
   }
 
   static standardizeAssetOutput(asset) {
     const camelAsset = MyFabricConnector.objectKeysSnakeToCamel(asset);
     const deepOmitedAsset = MyFabricConnector.omitDeep(camelAsset, 'properties');
-    return MyFabricConnector.renameKeysByMap(deepOmitedAsset, { dltId: 'dltID', originDltId: 'originDLTId', receiverPk: 'receiverPK' });
+    return MyFabricConnector.renameKeysByMap(deepOmitedAsset, {
+      dltId: 'dltID',
+      originDltId: 'originDLTId',
+      receiverPk: 'receiverPK',
+    });
   }
 
   /**
