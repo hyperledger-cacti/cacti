@@ -21,6 +21,8 @@ var logger = shim.NewLogger("mycc")
 type MyChaincode struct {
 }
 
+const pubKeyPrefix = "pubKey:"
+
 // Init is the function to be called when the chaincode is instantiated
 func (t *MyChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 	return shim.Success(nil)
@@ -53,16 +55,6 @@ func (t *MyChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		logger.Errorf(msg)
 		return shim.Error(msg)
 	}
-}
-
-func readPubKeysMap(stub shim.ChaincodeStubInterface) (map[string]string, error) {
-	pubKeysMap := make(map[string]string)
-	pubKeysBytes, err := stub.GetState("pubs")
-	if err == nil {
-		err = json.Unmarshal(pubKeysBytes, &pubKeysMap)
-		return pubKeysMap, nil
-	}
-	return pubKeysMap, err
 }
 
 func parsePubKey(pubKey string, verify bool) ([]byte, error) {
@@ -98,21 +90,14 @@ func (t *MyChaincode) addPubKey(stub shim.ChaincodeStubInterface, args []string)
 		return shim.Error(err.Error())
 	}
 
-	pubKeysMap, err := readPubKeysMap(stub)
-	if err != nil {
-		return shim.Error("Public key storage is broken")
-	}
-	pubKeysMap[pubKey] = name
-
 	// Put the asset to the blockchain KVS
-	pubKeysBytes, _ := json.Marshal(pubKeysMap)
-	logger.Infof("%s\n", pubKeysBytes)
-	err = stub.PutState("pubs", pubKeysBytes)
+	err = stub.PutState(pubKeyPrefix+pubKey, []byte(name))
 	if err != nil {
 		return shim.Error("Failed to write asset to the blockchain")
 	}
+	logger.Infof("public key named '%s' added: %s.\n", name, pubKey)
 
-	return shim.Success(pubKeysBytes)
+	return shim.Success([]byte(name))
 }
 
 func getKey(assetID string) string {
@@ -148,13 +133,12 @@ func (t *MyChaincode) verifyInt(stub shim.ChaincodeStubInterface, args []string)
 	var numGood int = 0
 	results := make([]bool, len(args)/2)
 	msg := args[0]
-	pubKeysMap, _ := readPubKeysMap(stub)
 
 	for i := 0; i < len(args)/2; i++ {
 		pubkey := args[1+i*2]
 		signature := args[2+i*2]
-		_, ok := pubKeysMap[pubkey]
-		results[i] = ok && t.verifyOne(msg, pubkey, signature)
+		_, err := stub.GetState(pubKeyPrefix + pubkey)
+		results[i] = (err == nil) && t.verifyOne(msg, pubkey, signature)
 		if results[i] {
 			numGood += 1
 		}
