@@ -11,7 +11,7 @@
     "start": "node index.js",
     "upgrade-interactive": "npm-check --update",
     "test": "cross-env NODE_ENV=test ./node_modules/.bin/mocha --ui bdd --reporter spec --colors routes/**/*.test.js --recursive --exit",
-    "postinstall": "patch --verbose --force ./node_modules/web3-core-helpers/src/formatters.js ./web3_timestamp_fix.patch"
+    "postinstall": "patch --verbose --force ./node_modules/web3-core-helpers/src/formatters.js ./web3_timestamp_fix.patch || true"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
