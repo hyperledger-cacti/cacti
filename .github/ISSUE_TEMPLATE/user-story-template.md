@@ -1,6 +1,6 @@
 ---
 name: User Story template
-about: Create a user story for BAF
+about: Create a user story for Blockchain Integration Framework
 title: ''
 labels: ''
 assignees: ''
