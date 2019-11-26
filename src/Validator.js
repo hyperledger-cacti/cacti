@@ -84,7 +84,7 @@ class Validator {
     this.setupLeaderElections();
   }
 
-  get isCurrentNodeLeader() {
+  isCurrentNodeLeader() {
     return typeof this.leaderNodeInfo === 'object' && this.leaderNodeInfo.id === this.selfNodeInfo.id;
   }
 
@@ -133,7 +133,7 @@ class Validator {
   }
 
   attemptToBecomeLeader(theLease) {
-    if (this.isCurrentNodeLeader) {
+    if (this.isCurrentNodeLeader()) {
       return;
     }
     this.etcdClient
@@ -160,7 +160,7 @@ class Validator {
    * @return {void}
    */
   stop() {
-    if (this.isCurrentNodeLeader) {
+    if (this.isCurrentNodeLeader()) {
       clearInterval(this.intervalExec);
       this.requestSocket.close();
     }
@@ -313,7 +313,7 @@ class Validator {
       this.requestSocket = null;
     }
 
-    if (this.isCurrentNodeLeader) {
+    if (this.isCurrentNodeLeader()) {
       this.startAsLeader();
     } else {
       this.startAsFollower();
