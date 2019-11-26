@@ -185,6 +185,7 @@ services:
     hostname: node1
     ports:
       - "22000:8546"
+      - "8545:8545"
     volumes:
       - 1:/qdata
       - .:/examples:ro
