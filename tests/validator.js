@@ -212,7 +212,7 @@ describe(`Validator module`, function() {
       // sets this.leaderPubAddr, this.leaderRepAddr, this.leaderClientRepAddr according to new leader
       Object.assign(leader, leader.leaderNodeInfo.networkInfo);
 
-      chai.expect(leader.isCurrentNodeLeader).to.equal(true);
+      chai.expect(leader.isCurrentNodeLeader()).to.equal(true);
 
       // Validator starting as leader
       leader.startAsLeader();
@@ -265,7 +265,7 @@ describe(`Validator module`, function() {
       // sets this.leaderPubAddr, this.leaderRepAddr, this.leaderClientRepAddr according to new leader
       Object.assign(validator, validator.leaderNodeInfo.networkInfo);
 
-      chai.expect(validator.isCurrentNodeLeader).to.equal(true);
+      chai.expect(validator.isCurrentNodeLeader()).to.equal(true);
 
       // Validator starting as leader
       validator.startAsLeader();
@@ -316,7 +316,7 @@ describe(`Validator module`, function() {
       // sets this.leaderPubAddr, this.leaderRepAddr, this.leaderClientRepAddr according to new leader
       Object.assign(validator, validator.leaderNodeInfo.networkInfo);
 
-      chai.expect(validator.isCurrentNodeLeader).to.equal(true);
+      chai.expect(validator.isCurrentNodeLeader()).to.equal(true);
       // Validator starting as leader
       validator.startAsLeader();
       const signature = {
