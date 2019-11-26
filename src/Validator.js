@@ -1,6 +1,8 @@
 /* eslint no-use-before-define: ["error", { "variables": false }] */
 const zmq = require(`zeromq`);
 const log4js = require(`log4js`);
+const { Etcd3 } = require('etcd3');
+const uuidV4 = require('uuid/v4');
 
 const fedcom = require(`./federation-communication`);
 const conf = require(`../config.json`);
@@ -10,6 +12,8 @@ const Multisig = require(`./Multisig`);
 
 const logger = log4js.getLogger(`Validator`);
 logger.level = `DEBUG`;
+
+const BIF_LEADER = 'bif/leader';
 
 /**
  * Validator
@@ -43,27 +47,13 @@ class Validator {
    * @param {String} options.clientRepAddr Client Rep address
    * @param {String} options.pubAddr Public address
    * @param {String} options.repAddr Rep address
-   * @param {String} options.leaderPubAddr Leader Public address
-   * @param {String} options.leaderRepAddr Leader Rep address
-   * @param {String} options.leaderClientRepAddr Leader Client Rep address
-   * @param {String} options.type Validator type
    */
   constructor(blockchainClient, options) {
     if (!(blockchainClient instanceof Connector)) {
       throw new Error(`Validator needs a valid connector to get started`);
     }
     this.blockchainClient = blockchainClient;
-
     Object.assign(this, options);
-    if (this.type === fedcom.VALIDATOR_TYPE.LEADER) {
-      this.leaderPubAddr = options.pubAddr;
-      this.leaderRepAddr = options.repAddr;
-      this.leaderClientRepAddr = options.clientRepAddr;
-    } else {
-      this.leaderPubAddr = options.leaderPubAddr;
-      this.leaderRepAddr = options.leaderRepAddr;
-      this.leaderClientRepAddr = options.leaderClientRepAddr;
-    }
 
     this.publishSocket = null;
     this.requestSocket = null;
@@ -72,6 +62,89 @@ class Validator {
     this.clientRepSocket = null;
     this.currentMultisig = new Multisig();
     this.electionTimeout = conf.electionTimeout;
+    this.randomizedLeadershipPoolInterval = this.electionTimeout / 3 + (Math.random() * this.electionTimeout) / 3;
+
+    this.selfNodeInfo = {
+      id: uuidV4(),
+      pid: process.pid,
+      startedAt: new Date(),
+      networkInfo: {
+        leaderPubAddr: this.pubAddr,
+        leaderRepAddr: this.repAddr,
+        leaderClientRepAddr: this.clientRepAddr,
+      },
+    };
+
+    logger.debug(`Creating new validator instance. Node info: `, JSON.stringify(this.selfNodeInfo));
+
+    // etcd setup
+    this.EtcdConstructor = typeof this.EtcdConstructor === 'function' ? this.EtcdConstructor : Etcd3;
+    this.etcdClient = this.createEtcdClient();
+
+    this.setupLeaderElections();
+  }
+
+  get isCurrentNodeLeader() {
+    return typeof this.leaderNodeInfo === 'object' && this.leaderNodeInfo.id === this.selfNodeInfo.id;
+  }
+
+  createEtcdClient() {
+    if (typeof this.EtcdConstructor !== 'function') {
+      throw new TypeError(`Validator#createEtcdClient() expected this.EtcdConstructor to be function.`);
+    }
+    if (!Array.isArray(this.etcdHosts)) {
+      throw new TypeError(`Validator#createEtcdClient() expected this.etcdHosts to be an Array<string>.`);
+    }
+    logger.debug(`Creating etcd client with hosts`, this.etcdHosts);
+    return new this.EtcdConstructor({
+      hosts: this.etcdHosts,
+    });
+  }
+
+  async setupLeaderElections() {
+    // Setup the watcher
+    const watcher = await this.etcdClient
+      .watch()
+      .key(BIF_LEADER)
+      .create();
+    logger.debug(`Etcd watcher set up OK.`);
+
+    watcher
+      .on('disconnected', () => logger.debug('[WATCH] disconnected...', this.selfNodeInfo))
+      .on('connected', () => logger.debug('[WATCH] successfully reconnected!', this.selfNodeInfo))
+      .on('put', res => {
+        const newLeaderNodeInfoJson = res.value.toString('utf8');
+        logger.debug(`[WATCH] key ${BIF_LEADER} got set to new value: `, newLeaderNodeInfoJson);
+        const newLeaderNodeInfo = JSON.parse(newLeaderNodeInfoJson);
+        this.switchToNewLeader(newLeaderNodeInfo);
+      });
+    // Finished settig up watcher
+
+    const leaseTtlSeconds = Math.round(this.electionTimeout / 1000);
+    logger.debug(`Creating lease with TTL=${leaseTtlSeconds} seconds...`);
+    const theLease = this.etcdClient.lease(leaseTtlSeconds);
+
+    theLease.on('lost', () => logger.debug(['LEASE:keepaliveLost']));
+    theLease.on('keepaliveFailed', () => logger.warn(['LEASE:keepaliveFailed']));
+    theLease.on('keepaliveEstablished', () => logger.debug(['LEASE:keepaliveEstablished']));
+
+    this.attemptToBecomeLeader(theLease);
+    setInterval(this.attemptToBecomeLeader.bind(this, theLease), this.randomizedLeadershipPoolInterval);
+  }
+
+  attemptToBecomeLeader(theLease) {
+    if (this.isCurrentNodeLeader) {
+      return;
+    }
+    this.etcdClient
+      .if(BIF_LEADER, 'Lease', '==', 0)
+      .then(theLease.put(BIF_LEADER).value(JSON.stringify(this.selfNodeInfo)))
+      .else(this.etcdClient.get(BIF_LEADER))
+      .commit()
+      // .then(transactionResponse => {
+      //   logger.debug(`TransactionResponse=${JSON.stringify(transactionResponse)}`);
+      // })
+      .catch(ex => logger.error('Leadership attempt failed with exception:', ex));
   }
 
   /**
@@ -80,12 +153,6 @@ class Validator {
    */
   start() {
     this.startClientServer();
-
-    if (this.type === fedcom.VALIDATOR_TYPE.LEADER) {
-      this.startAsLeader();
-    } else {
-      this.startAsFollower();
-    }
   }
 
   /**
@@ -93,7 +160,7 @@ class Validator {
    * @return {void}
    */
   stop() {
-    if (this.type === fedcom.VALIDATOR_TYPE.LEADER) {
+    if (this.isCurrentNodeLeader) {
       clearInterval(this.intervalExec);
       this.requestSocket.close();
     }
@@ -108,17 +175,11 @@ class Validator {
    */
   startAsLeader() {
     logger.debug(`Starting as Leader ...`);
-    logger.debug(
-      `I am : 
-      (${this.pubAddr},
-      ${this.repAddr},
-      ${this.clientRepAddr})`
-    );
+    logger.debug(`I am : (${this.pubAddr}, ${this.repAddr}, ${this.clientRepAddr})`);
 
     this.type = fedcom.VALIDATOR_TYPE.LEADER;
     this.publishSocket = zmq.socket(`pub`);
     this.publishSocket.bindSync(this.leaderPubAddr);
-    this.intervalExec = this.newLeaderElection();
     this.requestSocket = zmq.socket(`rep`);
     this.requestSocket.bindSync(this.leaderRepAddr);
     this.requestSocket.on(`message`, fedcom.ValidatorAsLeaderMessage.bind(this));
@@ -131,12 +192,7 @@ class Validator {
    */
   startAsFollower() {
     logger.debug(`Starting as Follower... `);
-    logger.debug(
-      `My Leader is : 
-      (${this.leaderPubAddr},
-      ${this.leaderRepAddr},
-      ${this.leaderClientRepAddr})`
-    );
+    logger.debug(`My Leader is : (${this.leaderPubAddr}, ${this.leaderRepAddr}, ${this.leaderClientRepAddr})`);
 
     this.type = fedcom.VALIDATOR_TYPE.FOLLOWER;
     this.publishSocket = zmq.socket(`sub`);
@@ -212,17 +268,6 @@ class Validator {
   }
 
   /**
-   * Select on validator in the specified pool to be the leader of the next round
-   * @static
-   * @param {string[]} aliveValidators - Alive Validators
-   * @return {string} Next Leader Address
-   */
-  static selectNextLeader(aliveValidators) {
-    const index = Math.floor(Math.random() * Math.floor(aliveValidators.length));
-    return aliveValidators[index];
-  }
-
-  /**
    * Sign locally and broadcast remaining job to alive validators
    * @param {string} type Validator type
    * @param {object} dataToSign Data To Sign
@@ -250,62 +295,29 @@ class Validator {
   }
 
   /**
-   * Prepare validator pool and select new leader
-   * @return {string} Interval Id.
-   */
-  newLeaderElection() {
-    return setInterval(() => {
-      this.availableFollowers = [];
-
-      logger.debug(`Sending heartbeat request`);
-      this.publishSocket.send([fedcom.MSG_TYPE.HEARTBEAT, `{}`]);
-
-      setTimeout(() => {
-        // Select the next leader
-        if (this.availableFollowers.length !== 0) {
-          const nextLeader = Validator.selectNextLeader(this.availableFollowers);
-          this.publishSocket.send([fedcom.MSG_TYPE.NEWLEADER, JSON.stringify(nextLeader)]);
-          // Switch from leader to follower
-          this.switchToNewLeader(nextLeader);
-        }
-      }, conf.timeout);
-    }, this.electionTimeout);
-  }
-
-  /**
    * Change local parameters to adjust to new leader
-   * @param {Object} newLeader
-   * @param {string} newLeader.pub New Leader Public Address
-   * @param {string} newLeader.rep New Leader Rep Address
-   * @param {string} newLeader.clientRep New Leader Client Rep Address
    * @return {void}
    */
-  switchToNewLeader(newLeader) {
-    // Update leader address
-    this.leaderPubAddr = newLeader.pub;
-    this.leaderRepAddr = newLeader.rep;
-    this.leaderClientRepAddr = newLeader.clientRep;
+  switchToNewLeader(newLeaderNodeInfo) {
+    this.leaderNodeInfo = newLeaderNodeInfo;
+    // sets this.leaderPubAddr, this.leaderRepAddr, this.leaderClientRepAddr according to new leader
+    Object.assign(this, this.leaderNodeInfo.networkInfo);
 
     // Stop the pub and rep sockets
-    this.publishSocket.close();
+    if (this.publishSocket) {
+      this.publishSocket.close();
+    }
 
-    if (this.type === fedcom.VALIDATOR_TYPE.LEADER) {
-      // REFAC: this if content could go to line ~206
-      // (right before newLeaderElection/switchToNewLeader)
-      // but that would need to refac the test
+    if (this.requestSocket) {
       this.requestSocket.close();
       this.requestSocket = null;
-      clearInterval(this.intervalExec);
-      this.intervalExec = null;
     }
 
-    if (this.pubAddr === newLeader.pub) {
+    if (this.isCurrentNodeLeader) {
       this.startAsLeader();
-      return;
+    } else {
+      this.startAsFollower();
     }
-
-    // Follower updates its references to the new leader
-    this.startAsFollower();
   }
 }
 

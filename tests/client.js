@@ -124,6 +124,7 @@ describe(`Client module`, function() {
         pubKey: `031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b`,
       };
       const validatorOptions1 = {
+        etcdHosts: ['http://localhost:2379'],
         ...validatorKeys,
         type: fedcom.VALIDATOR_TYPE.LEADER,
         clientRepAddr: `tcp://127.0.0.1:7103`,
@@ -137,7 +138,11 @@ describe(`Client module`, function() {
       validator1 = new Validator(connector1, validatorOptions1);
       validator1.start();
 
+      // self promote to leader manually for test since there's no etd cluster, we need to fake/rig the election
+      validator1.switchToNewLeader(validator1.selfNodeInfo);
+
       const validatorOptions2 = {
+        etcdHosts: ['http://localhost:2379'],
         ...validatorKeys,
         type: fedcom.VALIDATOR_TYPE.FOLLOWER,
         leaderClientRepAddr: `tcp://127.0.0.1:7103`,
