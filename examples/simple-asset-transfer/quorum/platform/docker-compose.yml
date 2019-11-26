@@ -187,7 +187,7 @@ x-tx-manager-def:
             --publickeys=/examples/keys/tm$${NODE_ID}.pub \
             --privatekeys=/examples/keys/tm$${NODE_ID}.key \
             --storage=$${DDIR} \
-            --verbosity=4
+            --verbosity=1
           ;;
         *)
           echo "Invalid Transaction Manager"
