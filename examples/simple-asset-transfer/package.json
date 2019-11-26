@@ -2,13 +2,12 @@
 	"version": "0.1.0",
 	"name": "@hyperledger-labs/blockchain-integration-framework.examples.simple-asset-transfer",
 	"dependencies": {
-		"@hyperledger-labs/blockchain-integration-framework": "git+https://github.com/hyperledger-labs/blockchain-integration-framework.git#fix/peter.somogyvari/make-ci-pass",
+		"@hyperledger-labs/blockchain-integration-framework": "../../.tmp/hyperledger-labs-blockchain-integration-framework-dev.tgz",
 		"cookie-parser": "^1.4.4",
 		"express-bearer-token": "^2.4.0",
 		"express-jwt": "^5.3.1",
 		"express-session": "^1.16.2",
-		"request-promise": "^4.2.4",
-		"typedarray-to-buffer": "^3.1.5"
+		"request-promise": "^4.2.4"
 	},
 	"devDependencies": {
 		"npm-check": "^5.9.0"
@@ -48,7 +47,8 @@
 		"scenario:QtC": "cd scenarios && node quorum-to-corda.js",
 		"test": "../../node_modules/.bin/cross-env NODE_ENV=test ../../node_modules/.bin/mocha --ui bdd --reporter spec --colors tests/*.js --recursive --exit",
 		"test:bc": "BLOCKCHAIN=true npm run test",
-		"upgrade-interactive": "npm-check --update"
+		"upgrade-interactive": "npm-check --update",
+		"preinstall": "node ../../tools/create-local-npm-package.js"
 	},
 	"private": true,
 	"engines": {

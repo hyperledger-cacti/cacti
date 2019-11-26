@@ -32,3 +32,4 @@ typings/
 examples/simple-asset-transfer/fabric/**/hfc-key-store/
 
 bin/
+.tmp/
