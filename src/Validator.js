@@ -300,8 +300,12 @@ class Validator {
    */
   switchToNewLeader(newLeaderNodeInfo) {
     this.leaderNodeInfo = newLeaderNodeInfo;
-    // sets this.leaderPubAddr, this.leaderRepAddr, this.leaderClientRepAddr according to new leader
-    Object.assign(this, this.leaderNodeInfo.networkInfo);
+
+    // TODO(peter.somogyvari): Once leader election has enough test coverage, get rid of these property assignments
+    // and just use the this.leaderNodeInfo.networkInfo object directly everywhere.
+    this.leaderPubAddr = this.leaderNodeInfo.networkInfo.leaderPubAddr;
+    this.leaderRepAddr = this.leaderNodeInfo.networkInfo.leaderRepAddr;
+    this.leaderClientRepAddr = this.leaderNodeInfo.networkInfo.leaderClientRepAddr;
 
     // Stop the pub and rep sockets
     if (this.publishSocket) {
