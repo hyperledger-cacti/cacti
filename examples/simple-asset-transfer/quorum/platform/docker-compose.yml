@@ -54,6 +54,12 @@ x-quorum-def:
         --nodiscover \
         --verbosity 5 \
         --networkid $${NETWORK_ID} \
+        --rpc \
+        --rpcaddr=0.0.0.0 \
+        --rpcvhosts=node1 \
+        --rpcport=8545 \
+        --rpcapi=private,parity,admin,db,eth,debug,miner,net,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-istanbul} \
+        --rpccorsdomain "*" \
         --ws \
         --wsaddr 0.0.0.0 \
         --wsport 8546 \
@@ -179,6 +185,7 @@ services:
     hostname: node1
     ports:
       - "22000:8546"
+      - "8545:8545"
     volumes:
       - 1:/qdata
       - .:/examples:ro

@@ -86,6 +86,7 @@ const config = {
       win32: envVars.WEB3_HOST_WIN32,
     },
     port: envVars.WEB3_PORT,
+    rpcPort: envVars.WEB3_RPC_PORT,
     ethKey: envVars.WEB3_ETH_KEY,
     constKey: envVars.WEB3_CONST_KEY,
   },
