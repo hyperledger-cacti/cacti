@@ -134,7 +134,7 @@ services:
       - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
     networks:
-        fabric-network:
+        quorum-network:
             ipv4_address: 192.20.0.50
 
   etcd2:
@@ -150,7 +150,7 @@ services:
       - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
     networks:
-        fabric-network:
+        quorum-network:
             ipv4_address: 192.20.0.51
 
   etcd3:
@@ -166,5 +166,5 @@ services:
       - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
     networks:
-        fabric-network:
+        quorum-network:
             ipv4_address: 192.20.0.52
