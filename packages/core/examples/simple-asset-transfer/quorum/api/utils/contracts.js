@@ -1,5 +1,5 @@
 const path = require('path');
-const web3 = require('./web3');
+const web3Ws = require('./web3');
 const config = require('../config/config');
 const logger = require('../utils/logger')('contracts');
 
@@ -14,7 +14,14 @@ const Contracts = {
     return this[name];
   },
 
-  getContract(contractName, version) {
+  /**
+   *
+   * @param {*} contractName
+   * @param {*} version
+   * @param {*} web3Instance The Web3 instance that will be used to deploy `contractName`. Use this to overide the
+   * default Web3 instance (which uses the WebSocketProvider under the hood) with your own.
+   */
+  getContract(contractName, version, web3Instance = web3Ws) {
     const name = version && version > 1 ? path.join(`v${version}`, contractName) : contractName;
     if (!this[name]) {
       this.getBuild(name);
@@ -23,9 +30,9 @@ const Contracts = {
     if (!this[`${name}Contract`]) {
       let contract;
       if (Object.keys(this[name].networks || {}).length) {
-        contract = new web3.eth.Contract(this[name].abi, this[name].networks.address);
+        contract = new web3Instance.eth.Contract(this[name].abi, this[name].networks.address);
       } else {
-        contract = new web3.eth.Contract(this[name].abi);
+        contract = new web3Instance.eth.Contract(this[name].abi);
       }
       contract.options.data = this[name].bytecode;
       this[`${name}Contract`] = contract;
@@ -38,7 +45,7 @@ const Contracts = {
       this.getBuild(name);
     }
     if (!this[name + address]) {
-      this[name + address] = new web3.eth.Contract(this[name].abi, address);
+      this[name + address] = new web3Ws.eth.Contract(this[name].abi, address);
     }
     return this[name + address];
   },
@@ -49,7 +56,7 @@ const Contracts = {
         arguments: contractArguments,
       })
       .send({
-        from: web3.eth.defaultAccount,
+        from: web3Ws.eth.defaultAccount,
         gas: 10000000,
       })
       .on('transactionHash', txHash => logger.log('info', `newPublicContract: txHash:${txHash}`));
@@ -63,7 +70,7 @@ const Contracts = {
         arguments: contractArguments,
       })
       .send({
-        from: web3.eth.defaultAccount,
+        from: web3Ws.eth.defaultAccount,
         gas: 100000000,
         privateFor,
       })

@@ -2,10 +2,11 @@ const Artifactor = require('truffle-artifactor');
 const contracts = require('../utils/contracts');
 const config = require('../config/config');
 const logger = require('../utils/logger')('deployContracts');
+const web3Http = require('../utils/web3-http');
 
 async function deployRoot() {
   const rootBuild = contracts.getBuild('Root');
-  const rootContract = contracts.getContract('Root');
+  const rootContract = contracts.getContract('Root', undefined, web3Http);
   const contract = await contracts.newPublicContract(rootContract);
   rootBuild.networks = { address: contract.options.address };
 
