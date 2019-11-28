@@ -1,5 +1,7 @@
 const rp = require(`request-promise-native`);
 
+const { Functions } = require('../../common/functions');
+
 const Connector = require(`../Connector`);
 
 class ConnectorQuorum extends Connector {
@@ -36,13 +38,21 @@ class ConnectorQuorum extends Connector {
       this.checkUrl();
       this.checkUserName();
       this.checkPassword();
-      const res = await rp({
-        method: `POST`,
-        uri: `${this.options.url}/api/v1/auth/login`,
-        form: { username: this.options.username, password: this.options.password },
-        json: true,
-      });
-      return res.token;
+      return Functions.retry(
+        async () => {
+          const res = await rp({
+            method: `POST`,
+            uri: `${this.options.url}/api/v1/auth/login`,
+            form: { username: this.options.username, password: this.options.password },
+            json: true,
+          });
+          return res.token;
+        },
+        (tryIndex, ex) => {
+          console.log(`----- RETRY PREDICATE `, tryIndex, ex.stack);
+          return tryIndex <= 10 && ex.stack.includes('ECONNRESET');
+        }
+      );
     } catch (error) {
       return Promise.reject(error);
     }
