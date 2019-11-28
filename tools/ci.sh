@@ -11,9 +11,10 @@ docker --version
 docker-compose --version
 node --version
 npm --version
-java -version
+java -version | true
 npm install
 npm run test
+
 cd examples/simple-asset-transfer
 npm install
 rm -rf ./node_modules/websocket/.git/

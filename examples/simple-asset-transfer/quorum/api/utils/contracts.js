@@ -52,7 +52,7 @@ const Contracts = {
         from: web3.eth.defaultAccount,
         gas: 10000000,
       })
-      .on('transactionHash', txHash => logger.log('debug', `newPublicContract: txHash:${txHash}`));
+      .on('transactionHash', txHash => logger.log('info', `newPublicContract: txHash:${txHash}`));
     logger.log('debug', `newPublicContract: ${newContract.options.address}`);
     return newContract;
   },
