@@ -22,12 +22,17 @@ async function registerActor({ name, type, constKey, ethAddress, host, port }) {
     host,
     port
   );
-  const receipt = await rootContract.methods
-    .registerActor(name, constKey, ethAddress, ActorTypes[type], host, port)
-    .send({
-      from: web3.eth.defaultAccount,
-      gas: 3000000,
-    });
+  const actorRegistrationTask = rootContract.methods
+    .registerActor(name, constKey, ethAddress, ActorTypes[type], host, port);
+
+  const gasEstimate = await actorRegistrationTask.estimateGas();
+  const gas = gasEstimate * 3; // offer triple the gas estimate to be sure
+  const taskPayload = {
+    from: web3.eth.defaultAccount,
+    gas,
+  };
+  logger.info(`registerActor gasEstimate=%s taskPayload=%s`, gasEstimate, JSON.stringify(taskPayload));
+  const receipt = await actorRegistrationTask.send(taskPayload);
   logger.log('debug', 'registerActor receipt %j', receipt);
   return receipt;
 }

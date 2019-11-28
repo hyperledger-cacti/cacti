@@ -51,16 +51,20 @@ const Contracts = {
   },
 
   async newPublicContract(contractObject, ...contractArguments) {
-    const newContract = await contractObject
-      .deploy({
-        arguments: contractArguments,
-      })
-      .send({
-        from: web3Ws.eth.defaultAccount,
-        gas: 10000000,
-      })
-      .on('transactionHash', txHash => logger.log('info', `newPublicContract: txHash:${txHash}`));
-    logger.log('debug', `newPublicContract: ${newContract.options.address}`);
+    const deployTask = contractObject.deploy({ arguments: contractArguments });
+    const gasEstimate = await deployTask.estimateGas({
+      from: web3Ws.eth.defaultAccount,
+      gas: 10000000,
+    });
+    const gas = gasEstimate * 3; // offer triple the gas estimate to be sure
+    const taskPayload = {
+      from: web3Ws.eth.defaultAccount,
+      gas,
+    };
+    logger.info(`newPublicContract: gasEstimate=%s taskPayload=%s`, gasEstimate, JSON.stringify(taskPayload));
+    const newContract = await deployTask.send(taskPayload);
+
+    logger.log('debug', `newPublicContract: deployment DONE. address=${newContract.options.address}`);
     return newContract;
   },
 

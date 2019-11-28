@@ -38,6 +38,9 @@ module.exports = (async () => {
       }
       tryCount += 1;
     }
+    if (notSuccessful) {
+      throw new Error(`Failed to deploy contracts after ${maxTries} attempts. See logs above for details.`);
+    }
     if (config.env !== 'test') {
       /* Forcibly exit the process as we suspect that web3.js may leave dangling
         open network connections that prevent normal exit. */
