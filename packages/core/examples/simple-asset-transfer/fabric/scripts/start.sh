@@ -15,6 +15,8 @@ timestamp=$( date +%T )
 echo " [Logs after : $timestamp]" >>$path_to_log_file
 ./runApp.sh 2>&1 | tee $path_to_log_file
 
+sleep 120
+
 echo -n "Starting the SDK server ... "
 cd ../api
 PORT=4000 node app >>$path_to_log_file 2>&1 &

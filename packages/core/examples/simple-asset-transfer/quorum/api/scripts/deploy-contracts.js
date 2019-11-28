@@ -34,7 +34,7 @@ module.exports = (async () => {
       } catch (ex) {
         // eslint-disable-next-line no-await-in-loop
         await new Promise(resolve => setTimeout(resolve, delayBetweenTries));
-        logger.info(`Attempt #${tryCount} to deploy contracts failed`);
+        logger.info(`Attempt #${tryCount} to deploy contract failed`, ex);
       }
       tryCount += 1;
     }
