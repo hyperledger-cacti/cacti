@@ -45,7 +45,7 @@
 		"scenario:CtF": "cd scenarios && node corda-to-fabric.js",
 		"scenario:FtC": "cd scenarios && node fabric-to-corda.js",
 		"scenario:QtC": "cd scenarios && node quorum-to-corda.js",
-		"test": "../../node_modules/.bin/cross-env NODE_ENV=test ../../node_modules/.bin/mocha --ui bdd --reporter spec --colors tests/*.js --recursive --exit",
+		"test": "../../node_modules/.bin/cross-env NODE_ENV=test ../../node_modules/.bin/mocha --ui bdd --reporter spec --colors tests/*.js --recursive --exit --retries 10",
 		"test:bc": "BLOCKCHAIN=true npm run test",
 		"upgrade-interactive": "npm-check --update",
 		"preinstall": "node ../../tools/create-local-npm-package.js"

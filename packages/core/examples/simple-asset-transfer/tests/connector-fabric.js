@@ -128,7 +128,7 @@ describe(`ConnectorFabricExample addForeignValidator`, function() {
   });
 
   it(`Add correct foreign validator`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     const name = `foreignValidatorTest`;
     const pubkey = `036aaf98c8c07ccef29f43528b8682407b1ddb9e9ca4c427c751a3ea151cfabd90`;
     chai
@@ -138,7 +138,7 @@ describe(`ConnectorFabricExample addForeignValidator`, function() {
   });
 
   it(`Add foreign validator with empty input`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     chai
       .expect(connector2.addForeignValidator())
       .be.rejectedWith(Error, `Failed to invoke chaincode`)
@@ -146,7 +146,7 @@ describe(`ConnectorFabricExample addForeignValidator`, function() {
   });
 
   it(`Add foreign validator with wrong pubkey`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     const name = `foreignValidator`;
     const pubkey = `036aaf98c8c07ccef29f43528b8682407b1ddb9e9ca4c427c751a3ea151cfabd90wrbgbean.krg;w`;
     chai
@@ -175,7 +175,7 @@ describe(`ConnectorFabricExample verifySignature`, function() {
   });
 
   it(`Verify a correct signature`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     const pubkey = `036aaf98c8c07ccef29f43528b8682407b1ddb9e9ca4c427c751a3ea151cfabd90`;
     const signature = `82d8cb179cf30fe6eda365f8cd946711a019e42df0c119671fe6de7e94e591ff42d1b26a14b14f294360f82e376f1bbce92d839f984a2f65bd8bc3918354db8b`;
     const message = `Hello world!`;
@@ -186,7 +186,7 @@ describe(`ConnectorFabricExample verifySignature`, function() {
   });
 
   it(`Verify a wrong signature`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     const pubkey = `036aaf98c8c07ccef29f43528b8682407b1ddb9e9ca4c427c751a3ea151cfabd90`;
     const signature = `82d8cb179cf30fe6eda365f8cd946711a019e42df0c119671fe6de7e94e591ff42d1b26a14b14f294360f82e376f1bbce92d839f984a2f65bd8bc3918354db8b`;
     const message = `Hello`;
@@ -219,7 +219,7 @@ describe(`ConnectorFabricExample verifyMultisig`, function() {
   });
 
   it(`empty multisig object should throw`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     const multisig1 = new Multisig();
     chai
       .expect(connector4.verifyMultisig(multisig1))
@@ -228,7 +228,7 @@ describe(`ConnectorFabricExample verifyMultisig`, function() {
   });
 
   it(`one correct signature, one wrong signature`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     const multisig2 = new Multisig(`Hello world!`);
     const pubkey = `036aaf98c8c07ccef29f43528b8682407b1ddb9e9ca4c427c751a3ea151cfabd90`;
     const signature = `82d8cb179cf30fe6eda365f8cd946711a019e42df0c119671fe6de7e94e591ff42d1b26a14b14f294360f82e376f1bbce92d839f984a2f65bd8bc3918354db8b`;
@@ -264,7 +264,7 @@ describe(`ConnectorFabricExample CreateAsset`, function() {
   });
 
   it(`Creating a correctly formed asset`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     const asset1 = {
       asset_id: `Asset_DLT_1_${Date.now()}`,
       origin: [
@@ -315,7 +315,7 @@ describe(`ConnectorFabricExample CreateAsset`, function() {
 });
 
 describe(`ConnectorFabricExample LockAsset`, function() {
-  this.timeout(15000);
+  this.timeout(120000);
   const options = config.blockchains.fabric;
   const connector5 = new ConnectorFabricEx(options);
 
@@ -341,7 +341,7 @@ describe(`ConnectorFabricExample LockAsset`, function() {
     if (!process.env.BLOCKCHAIN) {
       this.skip();
     } else {
-      this.timeout(15000);
+      this.timeout(120000);
       await connector5.createAsset(asset4);
     }
   });
@@ -354,7 +354,7 @@ describe(`ConnectorFabricExample LockAsset`, function() {
   });
 
   it(`Locking an existing asset with correct params`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     chai
       .expect(
         connector5.lockAsset(
@@ -368,7 +368,7 @@ describe(`ConnectorFabricExample LockAsset`, function() {
   });
 
   it(`Locking an already locked asset`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     chai
       .expect(
         connector5.lockAsset(
@@ -421,7 +421,7 @@ describe(`ConnectorFabricExample SetProperty`, function() {
     if (!process.env.BLOCKCHAIN) {
       this.skip();
     } else {
-      this.timeout(15000);
+      this.timeout(120000);
       await connector6.createAsset(asset5);
     }
   });
@@ -434,7 +434,7 @@ describe(`ConnectorFabricExample SetProperty`, function() {
   });
 
   it(`Setting an existing property`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     chai
       .expect(connector6.setProperty(asset5.asset_id, `property1`, `new_value_property_1`))
       .to.eventually.include({ success: true })
@@ -442,7 +442,7 @@ describe(`ConnectorFabricExample SetProperty`, function() {
   });
 
   it(`Setting an unknown property`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     chai
       .expect(connector6.setProperty(asset5.asset_id, `property4`, `new_value_property_4`))
       .be.rejectedWith(Error)
@@ -483,18 +483,18 @@ describe(`ConnectorFabricExample GetAsset`, function() {
     if (!process.env.BLOCKCHAIN) {
       this.skip();
     } else {
-      this.timeout(15000);
+      this.timeout(120000);
       await connector7.createAsset(asset6);
     }
   });
 
   it(`get existing asset`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     chai.expect(connector7.getAsset(asset6.asset_id)).to.eventually.fulfilled.notify(done);
   });
 
   it(`get unknown asset`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     chai
       .expect(connector7.getAsset(`Asset_DLT_1`))
       .be.rejectedWith(Error)
@@ -515,7 +515,7 @@ describe(`ConnectorFabricExample copyAsset`, function() {
   const connector3 = new ConnectorFabricEx(options);
 
   before(function() {
-    this.timeout(15000);
+    this.timeout(120000);
     if (!process.env.BLOCKCHAIN) {
       this.skip();
     }
@@ -526,7 +526,7 @@ describe(`ConnectorFabricExample copyAsset`, function() {
 
   it(`Copy Asset with correct signature`, function(done) {
     this.skip(); // FixMe: Asset can be copied (created) only once.
-    this.timeout(15000);
+    this.timeout(120000);
     const pubkey = '03fd076032614ba907cf03108bfb37840fd7bf4057228d32a7323077bf70144db8';
     const signature =
       'e16f7b7a4de297fb7c851d5d45275d1bae3d5ad838df2f0e11c8c24dd35e91061f16d9afb79cf93f000db248cbac8913df54d26927e18c5e28cd13ff487446eb';
@@ -544,7 +544,7 @@ describe(`ConnectorFabricExample copyAsset`, function() {
   });
 
   it(`Copy Asset with wrong signature`, function(done) {
-    this.timeout(15000);
+    this.timeout(120000);
     const pubkey = '03fd076032614ba907cf03108bfb37840fd7bf4057228d32a7323077bf70144db8';
     const signature =
       'e16f7b7a4de297fb7c851d5d45275d1bae3d5ad838df2f0e11c8c24dd35e91061f16d9afb79cf93f000db248cbac8913df54d26927e18c5e28cd13ff487446eb';
