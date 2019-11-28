@@ -4,6 +4,10 @@
 ###
 ### Designed to be re-entrant on a local dev machine as well, not just on a
 ### newly pulled up VM.
+### Aims to set up and tear down a test environment that's as close to a
+### production deployment as feasible.
+### Also aimed at being stateless, idempotent and consistent, e.g. running it
+### multiple times should always produce the same results.
 ###
 
 STARTED_AT=`date +%s`
