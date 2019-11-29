@@ -21,7 +21,7 @@ async function deployRoot() {
 module.exports = (async () => {
   try {
     // We need a re-try mechanism to be more resilient against race conditions that come up on stronger hardware
-    const maxTries = 5;
+    const maxTries = 25;
     const delayBetweenTries = 15000;
     let tryCount = 1;
     let notSuccessful = true;
@@ -34,7 +34,7 @@ module.exports = (async () => {
       } catch (ex) {
         // eslint-disable-next-line no-await-in-loop
         await new Promise(resolve => setTimeout(resolve, delayBetweenTries));
-        logger.info(`Attempt #${tryCount} to deploy contract failed`, ex);
+        logger.info(`Attempt #${tryCount} to deploy contract failed: `, ex);
       }
       tryCount += 1;
     }
