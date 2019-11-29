@@ -175,7 +175,7 @@ x-tx-manager-def:
           }
       EOF
           cat $${DDIR}/tessera-config$${TESSERA_CONFIG_TYPE}.json
-          java -Xms128M -Xmx128M -jar /tessera/tessera-app.jar -configfile $${DDIR}/tessera-config$${TESSERA_CONFIG_TYPE}.json
+          java -Xms128M -Xmx128M -Dverbosity=WARN -jar /tessera/tessera-app.jar -configfile $${DDIR}/tessera-config$${TESSERA_CONFIG_TYPE}.json
           ;;
         constellation)
           echo "socket=\"$${DDIR}/tm.ipc\"\npublickeys=[\"/examples/keys/tm$${NODE_ID}.pub\"]\n" > $${DDIR}/tm.conf
