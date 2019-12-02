@@ -209,7 +209,7 @@ services:
       - PRIVATE_CONFIG=/qdata/tm/tm.ipc
       - NODE_ID=1
     networks:
-      quorum-examples-net:
+      quorum_quorum-examples-net:
         ipv4_address: 172.16.239.11
   txmanager1:
     << : *tx-manager-def
@@ -220,7 +220,7 @@ services:
       - vol1:/qdata
       - .:/examples:ro
     networks:
-      quorum-examples-net:
+      quorum_quorum-examples-net:
         ipv4_address: 172.16.239.101
     environment:
       - NODE_ID=1
@@ -238,7 +238,7 @@ services:
       - PRIVATE_CONFIG=/qdata/tm/tm.ipc
       - NODE_ID=2
     networks:
-      quorum-examples-net:
+      quorum_quorum-examples-net:
         ipv4_address: 172.16.239.12
   txmanager2:
     << : *tx-manager-def
@@ -249,7 +249,7 @@ services:
       - vol2:/qdata
       - .:/examples:ro
     networks:
-      quorum-examples-net:
+      quorum_quorum-examples-net:
         ipv4_address: 172.16.239.102
     environment:
       - NODE_ID=2
@@ -267,7 +267,7 @@ services:
       - PRIVATE_CONFIG=/qdata/tm/tm.ipc
       - NODE_ID=3
     networks:
-      quorum-examples-net:
+      quorum_quorum-examples-net:
         ipv4_address: 172.16.239.13
   txmanager3:
     << : *tx-manager-def
@@ -278,7 +278,7 @@ services:
       - vol3:/qdata
       - .:/examples:ro
     networks:
-      quorum-examples-net:
+      quorum_quorum-examples-net:
         ipv4_address: 172.16.239.103
     environment:
       - NODE_ID=3
@@ -296,7 +296,7 @@ services:
       - PRIVATE_CONFIG=/qdata/tm/tm.ipc
       - NODE_ID=4
     networks:
-      quorum-examples-net:
+      quorum_quorum-examples-net:
         ipv4_address: 172.16.239.14
   txmanager4:
     << : *tx-manager-def
@@ -307,13 +307,13 @@ services:
       - vol4:/qdata
       - .:/examples:ro
     networks:
-      quorum-examples-net:
+      quorum_quorum-examples-net:
         ipv4_address: 172.16.239.104
     environment:
       - NODE_ID=4
 networks:
-  quorum-examples-net:
-    name: quorum-examples-net
+  quorum_quorum-examples-net:
+    name: quorum_quorum-examples-net
     driver: bridge
     ipam:
       driver: default
