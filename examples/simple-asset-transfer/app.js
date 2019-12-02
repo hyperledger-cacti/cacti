@@ -1,4 +1,4 @@
-const Validator = require(`@hyperledger-labs/blockchain-integration-framework`).Validator;
+const { Validator } = require(`@hyperledger-labs/blockchain-integration-framework`);
 const { genKeyFile } = require(`@hyperledger-labs/blockchain-integration-framework`).cryptoUtils;
 const ConnectorFabric = require(`./fabric/connector`);
 const ConnectorQuorum = require(`./quorum/connector`);
@@ -7,14 +7,11 @@ const ConnectorCorda = require(`./corda/connector`);
 (async () => {
   const keypair = await genKeyFile(`/federation/keypair`);
   const validatorOptions = {
+    etcdHosts: process.env.ETCD_HOSTS.split(','),
     clientRepAddr: process.env.CLIENT_REP_ADDR,
     pubAddr: process.env.PUB_ADDR,
     repAddr: process.env.REP_ADDR,
-    leaderPubAddr: process.env.LEAD_PUB_ADDR,
-    leaderRepAddr: process.env.LEAD_REP_ADDR,
-    leaderClientRepAddr: process.env.LEAD_CLIENT_REP_ADDR,
     dlType: process.env.DLT_TYPE,
-    type: process.env.TYPE,
     pubKey: keypair.pk,
     privKey: keypair.sk,
   };

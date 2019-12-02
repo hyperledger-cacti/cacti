@@ -3,7 +3,7 @@
 /* eslint func-names: ["error", "never"] */
 const chai = require(`chai`);
 const zmq = require(`zeromq`);
-
+const uuidV4 = require('uuid/v4');
 const fedcom = require(`../src/federation-communication`);
 const Validator = require(`../src/Validator`);
 const Multisig = require(`../src/Multisig`);
@@ -34,6 +34,7 @@ describe(`Validator module`, function() {
     it(`Create a leader`, function() {
       // Lets set the leader to be validator 1
       const leaderOptions = {
+        etcdHosts: ['http://localhost:2379'],
         ...keyOptions,
         ...addrOptions,
         type: fedcom.VALIDATOR_TYPE.LEADER,
@@ -50,6 +51,7 @@ describe(`Validator module`, function() {
     it(`Create a follower`, function() {
       // leader is considered to be validator 2
       const followerOptions = {
+        etcdHosts: ['http://localhost:2379'],
         ...keyOptions,
         ...addrOptions,
         type: fedcom.VALIDATOR_TYPE.FOLLOWER,
@@ -101,15 +103,20 @@ describe(`Validator module`, function() {
     });
 
     describe(`Switch to new leader`, function() {
-      const newLeader = {
-        type: fedcom.MSG_TYPE.HEARTBEAT,
-        pub: `tcp://127.0.0.1:13003`,
-        rep: `tcp://127.0.0.1:15003`,
-        clientRep: `tcp://127.0.0.1:17003`,
+      const newLeaderNodeInfo = {
+        id: uuidV4(),
+        pid: process.pid,
+        startedAt: new Date(),
+        networkInfo: {
+          leaderRepAddr: `tcp://127.0.0.1:15003`,
+          leaderPubAddr: `tcp://127.0.0.1:13003`,
+          leaderClientRepAddr: `tcp://127.0.0.1:17003`,
+        },
       };
 
       it(`Switch from leader to follower`, function() {
         const leaderOptions = {
+          etcdHosts: ['http://localhost:2379'],
           ...keyOptions,
           ...addrOptions,
           type: fedcom.VALIDATOR_TYPE.LEADER,
@@ -118,12 +125,11 @@ describe(`Validator module`, function() {
 
         // Validator starting as leader
         validator.start();
-        validator.switchToNewLeader(newLeader);
+        validator.switchToNewLeader(newLeaderNodeInfo);
 
         chai.expect(validator.leaderPubAddr).to.equal(`tcp://127.0.0.1:13003`);
         chai.expect(validator.leaderRepAddr).to.equal(`tcp://127.0.0.1:15003`);
         chai.expect(validator.leaderClientRepAddr).to.equal(`tcp://127.0.0.1:17003`);
-        chai.expect(validator.type).to.equal(fedcom.VALIDATOR_TYPE.FOLLOWER);
 
         // Stop the validator
         validator.stop();
@@ -134,6 +140,7 @@ describe(`Validator module`, function() {
         // Its leader is follower 2
         // It has been elected leader
         const followerOptions = {
+          etcdHosts: ['http://localhost:2379'],
           ...keyOptions,
           clientRepAddr: `tcp://127.0.0.1:17003`,
           pubAddr: `tcp://127.0.0.1:13003`,
@@ -141,19 +148,17 @@ describe(`Validator module`, function() {
           leaderPubAddr: `tcp://127.0.0.1:13002`,
           leaderRepAddr: `tcp://127.0.0.1:15002`,
           leaderClientRepAddr: `tcp://127.0.0.1:17002`,
-          type: fedcom.VALIDATOR_TYPE.FOLLOWER,
         };
         const validator = new Validator(new Connector.FABRIC(config.blockchains.fabric), followerOptions);
         // Validator starting as follower 3
         validator.start();
 
         // New leader is follower 3
-        validator.switchToNewLeader(newLeader);
+        validator.switchToNewLeader(newLeaderNodeInfo);
 
         chai.expect(validator.leaderPubAddr).to.equal(`tcp://127.0.0.1:13003`);
         chai.expect(validator.leaderRepAddr).to.equal(`tcp://127.0.0.1:15003`);
         chai.expect(validator.leaderClientRepAddr).to.equal(`tcp://127.0.0.1:17003`);
-        chai.expect(validator.type).to.equal(fedcom.VALIDATOR_TYPE.LEADER);
 
         // Stop the validator
         validator.stop();
@@ -164,6 +169,7 @@ describe(`Validator module`, function() {
         // His leader is follower 2
         // Elected validator is follower 3
         const followerOptions = {
+          etcdHosts: ['http://localhost:2379'],
           ...keyOptions,
           ...addrOptions,
           type: fedcom.VALIDATOR_TYPE.FOLLOWER,
@@ -176,7 +182,7 @@ describe(`Validator module`, function() {
         validator.start();
 
         // New leader is follower 3
-        validator.switchToNewLeader(newLeader);
+        validator.switchToNewLeader(newLeaderNodeInfo);
 
         chai.expect(validator.leaderPubAddr).to.equal(`tcp://127.0.0.1:13003`);
         chai.expect(validator.leaderRepAddr).to.equal(`tcp://127.0.0.1:15003`);
@@ -195,11 +201,18 @@ describe(`Validator module`, function() {
 
     it(`The messages are well published via the right addr`, async function() {
       const leaderOptions = {
+        etcdHosts: ['http://localhost:2379'],
         ...keyOptions,
         ...addrOptions,
-        type: fedcom.VALIDATOR_TYPE.LEADER,
       };
       leader = new Validator(new Connector.FABRIC(config.blockchains.fabric), leaderOptions);
+
+      // self promote to leader manually for test since there's no etd cluster, we need to fake/rig the election
+      leader.leaderNodeInfo = leader.selfNodeInfo;
+      // sets this.leaderPubAddr, this.leaderRepAddr, this.leaderClientRepAddr according to new leader
+      Object.assign(leader, leader.leaderNodeInfo.networkInfo);
+
+      chai.expect(leader.isCurrentNodeLeader()).to.equal(true);
 
       // Validator starting as leader
       leader.startAsLeader();
@@ -209,14 +222,14 @@ describe(`Validator module`, function() {
         new Promise((resolve, reject) => {
           const socket = zmq.socket(`sub`);
           try {
-            socket.connect(`tcp://127.0.0.1:13001`);
+            socket.connect(leader.leaderPubAddr);
             socket.subscribe(``);
           } catch (error) {
             reject(error);
           }
 
-          socket.on(`message`, type => {
-            resolve(type.toString());
+          socket.on(`message`, typeBuffer => {
+            resolve(typeBuffer.toString());
             clearInterval(leader.intervalExec);
             leader.publishSocket.close();
             leader.requestSocket.close();
@@ -224,13 +237,21 @@ describe(`Validator module`, function() {
           });
         });
 
-      const type = await receiveBroadcast();
-      const ok = [fedcom.MSG_TYPE.HEARTBEAT, fedcom.MSG_TYPE.NEWLEADER, fedcom.MSG_TYPE.SIGN].includes(type);
-      chai.expect(ok).to.equal(true);
+      setTimeout(() => {
+        const targetDLTType = `FABRIC`;
+        const data = {};
+        const type = fedcom.MSG_TYPE.SIGN;
+        const signatureReq = { type, data, targetDLTType, requester: leader.leaderRepAddr };
+        leader.publishSocket.send([fedcom.MSG_TYPE.SIGN, JSON.stringify(signatureReq)]);
+      }, 100);
+
+      const broadcastedType = await receiveBroadcast(); // if message didn't arrive this will cause the test to time out
+      chai.expect(broadcastedType).to.equal(fedcom.MSG_TYPE.SIGN);
     });
 
     it(`The leader listens to heartbeat messages at repAddr`, async function() {
       const leaderOptions = {
+        etcdHosts: ['http://localhost:2379'],
         ...keyOptions,
         clientRepAddr: `tcp://127.0.0.1:17002`,
         pubAddr: `tcp://127.0.0.1:13002`,
@@ -238,6 +259,13 @@ describe(`Validator module`, function() {
         type: fedcom.VALIDATOR_TYPE.LEADER,
       };
       const validator = new Validator(new Connector.FABRIC(config.blockchains.fabric), leaderOptions);
+
+      // self promote to leader manually for test since there's no etd cluster, we need to fake/rig the election
+      validator.leaderNodeInfo = validator.selfNodeInfo;
+      // sets this.leaderPubAddr, this.leaderRepAddr, this.leaderClientRepAddr according to new leader
+      Object.assign(validator, validator.leaderNodeInfo.networkInfo);
+
+      chai.expect(validator.isCurrentNodeLeader()).to.equal(true);
 
       // Validator starting as leader
       validator.startAsLeader();
@@ -274,6 +302,7 @@ describe(`Validator module`, function() {
 
     it(`The leader listens to signature messages at repAddr`, async function() {
       const leaderOptions = {
+        etcdHosts: ['http://localhost:2379'],
         ...keyOptions,
         clientRepAddr: `tcp://127.0.0.1:17003`,
         pubAddr: `tcp://127.0.0.1:13003`,
@@ -282,6 +311,12 @@ describe(`Validator module`, function() {
       };
       const validator = new Validator(new Connector.FABRIC(config.blockchains.fabric), leaderOptions);
 
+      // self promote to leader manually for test since there's no etd cluster, we need to fake/rig the election
+      validator.leaderNodeInfo = validator.selfNodeInfo;
+      // sets this.leaderPubAddr, this.leaderRepAddr, this.leaderClientRepAddr according to new leader
+      Object.assign(validator, validator.leaderNodeInfo.networkInfo);
+
+      chai.expect(validator.isCurrentNodeLeader()).to.equal(true);
       // Validator starting as leader
       validator.startAsLeader();
       const signature = {
@@ -388,7 +423,8 @@ describe(`Validator module`, function() {
   //     chai.expect(signature).to.have.own.property(`signature`);
   //     chai.expect(signature).to.deep.equal({
   //       type: fedcom.MSG_TYPE.SIGN,
-  //       signature: `31a5012bcdaf27b75d34c78d643d262c8b01db477dc65f308189866cfac0f82461362e3b00039007c2f1da164de7aeeba2f491711cde191957d51cc408eb1787`, // eslint-disable-line
+  // eslint-disable-next-line
+  //       signature: `31a5012bcdaf27b75d34c78d643d262c8b01db477dc65f308189866cfac0f82461362e3b00039007c2f1da164de7aeeba2f491711cde191957d51cc408eb1787`,
   //       pubKey: `031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b`,
   //     });
   //   });
@@ -401,6 +437,7 @@ describe(`Validator module`, function() {
 
       before(function() {
         const leaderOptions = {
+          etcdHosts: ['http://localhost:2379'],
           ...keyOptions,
           ...addrOptions,
           type: fedcom.VALIDATOR_TYPE.LEADER,
@@ -483,6 +520,7 @@ describe(`Validator module`, function() {
 
       before(function() {
         const followerOptions = {
+          etcdHosts: ['http://localhost:2379'],
           ...keyOptions,
           clientRepAddr: `tcp://127.0.0.1:17005`,
           pubAddr: `tcp://127.0.0.1:13005`,
