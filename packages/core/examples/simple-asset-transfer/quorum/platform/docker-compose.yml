@@ -60,7 +60,7 @@ x-quorum-def:
         --datadir $${DDIR} \
         --permissioned \
         --nodiscover \
-        --verbosity 5 \
+        --verbosity 2 \
         --networkid $${NETWORK_ID} \
         --rpc \
         --rpccorsdomain "*" \
