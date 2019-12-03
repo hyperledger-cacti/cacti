@@ -50,6 +50,7 @@ function mainTask()
   npm run quorum:api:down
 
   npm install
+  rm -rf fabric/api/fabric-client-kv-org*
 
   ### FABRIC
   cd ./fabric/api/
@@ -86,7 +87,7 @@ function mainTask()
   sleep 120
   npm run test:bc
 
-  dumpAllLogs
+  # dumpAllLogs
 
   npm run fed:quorum:down
   npm run fabric:down
@@ -104,7 +105,7 @@ function onTaskFailure()
 {
   set +e # do not crash process upon individual command failures
 
-  dumpAllLogs
+  # dumpAllLogs
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))
@@ -115,8 +116,10 @@ function onTaskFailure()
 function dumpAllLogs()
 {
   set +e # do not crash process upon individual command failures
+  ORIGINAL_PWD=$PWD
   cd "$PKG_ROOT_DIR" # switch back to the original root dir because we don't know where exactly the script crashed
   ./tools/dump-all-logs.sh $CI_ROOT_DIR
+  cd "$ORIGINAL_PWD"
 }
 
 (
