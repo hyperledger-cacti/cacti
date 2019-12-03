@@ -103,6 +103,8 @@ function mainTask()
   npm run scenario:QtF
   npm run scenario:FtQ
   npm run test:bc
+  
+  dumpAllLogs
 
   npm run fed:quorum:down
   npm run fed:fabric:down
@@ -121,7 +123,7 @@ function onTaskFailure()
 {
   set +e # do not crash process upon individual command failures
 
-  # dumpAllLogs
+  dumpAllLogs
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))
