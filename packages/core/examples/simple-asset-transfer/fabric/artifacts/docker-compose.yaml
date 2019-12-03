@@ -10,6 +10,7 @@ services:
   ca.org1.example.com:
     image: hyperledger/fabric-ca:1.4.0
     environment:
+      - FABRIC_LOGGING_SPEC=INFO
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org1
       - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
@@ -27,6 +28,7 @@ services:
   ca.org2.example.com:
     image: hyperledger/fabric-ca:1.4.0
     environment:
+      - FABRIC_LOGGING_SPEC=INFO
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-org2
       - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
@@ -45,7 +47,7 @@ services:
     container_name: orderer.example.com
     image: hyperledger/fabric-orderer:1.4.0
     environment:
-      - FABRIC_LOGGING_SPEC=debug
+      - FABRIC_LOGGING_SPEC=INFO
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
       - ORDERER_GENERAL_GENESISMETHOD=file
       - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
@@ -74,7 +76,7 @@ services:
       - CORE_PEER_ID=peer0.org1.example.com
       - CORE_PEER_LOCALMSPID=Org1MSP
       - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.example.com:7051      
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.example.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
     ports:
       - 7051:7051
@@ -93,7 +95,7 @@ services:
       - CORE_PEER_ID=peer1.org1.example.com
       - CORE_PEER_LOCALMSPID=Org1MSP
       - CORE_PEER_ADDRESS=peer1.org1.example.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051      
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.example.com:7051
     ports:
       - 7056:7051
@@ -112,7 +114,7 @@ services:
       - CORE_PEER_ID=peer0.org2.example.com
       - CORE_PEER_LOCALMSPID=Org2MSP
       - CORE_PEER_ADDRESS=peer0.org2.example.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2.example.com:7051      
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2.example.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.example.com:7051
     ports:
       - 8051:7051
@@ -131,7 +133,7 @@ services:
       - CORE_PEER_ID=peer1.org2.example.com
       - CORE_PEER_LOCALMSPID=Org2MSP
       - CORE_PEER_ADDRESS=peer1.org2.example.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.example.com:7051      
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.example.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2.example.com:7051
     ports:
       - 8056:7051
