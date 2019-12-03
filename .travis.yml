@@ -14,4 +14,4 @@ install:
   - docker-compose --version
 
 script:
-  - ./tools/ci.sh
+  - ./packages/core/tools/ci.sh
