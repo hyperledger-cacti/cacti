@@ -1,10 +1,10 @@
-# 172.21.0.0/20 - Network Federation-Quorum 
+# 172.21.0.0/20 - Network Federation-Quorum
 version: "3.7"
 
 networks:
   default:
     external:
-      name: "quorum_quorum-examples-net"
+      name: "quorum-examples-net"
 volumes:
     build:
 
@@ -19,7 +19,7 @@ services:
       dockerfile: ./Dockerfile
     image: "federation/qserver"
 
-    # Overwrite any env var defined in .env file (if required)    
+    # Overwrite any env var defined in .env file (if required)
     environment:
       NODE_ENV: development
       APP_PORT: 5050
@@ -36,20 +36,20 @@ services:
     ports:
      - 5050:5050
     entrypoint:
-     - npm 
+     - npm
      - run
      - "init-start"
     # command: "npm run init-start"
-  
+
   qserver2:
     hostname: qserver2
     volumes:
       # Mounts the project directory on the host to /app inside the container,
       # allowing you to modify the code without having to rebuild the image.
-      - build:/src/build/ 
+      - build:/src/build/
     image: "federation/qserver"
 
-    # Overwrite any env var defined in .env file (if required)    
+    # Overwrite any env var defined in .env file (if required)
     environment:
       NODE_ENV: development
       APP_PORT: 5051
@@ -66,17 +66,17 @@ services:
     ports:
      - 5051:5051
     depends_on:
-      - qserver1 
+      - qserver1
 
   qserver3:
     hostname: qserver3
     volumes:
       # Mounts the project directory on the host to /app inside the container,
       # allowing you to modify the code without having to rebuild the image.
-      - build:/src/build/ 
+      - build:/src/build/
     image: "federation/qserver"
 
-    # Overwrite any env var defined in .env file (if required)    
+    # Overwrite any env var defined in .env file (if required)
     environment:
       NODE_ENV: development
       APP_PORT: 5052
@@ -100,10 +100,10 @@ services:
     volumes:
       # Mounts the project directory on the host to /app inside the container,
       # allowing you to modify the code without having to rebuild the image.
-      - build:/src/build/ 
+      - build:/src/build/
     image: "federation/qserver"
 
-    # Overwrite any env var defined in .env file (if required)    
+    # Overwrite any env var defined in .env file (if required)
     environment:
       NODE_ENV: development
       APP_PORT: 5053

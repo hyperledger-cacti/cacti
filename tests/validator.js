@@ -4,6 +4,7 @@
 const chai = require(`chai`);
 const zmq = require(`zeromq`);
 const uuidV4 = require('uuid/v4');
+
 const fedcom = require(`../src/federation-communication`);
 const Validator = require(`../src/Validator`);
 const Multisig = require(`../src/Multisig`);

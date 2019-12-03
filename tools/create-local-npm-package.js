@@ -8,7 +8,7 @@ const PROJECT_ROOT = join(__dirname, '../'); // step out of the tools dir to pro
 const TMP_DIR = join(PROJECT_ROOT, './.tmp');
 
 /**
- * A short, self-contained script with zero non-builtin dependencies (so that it doesn't require package.sjon/npm install)
+ * A short, self-contained script with zero dependencies (so that it doesn't require package.sjon/npm install)
  * to be executed. It just needs NodeJS installed on the host operating system to be ready to go.
  *
  * The script is responsible for generating an npm package archivel file with a fixed name that can be used to install
