@@ -47,12 +47,9 @@ function mainTask()
   npm run quorum:api:down
 
   npm install
-  rm -rf ./node_modules/websocket/.git/
 
   ### FABRIC
   cd ./fabric/api/
-  rm -rf ./fabric-client-kv-org*
-  rm -rf ./node_modules/websocket/.git/
   npm install
   cd ../../
   npm run fabric
@@ -62,7 +59,6 @@ function mainTask()
   # Create docker network if not already in place
   docker network inspect quorum_quorum-examples-net > /dev/null || docker network create --gateway=172.16.239.1 --subnet=172.16.239.0/24 quorum_quorum-examples-net
   cd ./quorum/api/
-  rm -rf ./node_modules/websocket/.git/
   npm install
   cd ../../
   npm run quorum
