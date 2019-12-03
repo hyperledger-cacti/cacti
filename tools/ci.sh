@@ -58,7 +58,7 @@ function mainTask()
   ### QUORUM
 
   # Create docker network if not already in place
-  docker network inspect quorum_quorum-examples-net > /dev/null || docker network create --gateway=172.16.239.1 --subnet=172.16.239.0/24 quorum_quorum-examples-net
+  docker network rm quorum-examples-net > /dev/null || docker network create --gateway=172.16.239.1 --subnet=172.16.239.0/24 quorum-examples-net
   cd ./quorum/api/
   npm install
   cd ../../
