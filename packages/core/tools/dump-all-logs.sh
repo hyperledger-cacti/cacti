@@ -8,8 +8,8 @@
 
 set +e # do not crash process upon individual command failures
 
-ciRootDir=$1 # main script passes in the directory to operate in (where the right package.json exists with the tasks)
-cd $ciRootDir
+CI_ROOT_DIR=$1 # main script passes in the directory to operate in (where the right package.json exists with the tasks)
+cd $CI_ROOT_DIR
 
 # Echo a begin and end with a UUID so that it is easy to find the logs in large console outputs
 LOG_DUMP_SEPARATOR="52ab9841-eb58-4fba-8bd6-0d2eb091393f"

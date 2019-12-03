@@ -5,9 +5,10 @@
 ### Designed to be re-entrant on a local dev machine as well, not just on a newly pulled up VM.
 ###
 
-startedAt=`date +%s`
-baseDir=`pwd`
-ciRootDir="$baseDir/examples/simple-asset-transfer"
+STARTED_AT=`date +%s`
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PKG_ROOT_DIR="$SCRIPT_DIR/.."
+CI_ROOT_DIR="$PKG_ROOT_DIR/examples/simple-asset-transfer"
 
 function mainTask()
 {
@@ -32,16 +33,17 @@ function mainTask()
   java -version || true
 
   ### COMMON
+  cd $PKG_ROOT_DIR
 
-  rm -rf ./$ciRootDir/fabric/api/node_modules
-  rm -rf ./$ciRootDir/quorum/api/node_modules
-  rm -rf ./$ciRootDir/node_modules
+  rm -rf ./$CI_ROOT_DIR/fabric/api/node_modules
+  rm -rf ./$CI_ROOT_DIR/quorum/api/node_modules
+  rm -rf ./$CI_ROOT_DIR/node_modules
   rm -rf ./node_modules
 
   npm install
   npm run test
 
-  cd $ciRootDir
+  cd $CI_ROOT_DIR
   npm run fed:quorum:down
   npm run fabric:down
   npm run quorum:down
@@ -83,16 +85,17 @@ function mainTask()
   docker ps -a
   sleep 120
   npm run test:bc
+
+  dumpAllLogs
+
   npm run fed:quorum:down
   npm run fabric:down
   npm run quorum:down
   npm run quorum:api:down
   cd ../..
 
-  dumpAllLogs
-
-  endedAt=`date +%s`
-  runtime=$((endedAt-startedAt))
+  ENDED_AT=`date +%s`
+  runtime=$((ENDED_AT-STARTED_AT))
   echo "$(date -Iseconds) [CI] SUCCESS - runtime=$runtime seconds."
   exit 0
 }
@@ -103,8 +106,8 @@ function onTaskFailure()
 
   dumpAllLogs
 
-  endedAt=`date +%s`
-  runtime=$((endedAt-startedAt))
+  ENDED_AT=`date +%s`
+  runtime=$((ENDED_AT-STARTED_AT))
   echo "$(date -Iseconds) [CI] FAILURE - runtime=$runtime seconds."
   exit 1
 }
@@ -112,8 +115,8 @@ function onTaskFailure()
 function dumpAllLogs()
 {
   set +e # do not crash process upon individual command failures
-  cd "$baseDir" # switch back to the original root dir because we don't know where exactly the script crashed
-  ./tools/dump-all-logs.sh $ciRootDir
+  cd "$PKG_ROOT_DIR" # switch back to the original root dir because we don't know where exactly the script crashed
+  ./tools/dump-all-logs.sh $CI_ROOT_DIR
 }
 
 (
