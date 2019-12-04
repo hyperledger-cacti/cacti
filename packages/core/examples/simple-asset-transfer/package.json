@@ -2,7 +2,7 @@
 	"version": "0.1.0",
 	"name": "@hyperledger-labs/blockchain-integration-framework.examples.simple-asset-transfer",
 	"dependencies": {
-		"@hyperledger-labs/blockchain-integration-framework": "../../.tmp/hyperledger-labs-blockchain-integration-framework-dev.tgz",
+		"@hyperledger-labs/blockchain-integration-framework": "file:../../.tmp/hyperledger-labs-blockchain-integration-framework-dev.tgz",
 		"cookie-parser": "^1.4.4",
 		"express-bearer-token": "^2.4.0",
 		"express-jwt": "^5.3.1",

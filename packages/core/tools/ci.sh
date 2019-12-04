@@ -36,16 +36,29 @@ function mainTask()
   ### COMMON
   cd $PKG_ROOT_DIR
 
-  rm -rf ./$CI_ROOT_DIR/fabric/api/node_modules
-  rm -rf ./$CI_ROOT_DIR/quorum/api/node_modules
-  rm -rf ./$CI_ROOT_DIR/node_modules
+  rm -rf $CI_ROOT_DIR/fabric/api/node_modules
+  rm -rf $CI_ROOT_DIR/quorum/api/node_modules
+  rm -rf $CI_ROOT_DIR/node_modules
   rm -rf ./node_modules
 
   npm install
   npm run test
 
   cd $CI_ROOT_DIR
+  npm run fed:quorum:down
+  npm run fed:fabric:down
+  npm run fabric:down
+  npm run quorum:down
+  npm run quorum:api:down
+
   npm install
+
+  # The uninstall+install cycle is needed to erase any left-over SHA hash based lock which would cause npm to install
+  # from cache instead of grabbing the exact file that we just produced via the create local npm package script.
+  npm uninstall @hyperledger-labs/blockchain-integration-framework
+  npm install @hyperledger-labs/blockchain-integration-framework@file:../../.tmp/hyperledger-labs-blockchain-integration-framework-dev.tgz
+
+  rm -rf fabric/api/fabric-client-kv-org*
 
   ### FABRIC
 
@@ -88,7 +101,7 @@ function mainTask()
   # Run scenarios and blockchain regression tests
   npm run scenario:share
   npm run scenario:QtF
-  npm run scenario:FtQ  # TODO: needs fixing
+  npm run scenario:FtQ
   npm run test:bc
 
   npm run fed:quorum:down
