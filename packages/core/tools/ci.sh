@@ -2,7 +2,8 @@
 ###
 ### Continous Integration Shell Script
 ###
-### Designed to be re-entrant on a local dev machine as well, not just on a newly pulled up VM.
+### Designed to be re-entrant on a local dev machine as well, not just on a
+### newly pulled up VM.
 ###
 
 STARTED_AT=`date +%s`
@@ -35,9 +36,9 @@ function mainTask()
   ### COMMON
   cd $PKG_ROOT_DIR
 
-  rm -rf ./$CI_ROOT_DIR/fabric/api/node_modules
-  rm -rf ./$CI_ROOT_DIR/quorum/api/node_modules
-  rm -rf ./$CI_ROOT_DIR/node_modules
+  rm -rf $CI_ROOT_DIR/fabric/api/node_modules
+  rm -rf $CI_ROOT_DIR/quorum/api/node_modules
+  rm -rf $CI_ROOT_DIR/node_modules
   rm -rf ./node_modules
 
   npm install
@@ -45,14 +46,22 @@ function mainTask()
 
   cd $CI_ROOT_DIR
   npm run fed:quorum:down
+  npm run fed:fabric:down
   npm run fabric:down
   npm run quorum:down
   npm run quorum:api:down
 
   npm install
+
+  # The uninstall+install cycle is needed to erase any left-over SHA hash based lock which would cause npm to install
+  # from cache instead of grabbing the exact file that we just produced via the create local npm package script.
+  npm uninstall @hyperledger-labs/blockchain-integration-framework
+  npm install @hyperledger-labs/blockchain-integration-framework@file:../../.tmp/hyperledger-labs-blockchain-integration-framework-dev.tgz
+
   rm -rf fabric/api/fabric-client-kv-org*
 
   ### FABRIC
+
   cd ./fabric/api/
   npm install
   cd ../../
@@ -68,8 +77,11 @@ function mainTask()
   npm run quorum
   npm run quorum:api:build
   npm run quorum:api
+
+  # Build and launch federation validators
   npm run fed:build
   npm run fed:quorum
+  npm run fed:fabric
   docker images
 
   # If enough time have passed and there are still containers not ready then
@@ -84,12 +96,16 @@ function mainTask()
   done
 
   docker ps -a
-  sleep 120
+  sleep ${CI_CONTAINERS_WAIT_TIME:-120}
+
+  # Run scenarios and blockchain regression tests
+  npm run scenario:share nocorda
+  npm run scenario:QtF
+  npm run scenario:FtQ
   npm run test:bc
 
-  # dumpAllLogs
-
   npm run fed:quorum:down
+  npm run fed:fabric:down
   npm run fabric:down
   npm run quorum:down
   npm run quorum:api:down
@@ -116,10 +132,10 @@ function onTaskFailure()
 function dumpAllLogs()
 {
   set +e # do not crash process upon individual command failures
-  ORIGINAL_PWD=$PWD
-  cd "$PKG_ROOT_DIR" # switch back to the original root dir because we don't know where exactly the script crashed
-  ./tools/dump-all-logs.sh $CI_ROOT_DIR
-  cd "$ORIGINAL_PWD"
+  cd "$PKG_ROOT_DIR" # switch back to the original root dir because we don't
+                     # know where exactly the script crashed
+  [ "$CI_NO_DUMP_ALL_LOGS" ] || ./tools/dump-all-logs.sh $CI_ROOT_DIR
+  cd -
 }
 
 (

@@ -25,7 +25,7 @@ services:
       APP_PORT: 5050
       APP_HOST_LINUX: qserver1
       WEB3_HOST_LINUX: node1
-      WEB3_PORT: 8546
+      WEB3_RPC_PORT: 8545
 
       # VALIDATOR
       WEB3_ETH_KEY: "0xed9d02e382b34818e88B88a309c7fe71E65f419d"
@@ -55,7 +55,7 @@ services:
       APP_PORT: 5051
       APP_HOST_LINUX: qserver2
       WEB3_HOST_LINUX: node2
-      WEB3_PORT: 8546
+      WEB3_RPC_PORT: 8545
 
       # VALIDATOR
       WEB3_ETH_KEY: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e"
@@ -82,7 +82,7 @@ services:
       APP_PORT: 5052
       APP_HOST_LINUX: qserver3
       WEB3_HOST_LINUX: node3
-      WEB3_PORT: 8546
+      WEB3_RPC_PORT: 8545
 
       # VALIDATOR
       WEB3_ETH_KEY: "0x0fbdc686b912d7722dc86510934589e0aaf3b55a"
@@ -109,7 +109,7 @@ services:
       APP_PORT: 5053
       APP_HOST_LINUX: qserver4
       WEB3_HOST_LINUX: node4
-      WEB3_PORT: 8546
+      WEB3_RPC_PORT: 8545
 
       # VALIDATOR
       WEB3_ETH_KEY: "0x9186eb3d20cbd1f5f992a950d808c4495153abd5"

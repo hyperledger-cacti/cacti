@@ -38,7 +38,7 @@ const envVarsSchema = Joi.object({
   WEB3_HOST_WIN32: Joi.string()
     .required()
     .description('Quorum host win32'),
-  WEB3_PORT: Joi.number().required(),
+  WEB3_RPC_PORT: Joi.number().required(),
   WEB3_ETH_KEY: Joi.string()
     .required()
     .description('Ethereum key'),

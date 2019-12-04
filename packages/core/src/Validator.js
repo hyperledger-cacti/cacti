@@ -102,6 +102,36 @@ class Validator {
   }
 
   async setupLeaderElections() {
+
+    const leaseTtlSeconds = Math.round(this.electionTimeout / 1000);
+    logger.debug(`Creating lease with TTL=${leaseTtlSeconds} seconds...`);
+    const theLease = this.etcdClient.lease(leaseTtlSeconds);
+
+    theLease.on('lost', () => logger.debug(['LEASE:keepaliveLost']));
+    theLease.on('keepaliveFailed', () => logger.warn(['LEASE:keepaliveFailed']));
+    theLease.on('keepaliveEstablished', () => logger.debug(['LEASE:keepaliveEstablished']));
+
+    const maxTries = 25;
+    let didSucceed = false;
+    let tryIndex = 0;
+    let lastError;
+    const tryDelayMs = 5000;
+    while (++tryIndex < maxTries && !didSucceed) {
+      try {
+        logger.debug(`Calling attemptToBecomeLeader() ${maxTries}/${tryIndex}`);
+        await this.attemptToBecomeLeader(theLease);
+        didSucceed = true;
+      } catch (ex) {
+        didSucceed = false;
+        lastError = ex;
+        logger.debug(`Will re-try attemptToBecomeLeader() ...`);
+        await new Promise((resolve) => setTimeout(resolve, tryDelayMs));
+      }
+    }
+    if (!didSucceed) {
+      throw lastError;
+    }
+
     // Setup the watcher
     const watcher = await this.etcdClient
       .watch()
@@ -117,34 +147,44 @@ class Validator {
         logger.debug(`[WATCH] key ${BIF_LEADER} got set to new value: `, newLeaderNodeInfoJson);
         const newLeaderNodeInfo = JSON.parse(newLeaderNodeInfoJson);
         this.switchToNewLeader(newLeaderNodeInfo);
+        // TODO: check if this gets called when leader ttl expires as well. If yes, we can pounce on that to attempt
+        // leadership.
       });
     // Finished settig up watcher
 
-    const leaseTtlSeconds = Math.round(this.electionTimeout / 1000);
-    logger.debug(`Creating lease with TTL=${leaseTtlSeconds} seconds...`);
-    const theLease = this.etcdClient.lease(leaseTtlSeconds);
-
-    theLease.on('lost', () => logger.debug(['LEASE:keepaliveLost']));
-    theLease.on('keepaliveFailed', () => logger.warn(['LEASE:keepaliveFailed']));
-    theLease.on('keepaliveEstablished', () => logger.debug(['LEASE:keepaliveEstablished']));
-
-    this.attemptToBecomeLeader(theLease);
     setInterval(this.attemptToBecomeLeader.bind(this, theLease), this.randomizedLeadershipPoolInterval);
+    logger.debug(`Scheduled regular attemptToBecomeLeader() calls every ${this.randomizedLeadershipPoolInterval}ms`);
   }
 
   attemptToBecomeLeader(theLease) {
     if (this.isCurrentNodeLeader()) {
       return;
     }
-    this.etcdClient
+    return this.etcdClient
       .if(BIF_LEADER, 'Lease', '==', 0)
       .then(theLease.put(BIF_LEADER).value(JSON.stringify(this.selfNodeInfo)))
       .else(this.etcdClient.get(BIF_LEADER))
       .commit()
-      // .then(transactionResponse => {
-      //   logger.debug(`TransactionResponse=${JSON.stringify(transactionResponse)}`);
-      // })
-      .catch(ex => logger.error('Leadership attempt failed with exception:', ex));
+      .then(txnResponse => {
+        logger.debug(`attemptToBecomeLeader() succeeded=${txnResponse.succeeded}`);
+        let newLeaderNodeInfo
+        if (txnResponse.succeeded) {
+          newLeaderNodeInfo = this.selfNodeInfo;
+        } else {
+          // For details on the txResponse structure visit the link below:
+          // https://mixer.github.io/etcd3/interfaces/rpc_.itxnresponse.html
+          const { responses } = txnResponse;
+          const [getBifLeaderResponse] = responses;
+          const { response_range } = getBifLeaderResponse;
+          const { kvs } = response_range;
+          const [newLeaderNodeInfoEntry] = kvs;
+          const { value: newLeaderNodeInfoBuffer } = newLeaderNodeInfoEntry;
+          const newLeaderNodeInfoJson = newLeaderNodeInfoBuffer.toString('utf8');
+          logger.debug(`attemptToBecomeLeader() newLeaderNodeInfoJson=${newLeaderNodeInfoJson}`);
+          newLeaderNodeInfo = JSON.parse(newLeaderNodeInfoJson);
+        }
+        this.switchToNewLeader(newLeaderNodeInfo);
+      });
   }
 
   /**
@@ -299,6 +339,11 @@ class Validator {
    * @return {void}
    */
   switchToNewLeader(newLeaderNodeInfo) {
+    if (this.leaderNodeInfo && this.leaderNodeInfo.id === newLeaderNodeInfo.id) {
+      logger.debug(`switchToNewLeader() leader is same as before...`, JSON.stringify(newLeaderNodeInfo));
+    } else {
+      logger.debug(`switchToNewLeader() leader is different from before...`, JSON.stringify(newLeaderNodeInfo));
+    }
     this.leaderNodeInfo = newLeaderNodeInfo;
 
     // TODO(peter.somogyvari): Once leader election has enough test coverage, get rid of these property assignments
