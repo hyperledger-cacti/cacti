@@ -99,7 +99,7 @@ function mainTask()
   sleep ${CI_CONTAINERS_WAIT_TIME:-120}
 
   # Run scenarios and blockchain regression tests
-  npm run scenario:share
+  npm run scenario:share nocorda
   npm run scenario:QtF
   npm run scenario:FtQ
   npm run test:bc
