@@ -104,6 +104,8 @@ function mainTask()
   npm run scenario:FtQ
   npm run test:bc
 
+  dumpAllLogs
+
   npm run fed:quorum:down
   npm run fed:fabric:down
   npm run fabric:down
@@ -119,9 +121,9 @@ function mainTask()
 
 function onTaskFailure()
 {
-  set +e # do not crash process upon individual command failures
+  set +eu # do not crash process upon individual command failures
 
-  # dumpAllLogs
+  dumpAllLogs
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))
@@ -131,7 +133,7 @@ function onTaskFailure()
 
 function dumpAllLogs()
 {
-  set +e # do not crash process upon individual command failures
+  set +eu # do not crash process upon individual command failures
   cd "$PKG_ROOT_DIR" # switch back to the original root dir because we don't
                      # know where exactly the script crashed
   [ "$CI_NO_DUMP_ALL_LOGS" ] || ./tools/dump-all-logs.sh $CI_ROOT_DIR
