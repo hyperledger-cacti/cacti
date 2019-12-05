@@ -18,7 +18,7 @@ const connectorFabric = new ConnectorFabric(conf.blockchains.fabric);
     const noCorda = process.argv.indexOf('nocorda') > -1;
 
     // Step.1: Ask for Corda public keys
-    let cordaPubKeys;
+    let cordaPubKeys = [];
     if (!noCorda) {
       const askForCordaPubKeyRequests = conf.federations.corda.map(endpoint => Client.askForPubKey(endpoint));
       cordaPubKeys = await Promise.all(askForCordaPubKeyRequests);
@@ -26,7 +26,7 @@ const connectorFabric = new ConnectorFabric(conf.blockchains.fabric);
     }
 
     // Step.2: Ask for Quorum public keys
-    let quorumPubKeys;
+    let quorumPubKeys = [];
     if (!noQuorum) {
       const askForQuorumPubKeyRequests = conf.federations.quorum.map(endpoint => Client.askForPubKey(endpoint));
       quorumPubKeys = await Promise.all(askForQuorumPubKeyRequests);
@@ -34,7 +34,7 @@ const connectorFabric = new ConnectorFabric(conf.blockchains.fabric);
     }
 
     // Step.3: Ask for Fabric public keys
-    let fabricPubKeys;
+    let fabricPubKeys = [];
     if (!noFabric) {
       const askForFabricPubKeyRequests = conf.federations.fabric.map(endpoint => Client.askForPubKey(endpoint));
       fabricPubKeys = await Promise.all(askForFabricPubKeyRequests);
@@ -42,32 +42,23 @@ const connectorFabric = new ConnectorFabric(conf.blockchains.fabric);
     }
 
     // Step.4 Add Corda + Quorum public keys to Fabric network
-    if (!noCorda && !noFabric) {
-      const cordaValForFabric = await cordaPubKeys.reduce(
-        (acc, currentKey, index) =>
-          acc.then(() => connectorFabric.addForeignValidator(currentKey, `corda_validator_${index + 1}`)),
-        Promise.resolve()
-      );
-      logger.info(`Corda Validators has been added to Fabric successfully`, { cordaValForFabric });
-    }
-    if (!noQuorum && !noFabric) {
-      const quorumValForFabric = await quorumPubKeys.reduce(
-        (acc, currentKey, index) =>
-          acc.then(() => connectorFabric.addForeignValidator(currentKey, `quorum_validator_${index + 1}`)),
-        Promise.resolve()
-      );
-      logger.info(`Quorum Validators has been added to Fabric successfully`, { quorumValForFabric });
+    if (!noFabric) {
+      const otherKeys = quorumPubKeys.concat(cordaPubKeys);
+      const quorumValForFabric = await Promise.all(quorumPubKeys.map(
+        (currentKey, index) =>
+          connectorFabric.addForeignValidator(currentKey, `quorum_validator_${index + 1}`)
+      ));
+      logger.info(`Corda and Quorum Validators has been added to Fabric successfully`, { quorumValForFabric });
     }
 
     // Step.5 Add Fabric + Quorum public keys to Corda network
-    if (!noQuorum && !noCorda) {
+    if (!noCorda) {
       const addQuorumValToCordaRequests = await quorumPubKeys.map((key, index) =>
         connectorCorda.addForeignValidator(key, `quorum_validator_${index + 1}`)
       );
       const quorumValForCorda = await Promise.all(addQuorumValToCordaRequests);
       logger.info(`Foreign Validators has been added to Corda successfully`, { quorumValForCorda });
-    }
-    if (!noFabric && !noCorda) {
+
       const addFabricValToCordaRequests = await fabricPubKeys.map((key, index) =>
         connectorCorda.addForeignValidator(key, `fabric_validator_${index + 1}`)
       );
@@ -76,14 +67,13 @@ const connectorFabric = new ConnectorFabric(conf.blockchains.fabric);
     }
 
     // Step.6 Add Corda + Fabric pubic keys to Quorum network
-    if (!noCorda && !noQuorum) {
+    if (!noQuorum) {
       const addCordaValToQuorumRequests = cordaPubKeys.map((key, index) =>
         connectorQuorum.addForeignValidator(key, `corda_validator_${index + 1}`)
       );
       const cordaValForQuorum = await Promise.all(addCordaValToQuorumRequests);
       logger.info(`Foreign Validators has been added to Quorum successfully`, { cordaValForQuorum });
-    }
-    if (!noFabric && !noQuorum) {
+
       const addFabricValToQuorumRequests = fabricPubKeys.map((key, index) =>
         connectorQuorum.addForeignValidator(key, `fabric_validator_${index + 1}`)
       );
