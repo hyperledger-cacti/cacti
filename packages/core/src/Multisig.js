@@ -2,8 +2,6 @@ const secp256k1 = require(`secp256k1`);
 const cryptoUtils = require(`./crypto-utils`);
 
 class Multisig {
-  // TODO: Error handling (class-wide)
-
   /**
    * @param {String} msg Message
    */
@@ -23,11 +21,12 @@ class Multisig {
    * @return {string} Formatted Message
    */
   setMsg(msg) {
-    if (Object.prototype.toString.call(msg) === `[object String]`) {
-      this.msg = msg;
-      this.formattedMsg = cryptoUtils.dataHash(this.msg);
-      this.signatures = {};
+    if (typeof msg !== 'string') {
+      throw new Error('argument must be a string');
     }
+    this.msg = msg;
+    this.formattedMsg = cryptoUtils.dataHash(this.msg);
+    this.signatures = {};
     return this.formattedMsg;
   }
 
