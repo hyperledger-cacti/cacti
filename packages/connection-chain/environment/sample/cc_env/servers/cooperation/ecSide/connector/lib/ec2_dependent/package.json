@@ -1,0 +1,10 @@
+{
+  "name": "dependent",
+  "version": "0.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "web3": "^0.20.0"
+  }
+}

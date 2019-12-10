@@ -1,0 +1,133 @@
+# Copyright 2019 Fujitsu Laboratories Ltd.
+# SPDX-License-Identifier: Apache-2.0
+version: '2'
+networks:
+  ccnet:
+    external: true
+  ec1net:
+    external: true
+  ec2net:
+    external: true
+services:
+  rest-server:
+    build: ../../../base/cc_env/servers/restserver/build
+    image: hyperledger/ccenv-node6-rest-server
+    container_name: rest-server
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/work/server
+    volumes:
+      - ../../../base/cc_env/servers/restserver:/opt/gopath/src/github.com/hyperledger/fabric/work/server
+      - ../servers/restserver/coreapi/config:/opt/gopath/src/github.com/hyperledger/fabric/work/server/coreapi/config
+      - ../servers/restserver/coreapi/lib/userImple:/opt/gopath/src/github.com/hyperledger/fabric/work/server/coreapi/lib/userImple
+      - ../servers/restserver/coreapi/routes/userImple:/opt/gopath/src/github.com/hyperledger/fabric/work/server/coreapi/routes/userImple
+      - ../servers/restserver/coreapi/app.js:/opt/gopath/src/github.com/hyperledger/fabric/work/server/coreapi/app.js
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+#    ports:
+#      - '3030:3030'
+    command: /bin/bash -c "/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh && /opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh"
+  app-server:
+    build: ../../../base/cc_env/servers/appserver/build
+    image: hyperledger/ccenv-node6-app-server
+    container_name: app-server
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/work/server
+    volumes:
+      - ../../../base/cc_env/servers/appserver:/opt/gopath/src/github.com/hyperledger/fabric/work/server
+      - ../servers/appserver/serviceapi/routes/userImple:/opt/gopath/src/github.com/hyperledger/fabric/work/server/serviceapi/routes/userImple
+      - ../servers/appserver/serviceapi/app.js:/opt/gopath/src/github.com/hyperledger/fabric/work/server/serviceapi/app.js
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - '3031:3031'
+    command: /bin/bash -c "/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh && /opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh"
+  ec1-adapter:
+    build: ../../../base/cc_env/servers/cooperation/coreSide/build
+    image: hyperledger/ccenv-node8-adapter-server
+    container_name: ec1-adapter
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/work/server
+    volumes:
+      - ../../../base/cc_env/servers/cooperation/coreSide/build:/opt/gopath/src/github.com/hyperledger/fabric/work/server/build
+      - ../../../base/cc_env/servers/cooperation/coreSide/idle.sh:/opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh
+      - ../../../base/cc_env/servers/cooperation/coreSide/setup.sh:/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh
+      - ../../../base/cc_env/servers/cooperation/coreSide/ec1_adapter:/opt/gopath/src/github.com/hyperledger/fabric/work/server/adapter
+      - ../servers/cooperation/coreSide/adapter/lib/ec1_dependent:/opt/gopath/src/github.com/hyperledger/fabric/work/server/adapter/lib/dependent
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+#    ports:
+#      - '5030:5030'
+    command: /bin/bash -c "/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh && /opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh"
+  ec1-connector:
+    build: ../../../base/cc_env/servers/cooperation/ecSide/build
+    image: hyperledger/ccenv-node8-connector-server
+    container_name: ec1-connector
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/work/server
+    volumes:
+      - ../../../base/cc_env/servers/cooperation/ecSide/build:/opt/gopath/src/github.com/hyperledger/fabric/work/server/build
+      - ../../../base/cc_env/servers/cooperation/ecSide/idle.sh:/opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh
+      - ../../../base/cc_env/servers/cooperation/ecSide/setup.sh:/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh
+      - ../../../base/cc_env/servers/cooperation/ecSide/ec1_connector:/opt/gopath/src/github.com/hyperledger/fabric/work/server/connector
+      - ../servers/cooperation/ecSide/connector/lib/ec1_dependent:/opt/gopath/src/github.com/hyperledger/fabric/work/server/connector/lib/dependent
+    networks:
+      - ec1net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - '5040:5040'
+    command: /bin/bash -c "/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh && /opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh"
+  ec2-adapter:
+    image: hyperledger/ccenv-node8-adapter-server
+    container_name: ec2-adapter
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/work/server
+    volumes:
+      - ../../../base/cc_env/servers/cooperation/coreSide/build:/opt/gopath/src/github.com/hyperledger/fabric/work/server/build
+      - ../../../base/cc_env/servers/cooperation/coreSide/idle.sh:/opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh
+      - ../../../base/cc_env/servers/cooperation/coreSide/setup.sh:/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh
+      - ../../../base/cc_env/servers/cooperation/coreSide/ec2_adapter:/opt/gopath/src/github.com/hyperledger/fabric/work/server/adapter
+      - ../servers/cooperation/coreSide/adapter/lib/ec2_dependent:/opt/gopath/src/github.com/hyperledger/fabric/work/server/adapter/lib/dependent
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+#    ports:
+#      - '6030:6030'
+    command: /bin/bash -c "/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh && /opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh"
+  ec2-connector:
+    image: hyperledger/ccenv-node8-connector-server
+    container_name: ec2-connector
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/work/server
+    volumes:
+      - ../../../base/cc_env/servers/cooperation/ecSide/build:/opt/gopath/src/github.com/hyperledger/fabric/work/server/build
+      - ../../../base/cc_env/servers/cooperation/ecSide/idle.sh:/opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh
+      - ../../../base/cc_env/servers/cooperation/ecSide/setup.sh:/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh
+      - ../../../base/cc_env/servers/cooperation/ecSide/ec2_connector:/opt/gopath/src/github.com/hyperledger/fabric/work/server/connector
+      - ../servers/cooperation/ecSide/connector/lib/ec2_dependent:/opt/gopath/src/github.com/hyperledger/fabric/work/server/connector/lib/dependent
+    networks:
+      - ec2net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - '6040:6040'
+    command: /bin/bash -c "/opt/gopath/src/github.com/hyperledger/fabric/work/server/setup.sh && /opt/gopath/src/github.com/hyperledger/fabric/work/server/idle.sh"
