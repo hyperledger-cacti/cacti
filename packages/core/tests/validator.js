@@ -326,9 +326,9 @@ describe(`Validator module`, function() {
         pubKey: `031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b`,
       };
 
-      // validator.signatures is supposed to be a Multisig object
+      // validator.currentMultisig is supposed to be a Multisig object
       // Created when the leader received a signature request
-      validator.signatures = new Multisig(`some data`);
+      validator.currentMultisig = new Multisig(`some data`);
 
       // Replace the dataSign method by the a fake function
       // That returns {data: `some data`, signature: ecdsa256(sha256(`some data`))}

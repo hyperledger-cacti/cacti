@@ -43,13 +43,13 @@ describe(`Multisig module`, function() {
     describe(`Add signatures`, function() {
       it(`Add a signature to an empty message`, function() {
         const emptyMultisig = new Multisig();
-        emptyMultisig.addSignature();
+        chai.expect(emptyMultisig.addSignature).to.throw(TypeError);
         chai.expect(emptyMultisig.signatures).to.deep.equal({});
       });
 
       it(`Add a wrong signature`, function() {
         const helloWorldMultisig = new Multisig(`hello_world`);
-        helloWorldMultisig.addSignature();
+        chai.expect(helloWorldMultisig.addSignature).to.throw(TypeError);
         chai.expect(helloWorldMultisig.signatures).to.deep.equal({});
       });
 

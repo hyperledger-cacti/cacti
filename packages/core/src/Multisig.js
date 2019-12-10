@@ -15,14 +15,18 @@ class Multisig {
     }
   }
 
+  isNonEmptyString(arg) {
+    return arg && typeof arg === 'string';
+  }
+
   /**
    * Change the raw message and reset options
    * @param {string} msg Message
    * @return {string} Formatted Message
    */
   setMsg(msg) {
-    if (typeof msg !== 'string') {
-      throw new Error('argument must be a string');
+    if (!this.isNonEmptyString(msg)) {
+      throw new TypeError('Argument must be a non-empty string');
     }
     this.msg = msg;
     this.formattedMsg = cryptoUtils.dataHash(this.msg);
@@ -37,6 +41,9 @@ class Multisig {
    * @return {boolean} Verify Signature Result
    */
   verifySignature(pubKey, signedMsg) {
+    if (!this.isNonEmptyString(pubKey) || !this.isNonEmptyString(signedMsg)) {
+      throw new TypeError('Arguments must be public key and signatures as strings');
+    }
     return secp256k1.verify(
       Buffer.from(this.formattedMsg, `hex`),
       Buffer.from(signedMsg, `hex`),
@@ -51,10 +58,14 @@ class Multisig {
    * @return {object} Signatures
    */
   addSignature(pubKey, signedMsg) {
-    if (this.msg !== null && pubKey !== undefined && signedMsg !== undefined) {
-      if (!(pubKey in this.signatures)) {
-        this.signatures[pubKey] = signedMsg;
-      }
+    if (!this.msg) {
+      throw new TypeError('Message is not set yet');
+    }
+    if (!this.isNonEmptyString(pubKey) && !this.isNonEmptyString(signedMsg)) {
+      throw new TypeError('Arguments must be public key and signatures as strings');
+    }
+    if (!(pubKey in this.signatures)) {
+      this.signatures[pubKey] = signedMsg;
     }
     return this.signatures;
   }
@@ -65,6 +76,9 @@ class Multisig {
    * @returns {boolean[]} verified Signatures
    */
   verifyRequiredSignature(requiredPubKeys) {
+    if (!requiredPubKeys || !requiredPubKeys.constructor === Array) {
+      throw new Error('Argument must be an array of public keys');
+    };
     const verifiedSignatures = [];
     requiredPubKeys.forEach(pubKey => {
       let verify = false;
@@ -74,6 +88,7 @@ class Multisig {
       verifiedSignatures.push(verify);
     });
     return verifiedSignatures;
+
   }
 }
 
