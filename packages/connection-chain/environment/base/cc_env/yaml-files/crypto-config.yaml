@@ -1,0 +1,14 @@
+# Copyright 2019 Fujitsu Laboratories Ltd.
+# SPDX-License-Identifier: Apache-2.0
+OrdererOrgs:
+  - Name: Orderer
+    Domain: example.com
+    Specs:
+      - Hostname: orderer
+PeerOrgs:
+  - Name: Org1
+    Domain: org1.example.com
+    Template:
+      Count: 4
+    Users:
+      Count: 1
