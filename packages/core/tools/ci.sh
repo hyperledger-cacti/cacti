@@ -31,7 +31,7 @@ function mainTask()
   docker-compose --version
   node --version
   npm --version
-  java -version || true
+  java -version
 
   ### COMMON
   cd $PKG_ROOT_DIR
@@ -47,6 +47,7 @@ function mainTask()
   cd $CI_ROOT_DIR
   npm run fed:quorum:down
   npm run fed:fabric:down
+  npm run fed:corda:down
   npm run fabric:down
   npm run quorum:down
   npm run quorum:api:down
@@ -58,10 +59,9 @@ function mainTask()
   npm uninstall @hyperledger-labs/blockchain-integration-framework
   npm install @hyperledger-labs/blockchain-integration-framework@file:../../.tmp/hyperledger-labs-blockchain-integration-framework-dev.tgz
 
-  rm -rf fabric/api/fabric-client-kv-org*
-
   ### FABRIC
 
+  rm -rf fabric/api/fabric-client-kv-org*
   cd ./fabric/api/
   npm install
   cd ../../
@@ -82,7 +82,6 @@ function mainTask()
   npm run fed:build
   npm run fed:quorum
   npm run fed:fabric
-  docker images
 
   # If enough time have passed and there are still containers not ready then
   # just assume that they are in a crash loop and abort CI run.
@@ -94,23 +93,38 @@ function mainTask()
     iterationCount=$[$iterationCount +1]
     sleep 15; echo; date;
   done
-
-  docker ps -a
   sleep ${CI_CONTAINERS_WAIT_TIME:-120}
 
   # Run scenarios and blockchain regression tests
-  npm run scenario:share nocorda
+  if [ -v CI_NO_CORDA ]; then
+      npm run scenario:share nocorda
+  else
+      npm run corda:build
+      npm run corda
+      npm run fed:corda
+      sleep ${CI_CONTAINERS_WAIT_TIME:-12}
+
+      # Run scenarios between Corda and Quorum
+      npm run scenario:share
+      npm run scenario:CtF
+      npm run scenario:FtC
+      npm run scenario:CtQ
+      npm run scenario:QtC
+  fi
   npm run scenario:QtF
   npm run scenario:FtQ
   npm run test:bc
 
   dumpAllLogs
 
+  # Unloading Quorum staff to save resources for Corda
   npm run fed:quorum:down
+  npm run fed:corda:down
   npm run fed:fabric:down
-  npm run fabric:down
-  npm run quorum:down
+  npm run corda:down
   npm run quorum:api:down
+  npm run quorum:down
+  npm run fabric:down
   cd ../..
 
   ENDED_AT=`date +%s`
@@ -136,7 +150,7 @@ function dumpAllLogs()
   set +eu # do not crash process upon individual command failures
   cd "$PKG_ROOT_DIR" # switch back to the original root dir because we don't
                      # know where exactly the script crashed
-  [ "$CI_NO_DUMP_ALL_LOGS" ] || ./tools/dump-all-logs.sh $CI_ROOT_DIR
+  [ -v CI_NO_DUMP_ALL_LOGS ] || ./tools/dump-all-logs.sh $CI_ROOT_DIR
   cd -
 }
 

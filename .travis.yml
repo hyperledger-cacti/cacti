@@ -9,12 +9,8 @@ dist: bionic
 services:
   - docker
 
-install:
-  - docker --version
-  - docker-compose --version
-
 script:
-  - ./packages/core/tools/ci.sh
+  - CI_CONTAINERS_WAIT_TIME=12 CI_NO_CORDA=true ./packages/core/tools/ci.sh
 
 after_script:
   - docker ps -a
