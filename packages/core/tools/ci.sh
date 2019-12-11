@@ -78,11 +78,16 @@ function mainTask()
   npm run quorum:api:build
   npm run quorum:api
 
+  ### CORDA
+
+  npm run corda:build
+  npm run corda
+
   # Build and launch federation validators
   npm run fed:build
   npm run fed:quorum
   npm run fed:fabric
-  docker images
+  npm run fed:corda
 
   # If enough time have passed and there are still containers not ready then
   # just assume that they are in a crash loop and abort CI run.
@@ -99,7 +104,7 @@ function mainTask()
   sleep ${CI_CONTAINERS_WAIT_TIME:-120}
 
   # Run scenarios and blockchain regression tests
-  npm run scenario:share nocorda
+  npm run scenario:share
   npm run scenario:QtF
   npm run scenario:FtQ
   npm run test:bc
