@@ -1,8 +1,6 @@
 language: node_js
 node_js:
   - 8
-jdk:
-  - oraclejdk8
 
 os: linux
 
@@ -11,9 +9,19 @@ dist: bionic
 services:
   - docker
 
+env:
+  - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
 install:
-  - docker --version
-  - docker-compose --version
+  - sudo apt-get update
+  - sudo apt-get purge -y java-common
+  - dpkg -l | grep 'jdk\|jre' | awk '{print $2}' | sudo xargs apt-get purge -y
+  - dpkg -l | grep 'jdk\|jre\|java' || true
+  - sudo rm -rf /usr/local/lib/jvm/
+  - which java || true
+  - java -version || true
+  - sudo apt-get install -y openjdk-8-jre-headless
+  - java -version
 
 script:
   - ./packages/core/tools/ci.sh
