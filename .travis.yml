@@ -14,13 +14,9 @@ env:
 
 install:
   - sudo apt-get update
-  - sudo apt-get purge -y java-common
-  - dpkg -l | grep 'jdk\|jre' | awk '{print $2}' | sudo xargs apt-get purge -y
-  - dpkg -l | grep 'jdk\|jre\|java' || true
+  - sudo apt-get purge -y java-common openjdk-\*
   - sudo rm -rf /usr/local/lib/jvm/
-  - which java || true
-  - java -version || true
-  - sudo apt-get install -y openjdk-8-jre-headless
+  - sudo apt-get install -y openjdk-8-jdk-headless
   - java -version
 
 script:
