@@ -69,42 +69,42 @@ function mainTask()
 
   ### QUORUM
 
-  # Create docker network if not already in place
-  docker network rm quorum-examples-net > /dev/null || docker network create --gateway=172.16.239.1 --subnet=172.16.239.0/24 quorum-examples-net
-  cd ./quorum/api/
-  npm install
-  cd ../../
-  npm run quorum
-  npm run quorum:api:build
-  npm run quorum:api
+  # # Create docker network if not already in place
+  # docker network rm quorum-examples-net > /dev/null || docker network create --gateway=172.16.239.1 --subnet=172.16.239.0/24 quorum-examples-net
+  # cd ./quorum/api/
+  # npm install
+  # cd ../../
+  # npm run quorum
+  # npm run quorum:api:build
+  # npm run quorum:api
 
-  # Build and launch federation validators
+  # # Build and launch federation validators
   npm run fed:build
-  npm run fed:quorum
+  # npm run fed:quorum
   npm run fed:fabric
 
-  # If enough time have passed and there are still containers not ready then
-  # just assume that they are in a crash loop and abort CI run.
-  iterationCount=1
-  while docker ps | grep "starting\|unhealthy"; do
-    if [ "$iterationCount" -gt 20 ]; then
-      false;
-    fi
-    iterationCount=$[$iterationCount +1]
-    sleep 15; echo; date;
-  done
-  sleep ${CI_CONTAINERS_WAIT_TIME:-120}
+  # # If enough time have passed and there are still containers not ready then
+  # # just assume that they are in a crash loop and abort CI run.
+  # iterationCount=1
+  # while docker ps | grep "starting\|unhealthy"; do
+  #   if [ "$iterationCount" -gt 20 ]; then
+  #     false;
+  #   fi
+  #   iterationCount=$[$iterationCount +1]
+  #   sleep 15; echo; date;
+  # done
+  # sleep ${CI_CONTAINERS_WAIT_TIME:-120}
 
-  # Run scenarios and blockchain regression tests
-  npm run scenario:share nocorda
-  npm run scenario:QtF
-  npm run scenario:FtQ
-  npm run test:bc
+  # # Run scenarios and blockchain regression tests
+  # npm run scenario:share nocorda
+  # npm run scenario:QtF
+  # npm run scenario:FtQ
+  # npm run test:bc
 
-  # Unloading Quorum staff to save resources for Corda
-  npm run fed:quorum:down
-  npm run quorum:down
-  npm run quorum:api:down
+  # # Unloading Quorum staff to save resources for Corda
+  # npm run fed:quorum:down
+  # npm run quorum:down
+  # npm run quorum:api:down
 
   ### CORDA
 
