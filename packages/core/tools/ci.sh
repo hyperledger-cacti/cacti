@@ -31,7 +31,7 @@ function mainTask()
   docker-compose --version
   node --version
   npm --version
-  java -version || true
+  java -version
 
   ### COMMON
   cd $PKG_ROOT_DIR
@@ -58,10 +58,10 @@ function mainTask()
   npm uninstall @hyperledger-labs/blockchain-integration-framework
   npm install @hyperledger-labs/blockchain-integration-framework@file:../../.tmp/hyperledger-labs-blockchain-integration-framework-dev.tgz
 
-  rm -rf fabric/api/fabric-client-kv-org*
 
   ### FABRIC
 
+  rm -rf fabric/api/fabric-client-kv-org*
   cd ./fabric/api/
   npm install
   cd ../../
@@ -78,16 +78,10 @@ function mainTask()
   npm run quorum:api:build
   npm run quorum:api
 
-  ### CORDA
-
-  npm run corda:build
-  npm run corda
-
   # Build and launch federation validators
   npm run fed:build
   npm run fed:quorum
   npm run fed:fabric
-  npm run fed:corda
 
   # If enough time have passed and there are still containers not ready then
   # just assume that they are in a crash loop and abort CI run.
@@ -99,23 +93,35 @@ function mainTask()
     iterationCount=$[$iterationCount +1]
     sleep 15; echo; date;
   done
-
-  docker ps -a
   sleep ${CI_CONTAINERS_WAIT_TIME:-120}
 
   # Run scenarios and blockchain regression tests
-  npm run scenario:share
+  npm run scenario:share nocorda
   npm run scenario:QtF
   npm run scenario:FtQ
   npm run test:bc
 
-  dumpAllLogs
-
+  # Unloading Quorum staff to save resources for Corda
   npm run fed:quorum:down
-  npm run fed:fabric:down
-  npm run fabric:down
   npm run quorum:down
   npm run quorum:api:down
+
+  ### CORDA
+
+  npm run corda:build
+  npm run corda
+  npm run fed:corda
+
+  npm run scenario:share noquorum
+  npm run scenario:CtF
+  npm run scenario:FtC
+
+  dumpAllLogs
+
+  npm run fed:corda:down
+  npm run fed:fabric:down
+  npm run corda:down
+  npm run fabric:down
   cd ../..
 
   ENDED_AT=`date +%s`
