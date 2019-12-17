@@ -56,24 +56,15 @@ Blockchain Integration Framework introduces an “interoperability validator” 
 - Implement confidential communication within the overlay network. The validator network should match the confidentiality setup of the local ledger
 - Replace current signature scheme by BLS to optimize the proof size (Hyperledger Ursa is a lead)
 
+_Note that BIF follows Semantic Versioning and as the software is pre-1.0, [backwards compatibility is not guaranteed between versions](https://semver.org/#spec-item-4)_
+
 ## Contact
 We welcome your questions & feedback on our [Rocketchat channel](https://chat.hyperledger.org/channel/blockchain-integration-framework).
 
 ## Contributing
 We welcome contributions to BIF in many forms, and there’s always plenty to do!
 
-First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating. 
-
-There are many ways to contibute to BIF, both as a user and as a developer.
-
-As a user, this can inlcude:
-* [Making Feature/Enhancement Proposals](https://github.com/hyperledger-labs/blockchain-integration-framework/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
-* [Reporting bugs](https://github.com/hyperledger-labs/blockchain-integration-framework/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
-
-As a developer:
-* if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger-labs/blockchain-integration-framework/labels/help%20wanted) or ["good-first-issue"](https://github.com/hyperledger-labs/blockchain-integration-framework/labels/good%20first%20issue) task
-* If you can commit to full-time development, then please contact us on our [Rocketchat channel](https://chat.hyperledger.org/channel/blockchain-integration-framework) to work through logistics!
-
+Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
 
 ## Initial Committers
 
