@@ -1,10 +1,9 @@
-# Hyperledger Blockchain Integration Framework <!-- omit in toc -->
+# Hyperledger Labs Blockchain Integration Framework <!-- omit in toc -->
 
 [![Build status]](https://travis-ci.org/hyperledger-labs/blockchain-integration-framework)
 
 [Build status]: https://travis-ci.org/hyperledger-labs/blockchain-integration-framework.svg?branch=master
 
-- [Lab Name](#lab-name)
 - [Short Description](#short-description)
 - [Scope of Lab](#scope-of-lab)
   - [Blockchain Interoperability Space](#blockchain-interoperability-space)
@@ -13,12 +12,10 @@
   - [Future Work](#future-work)
 - [Contact](#contact)
 - [Contributing](#contributing)
+- [License](#license)
 - [Initial Committers](#initial-committers)
 - [Sponsor](#sponsor)
 
-## Lab Name
-
-Blockchain Integration Framework
 
 ## Short Description
 
@@ -66,6 +63,9 @@ We welcome contributions to BIF in many forms, and there’s always plenty to do
 
 Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
 
+## License
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE](/LICENSE) file.
+
 ## Initial Committers
 
 - [tkuhrt](https://github.com/tkuhrt)
@@ -76,3 +76,4 @@ Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
 ## Sponsor
 
 [Hart Montgomery](mailto:hmontgomery@us.fujitsu.com) ([hartm](https://github.com/hartm)) - TSC member
+
