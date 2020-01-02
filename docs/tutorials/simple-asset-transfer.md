@@ -14,6 +14,8 @@ Note: Fabric SDK has stricter engine requirements (npm < 6.0 & node < 9.0)
 
 The scripts and following commands have only been tested on Ubuntu 18.04
 
+You can use [configure.sh](../../packages/core/tools/configure.sh) to automatically install the prerequisites to the new Ubuntu host.
+
 ### Setup
 
 Since the example runs on Hyperledger Fabric and Quorum, we'll first need to install and run local networks for both. Considering that we need to run 2 or more DLTs, the preferred setup for the demo is in Docker containers and we don't provide support for manual install just yet. We are gonna deploy 2 dockerised Blockchains with 4 nodes each plus the federations, it can prove power intensive for a single machine, we recommend deploying the environments in different machines: e.g. Fabric Blockchain and federation on one machine and Quorum Blockchain and federation in another one.
