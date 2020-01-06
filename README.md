@@ -1,8 +1,10 @@
 # Hyperledger Labs Blockchain Integration Framework <!-- omit in toc -->
 
 [![Build status]](https://travis-ci.org/hyperledger-labs/blockchain-integration-framework)
+[![CircleCI]](https://circleci.com/gh/hyperledger-labs/blockchain-integration-framework/tree/master)
 
 [Build status]: https://travis-ci.org/hyperledger-labs/blockchain-integration-framework.svg?branch=master
+[CircleCI]: https://circleci.com/gh/hyperledger-labs/blockchain-integration-framework/tree/master.svg?style=svg
 
 - [Short Description](#short-description)
 - [Scope of Lab](#scope-of-lab)
