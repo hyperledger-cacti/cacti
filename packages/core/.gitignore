@@ -1,3 +1,4 @@
+.vagrant
 .DS_Store
 node_modules/
 docs/main
