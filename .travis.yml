@@ -1,11 +1,13 @@
-language: minimal
+language: node_js
+node_js:
+  - 8
 
 os: linux
 
 dist: bionic
 
-install:
-  - ./packages/core/tools/configure.sh
+services:
+  - docker
 
 script:
   - CI_CONTAINERS_WAIT_TIME=12 CI_NO_CORDA=true ./packages/core/tools/ci.sh
