@@ -14,7 +14,7 @@
     "https-proxy-agent": "^2.2.1",
     "jade": "~1.11.0",
     "log4js": "^3.0.6",
-    "morgan": "~1.8.1",
+    "morgan": "~1.9.1",
     "request": "^2.81.0",
     "serve-favicon": "~2.4.2"
   }
