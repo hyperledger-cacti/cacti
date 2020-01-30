@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ###
 ### Continous Integration Shell Script --- Dump All Logs
 ###

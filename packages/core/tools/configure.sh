@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/usr/bin/env bash -x
 
 # Remove existing software that we want specific version.
 sudo apt purge nodejs openjdk-\*

@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ###
 ### Continous Integration Shell Script
 ###
 ### Designed to be re-entrant on a local dev machine as well, not just on a
 ### newly pulled up VM.
 ###
+echo $BASH_VERSION
 
 STARTED_AT=`date +%s`
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -129,7 +130,7 @@ function mainTask()
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))
-  echo "$(date -Iseconds) [CI] SUCCESS - runtime=$runtime seconds."
+  echo "$(date +%FT%T%z) [CI] SUCCESS - runtime=$runtime seconds."
   exit 0
 }
 
@@ -141,7 +142,7 @@ function onTaskFailure()
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))
-  echo "$(date -Iseconds) [CI] FAILURE - runtime=$runtime seconds."
+  echo "$(date +%FT%T%z) [CI] FAILURE - runtime=$runtime seconds."
   exit 1
 }
 
