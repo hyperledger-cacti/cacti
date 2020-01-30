@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Start the API wrapping methods to interact with fabric
 if [ ! -d "../logs" ]; then
@@ -7,7 +7,7 @@ if [ ! -d "../logs" ]; then
 fi
 
 # Kill old SDK server
-fuser -k -n tcp 4000
+pid=$(lsof -i tcp:4000 -t);  [ -z "$pid" ] || kill -TERM $pid || kill -KILL $pid
 
 path_to_log_file="../logs/start.log"
 
