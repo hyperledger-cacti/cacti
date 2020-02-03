@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:10-alpine
 RUN apk update && apk upgrade && apk add --update netcat-openbsd && rm -rf /var/cache/apk/*
 ADD ./api /src
 ADD ./contracts /contracts
