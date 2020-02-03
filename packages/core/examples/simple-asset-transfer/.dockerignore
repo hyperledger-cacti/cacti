@@ -11,3 +11,5 @@ quorum/api
 quorum/bin
 quorum/platform
 quorum/contracts
+
+corda/workflows/build/test-results
