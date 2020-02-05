@@ -5,7 +5,7 @@
 const chai = require(`chai`);
 const cp = require(`chai-as-promised`);
 
-const Connector = require(`../src/pluggins/Connector`);
+const Connector = require(`../src/plugins/Connector`);
 const config = require(`./config`);
 const Multisig = require(`../src/Multisig`);
 

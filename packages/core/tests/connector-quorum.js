@@ -7,7 +7,7 @@ const cp = require(`chai-as-promised`);
 const { randomBytes } = require(`crypto`);
 const secp256k1 = require(`secp256k1`);
 
-const Connector = require(`../src/pluggins/Connector`);
+const Connector = require(`../src/plugins/Connector`);
 const config = require(`./config`);
 const Multisig = require(`../src/Multisig`);
 

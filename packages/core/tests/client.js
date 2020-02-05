@@ -7,7 +7,7 @@ const chai = require(`chai`);
 const zmq = require(`zeromq`);
 
 const Client = require(`../src/Client`);
-const Connector = require(`../src/pluggins/Connector`);
+const Connector = require(`../src/plugins/Connector`);
 const conf = require(`./config`);
 const Validator = require(`../src/Validator`);
 const fedcom = require(`../src/federation-communication`);
@@ -24,7 +24,7 @@ describe(`Client module`, function() {
   });
 
   // eslint-disable-next-line
-  describe(`Look for an alive validator`, function () {
+  describe(`Look for an alive validator`, function() {
     // Looking for an alive validator can take 3*3000 ms
     // So we`re setting a bigger timeout
     this.timeout(25000);
@@ -103,7 +103,7 @@ describe(`Client module`, function() {
   });
 
   // eslint-disable-next-line
-  describe(`Asking for signatures`, function () {
+  describe(`Asking for signatures`, function() {
     let validator1;
     let validator2;
     const clientRepAddr1 = `tcp://127.0.0.1:7103`;
@@ -184,9 +184,11 @@ describe(`Client module`, function() {
         msg: `some data`,
         formattedMsg: `6cba8c69b5f9084d8eefd5dd7cf71ed5469f5bbb9d8446533ebe4beccdfb3ce9`,
         signatures: {
-          '031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b': // eslint-disable-line
+          // eslint-disable-line
+          '031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b':
             '31a5012bcdaf27b75d34c78d643d262c8b01db477dc65f308189866cfac0f82461362e3b00039007c2f1da164de7aeeba2f491711cde191957d51cc408eb1787', // eslint-disable-line
-          '031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b': // eslint-disable-line
+          // eslint-disable-line
+          '031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b':
             '31a5012bcdaf27b75d34c78d643d262c8b01db477dc65f308189866cfac0f82461362e3b00039007c2f1da164de7aeeba2f491711cde191957d51cc408eb1787', // eslint-disable-line
         },
       });

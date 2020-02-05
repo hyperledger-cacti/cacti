@@ -8,7 +8,7 @@ const uuidV4 = require('uuid/v4');
 const fedcom = require(`../src/federation-communication`);
 const Validator = require(`../src/Validator`);
 const Multisig = require(`../src/Multisig`);
-const Connector = require(`../src/pluggins/Connector`);
+const Connector = require(`../src/plugins/Connector`);
 const config = require(`./config`);
 
 describe(`Validator module`, function() {
@@ -196,7 +196,8 @@ describe(`Validator module`, function() {
     });
   });
 
-  describe(`Start as a Leader`, function() { // eslint-disable-line
+  describe(`Start as a Leader`, function() {
+    // eslint-disable-line
     let leader;
     this.timeout(15000);
 
@@ -432,7 +433,8 @@ describe(`Validator module`, function() {
   // });
 
   describe(`Start client server`, function() {
-    describe(`Start a client server on a leader`, function() { // eslint-disable-line
+    describe(`Start a client server on a leader`, function() {
+      // eslint-disable-line
       this.timeout(5000);
       let leader;
 
@@ -510,12 +512,13 @@ describe(`Validator module`, function() {
         chai.expect(multisig.formattedMsg).to.equal(`6cba8c69b5f9084d8eefd5dd7cf71ed5469f5bbb9d8446533ebe4beccdfb3ce9`);
         chai.expect(multisig.signatures).to.deep.equal({
           '031b3e4b65070268bd2ce3652966f75ebdf7184f637fd24a4fe0417c2dcb92fd9b':
-          '31a5012bcdaf27b75d34c78d643d262c8b01db477dc65f308189866cfac0f82461362e3b00039007c2f1da164de7aeeba2f491711cde191957d51cc408eb1787', // eslint-disable-line
+            '31a5012bcdaf27b75d34c78d643d262c8b01db477dc65f308189866cfac0f82461362e3b00039007c2f1da164de7aeeba2f491711cde191957d51cc408eb1787', // eslint-disable-line
         });
       });
     });
 
-    describe(`Start a client server on a follower`, function() { // eslint-disable-line
+    describe(`Start a client server on a follower`, function() {
+      // eslint-disable-line
       this.timeout(5000);
       let follower;
 

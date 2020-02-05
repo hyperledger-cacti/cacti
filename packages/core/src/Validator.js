@@ -6,7 +6,7 @@ const uuidV4 = require('uuid/v4');
 
 const fedcom = require(`./federation-communication`);
 const conf = require(`../config.json`);
-const Connector = require(`./pluggins/Connector`);
+const Connector = require(`./plugins/Connector`);
 const Crypto = require(`./crypto-utils`);
 const Multisig = require(`./Multisig`);
 
@@ -102,7 +102,6 @@ class Validator {
   }
 
   async setupLeaderElections() {
-
     const leaseTtlSeconds = Math.round(this.electionTimeout / 1000);
     logger.debug(`Creating lease with TTL=${leaseTtlSeconds} seconds...`);
     const theLease = this.etcdClient.lease(leaseTtlSeconds);
@@ -125,7 +124,7 @@ class Validator {
         didSucceed = false;
         lastError = ex;
         logger.debug(`Will re-try attemptToBecomeLeader() ...`);
-        await new Promise((resolve) => setTimeout(resolve, tryDelayMs));
+        await new Promise(resolve => setTimeout(resolve, tryDelayMs));
       }
     }
     if (!didSucceed) {
@@ -167,7 +166,7 @@ class Validator {
       .commit()
       .then(txnResponse => {
         logger.debug(`attemptToBecomeLeader() succeeded=${txnResponse.succeeded}`);
-        let newLeaderNodeInfo
+        let newLeaderNodeInfo;
         if (txnResponse.succeeded) {
           newLeaderNodeInfo = this.selfNodeInfo;
         } else {

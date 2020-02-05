@@ -3,7 +3,7 @@
 /* eslint func-names: ["error", "never"] */
 const chai = require(`chai`);
 
-const Connector = require(`../src/pluggins/Connector`);
+const Connector = require(`../src/plugins/Connector`);
 
 describe(`Connector Constructor`, function() {
   it(`New instance of abstract class 'Connector' should throw`, function() {
