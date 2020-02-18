@@ -19,9 +19,10 @@ jobs:
             cat /etc/os-release
             java -version
             lscpu || true
+            lsmem || true
             source /opt/circleci/.nvm/nvm.sh
-            nvm install 8.17
-            nvm alias default 8.17
+            nvm install 10
+            nvm alias default 10
             node -v
             npm -v
       - restore_cache:
@@ -99,4 +100,4 @@ workflows:
   version: 2
   workflow:
     jobs:
-    - build
+      - build
