@@ -9,7 +9,7 @@ jobs:
     #   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
     machine:
       image: ubuntu-1604:201903-01
-    # resource_class: large
+      resource_class: large
     steps:
       - checkout # check out source code to working directory
       # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
@@ -17,12 +17,12 @@ jobs:
           name: Setting up environment
           command: |
             cat /etc/os-release
+            sudo apt install -y util-linux
             java -version
             lscpu || true
-            lsmem || true
             source /opt/circleci/.nvm/nvm.sh
-            nvm install 10
-            nvm alias default 10
+            nvm install 8.17
+            nvm alias default 8.17
             node -v
             npm -v
       - restore_cache:
