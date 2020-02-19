@@ -75,9 +75,7 @@
 
 Blockchain technologies are growing in usage, but fragmentation is a big problem that may hinder reaching critical levels of adoption in the future.
 
-We propose a protocol and it's implementation to connect as many of them as possible in an attempt to solve the fragmentation problem by creating a heterogeneous system architecture <sup>[1](#7-references)</sup> similar to what the banking system has where each institution can have their own internal implementation of financial transactions and yet cross-institution transfers are a common and well supported use case.
-
-We do not limit ourselves to financial transactions, but instead aim to remain unopinionated and flexible for future extensions to be a catalyst of innovation rather than slowing it down.
+We propose a protocol and it's implementation to connect as many of them as possible in an attempt to solve the fragmentation problem by creating a heterogeneous system architecture <sup>[1](#7-references)</sup>.
 
 # 2. Example Use Cases
 
