@@ -7,7 +7,6 @@
   - [2.3 Money Exchanges](#23-money-exchanges)
   - [2.4 Stable Coin Pegged to Other Currency](#24-stable-coin-pegged-to-other-currency)
     - [2.4.1 With Permissionless Ledgers (BTC)](#241-with-permissionless-ledgers-btc)
-      - [2.4.1.1 Proof of Burn](#2411-proof-of-burn)
     - [2.4.2 With Fiat Money (USD)](#242-with-fiat-money-usd)
   - [2.5 Healthcare Data Sharing with Access Control Lists](#25-healthcare-data-sharing-with-access-control-lists)
   - [2.6 Integrate Existing Food Traceability Solutions](#26-integrate-existing-food-traceability-solutions)
@@ -153,13 +152,6 @@ onto their ExampleCoin wallet on the other network.
 An ExampleCoin holder can redeem their funds to BTC by receiving a Proof of Burn on the ExampleCoin ledger and getting sent the matching amount of BTC from the `ExampleCoin Reserve Wallet` to their BTC wallet.
 
 ![ExampleCoin Pegged to Bitcoin](https://www.plantuml.com/plantuml/png/0/XP9FIyH03CNlyoc2dhmiui6JY5ln7tWG4KJmaft6TkWqgJFfrbNyxgPBLzP5yLQQlFpoNkOiAoRjsmWNRzXsaSubCDnHLL49Ab04zVR7EGqQ2QvN7QL8PKK9YYY-yJLQ_mqhLGar2CDbmfO6ISqp_pCoDu4xj7R8zDeJUvgd9CD37Np3b3CSRRKawRdqajZ8HuTRXHRVMcl6Yd9u9pW-_6NkdNaCFdJ82ZR6B0Gcvrx6LM7lGHH_-h_X9R5AMkq1Pb3o0VPlGrNhLS8LV3W0bjAKyuCViaUCaJIlHUI7RmqHhqMVxdC7EcMn2rpynOiHHEin_4cuZKHPR9XF5ACC4tIZBWvsZmptb2ajAKzpfisxzCVkewcJsMnskcbQrnsB4jZfBTN6pG6vX08iUZDed2N6dc117ljChe2GOO7URbI1MPdAyW9po09Hk79Z15OPrZj1BT4kDieGDFLPxHbPM45NCqU66kdEdTcdFUCl "ExampleCoin Pegged to Bitcoin")
-
-#### 2.4.1.1 Proof of Burn
-
-Cryptographic proof that a certain instance of a coin has been decommissioned and will not be possible to participate in any further transactions.
-Interesting possibilities to consider:
-* Could offline trades (private key exchanges) make sense for burnt funds?
-* Could a hard fork revive burnt assets?
 
 ### 2.4.2 With Fiat Money (USD)
 
