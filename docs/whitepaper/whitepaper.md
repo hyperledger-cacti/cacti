@@ -59,7 +59,8 @@
     - [4.3.1 Ledger Connector Plugins](#431-ledger-connector-plugins)
     - [4.3.2 Identity Federation Plugins](#432-identity-federation-plugins)
       - [4.3.1.1 X.509 Certificate Plugin](#4311-x509-certificate-plugin)
-    - [4.3.3 Storage Plugins](#433-storage-plugins)
+    - [4.3.3 Key/Value Storage Plugins](#433-keyvalue-storage-plugins)
+    - [4.3.4 Serverside Keychain Plugins](#434-serverside-keychain-plugins)
 - [5. Identities, Authentication, Authorization](#5-identities-authentication-authorization)
   - [5.1 Transaction Signing Modes, Key Ownership](#51-transaction-signing-modes-key-ownership)
     - [5.1.1 Client-side Transaction Signing](#511-client-side-transaction-signing)
@@ -394,6 +395,8 @@ Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
 
 Responsible for persistently storing highly sensitive data (e.g. private keys) in an encrypted format.
 
+For further details on the API surface, see the relevant section under `Plugin Architecture`.
+
 #### 4.1.1.7 tracing
 
 Contains components for tracing, logging and application performance management (APM) of code written for the rest of the Blockchain Integration Framework packages.
@@ -471,6 +474,10 @@ Plugins are an abstraction layer on top of the core components that allows opera
 
 Plugins are implemented as ES6 modules (source code) that can be loaded at runtime from the persistent data store. The core package is responsible for validating code signatures to guarantee source code integrity.
 
+An overarching theme for all aspects that are covered by the plugin architecture is that there should be a dummy implementation for each aspect to allow the simplest possible deployments to happen on a single, consumer grade machine rather than requiring costly hardware and specialized knowledge.
+
+> Ideally, a fully testable/operational (but not production ready) `BIF` deployment could be spun up on a developer laptop with a single command (an npm script for example).
+
 ---
 
 ![Plugin Architecture](https://www.plantuml.com/plantuml/png/0/dLHDRzD043tZNp6O0wr4LQ3YKaLHdP90fBH4RRWXLPlrn5bblMjcn_dWrpEsK-mYIq5S8ddcpPjvRsPp4rWHbxc5kIqpuo0XlJQCcal2A7fjdBPbYZ3Wib0fNLrgd-VU3NioA-_uGkqm-1mlSxyq5a_2KiLggS9fu0OF9p41QOiqZ28sR16-7WeaYsc612FhzKQlbGYSEiQC51llO48gnvsdpG_NA_yjM5mni0SosPeXDIGfgPICijRlddApDowBmiQuGWaRVCQLAYqlSC-9DPdBqJ5e-K7ge6R68Sjyu8dNlfC8-BD4fp4Xyhl5skYDmn3WOmT2ldIfzkH4rwTEF5VxNB0gms1-8Lozxw6ToxADDeMIeOH5_951AfrAioU8awAmHZVcV1S_Or2XoNs0mS2aeiFm0VnEcW-7KZT9dkw-ZQQpyLcpyHItHkEx-Ax-4ZUgp_WyYfP-3_7OfJLjYE7Dh79qP4kCNZNDHtuPeG04UOIFfXDXAAm_L2u-rtmXF4G0sblRB2F8tFCfFDRhXtkVubauhoTF2jD41Lzqf4_Kaeo-zSvXrRhP_L_DPytbjFt_3Fseh3m1eNo-NeWRGhX7hgwfxjs4Zf6MMrJ2nR2T3AxXeLfEO5YGSa7Lac2yHrtMbrO5jegn8wOj5gPUBTTmA_VPptXywIrnlnkzqRRXKTW_J__I3a9vOEv5pGC6UJVXFrFHZJWiVsE_0G00 "Plugin Architecture")
@@ -536,19 +543,41 @@ This technically allows calling clients to assume the identities of the validato
 
 PassportJS already has plugins written for client certificate validation, but we go one step further with this plugin by providing the option to obtain CA certificates from the validator nodes themselves at runtime.
 
-### 4.3.3 Storage Plugins
+### 4.3.3 Key/Value Storage Plugins
 
-Storage plugins allow the higher-level packages to store and retrieve configuration metadata for a `BIF` cluster such as:
+Key/Value Storage plugins allow the higher-level packages to store and retrieve configuration metadata for a `BIF` cluster such as:
 * Who are the active validators and what are the hosts where said validators are accessible over a network?
 * What public keys belong to which validator nodes?
 * What transactions have been scheduled, started, completed?
 
 ```typescript
-interface StoragePlugin {
+interface KeyValueStoragePlugin {
   async get<T>(key: string): Promise<T>;
   async set<T>(key: string, value: T): Promise<void>;
+  async delete<T>(key: string): Promise<void>;
 }
 ```
+
+### 4.3.4 Serverside Keychain Plugins
+
+The API surface of keychain plugins is roughly the equivalent of the key/value *Storage* plugins, but under the hood these are of course guaranteed to encrypt the stored data at rest by way of leveraging storage backends purpose built for storing and managing secrets.
+
+Possible storage backends include self hosted software [1] and cloud native services [2][3][4] as well. The goal of the keychain plugins (and the plugin architecture at large) is to make `BIF` deployable in different environments with different backing services such as an on-premise data center or a cloud provider who sells their own secret management services/APIs.
+There should be a dummy implementation as well that stores secrets in-memory and unencrypted (strictly for development purposes of course). The latter will decrease the barrier to entry for new users and would be contributors alike.
+
+Direct support for HSM (Hardware Security Modules) is also something the keychain plugins could enable, but this is lower priority since any serious storage backend with secret management in mind will have built-in support for dealing with HSMs transparently.
+
+By design, the keychain plugin can only be used by authenticated users with an active `BIF` session. Users secrets are isolated from each other on the keychain via namespacing that is internal to the keychain plugin implementations (e.g. users cannot query other users namespaces whatsoever).
+
+```typescript
+interface KeychainPlugin extends KeyValueStoragePlugin {
+}
+```
+
+[1] https://www.vaultproject.io/
+[2] https://aws.amazon.com/secrets-manager/
+[3] https://aws.amazon.com/kms/
+[4] https://azure.microsoft.com/en-us/services/key-vault/
 
 # 5. Identities, Authentication, Authorization
 
