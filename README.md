@@ -35,7 +35,7 @@ This lab project proposes an alternative to these models, and it is designed spe
 ### Documentation
 
 * [Whitepaper](./docs/whitepaper/whitepaper.md)
-* [Original Design Principles Google Doc - Deprecated](https://docs.google.com/document/d/1oCF7q_or7EWlVEmCMYuGU3ksKrNjHf07pSTrviRfktk/edit)
+* [Original Design Principles Google Doc](https://docs.google.com/document/d/1oCF7q_or7EWlVEmCMYuGU3ksKrNjHf07pSTrviRfktk/edit)
 
 ### How It Works
 
