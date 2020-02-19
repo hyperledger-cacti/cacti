@@ -1,0 +1,74 @@
+@startuml Authentication, Authorization for Permissioned Chains
+
+title Hyperledger Blockchain Integration Framework\nAuthentication, Authorization for Permissioned Chains
+
+left to right direction
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam maxmessagesize 30
+skinparam sequenceParticipant underline
+
+frame "End User Application" as eu {
+  actor "<<identity owner>>" as io
+  node "Identity Proof 1\n<<RSA Key Pair>>" as ppkp1 #PaleVioletRed {
+  }
+  node "Identity Proof 2\n<<ECDSA Key Pair>>" as ppkp2 #PaleVioletRed {
+  }
+  node "Identity Proof 3\n<<Password>>" as password #PaleVioletRed {
+  }
+  node "Identity Proof 4\n<<OIDC Token>>" as authtoken #PaleVioletRed {
+  }
+}
+
+
+frame "Company A\n<<organization>>" as ca #LightGray {
+  node "Blockchain Integration Framework\n<<software deployment>>" as bif #LightYellow {
+    node "REST API\n<<web service>>" as bifrestapi #LightGreen {
+    }
+    together {
+      node "Network A\n<<identity plugin>>" as bifidpluginnetworka #LightGreen {
+      }
+      node "Network B\n<<identity plugin>>" as bifidpluginnetworkb #LightGreen {
+      }
+      node "Network A\n<<connector plugin>>" as bifconnectorpluginnetworka #LightGreen {
+      }
+      node "Network B\n<<connector plugin>>" as bifconnectorpluginnetworkb #LightGreen {
+      }
+    }
+  }
+}
+
+frame "Network A\n<<permissioned ledger>>" as na #LightGray {
+  node "Wallet 1 of End User\n<<address>>" as weua #LightYellow {
+  }
+}
+
+frame "Network B\n<<permissioned ledger>>" as nb #LightGray {
+  node "Wallet 2 of End User\n<<address>>" as weub #LightYellow {
+  }
+}
+
+io ..> bifrestapi: Request transactions
+note on link
+  Uses one or more of the
+  identity proofs for each
+  request that BIF
+  verifies/passes along
+  via the appropriate plugins
+  before instructing the
+  participating ledgers
+  to execute transactions:
+  1. Export data
+  2. Transfer coins
+  3. Manage permissions
+  4. etc.
+end note
+bifrestapi <..> bifconnectorpluginnetworka
+bifrestapi <..> bifconnectorpluginnetworkb
+bifrestapi <..> bifidpluginnetworka
+bifrestapi <..> bifidpluginnetworkb
+bifconnectorpluginnetworka ..> na: Execute transactions
+bifconnectorpluginnetworkb ..> nb: Execute transactions
+
+@enduml
