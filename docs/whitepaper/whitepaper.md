@@ -60,7 +60,7 @@
     - [4.3.1 Ledger Connector Plugins](#431-ledger-connector-plugins)
     - [4.3.2 Identity Federation Plugins](#432-identity-federation-plugins)
       - [4.3.1.1 X.509 Certificate Plugin](#4311-x509-certificate-plugin)
-      - [4.3.3 Storage Plugins](#433-storage-plugins)
+    - [4.3.3 Storage Plugins](#433-storage-plugins)
 - [5. Identities, Authentication, Authorization](#5-identities-authentication-authorization)
   - [5.1 Transaction Signing Modes, Key Ownership](#51-transaction-signing-modes-key-ownership)
     - [5.1.1 Client-side Transaction Signing](#511-client-side-transaction-signing)
@@ -69,12 +69,7 @@
   - [5.3 Server-side Keychain for Web Applications](#53-server-side-keychain-for-web-applications)
 - [6. Terminology](#6-terminology)
 - [7. References](#7-references)
-<li>Server-side breach can expose encrypted keys stored in the keychain</li>
-</ul>](#ul-liserver-side-breach-can-expose-encrypted-keys-stored-in-the-keychainli-ul)
-  - [5.2 Open ID Connect Provider, Identity Provider](#52-open-id-connect-provider-identity-provider)
-  - [5.3 Server-side Keychain for Web Applications](#53-server-side-keychain-for-web-applications)
-- [6. Terminology](#6-terminology)
-- [7. References](#7-references)
+
 
 # 1. Abstract
 
@@ -97,7 +92,7 @@ Details TBD
 
 ## 2.2 Escrowed Sale of Data for Coins
 
-Company A is looking to buy some data. Company B has some data it's looking to monetize.
+Organization A is looking to buy some data. Organization B has some data it's looking to monetize.
 
 Data in this context is any series of bits stored on a computer:
 * Machine learning model
@@ -106,7 +101,7 @@ Data in this context is any series of bits stored on a computer:
 * proprietary source code or binaries of software
 * etc.
 
-Company A and B trade the data and the funds through a BIF transaction in an
+Organization A and B trade the data and the funds through a BIF transaction in an
 atomic swap with escrow securing both parties from fraud or unintended failures.
 
 Through the transaction protocol's handshake mechanism, A and B can agree (in
@@ -154,9 +149,9 @@ for certain treatments. The user is in control over their data on both platforms
 
 ## 2.6 Integrate Existing Food Traceability Solutions
 
-Both `Company A` and `Company B` have separate products/services for solving the problem of verifying the source of food products sold by retailers.
-A retailer has purchased the food tracability solution from `Company A` while a food manufacturer (whom the retailer is a customer of) has purchased their food tracability solution from `Company B`.
-The retailer wants to provide end to end food tracability to their customers, but this is not possible since the chain of tracability breaks down at the manufacturer who uses a different service or solution. `BIF` is used as an architectural component to build an integration for the retailer which ensures that consumers have access to food tracing data regardless of the originating system for it being the product/service of `Company A` or `Company B`.
+Both `Organization A` and `Organization B` have separate products/services for solving the problem of verifying the source of food products sold by retailers.
+A retailer has purchased the food tracability solution from `Organization A` while a food manufacturer (whom the retailer is a customer of) has purchased their food tracability solution from `Organization B`.
+The retailer wants to provide end to end food tracability to their customers, but this is not possible since the chain of tracability breaks down at the manufacturer who uses a different service or solution. `BIF` is used as an architectural component to build an integration for the retailer which ensures that consumers have access to food tracing data regardless of the originating system for it being the product/service of `Organization A` or `Organization B`.
 
 ![Food Tracability Integration](https://www.plantuml.com/plantuml/png/0/fLNHQjj047pNLopk1xIqzCKa9b6eKqCBflPB8I-dqvvyzUbMtJlLLKh-lIl5IjHOTXC20e6OdPsTcrjTXAWurgM3EL4EQrPQPTRPsC32HonOHKi-IQAD3k5pKo4xp0jaI1tfhTuewuT8cBCgSKUylV6d6SFM-ae96WB-hD5hl6IctNfZzTPZ2F1-066gVQw9lJJ-EFXUgj-bO5M1mTuYV7WtGhkK0QssbV8HX4K6i1vb8geW4cGK8vMGMqPzBqpfI0oJRnYLTTBlgWw2G9w02i0wIKmx8aokg1JE1Yvl_DaPSQ6ylUrccyqwg5RmveijDl6QLGD_4W1FkTGTsB8YLtVUTKo1JDmfnZsBYQ7d-OxEqQvZkalk3dIantHaBzMHZkl8Jkle-7hNZcXXV9KMoB5or9JeuzjGPq6phGRiRY3ocX7zNcFVPPXJ8sVyoUTj1DhNKm4lw6eDHZHnttUrRL9NuxWxNvMlZUIhvgCEcV9LgNc6Gsh4eKUTgoP4B1-kghYqpzSHlS7gSS5FYAIYPLYivLxoBwlxN8LW3pGCrioHhXittlJ_I-aWs9ar_-Pw8AU4y_DPTv4xiwQmh5dO0yA9uqZa5DeoKqxbgnIWX4tGXgbTM8y9w87j1Nq-VzgNYVE3WaExOSdqGvPQmhh3xtCwxMWnt8iYjeNr8McFiGLjt1JIshfSSZsWagVTbsGWNSoJv09zBl-Clm00 "Food Tracability Integration")
 
@@ -481,7 +476,7 @@ This technically allows calling clients to assume the identities of the validato
 
 PassportJS already has plugins written for client certificate validation, but we go one step further with this plugin by providing the option to obtain CA certificates from the validator nodes themselves at runtime.
 
-#### 4.3.3 Storage Plugins
+### 4.3.3 Storage Plugins
 
 Storage plugins allow the higher level packages to store and retrieve configuration metadata for a `BIF` cluster such as:
 * Who are the active validators and what are the hosts where said validators are accessible over a network
@@ -574,19 +569,22 @@ Web 3.0 applications (decentraized apps or DApps) which interact with blockchain
 
 # 6. Terminology
 
-**Credentials**:
-Could mean user authentication credentials/identity proofs in an IT application or any other credentials in the traditional sense of the word such as a proof that a person obtained a masters or PhD.
+**End User**: A person (private citizen or a corporate employee) who interacts with BIF and other ledger-related systems to achieve a specific goal or complete a task such as to send/receive/exchange money or data.
 
-**Ledger/Network/Chain**:
-Synonomous words meaning referring largely to the same thing in this paper.
+**Business Organization**: A for-profit or non-profit entity formed by one or more people to achieve financial gain or achieve a specific (non-financial) goal. For brevity, *business organization* may be shortened to *organization* throughout the document.
 
-**Identity Owner**: A person or organization who is in control of one or more identities. For example, owning two separate email accounts by one person means that said person is the identity owner of two separate identities (the email accounts).
+**Identity Owner**: A person or organization who is in control of one or more identities. For example, owning two separate email accounts by one person means that said person is the identity owner of two separate identities (the email accounts). Owning cryptcurrency wallets (their private keys) also makes one an identity owner.
 
-**Identity Secret**: A private key or a password that - by design - is only ever known by the identity owner.
+**Identity Secret**: A private key or a password that - by design - is only ever known by the identity owner (unless stolen).
+
+**Credentials**: Could mean user authentication credentials/identity proofs in an IT application or any other credentials in the traditional sense of the word such as a proof that a person obtained a masters or PhD.
+
+**Ledger/Network/Chain**: Synonomous words meaning referring largely to the same thing in this paper.
 
 **OIDC**: Open ID Connect authentication protocol
 
 **PKI**: Public Key Infrastructure
+
 
 # 7. References
 
