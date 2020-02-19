@@ -1,0 +1,120 @@
+@startuml
+title Ethereum to Quorum Asset Transfer
+
+participant "User A" as user
+box "BIF" #lightGrey 
+entity "Service App" as sapp
+entity "API Server" as apis
+entity "Validator 1" as validator_1
+entity "Validator 2" as validator_2
+end box
+
+box "Ledgers" #orange
+database "Ethereum Ledger" as ledger_e
+database "Quorum Ledger" as ledger_q
+end box
+
+user -> sapp: "Request asset transfer \nfrom Ethereum to Quorum"
+activate sapp
+
+== Lock Ethereum asset until Quorum asset transfer is completed ==
+sapp -> apis: "Request to lock \nEthereum asset"
+activate apis
+
+apis ->> ledger_e: "Invoke smart contract\n to transfer asset"
+sapp <<-- apis: "Request posted"
+deactivate apis
+user <<-- sapp: "Request accepted"
+deactivate sapp
+
+activate ledger_e
+ledger_e -> ledger_e: "Consensus completed"
+validator_1 <<- ledger_e: "Notify new block data"
+deactivate ledger_e
+activate validator_1
+
+validator_1 -> validator_1: "Validate transactions"
+validator_1 -> validator_1: "digital sign on \nvalid transaction"
+
+validator_1 -> apis: "Request to update\n transaction status"
+activate apis
+apis -> apis: "Update transaction \nstatus(asset locked)"
+apis -->> validator_1: "transaction update\n accepted"
+deactivate validator_1
+
+sapp <- apis: "Notify transaction \nstatus update"
+activate sapp
+sapp -> sapp: "update state"
+sapp -->> apis: "notification received"
+deactivate apis
+
+sapp -> sapp: "determine \nnext operation\n(transfer Quorum asset)"
+
+== Transfer Quorum Asset ==
+
+sapp -> apis: "Request to \ntransfer Quorum asset"
+activate apis
+apis ->> ledger_q: "Invoke smart contract\n to transfer asset"
+sapp <<-- apis: "Request posted"
+deactivate apis
+deactivate sapp
+
+activate ledger_q
+ledger_q -> ledger_q: "Consensus completed"
+validator_2 <<- ledger_q: "Notify new block data"
+deactivate ledger_q
+activate validator_2
+
+validator_2 -> validator_2: "Validate transactions"
+validator_2 -> validator_2: "digital sign on \nvalid transaction"
+
+validator_2 -> apis: "Request to update\n transaction status"
+activate apis
+apis -> apis: "Update transaction \nstatus"
+apis -->> validator_2: "transaction update\n accepted"
+deactivate validator_2
+
+sapp <- apis: "Notify transaction \nstatus update"
+activate sapp
+sapp -> sapp: "update state"
+sapp -->> apis: "notification received"
+deactivate apis
+
+sapp -> sapp: "determine \nnext operation\n(Settle transfered \nEthereum asset)"
+
+== Settle transfered Ethereum asset ==
+sapp -> apis: "Request to transfer (unlock?) \nEthereum asset"
+activate apis
+
+apis ->> ledger_e: "Invoke smart contract\n to transfer asset"
+sapp <<-- apis: "Request posted"
+deactivate apis
+user <<-- sapp: "Request accepted"
+deactivate sapp
+
+activate ledger_e
+ledger_e -> ledger_e: "Consensus completed"
+validator_1 <<- ledger_e: "Notify new block data"
+deactivate ledger_e
+activate validator_1
+
+validator_1 -> validator_1: "Validate transactions"
+validator_1 -> validator_1: "digital sign on \nvalid transaction"
+
+validator_1 -> apis: "Request to update\n transaction status"
+activate apis
+apis -> apis: "Update transaction \nstatus(asset locked)"
+apis -->> validator_1: "transaction update\n accepted"
+deactivate validator_1
+
+sapp <- apis: "Notify transaction \nstatus update"
+activate sapp
+sapp -> sapp: "update state"
+sapp -->> apis: "notification received"
+deactivate apis
+
+sapp -> sapp: "determine \nnext operation\n(no more operation)"
+deactivate sapp
+
+
+@enduml
