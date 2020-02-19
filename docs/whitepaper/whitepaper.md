@@ -83,23 +83,24 @@ Specific use cases that we intend to support.
 The core idea is to support as many use-cases as possible by enabling interoperability
 between a large variety of ledgers specific to certain mainstream or exotic use cases.
 
-## 2.1 Fabric to Quorum Asset Transfer
+## 2.1 Ethereum to Quorum Asset Transfer
 
-| W3C Use Case Attribute Name | W3C Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Use Case Title              | Fabric to Quorum Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Use Case                    | 1. `User A` owns an asset on a Fabric ledger<br>2. `User A` transfers the asset a Quorum ledger<br><br>3. `User A` verifies that the same data is now present on the Quorum ledger as it was on the Fabric ledger                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Type of Social Interaction  | Generic Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Narrative                   | A person (`User A`) has multiple accounts on different ledgers (Fabric, Quorum) and they wish to have a certain piece of data available on both ledgers to achieve a certain outcome. The asset they are transferring is a generic asset meaning that it doesn't have to be currency of any sort, it can be any arbitrary set of bits that is up to the User to make use of in a meaningful way. Given the latter, this use case does not have any requirements on the avoidance of double spending since this is not necessarily applicable.                                                                                                                                                                                                                                                                                  |
-| Actors                      | 1. `User A`: The person or entity who has ownership of the transferred asset.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| Goals of Actors             | To have some data available on multiple ledgers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Success Scenario            | Transfer succeeds without issues. Asset is available on both Fabric and Quorum ledgers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Success Criteria            | Presence of asset on both ledgers has cryptographic proof that is obtainable through BIF.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| Failure Criteria            | Signatures (the cryptographic proof) is invalid in any one of the ledgers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Prerequisites               | 1. Ledgers are provisioned<br>2. `User A` identity established on both ledgers.<br>3. `User A` has access to BIF deployment                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Comments                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Use Case Title             | Ethereum to Quorum Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Use Case                   | 1. `User A` owns an asset on a Ethereum ledger<br>2. `User A` transfers some asset on Ethereum ledger to a Quorum ledger                                                                                                                                                                                                                                                                                                                         |
+| Interworking patterns      | Value transfer                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Type of Social Interaction | Generic Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Narrative                  | A person (`User A`) has multiple accounts on different ledgers (Ethereum, Quorum) and they wish to transfer some asset from Ethereum ledger to a Quorum ledger. The asset they are transferring is a generic asset meaning that it doesn't have to be currency of any sort, but we assumed that `User A` agreed to release ownership of transferring asset on Ethereum ledger instead of getting ownership of transfered asset on Quorum ledger. |
+| Actors                     | 1. `User A`: The person or entity who has ownership of the transferred asset.                                                                                                                                                                                                                                                                                                                                                                    |
+| Goals of Actors            | Some asset on Ethereum ledger had transfered to Quorum ledger.                                                                                                                                                                                                                                                                                                                                                                                   |
+| Success Scenario           | Transfer succeeds without issues. Asset is available on both Ethereum and Quorum ledgers.                                                                                                                                                                                                                                                                                                                                                        |
+| Success Criteria           | Presence of asset transfer across ledgers has cryptographic proof that is obtainable through BIF.                                                                                                                                                                                                                                                                                                                                                |
+| Failure Criteria           | Asset transfer on both ledger is canceled.                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Prerequisites              | 1. Ledgers are provisioned<br>2. `User A` identity established on both ledgers.<br>3. `User A` has access to BIF deployment                                                                                                                                                                                                                                                                                                                      |
+| Comments                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
-![Sequence Diagram - Fabric Quorum Asset Transfer](https://www.plantuml.com/plantuml/png/0/bLN1RXen4BtxAqRqqaf9AZYYW4BIqg8IDHKalI0Xunt0oiQcO-yc_7t6teKisuKstF1xysRcpGnSEI_9PqyfJF1FXaOXVD5oHV89pc4e5wGL_CeiPKymS0uzJ4aQjqGImckV8dpVRf1IJ5P8S9rQzQZMKXiO6O-iuhKrC6GrVBRqE3FlJYALjmJt3ca-0Eb02h6mBz2w7WrRy66iLsl_ZUHMeE5ojj0Qt8su4ygHMf6-qMwFFSXK9vBr8fJpUm8iLYgEOm-kjQDpXlcDDPwuX7bP98UfTYEXB3yGEeAJo8LqMFOsBwG3cBJVm2Aa2dRUIfAPjwohS-aHh16YruD1vjSXjmfllHwJuBmVM-mUO8BGPsJYsmLCxICMyMEUpixkmkUQo5y48I12WP8tuS2VFA2gtUMPvvmBTfuSumEJGqZ28Rz9So_UGkd2n8VUPkPZf5-4VSAavod3JsLisLl9lz-mdPZ0pn-Y2iQmUkOJu0ceDedbiZIi2mz8Uhc5YLuPoU7ePiOkmrR0Vj6SKDmW3oMjq0euE5iANIgRyfAl2D7qxyWgv2AUjL_3rnTKMRYXoy-HqnUOykPKjDZpPZN2f3zOMF8G5PqxcvaAjB7EwGNVx-reUdk0IEybZurlU4EMQtBXW9B6XRmX3DyEJhUsKWsKsb8TOJ2dRln-sVB_D3_ksea1L0KFXX1MM9iC8-UuvGtnUzkBK9Cqj694vMuw3NTJMd9mCfruCftToHHcrmxd7ITIjViCRj7ByBia_eMVHiKLDyp_9Qy0 "Sequence Diagram - Fabric Quorum Asset Transfer")
+<img src="./use-case-ethereum-to-quorum-asset-transfer.png"/>
 
 ## 2.2 Escrowed Sale of Data for Coins
 
@@ -176,7 +177,6 @@ gets replaced by a traditional bank account holding USD.
 | Comments                    | It makes most sense for best privacy if `User A` and `User B` are both present with an identity on the same permissioned, privacy-enabled ledger rather than on two separate ones. This gives `User A` an additional layer of security since they can know that their data is still only stored on one ledger instead of two (albeit both being privacy-enabled)|
 
 ![Sequence Diagram - Healthcare Data Sharing with Access Control Lists](https://www.plantuml.com/plantuml/png/0/hLHDRzf04BtxLupefJtaa1mjX69IaQ16AYfgUeaK3Ui1Zx1ttTd1b7_VMK1WL9NcqAFtVSsyNVa-AefkcXhcz7D3tX5yPbm9Dd03JuIrLWx53b4HvXKA-nLiMIiedACOuI5ubL33CqUDMHRNx5jCya8aR2U6pdLN4x1YpIxBbDM-ddOjIKtbYWJ6TN1hLo5xc7eborOE7YPcGjiWwrV_VqP3fq7WUoHvAm0Z80o7hMMHrz6eZuuJkZ2qEeUq4ZekIOoPBS8l64ydyE57nKhp9gmfCnFM7GoAsNImDs_vTFPYcvTezX_ZfptO6LI2sHoy1i_x8kBWmj4KkC18CC65i7ixa9Ayl3s3OugRFdHtjiQD1jkAErI2u2qBRaPfi1o-fKAZ7gexj9LbaB0z9OUPXAPLM5ebVGw0a6x4mwEWLvYHD1mZ9_EJkhpBuP4KYXX9N_r5YsbiQ_1aSuMJ32yMM2xF6LqEBoIyt5rFSSBA3krjyygZ9LA4_MKO1j2TwXYwK0V9LqBaHxQw8qeKggtWddJgkx-BXSfHiGYYIUZBFyRlLsJZFmYbuwlZ7rFAs_VI-wqU9ILy_VAUI_WdFJkoUy_Xy0gigkpUDhP_o6y0 "Sequence Diagram - Healthcare Data Sharing with Access Control Lists")
-
 
 ## 2.6 Integrate Existing Food Traceability Solutions
 
@@ -322,9 +322,58 @@ A newly joined consortium member does not have to participate in every component
 
 # 4. Architecture
 
-## 4.1 Technical Architecture
+## 4.1 Interworking patterns
 
-### 4.1.1 Monorepo Packages
+### 4.1.1 Interworking patterns list
+
+The Blockchain Integration Framework has several interworking patterns as the following.
+
+- Note: In the following description, **Value (V)** means numerical assets (e.g. money). **Data (D)** means non-numerical assets (e.g. ownership proof). Ledger 1 is source ledger, Ledger 2 is destination ledger.
+
+| No. | Name                | Pattern | Consistency                                                                                    |
+| --- | ------------------- | ------- | ---------------------------------------------------------------------------------------------- |
+| 1.  | value transfer      | V -> V  | check if V1 = V2 <br> (as V1 is value on ledger 1, V2 is value on ledger 2)                    |
+| 2.  | value-data transfer | V -> D  | check if data transfer is successful when value is transferred                                 |
+| 3.  | data-value transfer | D -> V  | check if value transfer is successful when data is transferred                                 |
+| 4.  | data transfer       | D -> D  | check if all D1 is copied on ledger 2 <br> (as D1 is data on ledger 1, D2 is data on ledger 2) |
+| 5.  | data merge          | D <-> D | check if D1 = D2 as a result <br> (as D1 is data on ledger 1, D2 is data on ledger 2)          |
+
+### 4.1.2 Value transfer
+
+#### 4.1.2.1 Desription of the pattern
+
+#### 4.1.2.2 Sequence diagram
+
+<img src="./feature-value-transfer.png"/>
+
+### 4.1.3 Value-data transfer
+
+#### 4.1.3.1 Desription of the pattern
+
+#### 4.1.3.2 Sequence diagram
+
+### 4.1.4 Data-value transfer
+
+#### 4.1.4.1 Desription of the pattern
+
+#### 4.1.4.2 Sequence diagram
+
+### 4.1.5 Data transfer
+
+#### 4.1.5.1 Desription of the pattern
+
+#### 4.1.5.2 Sequence diagram
+
+### 4.1.6 Data merge
+
+#### 4.1.6.1 Desription of the pattern
+
+#### 4.1.6.2 Sequence diagram
+
+
+## 4.2 Technical Architecture
+
+### 4.2.1 Monorepo Packages
 
 The Blockchain Integration Framework is divided into a set of npm packages that can be compiled separately or all at once.
 
@@ -333,14 +382,14 @@ Naming conventions for packages:
 * sdk-* for packages designed to be used directly by application developers
 * All other packages should be named preferably as a single English word suggesting the most important feature/responsibility of the package itself.
 
-#### 4.1.1.1 core
+#### 4.2.1.1 core
 
 Contains the kernel of the Blockchain Integration Framework.
 Code that is strongly opinionated lives here, the rest is pushed to other packages that implement plugins or define their interfaces.
 
 **The main responsibilities of the `core` package are:**
 
-##### 4.1.1.1.1 Runtime Configuration Parsing and Validation
+##### 4.2.1.1.1 Runtime Configuration Parsing and Validation
 
 The core package is responsible for parsing runtime configuration from the usual sources (shown in order of precedence):
 * Explicit instructions via code (`config.setHttpPort(3000);`)
@@ -350,7 +399,7 @@ The core package is responsible for parsing runtime configuration from the usual
 
 The Apache 2.0 licensed node-convict library to be leveraged for the mechanical parts of the configuration parsing and validation: https://github.com/mozilla/node-convict
 
-##### 4.1.1.1.2 Configuration Schema - Validator
+##### 4.2.1.1.2 Configuration Schema - Validator
 
 |   | Parameter   | Type            | Config Key: CLI        | Config Key: Env      | Config Key: JSON    | Description                                                                                          |
 |---|-------------|-----------------|-----------------|---------------|--------------|------------------------------------------------------------------------------------------------------|
@@ -358,7 +407,7 @@ The Apache 2.0 licensed node-convict library to be leveraged for the mechanical 
 |   | Private Key | `string`        | `--private-key` | `PRIVATE_KEY` | `privateKey` | The private key of the validator node to be used when signing validated messages.                    |
 |   | Public Key  | `string`        | `--public-key`  | `PUBLIC_KEY`  | `publicKey`  | The public key of the validator node that pairs with the `Private Key` of the same node.             |
 
-##### 4.1.1.1.3 Configuration Schema - API Server
+##### 4.2.1.1.3 Configuration Schema - API Server
 
 |   | Parameter                 | Type            | Key: CLI, Env, JSON                                                                                | Description                                                                                                                                                                                                                                                                                                                                                                                                             |
 |---|---------------------------|-----------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -370,11 +419,11 @@ The Apache 2.0 licensed node-convict library to be leveraged for the mechanical 
 |   | Authentication Options    | `Array<string>` | `--authentication-options`<br><br>`AUTHENTICATION_OPTIONS`<br><br>`authenticationOptions`          | Used to provide arguments to the constructors (or factory functions) exported by the modules specified by `AUTHENTICATION_STRATEGIES`. For example, in this configuration parameter you can specify the callback URL for an Open ID Connect provider of your choice, the client ID, client secret, etc. Important: The order in which the items appear have to match the order of items in `AUTHENTICATION_STRATEGIES`. |
 |   | Package Registries        | `Array<string>` | `--package-registries`<br><br>`PACKAGE_REGISTRIES`<br><br>`packageRegistries`                      | Optional. Defaults to the public npm registry at `https://registry.npmjs.org/`. Can be used to specify private registries in the event of closed source plugins. If multiple registry URLs are provided, they all will be tried in-order at bootstrap time.                                                                                                                                                              |
 
-##### 4.1.1.1.4 Plugin Loading/Validation
+##### 4.2.1.1.4 Plugin Loading/Validation
 
 Plugin loading happens through NodeJS's built-in module loader and the validation is performed by the Node Package Manager tool (npm) which verifies the byte level integrity of all installed modules.
 
-#### 4.1.1.2 cmd-api-server
+#### 4.2.1.2 cmd-api-server
 
 A command line application for running the API server that provides a unified REST based HTTP API for calling code.
 
@@ -382,31 +431,31 @@ By design this is stateless and horizontally scalable.
 
 Comes with Swagger API definitions.
 
-#### 4.1.1.3 cmd-validator
+#### 4.2.1.3 cmd-validator
 
 Command line application to run a single `BIF` validator node.
 
-#### 4.1.1.4 sdk-javascript
+#### 4.2.1.4 sdk-javascript
 
 Javascript SDK (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
 Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
 
-#### 4.1.1.5 keychain
+#### 4.2.1.5 keychain
 
 Responsible for persistently storing highly sensitive data (e.g. private keys) in an encrypted format.
 
 For further details on the API surface, see the relevant section under `Plugin Architecture`.
 
-#### 4.1.1.7 tracing
+#### 4.2.1.7 tracing
 
 Contains components for tracing, logging and application performance management (APM) of code written for the rest of the Blockchain Integration Framework packages.
 
-#### 4.1.1.8 audit
+#### 4.2.1.8 audit
 
 Components useful for writing and reading audit records that must be archived longer term and immutable.
 The latter properties are what differentiates audit logs from tracing/logging messages which are designed to be ephemeral and to support technical issues not regulatory/compliance/governance related issues.
 
-#### 4.1.1.9 document-storage
+#### 4.2.1.9 document-storage
 
 Provides structured or unstructured document storage and analytics capabilities for other packages such as `audit` and `tracing`.
 Comes with its own API surface that serves as an adapter for different storage backends via plugins.
@@ -416,43 +465,43 @@ By default, `Open Distro for ElasticSearch` is used as the storage backend: http
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `BIF`.
 
-#### 4.1.1.10 relational-storage
+#### 4.2.1.10 relational-storage
 
 Contains components responsible for providing access to standard SQL compliant persistent storage.
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `BIF`.
 
-#### 4.1.1.11 immutable-storage
+#### 4.2.1.11 immutable-storage
 
 Contains components responsible for providing access to immutable storage such as a distributed ledger with append-only semantics such as a blockchain network (e.g. Hyperledger Fabric).
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `BIF`.
 
-### 4.1.2 Deployment Diagram
+### 4.2.2 Deployment Diagram
 
 Source file: `./docs/architecture/deployment-diagram.puml`
 
 ![Deployment Diagram HL BIF](https://www.plantuml.com/plantuml/png/0/ZLNHRjem57tFLzpnqasYJF3SeYQ43ZGAQ6LxgXGvpWKi73jo73eqzTzt7GA4aj4X8N1yphat9ySt3xbbnXQfX10pgNSfAWkXO2l3KXXD81W_UfxtIIWkYmJXBcKMZM3oAzTfgbNVku651f5csbYmQuGyCy8YB8L4sEa2mjdqPW4ACG6h8PEC8p3832x5xq-DmYXbjjOA-qsxacLMPn5V6vrYhFMc4PKmosAMauHdXQLEBc_kHOrs6Hg9oGeD15Bp3LypeM2iB1B02gtWaO3ugis6F5Yw_ywFg2R6SeZ5Ce4_dWTWa5kcLbIkzMorOIk4kT5RaQ1fEMIUTGa8z7doez1V-87_FFpypR1T6xhjKYXkdrJQq0eOtmYrWf3k1vmcjhvK4c-U-vvN_SMae5lN1gQQ_1Z88hTLxQtY5R4HFz4iWO19flY18EDZfN_pkftEjDAlq6V0WLQALjgyA0Wd2-XMs2YHjXln8-NjOsglHkrTK9lSyETZU4QpfSTRTu9b8c_meeQ-DCDnp3L7QkoZ9NkIEdjUnEHI5mcqvaKi1I_JPXJQaa6_X7uxPAqrJYXZmWhCosrnN9QQjV8BmrJEk7LPgKWxy4kI5QpgW3atOQYIw6UE9lBTBXRi4CZ1S3APZsRJMYAFH_4ybKyw5kMPsWf-FP2DVGLLNt5pNy6-h_ZGryIVBsRpQ33wCNiQ1hFPzrD_-s5mtbo8-SPDYC3eLv9xrzx9sr3areYui3IO9kKGs9jCyRfgxod6reNuse6c_IJklclleYof_Q-5ftFWQlS-hDtxi7RlqX_FZQcxJgVJtnyLpusEvZKX2UzIUtT_Vz-l1RHsqHbQMxefvtcKExYzxPyIHbVYyih-cPBi0wg4taj_0G00 "Deployment Diagram HL BIF")
 
-### 4.1.3 Component Diagram
+### 4.2.3 Component Diagram
 
 Source file: `./docs/architecture/component-diagram.puml`
 
 ![Component DiagramHyperledger Blockchain Integration Framework](https://www.plantuml.com/plantuml/png/0/ZLN1Rjim3BthAmXVrWQhiVGO546pPaK7x32i1NOPCCWownYH9LTKbdX9_tsKx2JsihRBIT9xV7mYAUUQl7H-LMaXVEarmesjQclGU9YNid2o-c7kcXgTnhn01n-rLKkraAM1pyOZ4tnf3Tmo4TVMBONWqD8taDnOGsXeHJDTM5VwHPM0951I5x0L02Cm73C1ZniVjzv9Gr85lTlIICqg4yYirIYDU1P2PiGKvI6PVtc8MhdsFQcue5LTM-SnFqrF4vWv9vkhKsZQnbPS2WPZbWFxld_Q4jTIQpmoliTj2sMXFWSaLciQpE-hmjP_ph7MjgduQ7-BlBl6Yg9nDNGtWLF7VSqsVzHQTq8opnqITTNjSGUtYI6aNeefkS7kKIg4v1CfPzTVdVrLvkXY7DOSDsJTU-jaWGCQdT8OzrPPVITDJWkvn6_uj49gxVZDWXm-HKzIAQozp3GEyn_gEpoUlfs7wb39NYAAYGWrAXwQeTu4XliWhxGaWkJXEAkTM7lB3evzZq2S1yO2ACAysekBsF49N5t9ed1OI8_JQOS-CxpRnaSYte6n7eE86VC6O0OyFOoP_PJ36Ao3oZfc7QOyRRdcU1H3CZo-3SWQaAQ9HBEgCdxNzX7EVgEpu2rKZ9s7N54BJHwDyFACBRwFviuXJOCj4OVtUSUN-jlpvT5pR-B3YFFiRBXskc7_1vClsmwFudyTzpAzPVwoCpzYxwH2ErJuz54PcieDEO3hLx3OtbTmgaz1qSv4CavWjqjJk-LbceuI7YB-26_ONBf_1SCjXMto8KqvahN3YgEm5litq-cC_W7oK8uX_aBM0K5SSvNu7-0F "Component DiagramHyperledger Blockchain Integration Framework")
 
-### 4.1.4 Class Diagram
+### 4.2.4 Class Diagram
 
-### 4.1.5 Sequence Diagram - Transactions
-
-TBD
-
-## 4.2 Transaction Protocol Specification
-
-### 4.2.1 Handshake Mechanism
+### 4.2.5 Sequence Diagram - Transactions
 
 TBD
 
-### 4.1.9 Transaction Protocol Negotiation
+## 4.3 Transaction Protocol Specification
+
+### 4.3.1 Handshake Mechanism
+
+TBD
+
+### 4.3.2 Transaction Protocol Negotiation
 
 Participants in the transaction must have a handshake mechanism where they agree on one of the supported protocols to use to execute the transaction. The algorithm looks an intersection in the list of supported algorithms by the participants.
 
@@ -462,7 +511,7 @@ Adding new protocols must be possible as part of the plugin architecture allowin
 The two initially supported protocols shall be the ones that can satisfy the requirements for Fujitsu’s and Accenture’s implementations respectively.
 Means for establishing bi-directional communication channels through proxies/firewalls/NAT wherever possible
 
-## 4.3 Plugin Architecture
+## 4.4 Plugin Architecture
 
 Since our goal is integration, it is critical that `BIF` has the flexibility of supporting most ledgers, even those that don't exist today.
 
@@ -484,7 +533,7 @@ An overarching theme for all aspects that are covered by the plugin architecture
 
 ---
 
-### 4.3.1 Ledger Connector Plugins
+### 4.4.1 Ledger Connector Plugins
 
 Success is defined as:
 1. Adding support in `BIF` for a ledger invented in the future requires no `core` code changes, but instead can be implemented by simply adding a corresponding connector plugin to deal with said newly invented ledger.
@@ -519,7 +568,7 @@ export enum PermissionScheme {
 
 ```
 
-### 4.3.2 Identity Federation Plugins
+### 4.4.2 Identity Federation Plugins
 
 Identity federation plugins operate inside the API Server and need to implement the interface of a common PassportJS Strategy:
 https://github.com/jaredhanson/passport-strategy#implement-authentication
@@ -536,14 +585,14 @@ abstract class IdentityFederationPlugin {
 }
 ```
 
-#### 4.3.1.1 X.509 Certificate Plugin
+#### 4.4.1.1 X.509 Certificate Plugin
 
 The X.509 Certificate plugin facilitates clients authentication by allowing them to present a certificate instead of operating with authentication tokens.
 This technically allows calling clients to assume the identities of the validator nodes through the REST API without having to have access to the signing private key of said validator node.
 
 PassportJS already has plugins written for client certificate validation, but we go one step further with this plugin by providing the option to obtain CA certificates from the validator nodes themselves at runtime.
 
-### 4.3.3 Key/Value Storage Plugins
+### 4.4.3 Key/Value Storage Plugins
 
 Key/Value Storage plugins allow the higher-level packages to store and retrieve configuration metadata for a `BIF` cluster such as:
 * Who are the active validators and what are the hosts where said validators are accessible over a network?
@@ -558,7 +607,7 @@ interface KeyValueStoragePlugin {
 }
 ```
 
-### 4.3.4 Serverside Keychain Plugins
+### 4.4.4 Serverside Keychain Plugins
 
 The API surface of keychain plugins is roughly the equivalent of the key/value *Storage* plugins, but under the hood these are of course guaranteed to encrypt the stored data at rest by way of leveraging storage backends purpose built for storing and managing secrets.
 
