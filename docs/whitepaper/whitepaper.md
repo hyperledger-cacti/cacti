@@ -707,6 +707,18 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 
 # 6. Terminology
 
+**API Server**: A module of BIF which provides a unified interface to control/monitor Blockchain ledger behind it.
+
+**Validator**: A module of BIF which verifies validity of transaction to be sent out to the blockchain application.
+
+**Lock asset**: An operation to the asset managed on blockchain ledger, which disable further operation to targeted asset. The target can be whole or partial depends on type of asset.
+
+**Abort**: A state of BIF which is determined integrated ledger operation is failed, and BIF will execute recovery operations.
+
+**Integrated ledger operation**: A series of blockchain ledger operations which will be triggered by BIF. BIF is responsible to execute 'recovery operations' when 'Abort' is occurred.
+
+**Restore operation(s)**: Single or multiple ledger operations which is executed by BIF to restore the state of integrated service before start of integrated operation.
+
 **End User**: A person (private citizen or a corporate employee) who interacts with BIF and other ledger-related systems to achieve a specific goal or complete a task such as to send/receive/exchange money or data.
 
 **Business Organization**: A for-profit or non-profit entity formed by one or more people to achieve financial gain or achieve a specific (non-financial) goal. For brevity, *business organization* may be shortened to *organization* throughout the document.
