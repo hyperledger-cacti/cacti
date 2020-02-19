@@ -9,9 +9,9 @@
     - [2.4.1 With Permissionless Ledgers (BTC)](#241-with-permissionless-ledgers-btc)
       - [2.4.1.1 Proof of Burn](#2411-proof-of-burn)
     - [2.4.2 With Fiat Money (USD)](#242-with-fiat-money-usd)
-  - [2.5 Healthcare: Cross-Provider Data Sharing with Access Control Lists](#25-healthcare-cross-provider-data-sharing-with-access-control-lists)
+  - [2.5 Healthcare Data Sharing with Access Control Lists](#25-healthcare-data-sharing-with-access-control-lists)
   - [2.6 Integrate Existing Food Traceability Solutions](#26-integrate-existing-food-traceability-solutions)
-  - [2.7 End User to Wallet Authentication/Authorization](#27-end-user-to-wallet-authenticationauthorization)
+  - [2.7 End User Wallet Authentication/Authorization](#27-end-user-wallet-authenticationauthorization)
 - [3. Software Design](#3-software-design)
   - [3.1. Principles](#31-principles)
     - [3.1.1. Wide support](#311-wide-support)
@@ -81,42 +81,69 @@ We propose a protocol and it's implementation to connect as many of them as poss
 
 Specific use cases that we intend to support.
 The core idea is to support as many use-cases as possible by enabling interoperability
-between a large variety of ledgers specific to certain main stream or exotic use cases.
+between a large variety of ledgers specific to certain mainstream or exotic use cases.
 
 ## 2.1 Fabric to Quorum Asset Transfer
 
-Export an asset from one network to the other.
-Details TBD
+| W3C Use Case Attribute Name | W3C Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Use Case Title              | Fabric to Quorum Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Use Case                    | 1. `User A` owns an asset on a Fabric ledger<br>2. `User A` transfers the asset a Quorum ledger<br><br>3. `User A` verifies that the same data is now present on the Quorum ledger as it was on the Fabric ledger                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Type of Social Interaction  | Generic Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Narrative                   | A person (`User A`) has multiple accounts on different ledgers (Fabric, Quorum) and they wish to have a certain piece of data available on both ledgers to achieve a certain outcome. The asset they are transferring is a generic asset meaning that it doesn't have to be currency of any sort, it can be any arbitrary set of bits that is up to the User to make use of in a meaningful way. Given the latter, this use case does not have any requirements on the avoidance of double spending since this is not necessarily applicable.                                                                                                                                                                                                                                                                                  |
+| Actors                      | 1. `User A`: The person or entity who has ownership of the transferred asset.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Goals of Actors             | To have some data available on multiple ledgers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Success Scenario            | Transfer succeeds without issues. Asset is available on both Fabric and Quorum ledgers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Success Criteria            | Presence of asset on both ledgers has cryptographic proof that is obtainable through BIF.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Failure Criteria            | Signatures (the cryptographic proof) is invalid in any one of the ledgers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Prerequisites               | 1. Ledgers are provisioned<br>2. `User A` identity established on both ledgers.<br>3. `User A` has access to BIF deployment                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Comments                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+
+![Sequence Diagram - Fabric Quorum Asset Transfer](https://www.plantuml.com/plantuml/png/0/bLN1RXen4BtxAqRqqaf9AZYYW4BIqg8IDHKalI0Xunt0oiQcO-yc_7t6teKisuKstF1xysRcpGnSEI_9PqyfJF1FXaOXVD5oHV89pc4e5wGL_CeiPKymS0uzJ4aQjqGImckV8dpVRf1IJ5P8S9rQzQZMKXiO6O-iuhKrC6GrVBRqE3FlJYALjmJt3ca-0Eb02h6mBz2w7WrRy66iLsl_ZUHMeE5ojj0Qt8su4ygHMf6-qMwFFSXK9vBr8fJpUm8iLYgEOm-kjQDpXlcDDPwuX7bP98UfTYEXB3yGEeAJo8LqMFOsBwG3cBJVm2Aa2dRUIfAPjwohS-aHh16YruD1vjSXjmfllHwJuBmVM-mUO8BGPsJYsmLCxICMyMEUpixkmkUQo5y48I12WP8tuS2VFA2gtUMPvvmBTfuSumEJGqZ28Rz9So_UGkd2n8VUPkPZf5-4VSAavod3JsLisLl9lz-mdPZ0pn-Y2iQmUkOJu0ceDedbiZIi2mz8Uhc5YLuPoU7ePiOkmrR0Vj6SKDmW3oMjq0euE5iANIgRyfAl2D7qxyWgv2AUjL_3rnTKMRYXoy-HqnUOykPKjDZpPZN2f3zOMF8G5PqxcvaAjB7EwGNVx-reUdk0IEybZurlU4EMQtBXW9B6XRmX3DyEJhUsKWsKsb8TOJ2dRln-sVB_D3_ksea1L0KFXX1MM9iC8-UuvGtnUzkBK9Cqj694vMuw3NTJMd9mCfruCftToHHcrmxd7ITIjViCRj7ByBia_eMVHiKLDyp_9Qy0 "Sequence Diagram - Fabric Quorum Asset Transfer")
 
 ## 2.2 Escrowed Sale of Data for Coins
 
-Organization A is looking to buy some data. Organization B has some data it's looking to monetize.
 
-Data in this context is any series of bits stored on a computer:
-* Machine learning model
-* ad-tech database
-* digital/digitized art
-* proprietary source code or binaries of software
-* etc.
+| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+|-----------------------------|-|
+| Use Case Title              | Escrowed Sale of Data for Coins |
+| Use Case                    | 1. `User A` initiates (proposes) an escrowed transaction with `User B`<br>2. `User A` places funds, `User B` places the data to a digital escrow service.<br>3. They both observe each other's input to the escrow service and decide to proceed.<br>4. Escrow service releases the funds and the data to the parties in the exchange. |
+| Type of Social Interaction  | Peer to Peer Exchange |
+| Narrative                   | Data in this context is any series of bits stored on a computer:<br> * Machine learning model<br> * ad-tech database<br> * digital/digitized art<br> * proprietary source code or binaries of software<br> * etc.<br><br>`User A` and B trade the data and the funds through a BIF transaction in an atomic swap with escrow securing both parties from fraud or unintended failures.<br>Through the transaction protocol's handshake mechanism, A and B can agree (in advance) upon<br><br>* The delivery addresses (which ledger, which wallet)<br>* the provider of escrow that they both trust<br>* the price and currency<br><br>Establishing trust (e.g. Is that art original or is that machine learning model has the advertised accuracy) can be facilitated through the participating DLTs if they support it. Note that `User A` has no way of knowing the quality of the dataset, they entirely rely on `User B`'s description of its quality (there are solutions to this problem, but it's not within the scope of our use case to discuss these). |
+| Actors                      | 1. `User A`: A person or business organization with the intent to purchase data.<br>2. `User B`: A person or business entity with data to sell. |
+| Goals of Actors             | `User A` wants to have access to data for an arbitrary reason such as having a business process that can enhanced by it.<br> `User B`: Is looking to generate income/profits from data they have obtained/created/etc. |
+| Success Scenario            | Both parties have signaled to proceed with escrow and the swap happened as specified in advance. |
+| Success Criteria            | `User A` has access to the data, `User B` has been provided with the funds. |
+| Failure Criteria            | Either party did not hold up their end of the exchange/trace. |
+| Prerequisites               | `User A` has the funds to make the purchase<br>`User B` has the data that `User A` wishes to purchase.<br>`User A` and B can agree on a suitable currency to denominate the deal in and there is also consensus on the provider of escrow. |
+| Comments                    | Hyperledger Private Data: https://hyperledger-fabric.readthedocs.io/en/release-1.4/private_data_tutorial.html <br> Besu Privacy Groups: https://besu.hyperledger.org/en/stable/Concepts/Privacy/Privacy-Groups/ |
 
-Organization A and B trade the data and the funds through a BIF transaction in an
-atomic swap with escrow securing both parties from fraud or unintended failures.
-
-Through the transaction protocol's handshake mechanism, A and B can agree (in
-advance) upon
-* The delivery addresses (which ledger, which wallet)
-* the provider of escrow that they both trust
-* the price and currency
-
-Establishing trust (e.g. Is that art original or is that machine learnig model has the advertized accuracy) can be facilitated through the participating DLTs if they support it.
+![Sequence Diagram - Escrowed Sale of Data for Coins](https://www.plantuml.com/plantuml/png/0/jPF1Qi9048Rl-nI3nu07FNee6cseq8FKzYR899dOnNKtdTreVVlEnb1ZeI257ZF_jpCVEvkf3yYXEHXOqqT3jY1OQDmn7c08ZxvWTw8IrcW8N0KB30YLOvWxRRrIVgzjZH6UiP2Pis4TpiBgW4ONIWKTvElfN1CRAdV4a1fNx8jtr1QMDf1C2jfPoAG9dHplD_Ol8bW4-NZpnDiPe0ViLz9OoPNAtIUaoqoH5Qqp36QhvQ25Qosr4YI_G8FdrjKFL2bpSlG46UQiY-qbY8VAqJLCoJVzQ7njXqrmegAF64JSIW663t7Y15RiQYUdNncjZup4JA5Xsozr61gOCqcJijzYhNUtS73TNK7MsD8hY5p4ox7GqQgjNpaXkfdTkNwtkRELveFCl8TH-JrUSNCzhL6drIxqNwnkDr1LgXlTYYR92ncAEwpQUq5HYMjDaerD4l5XAaWVjTs1lFEWoL-I-AvWrkAfCBwcE87CEKc--qz-61rgGt5_NPx_bgkfN8ZyaLy0 "Sequence Diagram - Escrowed Sale of Data for Coins")
 
 ## 2.3 Money Exchanges
 
 Enabling the trading of fiat and virtual currencies in any permutation of possible pairs.
 
+> On the technical level, this use case is the same as the one above and therefore the specific details were omitted.
+
 ## 2.4 Stable Coin Pegged to Other Currency
 
-Someone launches a highly scalable ledger with their own coin called ExampleCoin that can consistently sustain throughput levels of a million transactions per second reliably, but they struggle with adoption because nobody wants to buy into their coin fearing that it will lose its value. They choose to put in place a two-way peg with Bitcoin which guarantees to holders of their coin that it can always be redeemed for a fixed number of Bitcoins/USDs.
+
+| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+|-----------------------------|-|
+| Use Case Title              | Stable Coin Pegged to Other Currency |
+| Use Case                    | 1. `User A` creates their own ledger<br>2. `User A` deploys BIF in an environment set up by them.<br>3. `User A` implements necessary plugins for BIF to interface with their ledger for transactions, token minting and burning.|
+| Type of Social Interaction  | Software Implementation Project |
+| Narrative                   | Someone launches a highly scalable ledger with their own coin called ExampleCoin that can consistently sustain throughput levels of a million transactions per second reliably, but they struggle with adoption because nobody wants to buy into their coin fearing that it will lose its value. They choose to put in place a two-way peg with Bitcoin which guarantees to holders of their coin that it can always be redeemed for a fixed number of Bitcoins/USDs. |
+| Actors                      | `User A`: Owner and/or operator of a ledger and currency that they wish to stabilize (peg) to other currencies |
+| Goals of Actors             | 1. Achieve credibility for their currency by backing funds.<br>2. Implement necessary software with minimal boilerplate code (most of which should be provided by BIF) |
+| Success Scenario            | `User A` stood up a BIF deployment with their self-authored plugins and it is possible for end `user a`pplication development to start by leveraging the BIF REST APIs which now expose the functionalities provided by the plugin authored by ``User A`` |
+| Success Criteria            | Success scenario was achieved without significant extra development effort apart from creating the BIF plugins. |
+| Failure Criteria            | Implementation complexity was high enough that it would've been easier to write something from scratch without the framework |
+| Prerequisites               | * Operational ledger and currency<br>*Technical knowledge for plugin implementation (software engineering) |
+| Comments                    | |
+
+> Sequence diagram omitted as use case does not pertain to end users of BIF itself.
 
 ### 2.4.1 With Permissionless Ledgers (BTC)
 
@@ -139,23 +166,66 @@ Interesting possibilities to consider:
 Very similar idea as with pegging against BTC, but the BTC wallet used for reserves
 gets replaced by a traditional bank account holding USD.
 
-## 2.5 Healthcare: Cross-Provider Data Sharing with Access Control Lists
+## 2.5 Healthcare Data Sharing with Access Control Lists
 
-Let's say that two healthcare providers have both implemented their own blockchain based patient data management systems and are looking to integrate with each other
-to provide patients with a seamless experience when being directed from one to another
-for certain treatments. The user is in control over their data on both platforms separately and with a BIF backed integration they could also define fine grained access control lists consenting to the two healthcare providers to access each others' data that they collected about the patient.
+| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+|-----------------------------|-|
+| Use Case Title              | Healthcare Data Sharing with Access Control Lists |
+| Use Case                    | 1. `User A` (patient) engages in business with `User B` (healthcare provider)<br>2. `User B` requests permission to have read access to digitally stored medical history of `User A` and write access to log new entries in said medical history.<br>3.`User A` receives a prompt to grant access and allows it.<br>4. `User B` is granted permission through ledger specific access control/privacy features to the data of `User A`. |
+| Type of Social Interaction  | Peer to Peer Data Sharing |
+| Narrative                   | Let's say that two healthcare providers have both implemented their own blockchain based patient data management systems and are looking to integrate with each other to provide patients with a seamless experience when being directed from one to another for certain treatments. The user is in control over their data on both platforms separately and with a BIF backed integration they could also define fine grained access control lists consenting to the two healthcare providers to access each other's data that they collected about the patient. |
+| Actors                      | * `User A`: Patient engaging in business with a healthcare provider<br>* `User B`: Healthcare provider offering services to `User A`. Some of said services depend on having access to prior medical history of `User A`. |
+| Goals of Actors             | * `User A`: Wants to have fine grained access control in place when it comes to sharing their data to ensure that it does not end up in the hands of hackers or on a grey data market place.<br>`User B` |
+| Success Scenario            | `User B` (healthcare provider) has access to exactly as much information as they need to and nothing more. |
+| Success Criteria            | There's cryptographic proof for the integrity of the data. Data hasn't been compromised during the sharing process, e.g. other actors did not gain unauthorized access to the data by accident or through malicious actions. |
+| Failure Criteria            | `User B` (healthcare provider) either does not have access to the required data or they have access to data that they are not supposed to. |
+| Prerequisites               | `User A` and `User B` are registered on a ledger or two separate ledgers that support the concept of individual data ownership, access controls and sharing. |
+| Comments                    | It makes most sense for best privacy if `User A` and `User B` are both present with an identity on the same permissioned, privacy-enabled ledger rather than on two separate ones. This gives `User A` an additional layer of security since they can know that their data is still only stored on one ledger instead of two (albeit both being privacy-enabled)|
+
+![Sequence Diagram - Healthcare Data Sharing with Access Control Lists](https://www.plantuml.com/plantuml/png/0/hLHDRzf04BtxLupefJtaa1mjX69IaQ16AYfgUeaK3Ui1Zx1ttTd1b7_VMK1WL9NcqAFtVSsyNVa-AefkcXhcz7D3tX5yPbm9Dd03JuIrLWx53b4HvXKA-nLiMIiedACOuI5ubL33CqUDMHRNx5jCya8aR2U6pdLN4x1YpIxBbDM-ddOjIKtbYWJ6TN1hLo5xc7eborOE7YPcGjiWwrV_VqP3fq7WUoHvAm0Z80o7hMMHrz6eZuuJkZ2qEeUq4ZekIOoPBS8l64ydyE57nKhp9gmfCnFM7GoAsNImDs_vTFPYcvTezX_ZfptO6LI2sHoy1i_x8kBWmj4KkC18CC65i7ixa9Ayl3s3OugRFdHtjiQD1jkAErI2u2qBRaPfi1o-fKAZ7gexj9LbaB0z9OUPXAPLM5ebVGw0a6x4mwEWLvYHD1mZ9_EJkhpBuP4KYXX9N_r5YsbiQ_1aSuMJ32yMM2xF6LqEBoIyt5rFSSBA3krjyygZ9LA4_MKO1j2TwXYwK0V9LqBaHxQw8qeKggtWddJgkx-BXSfHiGYYIUZBFyRlLsJZFmYbuwlZ7rFAs_VI-wqU9ILy_VAUI_WdFJkoUy_Xy0gigkpUDhP_o6y0 "Sequence Diagram - Healthcare Data Sharing with Access Control Lists")
+
 
 ## 2.6 Integrate Existing Food Traceability Solutions
 
-Both `Organization A` and `Organization B` have separate products/services for solving the problem of verifying the source of food products sold by retailers.
-A retailer has purchased the food tracability solution from `Organization A` while a food manufacturer (whom the retailer is a customer of) has purchased their food tracability solution from `Organization B`.
-The retailer wants to provide end to end food tracability to their customers, but this is not possible since the chain of tracability breaks down at the manufacturer who uses a different service or solution. `BIF` is used as an architectural component to build an integration for the retailer which ensures that consumers have access to food tracing data regardless of the originating system for it being the product/service of `Organization A` or `Organization B`.
+| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+|-----------------------------|------------------------------|
+| Use Case Title              | Food Traceability Integration |
+| Use Case                    | 1. `Consumer` is evaluating a food item in a physical retail store.<br> 2. `Consumer` queries the designated end user application designed to provide food traces. 3. `Consumer` makes purchasing decision based on food trace.|
+| Type of Social Interaction  | Software Implementation Project |
+| Narrative                   | Both `Organization A` and `Organization B` have separate products/services for solving the problem of verifying the source of food products sold by retailers.<br>A retailer has purchased the food traceability solution from `Organization A` while a food manufacturer (whom the retailer is a customer of) has purchased their food traceability solution from `Organization B`.<br>The retailer wants to provide end to end food traceability to their customers, but this is not possible since the chain of traceability breaks down at the manufacturer who uses a different service or solution. `BIF` is used as an architectural component to build an integration for the retailer which ensures that consumers have access to food tracing data regardless of the originating system for it being the product/service of `Organization A` or `Organization B`. |
+| Actors                      | `Organization A`, `Organization B` entities whose business has to do with food somewhere along the global chain from growing/manufacturing to the consumer retail shelves.<br> `Consumer`: Private citizen who makes food purchases in a consumer retail goods store and wishes to trace the food end to end before purchasing decisions are finalized. |
+| Goals of Actors             | `Organization A`, `Organization B`: Provide `Consumer` with a way to trace food items back to the source.<br>`Consumer`: Consume food that's been ethically sourced, treated and transported. |
+| Success Scenario            | `Consumer` satisfaction increases on account of the ability to verify food origins. |
+| Success Criteria            | `Consumer` is able to verify food items' origins before making a purchasing decision. |
+| Failure Criteria            | `Consumer` is unable to verify food items' origins partially or completely. |
+| Prerequisites               | 1. `Organization A` and `Organization B` are both signed up for blockchain enabled software services that provide end to end food traceability solutions on their own but require all participants in the chain to use a single solution in order to work.<br>2. Both solutions of `Organization A` and `B` have terms and conditions such that it is possible technically and legally to integrate the software with each other and `BIF`. |
+| Comments                    | |
 
-![Food Tracability Integration](https://www.plantuml.com/plantuml/png/0/fLNHQjj047pNLopk1xIqzCKa9b6eKqCBflPB8I-dqvvyzUbMtJlLLKh-lIl5IjHOTXC20e6OdPsTcrjTXAWurgM3EL4EQrPQPTRPsC32HonOHKi-IQAD3k5pKo4xp0jaI1tfhTuewuT8cBCgSKUylV6d6SFM-ae96WB-hD5hl6IctNfZzTPZ2F1-066gVQw9lJJ-EFXUgj-bO5M1mTuYV7WtGhkK0QssbV8HX4K6i1vb8geW4cGK8vMGMqPzBqpfI0oJRnYLTTBlgWw2G9w02i0wIKmx8aokg1JE1Yvl_DaPSQ6ylUrccyqwg5RmveijDl6QLGD_4W1FkTGTsB8YLtVUTKo1JDmfnZsBYQ7d-OxEqQvZkalk3dIantHaBzMHZkl8Jkle-7hNZcXXV9KMoB5or9JeuzjGPq6phGRiRY3ocX7zNcFVPPXJ8sVyoUTj1DhNKm4lw6eDHZHnttUrRL9NuxWxNvMlZUIhvgCEcV9LgNc6Gsh4eKUTgoP4B1-kghYqpzSHlS7gSS5FYAIYPLYivLxoBwlxN8LW3pGCrioHhXittlJ_I-aWs9ar_-Pw8AU4y_DPTv4xiwQmh5dO0yA9uqZa5DeoKqxbgnIWX4tGXgbTM8y9w87j1Nq-VzgNYVE3WaExOSdqGvPQmhh3xtCwxMWnt8iYjeNr8McFiGLjt1JIshfSSZsWagVTbsGWNSoJv09zBl-Clm00 "Food Tracability Integration")
+![Sequence Diagram - Food Traceability Integration](https://www.plantuml.com/plantuml/png/0/rPRBRjim44Nt_8g1ksaNIM4jWzY8dS1eW0PDcqSt0G9A6jc4QL8bgQJkrtT8oefVifnTkxDy3uSpbyF7XNNSk6eXuGv_LQWoX2l1fuOlu0GcMkTmRtY6F1LIk2LSAuSaEg4LOtOkLCazEZ96lqwqSdTkAH64ur9aZ3dXwElBiaGZCP-YWR7KsJoRSQ7MGy64Wk2hDlCdzVuqUEQqWGUBvda4t0A7y_DCArijq0o7w_BOood9saov4lnFd7q4P49HRBANdirss773ibJ_Xb5PKgLH-l1p9XmoLCwds9iOyWDLtlE1YlgZKSSycw_4DFucBGSA6YEFhoVR4KUtru7dfMZ-UoIdSqvPVxIVWlYo6QRtDHXlUwjW1FEKMmokFaVrkUz7vltzOXB4v2qkhvmcfyGBTmX-1GO3-86PDZbSKG0O36XkE1asLPzvd_pmi9A1YJo3Xl5yRSGX75QGvyc8monun9Dvlmiqw2gZTjHw54Ri2AWJwGHOzezvb_n7tb4htg2PubidIgrBkDLI2ZNzV6_4b7ewpBPjnlSApH9YqqEVRNNF7dKzcpeHEWRMa0wWAuU4RQt27lNW50dh13PpQ9heKY_AojKkNecYs5FMNgsbmsw4jUH_7EDqgyl7uFNqg__WeQHZQxr_TfJt5faSA38vj95QyjvPo6FmpMAIrZBVb712-tOFso1Sc77Tlr7N2sN3Tk2RXqjigK25VPDtd2u7-BPkRe7txAvMigwubhQtlwqffMan9HQk_XuvS3DXeTH2-Py8_dxpDrRKGvocMJWbde2TwKgkfaqHw3L2zvoawpO05CHWeGskIb1BYaUtOE6b1MHSqQXQf8UC4PHlkWotEIsmJfr_-X1Q8ncre4HAk_2vkB1a9XPrMYFUK5yPEyw8Bg9BZmt2pu3UK5ARiwb1LCCRFaTuHIb1A2f_WVcJsW3Aoj2pBdHpZfcmz23Q8lox8fmzeLGTM_AKCNP15T83z2y0 "Sequence Diagram - Food Traceability Integration")
 
-## 2.7 End User to Wallet Authentication/Authorization
+---
 
-End user facing applications can provide a seamless experience connecting multiple permissioned (or permissionless) networks for an end user who has a set of different identity proofs for wallets on different chains.
+![Food TraceabilityIntegration](https://www.plantuml.com/plantuml/png/0/fLNHQjj047pNLopk1xIqzCKa9b6eKqCBflPB8I-dqvvyzUbMtJlLLKh-lIl5IjHOTXC20e6OdPsTcrjTXAWurgM3EL4EQrPQPTRPsC32HonOHKi-IQAD3k5pKo4xp0jaI1tfhTuewuT8cBCgSKUylV6d6SFM-ae96WB-hD5hl6IctNfZzTPZ2F1-066gVQw9lJJ-EFXUgj-bO5M1mTuYV7WtGhkK0QssbV8HX4K6i1vb8geW4cGK8vMGMqPzBqpfI0oJRnYLTTBlgWw2G9w02i0wIKmx8aokg1JE1Yvl_DaPSQ6ylUrccyqwg5RmveijDl6QLGD_4W1FkTGTsB8YLtVUTKo1JDmfnZsBYQ7d-OxEqQvZkalk3dIantHaBzMHZkl8Jkle-7hNZcXXV9KMoB5or9JeuzjGPq6phGRiRY3ocX7zNcFVPPXJ8sVyoUTj1DhNKm4lw6eDHZHnttUrRL9NuxWxNvMlZUIhvgCEcV9LgNc6Gsh4eKUTgoP4B1-kghYqpzSHlS7gSS5FYAIYPLYivLxoBwlxN8LW3pGCrioHhXittlJ_I-aWs9ar_-Pw8AU4y_DPTv4xiwQmh5dO0yA9uqZa5DeoKqxbgnIWX4tGXgbTM8y9w87j1Nq-VzgNYVE3WaExOSdqGvPQmhh3xtCwxMWnt8iYjeNr8McFiGLjt1JIshfSSZsWagVTbsGWNSoJv09zBl-Clm00 "Food TraceabilityIntegration")
+
+## 2.7 End User Wallet Authentication/Authorization
+
+| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+|-----------------------------|------------------------------|
+| Use Case Title              | Wallet Authentication/Authorization |
+| Use Case                    | 1. `User A` has separate identities on different permissioned and permissionless ledgers in the form of private/public key pairs (Public Key Infrastructure).<br>2. `User A` wishes to access/manage these identities through a single API or user interface and opts to on-board the identities to a `BIF` deployment.<br>3. `User A` performs the on-boarding of identities and is now able to interact with wallets attached to said identities through `BIF` or end user applications that leverage `BIF` under the hood (e.g. either by directly issuing API requests or using an application that does so.|
+| Type of Social Interaction  | Identity Management |
+| Narrative                   | End user facing applications can provide a seamless experience connecting multiple permissioned (or permissionless) networks for an end user who has a set of different identity proofs for wallets on different ledgers. |
+| Actors                      | `User A`: The person or entity whose identities get consolidated within a single `BIF` deployment |
+| Goals of Actors             | `User A`: Convenient way to manage an array of distinct identities with the trade-off that a `BIF` deployment must be trusted with the private keys of the identities involved (an educated decision on the user's part). |
+| Success Scenario            | `User A` is able to interact with their wallets without having to access each private key individually. |
+| Success Criteria            | `User A`'s credentials are safely stored in the `BIF` keychain component where it is the least likely that they will be compromised (note that it is never impossible, but least unlikely, definitely) |
+| Failure Criteria            | `User A` is unable to import identities to `BIF` for a number of different reasons such as key format incompatibilities. |
+| Prerequisites               | 1. `User A` has to have the identities on the various ledgers set up prior to importing them and must have access to the private |
+| Comments                    |  |
+
+![Sequence Diagram - End User Wallet Authentication Authorization](https://www.plantuml.com/plantuml/png/0/nLLBRzf04BxlhnZHIul48Jb68GeeGKLKAYgakI15Ypt1AzkpxkuOulxwZjVc4PH4z7rSpyottsDMllQi7PTv1ZFyLY9523T6hvpEeGUt5CETHmVtEikGOL1oWiGcqcmiXQDrvdiuAULJGuMk9mVEsSt84i-uoX0Cwyn4Ih5XENsi2dGPnYl17MOsIgD46u8nCSgr0NWa8BYnBbtGRxFI4LiN-Xy6e3rekBn4YdkbVBcwKcffds0u7i6x-yGmgXg8A-WCfkDEQ2_CxjjNaH5hWNllFuJYMibHBxL7w4om2a928PMP60IwmUzy2d9zPtlBRgmfV2Qif-Apuy9yOqFXV8-dIxQYoQmr8uZ0-anblaIdLByFNt1bF8iv6yD94DRlon3qhcef5_jwS70GHROaLWwvT0H3r4w-pcsA5D36UM4TmtGoFe9f2ztkJa2t2obMXJPEGTrJjwONC1ExyEM-1KcmhYeOOz0C3ZtBQ4jbQoVS5N6jzCOIRccsbqyQcARqEZVny2Hkp_h-B3TnSkuqUSbD8ckpzKUMtZvXL0hQjbEsTq7I_SmxHLPQd5abhBhT9aDXRIchW538ieL2sChAIlqmJ-bwT3O72RzGvw1bd-hjs9WiWwMitrAU9bjbSdcTtbAjQt-1sh4M5c4NQnvxCzUdqfSHW7Nh_mWvIlQu2vgwPgt5FR2FxQCD8wsx1mq7KF7PYTSlI1vJe-gXLdM0V32tnOhLszMtQZ-HQzYx_vwhiFYrN1lwh-OgvR-QQxZ-7-PwBIR9t_87 "Sequence Diagram - End User Wallet Authentication Authorization")
+
+---
 
 ![Authentication, Authorization for Permissioned Chains](https://www.plantuml.com/plantuml/png/0/fPPBRnen483l-oj6oRMYXQIN24KXXBIeBqHegqgvp7fd5ul5Tcrl2Qduxntl0sW2IMWlI1xFVFFmp2mNpgFrnJo7Nk6dfBmKwALMhygpjlA-F4AgBOp8pgLpVAG4-bEKoaMHbpudUByqP7DACh9mcMin4-4QXifJPYl2jSKvBRITtQf_T9LJwi5hi3ARUaYa9H4CeiZDf3B8V73qio0bg6UjNaocKimKEGUTBHMh2vK8RHM7-dPBFiUxEUjYHaxU4voysO4TSQsaa0QL1wPmob9H5AKXDJWQg0I-EiRsZCdhv8u07L01loC059vJE-fsPHAozqlG2uxY_BnKaffLb4uOD6pkHrRh5DgtgjiTt_JW0x48PMDXpCoquNY4ENsJEYS_vc85Hwjzf4uW3VfNkrcTWrWdWJL2v_XDauPI7my2dGRGb-5L7oPwHgf68VU43-VTh5MqBdjVp_b1bj0B76qpL7KdrII1SFmnjCmxYylIl0hZ-JxjTfrE_G8jGK8cryiv1rvJOvdMs1-KvtfHWXlqU70pWTve610BYhb_x2yfQ6DgYUVEo7LWn7bMW5NvwtL6F2Es5ZRSp-H3P5MgwouoUP59jO7Bf9AeIXjtU6dyF0HV7WAE3m2N4GlDfkKGF2IlR_ulyaCTF9N1gkcpkit-oiHixwTgxzM-r9vk-uuvDp2qWJk-MHI1X4d2pU1gwmKL-BYjTeLn-KmOyPDXT9uD8zuJXjJGQfrlzV0PZCDsTBoQBIg7vKvsaTAUWCU9D-ICRTcFuoEBBCmr3nJxvmRdcqstXMtWolLFAAPyPHlm53rS3gzPz8iizo6vrs7LC19phR8WbnXuW8OnnafaxzLJExwDAGq--U1jmG6gh7PkceLUogeA1WF-oj0TYO8fsrcTyLMx1OCxeor_WT0Z2pejc0ITbCTLwChXIGi-eU9l2MoUACXFMq1Uj2BYqeSAHLkxe5lNTSyil5mrtgNwS2cyGAVax9lCOABmZ6lnk4pH4mDNsiLxxA8BBWp_6Va3 "Authentication, Authorization for Permissioned Chains")
 
@@ -184,7 +254,7 @@ BIF - where possible - should be designed in a way so that these unique features
 
 Interoperability does not redefine ecosystems but adapts to them. Governance, trust model and workflows are preserved in each ecosystem
 Trust model and consensus must be a mandatory part of the protocol handshake so that any possible incompatibilities are revealed up front and in a transparent way and both parties can “walk away” without unintended loss of assets/data.
-The idea comes from how the traditional online payment processing APIs allow merchants to specify the acceptable level of guarantees before the transaction can be finalized (e.g. need pin, signed receipt, etc).
+The idea comes from how the traditional online payment processing APIs allow merchants to specify the acceptable level of guarantees before the transaction can be finalized (e.g. need pin, signed receipt, etc.).
 Following the same logic, we shall allow transacting parties to specify what sort of consensus, transaction finality, they require.
 Consensus requirements must support predicates, e.g. “I am on Fabric, but will accept Bitcoin so long X number of blocks were confirmed post-transaction”
 Requiring KYC (Know Your Customer) compliance could also be added to help foster adoption as much as possible.
@@ -197,7 +267,7 @@ Such transparency should be visible as trustworthy evidence.
 ### 3.1.7 Automated workflows
 
 Logic exists in each ecosystem to enable complex interoperability use-cases. Cross-ecosystem transfers can be automatically triggered in response to a previous one.
-Automated procedure which is regarding error recovery and exception handling, should be executed without any interruption.
+Automated procedure, which is regarding error recovery and exception handling, should be executed without any interruption.
 
 ### 3.1.8 Default to Highest Security
 
@@ -234,20 +304,20 @@ Adding new protocols must be possible as part of the plugin architecture allowin
 
 ### 3.2.2 Proxy/Firewall/NAT Compatibility
 
-Means for establishing bi directional communication channels through proxies/firewalls/NAT wherever possible
+Means for establishing bidirectional communication channels through proxies/firewalls/NAT wherever possible
 
 ### 3.2.3 Bi-directional Communications Layer
 
-Using a blockchain agnostic bi directional communication channel for controlling and monitoring transactions on blockchains through proxies/firewalls/NAT wherever possible.
+Using a blockchain agnostic bidirectional communication channel for controlling and monitoring transactions on blockchains through proxies/firewalls/NAT wherever possible.
    * Blockchains vary on their P2P communication protocols. It is better to build a modular method for sending/receiving generic transactions between trustworthy entities on blockchains.
 
 ### 3.2.4 Consortium Management
 
-Consortiums can be formed by cooperating entities (person, organization, etc) who wish to all contribute hardware/network resources to the operation of a `BIF` cluster (set of validator nodes, API servers, etc).
+Consortiums can be formed by cooperating entities (person, organization, etc.) who wish to all contribute hardware/network resources to the operation of a `BIF` cluster (set of validator nodes, API servers, etc.).
 
 After the forming of the consortium with it's initial set of members (one or more) it is possible to enroll or remove certain new or existing members.
 
-`BIF` does not prescribe any specific consensus algorithm for the addition or removel of consortium members, but rather focuses on the technical side of making it possible to operate a cluster of nodes under the ownership of separate entities without downtime while also keeping it possible to add/remove members.
+`BIF` does not prescribe any specific consensus algorithm for the addition or removal of consortium members, but rather focuses on the technical side of making it possible to operate a cluster of nodes under the ownership of separate entities without downtime while also keeping it possible to add/remove members.
 
 A newly joined consortium member does not have to participate in every component of `BIF`: Running a validator node is the only required action to participate, etcd, API server can remain the same as prior to the new member joining.
 
@@ -285,7 +355,7 @@ The core package is responsible for parsing runtime configuration from the usual
 * Operating system environment variables (`HTTP_PORT=3000`)
 * Static configuration files (config.json: `{ "httpPort": 3000 }`)
 
-The Apache 2.0 licenced node-convict library to be leveraged for the mechanical parts of the configuration parsing and validation: https://github.com/mozilla/node-convict
+The Apache 2.0 licensed node-convict library to be leveraged for the mechanical parts of the configuration parsing and validation: https://github.com/mozilla/node-convict
 
 ##### 4.1.1.1.2 Configuration Schema - Validator
 
@@ -305,7 +375,7 @@ The Apache 2.0 licenced node-convict library to be leveraged for the mechanical 
 |   | Virtual Hosts             | `Array<string>` | `--virtual-hosts`<br><br>`VIRTUAL_HOSTS`<br><br>`virtualHosts`                                     | <br>Optional. When specified, constrains the acceptable incoming requests to ones that specify their host HTTP header in a way that matches at least one of the patterns specified in this configuration parameter.                                                                                                                                                                                                     |
 |   | Authentication Strategies | `Array<string>` | `--authentication-strategies`<br><br>`AUTHENTICATION_STRATEGIES`<br><br>`authenticationStrategies` | Optional. Specifies the fully qualified name, version and exported module of one or more npm packages that are to be loaded and used as the providers for the authentication strategies. For example to use PassportJS's OpenID Connect strategy one with specify the value `["passport-oidc-strategy@0.1.1###Strategy"]` which will get parsed as a JSON string containing an array of strings.                        |
 |   | Authentication Options    | `Array<string>` | `--authentication-options`<br><br>`AUTHENTICATION_OPTIONS`<br><br>`authenticationOptions`          | Used to provide arguments to the constructors (or factory functions) exported by the modules specified by `AUTHENTICATION_STRATEGIES`. For example, in this configuration parameter you can specify the callback URL for an Open ID Connect provider of your choice, the client ID, client secret, etc. Important: The order in which the items appear have to match the order of items in `AUTHENTICATION_STRATEGIES`. |
-|   | Package Registries        | `Array<string>` | `--package-registries`<br><br>`PACKAGE_REGISTRIES`<br><br>`packageRegistries`                      | Optional. Defaults to the public npm registry at `https://registry.npmjs.org/`. Can be used to specify private registries in the event of closed source plugins. If multiple registry URLs are provided they all will be tried in-order at bootstrap time.                                                                                                                                                              |
+|   | Package Registries        | `Array<string>` | `--package-registries`<br><br>`PACKAGE_REGISTRIES`<br><br>`packageRegistries`                      | Optional. Defaults to the public npm registry at `https://registry.npmjs.org/`. Can be used to specify private registries in the event of closed source plugins. If multiple registry URLs are provided, they all will be tried in-order at bootstrap time.                                                                                                                                                              |
 
 ##### 4.1.1.1.4 Plugin Loading/Validation
 
@@ -339,7 +409,7 @@ Contains components for tracing, logging and application performance management 
 #### 4.1.1.8 audit
 
 Components useful for writing and reading audit records that must be archived longer term and immutable.
-The latter properties are what differentiates audit logs from tracing/logging messages which are designed to be ephemereal and to support technical issues not regulatory/compliance/governance related issues.
+The latter properties are what differentiates audit logs from tracing/logging messages which are designed to be ephemeral and to support technical issues not regulatory/compliance/governance related issues.
 
 #### 4.1.1.9 document-storage
 
@@ -476,10 +546,10 @@ PassportJS already has plugins written for client certificate validation, but we
 
 ### 4.3.3 Storage Plugins
 
-Storage plugins allow the higher level packages to store and retrieve configuration metadata for a `BIF` cluster such as:
-* Who are the active validators and what are the hosts where said validators are accessible over a network
-* What public keys belong to which validator nodes
-* What transactions have been scheduled, started, completed
+Storage plugins allow the higher-level packages to store and retrieve configuration metadata for a `BIF` cluster such as:
+* Who are the active validators and what are the hosts where said validators are accessible over a network?
+* What public keys belong to which validator nodes?
+* What transactions have been scheduled, started, completed?
 
 ```typescript
 interface StoragePlugin {
@@ -498,12 +568,12 @@ Developers using the `BIF` REST API for their applications can support one or bo
 The following sections outline the high-level features of `BIF` that make the above vision reality.
 
 An end user (through a user interface) can issue API requests to
-* register a username+password account (with optinal 2FA) **within** `BIF`.
+* register a username+password account (with optional MFA) **within** `BIF`.
 * associate their wallets to their `BIF` account and execute transactions involving those registered wallet (transaction signatures performed either locally or remotely as explained above).
 
 ## 5.1 Transaction Signing Modes, Key Ownership
 
-An application developer using `BIF` can choose to enable users to sign their transactions locally on their user agent device without disclosing their private keys to `BIF` or remotely where `BIF` stores private keys server-side, encrypted at rest, made decryptable through authenticating with their `BIF` account.
+An application developer using `BIF` can choose to enable users to sign their transactions locally on their `user a`gent device without disclosing their private keys to `BIF` or remotely where `BIF` stores private keys server-side, encrypted at rest, made decryptable through authenticating with their `BIF` account.
 Each mode comes with its own pros and cons that need to be carefully considered at design time.
 
 ### 5.1.1 Client-side Transaction Signing
@@ -553,7 +623,7 @@ There is a gap between traditional web/mobile applications and blockchain applic
 Traditional (Web 2.0) applications (that adhering security best practices) use server-side sessions (web) or secure keychains provided by the operating system (iOS, Android, etc.)
 The current industry standard and state of the art authentication protocol in the enterprise application development industry is Open ID Connect (OIDC).
 
-To successfully close the gap between the two worlds, `BIF` comes equipped with an OIDC identity provider and a server-side key chain that can be leveraged by end user applications to authenticate once against BIF and manage identities on other blockchains through that single BIF identity.
+To successfully close the gap between the two worlds, `BIF` comes equipped with an OIDC identity provider and a server-side key chain that can be leveraged by end `user a`pplications to authenticate once against BIF and manage identities on other blockchains through that single BIF identity.
 This feature is important for web applications which do not have secure offline storage APIs (HTML localStorage is not secure).
 
 Example: A user can register for a BIF account, import their private keys from their Fabric/Ethereum wallets and then have access to all of those identities by authenticating once only against `BIF` which will result in a server-side session (HTTP cookie) containing a JSON Web Token (JWT).
@@ -563,7 +633,7 @@ Example: A user can register for a BIF account, import their private keys from t
 ![Unified Identity Management](https://www.plantuml.com/plantuml/png/0/bLLDRnen4BtlhnZHGqz0eUgbGYYaJLhKjAfASaEg77i0TxrZnpOXjCf_x-ooNqeMqXwGy7ZcpRmtuzcp48MFsyp03UcLHWLpXHHrtCDNGMAD6PyIFXk4ptk7tg1QeuTpOsKgDq8Jp2dYsekeBS6b5ndkh4-NT0elUGq6Ln6Y1Q_NcmXAUvGvGduLKarEC19SQSB8MS7wkB59Sn7mReiaSUQztLrlj4m9Gu1noyNRBIbfFN6rxrhsJ3naxCkb1FqRuUsR3jZlh8cMsWcAm2ZCcWj94c6CtVtCz8EcTP8u8LD6WTxv_B9csGCHu9QPLwnVNUK4FtcnXpy9WBtznKIXz_7gkb5cL4Gf4_K89XFfiRWGPZez5Z6k8yR_6F6jZg2d4O_CJ4RheJTppcXvQELDG5_457TvOJKdksDHEJ1PvUrc0LuOXXu71xkAE-4H53fZz_aOJAUbEX_sWbWTBhtMrANhld2EVxhFXToNjR2PhMmys6fr4QcG5q3Qp5bYTEWDsMzuFnfMTG_5DcxolymGbpIP_BXONCFi-nmkI3chyueEZ5j-M5wz3AvKlv7r9BnIZMCB__6P0hezLMnuDbMTlAkUBrWZBGkcqeWGolGLI3XSToOETwOVkErig7ApgRISphwuCuk3tv7y3T2f2bBS5nDLfQ_EfvD_ARsEfAv0sechwH_1GF5W3mxliCCsxh1H4rmiii7qI7V9HjvY1Bn8qlSm2y5ApTC5_4QNL3zIteUyJ9PKjOZHkz1Wm7bQu_04FPSVwpP34nzuQRM6g4IfHFaFb9DLDVtjH6I2mtmprSWUJR4lmaOxnZvZFFuU_GK0 "Unified Identity Management")
 
 In web 2.0 applications the prevalent authentication/authorization solution is Open ID Connect which bases authentication on passwords and tokens which are derived from the passwords.
-Web 3.0 applications (decentraized apps or DApps) which interact with blockchain networks rely on private keys instead of passwords.
+Web 3.0 applications (decentralized apps or *DApps*) which interact with blockchain networks rely on private keys instead of passwords.
 
 # 6. Terminology
 
@@ -571,17 +641,19 @@ Web 3.0 applications (decentraized apps or DApps) which interact with blockchain
 
 **Business Organization**: A for-profit or non-profit entity formed by one or more people to achieve financial gain or achieve a specific (non-financial) goal. For brevity, *business organization* may be shortened to *organization* throughout the document.
 
-**Identity Owner**: A person or organization who is in control of one or more identities. For example, owning two separate email accounts by one person means that said person is the identity owner of two separate identities (the email accounts). Owning cryptcurrency wallets (their private keys) also makes one an identity owner.
+**Identity Owner**: A person or organization who is in control of one or more identities. For example, owning two separate email accounts by one person means that said person is the identity owner of two separate identities (the email accounts). Owning cryptocurrency wallets (their private keys) also makes one an identity owner.
 
 **Identity Secret**: A private key or a password that - by design - is only ever known by the identity owner (unless stolen).
 
-**Credentials**: Could mean user authentication credentials/identity proofs in an IT application or any other credentials in the traditional sense of the word such as a proof that a person obtained a masters or PhD.
+**Credentials**: Could mean `user a`uthentication credentials/identity proofs in an IT application or any other credentials in the traditional sense of the word such as a proof that a person obtained a masters or PhD.
 
-**Ledger/Network/Chain**: Synonomous words meaning referring largely to the same thing in this paper.
+**Ledger/Network/Chain**: Synonymous words meaning referring largely to the same thing in this paper.
 
 **OIDC**: Open ID Connect authentication protocol
 
 **PKI**: Public Key Infrastructure
+
+**MFA**: Multi Factor Authentication
 
 
 # 7. References
