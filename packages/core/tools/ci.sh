@@ -28,6 +28,21 @@ function mainTask()
     lsmem
   fi
 
+  if ! [ -x "$(command -v smem)" ]; then
+    echo 'smem is not installed, skipping...'
+  else
+    smem --abbreviate --totals --system
+  fi
+
+  # Travis does not have (nor need) nvm but CircleCI does have nvm and also
+  # need it big time because their default Node version is 6.x...
+  if [ "${CIRCLECI:-false}" = "true" ]; then
+    set +x
+    nvm install 10.19.0
+    nvm alias default 10.19.0
+    set -x
+  fi
+
   docker --version
   docker-compose --version
   node --version
