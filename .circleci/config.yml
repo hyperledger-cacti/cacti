@@ -1,89 +1,23 @@
 version: 2.1
 jobs:
   build:
-    # # Remove if parallelism is not desired
-    # parallelism: 2
-    # environment:
-    #   # Configure the JVM and Gradle to avoid OOM errors
-    #   _JAVA_OPTIONS: "-Xmx3g"
-    #   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+    environment:
+      CI_CONTAINERS_WAIT_TIME: 12
     machine:
       image: ubuntu-1604:201903-01
       resource_class: large
     steps:
       - checkout # check out source code to working directory
-      # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
       - run:
           name: Setting up environment
           command: |
-            cat /etc/os-release
             sudo apt install -y util-linux
-            java -version
-            lscpu || true
             source /opt/circleci/.nvm/nvm.sh
-            nvm install 8.17
-            nvm alias default 8.17
-            node -v
-            npm -v
-      - restore_cache:
-          key: v1-gradle-wrapper-{{ checksum "packages/core/examples/simple-asset-transfer/corda/gradle/wrapper/gradle-wrapper.properties" }}
-      - restore_cache:
-          key: v1-gradle-cache-{{ checksum "packages/core/examples/simple-asset-transfer/corda/build.gradle" }}
+            nvm install 10.19.0
+            nvm alias default 10.19.0
       - run:
-          name: Building Corda
-          command: |
-            cd packages/core/examples/simple-asset-transfer/
-            npm run corda:build
-      - save_cache:
-          paths:
-            - ~/.gradle/wrapper
-          key: v1-gradle-wrapper-{{ checksum "packages/core/examples/simple-asset-transfer/corda/gradle/wrapper/gradle-wrapper.properties" }}
-      - save_cache:
-          paths:
-            - ~/.gradle/caches
-          key: v1-gradle-cache-{{ checksum "packages/core/examples/simple-asset-transfer/corda/build.gradle" }}
-      - run:
-          name: Starting Corda
-          command: |
-            cd packages/core/examples/simple-asset-transfer/
-            npm run corda
-      # - run:
-      #     name: Starting Fabric
-      #     command: |
-      #       source /opt/circleci/.nvm/nvm.sh
-      #       cd packages/core/examples/simple-asset-transfer/
-      #       npm install
-      #       cd ./fabric/api/
-      #       npm install
-      #       cd ../../
-      #       npm run fabric
-
-      # - run:
-      #     name: Build and federation networks
-      #     command: |
-      #       source /opt/circleci/.nvm/nvm.sh
-      #       cd packages/core/examples/simple-asset-transfer/
-      #       npm run fed:build
-      #       npm run fed:corda
-      #       npm run fed:fabric
-
-      # - run:
-      #     name: Run scenarios
-      #     command: |
-      #       source /opt/circleci/.nvm/nvm.sh
-      #       cd packages/core/examples/simple-asset-transfer/
-      #       npm run scenario:share noquorum
-      #       npm run scenario:CtF
-      #       npm run scenario:FtC
-
-      - run:
-          name: Stopping Corda
-          command: |
-            cd packages/core/examples/simple-asset-transfer/
-            npm run fed:corda:down
-            # npm run fed:fabric:down
-            npm run corda:down
-            # npm run fabric:down
+          name: Run BIF CI Shell Script
+          command: ./packages/core/tools/ci.sh
 
       # Upload test results for display in Test Summary:
       # https://circleci.com/docs/2.0/collect-test-data/
