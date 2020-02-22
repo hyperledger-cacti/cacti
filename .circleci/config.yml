@@ -1,89 +1,40 @@
 version: 2.1
 jobs:
   build:
-    # # Remove if parallelism is not desired
-    # parallelism: 2
-    # environment:
-    #   # Configure the JVM and Gradle to avoid OOM errors
-    #   _JAVA_OPTIONS: "-Xmx3g"
-    #   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+    environment:
+      CI_CONTAINERS_WAIT_TIME: 60
     machine:
       image: ubuntu-1604:201903-01
       resource_class: large
     steps:
       - checkout # check out source code to working directory
-      # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
       - run:
-          name: Setting up environment
-          command: |
-            cat /etc/os-release
-            sudo apt install -y util-linux
-            java -version
-            lscpu || true
-            source /opt/circleci/.nvm/nvm.sh
-            nvm install 8.17
-            nvm alias default 8.17
-            node -v
-            npm -v
-      - restore_cache:
-          key: v1-gradle-wrapper-{{ checksum "packages/core/examples/simple-asset-transfer/corda/gradle/wrapper/gradle-wrapper.properties" }}
-      - restore_cache:
-          key: v1-gradle-cache-{{ checksum "packages/core/examples/simple-asset-transfer/corda/build.gradle" }}
-      - run:
-          name: Building Corda
-          command: |
-            cd packages/core/examples/simple-asset-transfer/
-            npm run corda:build
-      - save_cache:
-          paths:
-            - ~/.gradle/wrapper
-          key: v1-gradle-wrapper-{{ checksum "packages/core/examples/simple-asset-transfer/corda/gradle/wrapper/gradle-wrapper.properties" }}
-      - save_cache:
-          paths:
-            - ~/.gradle/caches
-          key: v1-gradle-cache-{{ checksum "packages/core/examples/simple-asset-transfer/corda/build.gradle" }}
-      - run:
-          name: Starting Corda
-          command: |
-            cd packages/core/examples/simple-asset-transfer/
-            npm run corda
-      # - run:
-      #     name: Starting Fabric
-      #     command: |
-      #       source /opt/circleci/.nvm/nvm.sh
-      #       cd packages/core/examples/simple-asset-transfer/
-      #       npm install
-      #       cd ./fabric/api/
-      #       npm install
-      #       cd ../../
-      #       npm run fabric
-
-      # - run:
-      #     name: Build and federation networks
-      #     command: |
-      #       source /opt/circleci/.nvm/nvm.sh
-      #       cd packages/core/examples/simple-asset-transfer/
-      #       npm run fed:build
-      #       npm run fed:corda
-      #       npm run fed:fabric
-
-      # - run:
-      #     name: Run scenarios
-      #     command: |
-      #       source /opt/circleci/.nvm/nvm.sh
-      #       cd packages/core/examples/simple-asset-transfer/
-      #       npm run scenario:share noquorum
-      #       npm run scenario:CtF
-      #       npm run scenario:FtC
+          name: apt-get update
+          command: sudo apt-get update
 
       - run:
-          name: Stopping Corda
+          name: apt-get install smem
+          command: sudo apt-get install -y smem
+
+      - run:
+          name: smem output
+          command: sudo smem --abbreviate --totals --system
+
+      - run:
+          name: Set up nvm
           command: |
-            cd packages/core/examples/simple-asset-transfer/
-            npm run fed:corda:down
-            # npm run fed:fabric:down
-            npm run corda:down
-            # npm run fabric:down
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # Each step uses the same `$BASH_ENV`, so need to modify it
+            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+            echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
+
+      - run:
+          name: Run BIF CI script
+          command: |
+            ./packages/core/tools/ci.sh
 
       # Upload test results for display in Test Summary:
       # https://circleci.com/docs/2.0/collect-test-data/
