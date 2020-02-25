@@ -19,7 +19,7 @@ Photo by Pontus Wellgraf on Unsplash
 | Mic Bowman                     | mic.bowman@intel.com                      |
 | Peter Somogyvari               | peter.somogyvari@accenture.com            |
 | Shingo Fujimoto                | shingo_fujimoto@fujitsu.com               |
-| Takeuchi Takuma                | takeuchi.takuma@fujitsu.com               |
+| Takuma Takeuchi                | takeuchi.takuma@fujitsu.com               |
 | Tracy Kuhrt                    | tracy.a.kuhrt@accenture.com               |
 
 # Document Revisions <!-- omit in toc -->
