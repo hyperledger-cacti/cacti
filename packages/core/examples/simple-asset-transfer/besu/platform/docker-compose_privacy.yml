@@ -58,7 +58,7 @@ services:
     environment:
       - BESU_PUBLIC_KEY_DIRECTORY=/opt/besu/public-keys/
       - LOG4J_CONFIGURATION_FILE=/config/log-config.xml
-    entrypoint: /opt/besu/bootnode_start.sh --network=dev --min-gas-price=0 --host-whitelist=* --metrics-enabled --metrics-host=0.0.0.0 --metrics-port=9545
+    entrypoint: /opt/besu/bootnode_start.sh --network=dev --min-gas-price=0 --host-whitelist=* --metrics-enabled --metrics-host=0.0.0.0 --metrics-port=9545 --revert-reason-enabled=true
     volumes:
       - public-keys:/opt/besu/public-keys/
       - ./config/besu/log-config.xml:/config/log-config.xml
@@ -74,6 +74,7 @@ services:
       - LOG4J_CONFIGURATION_FILE=/config/log-config.xml
     command: [
       "--network=dev",
+      "--revert-reason-enabled=true",
       "--rpc-http-enabled",
       "--rpc-http-host=0.0.0.0",
       "--rpc-http-port=8545",
@@ -130,6 +131,7 @@ services:
     command: [
       "--node-private-key-file=/opt/besu/keys/key",
       "--network=dev",
+      "--revert-reason-enabled=true",
       "--rpc-http-enabled",
       "--rpc-http-host=0.0.0.0",
       "--rpc-http-port=8545",
@@ -170,6 +172,7 @@ services:
     command: [
       "--node-private-key-file=/opt/besu/keys/key",
       "--network=dev",
+      "--revert-reason-enabled=true",
       "--rpc-http-enabled",
       "--rpc-http-host=0.0.0.0",
       "--rpc-http-port=8545",
@@ -210,6 +213,7 @@ services:
     command: [
       "--node-private-key-file=/opt/besu/keys/key",
       "--network=dev",
+      "--revert-reason-enabled=true",
       "--rpc-http-enabled",
       "--rpc-http-host=0.0.0.0",
       "--rpc-http-port=8545",

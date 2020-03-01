@@ -4,6 +4,11 @@ const config = require('../config/config');
 const { orion, besu } = require('../config/keys');
 const logger = require('../utils/logger')('contracts');
 
+const destinationKeys = Object.entries(orion).reduce(
+  (acc, val) => (val[0] == config.web3.host.linux ? acc : acc.concat(val[1].publicKey)),
+  []
+);
+
 const Contracts = {
   EMPTY_ADDRESS: '0x0000000000000000000000000000000000000000',
 
@@ -63,36 +68,48 @@ const Contracts = {
     const functionAbi = this[buildName].abi.find(e => {
       return e.name === name;
     });
+    logger.debug(JSON.stringify(functionAbi.outputs));
     const output = web3.eth.abi.decodeParameters(functionAbi.outputs, receipt.output);
+    if (output.__length__ == 1) {
+      return output['0'];
+    }
 
     return output;
   },
 
   async callMethod(buildName, name, arguments) {
+    logger.debug(`${buildName}.${name}(${arguments})`);
     const methodData = this.encodeFunctionInput(buildName, name, arguments);
 
     const functionCall = {
       to: this[`${buildName}Contract`].options.address,
       data: methodData,
-      privateFrom: orion.node1.publicKey,
-      privateFor: [orion.node2.publicKey],
-      privateKey: besu.node1.privateKey,
+      privateFrom: orion[config.web3.host.linux].publicKey,
+      privateFor: destinationKeys,
+      privateKey: besu[config.web3.host.linux].privateKey,
     };
     const txHash = await web3.eea.sendRawTransaction(functionCall);
     logger.info(`${buildName}.${name}(): txHash:${txHash}`);
 
-    const receipt = await web3.priv.getTransactionReceipt(txHash, orion.node1.publicKey);
+    const receipt = await web3.priv.getTransactionReceipt(txHash, orion[config.web3.host.linux].publicKey);
+    logger.debug(`${buildName}.${name}() receipt ${JSON.stringify(receipt)}`);
+
+    if (receipt.status == '0x0') {
+      throw new Error('Transaction Failed');
+    }
 
     const output = this.decodeFunctionOutput(buildName, name, receipt);
+
+    logger.debug(`${buildName}.${name}() returns ${JSON.stringify(output)}`);
     return { receipt, output };
   },
 
   async newPublicContract(contractObject, ...contractArguments) {
     const contractOptions = {
       data: contractObject.options.data,
-      privateFrom: orion.node1.publicKey,
-      privateFor: [orion.node2.publicKey],
-      privateKey: besu.node1.privateKey,
+      privateFrom: orion[config.web3.host.linux].publicKey,
+      privateFor: destinationKeys,
+      privateKey: besu[config.web3.host.linux].privateKey,
     };
 
     if (contractObject.networks) {
@@ -102,7 +119,7 @@ const Contracts = {
     const txHash = await web3.eea.sendRawTransaction(contractOptions);
     logger.log('info', `newPublicContract: txHash:${txHash}`);
 
-    const receipt = await web3.priv.getTransactionReceipt(txHash, orion.node1.publicKey);
+    const receipt = await web3.priv.getTransactionReceipt(txHash, orion[config.web3.host.linux].publicKey);
 
     contractObject.options.address = receipt.contractAddress;
 

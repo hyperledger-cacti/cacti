@@ -35,4 +35,12 @@ echo "COMPOSE_QUORUM_FEDERATION_LOG_END---$LOG_DUMP_SEPARATOR"
 docker-compose -p federation-corda -f ./federations/docker-compose-corda.yml --compatibility logs
 echo "COMPOSE_CORDA_FEDERATION_LOG_END---$LOG_DUMP_SEPARATOR"
 
+### BESU LOGS
+docker-compose -p besu -f ./besu/platform/docker-compose_privacy.yml --compatibility logs
+echo "COMPOSE_BESU_NETWORK_LOG_END---$LOG_DUMP_SEPARATOR"
+docker-compose -p besu-api -f ./besu/api/docker-compose.yml --compatibility logs
+echo "COMPOSE_BESU_API_LOG_END---$LOG_DUMP_SEPARATOR"
+docker-compose -p federation-besu -f ./federations/docker-compose-besu.yml --compatibility logs
+echo "COMPOSE_BESU_FEDERATION_LOG_END---$LOG_DUMP_SEPARATOR"
+
 echo "LOGS_END---$LOG_DUMP_SEPARATOR"

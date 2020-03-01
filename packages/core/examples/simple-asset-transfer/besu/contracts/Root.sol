@@ -97,7 +97,7 @@ contract Root is WalletProxy {
             if (signcheck[i])
                 minGood --;
         }
-        require(minGood <= 0);
+        require(minGood <= 0, "Valid Signatures don't meet threshold");
 
         uint status;
         uint numTokens;

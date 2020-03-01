@@ -54,6 +54,7 @@ function mainTask()
 
   rm -rf $CI_ROOT_DIR/fabric/api/node_modules
   rm -rf $CI_ROOT_DIR/quorum/api/node_modules
+  rm -rf $CI_ROOT_DIR/besu/api/node_modules
   rm -rf $CI_ROOT_DIR/node_modules
   rm -rf ./node_modules
 
@@ -62,11 +63,14 @@ function mainTask()
 
   cd $CI_ROOT_DIR
   npm run fed:quorum:down
+  npm run fed:besu:down
   npm run fed:fabric:down
   npm run fed:corda:down
   npm run fabric:down
   npm run quorum:down
   npm run quorum:api:down
+  npm run besu:down
+  npm run besu:api:down
 
   npm install
 
@@ -94,9 +98,19 @@ function mainTask()
   npm run quorum:api:build
   npm run quorum:api
 
+  # BESU
+
+  cd ./besu/api/
+  npm install
+  cd ../../
+  npm run besu
+  npm run besu:api:build
+  npm run besu:api
+
   # Build and launch federation validators
   npm run fed:build
   npm run fed:quorum
+  npm run fed:besu
   npm run fed:fabric
 
   # If enough time have passed and there are still containers not ready then
@@ -120,18 +134,30 @@ function mainTask()
       npm run fed:corda
       sleep ${CI_CONTAINERS_WAIT_TIME:-12}
 
-      # Run scenarios between Corda and Quorum
       npm run scenario:share
+      # Run scenarios between Corda and Fabric
       npm run scenario:CtF
       npm run scenario:FtC
+      # Run scenarios between Corda and Quorum
       npm run scenario:CtQ
       npm run scenario:QtC
+      # Run scenarios between Corda and Besu
+      npm run scenario:CtB
+      npm run scenario:BtC
   fi
+  # Run scenarios between Quorum and Fabric
   npm run scenario:QtF
   npm run scenario:FtQ
+  # Run scenarios between Fabric and Besu
+  npm run scenario:BtF
+  npm run scenario:FtB
+  # Run scenarios between Quorum and Besu
+  npm run scenario:BtQ
+  npm run scenario:QtB
+
   npm run test:bc
 
-  dumpAllLogs
+  # dumpAllLogs
 
   # Unloading Quorum staff to save resources for Corda
   npm run fed:quorum:down
