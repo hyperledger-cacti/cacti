@@ -1,8 +1,5 @@
 const contracts = require('../utils/contracts');
 const logger = require('../utils/logger')('rootWrapper');
-const Web3 = require('../utils/web3');
-const rlp = require('rlp');
-const util = require('util');
 
 async function getAsset(assetId) {
   logger.log('debug', 'getAsset assetId: %s', assetId);
@@ -36,6 +33,7 @@ async function createAsset(assetId, origin, properties) {
   ]);
 
   logger.log('debug', 'createAsset receipt %j', receipt);
+  logger.log('debug', 'createAsset output %j', output);
   return output;
 }
 

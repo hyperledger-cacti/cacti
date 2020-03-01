@@ -103,14 +103,22 @@ async function getMyActorDetails() {
 }
 
 function checkAndTrim(signature) {
-  const re = /^(0x)?[0-9A-Fa-f]{130}$/;
+  signature = signature.startsWith('0x') ? signature.substr(2) : signature;
+
+  // const versionMissing = /^[0-9A-Fa-f]{128}$/;
+  // if (signature.match(versionMissing) == null) {
+  //   logger.log('warn', 'Signature %s missing version, defaulting to 27', signature);
+  //   return signature + '27';
+  // }
+
+  const re = /^[0-9A-Fa-f]{130}$/;
   if (signature.match(re) == null) {
     logger.log('warn', 'Signature %s does not fit the format %s', signature, re);
     return Array(130)
       .fill('0')
       .join('');
   }
-  return signature.startsWith('0x') ? signature.substr(2) : signature;
+  return signature;
 }
 
 async function verify(message, signatures = []) {

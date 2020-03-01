@@ -12,6 +12,9 @@ const sha3 = require(`sha3`);
 const Web3 = require(`web3`);
 const web3Utils = require(`web3-utils`);
 const web3 = new Web3(); // needed only for ethereum-specific signatures
+const log4js = require(`log4js`);
+const logger = log4js.getLogger(`Crypto`);
+logger.level = `DEBUG`;
 
 /**
  * Cast string into hexadecimal encoded buffer
@@ -91,16 +94,19 @@ const dataHash = data => {
  * @returns {string}
  */
 const signMsg = async (msg, privKey, targetDLTType) => {
-  let signObj;
-  if (targetDLTType === `QUORUM`) {
-    // Quorum smart contracts needs specific signature algorithm.
-    const hash = web3Utils.sha3(Buffer.from(msg));
-    signObj = await web3.eth.accounts.sign(hash, `0x${privKey}`); // REFAC can we sign all message with this?
-  } else {
-    const pkey = Buffer.from(privKey, `hex`);
-    signObj = secp256k1.sign(Buffer.from(module.exports.dataHash(msg), `hex`), pkey);
+  logger.debug(`Signing for ${targetDLTType}`);
+  switch (targetDLTType) {
+    case 'BESU':
+    case 'QUORUM':
+      // Quorum smart contracts needs specific signature algorithm.
+      const hash = web3Utils.sha3(Buffer.from(msg));
+      signObj = await web3.eth.accounts.sign(hash, `0x${privKey}`); // REFAC can we sign all message with this?
+      return signObj.signature.toString(`hex`);
+    default:
+      const pkey = Buffer.from(privKey, `hex`);
+      signObj = secp256k1.sign(Buffer.from(module.exports.dataHash(msg), `hex`), pkey);
+      return signObj.signature.toString(`hex`);
   }
-  return signObj.signature.toString(`hex`);
 };
 
 /**

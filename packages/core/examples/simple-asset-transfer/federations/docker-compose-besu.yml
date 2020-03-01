@@ -93,34 +93,6 @@ services:
       - etcd2
       - etcd3
 
-  besu_validator4:
-    image: "federation/validator"
-    environment:
-      ETCD_HOSTS: "http://etcd1:2379,http://etcd2:2379,http://etcd3:2379"
-      CLIENT_REP_ADDR: "tcp://192.22.0.5:7016"
-      PUB_ADDR: "tcp://192.22.0.5:3016"
-      REP_ADDR: "tcp://192.22.0.5:5016"
-      USER_NAME: "test"
-      PASSWORD: "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3"
-      URL: "http://192.22.0.1:6053"
-      DLT_TYPE: "BESU"
-      API_PORT: 9016
-    mem_limit: 6g
-    expose:
-      - "6053"
-    ports:
-      - "7016:7016"
-      - "3016:3016"
-      - "5016:5016"
-      - "9016:9016"
-    networks:
-        besu-network:
-            ipv4_address: 192.22.0.5
-    depends_on:
-      - etcd1
-      - etcd2
-      - etcd3
-
   etcd1:
     image: bitnami/etcd:3.4.3
     environment:

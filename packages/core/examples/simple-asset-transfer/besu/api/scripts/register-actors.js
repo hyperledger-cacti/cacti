@@ -4,7 +4,9 @@ const logger = require('../utils/logger')('register');
 
 async function registerActors() {
   logger.log('info', 'Registering actors... %j', ACTORS);
-  await Promise.all(ACTORS.map(actor => actorWrapper.registerActor(actor)));
+  for (actor of ACTORS) {
+    await actorWrapper.registerActor(actor);
+  }
 }
 
 registerActors()
