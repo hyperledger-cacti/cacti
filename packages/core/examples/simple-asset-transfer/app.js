@@ -3,6 +3,7 @@ const { genKeyFile } = require(`@hyperledger-labs/blockchain-integration-framewo
 const ConnectorFabric = require(`./fabric/connector`);
 const ConnectorQuorum = require(`./quorum/connector`);
 const ConnectorCorda = require(`./corda/connector`);
+const ConnectorBesu = require(`./besu/connector`);
 
 (async () => {
   const keypair = await genKeyFile(`/federation/keypair`);
@@ -34,6 +35,9 @@ const ConnectorCorda = require(`./corda/connector`);
       break;
     case `CORDA`:
       connector = new ConnectorCorda(connectorOptions);
+      break;
+    case `BESU`:
+      connector = new ConnectorBesu(connectorOptions);
       break;
     default:
       throw new Error(`undefined dlType`);
