@@ -82,10 +82,9 @@ function mainTask()
   ### FABRIC
 
   rm -rf fabric/api/fabric-client-kv-org*
-  cd ./fabric/api/
-  npm install
-  cd ../../
+  npm run fabric:api:build
   npm run fabric
+  npm run fabric:init
 
   ### QUORUM
 

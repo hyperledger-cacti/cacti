@@ -148,7 +148,7 @@ organizations:
 #
 orderers:
   orderer.example.com:
-    url: grpcs://localhost:7050
+    url: grpcs://orderer.example.com:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -165,30 +165,29 @@ orderers:
 peers:
   peer0.org1.example.com:
     # this URL is used to send endorsement and query requests
-    url: grpcs://localhost:7051
+    url: grpcs://peer0.org1.example.com:7051
 
     grpcOptions:
       ssl-target-name-override: peer0.org1.example.com
     tlsCACerts:
       path: ../artifacts/channel/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-
   peer1.org1.example.com:
-    url: grpcs://localhost:7056
+    url: grpcs://peer1.org1.example.com:7051
     grpcOptions:
       ssl-target-name-override: peer1.org1.example.com
     tlsCACerts:
       path: ../artifacts/channel/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt
 
   peer0.org2.example.com:
-    url: grpcs://localhost:8051
+    url: grpcs://peer0.org2.example.com:7051
     grpcOptions:
       ssl-target-name-override: peer0.org2.example.com
     tlsCACerts:
       path: ../artifacts/channel/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
 
   peer1.org2.example.com:
-    url: grpcs://localhost:8056
-    eventUrl: grpcs://localhost:8058
+    url: grpcs://peer1.org2.example.com:7051
+    eventUrl: grpcs://peer1.org2.example.com:7053
     grpcOptions:
       ssl-target-name-override: peer1.org2.example.com
     tlsCACerts:
@@ -201,7 +200,7 @@ peers:
 #
 certificateAuthorities:
   ca-org1:
-    url: https://localhost:7054
+    url: https://ca.org1.example.com:7054
     # the properties specified under this object are passed to the 'http' client verbatim when
     # making the request to the Fabric-CA server
     httpOptions:
@@ -218,7 +217,7 @@ certificateAuthorities:
     caName: ca-org1
 
   ca-org2:
-    url: https://localhost:8054
+    url: https://ca.org2.example.com:7054
     httpOptions:
       verify: false
     tlsCACerts:

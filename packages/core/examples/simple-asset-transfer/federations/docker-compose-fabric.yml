@@ -1,21 +1,22 @@
 version: "2"
 
+
 networks:
-    fabric-network:
-        driver: bridge
-        ipam:
-            config:
-              - subnet: 172.20.0.0/20
-                gateway: 172.20.0.1
+  fabric-network:
+    driver: bridge
+    ipam:
+        config:
+          - subnet: 172.20.0.0/20
+            gateway: 172.20.0.1
 
 services:
   fabric_validator1:
     image: "federation/validator"
     environment:
       ETCD_HOSTS: "http://etcd1:2379,http://etcd2:2379,http://etcd3:2379"
-      CLIENT_REP_ADDR: "tcp://172.20.0.5:7001"
-      PUB_ADDR: "tcp://172.20.0.5:3001"
-      REP_ADDR: "tcp://172.20.0.5:5001"
+      CLIENT_REP_ADDR: "tcp://172.20.1.5:7001"
+      PUB_ADDR: "tcp://172.20.1.5:3001"
+      REP_ADDR: "tcp://172.20.1.5:5001"
       URL: "http://172.20.0.1:4000"
       PEER_NAME: "peer0.org1.example.com"
       USER_NAME: "Naima"
@@ -26,7 +27,7 @@ services:
     mem_limit: 6g
     networks:
         fabric-network:
-            ipv4_address: 172.20.0.5
+            ipv4_address: 172.20.1.5
     expose:
       - "4000"
     ports:
@@ -43,9 +44,9 @@ services:
     image: "federation/validator"
     environment:
       ETCD_HOSTS: "http://etcd1:2379,http://etcd2:2379,http://etcd3:2379"
-      CLIENT_REP_ADDR: "tcp://172.20.0.6:7002"
-      PUB_ADDR: "tcp://172.20.0.6:3002"
-      REP_ADDR: "tcp://172.20.0.6:5002"
+      CLIENT_REP_ADDR: "tcp://172.20.1.6:7002"
+      PUB_ADDR: "tcp://172.20.1.6:3002"
+      REP_ADDR: "tcp://172.20.1.6:5002"
       USER_NAME: "Mike"
       ORG_NAME: "Org1"
       URL: "http://172.20.0.1:4000"
@@ -63,7 +64,7 @@ services:
       - "9002:9002"
     networks:
         fabric-network:
-            ipv4_address: 172.20.0.6
+            ipv4_address: 172.20.1.6
     depends_on:
       - etcd1
       - etcd2
@@ -73,9 +74,9 @@ services:
     image: "federation/validator"
     environment:
       ETCD_HOSTS: "http://etcd1:2379,http://etcd2:2379,http://etcd3:2379"
-      CLIENT_REP_ADDR: "tcp://172.20.0.7:7003"
-      PUB_ADDR: "tcp://172.20.0.7:3003"
-      REP_ADDR: "tcp://172.20.0.7:5003"
+      CLIENT_REP_ADDR: "tcp://172.20.1.7:7003"
+      PUB_ADDR: "tcp://172.20.1.7:3003"
+      REP_ADDR: "tcp://172.20.1.7:5003"
       USER_NAME: "Hugo"
       ORG_NAME: "Org2"
       URL: "http://172.20.0.1:4000"
@@ -93,7 +94,7 @@ services:
       - "9003:9003"
     networks:
         fabric-network:
-            ipv4_address: 172.20.0.7
+            ipv4_address: 172.20.1.7
     depends_on:
       - etcd1
       - etcd2
@@ -103,9 +104,9 @@ services:
     image: "federation/validator"
     environment:
       ETCD_HOSTS: "http://etcd1:2379,http://etcd2:2379,http://etcd3:2379"
-      CLIENT_REP_ADDR: "tcp://172.20.0.8:7004"
-      PUB_ADDR: "tcp://172.20.0.8:3004"
-      REP_ADDR: "tcp://172.20.0.8:5004"
+      CLIENT_REP_ADDR: "tcp://172.20.1.8:7004"
+      PUB_ADDR: "tcp://172.20.1.8:3004"
+      REP_ADDR: "tcp://172.20.1.8:5004"
       USER_NAME: "Luca"
       ORG_NAME: "Org2"
       URL: "http://172.20.0.1:4000"
@@ -123,7 +124,7 @@ services:
       - "9004:9004"
     networks:
         fabric-network:
-            ipv4_address: 172.20.0.8
+            ipv4_address: 172.20.1.8
     depends_on:
       - etcd1
       - etcd2
@@ -143,7 +144,7 @@ services:
       - ETCD_INITIAL_CLUSTER_STATE=new
     networks:
         fabric-network:
-            ipv4_address: 172.20.0.50
+            ipv4_address: 172.20.1.50
 
   etcd2:
     image: bitnami/etcd:3
@@ -159,7 +160,7 @@ services:
       - ETCD_INITIAL_CLUSTER_STATE=new
     networks:
         fabric-network:
-            ipv4_address: 172.20.0.51
+            ipv4_address: 172.20.1.51
 
   etcd3:
     image: bitnami/etcd:3
@@ -175,4 +176,4 @@ services:
       - ETCD_INITIAL_CLUSTER_STATE=new
     networks:
         fabric-network:
-            ipv4_address: 172.20.0.52
+            ipv4_address: 172.20.1.52

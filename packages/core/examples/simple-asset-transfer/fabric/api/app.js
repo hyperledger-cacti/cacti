@@ -16,6 +16,7 @@
 'use strict';
 var log4js = require('log4js');
 var logger = log4js.getLogger('SampleWebApp');
+logger.level = 'DEBUG';
 var express = require('express');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
