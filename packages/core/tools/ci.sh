@@ -163,7 +163,12 @@ function mainTask()
   npm run fed:quorum:down
   npm run fed:corda:down
   npm run fed:fabric:down
+
+  # Corda down scripts don't exist unless Corda is built
+  if [ ! -v CI_NO_CORDA ]; then
   npm run corda:down
+  fi
+
   npm run quorum:api:down
   npm run quorum:down
   npm run fabric:down
