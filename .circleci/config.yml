@@ -2,6 +2,7 @@ version: 2.1
 jobs:
   build:
     environment:
+      CI_NO_CORDA: true
       CI_CONTAINERS_WAIT_TIME: 60
     machine:
       image: ubuntu-1604:201903-01
