@@ -1,7 +1,9 @@
-FROM node:10-alpine
+FROM node:10-slim
 
-RUN apk update
-RUN apk add python3-dev libstdc++ g++ make
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  python-minimal \
+  software-properties-common
 
 ADD ./api /src
 ADD ./contracts /contracts
@@ -11,7 +13,10 @@ WORKDIR /src
 
 RUN npm install
 
+# Rebuild node modules inside container to compile platform specific dependencies
+RUN npm rebuild
+
 ENV HOST 0.0.0.0
 ENV PORT 4000
 
-CMD ["node", "app"]
+CMD ["node", "app.js"]
