@@ -16,8 +16,6 @@ LOG_DUMP_SEPARATOR="52ab9841-eb58-4fba-8bd6-0d2eb091393f"
 echo "LOGS_BEGIN---$LOG_DUMP_SEPARATOR"
 
 ### FABRIC LOGS
-cat fabric/logs/start.log
-echo "FABRIC_STARTUP_LOG_END---$LOG_DUMP_SEPARATOR"
 docker-compose -f fabric/artifacts/docker-compose.yaml logs
 echo "COMPOSE_FABRIC_NETWORK_LOG_END---$LOG_DUMP_SEPARATOR"
 docker-compose -p federation-fabric -f ./federations/docker-compose-fabric.yml --compatibility logs
