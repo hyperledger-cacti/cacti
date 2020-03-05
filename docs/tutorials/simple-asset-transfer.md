@@ -31,8 +31,8 @@ Check example package.json for available commands. In simple-asset-transfer fold
 
 #### Fabric Blockchain
 
-To run the Fabric Blockchain, you can use the folowing script:
-``npm run fabric``
+To run the Fabric Blockchain, you can use the folowing scripts:
+First build the API server container image by running `npm run fabric:api:build` and then execute ``npm run fabric``
 This will automatically pull the necessary images for Fabric nodes and run an environment of 4 nodes partitioned in 2 organizations within the same channel as well as the Fabric SDK listening on port 4000. If you already have a process listening to port 4000, you can change it in the Fabric api config file ``fabric/api/config.json``. Note: some bash scripts will refer directly to the applications running on port 4000 for cleanup, if you change the Fabric SDK port you may have to kill the application by yourself once you're done.
 
 The fabric Network and SDK will start in the background, you can use ``npm run fabric:log`` to show the Fabric nodes outputs and ``cat fabric/logs/start.log`` for the SDK outputs
@@ -41,11 +41,11 @@ Alternatively, you can do all of the above manually by following [Fabric documen
 
 #### Fabric Federation
 
-To enable the overlay network of validators we need to build locally the docker image: 
+To enable the overlay network of validators we need to build locally the docker image:
 ``npm run fed:build``
 
 Then, you can run a federation of 4 validators:
-``npm run fed:fabric`` 
+``npm run fed:fabric``
 Federation validators are relying on Fabric nodes and connectors to perform Blockchain actions and verifications, the default config is set to look for a running instance of the Fabric SDK locally on port 4000. If you are running the Fabric SDK on a different port or another machine you want to modify the ``federations/docker-compose-fabric.yml`` accordingly, look for ``URL: "http://172.20.0.1:4000"`` for each of the services and modify the string to point to the correct endpoint.
 
 The federation will start in the background, you can use ``npm run fed:fabric:log`` to show the Fabric federation validator outputs.
@@ -57,21 +57,21 @@ To run the Quorum Blockchain, you can use the following script:
 
 This will run a Quorum network of 7 nodes using Tessera and RAFT. Tessera can take a few minutes to start completely and you will have to wait for it before launching the following commands. To now when Tessera is ready, you can list your docker containers ``docker ps`` and wait for all of them to turn "healthy".
 
-Then, you can build 
+Then, you can build
 ``npm run quorum:api:build``
 and then run the custom quorum API:
 ``npm run quorum:api``
-quorum API will use ports 5050, 5051, 5052 and 5053 by default, you can change it in the Fabric api docker-compose file ``quorum/api/docker-compose.yml``, look for ``APP_PORT: 505`` for each of the services. 
+quorum API will use ports 5050, 5051, 5052 and 5053 by default, you can change it in the Fabric api docker-compose file ``quorum/api/docker-compose.yml``, look for ``APP_PORT: 505`` for each of the services.
 
 The Quorum Network and SDK will start in the background, you can use respectively ``npm run quorum:log`` and ``npm run quorum-api:log`` to show the Quorum nodes and Quorum API outputs.
 
 #### Quorum Federation
 
-The same way than the Fabric federation, to enable the overlay network of validators we need to build locally the docker image: 
+The same way than the Fabric federation, to enable the overlay network of validators we need to build locally the docker image:
 ``npm run fed:build``. If you plan to deploy both federations on the same machine, you don't have to rebuild the image
 
 Then, you can run a federation of 4 validators:
-``npm run fed:quorum`` 
+``npm run fed:quorum``
 Federation validators are relying on Fabric nodes and connectors to perform Blockchain actions and verifications, the default config is set to look for a running instance of the Fabric SDK locally on port 5050. If you are running the Fabric SDK on a different port or another machine you want to modify the ``federations/docker-compose-fabric.yml`` accordingly, look for ``URL: "http://172.20.0.1:5050"`` for each of the services and modify the string to point to the correct endpoint.
 
 #### Corda Blockchain
@@ -92,13 +92,13 @@ As mentioned above, you do not need to rebuild the docker image if you have alre
 ``npm run fed:build``
 
 Then, you can run a federation of 4 validators:
-``npm run fed:corda`` 
+``npm run fed:corda``
 Federation validators are relying on connectors to trigger Corda flows and verifications.
 
 The federation will start in the background, you can use ``npm run fed:corda:log`` to show the Corda federation validator outputs.
 
 ### Scenarios
- 
+
 All scenarios are connected to all three Blockchains and their federations. If you run everything locally with the default port you can go forward and launch one of the scenarios with the following commands. Otherwise, you will have to modify the config file located in the scenarios folder under simple-asset-transfer folder, to match the proper url for each of the networks.
 
 * **share-pub-key** ``npm run scenario:share``
