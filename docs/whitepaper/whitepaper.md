@@ -401,37 +401,18 @@ The Blockchain Integration Framework has several interworking patterns as the fo
 | 4.  | data transfer       | D -> D  | check if all D1 is copied on ledger 2 <br> (as D1 is data on ledger 1, D2 is data on ledger 2) |
 | 5.  | data merge          | D <-> D | check if D1 = D2 as a result <br> (as D1 is data on ledger 1, D2 is data on ledger 2)          |
 
-### 4.1.2 Value transfer
+### 4.1.2 Interworking architecture
 
-#### 4.1.2.1 Desription of the pattern
+The Blockchain Integration Framework is composed by Web application or Smart contract on a blockchain, the sets of Ledger-n, and API server-n (n = 1, 2, .., N).
+The following architecture is the case that N = 2.
 
-#### 4.1.2.2 Sequence diagram
+<img src="./interworking-architecture-diagram.png" width="700">
 
-<img src="./feature-value-transfer.png"/>
-
-### 4.1.3 Value-data transfer
-
-#### 4.1.3.1 Desription of the pattern
-
-#### 4.1.3.2 Sequence diagram
-
-### 4.1.4 Data-value transfer
-
-#### 4.1.4.1 Desription of the pattern
-
-#### 4.1.4.2 Sequence diagram
-
-### 4.1.5 Data transfer
-
-#### 4.1.5.1 Desription of the pattern
-
-#### 4.1.5.2 Sequence diagram
-
-### 4.1.6 Data merge
-
-#### 4.1.6.1 Desription of the pattern
-
-#### 4.1.6.2 Sequence diagram
+Each components are the following:
+- **BIF Web application or Smart contract on a blockchain**: the component which has Tx verifiers, Tx submitters, and secure bi-directional channels to each API server.  This component receives application users' API call.
+- **API server-n**: the component which includes API server-plugin-n.
+	- **API server-plugin-n**: the component for connecting each ledger.  This component depends on each ledger.
+- **Ledger-n**: Ledger (e.g. Ethereum, Quorum, Hyperledger fabric, ...)
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
@@ -776,6 +757,14 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
 # 6. Terminology
+
+**Application user**: The user who requests an API call to a BIF application or smart contract. The API call triggers the sending of the transaction to the remote ledger.
+
+**BIF Web application or Smart contract on a blockchain**: The entity executes business logic and provide integration services that include multiple blockchains.
+
+**Tx verifier**: The entity verifies the signature of the transaction data transmitted over the secure bidirectional channel. Validated transactions are processed by the BIF Web application or Smart Contract to execute the integrated business logic.
+
+**Tx submitter**: The entity submits the remote transaction to the API server plug-in on one of the ledgers.
 
 **API Server**: A module of BIF which provides a unified interface to control/monitor Blockchain ledger behind it.
 
