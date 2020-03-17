@@ -2,7 +2,7 @@ const rp = require(`request-promise-native`);
 const log4js = require('log4js');
 
 const pathToChaincode = `mycc/`;
-const pathToChannel = `../../artifacts/channel/mychannel.tx`
+const pathToChannel = `../../artifacts/channel/mychannel.tx`;
 const logger = log4js.getLogger('init-network');
 logger.level = 'INFO';
 
@@ -45,7 +45,7 @@ async function enroll(username, orgName) {
       json: true,
     });
 
-    if(!createChannel.success) {
+    if (!createChannel.success) {
       throw new Error(createChannel.message);
     }
     logger.info(createChannel.message);
@@ -62,7 +62,7 @@ async function enroll(username, orgName) {
       json: true,
     });
 
-    if(!org1JoinChannel.success) {
+    if (!org1JoinChannel.success) {
       throw new Error(org1JoinChannel.message);
     }
     logger.info(org1JoinChannel.message);
@@ -83,7 +83,7 @@ async function enroll(username, orgName) {
       json: true,
     });
 
-    if(!org1InstallChaincode.success) {
+    if (!org1InstallChaincode.success) {
       throw new Error(org1InstallChaincode.message);
     }
     logger.info(org1InstallChaincode.message);
@@ -100,7 +100,7 @@ async function enroll(username, orgName) {
       json: true,
     });
 
-    if(!org2JoinChannel.success) {
+    if (!org2JoinChannel.success) {
       throw new Error(org2JoinChannel.message);
     }
     logger.info(org2JoinChannel.message);
@@ -121,7 +121,7 @@ async function enroll(username, orgName) {
       json: true,
     });
 
-    if(!org2InstallChaincode.success) {
+    if (!org2InstallChaincode.success) {
       throw new Error(org2InstallChaincode.message);
     }
     logger.info(org2InstallChaincode.message);
@@ -141,7 +141,7 @@ async function enroll(username, orgName) {
       json: true,
     });
 
-    if(!org1InstantiateChaincode.success) {
+    if (!org1InstantiateChaincode.success) {
       throw new Error(org1InstantiateChaincode.message);
     }
     logger.info(org1InstantiateChaincode.message);

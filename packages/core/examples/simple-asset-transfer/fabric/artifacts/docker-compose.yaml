@@ -15,7 +15,7 @@ networks:
 
 services:
   ca.org1.example.com:
-    image: hyperledger/fabric-ca:1.4.0
+    image: hyperledger/fabric-ca:1.4.4
     environment:
       - FABRIC_LOGGING_SPEC=INFO
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
@@ -35,7 +35,7 @@ services:
       - fabric-network
 
   ca.org2.example.com:
-    image: hyperledger/fabric-ca:1.4.0
+    image: hyperledger/fabric-ca:1.4.4
     environment:
       - FABRIC_LOGGING_SPEC=INFO
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
@@ -58,7 +58,7 @@ services:
     container_name: orderer.example.com
     networks:
       - fabric-network
-    image: hyperledger/fabric-orderer:1.4.0
+    image: hyperledger/fabric-orderer:1.4.4
     environment:
       - FABRIC_LOGGING_SPEC=INFO
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
