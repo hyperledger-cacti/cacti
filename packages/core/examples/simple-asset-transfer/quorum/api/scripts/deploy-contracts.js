@@ -19,7 +19,24 @@ async function deployRoot() {
 
 module.exports = (async () => {
   try {
-    await deployRoot();
+    // We need a re-try mechanism to be more resilient against race conditions that come up on stronger hardware
+    const maxTries = 5;
+    const delayBetweenTries = 15000;
+    let tryCount = 1;
+    let notSuccessful = true;
+    while (tryCount <= maxTries && notSuccessful) {
+      logger.info(`Attempting to deploy contracts: #${tryCount}...`);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await deployRoot();
+        notSuccessful = false;
+      } catch (ex) {
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise(resolve => setTimeout(resolve, delayBetweenTries));
+        logger.info(`Attempt #${tryCount} to deploy contracts failed`);
+      }
+      tryCount += 1;
+    }
     if (config.env !== 'test') {
       /* Forcibly exit the process as we suspect that web3.js may leave dangling
         open network connections that prevent normal exit. */
