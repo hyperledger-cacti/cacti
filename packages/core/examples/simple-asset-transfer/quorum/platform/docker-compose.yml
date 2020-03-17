@@ -10,7 +10,7 @@ version: "3.6"
 x-quorum-def:
   &quorum-def
   restart: "on-failure"
-  image: "${QUORUM_DOCKER_IMAGE:-quorumengineering/quorum:2.3.0}"
+  image: "${QUORUM_DOCKER_IMAGE:-quorumengineering/quorum:2.2.5}"
   expose:
     - "21000"
     - "50400"
@@ -70,6 +70,10 @@ x-quorum-def:
         --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-istanbul} \
         --port 21000 \
         --unlock 0 \
+        --mine \
+        --miner.threads 1 \
+        --miner.gaslimit 60000000 \
+        --miner.gastarget 10 \
         --password /examples/passwords.txt \
         ${QUORUM_GETH_ARGS:-} $${GETH_ARGS_${QUORUM_CONSENSUS:-istanbul}}
 x-tx-manager-def:
