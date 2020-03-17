@@ -61,7 +61,6 @@ function mainTask()
   rm -rf $CI_ROOT_DIR/besu/api/node_modules
   rm -rf $CI_ROOT_DIR/node_modules
   rm -rf ./node_modules
-
   npm install
   npm run test
 
@@ -175,7 +174,7 @@ function mainTask()
   npm run quorum:api:down
   npm run quorum:down
   npm run fabric:down
-  cd ../..
+  cd $PKG_ROOT_DIR
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))
