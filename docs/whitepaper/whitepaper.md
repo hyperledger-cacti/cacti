@@ -401,24 +401,34 @@ The Blockchain Integration Framework has several interworking patterns as the fo
 | 4.  | data transfer       | D -> D  | check if all D1 is copied on ledger 2 <br> (as D1 is data on ledger 1, D2 is data on ledger 2) |
 | 5.  | data merge          | D <-> D | check if D1 = D2 as a result <br> (as D1 is data on ledger 1, D2 is data on ledger 2)          |
 
-### 4.1.2 Interworking architecture
+### 4.2 Interworking architecture
 
-The Blockchain Integration Framework is composed by Web application or Smart contract on a blockchain, the sets of Ledger-n, and API server-n (n = 1, 2, .., N).
-The following architecture is the case that N = 2.
+Blockchain Integration Framework will provide integrated service(s) by executing ledger operations across multiple blockchain ledgers. The execution of operations are controlled by the module of Blockchain Integration Framework which will be provided by vendors as the single Blockchain Integration Framework Business Logic plugin.
+The supported blockchain platforms by Blockchain Integration Framework can be added by implementing new Blockchain Integration Framework Ledger plugin.
+Once an API call to Blockchain Integration Framework framework is requested by a User, Business Logic plugin determines which ledger operations should be executed, and it ensures reliability on the issued integrated service is completed as expected.
+Following diagram shows the architecture of Blockchain Integration Framework based on the discussion made at BIF Lab project calls.
+The overall architecture is as the following figure.
 
-<img src="./interworking-architecture-diagram.png" width="700">
+<img src="./architecture-with-plugin-and-routing.png" width="700">
 
-Each components are the following:
-- **BIF Web application or Smart contract on a blockchain**: the component which has Tx verifiers, Tx submitters, and secure bi-directional channels to each API server.  This component receives application users' API call.
-- **API server-n**: the component which includes API server-plugin-n.
-	- **API server-plugin-n**: the component for connecting each ledger.  This component depends on each ledger.
+Each entity is as follows:
+- **Business Logic Plugin**: The entity executes business logic and provide integration services that are connected with multiple blockchains. The entity is composed by web application or smart contract on a blockchain. The entity is a single plugin and required for executing Blockchain Integration Framework applications.
+- **Ledger Plugin**: The entity communicates Business Logic Plugin with each ledger.  The entity is composed by a validator and a verifier as follows. The entity(s) is(are) chosen from multiple plugins on configuration.
+- **Validator**: The entity verifies transactions on the connected ledger and makes signatures for requesting to the verifier. The entity connects the verifier using a bi-directional channel.
+- **Verifier**: The entity verifies the signatures from the validator. The entity connects the validator using a bi-directional channel.
+- **BIF Routing Interface**: The entity is a routing service between Business Logic Plugin and  Ledger Plugin(s). The entity is also a routing service between Business Logic Plugin and API calls from application users.
 - **Ledger-n**: Ledger (e.g. Ethereum, Quorum, Hyperledger fabric, ...)
+ 
+The execution steps are described as follows:
+- **Step 1**: Application user(s) makes an API call for operations on a single ledger or between multiple ledgers.  The API call is sent to Business Logic Plugin via Blockchain Integration Framework Routing Interface.
+- **Step 2**: Business Logic Plugin requests ledger operation(s) to Ledger Plugin(s) via Blockchain Integration Framework Routing Interface.  Ledger plugin requests the operation(s) to its connected ledger. The operation is settled on the ledger.
+- **Step 3**: The Ledger Plugin is monitoring transaction data on its connected ledger.  If Ledger Plugin receives transaction data related with the operation(s) of Step 2, Ledger Plugin verifies the transaction and send the verified transaction information to Business Logic Plugin via Blockchain Integration Framework Routing Interface, then Business Logic Plugin receives this information and records it.
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.2 Technical Architecture
+## 4.3 Technical Architecture
 
-### 4.2.1 Monorepo Packages
+### 4.3.1 Monorepo Packages
 
 The Blockchain Integration Framework is divided into a set of npm packages that can be compiled separately or all at once.
 
@@ -427,14 +437,14 @@ Naming conventions for packages:
 * sdk-* for packages designed to be used directly by application developers
 * All other packages should be named preferably as a single English word suggesting the most important feature/responsibility of the package itself.
 
-#### 4.2.1.1 core
+#### 4.3.1.1 core
 
 Contains the kernel of the Blockchain Integration Framework.
 Code that is strongly opinionated lives here, the rest is pushed to other packages that implement plugins or define their interfaces.
 
 **The main responsibilities of the `core` package are:**
 
-##### 4.2.1.1.1 Runtime Configuration Parsing and Validation
+##### 4.3.1.1.1 Runtime Configuration Parsing and Validation
 
 The core package is responsible for parsing runtime configuration from the usual sources (shown in order of precedence):
 * Explicit instructions via code (`config.setHttpPort(3000);`)
@@ -444,7 +454,7 @@ The core package is responsible for parsing runtime configuration from the usual
 
 The Apache 2.0 licensed node-convict library to be leveraged for the mechanical parts of the configuration parsing and validation: https://github.com/mozilla/node-convict
 
-##### 4.2.1.1.2 Configuration Schema - Validator
+##### 4.3.1.1.2 Configuration Schema - Validator
 
 |   | Parameter   | Type            | Config Key: CLI        | Config Key: Env      | Config Key: JSON    | Description                                                                                          |
 |---|-------------|-----------------|-----------------|---------------|--------------|------------------------------------------------------------------------------------------------------|
@@ -452,7 +462,7 @@ The Apache 2.0 licensed node-convict library to be leveraged for the mechanical 
 |   | Private Key | `string`        | `--private-key` | `PRIVATE_KEY` | `privateKey` | The private key of the validator node to be used when signing validated messages.                    |
 |   | Public Key  | `string`        | `--public-key`  | `PUBLIC_KEY`  | `publicKey`  | The public key of the validator node that pairs with the `Private Key` of the same node.             |
 
-##### 4.2.1.1.3 Configuration Schema - API Server
+##### 4.3.1.1.3 Configuration Schema - API Server
 
 |   | Parameter                 | Type            | Key: CLI, Env, JSON                                                                                | Description                                                                                                                                                                                                                                                                                                                                                                                                             |
 |---|---------------------------|-----------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -464,11 +474,11 @@ The Apache 2.0 licensed node-convict library to be leveraged for the mechanical 
 |   | Authentication Options    | `Array<string>` | `--authentication-options`<br><br>`AUTHENTICATION_OPTIONS`<br><br>`authenticationOptions`          | Used to provide arguments to the constructors (or factory functions) exported by the modules specified by `AUTHENTICATION_STRATEGIES`. For example, in this configuration parameter you can specify the callback URL for an Open ID Connect provider of your choice, the client ID, client secret, etc. Important: The order in which the items appear have to match the order of items in `AUTHENTICATION_STRATEGIES`. |
 |   | Package Registries        | `Array<string>` | `--package-registries`<br><br>`PACKAGE_REGISTRIES`<br><br>`packageRegistries`                      | Optional. Defaults to the public npm registry at `https://registry.npmjs.org/`. Can be used to specify private registries in the event of closed source plugins. If multiple registry URLs are provided, they all will be tried in-order at bootstrap time.                                                                                                                                                              |
 
-##### 4.2.1.1.4 Plugin Loading/Validation
+##### 4.3.1.1.4 Plugin Loading/Validation
 
 Plugin loading happens through NodeJS's built-in module loader and the validation is performed by the Node Package Manager tool (npm) which verifies the byte level integrity of all installed modules.
 
-#### 4.2.1.2 cmd-api-server
+#### 4.3.1.2 cmd-api-server
 
 A command line application for running the API server that provides a unified REST based HTTP API for calling code.
 
@@ -476,31 +486,31 @@ By design this is stateless and horizontally scalable.
 
 Comes with Swagger API definitions.
 
-#### 4.2.1.3 cmd-validator
+#### 4.3.1.3 cmd-validator
 
 Command line application to run a single `BIF` validator node.
 
-#### 4.2.1.4 sdk-javascript
+#### 4.3.1.4 sdk-javascript
 
 Javascript SDK (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
 Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
 
-#### 4.2.1.5 keychain
+#### 4.3.1.5 keychain
 
 Responsible for persistently storing highly sensitive data (e.g. private keys) in an encrypted format.
 
 For further details on the API surface, see the relevant section under `Plugin Architecture`.
 
-#### 4.2.1.7 tracing
+#### 4.3.1.7 tracing
 
 Contains components for tracing, logging and application performance management (APM) of code written for the rest of the Blockchain Integration Framework packages.
 
-#### 4.2.1.8 audit
+#### 4.3.1.8 audit
 
 Components useful for writing and reading audit records that must be archived longer term and immutable.
 The latter properties are what differentiates audit logs from tracing/logging messages which are designed to be ephemeral and to support technical issues not regulatory/compliance/governance related issues.
 
-#### 4.2.1.9 document-storage
+#### 4.3.1.9 document-storage
 
 Provides structured or unstructured document storage and analytics capabilities for other packages such as `audit` and `tracing`.
 Comes with its own API surface that serves as an adapter for different storage backends via plugins.
@@ -510,43 +520,43 @@ By default, `Open Distro for ElasticSearch` is used as the storage backend: http
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `BIF`.
 
-#### 4.2.1.10 relational-storage
+#### 4.3.1.10 relational-storage
 
 Contains components responsible for providing access to standard SQL compliant persistent storage.
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `BIF`.
 
-#### 4.2.1.11 immutable-storage
+#### 4.3.1.11 immutable-storage
 
 Contains components responsible for providing access to immutable storage such as a distributed ledger with append-only semantics such as a blockchain network (e.g. Hyperledger Fabric).
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `BIF`.
 
-### 4.2.2 Deployment Diagram
+### 4.3.2 Deployment Diagram
 
 Source file: `./docs/architecture/deployment-diagram.puml`
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLNHRjem57tFLzpnqasYJF3SeYQ43ZGAQ6LxgXGvpWKi73jo73eqzTzt7GA4aj4X8N1yphat9ySt3xbbnXQfX10pgNSfAWkXO2l3KXXD81W_UfxtIIWkYmJXBcKMZM3oAzTfgbNVku651f5csbYmQuGyCy8YB8L4sEa2mjdqPW4ACG6h8PEC8p3832x5xq-DmYXbjjOA-qsxacLMPn5V6vrYhFMc4PKmosAMauHdXQLEBc_kHOrs6Hg9oGeD15Bp3LypeM2iB1B02gtWaO3ugis6F5Yw_ywFg2R6SeZ5Ce4_dWTWa5kcLbIkzMorOIk4kT5RaQ1fEMIUTGa8z7doez1V-87_FFpypR1T6xhjKYXkdrJQq0eOtmYrWf3k1vmcjhvK4c-U-vvN_SMae5lN1gQQ_1Z88hTLxQtY5R4HFz4iWO19flY18EDZfN_pkftEjDAlq6V0WLQALjgyA0Wd2-XMs2YHjXln8-NjOsglHkrTK9lSyETZU4QpfSTRTu9b8c_meeQ-DCDnp3L7QkoZ9NkIEdjUnEHI5mcqvaKi1I_JPXJQaa6_X7uxPAqrJYXZmWhCosrnN9QQjV8BmrJEk7LPgKWxy4kI5QpgW3atOQYIw6UE9lBTBXRi4CZ1S3APZsRJMYAFH_4ybKyw5kMPsWf-FP2DVGLLNt5pNy6-h_ZGryIVBsRpQ33wCNiQ1hFPzrD_-s5mtbo8-SPDYC3eLv9xrzx9sr3areYui3IO9kKGs9jCyRfgxod6reNuse6c_IJklclleYof_Q-5ftFWQlS-hDtxi7RlqX_FZQcxJgVJtnyLpusEvZKX2UzIUtT_Vz-l1RHsqHbQMxefvtcKExYzxPyIHbVYyih-cPBi0wg4taj_0G00">
 
-### 4.2.3 Component Diagram
+### 4.3.3 Component Diagram
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLN1Rjim3BthAmXVrWQhiVGO546pPaK7x32i1NOPCCWownYH9LTKbdX9_tsKx2JsihRBIT9xV7mYAUUQl7H-LMaXVEarmesjQclGU9YNid2o-c7kcXgTnhn01n-rLKkraAM1pyOZ4tnf3Tmo4TVMBONWqD8taDnOGsXeHJDTM5VwHPM0951I5x0L02Cm73C1ZniVjzv9Gr85lTlIICqg4yYirIYDU1P2PiGKvI6PVtc8MhdsFQcue5LTM-SnFqrF4vWv9vkhKsZQnbPS2WPZbWFxld_Q4jTIQpmoliTj2sMXFWSaLciQpE-hmjP_ph7MjgduQ7-BlBl6Yg9nDNGtWLF7VSqsVzHQTq8opnqITTNjSGUtYI6aNeefkS7kKIg4v1CfPzTVdVrLvkXY7DOSDsJTU-jaWGCQdT8OzrPPVITDJWkvn6_uj49gxVZDWXm-HKzIAQozp3GEyn_gEpoUlfs7wb39NYAAYGWrAXwQeTu4XliWhxGaWkJXEAkTM7lB3evzZq2S1yO2ACAysekBsF49N5t9ed1OI8_JQOS-CxpRnaSYte6n7eE86VC6O0OyFOoP_PJ36Ao3oZfc7QOyRRdcU1H3CZo-3SWQaAQ9HBEgCdxNzX7EVgEpu2rKZ9s7N54BJHwDyFACBRwFviuXJOCj4OVtUSUN-jlpvT5pR-B3YFFiRBXskc7_1vClsmwFudyTzpAzPVwoCpzYxwH2ErJuz54PcieDEO3hLx3OtbTmgaz1qSv4CavWjqjJk-LbceuI7YB-26_ONBf_1SCjXMto8KqvahN3YgEm5litq-cC_W7oK8uX_aBM0K5SSvNu7-0F">
 
-### 4.2.4 Class Diagram
+### 4.3.4 Class Diagram
 
-### 4.2.5 Sequence Diagram - Transactions
+### 4.3.5 Sequence Diagram - Transactions
 
 TBD
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.3 Transaction Protocol Specification
+## 4.4 Transaction Protocol Specification
 
-### 4.3.1 Handshake Mechanism
+### 4.4.1 Handshake Mechanism
 
 TBD
 
-### 4.3.2 Transaction Protocol Negotiation
+### 4.4.2 Transaction Protocol Negotiation
 
 Participants in the transaction must have a handshake mechanism where they agree on one of the supported protocols to use to execute the transaction. The algorithm looks an intersection in the list of supported algorithms by the participants.
 
@@ -558,7 +568,7 @@ Means for establishing bi-directional communication channels through proxies/fir
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.4 Plugin Architecture
+## 4.5 Plugin Architecture
 
 Since our goal is integration, it is critical that `BIF` has the flexibility of supporting most ledgers, even those that don't exist today.
 
@@ -580,7 +590,7 @@ An overarching theme for all aspects that are covered by the plugin architecture
 
 ---
 
-### 4.4.1 Ledger Connector Plugins
+### 4.5.1 Ledger Connector Plugins
 
 Success is defined as:
 1. Adding support in `BIF` for a ledger invented in the future requires no `core` code changes, but instead can be implemented by simply adding a corresponding connector plugin to deal with said newly invented ledger.
@@ -615,7 +625,7 @@ export enum PermissionScheme {
 
 ```
 
-### 4.4.2 Identity Federation Plugins
+### 4.5.2 Identity Federation Plugins
 
 Identity federation plugins operate inside the API Server and need to implement the interface of a common PassportJS Strategy:
 https://github.com/jaredhanson/passport-strategy#implement-authentication
@@ -632,14 +642,14 @@ abstract class IdentityFederationPlugin {
 }
 ```
 
-#### 4.4.1.1 X.509 Certificate Plugin
+#### 4.5.1.1 X.509 Certificate Plugin
 
 The X.509 Certificate plugin facilitates clients authentication by allowing them to present a certificate instead of operating with authentication tokens.
 This technically allows calling clients to assume the identities of the validator nodes through the REST API without having to have access to the signing private key of said validator node.
 
 PassportJS already has plugins written for client certificate validation, but we go one step further with this plugin by providing the option to obtain CA certificates from the validator nodes themselves at runtime.
 
-### 4.4.3 Key/Value Storage Plugins
+### 4.5.3 Key/Value Storage Plugins
 
 Key/Value Storage plugins allow the higher-level packages to store and retrieve configuration metadata for a `BIF` cluster such as:
 * Who are the active validators and what are the hosts where said validators are accessible over a network?
@@ -654,7 +664,7 @@ interface KeyValueStoragePlugin {
 }
 ```
 
-### 4.4.4 Serverside Keychain Plugins
+### 4.5.4 Serverside Keychain Plugins
 
 The API surface of keychain plugins is roughly the equivalent of the key/value *Storage* plugins, but under the hood these are of course guaranteed to encrypt the stored data at rest by way of leveraging storage backends purpose built for storing and managing secrets.
 
@@ -801,3 +811,4 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 # 7. References
 
 1: [Heterogeneous System Architecture](https://en.wikipedia.org/wiki/Heterogeneous_System_Architecture) - Wikipedia, Retrieved at: 11th of December 2019
+
