@@ -46,7 +46,7 @@ Blockchain Integration Framework introduces an “interoperability validator” 
 _Note that BIF follows Semantic Versioning and as the software is pre-1.0, [backwards compatibility is not guaranteed between versions](https://semver.org/#spec-item-4)_
 
 ## Contact
-We welcome your questions & feedback on our [Rocketchat channel](https://chat.hyperledger.org/channel/blockchain-integration-framework).
+We welcome your questions & feedback on our [Rocketchat channel](https://chat.hyperledger.org/channel/cactus).
 
 ## Contributing
 We welcome contributions to BIF in many forms, and there’s always plenty to do!
