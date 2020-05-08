@@ -1,4 +1,4 @@
-# Hyperledger Labs Blockchain Integration Framework <!-- omit in toc -->
+# Hyperledger Cactus <!-- omit in toc -->
 
 [![Build status]](https://travis-ci.org/hyperledger-labs/blockchain-integration-framework)
 [![CircleCI]](https://circleci.com/gh/hyperledger-labs/blockchain-integration-framework/tree/master)
@@ -39,17 +39,17 @@ This lab project proposes an alternative to these models, and it is designed spe
 
 ### How It Works
 
-Blockchain Integration Framework introduces an “interoperability validator” overlay network for each of the interoperable blockchains. Interoperability validators are known or broadly discoverable by the ecosystem and are typically participants already taking part in the governance or consensus. Interoperability validators will collectively handle export requests from local nodes by verifying against their version of the ledger (steps 1 to 3). Each request is answered by a (configurable) minimum quorum of validator signatures necessary or rejected as fast as possible (steps 4 and 5). The network can continue working even if some of the validators are down, or not participating, but assuming the minimum quorum can be guaranteed. Messages certified by a distributed ledger’s transfer validators can be delivered by any secure off-chain communication system (step 6). A proof coming from a foreign distributed ledger can be verified against the public keys of the transfer validators of that foreign distributed ledger either locally by the recipient or using an on-chain logic –- typically smart-contracts (step 7 and 8)
+Hyperledger Cactus introduces an “interoperability validator” overlay network for each of the interoperable blockchains. Interoperability validators are known or broadly discoverable by the ecosystem and are typically participants already taking part in the governance or consensus. Interoperability validators will collectively handle export requests from local nodes by verifying against their version of the ledger (steps 1 to 3). Each request is answered by a (configurable) minimum quorum of validator signatures necessary or rejected as fast as possible (steps 4 and 5). The network can continue working even if some of the validators are down, or not participating, but assuming the minimum quorum can be guaranteed. Messages certified by a distributed ledger’s transfer validators can be delivered by any secure off-chain communication system (step 6). A proof coming from a foreign distributed ledger can be verified against the public keys of the transfer validators of that foreign distributed ledger either locally by the recipient or using an on-chain logic –- typically smart-contracts (step 7 and 8)
 
 ![High-Level Workflow](./docs/images/blockchain-integration-framework-high-level-workflow.png "Interoperability between two different DLTs")
 
-_Note that BIF follows Semantic Versioning and as the software is pre-1.0, [backwards compatibility is not guaranteed between versions](https://semver.org/#spec-item-4)_
+_Note that Hyperledger Cactus follows Semantic Versioning and as the software is pre-1.0, [backwards compatibility is not guaranteed between versions](https://semver.org/#spec-item-4)_
 
 ## Contact
-We welcome your questions & feedback on our [Rocketchat channel](https://chat.hyperledger.org/channel/blockchain-integration-framework).
+We welcome your questions & feedback on our [Rocketchat channel](https://chat.hyperledger.org/channel/cactus).
 
 ## Contributing
-We welcome contributions to BIF in many forms, and there’s always plenty to do!
+We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
 Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
 
@@ -66,4 +66,3 @@ This distribution is published under the Apache License Version 2.0 found in the
 ## Sponsor
 
 [Hart Montgomery](mailto:hmontgomery@us.fujitsu.com) ([hartm](https://github.com/hartm)) - TSC member
-

@@ -13,7 +13,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 
-Steps to reproduce the behavior on a successfully deployed BIF cluster.
+Steps to reproduce the behavior on a successfully deployed Hyperledger Cactus cluster.
 
 **Expected behavior**
 
@@ -53,12 +53,12 @@ VERSION_CODENAME=bionic
 UBUNTU_CODENAME=bionic
 ```
 
-**BIF release version or commit (git rev-parse --short HEAD):**
+**Hyperledger Cactus release version or commit (git rev-parse --short HEAD):**
 
 Either a semantic version of the release you are using such as `1.0.0` or a git
 commit hash if you are directly working with code from the git repository.
 
-**BIF Plugins/Connectors Used**
+**Hyperledger Cactus Plugins/Connectors Used**
 
  - Which DLT connectors are you using (Fabric, Quorum, Corda, Besu, etc.)
 

@@ -5,7 +5,7 @@
 
 title Interworking architecture diagram
 
-node "BIF Web application or Smart contract on a blockchain" as web_app {
+node "Hyperledger Cactus Web application or Smart contract on a blockchain" as web_app {
 	rectangle "TX submitter / TX verifier" as txverifier1 {
 	}
 	rectangle "TX submitter / TX verifier" as txverifier2 {

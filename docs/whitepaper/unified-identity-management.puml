@@ -1,5 +1,5 @@
 @startuml Unified Identity Management
-title Hyperledger Blockchain Integration Framework\nUnified Identity Management
+title Hyperledger Cactus\nUnified Identity Management
 
 ' left to right direction
 
@@ -11,7 +11,7 @@ skinparam sequenceParticipant underline
 
 allow_mixing
 
-package "BIF Identity" as bifidentity #LightGray {
+package "Hyperledger Cactus Identity" as cactusidentity #LightGray {
   object "DLT Identity 1" as dlti1 <<credential>>
   object "DLT Identity 2" as dlti2 <<credential>>
   object "DLT Identity N" as dltin <<credential>>
@@ -19,7 +19,7 @@ package "BIF Identity" as bifidentity #LightGray {
 
 actor "Application User" as actor1 <<identity owner>>
 
-frame "Blockchain Integration Framework" <<software deployment>> #LightCyan {
+frame "Hyperledger Cactus" <<software deployment>> #LightCyan {
 
   package "pkg-cmd-api-server" as pkgcmdapiserver #LightGreen {
     component "/api/v1/identity/authenticate\n<<REST API Endpoint>>" as authenticateendpoint
@@ -44,7 +44,7 @@ actor1 .down. dlti2
 actor1 .down. dltin
 
 actor1 .right.> addcredentialendpoint
-note on link: Associate DLT\nIdentity to BIF\nidentity
+note on link: Associate DLT\nIdentity to Hyperledger Cactus\nidentity
 
 addcredentialendpoint ..> pkgidentity
 note on link: Store identity credentials
@@ -53,6 +53,6 @@ pkgidentity ..> pkgkeychain
 note on link: Store identity credentials
 
 addcredentialendpoint ..> pkgsqlstorage
-note on link: Store BIF/DLT identity relationships
+note on link: Store Hyperledger Cactus/DLT identity relationships
 
 @enduml

@@ -1,6 +1,6 @@
 @startuml Authentication, Authorization for Permissioned Chains
 
-title Hyperledger Blockchain Integration Framework\nAuthentication, Authorization for Permissioned Chains
+title Hyperledger Cactus\nAuthentication, Authorization for Permissioned Chains
 
 left to right direction
 
@@ -23,17 +23,17 @@ frame "End User Application" as eu {
 
 
 frame "Company A\n<<organization>>" as ca #LightGray {
-  node "Blockchain Integration Framework\n<<software deployment>>" as bif #LightYellow {
-    node "REST API\n<<web service>>" as bifrestapi #LightGreen {
+  node "Hyperledger Cactus\n<<software deployment>>" as Hyperledger Cactus #LightYellow {
+    node "REST API\n<<web service>>" as cactusrestapi #LightGreen {
     }
     together {
-      node "Network A\n<<identity plugin>>" as bifidpluginnetworka #LightGreen {
+      node "Network A\n<<identity plugin>>" as cactusidpluginnetworka #LightGreen {
       }
-      node "Network B\n<<identity plugin>>" as bifidpluginnetworkb #LightGreen {
+      node "Network B\n<<identity plugin>>" as cactusidpluginnetworkb #LightGreen {
       }
-      node "Network A\n<<connector plugin>>" as bifconnectorpluginnetworka #LightGreen {
+      node "Network A\n<<connector plugin>>" as cactusconnectorpluginnetworka #LightGreen {
       }
-      node "Network B\n<<connector plugin>>" as bifconnectorpluginnetworkb #LightGreen {
+      node "Network B\n<<connector plugin>>" as cactusconnectorpluginnetworkb #LightGreen {
       }
     }
   }
@@ -49,11 +49,11 @@ frame "Network B\n<<permissioned ledger>>" as nb #LightGray {
   }
 }
 
-io ..> bifrestapi: Request transactions
+io ..> cactusrestapi: Request transactions
 note on link
   Uses one or more of the
   identity proofs for each
-  request that BIF
+  request that Hyperledger Cactus
   verifies/passes along
   via the appropriate plugins
   before instructing the
@@ -64,11 +64,11 @@ note on link
   3. Manage permissions
   4. etc.
 end note
-bifrestapi <..> bifconnectorpluginnetworka
-bifrestapi <..> bifconnectorpluginnetworkb
-bifrestapi <..> bifidpluginnetworka
-bifrestapi <..> bifidpluginnetworkb
-bifconnectorpluginnetworka ..> na: Execute transactions
-bifconnectorpluginnetworkb ..> nb: Execute transactions
+cactusrestapi <..> cactusconnectorpluginnetworka
+cactusrestapi <..> cactusconnectorpluginnetworkb
+cactusrestapi <..> cactusidpluginnetworka
+cactusrestapi <..> cactusidpluginnetworkb
+cactusconnectorpluginnetworka ..> na: Execute transactions
+cactusconnectorpluginnetworkb ..> nb: Execute transactions
 
 @enduml

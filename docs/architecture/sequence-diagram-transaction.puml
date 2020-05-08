@@ -1,6 +1,6 @@
 @startuml Sequence Diagram - Transaction
 
-title Hyperledger Blockchain Integration Framework\nSequence Diagram - Transaction
+title Hyperledger Cactus\nSequence Diagram - Transaction
 
 skinparam sequenceArrowThickness 2
 skinparam roundcorner 20
@@ -12,7 +12,7 @@ actor IdentityA as a
 actor IdentityB as b
 end box
 
-box "BIF" #LightGray
+box "Hyperledger Cactus" #LightGray
 entity "API Server" as apis
 entity "Validator" as v
 end box

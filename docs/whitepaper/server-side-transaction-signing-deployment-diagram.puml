@@ -7,7 +7,7 @@
 !include <tupadr3/font-awesome/key>
 !include <tupadr3/font-awesome/server>
 
-title Hyperledger Blockchain Integration Framework\nServer Side Transaction Signing
+title Hyperledger Cactus\nServer Side Transaction Signing
 
 left to right direction
 ' allow_mixing
@@ -22,15 +22,15 @@ actor "Application User" as actor1 <<identity owner>>
 
 FA_MOBILE(mobiledevice,"Mobile Device")
 
-FA_SERVER(bifserverside,"BIF Server Side\n<size:30><&key></size>")
-note bottom of bifserverside #LightSkyBlue
-  <size:20><&key></size> <b>Private key of user resides on BIF server side</b>
+FA_SERVER(cactusserverside,"Hyperledger Cactus Server Side\n<size:30><&key></size>")
+note bottom of cactusserverside #LightSkyBlue
+  <size:20><&key></size> <b>Private key of user resides on Hyperledger Cactus server side</b>
 end note
 
 FA_DATABASE(dlt,"Distributed Ledger")
 
 actor1 ..|> mobiledevice: Decides to execute transaction
-mobiledevice ..|> bifserverside: Send unsigned transaction data
-bifserverside ..|> dlt: Send signed transaction data
+mobiledevice ..|> cactusserverside: Send unsigned transaction data
+cactusserverside ..|> dlt: Send signed transaction data
 
 @enduml

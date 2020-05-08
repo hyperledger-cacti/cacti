@@ -1,6 +1,6 @@
 @startuml Document Storage Deployment Diagram
 
-title Hyperledger Blockchain Integration Framework\nDocument Storage Deployment Diagram
+title Hyperledger Cactus\nDocument Storage Deployment Diagram
 
 ' skinparam Linetype ortho
 skinparam sequenceArrowThickness 3
@@ -10,7 +10,7 @@ skinparam sequenceParticipant underline
 !include <tupadr3/common>
 !include <tupadr3/font-awesome/database>
 
-frame "Blockchain Integration Framework" <<software deployment>> #LightCyan {
+frame "Hyperledger Cactus" <<software deployment>> #LightCyan {
 
   package "pkg-cmd-api-server" as pkgcmdapiserver #LightGreen {
     component "/api/v1/identity/add-credential\n<<REST API Endpoint>>" as addcredentialendpoint
@@ -27,11 +27,11 @@ frame "Blockchain Integration Framework" <<software deployment>> #LightCyan {
 
   together {
     package "pkg-tracing" as pkgtracing #LightGreen {
-      component "BifTracer\n<<class>>" as biftracer
+      component "CactusTracer\n<<class>>" as cactustracer
     }
 
     package "pkg-audit" as pkgaudit #LightGreen {
-      component "BifAuditLogger\n<<class>>" as bifauditlogger
+      component "CactusAuditLogger\n<<class>>" as cactusauditlogger
     }
   }
   package "pkg-document-storage" as pkgdocumentstorage #LightGreen {
@@ -61,7 +61,7 @@ identityservice .down.> pkgkeychain
 keychainservice ..down.> pkgaudit
 keychainservice ..down.> pkgtracing
 
-biftracer .up.> ingestendpoint #RoyalBlue
-bifauditlogger .up.> ingestendpoint #RoyalBlue
+cactustracer .up.> ingestendpoint #RoyalBlue
+cactusauditlogger .up.> ingestendpoint #RoyalBlue
 
 @enduml

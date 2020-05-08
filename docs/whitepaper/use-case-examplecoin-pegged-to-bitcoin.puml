@@ -1,6 +1,6 @@
 @startuml ExampleCoin Pegged to Bitcoin
 
-title Hyperledger Blockchain Integration Framework\nExampleCoin Pegged to Bitcoin
+title Hyperledger Cactus\nExampleCoin Pegged to Bitcoin
 
 skinparam sequenceArrowThickness 2
 skinparam roundcorner 20

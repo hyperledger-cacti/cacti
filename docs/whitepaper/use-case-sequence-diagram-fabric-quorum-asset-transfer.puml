@@ -1,17 +1,17 @@
 @startuml Sequence Diagram - Fabric Quorum Asset Transfer
 
-title Hyperledger Blockchain Integration Framework\nSequence Diagram - Fabric Quorum Asset Transfer
+title Hyperledger Cactus\nSequence Diagram - Fabric Quorum Asset Transfer
 
 actor User_A as a
 
-box "BIF" #LightGray
+box "Hyperledger Cactus" #LightGray
 entity "API Server" as apis
 entity "Validator" as v
 end box
 
 box "Ledgers"
-entity BIF_Contract_Fabric as c1
-entity BIF_Contract_Quorum as c2
+entity Cactus_Contract_Fabric as c1
+entity Cactus_Contract_Quorum as c2
 database Fabric_Ledger as d1
 database Quorum_Ledger as d2
 end box
@@ -36,7 +36,7 @@ a -> apis: Lock Fabric Asset
 return Locked Fabric Asset
 
 autoactivate off
-a -> a: Verify Signatures\nof BIF Validators
+a -> a: Verify Signatures\nof Hyperledger Cactus Validators
 opt Signatures Valid
   a -> a: <color green>Proceed with Execution</color>
 else Signatures Invalid
@@ -51,7 +51,7 @@ a -> apis: Create Quorum Asset
   apis -> v: Create Quorum Asset
 
     autoactivate off
-    v -> v: Verify Signatures\nof BIF Validators
+    v -> v: Verify Signatures\nof Hyperledger Cactus Validators
     critical Signatures Valid
       v -> v: <color green>Continue
     else Signatures Invalid
