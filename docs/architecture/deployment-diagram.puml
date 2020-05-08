@@ -1,4 +1,4 @@
-@startuml Deployment Diagram HL BIF
+@startuml Deployment Diagram Hyperledger Cactus
 
 
 !include <material/common>
@@ -7,13 +7,13 @@
 !include <material/laptop_chromebook>
 !include <material/database>
 
-title Deployment Diagram\nHyperledger Blockchain Integration Framework
+title Deployment Diagram\nHyperledger Cactus
 
 
-frame "BIF Deployment" as bifd {
+frame "Hyperledger Cactus Deployment" as cactus {
 
   rectangle "Storage Provider" as sp1 {
-    MA_DATABASE(Gray, 1, bifdb, rectangle, "Backing Data Store") {
+    MA_DATABASE(Gray, 1, cactusdb, rectangle, "Backing Data Store") {
     }
   }
 
@@ -74,7 +74,7 @@ vnc <...> sp1
 
 net <===> identities
 net <===> dlts
-net <===> bifd
+net <===> cactus
 
 eua --> cellphone
 eub --> laptop

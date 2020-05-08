@@ -1,7 +1,7 @@
 @startuml state-diagram-validator
 
 title \n<u>Leader Election State Diagram</u>\n
-footer \nHyperledger Blockchain Integration Framework, 2019
+footer \nHyperledger Cactus, 2019
 
 [*] --> Started
 Started --> Candidate

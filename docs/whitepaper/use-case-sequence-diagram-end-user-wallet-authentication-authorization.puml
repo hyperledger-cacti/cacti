@@ -2,11 +2,11 @@
 
 skinparam ArrowFontStyle italic
 
-title Hyperledger Blockchain Integration Framework\nSequence Diagram - End User Wallet Authentication Authorization
+title Hyperledger Cactus\nSequence Diagram - End User Wallet Authentication Authorization
 
 actor User_A as a <<end-user>>
 
-box BIF #White
+box Cactus #White
 entity "API" as api
 entity "Validator(s)" as v
 database "Keychain" as k
@@ -20,7 +20,7 @@ end box
 autoactivate on
 autonumber
 
-== Register with BIF ==
+== Register with Hyperledger Cactus ==
 
 a -> api: Register User Account
 return Bearer Token
@@ -43,7 +43,7 @@ a -> api: Execute Transaction\non **LedgerOne**
 note right
 **User A** only need to present
 **Bearer Token** from step
-2 and BIF will be able to
+2 and Hyperledger Cactus will be able to
 impersonate **User A**
 on LedgerOne
 end note
@@ -61,7 +61,7 @@ a -> api: Execute Transaction\non **LedgerTwo**
 note right
 **User A** only need to present
 **Bearer Token** from step
-2 and BIF will be able to
+2 and Hyperledger Cactus will be able to
 impersonate **User A**
 on LedgerTwo
 end note

@@ -7,7 +7,7 @@
 !include <tupadr3/font-awesome/key>
 !include <tupadr3/font-awesome/server>
 
-title Hyperledger Blockchain Integration Framework\nPlugin Architecture
+title Hyperledger Cactus\nPlugin Architecture
 
 ' left to right direction
 ' allow_mixing
@@ -25,7 +25,7 @@ box "End Users" #LightBlue
 	actor Bob
 end box
 
-box "BIF Deployment" #LightGrey
+box "Hyperledger Cactus Deployment" #LightGrey
   collections "API Server Node(s)" as ApiServer
   participant FabricConnectorPlugin
 end box

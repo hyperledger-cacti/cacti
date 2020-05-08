@@ -4,7 +4,7 @@
 !include <office/Servers/application_server>
 
 center header
-Hyperledger Blockchain Integration Framework
+Hyperledger Cactus
 
 endheader
 
@@ -13,9 +13,9 @@ title
 
 end title
 
-center footer Hyperledger Blockchain Integration Framework, 2019
+center footer Hyperledger Cactus, 2019
 
-frame BIF {
+frame Cactus {
 
   frame Etcd_Cluster as ec {
     OFF_DATABASE_SERVER(etcd1,"Etcd 1")

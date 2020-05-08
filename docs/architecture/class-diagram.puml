@@ -1,6 +1,6 @@
 @startuml
 
-title Hyperledger Blockchain Integration Framework\nClass Diagram
+title Hyperledger Cactus\nClass Diagram
 
 entity "ConsensusAlgorithm" as calg {
   * name: text

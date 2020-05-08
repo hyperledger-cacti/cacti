@@ -2,7 +2,7 @@
 
 ## Summary
 
-Validators nodes self-elect a leader by leveraging the Etcd API's `watch` and `lease` features. BIF depends on Etcd API version 3, but other than that it's able to work with any Etcd cluster or single node configuration as long as connectivity is achievable.
+Validators nodes self-elect a leader by leveraging the Etcd API's `watch` and `lease` features. Hyperledger Cactus depends on Etcd API version 3, but other than that it's able to work with any Etcd cluster or single node configuration as long as connectivity is achievable.
 
 At startup, each node attempts to make themselves leader, which will only succeed if there is no current leader.
 

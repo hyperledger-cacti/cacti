@@ -8,7 +8,7 @@
 !include <tupadr3/font-awesome/server>
 !include <tupadr3/font-awesome/info_circle>
 
-title Hyperledger Blockchain Integration Framework\nClient Side Transaction Signing
+title Hyperledger Cactus\nClient Side Transaction Signing
 
 left to right direction
 ' allow_mixing
@@ -26,12 +26,12 @@ note bottom of mobiledevice #LightSkyBlue
   <size:20><&key></size><b> Private key resides on client device of user</b>
 end note
 
-FA_SERVER(bifserverside,"BIF Server Side")
+FA_SERVER(cactusserverside,"Hyperledger Cactus Server Side")
 
 FA_DATABASE(dlt,"Distributed Ledger")
 
 actor1 ..|> mobiledevice: Decides to execute transaction
-mobiledevice ..|> bifserverside: Send already signed transaction data
-bifserverside ..|> dlt: Forward signed transaction as-is
+mobiledevice ..|> cactusserverside: Send already signed transaction data
+cactusserverside ..|> dlt: Forward signed transaction as-is
 
 @enduml

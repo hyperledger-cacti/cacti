@@ -1,6 +1,6 @@
 ---
 name: User Story template
-about: Create a user story for Blockchain Integration Framework
+about: Create a user story for Hyperledger Cactus
 title: ''
 labels: ''
 assignees: ''

@@ -2,12 +2,12 @@
 
 skinparam ArrowFontStyle italic
 
-title Hyperledger Blockchain Integration Framework\nSequence Diagram - Healthcare Data Sharing with Access Control Lists
+title Hyperledger Cactus\nSequence Diagram - Healthcare Data Sharing with Access Control Lists
 
 actor User_A as a <<patient>>
 actor User_B as b <<healthcare provider>>
 
-box BIF #WhiteSmoke
+box Cactus #WhiteSmoke
 entity "API" as api
 entity "Validator(s)" as v
 end box

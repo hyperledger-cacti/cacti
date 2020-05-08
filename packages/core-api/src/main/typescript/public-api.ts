@@ -77,7 +77,7 @@ export interface TransactionAcceptance {
 }
 
 export interface ApiRequest<TransactionProposal> {
-  // The version of BIF protocol that the calling client is intending on using.
+  // The version of Hyperledger Cactus protocol that the calling client is intending on using.
   // If the server does not support it, it must reject the request with a payload
   // providing a list of acceptible protocol versions that are acceptable.
   protocolVersion: number;
@@ -90,7 +90,7 @@ export interface ApiRequest<TransactionProposal> {
 }
 
 export interface ApiResponse<TransactionProposal> {
-  // The version of BIF protocol that the calling client is intending on using.
+  // The version of Hyperledger Cactus protocol that the calling client is intending on using.
   // If the server does not support it, it must reject the request with a payload
   // providing a list of acceptible protocol versions that are acceptable.
   protocolVersion: number;

@@ -2,12 +2,12 @@
 
 skinparam ArrowFontStyle italic
 
-title Hyperledger Blockchain Integration Framework\nSequence Diagram - Escrowed Sale of Data for Coins
+title Hyperledger Cactus\nSequence Diagram - Escrowed Sale of Data for Coins
 
 actor User_A as a
 actor User_B as b
 
-box BIF
+box Cactus
 entity "API" as api
 end box
 

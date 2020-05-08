@@ -33,7 +33,7 @@ jobs:
             echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
 
       - run:
-          name: Run BIF CI script
+          name: Run Hyperledger Cactus CI script
           command: |
             ./packages/core/tools/ci.sh
 

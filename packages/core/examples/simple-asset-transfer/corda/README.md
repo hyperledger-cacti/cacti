@@ -2,7 +2,7 @@
   <img src="https://www.corda.net/wp-content/uploads/2016/11/fg005_corda_b.png" alt="Corda" width="500">
 </p>
 
-# Corda application 'Hyperledger Blockchain Integration Framework'
+# Corda application 'Hyperledger Cactus'
 
 **This is based on the KOTLIN version of the CorDapp template.(https://github.com/corda/cordapp-template-kotlin/).**
 
@@ -31,9 +31,9 @@ For IDE, compilation and JVM version issues, see the
 
 To get started, clone this repository and change directory to the newly cloned repo:
 
-     cd Hyperledger Blockchain Integration Framework/examples/simple-asset-transfer/corda
+     cd Hyperledger Cactus/examples/simple-asset-transfer/corda
 
-## Building the Corda application 'Hyperledger Blockchain Integration Framework'
+## Building the Corda application 'Hyperledger Cactus'
 
 **Unix:**
 
@@ -43,11 +43,11 @@ To get started, clone this repository and change directory to the newly cloned r
 
      gradlew.bat build deployNodes deployWeb
 
-## Corda application 'Hyperledger Blockchain Integration Framework' project packages
+## Corda application 'Hyperledger Cactus' project packages
 
 Project has a fine-grained structure with the following dependencies:
 
-    Hyperledger Blockchain Integration Framework-corda
+    Hyperledger Cactus-corda
         |
         contracts
         workflows
@@ -272,7 +272,7 @@ While the sole template endpoint is served on:
     }
     }
 
-## Running Corda application 'Hyperledger Blockchain Integration Framework' inside the IDE scope
+## Running Corda application 'Hyperledger Cactus' inside the IDE scope
 
 To enable Corda application run inside the IDE scope, the following steps should be executed:
 

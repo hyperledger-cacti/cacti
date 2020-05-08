@@ -2,7 +2,7 @@
 
 skinparam ArrowFontStyle italic
 
-title Hyperledger Blockchain Integration Framework\nSequence Diagram - Food Traceability Integration
+title Hyperledger Cactus\nSequence Diagram - Food Traceability Integration
 
 actor User_A as a <<consumer>>
 actor User_B as b <<organiazation A staff>>
@@ -13,7 +13,7 @@ entity "Frontend" as frontend
 entity "Backend" as backend
 end box
 
-box BIF #White
+box Cactus #White
 entity "API" as api
 entity "Validator(s)" as v
 end box
@@ -86,8 +86,9 @@ a -> frontend: Query Food Merged Record
       Food Ledger 1 and 2 should
       be equivalent and therefore
       any one of them can be
-      queried by BIF to obtain the
-      complete food trace records.
+      queried by Hyperledger Fabric
+      to obtain the complete food
+      trace records.
       end note
     return Merged Food Data Records
   return Merged Food Data Records

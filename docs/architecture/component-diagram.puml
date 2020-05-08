@@ -1,10 +1,10 @@
 @startuml Sequence Diagram - Transaction
 
-title Hyperledger Blockchain Integration Framework\nSequence Diagram - Transaction
+title Hyperledger Cactus\nSequence Diagram - Transaction
 
 left to right direction
 
-frame "BIF" as 1bif {
+frame "Hyperledger Cactus" as 1cactus {
   package "Core" as 2core <<package>> #LightSlateGray {
     interface "IStoragePlugin" as 3istorageplugin <<interface>> {
     }

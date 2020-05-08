@@ -5,7 +5,7 @@ cordapp {
     targetPlatformVersion corda_platform_version.toInteger()
     minimumPlatformVersion corda_platform_version.toInteger()
     workflow {
-        name "Hyperledger Blockchain Integration Framework Corda Flows"
+        name "Hyperledger Cactus Corda Flows"
         vendor "Accenture"
         licence "Apache License, Version 2.0"
         versionId 1

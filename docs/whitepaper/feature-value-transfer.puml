@@ -2,7 +2,7 @@
 title Value Transfer
 
 participant "User A" as user
-box "BIF" #lightGrey 
+box "Hyperledger Cactus" #lightGrey 
 entity "Service App" as sapp
 entity "API Server" as apis
 entity "Validator1" as validator_1
