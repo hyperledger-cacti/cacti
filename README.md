@@ -1,13 +1,13 @@
 # Hyperledger Cactus <!-- omit in toc -->
 
-[![Build status]](https://travis-ci.org/hyperledger-labs/blockchain-integration-framework)
-[![CircleCI]](https://circleci.com/gh/hyperledger-labs/blockchain-integration-framework/tree/master)
+[![Build status]](https://travis-ci.org/hyperledger/cactus)
+[![CircleCI]](https://circleci.com/gh/hyperledger/cactus/tree/master)
 
-[Build status]: https://travis-ci.org/hyperledger-labs/blockchain-integration-framework.svg?branch=master
-[CircleCI]: https://circleci.com/gh/hyperledger-labs/blockchain-integration-framework/tree/master.svg?style=svg
+[Build status]: https://travis-ci.org/hyperledger/cactus.svg?branch=master
+[CircleCI]: https://circleci.com/gh/hyperledger/cactus/tree/master.svg?style=svg
 
 - [Short Description](#short-description)
-- [Scope of Lab](#scope-of-lab)
+- [Scope of Project](#scope-of-project)
   - [Blockchain Interoperability Space](#blockchain-interoperability-space)
   - [Documentation](#documentation)
   - [How It Works](#how-it-works)
@@ -22,7 +22,7 @@
 
 A new approach to the blockchain interoperability problem
 
-## Scope of Lab
+## Scope of Project
 
 Define a communication model to enable permissioned blockchain ecosystems to exchange any on-chain data or custom assets (fungible/non fungible) independent of the platform (e.g. Hyperledger Fabric, Quorum, etc.) without a middleman. This lab project will implement an interoperability validator network, which is an overlay network of hand-picked actors that will validate and sign data before sharing.
 
@@ -46,7 +46,7 @@ Hyperledger Cactus introduces an “interoperability validator” overlay networ
 _Note that Hyperledger Cactus follows Semantic Versioning and as the software is pre-1.0, [backwards compatibility is not guaranteed between versions](https://semver.org/#spec-item-4)_
 
 ## Contact
-We welcome your questions & feedback on our [Rocketchat channel](https://chat.hyperledger.org/channel/cactus).
+We welcome your questions & feedback on our [chat channel](https://chat.hyperledger.org/channel/cactus).
 
 ## Contributing
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
