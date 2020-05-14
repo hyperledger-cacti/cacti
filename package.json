@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "configure": "lerna clean --yes && lerna bootstrap && npm run build && node ./tools/generate-api-server-config.js",
+    "start": "node ./packages/bif-cmd-api-server/dist/lib/main/typescript/cmd/bif-api.js --config-file=.config.json",
     "tsc": "lerna exec --stream --ignore '*/*cockpit' -- tsc --project ./tsconfig.json",
     "clean": "lerna exec --stream --ignore '*/*cockpit' -- del-cli dist/**",
     "build": "npm-run-all --parallel build:frontend build:backend",
