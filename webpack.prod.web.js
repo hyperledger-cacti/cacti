@@ -46,6 +46,7 @@ module.exports = {
   plugins: [
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
+      openAnalyzer: false,
       reportFilename: `${pkg.browserMinified}.html`
     })
   ],
