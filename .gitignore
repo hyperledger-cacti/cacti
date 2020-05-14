@@ -29,7 +29,8 @@ typings/
 .next
 
 # vscode files
-.vscode/
+.vscode/*
+!.vscode/template.launch.json
 
 # Introperability App specifics
 examples/simple-asset-transfer/fabric/**/hfc-key-store/
