@@ -5,7 +5,6 @@ import { PluginAspect } from "./plugin-aspect";
  *
  */
 export interface ICactusPlugin {
-
   /**
    * Returns the ID of the plugin which is a string uniquely identifying the plugin among other plugins so that they can
    * be managed separately without conflicts or runtime errors.
@@ -23,6 +22,8 @@ export interface ICactusPlugin {
   getAspect(): PluginAspect;
 }
 
-export function isICactusPlugin(pluginInstance: ICactusPlugin): pluginInstance is ICactusPlugin {
-  return typeof pluginInstance.getId === 'function';
+export function isICactusPlugin(
+  pluginInstance: ICactusPlugin
+): pluginInstance is ICactusPlugin {
+  return typeof pluginInstance.getId === "function";
 }

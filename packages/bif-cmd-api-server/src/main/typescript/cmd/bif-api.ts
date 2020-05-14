@@ -4,7 +4,7 @@ import { ApiServer } from "../api-server";
 import { ConfigService } from "../config/config-service";
 
 const main = async () => {
-  if (process.argv[2].includes('help')) {
+  if (process.argv[2].includes("help")) {
     const helpText = ConfigService.getHelpText();
     // tslint:disable-next-line: no-console
     console.log(helpText);
@@ -31,4 +31,4 @@ main()
     // tslint:disable-next-line: no-console
     console.error(`BIF API server crashed: `, ex);
     process.exit(1);
-  })
+  });

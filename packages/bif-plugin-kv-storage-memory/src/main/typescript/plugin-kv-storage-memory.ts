@@ -1,11 +1,10 @@
-import { IPluginKVStorage, PluginAspect } from '@hyperledger-labs/bif-core-api';
+import { IPluginKVStorage, PluginAspect } from "@hyperledger-labs/bif-core-api";
 
 export interface IPluginKVStorageOptions {
   backend: Map<string, any>;
 }
 
 export class PluginKVStorageMemory implements IPluginKVStorage {
-
   constructor(public readonly options: IPluginKVStorageOptions) {
     if (!options) {
       throw new Error(`PluginKVStorageMemory#ctor options falsy.`);

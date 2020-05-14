@@ -1,11 +1,10 @@
-import { Server } from 'http';
-import { Server as SecureServer } from 'https';
+import { Server } from "http";
+import { Server as SecureServer } from "https";
 
 /**
  * Utility class for handling common tasks for NodeJS HTTP/S server objects.
  */
 export class Servers {
-
   /**
    * Returns with a promise that resolves when the server has been shut down. Rejects if anything goes wrong of if the
    * parameters are invalid.
@@ -19,7 +18,11 @@ export class Servers {
     return new Promise<void>((resolve, reject) => {
       server.close((err: any) => {
         if (err) {
-          reject(new Error(`Servers#shutdown() Failed to shut down server: ${err.stack}`));
+          reject(
+            new Error(
+              `Servers#shutdown() Failed to shut down server: ${err.stack}`
+            )
+          );
         } else {
           resolve();
         }

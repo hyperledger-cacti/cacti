@@ -1,11 +1,11 @@
-import Docker, { Container } from 'dockerode';
-import isPortReachable from 'is-port-reachable';
-import Joi from 'joi';
-import tar from 'tar-stream';
-import { EventEmitter } from 'events';
+import Docker, { Container } from "dockerode";
+import isPortReachable from "is-port-reachable";
+import Joi from "joi";
+import tar from "tar-stream";
+import { EventEmitter } from "events";
 import { ITestLedger } from "../i-test-ledger";
-import { Streams } from '../common/streams';
-import { IKeyPair } from '../i-key-pair';
+import { Streams } from "../common/streams";
+import { IKeyPair } from "../i-key-pair";
 
 export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;
@@ -14,19 +14,25 @@ export interface IBesuTestLedgerConstructorOptions {
 }
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageVersion: 'latest',
-  containerImageName: 'petermetz/besu-all-in-one',
+  containerImageVersion: "latest",
+  containerImageName: "petermetz/besu-all-in-one",
   rpcApiHttpPort: 8545,
 });
 
-export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys({
-  containerImageVersion: Joi.string().min(5).required(),
-  containerImageName: Joi.string().min(1).required(),
-  rpcApiHttpPort: Joi.number().integer().positive().min(1024).max(65535).required(),
-});
+export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
+  {
+    containerImageVersion: Joi.string().min(5).required(),
+    containerImageName: Joi.string().min(1).required(),
+    rpcApiHttpPort: Joi.number()
+      .integer()
+      .positive()
+      .min(1024)
+      .max(65535)
+      .required(),
+  }
+);
 
 export class BesuTestLedger implements ITestLedger {
-
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
   public readonly rpcApiHttpPort: number;
@@ -37,16 +43,23 @@ export class BesuTestLedger implements ITestLedger {
     if (!options) {
       throw new TypeError(`BesuTestLedger#ctor options was falsy.`);
     }
-    this.containerImageVersion = options.containerImageVersion || BESU_TEST_LEDGER_DEFAULT_OPTIONS.containerImageVersion;
-    this.containerImageName = options.containerImageName || BESU_TEST_LEDGER_DEFAULT_OPTIONS.containerImageName;
-    this.rpcApiHttpPort = options.rpcApiHttpPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
+    this.containerImageVersion =
+      options.containerImageVersion ||
+      BESU_TEST_LEDGER_DEFAULT_OPTIONS.containerImageVersion;
+    this.containerImageName =
+      options.containerImageName ||
+      BESU_TEST_LEDGER_DEFAULT_OPTIONS.containerImageName;
+    this.rpcApiHttpPort =
+      options.rpcApiHttpPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
 
     this.validateConstructorOptions();
   }
 
   public getContainer(): Container {
     if (!this.container) {
-      throw new Error(`BesuTestLedger#getBesuKeyPair() container wasn't started by this instance yet.`);
+      throw new Error(
+        `BesuTestLedger#getBesuKeyPair() container wasn't started by this instance yet.`
+      );
     } else {
       return this.container;
     }
@@ -62,22 +75,24 @@ export class BesuTestLedger implements ITestLedger {
   }
 
   public async getFileContents(filePath: string): Promise<string> {
-    const response: any = await this.getContainer().getArchive({ path: filePath });
+    const response: any = await this.getContainer().getArchive({
+      path: filePath,
+    });
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
-      let fileContents: string = '';
-      extract.on('entry', async (header: any, stream, next) => {
-        stream.on('error', (err: Error) => {
+      let fileContents: string = "";
+      extract.on("entry", async (header: any, stream, next) => {
+        stream.on("error", (err: Error) => {
           reject(err);
         });
         const chunks: string[] = await Streams.aggregate<string>(stream);
-        fileContents += chunks.join('');
+        fileContents += chunks.join("");
         stream.resume();
         next();
-      })
+      });
 
-      extract.on('finish', () => {
+      extract.on("finish", () => {
         resolve(fileContents);
       });
 
@@ -86,19 +101,18 @@ export class BesuTestLedger implements ITestLedger {
   }
 
   public async getBesuKeyPair(): Promise<IKeyPair> {
-    const publicKey = await this.getFileContents('/opt/besu/keys/key.pub');
-    const privateKey = await this.getFileContents('/opt/besu/keys/key');
+    const publicKey = await this.getFileContents("/opt/besu/keys/key.pub");
+    const privateKey = await this.getFileContents("/opt/besu/keys/key");
     return { publicKey, privateKey };
   }
 
   public async getOrionKeyPair(): Promise<IKeyPair> {
-    const publicKey = await this.getFileContents('/config/orion/nodeKey.pub');
-    const privateKey = await this.getFileContents('/config/orion/nodeKey.key');
+    const publicKey = await this.getFileContents("/config/orion/nodeKey.pub");
+    const privateKey = await this.getFileContents("/config/orion/nodeKey.key");
     return { publicKey, privateKey };
   }
 
   public async start(): Promise<Container> {
-
     const containerNameAndTag = this.getContainerImageName();
 
     if (this.container) {
@@ -110,7 +124,6 @@ export class BesuTestLedger implements ITestLedger {
     await this.pullContainerImage(containerNameAndTag);
 
     return new Promise<Container>((resolve, reject) => {
-
       const eventEmitter: EventEmitter = docker.run(
         containerNameAndTag,
         [],
@@ -118,11 +131,11 @@ export class BesuTestLedger implements ITestLedger {
         {
           ExposedPorts: {
             [`${this.rpcApiHttpPort}/tcp`]: {}, // besu RPC - HTTP
-            '8546/tcp': {}, // besu RPC - WebSocket
-            '8888/tcp': {}, // orion Client Port - HTTP
-            '8080/tcp': {}, // orion Node Port - HTTP
-            '9001/tcp': {}, // supervisord - HTTP
-            '9545/tcp': {}, // besu metrics
+            "8546/tcp": {}, // besu RPC - WebSocket
+            "8888/tcp": {}, // orion Client Port - HTTP
+            "8080/tcp": {}, // orion Node Port - HTTP
+            "9001/tcp": {}, // supervisord - HTTP
+            "9545/tcp": {}, // besu metrics
           },
           Hostconfig: {
             PortBindings: {
@@ -135,8 +148,7 @@ export class BesuTestLedger implements ITestLedger {
             },
           },
         },
-        {
-        },
+        {},
         (err: any) => {
           if (err) {
             reject(err);
@@ -144,7 +156,7 @@ export class BesuTestLedger implements ITestLedger {
         }
       );
 
-      eventEmitter.once('start', async (container: Container) => {
+      eventEmitter.once("start", async (container: Container) => {
         this.container = container;
         // once the container has started, we wait until the the besu RPC API starts listening on the designated port
         // which we determine by continously trying to establish a socket until it actually works
@@ -174,7 +186,11 @@ export class BesuTestLedger implements ITestLedger {
           }
         });
       } else {
-        return reject(new Error(`BesuTestLedger#stop() Container was not running to begin with.`));
+        return reject(
+          new Error(
+            `BesuTestLedger#stop() Container was not running to begin with.`
+          )
+        );
       }
     });
   }
@@ -183,27 +199,41 @@ export class BesuTestLedger implements ITestLedger {
     if (this.container) {
       return this.container.remove();
     } else {
-      return Promise.reject(new Error(`BesuTestLedger#destroy() Container was never created, nothing to destroy.`));
+      return Promise.reject(
+        new Error(
+          `BesuTestLedger#destroy() Container was never created, nothing to destroy.`
+        )
+      );
     }
   }
 
   public async getContainerIpAddress(): Promise<string> {
     const docker = new Docker();
     const containerImageName = this.getContainerImageName();
-    const containerInfos: Docker.ContainerInfo[] = await docker.listContainers({});
+    const containerInfos: Docker.ContainerInfo[] = await docker.listContainers(
+      {}
+    );
 
-    const aContainerInfo = containerInfos.find(ci => ci.Image === containerImageName);
+    const aContainerInfo = containerInfos.find(
+      (ci) => ci.Image === containerImageName
+    );
     if (aContainerInfo) {
       const { NetworkSettings } = aContainerInfo;
       const networkNames: string[] = Object.keys(NetworkSettings.Networks);
       if (networkNames.length < 1) {
-        throw new Error(`BesuTestLedger#getContainerIpAddress() no network found: ${JSON.stringify(NetworkSettings)}`);
+        throw new Error(
+          `BesuTestLedger#getContainerIpAddress() no network found: ${JSON.stringify(
+            NetworkSettings
+          )}`
+        );
       } else {
         // return IP address of container on the first network that we found it connected to. Make this configurable?
         return NetworkSettings.Networks[networkNames[0]].IPAddress;
       }
     } else {
-      throw new Error(`BesuTestLedger#getContainerIpAddress() cannot find container image ${this.containerImageName}`);
+      throw new Error(
+        `BesuTestLedger#getContainerIpAddress() cannot find container image ${this.containerImageName}`
+      );
     }
   }
 
@@ -241,7 +271,9 @@ export class BesuTestLedger implements ITestLedger {
     );
 
     if (validationResult.error) {
-      throw new Error(`BesuTestLedger#ctor ${validationResult.error.annotate()}`)
+      throw new Error(
+        `BesuTestLedger#ctor ${validationResult.error.annotate()}`
+      );
     }
   }
 }

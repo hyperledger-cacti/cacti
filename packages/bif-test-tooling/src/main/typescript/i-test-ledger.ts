@@ -1,4 +1,4 @@
-import { Container } from 'dockerode';
+import { Container } from "dockerode";
 
 export interface ITestLedger {
   start(): Promise<Container>;

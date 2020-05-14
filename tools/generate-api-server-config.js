@@ -1,33 +1,39 @@
-const fs = require('fs');
-const inquirer = require('inquirer');
-const { ConfigService } = require('../packages/bif-cmd-api-server/dist/lib/main/typescript/config/config-service');
+const fs = require("fs");
+const inquirer = require("inquirer");
+const {
+  ConfigService,
+} = require("../packages/bif-cmd-api-server/dist/lib/main/typescript/config/config-service");
 
 const main = async () => {
   const configService = new ConfigService();
   const config = configService.newExampleConfig();
-  const configJson = JSON.stringify(config, null, 4).concat('\n');
+  const configJson = JSON.stringify(config, null, 4).concat("\n");
 
   if (fs.existsSync(config.configFile)) {
     const answers = await inquirer.prompt([
       {
-        name: 'overwritePreviousConfig',
-        type: 'confirm',
+        name: "overwritePreviousConfig",
+        type: "confirm",
         message: `Configuration file ${config.configFile} already exists. Overwrite it? (No)`,
-        default: false
-      }
+        default: false,
+      },
     ]);
     if (answers.overwritePreviousConfig) {
       fs.writeFileSync(config.configFile, configJson);
       console.log(`Written generated config to: ${config.configFile}`);
     } else {
-      console.log(`You opted to not overwrite the previous configuration file at ${config.configFile}, skipping...`);
+      console.log(
+        `You opted to not overwrite the previous configuration file at ${config.configFile}, skipping...`
+      );
     }
   } else {
     fs.writeFileSync(config.configFile, configJson);
     console.log(`Written generated config to: ${config.configFile}`);
   }
   const apiServerCmd = `node ./packages/bif-cmd-api-server/dist/lib/main/typescript/cmd/bif-api.js --config-file=${config.configFile}`;
-  console.log(`You can start the BIF API server with ${config.configFile} by executing this from the project root:`);
+  console.log(
+    `You can start the BIF API server with ${config.configFile} by executing this from the project root:`
+  );
   console.log(apiServerCmd);
 };
 

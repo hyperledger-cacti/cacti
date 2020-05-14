@@ -1,2 +1,2 @@
-export { PluginKeychainMemory } from './plugin-keychain-memory';
-export { PluginFactoryKeychain } from './plugin-factory-keychain';
+export { PluginKeychainMemory } from "./plugin-keychain-memory";
+export { PluginFactoryKeychain } from "./plugin-factory-keychain";
