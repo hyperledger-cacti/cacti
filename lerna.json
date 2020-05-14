@@ -2,5 +2,13 @@
   "packages": [
     "packages/bif-*"
   ],
-  "version": "independent"
+  "version": "fixed",
+  "command": {
+    "version": {
+      "message": "chore(release): publish",
+      "allowBranch": [
+        "release/*"
+      ]
+    }
+  }
 }
