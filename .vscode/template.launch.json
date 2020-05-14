@@ -1,0 +1,56 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "bif-cmd-api-server",
+      "program": "${workspaceFolder}/packages/bif-cmd-api-server/dist/lib/main/typescript/cmd/bif-api.js",
+      "args": [
+        "--public-key=03aa57b5c6506a6e5a2851dcbc14bf2b3d2b9196aecacc946f630eab5203dca8c4",
+        "--private-key=da43d3ce06f7b0eef447ca209c00cf2efdef02a761fb5ba2aaf7fc601ceaf555",
+        "--api-cors-domain-csv=http://editor.swagger.io"
+      ],
+      "outFiles": [
+        "/packages/bif-cmd-api-server/dist/lib/**/*"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "TAP: Current JS Test File",
+      "console": "integratedTerminal",
+      "program": "${workspaceFolder}/${relativeFile}",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--timeout=9999999"
+      ],
+      "outFiles": [
+        "dist/lib/*"
+      ],
+      "env": {}
+    },
+    {
+      "name": "TAP: Current TS Test File",
+      "type": "node",
+      "request": "launch",
+      "protocol": "inspector",
+      "env": {
+        "TS_NODE_PROJECT": "tsconfig.json"
+      },
+      "args": [
+        "${relativeFile}"
+      ],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}"
+    }
+  ]
+}
