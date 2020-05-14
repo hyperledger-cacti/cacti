@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-labs/bif-plugin-kv-storage-memory",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Key/value storage plugin that has an in-memory backend. Only makes sense to use it for local development/demo environments where there is only a single BIF node running in your consortium.",
   "main": "dist/bif-plugin-kv-storage-memory.node.umd.js",
   "mainMinified": "dist/bif-plugin-kv-storage-memory.node.umd.min.js",
@@ -8,8 +8,9 @@
   "browserMinified": "dist/bif-plugin-kv-storage-memory.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/types/main/typescript/index.d.ts",
-  "scripts": {
-  },
+  "files": [
+    "dist/*"
+  ],
   "engines": {
     "node": ">=10",
     "npm": ">=6"
