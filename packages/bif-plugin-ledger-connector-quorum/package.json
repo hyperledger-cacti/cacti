@@ -1,11 +1,11 @@
 {
-  "name": "@hyperledger-labs/bif-core-api",
+  "name": "@hyperledger-labs/bif-plugin-ledger-connector-quorum",
   "version": "0.2.0",
-  "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
-  "main": "dist/bif-core-api.node.umd.js",
-  "mainMinified": "dist/bif-core-api.node.umd.min.js",
-  "browser": "dist/bif-core-api.web.umd.js",
-  "browserMinified": "dist/bif-core-api.web.umd.min.js",
+  "description": "Allows BIF nodes to connect to a Quorum ledger.",
+  "main": "dist/bif-plugin-ledger-connector-quorum.node.umd.js",
+  "mainMinified": "dist/bif-plugin-ledger-connector-quorum.node.umd.min.js",
+  "browser": "dist/bif-plugin-ledger-connector-quorum.web.umd.js",
+  "browserMinified": "dist/bif-plugin-ledger-connector-quorum.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/types/main/typescript/index.d.ts",
   "files": [
@@ -13,6 +13,9 @@
   ],
   "scripts": {
     "tsc": "tsc --project ./tsconfig.json"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "engines": {
     "node": ">=10",
@@ -45,10 +48,15 @@
     "url": "https://github.com/hyperledger-labs/blockchain-integration-framework/issues"
   },
   "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
-  "devDependencies": {
-    "@types/joi": "14.3.4"
-  },
   "dependencies": {
-    "joi": "14.3.1"
+    "@hyperledger-labs/bif-common": "0.2.0",
+    "@hyperledger-labs/bif-core-api": "^0.2.0",
+    "joi": "14.3.1",
+    "web3": "1.2.7"
+  },
+  "devDependencies": {
+    "@hyperledger-labs/bif-common": "0.2.0",
+    "@hyperledger-labs/bif-test-tooling": "0.2.0",
+    "@types/joi": "14.3.4"
   }
 }

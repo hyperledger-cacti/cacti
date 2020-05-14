@@ -12,7 +12,9 @@
   "mainMinified": "dist/bif-core-api.node.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/types/main/typescript/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "tsc": "tsc --project ./tsconfig.json"
+  },
   "engines": {
     "node": ">=10",
     "npm": ">=6"

@@ -11,6 +11,9 @@
   "files": [
     "dist/*"
   ],
+  "scripts": {
+    "tsc": "tsc --project ./tsconfig.json"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -46,6 +49,7 @@
   },
   "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
   "dependencies": {
+    "@hyperledger-labs/bif-common": "0.2.0",
     "@hyperledger-labs/bif-core-api": "^0.2.0",
     "joi": "14.3.1",
     "web3": "1.2.7",

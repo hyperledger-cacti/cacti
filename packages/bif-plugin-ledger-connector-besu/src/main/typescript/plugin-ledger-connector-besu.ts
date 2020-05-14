@@ -10,7 +10,7 @@ export interface ITransactionOptions {
   privateKey?: string;
 }
 
-export class PluginLedgerConnectorBesu implements IPluginLedgerConnector {
+export class PluginLedgerConnectorBesu implements IPluginLedgerConnector<any, any> {
 
   private readonly web3: Web3;
   private readonly web3Eea: IWeb3InstanceExtended;
@@ -33,11 +33,8 @@ export class PluginLedgerConnectorBesu implements IPluginLedgerConnector {
     return contract;
   }
 
-  public async deployContractInternal(options: any): Promise<void> {
-
-    // const contract = this.instantiateContract(contractJsonArtifact);
-
-    const privateKey = options.privateKey.toLowerCase().startsWith('0x') ? options.privateKey.substring(2): options.privateKey; // besu node's private key
+  public async deployContract(options: any): Promise<void> {
+    const privateKey = options.privateKey.toLowerCase().startsWith('0x') ? options.privateKey.substring(2) : options.privateKey; // besu node's private key
     const publicKey = options.publicKey; // orion public key of the sender
     const allOrionPublicKeys: string[] = [options.publicKey]; // all orion public keys of receipients
 
@@ -53,10 +50,6 @@ export class PluginLedgerConnectorBesu implements IPluginLedgerConnector {
 
     const txHash = await this.web3Eea.eea.sendRawTransaction(contractOptions);
     return txHash;
-  }
-
-  public deployContract(): Promise<void> {
-    return this.sendTransaction({});
   }
 
   public async addPublicKey(publicKeyHex: string): Promise<void> {

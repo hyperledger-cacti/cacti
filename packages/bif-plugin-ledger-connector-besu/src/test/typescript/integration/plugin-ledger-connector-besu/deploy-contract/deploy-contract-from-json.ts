@@ -29,7 +29,7 @@ tap.test('deploys contract via .json file', async (assert: any) => {
     contractJsonArtifact: HelloWorldContractJson,
   };
 
-  const out = await connector.deployContractInternal(options);
+  const out = await connector.deployContract(options);
   assert.ok(out);
 
   assert.end();
