@@ -95,17 +95,20 @@ const dataHash = data => {
  */
 const signMsg = async (msg, privKey, targetDLTType) => {
   logger.debug(`Signing for ${targetDLTType}`);
+  let signObj;
   switch (targetDLTType) {
     case 'BESU':
-    case 'QUORUM':
+    case 'QUORUM': {
       // Quorum smart contracts needs specific signature algorithm.
       const hash = web3Utils.sha3(Buffer.from(msg));
       signObj = await web3.eth.accounts.sign(hash, `0x${privKey}`); // REFAC can we sign all message with this?
       return signObj.signature.toString(`hex`);
-    default:
+    }
+    default: {
       const pkey = Buffer.from(privKey, `hex`);
       signObj = secp256k1.sign(Buffer.from(module.exports.dataHash(msg), `hex`), pkey);
       return signObj.signature.toString(`hex`);
+    }
   }
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 const url = require(`url`);
 
 const connectors = `${__dirname}/connectors`;
@@ -105,8 +106,7 @@ class Connector {
    * @param {string} name foreign validator name
    * @return {ForeignValidator} - Foreign Validator object
    */
-  async addForeignValidator(pubKey, name) {
-    // eslint-disable-line
+  async addForeignValidator() {
     throw new TypeError(`Not allow to call 'Connector's addForeignValidator' from child class.`);
   }
 
@@ -117,7 +117,6 @@ class Connector {
    * @return {string} - Token if valid credentials are provided
    */
   async getAccessToken() {
-    // eslint-disable-line
     throw new TypeError(`Not allow to call 'Connector's getAccessToken' from child class.`);
   }
 
@@ -134,8 +133,7 @@ class Connector {
    * @param {MultisigObject} multisig
    * @return {VerifySignatureResponse[]} - Array of Verify Signature Response
    */
-  async verifyMultisig(multisig) {
-    // eslint-disable-line
+  async verifyMultisig() {
     throw new TypeError(`Not allow to call 'Connector's verifyMultisig' from child class.`);
   }
 
@@ -154,8 +152,7 @@ class Connector {
    * @param {string} signature signature
    * @return {VerifySignatureResponse} - Verify Signature Response
    */
-  async verifySignature(message, signature) {
-    // eslint-disable-line
+  async verifySignature() {
     throw new TypeError(`Not allow to call 'Connector's verifySignature' from child class.`);
   }
 }

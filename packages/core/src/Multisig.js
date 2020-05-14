@@ -15,7 +15,7 @@ class Multisig {
     }
   }
 
-  isNonEmptyString(arg) {
+  static isNonEmptyString(arg) {
     return arg && typeof arg === 'string';
   }
 
@@ -25,7 +25,7 @@ class Multisig {
    * @return {string} Formatted Message
    */
   setMsg(msg) {
-    if (!this.isNonEmptyString(msg)) {
+    if (!Multisig.isNonEmptyString(msg)) {
       throw new TypeError('Argument must be a non-empty string');
     }
     this.msg = msg;
@@ -41,7 +41,7 @@ class Multisig {
    * @return {boolean} Verify Signature Result
    */
   verifySignature(pubKey, signedMsg) {
-    if (!this.isNonEmptyString(pubKey) || !this.isNonEmptyString(signedMsg)) {
+    if (!Multisig.isNonEmptyString(pubKey) || !Multisig.isNonEmptyString(signedMsg)) {
       throw new TypeError('Arguments must be public key and signatures as strings');
     }
     return secp256k1.verify(
@@ -61,7 +61,7 @@ class Multisig {
     if (!this.msg) {
       throw new TypeError('Message is not set yet');
     }
-    if (!this.isNonEmptyString(pubKey) && !this.isNonEmptyString(signedMsg)) {
+    if (!Multisig.isNonEmptyString(pubKey) && !Multisig.isNonEmptyString(signedMsg)) {
       throw new TypeError('Arguments must be public key and signatures as strings');
     }
     if (!(pubKey in this.signatures)) {
@@ -78,7 +78,7 @@ class Multisig {
   verifyRequiredSignature(requiredPubKeys) {
     if (!requiredPubKeys || !requiredPubKeys.constructor === Array) {
       throw new Error('Argument must be an array of public keys');
-    };
+    }
     const verifiedSignatures = [];
     requiredPubKeys.forEach(pubKey => {
       let verify = false;
@@ -88,7 +88,6 @@ class Multisig {
       verifiedSignatures.push(verify);
     });
     return verifiedSignatures;
-
   }
 }
 
