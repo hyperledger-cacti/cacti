@@ -8,12 +8,15 @@ import { IPluginKVStorage, PluginFactory } from '@hyperledger-labs/bif-core-api'
 import { CreateConsortiumEndpointV1 } from './consortium/routes/create-consortium-endpoint-v1';
 import { IBifApiServerOptions, ConfigService } from './config/config-service';
 import { BIF_OPEN_API_JSON } from './openapi-spec';
+import { Logger, LoggerProvider } from '@hyperledger-labs/bif-common';
 
 export interface IApiServerConstructorOptions {
   config: Config<IBifApiServerOptions>;
 }
 
 export class ApiServer {
+
+  private readonly log: Logger;
 
   constructor(public readonly options: IApiServerConstructorOptions) {
     if (!options) {
@@ -22,6 +25,7 @@ export class ApiServer {
     if (!options.config) {
       throw new Error(`ApiServer#ctor options.config was falsy`);
     }
+    this.log = LoggerProvider.getOrCreate({ label: 'api-server', level: options.config.get('logLevel') });
   }
 
   async start(): Promise<void> {
@@ -34,7 +38,10 @@ export class ApiServer {
     const app: Express = express();
 
     const cockpitWwwRoot = this.options.config.get('cockpitWwwRoot');
-    app.use(express.static(cockpitWwwRoot));
+    this.log.info(`cockpitWwwRoot: ${cockpitWwwRoot}`);
+    const resolvedWwwRoot = path.resolve(process.cwd(), cockpitWwwRoot);
+    this.log.info(`resolvedWwwRoot: ${resolvedWwwRoot}`);
+    app.use(express.static(resolvedWwwRoot));
 
     const cockpitPort: number = this.options.config.get('cockpitPort');
     const cockpitHost: string = this.options.config.get('cockpitHost');

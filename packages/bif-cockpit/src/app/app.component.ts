@@ -4,6 +4,8 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
+import { LoggerProvider, Logger } from '@hyperledger-labs/bif-common';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -45,11 +47,15 @@ export class AppComponent implements OnInit {
   ];
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
+  private readonly logger: Logger;
+
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar
   ) {
+    this.logger = LoggerProvider.getOrCreate({ label: 'app-component', level: 'debug' });
+    this.logger.info('Initializing app...');
     this.initializeApp();
   }
 
@@ -57,6 +63,7 @@ export class AppComponent implements OnInit {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.logger.info('App initialized OK. Splashscreen was hidden.');
     });
   }
 

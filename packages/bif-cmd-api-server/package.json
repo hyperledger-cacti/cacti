@@ -46,6 +46,7 @@
   "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
   "dependencies": {
     "@hyperledger-labs/bif-cockpit": "0.2.0",
+    "@hyperledger-labs/bif-common": "0.2.0",
     "@hyperledger-labs/bif-core-api": "0.2.0",
     "@hyperledger-labs/bif-plugin-keychain-memory": "0.2.0",
     "@hyperledger-labs/bif-plugin-kv-storage-memory": "0.2.0",

@@ -2,10 +2,12 @@ import { randomBytes } from 'crypto';
 import convict, { Schema, Config, SchemaObj } from 'convict';
 import secp256k1 from 'secp256k1';
 import { v4 as uuidV4 } from 'uuid';
+import { LoggerProvider, Logger } from '@hyperledger-labs/bif-common';
 
 export interface IBifApiServerOptions {
   configFile: string;
   bifNodeId: string;
+  logLevel: string;
   cockpitHost: string;
   cockpitPort: number;
   cockpitWwwRoot: string;
@@ -64,6 +66,14 @@ export class ConfigService {
         env: 'BIF_NODE_ID',
         arg: 'bif-node-id',
       },
+      logLevel: {
+        doc: 'The level at which loggers should be configured. Supported values include the following: ' +
+          'error, warn, info, debug, trace',
+        format: ConfigService.formatNonBlankString,
+        default: 'warn',
+        env: 'LOG_LEVEL',
+        arg: 'log-level',
+      },
       cockpitHost: {
         doc: 'The host to bind the Cockpit webserver to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.',
         format: 'ipaddress',
@@ -83,7 +93,7 @@ export class ConfigService {
         format: '*',
         env: 'COCKPIT_WWW_ROOT',
         arg: 'cockpit-www-root',
-        default: 'node_modules/@hyperledger-labs/bif-cockpit/www/',
+        default: 'packages/bif-cmd-api-server/node_modules/@hyperledger-labs/bif-cockpit/www/',
       },
       apiHost: {
         doc: 'The host to bind the API to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.',
@@ -200,6 +210,7 @@ export class ConfigService {
     return {
       configFile: '.config.json',
       bifNodeId: uuidV4(),
+      logLevel: 'debug',
       publicKey,
       privateKey,
       apiCorsDomainCsv: (schema.apiCorsDomainCsv as SchemaObj).default,
@@ -227,6 +238,9 @@ export class ConfigService {
       }
       ConfigService.config.validate();
       this.validateKeyPairMatch();
+      const level = ConfigService.config.get('logLevel');
+      const logger: Logger = LoggerProvider.getOrCreate({ label: 'config-service', level });
+      logger.info('Configuration validation OK.');
     }
     return ConfigService.config;
   }
