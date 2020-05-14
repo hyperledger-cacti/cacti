@@ -1,11 +1,11 @@
 {
-  "name": "@hyperledger-labs/bif-test-tooling",
+  "name": "@hyperledger-labs/bif-plugin-ledger-connector-besu",
   "version": "0.2.0",
-  "description": "Swiss army knife for test development. Main goal is to make pulling up test/dummy ledgers on the fly for tests easy, especially for test cases that are about simulating clean ledger state or wiped ledger state, etc.",
-  "main": "dist/bif-test-tooling.node.umd.js",
-  "mainMinified": "dist/bif-test-tooling.node.umd.min.js",
-  "browser": "dist/bif-test-tooling.web.umd.js",
-  "browserMinified": "dist/bif-test-tooling.web.umd.min.js",
+  "description": "Allows BIF nodes to connect to a Besu ledger.",
+  "main": "dist/bif-plugin-ledger-connector-besu.node.umd.js",
+  "mainMinified": "dist/bif-plugin-ledger-connector-besu.node.umd.min.js",
+  "browser": "dist/bif-plugin-ledger-connector-besu.web.umd.js",
+  "browserMinified": "dist/bif-plugin-ledger-connector-besu.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/types/main/typescript/index.d.ts",
   "files": [
@@ -46,21 +46,13 @@
   },
   "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
   "dependencies": {
-    "axios": "0.19.2",
-    "dockerode": "3.2.0",
-    "extract-zip": "2.0.0",
-    "fs-extra": "9.0.0",
-    "is-port-reachable": "3.0.0",
+    "@hyperledger-labs/bif-core-api": "^0.2.0",
     "joi": "14.3.1",
-    "loglevel": "1.6.7",
-    "loglevel-plugin-prefix": "0.8.4",
-    "tar-stream": "2.1.2"
+    "web3": "1.2.7",
+    "web3-eea": "0.9.0"
   },
   "devDependencies": {
-    "@types/dockerode": "2.5.28",
-    "@types/extract-zip": "1.6.2",
-    "@types/fs-extra": "8.1.0",
-    "@types/joi": "14.3.4",
-    "@types/tar-stream": "2.1.0"
+    "@hyperledger-labs/bif-test-tooling": "0.2.0",
+    "@types/joi": "14.3.4"
   }
 }

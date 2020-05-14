@@ -1,27 +1,36 @@
 import Docker, { Container } from 'dockerode';
+import isPortReachable from 'is-port-reachable';
 import Joi from 'joi';
+import tar from 'tar-stream';
 import { EventEmitter } from 'events';
 import { ITestLedger } from "../i-test-ledger";
+import { Streams } from '../common/streams';
+import { IKeyPair } from '../i-key-pair';
 
 export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;
   containerImageName?: string;
+  rpcApiHttpPort?: number;
 }
 
 export const DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: 'latest',
   containerImageName: 'petermetz/besu-all-in-one',
+  rpcApiHttpPort: 8545,
 });
 
 export const OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys({
   containerImageVersion: Joi.string().min(5).required(),
   containerImageName: Joi.string().min(1).required(),
+  rpcApiHttpPort: Joi.number().integer().positive().min(1024).max(65535).required(),
 });
 
 export class BesuTestLedger implements ITestLedger {
 
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
+  public readonly rpcApiHttpPort: number;
+
   private container: Container | undefined;
 
   constructor(public readonly options: IBesuTestLedgerConstructorOptions = {}) {
@@ -30,12 +39,62 @@ export class BesuTestLedger implements ITestLedger {
     }
     this.containerImageVersion = options.containerImageVersion || DEFAULT_OPTIONS.containerImageVersion;
     this.containerImageName = options.containerImageName || DEFAULT_OPTIONS.containerImageName;
+    this.rpcApiHttpPort = options.rpcApiHttpPort || DEFAULT_OPTIONS.rpcApiHttpPort;
 
     this.validateConstructorOptions();
   }
 
+  public getContainer(): Container {
+    if (!this.container) {
+      throw new Error(`BesuTestLedger#getBesuKeyPair() container wasn't started by this instance yet.`);
+    } else {
+      return this.container;
+    }
+  }
+
   public getContainerImageName(): string {
     return `${this.containerImageName}:${this.containerImageVersion}`;
+  }
+
+  public async getRpcApiHttpHost(): Promise<string> {
+    const ipAddress: string = await this.getContainerIpAddress();
+    return `http://${ipAddress}:${this.rpcApiHttpPort}`;
+  }
+
+  public async getFileContents(filePath: string): Promise<string> {
+    const response: any = await this.getContainer().getArchive({ path: filePath });
+    const extract: tar.Extract = tar.extract({ autoDestroy: true });
+
+    return new Promise((resolve, reject) => {
+      let fileContents: string = '';
+      extract.on('entry', async (header: any, stream, next) => {
+        stream.on('error', (err: Error) => {
+          reject(err);
+        });
+        const chunks: string[] = await Streams.aggregate<string>(stream);
+        fileContents += chunks.join('');
+        stream.resume();
+        next();
+      })
+
+      extract.on('finish', () => {
+        resolve(fileContents);
+      });
+
+      response.pipe(extract);
+    });
+  }
+
+  public async getBesuKeyPair(): Promise<IKeyPair> {
+    const publicKey = await this.getFileContents('/opt/besu/keys/key.pub');
+    const privateKey = await this.getFileContents('/opt/besu/keys/key');
+    return { publicKey, privateKey };
+  }
+
+  public async getOrionKeyPair(): Promise<IKeyPair> {
+    const publicKey = await this.getFileContents('/config/orion/nodeKey.pub');
+    const privateKey = await this.getFileContents('/config/orion/nodeKey.key');
+    return { publicKey, privateKey };
   }
 
   public async start(): Promise<Container> {
@@ -58,22 +117,22 @@ export class BesuTestLedger implements ITestLedger {
         [],
         {
           ExposedPorts: {
-            '8545/tcp': {},
-            '8546/tcp': {},
-            '8888/tcp': {},
-            '8080/tcp': {},
-            '9001/tcp': {},
-            '9545/tcp': {},
+            [`${this.rpcApiHttpPort}/tcp`]: {}, // besu RPC - HTTP
+            '8546/tcp': {}, // besu RPC - WebSocket
+            '8888/tcp': {}, // orion Client Port - HTTP
+            '8080/tcp': {}, // orion Node Port - HTTP
+            '9001/tcp': {}, // supervisord - HTTP
+            '9545/tcp': {}, // besu metrics
           },
           Hostconfig: {
-            // PortBindings: {
-            //   '8545/tcp': [{ HostPort: '8545', }],
-            //   '8546/tcp': [{ HostPort: '8546', }],
-            //   '8080/tcp': [{ HostPort: '8080', }],
-            //   '8888/tcp': [{ HostPort: '8888', }],
-            //   '9001/tcp': [{ HostPort: '9001', }],
-            //   '9545/tcp': [{ HostPort: '9545', }],
-            // },
+            PortBindings: {
+              // [`${this.rpcApiHttpPort}/tcp`]: [{ HostPort: '8545', }],
+              // '8546/tcp': [{ HostPort: '8546', }],
+              // '8080/tcp': [{ HostPort: '8080', }],
+              // '8888/tcp': [{ HostPort: '8888', }],
+              // '9001/tcp': [{ HostPort: '9001', }],
+              // '9545/tcp': [{ HostPort: '9545', }],
+            },
           },
         },
         {
@@ -85,9 +144,21 @@ export class BesuTestLedger implements ITestLedger {
         }
       );
 
-      eventEmitter.once('start', (container: Container) => {
+      eventEmitter.once('start', async (container: Container) => {
         this.container = container;
-        resolve(container);
+        // once the container has started, we wait until the the besu RPC API starts listening on the designated port
+        // which we determine by continously trying to establish a socket until it actually works
+        const host: string = await this.getContainerIpAddress();
+        try {
+          let reachable: boolean = false;
+          do {
+            reachable = await isPortReachable(this.rpcApiHttpPort, { host });
+            await new Promise((resolve2) => setTimeout(resolve2, 100));
+          } while (!reachable);
+          resolve(container);
+        } catch (ex) {
+          reject(ex);
+        }
       });
     });
   }
@@ -164,6 +235,7 @@ export class BesuTestLedger implements ITestLedger {
       {
         containerImageVersion: this.containerImageVersion,
         containerImageName: this.containerImageName,
+        rpcApiHttpPort: this.rpcApiHttpPort,
       },
       OPTIONS_JOI_SCHEMA
     );
