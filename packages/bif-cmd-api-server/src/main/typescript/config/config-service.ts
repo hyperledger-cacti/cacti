@@ -1,8 +1,11 @@
-import convict, { Schema, Config } from 'convict';
+import { randomBytes } from 'crypto';
+import convict, { Schema, Config, SchemaObj } from 'convict';
 import secp256k1 from 'secp256k1';
+import { v4 as uuidV4 } from 'uuid';
 
 export interface IBifApiServerOptions {
   configFile: string;
+  bifNodeId: string;
   cockpitHost: string;
   cockpitPort: number;
   cockpitWwwRoot: string;
@@ -11,8 +14,12 @@ export interface IBifApiServerOptions {
   apiCorsDomainCsv: string;
   storagePluginPackage: string;
   storagePluginOptionsJson: string;
+  keychainPluginPackage: string;
+  keychainPluginOptionsJson: string;
   publicKey: string;
   privateKey: string;
+  keychainSuffixPublicKey: string;
+  keychainSuffixPrivateKey: string;
 }
 
 export class ConfigService {
@@ -48,6 +55,14 @@ export class ConfigService {
         default: '',
         env: 'CONFIG_FILE',
         arg: 'config-file',
+      },
+      bifNodeId: {
+        doc: 'Identifier of this particular BIF node. Must be unique among the total set of BIF nodes running in any ' +
+          'given BIF deployment. Can be any string of characters such as a UUID or an Int64',
+        format: ConfigService.formatNonBlankString,
+        default: null as any,
+        env: 'BIF_NODE_ID',
+        arg: 'bif-node-id',
       },
       cockpitHost: {
         doc: 'The host to bind the Cockpit webserver to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.',
@@ -94,13 +109,33 @@ export class ConfigService {
       storagePluginPackage: {
         doc: 'The NodeJS package name that will be dynamically imported. ' +
           'You have to make sure that this is installed prior to starting the API server. ' +
-          'Defaults to the in-memory storage plugin that is NOT for production use.',
-        format: '*',
+          'Use "@hyperledger-labs/bif-plugin-kv-storage-memory" here for development' +
+          'or demo environments with only a single node you can use ' +
+          'the built-in stub that stores everything in-memory, un-encrypted:',
+        format: ConfigService.formatNonBlankString,
         env: 'STORAGE_PLUGIN_PACKAGE',
         arg: 'storage-plugin-package',
-        default: '@hyperledger-labs/bif-plugin-kv-storage-memory'
+        default: null as any
       },
       storagePluginOptionsJson: {
+        doc: 'JSON string representing the options object that will be passed in to  the keychain plugin during initialization.',
+        env: 'KEYCHAIN_PLUGIN_OPTIONS_JSON',
+        arg: 'keychain-plugin-options-json',
+        format: '*',
+        default: '{}'
+      },
+      keychainPluginPackage: {
+        doc: 'The NodeJS package name that will be dynamically imported. ' +
+          'You have to make sure that this is installed prior to starting the API server. ' +
+          'Use "@hyperledger-labs/bif-plugin-keychain-memory" here for development' +
+          'or demo environments with only a single node you can use ' +
+          'the built-in stub that stores everything in-memory, un-encrypted:',
+        format: '*',
+        env: 'KEYCHAIN_PLUGIN_PACKAGE',
+        arg: 'keychain-plugin-package',
+        default: null as any
+      },
+      keychainPluginOptionsJson: {
         doc: 'JSON string representing the options object that will be passed in to  the storage plugin during initialization.',
         env: 'STORAGE_PLUGIN_OPTIONS_JSON',
         arg: 'storage-plugin-options-json',
@@ -111,11 +146,7 @@ export class ConfigService {
         doc: 'Public key of this BIF node (the API server)',
         env: 'PUBLIC_KEY',
         arg: 'public-key',
-        format: (val) => {
-          if (typeof val === 'undefined' || val === null || val === '') {
-            throw new Error('must be a non-empty string');
-          }
-        },
+        format: ConfigService.formatNonBlankString,
         default: null as any,
       },
       privateKey: {
@@ -123,13 +154,64 @@ export class ConfigService {
         doc: 'Private key of this BIF node (the API server)',
         env: 'PRIVATE_KEY',
         arg: 'private-key',
-        format: (val) => {
-          if (typeof val === 'undefined' || val === null || val === '') {
-            throw new Error('must be a non-empty string');
-          }
-        },
+        format: ConfigService.formatNonBlankString,
         default: null as any,
+      },
+      keychainSuffixPrivateKey: {
+        doc: 'The key under which to store/retrieve the private key from the keychain of this BIF node (API server)' +
+          'The complete lookup key is constructed from the ${BIF_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.',
+        env: 'KEYCHAIN_SUFFIX_PRIVATE_KEY',
+        arg: 'keychain-suffix-private-key',
+        format: '*',
+        default: 'BIF_NODE_PRIVATE_KEY',
+      },
+      keychainSuffixPublicKey: {
+        doc: 'The key under which to store/retrieve the public key from the keychain of this BIF node (API server)' +
+          'The complete lookup key is constructed from the ${BIF_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.',
+        env: 'KEYCHAIN_SUFFIX_PUBLIC_KEY',
+        arg: 'keychain-suffix-public-key',
+        format: '*',
+        default: 'BIF_NODE_PUBLIC_KEY',
       }
+    };
+  }
+
+  private static formatNonBlankString(value: unknown) {
+    if (typeof value === 'undefined' || value === null || value === '') {
+      throw new Error('must be a non-empty string');
+    }
+  }
+
+  generateExampleConfig(): IBifApiServerOptions {
+    const schema = ConfigService.getConfigSchema();
+
+    // FIXME most of this lowever level crypto code should be in a commons package that's universal
+    let privateKeyBytes
+    do {
+      privateKeyBytes = randomBytes(32)
+    } while (!secp256k1.privateKeyVerify(privateKeyBytes));
+
+    const publicKeyBytes = secp256k1.publicKeyCreate(privateKeyBytes);
+    const privateKey = Buffer.from(privateKeyBytes).toString('hex');
+    const publicKey = Buffer.from(publicKeyBytes).toString('hex');
+
+    return {
+      configFile: '.config.json',
+      bifNodeId: uuidV4(),
+      publicKey,
+      privateKey,
+      apiCorsDomainCsv: (schema.apiCorsDomainCsv as SchemaObj).default,
+      apiHost: (schema.apiHost as SchemaObj).default,
+      apiPort: (schema.apiPort as SchemaObj).default,
+      cockpitHost: (schema.cockpitHost as SchemaObj).default,
+      cockpitPort: (schema.cockpitPort as SchemaObj).default,
+      cockpitWwwRoot: (schema.cockpitWwwRoot as SchemaObj).default,
+      keychainPluginPackage: '@hyperledger-labs/bif-plugin-keychain-memory',
+      keychainPluginOptionsJson: (schema.keychainPluginOptionsJson as SchemaObj).default,
+      keychainSuffixPublicKey: (schema.keychainSuffixPublicKey as SchemaObj).default,
+      keychainSuffixPrivateKey: (schema.keychainSuffixPrivateKey as SchemaObj).default,
+      storagePluginPackage: '@hyperledger-labs/bif-plugin-kv-storage-memory',
+      storagePluginOptionsJson: (schema.storagePluginOptionsJson as SchemaObj).default,
     };
   }
 
@@ -142,15 +224,27 @@ export class ConfigService {
         ConfigService.config.loadFile(configFilePath);
       }
       ConfigService.config.validate();
-      const privateKey = ConfigService.config.get('privateKey');
-      const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, 'hex'));
-      const publicKey = ConfigService.config.get('publicKey');
-      const expectedPublicKeyBytes = secp256k1.publicKeyCreate(privateKeyBytes);
-      const expectedPublicKey = Buffer.from(expectedPublicKeyBytes).toString('hex');
-      if (publicKey !== expectedPublicKey) {
-        throw new Error(`Public key does not match private key. Configured=${publicKey} Expected=${expectedPublicKey}`);
-      }
+      this.validateKeyPairMatch();
     }
     return ConfigService.config;
   }
+
+  /**
+   * Validation that prevents operators from mistakenly deploying a public key
+   * that they may not have the private key for or vica versa.
+   *
+   * @throws If the private key and the public key are not part of the same key pair.
+   */
+  validateKeyPairMatch(): void {
+    // FIXME most of this lowever level crypto code should be in a commons package that's universal
+    const privateKey = ConfigService.config.get('privateKey');
+    const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, 'hex'));
+    const publicKey = ConfigService.config.get('publicKey');
+    const expectedPublicKeyBytes = secp256k1.publicKeyCreate(privateKeyBytes);
+    const expectedPublicKey = Buffer.from(expectedPublicKeyBytes).toString('hex');
+    if (publicKey !== expectedPublicKey) {
+      throw new Error(`Public key does not match private key. Configured=${publicKey} Expected=${expectedPublicKey}`);
+    }
+  }
+
 }

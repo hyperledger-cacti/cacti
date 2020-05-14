@@ -1,3 +1,4 @@
+.config.json
 .nyc_output/
 dist/
 .DS_Store
