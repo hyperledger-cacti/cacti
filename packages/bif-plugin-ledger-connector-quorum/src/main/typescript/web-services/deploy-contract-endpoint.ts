@@ -23,10 +23,10 @@ export class DeployContractEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public handleRequest(req: any, res: any, next: any): void {
+  public async handleRequest(req: any, res: any, next: any): Promise<void> {
     const options: IQuorumDeployContractOptions = req.body;
-    this.options.plugin.deployContract(options);
-    res.json({ success: true });
+    const data = await this.options.plugin.deployContract(options);
+    res.json({ success: true, data });
   }
 
   // FIXME: this should actually validate the request?
