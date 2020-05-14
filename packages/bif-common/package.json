@@ -51,7 +51,8 @@
   "dependencies": {
     "joi": "14.3.1",
     "loglevel": "1.6.7",
-    "loglevel-plugin-prefix": "0.8.4"
+    "loglevel-plugin-prefix": "0.8.4",
+    "typescript-optional": "2.0.1"
   },
   "devDependencies": {
     "@types/joi": "14.3.4"

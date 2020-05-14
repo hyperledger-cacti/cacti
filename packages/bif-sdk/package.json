@@ -51,7 +51,8 @@
   "dependencies": {
     "@hyperledger-labs/bif-common": "0.2.0",
     "axios": "0.19.2",
-    "joi": "14.3.1"
+    "joi": "14.3.1",
+    "typescript-optional": "2.0.1"
   },
   "devDependencies": {
     "@types/joi": "14.3.4"

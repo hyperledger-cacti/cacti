@@ -50,7 +50,8 @@
   "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
   "dependencies": {
     "@hyperledger-labs/bif-core-api": "^0.2.0",
-    "joi": "14.3.1"
+    "joi": "14.3.1",
+    "typescript-optional": "2.0.1"
   },
   "devDependencies": {
     "@types/joi": "14.3.4"
