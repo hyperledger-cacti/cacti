@@ -4,7 +4,7 @@ const { ConfigService } = require('../packages/bif-cmd-api-server/dist/lib/main/
 
 const main = async () => {
   const configService = new ConfigService();
-  const config = configService.generateExampleConfig();
+  const config = configService.newExampleConfig();
   const configJson = JSON.stringify(config, null, 4).concat('\n');
 
   if (fs.existsSync(config.configFile)) {
