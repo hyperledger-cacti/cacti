@@ -1,9 +1,10 @@
-import { IPluginLedgerConnector } from '@hyperledger-labs/bif-core-api';
+import { IPluginLedgerConnector, IWebServiceEndpoint, IPluginWebService, PluginAspect } from '@hyperledger-labs/bif-core-api';
 import { Logger, LoggerProvider } from '@hyperledger-labs/bif-common';
 
 import Web3 from 'web3';
 import { Contract, ContractSendMethod, ContractOptions, DeployOptions, SendOptions } from 'web3-eth-contract/types/index';
 import { PromiEvent } from 'web3-core/types/index';
+import { DeployContractEndpoint } from './web-services/deploy-contract-endpoint';
 
 export interface IPluginLedgerConnectorQuorumOptions {
   rpcApiHttpHost: string;
@@ -25,7 +26,7 @@ export interface IQuorumDeployContractOptions {
   gasPrice?: number;
 }
 
-export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, Contract> {
+export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, Contract>, IPluginWebService {
 
   private readonly web3: Web3;
   private readonly log: Logger;
@@ -37,6 +38,24 @@ export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, 
     const web3Provider = new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
     this.web3 = new Web3(web3Provider);
     this.log = LoggerProvider.getOrCreate({ label: 'plugin-ledger-connector-quorum', level: 'trace' })
+  }
+
+  public installWebService(expressApp: any): IWebServiceEndpoint[] {
+    const endpoints: IWebServiceEndpoint[] = [];
+    {
+      const endpoint: IWebServiceEndpoint = new DeployContractEndpoint({ path: '/deploy-contract', plugin: this });
+      expressApp.use(endpoint.getPath(), endpoint.getExpressRequestHandler());
+      endpoints.push(endpoint);
+    }
+    return endpoints;
+  }
+
+  public getId(): string {
+    return `@hyperledger/cactus-plugin-ledger-connector-quorum`;
+  }
+
+  public getAspect(): PluginAspect {
+    return PluginAspect.LEDGER_CONNECTOR
   }
 
   public async sendTransaction(options: ITransactionOptions): Promise<any> {

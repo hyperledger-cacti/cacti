@@ -194,7 +194,43 @@ export class ConfigService {
     }
   }
 
-  generateExampleConfig(): IBifApiServerOptions {
+  /**
+   * Remaps the example config returned by `newExampleConfig()` into a similar object whose keys are the designated
+   * environment variable names. As an example it returns something like this:
+   *
+   * ```json
+   * {
+   *   "HTTP_PORT": "3000"
+   * }
+   * ```
+   *
+   * Where the output of `newExampleConfig()` would be something like this (example)
+   *
+   * ```json
+   * {
+   *   "httpPort": "3000"
+   * }
+   * ```
+   */
+  public newExampleConfigEnv(bifApiServerOptions?: IBifApiServerOptions): { [key: string]: string } {
+    bifApiServerOptions = bifApiServerOptions || this.newExampleConfig();
+    const configSchema: any = ConfigService.getConfigSchema();
+    return Object
+      .entries(bifApiServerOptions)
+      .reduce((acc: any, [key, value]) => {
+        const schemaObj: any = configSchema[key];
+        acc[schemaObj.env] = value;
+        return acc;
+      }, {});
+  }
+
+  public newExampleConfigConvict(bifApiServerOptions?: IBifApiServerOptions): Config<IBifApiServerOptions> {
+    bifApiServerOptions = bifApiServerOptions || this.newExampleConfig();
+    const env = this.newExampleConfigEnv(bifApiServerOptions);
+    return this.getOrCreate({ env });
+  }
+
+  public newExampleConfig(): IBifApiServerOptions {
     const schema = ConfigService.getConfigSchema();
 
     // FIXME most of this lowever level crypto code should be in a commons package that's universal
@@ -228,10 +264,10 @@ export class ConfigService {
     };
   }
 
-  getOrCreate(): Config<IBifApiServerOptions> {
+  getOrCreate(options?: { env?: any, args?: string[] }): Config<IBifApiServerOptions> {
     if (!ConfigService.config) {
       const schema: Schema<IBifApiServerOptions> = ConfigService.getConfigSchema();
-      ConfigService.config = convict(schema);
+      ConfigService.config = (convict as any)(schema, options);
       if (ConfigService.config.get('configFile')) {
         const configFilePath = ConfigService.config.get('configFile');
         ConfigService.config.loadFile(configFilePath);

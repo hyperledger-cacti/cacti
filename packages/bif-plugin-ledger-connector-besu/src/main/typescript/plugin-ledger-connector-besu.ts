@@ -1,4 +1,4 @@
-import { IPluginLedgerConnector } from '@hyperledger-labs/bif-core-api';
+import { IPluginLedgerConnector, PluginAspect } from '@hyperledger-labs/bif-core-api';
 import Web3 from 'web3';
 import EEAClient, { IWeb3InstanceExtended } from 'web3-eea';
 
@@ -22,6 +22,14 @@ export class PluginLedgerConnectorBesu implements IPluginLedgerConnector<any, an
     const web3Provider = new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
     this.web3 = new Web3(web3Provider);
     this.web3Eea = EEAClient(this.web3, 2018);
+  }
+
+  public getId(): string {
+    return `@hyperledger/cactus-plugin-ledger-connectur-besu`;
+  }
+
+  public getAspect(): PluginAspect {
+    return PluginAspect.LEDGER_CONNECTOR;
   }
 
   public async sendTransaction(options: ITransactionOptions): Promise<any> {

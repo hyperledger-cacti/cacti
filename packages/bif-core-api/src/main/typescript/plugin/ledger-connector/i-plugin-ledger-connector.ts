@@ -1,8 +1,9 @@
+import { ICactusPlugin } from "../i-cactus-plugin";
 
 /**
  * Common interface to be implemented by plugins which are implementing the connection to ledgers.
  */
-export interface IPluginLedgerConnector<T,K> {
+export interface IPluginLedgerConnector<T, K> extends ICactusPlugin {
 
     /**
      * Deploys the BIF build-in smart contract written for this ledger to manage the validator's public keys.
