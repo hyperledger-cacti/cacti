@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint no-use-before-define: ["error", { "variables": false }] */
 const zmq = require(`zeromq`);
 const log4js = require(`log4js`);
@@ -112,10 +113,11 @@ class Validator {
 
     const maxTries = 25;
     let didSucceed = false;
-    let tryIndex = 0;
+    let tryIndex = 1;
     let lastError;
     const tryDelayMs = 5000;
-    while (++tryIndex < maxTries && !didSucceed) {
+    while (tryIndex < maxTries && !didSucceed) {
+      tryIndex += 1;
       try {
         logger.debug(`Calling attemptToBecomeLeader() ${maxTries}/${tryIndex}`);
         await this.attemptToBecomeLeader(theLease);
@@ -157,7 +159,7 @@ class Validator {
 
   attemptToBecomeLeader(theLease) {
     if (this.isCurrentNodeLeader()) {
-      return;
+      return Promise.resolve();
     }
     return this.etcdClient
       .if(BIF_LEADER, 'Lease', '==', 0)
@@ -174,8 +176,8 @@ class Validator {
           // https://mixer.github.io/etcd3/interfaces/rpc_.itxnresponse.html
           const { responses } = txnResponse;
           const [getBifLeaderResponse] = responses;
-          const { response_range } = getBifLeaderResponse;
-          const { kvs } = response_range;
+          const { response_range: responseRange } = getBifLeaderResponse;
+          const { kvs } = responseRange;
           const [newLeaderNodeInfoEntry] = kvs;
           const { value: newLeaderNodeInfoBuffer } = newLeaderNodeInfoEntry;
           const newLeaderNodeInfoJson = newLeaderNodeInfoBuffer.toString('utf8');
