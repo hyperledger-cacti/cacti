@@ -1,7 +1,7 @@
 {
-  "name": "@hyperledger-labs/bif-plugin-kv-storage-memory",
+  "name": "@hyperledger-labs/bif-plugin-keychain-memory",
   "version": "0.2.0",
-  "description": "Key/value storage plugin that has an in-memory backend. Only makes sense to use it for local development/demo environments where there is only a single BIF node running in your consortium.",
+  "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing.",
   "main": "dist/bif-plugin-kv-storage-memory.node.umd.js",
   "mainMinified": "dist/bif-plugin-kv-storage-memory.node.umd.min.js",
   "browser": "dist/bif-plugin-kv-storage-memory.web.umd.js",
@@ -11,6 +11,9 @@
   "files": [
     "dist/*"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=10",
     "npm": ">=6"
