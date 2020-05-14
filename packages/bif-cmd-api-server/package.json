@@ -59,23 +59,5 @@
     "node-fetch": "^3.0.0-beta.4",
     "secp256k1": "^4.0.0",
     "sha3": "^2.1.2"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog",
-      "maxHeaderWidth": 72
-    }
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "header-max-length": [
-        0,
-        "always",
-        72
-      ]
-    }
   }
 }
