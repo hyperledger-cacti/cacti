@@ -25,7 +25,6 @@
     "commit": "git-cz",
     "setup": "lerna exec --stream --ignore '*/*cockpit' -- rm -rf node_modules package-lock.json",
     "lint": "lerna exec --stream --ignore '*/*cockpit' -- cross-env DEBUG= tslint --project tsconfig.json",
-    "pretest": "npm run build",
     "test": "lerna exec --stream --ignore '*/*cockpit' -- tap --timeout=600 src/test/typescript/unit/",
     "test:bif-test-tooling": "lerna exec --stream --scope '*/*test-tooling' -- tap --timeout=600 src/test/typescript/integration/",
     "test-coverage": "lerna exec --stream --ignore '*/*cockpit' -- tap --timeout=600 src/test/typescript/unit/ --cov",
