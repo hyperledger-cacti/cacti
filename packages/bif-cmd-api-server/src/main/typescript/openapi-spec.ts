@@ -123,3 +123,12 @@ export const BIF_OPEN_API_JSON: OpenAPI.OpenAPIV3.Document = {
     }
   }
 };
+
+export async function exportToFileSystemAsJson(): Promise<void> {
+  const fs = await import('fs');
+  const destination = process.argv[2] || './bif-openapi-spec.json';
+
+  // tslint:disable-next-line: no-console
+  console.log(`OpenApiSpec#exportToFileSystemAsJson() destination=${destination}`);
+  fs.writeFileSync(destination, JSON.stringify(BIF_OPEN_API_JSON, null, 4));
+};
