@@ -17,7 +17,7 @@ const main = async () => {
   } else {
     const configService = new ConfigService();
     const config = configService.getOrCreate();
-    const apiServer = new ApiServer({ config });
+    const apiServer = new ApiServer({ config, plugins: [] });
     await apiServer.start();
   }
 };

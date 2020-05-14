@@ -1,10 +1,11 @@
-import { IPluginKVStorage } from '@hyperledger-labs/bif-core-api';
+import { IPluginKVStorage, PluginAspect } from '@hyperledger-labs/bif-core-api';
 
 export interface IPluginKVStorageOptions {
   backend: Map<string, any>;
 }
 
 export class PluginKVStorageMemory implements IPluginKVStorage {
+
   constructor(public readonly options: IPluginKVStorageOptions) {
     if (!options) {
       throw new Error(`PluginKVStorageMemory#ctor options falsy.`);
@@ -12,6 +13,14 @@ export class PluginKVStorageMemory implements IPluginKVStorage {
     if (!options.backend) {
       options.backend = new Map();
     }
+  }
+
+  public getId(): string {
+    return `@hyperledger/cactus-plugin-kv-storage-memory`;
+  }
+
+  public getAspect(): PluginAspect {
+    return PluginAspect.KV_STORAGE;
   }
 
   async get<T>(key: string): Promise<T> {

@@ -1,10 +1,11 @@
-import { IPluginKeychain } from '@hyperledger-labs/bif-core-api';
+import { IPluginKeychain, PluginAspect } from '@hyperledger-labs/bif-core-api';
 
 export interface IPluginKeychainOptions {
   backend: Map<string, any>;
 }
 
 export class PluginKeychainMemory implements IPluginKeychain {
+
   constructor(public readonly options: IPluginKeychainOptions) {
     if (!options) {
       throw new Error(`PluginKeychainMemory#ctor options falsy.`);
@@ -12,6 +13,14 @@ export class PluginKeychainMemory implements IPluginKeychain {
     if (!options.backend) {
       options.backend = new Map();
     }
+  }
+
+  public getId(): string {
+    return `@hyperledger/cactus-plugin-keychain-memory`;
+  }
+
+  public getAspect(): PluginAspect {
+    return PluginAspect.KEYCHAIN;
   }
 
   async rotateEncryptionKeys(): Promise<void> {
