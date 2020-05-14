@@ -35,24 +35,25 @@ export class CreateConsortiumEndpointV1 {
     const consortium: IConsortium = req.body;
     const idAlreadyExists = await this.options.storage.has(consortium.id);
     if (idAlreadyExists) {
-      res.json({ success: false, message: `Consortium with ID ${consortium.id} already exists.` });
       res.status(400);
+      res.json({ success: false, message: `Consortium with ID ${consortium.id} already exists.` });
+    } else {
+      // FIXME: We need a library handling the crypto, how about NodeJS bindings for Ursa?
+      const privateKey = this.options.config.get('privateKey');
+      const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, 'hex'));
+      const consortiumJson: string = JSON.stringify(consortium);
+      const consortiumBytesHash = Uint8Array.from(keccak256.array(consortiumJson));
+      const signatureWrapper = secp256k1.ecdsaSign(consortiumBytesHash, privateKeyBytes);
+      const signature = Buffer.from(signatureWrapper.signature).toString('hex');
+      const consortiumWrapper: IConsortiumWrapper = {
+        signature,
+        consortiumJson,
+      };
+      const wrapperJson = JSON.stringify(consortiumWrapper);
+      // tslint:disable-next-line: no-console
+      await this.options.storage.set(consortium.id, wrapperJson);
+      res.status(201);
+      res.json({ success: true, consortiumWrapper });
     }
-    // FIXME: We need a library handling the crypto, how about NodeJS bindings for Ursa?
-    const privateKey = this.options.config.get('privateKey');
-    const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, 'hex'));
-    const consortiumJson: string = JSON.stringify(consortium);
-    const consortiumBytesHash = Uint8Array.from(keccak256.array(consortiumJson));
-    const signatureWrapper = secp256k1.ecdsaSign(consortiumBytesHash, privateKeyBytes);
-    const signature = Buffer.from(signatureWrapper.signature).toString('hex');
-    const consortiumWrapper: IConsortiumWrapper = {
-      signature,
-      consortiumJson,
-    };
-    const wrapperJson = JSON.stringify(consortiumWrapper);
-    // tslint:disable-next-line: no-console
-    await this.options.storage.set(consortium.id, wrapperJson);
-    res.json({ success: true, consortiumWrapper });
-    res.status(201);
   }
 }

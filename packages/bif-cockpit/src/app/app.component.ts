@@ -5,6 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { LoggerProvider, Logger } from '@hyperledger-labs/bif-common';
+import { DefaultApi, Configuration } from '@hyperledger-labs/bif-sdk';
 
 @Component({
   selector: 'app-root',
@@ -72,5 +73,22 @@ export class AppComponent implements OnInit {
     if (path !== undefined) {
       this.selectedIndex = this.appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
     }
+    this.testApi();
+  }
+
+  async testApi(): Promise<void> {
+    const BIF_API_HOST = 'http://localhost:4000';
+    const configuration = new Configuration({ basePath: BIF_API_HOST,});
+    const api = new DefaultApi(configuration);
+    const response = await api.apiV1ConsortiumPost({
+      configurationEndpoint: 'domain-and-an-http-endpoint',
+      id: 'asdf',
+      name: 'asdf',
+      bifNodes: [
+        {
+          host: 'BIF-NODE-HOST-1', publicKey: 'FAKE-PUBLIC-KEY'
+        }
+      ]
+    });
   }
 }
