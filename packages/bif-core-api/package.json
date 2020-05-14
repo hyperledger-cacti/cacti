@@ -41,5 +41,11 @@
   "bugs": {
     "url": "https://github.com/hyperledger-labs/blockchain-integration-framework/issues"
   },
-  "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme"
+  "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
+  "devDependencies": {
+    "@types/joi": "14.3.4"
+  },
+  "dependencies": {
+    "joi": "14.3.1"
+  }
 }

@@ -46,6 +46,10 @@
   },
   "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
   "dependencies": {
-    "@hyperledger-labs/bif-core-api": "^0.2.0"
+    "@hyperledger-labs/bif-core-api": "^0.2.0",
+    "joi": "14.3.1"
+  },
+  "devDependencies": {
+    "@types/joi": "14.3.4"
   }
 }
