@@ -2,12 +2,12 @@
 /**
  * Common interface to be implemented by plugins which are implementing the connection to ledgers.
  */
-export interface IPluginLedgerConnector {
+export interface IPluginLedgerConnector<T,K> {
 
     /**
      * Deploys the BIF build-in smart contract written for this ledger to manage the validator's public keys.
      */
-    deployContract(): Promise<void>;
+    deployContract(options?: T): Promise<K>;
 
     /**
      * Adds the public key to the ledger state.

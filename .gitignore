@@ -6,6 +6,7 @@ node_modules/
 docs/main
 logs/
 jspm_packages/
+generated-sources/
 
 # Optional npm cache directory
 .npm

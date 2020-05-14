@@ -11,6 +11,9 @@
   "files": [
     "dist/*"
   ],
+  "scripts": {
+    "tsc": "tsc --project ./tsconfig.json"
+  },
   "engines": {
     "node": ">=10",
     "npm": ">=6"

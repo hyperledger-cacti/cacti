@@ -4,9 +4,10 @@
   "scripts": {
     "configure": "lerna clean --yes && lerna bootstrap && npm run build && node ./tools/generate-api-server-config.js",
     "start:api-server": "node ./packages/bif-cmd-api-server/dist/lib/main/typescript/cmd/bif-api.js --config-file=.config.json",
-    "pregenerate-sdk": "ts-node -e 'import(\"./packages/bif-cmd-api-server/src/main/typescript/openapi-spec\").then((x) => x.exportToFileSystemAsJson());'",
+    "export-open-api-spec": "ts-node -e 'import(\"./packages/bif-cmd-api-server/src/main/typescript/openapi-spec\").then((x) => x.exportToFileSystemAsJson());'",
+    "pregenerate-sdk": "npm-run-all export-open-api-spec",
     "generate-sdk": "openapi-generator generate --input-spec bif-openapi-spec.json -g typescript-axios -o packages/bif-sdk/src/main/typescript/generated/openapi/typescript-axios/",
-    "tsc": "lerna exec --stream --ignore '*/*cockpit' -- tsc --project ./tsconfig.json",
+    "tsc": "lerna run tsc",
     "clean": "lerna exec --stream --ignore '*/*cockpit' -- del-cli dist/** && del-cli packages/bif-sdk/src/main/typescript/generated/openapi/typescript-axios/*",
     "build": "npm-run-all build:backend build:frontend",
     "build:frontend": "lerna exec --stream --scope '*/*cockpit' -- ng build --prod",
