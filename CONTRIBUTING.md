@@ -27,12 +27,21 @@ To protect the Hyperledger Cactus source code, GitHub pull requests are accepted
 1. Initiate a pull request from your fork to the base repository
 1. Await CI, DCO & linting quality checks, as well as any feedback from reviewers
 
-### Adding a new dependency to one of the packages:
+### Adding a new public npm dependency to one of the packages:
 
 For example web3 can be added as a dependency to the besu ledger connector plugin's package this way:
 
 ```sh
 npx lerna add web3@latest --scope '*/*plugin-ledger-connector-besu' --exact # [--dev] [--peer]
+npx lerna add is-port-reachable --scope '*/*test-tooling' --exact # [--dev] [--peer]
 ```
 
 If you are adding a development dependency you can use the `--dev` option and `--peer` for a peer dependency.
+
+### Adding a sibling package npm dependency to one of the packages:
+
+For example the `bif-test-tooling` can be added as a dev dependency to the besu ledger connector plugin's package this way:
+
+```sh
+npx lerna add @hyperledger-labs/bif-test-tooling --scope '*/*plugin-ledger-connector-besu' --exact --dev
+```

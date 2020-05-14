@@ -60,5 +60,6 @@ module.exports = {
     globalObject: 'this',
   },
   externals: {
+    'swarm-js': 'swarm-js'
   },
 };
