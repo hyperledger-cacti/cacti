@@ -5,6 +5,6 @@ export interface IPluginWebService extends ICactusPlugin {
   installWebService(expressApp: any): IWebServiceEndpoint[];
 }
 
-export function isIPluginWebService(pluginInstance: IPluginWebService): pluginInstance is IPluginWebService {
+export function isIPluginWebService(pluginInstance: any): pluginInstance is IPluginWebService {
   return typeof pluginInstance.installWebService === 'function';
 }

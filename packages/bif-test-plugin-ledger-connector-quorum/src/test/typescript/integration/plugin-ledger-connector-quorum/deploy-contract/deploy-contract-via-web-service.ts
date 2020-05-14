@@ -1,5 +1,6 @@
 // tslint:disable-next-line: no-var-requires
 const tap = require('tap');
+import axios, {AxiosPromise, AxiosInstance} from 'axios';
 import { QuorumTestLedger, IQuorumGenesisOptions, IAccount } from '@hyperledger-labs/bif-test-tooling';
 import HelloWorldContractJson from '../../../../solidity/hello-world-contract/HelloWorld.json';
 import { Logger, LoggerProvider } from '@hyperledger-labs/bif-common';
@@ -13,6 +14,16 @@ const log: Logger = LoggerProvider.getOrCreate({ label: 'test-deploy-contract-vi
 
 tap.test('pulls up API server and deploys contract via REST API', async (assert: any) => {
 
+  // 1. Instantiate a ledger object
+  const quorumTestLedger = new QuorumTestLedger({ containerImageVersion: '1.0.0' });
+  assert.tearDown(() => quorumTestLedger.stop());
+  assert.tearDown(() => quorumTestLedger.destroy());
+  // 2. Start the actual ledger
+  await quorumTestLedger.start();
+
+  // 3. Gather parameteres needed to run an embedded ApiServer which can connect to/interact with said ledger
+  const rpcApiHttpHost = await quorumTestLedger.getRpcApiHttpHost();
+
   const configService = new ConfigService();
   const bifApiServerOptions: IBifApiServerOptions = configService.newExampleConfig();
   bifApiServerOptions.configFile = '';
@@ -20,26 +31,21 @@ tap.test('pulls up API server and deploys contract via REST API', async (assert:
   bifApiServerOptions.apiPort = 0;
   const config = configService.newExampleConfigConvict(bifApiServerOptions);
   const plugins: ICactusPlugin[] = [];
+
   const kvStoragePlugin = new PluginKVStorageMemory({ backend: new Map() });
-  plugins.push(kvStoragePlugin)
+  plugins.push(kvStoragePlugin);
+
+  const ledgerConnectorQuorum = new PluginLedgerConnectorQuorum({ rpcApiHttpHost });
+  plugins.push(ledgerConnectorQuorum);
+
   const apiServer = new ApiServer({ config, plugins });
+  assert.tearDown(() => apiServer.shutdown());
+
+  // 4. Start the API server which now is connected to the quorum ledger
   const out = await apiServer.start();
   log.debug(`ApiServer.started OK:`, out);
 
-  const quorumTestLedger = new QuorumTestLedger({ containerImageVersion: '1.0.0' });
-  await quorumTestLedger.start();
-
-  assert.tearDown(async () => {
-    log.debug(`Starting teardown...`);
-    await quorumTestLedger.stop();
-    log.debug(`Stopped container OK.`);
-    await quorumTestLedger.destroy();
-    log.debug(`Destroyed container OK.`);
-    await apiServer.shutdown();
-    log.debug(`ApiServer shut down OK.`);
-  });
-
-  const rpcApiHttpHost = await quorumTestLedger.getRpcApiHttpHost();
+  // 5. Find a high net worth account in the genesis object of the quorum ledger
   const quorumGenesisOptions: IQuorumGenesisOptions = await quorumTestLedger.getGenesisJsObject();
   assert.ok(quorumGenesisOptions);
   assert.ok(quorumGenesisOptions.alloc);
@@ -51,32 +57,16 @@ tap.test('pulls up API server and deploys contract via REST API', async (assert:
   });
   const [firstHighNetWorthAccount] = highNetWorthAccounts;
 
-  const factory = new PluginFactoryLedgerConnector();
-  const connector: PluginLedgerConnectorQuorum = await factory.create({ rpcApiHttpHost });
-
-  const options: IQuorumDeployContractOptions = {
-    ethAccountUnlockPassword: '',
-    fromAddress: firstHighNetWorthAccount,
-    contractJsonArtifact: HelloWorldContractJson,
-  };
-
-  const contract: Web3EthContract = await connector.deployContract(options);
-  assert.ok(contract);
-
-  const contractMethod = contract.methods.sayHello();
-  assert.ok(contractMethod);
-
-  const callResponse = await contractMethod.call({ from: firstHighNetWorthAccount });
-  log.debug(`Got message from smart contract method:`, { callResponse });
-  assert.ok(callResponse);
-
+  // 6. Instantiate the SDK dynamically with whatever port the API server ended up bound to (port 0)
   const httpServer = apiServer.getHttpServerApi();
-  // AddressInfo={ address: string, family: string, port: number };
   const addressInfo: any  = httpServer?.address();
   log.debug(`AddressInfo: `, addressInfo);
-  const BIF_API_HOST = `http://${addressInfo.address}:${addressInfo.port}`;
-  const configuration = new Configuration({ basePath: BIF_API_HOST, });
+  const CACTUS_API_HOST = `http://${addressInfo.address}:${addressInfo.port}`;
+
+  const configuration = new Configuration({ basePath: CACTUS_API_HOST, });
   const api = new DefaultApi(configuration);
+
+  // 7. Issue an API call to the API server via the SDK verifying that the SDK and the API server both work
   const response = await api.apiV1ConsortiumPost({
     configurationEndpoint: 'domain-and-an-http-endpoint',
     id: 'asdf',
@@ -90,6 +80,18 @@ tap.test('pulls up API server and deploys contract via REST API', async (assert:
   assert.ok(response);
   assert.ok(response.status > 199 && response.status < 300);
 
+  // 8. Assemble request to invoke the deploy contract method of the quorum ledger connector plugin via the REST API
+  const bodyObject = {
+    ethAccountUnlockPassword: '',
+    fromAddress: firstHighNetWorthAccount,
+    contractJsonArtifact: HelloWorldContractJson,
+  };
+  const pluginId = ledgerConnectorQuorum.getId();
+  const url = `${CACTUS_API_HOST}/api/v1/plugins/${pluginId}/contract/deploy`;
+  // 9. Deploy smart contract by issuing REST API call
+  // TODO: Make this part of the SDK so that manual request assembly is not required. Should plugins have their own SDK?
+  const response2 = await axios.post(url, bodyObject, {  });
+  assert.ok(response2, 'Response for contract deployment is truthy');
+  assert.ok(response2.status > 199 && response.status < 300, 'Response status code for contract deployment is 2xx');
   assert.end();
-  log.debug('Assertion ended OK.');
 });

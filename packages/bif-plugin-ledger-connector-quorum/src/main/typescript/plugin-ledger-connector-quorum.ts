@@ -35,6 +35,9 @@ export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, 
     if (!options) {
       throw new Error(`PluginLedgerConnectorQuorum#ctor options falsy.`);
     }
+    if (!options.rpcApiHttpHost) {
+      throw new Error(`PluginLedgerConnectorQuorum#ctor options.rpcApiHttpHost falsy.`);
+    }
     const web3Provider = new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
     this.web3 = new Web3(web3Provider);
     this.log = LoggerProvider.getOrCreate({ label: 'plugin-ledger-connector-quorum', level: 'trace' })
@@ -43,9 +46,12 @@ export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, 
   public installWebService(expressApp: any): IWebServiceEndpoint[] {
     const endpoints: IWebServiceEndpoint[] = [];
     {
-      const endpoint: IWebServiceEndpoint = new DeployContractEndpoint({ path: '/deploy-contract', plugin: this });
+      const pluginId = this.getId(); // @hyperledger/cactus-plugin-ledger-connector-quorum
+      const path = `/api/v1/plugins/${pluginId}/contract/deploy`;
+      const endpoint: IWebServiceEndpoint = new DeployContractEndpoint({ path, plugin: this });
       expressApp.use(endpoint.getPath(), endpoint.getExpressRequestHandler());
       endpoints.push(endpoint);
+      this.log.info(`Registered contract deployment endpoint at ${path}`);
     }
     return endpoints;
   }
