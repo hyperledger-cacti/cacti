@@ -65,50 +65,34 @@ Photo by Pontus Wellgraf on Unsplash
 - [4. Architecture](#4-architecture)
   - [4.1 Interworking patterns](#41-interworking-patterns)
     - [4.1.1 Interworking patterns list](#411-interworking-patterns-list)
-    - [4.1.2 Value transfer](#412-value-transfer)
-      - [4.1.2.1 Desription of the pattern](#4121-desription-of-the-pattern)
-      - [4.1.2.2 Sequence diagram](#4122-sequence-diagram)
-    - [4.1.3 Value-data transfer](#413-value-data-transfer)
-      - [4.1.3.1 Desription of the pattern](#4131-desription-of-the-pattern)
-      - [4.1.3.2 Sequence diagram](#4132-sequence-diagram)
-    - [4.1.4 Data-value transfer](#414-data-value-transfer)
-      - [4.1.4.1 Desription of the pattern](#4141-desription-of-the-pattern)
-      - [4.1.4.2 Sequence diagram](#4142-sequence-diagram)
-    - [4.1.5 Data transfer](#415-data-transfer)
-      - [4.1.5.1 Desription of the pattern](#4151-desription-of-the-pattern)
-      - [4.1.5.2 Sequence diagram](#4152-sequence-diagram)
-    - [4.1.6 Data merge](#416-data-merge)
-      - [4.1.6.1 Desription of the pattern](#4161-desription-of-the-pattern)
-      - [4.1.6.2 Sequence diagram](#4162-sequence-diagram)
-  - [4.2 Technical Architecture](#42-technical-architecture)
-    - [4.2.1 Monorepo Packages](#421-monorepo-packages)
-      - [4.2.1.1 core](#4211-core)
-        - [4.2.1.1.1 Runtime Configuration Parsing and Validation](#42111-runtime-configuration-parsing-and-validation)
-        - [4.2.1.1.2 Configuration Schema - Validator](#42112-configuration-schema---validator)
-        - [4.2.1.1.3 Configuration Schema - API Server](#42113-configuration-schema---api-server)
-        - [4.2.1.1.4 Plugin Loading/Validation](#42114-plugin-loadingvalidation)
-      - [4.2.1.2 cmd-api-server](#4212-cmd-api-server)
-      - [4.2.1.3 cmd-validator](#4213-cmd-validator)
-      - [4.2.1.4 sdk-javascript](#4214-sdk-javascript)
+    - [4.2 Interworking architecture](#42-interworking-architecture)
+  - [4.3 Technical Architecture](#43-technical-architecture)
+    - [4.3.1 Monorepo Packages](#431-monorepo-packages)
+      - [4.2.1.1 cmd-api-server](#4211-cmd-api-server)
+        - [4.3.1.1.1 Runtime Configuration Parsing and Validation](#43111-runtime-configuration-parsing-and-validation)
+        - [4.2.1.1.2 Configuration Schema - API Server](#42112-configuration-schema---api-server)
+        - [4.3.1.1.4 Plugin Loading/Validation](#43114-plugin-loadingvalidation)
+      - [4.2.1.2 core-api](#4212-core-api)
+      - [4.2.1.4 sdk](#4214-sdk)
       - [4.2.1.5 keychain](#4215-keychain)
-      - [4.2.1.7 tracing](#4217-tracing)
-      - [4.2.1.8 audit](#4218-audit)
-      - [4.2.1.9 document-storage](#4219-document-storage)
-      - [4.2.1.10 relational-storage](#42110-relational-storage)
-      - [4.2.1.11 immutable-storage](#42111-immutable-storage)
-    - [4.2.2 Deployment Diagram](#422-deployment-diagram)
-    - [4.2.3 Component Diagram](#423-component-diagram)
-    - [4.2.4 Class Diagram](#424-class-diagram)
-    - [4.2.5 Sequence Diagram - Transactions](#425-sequence-diagram---transactions)
-  - [4.3 Transaction Protocol Specification](#43-transaction-protocol-specification)
-    - [4.3.1 Handshake Mechanism](#431-handshake-mechanism)
-    - [4.3.2 Transaction Protocol Negotiation](#432-transaction-protocol-negotiation)
-  - [4.4 Plugin Architecture](#44-plugin-architecture)
-    - [4.4.1 Ledger Connector Plugins](#441-ledger-connector-plugins)
-    - [4.4.2 Identity Federation Plugins](#442-identity-federation-plugins)
-      - [4.4.1.1 X.509 Certificate Plugin](#4411-x509-certificate-plugin)
-    - [4.4.3 Key/Value Storage Plugins](#443-keyvalue-storage-plugins)
-    - [4.4.4 Serverside Keychain Plugins](#444-serverside-keychain-plugins)
+      - [4.3.1.7 tracing](#4317-tracing)
+      - [4.3.1.8 audit](#4318-audit)
+      - [4.3.1.9 document-storage](#4319-document-storage)
+      - [4.3.1.10 relational-storage](#43110-relational-storage)
+      - [4.3.1.11 immutable-storage](#43111-immutable-storage)
+    - [4.3.2 Deployment Diagram](#432-deployment-diagram)
+    - [4.3.3 Component Diagram](#433-component-diagram)
+    - [4.3.4 Class Diagram](#434-class-diagram)
+    - [4.3.5 Sequence Diagram - Transactions](#435-sequence-diagram---transactions)
+  - [4.4 Transaction Protocol Specification](#44-transaction-protocol-specification)
+    - [4.4.1 Handshake Mechanism](#441-handshake-mechanism)
+    - [4.4.2 Transaction Protocol Negotiation](#442-transaction-protocol-negotiation)
+  - [4.5 Plugin Architecture](#45-plugin-architecture)
+    - [4.5.1 Ledger Connector Plugins](#451-ledger-connector-plugins)
+    - [4.5.2 Identity Federation Plugins](#452-identity-federation-plugins)
+      - [4.5.1.1 X.509 Certificate Plugin](#4511-x509-certificate-plugin)
+    - [4.5.3 Key/Value Storage Plugins](#453-keyvalue-storage-plugins)
+    - [4.5.4 Serverside Keychain Plugins](#454-serverside-keychain-plugins)
 - [5. Identities, Authentication, Authorization](#5-identities-authentication-authorization)
   - [5.1 Transaction Signing Modes, Key Ownership](#51-transaction-signing-modes-key-ownership)
     - [5.1.1 Client-side Transaction Signing](#511-client-side-transaction-signing)
@@ -432,17 +416,23 @@ The execution steps are described as follows:
 
 Hyperledger Cactus is divided into a set of npm packages that can be compiled separately or all at once.
 
+All packages have a prefix of `cactus-*` to avoid potential naming conflicts with npm modules published by other Hyperledger projects. For example if both Cactus and Aries were to publish a package named `common` under the shared `@hyperledger` npm scope then the resulting fully qualified package name would end up being (without the prefix) as `@hyperledger/common` but with prefixes the conflict can be resolved as `@hyperledger/cactus-common` and `@hyperledger/aries-common`. Aries is just as an example here, we do not know if they plan on releasing packages under such names, but it also does not matter for the demonstration of ours.
+
 Naming conventions for packages:
 * cmd-* for packages that ship their own executable
-* sdk-* for packages designed to be used directly by application developers
+* sdk-* for packages designed to be used directly by application developers except for the Javacript SDK which is named just `sdk` for simplicity.
 * All other packages should be named preferably as a single English word suggesting the most important feature/responsibility of the package itself.
 
-#### 4.3.1.1 core
+#### 4.2.1.1 cmd-api-server
 
+A command line application for running the API server that provides a unified REST based HTTP API for calling code.
 Contains the kernel of Hyperledger Cactus.
 Code that is strongly opinionated lives here, the rest is pushed to other packages that implement plugins or define their interfaces.
+Comes with Swagger API definitions, plugin loading built-in.
 
-**The main responsibilities of the `core` package are:**
+> By design this is stateless and horizontally scalable.
+
+**The main responsibilities of this package are:**
 
 ##### 4.3.1.1.1 Runtime Configuration Parsing and Validation
 
@@ -454,61 +444,142 @@ The core package is responsible for parsing runtime configuration from the usual
 
 The Apache 2.0 licensed node-convict library to be leveraged for the mechanical parts of the configuration parsing and validation: https://github.com/mozilla/node-convict
 
-##### 4.3.1.1.2 Configuration Schema - Validator
+##### 4.2.1.1.2 Configuration Schema - API Server
 
-|   | Parameter   | Type            | Config Key: CLI        | Config Key: Env      | Config Key: JSON    | Description                                                                                          |
-|---|-------------|-----------------|-----------------|---------------|--------------|------------------------------------------------------------------------------------------------------|
-|   | Etcd Hosts  | `Array<string>` | `--etcd-hosts`  | `ETCD_HOSTS`  | `etcdHosts`  | The hosts of Etcd nodes the validator node should connect to for the purpose of leadership election. |
-|   | Private Key | `string`        | `--private-key` | `PRIVATE_KEY` | `privateKey` | The private key of the validator node to be used when signing validated messages.                    |
-|   | Public Key  | `string`        | `--public-key`  | `PUBLIC_KEY`  | `publicKey`  | The public key of the validator node that pairs with the `Private Key` of the same node.             |
+To obtain the latest configuration options you can check out the latest source code of Cactus and then run this from the root folder of the project on a machine that has at least NodeJS 10 or newer installed:
 
-##### 4.3.1.1.3 Configuration Schema - API Server
+```sh
+$ date
+Mon May 11 18:27:08 PDT 2020
 
-|   | Parameter                 | Type            | Key: CLI, Env, JSON                                                                                | Description                                                                                                                                                                                                                                                                                                                                                                                                             |
-|---|---------------------------|-----------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|   | Validator Hosts           | `Array<string>` | `--validator-hosts`<br><br>`VALIDATOR_HOSTS`<br><br>`validatorHosts`                               | <br>List of hosts to connect to when requesting validation related tasks from the validator nodes.                                                                                                                                                                                                                                                                                                                      |
-|   | HTTPS_PORT                | `number`        | `--https-port`<br><br>`HTTPS_PORT`<br><br>`httpsPort`                                              | The TCP port to listen on for HTTPS connections.                                                                                                                                                                                                                                                                                                                                                                        |
-|   | CORS Domains              | `Array<string>` | `--cors-domains`<br><br>`CORS_DOMAINS`<br><br>`corsDomains`                                        | Optional. Zero or more domain patterns (wildcards are allowed).                                                                                                                                                                                                                                                                                                                                                         |
-|   | Virtual Hosts             | `Array<string>` | `--virtual-hosts`<br><br>`VIRTUAL_HOSTS`<br><br>`virtualHosts`                                     | <br>Optional. When specified, constrains the acceptable incoming requests to ones that specify their host HTTP header in a way that matches at least one of the patterns specified in this configuration parameter.                                                                                                                                                                                                     |
-|   | Authentication Strategies | `Array<string>` | `--authentication-strategies`<br><br>`AUTHENTICATION_STRATEGIES`<br><br>`authenticationStrategies` | Optional. Specifies the fully qualified name, version and exported module of one or more npm packages that are to be loaded and used as the providers for the authentication strategies. For example to use PassportJS's OpenID Connect strategy one with specify the value `["passport-oidc-strategy@0.1.1###Strategy"]` which will get parsed as a JSON string containing an array of strings.                        |
-|   | Authentication Options    | `Array<string>` | `--authentication-options`<br><br>`AUTHENTICATION_OPTIONS`<br><br>`authenticationOptions`          | Used to provide arguments to the constructors (or factory functions) exported by the modules specified by `AUTHENTICATION_STRATEGIES`. For example, in this configuration parameter you can specify the callback URL for an Open ID Connect provider of your choice, the client ID, client secret, etc. Important: The order in which the items appear have to match the order of items in `AUTHENTICATION_STRATEGIES`. |
-|   | Package Registries        | `Array<string>` | `--package-registries`<br><br>`PACKAGE_REGISTRIES`<br><br>`packageRegistries`                      | Optional. Defaults to the public npm registry at `https://registry.npmjs.org/`. Can be used to specify private registries in the event of closed source plugins. If multiple registry URLs are provided, they all will be tried in-order at bootstrap time.                                                                                                                                                              |
+$ npx ts-node -e "import {ConfigService} from './packages/bif-cmd-api-server/src/main/typescript/config/config-service'; console.log(ConfigService.getHelpText());"
+
+Order of precedent for parameters in descdending order: CLI, Environment variables, Configuration file.
+Passing "help" as the first argument prints this message and also dumps the effective configuration.
+
+Configuration Parameters
+========================
+
+  configFile:
+                Description: The path to a config file that holds the configuration itself which will be parsed and validated.
+                Default: Mandatory parameter without a default value.
+                Env: CONFIG_FILE
+                CLI: --config-file
+  bifNodeId:
+                Description: Identifier of this particular BIF node. Must be unique among the total set of BIF nodes running in any given BIF deployment. Can be any string of characters such as a UUID or an Int64
+                Default: Mandatory parameter without a default value.
+                Env: BIF_NODE_ID
+                CLI: --bif-node-id
+  logLevel:
+                Description: The level at which loggers should be configured. Supported values include the following: error, warn, info, debug, trace
+                Default: warn
+                Env: LOG_LEVEL
+                CLI: --log-level
+  cockpitHost:
+                Description: The host to bind the Cockpit webserver to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.
+                Default: 127.0.0.1
+                Env: COCKPIT_HOST
+                CLI: --cockpit-host
+  cockpitPort:
+                Description: The HTTP port to bind the Cockpit webserver to.
+                Default: 3000
+                Env: COCKPIT_PORT
+                CLI: --cockpit-port
+  cockpitWwwRoot:
+                Description: The file-system path pointing to the static files of web application served as the cockpit by the API server.
+                Default: packages/bif-cmd-api-server/node_modules/@hyperledger-labs/bif-cockpit/www/
+                Env: COCKPIT_WWW_ROOT
+                CLI: --cockpit-www-root
+  apiHost:
+                Description: The host to bind the API to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.
+                Default: 127.0.0.1
+                Env: API_HOST
+                CLI: --api-host
+  apiPort:
+                Description: The HTTP port to bind the API server endpoints to.
+                Default: 4000
+                Env: API_PORT
+                CLI: --api-port
+  apiCorsDomainCsv:
+                Description: The Comma seperated list of domains to allow Cross Origin Resource Sharing from when serving API requests. The wildcard (*) character is supported to allow CORS for any and all domains, however using it is not recommended unless you are developing or demonstrating something with BIF.
+                Default: Mandatory parameter without a default value.
+                Env: API_CORS_DOMAIN_CSV
+                CLI: --api-cors-domain-csv
+  storagePluginPackage:
+                Description: The NodeJS package name that will be dynamically imported. You have to make sure that this is installed prior to starting the API server. Use "@hyperledger-labs/bif-plugin-kv-storage-memory" here for developmentor demo environments with only a single node you can use the built-in stub that stores everything in-memory, un-encrypted:
+                Default: Mandatory parameter without a default value.
+                Env: STORAGE_PLUGIN_PACKAGE
+                CLI: --storage-plugin-package
+  storagePluginOptionsJson:
+                Description: JSON string representing the options object that will be passed in to  the keychain plugin during initialization.
+                Default: {}
+                Env: KEYCHAIN_PLUGIN_OPTIONS_JSON
+                CLI: --keychain-plugin-options-json
+  keychainPluginPackage:
+                Description: The NodeJS package name that will be dynamically imported. You have to make sure that this is installed prior to starting the API server. Use "@hyperledger-labs/bif-plugin-keychain-memory" here for developmentor demo environments with only a single node you can use the built-in stub that stores everything in-memory, un-encrypted:
+                Default: Mandatory parameter without a default value.
+                Env: KEYCHAIN_PLUGIN_PACKAGE
+                CLI: --keychain-plugin-package
+  keychainPluginOptionsJson:
+                Description: JSON string representing the options object that will be passed in to  the storage plugin during initialization.
+                Default: {}
+                Env: STORAGE_PLUGIN_OPTIONS_JSON
+                CLI: --storage-plugin-options-json
+  publicKey:
+                Description: Public key of this BIF node (the API server)
+                Default: Mandatory parameter without a default value.
+                Env: PUBLIC_KEY
+                CLI: --public-key
+  privateKey:
+                Description: Private key of this BIF node (the API server)
+                Default: Mandatory parameter without a default value.
+                Env: PRIVATE_KEY
+                CLI: --private-key
+  keychainSuffixPrivateKey:
+                Description: The key under which to store/retrieve the private key from the keychain of this BIF node (API server)The complete lookup key is constructed from the ${BIF_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
+                Default: BIF_NODE_PRIVATE_KEY
+                Env: KEYCHAIN_SUFFIX_PRIVATE_KEY
+                CLI: --keychain-suffix-private-key
+  keychainSuffixPublicKey:
+                Description: The key under which to store/retrieve the public key from the keychain of this BIF node (API server)The complete lookup key is constructed from the ${BIF_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
+                Default: BIF_NODE_PUBLIC_KEY
+                Env: KEYCHAIN_SUFFIX_PUBLIC_KEY
+                CLI: --keychain-suffix-public-key
+
+```
 
 ##### 4.3.1.1.4 Plugin Loading/Validation
 
 Plugin loading happens through NodeJS's built-in module loader and the validation is performed by the Node Package Manager tool (npm) which verifies the byte level integrity of all installed modules.
 
-#### 4.3.1.2 cmd-api-server
+#### 4.2.1.2 core-api
 
-A command line application for running the API server that provides a unified REST based HTTP API for calling code.
+Contains interface definitions for the plugin architecture and other system level components that are to be shared among many other packages.
+`core-api` is intended to be a leaf package meaning that it shouldn't depend on other packages in order to make it safe for any and all packages to depend on `core-api` without having to deal with circular dependency issues.
 
-By design this is stateless and horizontally scalable.
-
-Comes with Swagger API definitions.
-
-#### 4.3.1.3 cmd-validator
-
-Command line application to run a single `Cactus` validator node.
-
-#### 4.3.1.4 sdk-javascript
+#### 4.2.1.4 sdk
 
 Javascript SDK (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
 Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
 
-#### 4.3.1.5 keychain
+
+#### 4.2.1.5 keychain
 
 Responsible for persistently storing highly sensitive data (e.g. private keys) in an encrypted format.
 
 For further details on the API surface, see the relevant section under `Plugin Architecture`.
 
+
 #### 4.3.1.7 tracing
 
 Contains components for tracing, logging and application performance management (APM) of code written for the rest of the Hyperledger Cactus packages.
+
 
 #### 4.3.1.8 audit
 
 Components useful for writing and reading audit records that must be archived longer term and immutable.
 The latter properties are what differentiates audit logs from tracing/logging messages which are designed to be ephemeral and to support technical issues not regulatory/compliance/governance related issues.
+
 
 #### 4.3.1.9 document-storage
 
