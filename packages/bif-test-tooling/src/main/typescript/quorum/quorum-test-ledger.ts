@@ -6,6 +6,7 @@ import { EventEmitter } from 'events';
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from '../common/streams';
 import { IKeyPair } from '../i-key-pair';
+import { IQuorumGenesisOptions } from './i-quorum-genesis-options';
 
 export interface IQuorumTestLedgerConstructorOptions {
   containerImageVersion?: string;
@@ -91,6 +92,11 @@ export class QuorumTestLedger implements ITestLedger {
     return { publicKey, privateKey };
   }
 
+  public async getGenesisJsObject(): Promise<IQuorumGenesisOptions> {
+    const quorumGenesisJson: string = await this.getFileContents('/genesis.json');
+    return JSON.parse(quorumGenesisJson);
+  }
+
   public async getTesseraKeyPair(): Promise<IKeyPair> {
     const publicKey = await this.getFileContents('/tm.pub');
     const privateKey = await this.getFileContents('/tm.key');
@@ -110,12 +116,14 @@ export class QuorumTestLedger implements ITestLedger {
     await this.pullContainerImage(containerNameAndTag);
 
     return new Promise<Container>((resolve, reject) => {
-
       const eventEmitter: EventEmitter = docker.run(
         containerNameAndTag,
         [],
         [],
         {
+          // Env: [
+            // 'PRIVATE_CONFIG=ignore'// FIXME make it possible to have privacy configured programmatically for quorum
+          // ],
           ExposedPorts: {
             [`${this.rpcApiHttpPort}/tcp`]: {}, // quorum RPC - HTTP
             '8546/tcp': {}, // quorum RPC - WebSocket

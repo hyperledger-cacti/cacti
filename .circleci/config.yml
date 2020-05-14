@@ -2,8 +2,8 @@ version: 2.1
 jobs:
   build:
     environment:
-      CI_NO_CORDA: false
-      CI_CONTAINERS_WAIT_TIME: 60
+      CI_NO_CORDA: 'false'
+      CI_CONTAINERS_WAIT_TIME: '60'
     machine:
       image: ubuntu-1604:201903-01
       resource_class: xlarge
@@ -34,19 +34,7 @@ jobs:
 
       - run:
           name: Run Hyperledger Cactus CI script
-          command: |
-            ./packages/core/tools/ci.sh
-
-      # Upload test results for display in Test Summary:
-      # https://circleci.com/docs/2.0/collect-test-data/
-      - store_test_results:
-          path: packages/core/examples/simple-asset-transfer/corda/logs/
-
-      # Upload test results for display in Artifacts:
-      # https://circleci.com/docs/2.0/artifacts/
-      - store_artifacts:
-          path: packages/core/examples/simple-asset-transfer/corda/logs/
-          when: always
+          command: ./tools/ci.sh
 
 workflows:
   version: 2

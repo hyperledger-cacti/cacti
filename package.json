@@ -14,6 +14,7 @@
     "build:backend": "npm-run-all lint clean generate-sdk tsc webpack",
     "build:dev:pkg:cmd-api-server": "lerna exec --stream --scope '*/*api-server' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:pkg:test-tooling": "lerna exec --stream --scope '*/*test-tooling' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
+    "build:dev:pkg:bif-plugin-ledger-connector-quorum": "lerna exec --stream --scope '*/*connector-quorum' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:pkg:sdk": "lerna exec --stream --scope '*/*sdk' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "webpack": "npm-run-all webpack:web:dev webpack:node:dev webpack:web:prod webpack:node:prod",
     "webpack:web:prod": "lerna exec --stream --ignore '*/*{cockpit,server,test-tooling}' -- webpack --env=prod --target=web --config ../../webpack.config.js",
