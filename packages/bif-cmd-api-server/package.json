@@ -63,6 +63,7 @@
     "node-fetch": "3.0.0-beta.4",
     "secp256k1": "4.0.0",
     "sha3": "2.1.2",
+    "typescript-optional": "2.0.1",
     "uuid": "7.0.2"
   },
   "devDependencies": {

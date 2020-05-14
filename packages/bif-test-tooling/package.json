@@ -57,7 +57,8 @@
     "joi": "14.3.1",
     "loglevel": "1.6.7",
     "loglevel-plugin-prefix": "0.8.4",
-    "tar-stream": "2.1.2"
+    "tar-stream": "2.1.2",
+    "typescript-optional": "2.0.1"
   },
   "devDependencies": {
     "@types/dockerode": "2.5.28",
