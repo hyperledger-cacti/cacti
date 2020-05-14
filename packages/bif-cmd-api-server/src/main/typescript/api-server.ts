@@ -2,6 +2,7 @@ import path from 'path';
 import { Config } from 'convict';
 import express, { Express, Request, Response, NextFunction, RequestHandler, Application } from 'express';
 import { OpenApiValidator } from 'express-openapi-validator';
+import compression from 'compression';
 import bodyParser from 'body-parser';
 import cors, { CorsOptions } from 'cors';
 import { IPluginKVStorage, PluginFactory } from '@hyperledger-labs/bif-core-api';
@@ -34,14 +35,19 @@ export class ApiServer {
   }
 
   async startCockpitFileServer(): Promise<void> {
-
-    const app: Express = express();
-
     const cockpitWwwRoot = this.options.config.get('cockpitWwwRoot');
-    this.log.info(`cockpitWwwRoot: ${cockpitWwwRoot}`);
+    this.log.info(`wwwRoot: ${cockpitWwwRoot}`);
+
     const resolvedWwwRoot = path.resolve(process.cwd(), cockpitWwwRoot);
     this.log.info(`resolvedWwwRoot: ${resolvedWwwRoot}`);
+
+    const resolvedIndexHtml = path.resolve(resolvedWwwRoot + '/index.html');
+    this.log.info(`resolvedIndexHtml: ${resolvedIndexHtml}`);
+
+    const app: Express = express();
+    app.use(compression());
     app.use(express.static(resolvedWwwRoot));
+    app.get('/*', (_, res) => res.sendFile(resolvedIndexHtml));
 
     const cockpitPort: number = this.options.config.get('cockpitPort');
     const cockpitHost: string = this.options.config.get('cockpitHost');
@@ -58,6 +64,7 @@ export class ApiServer {
 
   async startApiServer(): Promise<void> {
     const app: Application = express();
+    app.use(compression());
 
     const corsMiddleware = this.createCorsMiddleware()
     app.use(corsMiddleware);
