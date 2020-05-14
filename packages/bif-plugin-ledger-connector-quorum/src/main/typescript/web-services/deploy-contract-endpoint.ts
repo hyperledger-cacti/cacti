@@ -1,6 +1,12 @@
-import { IWebServiceEndpoint, IExpressRequestHandler } from "@hyperledger-labs/bif-core-api";
+import {
+  IWebServiceEndpoint,
+  IExpressRequestHandler,
+} from "@hyperledger-labs/bif-core-api";
 import { Logger, LoggerProvider } from "@hyperledger-labs/bif-common";
-import { PluginLedgerConnectorQuorum, IQuorumDeployContractOptions } from "../plugin-ledger-connector-quorum";
+import {
+  PluginLedgerConnectorQuorum,
+  IQuorumDeployContractOptions,
+} from "../plugin-ledger-connector-quorum";
 
 export interface IDeployContractEndpointOptions {
   path: string;
@@ -8,11 +14,12 @@ export interface IDeployContractEndpointOptions {
 }
 
 export class DeployContractEndpoint implements IWebServiceEndpoint {
-
   private readonly log: Logger;
 
   constructor(public readonly options: IDeployContractEndpointOptions) {
-    this.log = LoggerProvider.getOrCreate({ label: 'deploy-contract-endpoint' });
+    this.log = LoggerProvider.getOrCreate({
+      label: "deploy-contract-endpoint",
+    });
   }
 
   public getPath(): string {

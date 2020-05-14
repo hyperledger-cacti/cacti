@@ -1,6 +1,9 @@
-import { IPluginLedgerConnector, PluginAspect } from '@hyperledger-labs/bif-core-api';
-import Web3 from 'web3';
-import EEAClient, { IWeb3InstanceExtended } from 'web3-eea';
+import {
+  IPluginLedgerConnector,
+  PluginAspect,
+} from "@hyperledger-labs/bif-core-api";
+import Web3 from "web3";
+import EEAClient, { IWeb3InstanceExtended } from "web3-eea";
 
 export interface IPluginLedgerConnectorBesuOptions {
   rpcApiHttpHost: string;
@@ -10,8 +13,8 @@ export interface ITransactionOptions {
   privateKey?: string;
 }
 
-export class PluginLedgerConnectorBesu implements IPluginLedgerConnector<any, any> {
-
+export class PluginLedgerConnectorBesu
+  implements IPluginLedgerConnector<any, any> {
   private readonly web3: Web3;
   private readonly web3Eea: IWeb3InstanceExtended;
 
@@ -19,7 +22,9 @@ export class PluginLedgerConnectorBesu implements IPluginLedgerConnector<any, an
     if (!options) {
       throw new Error(`PluginLedgerConnectorBesu#ctor options falsy.`);
     }
-    const web3Provider = new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
+    const web3Provider = new Web3.providers.HttpProvider(
+      this.options.rpcApiHttpHost
+    );
     this.web3 = new Web3(web3Provider);
     this.web3Eea = EEAClient(this.web3, 2018);
   }
@@ -37,12 +42,17 @@ export class PluginLedgerConnectorBesu implements IPluginLedgerConnector<any, an
   }
 
   public instantiateContract(contractJsonArtifact: any, address?: string): any {
-    const contract = new this.web3.eth.Contract(contractJsonArtifact.abi, address);
+    const contract = new this.web3.eth.Contract(
+      contractJsonArtifact.abi,
+      address
+    );
     return contract;
   }
 
   public async deployContract(options: any): Promise<void> {
-    const privateKey = options.privateKey.toLowerCase().startsWith('0x') ? options.privateKey.substring(2) : options.privateKey; // besu node's private key
+    const privateKey = options.privateKey.toLowerCase().startsWith("0x")
+      ? options.privateKey.substring(2)
+      : options.privateKey; // besu node's private key
     const publicKey = options.publicKey; // orion public key of the sender
     const allOrionPublicKeys: string[] = [options.publicKey]; // all orion public keys of receipients
 
@@ -63,5 +73,4 @@ export class PluginLedgerConnectorBesu implements IPluginLedgerConnector<any, an
   public async addPublicKey(publicKeyHex: string): Promise<void> {
     throw new Error("Method not implemented.");
   }
-
 }

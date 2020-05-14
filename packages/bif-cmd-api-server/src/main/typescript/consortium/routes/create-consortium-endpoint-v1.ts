@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction, Application } from 'express';
-import secp256k1 from 'secp256k1';
-import { keccak256 } from 'js-sha3';
+import { Request, Response, NextFunction, Application } from "express";
+import secp256k1 from "secp256k1";
+import { keccak256 } from "js-sha3";
 
-import { IPluginKVStorage } from '@hyperledger-labs/bif-core-api';
-import { IConsortium } from '../model/consortium';
-import { IConsortiumWrapper } from '../model/consortium-wrapper';
-import { Config } from 'convict';
-import { IBifApiServerOptions } from '../../config/config-service';
+import { IPluginKVStorage } from "@hyperledger-labs/bif-core-api";
+import { IConsortium } from "../model/consortium";
+import { IConsortiumWrapper } from "../model/consortium-wrapper";
+import { Config } from "convict";
+import { IBifApiServerOptions } from "../../config/config-service";
 
 export interface ICreateConsortiumEndpointOptions {
   storage: IPluginKVStorage;
@@ -14,7 +14,6 @@ export interface ICreateConsortiumEndpointOptions {
 }
 
 export class CreateConsortiumEndpointV1 {
-
   constructor(public readonly options: ICreateConsortiumEndpointOptions) {
     if (!options) {
       throw new Error(`CreateConsortiumEndpointV1#ctor options falsy.`);
@@ -28,23 +27,35 @@ export class CreateConsortiumEndpointV1 {
   }
 
   getPath(): string {
-    return '/api/v1/consortium';
+    return "/api/v1/consortium";
   }
 
-  async handleRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async handleRequest(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const consortium: IConsortium = req.body;
     const idAlreadyExists = await this.options.storage.has(consortium.id);
     if (idAlreadyExists) {
       res.status(400);
-      res.json({ success: false, message: `Consortium with ID ${consortium.id} already exists.` });
+      res.json({
+        success: false,
+        message: `Consortium with ID ${consortium.id} already exists.`,
+      });
     } else {
       // FIXME: We need a library handling the crypto, how about NodeJS bindings for Ursa?
-      const privateKey = this.options.config.get('privateKey');
-      const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, 'hex'));
+      const privateKey = this.options.config.get("privateKey");
+      const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
       const consortiumJson: string = JSON.stringify(consortium);
-      const consortiumBytesHash = Uint8Array.from(keccak256.array(consortiumJson));
-      const signatureWrapper = secp256k1.ecdsaSign(consortiumBytesHash, privateKeyBytes);
-      const signature = Buffer.from(signatureWrapper.signature).toString('hex');
+      const consortiumBytesHash = Uint8Array.from(
+        keccak256.array(consortiumJson)
+      );
+      const signatureWrapper = secp256k1.ecdsaSign(
+        consortiumBytesHash,
+        privateKeyBytes
+      );
+      const signature = Buffer.from(signatureWrapper.signature).toString("hex");
       const consortiumWrapper: IConsortiumWrapper = {
         signature,
         consortiumJson,

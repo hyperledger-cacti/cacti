@@ -1,11 +1,10 @@
-import { IPluginKeychain, PluginAspect } from '@hyperledger-labs/bif-core-api';
+import { IPluginKeychain, PluginAspect } from "@hyperledger-labs/bif-core-api";
 
 export interface IPluginKeychainOptions {
   backend: Map<string, any>;
 }
 
 export class PluginKeychainMemory implements IPluginKeychain {
-
   constructor(public readonly options: IPluginKeychainOptions) {
     if (!options) {
       throw new Error(`PluginKeychainMemory#ctor options falsy.`);
@@ -28,7 +27,7 @@ export class PluginKeychainMemory implements IPluginKeychain {
   }
 
   public getEncryptionAlgorithm(): string {
-    return 'no-encryption-used-by-this-plugin';
+    return "no-encryption-used-by-this-plugin";
   }
 
   async get<T>(key: string): Promise<T> {

@@ -1,17 +1,28 @@
 // tslint:disable-next-line: no-var-requires
-const tap = require('tap');
-import { Contract, SendOptions } from 'web3-eth-contract/types/index';
-import { PluginLedgerConnectorQuorum, PluginFactoryLedgerConnector } from '../../../../../main/typescript/public-api';
-import { QuorumTestLedger, IQuorumGenesisOptions, IAccount } from '@hyperledger-labs/bif-test-tooling';
-import HelloWorldContractJson from '../../../../solidity/hello-world-contract/HelloWorld.json';
-import { Logger, LoggerProvider } from '@hyperledger-labs/bif-common';
-import { IQuorumDeployContractOptions } from '../../../../../main/typescript/plugin-ledger-connector-quorum';
+const tap = require("tap");
+import { Contract, SendOptions } from "web3-eth-contract/types/index";
+import {
+  PluginLedgerConnectorQuorum,
+  PluginFactoryLedgerConnector,
+} from "../../../../../main/typescript/public-api";
+import {
+  QuorumTestLedger,
+  IQuorumGenesisOptions,
+  IAccount,
+} from "@hyperledger-labs/bif-test-tooling";
+import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
+import { Logger, LoggerProvider } from "@hyperledger-labs/bif-common";
+import { IQuorumDeployContractOptions } from "../../../../../main/typescript/plugin-ledger-connector-quorum";
 
-const log: Logger = LoggerProvider.getOrCreate({ label: 'test-deploy-contract-from-json', level: 'trace' })
+const log: Logger = LoggerProvider.getOrCreate({
+  label: "test-deploy-contract-from-json",
+  level: "trace",
+});
 
-tap.test('deploys contract via .json file', async (assert: any) => {
-
-  const quorumTestLedger = new QuorumTestLedger({ containerImageVersion: '1.0.0' });
+tap.test("deploys contract via .json file", async (assert: any) => {
+  const quorumTestLedger = new QuorumTestLedger({
+    containerImageVersion: "1.0.0",
+  });
   await quorumTestLedger.start();
 
   assert.tearDown(async () => {
@@ -28,7 +39,9 @@ tap.test('deploys contract via .json file', async (assert: any) => {
   assert.ok(quorumGenesisOptions);
   assert.ok(quorumGenesisOptions.alloc);
 
-  const highNetWorthAccounts: string[] = Object.keys(quorumGenesisOptions.alloc).filter((address: string) => {
+  const highNetWorthAccounts: string[] = Object.keys(
+    quorumGenesisOptions.alloc
+  ).filter((address: string) => {
     const anAccount: IAccount = quorumGenesisOptions.alloc[address];
     const balance: number = parseInt(anAccount.balance, 10);
     return balance > 10e7;
@@ -36,10 +49,12 @@ tap.test('deploys contract via .json file', async (assert: any) => {
   const [firstHighNetWorthAccount] = highNetWorthAccounts;
 
   const factory = new PluginFactoryLedgerConnector();
-  const connector: PluginLedgerConnectorQuorum = await factory.create({ rpcApiHttpHost });
+  const connector: PluginLedgerConnectorQuorum = await factory.create({
+    rpcApiHttpHost,
+  });
 
   const options: IQuorumDeployContractOptions = {
-    ethAccountUnlockPassword: '',
+    ethAccountUnlockPassword: "",
     fromAddress: firstHighNetWorthAccount,
     contractJsonArtifact: HelloWorldContractJson,
   };
@@ -50,10 +65,12 @@ tap.test('deploys contract via .json file', async (assert: any) => {
   const contractMethod = contract.methods.sayHello();
   assert.ok(contractMethod);
 
-  const callResponse = await contractMethod.call({ from: firstHighNetWorthAccount });
+  const callResponse = await contractMethod.call({
+    from: firstHighNetWorthAccount,
+  });
   log.debug(`Got message from smart contract method:`, { callResponse });
   assert.ok(callResponse);
 
   assert.end();
-  log.debug('Assertion ended OK.');
+  log.debug("Assertion ended OK.");
 });

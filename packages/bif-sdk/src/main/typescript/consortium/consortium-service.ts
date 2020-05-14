@@ -5,8 +5,7 @@ export interface IConsortiumServiceOptions {
 }
 
 export class ConsortiumService {
-  constructor(public readonly options: IConsortiumServiceOptions) {
-  }
+  constructor(public readonly options: IConsortiumServiceOptions) {}
 
   async create(): Promise<void> {
     return;

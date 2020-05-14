@@ -1,21 +1,28 @@
 // tslint:disable-next-line: no-var-requires
-const tap = require('tap');
-import { QuorumTestLedger, IKeyPair, isIKeyPair } from '../../../../../main/typescript/public-api';
-import { Container } from 'dockerode';
+const tap = require("tap");
+import {
+  QuorumTestLedger,
+  IKeyPair,
+  isIKeyPair,
+} from "../../../../../main/typescript/public-api";
+import { Container } from "dockerode";
 
-tap.test('constructor throws if invalid input is provided', (assert: any) => {
+tap.test("constructor throws if invalid input is provided", (assert: any) => {
   assert.ok(QuorumTestLedger);
-  assert.throws(() => new QuorumTestLedger({ containerImageVersion: 'nope' }));
+  assert.throws(() => new QuorumTestLedger({ containerImageVersion: "nope" }));
   assert.end();
 });
 
-tap.test('constructor does not throw if valid input is provided', (assert: any) => {
-  assert.ok(QuorumTestLedger);
-  assert.doesNotThrow(() => new QuorumTestLedger());
-  assert.end();
-});
+tap.test(
+  "constructor does not throw if valid input is provided",
+  (assert: any) => {
+    assert.ok(QuorumTestLedger);
+    assert.doesNotThrow(() => new QuorumTestLedger());
+    assert.end();
+  }
+);
 
-tap.test('starts/stops/destroys a docker container', async (assert: any) => {
+tap.test("starts/stops/destroys a docker container", async (assert: any) => {
   const ledger = new QuorumTestLedger();
   const container: Container = await ledger.start();
   assert.ok(container);

@@ -3,10 +3,12 @@ export interface IKeyPair {
   privateKey: string;
 }
 
-export function isIKeyPair(allegedKeyPair: IKeyPair): allegedKeyPair is IKeyPair {
+export function isIKeyPair(
+  allegedKeyPair: IKeyPair
+): allegedKeyPair is IKeyPair {
   return (
-    typeof allegedKeyPair.privateKey === 'string' &&
-    typeof allegedKeyPair.publicKey === 'string' &&
+    typeof allegedKeyPair.privateKey === "string" &&
+    typeof allegedKeyPair.publicKey === "string" &&
     allegedKeyPair.privateKey.length > 0 &&
     allegedKeyPair.publicKey.length > 0
   );

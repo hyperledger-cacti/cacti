@@ -1,4 +1,3 @@
-
 export interface IAccount {
   balance: string;
 }
@@ -32,4 +31,3 @@ export interface IQuorumGenesisOptions {
   parentHash: string;
   timestamp: string;
 }
-
