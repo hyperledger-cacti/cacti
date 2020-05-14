@@ -43,25 +43,5 @@
   "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
   "dependencies": {
     "@hyperledger-labs/bif-core-api": "^0.0.1"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog",
-      "maxHeaderWidth": 72
-    }
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "header-max-length": [
-        0,
-        "always",
-        72
-      ]
-    }
-  },
-  "devDependencies": {
   }
 }

@@ -40,25 +40,5 @@
   "bugs": {
     "url": "https://github.com/hyperledger-labs/blockchain-integration-framework/issues"
   },
-  "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog",
-      "maxHeaderWidth": 72
-    }
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "header-max-length": [
-        0,
-        "always",
-        72
-      ]
-    }
-  },
-  "devDependencies": {
-  }
+  "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme"
 }
