@@ -1,20 +1,31 @@
-import { asciiToHex } from 'web3-utils';
 import { IPluginLedgerConnector } from '@hyperledger-labs/bif-core-api';
 import { Logger, LoggerProvider } from '@hyperledger-labs/bif-common';
 
 import Web3 from 'web3';
 import { Contract, ContractSendMethod, ContractOptions, DeployOptions, SendOptions } from 'web3-eth-contract/types/index';
-import { PromiEvent, TransactionReceipt } from 'web3-core/types/index';
+import { PromiEvent } from 'web3-core/types/index';
 
 export interface IPluginLedgerConnectorQuorumOptions {
   rpcApiHttpHost: string;
 }
 
+/**
+ * FIXME: This is under construction.
+ */
 export interface ITransactionOptions {
   privateKey?: string;
 }
 
-export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, any> {
+export interface IQuorumDeployContractOptions {
+  ethAccountUnlockPassword: string; // The decryption key for geth to unlock the account
+  fromAddress: string; // The address to use
+  contractSourceCode?: string; // if provided then compile the contract through the API
+  contractJsonArtifact?: { bytecode: string }; // use this if provided (the pre-compiled JSON artifact)
+  gas?: number;
+  gasPrice?: number;
+}
+
+export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, Contract> {
 
   private readonly web3: Web3;
   private readonly log: Logger;
@@ -37,27 +48,21 @@ export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, 
     return new this.web3.eth.Contract(contractJsonArtifact.abi, address, contractOptions);
   }
 
-  public async deployContract(options: any): Promise<any> {
+  public async deployContract(options: IQuorumDeployContractOptions): Promise<Contract> {
+
+    if (!options.contractJsonArtifact) {
+      throw new Error(`PluginLedgerConnectorQuorum#deployContract() options.contractJsonArtifact falsy.`);
+    }
+
     try {
-      const ethPassword = '';
-      const unlocked: boolean = await this.web3.eth.personal.unlockAccount(options.from, ethPassword, 3600);
+      const unlocked: boolean = await this.web3.eth.personal.unlockAccount(options.fromAddress, options.ethAccountUnlockPassword, 3600);
       this.log.debug(`Web3 Account unlock outcome: ${unlocked}`);
     } catch (ex) {
-      throw new Error(`PluginLedgerConnectorQuorum#deployContract() failed to unlock account ${options.from}: ${ex.stack}`);
+      throw new Error(`PluginLedgerConnectorQuorum#deployContract() failed to unlock account ${options.fromAddress}: ${ex.stack}`);
     }
 
-    const fromAddress = options.from;
-    const contract: Contract = this.instantiateContract(options.contractJsonArtifact, fromAddress);
+    const contract: Contract = this.instantiateContract(options.contractJsonArtifact, options.fromAddress);
     this.log.debug(`Instantiated contract OK`);
-
-    let nonce: number;
-    try {
-      this.log.debug(`Getting transaction count (nonce for account)`);
-      nonce = await this.web3.eth.getTransactionCount(fromAddress);
-      this.log.debug(`Transaction count (nonce) acquird OK: ${nonce}`);
-    } catch (ex) {
-      throw new Error(`Failed to obtain nonce: ${ex.stack}`);
-    }
 
     const deployOptions: DeployOptions = {
       data: '0x' + options.contractJsonArtifact.bytecode,
@@ -66,38 +71,15 @@ export class PluginLedgerConnectorQuorum implements IPluginLedgerConnector<any, 
     const deployTask: ContractSendMethod = contract.deploy(deployOptions);
     this.log.debug(`Called deploy task OK with options: `, { deployOptions });
 
-    // try {
-    //   this.log.debug(`Asking ledger for gas estimate...`);
-    //   const gasEstimate = await deployTask.estimateGas({ gas: 5000000, });
-    //   this.log.debug(`Got GasEstimate=${gasEstimate}`);
-    //   // const gas = gasEstimate * 3; // offer triple the gas estimate to be sure
-    // } catch (ex) {
-    //   throw new Error(`PluginLedgerConnectorQuorum#deployContract() failed to get gas estimate: ${ex.stack}`);
-    // }
-
     const sendOptions: SendOptions = {
-      from: fromAddress,
-      gas: 1500000,
-      gasPrice: '0',
+      from: options.fromAddress,
+      gas: options.gas || 1000000,
+      gasPrice: `${options.gasPrice || 0}`,
     };
 
-    this.log.debug(`Calling send on deploy task...`);
+    this.log.debug(`Calling send on deploy task...`, { sendOptions });
     const promiEventContract: PromiEvent<Contract> = deployTask.send(sendOptions);
     this.log.debug(`Called send OK with options: `, { sendOptions });
-
-    // promiEventContract
-    //   .once('confirmation', (confNumber: number, receipt: TransactionReceipt) => {
-    //     this.log.debug(`deployContract() - confirmation: `, { confNumber, receipt });
-    //   })
-    //   .once('error', (error: Error) => {
-    //     this.log.error(`deployContract() - error: `, error);
-    //   })
-    //   .once('receipt', (receipt: TransactionReceipt) => {
-    //     this.log.debug(`deployContract() - receipt: `, { receipt });
-    //   })
-    //   .once('transactionHash', (receipt: string) => {
-    //     this.log.debug(`deployContract() - transactionHash: `, { receipt });
-    //   });
 
     try {
       this.log.debug(`Starting await for contract deployment promise...`);

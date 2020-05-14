@@ -1,9 +1,11 @@
 // tslint:disable-next-line: no-var-requires
 const tap = require('tap');
+import { Contract, SendOptions } from 'web3-eth-contract/types/index';
 import { PluginLedgerConnectorQuorum, PluginFactoryLedgerConnector } from '../../../../../main/typescript/public-api';
 import { QuorumTestLedger, IQuorumGenesisOptions, IAccount } from '@hyperledger-labs/bif-test-tooling';
 import HelloWorldContractJson from '../../../../solidity/hello-world-contract/HelloWorld.json';
 import { Logger, LoggerProvider } from '@hyperledger-labs/bif-common';
+import { IQuorumDeployContractOptions } from '../../../../../main/typescript/plugin-ledger-connector-quorum';
 
 const log: Logger = LoggerProvider.getOrCreate({ label: 'test-deploy-contract-from-json', level: 'trace' })
 
@@ -36,15 +38,21 @@ tap.test('deploys contract via .json file', async (assert: any) => {
   const factory = new PluginFactoryLedgerConnector();
   const connector: PluginLedgerConnectorQuorum = await factory.create({ rpcApiHttpHost });
 
-  const options = {
-    from: firstHighNetWorthAccount, // 0xed9d02e382b34818e88b88a309c7fe71e65f419d from the gensis json alloc property
+  const options: IQuorumDeployContractOptions = {
+    ethAccountUnlockPassword: '',
+    fromAddress: firstHighNetWorthAccount,
     contractJsonArtifact: HelloWorldContractJson,
-    // gas: 100000000000,
-    // gasPrice: 0,
   };
 
-  const out = await connector.deployContract(options);
-  assert.ok(out);
+  const contract: Contract = await connector.deployContract(options);
+  assert.ok(contract);
+
+  const contractMethod = contract.methods.sayHello();
+  assert.ok(contractMethod);
+
+  const callResponse = await contractMethod.call({ from: firstHighNetWorthAccount });
+  log.debug(`Got message from smart contract method:`, { callResponse });
+  assert.ok(callResponse);
 
   assert.end();
   log.debug('Assertion ended OK.');
