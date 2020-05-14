@@ -1,3 +1,5 @@
+.nyc_output/
+dist/
 .DS_Store
 node_modules/
 docs/main
@@ -33,3 +35,4 @@ examples/simple-asset-transfer/fabric/**/hfc-key-store/
 
 bin/
 .tmp/
+lerna-debug.log
