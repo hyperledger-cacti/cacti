@@ -100,7 +100,9 @@ export class ConfigService {
         default: 4000,
       },
       apiCorsDomainCsv: {
-        doc: 'The Comma seperated list of domains to allow Cross Origin Resource Sharing from when serving API requests.',
+        doc: 'The Comma seperated list of domains to allow Cross Origin Resource Sharing from when ' +
+          'serving API requests. The wildcard (*) character is supported to allow CORS for any and all domains, ' +
+          'however using it is not recommended unless you are developing or demonstrating something with BIF.',
         format: '*',
         env: 'API_CORS_DOMAIN_CSV',
         arg: 'api-cors-domain-csv',
