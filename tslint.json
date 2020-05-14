@@ -5,5 +5,11 @@
     ],
     "jsRules": {},
     "rules": {},
-    "rulesDirectory": []
+    "rulesDirectory": [],
+    "linterOptions": {
+        "exclude": [
+            "packages/bif-sdk/src/main/typescript/generated/**/*.ts",
+            "packages/bif-sdk/src/main/typescript/public-api.ts"
+        ]
+    }
 }
