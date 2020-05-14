@@ -22,9 +22,7 @@
     "test-coverage": "lerna exec --stream --ignore '*/*cockpit' -- tap --timeout=600 src/test/typescript/unit/ --cov",
     "test-coverage-html": "lerna exec --stream --ignore '*/*cockpit' -- tap --timeout=600 src/test/typescript/unit/ --cov --coverage-report=lcov",
     "test-integration": "lerna exec --stream --ignore '*/*cockpit' -- tap --timeout=600 src/test/typescript/integration/",
-    "prepare": "npm run test",
-    "preversion": "npm test",
-    "version": "npm run changelog"
+    "version": "lerna version --no-push --conventional-commits --sign-git-commit --sign-git-tag"
   },
   "devDependencies": {
     "@commitlint/cli": "8.1.0",
