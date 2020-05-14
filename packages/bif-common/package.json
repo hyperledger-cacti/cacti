@@ -46,7 +46,11 @@
   },
   "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
   "dependencies": {
+    "joi": "14.3.1",
     "loglevel": "1.6.7",
     "loglevel-plugin-prefix": "0.8.4"
+  },
+  "devDependencies": {
+    "@types/joi": "14.3.4"
   }
 }
