@@ -110,10 +110,11 @@ export class ApiServer {
   createCorsMiddleware(): RequestHandler {
     const apiCorsDomainCsv = this.options.config.get('apiCorsDomainCsv');
     const allowedDomains = apiCorsDomainCsv.split(',');
+    const allDomainsAllowed = allowedDomains.includes('*');
 
     const corsOptions: CorsOptions = {
       origin: (origin: string | undefined, callback) => {
-        if (origin && allowedDomains.indexOf(origin) !== -1) {
+        if (allDomainsAllowed || origin && allowedDomains.indexOf(origin) !== -1) {
           callback(null, true);
         } else {
           callback(new Error(`CORS not allowed for Origin "${origin}".`));
