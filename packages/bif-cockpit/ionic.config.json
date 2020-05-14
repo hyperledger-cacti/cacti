@@ -1,0 +1,7 @@
+{
+  "name": "BIF Cockpit",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,67 @@
+{
+  "name": "@hyperledger-labs/bif-plugin-kv-storage-memory",
+  "version": "0.0.1",
+  "description": "Key/value storage plugin that has an in-memory backend. Only makes sense to use it for local development/demo environments where there is only a single BIF node running in your consortium.",
+  "main": "dist/bif-plugin-kv-storage-memory.node.umd.js",
+  "mainMinified": "dist/bif-plugin-kv-storage-memory.node.umd.min.js",
+  "browser": "dist/bif-plugin-kv-storage-memory.web.umd.js",
+  "browserMinified": "dist/bif-plugin-kv-storage-memory.web.umd.min.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/types/main/typescript/index.d.ts",
+  "scripts": {
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-labs/blockchain-integration-framework.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Blockchain",
+    "Interoperability",
+    "Integration"
+  ],
+  "author": {
+    "name": "Peter Somogyvari",
+    "email": "peter.somogyvari@accenture.com",
+    "url": "https://accenture.com"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger-labs/blockchain-integration-framework/issues"
+  },
+  "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
+  "dependencies": {
+    "@hyperledger-labs/bif-core-api": "^0.0.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog",
+      "maxHeaderWidth": 72
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "header-max-length": [
+        0,
+        "always",
+        72
+      ]
+    }
+  },
+  "devDependencies": {
+  }
+}

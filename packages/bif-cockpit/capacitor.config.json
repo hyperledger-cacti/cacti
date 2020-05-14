@@ -1,0 +1,8 @@
+{
+  "appId": "org.hyperledger.bif",
+  "appName": "BIF Cockpit",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "cordova": {}
+}
