@@ -22,7 +22,7 @@
     "webpack:node:prod": "lerna exec --stream --ignore '*/*cockpit' -- webpack --env=prod --target=node --config ../../webpack.config.js",
     "webpack:node:dev": "lerna exec --stream --ignore '*/*cockpit' -- webpack --env=dev --target=node --config ../../webpack.config.js",
     "changelog": "conventional-changelog --infile CHANGELOG.md --outfile CHANGELOG.md && git add CHANGELOG.md",
-    "commit": "git-cz",
+    "commit": "git-cz --signoff",
     "prettier": "prettier --write --config .prettierrc.json \"./**/*.{ts,js}\"",
     "setup": "lerna exec --stream --ignore '*/*cockpit' -- rm -rf node_modules package-lock.json",
     "lint": "lerna exec --stream --ignore '*/*cockpit' -- cross-env DEBUG= tslint --project tsconfig.json",
