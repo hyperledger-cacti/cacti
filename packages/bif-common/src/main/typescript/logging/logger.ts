@@ -1,4 +1,8 @@
-import libLogLevel, { Logger as LogLevelLogger, levels } from "loglevel";
+import libLogLevel, {
+  Logger as LogLevelLogger,
+  levels,
+  LogLevelDesc,
+} from "loglevel";
 import prefix from "loglevel-plugin-prefix";
 
 prefix.reg(libLogLevel);
@@ -18,7 +22,7 @@ prefix.apply(libLogLevel, {
 
 export interface ILoggerOptions {
   label: string;
-  level?: string;
+  level?: LogLevelDesc;
 }
 
 /**
@@ -33,9 +37,13 @@ export class Logger {
   private readonly backend: LogLevelLogger;
 
   constructor(public readonly options: ILoggerOptions) {
-    const level: string = options.level || "warn";
+    const level: LogLevelDesc = options.level || "warn";
     this.backend = libLogLevel.getLogger(options.label);
-    this.backend.setLevel(level.toUpperCase() as any);
+    this.backend.setLevel(level);
+  }
+
+  public setLogLevel(logLevel: LogLevelDesc): void {
+    this.backend.setLevel(logLevel);
   }
 
   public async shutdown(gracePeriodMillis: number = 60000): Promise<void> {

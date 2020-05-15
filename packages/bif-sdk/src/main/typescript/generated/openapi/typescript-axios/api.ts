@@ -22,52 +22,64 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
- * @interface BifNode
+ * @interface HealthCheckResponse
  */
-export interface BifNode {
+export interface HealthCheckResponse {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof HealthCheckResponse
+     */
+    success?: boolean;
     /**
      * 
      * @type {string}
-     * @memberof BifNode
+     * @memberof HealthCheckResponse
      */
-    host: string;
+    createdAt: string;
     /**
      * 
-     * @type {string}
-     * @memberof BifNode
+     * @type {MemoryUsage}
+     * @memberof HealthCheckResponse
      */
-    publicKey?: string;
+    memoryUsage: MemoryUsage;
 }
 /**
  * 
  * @export
- * @interface Consortium
+ * @interface MemoryUsage
  */
-export interface Consortium {
+export interface MemoryUsage {
     /**
      * 
-     * @type {string}
-     * @memberof Consortium
+     * @type {number}
+     * @memberof MemoryUsage
      */
-    id: string;
+    rss?: number;
     /**
      * 
-     * @type {string}
-     * @memberof Consortium
+     * @type {number}
+     * @memberof MemoryUsage
      */
-    name: string;
+    heapTotal?: number;
     /**
      * 
-     * @type {string}
-     * @memberof Consortium
+     * @type {number}
+     * @memberof MemoryUsage
      */
-    configurationEndpoint: string;
+    heapUsed?: number;
     /**
      * 
-     * @type {Array<BifNode>}
-     * @memberof Consortium
+     * @type {number}
+     * @memberof MemoryUsage
      */
-    bifNodes?: Array<BifNode>;
+    external?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof MemoryUsage
+     */
+    arrayBuffers?: number;
 }
 
 /**
@@ -77,19 +89,13 @@ export interface Consortium {
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * The metadata of the consortium (minus the sensitive data)
-         * @summary Retrieves a consortium
-         * @param {string} consortiumId 
+         * Returns the current timestamp of the API server as proof of health/liveness
+         * @summary Can be used to verify liveness of an API server instance
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1ConsortiumConsortiumIdGet(consortiumId: string, options: any = {}): RequestArgs {
-            // verify required parameter 'consortiumId' is not null or undefined
-            if (consortiumId === null || consortiumId === undefined) {
-                throw new RequiredError('consortiumId','Required parameter consortiumId was null or undefined when calling apiV1ConsortiumConsortiumIdGet.');
-            }
-            const localVarPath = `/api/v1/consortium/{consortiumId}`
-                .replace(`{${"consortiumId"}}`, encodeURIComponent(String(consortiumId)));
+        apiV1ApiServerHealthcheckGet(options: any = {}): RequestArgs {
+            const localVarPath = `/api/v1/api-server/healthcheck`;
             const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
             let baseOptions;
             if (configuration) {
@@ -111,44 +117,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @summary Creates a new consortium from scratch based on the provided parameters.
-         * @param {Consortium} consortium 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1ConsortiumPost(consortium: Consortium, options: any = {}): RequestArgs {
-            // verify required parameter 'consortium' is not null or undefined
-            if (consortium === null || consortium === undefined) {
-                throw new RequiredError('consortium','Required parameter consortium was null or undefined when calling apiV1ConsortiumPost.');
-            }
-            const localVarPath = `/api/v1/consortium`;
-            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
-            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
-            delete localVarUrlObj.search;
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...options.headers};
-            const needsSerialization = (typeof consortium !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(consortium !== undefined ? consortium : {}) : (consortium || "");
-
-            return {
-                url: globalImportUrl.format(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -159,28 +127,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
-         * The metadata of the consortium (minus the sensitive data)
-         * @summary Retrieves a consortium
-         * @param {string} consortiumId 
+         * Returns the current timestamp of the API server as proof of health/liveness
+         * @summary Can be used to verify liveness of an API server instance
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1ConsortiumConsortiumIdGet(consortiumId: string, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Consortium> {
-            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).apiV1ConsortiumConsortiumIdGet(consortiumId, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * 
-         * @summary Creates a new consortium from scratch based on the provided parameters.
-         * @param {Consortium} consortium 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1ConsortiumPost(consortium: Consortium, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void> {
-            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).apiV1ConsortiumPost(consortium, options);
+        apiV1ApiServerHealthcheckGet(options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<HealthCheckResponse> {
+            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).apiV1ApiServerHealthcheckGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -196,24 +149,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
-         * The metadata of the consortium (minus the sensitive data)
-         * @summary Retrieves a consortium
-         * @param {string} consortiumId 
+         * Returns the current timestamp of the API server as proof of health/liveness
+         * @summary Can be used to verify liveness of an API server instance
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1ConsortiumConsortiumIdGet(consortiumId: string, options?: any): AxiosPromise<Consortium> {
-            return DefaultApiFp(configuration).apiV1ConsortiumConsortiumIdGet(consortiumId, options)(axios, basePath);
-        },
-        /**
-         * 
-         * @summary Creates a new consortium from scratch based on the provided parameters.
-         * @param {Consortium} consortium 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV1ConsortiumPost(consortium: Consortium, options?: any): AxiosPromise<void> {
-            return DefaultApiFp(configuration).apiV1ConsortiumPost(consortium, options)(axios, basePath);
+        apiV1ApiServerHealthcheckGet(options?: any): AxiosPromise<HealthCheckResponse> {
+            return DefaultApiFp(configuration).apiV1ApiServerHealthcheckGet(options)(axios, basePath);
         },
     };
 };
@@ -226,27 +168,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export class DefaultApi extends BaseAPI {
     /**
-     * The metadata of the consortium (minus the sensitive data)
-     * @summary Retrieves a consortium
-     * @param {string} consortiumId 
+     * Returns the current timestamp of the API server as proof of health/liveness
+     * @summary Can be used to verify liveness of an API server instance
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public apiV1ConsortiumConsortiumIdGet(consortiumId: string, options?: any) {
-        return DefaultApiFp(this.configuration).apiV1ConsortiumConsortiumIdGet(consortiumId, options)(this.axios, this.basePath);
-    }
-
-    /**
-     * 
-     * @summary Creates a new consortium from scratch based on the provided parameters.
-     * @param {Consortium} consortium 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV1ConsortiumPost(consortium: Consortium, options?: any) {
-        return DefaultApiFp(this.configuration).apiV1ConsortiumPost(consortium, options)(this.axios, this.basePath);
+    public apiV1ApiServerHealthcheckGet(options?: any) {
+        return DefaultApiFp(this.configuration).apiV1ApiServerHealthcheckGet(options)(this.axios, this.basePath);
     }
 
 }

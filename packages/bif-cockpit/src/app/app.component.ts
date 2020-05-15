@@ -85,16 +85,7 @@ export class AppComponent implements OnInit {
     const BIF_API_HOST = "http://localhost:4000";
     const configuration = new Configuration({ basePath: BIF_API_HOST });
     const api = new DefaultApi(configuration);
-    const response = await api.apiV1ConsortiumPost({
-      configurationEndpoint: "domain-and-an-http-endpoint",
-      id: "asdf",
-      name: "asdf",
-      bifNodes: [
-        {
-          host: "BIF-NODE-HOST-1",
-          publicKey: "FAKE-PUBLIC-KEY",
-        },
-      ],
-    });
+    const response = await api.apiV1ApiServerHealthcheckGet();
+    this.logger.info(`HealthcheckResponse: `, response.data);
   }
 }

@@ -6,6 +6,10 @@ import {
 } from "@hyperledger-labs/bif-core-api";
 import { Logger, LoggerProvider } from "@hyperledger-labs/bif-common";
 
+import { promisify } from "util";
+import { Optional } from "typescript-optional";
+import { Server } from "http";
+import { Server as SecureServer } from "https";
 import Web3 from "web3";
 import {
   Contract,
@@ -41,6 +45,7 @@ export class PluginLedgerConnectorQuorum
   implements IPluginLedgerConnector<any, Contract>, IPluginWebService {
   private readonly web3: Web3;
   private readonly log: Logger;
+  private httpServer: Server | SecureServer | null = null;
 
   constructor(public readonly options: IPluginLedgerConnectorQuorumOptions) {
     if (!options) {
@@ -61,7 +66,21 @@ export class PluginLedgerConnectorQuorum
     });
   }
 
-  public installWebService(expressApp: any): IWebServiceEndpoint[] {
+  public getHttpServer(): Optional<Server | SecureServer> {
+    return Optional.ofNullable(this.httpServer);
+  }
+
+  public async shutdown(): Promise<void> {
+    const serverMaybe = this.getHttpServer();
+    if (serverMaybe.isPresent()) {
+      const server = serverMaybe.get();
+      await promisify(server.close.bind(server))();
+    }
+  }
+
+  public async installWebServices(
+    expressApp: any
+  ): Promise<IWebServiceEndpoint[]> {
     const endpoints: IWebServiceEndpoint[] = [];
     {
       const pluginId = this.getId(); // @hyperledger/cactus-plugin-ledger-connector-quorum
