@@ -55,5 +55,7 @@ module.exports = {
     umdNamedDefine: true,
     globalObject: "this",
   },
-  externals: {},
+  externals: {
+    express: "express",
+  },
 };

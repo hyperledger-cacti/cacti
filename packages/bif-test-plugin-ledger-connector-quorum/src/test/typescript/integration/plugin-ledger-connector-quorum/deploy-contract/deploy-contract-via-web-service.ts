@@ -1,6 +1,6 @@
 // tslint:disable-next-line: no-var-requires
 const tap = require("tap");
-import axios, { AxiosPromise, AxiosInstance } from "axios";
+import axios, { AxiosPromise, AxiosInstance, AxiosResponse } from "axios";
 import {
   QuorumTestLedger,
   IQuorumGenesisOptions,
@@ -8,12 +8,7 @@ import {
 } from "@hyperledger-labs/bif-test-tooling";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import { Logger, LoggerProvider } from "@hyperledger-labs/bif-common";
-import {
-  Web3EthContract,
-  IQuorumDeployContractOptions,
-  PluginLedgerConnectorQuorum,
-  PluginFactoryLedgerConnector,
-} from "@hyperledger-labs/bif-plugin-ledger-connector-quorum";
+import { PluginLedgerConnectorQuorum } from "@hyperledger-labs/bif-plugin-ledger-connector-quorum";
 import {
   ApiServer,
   ConfigService,
@@ -21,7 +16,11 @@ import {
 } from "@hyperledger-labs/bif-cmd-api-server";
 import { ICactusPlugin } from "@hyperledger-labs/bif-core-api";
 import { PluginKVStorageMemory } from "@hyperledger-labs/bif-plugin-kv-storage-memory";
-import { DefaultApi, Configuration } from "@hyperledger-labs/bif-sdk";
+import {
+  DefaultApi,
+  Configuration,
+  HealthCheckResponse,
+} from "@hyperledger-labs/bif-sdk";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-deploy-contract-via-web-service",
@@ -90,19 +89,12 @@ tap.test(
     const api = new DefaultApi(configuration);
 
     // 7. Issue an API call to the API server via the SDK verifying that the SDK and the API server both work
-    const response = await api.apiV1ConsortiumPost({
-      configurationEndpoint: "domain-and-an-http-endpoint",
-      id: "asdf",
-      name: "asdf",
-      bifNodes: [
-        {
-          host: "BIF-NODE-HOST-1",
-          publicKey: "FAKE-PUBLIC-KEY",
-        },
-      ],
-    });
-    assert.ok(response);
-    assert.ok(response.status > 199 && response.status < 300);
+    const healthcheckResponse: AxiosResponse<HealthCheckResponse> = await api.apiV1ApiServerHealthcheckGet();
+    assert.ok(healthcheckResponse);
+    assert.ok(healthcheckResponse.data);
+    assert.ok(healthcheckResponse.data.success);
+    assert.ok(healthcheckResponse.data.memoryUsage);
+    assert.ok(healthcheckResponse.data.createdAt);
 
     // 8. Assemble request to invoke the deploy contract method of the quorum ledger connector plugin via the REST API
     const bodyObject = {
@@ -117,7 +109,7 @@ tap.test(
     const response2 = await axios.post(url, bodyObject, {});
     assert.ok(response2, "Response for contract deployment is truthy");
     assert.ok(
-      response2.status > 199 && response.status < 300,
+      response2.status > 199 && healthcheckResponse.status < 300,
       "Response status code for contract deployment is 2xx"
     );
     assert.end();

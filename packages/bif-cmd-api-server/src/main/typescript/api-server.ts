@@ -5,7 +5,6 @@ import express, {
   Express,
   Request,
   Response,
-  NextFunction,
   RequestHandler,
   Application,
 } from "express";
@@ -21,8 +20,7 @@ import {
   isIPluginWebService,
   IPluginWebService,
 } from "@hyperledger-labs/bif-core-api";
-import { CreateConsortiumEndpointV1 } from "./consortium/routes/create-consortium-endpoint-v1";
-import { IBifApiServerOptions, ConfigService } from "./config/config-service";
+import { IBifApiServerOptions } from "./config/config-service";
 import { BIF_OPEN_API_JSON } from "./openapi-spec";
 import { Logger, LoggerProvider } from "@hyperledger-labs/bif-common";
 import { Servers } from "./common/servers";
@@ -70,6 +68,21 @@ export class ApiServer {
   }
 
   public async shutdown(): Promise<void> {
+    this.log.info(`Shutting down API server ...`);
+    const webServicesShutdown = this.options.plugins
+      .filter((pluginInstance) => isIPluginWebService(pluginInstance))
+      .map((pluginInstance: ICactusPlugin) => {
+        return (pluginInstance as IPluginWebService).shutdown();
+      });
+
+    this.log.info(
+      `Found ${webServicesShutdown.length} web service plugin(s), shutting them down ...`
+    );
+    await Promise.all(webServicesShutdown);
+    this.log.info(
+      `Shut down ${webServicesShutdown.length} web service plugin(s) OK`
+    );
+
     if (this.httpServerApi) {
       this.log.info(`Closing HTTP server of the API...`);
       await Servers.shutdown(this.httpServerApi);
@@ -124,31 +137,23 @@ export class ApiServer {
     const openApiValidator = this.createOpenApiValidator();
     await openApiValidator.install(app);
 
-    app.get(
-      "/healthcheck",
-      (req: Request, res: Response, next: NextFunction) => {
-        res.json({ success: true, timestamp: new Date() });
-      }
-    );
-
-    const storage: IPluginKVStorage = await this.createStoragePlugin();
-    const configService = new ConfigService();
-    const config = configService.getOrCreate();
-    {
-      const endpoint = new CreateConsortiumEndpointV1({ storage, config });
-      app.post(endpoint.getPath(), endpoint.handleRequest.bind(endpoint));
-    }
-
-    this.options.plugins
-      .filter((pluginInstance) => isIPluginWebService(pluginInstance))
-      .forEach((pluginInstance: ICactusPlugin) => {
-        (pluginInstance as IPluginWebService).installWebService(app);
+    const healthcheckHandler = (req: Request, res: Response) => {
+      res.json({
+        success: true,
+        createdAt: new Date(),
+        memoryUsage: process.memoryUsage(),
       });
+    };
+    app.get("/api/v1/api-server/healthcheck", healthcheckHandler);
 
-    // FIXME
-    // app.get('/api/v1/consortium/:consortiumId', (req: Request, res: Response, next: NextFunction) => {
-    //   res.json({ swagger: 'TODO' });
-    // });
+    this.log.info(`Starting to install web services...`);
+    const webServicesInstalled = this.options.plugins
+      .filter((pluginInstance) => isIPluginWebService(pluginInstance))
+      .map((pluginInstance: ICactusPlugin) => {
+        return (pluginInstance as IPluginWebService).installWebServices(app);
+      });
+    await Promise.all(webServicesInstalled);
+    this.log.info(`Installed ${webServicesInstalled.length} web services OK`);
 
     const apiPort: number = this.options.config.get("apiPort");
     const apiHost: string = this.options.config.get("apiHost");

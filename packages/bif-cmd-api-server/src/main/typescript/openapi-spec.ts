@@ -29,86 +29,64 @@ export const BIF_OPEN_API_JSON: OpenAPI.OpenAPIV3.Document = {
   ],
   components: {
     schemas: {
-      Consortium: {
+      MemoryUsage: {
         type: "object",
         properties: {
-          id: {
-            type: "string",
+          rss: {
+            title: "Resident Set Size",
+            type: "number",
           },
-          name: {
-            type: "string",
+          heapTotal: {
+            title: "V8 memory usage - heap total",
+            type: "number",
           },
-          configurationEndpoint: {
-            type: "string",
+          heapUsed: {
+            title: "V8 memory usage - heap used",
+            type: "number",
           },
-          bifNodes: {
-            type: "array",
-            minItems: 1,
-            items: {
-              $ref: "#/components/schemas/BifNode",
-            },
+          external: {
+            title:
+              "Memory usage of C++ objects bound to JavaScript objects managed by V8",
+            type: "number",
+          },
+          arrayBuffers: {
+            title:
+              "Memory allocated for ArrayBuffers and SharedArrayBuffers, including all Node.js Buffers",
+            type: "number",
           },
         },
-        required: ["id", "name", "configurationEndpoint"],
       },
-      BifNode: {
+      HealthCheckResponse: {
         type: "object",
         properties: {
-          host: {
+          success: {
+            type: "boolean",
+          },
+          createdAt: {
             type: "string",
           },
-          publicKey: {
-            type: "string",
+          memoryUsage: {
+            $ref: "#/components/schemas/MemoryUsage",
           },
         },
-        required: ["host", "publicKeyHex"],
+        required: ["createdAt", "memoryUsage"],
       },
     },
   },
   paths: {
-    "/api/v1/consortium": {
-      post: {
-        summary:
-          "Creates a new consortium from scratch based on the provided parameters.",
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                $ref: "#/components/schemas/Consortium",
-              },
-            },
-          },
-        },
-        responses: {
-          "201": {
-            description: "Created",
-          },
-        },
-      },
-    },
-    "/api/v1/consortium/{consortiumId}": {
+    "/api/v1/api-server/healthcheck": {
       get: {
-        summary: "Retrieves a consortium",
+        summary: "Can be used to verify liveness of an API server instance",
         description:
-          "The metadata of the consortium (minus the sensitive data)",
-        parameters: [
-          {
-            in: "path",
-            name: "consortiumId",
-            required: true,
-            schema: {
-              type: "string",
-            },
-          },
-        ],
+          "Returns the current timestamp of the API server as proof of health/liveness",
+        parameters: [],
         responses: {
           "200": {
             description: "OK",
             content: {
               "application/json": {
                 schema: {
-                  $ref: "#/components/schemas/Consortium",
+                  $ref: "#/components/schemas/HealthCheckResponse",
                 },
               },
             },

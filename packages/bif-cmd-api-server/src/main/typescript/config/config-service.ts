@@ -2,12 +2,16 @@ import { randomBytes } from "crypto";
 import convict, { Schema, Config, SchemaObj } from "convict";
 import secp256k1 from "secp256k1";
 import { v4 as uuidV4 } from "uuid";
-import { LoggerProvider, Logger } from "@hyperledger-labs/bif-common";
+import {
+  LoggerProvider,
+  Logger,
+  LogLevelDesc,
+} from "@hyperledger-labs/bif-common";
 
 export interface IBifApiServerOptions {
   configFile: string;
   bifNodeId: string;
-  logLevel: string;
+  logLevel: LogLevelDesc;
   cockpitHost: string;
   cockpitPort: number;
   cockpitWwwRoot: string;
