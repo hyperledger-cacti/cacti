@@ -23,31 +23,37 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger-labs/blockchain-integration-framework.git"
+    "url": "git+https://github.com/hyperledger/cactus.git"
   },
   "keywords": [
     "Hyperledger",
+    "Cactus",
+    "Integration",
     "Blockchain",
-    "Interoperability",
-    "Integration"
+    "Distributed Ledger Technology"
   ],
   "author": {
-    "name": "Peter Somogyvari",
-    "email": "peter.somogyvari@accenture.com",
-    "url": "https://accenture.com"
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
   },
   "contributors": [
     {
       "name": "Please add yourself to the list of contributors",
       "email": "your.name@example.com",
       "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
     }
   ],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/hyperledger-labs/blockchain-integration-framework/issues"
+    "url": "https://github.com/hyperledger/cactus/issues"
   },
-  "homepage": "https://github.com/hyperledger-labs/blockchain-integration-framework#readme",
+  "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "joi": "14.3.1",
     "loglevel": "1.6.7",

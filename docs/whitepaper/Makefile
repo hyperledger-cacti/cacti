@@ -5,16 +5,16 @@ PDFLAGS = --from=markdown_mmd+yaml_metadata_block+smart+grid_tables+pipe_tables 
 WK_DEB_FILE = wkhtmltox_0.12.5-1.bionic_amd64.deb
 WK_DEB_URL = https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb
 WK = wkhtmltopdf
-WKFLAGS = --dpi 150 --disable-smart-shrinking hyperledger-blockchain-integration-framework-whitepaper.html --allow $(pwd)
+WKFLAGS = --dpi 150 --disable-smart-shrinking hyperledger-cactus-whitepaper.html --allow $(pwd)
 
 
 .PHONY: pdf
 pdf: html
-	$(WK) $(WKFLAGS) - hyperledger-blockchain-integration-framework-whitepaper.pdf
+	$(WK) $(WKFLAGS) - hyperledger-cactus-whitepaper.pdf
 
 .PHONY: html
 html:
-	$(PD) $(PDFLAGS) > hyperledger-blockchain-integration-framework-whitepaper.html
+	$(PD) $(PDFLAGS) > hyperledger-cactus-whitepaper.html
 
 install-wkhtmltox:
 	wget $(WK_DEB_URL)
