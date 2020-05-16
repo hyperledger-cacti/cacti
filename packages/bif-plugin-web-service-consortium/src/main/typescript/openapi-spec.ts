@@ -124,7 +124,7 @@ export async function exportToFileSystemAsJson(): Promise<void> {
   const fs = await import("fs");
   const destination =
     process.argv[2] ||
-    "./generated-sources/cactus-openapi-spec-plugin-web-service-consortium.json";
+    "./cactus-openapi-spec-plugin-web-service-consortium.json";
 
   // tslint:disable-next-line: no-console
   console.log(

@@ -14,7 +14,7 @@
   "scripts": {
     "export-open-api-spec": "ts-node -e 'import(\"./src/main/typescript/openapi-spec\").then((x) => x.exportToFileSystemAsJson());'",
     "pregenerate-sdk": "npm-run-all export-open-api-spec",
-    "generate-sdk": "openapi-generator generate --input-spec generated-sources/cactus-openapi-spec-plugin-web-service-consortium.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
+    "generate-sdk": "openapi-generator generate --input-spec cactus-openapi-spec-plugin-web-service-consortium.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
     "tsc": "tsc --project ./tsconfig.json",
     "posttsc": "npm run generate-sdk"
   },
