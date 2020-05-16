@@ -36,4 +36,4 @@ examples/simple-asset-transfer/fabric/**/hfc-key-store/
 bin/
 .tmp/
 lerna-debug.log
-bif-openapi-spec.json
+cactus-openapi-spec.json

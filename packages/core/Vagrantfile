@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   config.vm.network "public_network", bridge: "Default Switch"
 
   config.vm.provider :hyperv do |hyperv|
-    hyperv.vmname = "BIF-CI-Box"
+    hyperv.vmname = "CACTUS-CI-Box"
     hyperv.maxmemory = 16384
     hyperv.cpus = 4
   end

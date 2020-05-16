@@ -12,7 +12,7 @@ const TMP_DIR = join(PROJECT_ROOT, './.tmp');
  * to be executed. It just needs NodeJS installed on the host operating system to be ready to go.
  *
  * The script is responsible for generating an npm package archivel file with a fixed name that can be used to install
- * BIF locally for the examples without having to depend on remote Github URLs/registries for installation (which
+ * Cactus locally for the examples without having to depend on remote Github URLs/registries for installation (which
  * hugely complicates things and makes the whole process less deterministic)
  *
  * CWD (current working directory) agnostic: script anchors paths based on assumption that it is one level down from

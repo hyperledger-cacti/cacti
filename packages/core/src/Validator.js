@@ -14,7 +14,7 @@ const Multisig = require(`./Multisig`);
 const logger = log4js.getLogger(`Validator`);
 logger.level = `DEBUG`;
 
-const BIF_LEADER = 'bif/leader';
+const CACTUS_LEADER = 'cactus/leader';
 
 /**
  * Validator
@@ -136,7 +136,7 @@ class Validator {
     // Setup the watcher
     const watcher = await this.etcdClient
       .watch()
-      .key(BIF_LEADER)
+      .key(CACTUS_LEADER)
       .create();
     logger.debug(`Etcd watcher set up OK.`);
 
@@ -145,7 +145,7 @@ class Validator {
       .on('connected', () => logger.debug('[WATCH] successfully reconnected!', this.selfNodeInfo))
       .on('put', res => {
         const newLeaderNodeInfoJson = res.value.toString('utf8');
-        logger.debug(`[WATCH] key ${BIF_LEADER} got set to new value: `, newLeaderNodeInfoJson);
+        logger.debug(`[WATCH] key ${CACTUS_LEADER} got set to new value: `, newLeaderNodeInfoJson);
         const newLeaderNodeInfo = JSON.parse(newLeaderNodeInfoJson);
         this.switchToNewLeader(newLeaderNodeInfo);
         // TODO: check if this gets called when leader ttl expires as well. If yes, we can pounce on that to attempt
@@ -162,9 +162,9 @@ class Validator {
       return Promise.resolve();
     }
     return this.etcdClient
-      .if(BIF_LEADER, 'Lease', '==', 0)
-      .then(theLease.put(BIF_LEADER).value(JSON.stringify(this.selfNodeInfo)))
-      .else(this.etcdClient.get(BIF_LEADER))
+      .if(CACTUS_LEADER, 'Lease', '==', 0)
+      .then(theLease.put(CACTUS_LEADER).value(JSON.stringify(this.selfNodeInfo)))
+      .else(this.etcdClient.get(CACTUS_LEADER))
       .commit()
       .then(txnResponse => {
         logger.debug(`attemptToBecomeLeader() succeeded=${txnResponse.succeeded}`);
@@ -175,8 +175,8 @@ class Validator {
           // For details on the txResponse structure visit the link below:
           // https://mixer.github.io/etcd3/interfaces/rpc_.itxnresponse.html
           const { responses } = txnResponse;
-          const [getBifLeaderResponse] = responses;
-          const { response_range: responseRange } = getBifLeaderResponse;
+          const [getCactusLeaderResponse] = responses;
+          const { response_range: responseRange } = getCactusLeaderResponse;
           const { kvs } = responseRange;
           const [newLeaderNodeInfoEntry] = kvs;
           const { value: newLeaderNodeInfoBuffer } = newLeaderNodeInfoEntry;

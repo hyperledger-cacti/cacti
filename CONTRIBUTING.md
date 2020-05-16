@@ -39,14 +39,14 @@ If you are adding a development dependency you can use the `--dev` option and `-
 
 ### Adding a sibling package npm dependency to one of the packages:
 
-For example the `bif-test-tooling` can be added as a dev dependency to the besu ledger connector plugin's package this way:
+For example the `cactus-test-tooling` can be added as a dev dependency to the besu ledger connector plugin's package this way:
 
 ```sh
-npx lerna add @hyperledger-labs/bif-test-tooling --scope '*/*plugin-ledger-connector-besu' --exact --dev
+npx lerna add @hyperledger/cactus-test-tooling --scope '*/*plugin-ledger-connector-besu' --exact --dev
 ```
 
 Or add the common library to allow you the usage of the logger for example:
 
 ```sh
-npx lerna add @hyperledger-labs/bif-common --scope '*/*plugin-ledger-connector-quorum' --exact --dev
+npx lerna add @hyperledger/cactus-common --scope '*/*plugin-ledger-connector-quorum' --exact --dev
 ```
