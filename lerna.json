@@ -1,6 +1,6 @@
 {
   "packages": [
-    "packages/bif-*"
+    "packages/cactus-*"
   ],
   "version": "fixed",
   "command": {

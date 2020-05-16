@@ -2,7 +2,7 @@ const fs = require("fs");
 const inquirer = require("inquirer");
 const {
   ConfigService,
-} = require("../packages/bif-cmd-api-server/dist/lib/main/typescript/config/config-service");
+} = require("../packages/cactus-cmd-api-server/dist/lib/main/typescript/config/config-service");
 
 const main = async () => {
   const configService = new ConfigService();
@@ -30,9 +30,9 @@ const main = async () => {
     fs.writeFileSync(config.configFile, configJson);
     console.log(`Written generated config to: ${config.configFile}`);
   }
-  const apiServerCmd = `node ./packages/bif-cmd-api-server/dist/lib/main/typescript/cmd/bif-api.js --config-file=${config.configFile}`;
+  const apiServerCmd = `node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=${config.configFile}`;
   console.log(
-    `You can start the BIF API server with ${config.configFile} by executing this from the project root:`
+    `You can start the Cactus API server with ${config.configFile} by executing this from the project root:`
   );
   console.log(apiServerCmd);
 };
