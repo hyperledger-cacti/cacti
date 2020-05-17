@@ -5,7 +5,8 @@ import { SplashScreen } from "@ionic-native/splash-screen/ngx";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
 
 import { LoggerProvider, Logger } from "@hyperledger/cactus-common";
-import { DefaultApi, Configuration } from "@hyperledger/cactus-sdk";
+import { DefaultApi as DefaultApiConsortium } from "@hyperledger/cactus-plugin-web-service-consortium";
+import { ApiClient, Configuration } from "@hyperledger/cactus-sdk";
 
 @Component({
   selector: "app-root",
@@ -84,8 +85,26 @@ export class AppComponent implements OnInit {
   async testApi(): Promise<void> {
     const CACTUS_API_HOST = "http://localhost:4000";
     const configuration = new Configuration({ basePath: CACTUS_API_HOST });
-    const api = new DefaultApi(configuration);
-    const response = await api.apiV1ApiServerHealthcheckGet();
-    this.logger.info(`HealthcheckResponse: `, response.data);
+    const apiClient = new ApiClient(configuration).extendWith(
+      DefaultApiConsortium
+    );
+    const dummyConsortium = {
+      configurationEndpoint: "some-host",
+      id: "some-id",
+      name: "some-name",
+      cactusNodes: [{ host: "some-host", publicKey: "some-fake-public-key" }],
+    };
+    const createConsortiumResponse = await apiClient.apiV1PluginsHyperledgerCactusPluginWebServiceConsortiumConsortiumPost(
+      dummyConsortium
+    );
+    const healthCheckResponse = await apiClient.apiV1ApiServerHealthcheckGet();
+    this.logger.info(
+      `apiV1PluginsHyperledgerCactusPluginWebServiceConsortiumConsortiumPost: `,
+      createConsortiumResponse.data
+    );
+    this.logger.info(
+      `apiV1ApiServerHealthcheckGet: `,
+      healthCheckResponse.data
+    );
   }
 }
