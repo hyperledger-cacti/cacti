@@ -2,7 +2,8 @@
   "name": "@hyperledger-labs/cactus",
   "private": true,
   "scripts": {
-    "configure": "lerna clean --yes && lerna bootstrap && npm run build && node ./tools/generate-api-server-config.js",
+    "configure": "lerna clean --yes && lerna bootstrap && npm-run-all build generate-api-server-config",
+    "generate-api-server-config": "node ./tools/generate-api-server-config.js",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
     "export-open-api-spec": "ts-node -e 'import(\"./packages/cactus-cmd-api-server/src/main/typescript/openapi-spec\").then((x) => x.exportToFileSystemAsJson());'",
     "pregenerate-sdk": "npm-run-all export-open-api-spec",
