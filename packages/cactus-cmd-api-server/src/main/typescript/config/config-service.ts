@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 import convict, { Schema, Config, SchemaObj } from "convict";
+import { ipaddress } from "convict-format-with-validator";
 import secp256k1 from "secp256k1";
 import { v4 as uuidV4 } from "uuid";
 import {
@@ -7,6 +8,16 @@ import {
   Logger,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
+import { PluginAspect } from "@hyperledger/cactus-core-api";
+import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
+
+convict.addFormat(FORMAT_PLUGIN_ARRAY);
+convict.addFormat(ipaddress);
+
+export interface IPluginImport {
+  packageName: string;
+  options?: any;
+}
 
 export interface ICactusApiServerOptions {
   configFile: string;
@@ -18,6 +29,7 @@ export interface ICactusApiServerOptions {
   apiHost: string;
   apiPort: number;
   apiCorsDomainCsv: string;
+  plugins: IPluginImport[];
   storagePluginPackage: string;
   storagePluginOptionsJson: string;
   keychainPluginPackage: string;
@@ -60,6 +72,18 @@ export class ConfigService {
 
   private static getConfigSchema(): Schema<ICactusApiServerOptions> {
     return {
+      plugins: {
+        doc: "A collection of plugins to load at runtime.",
+        format: "plugin-array",
+        default: [],
+        env: "PLUGINS",
+        arg: "plugins",
+        pluginSchema: {
+          aspect: "*",
+          packageName: "*",
+          options: {},
+        },
+      } as any,
       configFile: {
         doc:
           "The path to a config file that holds the configuration itself which will be parsed and validated.",
@@ -272,6 +296,22 @@ export class ConfigService {
     const publicKey = Buffer.from(publicKeyBytes).toString("hex");
 
     return {
+      plugins: [
+        {
+          packageName: "@hyperledger/cactus-plugin-kv-storage-memory",
+          options: {},
+        },
+        {
+          packageName: "@hyperledger/cactus-plugin-keychain-memory",
+          options: {},
+        },
+        {
+          packageName: "@hyperledger/cactus-plugin-web-service-consortium",
+          options: {
+            privateKey: "some-fake-key",
+          },
+        },
+      ],
       configFile: ".config.json",
       cactusNodeId: uuidV4(),
       logLevel: "debug",

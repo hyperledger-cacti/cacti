@@ -8,7 +8,7 @@ import {
   ConfigService,
   ICactusApiServerOptions,
 } from "@hyperledger/cactus-cmd-api-server";
-import { ICactusPlugin, PluginRegistry } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core-api";
 import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
 import {
   DefaultApi,
@@ -20,7 +20,7 @@ import {
   Configuration as ConfigurationPlugin,
   PluginWebServiceConsortium,
   IPluginWebServiceConsortiumOptions,
-} from "../../../main/typescript/";
+} from "@hyperledger/cactus-plugin-web-service-consortium";
 
 LoggerProvider.setLogLevel("TRACE");
 const log: Logger = LoggerProvider.getOrCreate({
