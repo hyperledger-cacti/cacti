@@ -23,6 +23,7 @@
     "@angular/router": "8.2.14",
     "@capacitor/core": "1.5.1",
     "@hyperledger/cactus-common": "0.2.0",
+    "@hyperledger/cactus-plugin-web-service-consortium": "0.2.0",
     "@hyperledger/cactus-sdk": "0.2.0",
     "@ionic-native/core": "5.0.0",
     "@ionic-native/splash-screen": "5.0.0",

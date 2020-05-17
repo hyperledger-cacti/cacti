@@ -1,18 +1,24 @@
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Objects } from "@hyperledger/cactus-common";
+import {
+  Configuration,
+  DefaultApi,
+} from "./generated/openapi/typescript-axios";
 
-export interface IApiClientOptions {
-  apiHost: string;
-  apiPort: number;
-}
+export class ApiClient extends DefaultApi {
+  public extendWith<T extends {}>(
+    ctor: new (configuration?: Configuration) => T
+  ): T & this {
+    const instance = new ctor(this.configuration) as any;
+    const self = this as any;
 
-export class ApiClient {
-  private readonly log: Logger;
+    Objects.getAllMethodNames(instance).forEach(
+      (method: string) => (self[method] = instance[method])
+    );
 
-  constructor(public readonly options: IApiClientOptions) {
-    this.log = LoggerProvider.getOrCreate({ label: "api-client " });
-  }
+    Objects.getAllFieldNames(instance).forEach(
+      (field: string) => (self[field] = instance[field])
+    );
 
-  public async call(): Promise<void> {
-    this.log.debug(`call()`);
+    return this as T & this;
   }
 }
