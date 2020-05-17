@@ -1,6 +1,6 @@
 // tslint:disable-next-line: no-var-requires
 const tap = require("tap");
-import axios, { AxiosPromise, AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import {
   QuorumTestLedger,
   IQuorumGenesisOptions,

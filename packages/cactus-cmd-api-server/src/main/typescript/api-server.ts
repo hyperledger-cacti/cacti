@@ -1,6 +1,5 @@
 import path from "path";
 import { Server } from "http";
-import { Config } from "convict";
 import express, {
   Express,
   Request,
@@ -13,10 +12,8 @@ import compression from "compression";
 import bodyParser from "body-parser";
 import cors, { CorsOptions } from "cors";
 import {
-  IPluginKVStorage,
   PluginFactory,
   ICactusPlugin,
-  PluginAspect,
   isIPluginWebService,
   IPluginWebService,
   PluginRegistry,
@@ -73,8 +70,10 @@ export class ApiServer {
   public async getOrInitPluginRegistry(): Promise<PluginRegistry> {
     if (!this.pluginRegistry) {
       if (!this.options.pluginRegistry) {
+        this.log.info(`getOrInitPluginRegistry() initializing a new one...`);
         this.pluginRegistry = await this.initPluginRegistry();
       } else {
+        this.log.info(`getOrInitPluginRegistry() re-using injected one...`);
         this.pluginRegistry = this.options.pluginRegistry;
       }
     }
@@ -83,16 +82,18 @@ export class ApiServer {
 
   public async initPluginRegistry(): Promise<PluginRegistry> {
     const registry = new PluginRegistry({ plugins: [] });
-    // FIXME load the plugins here:
 
-    {
-      const storagePluginPackage = this.options.config.storagePluginPackage;
-      const { PluginFactoryKVStorage } = await import(storagePluginPackage);
-      const storagePluginOptionsJson = this.options.config
-        .storagePluginOptionsJson;
-      const storagePluginOptions = JSON.parse(storagePluginOptionsJson);
-      const pluginFactory = new PluginFactoryKVStorage();
-      const plugin = await pluginFactory.create(storagePluginOptions);
+    this.log.info(`Instantiated empty registry, invoking plugin factories...`);
+    for (const pluginImport of this.options.config.plugins) {
+      const { packageName, options } = pluginImport;
+      this.log.info(`Creating plugin from package: ${packageName}`, options);
+      const pluginOptions = { ...options, pluginRegistry: registry };
+      const { createPluginFactory } = await import(packageName);
+      const pluginFactory: PluginFactory<
+        ICactusPlugin,
+        any
+      > = await createPluginFactory();
+      const plugin = await pluginFactory.create(pluginOptions);
       registry.add(plugin);
     }
 

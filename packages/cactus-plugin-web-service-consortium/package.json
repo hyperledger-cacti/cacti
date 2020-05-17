@@ -68,7 +68,6 @@
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-cmd-api-server": "0.2.0",
     "@hyperledger/cactus-plugin-kv-storage-memory": "0.2.0",
     "@hyperledger/cactus-sdk": "0.2.0",
     "@types/express": "4.17.6",
