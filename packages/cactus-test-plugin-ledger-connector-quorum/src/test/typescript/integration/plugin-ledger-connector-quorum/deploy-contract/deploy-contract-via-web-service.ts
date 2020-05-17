@@ -14,7 +14,7 @@ import {
   ConfigService,
   ICactusApiServerOptions,
 } from "@hyperledger/cactus-cmd-api-server";
-import { ICactusPlugin } from "@hyperledger/cactus-core-api";
+import { ICactusPlugin, PluginRegistry } from "@hyperledger/cactus-core-api";
 import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
 import {
   DefaultApi,
@@ -59,8 +59,12 @@ tap.test(
       rpcApiHttpHost,
     });
     plugins.push(ledgerConnectorQuorum);
+    const pluginRegistry = new PluginRegistry({ plugins });
 
-    const apiServer = new ApiServer({ config, plugins });
+    const apiServer = new ApiServer({
+      config: config.getProperties(),
+      pluginRegistry,
+    });
     assert.tearDown(() => apiServer.shutdown());
 
     // 4. Start the API server which now is connected to the quorum ledger

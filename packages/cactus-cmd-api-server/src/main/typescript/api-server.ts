@@ -19,19 +19,21 @@ import {
   PluginAspect,
   isIPluginWebService,
   IPluginWebService,
+  PluginRegistry,
 } from "@hyperledger/cactus-core-api";
-import { ICactusApiServerOptions } from "./config/config-service";
+import { ICactusApiServerOptions as ICactusApiServerConfig } from "./config/config-service";
 import { CACTUS_OPEN_API_JSON } from "./openapi-spec";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { Servers } from "./common/servers";
 
 export interface IApiServerConstructorOptions {
-  plugins: ICactusPlugin[];
-  config: Config<ICactusApiServerOptions>;
+  pluginRegistry?: PluginRegistry;
+  config: ICactusApiServerConfig;
 }
 
 export class ApiServer {
   private readonly log: Logger;
+  private pluginRegistry: PluginRegistry | undefined;
   private httpServerApi: Server | null = null;
   private httpServerCockpit: Server | null = null;
 
@@ -42,9 +44,10 @@ export class ApiServer {
     if (!options.config) {
       throw new Error(`ApiServer#ctor options.config was falsy`);
     }
+
     this.log = LoggerProvider.getOrCreate({
       label: "api-server",
-      level: options.config.get("logLevel"),
+      level: options.config.logLevel,
     });
   }
 
@@ -67,21 +70,48 @@ export class ApiServer {
     return this.httpServerCockpit;
   }
 
+  public async getOrInitPluginRegistry(): Promise<PluginRegistry> {
+    if (!this.pluginRegistry) {
+      if (!this.options.pluginRegistry) {
+        this.pluginRegistry = await this.initPluginRegistry();
+      } else {
+        this.pluginRegistry = this.options.pluginRegistry;
+      }
+    }
+    return this.pluginRegistry;
+  }
+
+  public async initPluginRegistry(): Promise<PluginRegistry> {
+    const registry = new PluginRegistry({ plugins: [] });
+    // FIXME load the plugins here:
+
+    {
+      const storagePluginPackage = this.options.config.storagePluginPackage;
+      const { PluginFactoryKVStorage } = await import(storagePluginPackage);
+      const storagePluginOptionsJson = this.options.config
+        .storagePluginOptionsJson;
+      const storagePluginOptions = JSON.parse(storagePluginOptionsJson);
+      const pluginFactory = new PluginFactoryKVStorage();
+      const plugin = await pluginFactory.create(storagePluginOptions);
+      registry.add(plugin);
+    }
+
+    return registry;
+  }
+
   public async shutdown(): Promise<void> {
     this.log.info(`Shutting down API server ...`);
-    const webServicesShutdown = this.options.plugins
+    const registry = await this.getOrInitPluginRegistry();
+    const webServicesShutdown = registry
+      .getPlugins()
       .filter((pluginInstance) => isIPluginWebService(pluginInstance))
       .map((pluginInstance: ICactusPlugin) => {
         return (pluginInstance as IPluginWebService).shutdown();
       });
 
-    this.log.info(
-      `Found ${webServicesShutdown.length} web service plugin(s), shutting them down ...`
-    );
+    this.log.info(`Stopping ${webServicesShutdown.length} WS plugin(s)...`);
     await Promise.all(webServicesShutdown);
-    this.log.info(
-      `Shut down ${webServicesShutdown.length} web service plugin(s) OK`
-    );
+    this.log.info(`Stopped ${webServicesShutdown.length} WS plugin(s) OK`);
 
     if (this.httpServerApi) {
       this.log.info(`Closing HTTP server of the API...`);
@@ -97,7 +127,7 @@ export class ApiServer {
   }
 
   async startCockpitFileServer(): Promise<void> {
-    const cockpitWwwRoot = this.options.config.get("cockpitWwwRoot");
+    const cockpitWwwRoot = this.options.config.cockpitWwwRoot;
     this.log.info(`wwwRoot: ${cockpitWwwRoot}`);
 
     const resolvedWwwRoot = path.resolve(process.cwd(), cockpitWwwRoot);
@@ -111,14 +141,13 @@ export class ApiServer {
     app.use(express.static(resolvedWwwRoot));
     app.get("/*", (_, res) => res.sendFile(resolvedIndexHtml));
 
-    const cockpitPort: number = this.options.config.get("cockpitPort");
-    const cockpitHost: string = this.options.config.get("cockpitHost");
+    const cockpitPort: number = this.options.config.cockpitPort;
+    const cockpitHost: string = this.options.config.cockpitHost;
 
     await new Promise<any>((resolve, reject) => {
       this.httpServerCockpit = app.listen(cockpitPort, cockpitHost, () => {
-        this.log.info(
-          `Cactus Cockpit UI reachable on port http://${cockpitHost}:${cockpitPort}`
-        );
+        const httpUrl = `http://${cockpitHost}:${cockpitPort}`;
+        this.log.info(`Cactus Cockpit UI reachable ${httpUrl}`);
         resolve({ cockpitPort });
       });
       this.httpServerCockpit.on("error", (err: any) => reject(err));
@@ -146,17 +175,22 @@ export class ApiServer {
     };
     app.get("/api/v1/api-server/healthcheck", healthcheckHandler);
 
+    const registry = await this.getOrInitPluginRegistry();
+
     this.log.info(`Starting to install web services...`);
-    const webServicesInstalled = this.options.plugins
+
+    const webServicesInstalled = registry
+      .getPlugins()
       .filter((pluginInstance) => isIPluginWebService(pluginInstance))
       .map((pluginInstance: ICactusPlugin) => {
         return (pluginInstance as IPluginWebService).installWebServices(app);
       });
+
     await Promise.all(webServicesInstalled);
     this.log.info(`Installed ${webServicesInstalled.length} web services OK`);
 
-    const apiPort: number = this.options.config.get("apiPort");
-    const apiHost: string = this.options.config.get("apiHost");
+    const apiPort: number = this.options.config.apiPort;
+    const apiHost: string = this.options.config.apiHost;
     this.log.info(`Binding Cactus API to port ${apiPort}...`);
     await new Promise<any>((resolve, reject) => {
       const httpServerApi = app.listen(apiPort, apiHost, () => {
@@ -181,31 +215,8 @@ export class ApiServer {
     });
   }
 
-  async createStoragePlugin(): Promise<IPluginKVStorage> {
-    const kvStoragePlugin = this.options.plugins.find(
-      (p) => p.getAspect() === PluginAspect.KV_STORAGE
-    );
-    if (kvStoragePlugin) {
-      return kvStoragePlugin as IPluginKVStorage;
-    }
-    const storagePluginPackage = this.options.config.get(
-      "storagePluginPackage"
-    );
-    const { PluginFactoryKVStorage } = await import(storagePluginPackage);
-    const storagePluginOptionsJson = this.options.config.get(
-      "storagePluginOptionsJson"
-    );
-    const storagePluginOptions = JSON.parse(storagePluginOptionsJson);
-    const pluginFactory: PluginFactory<
-      IPluginKVStorage,
-      unknown
-    > = new PluginFactoryKVStorage();
-    const plugin = await pluginFactory.create(storagePluginOptions);
-    return plugin;
-  }
-
   createCorsMiddleware(): RequestHandler {
-    const apiCorsDomainCsv = this.options.config.get("apiCorsDomainCsv");
+    const apiCorsDomainCsv = this.options.config.apiCorsDomainCsv;
     const allowedDomains = apiCorsDomainCsv.split(",");
     const allDomainsAllowed = allowedDomains.includes("*");
 
