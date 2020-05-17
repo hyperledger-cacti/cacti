@@ -61,11 +61,12 @@ tap.test(
       cactusApiServerOptions
     );
 
-    const plugins: ICactusPlugin[] = [];
-    plugins.push(webServiceConsortiumPlugin);
-    plugins.push(kvStoragePlugin);
+    pluginRegistry.add(webServiceConsortiumPlugin);
 
-    const apiServer = new ApiServer({ config, plugins });
+    const apiServer = new ApiServer({
+      config: config.getProperties(),
+      pluginRegistry,
+    });
     assert.tearDown(() => apiServer.shutdown());
 
     // 5. Start the API server which is now listening on port A and it's healthcheck works through the main SDK

@@ -2,33 +2,37 @@
 
 import { ApiServer } from "../api-server";
 import { ConfigService } from "../config/config-service";
+import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+
+const log: Logger = LoggerProvider.getOrCreate({
+  label: "cactus-api",
+  level: "INFO",
+});
 
 const main = async () => {
+  const configService = new ConfigService();
+  const config = configService.getOrCreate();
+  const serverOptions = config.getProperties();
+
+  LoggerProvider.setLogLevel(serverOptions.logLevel);
+
   if (process.argv[2].includes("help")) {
     const helpText = ConfigService.getHelpText();
     // tslint:disable-next-line: no-console
     console.log(helpText);
-    const configService = new ConfigService();
-    const config = configService.getOrCreate();
-    // tslint:disable-next-line: no-console
-    console.log(`Effective Configuration:`);
-    // tslint:disable-next-line: no-console
-    console.log(JSON.stringify(config.getProperties(), null, 4));
+    log.info(`Effective Configuration:`);
+    log.info(JSON.stringify(serverOptions, null, 4));
   } else {
-    const configService = new ConfigService();
-    const config = configService.getOrCreate();
-    const apiServer = new ApiServer({ config, plugins: [] });
+    const apiServer = new ApiServer({ config: serverOptions });
     await apiServer.start();
   }
 };
 
 main()
-  .then((result) => {
-    // tslint:disable-next-line: no-console
-    console.log(`Cactus API server launched OK `);
+  .then(() => {
+    log.info(`Cactus API server launched OK `);
   })
   .catch((ex) => {
-    // tslint:disable-next-line: no-console
-    console.error(`Cactus API server crashed: `, ex);
+    log.error(`Cactus API server crashed: `, ex);
     process.exit(1);
   });
