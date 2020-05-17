@@ -9,7 +9,7 @@ const libraryName = `${packageNameNoScope}`;
 
 module.exports = {
   entry: {
-    [pkg.browserMinified]: `${packageDir}/src/main/typescript/index.ts`,
+    [pkg.browserMinified]: `${packageDir}/src/main/typescript/index.web.ts`,
   },
   mode: "production",
   devtool: "source-map",
