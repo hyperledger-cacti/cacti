@@ -52,7 +52,7 @@ function mainTask()
   ### COMMON
   cd $PROJECT_ROOT_DIR
 
-  npm install
+  npm ci
   ./node_modules/.bin/lerna clean --yes
   ./node_modules/.bin/lerna bootstrap
   npm run build
