@@ -450,7 +450,7 @@ To obtain the latest configuration options you can check out the latest source c
 
 ```sh
 $ date
-Mon May 11 18:27:08 PDT 2020
+Mon 18 May 2020 05:09:58 PM PDT
 
 $ npx ts-node -e "import {ConfigService} from './packages/cactus-cmd-api-server/src/main/typescript/config/config-service'; console.log(ConfigService.getHelpText());"
 
@@ -460,15 +460,20 @@ Passing "help" as the first argument prints this message and also dumps the effe
 Configuration Parameters
 ========================
 
+  plugins:
+                Description: A collection of plugins to load at runtime.
+                Default:
+                Env: PLUGINS
+                CLI: --plugins
   configFile:
                 Description: The path to a config file that holds the configuration itself which will be parsed and validated.
                 Default: Mandatory parameter without a default value.
                 Env: CONFIG_FILE
                 CLI: --config-file
-  cactus-NodeId:
-                Description: Identifier of this particular CACTUS- node. Must be unique among the total set of CACTUS- nodes running in any given CACTUS- deployment. Can be any string of characters such as a UUID or an Int64
+  cactusNodeId:
+                Description: Identifier of this particular Cactus node. Must be unique among the total set of Cactus nodes running in any given Cactus deployment. Can be any string of characters such as a UUID or an Int64
                 Default: Mandatory parameter without a default value.
-                Env: CACTUS-_NODE_ID
+                Env: CACTUS_NODE_ID
                 CLI: --cactus-node-id
   logLevel:
                 Description: The level at which loggers should be configured. Supported values include the following: error, warn, info, debug, trace
@@ -501,50 +506,31 @@ Configuration Parameters
                 Env: API_PORT
                 CLI: --api-port
   apiCorsDomainCsv:
-                Description: The Comma seperated list of domains to allow Cross Origin Resource Sharing from when serving API requests. The wildcard (*) character is supported to allow CORS for any and all domains, however using it is not recommended unless you are developing or demonstrating something with CACTUS-.
+                Description: The Comma seperated list of domains to allow Cross Origin Resource Sharing from when serving API requests. The wildcard (*) character is supported to allow CORS for any and all domains, however using it is not recommended unless you are developing or demonstrating something with Cactus.
                 Default: Mandatory parameter without a default value.
                 Env: API_CORS_DOMAIN_CSV
                 CLI: --api-cors-domain-csv
-  storagePluginPackage:
-                Description: The NodeJS package name that will be dynamically imported. You have to make sure that this is installed prior to starting the API server. Use "@hyperledger/cactus-plugin-kv-storage-memory" here for developmentor demo environments with only a single node you can use the built-in stub that stores everything in-memory, un-encrypted:
-                Default: Mandatory parameter without a default value.
-                Env: STORAGE_PLUGIN_PACKAGE
-                CLI: --storage-plugin-package
-  storagePluginOptionsJson:
-                Description: JSON string representing the options object that will be passed in to  the keychain plugin during initialization.
-                Default: {}
-                Env: KEYCHAIN_PLUGIN_OPTIONS_JSON
-                CLI: --keychain-plugin-options-json
-  keychainPluginPackage:
-                Description: The NodeJS package name that will be dynamically imported. You have to make sure that this is installed prior to starting the API server. Use "@hyperledger/cactus-plugin-keychain-memory" here for developmentor demo environments with only a single node you can use the built-in stub that stores everything in-memory, un-encrypted:
-                Default: Mandatory parameter without a default value.
-                Env: KEYCHAIN_PLUGIN_PACKAGE
-                CLI: --keychain-plugin-package
-  keychainPluginOptionsJson:
-                Description: JSON string representing the options object that will be passed in to  the storage plugin during initialization.
-                Default: {}
-                Env: STORAGE_PLUGIN_OPTIONS_JSON
-                CLI: --storage-plugin-options-json
   publicKey:
-                Description: Public key of this CACTUS- node (the API server)
+                Description: Public key of this Cactus node (the API server)
                 Default: Mandatory parameter without a default value.
                 Env: PUBLIC_KEY
                 CLI: --public-key
   privateKey:
-                Description: Private key of this CACTUS- node (the API server)
+                Description: Private key of this Cactus node (the API server)
                 Default: Mandatory parameter without a default value.
                 Env: PRIVATE_KEY
                 CLI: --private-key
   keychainSuffixPrivateKey:
-                Description: The key under which to store/retrieve the private key from the keychain of this CACTUS- node (API server)The complete lookup key is constructed from the ${CACTUS-_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
-                Default: CACTUS-_NODE_PRIVATE_KEY
+                Description: The key under which to store/retrieve the private key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${CACTUS_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
+                Default: CACTUS_NODE_PRIVATE_KEY
                 Env: KEYCHAIN_SUFFIX_PRIVATE_KEY
                 CLI: --keychain-suffix-private-key
   keychainSuffixPublicKey:
-                Description: The key under which to store/retrieve the public key from the keychain of this CACTUS- node (API server)The complete lookup key is constructed from the ${CACTUS-_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
-                Default: CACTUS-_NODE_PUBLIC_KEY
+                Description: The key under which to store/retrieve the public key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${CACTUS_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
+                Default: CACTUS_NODE_PUBLIC_KEY
                 Env: KEYCHAIN_SUFFIX_PUBLIC_KEY
                 CLI: --keychain-suffix-public-key
+
 
 ```
 
