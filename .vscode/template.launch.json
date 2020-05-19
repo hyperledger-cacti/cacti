@@ -4,19 +4,16 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "cactus-cmd-api-server",
+      "name": "cmd-api-server",
       "program": "${workspaceFolder}/packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js",
       "args": [
         "--public-key=03aa57b5c6506a6e5a2851dcbc14bf2b3d2b9196aecacc946f630eab5203dca8c4",
         "--private-key=da43d3ce06f7b0eef447ca209c00cf2efdef02a761fb5ba2aaf7fc601ceaf555",
-        "--api-cors-domain-csv=http://editor.swagger.io"
+        "--api-cors-domain-csv=http://editor.swagger.io",
+        "--config-file=.config.json"
       ],
-      "outFiles": [
-        "/packages/cactus-cmd-api-server/dist/lib/**/*"
-      ],
-      "skipFiles": [
-        "<node_internals>/**"
-      ]
+      "outFiles": ["/packages/cactus-cmd-api-server/dist/lib/**/*"],
+      "skipFiles": ["<node_internals>/**"]
     },
     {
       "type": "node",
