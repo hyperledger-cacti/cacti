@@ -62,7 +62,7 @@ export class PluginWebServiceConsortium implements IPluginWebService {
     // presence of webAppOptions implies that caller wants the plugin to configure it's own express instance on a custom
     // host/port to listen on
     if (this.options.webAppOptions) {
-      this.log.info(`Creating dedicatd HTTP server...`);
+      this.log.info(`Creating dedicated HTTP server...`);
       const { port, hostname } = this.options.webAppOptions;
 
       webApp.use(bodyParser.json({ limit: "50mb" }));
@@ -71,7 +71,7 @@ export class PluginWebServiceConsortium implements IPluginWebService {
         const httpServer = webApp.listen(port, hostname, (err: any) => {
           if (err) {
             reject(err);
-            this.log.error(`Failed to create dedicatd HTTP server`, err);
+            this.log.error(`Failed to create dedicated HTTP server`, err);
           } else {
             this.httpServer = httpServer;
             const theAddress = this.httpServer.address();
