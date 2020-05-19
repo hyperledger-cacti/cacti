@@ -8,7 +8,6 @@ import {
   Logger,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { PluginAspect } from "@hyperledger/cactus-core-api";
 import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
@@ -30,10 +29,6 @@ export interface ICactusApiServerOptions {
   apiPort: number;
   apiCorsDomainCsv: string;
   plugins: IPluginImport[];
-  storagePluginPackage: string;
-  storagePluginOptionsJson: string;
-  keychainPluginPackage: string;
-  keychainPluginOptionsJson: string;
   publicKey: string;
   privateKey: string;
   keychainSuffixPublicKey: string;
@@ -159,46 +154,6 @@ export class ConfigService {
         arg: "api-cors-domain-csv",
         default: "",
       },
-      storagePluginPackage: {
-        doc:
-          "The NodeJS package name that will be dynamically imported. " +
-          "You have to make sure that this is installed prior to starting the API server. " +
-          'Use "@hyperledger/cactus-plugin-kv-storage-memory" here for development' +
-          "or demo environments with only a single node you can use " +
-          "the built-in stub that stores everything in-memory, un-encrypted:",
-        format: ConfigService.formatNonBlankString,
-        env: "STORAGE_PLUGIN_PACKAGE",
-        arg: "storage-plugin-package",
-        default: null as any,
-      },
-      storagePluginOptionsJson: {
-        doc:
-          "JSON string representing the options object that will be passed in to  the keychain plugin during initialization.",
-        env: "KEYCHAIN_PLUGIN_OPTIONS_JSON",
-        arg: "keychain-plugin-options-json",
-        format: "*",
-        default: "{}",
-      },
-      keychainPluginPackage: {
-        doc:
-          "The NodeJS package name that will be dynamically imported. " +
-          "You have to make sure that this is installed prior to starting the API server. " +
-          'Use "@hyperledger/cactus-plugin-keychain-memory" here for development' +
-          "or demo environments with only a single node you can use " +
-          "the built-in stub that stores everything in-memory, un-encrypted:",
-        format: "*",
-        env: "KEYCHAIN_PLUGIN_PACKAGE",
-        arg: "keychain-plugin-package",
-        default: null as any,
-      },
-      keychainPluginOptionsJson: {
-        doc:
-          "JSON string representing the options object that will be passed in to  the storage plugin during initialization.",
-        env: "STORAGE_PLUGIN_OPTIONS_JSON",
-        arg: "storage-plugin-options-json",
-        format: "*",
-        default: "{}",
-      },
       publicKey: {
         doc: "Public key of this Cactus node (the API server)",
         env: "PUBLIC_KEY",
@@ -323,15 +278,9 @@ export class ConfigService {
       cockpitHost: (schema.cockpitHost as SchemaObj).default,
       cockpitPort: (schema.cockpitPort as SchemaObj).default,
       cockpitWwwRoot: (schema.cockpitWwwRoot as SchemaObj).default,
-      keychainPluginPackage: "@hyperledger/cactus-plugin-keychain-memory",
-      keychainPluginOptionsJson: (schema.keychainPluginOptionsJson as SchemaObj)
-        .default,
       keychainSuffixPublicKey: (schema.keychainSuffixPublicKey as SchemaObj)
         .default,
       keychainSuffixPrivateKey: (schema.keychainSuffixPrivateKey as SchemaObj)
-        .default,
-      storagePluginPackage: "@hyperledger/cactus-plugin-kv-storage-memory",
-      storagePluginOptionsJson: (schema.storagePluginOptionsJson as SchemaObj)
         .default,
     };
   }
