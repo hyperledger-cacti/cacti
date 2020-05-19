@@ -2,6 +2,7 @@
   "name": "@hyperledger-labs/cactus",
   "private": true,
   "scripts": {
+    "run-ci": "./tools/ci.sh",
     "configure": "lerna clean --yes && lerna bootstrap && npm-run-all build generate-api-server-config",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
@@ -19,6 +20,7 @@
     "build:dev:test-tooling": "lerna exec --stream --scope '*/*test-tooling' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:plugin-ledger-connector-quorum": "lerna exec --stream --scope '*/*connector-quorum' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:plugin-web-service-consortium": "lerna exec --stream --scope '*/*web-service-consortium' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
+    "build:dev:plugin-web-service-oidc": "lerna exec --stream --scope '*/*web-service-oidc' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:sdk": "lerna exec --stream --scope '*/*sdk' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "webpack": "npm-run-all webpack:web:dev webpack:node:dev webpack:web:prod webpack:node:prod",
     "webpack:web:prod": "lerna exec --stream --ignore '*/*{cockpit,server,test-tooling}' -- webpack --env=prod --target=web --config ../../webpack.config.js",
