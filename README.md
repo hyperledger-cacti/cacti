@@ -15,7 +15,7 @@ As blockchain technology proliferates, blockchain integration will become an inc
 ## Documentation
 
 * [Hyperledger Cactus Home](https://wiki.hyperledger.org/display/cactus)
-* [Whitepaper](./docs/whitepaper/whitepaper.md)
+* [Whitepaper](./whitepaper/whitepaper.md)
 
 ## How It Works
 
@@ -39,7 +39,7 @@ Once an API call to Hyperledger Cactus framework is requested by a User, Busines
 Following diagram shows the architecture of Hyperledger Cactus based on the discussion made at Hyperledger Cactus project calls.
 The overall architecture is as the following figure.
 
-<img src="https://github.com/hyperledger/cactus/raw/master/docs/whitepaper/architecture-with-plugin-and-routing.png" width="700">
+<img src="https://github.com/hyperledger/cactus/raw/master/whitepaper/architecture-with-plugin-and-routing.png" width="700">
 
 Each entity is as follows:
 - **Business Logic Plugin**: The entity executes business logic and provide integration services that are connected with multiple blockchains. The entity is composed by web application or smart contract on a blockchain. The entity is a single plugin and required for executing Hyperledger Cactus applications.
