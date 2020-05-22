@@ -74,9 +74,11 @@ export class ConfigService {
         env: "PLUGINS",
         arg: "plugins",
         pluginSchema: {
-          aspect: "*",
           packageName: "*",
-          options: {},
+          options: {
+            format: Object,
+            default: {},
+          },
         },
       } as any,
       configFile: {
