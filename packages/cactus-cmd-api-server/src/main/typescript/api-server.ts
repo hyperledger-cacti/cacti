@@ -1,5 +1,7 @@
 import path from "path";
-import { Server } from "http";
+import { AddressInfo } from "net";
+import { Server, createServer } from "http";
+import { Server as SecureServer } from "https";
 import express, {
   Express,
   Request,
@@ -25,14 +27,16 @@ import { Servers } from "./common/servers";
 
 export interface IApiServerConstructorOptions {
   pluginRegistry?: PluginRegistry;
+  httpServerApi?: Server | SecureServer;
+  httpServerCockpit?: Server | SecureServer;
   config: ICactusApiServerConfig;
 }
 
 export class ApiServer {
   private readonly log: Logger;
   private pluginRegistry: PluginRegistry | undefined;
-  private httpServerApi: Server | null = null;
-  private httpServerCockpit: Server | null = null;
+  private readonly httpServerApi: Server | SecureServer;
+  private readonly httpServerCockpit: Server | SecureServer;
 
   constructor(public readonly options: IApiServerConstructorOptions) {
     if (!options) {
@@ -41,6 +45,8 @@ export class ApiServer {
     if (!options.config) {
       throw new Error(`ApiServer#ctor options.config was falsy`);
     }
+    this.httpServerApi = this.options.httpServerApi || createServer();
+    this.httpServerCockpit = this.options.httpServerCockpit || createServer();
 
     this.log = LoggerProvider.getOrCreate({
       label: "api-server",
@@ -48,22 +54,26 @@ export class ApiServer {
     });
   }
 
-  async start(): Promise<void> {
+  async start(): Promise<any> {
     try {
-      await this.startCockpitFileServer();
-      await this.startApiServer();
+      const addressInfoCockpit = await this.startCockpitFileServer();
+      const addressInfoApi = await this.startApiServer();
+      return { addressInfoCockpit, addressInfoApi };
     } catch (ex) {
-      this.log.error(`Failed to start ApiServer: ${ex.stack}`);
+      const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
+      this.log.error(errorMessage);
       this.log.error(`Attempting shutdown...`);
       await this.shutdown();
+      this.log.info(`Server shut down OK`);
+      throw new Error(errorMessage);
     }
   }
 
-  public getHttpServerApi(): Server | null {
+  public getHttpServerApi(): Server | SecureServer {
     return this.httpServerApi;
   }
 
-  public getHttpServerCockpit(): Server | null {
+  public getHttpServerCockpit(): Server | SecureServer {
     return this.httpServerCockpit;
   }
 
@@ -102,7 +112,9 @@ export class ApiServer {
 
   public async shutdown(): Promise<void> {
     this.log.info(`Shutting down API server ...`);
+
     const registry = await this.getOrInitPluginRegistry();
+
     const webServicesShutdown = registry
       .getPlugins()
       .filter((pluginInstance) => isIPluginWebService(pluginInstance))
@@ -127,7 +139,7 @@ export class ApiServer {
     }
   }
 
-  async startCockpitFileServer(): Promise<void> {
+  async startCockpitFileServer(): Promise<AddressInfo> {
     const cockpitWwwRoot = this.options.config.cockpitWwwRoot;
     this.log.info(`wwwRoot: ${cockpitWwwRoot}`);
 
@@ -145,17 +157,28 @@ export class ApiServer {
     const cockpitPort: number = this.options.config.cockpitPort;
     const cockpitHost: string = this.options.config.cockpitHost;
 
-    await new Promise<any>((resolve, reject) => {
-      this.httpServerCockpit = app.listen(cockpitPort, cockpitHost, () => {
-        const httpUrl = `http://${cockpitHost}:${cockpitPort}`;
-        this.log.info(`Cactus Cockpit UI reachable ${httpUrl}`);
-        resolve({ cockpitPort });
+    if (!this.httpServerCockpit.listening) {
+      await new Promise((resolve, reject) => {
+        this.httpServerCockpit.once("error", reject);
+        this.httpServerCockpit.once("listening", resolve);
+        this.httpServerCockpit.listen(cockpitPort, cockpitHost);
       });
-      this.httpServerCockpit.on("error", (err: any) => reject(err));
-    });
+    }
+    this.httpServerCockpit.on("request", app);
+
+    // the address() method returns a string for unix domain sockets and null
+    // if the server is not listening but we don't car about any of those cases
+    // so the casting here should be safe. Famous last words... I know.
+    const addressInfo = this.httpServerCockpit.address() as AddressInfo;
+    this.log.info(`Cactus Cockpit net.AddressInfo`, addressInfo);
+
+    const httpUrl = `http://${addressInfo.address}:${addressInfo.port}`;
+    this.log.info(`Cactus Cockpit UI reachable ${httpUrl}`);
+
+    return addressInfo;
   }
 
-  async startApiServer(): Promise<void> {
+  async startApiServer(): Promise<AddressInfo> {
     const app: Application = express();
     app.use(compression());
 
@@ -187,25 +210,34 @@ export class ApiServer {
         return (pluginInstance as IPluginWebService).installWebServices(app);
       });
 
-    await Promise.all(webServicesInstalled);
-    this.log.info(`Installed ${webServicesInstalled.length} web services OK`);
+    const endpoints2D = await Promise.all(webServicesInstalled);
+    this.log.info(`Installed ${webServicesInstalled.length} web service(s) OK`);
+
+    const endpoints = endpoints2D.reduce((acc, val) => acc.concat(val), []);
+    endpoints.forEach((ep) => this.log.info(`Endpoint={path=${ep.getPath()}}`));
 
     const apiPort: number = this.options.config.apiPort;
     const apiHost: string = this.options.config.apiHost;
-    this.log.info(`Binding Cactus API to port ${apiPort}...`);
-    await new Promise<any>((resolve, reject) => {
-      const httpServerApi = app.listen(apiPort, apiHost, () => {
-        const address: any = httpServerApi.address();
-        this.log.info(`Successfully bound API to port ${apiPort}`, { address });
-        if (address && address.port) {
-          resolve({ port: address.port });
-        } else {
-          resolve({ port: apiPort });
-        }
+
+    if (!this.httpServerApi.listening) {
+      await new Promise((resolve, reject) => {
+        this.httpServerApi.once("error", reject);
+        this.httpServerApi.once("listening", resolve);
+        this.httpServerApi.listen(apiPort, apiHost);
       });
-      this.httpServerApi = httpServerApi;
-      this.httpServerApi.on("error", (err) => reject(err));
-    });
+    }
+    this.httpServerApi.on("request", app);
+
+    // the address() method returns a string for unix domain sockets and null
+    // if the server is not listening but we don't car about any of those cases
+    // so the casting here should be safe. Famous last words... I know.
+    const addressInfo = this.httpServerApi.address() as AddressInfo;
+    this.log.info(`Cactus API net.AddressInfo`, addressInfo);
+
+    const httpUrl = `http://${addressInfo.address}:${addressInfo.port}`;
+    this.log.info(`Cactus API reachable ${httpUrl}`);
+
+    return addressInfo;
   }
 
   createOpenApiValidator(): OpenApiValidator {
