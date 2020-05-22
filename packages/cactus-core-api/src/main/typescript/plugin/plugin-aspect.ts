@@ -1,4 +1,4 @@
-export const enum PluginAspect {
+export enum PluginAspect {
   KEYCHAIN = "KEYCHAIN",
   LEDGER_CONNECTOR = "LEDGER_CONNECTOR",
   KV_STORAGE = "KV_STORAGE",
