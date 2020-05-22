@@ -16,7 +16,7 @@
     "pregenerate-sdk": "npm-run-all export-open-api-spec",
     "generate-sdk": "openapi-generator generate --input-spec cactus-openapi-spec-plugin-web-service-consortium.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
     "tsc": "tsc --project ./tsconfig.json",
-    "posttsc": "npm run generate-sdk"
+    "pretsc": "npm run generate-sdk"
   },
   "engines": {
     "node": ">=10",
