@@ -21,6 +21,7 @@ Photo by Pontus Wellgraf on Unsplash
 | Shingo Fujimoto                | shingo_fujimoto@fujitsu.com               |
 | Takuma Takeuchi                | takeuchi.takuma@fujitsu.com               |
 | Tracy Kuhrt                    | tracy.a.kuhrt@accenture.com               |
+| Rafael Belchior                | rafael.belchior@tecnico.ulisboa.pt        |
 
 # Document Revisions <!-- omit in toc -->
 
@@ -42,6 +43,10 @@ Photo by Pontus Wellgraf on Unsplash
   - [2.5 Healthcare Data Sharing with Access Control Lists](#25-healthcare-data-sharing-with-access-control-lists)
   - [2.6 Integrate Existing Food Traceability Solutions](#26-integrate-existing-food-traceability-solutions)
   - [2.7 End User Wallet Authentication/Authorization](#27-end-user-wallet-authenticationauthorization)
+  - [2.8 Blockchain Migration](#28-blockchain-migration)
+    - [2.8.1 Blockchain Data Migration](#281-blockchain-migration-data)
+    - [2.8.2 Blockchain Smart Contract Migration](#282-blockchain-migration-contracts)
+    - [2.8.3 Semi-Automatic Blockchain Migration](#283-blockchain-migration-automatic)
 - [3. Software Design](#3-software-design)
   - [3.1. Principles](#31-principles)
     - [3.1.1. Wide support](#311-wide-support)
@@ -266,6 +271,62 @@ gets replaced by a traditional bank account holding USD.
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/fPPBRnen483l-oj6oRMYXQIN24KXXBIeBqHegqgvp7fd5ul5Tcrl2Qduxntl0sW2IMWlI1xFVFFmp2mNpgFrnJo7Nk6dfBmKwALMhygpjlA-F4AgBOp8pgLpVAG4-bEKoaMHbpudUByqP7DACh9mcMin4-4QXifJPYl2jSKvBRITtQf_T9LJwi5hi3ARUaYa9H4CeiZDf3B8V73qio0bg6UjNaocKimKEGUTBHMh2vK8RHM7-dPBFiUxEUjYHaxU4voysO4TSQsaa0QL1wPmob9H5AKXDJWQg0I-EiRsZCdhv8u07L01loC059vJE-fsPHAozqlG2uxY_BnKaffLb4uOD6pkHrRh5DgtgjiTt_JW0x48PMDXpCoquNY4ENsJEYS_vc85Hwjzf4uW3VfNkrcTWrWdWJL2v_XDauPI7my2dGRGb-5L7oPwHgf68VU43-VTh5MqBdjVp_b1bj0B76qpL7KdrII1SFmnjCmxYylIl0hZ-JxjTfrE_G8jGK8cryiv1rvJOvdMs1-KvtfHWXlqU70pWTve610BYhb_x2yfQ6DgYUVEo7LWn7bMW5NvwtL6F2Es5ZRSp-H3P5MgwouoUP59jO7Bf9AeIXjtU6dyF0HV7WAE3m2N4GlDfkKGF2IlR_ulyaCTF9N1gkcpkit-oiHixwTgxzM-r9vk-uuvDp2qWJk-MHI1X4d2pU1gwmKL-BYjTeLn-KmOyPDXT9uD8zuJXjJGQfrlzV0PZCDsTBoQBIg7vKvsaTAUWCU9D-ICRTcFuoEBBCmr3nJxvmRdcqstXMtWolLFAAPyPHlm53rS3gzPz8iizo6vrs7LC19phR8WbnXuW8OnnafaxzLJExwDAGq--U1jmG6gh7PkceLUogeA1WF-oj0TYO8fsrcTyLMx1OCxeor_WT0Z2pejc0ITbCTLwChXIGi-eU9l2MoUACXFMq1Uj2BYqeSAHLkxe5lNTSyil5mrtgNwS2cyGAVax9lCOABmZ6lnk4pH4mDNsiLxxA8BBWp_6Va3">
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
+
+## 2.8 Blockchain Migration
+
+
+| Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Use Case Title             | Blockchain Migration                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Use Case                   | 1. `Consortium A` operates a set of services/use cases on a source blockchain.<br>2. `Consortium A` decides to use another blockchain infrastructure to support their use case. <br>3. `Consortium A` migrates the existing assets to another blockchain.
+| Interworking patterns      | Value transfer                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Type of Social Interaction | Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Narrative                  | A group of stakeholders (`Consortium A`) operating a source blockchain (e.g., a Hyperledger Fabric instance) would like to migrate the functionality to a target blockchain (e.g., Hyperledger Besu), in order to expand their reach. However, such migration requires lots of resources and technical effort. The `Blockchain Migration feature` from Hyperledger Cactus can provide support for doing so, by connecting to the source and target blockchains, and performing the migration task.
+| Actors                     | 1. Stakeholders composing the `Consortium A`: The group of entities operating the source blockchain, who collectively aim at performing a migration to a target blockchain.                                                                                                                                                                                                                                                                                                                                                                    |
+| Goals of Actors            | `Consortium A` wishes to be able to operate their use case on the target blockchain. The service is functional after the migration.                                                                                                                                                                                                                                                                                                                                                                                   |
+| Success Scenario           | The consortium agrees on the migration, and it succeeds without issues.                                                                                                                                                                                                                                                                                                                                                        |
+| Success Criteria           | Assets have been migrated. An identical history for those assets has been reconstructed on the target blockchain.                                                                                                                                                                                                                                                                                                                                                |
+| Failure Criteria           | 1. It was not migrate the assets. <br> It was not possible to reconstruct the asset history on the target blockchain.                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Prerequisites              | 1. All stakeholders belonging to `Consortium A` want to migrate the blockchain. <br> 2. The `Consortium A` ontrols the source blockchain. <br>2. `Consortium A` has write and execute permissions on the target blockchain<br>
+| Comments                   | An asset is defined as data or smart contracts originating from the source blockchain. <br> This use case relates to use cases implying asset portability (e.g., 2.1) <br> This use case provides blockchain portability, thus reducing costs and fostering blockchain adoption.                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+
+
+---
+Motivation: The suitability of a blockchain solution regarding a use case depends on the underlying blockchain properties.
+            As blockchain technologies are maturing at a fast pace, in particular private blockchains, its properties might change. Consequently, this creates an unbalance between user expectations' and the applicability of the solution.
+            It is, therefore, desirable for an organization to be able to replace the blockchain providing the infrastructure to a certain service.
+          
+Currently, when a consortium wants to migrate their blockchain (e.g., the source blockchain became obsolete, cryptographic algorithms no longer secure, etc), the solution is to re-implement business logic using a different platform, yielding great effort. Migrating data to another blockchain currently is not feasible in practice. 
+This is one of the reasons mass adoption amongst enterprises grows slowly.
+Data migrations have been performed by (Frauenthaler et al., 2019) and (Scheid et al., 2019), both recent endeavors to render flexibility to blockchain-based solutions.
+In those works, the authors propose simple data migration capabilities for public, permissionless blockchains, in which a user can specify requirements for its blockchain. The developed solutions allow "switchovers," where a blockchain is migrated, in case there is a blockchain that better satisfies the current requirements.
+Nonetheless, arguably a more interesting approach would be to consider cross-smart contract execution functionality or another automatic way of migration.
+
+References: <br>
+E Scheid and Burkhard Rodrigues, B Stiller. 2019. Toward a policy-based blockchain agnostic framework. 16th IFIP/IEEE International Symposium on Integrated Network Management (IM 2019) (2019)
+Philipp Frauenthaler, Michael Borkowski, and Stefan Schulte. 2019. A Framework for Blockchain Interoperability and Runtime Selection.
+
+### 2.8.1 Blockchain Data Migration
+Data migration corresponds to capture the set or subset of data assets (information, in the form of bytes) on a source blockchain, and construct a representation of those in a target blockchain. Note that the models underlying both blockchains do not need to be the same (e.g., world state model in Hyperledger Fabric vs account model in Ethereum).
+To migrate data, it should be possible to capture the necessary information from the source blockchain and to write it on the target blockchain. The history of information should also be migrated (i.e., the updates over the elements considered information).
+
+### 2.8.2 Blockchain Smart Contract Migration
+The task of migrating a smart contract comprises the task of migrating data. In specific, the information should be accessible and writeable on another blockchain. Additionally, the target blockchain's virtual machine should support the computational complexity of the source blockchain (e.g., one cannot migrate all Ethereum smart contracts to Bitcoin, but the other way around is feasible).
+
+Automatic smart contract migration yields risks for enterprise blockchain systems, and thus the solution is non-trivial.
+
+### 2.8.3 Semi-Automatic Blockchain Migration
+
+By expressing my preferences in terms of functional and non-functional requirements, Hyperledger Cactus can recommend a set of suitable blockchains, as the target of the migration.
+Firstly, I could know in real-time the characteristics of the target blockchain that would influence my decision.
+For instance, the platform can analyze see the cost of writing information to Ethereum, the exchange rate US dollar - Ether, the average time to mine a block, the transaction throughput, and the network hash rate ((Frauenthaler et al., 2019).
+Based on that, the framework proposes a migration, with indicators such as predicted cost, predicted time to complete migration and the likelihood of success.
+As Ethereum does not show a desirable throughput, I choose Polkadot's platform. As it yields higher throughput, I then safely migrate my solution from Fabric to Polkadot, without compromising the solution in production. 
+ This feature is more useful regarding public blockchains.
+
+
+<div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
+
 
 # 3. Software Design
 
