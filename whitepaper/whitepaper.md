@@ -369,11 +369,9 @@ A newly joined consortium member does not have to participate in every component
 
 # 4. Architecture
 
-## 4.1 Interworking patterns
+## 4.1 Integration patterns
 
-### 4.1.1 Interworking patterns list
-
-Hyperledger Cactus has several interworking patterns as the following.
+Hyperledger Cactus has several integration patterns as the following.
 
 - Note: In the following description, **Value (V)** means numerical assets (e.g. money). **Data (D)** means non-numerical assets (e.g. ownership proof). Ledger 1 is source ledger, Ledger 2 is destination ledger.
 
@@ -385,7 +383,7 @@ Hyperledger Cactus has several interworking patterns as the following.
 | 4.  | data transfer       | D -> D  | check if all D1 is copied on ledger 2 <br> (as D1 is data on ledger 1, D2 is data on ledger 2) |
 | 5.  | data merge          | D <-> D | check if D1 = D2 as a result <br> (as D1 is data on ledger 1, D2 is data on ledger 2)          |
 
-### 4.2 Interworking architecture
+## 4.2 System architecture and basic flow
 
 Hyperledger Cactus will provide integrated service(s) by executing ledger operations across multiple blockchain ledgers. The execution of operations are controlled by the module of Hyperledger Cactus which will be provided by vendors as the single Hyperledger Cactus Business Logic plugin.
 The supported blockchain platforms by Hyperledger Cactus can be added by implementing new Hyperledger Cactus Ledger plugin.
@@ -396,17 +394,22 @@ The overall architecture is as the following figure.
 <img src="./architecture-with-plugin-and-routing.png" width="700">
 
 Each entity is as follows:
+- **Application user**: The entity submits API calls to "Cactus Routing Interface". 
 - **Business Logic Plugin**: The entity executes business logic and provide integration services that are connected with multiple blockchains. The entity is composed by web application or smart contract on a blockchain. The entity is a single plugin and required for executing Hyperledger Cactus applications.
 - **Ledger Plugin**: The entity communicates Business Logic Plugin with each ledger.  The entity is composed by a validator and a verifier as follows. The entity(s) is(are) chosen from multiple plugins on configuration.
-- **Validator**: The entity verifies transactions on the connected ledger and makes signatures for requesting to the verifier. The entity connects the verifier using a bi-directional channel.
-- **Verifier**: The entity verifies the signatures from the validator. The entity connects the validator using a bi-directional channel.
-- **Cactus Routing Interface**: The entity is a routing service between Business Logic Plugin and  Ledger Plugin(s). The entity is also a routing service between Business Logic Plugin and API calls from application users.
-- **Ledger-n**: Ledger (e.g. Ethereum, Quorum, Hyperledger Fabric, ...)
+- **Validator**: The entity monitors transaction records of Ledger operation, and it determines the result(success, failed, timeouted) from the transaction records. 
+Validator ensure the determined result with attaching digital signature with "Validator key" which can be verified by "Verifier".
+- **Verifier**: The entity accepts only sucussfully verified operation results by verifying the digital signature of the validator. Note that "Validator" is apart from "Verifier" over a bi-directional channel.
+- **Cactus Routing Interface**: The entity is a routing service between "Business Logic Plugin" and  "Ledger Plugin(s)". The entity is also a routing service between Business Logic Plugin and API calls from "Application user(s)".
+- **Ledger-n**: DLT platforms(e.g. Ethereum, Quorum, Hyperledger Fabric, ...)
 
 The execution steps are described as follows:
-- **Step 1**: Application user(s) makes an API call for operations on a single ledger or between multiple ledgers.  The API call is sent to Business Logic Plugin via Hyperledger Cactus Routing Interface.
-- **Step 2**: Business Logic Plugin requests ledger operation(s) to Ledger Plugin(s) via Hyperledger Cactus Routing Interface.  Ledger plugin requests the operation(s) to its connected ledger. The operation is settled on the ledger.
-- **Step 3**: The Ledger Plugin is monitoring transaction data on its connected ledger.  If Ledger Plugin receives transaction data related with the operation(s) of Step 2, Ledger Plugin verifies the transaction and send the verified transaction information to Business Logic Plugin via Hyperledger Cactus Routing Interface, then Business Logic Plugin receives this information and records it.
+- **Step 1**: "Application user(s)" submits an API call to "Cactus routing interface".  
+- **Step 2**: The API call is internally routed to "Business Logic Plugin" by "Cactus Routing Interface" for initiating associated business logic. 
+Then, "Business Logic Plugin" determines required ledger operation(s) to complete or abort a business logic. 
+- **Step 3**" "Business Logic Plugin" submits API calls to request operations on "Ledger(s)" wrapped with "Ledger Plugin(s)". Each API call will be routed to designated "Ledger Plugin" by "Routing Interface". 
+- **Step 4**: "Ledger Plugin" sends an event notification to "Business Logic Plugin" via "Cactus Routing Interface", when its sub-component "Verifier" detect an event regarding requested ledger operation to "Ledger".
+- **Step 5**: "Business Logic Plugin" receives a message from "Ledger Plugin" and determines completion or continuous of the business logic. When the business logic requires to continuous operations go to "Step 3" ,or end the process.
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
