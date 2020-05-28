@@ -52,12 +52,11 @@ function mainTask()
   ### COMMON
   cd $PROJECT_ROOT_DIR
 
-  npm install
+  npm ci
   ./node_modules/.bin/lerna clean --yes
   ./node_modules/.bin/lerna bootstrap
   npm run build
-  npm run test
-  npm run test-integration
+  npm run test:all
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))

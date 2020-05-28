@@ -1,6 +1,8 @@
 language: node_js
 node_js:
   - 10
+  - 12
+  - 14
 
 os: linux
 
@@ -10,7 +12,7 @@ services:
   - docker
 
 script:
-  - CI_CONTAINERS_WAIT_TIME=12 CI_NO_CORDA=true ./tools/ci.sh
+  - ./tools/ci.sh
 
 after_script:
   - docker ps -a

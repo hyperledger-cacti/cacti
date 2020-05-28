@@ -20,9 +20,11 @@ module.exports = {
         test: /\.ts$/,
         exclude: /node_modules/,
         use: [
+          "cache-loader",
           {
             loader: "ts-loader",
             options: {
+              transpileOnly: false,
               configFile: "tsconfig.json",
             },
           },
@@ -32,6 +34,7 @@ module.exports = {
         test: /\.(js|ts)$/,
         enforce: "pre",
         use: [
+          "cache-loader",
           {
             loader: "source-map-loader",
           },
@@ -43,11 +46,11 @@ module.exports = {
     extensions: [".ts", ".js"],
   },
   plugins: [
-    new BundleAnalyzerPlugin({
-      analyzerMode: "static",
-      openAnalyzer: false,
-      reportFilename: `${pkg.mainMinified}.html`,
-    }),
+    // new BundleAnalyzerPlugin({
+    //   analyzerMode: "static",
+    //   openAnalyzer: false,
+    //   reportFilename: `${pkg.mainMinified}.html`,
+    // }),
   ],
   optimization: {
     minimizer: [new TerserPlugin()],

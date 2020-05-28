@@ -10,7 +10,7 @@ export const CACTUS_OPEN_API_JSON: OpenAPI.OpenAPIV3.Document = {
   },
   servers: [
     {
-      url: "https://www.hlcactus.win/{basePath}",
+      url: "https://www.cactus.stream/{basePath}",
       description: "Public test instance",
       variables: {
         basePath: {
