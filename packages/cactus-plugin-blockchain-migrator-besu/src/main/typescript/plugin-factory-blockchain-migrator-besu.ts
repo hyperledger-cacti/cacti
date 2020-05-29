@@ -4,7 +4,7 @@ import {
     PluginBesuBlockchainMigrator,
 } from "./plugin-ledger-blockchain-migrator-besu";
 
-export class PluginFactoryBlockchainMigrator extends PluginFactory<
+export class PluginFactoryBlockchainBesuMigrator extends PluginFactory<
     PluginBesuBlockchainMigrator,
     IPluginBesuBlockchainMigratorOptions
     > {
@@ -14,4 +14,3 @@ export class PluginFactoryBlockchainMigrator extends PluginFactory<
         return new PluginBesuBlockchainMigrator(options);
     }
 }
-

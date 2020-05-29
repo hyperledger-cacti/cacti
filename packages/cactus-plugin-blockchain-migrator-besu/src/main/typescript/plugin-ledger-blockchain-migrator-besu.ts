@@ -1,48 +1,48 @@
-import { IPluginBlockchainMigrator } from "@hyperledger/cactus-core-api";
-import { PluginLedgerConnector } from "@hyperledger/cactus-core-api";
-import { PluginLedgerConnectorBesu } from "@hyperledger/cactus-core-api";
-import EEAClient from "web3-eea";
+import {IPluginBlockchainMigrator, PluginAspect} from "@hyperledger/cactus-core-api";
+// import { PluginLedgerConnectorBesu } from "../../../../cactus-plugin-ledger-connector-besu/src/main/typescript";
+import { PluginLedgerConnectorBesu } from "../../../../cactus-plugin-ledger-connector-besu/src/main/typescript";
+import { PluginLedgerConnectorQuorum } from "../../../../cactus-plugin-ledger-connector-quorum/src/main/typescript";
 
-enum migrationDepth  {
+export enum migrationDepth  {
     Data,
     SmartContracts,
     Both
 }
 
-//Decides which subset of the state of the blockchain will be migrated, based on different criteria
-enum migrationType  {
-    //Migrates all the blockchain's state
+// Decides which subset of the state of the blockchain will be migrated, based on different criteria
+export enum migrationType  {
+    // Migrates all the blockchain's state
     All,
-    //Migrates state created/updated after a certain timestamp
+    // Migrates state created/updated after a certain timestamp
     Time,
-    //Migrates a specific subset of the blockchain (e.g., transactions or states)
+    // Migrates a specific subset of the blockchain (e.g., transactions or states)
     Transactions,
-    //Migrates the state of the blockchain associated with a certain participant
+    // Migrates the state of the blockchain associated with a certain participant
     Participant
 }
 
-//Source ledger is Besu
-//Source ledger options are additional options belonging to the context of the migration, concerning a specific ledger
+// Source ledger is Besu
+// Source ledger options are additional options belonging to the context of the migration, concerning a specific ledger
 export interface IPluginBesuBlockchainMigratorOptions {
-    sourceLedger: PluginLedgerConnector,
-    sourceLedgerOptions: IPluginLedgerBlockchainSourceBlockchainOptions,
-    targetLedger: PluginLedgerConnector,
-    targetLedgerOptions: IPluginLedgerBlockchainTargetBlockchainOptions,
-    crossLedgerCommunicationProtocol: "Cactus",
+    sourceLedger: PluginLedgerConnectorBesu,
+    sourceLedgerOptions?: IPluginLedgerBlockchainSourceBlockchainOptions,
+    targetLedger: PluginLedgerConnectorQuorum,
+    targetLedgerOptions?: IPluginLedgerBlockchainTargetBlockchainOptions,
+    crossLedgerCommunicationProtocol: string,
     migrationDepth: migrationDepth,
     migrationType: migrationType,
     migrationOptions: IPluginLedgerBlockchainMigrationOptions
 }
 export interface IPluginLedgerBlockchainSourceBlockchainOptions {
-    options: any[];
+    options?: any[];
 }
 
 export interface IPluginLedgerBlockchainTargetBlockchainOptions {
-    options: any[];
+    options?: any[];
 }
 
 export interface IPluginLedgerBlockchainMigrationOptions {
-    options: any[];
+    options?: any[];
 }
 
 export interface ITransactionOptions {
@@ -51,8 +51,10 @@ export interface ITransactionOptions {
 
 export class PluginBesuBlockchainMigrator
     implements IPluginBlockchainMigrator <any, any> {
-    private readonly sourceLedger: PluginLedgerConnector;
-    private readonly targetLedger: PluginLedgerConnector;
+    private readonly sourceLedger: PluginLedgerConnectorBesu;
+    // Add other possibilities as to target Ledgers
+    private readonly targetLedger: PluginLedgerConnectorQuorum;
+    private readonly targetLedgerType: string;
     private readonly migrationType : migrationType;
     private readonly migrationDepth: migrationDepth;
     private readonly migrationOptions: IPluginLedgerBlockchainMigrationOptions;
@@ -62,15 +64,13 @@ export class PluginBesuBlockchainMigrator
             throw new Error(`PluginBesuBlockchainMigratorOptions options falsy.`);
         }
 
-        if (!(options.sourceLedger instanceof PluginLedgerConnectorBesu))   {
-            throw new Error(`PluginBesuBlockchainMigratorOptions source ledger has to be Besu.`);
-        }
-
         this.sourceLedger = this.options.sourceLedger;
         this.targetLedger = this.options.targetLedger;
         this.migrationType = this.options.migrationType;
         this.migrationDepth = this.options.migrationDepth;
         this.migrationOptions = this.options.migrationOptions;
+        this.targetLedgerType = this.options.targetLedger.getId();
+
     }
 
     public getId(): string {
@@ -87,5 +87,16 @@ export class PluginBesuBlockchainMigrator
 
     public async approveMigration(options: string): Promise<void> {
         throw new Error("Method not implemented.");
+    }
+
+    public async deployToTargetLedger(migrationDepth: migrationDepth,
+                                      migrationType: migrationType,
+                                      migrationOptions: IPluginLedgerBlockchainMigrationOptions): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+
+    // Migration plugin aspect?
+    public getAspect(): PluginAspect {
+        return PluginAspect.LEDGER_CONNECTOR;
     }
 }

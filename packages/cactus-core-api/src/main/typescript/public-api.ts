@@ -11,3 +11,4 @@ export { PluginFactory } from "./plugin/plugin-factory";
 export { ICactusPlugin, isICactusPlugin } from "./plugin/i-cactus-plugin";
 export { PluginAspect } from "./plugin/plugin-aspect";
 export { PluginRegistry } from "./plugin/plugin-registry";
+export { IPluginBlockchainMigrator } from "./plugin/blockchain-migrator/i-plugin-blockchain-migrator";

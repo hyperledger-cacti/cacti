@@ -1,0 +1,69 @@
+{
+  "name": "@hyperledger/cactus-plugin-blockchain-migrator-besu",
+  "version": "0.1.0",
+  "description": "Allows Cactus nodes to connect to a Besu ledger and a target ledger and perform a migration.",
+  "main": "dist/cactus-plugin-blockchain-migrator-besu.node.umd.js",
+  "mainMinified": "dist/cactus-plugin-blockchain-migrator-besu.node.umd.min.js",
+  "browser": "dist/cactus-plugin-blockchain-migrator-besu.web.umd.js",
+  "browserMinified": "dist/cactus-plugin-blockchain-migrator-besu.web.umd.min.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/types/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "tsc": "tsc --project ./tsconfig.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Rafael Belchior",
+      "email": "rafael.belchior@tecnico.ulisboa.pt",
+      "url": ""
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "dependencies": {
+    "@hyperledger/cactus-common": "0.2.0",
+    "@hyperledger/cactus-core-api": "^0.2.0",
+    "joi": "14.3.1",
+    "typescript-optional": "2.0.1",
+    "web3": "1.2.7",
+    "web3-eea": "0.9.0"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-test-tooling": "0.2.0",
+    "@types/joi": "14.3.4"
+  }
+}
