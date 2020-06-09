@@ -1,0 +1,7 @@
+version: "3.6"
+services:
+  all_in_one:
+    build:
+      context: .
+    stdin_open: true
+    tty: true
