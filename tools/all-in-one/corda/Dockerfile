@@ -11,3 +11,7 @@ RUN mkdir -p /opt/corda/partyA/drivers
 RUN mkdir -p /opt/corda/partyA/logs
 RUN mkdir -p /opt/corda/partyA/bin
 RUN mkdir -p /opt/corda/partyA/additional-node-infos
+
+# copy corda jar
+RUN mkdir -p /opt/corda/bin
+COPY --from=corda /opt/corda/bin/ /opt/corda/bin/
