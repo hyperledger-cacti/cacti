@@ -26,9 +26,9 @@ install-pandoc:
 	sudo gdebi --non-interactive $(PD_DEB_FILE)
 	rm $(PD_DEB_FILE)
 
-install-gdebig-core:
+install-gdebi-core:
 	sudo apt-get update
 	sudo apt-get install -y gdebi-core
 
-# Tested on Ubuntu 18.04 only
-configure: install-pandoc install-wkhtmltox install-gdebig-core
+# Tested on Ubuntu 18.04 and 20.04 only
+configure: install-gdebi-core install-pandoc install-wkhtmltox
