@@ -70,7 +70,7 @@ end note
     v -> k: Fetch LedgerTwo\nPrivate Key of User_A
     return Private Key
 
-    v -> d1: Execute Transaction\non **LedgerTwo**\nas **User_A**
+    v -> d2: Execute Transaction\non **LedgerTwo**\nas **User_A**
     return Transaction Executed
   return Transaction Executed
 return Transaction Executed

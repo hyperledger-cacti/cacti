@@ -263,7 +263,7 @@ gets replaced by a traditional bank account holding USD.
 | Prerequisites               | 1. `User A` has to have the identities on the various ledgers set up prior to importing them and must have access to the private |
 | Comments                    |  |
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/nLLBRzf04BxlhnZHIul48Jb68GeeGKLKAYgakI15Ypt1AzkpxkuOulxwZjVc4PH4z7rSpyottsDMllQi7PTv1ZFyLY9523T6hvpEeGUt5CETHmVtEikGOL1oWiGcqcmiXQDrvdiuAULJGuMk9mVEsSt84i-uoX0Cwyn4Ih5XENsi2dGPnYl17MOsIgD46u8nCSgr0NWa8BYnBbtGRxFI4LiN-Xy6e3rekBn4YdkbVBcwKcffds0u7i6x-yGmgXg8A-WCfkDEQ2_CxjjNaH5hWNllFuJYMibHBxL7w4om2a928PMP60IwmUzy2d9zPtlBRgmfV2Qif-Apuy9yOqFXV8-dIxQYoQmr8uZ0-anblaIdLByFNt1bF8iv6yD94DRlon3qhcef5_jwS70GHROaLWwvT0H3r4w-pcsA5D36UM4TmtGoFe9f2ztkJa2t2obMXJPEGTrJjwONC1ExyEM-1KcmhYeOOz0C3ZtBQ4jbQoVS5N6jzCOIRccsbqyQcARqEZVny2Hkp_h-B3TnSkuqUSbD8ckpzKUMtZvXL0hQjbEsTq7I_SmxHLPQd5abhBhT9aDXRIchW538ieL2sChAIlqmJ-bwT3O72RzGvw1bd-hjs9WiWwMitrAU9bjbSdcTtbAjQt-1sh4M5c4NQnvxCzUdqfSHW7Nh_mWvIlQu2vgwPgt5FR2FxQCD8wsx1mq7KF7PYTSlI1vJe-gXLdM0V32tnOhLszMtQZ-HQzYx_vwhiFYrN1lwh-OgvR-QQxZ-7-PwBIR9t_87">
+<img width="700" src="./use-case-sequence-diagram-end-user-wallet-authentication-authorization.png">
 
 ---
 
