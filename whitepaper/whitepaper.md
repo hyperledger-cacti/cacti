@@ -68,9 +68,8 @@ Photo by Pontus Wellgraf on Unsplash
     - [3.2.4 Consortium Management](#324-consortium-management)
   - [3.3 Working Policies](#33-working-policies)
 - [4. Architecture](#4-architecture)
-  - [4.1 Interworking patterns](#41-interworking-patterns)
-    - [4.1.1 Interworking patterns list](#411-interworking-patterns-list)
-    - [4.2 Interworking architecture](#42-interworking-architecture)
+  - [4.1 Integration patterns](#41-integration-patterns)
+  - [4.2 System architecture and basic flow](#42-system-architecture-and-basic-flow)
   - [4.3 Technical Architecture](#43-technical-architecture)
     - [4.3.1 Monorepo Packages](#431-monorepo-packages)
       - [4.2.1.1 cmd-api-server](#4211-cmd-api-server)
@@ -281,13 +280,13 @@ gets replaced by a traditional bank account holding USD.
 | Use Case                   | 1. `Consortium A` operates a set of services/use cases on a source blockchain.<br>2. `Consortium A` decides to use another blockchain infrastructure to support their use case. <br>3. `Consortium A` migrates the existing assets to another blockchain.
 | Interworking patterns      | Value transfer                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | Type of Social Interaction | Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| Narrative                  | A group of stakeholders (`Consortium A`) operating a source blockchain (e.g., a Hyperledger Fabric instance) would like to migrate the functionality to a target blockchain (e.g., Hyperledger Besu), in order to expand their reach. However, such migration requires lots of resources and technical effort. The `Blockchain Migration feature` from Hyperledger Cactus can provide support for doing so, by connecting to the source and target blockchains, and performing the migration task.
-| Actors                     | 1. Stakeholders composing the `Consortium A`: The group of entities operating the source blockchain, who collectively aim at performing a migration to a target blockchain.                                                                                                                                                                                                                                                                                                                                                                    |
+| Narrative                  | A group of members (`Consortium A`) are operating a source blockchain (e.g., a Hyperledger Fabric instance) would like to migrate the functionality to a target blockchain (e.g., Hyperledger Besu), in order to expand their reach. However, such migration requires lots of resources and technical effort. The `Blockchain Migration feature` from Hyperledger Cactus can provide support for doing so, by connecting to the source and target blockchains, and performing the migration task.
+| Actors                     | 1. Consortium members composing the `Consortium A`: The group of entities operating the source blockchain, who collectively aim at performing a migration to a target blockchain.                                                                                                                                                                                                                                                                                                                                                                    |
 | Goals of Actors            | `Consortium A` wishes to be able to operate their use case on the target blockchain. The service is functional after the migration.                                                                                                                                                                                                                                                                                                                                                                                   |
-| Success Scenario           | The consortium agrees on the migration, and it succeeds without issues.                                                                                                                                                                                                                                                                                                                                                        |
+| Success Scenario           | The consortium agrees on the migration, and it is performed in a decentralized way. Blockchain migration succeeds without issues.                                                                                                                                                                                                                                                                                                                                                        |
 | Success Criteria           | Assets have been migrated. An identical history for those assets has been reconstructed on the target blockchain.                                                                                                                                                                                                                                                                                                                                                |
 | Failure Criteria           | 1. It was not migrate the assets. <br> It was not possible to reconstruct the asset history on the target blockchain.                                                                                                                                                                                                                                                                                                                                                                                                          |
-| Prerequisites              | 1. All stakeholders belonging to `Consortium A` want to migrate the blockchain. <br> 2. The `Consortium A` ontrols the source blockchain. <br>2. `Consortium A` has write and execute permissions on the target blockchain<br>
+| Prerequisites              | 1. All members belonging to `Consortium A` want to migrate the blockchain. <br> 2. The `Consortium A` controls the source blockchain. <br>3. `Consortium A` has write and execute permissions on the target blockchain<br>
 | Comments                   | An asset is defined as data or smart contracts originating from the source blockchain. <br> This use case relates to use cases implying asset portability (e.g., 2.1) <br> This use case provides blockchain portability, thus reducing costs and fostering blockchain adoption.                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 
@@ -295,20 +294,17 @@ gets replaced by a traditional bank account holding USD.
 Motivation: The suitability of a blockchain solution regarding a use case depends on the underlying blockchain properties.
             As blockchain technologies are maturing at a fast pace, in particular private blockchains, its properties might change. Consequently, this creates an unbalance between user expectations' and the applicability of the solution.
             It is, therefore, desirable for an organization to be able to replace the blockchain providing the infrastructure to a certain service.
-          
-Currently, when a consortium wants to migrate their blockchain (e.g., the source blockchain became obsolete, cryptographic algorithms no longer secure, etc), the solution is to re-implement business logic using a different platform, yielding great effort. Migrating data to another blockchain currently is not feasible in practice. 
-This is one of the reasons mass adoption amongst enterprises grows slowly.
-Data migrations have been performed by (Frauenthaler et al., 2019) and (Scheid et al., 2019), both recent endeavors to render flexibility to blockchain-based solutions.
-In those works, the authors propose simple data migration capabilities for public, permissionless blockchains, in which a user can specify requirements for its blockchain. The developed solutions allow "switchovers," where a blockchain is migrated, in case there is a blockchain that better satisfies the current requirements.
-Nonetheless, arguably a more interesting approach would be to consider cross-smart contract execution functionality or another automatic way of migration.
 
-References: <br>
-E Scheid and Burkhard Rodrigues, B Stiller. 2019. Toward a policy-based blockchain agnostic framework. 16th IFIP/IEEE International Symposium on Integrated Network Management (IM 2019) (2019)
-Philipp Frauenthaler, Michael Borkowski, and Stefan Schulte. 2019. A Framework for Blockchain Interoperability and Runtime Selection.
+Currently, when a consortium wants to migrate their blockchain (e.g., the source blockchain became obsolete, cryptographic algorithms no longer secure, etc), the solution is to re-implement business logic using a different platform, yielding great effort.
+Data migrations have been performed before on public blockchains [[2](#7-references),[3](#7-references)], both recent endeavors to render flexibility to blockchain-based solutions.
+In those works, the authors propose simple data migration capabilities for public, permissionless blockchains, in which a user can specify requirements for the blockchain infrastructure supporting their service.
 
 ### 2.8.1 Blockchain Data Migration
 Data migration corresponds to capture the set or subset of data assets (information, in the form of bytes) on a source blockchain, and construct a representation of those in a target blockchain. Note that the models underlying both blockchains do not need to be the same (e.g., world state model in Hyperledger Fabric vs account model in Ethereum).
 To migrate data, it should be possible to capture the necessary information from the source blockchain and to write it on the target blockchain. The history of information should also be migrated (i.e., the updates over the elements considered information).
+
+
+<img width="700" src="./use-case-sequence-diagram-blockchain-migration.png">
 
 ### 2.8.2 Blockchain Smart Contract Migration
 The task of migrating a smart contract comprises the task of migrating data. In specific, the information should be accessible and writeable on another blockchain. Additionally, the target blockchain's virtual machine should support the computational complexity of the source blockchain (e.g., one cannot migrate all Ethereum smart contracts to Bitcoin, but the other way around is feasible).
@@ -319,9 +315,9 @@ Automatic smart contract migration yields risks for enterprise blockchain system
 
 By expressing my preferences in terms of functional and non-functional requirements, Hyperledger Cactus can recommend a set of suitable blockchains, as the target of the migration.
 Firstly, I could know in real-time the characteristics of the target blockchain that would influence my decision.
-For instance, the platform can analyze see the cost of writing information to Ethereum, the exchange rate US dollar - Ether, the average time to mine a block, the transaction throughput, and the network hash rate ((Frauenthaler et al., 2019).
+For instance, the platform can analyze see the cost of writing information to Ethereum, the exchange rate US dollar - Ether, the average time to mine a block, the transaction throughput, and the network hash rate [[3](#7-references)</sup>].
 Based on that, the framework proposes a migration, with indicators such as predicted cost, predicted time to complete migration and the likelihood of success.
-As Ethereum does not show a desirable throughput, I choose Polkadot's platform. As it yields higher throughput, I then safely migrate my solution from Fabric to Polkadot, without compromising the solution in production. 
+As Ethereum does not show a desirable throughput, I choose Polkadot's platform. As it yields higher throughput, I then safely migrate my solution from Fabric to Polkadot, without compromising the solution in production.
  This feature is more useful regarding public blockchains.
 
 
@@ -455,20 +451,20 @@ The overall architecture is as the following figure.
 <img src="./architecture-with-plugin-and-routing.png" width="700">
 
 Each entity is as follows:
-- **Application user**: The entity submits API calls to "Cactus Routing Interface". 
+- **Application user**: The entity submits API calls to "Cactus Routing Interface".
 - **Business Logic Plugin**: The entity executes business logic and provide integration services that are connected with multiple blockchains. The entity is composed by web application or smart contract on a blockchain. The entity is a single plugin and required for executing Hyperledger Cactus applications.
 - **Ledger Plugin**: The entity communicates Business Logic Plugin with each ledger.  The entity is composed by a validator and a verifier as follows. The entity(s) is(are) chosen from multiple plugins on configuration.
-- **Validator**: The entity monitors transaction records of Ledger operation, and it determines the result(success, failed, timeouted) from the transaction records. 
+- **Validator**: The entity monitors transaction records of Ledger operation, and it determines the result(success, failed, timeouted) from the transaction records.
 Validator ensure the determined result with attaching digital signature with "Validator key" which can be verified by "Verifier".
 - **Verifier**: The entity accepts only sucussfully verified operation results by verifying the digital signature of the validator. Note that "Validator" is apart from "Verifier" over a bi-directional channel.
 - **Cactus Routing Interface**: The entity is a routing service between "Business Logic Plugin" and  "Ledger Plugin(s)". The entity is also a routing service between Business Logic Plugin and API calls from "Application user(s)".
 - **Ledger-n**: DLT platforms(e.g. Ethereum, Quorum, Hyperledger Fabric, ...)
 
 The execution steps are described as follows:
-- **Step 1**: "Application user(s)" submits an API call to "Cactus routing interface".  
-- **Step 2**: The API call is internally routed to "Business Logic Plugin" by "Cactus Routing Interface" for initiating associated business logic. 
-Then, "Business Logic Plugin" determines required ledger operation(s) to complete or abort a business logic. 
-- **Step 3**" "Business Logic Plugin" submits API calls to request operations on "Ledger(s)" wrapped with "Ledger Plugin(s)". Each API call will be routed to designated "Ledger Plugin" by "Routing Interface". 
+- **Step 1**: "Application user(s)" submits an API call to "Cactus routing interface".
+- **Step 2**: The API call is internally routed to "Business Logic Plugin" by "Cactus Routing Interface" for initiating associated business logic.
+Then, "Business Logic Plugin" determines required ledger operation(s) to complete or abort a business logic.
+- **Step 3**" "Business Logic Plugin" submits API calls to request operations on "Ledger(s)" wrapped with "Ledger Plugin(s)". Each API call will be routed to designated "Ledger Plugin" by "Routing Interface".
 - **Step 4**: "Ledger Plugin" sends an event notification to "Business Logic Plugin" via "Cactus Routing Interface", when its sub-component "Verifier" detect an event regarding requested ledger operation to "Ledger".
 - **Step 5**: "Business Logic Plugin" receives a message from "Ledger Plugin" and determines completion or continuous of the business logic. When the business logic requires to continuous operations go to "Step 3" ,or end the process.
 
@@ -932,3 +928,7 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 # 7. References
 
 1: [Heterogeneous System Architecture](https://en.wikipedia.org/wiki/Heterogeneous_System_Architecture) - Wikipedia, Retrieved at: 11th of December 2019
+
+2: E Scheid and Burkhard Rodrigues, B Stiller. 2019. Toward a policy-based blockchain agnostic framework. 16th IFIP/IEEE International Symposium on Integrated Network Management (IM 2019) (2019)
+
+3: Philipp Frauenthaler, Michael Borkowski, and Stefan Schulte. 2019. A Framework for Blockchain Interoperability and Runtime Selection.
