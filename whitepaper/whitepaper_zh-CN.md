@@ -23,6 +23,15 @@ Photo by Pontus Wellgraf on Unsplash
 | Tracy Kuhrt                    | tracy.a.kuhrt@accenture.com               |
 | Rafael Belchior                | rafael.belchior@tecnico.ulisboa.pt        |
 
+# 翻译者 <!-- omit in toc -->
+
+| Translators/Reviewers | Email                   |
+| --------------------- | ----------------------- |
+| Yang Cheng            | chengyang418@163.com    |
+| Yuxiang Liu           | david-khala@hotmail.com |
+
+
+
 # 历史版本 <!-- omit in toc -->
 
 | Date of Revision      | Description of Changes Made                            |
@@ -32,229 +41,218 @@ Photo by Pontus Wellgraf on Unsplash
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-- [1. Abstract](#1-abstract)
-- [2. Example Use Cases](#2-example-use-cases)
-  - [2.1 Ethereum to Quorum Asset Transfer](#21-ethereum-to-quorum-asset-transfer)
-  - [2.2 Escrowed Sale of Data for Coins](#22-escrowed-sale-of-data-for-coins)
-  - [2.3 Money Exchanges](#23-money-exchanges)
-  - [2.4 Stable Coin Pegged to Other Currency](#24-stable-coin-pegged-to-other-currency)
-    - [2.4.1 With Permissionless Ledgers (BTC)](#241-with-permissionless-ledgers-btc)
-    - [2.4.2 With Fiat Money (USD)](#242-with-fiat-money-usd)
-  - [2.5 Healthcare Data Sharing with Access Control Lists](#25-healthcare-data-sharing-with-access-control-lists)
-  - [2.6 Integrate Existing Food Traceability Solutions](#26-integrate-existing-food-traceability-solutions)
-  - [2.7 End User Wallet Authentication/Authorization](#27-end-user-wallet-authenticationauthorization)
-  - [2.8 Blockchain Migration](#28-blockchain-migration)
-    - [2.8.1 Blockchain Data Migration](#281-blockchain-data-migration)
-    - [2.8.2 Blockchain Smart Contract Migration](#282-blockchain-smart-contract-migration)
-    - [2.8.3 Semi-Automatic Blockchain Migration](#283-semi-automatic-blockchain-migration)
-- [3. Software Design](#3-software-design)
-  - [3.1. Principles](#31-principles)
-    - [3.1.1. Wide support](#311-wide-support)
-    - [3.1.2. Plugin Architecture from all possible aspects](#312-plugin-architecture-from-all-possible-aspects)
-    - [3.1.3. Prevent Double spending Where Possible](#313-prevent-double-spending-where-possible)
-    - [3.1.4 DLT Feature Inclusivity](#314-dlt-feature-inclusivity)
-    - [3.1.5 Low impact](#315-low-impact)
-    - [3.1.6 Transparency](#316-transparency)
-    - [3.1.7 Automated workflows](#317-automated-workflows)
-    - [3.1.8 Default to Highest Security](#318-default-to-highest-security)
-    - [3.1.9 Transaction Protocol Negotiation](#319-transaction-protocol-negotiation)
-    - [3.1.10 Avoid modifying the total amount of digital assets on any blockchain whenever possible](#3110-avoid-modifying-the-total-amount-of-digital-assets-on-any-blockchain-whenever-possible)
-    - [3.1.11 Provide abstraction for common operations](#3111-provide-abstraction-for-common-operations)
-    - [3.1.12 Integration with Identity Frameworks (Moonshot)](#3112-integration-with-identity-frameworks-moonshot)
-  - [3.2 Feature Requirements](#32-feature-requirements)
-    - [3.2.1 New Protocol Integration](#321-new-protocol-integration)
-    - [3.2.2 Proxy/Firewall/NAT Compatibility](#322-proxyfirewallnat-compatibility)
-    - [3.2.3 Bi-directional Communications Layer](#323-bi-directional-communications-layer)
-    - [3.2.4 Consortium Management](#324-consortium-management)
-  - [3.3 Working Policies](#33-working-policies)
-- [4. Architecture](#4-architecture)
-  - [4.1 Interworking patterns](#41-interworking-patterns)
-    - [4.1.1 Interworking patterns list](#411-interworking-patterns-list)
-    - [4.2 Interworking architecture](#42-interworking-architecture)
-  - [4.3 Technical Architecture](#43-technical-architecture)
-    - [4.3.1 Monorepo Packages](#431-monorepo-packages)
-      - [4.2.1.1 cmd-api-server](#4211-cmd-api-server)
-        - [4.3.1.1.1 Runtime Configuration Parsing and Validation](#43111-runtime-configuration-parsing-and-validation)
-        - [4.2.1.1.2 Configuration Schema - API Server](#42112-configuration-schema---api-server)
-        - [4.3.1.1.4 Plugin Loading/Validation](#43114-plugin-loadingvalidation)
-      - [4.2.1.2 core-api](#4212-core-api)
-      - [4.2.1.4 sdk](#4214-sdk)
-      - [4.2.1.5 keychain](#4215-keychain)
-      - [4.3.1.7 tracing](#4317-tracing)
-      - [4.3.1.8 audit](#4318-audit)
-      - [4.3.1.9 document-storage](#4319-document-storage)
-      - [4.3.1.10 relational-storage](#43110-relational-storage)
-      - [4.3.1.11 immutable-storage](#43111-immutable-storage)
-    - [4.3.2 Deployment Diagram](#432-deployment-diagram)
-    - [4.3.3 Component Diagram](#433-component-diagram)
-    - [4.3.4 Class Diagram](#434-class-diagram)
-    - [4.3.5 Sequence Diagram - Transactions](#435-sequence-diagram---transactions)
-  - [4.4 Transaction Protocol Specification](#44-transaction-protocol-specification)
-    - [4.4.1 Handshake Mechanism](#441-handshake-mechanism)
-    - [4.4.2 Transaction Protocol Negotiation](#442-transaction-protocol-negotiation)
-  - [4.5 Plugin Architecture](#45-plugin-architecture)
-    - [4.5.1 Ledger Connector Plugins](#451-ledger-connector-plugins)
-    - [4.5.2 Identity Federation Plugins](#452-identity-federation-plugins)
-      - [4.5.1.1 X.509 Certificate Plugin](#4511-x509-certificate-plugin)
-    - [4.5.3 Key/Value Storage Plugins](#453-keyvalue-storage-plugins)
-    - [4.5.4 Serverside Keychain Plugins](#454-serverside-keychain-plugins)
-- [5. Identities, Authentication, Authorization](#5-identities-authentication-authorization)
-  - [5.1 Transaction Signing Modes, Key Ownership](#51-transaction-signing-modes-key-ownership)
-    - [5.1.1 Client-side Transaction Signing](#511-client-side-transaction-signing)
-    - [5.1.2 Server-side Transaction Signing](#512-server-side-transaction-signing)
-  - [5.2 Open ID Connect Provider, Identity Provider](#52-open-id-connect-provider-identity-provider)
-  - [5.3 Server-side Keychain for Web Applications](#53-server-side-keychain-for-web-applications)
-- [6. Terminology](#6-terminology)
-- [7. References](#7-references)
+- [1. 概述](#1-概述)
+- [2. 使用案例](#2-使用案例)
+  - [2.1 Ethereum 到 Quorum 的资产转移](#21-ethereum-到-quorum-的资产转移)
+  - [2.2 数据托管出售](#22-数据托管出售)
+  - [2.3 货币兑换](#23-货币兑换)
+  - [2.4 稳定币和其他货币的铆定](#24-稳定币和其他货币的铆定)
+    - [2.4.1 和非授权区块链（BTC）](#241-和非授权区块链btc)
+    - [2.4.2 和法定货币](#242-和法定货币)
+  - [2.5 带有访问控制列表的医疗保健数据共享](#25-带有访问控制列表的医疗保健数据共享)
+  - [2.6 集成现有的食品溯源解决方案](#26-集成现有的食品溯源解决方案)
+  - [2.7 终端用户钱包身份验证/授权](#27-终端用户钱包身份验证授权)
+  - [2.8 区块链迁移](#28-区块链迁移)
+    - [2.8.1 区块链数据迁移](#281-区块链数据迁移)
+    - [2.8.2 区块链智能合约迁移](#282-区块链智能合约迁移)
+    - [2.8.3 半自动区块链迁移](#283-半自动区块链迁移)
+- [3. 软件设计](#3-软件设计)
+  - [3.1. 原则](#31-原则)
+    - [3.1.1. 广泛的支持](#311-广泛的支持)
+    - [3.1.2. 尽可能的插件化架构](#312-尽可能的插件化架构)
+    - [3.1.3. 尽可能避免双花](#313-尽可能避免双花)
+    - [3.1.4 特性的包容性](#314-特性的包容性)
+    - [3.1.5 低影响](#315-低影响)
+    - [3.1.6 透明性](#316-透明性)
+    - [3.1.7 自动化的工作流](#317-自动化的工作流)
+    - [3.1.8 默认最高的安全性](#318-默认最高的安全性)
+    - [3.1.9 交易协议协商](#319-交易协议协商)
+    - [3.1.10 避免任何区块链网络上数字资产总量的变动的可能](#3110-避免任何区块链网络上数字资产总量的变动的可能)
+    - [3.1.11 提供通用操作的抽象](#3111-提供通用操作的抽象)
+    - [3.1.12 集成身份框架（Moonshot）](#3112-集成身份框架moonshot)
+  - [3.2 特性需求](#32-特性需求)
+    - [3.2.1 新协议的集成](#321-新协议的集成)
+    - [3.2.2 代理/防火墙/NAT 能力](#322-代理防火墙nat-能力)
+    - [3.2.3 双向通信层](#323-双向通信层)
+    - [3.2.4 联盟管理](#324-联盟管理)
+  - [3.3 工作策略](#33-工作策略)
+- [4. 架构](#4-架构)
+  - [4.1 集成模式](#41-集成模式)
+  - [4.2 系统架构和基本流程](#42-系统架构和基本流程)
+  - [4.3 技术架构](#43-技术架构)
+    - [4.3.1 Monorepo包](#431-monorepo包)
+      - [4.3.1.1 cmd-api-server](#4311-cmd-api-server)
+        - [4.3.1.1.1  运行时配置解析和验证](#43111-运行时配置解析和验证)
+        - [4.3.1.1.2 配置模式 - API 服务器](#43112-配置模式---api-服务器)
+        - [4.3.1.1.4 插件加载/验证](#43114-插件加载验证)
+      - [4.3.1.2 core-api](#4312-core-api)
+      - [4.3.1.4 sdk](#4314-sdk)
+      - [4.3.1.5 密钥串（keychain）](#4315-密钥串keychain)
+      - [4.3.1.7 追溯](#4317-追溯)
+      - [4.3.1.8 审核](#4318-审核)
+      - [4.3.1.9 文档存储](#4319-文档存储)
+      - [4.3.1.10 相关存储](#43110-相关存储)
+      - [4.3.1.11 不可篡改存储](#43111-不可篡改存储)
+    - [4.3.2 部署图](#432-部署图)
+    - [4.3.3 组件图](#433-组件图)
+    - [4.3.4 类图](#434-类图)
+    - [4.3.5 时序图——交易](#435-时序图交易)
+  - [4.4 交易协议说明](#44-交易协议说明)
+    - [4.4.1 握手机制](#441-握手机制)
+    - [4.4.2 交易协议协商](#442-交易协议协商)
+  - [4.5 插件架构](#45-插件架构)
+    - [4.5.1 账本连接器插件](#451-账本连接器插件)
+    - [4.5.2 身份联盟插件](#452-身份联盟插件)
+      - [4.5.1.1 X.509证书插件](#4511-x509证书插件)
+    - [4.5.3 Key/Value 存储插件](#453-keyvalue-存储插件)
+    - [4.5.4 服务端密钥串插件](#454-服务端密钥串插件)
+- [5. 身份、认证、授权](#5-身份认证授权)
+  - [5.1 交易签名模式、键所有权](#51-交易签名模式键所有权)
+    - [5.1.1 客户端交易签名](#511-客户端交易签名)
+    - [5.1.2 服务端交易签名](#512-服务端交易签名)
+  - [5.2 Open ID 链接提供者、身份提供者](#52-open-id-链接提供者身份提供者)
+  - [5.3 Web应用的服务端密钥串](#53-web应用的服务端密钥串)
+- [6. 术语](#6-术语)
+- [7. References 参考文献](#7-references-参考文献)
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
 # 1. 概述
 
-Blockchain technologies are growing in usage, but fragmentation is a big problem that may hinder reaching critical levels of adoption in the future.
+区块链技术的应用正在快速增长，但是碎片化可能是未来阻碍区块链应用的一个大问题。
 
-We propose a protocol and it's implementation to connect as many of them as possible in an attempt to solve the fragmentation problem by creating a heterogeneous system architecture <sup>[1](#7-references)</sup>.
-
-区块链技术的使用正在快速增长，但是碎片化可能是未来阻碍区块链应用的一个大问题。
-
-我们提出了一个协议，并根据一个异构系统架构<sup>[1](#7-references)</sup>进行了实现以便链接尽可能多的区块链系统，以此来解决碎片化的问题。
+我们提出了一个协议，并根据一个异构系统架构<sup>[1](#7-references)</sup>进行了实现以便连接尽可能多的区块链系统，以此来解决碎片化的问题。
 
 # 2. 使用案例
 
-Specific use cases that we intend to support.
-The core idea is to support as many use-cases as possible by enabling interoperability
-between a large variety of ledgers specific to certain mainstream or exotic use cases.
-
 我们的目的是支持特定使用场景。核心思想是通过多种账本的互操作性支持尽可能多的使用场景，特别是一些主流或者其他的用例。
-
-## 2.1 Ethereum to Quorum Asset Transfer
 
 ## 2.1 Ethereum 到 Quorum 的资产转移
 
-| Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Use Case Title             | Ethereum to Quorum Escrowed Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                |
-| Use Case                   | 1. `User A` owns some assets on a Ethereum ledger<br>2. `User A` asks `Exchanger` to exchange specified amount of assets on Ethereum ledger, and receives exchanged asset at the Quorum ledger.
-| Interworking patterns      | Value transfer                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Type of Social Interaction | Escrowed Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| Narrative                  | A person (`User A`) has multiple accounts on different ledgers (Ethereum, Quorum) and he wishes to send some assets from Ethereum ledger to a Quorum ledger with considering conversion rate. The sent asset on Ethereum will be received by Exchanger only when he successfully received converted asset on Quorum ledger. |
-| Actors                     | 1. `User A`: The person or entity who has ownership of the assets asscociated with its accounts on ledger.                                                                                                                                                                                                                                                                                                                                                                    |
-| Goals of Actors            | `User A` loses ownership of sent assets on Ethereum, but he will get ownnership of exchanged asset value on Quorum.                                                                                                                                                                                                                                                                                                                                                                                   |
-| Success Scenario           | Transfer succeeds without issues. Asset is available on both Ethereum and Quorum ledgers.                                                                                                                                                                                                                                                                                                                                                        |
-| Success Criteria           | Transfer asset on Quorum was successed.                                                                                                                                                                                                                                                                                                                                                |
-| Failure Criteria           | Transfer asset on Quorum was failed.                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Prerequisites              | 1. Ledgers are provisioned<br>2. `User A` and `Exchanger` identities established on both ledgers<br>3. `Exchanger` authorized business logic plugin to operate the account on Quorum ledger.<br>4.`User A` has access to Hyperledger Cactus deployment                                                                                                                                                                                                                                                                                                               |
-| Comments                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 用例属性名称 | 用例属性值                                                   |
+| ------------ | ------------------------------------------------------------ |
+| 用例标题     | Ethereum 到 Quorum 的托管资产转移                            |
+| 用例         | 1. `用户 A` 在 Ethereum 账本上拥有一些资产</br>2. `用户 A` 让`交易员`交易 Ethereum 账本上的指定数量的资产，Quorum 账本接收资产。 |
+| 互通模式     | 数值转移                                                     |
+| 社交类型     | 托管资产转移                                                 |
+| 描述         | 一个人（`用户 A`）在不同的账本（Ethereum，Quorum）上有多个账户，他希望按照一定汇率将 Ethereum 账本上的资产发送到 Quorum 账本上。只有当它成功的在 Quorum 账本上接收到转换的资产后交易员才可以接收到 Ethereum 上发送的资产。 |
+| 参与者       | 1. `用户 A`：一个人或者实体在拥有账本上与之相关账户的资产。  |
+| 参与者目标   | `用户 A` 失去 Ethereum 上发送的资产的所有权，但是得到 Quorum 上交换的资产数量的所有权。 |
+| 成功情景     | 转移成功没有问题。资产在 Ethereum 和 Quorum 账本上都可用。   |
+| 成功标准     | 成功转移资产到 Quorum。                                      |
+| 失败标准     | 转移资产到 Quorum 失败。                                     |
+| 前提条件     | 1. 已提供账本。</br>2.`用户 A` 和`交易员`都在账本上建立了身份。</br>3.`交易员`有权使用业务逻辑插件操作 Quorum 账本上的账户。</br>4.`用户 A` 可以访问部署的 Hyperledger Cactus。 |
+| 备注         |                                                              |
+
+
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 <img src="./use-case-ethereum-to-quorum-asset-transfer.png" width="700">
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 2.2 Escrowed Sale of Data for Coins
-
 ## 2.2 数据托管出售
 
 
-| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+| W3C 用例属性名称           | W3C 用例属性值                                               |
 |-----------------------------|------------------------------------------------|
-| Use Case Title 用例名          | Escrowed Sale of Data for Coins |
-| Use Case                    | 1. `User A` initiates (proposes) an escrowed transaction with `User B`<br>2. `User A` places funds, `User B` places the data to a digital escrow service.<br>3. They both observe each other's input to the escrow service and decide to proceed.<br>4. Escrow service releases the funds and the data to the parties in the exchange. |
-| Type of Social Interaction  | Peer to Peer Exchange |
-| Narrative                   | Data in this context is any series of bits stored on a computer:<br> * Machine learning model<br> * ad-tech database<br> * digital/digitized art<br> * proprietary source code or binaries of software<br> * etc.<br><br>`User A` and B trade the data and the funds through a Hyperledger Cactus transaction in an atomic swap with escrow securing both parties from fraud or unintended failures.<br>Through the transaction protocol's handshake mechanism, A and B can agree (in advance) upon<br><br>* The delivery addresses (which ledger, which wallet)<br>* the provider of escrow that they both trust<br>* the price and currency<br><br>Establishing trust (e.g. Is that art original or is that machine learning model has the advertised accuracy) can be facilitated through the participating DLTs if they support it. Note that `User A` has no way of knowing the quality of the dataset, they entirely rely on `User B`'s description of its quality (there are solutions to this problem, but it's not within the scope of our use case to discuss these). |
-| Actors                      | 1. `User A`: A person or business organization with the intent to purchase data.<br>2. `User B`: A person or business entity with data to sell. |
-| Goals of Actors             | `User A` wants to have access to data for an arbitrary reason such as having a business process that can enhanced by it.<br> `User B`: Is looking to generate income/profits from data they have obtained/created/etc. |
-| Success Scenario            | Both parties have signaled to proceed with escrow and the swap happened as specified in advance. |
-| Success Criteria            | `User A` has access to the data, `User B` has been provided with the funds. |
-| Failure Criteria            | Either party did not hold up their end of the exchange/trace. |
-| Prerequisites               | `User A` has the funds to make the purchase<br>`User B` has the data that `User A` wishes to purchase.<br>`User A` and B can agree on a suitable currency to denominate the deal in and there is also consensus on the provider of escrow. |
-| Comments                    | Hyperledger Private Data: https://hyperledger-fabric.readthedocs.io/en/release-1.4/private_data_tutorial.html <br> Besu Privacy Groups: https://besu.hyperledger.org/en/stable/Concepts/Privacy/Privacy-Groups/ |
+| 用例标题      | 数据托管出售 |
+| 用例                  | 1. `用户 A` 初始化（提案）一个和`用户 B`的托管交易。<br>2. `用户 A` 拿出资金，`用户 B` 拿出用于数字托管服务的数据。<br>3. 他们都观察到对方向托管服务的输入然后决定继续进行。<br>4. 托管服务释放资金和数据到交换的参与者。 |
+| 社交类型  | 点对点交换 |
+| 描述                 | 在此场景中的数据是电脑中以比特形式存储的内容：<br> * 机器学习模型<br> * 广告技术数据库<br> * 数字或数字化的艺术<br> * 专有的软件源码或二进制<br> * 其他。<br><br>`用户 A` 和 B 使用 Hyperledger Cactus 交易数据和资金，交易以原子交换的托管方式进行，可以有效避免参会双方的欺诈或者交易失败。<br>通过交易协议的握手机制，A 和 B 可以（事先）同意：<br><br>* 交付地址（哪个账本，哪个钱包） <br>* 他们都信任的托管商<br>* 价格和货币类型<br><br>可以通过参与 DLT，如果他们支持的话，来促进信任的建立。注意，`用户 A` 没办法知道数据集的质量，他们完全依赖于`用户 B` 的描述（这个问题有一些解决方案，但那不在我们讨论的范围之内）。 |
+| 参与者                   | 1. `用户 A`：一个想要购买数据的人或者商业组织。  <br>2. `用户 B`：一个想要出售数据的人或者商业实体。 |
+| 参与者目标        | `用户 A` 想要获得数据的访问权，可能因为这些数据可以帮他增强业务过程。<br> `用户 B` 想要通过他们的拥有的数据产生利润。 |
+| 成功情景        | 参与者都独立进行托管操作并且按预期完成交换。 |
+| 成功标准        | `用户 A` 成功访问数据，`用户 B` 获得了资金。 |
+| 失败标准        | 任何一个参与者没有完成他们最终的交易。 |
+| 前提条件           | `用户 A` 有用于交易的资金。<br>`用户 B` 有 `用户 A` 想要的数据。<br>`用户 A` 和 B 同意以合适的货币进行交易并且和托管商达成共识。 |
+| 备注                  | Hyperledger 私有数据： https://hyperledger-fabric.readthedocs.io/en/release-1.4/private_data_tutorial.html <br> Besu 私有群组： https://besu.hyperledger.org/en/stable/Concepts/Privacy/Privacy-Groups/ |
 
 <br>
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/jPF1Qi9048Rl-nI3nu07FNee6cseq8FKzYR899dOnNKtdTreVVlEnb1ZeI257ZF_jpCVEvkf3yYXEHXOqqT3jY1OQDmn7c08ZxvWTw8IrcW8N0KB30YLOvWxRRrIVgzjZH6UiP2Pis4TpiBgW4ONIWKTvElfN1CRAdV4a1fNx8jtr1QMDf1C2jfPoAG9dHplD_Ol8bW4-NZpnDiPe0ViLz9OoPNAtIUaoqoH5Qqp36QhvQ25Qosr4YI_G8FdrjKFL2bpSlG46UQiY-qbY8VAqJLCoJVzQ7njXqrmegAF64JSIW663t7Y15RiQYUdNncjZup4JA5Xsozr61gOCqcJijzYhNUtS73TNK7MsD8hY5p4ox7GqQgjNpaXkfdTkNwtkRELveFCl8TH-JrUSNCzhL6drIxqNwnkDr1LgXlTYYR92ncAEwpQUq5HYMjDaerD4l5XAaWVjTs1lFEWoL-I-AvWrkAfCBwcE87CEKc--qz-61rgGt5_NPx_bgkfN8ZyaLy0">
+
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 2.3 Money Exchanges 货币兑换
-
-Enabling the trading of fiat and virtual currencies in any permutation of possible pairs.
+## 2.3 货币兑换
 
 使法定货币和虚拟货币能够以任何可能的组合进行交易。
 
-> On the technical level, this use case is the same as the one above and therefore the specific details were omitted.
-
 > 在技术层面，该用例和上边的用例是一样的，但是我们省略了一些细节。
 
-## 2.4 Stable Coin Pegged to Other Currency 稳定币和其他货币的铆钉
+## 2.4 稳定币和其他货币的铆定
 
 
-| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+| W3C 用例属性名称 | W3C 用例属性值                                               |
 |-----------------------------|------------------------------------------------|
-| Use Case Title              | Stable Coin Pegged to Other Currency |
-| Use Case                    | 1. `User A` creates their own ledger<br>2. `User A` deploys Hyperledger Cactus in an environment set up by them.<br>3. `User A` implements necessary plugins for Hyperledger Cactus to interface with their ledger for transactions, token minting and burning.|
-| Type of Social Interaction  | Software Implementation Project |
-| Narrative                   | Someone launches a highly scalable ledger with their own coin called ExampleCoin that can consistently sustain throughput levels of a million transactions per second reliably, but they struggle with adoption because nobody wants to buy into their coin fearing that it will lose its value. They choose to put in place a two-way peg with Bitcoin which guarantees to holders of their coin that it can always be redeemed for a fixed number of Bitcoins/USDs. |
-| Actors                      | `User A`: Owner and/or operator of a ledger and currency that they wish to stabilize (peg) to other currencies |
-| Goals of Actors             | 1. Achieve credibility for their currency by backing funds.<br>2. Implement necessary software with minimal boilerplate code (most of which should be provided by Hyperldger Cactus) |
-| Success Scenario            | `User A` stood up a Hyperledger Cactus deployment with their self-authored plugins and it is possible for end user application development to start by leveraging the Hyperledger Cactus REST APIs which now expose the functionalities provided by the plugin authored by ``User A`` |
-| Success Criteria            | Success scenario was achieved without significant extra development effort apart from creating the Hyperledger Cactus plugins. |
-| Failure Criteria            | Implementation complexity was high enough that it would've been easier to write something from scratch without the framework |
-| Prerequisites               | * Operational ledger and currency<br>*Technical knowledge for plugin implementation (software engineering) |
-| Comments                    | |
+| 用例标题          | 稳定币和其他货币的铆定 |
+| 用例                  | 1. `用户 A` 创建他们自己的账本。<br>2. `用户 A` 在自己的环境中部署 Hyperledger Cactus。<br>3. `用户 A` 实现了 Hyperledger Cactus 必要的插件来对接他们账本的交易，代币产生和燃烧。 |
+| 社交类型 | 软件实现项目 |
+| 描述                 | 有人启动了一个带有称为 ExampleCoin 代币的高可扩展账本，可以稳定保证每秒百万级别的交易吞吐，但是他们生存艰难，因为大家担心它的价值所以没有人愿意买他们的代币。他们选择与比特币建立一种双向锚定机制，向其持有者保证，他们的代币可以兑换成固定数量的比特币或美元。 |
+| 参与者                   | `用户 A`：账本和货币的所有者或者操作者，他们希望和其他货币保持稳定（锚定）。 |
+| 参与者目标             | 1. 通过支持资金来获得他们货币的信誉。<br>2. 用最少的样板代码实现必要的软件（大部分应该由 Hyperldger Cactus 提供）。 |
+| 成功情景        | `用户 A` 使用他们自己编写的插件来支持 Hyperledger Cactus 部署，终端用户应用程序开发可以从使用 Hyperledger Cactus REST API 开始，Hyperledger Cactus REST API 现在暴露了由`用户 A` 编写的插件所提供的功能。 |
+| 成功标准        | 除了创建 Hyperledger Cactus 插件外，成功情景没有显著的额外开发工作。 |
+| 失败标准        | 实现的复杂性很高，如果没有框架，从头开始写东西会更容易。 |
+| 前提条件           | * 可操作性的账本和货币。<br>* 实现插件的技术知识（软件工程）。 |
+| 备注                  | |
 
-> Sequence diagram omitted as use case does not pertain to end users of Hyperledger Cactus itself.
+> 我们省略了时序图，因为该使用场景不适用于 Hyperledger Cactus 的终端用户。
 
-### 2.4.1 With Permissionless Ledgers (BTC) 和非授权区块链（BTC）
+### 2.4.1 和非授权区块链（BTC）
 
-A BTC holder can exchange their BTC for ExampleCoins by sending their BTC to `ExampleCoin Reserve Wallet` and the equivalent amount of coins get minted for them
-onto their ExampleCoin wallet on the other network.
+BTC 的持有者可以购买 ExampleCoin，购买方式是将他们的 BTC 发送到`保存 ExampleCoin 的钱包`，然后其他网络上就会挖出相应数量的代币发送到他们的 ExampleCoin 钱包。
 
-An ExampleCoin holder can redeem their funds to BTC by receiving a Proof of Burn on the ExampleCoin ledger and getting sent the matching amount of BTC from the `ExampleCoin Reserve Wallet` to their BTC wallet.
+ExampleCoin 的持有者可以将他们的资产兑换为 BTC，兑换方式是接收 ExampleCoin 账本上的燃烧证明（Proof of Burn），然后从`保存 ExampleCoin 的钱包`发送对应数量的 BTC 到他们的 BTC 钱包。
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/XP9FIyH03CNlyoc2dhmiui6JY5ln7tWG4KJmaft6TkWqgJFfrbNyxgPBLzP5yLQQlFpoNkOiAoRjsmWNRzXsaSubCDnHLL49Ab04zVR7EGqQ2QvN7QL8PKK9YYY-yJLQ_mqhLGar2CDbmfO6ISqp_pCoDu4xj7R8zDeJUvgd9CD37Np3b3CSRRKawRdqajZ8HuTRXHRVMcl6Yd9u9pW-_6NkdNaCFdJ82ZR6B0Gcvrx6LM7lGHH_-h_X9R5AMkq1Pb3o0VPlGrNhLS8LV3W0bjAKyuCViaUCaJIlHUI7RmqHhqMVxdC7EcMn2rpynOiHHEin_4cuZKHPR9XF5ACC4tIZBWvsZmptb2ajAKzpfisxzCVkewcJsMnskcbQrnsB4jZfBTN6pG6vX08iUZDed2N6dc117ljChe2GOO7URbI1MPdAyW9po09Hk79Z15OPrZj1BT4kDieGDFLPxHbPM45NCqU66kdEdTcdFUCl">
 
-### 2.4.2 With Fiat Money (USD) 和法定货币
+### 2.4.2 和法定货币
 
-Very similar idea as with pegging against BTC, but the BTC wallet used for reserves
-gets replaced by a traditional bank account holding USD.
+和锚定 BTC 的想法非常相似，但是用来存储 BTC 的钱包换成了保存 USD 的传统银行账户。
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 2.5 Healthcare Data Sharing with Access Control Lists  带有访问控制的健康数据共享
+## 2.5 带有访问控制列表的医疗保健数据共享
 
-| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+| W3C 用例属性名称 | W3C 用例属性值 |
 |-----------------------------|------------------------------------------------|
-| Use Case Title              | Healthcare Data Sharing with Access Control Lists |
-| Use Case                    | 1. `User A` (patient) engages in business with `User B` (healthcare provider)<br>2. `User B` requests permission to have read access to digitally stored medical history of `User A` and write access to log new entries in said medical history.<br>3.`User A` receives a prompt to grant access and allows it.<br>4. `User B` is granted permission through ledger specific access control/privacy features to the data of `User A`. |
-| Type of Social Interaction  | Peer to Peer Data Sharing |
-| Narrative                   | Let's say that two healthcare providers have both implemented their own blockchain based patient data management systems and are looking to integrate with each other to provide patients with a seamless experience when being directed from one to another for certain treatments. The user is in control over their data on both platforms separately and with a Hyperledger Cactus backed integration they could also define fine grained access control lists consenting to the two healthcare providers to access each other's data that they collected about the patient. |
-| Actors                      | * `User A`: Patient engaging in business with a healthcare provider<br>* `User B`: Healthcare provider offering services to `User A`. Some of said services depend on having access to prior medical history of `User A`. |
-| Goals of Actors             | * `User A`: Wants to have fine grained access control in place when it comes to sharing their data to ensure that it does not end up in the hands of hackers or on a grey data market place.<br>`User B` |
-| Success Scenario            | `User B` (healthcare provider) has access to exactly as much information as they need to and nothing more. |
-| Success Criteria            | There's cryptographic proof for the integrity of the data. Data hasn't been compromised during the sharing process, e.g. other actors did not gain unauthorized access to the data by accident or through malicious actions. |
-| Failure Criteria            | `User B` (healthcare provider) either does not have access to the required data or they have access to data that they are not supposed to. |
-| Prerequisites               | `User A` and `User B` are registered on a ledger or two separate ledgers that support the concept of individual data ownership, access controls and sharing. |
-| Comments                    | It makes most sense for best privacy if `User A` and `User B` are both present with an identity on the same permissioned, privacy-enabled ledger rather than on two separate ones. This gives `User A` an additional layer of security since they can know that their data is still only stored on one ledger instead of two (albeit both being privacy-enabled)|
+| 用例标题         | 带有访问控制列表的医疗保健数据共享 |
+| 用例             | 1. `用户 A` （病人）和`用户 B`（医疗保健提供者） 建立业务关系。<br>2. `用户 B` 请求`用户 A` 的电子病历的读取和写入权限。<br>3. `用户 A` 接收到访问请求并通过。<br>4. `用户 B` 通过账本特定的访问控制或隐私特性得到获取 `用户 A` 数据的授权。 |
+| 社交类型         | 点对点数据共享 |
+| 描述                 | 假设两个医疗保健提供商都实现了自己的基于区块链的患者数据管理系统，并希望彼此集成，以便为患者从一个到另一个医疗保健提供商进行某些治疗时提供无缝连接的体验。用户可以在两个平台上分别控制自己的数据，并且通过 Hyperledger Cactus 支持的集成，他们还可以定义细粒度的访问控制列表，同意两个医疗保健提供商访问彼此收集的有关患者的数据。 |
+| 参与者                   | * `用户 A`：和医疗保健提供者建立业务关系。<br>* `用户 B`：医疗保健提供者为`用户 A` 提供服务。其中一些服务依赖于`用户 A`之前病历的访问权限。 |
+| 参与者目标             | * `用户 A`：想以更好地方式授权分享数据的数据，以免数据落入黑客之手或者流转到黑市中。<br>`用户 B` |
+| 成功情景         | `用户 B`（医疗保健提供者）可以访问尽可能多的他们需要的数据，但是不能访问其他数据。 |
+| 成功标准         | 有数据完整性的加密证明。数据在共享过程中没有受到损害，例如，其他参与者没有通过意外或恶意行为获得对数据的未经授权的访问。 |
+| 失败标准         | `用户 B`（医疗保健提供者）没有访问所需数据的权限，或者有了不应访问的数据的权限。 |
+| 前提条件           | `用户 A` 和`用户 B` 注册在同一个或两个单独的账本上，账本支持个人数据所有权、访问控制和共享的概念。 |
+| 备注                  | 如果`用户 A` 和`用户 B` 都在同一个授权的、支持隐私的账本上而不是在两个单独的账本上，那么最好的隐私更有意义。这为`用户 A` 提供了额外的安全层，因为他们可以知道他们的数据仍然只存储在一个账本上，而不是两个（尽管这两个账本都启用了隐私保护） |
+
+
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/hLHDRzf04BtxLupefJtaa1mjX69IaQ16AYfgUeaK3Ui1Zx1ttTd1b7_VMK1WL9NcqAFtVSsyNVa-AefkcXhcz7D3tX5yPbm9Dd03JuIrLWx53b4HvXKA-nLiMIiedACOuI5ubL33CqUDMHRNx5jCya8aR2U6pdLN4x1YpIxBbDM-ddOjIKtbYWJ6TN1hLo5xc7eborOE7YPcGjiWwrV_VqP3fq7WUoHvAm0Z80o7hMMHrz6eZuuJkZ2qEeUq4ZekIOoPBS8l64ydyE57nKhp9gmfCnFM7GoAsNImDs_vTFPYcvTezX_ZfptO6LI2sHoy1i_x8kBWmj4KkC18CC65i7ixa9Ayl3s3OugRFdHtjiQD1jkAErI2u2qBRaPfi1o-fKAZ7gexj9LbaB0z9OUPXAPLM5ebVGw0a6x4mwEWLvYHD1mZ9_EJkhpBuP4KYXX9N_r5YsbiQ_1aSuMJ32yMM2xF6LqEBoIyt5rFSSBA3krjyygZ9LA4_MKO1j2TwXYwK0V9LqBaHxQw8qeKggtWddJgkx-BXSfHiGYYIUZBFyRlLsJZFmYbuwlZ7rFAs_VI-wqU9ILy_VAUI_WdFJkoUy_Xy0gigkpUDhP_o6y0">
+
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 2.6 Integrate Existing Food Traceability Solutions 整合现有的食物溯源解决方案 
+## 2.6 集成现有的食品溯源解决方案 
 
-| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
-|-----------------------------|------------------------------|
-| Use Case Title              | Food Traceability Integration |
-| Use Case                    | 1. `Consumer` is evaluating a food item in a physical retail store.<br> 2. `Consumer` queries the designated end user application designed to provide food traces. 3. `Consumer` makes purchasing decision based on food trace.|
-| Type of Social Interaction  | Software Implementation Project |
-| Narrative                   | Both `Organization A` and `Organization B` have separate products/services for solving the problem of verifying the source of food products sold by retailers.<br>A retailer has purchased the food traceability solution from `Organization A` while a food manufacturer (whom the retailer is a customer of) has purchased their food traceability solution from `Organization B`.<br>The retailer wants to provide end to end food traceability to their customers, but this is not possible since the chain of traceability breaks down at the manufacturer who uses a different service or solution. `Cactus` is used as an architectural component to build an integration for the retailer which ensures that consumers have access to food tracing data regardless of the originating system for it being the product/service of `Organization A` or `Organization B`. |
-| Actors                      | `Organization A`, `Organization B` entities whose business has to do with food somewhere along the global chain from growing/manufacturing to the consumer retail shelves.<br> `Consumer`: Private citizen who makes food purchases in a consumer retail goods store and wishes to trace the food end to end before purchasing decisions are finalized. |
-| Goals of Actors             | `Organization A`, `Organization B`: Provide `Consumer` with a way to trace food items back to the source.<br>`Consumer`: Consume food that's been ethically sourced, treated and transported. |
-| Success Scenario            | `Consumer` satisfaction increases on account of the ability to verify food origins. |
-| Success Criteria            | `Consumer` is able to verify food items' origins before making a purchasing decision. |
-| Failure Criteria            | `Consumer` is unable to verify food items' origins partially or completely. |
-| Prerequisites               | 1. `Organization A` and `Organization B` are both signed up for blockchain enabled software services that provide end to end food traceability solutions on their own but require all participants in the chain to use a single solution in order to work.<br>2. Both solutions of `Organization A` and `B` have terms and conditions such that it is possible technically and legally to integrate the software with each other and `Cactus`. |
-| Comments                    | |
+| W3C 用例属性名称 | W3C 用例属性值                                               |
+| ---------------- | ------------------------------------------------------------ |
+| 用例标题         | 食品溯源集成                                                 |
+| 用例             | 1. `消费者` 正在对实体零售店的食品进行评估。<br/>2. `消费者`询问指定的提供食品轨迹的终端用户应用程序。<br/>3. `消费者` 根据食物轨迹做出购买决定。 |
+| 社交类型         | 软件实现项目                                                 |
+| 描述             | 零售商已从`组织 A` 购买食品溯源解决方案，而食品制造商（零售商是其客户）购买了`组织 B` 的食品溯源解决方案。<br/>零售商希望向其客户提供端到端的食品溯源，但这是不可能的，因为溯源的链路在使用不同服务或解决方案的制造商处断开了。`Cactus` 被用作为零售商构建一个集成的架构组件，以确保消费者能够访问食品溯源数据，而不管其来源系统是`组织 A` 还是 `组织 B` 的产品或服务。 |
+| 参与者           | `组织 A` ，`组织 B`，他们的业务涉及从种植或制造到消费者零售货架的食品全球供应链中的某些部分。<br/>`消费者`：在消费品零售商店购买食品，并希望在最终确定购买决定之前对食品进行全程溯源的公民。 |
+| 参与者目标       | `组织 A`，`组织 B`：为`消费者`提供食品来源的方法。<br/>`消费者`：消费经过正当途径采购、处理和运输的食品。 |
+| 成功情景         | 因为可以核实食物来源，`消费者`的满意度得到了提高。           |
+| 成功标准         | `消费者`在做出购买决定之前可以核实食品的来源。               |
+| 失败标准         | `消费者`无法部分或完全核实食品来源。                         |
+| 前提条件         | 1. `组织 A` 和`组织 B`都自己注册了提供端到端的食品溯源解决方案的区块链软件服务，但要求链中的所有参与者使用单一解决方案才能工作。<br/>2. `组织 A` 和`组织 B` 的两种解决方案都有条款和条件，以便在技术和法律上能够在软件互相集成以及集成`Cactus`。 |
+| 备注             |                                                              |
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/rPRBRjim44Nt_8g1ksaNIM4jWzY8dS1eW0PDcqSt0G9A6jc4QL8bgQJkrtT8oefVifnTkxDy3uSpbyF7XNNSk6eXuGv_LQWoX2l1fuOlu0GcMkTmRtY6F1LIk2LSAuSaEg4LOtOkLCazEZ96lqwqSdTkAH64ur9aZ3dXwElBiaGZCP-YWR7KsJoRSQ7MGy64Wk2hDlCdzVuqUEQqWGUBvda4t0A7y_DCArijq0o7w_BOood9saov4lnFd7q4P49HRBANdirss773ibJ_Xb5PKgLH-l1p9XmoLCwds9iOyWDLtlE1YlgZKSSycw_4DFucBGSA6YEFhoVR4KUtru7dfMZ-UoIdSqvPVxIVWlYo6QRtDHXlUwjW1FEKMmokFaVrkUz7vltzOXB4v2qkhvmcfyGBTmX-1GO3-86PDZbSKG0O36XkE1asLPzvd_pmi9A1YJo3Xl5yRSGX75QGvyc8monun9Dvlmiqw2gZTjHw54Ri2AWJwGHOzezvb_n7tb4htg2PubidIgrBkDLI2ZNzV6_4b7ewpBPjnlSApH9YqqEVRNNF7dKzcpeHEWRMa0wWAuU4RQt27lNW50dh13PpQ9heKY_AojKkNecYs5FMNgsbmsw4jUH_7EDqgyl7uFNqg__WeQHZQxr_TfJt5faSA38vj95QyjvPo6FmpMAIrZBVb712-tOFso1Sc77Tlr7N2sN3Tk2RXqjigK25VPDtd2u7-BPkRe7txAvMigwubhQtlwqffMan9HQk_XuvS3DXeTH2-Py8_dxpDrRKGvocMJWbde2TwKgkfaqHw3L2zvoawpO05CHWeGskIb1BYaUtOE6b1MHSqQXQf8UC4PHlkWotEIsmJfr_-X1Q8ncre4HAk_2vkB1a9XPrMYFUK5yPEyw8Bg9BZmt2pu3UK5ARiwb1LCCRFaTuHIb1A2f_WVcJsW3Aoj2pBdHpZfcmz23Q8lox8fmzeLGTM_AKCNP15T83z2y0">
+
+
 
 ---
 
@@ -262,23 +260,27 @@ gets replaced by a traditional bank account holding USD.
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 2.7 End User Wallet Authentication/Authorization 终端用户钱包身份验证及授权
+## 2.7 终端用户钱包身份验证/授权
 
-| W3C Use Case Attribute Name | W3C Use Case Attribute Value |
+| W3C 用例属性名称 | W3C 用例属性值                                               |
 |-----------------------------|------------------------------|
-| Use Case Title              | Wallet Authentication/Authorization |
-| Use Case                    | 1. `User A` has separate identities on different permissioned and permissionless ledgers in the form of private/public key pairs (Public Key Infrastructure).<br>2. `User A` wishes to access/manage these identities through a single API or user interface and opts to on-board the identities to a `Cactus` deployment.<br>3. `User A` performs the on-boarding of identities and is now able to interact with wallets attached to said identities through `Cactus` or end user applications that leverage `Cactus` under the hood (e.g. either by directly issuing API requests or using an application that does so.|
-| Type of Social Interaction  | Identity Management |
-| Narrative                   | End user facing applications can provide a seamless experience connecting multiple permissioned (or permissionless) networks for an end user who has a set of different identity proofs for wallets on different ledgers. |
-| Actors                      | `User A`: The person or entity whose identities get consolidated within a single `Cactus` deployment |
-| Goals of Actors             | `User A`: Convenient way to manage an array of distinct identities with the trade-off that a `Cactus` deployment must be trusted with the private keys of the identities involved (an educated decision on the user's part). |
-| Success Scenario            | `User A` is able to interact with their wallets without having to access each private key individually. |
-| Success Criteria            | `User A`'s credentials are safely stored in the `Cactus` keychain component where it is the least likely that they will be compromised (note that it is never impossible, but least unlikely, definitely) |
-| Failure Criteria            | `User A` is unable to import identities to `Cactus` for a number of different reasons such as key format incompatibilities. |
-| Prerequisites               | 1. `User A` has to have the identities on the various ledgers set up prior to importing them and must have access to the private |
-| Comments                    |  |
+| 用例标题         | 钱包验证/授权 |
+| 用例             | 1. `用户 A` 分别在不同的授权和非授权账本上拥有公私钥形式（PKI）的身份。<br>2. `用户 A` 希望通过单独的 API 或者用户接口将这些身份上传到 `Cactus`中来管理这些身份。<br>3. `用户 A`  更倾向于上传身份，并且现在能够通过或使用 `Cactus` 的终端用户应用程序（例如，通过直接发出 API 请求或使用这样做的应用程序）与保存上述身份的钱包进行交互。 |
+| 社交类型         | 身份管理 |
+| 描述                 | 面向终端用户的应用程序可以为终端用户提供多个许可（或无许可）网络无缝连接的体验，终端用户拥有一组用于不同账本上的钱包的不同身份证明。 |
+| 参与者                   | `用户 A`：其身份通过单个 `Cactus` 部署进行加强的人或实体。 |
+| 参与者目标             | `用户 A`：以一种方便的方式来管理一系列不同的身份，同时权衡一个`Cactus`部署必须与所涉及身份的私钥相信任（这是用户有经验的决定）。 |
+| 成功情景         | `用户 A` 可以与他们的钱包进行交互，而不必单独访问每个私钥。 |
+| 成功标准         | `用户A` 的凭证被安全地存储在 `Cactus` 的密钥串组件中，在那里它们被破坏的可能性最小（注意，当然，被破坏从来都不是不可能的，但以最小的不可能性） |
+| 失败标准         | `用户 A` 不能向 `Cactus` 导入身份，原因有很多比如密钥格式不兼容。 |
+| 前提条件           | 1. `用户 A` 必须在导入之前在各种分类账上设置身份，并且必须有权访问私钥。 |
+| 备注                  |  |
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/nLLBRzf04BxlhnZHIul48Jb68GeeGKLKAYgakI15Ypt1AzkpxkuOulxwZjVc4PH4z7rSpyottsDMllQi7PTv1ZFyLY9523T6hvpEeGUt5CETHmVtEikGOL1oWiGcqcmiXQDrvdiuAULJGuMk9mVEsSt84i-uoX0Cwyn4Ih5XENsi2dGPnYl17MOsIgD46u8nCSgr0NWa8BYnBbtGRxFI4LiN-Xy6e3rekBn4YdkbVBcwKcffds0u7i6x-yGmgXg8A-WCfkDEQ2_CxjjNaH5hWNllFuJYMibHBxL7w4om2a928PMP60IwmUzy2d9zPtlBRgmfV2Qif-Apuy9yOqFXV8-dIxQYoQmr8uZ0-anblaIdLByFNt1bF8iv6yD94DRlon3qhcef5_jwS70GHROaLWwvT0H3r4w-pcsA5D36UM4TmtGoFe9f2ztkJa2t2obMXJPEGTrJjwONC1ExyEM-1KcmhYeOOz0C3ZtBQ4jbQoVS5N6jzCOIRccsbqyQcARqEZVny2Hkp_h-B3TnSkuqUSbD8ckpzKUMtZvXL0hQjbEsTq7I_SmxHLPQd5abhBhT9aDXRIchW538ieL2sChAIlqmJ-bwT3O72RzGvw1bd-hjs9WiWwMitrAU9bjbSdcTtbAjQt-1sh4M5c4NQnvxCzUdqfSHW7Nh_mWvIlQu2vgwPgt5FR2FxQCD8wsx1mq7KF7PYTSlI1vJe-gXLdM0V32tnOhLszMtQZ-HQzYx_vwhiFYrN1lwh-OgvR-QQxZ-7-PwBIR9t_87">
+
+
+
+
 
 ---
 
@@ -286,56 +288,41 @@ gets replaced by a traditional bank account holding USD.
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 2.8 Blockchain Migration 区块链整合
+## 2.8 区块链迁移
 
-
-| Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Use Case Title 用例标题            | Blockchain Migration                                                                                                                                                                                                                                                                                                                                                                                                               |
-| Use Case                   | 1. `Consortium A` operates a set of services/use cases on a source blockchain.<br>2. `Consortium A` decides to use another blockchain infrastructure to support their use case. <br>3. `Consortium A` migrates the existing assets to another blockchain.
-| Interworking patterns      | Value transfer                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Type of Social Interaction | Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| Narrative                  | A group of stakeholders (`Consortium A`) operating a source blockchain (e.g., a Hyperledger Fabric instance) would like to migrate the functionality to a target blockchain (e.g., Hyperledger Besu), in order to expand their reach. However, such migration requires lots of resources and technical effort. The `Blockchain Migration feature` from Hyperledger Cactus can provide support for doing so, by connecting to the source and target blockchains, and performing the migration task.
-| Actors                     | 1. Stakeholders composing the `Consortium A`: The group of entities operating the source blockchain, who collectively aim at performing a migration to a target blockchain.                                                                                                                                                                                                                                                                                                                                                                    |
-| Goals of Actors            | `Consortium A` wishes to be able to operate their use case on the target blockchain. The service is functional after the migration.                                                                                                                                                                                                                                                                                                                                                                                   |
-| Success Scenario           | The consortium agrees on the migration, and it succeeds without issues.                                                                                                                                                                                                                                                                                                                                                        |
-| Success Criteria           | Assets have been migrated. An identical history for those assets has been reconstructed on the target blockchain.                                                                                                                                                                                                                                                                                                                                                |
-| Failure Criteria           | 1. It was not migrate the assets. <br> It was not possible to reconstruct the asset history on the target blockchain.                                                                                                                                                                                                                                                                                                                                                                                                          |
-| Prerequisites              | 1. All stakeholders belonging to `Consortium A` want to migrate the blockchain. <br> 2. The `Consortium A` ontrols the source blockchain. <br>2. `Consortium A` has write and execute permissions on the target blockchain<br>
-| Comments                   | An asset is defined as data or smart contracts originating from the source blockchain. <br> This use case relates to use cases implying asset portability (e.g., 2.1) <br> This use case provides blockchain portability, thus reducing costs and fostering blockchain adoption.                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| W3C 用例属性名称 | W3C 用例属性值                                               |
+| ---------------- | ------------------------------------------------------------ |
+| 用例标题         | 区块链迁移                                                   |
+| 用例             | 1. `联盟 A` 在源区块链上操作一组服务或用例。<br/>2. `联盟 A` 决定使用另外一个区块链基础设施支持他的用例<br/>3. `联盟 A` 将现有资产迁移到另外一个区块链。 |
+| 社交类型         | 资产转移                                                     |
+| 描述             | 运营源区块链（例如，Hyperledger Fabric 实例）的一组成员（`联盟 A`）希望将功能迁移到目标区块链（例如，Hyperledger Besu），以扩大其覆盖范围。然而，这种迁移需要大量的资源和技术努力。来自 Hyperledger Cactus的“区块链迁移功能”可以通过连接源区块链和目标区块链并执行迁移任务来提供支持。 |
+| 参与者           | 1. 联盟成员组成的`联盟 A`：操作源区块链的一组实体，他们的共同目标是实现向目标区块链的迁移。 |
+| 参与者目标       | `联盟 A` 想要在目标区块链上操作他们的用例。服务在迁移后可用。 |
+| 成功情景         | 联盟一致同意以去中心化方式迁移。区块链成功迁移并且没有出现问题。 |
+| 成功标准         | 资产完成迁移。那些资产的身份历史在目标区块链中完成重构。     |
+| 失败标准         | 1. 资产没有迁移。<br/>2. 不能在目标区块链中重构资产历史。    |
+| 前提条件         | 1. 所有`联盟 A` 中的成员都想迁移区块链。 <br/>2. `联盟 A` 控制着源区块链。<br/>3. `联盟 A` 拥有目标区块链的写权限。<br/> |
+| 备注             | 资产的定义是，源区块链产生的数据或者智能合约。<br/>该用例和资产可移植的用例相关（例如，2.1）。<br/>该用例提供了区块链的可移植性，从而降低了成本并促进了区块链的采用。 |
 
 ---
-Motivation: The suitability of a blockchain solution regarding a use case depends on the underlying blockchain properties.
-            As blockchain technologies are maturing at a fast pace, in particular private blockchains, its properties might change. Consequently, this creates an unbalance between user expectations' and the applicability of the solution.
-            It is, therefore, desirable for an organization to be able to replace the blockchain providing the infrastructure to a certain service.
-          
-Currently, when a consortium wants to migrate their blockchain (e.g., the source blockchain became obsolete, cryptographic algorithms no longer secure, etc), the solution is to re-implement business logic using a different platform, yielding great effort. Migrating data to another blockchain currently is not feasible in practice. 
-This is one of the reasons mass adoption amongst enterprises grows slowly.
-Data migrations have been performed by (Frauenthaler et al., 2019) and (Scheid et al., 2019), both recent endeavors to render flexibility to blockchain-based solutions.
-In those works, the authors propose simple data migration capabilities for public, permissionless blockchains, in which a user can specify requirements for its blockchain. The developed solutions allow "switchovers," where a blockchain is migrated, in case there is a blockchain that better satisfies the current requirements.
-Nonetheless, arguably a more interesting approach would be to consider cross-smart contract execution functionality or another automatic way of migration.
+动机：区块链解决方案对于用例的适用性取决于底层区块链属性。随着区块链技术的快速成熟，特别是私有区块链，其属性可能会发生变化。因此，这就造成了用户期望和解决方案适用性之间的不平衡。因此，一个组织希望能够取代为某项服务提供基础设施的区块链。
 
-References: <br>
-E Scheid and Burkhard Rodrigues, B Stiller. 2019. Toward a policy-based blockchain agnostic framework. 16th IFIP/IEEE International Symposium on Integrated Network Management (IM 2019) (2019)
-Philipp Frauenthaler, Michael Borkowski, and Stefan Schulte. 2019. A Framework for Blockchain Interoperability and Runtime Selection.
+目前，当一个联盟想要迁移他们的区块链时（例如，源区块链已经过时，加密算法不再安全等），解决方案是使用不同的平台重新实现业务逻辑，需要付出巨大的努力。数据迁移在公链中实现过 [[2](#7-references),[3](#7-references)]，他们最近都在努力为基于区块链的解决方案提供灵活性。在这些工作中，作者提出了公共的、无许可的区块链的简单数据迁移功能，用户可以在他们的服务支持的区块链基础设施上指定需求。
 
-### 2.8.1 Blockchain Data Migration 区块链数据整合
-Data migration corresponds to capture the set or subset of data assets (information, in the form of bytes) on a source blockchain, and construct a representation of those in a target blockchain. Note that the models underlying both blockchains do not need to be the same (e.g., world state model in Hyperledger Fabric vs account model in Ethereum).
-To migrate data, it should be possible to capture the necessary information from the source blockchain and to write it on the target blockchain. The history of information should also be migrated (i.e., the updates over the elements considered information).
 
-### 2.8.2 Blockchain Smart Contract Migration 区块链智能合约整合
-The task of migrating a smart contract comprises the task of migrating data. In specific, the information should be accessible and writeable on another blockchain. Additionally, the target blockchain's virtual machine should support the computational complexity of the source blockchain (e.g., one cannot migrate all Ethereum smart contracts to Bitcoin, but the other way around is feasible).
+### 2.8.1 区块链数据迁移
+数据迁移相当于捕获源区块链上数据资产（信息，以字节形式）的集合或子集，并构建目标区块链中这些资产的表示。请注意，两个区块链的基础模型不必相同（例如，Hyperledger Fabric 的世界状态模型与以太坊中的帐户模型）。要迁移数据，就要能够从源区块链捕获必要的信息并将其写入目标区块链。还要迁移信息的历史记录（例如，元素的更新就可以认为是信息）。
 
-Automatic smart contract migration yields risks for enterprise blockchain systems, and thus the solution is non-trivial.
+<img width="700" src="./use-case-sequence-diagram-blockchain-migration.png">
 
-### 2.8.3 Semi-Automatic Blockchain Migration 半自动区块链整合
+### 2.8.2 区块链智能合约迁移
+迁移智能合约的任务包括迁移数据的任务。具体来说，信息应该可以在另一个区块链上访问和写入。此外，目标区块链的虚拟机应支持源区块链的计算复杂性（例如，不能将所有以太坊智能合约迁移到比特币，但反过来是可行的）。
 
-By expressing my preferences in terms of functional and non-functional requirements, Hyperledger Cactus can recommend a set of suitable blockchains, as the target of the migration.
-Firstly, I could know in real-time the characteristics of the target blockchain that would influence my decision.
-For instance, the platform can analyze see the cost of writing information to Ethereum, the exchange rate US dollar - Ether, the average time to mine a block, the transaction throughput, and the network hash rate ((Frauenthaler et al., 2019).
-Based on that, the framework proposes a migration, with indicators such as predicted cost, predicted time to complete migration and the likelihood of success.
-As Ethereum does not show a desirable throughput, I choose Polkadot's platform. As it yields higher throughput, I then safely migrate my solution from Fabric to Polkadot, without compromising the solution in production. 
- This feature is more useful regarding public blockchains.
+自动智能合约迁移为企业区块链系统带来风险，因此解决方案非常重要。
+
+### 2.8.3 半自动区块链迁移
+
+通过我对功能性和非功能性需求的偏好，Hyperledger Cactus 可以推荐一组合适的区块链作为迁移的目标。首先，我可以实时了解目标区块链的特征，这将影响我的决策。例如，平台可以分析向以太坊写入信息的成本、美元-以太币的汇率、出块的平均时间、事务吞吐量和网络哈希率[[3](#7-references)</sup>]。在此基础上，该框架提出了一个迁移方案，其中包括预测成本、完成迁移的预计时间和成功的可能性等指标。由于以太坊没有显示出理想的吞吐量，所以我选择了 Polkadot 的平台。当它产生更高的吞吐量时，我就安全地将我的解决方案从 Fabric 迁移到 Polkadot，而不影响生产中的解决方案。对于公共区块链，此功能更有用。
 
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
@@ -351,11 +338,11 @@ As Ethereum does not show a desirable throughput, I choose Polkadot's platform. 
 
 ### 3.1.2. 尽可能的插件化架构
 
-身份、DLT、服务发现。最小化固执己见，我们拥抱互操作性而不是孤立和锁定。密切关注社区反馈和 PR 以确定 Hyperledger Cactus 核心代码可以提取为插件的功能。限制限定以便添加未来的使用案例和协议。
+身份、DLT、服务发现。最小固化，我们拥抱互操作性而不是孤立和锁定。密切关注社区反馈和 PR 以确定 Hyperledger Cactus 核心代码可以提取为插件的功能。限制限定以便添加未来的使用用例和协议。
 
 ### 3.1.3. 尽可能避免双花
 
-同一时间内相同资产不能存在的两种形式，除非有明确的标识，比如[截止10月30号限定在特定 DLT 组合中；例如：不适用于 Fabric + Bitcoin]。
+同一时间内相同资产不能存在的两种形式，除非有明确的标识，比如【截止10月30号限定在特定 DLT 组合中；例如：不适用于 Fabric + Bitcoin】。
 
 ### 3.1.4 特性的包容性
 
@@ -389,7 +376,7 @@ As Ethereum does not show a desirable throughput, I choose Polkadot's platform. 
 
 我们的公共模块化应该扩展到在区块链上操作和/或发现交易的通用机制。
 
-### 3.1.12 整合身份框架（Moonshot）
+### 3.1.12 集成身份框架（Moonshot）
 
 不限制身份框架，要允许`Cactus`的用户使用最常用的身份框架并且支持未来通过插件化的架构对扩展身份框架的支持列表。支持`Cactus`的用户实现身份验证、授权和读写证书。
 
@@ -401,7 +388,7 @@ As Ethereum does not show a desirable throughput, I choose Polkadot's platform. 
 
 ## 3.2 特性需求
 
-### 3.2.1 新协议的整合
+### 3.2.1 新协议的集成
 
 增加新的协议必须成为插件架构的一部分，以便社区可以提议、开发、测试和发布他们实现的协议。
 
@@ -433,94 +420,80 @@ As Ethereum does not show a desirable throughput, I choose Polkadot's platform. 
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-# 4. Architecture  架构
+# 4. 架构
 
-## 4.1 Integration patterns 整合模式
+## 4.1 集成模式
 
-Hyperledger Cactus has several integration patterns as the following.
+Hyperledger Cactus 有如下多种集成模式。
 
-Hyperledger Cactus 有如下多种整合模式。
-
-- Note: In the following description, **Value (V)** means numerical assets (e.g. money). **Data (D)** means non-numerical assets (e.g. ownership proof). Ledger 1 is source ledger, Ledger 2 is destination ledger.
 - 注意：在下边的描述中，**Value(V)**的意思是数字资产（例如，钱）。**Data(D)**的意思是非数字资产（例如，所有权证明）。账本1是原账本，账本2是目标账本。
 
-| No. | Name                | Pattern | Consistency                                                                                    |
-| --- | ------------------- | ------- | ---------------------------------------------------------------------------------------------- |
-| 1.  | value transfer      | V -> V  | check if V1 = V2 <br> (as V1 is value on ledger 1, V2 is value on ledger 2)                    |
-| 2.  | value-data transfer | V -> D  | check if data transfer is successful when value is transferred                                 |
-| 3.  | data-value transfer | D -> V  | check if value transfer is successful when data is transferred                                 |
-| 4.  | data transfer       | D -> D  | check if all D1 is copied on ledger 2 <br> (as D1 is data on ledger 1, D2 is data on ledger 2) |
-| 5.  | data merge          | D <-> D | check if D1 = D2 as a result <br> (as D1 is data on ledger 1, D2 is data on ledger 2)          |
+| No.  | Name          | Pattern | Consistency                                                  |
+| ---- | ------------- | ------- | ------------------------------------------------------------ |
+| 1.   | 数值转移      | V -> V  | 检查是否 V1 = V2 <br> （V1 是账本 1 上的数值，V2 是账本 2 上的数值） |
+| 2.   | 数值-数据转移 | V -> D  | 检查是否数值转移完成后数据也成功转移了                       |
+| 3.   | 数据-数值转移 | D -> V  | 检查是否数据转移完成后数值也成功转移了                       |
+| 4.   | 数据转移      | D -> D  | 检查是否所有 D1 都复制到了账本2 <br>（D1 是账本 1 上的数据，D2 是账本 2 上的数据） |
+| 5.   | 数据合并      | D <-> D | 最终是否 D1 = D2 <br>（D1 是账本 1 上的数据，D2 是账本 2 上的数据） |
 
-## 4.2 System architecture and basic flow 系统架构和基本流程
+## 4.2 系统架构和基本流程
 
-Hyperledger Cactus will provide integrated service(s) by executing ledger operations across multiple blockchain ledgers. The execution of operations are controlled by the module of Hyperledger Cactus which will be provided by vendors as the single Hyperledger Cactus Business Logic plugin.
-The supported blockchain platforms by Hyperledger Cactus can be added by implementing new Hyperledger Cactus Ledger plugin.
-Once an API call to Hyperledger Cactus framework is requested by a User, Business Logic plugin determines which ledger operations should be executed, and it ensures reliability on the issued integrated service is completed as expected.
-Following diagram shows the architecture of Hyperledger Cactus based on the discussion made at Hyperledger Cactus project calls.
-The overall architecture is as the following figure.
-
-Hyperledger Cactus 将通过跨多区块链账本执行账本的操作提供整合服务。操作的执行由 Hyperledger Cactus 的模块控制，该模块将以单个 Hyperledger Cactus 业务逻辑插件的方式提供。Hyperledger Cactus 支持的区块链平台可以通过实现新的 Hyperledger Cactus 账本插件来加入。当用户通过 API 调用 Hyperledger Cactus 框架的时候，业务逻辑插件决定由哪个账本执行操作，它确保发布的集成服务的可靠性符合预期。下边的图片展示了在 Hyperledger Cactus 项目会议上讨论 Hyperledger Cactus 的架构。整体架构如下图。
+Hyperledger Cactus 将通过跨多区块链账本执行账本的操作提供集成服务。操作的执行由 Hyperledger Cactus 的模块控制，该模块将以单个 Hyperledger Cactus 业务逻辑插件的方式提供。Hyperledger Cactus 支持的区块链平台可以通过实现新的 Hyperledger Cactus 账本插件来加入。当用户通过 API 调用 Hyperledger Cactus 框架的时候，业务逻辑插件决定由哪个账本执行操作，它确保发布的集成服务的可靠性符合预期。下边的图片展示了在 Hyperledger Cactus 项目会议上讨论的 Hyperledger Cactus 架构。整体架构如下图。
 
 <img src="./architecture-with-plugin-and-routing.png" width="700">
 
-Each entity is as follows:
-- **Application user**: The entity submits API calls to "Cactus Routing Interface". 
-- **Business Logic Plugin**: The entity executes business logic and provide integration services that are connected with multiple blockchains. The entity is composed by web application or smart contract on a blockchain. The entity is a single plugin and required for executing Hyperledger Cactus applications.
-- **Ledger Plugin**: The entity communicates Business Logic Plugin with each ledger.  The entity is composed by a validator and a verifier as follows. The entity(s) is(are) chosen from multiple plugins on configuration.
-- **Validator**: The entity monitors transaction records of Ledger operation, and it determines the result(success, failed, timeouted) from the transaction records. 
-Validator ensure the determined result with attaching digital signature with "Validator key" which can be verified by "Verifier".
-- **Verifier**: The entity accepts only sucussfully verified operation results by verifying the digital signature of the validator. Note that "Validator" is apart from "Verifier" over a bi-directional channel.
-- **Cactus Routing Interface**: The entity is a routing service between "Business Logic Plugin" and  "Ledger Plugin(s)". The entity is also a routing service between Business Logic Plugin and API calls from "Application user(s)".
-- **Ledger-n**: DLT platforms(e.g. Ethereum, Quorum, Hyperledger Fabric, ...)
+每个实体如下：
+- **Application user（应用程序用户）**: 提交 API 调用到 “Cactus 路由接口”的实体。
+- **Business Logic Plugin（业务逻辑插件）**: 该实体执行业务逻辑并提供多个区块链连接的集成服务。该实体有 Web 应用程序或区块链上的智能合约组成。该实体是运行 Hyperledger Cactus 应用程序时所必须的一个独立的插件。 
+- **Ledger Plugin（账本插件）**: 该实体是每个账本进行通信的业务逻辑插件。该实体由下边的验证器和验证者组成。该实体可通过配置从不同的插件中选择。
+- **Validator（验证器）**: 该实体监控账本操作的交易记录，并且决定就交易记录的结果（成功、失败、超时）。验证器确保带有“验证器密钥”数字签名的结果可以被“验证者”验证。
+- **Verifier（验证者）**: 该实体只接收验证器签名验证通过了的操作结果。注意，“验证器”是“验证者”双向通道的一部分。
+- **Cactus Routing Interface（Cactus 路由接口）**: 该实体是“业务逻辑插件”和“账本插件”的路由服务。该实体也是业务逻辑插件和“应用程序用户”调用 API 的路由服务。
+- **Ledger-n（账本-n）**: DLT 平台（例如：Ethereum，Quorum，Hyperledger Fabric ...）
 
-The execution steps are described as follows:
-- **Step 1**: "Application user(s)" submits an API call to "Cactus routing interface".  
-- **Step 2**: The API call is internally routed to "Business Logic Plugin" by "Cactus Routing Interface" for initiating associated business logic. 
-Then, "Business Logic Plugin" determines required ledger operation(s) to complete or abort a business logic. 
-- **Step 3**" "Business Logic Plugin" submits API calls to request operations on "Ledger(s)" wrapped with "Ledger Plugin(s)". Each API call will be routed to designated "Ledger Plugin" by "Routing Interface". 
-- **Step 4**: "Ledger Plugin" sends an event notification to "Business Logic Plugin" via "Cactus Routing Interface", when its sub-component "Verifier" detect an event regarding requested ledger operation to "Ledger".
-- **Step 5**: "Business Logic Plugin" receives a message from "Ledger Plugin" and determines completion or continuous of the business logic. When the business logic requires to continuous operations go to "Step 3" ,or end the process.
+执行步骤如下：
+- **步骤 1**: “应用程序用户”提交 API 调用到 “Cactus 路由接口”。  
+- **步骤 2**: API 调用由 “Cactus 路由接口”在内部将“业务逻辑插件”和业务逻辑初始关联起来。然后，“业务逻辑插件”决定需要的账本操作来完成或者终止业务逻辑。
+- **步骤 3**: “业务逻辑插件”提交 API 调用“账本”上需要的操作，“账本”由“账本插件”包装。每个 API 调用都将由“路由接口”路由到设计好的“账本插件”上。
+- **步骤 4**: “账本插件”通过“Cactus 路由接口”向“业务逻辑插件”发送事件提醒，当它的子组件“验证者”检测到有“账本”的账本操作请求事件时。
+- **步骤 5**: “业务逻辑插件”从“账本插件”接收消息并决定业务逻辑的完成或者继续。当业务逻辑需要继续执行时跳到“步骤 3”，否则终止程序。
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.3 Technical Architecture 技术架构
+## 4.3 技术架构
 
-### 4.3.1 Monorepo Packages  Monorepo包
+### 4.3.1 Monorepo包
 
-Hyperledger Cactus is divided into a set of npm packages that can be compiled separately or all at once.
+Hyperledger Cactus 拆分成了一组 npm 包，这些包可以单独或一次全部编译。
 
-All packages have a prefix of `cactus-*` to avoid potential naming conflicts with npm modules published by other Hyperledger projects. For example if both Cactus and Aries were to publish a package named `common` under the shared `@hyperledger` npm scope then the resulting fully qualified package name would end up being (without the prefix) as `@hyperledger/common` but with prefixes the conflict can be resolved as `@hyperledger/cactus-common` and `@hyperledger/aries-common`. Aries is just as an example here, we do not know if they plan on releasing packages under such names, but it also does not matter for the demonstration of ours.
+所有的包都有一个 `cactus-*` 前缀来避免和其他 Hyperledger 项目发布的 npm 命名冲突。例如，如果 Cactus 和 Aries 都在 `@hyperledger` npm 范围下发布了一个名为 `common` 的包，该包的全限定报名就会是（没有前缀时） `@hyperledger/common` ，如果加上前缀就可以解决冲突问题，包名就成了 `@hyperledger/cactus-common` 和 `@hyperledger/aries-common`。在这里 Aries 只是一个示例，我们并不知道他们是否计划发布这样命名的包，但是这并不影响我们的示范。
 
-Naming conventions for packages:
-* cmd-* for packages that ship their own executable
-* sdk-* for packages designed to be used directly by application developers except for the Javacript SDK which is named just `sdk` for simplicity.
-* All other packages should be named preferably as a single English word suggesting the most important feature/responsibility of the package itself.
+包的命名习惯：
+* cmd-* 存放包的可执行文件。
+* sdk-* 存放应用开发者可以直接使用的包， Javascript SDK 除外，它的名字直接是 `sdk`。
+* 所有其他包的命名，比如表明包的主要特性/职责的单个英文单词也是可取的。
 
-#### 4.2.1.1 cmd-api-server
+#### 4.3.1.1 cmd-api-server
 
-A command line application for running the API server that provides a unified REST based HTTP API for calling code.
-Contains the kernel of Hyperledger Cactus.
-Code that is strongly opinionated lives here, the rest is pushed to other packages that implement plugins or define their interfaces.
-Comes with Swagger API definitions, plugin loading built-in.
+启动 API 服务器的命令行应用程序，它为调用代码提供了统一的基于 REST 的 HTTP API。包含了 Hyperledger Cactus 的核心。此处的代码是固定的，其余的被推送到实现了插件或者定义了它们的接口的其他包。使用 Swagger API 定义，插件在内部加载。
 
-> By design this is stateless and horizontally scalable.
+> 这个地方的设计是无状态且可以水平扩展。
 
-**The main responsibilities of this package are: 改包的主要职责：**
+**该包的主要职责：**
 
-##### 4.3.1.1.1 Runtime Configuration Parsing and Validation 运行时配置解析和验证
+##### 4.3.1.1.1  运行时配置解析和验证
 
-The core package is responsible for parsing runtime configuration from the usual sources (shown in order of precedence):
-* Explicit instructions via code (`config.setHttpPort(3000);`)
-* Command line arguments (`--http-port=3000`)
-* Operating system environment variables (`HTTP_PORT=3000`)
-* Static configuration files (config.json: `{ "httpPort": 3000 }`)
+核心包的职责是从通用源中解析运行时配置（按优先级排序）：
+* 代码中明确指定 (`config.setHttpPort(3000);`) 
+* 命令行参数 (`--http-port=3000`)
+* 操作系统环境变量 (`HTTP_PORT=3000`)
+* 静态配置文件 (config.json: `{ "httpPort": 3000 }`)
 
-The Apache 2.0 licensed node-convict library to be leveraged for the mechanical parts of the configuration parsing and validation: https://github.com/mozilla/node-convict
+使用 Apache 2.0 许可下的 node-convict 库来做配置的解析和验证：https://github.com/mozilla/node-convict
 
-##### 4.2.1.1.2 Configuration Schema - API Server 配置模式 - API 服务器
+##### 4.3.1.1.2 配置模式 - API 服务器
 
-To obtain the latest configuration options you can check out the latest source code of Cactus and then run this from the root folder of the project on a machine that has at least NodeJS 10 or newer installed:
+要想获取最新的配置选项，你可以切换到 Cactus 最新的源码并在装有 NodeJS 10 或更新版本的机器上进入项目根目录来运行：
 
 ```sh
 $ date
@@ -528,10 +501,9 @@ Mon 18 May 2020 05:09:58 PM PDT
 
 $ npx ts-node -e "import {ConfigService} from './packages/cactus-cmd-api-server/src/main/typescript/config/config-service'; console.log(ConfigService.getHelpText());"
 
-Order of precedent for parameters in descdending order: CLI, Environment variables, Configuration file.
-Passing "help" as the first argument prints this message and also dumps the effective configuration.
+按降序的参数的优先顺序：CLI，环境变量，配置文件。输入“help”作为第一个参数打印这些信息同时显示有效的配置。
 
-Configuration Parameters
+配置参数
 ========================
 
   plugins:
@@ -608,112 +580,99 @@ Configuration Parameters
 
 ```
 
-##### 4.3.1.1.4 Plugin Loading/Validation 插件加载/验证
+##### 4.3.1.1.4 插件加载/验证
 
-Plugin loading happens through NodeJS's built-in module loader and the validation is performed by the Node Package Manager tool (npm) which verifies the byte level integrity of all installed modules.
+NodeJS 的内置木块加载器加载插件，Node 包管理工具（npm）在验证插件，验证时按照字节级别完整的验证所有安装的模块。
 
-#### 4.2.1.2 core-api
+#### 4.3.1.2 core-api
 
-Contains interface definitions for the plugin architecture and other system level components that are to be shared among many other packages.
-`core-api` is intended to be a leaf package meaning that it shouldn't depend on other packages in order to make it safe for any and all packages to depend on `core-api` without having to deal with circular dependency issues.
+包含插件架构和其他很多包共享的系统级组件的接口定义。`core-api` 的目的是成为一个叶子包，意思是说它不依赖其他包，所以所有依赖 `core-api` 的包会更加安全，不必解决循环依赖问题。
 
-#### 4.2.1.4 sdk
+#### 4.3.1.4 sdk
 
-Javascript SDK (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
-Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
+`cmd-api-server` 提供的 RESTful HTTP API 的 Javascript SDK（绑定的）。兼容 NodeJS 和 Web 浏览器（HTML 5 DOM + ES6）环境。
 
+#### 4.3.1.5 密钥串（keychain）
 
-#### 4.2.1.5 keychain 主链
+负责以加密格式持久存储敏感数据（例如，私钥）。
 
-Responsible for persistently storing highly sensitive data (e.g. private keys) in an encrypted format.
+API 层面的更多细节，请查看`插件架构`下的相关章节。
 
-For further details on the API surface, see the relevant section under `Plugin Architecture`.
+#### 4.3.1.7 追溯
 
+包含用于追溯、记录和其他 Hyperledger Cactus 包的代码的应用性能管理（APM）的组件。
 
-#### 4.3.1.7 tracing 追溯
+#### 4.3.1.8 审核
 
-Contains components for tracing, logging and application performance management (APM) of code written for the rest of the Hyperledger Cactus packages.
+用于写和读取审核记录的组件必须可以持久保存且不可篡改。后一个属性是审计日志与跟踪/日志消息的区别，跟踪/日志消息的设计是短暂的，用于支持技术问题，而不是与法规/合规/治理相关的问题。
 
+#### 4.3.1.9 文档存储
 
-#### 4.3.1.8 audit 审核
-
-Components useful for writing and reading audit records that must be archived longer term and immutable.
-The latter properties are what differentiates audit logs from tracing/logging messages which are designed to be ephemeral and to support technical issues not regulatory/compliance/governance related issues.
-
-
-#### 4.3.1.9 document-storage 文档存储
-
-Provides structured or unstructured document storage and analytics capabilities for other packages such as `audit` and `tracing`.
-Comes with its own API surface that serves as an adapter for different storage backends via plugins.
-By default, `Open Distro for ElasticSearch` is used as the storage backend: https://aws.amazon.com/blogs/aws/new-open-distro-for-elasticsearch/
+为其他包，如`审核`和`追溯`，提供结构化或非结构化的文档存储和分析能力。使用它自己的 API 层通过插件实现不同后端存储服务的适配。默认使用 `Open Distro for ElasticSearch` 作为后台存储： https://aws.amazon.com/blogs/aws/new-open-distro-for-elasticsearch/
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLLHRzem47xthxZHXsrIWQ5gRmWL1jsgLHegQ4-L9cDVWaLYPxPJngR-zrsSX990QP5uyDtd-xwxyrskdUVMvsa2KoFo5BM7XJUMnmXJp1Ap2wQfuh7bAMDU-GJXsov3cw2CqS8aCM8ZrbnfkDKU2UQLqN13SDmQktdGRmhy7jn6wOpJ0UwKHayKOAnV6_RiSFWxHormRAtPBjTAR3Gw1rS746joBOMncgHzFh2d_4zAMA9twY_2rQSJOUTK2ILKnaaOHQ4KIGXxfxH8Seamz7d6fRtg2vEcHezEU2AZVPTlqPaK-v9xlk8EHun5HJMWyrgjEZ0SEXFvBRS8Sb-bqGWkxbIyzbzsNCC_nW0oBZP5AJlP9kwAL7PvfheExIFQ3d07P2Oh6KjRTV-hHIm20FqeYSpeeWUTFk7wZuE-adHKVjVdKdQ5nN3aoOCU3kzdYoMCvxSmqp8pgj0KU0Zv3CJAzr9yMJs4hYiVGbzfQeS_5xz470H-Eig-LbtdNP_FvtnReHPK7oMmq20IxbpDMxbTwJv9lC5Tw6LDN9_F4t-lK2yGrq5QnDx4wDVKo39UGuUtN52TQXdLyOIAXew9YfQ4HDjMi5AH3uvm9x2t27akbQ_fmk4DPEC2TsVY-2HZY984RqLR_XkyxVTJIwZjbVcLneSNLLN_v-2eyS5TLVznqBxz8qCzLSvRCrlCapnMkXt044861Bei848gJ_ibSBGE9vGZtNbv-2cgTAlc3W3GXZPF40Ib8eWCbNP6McYBBP1RiIuLoGZTlYXyLzNaPlnhEbwE9-F5x8DS3IuxdSjwOrrkryhZHxYuDpkUJ98SwnoqyGWhuxr9mKH7rIeckDeukKF7wi45QgqIZ6uqUeW508gOZ3Kd7NfvrXiTnM-TeIVDLXFkHD6FJNiq5PEnavjh3pdO8wor2munzRIorjX2xm0KtlPPH3MoZErdhv7_Njr1FvepyogSNPELllB_0G00">
 
-> The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
+> 该包提供的 API 层保持了简洁和功能的精简，因此通过 `Cactus` 架构不同的底层后端存储可以作为一个选项长久保持。
 
-#### 4.3.1.10 relational-storage 相关存储
+#### 4.3.1.10 相关存储
 
-Contains components responsible for providing access to standard SQL compliant persistent storage.
+包含负责提供访问兼容标准 SQL 的持久存储的组件。
 
-> The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
+> 该包提供的 API 层保持了简洁和功能的精简，因此通过 `Cactus` 架构不同的底层后端存储可以作为一个选项长久保持。
 
-#### 4.3.1.11 immutable-storage 不可篡改存储
+#### 4.3.1.11 不可篡改存储
 
-Contains components responsible for providing access to immutable storage such as a distributed ledger with append-only semantics such as a blockchain network (e.g. Hyperledger Fabric).
+包含的负责提供访问不可篡改存储组件，比如带有只能追加语义的分布式账本，就像区块链网络（如，Hyperledger Fabric）。
 
-> The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
+> 该包提供的 API 层保持了简洁和功能的精简，因此通过 `Cactus` 架构不同的底层后端存储可以作为一个选项长久保持。
 
-### 4.3.2 Deployment Diagram 部署图
+### 4.3.2 部署图
 
 Source file: `./docs/architecture/deployment-diagram.puml`
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLNHRjem57tFLzpnqasYJF3SeYQ43ZGAQ6LxgXGvpWKi73jo73eqzTzt7GA4aj4X8N1yphat9ySt3xbbnXQfX10pgNSfAWkXO2l3KXXD81W_UfxtIIWkYmJXBcKMZM3oAzTfgbNVku651f5csbYmQuGyCy8YB8L4sEa2mjdqPW4ACG6h8PEC8p3832x5xq-DmYXbjjOA-qsxacLMPn5V6vrYhFMc4PKmosAMauHdXQLEBc_kHOrs6Hg9oGeD15Bp3LypeM2iB1B02gtWaO3ugis6F5Yw_ywFg2R6SeZ5Ce4_dWTWa5kcLbIkzMorOIk4kT5RaQ1fEMIUTGa8z7doez1V-87_FFpypR1T6xhjKYXkdrJQq0eOtmYrWf3k1vmcjhvK4c-U-vvN_SMae5lN1gQQ_1Z88hTLxQtY5R4HFz4iWO19flY18EDZfN_pkftEjDAlq6V0WLQALjgyA0Wd2-XMs2YHjXln8-NjOsglHkrTK9lSyETZU4QpfSTRTu9b8c_meeQ-DCDnp3L7QkoZ9NkIEdjUnEHI5mcqvaKi1I_JPXJQaa6_X7uxPAqrJYXZmWhCosrnN9QQjV8BmrJEk7LPgKWxy4kI5QpgW3atOQYIw6UE9lBTBXRi4CZ1S3APZsRJMYAFH_4ybKyw5kMPsWf-FP2DVGLLNt5pNy6-h_ZGryIVBsRpQ33wCNiQ1hFPzrD_-s5mtbo8-SPDYC3eLv9xrzx9sr3areYui3IO9kKGs9jCyRfgxod6reNuse6c_IJklclleYof_Q-5ftFWQlS-hDtxi7RlqX_FZQcxJgVJtnyLpusEvZKX2UzIUtT_Vz-l1RHsqHbQMxefvtcKExYzxPyIHbVYyih-cPBi0wg4taj_0G00">
 
-### 4.3.3 Component Diagram 组件图
+### 4.3.3 组件图
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLN1Rjim3BthAmXVrWQhiVGO546pPaK7x32i1NOPCCWownYH9LTKbdX9_tsKx2JsihRBIT9xV7mYAUUQl7H-LMaXVEarmesjQclGU9YNid2o-c7kcXgTnhn01n-rLKkraAM1pyOZ4tnf3Tmo4TVMBONWqD8taDnOGsXeHJDTM5VwHPM0951I5x0L02Cm73C1ZniVjzv9Gr85lTlIICqg4yYirIYDU1P2PiGKvI6PVtc8MhdsFQcue5LTM-SnFqrF4vWv9vkhKsZQnbPS2WPZbWFxld_Q4jTIQpmoliTj2sMXFWSaLciQpE-hmjP_ph7MjgduQ7-BlBl6Yg9nDNGtWLF7VSqsVzHQTq8opnqITTNjSGUtYI6aNeefkS7kKIg4v1CfPzTVdVrLvkXY7DOSDsJTU-jaWGCQdT8OzrPPVITDJWkvn6_uj49gxVZDWXm-HKzIAQozp3GEyn_gEpoUlfs7wb39NYAAYGWrAXwQeTu4XliWhxGaWkJXEAkTM7lB3evzZq2S1yO2ACAysekBsF49N5t9ed1OI8_JQOS-CxpRnaSYte6n7eE86VC6O0OyFOoP_PJ36Ao3oZfc7QOyRRdcU1H3CZo-3SWQaAQ9HBEgCdxNzX7EVgEpu2rKZ9s7N54BJHwDyFACBRwFviuXJOCj4OVtUSUN-jlpvT5pR-B3YFFiRBXskc7_1vClsmwFudyTzpAzPVwoCpzYxwH2ErJuz54PcieDEO3hLx3OtbTmgaz1qSv4CavWjqjJk-LbceuI7YB-26_ONBf_1SCjXMto8KqvahN3YgEm5litq-cC_W7oK8uX_aBM0K5SSvNu7-0F">
 
-### 4.3.4 Class Diagram 类图
+### 4.3.4 类图
 
-### 4.3.5 Sequence Diagram - Transactions 顺序图——交易
+### 4.3.5 时序图——交易
 
 TBD
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.4 Transaction Protocol Specification 交易协议说明
+## 4.4 交易协议说明
 
-### 4.4.1 Handshake Mechanism 握手机制
+### 4.4.1 握手机制
 
 TBD
 
-### 4.4.2 Transaction Protocol Negotiation 交易协议协商
+### 4.4.2 交易协议协商
 
-Participants in the transaction must have a handshake mechanism where they agree on one of the supported protocols to use to execute the transaction. The algorithm looks an intersection in the list of supported algorithms by the participants.
+交易参与者必须有一个握手机制，一次来来同意执行一个大家都支持的用于执行交易的协议。该算法查找参与者支持的算法列表的交叉点。
 
-Participants can insist on a specific protocol by pretending that they only support said protocol only.
-Protocols can be versioned as the specifications mature.
-Adding new protocols must be possible as part of the plugin architecture allowing the community to propose, develop, test and release their own implementations at will.
-The two initially supported protocols shall be the ones that can satisfy the requirements for Fujitsu’s and Accenture’s implementations respectively.
-Means for establishing bi-directional communication channels through proxies/firewalls/NAT wherever possible
+参与者可以通过假装只支持自己所说的协议的方式坚持使用特定协议。随着规范的成熟，可以对协议进行版本控制。作为插件架构，必须添加新协议，允许社区提议、开发、测试和发布他们自己的实现。最初支持的两个协议应分别满足 Fujitsu（富士通）和 Accenture（埃森哲）的要求。尽可能通过代理/防火墙/NAT建立双向通信信道。
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.5 Plugin Architecture 插件架构
+## 4.5 插件架构
 
-Since our goal is integration, it is critical that `Cactus` has the flexibility of supporting most ledgers, even those that don't exist today.
+因为我们目的是集成，所以 `Cactus` 要能够灵活地支持多种的账本，尽管目前还没有实现。
 
-> A plugin is a self contained piece of code that implements a predefined interface pertaining to a specific functionality of `Cactus` such as transaction execution.
+> 插件是一个自包容的代码片段，实现了 `Cactus` 中为特定功能预定义的接口，比如交易执行。
 
-Plugins are an abstraction layer on top of the core components that allows operators of `Cactus` to swap out implementations at will.
+插件是核心组件顶层的抽象，支持 `Cactus` 操作者根据意愿切换不同的实现。
 
-> Backward compatibility is important, but versioning of the plugins still follows the semantic versioning convention meaning that major upgrades can have breaking changes.
+> 向后兼容性很重要，但插件的版本控制仍然遵循语义版本控制约定，这意味着主要升级可能会有破坏性的更改。
 
-Plugins are implemented as ES6 modules (source code) that can be loaded at runtime from the persistent data store. The core package is responsible for validating code signatures to guarantee source code integrity.
+插件使用 ES6 模组（源码）实现，可以在运行环境中从持久化数据存储中加载。核心包负责验证代码签名来保证源码的完整性。
 
-An overarching theme for all aspects that are covered by the plugin architecture is that there should be a dummy implementation for each aspect to allow the simplest possible deployments to happen on a single, consumer grade machine rather than requiring costly hardware and specialized knowledge.
+插件架构涵盖的所有方面的一个总体主题是，每个方面都应该有一个傻瓜式实现，以允许在单个消费级机器上部署，而不是昂贵的硬件和专业知识。
 
-> Ideally, a fully testable/operational (but not production ready) `Cactus` deployment could be spun up on a developer laptop with a single command (an npm script for example).
+> 理想情况下，一个完全可测试/可操作（但是还没有成为产品）的 `Cactus` 部署应该可以通过一个简单的命令（比如一个 npm 脚本）在开发者的笔记本上运行。
 
 ---
 
@@ -721,13 +680,13 @@ An overarching theme for all aspects that are covered by the plugin architecture
 
 ---
 
-### 4.5.1 Ledger Connector Plugins 账本链接器插件
+### 4.5.1 账本连接器插件
 
-Success is defined as:
-1. Adding support in `Cactus` for a ledger invented in the future requires no `core` code changes, but instead can be implemented by simply adding a corresponding connector plugin to deal with said newly invented ledger.
-2. Client applications using the REST API and leveraging the feature checks can remain 100% functional regardless of the number and nature of deployed connector plugins in `Cactus`. For example: a generic money sending application does not have to hardcode the supported ledgers it supports because the unified REST API interface (fed by the ledger connector plugins) guarantees that supported features will be operational.
+成功的定义是：
+1.在 `Cactus` 中添加对未来发明的账本的支持不需要修改`核心`代码，而是可以通过简单地添加相应的连接器插件处理新账本来实现。
+2. 使用 REST API 和利用特性检查的客户端应用程序可以保持 100% 的功能，而不管 `Cactus` 中部署的连接器插件的数量和性质如何。例如：一个通用的汇款应用程序不必对其支持的账本进行硬编码，因为统一的 REST API 接口（由账本连接器插件提供）保证了支持的功能可以运行。
 
-Because the features of different ledgers can be very diverse, the plugin interface has feature checks built into allowing callers/client applications to **determine programmatically, at runtime** if a certain feature is supported or not on a given ledger.
+由于不同账本的功能可能非常不同，插件接口内置了功能检查，以支持调用方/客户端应用程序**在运行时以编程方式确定**给定账本上是否支持某个功能。
 
 ```typescript
 export interface LedgerConnector {
@@ -756,10 +715,9 @@ export enum PermissionScheme {
 
 ```
 
-### 4.5.2 Identity Federation Plugins 身份联盟插件
+### 4.5.2 身份联盟插件
 
-Identity federation plugins operate inside the API Server and need to implement the interface of a common PassportJS Strategy:
-https://github.com/jaredhanson/passport-strategy#implement-authentication
+身份联盟插件在 API 服务器内部运行并且需要实现通用 PassportJS 策略的接口：https://github.com/jaredhanson/passport-strategy#implement-authentication
 
 ```typescript
 abstract class IdentityFederationPlugin {
@@ -773,19 +731,18 @@ abstract class IdentityFederationPlugin {
 }
 ```
 
-#### 4.5.1.1 X.509 Certificate Plugin X.509证书插件
+#### 4.5.1.1 X.509证书插件
 
-The X.509 Certificate plugin facilitates clients authentication by allowing them to present a certificate instead of operating with authentication tokens.
-This technically allows calling clients to assume the identities of the validator nodes through the REST API without having to have access to the signing private key of said validator node.
+X.509证书插件允许客户端提供证书，而不是使用身份验证令牌操作，从而简化了客户端身份验证。这在技术上允许调用客户端通过 REST API 获取验证器节点的身份，而不必访问验证器节点的签名私钥。
 
-PassportJS already has plugins written for client certificate validation, but we go one step further with this plugin by providing the option to obtain CA certificates from the validator nodes themselves at runtime.
+PassportJS 已经有为客户端证书验证而写的插件了，但是我们在此插件上更进了一步，提供了在运行时从验证器节点自己获取 CA 证书的选项。
 
-### 4.5.3 Key/Value Storage Plugins Key/Value 存储插件
+### 4.5.3 Key/Value 存储插件
 
-Key/Value Storage plugins allow the higher-level packages to store and retrieve configuration metadata for a `Cactus` cluster such as:
-* Who are the active validators and what are the hosts where said validators are accessible over a network?
-* What public keys belong to which validator nodes?
-* What transactions have been scheduled, started, completed?
+Key/Value 存储插件支持更高级别的包来存储和检索 `Cactus` 集群的配置元数据，比如
+* 谁是活跃验证器和网络中可访问验证器的主机名？
+* 哪个公钥属于哪个验证器节点？
+* 哪些交易已经预定了、哪些已经开始了，哪些结束了？
 
 ```typescript
 interface KeyValueStoragePlugin {
@@ -795,16 +752,15 @@ interface KeyValueStoragePlugin {
 }
 ```
 
-### 4.5.4 Serverside Keychain Plugins 服务端主链插件
+### 4.5.4 服务端密钥串插件
 
-The API surface of keychain plugins is roughly the equivalent of the key/value *Storage* plugins, but under the hood these are of course guaranteed to encrypt the stored data at rest by way of leveraging storage backends purpose built for storing and managing secrets.
+密钥串插件在 API 层面上和 Key/Value *存储*插件插件差不多，但是在幕后，它们当然可以通过利用专门为存储和管理机密数据而构建的存储后端来加密静态存储的数据。
 
-Possible storage backends include self hosted software [1] and cloud native services [2][3][4] as well. The goal of the keychain plugins (and the plugin architecture at large) is to make `Cactus` deployable in different environments with different backing services such as an on-premise data center or a cloud provider who sells their own secret management services/APIs.
-There should be a dummy implementation as well that stores secrets in-memory and unencrypted (strictly for development purposes of course). The latter will decrease the barrier to entry for new users and would be contributors alike.
+可能的存储后端还包括自己管理的软件 [1] 和云原生服务 [2][3][4]。密钥串插件（从大方面说还有插件架构）的目的是使 `Cactus` 可部署在有不同后端服务的环境中，比如在部署的数据中心或者出售机密管理服务/API的云服务商。这应该是傻瓜式的，同样还有将机密数据保存在内存和解密也一样（严格来说只是部署方面）。后者将减少新用户进入的障碍，并可能成为像贡献者一样的人。
 
-Direct support for HSM (Hardware Security Modules) is also something the keychain plugins could enable, but this is lower priority since any serious storage backend with secret management in mind will have built-in support for dealing with HSMs transparently.
+直接支持 HSM（Hardware Security Modules，硬件安全模块）也是密钥串插件需要支持的，但是这个优先级比较低，因为考虑到所有严谨的带有机密数据管理的存储后端都将内置对处理 HSM 透明的支持。
 
-By design, the keychain plugin can only be used by authenticated users with an active `Cactus` session. Users secrets are isolated from each other on the keychain via namespacing that is internal to the keychain plugin implementations (e.g. users cannot query other users namespaces whatsoever).
+根据设计，密钥串插件只能由具有活动 `Cactus` 会话的经过身份验证的用户使用。用户的机密信息通过密钥串插件内部实现的命名空间在密钥串上相互隔离（例如，用户不能查询其他用户的命名空间）。
 
 ```typescript
 interface KeychainPlugin extends KeyValueStoragePlugin {
@@ -818,36 +774,34 @@ interface KeychainPlugin extends KeyValueStoragePlugin {
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-# 5. Identities, Authentication, Authorization 身份、认证、授权
+# 5. 身份、认证、授权
 
-`Cactus` aims to provide a unified API surface for managing identities of an identity owner.
-Developers using the `Cactus` REST API for their applications can support one or both of the below requirements:
-1. Applications with a focus on access control and business process efficiency (usually in the enterprise)
-2. Applications with a focus on individual privacy (usually consumer-based applications)
+`Cactus` 的目标是提供管理身份拥有者身份的统一 API。开发者在他们的应用程序中使用 `Cactus` REST API 可以支持以下其中一个或者两个需求：
+1. 关注访问控制和高效业务处理（通常在企业中）的应用程序。
+2. 关注个人隐私（通常是基于客户的应用）的应用程序。
 
-The following sections outline the high-level features of `Cactus` that make the above vision reality.
+下边的章节概括了 `Cactus` 中实现上述情况的高级特性。
 
-An end user (through a user interface) can issue API requests to
-* register a username+password account (with optional MFA) **within** `Cactus`.
-* associate their wallets to their `Cactus` account and execute transactions involving those registered wallet (transaction signatures performed either locally or remotely as explained above).
+终端用户（通过用户接口）可以发出 API 请求来：
+* **在** `Cactus` 中注册一个用户名+密码的账户。
+* 将他们的 `Cactus` 账户关联到他们的钱包并且使用注册过的钱包执行交易（就像前边说的可以通过本地或者远程进行交易签名）。
 
-## 5.1 Transaction Signing Modes, Key Ownership 交易签名模式、键所有权
+## 5.1 交易签名模式、键所有权
 
-An application developer using `Cactus` can choose to enable users to sign their transactions locally on their user agent device without disclosing their private keys to `Cactus` or remotely where `Cactus` stores private keys server-side, encrypted at rest, made decryptable through authenticating with their `Cactus` account.
-Each mode comes with its own pros and cons that need to be carefully considered at design time.
+使用 `Cactus` 的应用开发者可以选择支持用户在他们本地的代理设备上本地签名他们的交易而不向 `Cactus` 暴露他们的私钥，或者远程使用 `Cactus` 服务端存储的私钥静态加密，通过授权他们的 `Cactus` 账户进行解密。每种方式都有他们的利弊，设计时需要仔细考虑。
 
-### 5.1.1 Client-side Transaction Signing 客户端交易签名
+### 5.1.1 客户端交易签名
 
-Usually a better fit for consumer-based applications where end users have higher expectation of individual privacy.
+通常更适用于用户有更高的个人隐私需求的基于消费者的应用程序。
 
-**Pros**
-* Keys are not compromised when a `Cactus` deployment is compromised
-* Operator of `Cactus` deployment is not liable for breach of keys (same as above)
-* Reduced server-side complexity (no need to manage keys centrally)
+**优势**
+* 当 `Cactus` 部署被破坏时，密钥不被破坏
+* `Cactus` 部署的操作员不对密钥的安全负责（和上面一样）
+* 降低了服务端的复杂度（不用中心化管理密钥）
 
-**Cons**
-* User experience is sub-optimal compared to sever side transaction signing
-* Users can lose access permanently if they lose the key (not acceptable in most enterprise/professional use cases)
+**劣势**
+* 与服务器端交易签名相比，用户体验是次优的
+* 用户会永远失去访问权如果他们丢失了密钥（在多数企业级/专业的用例中是不可接受的）
 
 ---
 
@@ -855,16 +809,16 @@ Usually a better fit for consumer-based applications where end users have higher
 
 ---
 
-### 5.1.2 Server-side Transaction Signing 服务端交易签名
+### 5.1.2 服务端交易签名
 
-Usually a better fit for enterprise applications where end users have most likely lowered their expectations of individual privacy due to the hard requirements of compliance, governance, internal or external policy enforcement.
+通常适用于企业级应用，由于服从、治理、内部或外部政策约束终端用户更愿意降低对隐私的期望。
 
-**Pros**
-* Frees end users from the burden of managing keys themselves (better user experience)
-  * Improved compliance, governance
+**优势**
+* 免去了用户管理密钥的负担（用户体验更好）
+  * 改进了法规遵从性和治理
 
-**Cons**
-* Server-side breach can expose encrypted keys stored in the keychain
+**劣势**
+* 服务端被破坏会泄露存储在密钥串上的被加密的密钥。
 
 ---
 
@@ -872,102 +826,61 @@ Usually a better fit for enterprise applications where end users have most likel
 
 ---
 
-## 5.2 Open ID Connect Provider, Identity Provider Open ID 链接提供者、身份提供者
+## 5.2 Open ID 链接提供者、身份提供者
 
-`Cactus` can authenticate users against *third party Identity Providers* or serve as an *Identity Provider* itself.
-Everything follows the well-established industry standards of Open ID Connect to maximize information security and reduce the probability of data breaches.
+`Cactus` 可以通过*第三方身份提供者*或自己作为*身份提供者*验证用户。一切都遵循公认的 Open ID Connect 行业标准，以最大限度地提高信息安全性并降低数据泄露的可能性。
 
-## 5.3 Server-side Keychain for Web Applications Web应用的服务端主链
+## 5.3 Web应用的服务端密钥串
 
-There is a gap between traditional web/mobile applications and blockchain applications (web 2.0 and 3.0 if you will) authentication protocols in the sense that blockchain networks rely on private keys belonging to a Public Key Infrastructure (PKI) to authenticate users while traditional web/mobile applications mostly rely on a centralized authority storing hashed passwords and the issuance of ephemeral tokens upon successful authentication (e.g. successful login with a password).
-Traditional (Web 2.0) applications (that adhering security best practices) use server-side sessions (web) or secure keychains provided by the operating system (iOS, Android, etc.)
-The current industry standard and state of the art authentication protocol in the enterprise application development industry is Open ID Connect (OIDC).
+传统的 web 或移动端应用程序和区块链应用程序（web 2.0 和 3.0，如果你愿意的话）认证协议之间存在着差距，因为区块链网络依赖于属于公钥基础设施（PKI）的私钥来认证用户，而传统的 Web 或移动端应用程序主要依赖于中央集权存储的散列后的密码，以及在成功验证身份（例如，使用密码成功登录）后颁发的临时令牌。传统（Web 2.0）应用程序（遵循安全最佳实践）使用服务器端会话（Web）或操作系统（iOS、Android等）提供的安全密钥串。目前企业应用开发行业的行业标准和最先进的认证协议是 Open ID Connect（OIDC）。
 
-To successfully close the gap between the two worlds, `Cactus` comes equipped with an OIDC identity provider and a server-side key chain that can be leveraged by end user applications to authenticate once against Hyperledger Cactus and manage identities on other blockchains through that single Hyperledger Cactus identity.
-This feature is important for web applications which do not have secure offline storage APIs (HTML localStorage is not secure).
+为了成功缩小这两个世界之间的差距，`Cactus` 配备了一个 OIDC 身份提供者和一个服务器端密钥串，终端用户应用程序可以利用该密钥串对 Hyperledger Cactus 进行一次身份验证，并通过该 Hyperledger Cactus 身份管理其他区块链上的身份。此功能对于没有安全脱机存储 API（HTML localStorage不安全）的 Web 应用程序非常重要。
 
-Example: A user can register for a Hyperledger Cactus account, import their private keys from their Fabric/Ethereum wallets and then have access to all of those identities by authenticating once only against `Cactus` which will result in a server-side session (HTTP cookie) containing a JSON Web Token (JWT).
+示例：用户可以注册一个 Hyperledger Cactus 帐户，从其 Fabric 或 Ethereum 钱包中导入私钥，然后通过仅对 `Cactus` 进行一次身份验证来访问所有这些身份，这将产生一个包含 JSON Web Token（JWT）的服务器端会话（HTTP cookie） 。
 
-> Native mobile applications may not need to use the server-side keychain since they usually come equipped with an OS provided one (Android, iOS does).
+> 原生移动应用程序可能不需要使用服务器端密钥串，因为它们通常配备操作系统提供的密钥串（Android、iOS就是这样）。
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/bLLDRnen4BtlhnZHGqz0eUgbGYYaJLhKjAfASaEg77i0TxrZnpOXjCf_x-ooNqeMqXwGy7ZcpRmtuzcp48MFsyp03UcLHWLpXHHrtCDNGMAD6PyIFXk4ptk7tg1QeuTpOsKgDq8Jp2dYsekeBS6b5ndkh4-NT0elUGq6Ln6Y1Q_NcmXAUvGvGduLKarEC19SQSB8MS7wkB59Sn7mReiaSUQztLrlj4m9Gu1noyNRBIbfFN6rxrhsJ3naxCkb1FqRuUsR3jZlh8cMsWcAm2ZCcWj94c6CtVtCz8EcTP8u8LD6WTxv_B9csGCHu9QPLwnVNUK4FtcnXpy9WBtznKIXz_7gkb5cL4Gf4_K89XFfiRWGPZez5Z6k8yR_6F6jZg2d4O_CJ4RheJTppcXvQELDG5_457TvOJKdksDHEJ1PvUrc0LuOXXu71xkAE-4H53fZz_aOJAUbEX_sWbWTBhtMrANhld2EVxhFXToNjR2PhMmys6fr4QcG5q3Qp5bYTEWDsMzuFnfMTG_5DcxolymGbpIP_BXONCFi-nmkI3chyueEZ5j-M5wz3AvKlv7r9BnIZMCB__6P0hezLMnuDbMTlAkUBrWZBGkcqeWGolGLI3XSToOETwOVkErig7ApgRISphwuCuk3tv7y3T2f2bBS5nDLfQ_EfvD_ARsEfAv0sechwH_1GF5W3mxliCCsxh1H4rmiii7qI7V9HjvY1Bn8qlSm2y5ApTC5_4QNL3zIteUyJ9PKjOZHkz1Wm7bQu_04FPSVwpP34nzuQRM6g4IfHFaFb9DLDVtjH6I2mtmprSWUJR4lmaOxnZvZFFuU_GK0" >
 
-In web 2.0 applications the prevalent authentication/authorization solution is Open ID Connect which bases authentication on passwords and tokens which are derived from the passwords.
-Web 3.0 applications (decentralized apps or *DApps*) which interact with blockchain networks rely on private keys instead of passwords.
+在 Web 2.0 应用程序中，流行的身份验证/授权解决方案是 Open ID Connect，它基于从密码派生的密码和令牌进行身份验证。与区块链网络交互的 Web 3.0 应用程序（分散应用程序或 *DApps*）依赖私钥而不是密码。
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-# 6. Terminology 术语 
-
-**Application user**: The user who requests an API call to a Hyperledger Cactus application or smart contract. The API call triggers the sending of the transaction to the remote ledger.
+# 6. 术语 
 
 **应用用户**：向 Hyperledger Cactus 应用或智能合约请求 API 调用的用户。API 调用触发向远程账本发送交易。 
 
-**Hyperledger Cactus Web application or Smart contract on a blockchain**: The entity executes business logic and provide integration services that include multiple blockchains.
-
-**Hyperledger Cactus Web 应用或区块链上的智能合约**：执行商业逻辑并提供多个区块链整合服务的实体。
-
-**Tx verifier**: The entity verifies the signature of the transaction data transmitted over the secure bidirectional channel. Validated transactions are processed by the Hyperledger Cactus Web application or Smart Contract to execute the integrated business logic.
+**Hyperledger Cactus Web 应用或区块链上的智能合约**：执行商业逻辑并提供多个区块链集成服务的实体。
 
 **Tx 验证者**： 验证从安全双向通道发送来的交易数据的签名的实体。已验证的交易会被 Hyperledger Cactus Web 应用处理或者由智能合约执行相应的业务逻辑。
 
-**Tx submitter**: The entity submits the remote transaction to the API server plug-in on one of the ledgers.
-
 **Tx 提交者**：提交远程交易到其中一个账本的 API 服务器的实体。
-
-**API Server**: A module of Hyperledger Cactus which provides a unified interface to control/monitor Blockchain ledger behind it.
 
 **API 服务器**：Hyperledger Cactus 的一个模块，提供了统一处理/控制在它后面的区块链账本的接口。
 
-**Validator**: A module of Hyperledger Cactus which verifies validity of transaction to be sent out to the blockchain application.
-
 **验证者**：Hyperledger Cactus 的一个模块，验证发送到区块链应用的交易的有效性。
-
-**Lock asset**: An operation to the asset managed on blockchain ledger, which disable further operation to targeted asset. The target can be whole or partial depends on type of asset.
 
 **锁定资产**：对区块链账本管理的资产的操作，即禁止对目标资产的操作。目标根据资产类型可以是全部或者部分。
 
-**Abort**: A state of Hyperledger Cactus which is determined integrated ledger operation is failed, and Hyperledger Cactus will execute recovery operations.
-
 **终止**：Hyperledger Cactus 的一个状态，表明账本操作失败，Hyperleder Cactus 将执行恢复操作。
 
-**Integrated ledger operation**: A series of blockchain ledger operations which will be triggered by Hyperledger Cactus. Hyperledger Cactus is responsible to execute 'recovery operations' when 'Abort' is occurred.
+**集成账本操作**：一系列区块链账本的操作，这些操作由 Hyperledger Cactus 触发。当 "终止" 发生时 Hyperledger Cactus 有责任执行 "恢复操作"。
 
-**整合账本操作**：一系列区块链账本的操作，这些操作由 Hyperledger Cactus 触发。当 "终止" 发生时 Hyperledger Cactus 有责任执行 "恢复操作"。
-
-**Restore operation(s)**: Single or multiple ledger operations which is executed by Hyperledger Cactus to restore the state of integrated service before start of integrated operation.
-
-**恢复操作**：单个或者多个账本操作，由 Hyperledger Cactus 执行在整合操作前来恢复整合服务的状态。
-
-**End User**: A person (private citizen or a corporate employee) who interacts with Hyperledger Cactus and other ledger-related systems to achieve a specific goal or complete a task such as to send/receive/exchange money or data.
+**恢复操作**：单个或者多个账本操作，由 Hyperledger Cactus 执行在集成操作前来恢复集成服务的状态。
 
 **终端用户**：与 Hyperledger Cactus 或者其他账本相关系统交互的人（个人或者公司职员），他们可以完成某些目标，或者完成发送、接收、交换钱或者数据这样的任务。
 
-**Business Organization**: A for-profit or non-profit entity formed by one or more people to achieve financial gain or achieve a specific (non-financial) goal. For brevity, *business organization* may be shortened to *organization* throughout the document.
-
 **商业组织**：有一个或多个人组成的盈利或非盈利组织，来实现经济收益或者特定（非盈利组织）目标。简单来说，本文中*商业组织*可以简写为*组织*。
-
-**Identity Owner**: A person or organization who is in control of one or more identities. For example, owning two separate email accounts by one person means that said person is the identity owner of two separate identities (the email accounts). Owning cryptocurrency wallets (their private keys) also makes one an identity owner.
 
 **身份所有者**：对一个或多个身份拥有控制权的个人或组织。例如，一个拥有两个独立邮箱账户的人意味着这个人是两个独立身份（邮箱账本）的身份所有者。拥有加密货币钱包（钱包私钥）也是一个身份所有者。
 
-**Identity Secret**: A private key or a password that - by design - is only ever known by the identity owner (unless stolen).
-
 **身份密码**：一个只有身份拥有者知道的私钥或者密码（除非被窃取）。
-
-**Credentials**: Could mean `user a`uthentication credentials/identity proofs in an IT application or any other credentials in the traditional sense of the word such as a proof that a person obtained a masters or PhD.
 
 **证书**：可以是 IT 应用中`用户身份认证`证书或身份的证明，也可以是交易场景中的其他证书，比如证明一个人拥有学士或者博士学位。 
 
-**Ledger/Network/Chain**: Synonymous words meaning referring largely to the same thing in this paper.
-
 **账本/网络/链**：同义词，本文中使用他们表示相同的内容。
 
-**OIDC**: Open ID Connect authentication protocol
-
 **OIDC**：Open ID 链接身份验证协议。
-
-**PKI**: Public Key Infrastructure
 
 **PKI**：Public Key Infrastructure，公钥基础设施
 
@@ -978,3 +891,7 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 # 7. References 参考文献
 
 1: [Heterogeneous System Architecture](https://en.wikipedia.org/wiki/Heterogeneous_System_Architecture) - Wikipedia, Retrieved at: 11th of December 2019
+
+2: E Scheid and Burkhard Rodrigues, B Stiller. 2019. Toward a policy-based blockchain agnostic framework. 16th IFIP/IEEE International Symposium on Integrated Network Management (IM 2019) (2019)
+
+3: Philipp Frauenthaler, Michael Borkowski, and Stefan Schulte. 2019. A Framework for Blockchain Interoperability and Runtime Selection.
