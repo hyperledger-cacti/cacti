@@ -33,7 +33,7 @@ export const CORDA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().key
   }
 );
 
-export class CordaTestLedger {
+export class CordaTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
 
@@ -113,6 +113,38 @@ export class CordaTestLedger {
         }
       });
     });
+  }
+
+  public stop(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (this.container) {
+        this.container.stop({}, (err: any, result: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
+          }
+        });
+      } else {
+        return reject(
+          new Error(
+            `CordaTestLedger#stop() Container was not running to begin with.`
+          )
+        );
+      }
+    });
+  }
+
+  public destroy(): Promise<any> {
+    if (this.container) {
+      return this.container.remove();
+    } else {
+      return Promise.reject(
+        new Error(
+          `CordaTestLedger#destroy() Container was never created, nothing to destroy.`
+        )
+      );
+    }
   }
 
   private pullContainerImage(containerNameAndTag: string): Promise<any[]> {
