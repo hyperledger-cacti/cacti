@@ -73,6 +73,7 @@ export class CordaTestLedger {
         [],
         [],
         {
+          User: "root",
           ExposedPorts: {
             "10013/tcp": {}, // corda PartyA RPC
           },
