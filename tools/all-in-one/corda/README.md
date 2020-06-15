@@ -4,7 +4,7 @@
 ``docker build . -t corda-all-in-one``
 
 #### Run
-``docker run -u root --rm -it --entrypoint=/bin/bash corda-all-in-one``
+``docker run -u root corda-all-in-one``
 
 ## Build and run with Docker Compose
 
