@@ -1,8 +1,6 @@
 FROM azul/zulu-openjdk:8u192
 FROM corda/corda-zulu-4.0:latest AS corda
 
-
-
 # create party A dir structure
 RUN echo "Creating node directory structure for PartyA"
 RUN mkdir -p /opt/corda/partyA/cordapps
@@ -53,9 +51,12 @@ ADD PartyB/certificates/sslkeystore.jks /opt/corda/partyB/certificates/sslkeysto
 ADD PartyB/node.conf /opt/corda/partyB/node.conf
 ADD additional-node-infos /opt/corda/partyB/additional-node-infos
 
+
 EXPOSE 10013
 EXPOSE 10014
+EXPOSE 10003
+EXPOSE 10004
 
 # run nodes
 ADD init_node.sh /opt/corda/bin/init_node.sh
-CMD /opt/corda/bin/init_node.sh
+ENTRYPOINT ["/opt/corda/bin/init_node.sh"]

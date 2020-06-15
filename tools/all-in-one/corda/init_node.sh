@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Gradle build..."
 cd /opt/corda/corda-source
 ./gradlew build -x test
