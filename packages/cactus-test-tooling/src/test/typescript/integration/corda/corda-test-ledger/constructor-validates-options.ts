@@ -1,11 +1,8 @@
 // tslint:disable-next-line: no-var-requires
 const tap = require("tap");
-import {
-  CordaTestLedger,
-  IKeyPair,
-  isIKeyPair,
-} from "../../../../../main/typescript/public-api";
 import { Container } from "dockerode";
+import isPortReachable from "is-port-reachable";
+import { CordaTestLedger } from "../../../../../main/typescript/public-api";
 
 tap.test("constructor throws if invalid input is provided", (assert: any) => {
   assert.ok(CordaTestLedger);
@@ -26,11 +23,16 @@ tap.test("starts/stops/destroys a docker container", async (assert: any) => {
   const cordaTestLedger = new CordaTestLedger();
   const container: Container = await cordaTestLedger.start();
   assert.ok(container);
-  const ipAddress: string = await cordaTestLedger.getContainerIpAddress();
-  assert.ok(ipAddress);
-  assert.ok(ipAddress.length);
 
-  await besuTestLedger.stop();
-  await besuTestLedger.destroy();
+  const rpcPortA: number = await cordaTestLedger.getRpcAPublicPort();
+  assert.ok(rpcPortA, "rpcPortA truthy");
+  assert.ok(isFinite(rpcPortA), "rpcPortA is finite integer");
+
+  const host = "localhost";
+  const reachable = await isPortReachable(rpcPortA, { host });
+  assert.ok(reachable, `Port RPC A ${rpcPortA} reachable via localhost`);
+
+  await cordaTestLedger.stop();
+  await cordaTestLedger.destroy();
   assert.end();
 });
