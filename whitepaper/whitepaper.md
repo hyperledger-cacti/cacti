@@ -98,11 +98,12 @@ Photo by Pontus Wellgraf on Unsplash
     - [4.5.3 Key/Value Storage Plugins](#453-keyvalue-storage-plugins)
     - [4.5.4 Serverside Keychain Plugins](#454-serverside-keychain-plugins)
 - [5. Identities, Authentication, Authorization](#5-identities-authentication-authorization)
-  - [5.1 Transaction Signing Modes, Key Ownership](#51-transaction-signing-modes-key-ownership)
-    - [5.1.1 Client-side Transaction Signing](#511-client-side-transaction-signing)
-    - [5.1.2 Server-side Transaction Signing](#512-server-side-transaction-signing)
-  - [5.2 Open ID Connect Provider, Identity Provider](#52-open-id-connect-provider-identity-provider)
-  - [5.3 Server-side Keychain for Web Applications](#53-server-side-keychain-for-web-applications)
+  - [5.1 Definition of Identities in Cactus](#51-definition-of-identities-in-cactus)
+  - [5.2 Transaction Signing Modes, Key Ownership](#52-transaction-signing-modes-key-ownership)
+    - [5.2.1 Client-side Transaction Signing](#521-client-side-transaction-signing)
+    - [5.2.2 Server-side Transaction Signing](#522-server-side-transaction-signing)
+  - [5.3 Open ID Connect Provider, Identity Provider](#53-open-id-connect-provider-identity-provider)
+  - [5.4 Server-side Keychain for Web Applications](#54-server-side-keychain-for-web-applications)
 - [6. Terminology](#6-terminology)
 - [7. References](#7-references)
 
@@ -807,7 +808,7 @@ interface KeychainPlugin extends KeyValueStoragePlugin {
 # 5. Identities, Authentication, Authorization
 
 `Cactus` aims to provide a unified API surface for managing identities of an identity owner.
-Developers using the `Cactus` REST API for their applications can support one or both of the below requirements:
+Developers using the `Cactus` Service API for their applications can support one or both of the below requirements:
 1. Applications with a focus on access control and business process efficiency (usually in the enterprise)
 2. Applications with a focus on individual privacy (usually consumer-based applications)
 
@@ -816,13 +817,39 @@ The following sections outline the high-level features of `Cactus` that make the
 An end user (through a user interface) can issue API requests to
 * register a username+password account (with optional MFA) **within** `Cactus`.
 * associate their wallets to their `Cactus` account and execute transactions involving those registered wallet (transaction signatures performed either locally or remotely as explained above).
+* execute a trade which executes a set of transactions across integrated Ledgers. `Cactus` may also executes recovery transaction(s) when the trade was failed with some reason. For example, recovery transactions may be executed to reverse executed transaction result using intermediate account which provide escrow trading service.
 
-## 5.1 Transaction Signing Modes, Key Ownership
+## 5.1 Definition of Identities in Cactus
+
+Various identities are used at Cactus Service API.
+
+**Cactus user ID**
+* ID for user (behind web service application) to execute a Service API call. 
+* Service provider assign the role(s) and access right(s) of user in integrated service as part of `Business Logic Plugin`.
+* The user can add Wallet(s) which is associated with account address and/or key. 
+
+**Wallet ID**
+* ID for the user identity which is associated with authentication credential at integrated `Ledger`.
+* It is recommended to store temporary credential here allowing minimal access to operate `Ledger` instead of giving full access with master secret.
+* Service API enables user to add/update/delete authentication credential for the Wallet. 
+
+**Ledger ID**
+* ID for `Ledger Plugin` which is used at Wallet
+* `Ledger ID` is assigned by administrator of integrated service, and provided for user to configure their own Wallet settings.
+* The connectivity settings associated with the `Ledger ID` is also configured at `Ledger Plugin` by the administrator.
+
+**Business Logic ID**
+* ID for business logic to be invoked by Cactus user.
+* Each business logic should be implemented to execute necessary transactions on integrated `Ledgers` without any interaction with user during its execution.
+* Business logic may require user to setup access permission with storing credential before executing business logic call.
+
+
+## 5.2 Transaction Signing Modes, Key Ownership
 
 An application developer using `Cactus` can choose to enable users to sign their transactions locally on their user agent device without disclosing their private keys to `Cactus` or remotely where `Cactus` stores private keys server-side, encrypted at rest, made decryptable through authenticating with their `Cactus` account.
 Each mode comes with its own pros and cons that need to be carefully considered at design time.
 
-### 5.1.1 Client-side Transaction Signing
+### 5.2.1 Client-side Transaction Signing
 
 Usually a better fit for consumer-based applications where end users have higher expectation of individual privacy.
 
@@ -841,7 +868,7 @@ Usually a better fit for consumer-based applications where end users have higher
 
 ---
 
-### 5.1.2 Server-side Transaction Signing
+### 5.2.2 Server-side Transaction Signing
 
 Usually a better fit for enterprise applications where end users have most likely lowered their expectations of individual privacy due to the hard requirements of compliance, governance, internal or external policy enforcement.
 
@@ -858,12 +885,12 @@ Usually a better fit for enterprise applications where end users have most likel
 
 ---
 
-## 5.2 Open ID Connect Provider, Identity Provider
+## 5.3 Open ID Connect Provider, Identity Provider
 
 `Cactus` can authenticate users against *third party Identity Providers* or serve as an *Identity Provider* itself.
 Everything follows the well-established industry standards of Open ID Connect to maximize information security and reduce the probability of data breaches.
 
-## 5.3 Server-side Keychain for Web Applications
+## 5.4 Server-side Keychain for Web Applications
 
 There is a gap between traditional web/mobile applications and blockchain applications (web 2.0 and 3.0 if you will) authentication protocols in the sense that blockchain networks rely on private keys belonging to a Public Key Infrastructure (PKI) to authenticate users while traditional web/mobile applications mostly rely on a centralized authority storing hashed passwords and the issuance of ephemeral tokens upon successful authentication (e.g. successful login with a password).
 Traditional (Web 2.0) applications (that adhering security best practices) use server-side sessions (web) or secure keychains provided by the operating system (iOS, Android, etc.)
