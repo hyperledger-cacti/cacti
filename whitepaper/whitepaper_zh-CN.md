@@ -2,6 +2,8 @@
 
 # Hyperledger Cactus<br>白皮书 <!-- omit in toc -->
 
+本译文基于 https://github.com/hyperledger/cactus CommitID：d0b47d2e5afa65638c6bbd1e0737d4116f073654
+
 ## Version 0.1 (Early Draft) <!-- omit in toc -->
 
 <img src="./pontus-wellgraf-agCzLSG4_gE-unsplash-cropped-compressed.jpg" width="700">
@@ -30,14 +32,11 @@ Photo by Pontus Wellgraf on Unsplash
 | Yang Cheng            | chengyang418@163.com    |
 | Yuxiang Liu           | david-khala@hotmail.com |
 
-
-
 # 历史版本 <!-- omit in toc -->
 
 | Date of Revision      | Description of Changes Made                            |
 |-----------------------|--------------------------------------------------------|
 | February 2020         | Initial draft                                          |
-
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
@@ -198,7 +197,7 @@ Photo by Pontus Wellgraf on Unsplash
 
 > 我们省略了时序图，因为该使用场景不适用于 Hyperledger Cactus 的终端用户。
 
-### 2.4.1 和非授权区块链（BTC）
+### 2.4.1 和非授权区块链兑换
 
 BTC 的持有者可以购买 ExampleCoin，购买方式是将他们的 BTC 发送到`保存 ExampleCoin 的钱包`，然后其他网络上就会挖出相应数量的代币发送到他们的 ExampleCoin 钱包。
 
@@ -206,7 +205,7 @@ ExampleCoin 的持有者可以将他们的资产兑换为 BTC，兑换方式是�
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/XP9FIyH03CNlyoc2dhmiui6JY5ln7tWG4KJmaft6TkWqgJFfrbNyxgPBLzP5yLQQlFpoNkOiAoRjsmWNRzXsaSubCDnHLL49Ab04zVR7EGqQ2QvN7QL8PKK9YYY-yJLQ_mqhLGar2CDbmfO6ISqp_pCoDu4xj7R8zDeJUvgd9CD37Np3b3CSRRKawRdqajZ8HuTRXHRVMcl6Yd9u9pW-_6NkdNaCFdJ82ZR6B0Gcvrx6LM7lGHH_-h_X9R5AMkq1Pb3o0VPlGrNhLS8LV3W0bjAKyuCViaUCaJIlHUI7RmqHhqMVxdC7EcMn2rpynOiHHEin_4cuZKHPR9XF5ACC4tIZBWvsZmptb2ajAKzpfisxzCVkewcJsMnskcbQrnsB4jZfBTN6pG6vX08iUZDed2N6dc117ljChe2GOO7URbI1MPdAyW9po09Hk79Z15OPrZj1BT4kDieGDFLPxHbPM45NCqU66kdEdTcdFUCl">
 
-### 2.4.2 和法定货币
+### 2.4.2 和法定货币兑换
 
 和锚定 BTC 的想法非常相似，但是用来存储 BTC 的钱包换成了保存 USD 的传统银行账户。
 
@@ -276,11 +275,7 @@ ExampleCoin 的持有者可以将他们的资产兑换为 BTC，兑换方式是�
 | 前提条件           | 1. `用户 A` 必须在导入之前在各种分类账上设置身份，并且必须有权访问私钥。 |
 | 备注                  |  |
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/nLLBRzf04BxlhnZHIul48Jb68GeeGKLKAYgakI15Ypt1AzkpxkuOulxwZjVc4PH4z7rSpyottsDMllQi7PTv1ZFyLY9523T6hvpEeGUt5CETHmVtEikGOL1oWiGcqcmiXQDrvdiuAULJGuMk9mVEsSt84i-uoX0Cwyn4Ih5XENsi2dGPnYl17MOsIgD46u8nCSgr0NWa8BYnBbtGRxFI4LiN-Xy6e3rekBn4YdkbVBcwKcffds0u7i6x-yGmgXg8A-WCfkDEQ2_CxjjNaH5hWNllFuJYMibHBxL7w4om2a928PMP60IwmUzy2d9zPtlBRgmfV2Qif-Apuy9yOqFXV8-dIxQYoQmr8uZ0-anblaIdLByFNt1bF8iv6yD94DRlon3qhcef5_jwS70GHROaLWwvT0H3r4w-pcsA5D36UM4TmtGoFe9f2ztkJa2t2obMXJPEGTrJjwONC1ExyEM-1KcmhYeOOz0C3ZtBQ4jbQoVS5N6jzCOIRccsbqyQcARqEZVny2Hkp_h-B3TnSkuqUSbD8ckpzKUMtZvXL0hQjbEsTq7I_SmxHLPQd5abhBhT9aDXRIchW538ieL2sChAIlqmJ-bwT3O72RzGvw1bd-hjs9WiWwMitrAU9bjbSdcTtbAjQt-1sh4M5c4NQnvxCzUdqfSHW7Nh_mWvIlQu2vgwPgt5FR2FxQCD8wsx1mq7KF7PYTSlI1vJe-gXLdM0V32tnOhLszMtQZ-HQzYx_vwhiFYrN1lwh-OgvR-QQxZ-7-PwBIR9t_87">
-
-
-
-
+<img width="700" src="img width="700" src="./use-case-sequence-diagram-end-user-wallet-authentication-authorization.png">
 
 ---
 
