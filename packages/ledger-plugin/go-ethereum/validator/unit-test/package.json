@@ -1,0 +1,11 @@
+{
+  "name": "validatorDriver",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "config": "^1.26.1",
+    "ethereumjs-tx": "^1.3.4",
+    "web3": "^0.20.0",
+    "socket.io": "^2.0.4"
+  }
+}
