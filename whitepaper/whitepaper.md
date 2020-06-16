@@ -84,15 +84,15 @@ Photo by Pontus Wellgraf on Unsplash
       - [4.4.1.1 cmd-api-server](#4411-cmd-api-server)
         - [4.4.1.1.1 Runtime Configuration Parsing and Validation](#44111-runtime-configuration-parsing-and-validation)
         - [4.4.1.1.2 Configuration Schema - API Server](#44112-configuration-schema---api-server)
-        - [4.4.1.1.4 Plugin Loading/Validation](#44114-plugin-loadingvalidation)
+        - [4.4.1.1.3 Plugin Loading/Validation](#44113-plugin-loadingvalidation)
       - [4.4.1.2 core-api](#4412-core-api)
-      - [4.4.1.4 sdk](#4414-sdk)
-      - [4.4.1.5 keychain](#4415-keychain)
-      - [4.4.1.7 tracing](#4417-tracing)
-      - [4.4.1.8 audit](#4418-audit)
-      - [4.4.1.9 document-storage](#4419-document-storage)
-      - [4.4.1.10 relational-storage](#44110-relational-storage)
-      - [4.4.1.11 immutable-storage](#44111-immutable-storage)
+      - [4.4.1.3 sdk](#4413-sdk)
+      - [4.4.1.4 keychain](#4414-keychain)
+      - [4.4.1.5 tracing](#4415-tracing)
+      - [4.4.1.6 audit](#4416-audit)
+      - [4.4.1.7 document-storage](#4417-document-storage)
+      - [4.4.1.8 relational-storage](#4418-relational-storage)
+      - [4.4.1.9 immutable-storage](#4419-immutable-storage)
     - [4.4.2 Deployment Diagram](#442-deployment-diagram)
     - [4.4.3 Component Diagram](#443-component-diagram)
     - [4.4.4 Class Diagram](#444-class-diagram)
@@ -103,7 +103,7 @@ Photo by Pontus Wellgraf on Unsplash
   - [4.6 Plugin Architecture](#46-plugin-architecture)
     - [4.6.1 Ledger Connector Plugins](#461-ledger-connector-plugins)
     - [4.6.2 Identity Federation Plugins](#462-identity-federation-plugins)
-      - [4.6.1.1 X.509 Certificate Plugin](#4611-x509-certificate-plugin)
+      - [4.6.2.1 X.509 Certificate Plugin](#4621-x509-certificate-plugin)
     - [4.6.3 Key/Value Storage Plugins](#463-keyvalue-storage-plugins)
     - [4.6.4 Serverside Keychain Plugins](#464-serverside-keychain-plugins)
 - [5. Identities, Authentication, Authorization](#5-identities-authentication-authorization)
@@ -687,7 +687,7 @@ Configuration Parameters
 
 ```
 
-##### 4.4.1.1.4 Plugin Loading/Validation
+##### 4.4.1.1.3 Plugin Loading/Validation
 
 Plugin loading happens through NodeJS's built-in module loader and the validation is performed by the Node Package Manager tool (npm) which verifies the byte level integrity of all installed modules.
 
@@ -696,27 +696,27 @@ Plugin loading happens through NodeJS's built-in module loader and the validatio
 Contains interface definitions for the plugin architecture and other system level components that are to be shared among many other packages.
 `core-api` is intended to be a leaf package meaning that it shouldn't depend on other packages in order to make it safe for any and all packages to depend on `core-api` without having to deal with circular dependency issues.
 
-#### 4.4.1.4 sdk
+#### 4.4.1.3 sdk
 
 Javascript SDK (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
 Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
 
-#### 4.4.1.5 keychain
+#### 4.4.1.4 keychain
 
 Responsible for persistently storing highly sensitive data (e.g. private keys) in an encrypted format.
 
 For further details on the API surface, see the relevant section under `Plugin Architecture`.
 
-#### 4.4.1.7 tracing
+#### 4.4.1.5 tracing
 
 Contains components for tracing, logging and application performance management (APM) of code written for the rest of the Hyperledger Cactus packages.
 
-#### 4.4.1.8 audit
+#### 4.4.1.6 audit
 
 Components useful for writing and reading audit records that must be archived longer term and immutable.
 The latter properties are what differentiates audit logs from tracing/logging messages which are designed to be ephemeral and to support technical issues not regulatory/compliance/governance related issues.
 
-#### 4.4.1.9 document-storage
+#### 4.4.1.7 document-storage
 
 Provides structured or unstructured document storage and analytics capabilities for other packages such as `audit` and `tracing`.
 Comes with its own API surface that serves as an adapter for different storage backends via plugins.
@@ -726,13 +726,13 @@ By default, `Open Distro for ElasticSearch` is used as the storage backend: http
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
 
-#### 4.4.1.10 relational-storage
+#### 4.4.1.8 relational-storage
 
 Contains components responsible for providing access to standard SQL compliant persistent storage.
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
 
-#### 4.4.1.11 immutable-storage
+#### 4.4.1.9 immutable-storage
 
 Contains components responsible for providing access to immutable storage such as a distributed ledger with append-only semantics such as a blockchain network (e.g. Hyperledger Fabric).
 
@@ -848,7 +848,7 @@ abstract class IdentityFederationPlugin {
 }
 ```
 
-#### 4.6.1.1 X.509 Certificate Plugin
+#### 4.6.2.1 X.509 Certificate Plugin
 
 The X.509 Certificate plugin facilitates clients authentication by allowing them to present a certificate instead of operating with authentication tokens.
 This technically allows calling clients to assume the identities of the validator nodes through the REST API without having to have access to the signing private key of said validator node.
