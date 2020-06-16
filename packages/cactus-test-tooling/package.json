@@ -13,13 +13,10 @@
   ],
   "scripts": {
     "tsc": "tsc --project ./tsconfig.json",
-
     "webpack": "npm-run-all webpack:dev webpack:prod",
-
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-
     "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
@@ -65,6 +62,7 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
+    "@hyperledger/cactus-common": "^0.2.0",
     "axios": "0.19.2",
     "dockerode": "3.2.0",
     "extract-zip": "2.0.0",

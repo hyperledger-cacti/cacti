@@ -13,3 +13,10 @@ export {
   QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
 } from "./quorum/quorum-test-ledger";
 export * from "./quorum/i-quorum-genesis-options";
+export { Containers } from "./common/containers";
+export {
+  HttpEchoContainer,
+  IHttpEchoContainerConstructorOptions,
+  HTTP_ECHO_CONTAINER_CTOR_DEFAULTS,
+  HTTP_ECHO_CONTAINER_OPTS_SCHEMA,
+} from "./http-echo/http-echo-container";
