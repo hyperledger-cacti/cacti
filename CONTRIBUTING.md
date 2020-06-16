@@ -50,33 +50,34 @@ Further reading:
 
 1. Fork [hyperledger/cactus](https://github.com/hyperledger/cactus) via Github UI
 2. Clone the fork to your local machine
-3. Complete the desired changes and where possible test locally
+3. (Optional) [Create local branch](#create-local-branch) for minimizing code conflicts when you want to contribute multiple changes regarding different issues in parallel.
+4. Complete the desired changes and where possible test locally
    1. You can run the full CI suite on Mac/Linux/WSL by running the script at `./tools/ci.sh`
    2. If you do not have your environment set up for running bash scripts, do not worry, all pull requests will automatically have the same script executed for it when opened. The only downside is the slower feedback loop.
-4. Make sure you have set up your git signatures
+5. Make sure you have set up your git signatures
    1. Note: Always sign your commits using the `git commit -S`
    2. For more information see [here](https://gist.github.com/tkuhrt/10211ae0a26a91a8c030d00344f7d11b)
-5. Think about/decide on what your commit message will be.
+6. Think about/decide on what your commit message will be.
    1. The commit message syntax might be hard to remember at first so you we invite you to use the `npm run commit` command which upon execution presents you with a series of prompts that you can fill out and have your input validated in realtime, making it impossible (or at least much harder) to produce an invalid commit message that the commit lint bot on Github will flag with an error.
       1. The use of this tool described above is entirely optional in case you need a crutch.
       2. Note that running the `npm run commit` command will also attempt to perform the actual commit at the end unless you kill the process with `Ctrl + C` or whatever is your terminal's shortcut for the same action.
       3. The `npm run commit` command will also attempt to sign the produced commit so make sure that it is set up properly prior to using it.
-6. Commit your changes
+7. Commit your changes
     1. Make sure your commit message follows the formatting requirements (details above) and here: [Conventional Commits syntax](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification); this aids in release notes generation which we intend to automate
     2. Be aware that we are using git commit hooks for the automation of certain mundane tasks such as applying the required code style and formatting so your code will be wrapped at 80 characters each line automatically. If you wish to see how your changes will be altered by the formatter you can run the `npm run prettier` command from a terminal or install an IDE extension for the `Prettier` tool that can do the same (VSCode has one that is known to work).
-7. Ensure your branch is rebased onto the `upstream` master branch where `upstream` is fancy git talk for the main Cactus repo on Github (the one you created your fork from).
+8. Ensure your branch is rebased onto the `upstream` master branch where `upstream` is fancy git talk for the main Cactus repo on Github (the one you created your fork from).
    1. If you are having trouble, there are many great resources out there (so we will not write another here).
       1. If you are having trouble locating a suitable guide specifically on the mechanics of rebasing, we can recommend [this one](https://thoughtbot.com/blog/git-interactive-rebase-squash-amend-rewriting-history). Thanks to Rafael for the link!
    2. If merge conflicts arise, you must fix these at rebase time since omitting this step does not magically make the conflicts go away, just pushes it over the fence to the maintainer who will attempt to merge your pull request at a later point in time.
    3. If the above happens, at that point said maintainer will most likely ask you (if not already) to perform the rebase anyway since as the author of a change you are best positioned to resolve any conflicts on the code level. Occassionally maintainers may do the merge/conflict resolution themselves, but do not count on this nor try to make a habit out of relying on the potential kindness.
    4. After successful rebasing, take another look at your commit(s). Ideally there should be just one in each pull request, but also on the other hand each commit should be as small, simple and self contained as possible, so there can be cases where it makes sense to submit a PR with multiple commits if for example you also had to change something in the test tooling while implementing a feature (in which case there could be a commit for the feature itself and another for the necessary changes to the test tooling package). What we respectfully ask though is that you try to avoid these situations and submit most of your PRs with a single, self contained commit that does not touch multiple things. This significantly reduces the cognitive load required to review the changes which in turn makes everyone happier: the maintainers will have an easier job reviewing, which means they'll be doing it faster which will (probably) cause you joy in turn.
-8. Push your changes to your master (or whatever you named your feature branch, that is entirely up to you at the end of the day)
-9.  Initiate a pull request from your fork to the base repository
+9. Push your changes to your master (or whatever you named your feature branch, that is entirely up to you at the end of the day)
+10. Initiate a pull request from your fork to the base repository
    1. Remember: Opening a pull request is like saying "Hey maintainers, I have this change finalized and ready for you to spend time on reviewing it." The word `finalized` here is understood to imply that you are not planning on doing any more changes on the branch apart from when being asked to by the reviewers.
    2. It is perfectly acceptable to open a pull request and mark it as `draft` (a GitHub feature) which then signals to the maintainers that if they have time, they are welcome to look at the change, but it may or may not be in its final form yet so you are not responsible for potential loss of time on their end if the review has to be performed multiple times on account of changes. Once you promote your draft PR to a real one, the comments from the point above apply however.
    3. If your pull request contains a significant change, we recommend that you apply the similarly named github label on in it as well. It is okay if you do not do this, if we detect that the change is indeed significant, we will apply the label. If you do it in advance however, it will probably speed up the proceedings by removing one communication roundtrip from the review process of your pull request.
-10. Await CI, DCO & linting quality checks, as well as any feedback from reviewers
-11. If you need to update your pull request either because you discovered an issue or because you were asked to do so we ask that you:
+11. Await CI, DCO & linting quality checks, as well as any feedback from reviewers
+12. If you need to update your pull request either because you discovered an issue or because you were asked to do so we ask that you:
    4.  try to add the change in a way that does not produce additional commits on the PR but instead do an `git commit --amend --signoff` on your local branch and then a force push to the remote branch of yours (the PR essentially). Again, if the change you are doing does not fit within any one of the existing commits of your PR, then it is justified to add a new commit and this is up to your discretion (maintainers may respectfully ask you to squash if they see otherwise)
    5.  The rule of thumb for any and all things in git/Cactus is to maintain a clean, tidy commit log/history that enables everyone to easily look up changes and find accurate answers to the basic questions of `Who? / What? / When / Why?`. If you have ever been in a situation when you tried to figure out the original point a bug was introduced (and tried to figure out why the offending change was made in the first place) and the git blame just lead you to a 10 megabyte large patch with the message 'merge xyz', then you know exactly what it is we are trying to avoid here. :-)
 
@@ -96,9 +97,52 @@ Ensure all the following conditions are met (on top of you agreeing with the cha
 
 To protect the Hyperledger Cactus source code, GitHub pull requests are accepted from forked repositories only. There are also quality standards identified and documented here that will be enhanced over time.
 
+### Create local branch
 
+> Whenever you begin work on a new feature or bugfix, it's important that you create a new branch. 
 
+1. Clone your fork to your local machine
+2. Setup your local fork to keep up-to-date (optional)
+   ```
+   # Add 'upstream' repo to list of remotes
+   git remote add upstream https://github.com/hyperledger/cactus.git
 
+   # Verify the new remote named 'upstream'
+   git remote -v
+
+   # Checkout your master branch and rebase to upstream. 
+   # Run those commands whenever you want to synchronize with master branch
+   git fetch upstream
+   git checkout master
+   git rebase upstream/master
+   ```
+3. Create your branch.
+   ```
+   # Checkout the master branch - you want your new branch to come from master
+   git checkout master
+
+   # Create a new branch named `<newfeature>` (give simple informative name)
+   git branch <newfeature>
+   ```
+4. Checkout your branch and add/modify files.
+   ```
+   git checkout <newfeature>
+   git rebase master
+   # Happy coding !
+   ```
+5. Commit changes to your branch.
+   ```
+   # Commit and push your changes to your fork
+   git add -A
+   git commit -s -m "<type>[optional scope]: <description>"
+   git push origin <newfeature>
+   ```
+6. Once you've committed and pushed all of your changes to GitHub, go to the page for your fork on GitHub, select your development branch, and click the pull request button.
+7. Repeat step 3 to 6 when you need to prepare posting new pull request.
+ 
+NOTE: Once you submitted pull request to Cactus repository, step 6 is not necessary when you made further changes with `git commit --amend` since your amends will be sent automatically.
+
+NOTE: You can refer original tutorial ['GitHub Standard Fork & Pull Request Workflow'](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
 
 ### Adding a new public npm dependency to one of the packages:
 
