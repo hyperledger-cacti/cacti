@@ -508,20 +508,20 @@ NOTE: we are still open to consider other choose on API design patterns, such as
 
 Open endpoints require no authentication
 
-* [Login](login.md) : `POST /v1/login`
+* [Login](login.md) : `POST /bl-api/v1/login`
 
 #### Restricted Endpoints
 
 Restricted endpoints requre a valid Token to be included in the headder of the request. A Token can be acquired by calling [Login]().
 
-* [Request Execution of Trade(instance of business logic)]() : `POST /v1/trades/`
-* [Show Current Status of Trade]() : `GET /v1/trades/(id)`
-* [Show Business Logics]() : `GET /v1/logics/`
+* [Request Execution of Trade(instance of business logic)]() : `POST /bl-api/v1/trades/`
+* [Show Current Status of Trade]() : `GET /bl-api/v1/trades/(id)`
+* [Show Business Logics]() : `GET /bl-api/v1/logics/`
 * [Show Specification of Business Logic]() : `GET /v1/logics/(id)`
-* [Register a Wallet]() : `POST /v1/wallets/`
-* [Show Wallet List]() : `GET /v1/wallets/`
-* [Update Existing Wallets]() : `PUT /v1/wallets/(id)`
-* [Delete a Wallet]() : `DELETE /v1/walllets/(id)`
+* [Register a Wallet]() : `POST /bl-api/v1/wallets/`
+* [Show Wallet List]() : `GET /bl-api/v1/wallets/`
+* [Update Existing Wallets]() : `PUT /bl-api/v1/wallets/(id)`
+* [Delete a Wallet]() : `DELETE /bl-api/v1/walllets/(id)`
 
 NOTE: resource `trade` and `logic` are cannot be updated nor delete
 
