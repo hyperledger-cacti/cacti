@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Inject } from "@angular/core";
 
 import { Platform } from "@ionic/angular";
 import { SplashScreen } from "@ionic-native/splash-screen/ngx";
@@ -7,6 +7,7 @@ import { StatusBar } from "@ionic-native/status-bar/ngx";
 import { LoggerProvider, Logger } from "@hyperledger/cactus-common";
 import { DefaultApi as DefaultApiConsortium } from "@hyperledger/cactus-plugin-web-service-consortium";
 import { ApiClient, Configuration } from "@hyperledger/cactus-sdk";
+import { CACTUS_API_URL } from "src/constants";
 
 @Component({
   selector: "app-root",
@@ -54,7 +55,8 @@ export class AppComponent implements OnInit {
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
-    private statusBar: StatusBar
+    private statusBar: StatusBar,
+    @Inject(CACTUS_API_URL) public readonly cactusApiUrl: string
   ) {
     this.logger = LoggerProvider.getOrCreate({
       label: "app-component",
@@ -83,16 +85,21 @@ export class AppComponent implements OnInit {
   }
 
   async testApi(): Promise<void> {
-    const CACTUS_API_HOST = "http://localhost:4000";
-    const configuration = new Configuration({ basePath: CACTUS_API_HOST });
+    const configuration = new Configuration({ basePath: this.cactusApiUrl });
     const apiClient = new ApiClient(configuration).extendWith(
       DefaultApiConsortium
     );
+    const randomness = Math.random().toString(16);
     const dummyConsortium = {
-      configurationEndpoint: "some-host",
-      id: "some-id",
-      name: "some-name",
-      cactusNodes: [{ host: "some-host", publicKey: "some-fake-public-key" }],
+      configurationEndpoint: "some-host" + randomness,
+      id: "some-id" + randomness,
+      name: "some-name" + randomness,
+      cactusNodes: [
+        {
+          host: "some-host" + randomness,
+          publicKey: "some-fake-public-key" + randomness,
+        },
+      ],
     };
     const createConsortiumResponse = await apiClient.apiV1PluginsHyperledgerCactusPluginWebServiceConsortiumConsortiumPost(
       dummyConsortium
