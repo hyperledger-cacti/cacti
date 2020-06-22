@@ -70,6 +70,9 @@ Photo by Pontus Wellgraf on Unsplash
 - [4. Architecture](#4-architecture)
   - [4.1 Integration patterns](#41-integration-patterns)
   - [4.2 System architecture and basic flow](#42-system-architecture-and-basic-flow)
+    - [4.2.1 Definition of key components in system architecture](#421-definition-of-key-components-in-system-architecture)
+    - [4.2.2 Bootstrapping Cactus application](#422-bootstrapping-cactus-application)
+    - [4.2.3 Processing Service API call](#423-processing-service-api-call)
   - [4.3 Technical Architecture](#43-technical-architecture)
     - [4.3.1 Monorepo Packages](#431-monorepo-packages)
       - [4.2.1.1 cmd-api-server](#4211-cmd-api-server)
@@ -451,8 +454,10 @@ The overall architecture is as the following figure.
 
 <img src="./architecture-with-plugin-and-routing.png" width="700">
 
-Each entity is as follows:
-- **Application user**: The entity submits API calls to "Cactus Routing Interface".
+### 4.2.1 Definition of key components in system architecture
+
+Key components are defined as follows:
+- **Application user**: The entity submits API calls to "Cactus Routing Interface". Note: this component is exist outside of Cactus service system.
 - **Business Logic Plugin**: The entity executes business logic and provide integration services that are connected with multiple blockchains. The entity is composed by web application or smart contract on a blockchain. The entity is a single plugin and required for executing Hyperledger Cactus applications.
 - **Ledger Plugin**: The entity communicates Business Logic Plugin with each ledger.  The entity is composed by a validator and a verifier as follows. The entity(s) is(are) chosen from multiple plugins on configuration.
 - **Validator**: The entity monitors transaction records of Ledger operation, and it determines the result(success, failed, timeouted) from the transaction records.
@@ -461,7 +466,15 @@ Validator ensure the determined result with attaching digital signature with "Va
 - **Cactus Routing Interface**: The entity is a routing service between "Business Logic Plugin" and  "Ledger Plugin(s)". The entity is also a routing service between Business Logic Plugin and API calls from "Application user(s)".
 - **Ledger-n**: DLT platforms(e.g. Ethereum, Quorum, Hyperledger Fabric, ...)
 
-The execution steps are described as follows:
+### 4.2.2 Bootstrapping Cactus application
+
+Key components defined in 4.2.1 becomes ready to serve Cactus application service after  following procedures:
+1. Start `Validator`: The `Validator` of `Ledger Plugin` which is chosen for each `Ledger` depending the platform technology used (ex. Fabric, Besu, etc.) will be started by the administrator of `Validator`. `Validator` becomes ready status to accept connection from `Verifier` after initialization process is done.
+2. Start `Business Logic Plugin` implementation: The administrator of Cactus application service starts `Business Logic Plugin` which is implemented to execute business logic(s). `Business Logic Plugin` implementation first checks availability of depended `Ledger Plugin(s)`, then it trys to enable each `Ledger Plugin` with customized profile for actual integrating `Ledger`. This availability checks also covers determination on the status of connectivity from `Verifier` to `Validator`. The availability of each `Ledger` is registered and maintained at `Cactus Routing Interface`, and it allows bi-directional message communication between `Business Logic Plugin` and `Ledger`. 
+
+### 4.2.3 Processing Service API call
+
+ `Service API call` is processed as follows: 
 - **Step 1**: "Application user(s)" submits an API call to "Cactus routing interface".
 - **Step 2**: The API call is internally routed to "Business Logic Plugin" by "Cactus Routing Interface" for initiating associated business logic.
 Then, "Business Logic Plugin" determines required ledger operation(s) to complete or abort a business logic.
