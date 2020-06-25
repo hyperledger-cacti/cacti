@@ -1,0 +1,97 @@
+  
+@startuml
+title The communication protocol between Business Logic Plugin and Ledger Plugin
+
+box "Routing Interface" #LightGray
+entity "Routing Interface" as rif
+end box
+
+box "Business Logic Plugin" #Aquamarine
+entity "Business Logic Plugin" as blp
+end box
+box "Ledger Plugin" #Lavender
+entity "Verifier" as verifier
+entity "Validator" as validator
+end box
+database "ledger" as ledger
+
+== Initialize connecting with a ledger ==
+rif -> rif: enumerate deployed Ledger Plugins
+activate rif
+rif -> verifier: initialization
+activate verifier
+verifier -> validator: open socket.io connection
+activate validator
+validator -> validator: check identity of verifier
+validator -> ledger: setup parameters to call a ledger node
+activate ledger
+ledger --> validator: calling successed
+deactivate ledger
+validator --> verifier: connection established
+deactivate validator
+verifier --> rif: initialization finished
+deactivate verifier
+deactivate rif
+
+== Send a ledger operation request ==
+
+blp -> blp: event triggered
+activate blp
+blp -> blp: load scenario to determine next operation
+blp -> blp: load message template to create a ledger operation request
+blp -> blp: create a ledger operation request
+blp -> rif: send a ledger operation request
+activate rif
+rif -> verifier: forward ledger operation request
+activate verifier
+verifier -> validator: send a message over socket.io
+activate validator
+verifier --> rif: return OK
+deactivate verifier
+rif --> blp: return OK
+deactivate rif
+deactivate blp
+validator -> ledger: submit transaction
+activate ledger
+ledger --> validator: return OK
+deactivate ledger
+deactivate validator
+
+== Send a event notification ==
+
+ledger -> ledger: new block data is generated
+activate ledger
+ledger -> validator: notify block data
+activate validator
+validator --> ledger: return OK
+deactivate ledger
+validator -> validator: disasmble into transactions and validate each
+validator -> validator: add signature on valid transaction
+validator -> validator: re-assmble transaction into an event message
+validator -> verifier: send an event message
+deactivate validator
+activate verifier
+verifier -> verifier: verify signature on an event message
+verifier -> rif: forward an event message
+activate rif
+rif -> blp: forward an event message
+activate blp
+blp -> blp: update status of the trade
+blp --> rif: return OK
+deactivate blp
+rif --> verifier: return OK
+deactivate verifier
+deactivate rif
+
+== shutdown a connection ==
+rif -> rif: shutdown operation is invoked
+activate rif
+rif -> rif: enumerate active ledgers
+rif -> verifier: request shutwon
+activate verifier
+verifier -> verifier: close socket.io connection
+verifier --> rif: return OK
+deactivate verifier
+deactivate rif
+
+@enduml

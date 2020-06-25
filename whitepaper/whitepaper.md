@@ -73,33 +73,39 @@ Photo by Pontus Wellgraf on Unsplash
     - [4.2.1 Definition of key components in system architecture](#421-definition-of-key-components-in-system-architecture)
     - [4.2.2 Bootstrapping Cactus application](#422-bootstrapping-cactus-application)
     - [4.2.3 Processing Service API call](#423-processing-service-api-call)
-  - [4.3 Technical Architecture](#43-technical-architecture)
-    - [4.3.1 Monorepo Packages](#431-monorepo-packages)
-      - [4.2.1.1 cmd-api-server](#4211-cmd-api-server)
-        - [4.3.1.1.1 Runtime Configuration Parsing and Validation](#43111-runtime-configuration-parsing-and-validation)
-        - [4.2.1.1.2 Configuration Schema - API Server](#42112-configuration-schema---api-server)
-        - [4.3.1.1.4 Plugin Loading/Validation](#43114-plugin-loadingvalidation)
-      - [4.2.1.2 core-api](#4212-core-api)
-      - [4.2.1.4 sdk](#4214-sdk)
-      - [4.2.1.5 keychain](#4215-keychain)
-      - [4.3.1.7 tracing](#4317-tracing)
-      - [4.3.1.8 audit](#4318-audit)
-      - [4.3.1.9 document-storage](#4319-document-storage)
-      - [4.3.1.10 relational-storage](#43110-relational-storage)
-      - [4.3.1.11 immutable-storage](#43111-immutable-storage)
-    - [4.3.2 Deployment Diagram](#432-deployment-diagram)
-    - [4.3.3 Component Diagram](#433-component-diagram)
-    - [4.3.4 Class Diagram](#434-class-diagram)
-    - [4.3.5 Sequence Diagram - Transactions](#435-sequence-diagram---transactions)
-  - [4.4 Transaction Protocol Specification](#44-transaction-protocol-specification)
-    - [4.4.1 Handshake Mechanism](#441-handshake-mechanism)
-    - [4.4.2 Transaction Protocol Negotiation](#442-transaction-protocol-negotiation)
-  - [4.5 Plugin Architecture](#45-plugin-architecture)
-    - [4.5.1 Ledger Connector Plugins](#451-ledger-connector-plugins)
-    - [4.5.2 Identity Federation Plugins](#452-identity-federation-plugins)
-      - [4.5.1.1 X.509 Certificate Plugin](#4511-x509-certificate-plugin)
-    - [4.5.3 Key/Value Storage Plugins](#453-keyvalue-storage-plugins)
-    - [4.5.4 Serverside Keychain Plugins](#454-serverside-keychain-plugins)
+  - [4.3 APIs and communication protocols between Cactus components](#43-apis-and-communication-protocols-between-cactus-components)
+    - [4.3.1 Cactus Service API](#431-cactus-service-api)
+      - [Open Endpoints](#open-endpoints)
+      - [Restricted Endpoints](#restricted-endpoints)
+    - [4.3.2 Ledger plugin API](#432-ledger-plugin-api)
+    - [4.3.3 Exection of "business logic" at "Business Logic Plugin"](#433-exection-of-business-logic-at-business-logic-plugin)
+  - [4.4 Technical Architecture](#44-technical-architecture)
+    - [4.4.1 Monorepo Packages](#441-monorepo-packages)
+      - [4.4.1.1 cmd-api-server](#4411-cmd-api-server)
+        - [4.4.1.1.1 Runtime Configuration Parsing and Validation](#44111-runtime-configuration-parsing-and-validation)
+        - [4.4.1.1.2 Configuration Schema - API Server](#44112-configuration-schema---api-server)
+        - [4.4.1.1.3 Plugin Loading/Validation](#44113-plugin-loadingvalidation)
+      - [4.4.1.2 core-api](#4412-core-api)
+      - [4.4.1.3 sdk](#4413-sdk)
+      - [4.4.1.4 keychain](#4414-keychain)
+      - [4.4.1.5 tracing](#4415-tracing)
+      - [4.4.1.6 audit](#4416-audit)
+      - [4.4.1.7 document-storage](#4417-document-storage)
+      - [4.4.1.8 relational-storage](#4418-relational-storage)
+      - [4.4.1.9 immutable-storage](#4419-immutable-storage)
+    - [4.4.2 Deployment Diagram](#442-deployment-diagram)
+    - [4.4.3 Component Diagram](#443-component-diagram)
+    - [4.4.4 Class Diagram](#444-class-diagram)
+    - [4.4.5 Sequence Diagram - Transactions](#445-sequence-diagram---transactions)
+  - [4.5 Transaction Protocol Specification](#45-transaction-protocol-specification)
+    - [4.5.1 Handshake Mechanism](#451-handshake-mechanism)
+    - [4.5.2 Transaction Protocol Negotiation](#452-transaction-protocol-negotiation)
+  - [4.6 Plugin Architecture](#46-plugin-architecture)
+    - [4.6.1 Ledger Connector Plugins](#461-ledger-connector-plugins)
+    - [4.6.2 Identity Federation Plugins](#462-identity-federation-plugins)
+      - [4.6.2.1 X.509 Certificate Plugin](#4621-x509-certificate-plugin)
+    - [4.6.3 Key/Value Storage Plugins](#463-keyvalue-storage-plugins)
+    - [4.6.4 Serverside Keychain Plugins](#464-serverside-keychain-plugins)
 - [5. Identities, Authentication, Authorization](#5-identities-authentication-authorization)
   - [5.1 Definition of Identities in Cactus](#51-definition-of-identities-in-cactus)
   - [5.2 Transaction Signing Modes, Key Ownership](#52-transaction-signing-modes-key-ownership)
@@ -470,11 +476,11 @@ Validator ensure the determined result with attaching digital signature with "Va
 
 Key components defined in 4.2.1 becomes ready to serve Cactus application service after  following procedures:
 1. Start `Validator`: The `Validator` of `Ledger Plugin` which is chosen for each `Ledger` depending the platform technology used (ex. Fabric, Besu, etc.) will be started by the administrator of `Validator`. `Validator` becomes ready status to accept connection from `Verifier` after initialization process is done.
-2. Start `Business Logic Plugin` implementation: The administrator of Cactus application service starts `Business Logic Plugin` which is implemented to execute business logic(s). `Business Logic Plugin` implementation first checks availability of depended `Ledger Plugin(s)`, then it trys to enable each `Ledger Plugin` with customized profile for actual integrating `Ledger`. This availability checks also covers determination on the status of connectivity from `Verifier` to `Validator`. The availability of each `Ledger` is registered and maintained at `Cactus Routing Interface`, and it allows bi-directional message communication between `Business Logic Plugin` and `Ledger`. 
+2. Start `Business Logic Plugin` implementation: The administrator of Cactus application service starts `Business Logic Plugin` which is implemented to execute business logic(s). `Business Logic Plugin` implementation first checks availability of depended `Ledger Plugin(s)`, then it trys to enable each `Ledger Plugin` with customized profile for actual integrating `Ledger`. This availability checks also covers determination on the status of connectivity from `Verifier` to `Validator`. The availability of each `Ledger` is registered and maintained at `Cactus Routing Interface`, and it allows bi-directional message communication between `Business Logic Plugin` and `Ledger`.
 
 ### 4.2.3 Processing Service API call
 
- `Service API call` is processed as follows: 
+ `Service API call` is processed as follows:
 - **Step 1**: "Application user(s)" submits an API call to "Cactus routing interface".
 - **Step 2**: The API call is internally routed to "Business Logic Plugin" by "Cactus Routing Interface" for initiating associated business logic.
 Then, "Business Logic Plugin" determines required ledger operation(s) to complete or abort a business logic.
@@ -484,9 +490,82 @@ Then, "Business Logic Plugin" determines required ledger operation(s) to complet
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.3 Technical Architecture
+## 4.3 APIs and communication protocols between Cactus components
 
-### 4.3.1 Monorepo Packages
+API for Service Application, communication protocol for business logic plugin to interact with "Ledger Plugins" will be described in this section.
+
+### 4.3.1 Cactus Service API
+
+Cactus Service API is exposed to Application user(s). This API is used to request for initializing a business logic which is implemented at **Business Logic Plugin**. It is also used for making inquery of execution status and final result if the business logic is completed.
+
+Following RESTful API design manner, the request can be mapped to one of CRUD operation with associated resource 'trade'.
+
+The identity of User Application is authenticated and is applied for access control rule(s) check which is implemented as part of **Business Logic Plugin**.
+
+NOTE: we are still open to consider other choose on API design patterns, such as gRPC or GraphQL.
+
+#### Open Endpoints
+
+Open endpoints require no authentication
+
+* [Login](login.md) : `POST /api/v1/bl/login`
+
+#### Restricted Endpoints
+
+Restricted endpoints requre a valid Token to be included in the headder of the request. A Token can be acquired by calling [Login]().
+
+* [Request Execution of Trade(instance of business logic)]() : `POST /api/v1/bl/trades/`
+* [Show Current Status of Trade]() : `GET /api/v1/bl/trades/(id)`
+* [Show Business Logics]() : `GET /api/v1/bl/logics/`
+* [Show Specification of Business Logic]() : `GET /api/v1/bl/logics/(id)`
+* [Register a Wallet]() : `POST /api/v1/bl/wallets/`
+* [Show Wallet List]() : `GET /api/v1/bl/wallets/`
+* [Update Existing Wallets]() : `PUT /api/v1/bl/wallets/(id)`
+* [Delete a Wallet]() : `DELETE /api/v1/bl/walllets/(id)`
+
+NOTE: resource `trade` and `logic` are cannot be updated nor delete
+
+### 4.3.2 Ledger plugin API
+
+Ledger plugin API is designed for allowing **Business Logic Plugin** to operate and/or monitor Ledger behind **Validator** component.
+
+Each **Ledger plugin** can be implemented to provide common API which absorbs difference between integrating blockchain platforms.
+The developper can focus on implementing business logic of **Business Logic Plugin** in applicatio level once **Ledger plugin** for specific platform, ex. HLF or Besu, was implemented.
+
+APIs of Verifier and Validator are described as the following table:
+
+
+| No. | Component | API Name | Description |
+| --- | --- | --- | --- |
+| 1. | BLP -> Verifier | requestLedgerOperation | Request a verifier to execute a ledger operation |
+| 2. | BLP -> Verifier | getApiList | Get the list of available APIs on Verifier |
+| 3. | BLP -> Verifier | startMonitor | Request a verifier to start monitoring ledger |
+| 4. | BLP -> Verifier | stopMonitor | Rrequest a verifier to stop monitoring ledger |
+| 5. | Validator -> Verifier | getVerifierInformation | Get the verifier information including version, name, ID, and other information |
+| 6. | Verifier -> Validator | getValidatorInformation | Get the validator information including version, name, ID, and other information |
+| 7. | Verifier -> Validator | connect | request a validator to start a bi-directional communication channel |
+| 8. | Verifier -> Validator | disconnect | request a validator to stop a bi-directional communication channel |
+
+NOTE: On the above API table, the detail information will be described later (e.g. input/output parameters).
+
+
+### 4.3.3 Exection of "business logic" at "Business Logic Plugin"
+
+The developper of **Business Logic Plugin** can implement business logic(s) as codes to interact with **Ledger Plugin**.
+The interaction between **Business Logic Plugin** and **Ledger Plugin** includes:
+- Submit a transaction request on targeted **Ledger Plugin**
+- Make a inquery to targeted **Ledger Plugin** (ex. account balance inquery)
+- Receive an event message, which contains transaction/inquery result(s) or error from **Ledger Plugin**
+
+NOTE: The transaction request is prepared by **Business Logic Plugin** using transaction template with given parameters
+
+The communication protocol between Business Logic Plugin, Verifier, and Validator as following:
+
+<img src="./communication-protocol-between-blp-and-lp.png" width="700">
+
+## 4.4 Technical Architecture
+
+### 4.4.1 Monorepo Packages
 
 Hyperledger Cactus is divided into a set of npm packages that can be compiled separately or all at once.
 
@@ -497,7 +576,7 @@ Naming conventions for packages:
 * sdk-* for packages designed to be used directly by application developers except for the Javacript SDK which is named just `sdk` for simplicity.
 * All other packages should be named preferably as a single English word suggesting the most important feature/responsibility of the package itself.
 
-#### 4.2.1.1 cmd-api-server
+#### 4.4.1.1 cmd-api-server
 
 A command line application for running the API server that provides a unified REST based HTTP API for calling code.
 Contains the kernel of Hyperledger Cactus.
@@ -508,7 +587,7 @@ Comes with Swagger API definitions, plugin loading built-in.
 
 **The main responsibilities of this package are:**
 
-##### 4.3.1.1.1 Runtime Configuration Parsing and Validation
+##### 4.4.1.1.1 Runtime Configuration Parsing and Validation
 
 The core package is responsible for parsing runtime configuration from the usual sources (shown in order of precedence):
 * Explicit instructions via code (`config.setHttpPort(3000);`)
@@ -518,7 +597,7 @@ The core package is responsible for parsing runtime configuration from the usual
 
 The Apache 2.0 licensed node-convict library to be leveraged for the mechanical parts of the configuration parsing and validation: https://github.com/mozilla/node-convict
 
-##### 4.2.1.1.2 Configuration Schema - API Server
+##### 4.4.1.1.2 Configuration Schema - API Server
 
 To obtain the latest configuration options you can check out the latest source code of Cactus and then run this from the root folder of the project on a machine that has at least NodeJS 10 or newer installed:
 
@@ -608,40 +687,36 @@ Configuration Parameters
 
 ```
 
-##### 4.3.1.1.4 Plugin Loading/Validation
+##### 4.4.1.1.3 Plugin Loading/Validation
 
 Plugin loading happens through NodeJS's built-in module loader and the validation is performed by the Node Package Manager tool (npm) which verifies the byte level integrity of all installed modules.
 
-#### 4.2.1.2 core-api
+#### 4.4.1.2 core-api
 
 Contains interface definitions for the plugin architecture and other system level components that are to be shared among many other packages.
 `core-api` is intended to be a leaf package meaning that it shouldn't depend on other packages in order to make it safe for any and all packages to depend on `core-api` without having to deal with circular dependency issues.
 
-#### 4.2.1.4 sdk
+#### 4.4.1.3 sdk
 
 Javascript SDK (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
 Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
 
-
-#### 4.2.1.5 keychain
+#### 4.4.1.4 keychain
 
 Responsible for persistently storing highly sensitive data (e.g. private keys) in an encrypted format.
 
 For further details on the API surface, see the relevant section under `Plugin Architecture`.
 
-
-#### 4.3.1.7 tracing
+#### 4.4.1.5 tracing
 
 Contains components for tracing, logging and application performance management (APM) of code written for the rest of the Hyperledger Cactus packages.
 
-
-#### 4.3.1.8 audit
+#### 4.4.1.6 audit
 
 Components useful for writing and reading audit records that must be archived longer term and immutable.
 The latter properties are what differentiates audit logs from tracing/logging messages which are designed to be ephemeral and to support technical issues not regulatory/compliance/governance related issues.
 
-
-#### 4.3.1.9 document-storage
+#### 4.4.1.7 document-storage
 
 Provides structured or unstructured document storage and analytics capabilities for other packages such as `audit` and `tracing`.
 Comes with its own API surface that serves as an adapter for different storage backends via plugins.
@@ -651,43 +726,43 @@ By default, `Open Distro for ElasticSearch` is used as the storage backend: http
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
 
-#### 4.3.1.10 relational-storage
+#### 4.4.1.8 relational-storage
 
 Contains components responsible for providing access to standard SQL compliant persistent storage.
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
 
-#### 4.3.1.11 immutable-storage
+#### 4.4.1.9 immutable-storage
 
 Contains components responsible for providing access to immutable storage such as a distributed ledger with append-only semantics such as a blockchain network (e.g. Hyperledger Fabric).
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
 
-### 4.3.2 Deployment Diagram
+### 4.4.2 Deployment Diagram
 
 Source file: `./docs/architecture/deployment-diagram.puml`
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLNHRjem57tFLzpnqasYJF3SeYQ43ZGAQ6LxgXGvpWKi73jo73eqzTzt7GA4aj4X8N1yphat9ySt3xbbnXQfX10pgNSfAWkXO2l3KXXD81W_UfxtIIWkYmJXBcKMZM3oAzTfgbNVku651f5csbYmQuGyCy8YB8L4sEa2mjdqPW4ACG6h8PEC8p3832x5xq-DmYXbjjOA-qsxacLMPn5V6vrYhFMc4PKmosAMauHdXQLEBc_kHOrs6Hg9oGeD15Bp3LypeM2iB1B02gtWaO3ugis6F5Yw_ywFg2R6SeZ5Ce4_dWTWa5kcLbIkzMorOIk4kT5RaQ1fEMIUTGa8z7doez1V-87_FFpypR1T6xhjKYXkdrJQq0eOtmYrWf3k1vmcjhvK4c-U-vvN_SMae5lN1gQQ_1Z88hTLxQtY5R4HFz4iWO19flY18EDZfN_pkftEjDAlq6V0WLQALjgyA0Wd2-XMs2YHjXln8-NjOsglHkrTK9lSyETZU4QpfSTRTu9b8c_meeQ-DCDnp3L7QkoZ9NkIEdjUnEHI5mcqvaKi1I_JPXJQaa6_X7uxPAqrJYXZmWhCosrnN9QQjV8BmrJEk7LPgKWxy4kI5QpgW3atOQYIw6UE9lBTBXRi4CZ1S3APZsRJMYAFH_4ybKyw5kMPsWf-FP2DVGLLNt5pNy6-h_ZGryIVBsRpQ33wCNiQ1hFPzrD_-s5mtbo8-SPDYC3eLv9xrzx9sr3areYui3IO9kKGs9jCyRfgxod6reNuse6c_IJklclleYof_Q-5ftFWQlS-hDtxi7RlqX_FZQcxJgVJtnyLpusEvZKX2UzIUtT_Vz-l1RHsqHbQMxefvtcKExYzxPyIHbVYyih-cPBi0wg4taj_0G00">
 
-### 4.3.3 Component Diagram
+### 4.4.3 Component Diagram
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLN1Rjim3BthAmXVrWQhiVGO546pPaK7x32i1NOPCCWownYH9LTKbdX9_tsKx2JsihRBIT9xV7mYAUUQl7H-LMaXVEarmesjQclGU9YNid2o-c7kcXgTnhn01n-rLKkraAM1pyOZ4tnf3Tmo4TVMBONWqD8taDnOGsXeHJDTM5VwHPM0951I5x0L02Cm73C1ZniVjzv9Gr85lTlIICqg4yYirIYDU1P2PiGKvI6PVtc8MhdsFQcue5LTM-SnFqrF4vWv9vkhKsZQnbPS2WPZbWFxld_Q4jTIQpmoliTj2sMXFWSaLciQpE-hmjP_ph7MjgduQ7-BlBl6Yg9nDNGtWLF7VSqsVzHQTq8opnqITTNjSGUtYI6aNeefkS7kKIg4v1CfPzTVdVrLvkXY7DOSDsJTU-jaWGCQdT8OzrPPVITDJWkvn6_uj49gxVZDWXm-HKzIAQozp3GEyn_gEpoUlfs7wb39NYAAYGWrAXwQeTu4XliWhxGaWkJXEAkTM7lB3evzZq2S1yO2ACAysekBsF49N5t9ed1OI8_JQOS-CxpRnaSYte6n7eE86VC6O0OyFOoP_PJ36Ao3oZfc7QOyRRdcU1H3CZo-3SWQaAQ9HBEgCdxNzX7EVgEpu2rKZ9s7N54BJHwDyFACBRwFviuXJOCj4OVtUSUN-jlpvT5pR-B3YFFiRBXskc7_1vClsmwFudyTzpAzPVwoCpzYxwH2ErJuz54PcieDEO3hLx3OtbTmgaz1qSv4CavWjqjJk-LbceuI7YB-26_ONBf_1SCjXMto8KqvahN3YgEm5litq-cC_W7oK8uX_aBM0K5SSvNu7-0F">
 
-### 4.3.4 Class Diagram
+### 4.4.4 Class Diagram
 
-### 4.3.5 Sequence Diagram - Transactions
+### 4.4.5 Sequence Diagram - Transactions
 
 TBD
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.4 Transaction Protocol Specification
+## 4.5 Transaction Protocol Specification
 
-### 4.4.1 Handshake Mechanism
+### 4.5.1 Handshake Mechanism
 
 TBD
 
-### 4.4.2 Transaction Protocol Negotiation
+### 4.5.2 Transaction Protocol Negotiation
 
 Participants in the transaction must have a handshake mechanism where they agree on one of the supported protocols to use to execute the transaction. The algorithm looks an intersection in the list of supported algorithms by the participants.
 
@@ -699,7 +774,7 @@ Means for establishing bi-directional communication channels through proxies/fir
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 4.5 Plugin Architecture
+## 4.6 Plugin Architecture
 
 Since our goal is integration, it is critical that `Cactus` has the flexibility of supporting most ledgers, even those that don't exist today.
 
@@ -721,7 +796,7 @@ An overarching theme for all aspects that are covered by the plugin architecture
 
 ---
 
-### 4.5.1 Ledger Connector Plugins
+### 4.6.1 Ledger Connector Plugins
 
 Success is defined as:
 1. Adding support in `Cactus` for a ledger invented in the future requires no `core` code changes, but instead can be implemented by simply adding a corresponding connector plugin to deal with said newly invented ledger.
@@ -756,7 +831,7 @@ export enum PermissionScheme {
 
 ```
 
-### 4.5.2 Identity Federation Plugins
+### 4.6.2 Identity Federation Plugins
 
 Identity federation plugins operate inside the API Server and need to implement the interface of a common PassportJS Strategy:
 https://github.com/jaredhanson/passport-strategy#implement-authentication
@@ -773,14 +848,14 @@ abstract class IdentityFederationPlugin {
 }
 ```
 
-#### 4.5.1.1 X.509 Certificate Plugin
+#### 4.6.2.1 X.509 Certificate Plugin
 
 The X.509 Certificate plugin facilitates clients authentication by allowing them to present a certificate instead of operating with authentication tokens.
 This technically allows calling clients to assume the identities of the validator nodes through the REST API without having to have access to the signing private key of said validator node.
 
 PassportJS already has plugins written for client certificate validation, but we go one step further with this plugin by providing the option to obtain CA certificates from the validator nodes themselves at runtime.
 
-### 4.5.3 Key/Value Storage Plugins
+### 4.6.3 Key/Value Storage Plugins
 
 Key/Value Storage plugins allow the higher-level packages to store and retrieve configuration metadata for a `Cactus` cluster such as:
 * Who are the active validators and what are the hosts where said validators are accessible over a network?
@@ -795,7 +870,7 @@ interface KeyValueStoragePlugin {
 }
 ```
 
-### 4.5.4 Serverside Keychain Plugins
+### 4.6.4 Serverside Keychain Plugins
 
 The API surface of keychain plugins is roughly the equivalent of the key/value *Storage* plugins, but under the hood these are of course guaranteed to encrypt the stored data at rest by way of leveraging storage backends purpose built for storing and managing secrets.
 
@@ -837,14 +912,14 @@ An end user (through a user interface) can issue API requests to
 Various identities are used at Cactus Service API.
 
 **Cactus user ID**
-* ID for user (behind web service application) to execute a Service API call. 
+* ID for user (behind web service application) to execute a Service API call.
 * Service provider assign the role(s) and access right(s) of user in integrated service as part of `Business Logic Plugin`.
-* The user can add Wallet(s) which is associated with account address and/or key. 
+* The user can add Wallet(s) which is associated with account address and/or key.
 
 **Wallet ID**
 * ID for the user identity which is associated with authentication credential at integrated `Ledger`.
 * It is recommended to store temporary credential here allowing minimal access to operate `Ledger` instead of giving full access with master secret.
-* Service API enables user to add/update/delete authentication credential for the Wallet. 
+* Service API enables user to add/update/delete authentication credential for the Wallet.
 
 **Ledger ID**
 * ID for `Ledger Plugin` which is used at Wallet
