@@ -1,4 +1,4 @@
-import Docker, { Container } from "dockerode";
+import Docker, { Container, ContainerInfo } from "dockerode";
 import isPortReachable from "is-port-reachable";
 import Joi from "joi";
 import { EventEmitter } from "events";
@@ -80,10 +80,13 @@ export class HttpEchoContainer implements ITestLedger {
         ["--port", this.httpPort.toString(10)],
         [],
         {
-          ExposedPorts: {},
-          Hostconfig: {
-            PortBindings: {},
+          ExposedPorts: {
+            [`${this.httpPort}/tcp`]: {},
           },
+          // This is a workaround needed for macOS which has issues with routing
+          // to docker container's IP addresses directly...
+          // https://stackoverflow.com/a/39217691
+          PublishAllPorts: true,
         },
         {},
         (err: any) => {
@@ -95,11 +98,12 @@ export class HttpEchoContainer implements ITestLedger {
 
       eventEmitter.once("start", async (container: Container) => {
         this.container = container;
-        const host: string = await this.getContainerIpAddress();
+        const host: string = "127.0.0.1";
+        const hostPort = await this.getPublicHttpPort();
         try {
           let reachable: boolean = false;
           do {
-            reachable = await isPortReachable(this.httpPort, { host });
+            reachable = await isPortReachable(hostPort, { host });
             await new Promise((resolve2) => setTimeout(resolve2, 100));
           } while (!reachable);
           resolve(container);
@@ -142,31 +146,59 @@ export class HttpEchoContainer implements ITestLedger {
     }
   }
 
-  public async getContainerIpAddress(): Promise<string> {
+  protected async getContainerInfo(): Promise<ContainerInfo> {
+    const fnTag = "HttpEchoContainer#getContainerInfo()";
     const docker = new Docker();
-    const imageName = this.getImageName();
-    const containerInfos: Docker.ContainerInfo[] = await docker.listContainers(
-      {}
-    );
+    const image = this.getImageName();
+    const containerInfos = await docker.listContainers({});
 
-    const aContainerInfo = containerInfos.find((ci) => ci.Image === imageName);
+    const aContainerInfo = containerInfos.find((ci) => ci.Image === image);
+
+    if (aContainerInfo) {
+      return aContainerInfo;
+    } else {
+      throw new Error(`${fnTag} no image found: "${image}"`);
+    }
+  }
+
+  public async getPublicHttpPort(): Promise<number> {
+    const fnTag = "HttpEchoContainer#getRpcApiPublicPort()";
+    const aContainerInfo = await this.getContainerInfo();
+    const { httpPort: thePort } = this;
+    const { Ports: ports } = aContainerInfo;
+
+    if (ports.length < 1) {
+      throw new Error(`${fnTag} no ports exposed or mapped at all`);
+    }
+    const mapping = ports.find((x) => x.PrivatePort === thePort);
+    if (mapping) {
+      if (!mapping.PublicPort) {
+        throw new Error(`${fnTag} port ${thePort} mapped but not public`);
+      } else if (mapping.IP !== "0.0.0.0") {
+        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+      } else {
+        return mapping.PublicPort;
+      }
+    } else {
+      throw new Error(`${fnTag} no mapping found for ${thePort}`);
+    }
+  }
+
+  public async getContainerIpAddress(): Promise<string> {
+    const fnTag = "HttpEchoContainer#getContainerIpAddress()";
+    const aContainerInfo = await this.getContainerInfo();
+
     if (aContainerInfo) {
       const { NetworkSettings } = aContainerInfo;
       const networkNames: string[] = Object.keys(NetworkSettings.Networks);
       if (networkNames.length < 1) {
-        throw new Error(
-          `HttpEchoContainer#getContainerIpAddress() no network found: ${JSON.stringify(
-            NetworkSettings
-          )}`
-        );
+        throw new Error(`${fnTag} container not on any networks`);
       } else {
         // return IP address of container on the first network that we found it connected to. Make this configurable?
         return NetworkSettings.Networks[networkNames[0]].IPAddress;
       }
     } else {
-      throw new Error(
-        `HttpEchoContainer#getContainerIpAddress() cannot find container image ${this.imageName}`
-      );
+      throw new Error(`${fnTag} cannot find container image ${this.imageName}`);
     }
   }
 
