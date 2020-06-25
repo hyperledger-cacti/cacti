@@ -1,4 +1,4 @@
-Hyperledger Cactus is managed under an open governance model as described in the Hyperledger charter. Cactus is led by a set of maintainers, who can be found in the MAINTAINERS.md file.   
+Hyperledger Cactus is managed under an open governance model as described in the Hyperledger charter. Cactus is led by a set of maintainers, who can be found in the MAINTAINERS.md file.
 
 **Maintainers**
 
@@ -6,13 +6,13 @@ Cactus is led by the project’s maintainers. The maintainers are responsible fo
 
 **Becoming a Maintainer**
 
-The project’s maintainers will, from time-to-time, consider adding or removing a maintainer. An existing maintainer can submit a change set to the MAINTAINERS.md file. A nominated contributor may become a maintainer by a three-quarters approval of the proposal by the existing maintainers. Once approved, the change set is then merged and the individual is added to (or alternatively, removed from) the maintainers group. 
+The project’s maintainers will, from time-to-time, consider adding or removing a maintainer. An existing maintainer can submit a change set to the MAINTAINERS.md file. A nominated contributor may become a maintainer by a three-quarters approval of the proposal by the existing maintainers. Once approved, the change set is then merged and the individual is added to (or alternatively, removed from) the maintainers group.
 
 Maintainers may be removed by explicit resignation, for prolonged inactivity (3 or more months), or for some infraction of the code of conduct or by consistently demonstrating poor judgement. A maintainer removed for inactivity should be restored following a sustained resumption of contributions and reviews (a month or more) demonstrating a renewed commitment to the project.  We require that maintainers that will be temporarily inactive do so “gracefully” and update other maintainers on their status and time availability rather than appearing to “fall off the face of the earth.”
 
 **Releases**
 
-A majority of the maintainers may decide to create a release of Cactus.  Any broader rules of Hyperledger pertaining to releases must be followed.  Once the project is mature, there will be a stable LTS (long term support) release branch, as well as the master branch for upcoming new features. 
+A majority of the maintainers may decide to create a release of Cactus.  Any broader rules of Hyperledger pertaining to releases must be followed.  Once the project is mature, there will be a stable LTS (long term support) release branch, as well as the master branch for upcoming new features.
 
 **Making Feature/Enhancement Proposals**
 
@@ -33,13 +33,23 @@ Maintainers designated for review are required to review PRs in a timely manner 
 
 The technical requirements for submitting/approving/merging pull requests are further detailed in the CONTRIBUTING.md file where it is laid out in detail how to ensure git commit graph tidiness.
 
+**Reviewing Pull Requests**
+
+We are strongly committed to processing pull requests from everyone in a fair manner meaning that pull requests are to be
+reviewed in order of submission.
+Reviewing PRs in order of submission does not guarantee nor necessitate accepting/merging said PRs in order of submission
+since some PRs may require lengthy feedback loops while others may pass the muster without any change requests or
+feedback at all, depending on the nature of the change being proposed.
+Security related pull requests may be fast tracked even against the "in order of submission" principle if it appears
+that a vulnerability makes a pull request a time sensitive issue where the sooner we propagate a fix the better it is.
+
 **Maintainers Meeting**
 
 The maintainers hold regular maintainers meetings, which are open to everyone. The purpose of the maintainers meeting is to plan for and review the progress of releases, and to discuss the technical and operational direction of the project.
 
 Please see the wiki for maintainer meeting details.
 
-One point to mention about meetings is that new feature/enhancement proposals as described above should be presented to a maintainers meeting for consideration, feedback, and acceptance.  
+One point to mention about meetings is that new feature/enhancement proposals as described above should be presented to a maintainers meeting for consideration, feedback, and acceptance.
 
 **Roadmap**
 
