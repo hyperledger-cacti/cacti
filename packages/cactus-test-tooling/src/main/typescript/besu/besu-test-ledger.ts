@@ -1,5 +1,5 @@
-import Docker, { Container } from "dockerode";
-import isPortReachable from "is-port-reachable";
+import Docker, { Container, ContainerInfo } from "dockerode";
+import axios from "axios";
 import Joi from "joi";
 import tar from "tar-stream";
 import { EventEmitter } from "events";
@@ -56,10 +56,9 @@ export class BesuTestLedger implements ITestLedger {
   }
 
   public getContainer(): Container {
+    const fnTag = "BesuTestLedger#getContainer()";
     if (!this.container) {
-      throw new Error(
-        `BesuTestLedger#getBesuKeyPair() container wasn't started by this instance yet.`
-      );
+      throw new Error(`${fnTag} container not yet started by this instance.`);
     } else {
       return this.container;
     }
@@ -70,8 +69,9 @@ export class BesuTestLedger implements ITestLedger {
   }
 
   public async getRpcApiHttpHost(): Promise<string> {
-    const ipAddress: string = await this.getContainerIpAddress();
-    return `http://${ipAddress}:${this.rpcApiHttpPort}`;
+    const ipAddress: string = "127.0.0.1";
+    const hostPort: number = await this.getRpcApiPublicPort();
+    return `http://${ipAddress}:${hostPort}`;
   }
 
   public async getFileContents(filePath: string): Promise<string> {
@@ -137,16 +137,10 @@ export class BesuTestLedger implements ITestLedger {
             "9001/tcp": {}, // supervisord - HTTP
             "9545/tcp": {}, // besu metrics
           },
-          Hostconfig: {
-            PortBindings: {
-              // [`${this.rpcApiHttpPort}/tcp`]: [{ HostPort: '8545', }],
-              // '8546/tcp': [{ HostPort: '8546', }],
-              // '8080/tcp': [{ HostPort: '8080', }],
-              // '8888/tcp': [{ HostPort: '8888', }],
-              // '9001/tcp': [{ HostPort: '9001', }],
-              // '9545/tcp': [{ HostPort: '9545', }],
-            },
-          },
+          // This is a workaround needed for macOS which has issues with routing
+          // to docker container's IP addresses directly...
+          // https://stackoverflow.com/a/39217691
+          PublishAllPorts: true,
         },
         {},
         (err: any) => {
@@ -158,15 +152,8 @@ export class BesuTestLedger implements ITestLedger {
 
       eventEmitter.once("start", async (container: Container) => {
         this.container = container;
-        // once the container has started, we wait until the the besu RPC API starts listening on the designated port
-        // which we determine by continously trying to establish a socket until it actually works
-        const host: string = await this.getContainerIpAddress();
         try {
-          let reachable: boolean = false;
-          do {
-            reachable = await isPortReachable(this.rpcApiHttpPort, { host });
-            await new Promise((resolve2) => setTimeout(resolve2, 100));
-          } while (!reachable);
+          await this.waitForHealthCheck();
           resolve(container);
         } catch (ex) {
           reject(ex);
@@ -175,7 +162,27 @@ export class BesuTestLedger implements ITestLedger {
     });
   }
 
+  public async waitForHealthCheck(timeoutMs: number = 120000): Promise<void> {
+    const fnTag = "BesuTestLedger#waitForHealthCheck()";
+    const httpUrl = await this.getRpcApiHttpHost();
+    const startedAt = Date.now();
+    let reachable: boolean = false;
+    do {
+      try {
+        const res = await axios.get(httpUrl);
+        reachable = res.status > 199 && res.status < 300;
+      } catch (ex) {
+        reachable = false;
+        if (Date.now() >= startedAt + timeoutMs) {
+          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
+        }
+      }
+      await new Promise((resolve2) => setTimeout(resolve2, 100));
+    } while (!reachable);
+  }
+
   public stop(): Promise<any> {
+    const fnTag = "BesuTestLedger#stop()";
     return new Promise((resolve, reject) => {
       if (this.container) {
         this.container.stop({}, (err: any, result: any) => {
@@ -186,54 +193,74 @@ export class BesuTestLedger implements ITestLedger {
           }
         });
       } else {
-        return reject(
-          new Error(
-            `BesuTestLedger#stop() Container was not running to begin with.`
-          )
-        );
+        return reject(new Error(`${fnTag} Container was not running.`));
       }
     });
   }
 
   public destroy(): Promise<any> {
+    const fnTag = "BesuTestLedger#destroy()";
     if (this.container) {
       return this.container.remove();
     } else {
-      return Promise.reject(
-        new Error(
-          `BesuTestLedger#destroy() Container was never created, nothing to destroy.`
-        )
-      );
+      const ex = new Error(`${fnTag} Container not found, nothing to destroy.`);
+      return Promise.reject(ex);
+    }
+  }
+
+  protected async getContainerInfo(): Promise<ContainerInfo> {
+    const docker = new Docker();
+    const image = this.getContainerImageName();
+    const containerInfos = await docker.listContainers({});
+
+    const aContainerInfo = containerInfos.find((ci) => ci.Image === image);
+
+    if (aContainerInfo) {
+      return aContainerInfo;
+    } else {
+      throw new Error(`BesuTestLedger#getContainerInfo() no image "${image}"`);
+    }
+  }
+
+  public async getRpcApiPublicPort(): Promise<number> {
+    const fnTag = "BesuTestLedger#getRpcApiPublicPort()";
+    const aContainerInfo = await this.getContainerInfo();
+    const { rpcApiHttpPort: thePort } = this;
+    const { Ports: ports } = aContainerInfo;
+
+    if (ports.length < 1) {
+      throw new Error(`${fnTag} no ports exposed or mapped at all`);
+    }
+    const mapping = ports.find((x) => x.PrivatePort === thePort);
+    if (mapping) {
+      if (!mapping.PublicPort) {
+        throw new Error(`${fnTag} port ${thePort} mapped but not public`);
+      } else if (mapping.IP !== "0.0.0.0") {
+        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+      } else {
+        return mapping.PublicPort;
+      }
+    } else {
+      throw new Error(`${fnTag} no mapping found for ${thePort}`);
     }
   }
 
   public async getContainerIpAddress(): Promise<string> {
-    const docker = new Docker();
-    const containerImageName = this.getContainerImageName();
-    const containerInfos: Docker.ContainerInfo[] = await docker.listContainers(
-      {}
-    );
+    const fnTag = "BesuTestLedger#getContainerIpAddress()";
+    const aContainerInfo = await this.getContainerInfo();
 
-    const aContainerInfo = containerInfos.find(
-      (ci) => ci.Image === containerImageName
-    );
     if (aContainerInfo) {
       const { NetworkSettings } = aContainerInfo;
       const networkNames: string[] = Object.keys(NetworkSettings.Networks);
       if (networkNames.length < 1) {
-        throw new Error(
-          `BesuTestLedger#getContainerIpAddress() no network found: ${JSON.stringify(
-            NetworkSettings
-          )}`
-        );
+        throw new Error(`${fnTag} container not connected to any networks`);
       } else {
-        // return IP address of container on the first network that we found it connected to. Make this configurable?
+        // return IP address of container on the first network that we found
+        // it connected to. Make this configurable?
         return NetworkSettings.Networks[networkNames[0]].IPAddress;
       }
     } else {
-      throw new Error(
-        `BesuTestLedger#getContainerIpAddress() cannot find container image ${this.containerImageName}`
-      );
+      throw new Error(`${fnTag} cannot find image: ${this.containerImageName}`);
     }
   }
 
