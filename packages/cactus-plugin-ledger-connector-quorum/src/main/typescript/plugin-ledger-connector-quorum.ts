@@ -123,28 +123,27 @@ export class PluginLedgerConnectorQuorum
   public async deployContract(
     options: IQuorumDeployContractOptions
   ): Promise<Contract> {
+    const fnTag = "PluginLedgerConnectorQuorum#deployContract()";
     if (!options.contractJsonArtifact) {
-      throw new Error(
-        `PluginLedgerConnectorQuorum#deployContract() options.contractJsonArtifact falsy.`
-      );
+      throw new Error(`${fnTag} options.contractJsonArtifact falsy.`);
     }
+
+    const { fromAddress } = options;
 
     try {
       const unlocked: boolean = await this.web3.eth.personal.unlockAccount(
-        options.fromAddress,
+        fromAddress,
         options.ethAccountUnlockPassword,
         3600
       );
       this.log.debug(`Web3 Account unlock outcome: ${unlocked}`);
     } catch (ex) {
-      throw new Error(
-        `PluginLedgerConnectorQuorum#deployContract() failed to unlock account ${options.fromAddress}: ${ex.stack}`
-      );
+      throw new Error(`${fnTag} failed to unlock ${fromAddress}: ${ex.stack}`);
     }
 
     const contract: Contract = this.instantiateContract(
       options.contractJsonArtifact,
-      options.fromAddress
+      fromAddress
     );
     this.log.debug(`Instantiated contract OK`);
 
@@ -162,9 +161,7 @@ export class PluginLedgerConnectorQuorum
     };
 
     this.log.debug(`Calling send on deploy task...`, { sendOptions });
-    const promiEventContract: PromiEvent<Contract> = deployTask.send(
-      sendOptions
-    );
+    const promiEventContract = deployTask.send(sendOptions);
     this.log.debug(`Called send OK with options: `, { sendOptions });
 
     try {
@@ -173,8 +170,7 @@ export class PluginLedgerConnectorQuorum
       this.log.debug(`Deployed contract OK.`);
       return deployedContract;
     } catch (ex) {
-      const message = `PluginLedgerConnectorQuorum#deployContract() Failed to deploy contract: ${ex.stack}`;
-      throw new Error(message);
+      throw new Error(`${fnTag} Failed to deploy contract: ${ex.stack}`);
     }
   }
 
