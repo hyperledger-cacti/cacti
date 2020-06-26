@@ -31,9 +31,7 @@ tap.test(
   "pulls up API server and deploys contract via REST API",
   async (assert: any) => {
     // 1. Instantiate a ledger object
-    const quorumTestLedger = new QuorumTestLedger({
-      containerImageVersion: "1.0.0",
-    });
+    const quorumTestLedger = new QuorumTestLedger();
     assert.tearDown(() => quorumTestLedger.stop());
     assert.tearDown(() => quorumTestLedger.destroy());
     // 2. Start the actual ledger

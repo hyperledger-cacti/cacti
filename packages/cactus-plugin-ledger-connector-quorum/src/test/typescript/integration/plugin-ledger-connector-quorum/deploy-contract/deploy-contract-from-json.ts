@@ -20,9 +20,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 });
 
 tap.test("deploys contract via .json file", async (assert: any) => {
-  const quorumTestLedger = new QuorumTestLedger({
-    containerImageVersion: "1.0.0",
-  });
+  const quorumTestLedger = new QuorumTestLedger();
   await quorumTestLedger.start();
 
   assert.tearDown(async () => {
