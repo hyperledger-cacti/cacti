@@ -15,7 +15,7 @@ export interface IBesuTestLedgerConstructorOptions {
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "latest",
-  containerImageName: "petermetz/besu-all-in-one",
+  containerImageName: "hyperledger/cactus-besu-all-in-one",
   rpcApiHttpPort: 8545,
 });
 
