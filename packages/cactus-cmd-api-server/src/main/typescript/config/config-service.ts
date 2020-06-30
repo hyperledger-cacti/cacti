@@ -33,6 +33,7 @@ export interface ICactusApiServerOptions {
   privateKey: string;
   keychainSuffixPublicKey: string;
   keychainSuffixPrivateKey: string;
+  minNodeVersion: string;
 }
 
 export class ConfigService {
@@ -106,6 +107,17 @@ export class ConfigService {
         default: "warn",
         env: "LOG_LEVEL",
         arg: "log-level",
+      },
+      minNodeVersion: {
+        doc:
+          "Determines the lower bound of NodeJS version that the API " +
+          "server will be willing to start on. Defaults to v12 because v10 " +
+          "does not support TLS v1.3. If you must run on Node 10, just set " +
+          "this configuration parameter to 10.0.0 for example.",
+        format: ConfigService.formatNonBlankString,
+        default: "12.0.0",
+        env: "MIN_NODE_VERSION",
+        arg: "min-node-version",
       },
       cockpitHost: {
         doc:
@@ -272,6 +284,7 @@ export class ConfigService {
       configFile: ".config.json",
       cactusNodeId: uuidV4(),
       logLevel: "debug",
+      minNodeVersion: (schema.minNodeVersion as SchemaObj).default,
       publicKey,
       privateKey,
       apiCorsDomainCsv: (schema.apiCorsDomainCsv as SchemaObj).default,
