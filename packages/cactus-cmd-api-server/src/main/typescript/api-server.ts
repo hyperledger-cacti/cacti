@@ -1,5 +1,6 @@
 import path from "path";
 import { Server } from "http";
+import { gte } from "semver";
 import express, {
   Express,
   Request,
@@ -18,7 +19,10 @@ import {
   IPluginWebService,
   PluginRegistry,
 } from "@hyperledger/cactus-core-api";
-import { ICactusApiServerOptions as ICactusApiServerConfig } from "./config/config-service";
+import {
+  ICactusApiServerOptions as ICactusApiServerConfig,
+  ConfigService,
+} from "./config/config-service";
 import { CACTUS_OPEN_API_JSON } from "./openapi-spec";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { Servers } from "./common/servers";
@@ -49,6 +53,7 @@ export class ApiServer {
   }
 
   async start(): Promise<void> {
+    this.checkNodeVersion();
     try {
       await this.startCockpitFileServer();
       await this.startApiServer();
@@ -56,6 +61,25 @@ export class ApiServer {
       this.log.error(`Failed to start ApiServer: ${ex.stack}`);
       this.log.error(`Attempting shutdown...`);
       await this.shutdown();
+    }
+  }
+
+  /**
+   * Verifies that the currently running NodeJS process is at least of a certain
+   * NodeJS version as specified by the configuration.
+   *
+   * @throws {Error} if the version contraint is not satisfied by the runtime.
+   */
+  public checkNodeVersion(currentVersion: string = process.version): void {
+    if (gte(this.options.config.minNodeVersion, currentVersion)) {
+      const msg =
+        `ApiServer#checkNodeVersion() detected NodeJS ` +
+        `v${process.version} that is outdated as per the configuration. ` +
+        `If you must run on this NodeJS version you can override the minimum ` +
+        `acceptable version via config parameters of the API server. ` +
+        `Though doing so may lead to vulnerabilities in your deployment. ` +
+        `You've been warned.`;
+      throw new Error(msg);
     }
   }
 
