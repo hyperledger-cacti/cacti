@@ -4,7 +4,15 @@
         "tslint:recommended"
     ],
     "jsRules": {},
-    "rules": {},
+    "rules": {
+        "variable-name": {
+            "options": [
+                "allow-leading-underscore",
+                "ban-keywords",
+                "check-format"
+            ]
+        }
+    },
     "rulesDirectory": [],
     "linterOptions": {
         "exclude": [
