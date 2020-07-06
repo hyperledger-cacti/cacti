@@ -541,13 +541,160 @@ APIs of Verifier and Validator are described as the following table:
 | 2. | BLP -> Verifier | getApiList | Get the list of available APIs on Verifier |
 | 3. | BLP -> Verifier | startMonitor | Request a verifier to start monitoring ledger |
 | 4. | BLP -> Verifier | stopMonitor | Rrequest a verifier to stop monitoring ledger |
-| 5. | Validator -> Verifier | getVerifierInformation | Get the verifier information including version, name, ID, and other information |
-| 6. | Verifier -> Validator | getValidatorInformation | Get the validator information including version, name, ID, and other information |
-| 7. | Verifier -> Validator | connect | request a validator to start a bi-directional communication channel |
-| 8. | Verifier -> Validator | disconnect | request a validator to stop a bi-directional communication channel |
+| 5. | Validator -> Verifier | connect | request a validator to start a bi-directional communication channel |
+| 6. | Validator -> Verifier | disconnect | request a validator to stop a bi-directional communication channel |
+| 7. | Validator -> Verifier | getVerifierInformation | Get the verifier information including version, name, ID, and other information |
+| 8. | Verifier -> Validator | getValidatorInformation | Get the validator information including version, name, ID, and other information |
 
-NOTE: On the above API table, the detail information will be described later (e.g. input/output parameters).
+The detail information is described as following:
 
+- `package/ledger-plugin/ledger-plugin.js`
+	- interface `Verifier`
+		```
+		interface Verifier {
+			// BLP -> Verifier
+			getApiList(): List<ApiInfo>;
+			requestLedgerOperation();
+			startMonitor();
+			stopMonitor();
+			// Validator -> Verifier
+			connect();
+			disconnect();
+			getVerifierInfo(): List<VerifierInfo>;
+		}
+		```
+
+		- class `ApiInfo`, `RequestedData`
+			```
+			class ApiInfo {
+				apiType: string,
+				requestedData: List<RequestedData>
+			}
+			class RequestedData {
+				dataName: string,
+				dataType: string {"int", "string", ...}
+			}
+			```
+
+		- class `VerifierInfo`
+			```
+			class VerifierInfo {
+				version: string,
+				name: string,
+				ID: string,
+				otherData: List<VerifierInfoOtherData>
+			}
+			class VerifierInfoOtherData {
+				dataName: string,
+				dataType: string {"int", "string", ...}
+			}
+			```
+
+		- function `getApiList()`: `List<ApiInfo>`
+			- description:
+				- Get the list of available APIs on Verifier
+			- input parameter:
+				- none
+			- output sample:
+				```
+				{
+					{
+						apiType: "sendSignedTransaction",
+						reqeustedData: {
+							signedTx: signedTx(string),
+						}
+					},
+					{
+						apiType: "getBalance",
+						reqeustedData: {
+							address: address(string),
+						}
+					}
+				}
+				```
+
+		- function `requestLedgerOperation()`:
+			- description:
+				- Request a verifier to execute a ledger operation
+			- input parameter:
+				```
+				var params = {
+					apiType: string,
+					progress: string {"escrow", "transfer", ...},
+					data: List<OperationData>
+				}
+				```
+
+		- class `OperationData`
+			```
+			class OperationData {
+				dataName: dataType
+			}
+			```
+
+		- function `getVerifierInformation()`: `List<ApiInfo>`
+			- description:
+				- Get the verifier information including version, name, ID, and other information
+			- input parameter:
+				- none
+
+		- function `startMonitor()`: `Promise<LedgerEvent>`
+			- description:
+				- Request a verifier to start monitoring ledger
+			- input parameter:
+				- none
+
+		- function `stopMonitor()`: 
+			- description:
+				- Request a verifier to stop monitoring ledger
+			- input parameter:
+				- none
+
+		- function `connect()`:
+			- description:
+				- Request a verifier to start a bi-directional communication channel
+			- input parameter:
+				- none
+			- connecting profile:
+				- `validatorURL`
+				- authentication credential
+
+		- function `disconnect()`:
+			- description:
+				- Request a verifier to stop a bi-directional communication channel
+			- input parameter:
+				- none
+			- connecting profile:
+				- `validatorURL`
+				- authentication credential
+
+	- interface `Validator`
+		```
+		interface Validator {
+			// Verifier -> Validator
+			getValidatorInfo(): List<ValidatorInfo>
+		}
+		```
+
+		- function `getValidatorInformation()`:
+			- description:
+				- Get the validator information including version, name, ID, and other information
+			- input parameter:
+				- `validatorURL`
+
+		- class `ValidatorInfo`
+			```
+			class ValidatorInfo {
+				version: string,
+				name: string,
+				ID: string,
+				otherData: List<ValidatorInfoOtherData>
+			}
+			class ValidatorInfoOtherData {
+				dataName: string,
+				dataType: string {"int", "string", ...}
+			}
+			```
 
 ### 4.3.3 Exection of "business logic" at "Business Logic Plugin"
 
