@@ -1,0 +1,13 @@
+{
+  "name": "dependent",
+  "version": "0.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "config": "^1.26.1",
+    "log4js": "^3.0.6",
+    "fabric-ca-client": "~1.4.0",
+    "fabric-network": "~1.4.0"
+  }
+}
