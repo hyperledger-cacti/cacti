@@ -57,6 +57,7 @@ tap.test(
     cactusApiServerOptions.configFile = "";
     cactusApiServerOptions.apiCorsDomainCsv = "*";
     cactusApiServerOptions.apiPort = 0;
+    cactusApiServerOptions.apiTlsEnabled = false;
     const config = configService.newExampleConfigConvict(
       cactusApiServerOptions
     );

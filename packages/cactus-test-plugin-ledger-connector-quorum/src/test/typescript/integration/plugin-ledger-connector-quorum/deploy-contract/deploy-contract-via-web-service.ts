@@ -44,6 +44,7 @@ tap.test(
     const cactusApiServerOptions: ICactusApiServerOptions = configService.newExampleConfig();
     cactusApiServerOptions.configFile = "";
     cactusApiServerOptions.apiCorsDomainCsv = "*";
+    cactusApiServerOptions.apiTlsEnabled = false;
     cactusApiServerOptions.apiPort = 0;
     const config = configService.newExampleConfigConvict(
       cactusApiServerOptions
@@ -87,9 +88,11 @@ tap.test(
     const httpServer = apiServer.getHttpServerApi();
     const addressInfo: any = httpServer?.address();
     log.debug(`AddressInfo: `, addressInfo);
-    const CACTUS_API_HOST = `http://${addressInfo.address}:${addressInfo.port}`;
+    const protocol = config.get("apiTlsEnabled") ? "https:" : "http:";
+    const basePath = `${protocol}//${addressInfo.address}:${addressInfo.port}`;
+    log.debug(`SDK base path: %s`, basePath);
 
-    const configuration = new Configuration({ basePath: CACTUS_API_HOST });
+    const configuration = new Configuration({ basePath });
     const api = new DefaultApi(configuration);
 
     // 7. Issue an API call to the API server via the SDK verifying that the SDK and the API server both work
@@ -107,7 +110,7 @@ tap.test(
       contractJsonArtifact: HelloWorldContractJson,
     };
     const pluginId = ledgerConnectorQuorum.getId();
-    const url = `${CACTUS_API_HOST}/api/v1/plugins/${pluginId}/contract/deploy`;
+    const url = `${basePath}/api/v1/plugins/${pluginId}/contract/deploy`;
     // 9. Deploy smart contract by issuing REST API call
     // TODO: Make this part of the SDK so that manual request assembly is not required. Should plugins have their own SDK?
     const response2 = await axios.post(url, bodyObject, {});
