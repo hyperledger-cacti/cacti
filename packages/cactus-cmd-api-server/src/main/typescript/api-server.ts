@@ -1,6 +1,11 @@
 import path from "path";
-import { Server } from "http";
 import { gte } from "semver";
+import { AddressInfo } from "net";
+import tls from "tls";
+import { Server, createServer } from "http";
+import { Server as SecureServer } from "https";
+import { createServer as createSecureServer } from "https";
+import expressHttpProxy from "express-http-proxy";
 import express, {
   Express,
   Request,
@@ -29,14 +34,16 @@ import { Servers } from "./common/servers";
 
 export interface IApiServerConstructorOptions {
   pluginRegistry?: PluginRegistry;
+  httpServerApi?: Server | SecureServer;
+  httpServerCockpit?: Server | SecureServer;
   config: ICactusApiServerConfig;
 }
 
 export class ApiServer {
   private readonly log: Logger;
   private pluginRegistry: PluginRegistry | undefined;
-  private httpServerApi: Server | null = null;
-  private httpServerCockpit: Server | null = null;
+  private readonly httpServerApi: Server | SecureServer;
+  private readonly httpServerCockpit: Server | SecureServer;
 
   constructor(public readonly options: IApiServerConstructorOptions) {
     if (!options) {
@@ -46,21 +53,71 @@ export class ApiServer {
       throw new Error(`ApiServer#ctor options.config was falsy`);
     }
 
+    LoggerProvider.setLogLevel(options.config.logLevel);
+
+    if (this.options.httpServerApi) {
+      this.httpServerApi = this.options.httpServerApi;
+    } else if (this.options.config.apiTlsEnabled) {
+      this.httpServerApi = createSecureServer({
+        key: this.options.config.apiTlsKeyPem,
+        cert: this.options.config.apiTlsCertPem,
+      });
+    } else {
+      this.httpServerApi = createServer();
+    }
+
+    if (this.options.httpServerCockpit) {
+      this.httpServerCockpit = this.options.httpServerCockpit;
+    } else if (this.options.config.cockpitTlsEnabled) {
+      this.httpServerCockpit = createSecureServer({
+        key: this.options.config.cockpitTlsKeyPem,
+        cert: this.options.config.cockpitTlsCertPem,
+      });
+    } else {
+      this.httpServerCockpit = createServer();
+    }
+
     this.log = LoggerProvider.getOrCreate({
       label: "api-server",
       level: options.config.logLevel,
     });
   }
 
-  async start(): Promise<void> {
+  async start(): Promise<any> {
     this.checkNodeVersion();
+    const tlsMaxVersion = this.options.config.tlsDefaultMaxVersion;
+    this.log.info("Setting tls.DEFAULT_MAX_VERSION to %s...", tlsMaxVersion);
+    tls.DEFAULT_MAX_VERSION = tlsMaxVersion;
+
     try {
-      await this.startCockpitFileServer();
-      await this.startApiServer();
+      const { cockpitTlsEnabled, apiTlsEnabled } = this.options.config;
+      const addressInfoCockpit = await this.startCockpitFileServer();
+      const addressInfoApi = await this.startApiServer();
+
+      {
+        const { apiHost: host } = this.options.config;
+        const { port } = addressInfoApi;
+        const protocol = apiTlsEnabled ? "https:" : "http:";
+        const httpUrl = `${protocol}//${host}:${port}`;
+        this.log.info(`Cactus API reachable ${httpUrl}`);
+      }
+
+      {
+        const { cockpitHost: host } = this.options.config;
+        const { port } = addressInfoCockpit;
+        const protocol = cockpitTlsEnabled ? "https:" : "http:";
+        const httpUrl = `${protocol}//${host}:${port}`;
+        this.log.info(`Cactus Cockpit reachable ${httpUrl}`);
+      }
+
+      return { addressInfoCockpit, addressInfoApi };
     } catch (ex) {
-      this.log.error(`Failed to start ApiServer: ${ex.stack}`);
+      const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
+      this.log.error(errorMessage);
       this.log.error(`Attempting shutdown...`);
       await this.shutdown();
+      this.log.info(`Server shut down OK`);
+      throw new Error(errorMessage);
     }
   }
 
@@ -83,11 +140,11 @@ export class ApiServer {
     }
   }
 
-  public getHttpServerApi(): Server | null {
+  public getHttpServerApi(): Server | SecureServer {
     return this.httpServerApi;
   }
 
-  public getHttpServerCockpit(): Server | null {
+  public getHttpServerCockpit(): Server | SecureServer {
     return this.httpServerCockpit;
   }
 
@@ -106,12 +163,12 @@ export class ApiServer {
 
   public async initPluginRegistry(): Promise<PluginRegistry> {
     const registry = new PluginRegistry({ plugins: [] });
-
+    const { logLevel } = this.options.config;
     this.log.info(`Instantiated empty registry, invoking plugin factories...`);
     for (const pluginImport of this.options.config.plugins) {
       const { packageName, options } = pluginImport;
       this.log.info(`Creating plugin from package: ${packageName}`, options);
-      const pluginOptions = { ...options, pluginRegistry: registry };
+      const pluginOptions = { ...options, logLevel, pluginRegistry: registry };
       const { createPluginFactory } = await import(packageName);
       const pluginFactory: PluginFactory<
         ICactusPlugin,
@@ -126,7 +183,9 @@ export class ApiServer {
 
   public async shutdown(): Promise<void> {
     this.log.info(`Shutting down API server ...`);
+
     const registry = await this.getOrInitPluginRegistry();
+
     const webServicesShutdown = registry
       .getPlugins()
       .filter((pluginInstance) => isIPluginWebService(pluginInstance))
@@ -151,7 +210,7 @@ export class ApiServer {
     }
   }
 
-  async startCockpitFileServer(): Promise<void> {
+  async startCockpitFileServer(): Promise<AddressInfo> {
     const cockpitWwwRoot = this.options.config.cockpitWwwRoot;
     this.log.info(`wwwRoot: ${cockpitWwwRoot}`);
 
@@ -161,29 +220,70 @@ export class ApiServer {
     const resolvedIndexHtml = path.resolve(resolvedWwwRoot + "/index.html");
     this.log.info(`resolvedIndexHtml: ${resolvedIndexHtml}`);
 
+    const cockpitCorsDomainCsv = this.options.config.cockpitCorsDomainCsv;
+    const allowedDomains = cockpitCorsDomainCsv.split(",");
+    const corsMiddleware = this.createCorsMiddleware(allowedDomains);
+
+    const {
+      apiHost,
+      apiPort,
+      cockpitApiProxyRejectUnauthorized: rejectUnauthorized,
+    } = this.options.config;
+    const protocol = this.options.config.apiTlsEnabled ? "https:" : "http:";
+    const apiHttpUrl = `${protocol}//${apiHost}:${apiPort}`;
+
+    const apiProxyMiddleware = expressHttpProxy(apiHttpUrl, {
+      // preserve the path whatever it was. Without this the proxy just uses /
+      proxyReqPathResolver: (srcReq) => srcReq.originalUrl,
+
+      proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+        const { originalUrl: thePath } = srcReq;
+        const srcHost = srcReq.header("host");
+        const { host: destHostname, port: destPort } = proxyReqOpts;
+        const destHost = `${destHostname}:${destPort}`;
+        this.log.debug(`PROXY ${srcHost} => ${destHost} :: ${thePath}`);
+
+        // make sure self signed certs are accepted if it was configured as such by the user
+        (proxyReqOpts as any).rejectUnauthorized = rejectUnauthorized;
+        return proxyReqOpts;
+      },
+    });
+
     const app: Express = express();
+    app.use("/api/v*", apiProxyMiddleware);
     app.use(compression());
+    app.use(corsMiddleware);
     app.use(express.static(resolvedWwwRoot));
     app.get("/*", (_, res) => res.sendFile(resolvedIndexHtml));
 
     const cockpitPort: number = this.options.config.cockpitPort;
     const cockpitHost: string = this.options.config.cockpitHost;
 
-    await new Promise<any>((resolve, reject) => {
-      this.httpServerCockpit = app.listen(cockpitPort, cockpitHost, () => {
-        const httpUrl = `http://${cockpitHost}:${cockpitPort}`;
-        this.log.info(`Cactus Cockpit UI reachable ${httpUrl}`);
-        resolve({ cockpitPort });
+    if (!this.httpServerCockpit.listening) {
+      await new Promise((resolve, reject) => {
+        this.httpServerCockpit.once("error", reject);
+        this.httpServerCockpit.once("listening", resolve);
+        this.httpServerCockpit.listen(cockpitPort, cockpitHost);
       });
-      this.httpServerCockpit.on("error", (err: any) => reject(err));
-    });
+    }
+    this.httpServerCockpit.on("request", app);
+
+    // the address() method returns a string for unix domain sockets and null
+    // if the server is not listening but we don't car about any of those cases
+    // so the casting here should be safe. Famous last words... I know.
+    const addressInfo = this.httpServerCockpit.address() as AddressInfo;
+    this.log.info(`Cactus Cockpit net.AddressInfo`, addressInfo);
+
+    return addressInfo;
   }
 
-  async startApiServer(): Promise<void> {
+  async startApiServer(): Promise<AddressInfo> {
     const app: Application = express();
     app.use(compression());
 
-    const corsMiddleware = this.createCorsMiddleware();
+    const apiCorsDomainCsv = this.options.config.apiCorsDomainCsv;
+    const allowedDomains = apiCorsDomainCsv.split(",");
+    const corsMiddleware = this.createCorsMiddleware(allowedDomains);
     app.use(corsMiddleware);
 
     app.use(bodyParser.json({ limit: "50mb" }));
@@ -211,25 +311,31 @@ export class ApiServer {
         return (pluginInstance as IPluginWebService).installWebServices(app);
       });
 
-    await Promise.all(webServicesInstalled);
-    this.log.info(`Installed ${webServicesInstalled.length} web services OK`);
+    const endpoints2D = await Promise.all(webServicesInstalled);
+    this.log.info(`Installed ${webServicesInstalled.length} web service(s) OK`);
+
+    const endpoints = endpoints2D.reduce((acc, val) => acc.concat(val), []);
+    endpoints.forEach((ep) => this.log.info(`Endpoint={path=${ep.getPath()}}`));
 
     const apiPort: number = this.options.config.apiPort;
     const apiHost: string = this.options.config.apiHost;
-    this.log.info(`Binding Cactus API to port ${apiPort}...`);
-    await new Promise<any>((resolve, reject) => {
-      const httpServerApi = app.listen(apiPort, apiHost, () => {
-        const address: any = httpServerApi.address();
-        this.log.info(`Successfully bound API to port ${apiPort}`, { address });
-        if (address && address.port) {
-          resolve({ port: address.port });
-        } else {
-          resolve({ port: apiPort });
-        }
+
+    if (!this.httpServerApi.listening) {
+      await new Promise((resolve, reject) => {
+        this.httpServerApi.once("error", reject);
+        this.httpServerApi.once("listening", resolve);
+        this.httpServerApi.listen(apiPort, apiHost);
       });
-      this.httpServerApi = httpServerApi;
-      this.httpServerApi.on("error", (err) => reject(err));
-    });
+    }
+    this.httpServerApi.on("request", app);
+
+    // the address() method returns a string for unix domain sockets and null
+    // if the server is not listening but we don't car about any of those cases
+    // so the casting here should be safe. Famous last words... I know.
+    const addressInfo = this.httpServerApi.address() as AddressInfo;
+    this.log.info(`Cactus API net.AddressInfo`, addressInfo);
+
+    return addressInfo;
   }
 
   createOpenApiValidator(): OpenApiValidator {
@@ -240,23 +346,24 @@ export class ApiServer {
     });
   }
 
-  createCorsMiddleware(): RequestHandler {
-    const apiCorsDomainCsv = this.options.config.apiCorsDomainCsv;
-    const allowedDomains = apiCorsDomainCsv.split(",");
-    const allDomainsAllowed = allowedDomains.includes("*");
+  createCorsMiddleware(allowedDomains: string[]): RequestHandler {
+    const allDomainsOk = allowedDomains.includes("*");
 
-    const corsOptions: CorsOptions = {
-      origin: (origin: string | undefined, callback) => {
-        if (
-          allDomainsAllowed ||
-          (origin && allowedDomains.indexOf(origin) !== -1)
-        ) {
-          callback(null, true);
-        } else {
-          callback(new Error(`CORS not allowed for Origin "${origin}".`));
-        }
-      },
+    const corsOptionsDelegate = (req: Request, callback: any) => {
+      const origin = req.header("Origin");
+      const isDomainOk = origin && allowedDomains.includes(origin);
+      // this.log.debug("CORS %j %j %s", allDomainsOk, isDomainOk, req.originalUrl);
+
+      let corsOptions;
+      if (allDomainsOk) {
+        corsOptions = { origin: "*" }; // reflect (enable) the all origins in the CORS response
+      } else if (isDomainOk) {
+        corsOptions = { origin }; // reflect (enable) the requested origin in the CORS response
+      } else {
+        corsOptions = { origin: false }; // disable CORS for this request
+      }
+      callback(null, corsOptions); // callback expects two parameters: error and options
     };
-    return cors(corsOptions);
+    return cors(corsOptionsDelegate);
   }
 }
