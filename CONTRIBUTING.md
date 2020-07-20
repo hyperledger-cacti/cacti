@@ -171,6 +171,38 @@ NOTE: Once you submitted pull request to Cactus repository, step 6 is not necess
 
 NOTE: You can refer original tutorial ['GitHub Standard Fork & Pull Request Workflow'](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
 
+### Directory structure
+
+Whenever you begin to use your codes on Hyperledger Cactus, you should follow the directory strecture on Hyperledger Cactus.
+The current directory structure is described as the following:
+
+> - contrib/ : Contributions from each participants, which are not directly dependent on Cactus code.
+>   - Fujitsu-ConnectionChain/
+>   - Accenture-BIF/
+> - docs/
+>   - API/
+>     - business-logic-plugin.md
+>     - ledger-plugin.md
+>     - routing-interface.md
+> - examples/
+>   - example01-car-trade/
+>     - src/
+> - plugins/
+>     - business-logic-plugin/
+>       - lib/ : libraries for building Business Logic Plugin
+>     - ledger-plugin/ : Codes of Ledger Plugin
+>       - (ledger-name)/ : Including the ledger name (e.g. Ethereum, Fabric, ...)
+>         - verifier/
+>           - src/ : Source codes of Verifier on Ledger Plugin
+>           - unit-test/ : Unit test codes of Verifier on Ledger Plugin (single driver / driver and docker env / ...)
+>         - validator/
+>           - src/ : Source codes of Validator on Ledger Plugin
+>           - unit-test/ : Unit test codes of Validator on Ledger Plugin (single driver / driver and docker env / ...)
+>     - routing-interface/
+> - whitepaper/
+> - test/
+>   - docker-env/
+>   - kubernetes-env/
 
 ## Test Automation
 
