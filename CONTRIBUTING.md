@@ -14,6 +14,8 @@
     - [Running unit tests only](#running-unit-tests-only)
     - [Running integration tests only](#running-integration-tests-only)
     - [Debugging a test case](#debugging-a-test-case)
+  - [All-In-One Docker Images for Ledger Connector Plugins](#all-in-one-docker-images-for-ledger-connector-plugins)
+    - [Test Automation of Ledger Plugins](#test-automation-of-ledger-plugins)
   - [Building the SDK](#building-the-sdk)
   - [Adding a new public npm dependency to one of the packages:](#adding-a-new-public-npm-dependency-to-one-of-the-packages)
   - [Adding a sibling package npm dependency to one of the packages:](#adding-a-sibling-package-npm-dependency-to-one-of-the-packages)
@@ -392,6 +394,55 @@ test file that you wish to run.
 Breakpoints will work as long as you are debugging code in the same package.
 
 > Source map support is partial at this point but actively being worked on.
+
+
+### All-In-One Docker Images for Ledger Connector Plugins
+
+If you are working on a new ledger connector you'll need an `all-in-one` docker
+image as well, which will allow the expected level of test automation. If your
+chosen ledger's maintainers provide an adequate docker image, then you might not
+need to develop this yourself, but this is rarely the case so YMMV.
+
+To see an existing set of examples for `besu` and `quorum` images take a peek at
+the `tools/docker/besu-all-in-one` and `tools/docker/quorum-all-in-one` folders.
+These produce the `hyperledger/cactus-besu-all-in-one` and
+`hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are
+used in the test cases that are written for the specific ledger connector
+plugins at:
+* `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
+* `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.ts`
+
+The specific classes that utilize the `all-in-one` images can be found in the
+`test-tooling` package under these paths:
+* `packages/cactus-test-tooling/src/main/typescript/besu/besu-test-ledger.ts`
+* `packages/cactus-test-tooling/src/main/typescript/quorum/quorum-test-ledger.ts`
+
+#### Test Automation of Ledger Plugins
+
+Ledger plugin tests are written the same way as any other test (which is difficult to achieve, but we thrive to get it done).
+
+The only difference between a ledger connector plugin test case and any unit test is that the ledger connector plugin's
+test case will pull up a docker container from one of the `all-in-one` images that we maintain as part of Cactus and then
+use that `all-in-one-*` container to verify things such as the ability of the ledger connector plugin to deploy a
+contract to said ledger.
+
+
+As a generic best practice, the test cases should never re-use any `all-in-one`
+ledger container for the execution of multiple test cases because that will
+almost surely lead to flaky/unstable test cases over the long run and needless
+complexity, ordering dependencies and so on. It is recommended that if you have
+two test cases for a ledger connector plugin, they both pull up a newly created
+container from scratch, execute the test scenario and then tear down and delete
+the container completely.
+
+An example for a ledger connector plugin and it's test automation implemented the way it is explained above:
+`packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
+
+You can run this test case the same way you would run any other test case (which is also a requirement in itself for each test case):
+
+```sh
+npx tap --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts
+```
 
 ### Building the SDK
 
