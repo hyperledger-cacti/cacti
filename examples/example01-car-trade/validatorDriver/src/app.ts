@@ -30,7 +30,7 @@ app.get('/validatorDriver', function (req, res, next) {
     console.log('func : ' + func);
     console.log('param : ' + param);
 
-    xxx(validator, func, param, res, next);
+    foo(validator, func, param, res, next);
 });
 
 
@@ -44,10 +44,10 @@ app.post('/validatorDriver', function (req, res, next) {
     console.log('func : ' + func);
     console.log('param : ' + param);
 
-    xxx(validator, func, param, res, next);
+    foo(validator, func, param, res, next);
 });
 
-function xxx(validator, func, param, res, next): void {
+function foo(validator, func, param, res, next): void {
     // Determine BC type
     if (validator === 'fabric') {
         // fabric
