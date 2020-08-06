@@ -306,7 +306,7 @@ Motivation: The suitability of a blockchain solution regarding a use case depend
             It is, therefore, desirable for an organization to be able to replace the blockchain providing the infrastructure to a certain service.
 
 Currently, when a consortium wants to migrate their blockchain (e.g., the source blockchain became obsolete, cryptographic algorithms no longer secure, etc), the solution is to re-implement business logic using a different platform, yielding great effort.
-Data migrations have been performed before on public blockchains [[2](#7-references),[3](#7-references)], both recent endeavors to render flexibility to blockchain-based solutions.
+Data migrations have been performed before on public blockchains [[2](#7-references),[3](#7-references),[4](#7-references)], both recent endeavors to render flexibility to blockchain-based solutions.
 In those works, the authors propose simple data migration capabilities for public, permissionless blockchains, in which a user can specify requirements for the blockchain infrastructure supporting their service.
 
 ### 2.8.1 Blockchain Data Migration
@@ -1194,3 +1194,5 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 2: E Scheid and Burkhard Rodrigues, B Stiller. 2019. Toward a policy-based blockchain agnostic framework. 16th IFIP/IEEE International Symposium on Integrated Network Management (IM 2019) (2019)
 
 3: Philipp Frauenthaler, Michael Borkowski, and Stefan Schulte. 2019. A Framework for Blockchain Interoperability and Runtime Selection.
+
+4: H.M.N. Dilum Bandara, Xiwei Xu, and Ingo Weber. 2020. [Patterns for blockchain data migration](https://arxiv.org/abs/1906.00239). European Conf. on Pattern Languages of Programs 2020 (EuroPLoP 2020).
