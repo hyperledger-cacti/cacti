@@ -11,12 +11,14 @@ export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;
   containerImageName?: string;
   rpcApiHttpPort?: number;
+  envVars?: string[]
 }
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "latest",
   containerImageName: "hyperledger/cactus-besu-all-in-one",
   rpcApiHttpPort: 8545,
+  envVars: ["BESU_NETWORK=dev"]
 });
 
 export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
@@ -29,6 +31,7 @@ export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys
       .min(1024)
       .max(65535)
       .required(),
+    envVars: Joi.array().allow(null).required(),
   }
 );
 
@@ -36,6 +39,7 @@ export class BesuTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
   public readonly rpcApiHttpPort: number;
+  public readonly envVars: string[];
 
   private container: Container | undefined;
 
@@ -51,6 +55,8 @@ export class BesuTestLedger implements ITestLedger {
       BESU_TEST_LEDGER_DEFAULT_OPTIONS.containerImageName;
     this.rpcApiHttpPort =
       options.rpcApiHttpPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
+    this.envVars =
+        options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
 
     this.validateConstructorOptions();
   }
@@ -141,6 +147,7 @@ export class BesuTestLedger implements ITestLedger {
           // to docker container's IP addresses directly...
           // https://stackoverflow.com/a/39217691
           PublishAllPorts: true,
+          Env: this.envVars,
         },
         {},
         (err: any) => {
@@ -293,6 +300,7 @@ export class BesuTestLedger implements ITestLedger {
         containerImageVersion: this.containerImageVersion,
         containerImageName: this.containerImageName,
         rpcApiHttpPort: this.rpcApiHttpPort,
+        envVars: this.envVars,
       },
       BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA
     );
