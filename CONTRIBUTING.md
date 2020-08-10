@@ -13,6 +13,7 @@
     - [Running all test cases (unit+integration)](#running-all-test-cases-unitintegration)
     - [Running unit tests only](#running-unit-tests-only)
     - [Running integration tests only](#running-integration-tests-only)
+    - [What is npx used for?](#what-is-npx-used-for)
     - [Debugging a test case](#debugging-a-test-case)
   - [All-In-One Docker Images for Ledger Connector Plugins](#all-in-one-docker-images-for-ledger-connector-plugins)
     - [Test Automation of Ledger Plugins](#test-automation-of-ledger-plugins)
@@ -279,15 +280,12 @@ below applies to all tests regardless of their nature.
   - [Assertions API](https://node-tap.org/docs/api/asserts/) of Node TAP
   - Simplest possible test case:
       ```typescript
-      // tslint:disable-next-line: no-var-requires
-      const tap = require("tap");
+      const test, { Test } = require("tape");
       import * as publicApi from "../../../main/typescript/public-api";
 
-      tap.pass("Test file can be executed");
-
-      tap.test("Library can be loaded", (assert: any) => {
-         assert.ok(publicApi);
-         assert.end(); // yaay, test coverage
+      test("Module can be loaded", (t: Test) => {
+         t.ok(publicApi);
+         t.end(); // yaay, test coverage
       });
       ```
   - An [end to end test case](./packages/cactus-test-plugin-web-service-consortium/src/test/typescript/integration/plugin-web-service-consortium/security-isolation-via-api-server-ports.ts) showcasing everything in action
@@ -382,6 +380,13 @@ npm run test:unit
 npm run test:integration
 ```
 
+#### What is npx used for?
+
+`npx` is a standard top level binary placed on the path by NodeJS at installation time. We use it to avoid having to
+place every node module (project dependencies) on the OS path or to install them globally (`npm install some-pkg -g`)
+
+Read more about npx here: https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner
+
 #### Debugging a test case
 
 Open the `.vscode/template.launch.json` file and either copy it with a name of
@@ -438,11 +443,49 @@ the container completely.
 An example for a ledger connector plugin and it's test automation implemented the way it is explained above:
 `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
 
+> This test case is also an example of how to run an ApiServer independently with a single ledger plugin which is
+> how the test case is set up to begin with.
+
+Another option if you want to perform some tests manually is to run the API server with a configuration of your choice:
+
+```sh
+# Starting from the project root directory
+
+chmod +x ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js
+
+./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json
+```
+
 You can run this test case the same way you would run any other test case (which is also a requirement in itself for each test case):
 
 ```sh
 npx tap --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts
 ```
+
+You can specify an arbitrary set of test cases to run in a single execution via glob patterns. Examples of these glob
+patterns can be observed in the root directory's `package.json` file which has npm scripts for executing all tests with
+a single command (the CI script uses these):
+
+```json
+"test:all": "tap --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
+"test:unit": "tap --timeout=600 \"packages/cactus-*/src/test/typescript/unit/\"",
+"test:integration": "tap --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/integration/\""
+```
+
+Following a similar pattern if you have a specific folder where your test cases are, you can run everything in that
+folder by specifying the appropriate glob patterns (asterisks and double asterisks as necessary depending on the folder
+being a flat structure or with sub-directories and tests nested deep within them).
+
+For example this can work as well:
+
+```sh
+# Starting from the project root
+cd packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum
+npx tap --jobs=1 --timeout=600 \"./\"
+```
+
+> Be aware that glob patterns need quoting in some operating system's shell environments and not necessarily on others.
+> In the npm scripts Cactus uses we quote all of them to ensure a wider shell compatibility.
 
 ### Building the SDK
 
