@@ -116,6 +116,7 @@ Photo by Pontus Wellgraf on Unsplash
       - [5.6.2.1 X.509 Certificate Plugin](#5621-x509-certificate-plugin)
     - [5.6.3 Key/Value Storage Plugins](#563-keyvalue-storage-plugins)
     - [5.6.4 Serverside Keychain Plugins](#564-serverside-keychain-plugins)
+    - [5.6.5 Manual Consortium Plugin](#565-manual-consortium-plugin)
 - [6. Identities, Authentication, Authorization](#6-identities-authentication-authorization)
   - [6.1 Definition of Identities in Cactus](#61-definition-of-identities-in-cactus)
   - [6.2 Transaction Signing Modes, Key Ownership](#62-transaction-signing-modes-key-ownership)
@@ -651,13 +652,24 @@ Using a blockchain agnostic bidirectional communication channel for controlling 
 
 ### 4.2.4 Consortium Management
 
-Consortiums can be formed by cooperating entities (person, organization, etc.) who wish to all contribute hardware/network resources to the operation of a `Cactus` cluster (set of validator nodes, API servers, etc.).
+Consortiums can be formed by cooperating entities (person, organization, etc.) who wish to contribute hardware/network
+resources to the operation of a `Cactus` cluster.
 
-After the forming of the consortium with it's initial set of members (one or more) it is possible to enroll or remove certain new or existing members.
+What holds the consortiums together is the consensus among the members on who the members are, which is defined by the
+nodes' network hosts and public keys. The keys are produced from the Secp256k1 curve.
 
-`Cactus` does not prescribe any specific consensus algorithm for the addition or removal of consortium members, but rather focuses on the technical side of making it possible to operate a cluster of nodes under the ownership of separate entities without downtime while also keeping it possible to add/remove members.
+The consortium plugin(s) main responsibility is to provide information about the consortium's members, nodes and public keys.
+`Cactus` does not prescribe any specific consensus algorithm for the addition or removal of consortium members, but
+rather focuses on the technical side of making it possible to operate a cluster of nodes under the ownership of
+separate entities without downtime while also keeping it possible to add/remove members.
+It is up to authors of plugins who can implement any kind of consortium management functionality as they see fit.
+The default implementation that Cactus ships with is in the `cactus-plugin-consortium-manual` package which - as the
+name implies - leaves the achievement of consensus to the initial set of members who are expected to produce the initial
+set of network hosts/public keys and then configure their Cactus nodes accordingly.
+This process and the details of operation are laid out in much more detail in the dedicated section of the manual
+consortium management plugin further below in this document.
 
-A newly joined consortium member does not have to participate in every component of `Cactus`: Running a validator node is the only required action to participate, etcd, API server can remain the same as prior to the new member joining.
+After the forming of the consortium with it's initial set of members (one or more) it is possible to enroll or remove certain new or existing members, but this can vary based on different implementations.
 
 ## 4.3 Working Policies
 
@@ -1272,6 +1284,116 @@ interface KeychainPlugin extends KeyValueStoragePlugin {
 [4] https://azure.microsoft.com/en-us/services/key-vault/
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
+
+### 5.6.5 Manual Consortium Plugin
+
+This plugin is the default/simplest possible implementation of consortium management.
+It delegates the initial trust establishment to human actors to be done manually or offline if you will.
+
+Once a set of members and their nodes were agreed upon, a JSON document containing the consortium metadata can be
+constructed which becomes an input parameter for the `cactus-plugin-consortium-manual` package's implementation.
+Members bootstrap the consortium by configuring their Cactus nodes with the agreed upon JSON document and start their
+nodes.
+Since the JSON document is used to generate JSON Web Signatures (JWS) as defined by
+[RFC 7515](https://tools.ietf.org/html/rfc7515#section-7.2) it is important that every consortium member uses the same
+JSON document representing the consortium.
+
+> Attention: JWS is not the same as JSON Web Tokens (JWT). JWT is an extension of JWS and so they can seem very similar
+> or even indistinguishable, but it is actually two separate things where JWS is the lower level building block that
+> makes JWT's higher level use-cases possible. This is not related to Cactus itself, but is important to be mentioned
+> since JWT is very well known among software engineers while JWS is a much less often used standard.
+
+Example of said JSON document (the `"consortium"` property) as passed in to the plugin configuration can be
+seen below:
+
+```json
+{
+            "packageName": "@hyperledger/cactus-plugin-consortium-manual",
+            "options": {
+                "keyPairPem": "-----BEGIN PRIVATE KEY-----\nREDACTED\n-----END PRIVATE KEY-----\n",
+                "consortium": {
+                    "name": "Example Cactus Consortium",
+                    "id": "2ae136f6-f9f7-40a2-9f6c-92b1b5d5046c",
+                    "mainApiHost": "http://127.0.0.1:4000",
+                    "members": [
+                        {
+                            "id": "b24f8705-6da5-433a-b8c7-7d2079bae992",
+                            "name": "Example Cactus Consortium Member 1",
+                            "nodes": [
+                                {
+                                    "nodeApiHost": "http://127.0.0.1:4000",
+                                    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEtDeq7BgpelfsX7WKiSb7Lhxp8VeS6YY/\nInbYuTgwZ8ykGs2Am2fM03aeMX9pYEzaeOVRU6ptwaEBFYX+YftCSQ==\n-----END PUBLIC KEY-----\n"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+```
+
+The configuration above will cause the `Consortium JWS` REST API endpoint (callable via the SDK) to respond with a
+consortium JWS that looks similar to what is pasted below.
+
+Code examples of how to use the SDK to call this endpoint can be seen at
+`./packages/cactus-cockpit/src/app/consortium-inspector/consortium-inspector.page.ts`
+
+```json
+{
+    "payload": "eyJjb25zb3J0aXVtIjp7ImlkIjoiMmFlMTM2ZjYtZjlmNy00MGEyLTlmNmMtOTJiMWI1ZDUwNDZjIiwibWFpbkFwaUhvc3QiOiJodHRwOi8vMTI3LjAuMC4xOjQwMDAiLCJtZW1iZXJzIjpbeyJpZCI6ImIyNGY4NzA1LTZkYTUtNDMzYS1iOGM3LTdkMjA3OWJhZTk5MiIsIm5hbWUiOiJFeGFtcGxlIENhY3R1cyBDb25zb3J0aXVtIE1lbWJlciAxIiwibm9kZXMiOlt7Im5vZGVBcGlIb3N0IjoiaHR0cDovLzEyNy4wLjAuMTo0MDAwIiwicHVibGljS2V5UGVtIjoiLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cbk1GWXdFQVlIS29aSXpqMENBUVlGSzRFRUFBb0RRZ0FFdERlcTdCZ3BlbGZzWDdXS2lTYjdMaHhwOFZlUzZZWS9cbkluYll1VGd3Wjh5a0dzMkFtMmZNMDNhZU1YOXBZRXphZU9WUlU2cHR3YUVCRllYK1lmdENTUT09XG4tLS0tLUVORCBQVUJMSUMgS0VZLS0tLS1cbiJ9XX1dLCJuYW1lIjoiRXhhbXBsZSBDYWN0dXMgQ29uc29ydGl1bSJ9fQ",
+    "signatures": [
+        {
+            "protected": "eyJpYXQiOjE1OTYyNDQzMzQ0NTksImp0aSI6IjM3NmJjMzk0LTBlYWMtNDcwZi04NjliLThkYWIzNDRmNmY3MiIsImlzcyI6Ikh5cGVybGVkZ2VyIENhY3R1cyIsImFsZyI6IkVTMjU2SyJ9",
+            "signature": "ltnDyOe9WSdCk6f5Op8XlcnFoXUp3yJZgImsAvERnxWM-eeL6eX0MnCtfC5r3q6knt4kTTaUv8536SMCka_YyA"
+        }
+    ]
+}
+```
+
+The same JWS after being decoded looks like this:
+
+```json
+{
+    "payload": {
+        "consortium": {
+            "id": "2ae136f6-f9f7-40a2-9f6c-92b1b5d5046c",
+            "mainApiHost": "http://127.0.0.1:4000",
+            "members": [
+                {
+                    "id": "b24f8705-6da5-433a-b8c7-7d2079bae992",
+                    "name": "Example Cactus Consortium Member 1",
+                    "nodes": [
+                        {
+                            "nodeApiHost": "http://127.0.0.1:4000",
+                            "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEtDeq7BgpelfsX7WKiSb7Lhxp8VeS6YY/\nInbYuTgwZ8ykGs2Am2fM03aeMX9pYEzaeOVRU6ptwaEBFYX+YftCSQ==\n-----END PUBLIC KEY-----\n"
+                        }
+                    ]
+                }
+            ],
+            "name": "Example Cactus Consortium"
+        }
+    },
+    "signatures": [
+        {
+            "protected": {
+                "iat": 1596244334459,
+                "jti": "376bc394-0eac-470f-869b-8dab344f6f72",
+                "iss": "Hyperledger Cactus",
+                "alg": "ES256K"
+            },
+            "signature": "ltnDyOe9WSdCk6f5Op8XlcnFoXUp3yJZgImsAvERnxWM-eeL6eX0MnCtfC5r3q6knt4kTTaUv8536SMCka_YyA"
+        }
+    ]
+}
+```
+
+The below sequence diagram demonstrates a real world example of how a consortium between two business organizations (who both
+operate their own distributed ledgers) can be formed manually and then operated through the plugin discussed here.
+There's many other ways to perform the initial agreement that happens offline, but a concrete, non-generic example is
+provided here for ease of understanding:
+
+<img width="700" src="./plugin-consortium-manual-bootstrap-sequence-diagram.png">
+
 
 # 6. Identities, Authentication, Authorization
 

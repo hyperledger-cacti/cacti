@@ -1,0 +1,58 @@
+@startuml Sequence Diagram - Plugin Consortium Manual Bootstrap
+
+skinparam ArrowFontStyle italic
+
+title Hyperledger Cactus\nSequence Diagram - Plugin Consortium Manual Bootstrap
+
+box Humans
+actor Business_Organization_A as a <<consortium-member>>
+actor Business_Organization_B as b <<consortium-member>>
+end box
+
+box Cactus Node A
+entity "API Server A" as apia <<operated by member A>>
+end box
+
+box Cactus Node B
+entity "API Server B" as apib  <<operated by member B>>
+end box
+
+autoactivate off
+autonumber
+
+== Manual Consensus ==
+
+a -> b: Propose forming consortium\n(email, met in cafe, etc.)
+return Consent to consortium formation
+
+a -> b: Propose trusted communication\nchannel (corporate email or\ntrusted courier service/etc.)
+return Consent to proposed\ncommunication channel
+note over a,b
+This is where <u>**trust**</u> is established between the consortium members.
+If the selected channel is compromised in any way, that's an active MITM!
+end note
+
+== Provision Resources, Bootstrap Consortium ==
+
+a->a: Generate key(s) of node(s)
+a->a: Provision hardware resources\n(server,public IP, DNS)
+a->a: Decide on plugins to be used
+
+b->b: Generate key(s) of node(s)
+b->b: Provision hardware resources\n(server,public IP, DNS)
+b->b: Decide on plugins to be used
+
+a -> b: A sends node hosts,public keys to B
+return B responds in kind with their own
+note over a,b
+As mentioned above, if the communication was compromised, MITM can be
+executed at this point by the attacker by altering the keys/hosts in transit.
+end note
+
+a->apia: Configure consortium\nplugin with keys,hosts
+a->apia: Start Cactus API Server
+
+b->apib: Configure consortium\nplugin with keys,hosts
+b->apib: Start Cactus API Server
+
+@enduml

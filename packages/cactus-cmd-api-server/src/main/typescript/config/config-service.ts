@@ -1,10 +1,9 @@
-import { randomBytes } from "crypto";
 import { SecureVersion } from "tls";
 import { existsSync, readFileSync } from "fs";
 import convict, { Schema, Config, SchemaObj } from "convict";
 import { ipaddress } from "convict-format-with-validator";
-import secp256k1 from "secp256k1";
 import { v4 as uuidV4 } from "uuid";
+import { JWK, JWS } from "jose";
 import {
   LoggerProvider,
   Logger,
@@ -12,6 +11,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
 import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
+import { Consortium } from "@hyperledger/cactus-plugin-consortium-manual";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
@@ -24,6 +24,7 @@ export interface IPluginImport {
 export interface ICactusApiServerOptions {
   configFile: string;
   cactusNodeId: string;
+  consortiumId: string;
   logLevel: LogLevelDesc;
   tlsDefaultMaxVersion: SecureVersion;
   cockpitHost: string;
@@ -45,10 +46,8 @@ export interface ICactusApiServerOptions {
   apiTlsKeyPem: string;
   apiTlsClientCaPem: string;
   plugins: IPluginImport[];
-  publicKey: string;
-  privateKey: string;
-  keychainSuffixPublicKey: string;
-  keychainSuffixPrivateKey: string;
+  keyPairPem: string;
+  keychainSuffixKeyPairPem: string;
   minNodeVersion: string;
 }
 
@@ -105,6 +104,15 @@ export class ConfigService {
         default: "",
         env: "CONFIG_FILE",
         arg: "config-file",
+      },
+      consortiumId: {
+        doc:
+          "Identifier of the consortium your node is part of. " +
+          " Can be any string of characters such as a UUID",
+        format: ConfigService.formatNonBlankString,
+        default: null as any,
+        env: "CONSORTIUM_ID",
+        arg: "consortium-id",
       },
       cactusNodeId: {
         doc:
@@ -311,38 +319,26 @@ export class ConfigService {
         arg: "api-tls-key-pem",
         default: null as any,
       },
-      publicKey: {
-        doc: "Public key of this Cactus node (the API server)",
-        env: "PUBLIC_KEY",
-        arg: "public-key",
-        format: ConfigService.formatNonBlankString,
-        default: null as any,
-      },
-      privateKey: {
+      keyPairPem: {
         sensitive: true,
-        doc: "Private key of this Cactus node (the API server)",
-        env: "PRIVATE_KEY",
-        arg: "private-key",
+        doc:
+          "Key pair (private+public) of this Cactus node in the standard " +
+          " PEM format.",
+        env: "KEY_PAIR_PEM",
+        arg: "key-pair-pem",
         format: ConfigService.formatNonBlankString,
         default: null as any,
       },
-      keychainSuffixPrivateKey: {
+      keychainSuffixKeyPairPem: {
         doc:
-          "The key under which to store/retrieve the private key from the keychain of this Cactus node (API server)" +
-          "The complete lookup key is constructed from the ${CACTUS_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.",
-        env: "KEYCHAIN_SUFFIX_PRIVATE_KEY",
-        arg: "keychain-suffix-private-key",
+          "The key under which to store/retrieve the key pair PEM from the " +
+          " keychain of this Cactus node (API server) The complete lookup key" +
+          " is constructed from the ${CACTUS_NODE_ID}" +
+          "${KEYCHAIN_SUFFIX_KEY_PAIR_PEM} template.",
+        env: "KEYCHAIN_SUFFIX_KEY_PAIR_PEM",
+        arg: "keychain-suffix-key-pair-pem",
         format: "*",
-        default: "CACTUS_NODE_PRIVATE_KEY",
-      },
-      keychainSuffixPublicKey: {
-        doc:
-          "The key under which to store/retrieve the public key from the keychain of this Cactus node (API server)" +
-          "The complete lookup key is constructed from the ${CACTUS_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.",
-        env: "KEYCHAIN_SUFFIX_PUBLIC_KEY",
-        arg: "keychain-suffix-public-key",
-        format: "*",
-        default: "CACTUS_NODE_PUBLIC_KEY",
+        default: "CACTUS_NODE_KEY_PAIR_PEM",
       },
     };
   }
@@ -406,22 +402,31 @@ export class ConfigService {
   public newExampleConfig(): ICactusApiServerOptions {
     const schema = ConfigService.getConfigSchema();
 
-    // FIXME most of this lowever level crypto code should be in a commons package that's universal
-    let privateKeyBytes;
-    do {
-      privateKeyBytes = randomBytes(32);
-    } while (!secp256k1.privateKeyVerify(privateKeyBytes));
-
-    const publicKeyBytes = secp256k1.publicKeyCreate(privateKeyBytes);
-    const privateKey = Buffer.from(privateKeyBytes).toString("hex");
-    const publicKey = Buffer.from(publicKeyBytes).toString("hex");
-
     const apiTlsEnabled: boolean = (schema.apiTlsEnabled as SchemaObj).default;
     const apiHost = (schema.apiHost as SchemaObj).default;
     const apiPort = (schema.apiPort as SchemaObj).default;
+    const apiProtocol = apiTlsEnabled ? "https:" : "http";
+    const apiBaseUrl = `${apiProtocol}//${apiHost}:${apiPort}`;
 
-    // const apiProtocol = apiTlsEnabled ? "https:" : "http";
-    // const apiBaseUrl = `${apiProtocol}//${apiHost}:${apiPort}`;
+    const keyPair = JWK.generateSync("EC", "secp256k1", { use: "sig" }, true);
+    const keyPairPem = keyPair.toPEM(true);
+    const consortium: Consortium = {
+      name: "Example Cactus Consortium",
+      id: uuidV4(),
+      mainApiHost: apiBaseUrl,
+      members: [
+        {
+          id: uuidV4(),
+          name: "Example Cactus Consortium Member 1",
+          nodes: [
+            {
+              nodeApiHost: apiBaseUrl,
+              publicKeyPem: keyPair.toPEM(false),
+            },
+          ],
+        },
+      ],
+    };
 
     const cockpitTlsEnabled: boolean = (schema.cockpitTlsEnabled as SchemaObj)
       .default;
@@ -445,9 +450,10 @@ export class ConfigService {
         options: {},
       },
       {
-        packageName: "@hyperledger/cactus-plugin-web-service-consortium",
+        packageName: "@hyperledger/cactus-plugin-consortium-manual",
         options: {
-          privateKey,
+          keyPairPem,
+          consortium,
         },
       },
     ];
@@ -455,6 +461,7 @@ export class ConfigService {
     return {
       configFile: ".config.json",
       cactusNodeId: uuidV4(),
+      consortiumId: uuidV4(),
       logLevel: "debug",
       minNodeVersion: (schema.minNodeVersion as SchemaObj).default,
       tlsDefaultMaxVersion: "TLSv1.3",
@@ -476,11 +483,8 @@ export class ConfigService {
       cockpitTlsCertPem: pkiServer.certificatePem,
       cockpitTlsKeyPem: pkiServer.privateKeyPem,
       cockpitTlsClientCaPem: "-", // Cockpit mTLS is off so this will not crash the server
-      publicKey,
-      privateKey,
-      keychainSuffixPublicKey: (schema.keychainSuffixPublicKey as SchemaObj)
-        .default,
-      keychainSuffixPrivateKey: (schema.keychainSuffixPrivateKey as SchemaObj)
+      keyPairPem,
+      keychainSuffixKeyPairPem: (schema.keychainSuffixKeyPairPem as SchemaObj)
         .default,
       plugins,
     };
@@ -510,24 +514,22 @@ export class ConfigService {
   }
 
   /**
-   * Validation that prevents operators from mistakenly deploying a public key
-   * that they may not have the private key for or vica versa.
+   * Validation that prevents operators from mistakenly deploying a key pair
+   * that they may not be operational for whatever reason.
    *
-   * @throws If the private key and the public key are not part of the same key pair.
+   * @throws If a dummy sign+verification operation fails for any reason.
    */
   validateKeyPairMatch(): void {
+    const fnTag = "ConfigService#validateKeyPairMatch()";
     // FIXME most of this lowever level crypto code should be in a commons package that's universal
-    const privateKey = ConfigService.config.get("privateKey");
-    const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
-    const publicKey = ConfigService.config.get("publicKey");
-    const expectedPublicKeyBytes = secp256k1.publicKeyCreate(privateKeyBytes);
-    const expectedPublicKey = Buffer.from(expectedPublicKeyBytes).toString(
-      "hex"
-    );
-    if (publicKey !== expectedPublicKey) {
-      throw new Error(
-        `Public key does not match private key. Configured=${publicKey} Expected=${expectedPublicKey}`
-      );
+    const keyPairPem = ConfigService.config.get("keyPairPem");
+    const keyPair = JWK.asKey(keyPairPem);
+
+    const jws = JWS.sign({ hello: "world" }, keyPair);
+    try {
+      JWS.verify(jws, keyPair);
+    } catch (ex) {
+      throw new Error(`${fnTag} Invalid key pair PEM: ${ex && ex.stack}`);
     }
   }
 }
