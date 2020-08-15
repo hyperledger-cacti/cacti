@@ -4,13 +4,15 @@ import { PreloadAllModules, RouterModule, Routes } from "@angular/router";
 const routes: Routes = [
   {
     path: "",
-    redirectTo: "folder/Inbox",
+    redirectTo: "consortiums/inspector",
     pathMatch: "full",
   },
   {
-    path: "folder/:id",
+    path: "consortiums/inspector",
     loadChildren: () =>
-      import("./folder/folder.module").then((m) => m.FolderPageModule),
+      import("./consortium-inspector/consortium-inspector.module").then(
+        (m) => m.ConsortiumInspectorPageModule
+      ),
   },
 ];
 

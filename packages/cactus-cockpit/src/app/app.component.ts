@@ -5,7 +5,7 @@ import { SplashScreen } from "@ionic-native/splash-screen/ngx";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
 
 import { LoggerProvider, Logger } from "@hyperledger/cactus-common";
-import { DefaultApi as DefaultApiConsortium } from "@hyperledger/cactus-plugin-web-service-consortium";
+import { DefaultApi as DefaultApiConsortium } from "@hyperledger/cactus-plugin-consortium-manual";
 import { ApiClient, Configuration } from "@hyperledger/cactus-sdk";
 import { CACTUS_API_URL } from "src/constants";
 
@@ -18,39 +18,13 @@ export class AppComponent implements OnInit {
   public selectedIndex = 0;
   public appPages = [
     {
-      title: "Inbox",
-      url: "/folder/Inbox",
-      icon: "mail",
-    },
-    {
-      title: "Outbox",
-      url: "/folder/Outbox",
-      icon: "paper-plane",
-    },
-    {
-      title: "Favorites",
-      url: "/folder/Favorites",
-      icon: "heart",
-    },
-    {
-      title: "Archived",
-      url: "/folder/Archived",
-      icon: "archive",
-    },
-    {
-      title: "Trash",
-      url: "/folder/Trash",
-      icon: "trash",
-    },
-    {
-      title: "Spam",
-      url: "/folder/Spam",
-      icon: "warning",
+      title: "Consortiums",
+      url: "/consortiums-inspector",
+      icon: "color-filter",
     },
   ];
-  public labels = ["Family", "Friends", "Notes", "Work", "Travel", "Reminders"];
 
-  private readonly logger: Logger;
+  private readonly log: Logger;
 
   constructor(
     private platform: Platform,
@@ -58,11 +32,11 @@ export class AppComponent implements OnInit {
     private statusBar: StatusBar,
     @Inject(CACTUS_API_URL) public readonly cactusApiUrl: string
   ) {
-    this.logger = LoggerProvider.getOrCreate({
+    this.log = LoggerProvider.getOrCreate({
       label: "app-component",
       level: "debug",
     });
-    this.logger.info("Initializing app...");
+    this.log.info("Initializing app...");
     this.initializeApp();
   }
 
@@ -70,17 +44,11 @@ export class AppComponent implements OnInit {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      this.logger.info("App initialized OK. Splashscreen was hidden.");
+      this.log.info("App initialized OK. Splashscreen was hidden.");
     });
   }
 
   ngOnInit() {
-    const path = window.location.pathname.split("folder/")[1];
-    if (path !== undefined) {
-      this.selectedIndex = this.appPages.findIndex(
-        (page) => page.title.toLowerCase() === path.toLowerCase()
-      );
-    }
     this.testApi();
   }
 
@@ -89,29 +57,9 @@ export class AppComponent implements OnInit {
     const apiClient = new ApiClient(configuration).extendWith(
       DefaultApiConsortium
     );
-    const randomness = Math.random().toString(16);
-    const dummyConsortium = {
-      configurationEndpoint: "some-host" + randomness,
-      id: "some-id" + randomness,
-      name: "some-name" + randomness,
-      cactusNodes: [
-        {
-          host: "some-host" + randomness,
-          publicKey: "some-fake-public-key" + randomness,
-        },
-      ],
-    };
-    const createConsortiumResponse = await apiClient.apiV1PluginsHyperledgerCactusPluginWebServiceConsortiumConsortiumPost(
-      dummyConsortium
-    );
-    const healthCheckResponse = await apiClient.apiV1ApiServerHealthcheckGet();
-    this.logger.info(
-      `apiV1PluginsHyperledgerCactusPluginWebServiceConsortiumConsortiumPost: `,
-      createConsortiumResponse.data
-    );
-    this.logger.info(
-      `apiV1ApiServerHealthcheckGet: `,
-      healthCheckResponse.data
-    );
+    const res = await apiClient.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet();
+    const resHealthCheck = await apiClient.apiV1ApiServerHealthcheckGet();
+    this.log.info(`ConsortiumNodeJwtGet`, res.data);
+    this.log.info(`ApiServer HealthCheck Get:`, resHealthCheck.data);
   }
 }

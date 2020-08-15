@@ -16,7 +16,7 @@ import express, {
 import { OpenApiValidator } from "express-openapi-validator";
 import compression from "compression";
 import bodyParser from "body-parser";
-import cors, { CorsOptions } from "cors";
+import cors from "cors";
 import {
   PluginFactory,
   ICactusPlugin,
@@ -24,10 +24,7 @@ import {
   IPluginWebService,
   PluginRegistry,
 } from "@hyperledger/cactus-core-api";
-import {
-  ICactusApiServerOptions as ICactusApiServerConfig,
-  ConfigService,
-} from "./config/config-service";
+import { ICactusApiServerOptions } from "./config/config-service";
 import { CACTUS_OPEN_API_JSON } from "./openapi-spec";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { Servers } from "./common/servers";
@@ -36,7 +33,7 @@ export interface IApiServerConstructorOptions {
   pluginRegistry?: PluginRegistry;
   httpServerApi?: Server | SecureServer;
   httpServerCockpit?: Server | SecureServer;
-  config: ICactusApiServerConfig;
+  config: ICactusApiServerOptions;
 }
 
 export class ApiServer {
