@@ -52,6 +52,7 @@ test("Simple JSON Test", async (assert: Test) => {
   const sign2 = jsObjectSigner.sign(payload2);
 
   assert.equals(sign1.toString, sign2.toString);
+  assert.end();
 });
 
 test("Simple Nested JSON Test", async (assert: Test) => {
@@ -70,6 +71,7 @@ test("Simple Nested JSON Test", async (assert: Test) => {
   const sign2 = jsObjectSigner.sign(outer2);
 
   assert.equals(sign1.toString, sign2.toString);
+  assert.end();
 });
 
 test("Simple Date JSON Test", async (assert: Test) => {
@@ -106,6 +108,7 @@ test("Simple Date JSON Test", async (assert: Test) => {
   const sign2 = jsObjectSigner.sign(outer2);
 
   assert.equals(sign1.toString, sign2.toString);
+  assert.end();
 });
 
 test("Circular JSON Test", async (assert: Test) => {
@@ -121,6 +124,7 @@ test("Circular JSON Test", async (assert: Test) => {
   obj.b = obj;
 
   assert.throws(() => jsObjectSigner.sign(obj));
+  assert.end();
 });
 
 test("Very Signature Test", async (assert: Test) => {
@@ -136,6 +140,7 @@ test("Very Signature Test", async (assert: Test) => {
   const verify = jsObjectSigner.verify(payload1, sign1, keyPairs.publicKey);
 
   assert.equals(true, verify);
+  assert.end();
 });
 
 test("Test optional sign function", async (assert: Test) => {
@@ -156,6 +161,7 @@ test("Test optional sign function", async (assert: Test) => {
   const sign2 = jsObjectSigner.sign(outer2);
 
   assert.equals(sign1.toString, sign2.toString);
+  assert.end();
 });
 
 test("Test optional verify sign function", async (assert: Test) => {
@@ -175,6 +181,7 @@ test("Test optional verify sign function", async (assert: Test) => {
   const verify = jsObjectSigner.verify(outer1, sign1, keyPairs.publicKey);
 
   assert.equals(true, verify);
+  assert.end();
 });
 
 test("Test optional hash function", async (assert: Test) => {
@@ -195,6 +202,7 @@ test("Test optional hash function", async (assert: Test) => {
   const sign2 = jsObjectSigner.sign(outer2);
 
   assert.equals(sign1.toString, sign2.toString);
+  assert.end();
 });
 
 test("Test missing required constructor field", async (assert: Test) => {
@@ -207,4 +215,5 @@ test("Test missing required constructor field", async (assert: Test) => {
   } catch (e) {
     assert.equal(e.message, "JsObjectSigner#ctor options.privateKey falsy.");
   }
+  assert.end();
 });

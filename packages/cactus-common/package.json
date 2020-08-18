@@ -64,6 +64,7 @@
   "dependencies": {
     "joi": "14.3.1",
     "json-stable-stringify": "1.0.1",
+    "key-encoder": "2.0.3",
     "loglevel": "1.6.7",
     "loglevel-plugin-prefix": "0.8.4",
     "secp256k1": "4.0.2",

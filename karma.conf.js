@@ -12,14 +12,13 @@ module.exports = (config) => {
       // 'Electron',
       // "ElectronWithGui",
       // 'Chrome',
-      // 'ChromeHeadless',
-      "ChromeHeadlessDebug",
+      "ChromeHeadless",
+      // "ChromeHeadlessDebug",
     ],
 
     files: [
-      {
-        pattern: "packages/cactus-common/src/test/typescript/unit/**/*.ts",
-      },
+      // FIXME: For whatever reason only the first test gets executed not all of them
+      "./packages/cactus-common/src/test/typescript/unit/**/*",
     ],
 
     plugins: [
