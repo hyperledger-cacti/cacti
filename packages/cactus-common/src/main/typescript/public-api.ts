@@ -17,3 +17,4 @@ export {
 
 export { ISignerKeyPair } from "./signer-key-pair";
 export { Secp256k1Keys } from "./secp256k1-keys";
+export { KeyFormat, KeyConverter } from "./key-converter";
