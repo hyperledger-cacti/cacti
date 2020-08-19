@@ -1,0 +1,19 @@
+apply plugin: 'net.corda.plugins.cordapp'
+
+cordapp {
+    targetPlatformVersion corda_platform_version.toInteger()
+    minimumPlatformVersion corda_platform_version.toInteger()
+    contract {
+        name "Hyperledger Cactus Corda Contract"
+        vendor "Accenture"
+        licence "Apache License, Version 2.0"
+        versionId 1
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    // Corda dependencies.
+    cordaCompile "$corda_release_group:corda-core:$corda_release_version"
+    cordaCompile "$corda_release_group:corda-jackson:$corda_release_version"
+}

@@ -1,5 +1,12 @@
 FROM corda/corda-zulu-4.0:latest AS corda
+
+RUN mkdir -p /opt/corda/bin
+COPY --from=corda /opt/corda/bin/ /opt/corda/bin/
+
+
 FROM adoptopenjdk/openjdk8:alpine
+
+ARG KEYPATH=~/.ssh/id_rsa.pub
 
 
 # Set up Open-SSH server
@@ -73,12 +80,19 @@ ADD PartyB/certificates/sslkeystore.jks /opt/corda/partyB/certificates/sslkeysto
 ADD PartyB/node.conf /opt/corda/partyB/node.conf
 ADD additional-node-infos /opt/corda/partyB/additional-node-infos
 
-WORKDIR /opt/corda
+# set up gradle
+RUN mkdir -p /opt/corda/builder
+ADD deploy_contract.sh /opt/corda/builder/deploy_contract.sh
+RUN chmod +x /opt/corda/builder/deploy_contract.sh
+ADD builder/gradlew /opt/corda/builder/gradlew
+ADD builder/gradle /opt/corda/builder/gradle
 
 EXPOSE 10013
 EXPOSE 10014
 EXPOSE 10003
 EXPOSE 10004
+
+WORKDIR /opt/corda
 
 ADD init_node.sh /opt/corda/bin/init_node.sh
 ENTRYPOINT ["/opt/corda/bin/init_node.sh"]
