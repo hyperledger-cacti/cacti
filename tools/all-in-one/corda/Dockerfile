@@ -28,9 +28,6 @@ RUN mkdir -p /opt/corda/partyB/additional-node-infos
 RUN mkdir -p /opt/corda/bin
 COPY --from=corda /opt/corda/bin/ /opt/corda/bin/
 
-# add cactus cordapp source code
-ADD corda-source /opt/corda/corda-source
-
 WORKDIR /opt/corda
 
 # set up node file for party A
