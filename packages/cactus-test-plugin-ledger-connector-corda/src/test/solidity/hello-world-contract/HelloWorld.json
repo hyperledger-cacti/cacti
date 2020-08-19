@@ -1,0 +1,167 @@
+{
+    "contractName": "HelloWorld",
+    "abi": [
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "sayHello",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "pure",
+            "type": "function"
+        }
+    ],
+    "metadata": "{\"compiler\":{\"version\":\"0.5.1+commit.c8a2cb62\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"sayHello\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-plugin-ledger-connector-besu/src/test/solidity/hello-world-contract/HelloWorld.sol\":\"HelloWorld\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-plugin-ledger-connector-besu/src/test/solidity/hello-world-contract/HelloWorld.sol\":{\"keccak256\":\"0xf22ee0ef01b08a43f95f4f92fb00972915e42cc65ff4502361646f12c7148762\",\"urls\":[\"bzzr://e70661255d8f1d3155a7e999c74577de66bb7e67bb93012ecbbfbd4381f4f504\"]}},\"version\":1}",
+    "bytecode": "608060405234801561001057600080fd5b50610124806100206000396000f3fe6080604052600436106038577c01000000000000000000000000000000000000000000000000000000006000350463ef5fb05b8114603d575b600080fd5b348015604857600080fd5b50604f60c1565b6040805160208082528351818301528351919283929083019185019080838360005b8381101560875781810151838201526020016071565b50505050905090810190601f16801560b35780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b60408051808201909152600c81527f48656c6c6f20576f726c6421000000000000000000000000000000000000000060208201529056fea165627a7a72305820163679abbba7fb3b971fb45c42705166d72dce361ffbee6d7f65c733b022ce420029",
+    "deployedBytecode": "6080604052600436106038577c01000000000000000000000000000000000000000000000000000000006000350463ef5fb05b8114603d575b600080fd5b348015604857600080fd5b50604f60c1565b6040805160208082528351818301528351919283929083019185019080838360005b8381101560875781810151838201526020016071565b50505050905090810190601f16801560b35780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b60408051808201909152600c81527f48656c6c6f20576f726c6421000000000000000000000000000000000000000060208201529056fea165627a7a72305820163679abbba7fb3b971fb45c42705166d72dce361ffbee6d7f65c733b022ce420029",
+    "sourceMap": "25:112:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:112:0;;;;;;;",
+    "deployedSourceMap": "25:112:0:-;;;;;;;;;;;;;;;;;;;;;48:87;;8:9:-1;5:2;;;30:1;27;20:12;5:2;48:87:0;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:100:-1;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;48:87:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;110:21;;;;;;;;;;;;;;;;;48:87;:::o",
+    "sourcePath": "/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-plugin-ledger-connector-besu/src/test/solidity/hello-world-contract/HelloWorld.sol",
+    "compiler": {
+        "name": "solc",
+        "version": "0.5.1+commit.c8a2cb62"
+    },
+    "ast": {
+        "absolutePath": "/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-plugin-ledger-connector-besu/src/test/solidity/hello-world-contract/HelloWorld.sol",
+        "exportedSymbols": {
+            "HelloWorld": [
+                10
+            ]
+        },
+        "id": 11,
+        "nodeType": "SourceUnit",
+        "nodes": [
+            {
+                "id": 1,
+                "literals": [
+                    "solidity",
+                    ">",
+                    "0.5",
+                    ".0"
+                ],
+                "nodeType": "PragmaDirective",
+                "src": "0:23:0"
+            },
+            {
+                "baseContracts": [],
+                "contractDependencies": [],
+                "contractKind": "contract",
+                "documentation": null,
+                "fullyImplemented": true,
+                "id": 10,
+                "linearizedBaseContracts": [
+                    10
+                ],
+                "name": "HelloWorld",
+                "nodeType": "ContractDefinition",
+                "nodes": [
+                    {
+                        "body": {
+                            "id": 8,
+                            "nodeType": "Block",
+                            "src": "105:30:0",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "argumentTypes": null,
+                                        "hexValue": "48656c6c6f20576f726c6421",
+                                        "id": 6,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": true,
+                                        "kind": "string",
+                                        "lValueRequested": false,
+                                        "nodeType": "Literal",
+                                        "src": "117:14:0",
+                                        "subdenomination": null,
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_stringliteral_3ea2f1d0abf3fc66cf29eebb70cbd4e7fe762ef8a09bcc06c8edf641230afec0",
+                                            "typeString": "literal_string \"Hello World!\""
+                                        },
+                                        "value": "Hello World!"
+                                    },
+                                    "functionReturnParameters": 5,
+                                    "id": 7,
+                                    "nodeType": "Return",
+                                    "src": "110:21:0"
+                                }
+                            ]
+                        },
+                        "documentation": null,
+                        "id": 9,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "sayHello",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 2,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "66:2:0"
+                        },
+                        "returnParameters": {
+                            "id": 5,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 4,
+                                    "name": "",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 9,
+                                    "src": "90:13:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_string_memory_ptr",
+                                        "typeString": "string"
+                                    },
+                                    "typeName": {
+                                        "id": 3,
+                                        "name": "string",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "90:6:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage_ptr",
+                                            "typeString": "string"
+                                        }
+                                    },
+                                    "value": null,
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "89:15:0"
+                        },
+                        "scope": 10,
+                        "src": "48:87:0",
+                        "stateMutability": "pure",
+                        "superFunction": null,
+                        "visibility": "public"
+                    }
+                ],
+                "scope": 11,
+                "src": "25:112:0"
+            }
+        ],
+        "src": "0:138:0"
+    },
+    "functionHashes": {
+        "sayHello()": "ef5fb05b"
+    },
+    "gasEstimates": {
+        "creation": {
+            "codeDepositCost": "58400",
+            "executionCost": "111",
+            "totalCost": "58511"
+        },
+        "external": {
+            "sayHello()": "infinite"
+        }
+    }
+}

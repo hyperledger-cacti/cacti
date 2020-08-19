@@ -242,6 +242,11 @@ export class CordaTestLedger implements ITestLedger {
     }
   }
 
+  public async getRpcApiHttpHost(): Promise<string> {
+    const publicPort: number = await this.getRpcAPublicPort();
+    return `http://localhost:${publicPort}`;
+  }
+
   public async getContainerIpAddress(): Promise<string> {
     const aContainerInfo = await this.getContainerInfo();
     const { NetworkSettings } = aContainerInfo;

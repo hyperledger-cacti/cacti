@@ -1,17 +1,14 @@
 FROM corda/corda-zulu-4.0:latest AS corda
-
+FROM adoptopenjdk/openjdk8:alpine
 RUN mkdir -p /opt/corda/bin
 COPY --from=corda /opt/corda/bin/ /opt/corda/bin/
-
-
-FROM adoptopenjdk/openjdk8:alpine
 
 ARG KEYPATH=~/.ssh/id_rsa.pub
 
 
 # Set up Open-SSH server
 RUN apk update && \
-    apk add openssh augeas && \
+    apk add openssh augeas supervisor && \
     mkdir -p ~root/.ssh /etc/authorized_keys && chmod 700 ~root/.ssh/ && \
     augtool 'set /files/etc/ssh/sshd_config/AuthorizedKeysFile ".ssh/authorized_keys /etc/authorized_keys/%u"' && \
     augtool 'set /files/etc/ssh/sshd_config/PermitRootLogin yes' && \
@@ -94,5 +91,5 @@ EXPOSE 10004
 
 WORKDIR /opt/corda
 
-ADD init_node.sh /opt/corda/bin/init_node.sh
-ENTRYPOINT ["/opt/corda/bin/init_node.sh"]
+COPY supervisord.conf /etc/supervisord.conf
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
