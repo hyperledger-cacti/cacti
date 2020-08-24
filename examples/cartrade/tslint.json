@@ -1,0 +1,26 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "variable-name": {
+            "options": [
+                "allow-leading-underscore",
+                "ban-keywords",
+                "check-format"
+            ]
+        },
+        "no-string-literal": false,
+        "no-var-requires": false,
+        "object-literal-shorthand": false,
+        "max-classes-per-file": false
+    },
+    "rulesDirectory": [],
+    "linterOptions": {
+      "exclude": [
+        "node_modules"
+      ]
+    }
+}

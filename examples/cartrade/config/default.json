@@ -1,0 +1,77 @@
+{
+    "ledgerPluginInfo": [
+        {
+            "validatorId": "84jUisrs",
+            "validatorUrl": "https://localhost:5050",
+            "ledgerInfo": {
+                "ledgerAbstract": "Go-Ethereum Ledger"
+            }
+        },
+        {
+            "validatorId": "r9IS4dDf",
+            "validatorUrl": "https://localhost:5040",
+            "ledgerInfo": {
+                "ledgerAbstract": "Fabric Ledger"
+            }
+        }
+    ],
+    "cartradeInfo": {
+        "fabric": {
+            "mspid": "Org1MSP",
+            "keystore": "./wallet/admin",
+            "connUserName": "user1",
+            "contractName": "fabcar",
+            "peers": [
+                {
+                    "name": "peer0.org1.example.com",
+                    "requests": "grpc://localhost:7051"
+                }
+            ],
+            "orderer": {
+                "name": "orderer.example.com",
+                "url": "grpc://localhost:7050"
+            },
+            "ca": {
+                "name": "ca.example.com",
+                "url": "http://localhost:7054"
+            },
+            "submitter": {
+                "name": "admin",
+                "secret": "adminpw",
+                "certificate": "-----BEGIN CERTIFICATE-----\nMIICAjCCAaigAwIBAgIUYcAcX63XaN2Omym6hEXF+Kxzx2QwCgYIKoZIzj0EAwIw\nczELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh\nbiBGcmFuY2lzY28xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMT\nE2NhLm9yZzEuZXhhbXBsZS5jb20wHhcNMjAwNzI3MTAzNDAwWhcNMjEwNzI3MTAz\nOTAwWjAhMQ8wDQYDVQQLEwZjbGllbnQxDjAMBgNVBAMTBWFkbWluMFkwEwYHKoZI\nzj0CAQYIKoZIzj0DAQcDQgAE0TjOYDQfDbAOU3wYNvxgeaTE/r88BieO5V4yu/6E\nJk4yBHscyaRCnrLZ9eqyFa5+3G5V0mA7hbTw48mdeMArsKNsMGowDgYDVR0PAQH/\nBAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFBMOvw1wPpaBeZIpqc3AFbGs\nY0KMMCsGA1UdIwQkMCKAIEI5qg3NdtruuLoM2nAYUdFFBNMarRst3dusalc2Xkl8\nMAoGCCqGSM49BAMCA0gAMEUCIQDXvckX5bZ5mGPHpQ49aKSFsGJkwrX1BnW7DwA+\n4suQPQIgVGKIiQBQDGlOQHkt9lqno/yFiFZSjzZSS24LFIJNKU4=\n-----END CERTIFICATE-----\n",
+                "pkey": "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgQ3pbxM94ZzHPEHW7\n5TQ1N/WfCLSgqY97dfyF34WiJz2hRANCAATROM5gNB8NsA5TfBg2/GB5pMT+vzwG\nJ47lXjK7/oQmTjIEexzJpEKestn16rIVrn7cblXSYDuFtPDjyZ14wCuw\n-----END PRIVATE KEY-----\n"
+            },
+            "channelName": "mychannel",
+            "chaincodeId": "fabcar"
+        },
+        "ethereum": {
+            "gethUrl": "http://localhost:8545",
+            "chainName": "geth1",
+            "networkId": 10,
+            "chainId": 10,
+            "network": "mainnet",
+            "hardfork": "petersburg",
+            "gas": 21000,
+            // private key for from address
+            "fromAddressPkey": "40d7e5931a6e0807d3ebd70518f635dbf575975d3bb564ff34c99be416067c89",
+            // escrow address
+            "escrowAddress": "0x36e146d5afab61ab125ee671708eeb380aea05b6",
+            // private key for escrow address
+            "escrowAddressPkey": "13a45756bc314465c4ae2ff0eb9ab58cf72453c04604d8fa14393eb25ce96d06"
+        }
+    },
+    // Log level (trace/debug/info/warn/error/fatal)
+    "logLevel": "debug",
+    // Application Host Info
+    "applicationHostInfo": {
+        // host name
+        "hostName": "http://foo.foo.foo:bar",
+        // port number
+        "hostPort": 5034
+    },
+    "socketOptions": {
+        "rejectUnauthorized": false,
+        "reconnection": false,
+        "timeout": 20000
+    }
+}
