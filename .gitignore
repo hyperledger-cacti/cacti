@@ -38,3 +38,4 @@ bin/
 .tmp/
 lerna-debug.log
 cactus-openapi-spec.json
+cactus-openapi-spec-*.json
