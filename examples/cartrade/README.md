@@ -17,7 +17,9 @@
 		- `/packages/ledger-plugin/fabric/validator/unit-test/validatorDriver_signTransactionOffline.js`
 
 ## Boot method
-1. cd `/examples/cartrade`
+1. mv `/examples/cartrade/config/{package.json,tsconfig.json,tslint.json}` `/`
+	- This operation means that package.json, tsconfig.json, and tslint.json are moved into the top directory of cactus before the application is booted
+1. cd `/examples/cartrade/`
 1. npm install
 1. Modify the following information for your environment
 	- corrected escrow account information, etc. on `config/default.json`
