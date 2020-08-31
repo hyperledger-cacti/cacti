@@ -1,23 +1,7 @@
 {
-    "ledgerPluginInfo": [
-        {
-            "validatorId": "84jUisrs",
-            "validatorUrl": "https://localhost:5050",
-            "ledgerInfo": {
-                "ledgerAbstract": "Go-Ethereum Ledger"
-            }
-        },
-        {
-            "validatorId": "r9IS4dDf",
-            "validatorUrl": "https://localhost:5040",
-            "ledgerInfo": {
-                "ledgerAbstract": "Fabric Ledger"
-            }
-        }
-    ],
     "cartradeInfo": {
         "fabric": {
-            "mspid": "Org1MSP",
+            "mspID": "Org1MSP",
             "keystore": "./wallet/admin",
             "connUserName": "user1",
             "contractName": "fabcar",
@@ -29,11 +13,11 @@
             ],
             "orderer": {
                 "name": "orderer.example.com",
-                "url": "grpc://localhost:7050"
+                "URL": "grpc://localhost:7050"
             },
             "ca": {
                 "name": "ca.example.com",
-                "url": "http://localhost:7054"
+                "URL": "http://localhost:7054"
             },
             "submitter": {
                 "name": "admin",
@@ -42,36 +26,20 @@
                 "pkey": "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgQ3pbxM94ZzHPEHW7\n5TQ1N/WfCLSgqY97dfyF34WiJz2hRANCAATROM5gNB8NsA5TfBg2/GB5pMT+vzwG\nJ47lXjK7/oQmTjIEexzJpEKestn16rIVrn7cblXSYDuFtPDjyZ14wCuw\n-----END PRIVATE KEY-----\n"
             },
             "channelName": "mychannel",
-            "chaincodeId": "fabcar"
+            "chaincodeID": "fabcar"
         },
         "ethereum": {
-            "gethUrl": "http://localhost:8545",
+            "gethURL": "http://localhost:8545",
             "chainName": "geth1",
-            "networkId": 10,
-            "chainId": 10,
+            "networkID": 10,
+            "chainID": 10,
             "network": "mainnet",
             "hardfork": "petersburg",
             "gas": 21000,
-            // private key for from address
             "fromAddressPkey": "40d7e5931a6e0807d3ebd70518f635dbf575975d3bb564ff34c99be416067c89",
-            // escrow address
             "escrowAddress": "0x36e146d5afab61ab125ee671708eeb380aea05b6",
-            // private key for escrow address
             "escrowAddressPkey": "13a45756bc314465c4ae2ff0eb9ab58cf72453c04604d8fa14393eb25ce96d06"
         }
     },
-    // Log level (trace/debug/info/warn/error/fatal)
-    "logLevel": "debug",
-    // Application Host Info
-    "applicationHostInfo": {
-        // host name
-        "hostName": "http://foo.foo.foo:bar",
-        // port number
-        "hostPort": 5034
-    },
-    "socketOptions": {
-        "rejectUnauthorized": false,
-        "reconnection": false,
-        "timeout": 20000
-    }
+    "logLevel": "debug"
 }
