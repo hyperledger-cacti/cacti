@@ -146,7 +146,10 @@ export class PluginLedgerConnectorCorda
       "flow start " +
       flow +
       " " +
-      JSON.stringify(state).replace("{", "").replace("}", "");
+      JSON.stringify(state)
+        .replace("{", "")
+        .replace("}", "")
+        .replace(/\"/gi, " ");
     return this.executeCordaCommand(command);
   }
 

@@ -35,20 +35,27 @@ tap.test("deploys contract via .zip file", async (assert: any) => {
     password: "test",
   });
 
+  const zip = path.resolve(
+    process.cwd() +
+      "/packages/cactus-test-plugin-ledger-connector-corda/src/test/kotlin/upload.zip"
+  );
+  const key = path.resolve(
+    process.cwd() + "/tools/all-in-one/corda/corda_image"
+  );
   const options: ICordaDeployContractOptions = {
     host: "localhost",
     username: "root",
     port: sshPort,
     privateKey:
       "/Users/jacob.weate/Projects/jweate-bif/blockchain-integration-framework/tools/all-in-one/corda/corda_image",
-    contractZip:
-      "/Users/jacob.weate/Projects/jweate-bif/blockchain-integration-framework/packages/cactus-test-plugin-ledger-connector-corda/src/test/kotlin/upload.zip",
+    contractZip: zip,
   };
 
   // connector.deployContract(options).then(() => {
   //   log.info("COMPLETED");
   //   assert.end();
   // });
+
   const ssh = new NodeSSH();
   log.info("Port: %d | Key: %s", options.port, options.privateKey);
   ssh
@@ -77,6 +84,17 @@ tap.test("deploys contract via .zip file", async (assert: any) => {
         }
       );
     });
+
+  // const flow = "CashIssueFlow"
+  // class CordaState {
+  //   public amount: string = "";
+  //   public issuerBankPartyRef: string = "";
+
+  //   constructor(amount: string, issuerBankPartyRef: string){
+  //     this.amount = amount
+  //     this.issuerBankPartyRef = issuerBankPartyRef
+  //   }
+  // }
 
   // assert.tearDown(async () => {
   //   log.debug(`Starting teardown...`);
