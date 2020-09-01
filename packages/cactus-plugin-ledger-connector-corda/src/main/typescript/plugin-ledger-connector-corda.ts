@@ -13,6 +13,13 @@ import { Server as SecureServer } from "https";
 import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint";
 import { NodeSSH } from "node-ssh";
 
+/**
+ * FIXME: This is under construction.
+ */
+export interface ITransactionOptions {
+  privateKey?: string;
+}
+
 export interface IPluginLedgerConnectorCordaOptions {
   host: string;
   port: number;
@@ -92,8 +99,9 @@ export class PluginLedgerConnectorCorda
         `PluginLedgerConnectorCorda#deployContract() options.contractZip falsy.`
       );
     }
+    const log = this.log;
     const ssh = new NodeSSH();
-    this.log.info("Port: %d | Key: %s", options.port, options.privateKey);
+    log.info("Port: %d | Key: %s", options.port, options.privateKey);
     ssh
       .connect({
         host: "localhost",
@@ -101,7 +109,7 @@ export class PluginLedgerConnectorCorda
         port: options.port,
         privateKey: options.privateKey,
       })
-      .then(function () {
+      .then(() => {
         // Local, Remote
         ssh
           .putFile(
@@ -109,20 +117,20 @@ export class PluginLedgerConnectorCorda
             "/root/smart-contracts/upload.zip"
           )
           .then(
-            function () {
-              console.log("Smart Contracts uploaded to server");
+            () => {
+              log.info("Smart Contracts uploaded to server");
               ssh
                 .execCommand("/bin/ash deploy_contract.sh", {
                   cwd: "/opt/corda/builder",
                 })
-                .then(function (result) {
-                  console.log("STDOUT: " + result.stdout);
-                  console.log("STDERR: " + result.stderr);
+                .then((result) => {
+                  log.info("STDOUT: " + result.stdout);
+                  log.info("STDERR: " + result.stderr);
                 });
             },
-            function (error) {
-              console.log("Error: Failed to upload smart contract to server");
-              console.log(error);
+            (error) => {
+              log.info("Error: Failed to upload smart contract to server");
+              log.info(error);
             }
           );
       });

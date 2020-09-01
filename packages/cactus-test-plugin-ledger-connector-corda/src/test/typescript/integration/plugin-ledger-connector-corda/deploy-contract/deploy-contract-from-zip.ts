@@ -29,7 +29,10 @@ tap.test("deploys contract via .zip file", async (assert: any) => {
 
   const factory = new PluginFactoryLedgerConnector();
   const connector: PluginLedgerConnectorCorda = await factory.create({
-    rpcApiHttpHost,
+    host: "localhost",
+    port: partyASSH,
+    username: "user1",
+    password: "test",
   });
 
   const options: ICordaDeployContractOptions = {
@@ -55,22 +58,22 @@ tap.test("deploys contract via .zip file", async (assert: any) => {
       port: options.port,
       privateKey: options.privateKey,
     })
-    .then(function () {
+    .then(() => {
       // Local, Remote
       ssh.putFile(options.contractZip, "/root/smart-contracts/upload.zip").then(
-        function () {
-          console.log("Smart Contracts uploaded to server");
+        () => {
+          log.info("Smart Contracts uploaded to server");
           ssh
             .execCommand("/bin/ash deploy_contract.sh", {
               cwd: "/opt/corda/builder",
             })
-            .then(function (result) {
-              console.log("STDERR: " + result.stderr);
+            .then((result) => {
+              log.info("STDERR: " + result.stderr);
             });
         },
-        function (error) {
-          console.log("Error: Failed to upload smart contract to server");
-          console.log(error);
+        (error) => {
+          log.info("Error: Failed to upload smart contract to server");
+          log.info(error);
         }
       );
     });
