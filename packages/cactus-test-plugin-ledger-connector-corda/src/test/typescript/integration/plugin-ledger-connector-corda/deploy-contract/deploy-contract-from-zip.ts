@@ -36,34 +36,44 @@ tap.test("deploys contract via .zip file", async (assert: any) => {
     host: "localhost",
     username: "root",
     port: sshPort,
-    privateKey: "/Users/jacob.weate/.ssh/corda_image",
-    contractZip: "/Users/jacob.weate/Projects/ssh-docker/builder/upload.zip",
+    privateKey:
+      "/Users/jacob.weate/Projects/jweate-bif/blockchain-integration-framework/tools/all-in-one/corda/corda_image",
+    contractZip:
+      "/Users/jacob.weate/Projects/jweate-bif/blockchain-integration-framework/packages/cactus-test-plugin-ledger-connector-corda/src/test/kotlin/upload.zip",
   };
 
-  connector.deployContract(options).then(() => {
-    log.info("COMPLETED");
-    assert.end();
-  });
-  // const ssh = new NodeSSH()
-  // log.info("Port: %d | Key: %s", options.port, options.privateKey)
-  // ssh.connect({
-  //   host: 'localhost',
-  //   username: 'root',
-  //   port: options.port,
-  //   privateKey: options.privateKey
-  // })
-  // .then(function() {
-  //   // Local, Remote
-  //   ssh.putFile('/Users/jacob.weate/Projects/ssh-docker/builder/upload.zip', '/root/smart-contracts/upload.zip').then(function() {
-  //     console.log("Smart Contracts uploaded to server")
-  //         ssh.execCommand('/bin/ash deploy_contract.sh', { cwd:'/opt/corda/builder' }).then(function(result) {
-  //           console.log('STDERR: ' + result.stderr)
-  //         })
-  //       }, function(error) {
-  //         console.log("Error: Failed to upload smart contract to server")
-  //         console.log(error)
-  //       })
-  //   })
+  // connector.deployContract(options).then(() => {
+  //   log.info("COMPLETED");
+  //   assert.end();
+  // });
+  const ssh = new NodeSSH();
+  log.info("Port: %d | Key: %s", options.port, options.privateKey);
+  ssh
+    .connect({
+      host: "localhost",
+      username: "root",
+      port: options.port,
+      privateKey: options.privateKey,
+    })
+    .then(function () {
+      // Local, Remote
+      ssh.putFile(options.contractZip, "/root/smart-contracts/upload.zip").then(
+        function () {
+          console.log("Smart Contracts uploaded to server");
+          ssh
+            .execCommand("/bin/ash deploy_contract.sh", {
+              cwd: "/opt/corda/builder",
+            })
+            .then(function (result) {
+              console.log("STDERR: " + result.stderr);
+            });
+        },
+        function (error) {
+          console.log("Error: Failed to upload smart contract to server");
+          console.log(error);
+        }
+      );
+    });
 
   // assert.tearDown(async () => {
   //   log.debug(`Starting teardown...`);

@@ -111,11 +111,12 @@ export class PluginLedgerConnectorCorda
           .then(
             function () {
               console.log("Smart Contracts uploaded to server");
-              await ssh
+              ssh
                 .execCommand("/bin/ash deploy_contract.sh", {
                   cwd: "/opt/corda/builder",
                 })
                 .then(function (result) {
+                  console.log("STDOUT: " + result.stdout);
                   console.log("STDERR: " + result.stderr);
                 });
             },
