@@ -20,5 +20,6 @@ tap.test(
     assert.ok(typeof ipAddress === "string", "IP address string");
     assert.ok(ipAddress.length > 0, "IP address non-blank");
     assert.end();
+    ledger.stop();
   }
 );

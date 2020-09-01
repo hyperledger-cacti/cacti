@@ -65,5 +65,6 @@ module.exports = {
   },
   externals: {
     "swarm-js": "swarm-js",
+    "node-ssh": "node-ssh",
   },
 };

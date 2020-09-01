@@ -12,15 +12,12 @@ import { Server } from "http";
 import { Server as SecureServer } from "https";
 import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint";
 import { NodeSSH } from "node-ssh";
-export interface IPluginLedgerConnectorCordaOptions {
-  rpcApiHttpHost: string;
-}
 
-/**
- * FIXME: This is under construction.
- */
-export interface ITransactionOptions {
-  privateKey?: string;
+export interface IPluginLedgerConnectorCordaOptions {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
 }
 
 export interface ICordaDeployContractOptions {
@@ -40,15 +37,9 @@ export class PluginLedgerConnectorCorda
     if (!options) {
       throw new Error(`PluginLedgerConnectorCorda#ctor options falsy.`);
     }
-    if (!options.rpcApiHttpHost) {
-      throw new Error(
-        `PluginLedgerConnectorCorda#ctor options.rpcApiHttpHost falsy.`
-      );
+    if (!options.port) {
+      throw new Error(`PluginLedgerConnectorCorda#ctor options.port falsy.`);
     }
-    // const web3Provider = new Web3.providers.HttpProvider(
-    //   this.options.rpcApiHttpHost
-    // );
-    // this.web3 = new Web3(web3Provider);
     this.log = LoggerProvider.getOrCreate({
       label: "plugin-ledger-connector-corda",
       level: "trace",
@@ -102,33 +93,77 @@ export class PluginLedgerConnectorCorda
       );
     }
     const ssh = new NodeSSH();
+    this.log.info("Port: %d | Key: %s", options.port, options.privateKey);
     ssh
       .connect({
-        host: options.host,
-        username: options.username,
+        host: "localhost",
+        username: "root",
         port: options.port,
         privateKey: options.privateKey,
       })
-      .then(() => {
+      .then(function () {
         // Local, Remote
         ssh
-          .putFile(options.contractZip, "/root/smart-contracts/upload.zip")
+          .putFile(
+            "/Users/jacob.weate/Projects/ssh-docker/builder/upload.zip",
+            "/root/smart-contracts/upload.zip"
+          )
           .then(
-            () => {
-              this.log.debug("Smart Contracts uploaded to server");
-
-              // ssh.execCommand('./deploy_contract.sh', { cwd:'/opt/corda/builder' }).then(function(result) {
-              //   console.log("Copied success")
-              // })
+            function () {
+              console.log("Smart Contracts uploaded to server");
+              await ssh
+                .execCommand("/bin/ash deploy_contract.sh", {
+                  cwd: "/opt/corda/builder",
+                })
+                .then(function (result) {
+                  console.log("STDERR: " + result.stderr);
+                });
             },
-            (error) => {
-              this.log.debug(
-                "Error: Failed to upload smart contract to server"
-              );
-              this.log.debug(error);
+            function (error) {
+              console.log("Error: Failed to upload smart contract to server");
+              console.log(error);
             }
           );
       });
+  }
+
+  public async getFlowList(): Promise<any> {
+    const command = "flow list";
+    return this.executeCordaCommand(command);
+  }
+
+  public async startFlow(flow: string, state: object): Promise<any> {
+    const command =
+      "flow start " +
+      flow +
+      " " +
+      JSON.stringify(state).replace("{", "").replace("}", "");
+    return this.executeCordaCommand(command);
+  }
+
+  public async queryVault(stateName: string): Promise<any> {
+    const command = "run vaultQuery contractStateType: " + stateName;
+    return this.executeCordaCommand(command);
+  }
+
+  public async executeCordaCommand(command: string): Promise<any> {
+    const log = this.log;
+    const ssh = new NodeSSH();
+    let nodeResult = "";
+    ssh
+      .connect({
+        host: this.options.host,
+        port: this.options.port,
+        username: this.options.username,
+        password: this.options.password,
+      })
+      .then(() => {
+        ssh.execCommand(command).then((result) => {
+          this.log.info("STDOUT: " + result.stdout);
+          nodeResult = result.stdout;
+        });
+      });
+    return nodeResult;
   }
 
   public async addPublicKey(publicKeyHex: string): Promise<void> {

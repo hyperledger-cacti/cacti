@@ -82,6 +82,8 @@ export class CordaTestLedger implements ITestLedger {
           User: "root",
           ExposedPorts: {
             [`${this.rpcPortA}/tcp`]: {}, // corda PartyA RPC
+            "22/tcp": {}, // ssh server
+            "20013/tcp": {}, // node ssh
           },
           // will allocate random port on host and then we can use the getRpcAHostPort() method to determine
           // what that port exactly is. This is a workaround needed for macOS which has issues with routing to docker
@@ -186,6 +188,8 @@ export class CordaTestLedger implements ITestLedger {
     }
   }
 
+  // get privateKey to download privateKey in the image
+
   /**
    * Example of how the `portMappings` variable looks like at runtime when the
    * create options has PublishAllPorts: true
@@ -239,6 +243,50 @@ export class CordaTestLedger implements ITestLedger {
       }
     } else {
       throw new Error(`${fnTag} no mapping found for ${this.rpcPortA}`);
+    }
+  }
+
+  public async getSSHPublicPort(): Promise<number> {
+    const fnTag = "CordaTestLedger#getRpcAPublicPort()";
+    const aContainerInfo = await this.getContainerInfo();
+    const { Ports: portMappings } = aContainerInfo;
+
+    if (portMappings.length < 1) {
+      throw new Error(`${fnTag} no ports exposed or mapped at all`);
+    }
+    const mapping = portMappings.find((x) => x.PrivatePort === 22);
+    if (mapping) {
+      if (!mapping.PublicPort) {
+        throw new Error(`${fnTag} port 22 mapped but not public`);
+      } else if (mapping.IP !== "0.0.0.0") {
+        throw new Error(`${fnTag} port 22 mapped to localhost`);
+      } else {
+        return mapping.PublicPort;
+      }
+    } else {
+      throw new Error(`${fnTag} no mapping found for 22`);
+    }
+  }
+
+  public async getPartyASSHPublicPort(): Promise<number> {
+    const fnTag = "CordaTestLedger#getRpcAPublicPort()";
+    const aContainerInfo = await this.getContainerInfo();
+    const { Ports: portMappings } = aContainerInfo;
+
+    if (portMappings.length < 1) {
+      throw new Error(`${fnTag} no ports exposed or mapped at all`);
+    }
+    const mapping = portMappings.find((x) => x.PrivatePort === 20013);
+    if (mapping) {
+      if (!mapping.PublicPort) {
+        throw new Error(`${fnTag} port 20013 mapped but not public`);
+      } else if (mapping.IP !== "0.0.0.0") {
+        throw new Error(`${fnTag} port 20013 mapped to localhost`);
+      } else {
+        return mapping.PublicPort;
+      }
+    } else {
+      throw new Error(`${fnTag} no mapping found for 20013`);
     }
   }
 

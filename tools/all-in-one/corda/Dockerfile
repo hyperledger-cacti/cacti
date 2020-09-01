@@ -27,7 +27,8 @@ ADD corda_image.pub corda_image.pub
 RUN cp corda_image.pub ~/.ssh/authorized_keys
 RUN mkdir ~/smart-contracts
 
-RUN echo $'export PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \n\
+RUN echo $'JAVA_HOME=/opt/java/openjdk/bin/java \n\
+export PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \n\
 export PAGER=less \n\
 export PS1='\h:\w\$ ' \n\
 umask 022 \n\
@@ -88,6 +89,8 @@ EXPOSE 10013
 EXPOSE 10014
 EXPOSE 10003
 EXPOSE 10004
+EXPOSE 20013
+EXPOSE 20014
 
 WORKDIR /opt/corda
 

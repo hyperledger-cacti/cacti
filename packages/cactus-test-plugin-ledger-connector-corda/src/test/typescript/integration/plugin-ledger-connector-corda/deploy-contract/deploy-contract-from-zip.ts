@@ -3,11 +3,13 @@ const tap = require("tap");
 import {
   PluginLedgerConnectorCorda,
   PluginFactoryLedgerConnector,
-} from "../../../../../main/typescript/public-api";
+  ICordaDeployContractOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-corda";
 import { CordaTestLedger } from "@hyperledger/cactus-test-tooling";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { ICordaDeployContractOptions } from "../../../../../main/typescript/plugin-ledger-connector-corda";
 import * as fs from "fs";
+import * as path from "path";
+import { NodeSSH } from "node-ssh";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-deploy-contract-from-json",
@@ -19,20 +21,11 @@ tap.test("deploys contract via .zip file", async (assert: any) => {
     containerImageVersion: "latest",
   });
   await cordaTestLedger.start();
+  await new Promise((r) => setTimeout(r, 20000));
 
-  assert.tearDown(async () => {
-    log.debug(`Starting teardown...`);
-    await cordaTestLedger.stop();
-    log.debug(`Stopped container OK.`);
-    await cordaTestLedger.destroy();
-    log.debug(`Destroyed container OK.`);
-  });
-
-  // const rpcApiHttpHost: string = 'http://localhost:22000';
-  const rpcApiHttpHost = await cordaTestLedger.getRpcApiHttpHost();
-  // const cordaGenesisOptions: ICordaGenesisOptions = await cordaTestLedger.getGenesisJsObject();
-  // assert.ok(cordaGenesisOptions);
-  // assert.ok(cordaGenesisOptions.alloc);
+  const sshPort = await cordaTestLedger.getSSHPublicPort();
+  const partyASSH = await cordaTestLedger.getPartyASSHPublicPort();
+  const rpcApiHttpHost = await cordaTestLedger.getRpcAPublicPort();
 
   const factory = new PluginFactoryLedgerConnector();
   const connector: PluginLedgerConnectorCorda = await factory.create({
@@ -42,23 +35,40 @@ tap.test("deploys contract via .zip file", async (assert: any) => {
   const options: ICordaDeployContractOptions = {
     host: "localhost",
     username: "root",
-    port: 2200,
-    privateKey: "string",
-    contractZip: "./contract.zip",
+    port: sshPort,
+    privateKey: "/Users/jacob.weate/.ssh/corda_image",
+    contractZip: "/Users/jacob.weate/Projects/ssh-docker/builder/upload.zip",
   };
 
-  connector.deployContract(options);
-  // assert.ok(contract);
+  connector.deployContract(options).then(() => {
+    log.info("COMPLETED");
+    assert.end();
+  });
+  // const ssh = new NodeSSH()
+  // log.info("Port: %d | Key: %s", options.port, options.privateKey)
+  // ssh.connect({
+  //   host: 'localhost',
+  //   username: 'root',
+  //   port: options.port,
+  //   privateKey: options.privateKey
+  // })
+  // .then(function() {
+  //   // Local, Remote
+  //   ssh.putFile('/Users/jacob.weate/Projects/ssh-docker/builder/upload.zip', '/root/smart-contracts/upload.zip').then(function() {
+  //     console.log("Smart Contracts uploaded to server")
+  //         ssh.execCommand('/bin/ash deploy_contract.sh', { cwd:'/opt/corda/builder' }).then(function(result) {
+  //           console.log('STDERR: ' + result.stderr)
+  //         })
+  //       }, function(error) {
+  //         console.log("Error: Failed to upload smart contract to server")
+  //         console.log(error)
+  //       })
+  //   })
 
-  // const contractMethod = contract.methods.sayHello();
-  // assert.ok(contractMethod);
-
-  // const callResponse = await contractMethod.call({
-  //   from: firstHighNetWorthAccount,
-  // });
-  // log.debug(`Got message from smart contract method:`, { callResponse });
-  // assert.ok(callResponse);
-
-  assert.end();
-  log.debug("Assertion ended OK.");
+  // assert.tearDown(async () => {
+  //   log.debug(`Starting teardown...`);
+  //   await cordaTestLedger.stop();
+  //   log.debug(`Stopped container OK.`);
+  //   await cordaTestLedger.destroy();
+  //   log.debug(`Destroyed container OK.`);
 });
