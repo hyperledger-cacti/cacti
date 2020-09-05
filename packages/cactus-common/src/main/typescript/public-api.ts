@@ -3,6 +3,10 @@ export { Logger, ILoggerOptions } from "./logging/logger";
 export { LogLevelDesc } from "loglevel";
 export { Objects } from "./objects";
 export { Strings } from "./strings";
+export { Bools } from "./bools";
+export { Checks } from "./checks";
+export { CodedError } from "./coded-error";
+
 export {
   JsObjectSigner,
   IJsObjectSignerOptions,
@@ -10,5 +14,6 @@ export {
   VerifySignatureFunction,
   HashFunction,
 } from "./js-object-signer";
+
 export { ISignerKeyPair } from "./signer-key-pair";
 export { Secp256k1Keys } from "./secp256k1-keys";
