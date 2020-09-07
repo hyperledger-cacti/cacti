@@ -1,15 +1,11 @@
 {
-  "name": "BLP",
+  "name": "packages",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./examples/dist/packages/routing-interface/www.js",
-    "debug": "nodemon --inspect ./examples/dist/packages/routing-interface/www.js",
     "build": "npm run build-ts && npm run copy-static-assets",
     "build-ts": "tsc",
-    "tslint.old": "tslint -c tslint.json -p tsconfig.json",
-    "tslint.old2": "tslint -c tslint.json -p tsconfig.json",
-    "tslint": "tslint -c tslint.json -p tsconfig.json './packages/**/*.ts' './examples/**/*.ts'",
+    "tslint": "tslint -c tslint.json -p tsconfig.json './business-logic-plugin/*.ts' './ledger-plugin/*.ts' './routing-interface/**/*.ts'",
     "copy-static-assets": "ts-node copyStaticAssets.ts"
   },
   "dependencies": {

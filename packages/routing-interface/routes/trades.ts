@@ -25,10 +25,9 @@ router.post('/', (req: Request, res: Response, next: NextFunction) => {
   try {
     const tradeID: string = transactionManagement.startBusinessLogic(req);
 
-    const resultString: string = '{"tradeID":"' + tradeID + '"}'
-    res.status(201).location(config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID).json(resultString);
+    const result = {tradeID: tradeID};
+    res.status(201).location(config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID).json(result);
 
-    //    res.send("Not Implemented (Request Execution of Trade)\n");
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
@@ -45,11 +44,9 @@ router.get('/:id', (req: Request, res: Response, next: NextFunction) => {
   try {
 
 
-    const resultString: string = transactionManagement.getCartradeOperationStatus(req.params.id);
+    const result = transactionManagement.getOperationStatus(req.params.id);
+    res.status(200).json(result);
 
-    res.status(200).json(resultString);
-
-    //    res.send("Not Implemented (Show Current Status of Trade" + ", id=" + req.params.id + ")\n" + resultString + "\n");
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);

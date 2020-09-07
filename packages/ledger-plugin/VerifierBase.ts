@@ -77,8 +77,6 @@ export class VerifierBase implements Verifier {
                 };
                 logger.debug(`socketOptions = ${JSON.stringify(socketOptions)}`);
                 const socket: Socket = io(this.validatorUrl, socketOptions);
-                const eventListener = this.eventListener;
-                const className = this.constructor.name;
 
                 socket.on("connect_error", (err: object) => {
                     logger.error("##connect_error:", err);
@@ -104,11 +102,14 @@ export class VerifierBase implements Verifier {
                     // output the data received from the client
                     logger.debug("#[recv]eventReceived, res: " + json2str(res));
 
+                    logger.debug(`##set eventListener: ${this.eventListener}, ${this.constructor.name}`);
+                    const eventListener = this.eventListener;
+
                     if (eventListener != null) {
                         const eventFilter = eventListener.getEventFilter();
 
                         const event = new LedgerEvent();
-                        event.verifierId = className;
+                        event.verifierId = this.constructor.name;
                         event.data = res;
 
                         logger.debug(`####call eventListener.isTargetEvent()`);

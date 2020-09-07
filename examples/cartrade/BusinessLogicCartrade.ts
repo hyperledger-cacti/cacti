@@ -11,6 +11,7 @@ import { TradeInfo } from '../../packages/routing-interface/TradeInfo';
 import { TransactionInfoManagement } from './TransactionInfoManagement';
 import { TransactionInfo } from './TransactionInfo';
 import { TransactionData } from './TransactionData';
+import { BusinessLogicInquireCartradeStatus } from './BusinessLogicInquireCartradeStatus';
 import { TxInfoData } from './TxInfoData';
 import { transactionManagement } from '../../packages/routing-interface/routes/index';
 import { LedgerOperation } from '../../packages/business-logic-plugin/LedgerOperation';
@@ -105,8 +106,6 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         logger.debug("getVerifierEthereum");
         verifierEthereum.setEventListener(this);
         logger.debug("setEventListener");
-        verifierEthereum.startMonitor();
-        logger.debug("##startMonitor(ethereum)");
 
         // TODO: get private key from
         const fromAddressPkey = config.cartradeInfo.ethereum.fromAddressPkey;
@@ -138,7 +137,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 verifierEthereum.requestLedgerOperation(ledgerOperation);
 
                 // Specify the filtering condition of the event to be received
-                logger.debug(`##setEventListener!! `);
+                logger.debug(`##setEventFilter!! `);
                 const filter = {
                     txId: result.txId
                 }
@@ -160,8 +159,6 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
         verifierFabric.setEventListener(this);
         logger.debug("setEventListener");
-        verifierFabric.startMonitor();
-        logger.debug("##startMonitor(ethereum)");
 
         // Generate parameters for sendSignedProposal(changeCarOwner)
         const ccFncName: string = "changeCarOwner";
@@ -186,7 +183,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 verifierFabric.requestLedgerOperation(ledgerOperation);
 
                 // Specify the filtering condition of the event to be received
-                logger.debug(`##setEventListener!! `);
+                logger.debug(`##setEventFilter!! `);
                 const filter = {
                     txId: result.txId
                 }
@@ -234,7 +231,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 verifierEthereum.requestLedgerOperation(ledgerOperation);
 
                 // Specify the filtering condition of the event to be received
-                logger.debug(`##setEventListener!! `);
+                logger.debug(`##setEventFilter!! `);
                 const filter = {
                     txId: result.txId
                 }
@@ -243,6 +240,23 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             .catch(err => {
                 logger.error(err);
             });
+    }
+
+    completedTransaction(tradeInfo: TradeInfo) {
+
+        logger.debug("called completedTransaction");
+
+        let validatorId = this.useValidator['validatorID'][0];
+
+        logger.debug(`setEventListener(null): reset, validatorID: ${validatorId}`);
+        let verifier = transactionManagement.getVerifier(validatorId);
+        verifier.setEventListener(null);
+
+        validatorId = this.useValidator['validatorID'][1];
+        logger.debug(`setEventListener(null): reset, validatorID: ${validatorId}`);
+        verifier = transactionManagement.getVerifier(validatorId);
+        verifier.setEventListener(null);
+
     }
 
     finish() {
@@ -390,6 +404,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                     // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
                     this.transactionInfoManagement.setStatus(tradeInfo, "completed");
                     logger.info(`##INFO: completed cartrade, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`);
+                    this.completedTransaction(tradeInfo);
                     break;
                 case "completed":
                     logger.warn('##WARN: already completed, txinfo: ${json2str(transactionInfo)}');
@@ -486,6 +501,14 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             logger.error(`##err: isTargetEventFabric, err: ${err}, event: ${json2str(event)}`);
             return false;
         }
+    }
+
+    getOperationStatus(tradeID: string): object {
+        logger.debug(`##in getOperationStatus()`);
+        const businessLogicInquireCartradeStatus: BusinessLogicInquireCartradeStatus = new BusinessLogicInquireCartradeStatus();
+        const transactionStatusData = businessLogicInquireCartradeStatus.getCartradeOperationStatus(tradeID);
+
+        return transactionStatusData;
     }
 
 }

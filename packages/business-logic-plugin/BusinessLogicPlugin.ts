@@ -9,4 +9,5 @@ import { Request } from 'express';
 
 export interface BusinessLogicPlugin {
     startTransaction(req: Request, businessLogicID: string, tradeID: string): void;
+    getOperationStatus(tradeID: string): object;
 }

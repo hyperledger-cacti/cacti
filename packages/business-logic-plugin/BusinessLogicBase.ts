@@ -21,12 +21,17 @@ logger.level = config.logLevel;
 export class BusinessLogicBase implements BusinessLogicPlugin, VerifierEventListener {
     eventFilter: object | null = null;
 
-    startTransaction(req: Request, businessLogicID: string, tradeID: string) {
+    startTransaction(req: Request, businessLogicID: string, tradeID: string): void {
         // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
     }
 
     executeNextTransaction(txInfo: object, txId: string): void {
         // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
+    }
+
+    getOperationStatus(tradeID: string): object {
+        // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
+        return {};
     }
 
     onEvent(ledgerEvent: LedgerEvent): void {

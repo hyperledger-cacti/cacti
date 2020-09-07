@@ -1,7 +1,7 @@
 # example-cartrade
 
 ## Premise
-- Launch two Validators (For ethereim and fabric)
+- Launch two Validators (For Ethereum and Fabric)
 	- for Ethereum:
 		- `/packages/ledger-plugin/go-ethereum/validator`
 		- "validatorUrl": `https://localhost:5050`,
@@ -17,19 +17,22 @@
 		- `/packages/ledger-plugin/fabric/validator/unit-test/validatorDriver_signTransactionOffline.js`
 
 ## Boot method
-1. mv `/examples/cartrade/config/{package.json,tsconfig.json,tslint.json,copyStaticAssets.ts}` `/`
-	- This operation means that `package.json`, `tsconfig.json`, `tslint.json`, and `copyStaticAssets`. are moved into the top directory of cactus before the application is booted
 1. cd `/examples/cartrade/`
 1. npm install
 1. Modify the following information for your environment
-	- corrected escrow account information, etc. on `config/default.json`
+	- corrected escrow account information, etc. on `/packages/config/default.json`
+	- applicationHostInfo.hostName (URL of the host on the Location header)
+	- applicationHostInfo.hostPort (The port number of Routing-interface http server)
+1. npm run build
+1. cd BIF-trial/examples/cartrade
+1. npm install
+1. Modify the following information for your environment
+	- corrected escrow account information, etc. on `/examples/cartrade/config/default.json`
 	- cartradeInfo.fabric.submitter.certificate (certificate for admin)
 	- cartradeInfo.fabric.submitter.pkey (admin private key)
 	- carriadeInfo.ethereum.fromAddressPkey (private key of fromAddress)
 	- cartradeInfo.ethereum.escrowAddress (Address of the escrow account)
 	- carriadeInfo.ethereum.escrowAddressPkey (secret key of the escrow account)
-	- applicationHostInfo.hostName (URL of the host on the Location header)
-	- applicationHostInfo.hostPort (The port number of Rounting-interface HTTP server)
 1. npm run build
 1. npm run start
 	- cartrade application boots on port 5034.

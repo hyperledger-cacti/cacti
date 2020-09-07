@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./examples/dist",
+    "outDir": "../examples/cartrade/dist/packages",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -17,9 +17,9 @@
     ]
   },
   "include": [
-    "packages/business-logic-plugin/*.ts",
-    "packages/ledger-plugin/*.ts",
-    "packages/routing-interface/**/*.ts",
-    "examples/cartrade/*.ts"
+    "./**/*.ts",
+  ],
+  "exclude": [
+    "copyStaticAssets.ts"
   ]
 }

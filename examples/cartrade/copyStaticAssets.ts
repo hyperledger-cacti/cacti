@@ -10,5 +10,4 @@ import * as shell from 'shelljs';
 // NOTE: Copy the static assets to the dist folder.
 //      Example:
 //        shell.cp('-R', 'src/routing-interface/views', 'dist/routing-interface/views/');
-shell.cp('-R', 'packages/config', 'examples/dist/packages/');
-shell.cp('-R', 'examples/cartrade/config', 'examples/dist/examples/cartrade/');
+shell.cp('-R', 'config/default.json', 'dist/examples/cartrade/config/');

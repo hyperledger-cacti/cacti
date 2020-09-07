@@ -6,16 +6,14 @@
  */
 
 import { Request } from 'express';
-// import { BusinessLogicCartrade } from '../examples/cartrade/BusinessLogicCartrade';
 import { BusinessLogicPlugin } from '../business-logic-plugin/BusinessLogicPlugin';
-import { BusinessLogicInquireCartradeStatus } from '../../examples/cartrade/BusinessLogicInquireCartradeStatus';
 import { BLPRegistry } from './util/BLPRegistry';
 import { LPInfoHolder } from './util/LPInfoHolder';
 import { VerifierBase } from '../ledger-plugin/VerifierBase';
 import { VerifierFabric } from '../ledger-plugin/VerifierFabric';
 import { VerifierEthereum } from '../ledger-plugin/VerifierEthereum';
 
-import { getTargetBLPInstance } from '../../examples/cartrade/BLP_config';
+import { getTargetBLPInstance } from '../config/BLP_config';
 
 const fs = require('fs');
 const path = require('path');
@@ -117,11 +115,10 @@ export class TransactionManagement {
 
 
 
-    // Get state of cartrade
-    getCartradeOperationStatus(tradeID: string): string {
+    // Get state of operation
+    getOperationStatus(tradeID: string): object {
 
-        const businessLogicInquireCartradeStatus: BusinessLogicInquireCartradeStatus = new BusinessLogicInquireCartradeStatus();
-        const transactionStatusData: string = businessLogicInquireCartradeStatus.getCartradeOperationStatus(tradeID);
+        const transactionStatusData = this.businessLogicPlugin.getOperationStatus(tradeID);
 
         return transactionStatusData;
 
@@ -140,6 +137,8 @@ export class TransactionManagement {
             if (this.verifierEthereum == null) {
                 const ledgerPluginInfoEthereum: string = this.connectInfo.getLegerPluginInfo(validatorId);
                 this.verifierEthereum = new VerifierEthereum(ledgerPluginInfoEthereum);
+                logger.debug("##startMonitor(ethereum)");
+                this.verifierEthereum.startMonitor();
                 return this.verifierEthereum;
             }
             else {
@@ -153,6 +152,8 @@ export class TransactionManagement {
             if (this.verifierFabric == null) {
                 const ledgerPluginInfoFabric: string = this.connectInfo.getLegerPluginInfo(validatorId);
                 this.verifierFabric = new VerifierFabric(ledgerPluginInfoFabric);
+                logger.debug("##startMonitor(fabric)");
+                this.verifierFabric.startMonitor();
                 return this.verifierFabric;
             }
             else {
