@@ -11,14 +11,14 @@ export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;
   containerImageName?: string;
   rpcApiHttpPort?: number;
-  envVars?: string[]
+  envVars?: string[];
 }
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "latest",
   containerImageName: "hyperledger/cactus-besu-all-in-one",
   rpcApiHttpPort: 8545,
-  envVars: ["BESU_NETWORK=dev"]
+  envVars: ["BESU_NETWORK=dev"],
 });
 
 export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
@@ -42,6 +42,7 @@ export class BesuTestLedger implements ITestLedger {
   public readonly envVars: string[];
 
   private container: Container | undefined;
+  private containerId: string | undefined;
 
   constructor(public readonly options: IBesuTestLedgerConstructorOptions = {}) {
     if (!options) {
@@ -55,8 +56,7 @@ export class BesuTestLedger implements ITestLedger {
       BESU_TEST_LEDGER_DEFAULT_OPTIONS.containerImageName;
     this.rpcApiHttpPort =
       options.rpcApiHttpPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
-    this.envVars =
-        options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
+    this.envVars = options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
 
     this.validateConstructorOptions();
   }
@@ -159,6 +159,7 @@ export class BesuTestLedger implements ITestLedger {
 
       eventEmitter.once("start", async (container: Container) => {
         this.container = container;
+        this.containerId = container.id;
         try {
           await this.waitForHealthCheck();
           resolve(container);
@@ -220,7 +221,10 @@ export class BesuTestLedger implements ITestLedger {
     const image = this.getContainerImageName();
     const containerInfos = await docker.listContainers({});
 
-    const aContainerInfo = containerInfos.find((ci) => ci.Image === image);
+    let aContainerInfo;
+    if (this.containerId !== undefined) {
+      aContainerInfo = containerInfos.find((ci) => ci.Id === this.containerId);
+    }
 
     if (aContainerInfo) {
       return aContainerInfo;
