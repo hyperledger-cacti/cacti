@@ -39,6 +39,7 @@ export class QuorumTestLedger implements ITestLedger {
   public readonly rpcApiHttpPort: number;
 
   private container: Container | undefined;
+  private containerId: string | undefined;
 
   constructor(
     public readonly options: IQuorumTestLedgerConstructorOptions = {}
@@ -166,6 +167,7 @@ export class QuorumTestLedger implements ITestLedger {
 
       eventEmitter.once("start", async (container: Container) => {
         this.container = container;
+        this.containerId = container.id;
         try {
           await this.waitForHealthCheck();
           resolve(container);
@@ -233,7 +235,10 @@ export class QuorumTestLedger implements ITestLedger {
     const image = this.getContainerImageName();
     const containerInfos = await docker.listContainers({});
 
-    const aContainerInfo = containerInfos.find((ci) => ci.Image === image);
+    let aContainerInfo;
+    if (this.containerId !== undefined) {
+      aContainerInfo = containerInfos.find((ci) => ci.Id === this.containerId);
+    }
 
     if (aContainerInfo) {
       return aContainerInfo;
