@@ -17,11 +17,11 @@ const log: Logger = LoggerProvider.getOrCreate({
 });
 
 tap.test("deploys contract via .zip file", async (assert: any) => {
+  log.info(__filename);
   const cordaTestLedger = new CordaTestLedger({
     containerImageVersion: "latest",
   });
   await cordaTestLedger.start();
-  await new Promise((r) => setTimeout(r, 20000));
 
   const sshPort = await cordaTestLedger.getSSHPublicPort();
   const partyASSH = await cordaTestLedger.getPartyASSHPublicPort();
@@ -34,57 +34,31 @@ tap.test("deploys contract via .zip file", async (assert: any) => {
     username: "user1",
     password: "test",
   });
-
-  const zip = path.resolve(
-    process.cwd() +
-      "/packages/cactus-test-plugin-ledger-connector-corda/src/test/kotlin/upload.zip"
+  const fileBuffer = fs.readFileSync(
+    path.join(__dirname, "../../../../kotlin/upload.zip")
   );
-  const key = path.resolve(
-    process.cwd() + "/tools/all-in-one/corda/corda_image"
+  const key = path.join(
+    __dirname,
+    "../../../../../../../../tools/all-in-one/corda/corda_image"
   );
   const options: ICordaDeployContractOptions = {
     host: "localhost",
     username: "root",
     port: sshPort,
-    privateKey:
-      "/Users/jacob.weate/Projects/jweate-bif/blockchain-integration-framework/tools/all-in-one/corda/corda_image",
-    contractZip: zip,
+    privateKey: key,
+    contractZip: fileBuffer,
   };
+  log.info("PARTYA: <" + partyASSH + ">");
+  await new Promise((r) => setTimeout(r, 10000));
+  await connector.deployContract(options);
+  log.info("Deployment Completed");
+  await new Promise((r) => setTimeout(r, 200000));
+  const flows = await connector.getFlowList(partyASSH);
+  await new Promise((r) => setTimeout(r, 500));
+  log.info("FLOWS: " + flows);
 
-  // connector.deployContract(options).then(() => {
-  //   log.info("COMPLETED");
-  //   assert.end();
-  // });
-
-  const ssh = new NodeSSH();
-  log.info("Port: %d | Key: %s", options.port, options.privateKey);
-  ssh
-    .connect({
-      host: "localhost",
-      username: "root",
-      port: options.port,
-      privateKey: options.privateKey,
-    })
-    .then(() => {
-      // Local, Remote
-      ssh.putFile(options.contractZip, "/root/smart-contracts/upload.zip").then(
-        () => {
-          log.info("Smart Contracts uploaded to server");
-          ssh
-            .execCommand("/bin/ash deploy_contract.sh", {
-              cwd: "/opt/corda/builder",
-            })
-            .then((result) => {
-              log.info("STDERR: " + result.stderr);
-            });
-        },
-        (error) => {
-          log.info("Error: Failed to upload smart contract to server");
-          log.info(error);
-        }
-      );
-    });
-
+  cordaTestLedger.stop();
+  // log.info("FLOW LIST IS: " + flows)
   // const flow = "CashIssueFlow"
   // class CordaState {
   //   public amount: string = "";

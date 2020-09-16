@@ -12,6 +12,7 @@ import { Server } from "http";
 import { Server as SecureServer } from "https";
 import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint";
 import { NodeSSH } from "node-ssh";
+import * as fs from "fs";
 
 /**
  * FIXME: This is under construction.
@@ -32,7 +33,7 @@ export interface ICordaDeployContractOptions {
   username: string;
   port: number;
   privateKey: string; // The private key used to ssh into Docker container
-  contractZip: string;
+  contractZip: Buffer;
 }
 
 export class PluginLedgerConnectorCorda
@@ -99,6 +100,13 @@ export class PluginLedgerConnectorCorda
         `PluginLedgerConnectorCorda#deployContract() options.contractZip falsy.`
       );
     }
+    const file = fs.writeFile(
+      "/tmp/smart-contract.zip",
+      options.contractZip,
+      (error) => {
+        log.error(error?.message);
+      }
+    );
     const log = this.log;
     const ssh = new NodeSSH();
     log.info("Port: %d | Key: %s", options.port, options.privateKey);
@@ -113,20 +121,29 @@ export class PluginLedgerConnectorCorda
         // Local, Remote
         ssh
           .putFile(
-            "/Users/jacob.weate/Projects/ssh-docker/builder/upload.zip",
+            "/tmp/smart-contract.zip",
             "/root/smart-contracts/upload.zip"
           )
           .then(
             () => {
               log.info("Smart Contracts uploaded to server");
-              ssh
-                .execCommand("/bin/ash deploy_contract.sh", {
-                  cwd: "/opt/corda/builder",
-                })
-                .then((result) => {
-                  log.info("STDOUT: " + result.stdout);
-                  log.info("STDERR: " + result.stderr);
-                });
+              ssh.exec("./deploy_contract.sh", [], {
+                cwd: "/opt/corda/builder",
+                onStdout(chunk) {
+                  log.info("stdoutChunk", chunk.toString("utf8"));
+                },
+                onStderr(chunk) {
+                  log.info("stderrChunk", chunk.toString("utf8"));
+                },
+              });
+              // ssh
+              //   .execCommand("/bin/ash deploy_contract.sh", {
+              //     cwd: "/opt/corda/builder",
+              //   })
+              //   .then((result) => {
+              //     log.info("STDOUT: " + result.stdout);
+              //     log.info("STDERR: " + result.stderr);
+              //   });
             },
             (error) => {
               log.info("Error: Failed to upload smart contract to server");
@@ -136,12 +153,29 @@ export class PluginLedgerConnectorCorda
       });
   }
 
-  public async getFlowList(): Promise<any> {
-    const command = "flow list";
-    return this.executeCordaCommand(command);
+  public async getFlowList(porter: number): Promise<string> {
+    const log = this.log;
+    log.info("");
+    const ssh = new NodeSSH();
+    let nodeResult = "";
+    ssh
+      .connect({
+        host: "localhost",
+        port: porter,
+        username: "user1",
+        password: "test",
+      })
+      .then(() => {
+        ssh.execCommand("flow list").then((result) => {
+          nodeResult = result.stdout;
+          this.log.info("FLOW: " + nodeResult);
+          return nodeResult;
+        });
+      });
+    return nodeResult;
   }
 
-  public async startFlow(flow: string, state: object): Promise<any> {
+  public async startFlow(flow: string, state: object): Promise<string> {
     const command =
       "flow start " +
       flow +
@@ -158,16 +192,17 @@ export class PluginLedgerConnectorCorda
     return this.executeCordaCommand(command);
   }
 
-  public async executeCordaCommand(command: string): Promise<any> {
+  public async executeCordaCommand(command: string): Promise<string> {
     const log = this.log;
+    log.info("");
     const ssh = new NodeSSH();
     let nodeResult = "";
     ssh
       .connect({
-        host: this.options.host,
+        host: "localhost",
         port: this.options.port,
-        username: this.options.username,
-        password: this.options.password,
+        username: "user1",
+        password: "test",
       })
       .then(() => {
         ssh.execCommand(command).then((result) => {
@@ -176,6 +211,29 @@ export class PluginLedgerConnectorCorda
         });
       });
     return nodeResult;
+  }
+
+  public async checkConnection(
+    options: ICordaDeployContractOptions
+  ): Promise<boolean> {
+    const ssh = new NodeSSH();
+    let retry = 0;
+    let available = false;
+    while (!available && retry < 5) {
+      this.log.info("Checking connection");
+      const connection = ssh.connect({
+        host: "localhost",
+        username: "root",
+        port: options.port,
+        privateKey: options.privateKey,
+      });
+      available = (await connection).isConnected();
+      retry++;
+      if (!available) {
+        await new Promise((r) => setTimeout(r, 30000));
+      }
+    }
+    return available;
   }
 
   public async addPublicKey(publicKeyHex: string): Promise<void> {
