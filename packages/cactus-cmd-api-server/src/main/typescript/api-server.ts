@@ -26,8 +26,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { ICactusApiServerOptions } from "./config/config-service";
 import { CACTUS_OPEN_API_JSON } from "./openapi-spec";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { Servers } from "./common/servers";
+import { Logger, LoggerProvider, Servers } from "@hyperledger/cactus-common";
 
 export interface IApiServerConstructorOptions {
   pluginRegistry?: PluginRegistry;
