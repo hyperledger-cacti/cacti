@@ -20,6 +20,7 @@
   - [Building the SDK](#building-the-sdk)
   - [Adding a new public npm dependency to one of the packages:](#adding-a-new-public-npm-dependency-to-one-of-the-packages)
   - [Adding a sibling package npm dependency to one of the packages:](#adding-a-sibling-package-npm-dependency-to-one-of-the-packages)
+  - [On Reproducible Builds](#on-reproducible-builds)
 
 Thank you for your interest to contribute to Hyperledger Cactus! :tada:
 
@@ -524,3 +525,16 @@ Or add the common library to allow you the usage of the logger for example:
 ```sh
 npx lerna add @hyperledger/cactus-common --scope '*/*plugin-ledger-connector-quorum' --exact --dev
 ```
+
+### On Reproducible Builds
+
+As a best practice, any given revision (commit hash) stored in version control should produce the exact same build
+artifacts regardless of when or where the build was performed. This can only be achieved if npm dependency versions
+are locked  down instead of being automatically upgraded by npm (which makes the build time and machine dependent).
+
+Bottom line: Do not use the the `^`, `~` and `*` syntax elements while declaring your npm dependencies.
+
+Further details:
+- https://reproducible-builds.org/
+- https://spin.atomicobject.com/2016/12/16/reproducible-builds-npm-yarn/
+
