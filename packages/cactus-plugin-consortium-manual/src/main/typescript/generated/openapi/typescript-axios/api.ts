@@ -1,4 +1,5 @@
-// tslint:disable
+/* tslint:disable */
+/* eslint-disable */
 /**
  * Hyperledger Cactus Plugin - Consortium Web Service
  * Manage a Cactus consortium through the APIs. Needs administrative priviliges.
@@ -12,7 +13,6 @@
  */
 
 
-import * as globalImportUrl from 'url';
 import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
@@ -270,9 +270,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options: any = {}): RequestArgs {
+        apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws`;
-            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
@@ -283,13 +284,19 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
-            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
-            delete localVarUrlObj.search;
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...options.headers};
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
-                url: globalImportUrl.format(localVarUrlObj),
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
                 options: localVarRequestOptions,
             };
         },
@@ -299,9 +306,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options: any = {}): RequestArgs {
+        apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws`;
-            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
@@ -312,13 +320,19 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
-            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
-            delete localVarUrlObj.search;
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...options.headers};
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
-                url: globalImportUrl.format(localVarUrlObj),
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
                 options: localVarRequestOptions,
             };
         },
@@ -337,8 +351,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetConsortiumJwsResponse> {
-            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options);
+        async apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetConsortiumJwsResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -350,8 +364,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetNodeJwsResponse> {
-            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options);
+        async apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetNodeJwsResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -373,7 +387,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options?: any): AxiosPromise<GetConsortiumJwsResponse> {
-            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options)(axios, basePath);
+            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -382,7 +396,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options?: any): AxiosPromise<GetNodeJwsResponse> {
-            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options)(axios, basePath);
+            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -402,7 +416,7 @@ export class DefaultApi extends BaseAPI {
      * @memberof DefaultApi
      */
     public apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options?: any) {
-        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options)(this.axios, this.basePath);
+        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -413,9 +427,8 @@ export class DefaultApi extends BaseAPI {
      * @memberof DefaultApi
      */
     public apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options?: any) {
-        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options)(this.axios, this.basePath);
+        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options).then((request) => request(this.axios, this.basePath));
     }
-
 }
 
 

@@ -1,4 +1,5 @@
-// tslint:disable
+/* tslint:disable */
+/* eslint-disable */
 /**
  * Hyperledger Cactus API
  * Interact with a Cactus deployment through HTTP.
@@ -14,3 +15,4 @@
 
 export * from "./api";
 export * from "./configuration";
+

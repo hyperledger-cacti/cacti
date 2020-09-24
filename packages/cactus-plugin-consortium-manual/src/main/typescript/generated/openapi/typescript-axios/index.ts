@@ -1,4 +1,5 @@
-// tslint:disable
+/* tslint:disable */
+/* eslint-disable */
 /**
  * Hyperledger Cactus Plugin - Consortium Web Service
  * Manage a Cactus consortium through the APIs. Needs administrative priviliges.
@@ -14,3 +15,4 @@
 
 export * from "./api";
 export * from "./configuration";
+
