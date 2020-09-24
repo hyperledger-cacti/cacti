@@ -13,13 +13,10 @@
   ],
   "scripts": {
     "tsc": "tsc --project ./tsconfig.json",
-
     "webpack": "npm-run-all webpack:dev webpack:prod",
-
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-
     "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
@@ -70,7 +67,7 @@
     "joi": "14.3.1",
     "typescript-optional": "2.0.1",
     "web3": "1.2.7",
-    "web3-eea": "0.9.0"
+    "web3-eea": "0.10.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "0.2.0",
