@@ -1,4 +1,5 @@
-// tslint:disable
+/* tslint:disable */
+/* eslint-disable */
 /**
  * Hyperledger Cactus Plugin - Consortium Web Service
  * Manage a Cactus consortium through the APIs. Needs administrative priviliges.
@@ -13,10 +14,10 @@
 
 
 export interface ConfigurationParameters {
-    apiKey?: string | ((name: string) => string);
+    apiKey?: string | Promise<string> | ((name: string) => string) | ((name: string) => Promise<string>);
     username?: string;
     password?: string;
-    accessToken?: string | ((name?: string, scopes?: string[]) => string);
+    accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string) | ((name?: string, scopes?: string[]) => Promise<string>);
     basePath?: string;
     baseOptions?: any;
 }
@@ -27,17 +28,17 @@ export class Configuration {
      * @param name security name
      * @memberof Configuration
      */
-    apiKey?: string | ((name: string) => string);
+    apiKey?: string | Promise<string> | ((name: string) => string) | ((name: string) => Promise<string>);
     /**
      * parameter for basic security
-     * 
+     *
      * @type {string}
      * @memberof Configuration
      */
     username?: string;
     /**
      * parameter for basic security
-     * 
+     *
      * @type {string}
      * @memberof Configuration
      */
@@ -48,10 +49,10 @@ export class Configuration {
      * @param scopes oauth2 scope
      * @memberof Configuration
      */
-    accessToken?: string | ((name?: string, scopes?: string[]) => string);
+    accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string) | ((name?: string, scopes?: string[]) => Promise<string>);
     /**
      * override base path
-     * 
+     *
      * @type {string}
      * @memberof Configuration
      */

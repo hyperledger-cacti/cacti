@@ -46,7 +46,7 @@
   "devDependencies": {
     "@commitlint/cli": "8.1.0",
     "@commitlint/config-conventional": "8.0.0",
-    "@openapitools/openapi-generator-cli": "1.0.10-4.2.3",
+    "@openapitools/openapi-generator-cli": "1.0.18-5.0.0-beta2",
     "@types/node-fetch": "2.5.4",
     "@types/tape": "4.13.0",
     "@types/uuid": "3.4.6",
@@ -80,7 +80,7 @@
     "ts-loader": "6.2.1",
     "ts-node": "8.9.1",
     "tslint": "6.0.0",
-    "typescript": "3.9.3",
+    "typescript": "4.0.3",
     "webpack": "4.41.6",
     "webpack-bundle-analyzer": "3.6.0",
     "webpack-cli": "3.3.11"

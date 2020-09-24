@@ -1,4 +1,5 @@
-// tslint:disable
+/* tslint:disable */
+/* eslint-disable */
 /**
  * Hyperledger Cactus API
  * Interact with a Cactus deployment through HTTP.
@@ -12,7 +13,6 @@
  */
 
 
-import * as globalImportUrl from 'url';
 import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
@@ -94,9 +94,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1ApiServerHealthcheckGet(options: any = {}): RequestArgs {
+        apiV1ApiServerHealthcheckGet: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/api-server/healthcheck`;
-            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
@@ -107,13 +108,19 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
-            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
-            delete localVarUrlObj.search;
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...options.headers};
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
-                url: globalImportUrl.format(localVarUrlObj),
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
                 options: localVarRequestOptions,
             };
         },
@@ -132,8 +139,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1ApiServerHealthcheckGet(options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<HealthCheckResponse> {
-            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).apiV1ApiServerHealthcheckGet(options);
+        async apiV1ApiServerHealthcheckGet(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HealthCheckResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1ApiServerHealthcheckGet(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -155,7 +162,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1ApiServerHealthcheckGet(options?: any): AxiosPromise<HealthCheckResponse> {
-            return DefaultApiFp(configuration).apiV1ApiServerHealthcheckGet(options)(axios, basePath);
+            return DefaultApiFp(configuration).apiV1ApiServerHealthcheckGet(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -175,9 +182,8 @@ export class DefaultApi extends BaseAPI {
      * @memberof DefaultApi
      */
     public apiV1ApiServerHealthcheckGet(options?: any) {
-        return DefaultApiFp(this.configuration).apiV1ApiServerHealthcheckGet(options)(this.axios, this.basePath);
+        return DefaultApiFp(this.configuration).apiV1ApiServerHealthcheckGet(options).then((request) => request(this.axios, this.basePath));
     }
-
 }
 
 
