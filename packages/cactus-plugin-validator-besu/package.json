@@ -1,0 +1,88 @@
+{
+  "name": "@hyperledger/cactus-plugin-validator-besu",
+  "version": "0.2.0",
+  "description": "A web service plugin that obtain signatures of ledger state from Cactus nodes.",
+  "main": "dist/cactus-plugin-validator-besu.node.umd.js",
+  "mainMinified": "dist/cactus-plugin-validator-besu.node.umd.min.js",
+  "browser": "dist/cactus-plugin-validator-besu.web.umd.js",
+  "browserMinified": "dist/cactus-plugin-validator-besu.web.umd.min.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/types/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "export-open-api-spec": "ts-node -e 'import(\"./src/main/typescript/openapi-spec\").then((x) => x.exportToFileSystemAsJson());'",
+    "pregenerate-sdk": "npm-run-all export-open-api-spec",
+    "generate-sdk": "openapi-generator generate --input-spec cactus-openapi-spec-plugin-validator-besu.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
+    "tsc": "tsc --project ./tsconfig.json",
+    "pretsc": "npm run generate-sdk",
+    "webpack": "npm-run-all webpack:dev webpack:prod",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
+    "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
+    "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    },
+    {
+      "name": "Su-Yu Kuo",
+      "email": "su-yu.kuo@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "dependencies": {
+    "@hyperledger/cactus-common": "0.2.0",
+    "@hyperledger/cactus-core-api": "0.2.0",
+    "@types/compression": "1.7.0",
+    "axios": "0.19.2",
+    "body-parser": "1.19.0",
+    "compression": "1.7.4",
+    "express": "4.17.1",
+    "express-openapi-validator": "3.12.9",
+    "joi": "14.3.1",
+    "key-encoder": "2.0.3",
+    "typescript-optional": "2.0.1",
+    "web3": "1.2.11"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.6",
+    "@types/multer": "1.4.4"
+  }
+}
