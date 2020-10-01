@@ -1,4 +1,5 @@
-// tslint:disable
+/* tslint:disable */
+/* eslint-disable */
 /**
  * Hyperledger Cactus Plugin - Validator Besu Web Service
  * Obtain signatures of ledger state from Cactus nodes through the API .
@@ -14,3 +15,4 @@
 
 export * from "./api";
 export * from "./configuration";
+
