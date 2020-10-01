@@ -1,4 +1,5 @@
-// tslint:disable
+/* tslint:disable */
+/* eslint-disable */
 /**
  * Hyperledger Cactus Plugin - Validator Besu Web Service
  * Obtain signatures of ledger state from Cactus nodes through the API .
@@ -12,7 +13,6 @@
  */
 
 
-import * as globalImportUrl from 'url';
 import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
@@ -59,13 +59,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest: SignTransactionRequest, options: any = {}): RequestArgs {
+        apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost: async (signTransactionRequest: SignTransactionRequest, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'signTransactionRequest' is not null or undefined
             if (signTransactionRequest === null || signTransactionRequest === undefined) {
                 throw new RequiredError('signTransactionRequest','Required parameter signTransactionRequest was null or undefined when calling apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost.');
             }
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-validator-besu/sign-transaction`;
-            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
@@ -78,15 +79,21 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
-            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
-            delete localVarUrlObj.search;
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...options.headers};
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             const needsSerialization = (typeof signTransactionRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
             localVarRequestOptions.data =  needsSerialization ? JSON.stringify(signTransactionRequest !== undefined ? signTransactionRequest : {}) : (signTransactionRequest || "");
 
             return {
-                url: globalImportUrl.format(localVarUrlObj),
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
                 options: localVarRequestOptions,
             };
         },
@@ -106,8 +113,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest: SignTransactionRequest, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignTransactionResponse> {
-            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest, options);
+        async apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest: SignTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignTransactionResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -130,7 +137,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest: SignTransactionRequest, options?: any): AxiosPromise<SignTransactionResponse> {
-            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest, options)(axios, basePath);
+            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -151,9 +158,8 @@ export class DefaultApi extends BaseAPI {
      * @memberof DefaultApi
      */
     public apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest: SignTransactionRequest, options?: any) {
-        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest, options)(this.axios, this.basePath);
+        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginValidatorBesuSignTransactionPost(signTransactionRequest, options).then((request) => request(this.axios, this.basePath));
     }
-
 }
 
 
