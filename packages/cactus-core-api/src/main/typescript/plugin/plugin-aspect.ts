@@ -4,4 +4,5 @@ export enum PluginAspect {
   KV_STORAGE = "KV_STORAGE",
   WEB_SERVICE = "WEB_SERVICE",
   CONSORTIUM = "CONSORTIUM",
+  VALIDATOR = "VALIDATOR",
 }
