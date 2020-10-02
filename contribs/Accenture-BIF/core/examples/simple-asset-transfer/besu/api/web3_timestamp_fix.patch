@@ -1,4 +1,0 @@
-266c266
-<     block.timestamp = utils.hexToNumber(block.timestamp);
----
->     block.timestamp = Number.parseInt(parseInt(block.timestamp).toString().substring(0,10));
