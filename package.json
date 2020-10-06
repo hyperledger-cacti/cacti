@@ -57,7 +57,7 @@
     "cross-env": "5.2.0",
     "cz-conventional-changelog": "3.0.2",
     "del-cli": "3.0.1",
-    "electron": "9.1.1",
+    "electron": "9.3.1",
     "eslint-config-standard": "12.0.0",
     "eslint-plugin-import": "2.17.3",
     "eslint-plugin-node": "9.1.0",
