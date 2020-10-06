@@ -11,7 +11,7 @@ OrdererOrgs:
   # Orderer
   # ---------------------------------------------------------------------------
   - Name: Orderer
-    Domain: cactus.com
+    Domain: cactus.stream
     # ---------------------------------------------------------------------------
     # "Specs" - See PeerOrgs below for complete description
     # ---------------------------------------------------------------------------
@@ -25,7 +25,7 @@ PeerOrgs:
   # Org1
   # ---------------------------------------------------------------------------
   - Name: Org1
-    Domain: org1.cactus.com
+    Domain: org1.cactus.stream
     # ---------------------------------------------------------------------------
     # "Specs"
     # ---------------------------------------------------------------------------
@@ -43,8 +43,8 @@ PeerOrgs:
     #                 Org.Domain, respectively.
     # ---------------------------------------------------------------------------
     # Specs:
-    #   - Hostname: foo # implicitly "foo.org1.cactus.com"
-    #     CommonName: foo27.org5.cactus.com # overrides Hostname-based FQDN set above
+    #   - Hostname: foo # implicitly "foo.org1.cactus.stream"
+    #     CommonName: foo27.org5.cactus.stream # overrides Hostname-based FQDN set above
     #   - Hostname: bar
     #   - Hostname: baz
     # ---------------------------------------------------------------------------

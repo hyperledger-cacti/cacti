@@ -25,7 +25,7 @@ Organizations:
         ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
-        MSPDir: crypto-config/ordererOrganizations/cactus.com/msp
+        MSPDir: crypto-config/ordererOrganizations/cactus.stream/msp
 
     - &Org1
         # DefaultOrg defines the organization which is used in the sampleconfig
@@ -35,7 +35,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org1MSP
 
-        MSPDir: crypto-config/peerOrganizations/org1.cactus.com/msp
+        MSPDir: crypto-config/peerOrganizations/org1.cactus.stream/msp
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used

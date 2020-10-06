@@ -1,8 +1,19 @@
+import path from "path";
+
 import Docker, { Container, ContainerInfo } from "dockerode";
+import { Config as SshConfig } from "node-ssh";
+import Client from "fabric-client";
 import axios from "axios";
 import Joi from "joi";
 import { EventEmitter } from "events";
 import { ITestLedger } from "../i-test-ledger";
+import { Containers } from "../common/containers";
+import { ISigningIdentity } from "./i-fabric-signing-identity";
+import {
+  Logger,
+  LogLevelDesc,
+  LoggerProvider,
+} from "@hyperledger/cactus-common";
 
 /*
  * Contains options for Fabric container
@@ -11,6 +22,7 @@ export interface IFabricTestLedgerV1ConstructorOptions {
   imageVersion?: string;
   imageName?: string;
   opsApiHttpPort?: number;
+  logLevel?: LogLevelDesc;
 }
 
 /*
@@ -35,6 +47,7 @@ const OPTS_JOI_SCHEMA: Joi.Schema = Joi.object().keys({
 export const FABRIC_TEST_LEDGER_OPTIONS_JOI_SCHEMA = OPTS_JOI_SCHEMA;
 
 export class FabricTestLedgerV1 implements ITestLedger {
+  public readonly log: Logger;
   public readonly imageVersion: string;
   public readonly imageName: string;
   public readonly opsApiHttpPort: number;
@@ -42,17 +55,20 @@ export class FabricTestLedgerV1 implements ITestLedger {
   private container: Container | undefined;
   private containerId: string | undefined;
 
-  constructor(
-    public readonly options: IFabricTestLedgerV1ConstructorOptions = {}
-  ) {
+  constructor(public readonly options: IFabricTestLedgerV1ConstructorOptions) {
+    const fnTag = "FabricTestLedgerV1#constructor()";
     if (!options) {
-      throw new TypeError(`FabricTestLedgerV1#ctor options was falsy.`);
+      throw new TypeError(`${fnTag} options was falsy.`);
     }
     this.imageVersion = options.imageVersion || DEFAULT_OPTS.imageVersion;
     this.imageName = options.imageName || DEFAULT_OPTS.imageName;
     this.opsApiHttpPort = options.opsApiHttpPort || DEFAULT_OPTS.opsApiHttpPort;
 
     this.validateConstructorOptions();
+    this.log = LoggerProvider.getOrCreate({
+      label: "fabric-test-ledger-v1",
+      level: options.logLevel || "INFO",
+    });
   }
 
   public getContainer(): Container {
@@ -74,7 +90,114 @@ export class FabricTestLedgerV1 implements ITestLedger {
     return `http://${ipAddress}:${hostPort}/version`;
   }
 
-  public async start(): Promise<Container> {
+  public async getAdminFabricClient(): Promise<Client> {
+    const adminSigningIdentity = await this.getAdminSigningIdentity();
+    const { privateKeyPem, certificate, mspId } = adminSigningIdentity;
+
+    const connectionProfile = await this.getConnectionProfile();
+
+    const client: Client = Client.loadFromConfig(connectionProfile);
+    client.setAdminSigningIdentity(privateKeyPem, certificate, mspId);
+    return client;
+  }
+
+  /**
+   *
+   * @see https://hyperledger-fabric.readthedocs.io/en/release-1.4/developapps/connectionprofile.html#scenario
+   * @see https://hyperledger-fabric.readthedocs.io/en/release-1.4/developapps/connectionprofile.html#sample
+   */
+  public async getConnectionProfile(): Promise<any> {
+    const containerInfo = await this.getContainerInfo();
+    const peerGrpcPort = await Containers.getPublicPort(7051, containerInfo);
+    const ordererGrpcPort = await Containers.getPublicPort(7050, containerInfo);
+
+    return {
+      name: "org.hyperledger.cactus.sample.fabric-all-in-one",
+      version: "1.0",
+      "x-type": "hlfv1",
+      description:
+        "Connection profile for the Cactus Fabric All-In-One " +
+        " test docker container image. Do NOT use in production.",
+
+      channels: {
+        mychannel: {
+          orderers: ["orderer0"],
+          peers: {
+            peer0: {},
+          },
+        },
+      },
+
+      organizations: {
+        Org1: {
+          mspid: "Org1MSP",
+          peers: ["peer0"],
+        },
+        OrdererOrg: {
+          mspid: "OrdererMSP",
+        },
+      },
+
+      orderers: {
+        orderer0: {
+          url: `grpc://localhost:${ordererGrpcPort}`,
+        },
+      },
+
+      peers: {
+        peer0: {
+          url: `grpc://localhost:${peerGrpcPort}`,
+        },
+      },
+    };
+  }
+
+  public async getAdminSigningIdentity(): Promise<ISigningIdentity> {
+    const container = this.getContainer();
+
+    const adminMspDir =
+      "/etc/hyperledger/fabric/crypto-config/peerOrganizations/org1.cactus.stream/users/Admin@org1.cactus.stream/msp/";
+    const keyStorePath = `${adminMspDir}keystore/`;
+
+    const fileList = await Containers.ls(container, "/");
+    this.log.debug("FILE LIST: %o", fileList);
+
+    const [privateKeyFile] = await Containers.ls(container, keyStorePath);
+    const privateKeyPath = path.join(keyStorePath, privateKeyFile);
+
+    const privateKeyPem = await Containers.pullFile(container, privateKeyPath);
+
+    const certPath = `${adminMspDir}signcerts/Admin\@org1.cactus.stream-cert.pem`;
+    const certificate = await Containers.pullFile(container, certPath);
+
+    const mspId = "Org1MSP";
+
+    return {
+      privateKeyPem,
+      certificate,
+      mspId,
+    };
+  }
+
+  public async getSshConfig(): Promise<SshConfig> {
+    const fnTag = "FabricTestLedger#getSshConnectionOptions()";
+    if (!this.container) {
+      throw new Error(`${fnTag} - invalid state no container instance set`);
+    }
+    const filePath = "/etc/hyperledger/cactus/fabric-aio-image.key";
+    const privateKey = await Containers.pullFile(this.container, filePath);
+    const containerInfo = await this.getContainerInfo();
+    const port = await Containers.getPublicPort(22, containerInfo);
+    const sshConfig: SshConfig = {
+      host: "localhost",
+      privateKey,
+      username: "root",
+      port,
+    };
+    return sshConfig;
+  }
+
+  public async start(omitPull: boolean = false): Promise<Container> {
     const containerNameAndTag = this.getContainerImageName();
 
     if (this.container) {
@@ -83,7 +206,9 @@ export class FabricTestLedgerV1 implements ITestLedger {
     }
     const docker = new Docker();
 
-    await this.pullContainerImage(containerNameAndTag);
+    if (!omitPull) {
+      await Containers.pullImage(containerNameAndTag);
+    }
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
@@ -91,7 +216,25 @@ export class FabricTestLedgerV1 implements ITestLedger {
         [],
         [],
         {
+          Env: [
+            // `CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${networkMode}`,
+            "FABRIC_LOGGING_SPEC=DEBUG",
+            "CORE_PEER_ADDRESS=7051",
+            "CORE_VM_DOCKER_ATTACHSTDOUT=true",
+            "CORE_CHAINCODE_LOGGING_SHIM=debug",
+            "CORE_CHAINCODE_LOGGING_LEVEL=debug",
+          ],
+          PortBindings: {
+            "22/tcp": [{ HostPort: "30022" }],
+            "7050/tcp": [{ HostPort: "7050" }],
+            "7051/tcp": [{ HostPort: "7051" }],
+            "7052/tcp": [{ HostPort: "7052" }],
+            [`${this.opsApiHttpPort}/tcp`]: [
+              { HostPort: `${this.opsApiHttpPort}` },
+            ],
+          },
           ExposedPorts: {
+            "22/tcp": {}, // OpenSSH Server - TCP
             [`${this.opsApiHttpPort}/tcp`]: {}, // Fabric Peer GRPC - HTTP
             "7050/tcp": {}, // Orderer GRPC - HTTP
             "7051/tcp": {}, // Peer additional - HTTP
@@ -103,7 +246,16 @@ export class FabricTestLedgerV1 implements ITestLedger {
           // This is a workaround needed for macOS which has issues with routing
           // to docker container's IP addresses directly...
           // https://stackoverflow.com/a/39217691
-          PublishAllPorts: true,
+          // PublishAllPorts: true,
+
+          // needed for Docker-in-Docker support
+          Privileged: true,
+
+          // This is the fallback solution in case DinD does not work out
+          // The reason why this is less desirable compared to DinD is that
+          // it breaks the design principle of the AIO containers that they
+          // must be self contained and not depend on the host's file-system.
+          Binds: ["/var/run/:/host/var/run/"],
         },
         {},
         (err: any) => {
@@ -146,20 +298,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
   }
 
   public stop(): Promise<any> {
-    const fnTag = "FabricTestLedgerV1#stop()";
-    return new Promise((resolve, reject) => {
-      if (this.container) {
-        this.container.stop({}, (err: any, result: any) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        });
-      } else {
-        return reject(new Error(`${fnTag} Container was not running.`));
-      }
-    });
+    return Containers.stop(this.container as Container);
   }
 
   public async destroy(): Promise<any> {
@@ -190,67 +329,13 @@ export class FabricTestLedgerV1 implements ITestLedger {
   }
 
   public async getOpsApiPublicPort(): Promise<number> {
-    const fnTag = "FabricTestLedgerV1#getOpsApiPublicPort()";
-    const aContainerInfo = await this.getContainerInfo();
-    const { opsApiHttpPort: thePort } = this;
-    const { Ports: ports } = aContainerInfo;
-
-    if (ports.length < 1) {
-      throw new Error(`${fnTag} no ports exposed or mapped at all`);
-    }
-    const mapping = ports.find((x) => x.PrivatePort === thePort);
-    if (mapping) {
-      if (!mapping.PublicPort) {
-        throw new Error(`${fnTag} port ${thePort} mapped but not public`);
-      } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
-      } else {
-        return mapping.PublicPort;
-      }
-    } else {
-      throw new Error(`${fnTag} no mapping found for ${thePort}`);
-    }
+    const containerInfo = await this.getContainerInfo();
+    return Containers.getPublicPort(this.opsApiHttpPort, containerInfo);
   }
 
   public async getContainerIpAddress(): Promise<string> {
-    const fnTag = "FabricTestLedgerV1#getContainerIpAddress()";
-    const aContainerInfo = await this.getContainerInfo();
-
-    if (aContainerInfo) {
-      const { NetworkSettings } = aContainerInfo;
-      const networkNames: string[] = Object.keys(NetworkSettings.Networks);
-      if (networkNames.length < 1) {
-        throw new Error(`${fnTag} container not connected to any networks`);
-      } else {
-        // return IP address of container on the first network that we found it connected to. Make this configurable?
-        return NetworkSettings.Networks[networkNames[0]].IPAddress;
-      }
-    } else {
-      throw new Error(`${fnTag} cannot find docker image ${this.imageName}`);
-    }
-  }
-
-  private pullContainerImage(containerNameAndTag: string): Promise<any[]> {
-    return new Promise((resolve, reject) => {
-      const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: any, stream: any) => {
-        if (pullError) {
-          reject(pullError);
-        } else {
-          docker.modem.followProgress(
-            stream,
-            (progressError: any, output: any[]) => {
-              if (progressError) {
-                reject(progressError);
-              } else {
-                resolve(output);
-              }
-            },
-            (event: any) => null // ignore the spammy docker download log, we get it in the output variable anyway
-          );
-        }
-      });
-    });
+    const containerInfo = await this.getContainerInfo();
+    return Containers.getContainerInternalIp(containerInfo);
   }
 
   private validateConstructorOptions(): void {
