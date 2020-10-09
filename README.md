@@ -14,7 +14,7 @@ Hyperledger Cactus is currently undergoing a major refactoring effort to enable 
 
 As blockchain technology proliferates, blockchain integration will become an increasingly important topic in the broader blockchain ecosystem.  For instance, people might want to trade between multiple different blockchains that are run on different platforms. The blockchain integration framework is a web application system designed to allow users to securely integrate different blockchains. It includes a set of libraries, data models, and SDK to accelerate development of an integrated services application. Our goal is to build a system that allows users of our code to securely conduct transactions between all of the most commonly used blockchains.  
 
-## Documentation
+## Documentation 
 
 * [Hyperledger Cactus Home](https://wiki.hyperledger.org/display/cactus)
 * [Whitepaper](./whitepaper/whitepaper.md)
