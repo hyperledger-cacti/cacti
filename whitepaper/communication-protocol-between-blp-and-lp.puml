@@ -114,39 +114,32 @@ rif -> rif: parse LedgerEvent message \nto determine which tradeID \nand busines
 rif -> blp: notify LedgerEvent \nto associated business logic 
 activate blp
 blp -> blp: event triggered\n (state of the trade changed)
-
 blp -> blp: load scenario\n to determine next operation
-/'
+
+blp -> blp: (If there is a next operation,\nthe following processing continues \nas the same as the sequence of\n"Send a ledger operation request")
 blp -> blp: load message template\n of transaction request
-blp -> blp: prepare a signed\n transaction request
-blp -> rif: send signeda transaction request
+blp -> blp: make a signedTransaction
+blp -> rif: sendSignedTransaction(signedTransaction)
 activate rif
 rif -> rif: register TxID\n with associated tradeID
-rif -> verifier: forward signed\n transaction request
+rif -> verifier: sendSignedTransaction(signedTransaction)
 activate verifier
-verifier -> validator: send signed\n transaction\n over socket.io
+verifier -> validator: sendSignedTransaction(signedTransaction)\n over socket.io
 activate validator
-
 validator -> ledger: submit transaction
 activate ledger
 ledger --> validator: submit transaction OK
 deactivate ledger
 deactivate validator
-
-verifier --> rif: forward signed\n transaction request OK
+verifier --> rif: sendSignedTransaction()\nrequest OK
 deactivate verifier
-rif --> blp: send signed\n transaction request OK
+rif --> blp: sendSignedTransaction()\nrequest OK
 deactivate rif
 blp -> blp: event triggered (state of trade changed)
 blp --> rif: notify LedgerEvent OK
 deactivate blp
-
 deactivate verifier
 rif -> rif: update 'last observed block#'
-deactivate rif
-'/
-blp -> blp: (If there is a next operation,\nthe following processing is\nthe same as the sequence of\n"Send a ledger operation request")
-deactivate blp
 deactivate rif
 ...
 
