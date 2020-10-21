@@ -16,13 +16,8 @@ As blockchain technology proliferates, blockchain integration will become an inc
 
 ## Documentation
 
-* [Hyperledger Cactus Home](https://wiki.hyperledger.org/display/cactus)
-* [Whitepaper](./whitepaper/whitepaper.md)
-* [Hyperledger Forum Introduction To Cactus](https://www.youtube.com/watch?v=fgYrUIc_-sU)
-
-## Running Cactus
-
-Please review the [build guidelines](/BUILD.md) to build and run the project.
+* [Project Wiki](https://wiki.hyperledger.org/display/cactus): Schedule and logs of the maintainer meetings
+* [Whitepaper](./whitepaper/whitepaper.md): The official document on Cactus design specifications
 
 ## Contact
 * mailing list: [cactus@lists.hyperledger.org](mailto:cactus@lists.hyperledger.org)
