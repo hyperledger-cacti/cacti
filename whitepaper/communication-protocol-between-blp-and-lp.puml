@@ -1,4 +1,3 @@
-  
 @startuml
 title The communication protocol between Business Logic Plugin and Ledger Plugin
 
@@ -21,7 +20,7 @@ end box
 database "ledger" as ledger
 
 == Initialize connecting with a ledger ==
-admin -> rif: startService()
+admin -> rif: startService()\nrequest
 activate rif
 rif -> blp_registry: getLedgerPluginInfoList()
 activate blp_registry
@@ -46,7 +45,11 @@ blp_registry --> rif: update OK
 deactivate blp_registry
 rif -> verifier: startMonitor()
 activate verifier
-verifier -> verifier: start monitoring
+verifier -> validator: startMonitor()\nover socket.io
+activate validator
+validator -> validator: start monitoring
+validator --> verifier: startMonitor() OK
+deactivate validator
 verifier --> rif: startMonitor() OK
 deactivate verifier
 rif --> admin: startService() OK
@@ -55,7 +58,7 @@ deactivate rif
 
 == Send a ledger operation request ==
 
-euser -> rif: CREATE a trade
+euser -> rif: POST /api/v1/bl/trades/\n(request of creating a trade)
 activate rif
 rif -> rif: assign tradeID
 rif -> blp: startBL(businessLogicID)
@@ -63,27 +66,27 @@ activate blp
 blp -> blp: event triggered\n (startBL)
 blp -> blp: load scenario\n to determine next operation
 blp -> blp: load message template\n of transaction request
-blp -> blp: prepare a transaction\n request
-blp -> rif: send signed\n transaction request
+blp -> blp: make a signedTransaction
+blp -> rif: sendSignedTransaction(signedTransaction)
 activate rif
 rif -> rif: register TxID\n with associated tradeID
-rif -> verifier: forward signed\n transaction request
+rif -> verifier: sendSignedTransaction(signedTransaction)
 activate verifier
-verifier -> validator: send a message\n over socket.io
+verifier -> validator: sendSignedTransaction(signedTransaction)\nover socket.io
 activate validator
 validator -> ledger: submit transaction
 activate ledger
 ledger --> validator: submit transaction OK
 deactivate ledger
 deactivate validator
-verifier --> rif: forward signed\n transaction request OK
+verifier --> rif: sendSignedTransaction()\nrequest OK
 deactivate verifier
-rif --> blp: send signed transaction\n request OK
+rif --> blp: sendSignedTransaction()\n request OK
 deactivate rif
 blp -> blp: event triggered\n (state of trade changed)
 blp --> rif: startBL() OK
 deactivate blp
-rif --> euser: CREATE trade OK\n with tradeID
+rif --> euser: POST /api/v1/bl/trades/ OK\n with tradeID
 deactivate rif
 deactivate validator
 ...
@@ -113,6 +116,7 @@ activate blp
 blp -> blp: event triggered\n (state of the trade changed)
 
 blp -> blp: load scenario\n to determine next operation
+/'
 blp -> blp: load message template\n of transaction request
 blp -> blp: prepare a signed\n transaction request
 blp -> rif: send signeda transaction request
@@ -139,6 +143,10 @@ deactivate blp
 
 deactivate verifier
 rif -> rif: update 'last observed block#'
+deactivate rif
+'/
+blp -> blp: (If there is a next operation,\nthe following processing is\nthe same as the sequence of\n"Send a ledger operation request")
+deactivate blp
 deactivate rif
 ...
 
