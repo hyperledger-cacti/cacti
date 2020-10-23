@@ -67,7 +67,7 @@
     "@hyperledger/cactus-core-api": "^0.2.0",
     "@hyperledger/cactus-plugin-kv-storage-memory": "0.2.0",
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "^0.2.0",
-    "@hyperledger/cactus-sdk": "0.2.0",
+    "@hyperledger/cactus-api-client": "0.2.0",
     "axios": "0.19.2",
     "joi": "14.3.1",
     "typescript-optional": "2.0.1",

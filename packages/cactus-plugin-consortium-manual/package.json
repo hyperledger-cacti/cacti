@@ -79,7 +79,7 @@
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-kv-storage-memory": "0.2.0",
-    "@hyperledger/cactus-sdk": "0.2.0",
+    "@hyperledger/cactus-api-client": "0.2.0",
     "@types/express": "4.17.6",
     "@types/joi": "14.3.4",
     "@types/json-stable-stringify": "1.0.32",

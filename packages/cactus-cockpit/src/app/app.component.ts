@@ -6,7 +6,7 @@ import { StatusBar } from "@ionic-native/status-bar/ngx";
 
 import { LoggerProvider, Logger } from "@hyperledger/cactus-common";
 import { DefaultApi as DefaultApiConsortium } from "@hyperledger/cactus-plugin-consortium-manual";
-import { ApiClient, Configuration } from "@hyperledger/cactus-sdk";
+import { ApiClient, Configuration } from "@hyperledger/cactus-api-client";
 import { CACTUS_API_URL } from "src/constants";
 
 @Component({

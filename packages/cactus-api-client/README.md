@@ -1,4 +1,4 @@
-# `@hyperledger/cactus-sdk`
+# `@hyperledger/cactus-api-client`
 
 > TODO: description
 

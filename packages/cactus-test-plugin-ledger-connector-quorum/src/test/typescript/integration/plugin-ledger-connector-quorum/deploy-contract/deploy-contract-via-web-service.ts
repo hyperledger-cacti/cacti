@@ -20,7 +20,7 @@ import {
   DefaultApi,
   Configuration,
   HealthCheckResponse,
-} from "@hyperledger/cactus-sdk";
+} from "@hyperledger/cactus-api-client";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-deploy-contract-via-web-service",

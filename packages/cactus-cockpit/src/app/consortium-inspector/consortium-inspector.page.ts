@@ -5,7 +5,7 @@ import {
   LoggerProvider,
   ILoggerOptions,
 } from "@hyperledger/cactus-common";
-import { Configuration, ApiClient } from "@hyperledger/cactus-sdk";
+import { Configuration, ApiClient } from "@hyperledger/cactus-api-client";
 import {
   DefaultApi as PluginConsortiumManualApi,
   JWSGeneral,

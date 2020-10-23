@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { JWS, JWK } from "jose";
 import flatten from "lodash/flatten";
 
-import { ApiClient } from "@hyperledger/cactus-sdk";
+import { ApiClient } from "@hyperledger/cactus-api-client";
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
