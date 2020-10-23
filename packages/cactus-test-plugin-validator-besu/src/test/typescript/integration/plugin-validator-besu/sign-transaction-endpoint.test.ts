@@ -13,7 +13,7 @@ import {
   JsObjectSigner,
   IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
-import { Configuration, ApiClient } from "@hyperledger/cactus-sdk";
+import { Configuration, ApiClient } from "@hyperledger/cactus-api-client";
 import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import {
   IPluginValidatorBesuOptions,

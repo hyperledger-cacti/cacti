@@ -1,11 +1,11 @@
 {
-  "name": "@hyperledger/cactus-sdk",
+  "name": "@hyperledger/cactus-api-client",
   "version": "0.2.0",
   "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
-  "main": "dist/cactus-sdk.node.umd.js",
-  "mainMinified": "dist/cactus-sdk.node.umd.min.js",
-  "browser": "dist/cactus-sdk.web.umd.js",
-  "browserMinified": "dist/cactus-sdk.web.umd.min.js",
+  "main": "dist/cactus-api-client.node.umd.js",
+  "mainMinified": "dist/cactus-api-client.node.umd.min.js",
+  "browser": "dist/cactus-api-client.web.umd.js",
+  "browserMinified": "dist/cactus-api-client.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/types/main/typescript/index.d.ts",
   "files": [

@@ -6,7 +6,7 @@ import { JWK, JWS } from "jose";
 import { v4 as uuidV4 } from "uuid";
 
 import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { Configuration, ApiClient } from "@hyperledger/cactus-sdk";
+import { Configuration, ApiClient } from "@hyperledger/cactus-api-client";
 import {
   IPluginConsortiumManualOptions,
   PluginConsortiumManual,

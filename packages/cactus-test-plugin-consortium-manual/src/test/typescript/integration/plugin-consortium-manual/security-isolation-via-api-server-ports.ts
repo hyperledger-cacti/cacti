@@ -12,7 +12,7 @@ import {
   DefaultApi,
   Configuration,
   HealthCheckResponse,
-} from "@hyperledger/cactus-sdk";
+} from "@hyperledger/cactus-api-client";
 import {
   DefaultApi as DefaultApiPlugin,
   Configuration as ConfigurationPlugin,
