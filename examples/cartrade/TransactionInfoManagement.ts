@@ -9,6 +9,7 @@ import { TransactionInfo } from './TransactionInfo';
 import { TransactionData } from './TransactionData';
 import { TxInfoData } from './TxInfoData';
 import { TradeInfo } from '../../packages/routing-interface/TradeInfo';
+import { CartradeStatus } from './define'
 
 const fs = require('fs');
 const path = require('path');
@@ -64,7 +65,7 @@ export class TransactionInfoManagement {
         this.fileDump();
     }
 
-    setStatus(tradeInfo: TradeInfo, status: string) {
+    setStatus(tradeInfo: TradeInfo, status: CartradeStatus) {
 
         // Existence check of table file
         try {

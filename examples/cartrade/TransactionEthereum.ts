@@ -17,6 +17,8 @@ const moduleName = 'TransactionEthereum';
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
+const mapFromAddressNonce: Map<string, number> = new Map();
+
 export function makeRawTransaction(txParam: { fromAddress: string, fromAddressPkey: string, toAddress: string, amount: number, gas: number }): Promise<{ data: {}, txId: string }> {
     return new Promise(async (resolve, reject) => {
         try {
@@ -39,12 +41,20 @@ export function makeRawTransaction(txParam: { fromAddress: string, fromAddressPk
 
             // web3_v1.2.9_support
             web3.eth.getTransactionCount(txParam.fromAddress)
-                .then(_nance => {
-                    const txnCount: number = _nance;
+                .then(_nonce => {
+                    let txnCount: number = _nonce;
                     // NOTE: No need to count up.
 
                     // NOTE: gasPrice is not used
                     // const gasPrice: string = web3.eth.getGasPrice();
+
+                    const latestNonce = getLatestNonce(txParam.fromAddress);
+                    logger.debug(`####makeRawTransaction(): fromAddress: ${txParam.fromAddress}, txnCount: ${web3.utils.toHex(txnCount)}, latestNonce: ${web3.utils.toHex(latestNonce)}`);
+                    if (txnCount <= latestNonce) {
+                        txnCount = latestNonce + 1;
+                        logger.debug(`####makeRawTransaction(): Adjust txnCount, fromAddress: ${txParam.fromAddress}, txnCount: ${web3.utils.toHex(txnCount)}, latestNonce: ${web3.utils.toHex(latestNonce)}`);
+                    }
+                    setLatestNonce(txParam.fromAddress, txnCount);
 
                     const privKey: Buffer = Buffer.from(txParam.fromAddressPkey, 'hex');
                     logger.debug('##privKey=' + txParam.fromAddressPkey);
@@ -81,3 +91,16 @@ export function makeRawTransaction(txParam: { fromAddress: string, fromAddressPk
         };
     });
 }
+
+
+function getLatestNonce(fromAddress: string): number {
+    if (mapFromAddressNonce.has(fromAddress)) {
+        return mapFromAddressNonce.get(fromAddress);
+    }
+    return 0;
+}
+
+function setLatestNonce(fromAddress: string, nonce: number): void {
+    mapFromAddressNonce.set(fromAddress, nonce);
+}
+

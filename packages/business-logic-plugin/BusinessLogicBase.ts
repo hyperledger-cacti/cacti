@@ -9,19 +9,20 @@ import { Request } from 'express';
 import { BusinessLogicPlugin } from './BusinessLogicPlugin';
 import { VerifierEventListener, LedgerEvent } from '../ledger-plugin/LedgerPlugin';
 import { json2str } from '../ledger-plugin/DriverCommon'
+import { ConfigUtil } from '../routing-interface/util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../config/default.json"), 'utf8'));
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = 'BusinessLogicBase';
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
-export class BusinessLogicBase implements BusinessLogicPlugin, VerifierEventListener {
+export class BusinessLogicBase implements BusinessLogicPlugin {
     eventFilter: object | null = null;
 
-    startTransaction(req: Request, businessLogicID: string, tradeID: string) {
+    startTransaction(req: Request, businessLogicID: string, tradeID: string): void {
         // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
     }
 
@@ -29,7 +30,12 @@ export class BusinessLogicBase implements BusinessLogicPlugin, VerifierEventList
         // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
     }
 
-    onEvent(ledgerEvent: LedgerEvent): void {
+    getOperationStatus(tradeID: string): object {
+        // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
+        return {};
+    }
+
+    onEvent(ledgerEvent: LedgerEvent, targetIndex: number): void {
         // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
     }
 
@@ -44,7 +50,17 @@ export class BusinessLogicBase implements BusinessLogicPlugin, VerifierEventList
         logger.debug(`##called setEventFilter(after): ${json2str(this.eventFilter)}`);
     }
 
-    isTargetEvent(ledgerEvent: LedgerEvent): boolean {
+    getEventDataNum(ledgerEvent: LedgerEvent): number {
+        // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
+        return 0;
+    }
+
+    getTxIDFromEvent(ledgerEvent: LedgerEvent, targetIndex: number): string | null {
+        // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
+        return null;
+    }
+
+    hasTxIDInTransactions(txID: string): boolean {
         // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
         return false;
     }

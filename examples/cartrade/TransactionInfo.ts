@@ -20,7 +20,7 @@ export class TransactionInfo {
     fabricAccountToKey: string;
     tradingValue: string;
     carID: string;
-    status: string;
+    status: number;
     escrowLedger: string;
     escrowTxID: string;
     escrowTxInfo: string;

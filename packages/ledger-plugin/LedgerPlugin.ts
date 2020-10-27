@@ -42,8 +42,8 @@ export class LedgerEvent {
 
 export interface VerifierEventListener {
     onEvent(ledgerEvent: LedgerEvent): void;
-    getEventFilter(): object | null;
-    isTargetEvent(ledgerEvent: LedgerEvent): boolean;
+    // getEventFilter(): object | null;
+    // isTargetEvent(ledgerEvent: LedgerEvent): boolean;
 }
 
 // NOTE: The following methods are not implemented this time

@@ -1,6 +1,7 @@
 {
     "cartradeInfo": {
         "fabric": {
+            "validatorID": "r9IS4dDf",
             "mspID": "Org1MSP",
             "keystore": "./wallet/admin",
             "connUserName": "user1",
@@ -29,6 +30,7 @@
             "chaincodeID": "fabcar"
         },
         "ethereum": {
+            "validatorID": "84jUisrs",
             "gethURL": "http://localhost:8545",
             "chainName": "geth1",
             "networkID": 10,
@@ -36,7 +38,9 @@
             "network": "mainnet",
             "hardfork": "petersburg",
             "gas": 21000,
-            "fromAddressPkey": "40d7e5931a6e0807d3ebd70518f635dbf575975d3bb564ff34c99be416067c89",
+            "fromAddressPkey_0xec709e1774f0ce4aba47b52a499f9abaaa159f71": "40d7e5931a6e0807d3ebd70518f635dbf575975d3bb564ff34c99be416067c89",
+            "fromAddressPkey_0x36e146d5afab61ab125ee671708eeb380aea05b6": "13a45756bc314465c4ae2ff0eb9ab58cf72453c04604d8fa14393eb25ce96d06",
+            "fromAddressPkey_0x06fc56347d91c6ad2dae0c3ba38eb12ab0d72e97": "cb5d48d371916a4ea1627189d8af4f642a5d72746a06b559780c3f5932658207",
             "escrowAddress": "0x36e146d5afab61ab125ee671708eeb380aea05b6",
             "escrowAddressPkey": "13a45756bc314465c4ae2ff0eb9ab58cf72453c04604d8fa14393eb25ce96d06"
         }

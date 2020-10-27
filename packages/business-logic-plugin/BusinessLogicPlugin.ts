@@ -6,7 +6,13 @@
  */
 
 import { Request } from 'express';
+import { VerifierEventListener, LedgerEvent } from '../ledger-plugin/LedgerPlugin';
 
 export interface BusinessLogicPlugin {
     startTransaction(req: Request, businessLogicID: string, tradeID: string): void;
+    getOperationStatus(tradeID: string): object;
+    onEvent(ledgerEvent: LedgerEvent, targetIndex: number): void;
+    getEventDataNum(ledgerEvent: LedgerEvent): number;
+    getTxIDFromEvent(ledgerEvent: LedgerEvent, targetIndex: number): string | null;
+    hasTxIDInTransactions(txID: string): boolean;
 }

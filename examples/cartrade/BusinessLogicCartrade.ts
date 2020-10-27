@@ -11,14 +11,17 @@ import { TradeInfo } from '../../packages/routing-interface/TradeInfo';
 import { TransactionInfoManagement } from './TransactionInfoManagement';
 import { TransactionInfo } from './TransactionInfo';
 import { TransactionData } from './TransactionData';
+import { BusinessLogicInquireCartradeStatus } from './BusinessLogicInquireCartradeStatus';
 import { TxInfoData } from './TxInfoData';
 import { transactionManagement } from '../../packages/routing-interface/routes/index';
 import { LedgerOperation } from '../../packages/business-logic-plugin/LedgerOperation';
 import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
 import { makeRawTransaction } from './TransactionEthereum'
 import { makeSignedProposal } from './TransactionFabric';
-import { LedgerEvent } from '../../packages/ledger-plugin/LedgerPlugin';
+import { ApiInfo, LedgerEvent } from '../../packages/ledger-plugin/LedgerPlugin';
 import { json2str } from '../../packages/ledger-plugin/DriverCommon'
+import { CartradeStatus } from './define'
+import { RIFUtil } from '../../packages/routing-interface/util/RIFUtil';
 
 const fs = require('fs');
 const path = require('path');
@@ -30,7 +33,7 @@ logger.level = config.logLevel;
 
 export class BusinessLogicCartrade extends BusinessLogicBase {
     transactionInfoManagement: TransactionInfoManagement;
-    useValidator: {};
+    // useValidator: {};
 
     constructor() {
         super();
@@ -64,10 +67,10 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         const tradeInfo: TradeInfo = new TradeInfo(requestInfo.businessLogicID, requestInfo.tradeID);
 
         // trade status update
-        this.transactionInfoManagement.setStatus(tradeInfo, "underEscrow");
+        this.transactionInfoManagement.setStatus(tradeInfo, CartradeStatus.UnderEscrow);
 
         // Get varidator information
-        this.useValidator = JSON.parse(transactionManagement.getValidatorToUse(requestInfo.businessLogicID));
+        // this.useValidator = JSON.parse(transactionManagement.getValidatorToUse(requestInfo.businessLogicID));
 
         // this.dummyTransaction(requestInfo, tradeInfo);
         this.firstTransaction(requestInfo, tradeInfo);
@@ -80,17 +83,17 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         let transactionData: TransactionData = new TransactionData("escrow", "ledger001", "tid001");
         this.transactionInfoManagement.setTransactionData(tradeInfo, transactionData);
 
-        this.transactionInfoManagement.setStatus(tradeInfo, "underTransfer");
+        this.transactionInfoManagement.setStatus(tradeInfo, CartradeStatus.UnderTransfer);
 
         transactionData = new TransactionData("transfer", "ledger002", "tid002");
         this.transactionInfoManagement.setTransactionData(tradeInfo, transactionData);
 
-        this.transactionInfoManagement.setStatus(tradeInfo, "underSettlement");
+        this.transactionInfoManagement.setStatus(tradeInfo, CartradeStatus.UnderSettlement);
 
         transactionData = new TransactionData("settlement", "ledger003", "tid003");
         this.transactionInfoManagement.setTransactionData(tradeInfo, transactionData);
 
-        this.transactionInfoManagement.setStatus(tradeInfo, "completed");
+        this.transactionInfoManagement.setStatus(tradeInfo, CartradeStatus.Completed);
 
     }
 
@@ -101,15 +104,15 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         ///// Eth Escrow
 
         // Get Verifier Instance
-        const verifierEthereum = transactionManagement.getVerifier(this.useValidator['validatorID'][0]);
+        logger.debug(`##firstTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`);
+        const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
+        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
         logger.debug("getVerifierEthereum");
-        verifierEthereum.setEventListener(this);
-        logger.debug("setEventListener");
-        verifierEthereum.startMonitor();
-        logger.debug("##startMonitor(ethereum)");
 
         // TODO: get private key from
-        const fromAddressPkey = config.cartradeInfo.ethereum.fromAddressPkey;
+        logger.debug(`####fromAddress: ${requestInfo.tradeInfo.ethereumAccountFrom}`);
+        const fromAddressPkey = config.cartradeInfo.ethereum['fromAddressPkey_' + requestInfo.tradeInfo.ethereumAccountFrom];
+        logger.debug(`####fromAddressPkey: ${fromAddressPkey}`);
         // TODO: Get address of escrow and set parameter
         const escrowAddress = config.cartradeInfo.ethereum.escrowAddress;
 
@@ -136,13 +139,6 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
                 // Run Verifier (Ethereum)
                 verifierEthereum.requestLedgerOperation(ledgerOperation);
-
-                // Specify the filtering condition of the event to be received
-                logger.debug(`##setEventListener!! `);
-                const filter = {
-                    txId: result.txId
-                }
-                this.setEventFilter(filter);
             })
             .catch(err => {
                 logger.error(err);
@@ -156,12 +152,10 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         ///// Fab Transfer
 
         // Get Verifier Instance
-        const verifierFabric = transactionManagement.getVerifier(this.useValidator['validatorID'][1]);
-
-        verifierFabric.setEventListener(this);
-        logger.debug("setEventListener");
-        verifierFabric.startMonitor();
-        logger.debug("##startMonitor(ethereum)");
+        logger.debug(`##secondTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`);
+        const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
+        const verifierFabric = transactionManagement.getVerifier(useValidator['validatorID'][1]);
+        logger.debug("getVerifierFabric");
 
         // Generate parameters for sendSignedProposal(changeCarOwner)
         const ccFncName: string = "changeCarOwner";
@@ -184,13 +178,6 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
                 // Run Verifier (Fabric)
                 verifierFabric.requestLedgerOperation(ledgerOperation);
-
-                // Specify the filtering condition of the event to be received
-                logger.debug(`##setEventListener!! `);
-                const filter = {
-                    txId: result.txId
-                }
-                this.setEventFilter(filter);
             })
             .catch(err => {
                 logger.error(err);
@@ -202,7 +189,9 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         logger.debug("called thirdTransaction");
 
         // Get Verifier Instance
-        const verifierEthereum = transactionManagement.getVerifier(this.useValidator['validatorID'][0]);
+        logger.debug(`##thirdTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`);
+        const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
+        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
         logger.debug("getVerifierEthereum");
 
         // TODO: Get address of escrow and set parameter
@@ -232,46 +221,48 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
                 // Run Verifier (Ethereum)
                 verifierEthereum.requestLedgerOperation(ledgerOperation);
-
-                // Specify the filtering condition of the event to be received
-                logger.debug(`##setEventListener!! `);
-                const filter = {
-                    txId: result.txId
-                }
-                this.setEventFilter(filter);
             })
             .catch(err => {
                 logger.error(err);
             });
     }
 
+    completedTransaction(tradeInfo: TradeInfo) {
+
+        logger.debug("called completedTransaction");
+
+        logger.debug(`##completedTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`);
+        const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
+        const validatorId = useValidator['validatorID'][0];
+    }
+
     finish() {
         logger.debug("called finish");
     }
 
-    onEvent(ledgerEvent: LedgerEvent): void {
-        logger.debug(`##in BLP:EventListener(onEvent)`);
-        logger.debug(`##event: ${json2str(ledgerEvent)}`);
+    onEvent(ledgerEvent: LedgerEvent, targetIndex: number): void {
+        logger.debug(`##in BLP:onEvent()`);
+        logger.debug(`##onEvent(): ${json2str(ledgerEvent)}`);
 
         switch (ledgerEvent.verifierId) {
-            case "VerifierEthereum": // TODO: Originally, it is necessary to divide processing by Validator ID such as "84jUisrs"
-                this.onEvenEtherem(ledgerEvent.data);
+              case config.cartradeInfo.ethereum.validatorID:
+                this.onEvenEtherem(ledgerEvent.data, targetIndex);
                 break;
-            case "VerifierFabric": // TODO: Originally, it is necessary to divide processing by Validator ID such as "r9IS4dDf"
-                this.onEvenFabric(ledgerEvent.data);
+              case config.cartradeInfo.fabric.validatorID:
+                this.onEvenFabric(ledgerEvent.data, targetIndex);
                 break;
             default:
-                logger.error(`##ERROR: onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`);
+                logger.error(`##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`);
                 return;
         }
 
     }
 
-    onEvenEtherem(event: object): void {
+    onEvenEtherem(event: object, targetIndex: number): void {
         logger.debug(`##in onEvenEtherem()`);
-        const tx = this.getTransactionFromEthereumEvent(event);
+        const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
         if (tx == null) {
-            logger.error(`##ERR: invalid event: ${json2str(event)}`);
+            logger.error(`##onEvenEtherem(): invalid event: ${json2str(event)}`);
             return;
         }
 
@@ -282,7 +273,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             logger.debug(`##status =${status}`);
 
             if (status !== 200) {
-                logger.error(`##ERR: error event, status: ${status}, txId: ${txId}`);
+                logger.error(`##onEvenEtherem(): error event, status: ${status}, txId: ${txId}`);
                 return;
             }
 
@@ -290,26 +281,26 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             this.executeNextTransaction(tx, txId);
         }
         catch (err) {
-            logger.error(`##err: onEvent, err: ${err}, event: ${json2str(event)}`);
+            logger.error(`##onEvenEtherem(): err: ${err}, event: ${json2str(event)}`);
         }
     }
 
-    getTransactionFromEthereumEvent(event: object): object | null {
+    getTransactionFromEthereumEvent(event: object, targetIndex: number): object | null {
         try {
-            const retTransaction = event['blockData']['transactions'][0];
-            logger.debug(`##retTransaction: ${retTransaction}`);
+            const retTransaction = event['blockData']['transactions'][targetIndex];
+            logger.debug(`##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`);
             return retTransaction;
         }
         catch (err) {
-            logger.error(`##ERR: invalid even, err:${err}, event:${event}`);
+            logger.error(`##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`);
         }
     }
 
-    onEvenFabric(event: object): void {
+    onEvenFabric(event: object, targetIndex: number): void {
         logger.debug(`##in onEvenFabric()`);
-        const tx = this.getTransactionFromFabricEvent(event);
+        const tx = this.getTransactionFromFabricEvent(event, targetIndex);
         if (tx == null) {
-            logger.warn(`##ERR: invalid event: ${json2str(event)}`);
+            logger.warn(`##onEvenFabric(): invalid event: ${json2str(event)}`);
             return;
         }
 
@@ -320,7 +311,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             logger.debug(`##status =${status}`);
 
             if (status !== 200) {
-                logger.error(`##ERR: error event, status: ${status}, txId: ${txId}`);
+                logger.error(`##onEvenFabric(): error event, status: ${status}, txId: ${txId}`);
                 return;
             }
 
@@ -328,18 +319,18 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             this.executeNextTransaction(tx, txId);
         }
         catch (err) {
-            logger.error(`##err: onEvent, err: ${err}, event: ${json2str(event)}`);
+            logger.error(`##onEvenFabric(): onEvent, err: ${err}, event: ${json2str(event)}`);
         }
     }
 
-    getTransactionFromFabricEvent(event: object): object | null {
+    getTransactionFromFabricEvent(event: object, targetIndex): object | null {
         try {
-            const retTransaction = event['blockData'][0];
-            logger.debug(`##retTransaction: ${retTransaction}`);
+            const retTransaction = event['blockData'][targetIndex];
+            logger.debug(`##getTransactionFromFabricEvent(): retTransaction: ${retTransaction}`);
             return retTransaction;
         }
         catch (err) {
-            logger.error(`##ERR: invalid even, err:${err}, event:${event}`);
+            logger.error(`##getTransactionFromFabricEvent(): invalid even, err:${err}, event:${event}`);
         }
     }
 
@@ -359,7 +350,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
             let txInfoData: TxInfoData;
             switch (txStatus) {
-                case "underEscrow":
+                case CartradeStatus.UnderEscrow:
                     // store transaction information in DB
                     txInfoData = new TxInfoData("escrow", json2str(txInfo));
                     this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
@@ -367,10 +358,10 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                     // underEscrow -> underTransfer
                     logger.info(`##INFO: underEscrow -> underTransfer, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`);
                     // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
-                    this.transactionInfoManagement.setStatus(tradeInfo, "underTransfer");
+                    this.transactionInfoManagement.setStatus(tradeInfo, CartradeStatus.UnderTransfer);
                     this.secondTransaction(transactionInfo.carID, transactionInfo.fabricAccountTo, tradeInfo);
                     break;
-                case "underTransfer":
+                case CartradeStatus.UnderTransfer:
                     // store transaction information in DB
                     txInfoData = new TxInfoData("transfer", json2str(txInfo));
                     this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
@@ -378,20 +369,21 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                     // underTransfer -> underSettlement
                     logger.info(`##INFO: underTransfer -> underSettlement, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`);
                     // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
-                    this.transactionInfoManagement.setStatus(tradeInfo, "underSettlement");
+                    this.transactionInfoManagement.setStatus(tradeInfo, CartradeStatus.UnderSettlement);
                     this.thirdTransaction(transactionInfo.ethereumAccountTo, transactionInfo.tradingValue, tradeInfo);
                     break;
-                case "underSettlement":
+                case CartradeStatus.UnderSettlement:
                     // store transaction information in DB
                     txInfoData = new TxInfoData("settlement", json2str(txInfo));
                     this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
 
                     // underSettlement -> completed
                     // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
-                    this.transactionInfoManagement.setStatus(tradeInfo, "completed");
+                    this.transactionInfoManagement.setStatus(tradeInfo, CartradeStatus.Completed);
                     logger.info(`##INFO: completed cartrade, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`);
+                    this.completedTransaction(tradeInfo);
                     break;
-                case "completed":
+                case CartradeStatus.Completed:
                     logger.warn('##WARN: already completed, txinfo: ${json2str(transactionInfo)}');
                     return;
                 default:
@@ -414,78 +406,115 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         }
     }
 
-    isTargetEvent(ledgerEvent: LedgerEvent): boolean {
-        logger.debug(`##in isTargetEvent`);
-        logger.debug(`##event: ${json2str(ledgerEvent)}`);
+    getOperationStatus(tradeID: string): object {
+        logger.debug(`##in getOperationStatus()`);
+        const businessLogicInquireCartradeStatus: BusinessLogicInquireCartradeStatus = new BusinessLogicInquireCartradeStatus();
+        const transactionStatusData = businessLogicInquireCartradeStatus.getCartradeOperationStatus(tradeID);
 
-        const filter = this.getEventFilter();
-        if (filter === null) {
-            logger.debug(`##filter is null, skip.`);
-            return false;
-        }
-
-        switch (ledgerEvent.verifierId) {
-            case "VerifierEthereum": // TODO: Originally, it is necessary to divide processing by Validator ID such as "84jUisrs"
-                return this.isTargetEventEtherem(ledgerEvent.data, filter);
-            case "VerifierFabric": // TODO: Originally, it is necessary to divide processing by Validator ID such as "r9IS4dDf"
-                return this.isTargetEventFabric(ledgerEvent.data, filter);
-            default:
-                logger.error(`##ERROR: onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`);
-        }
-
-        return false;
+        return transactionStatusData;
     }
 
-    isTargetEventEtherem(event: object, filter: object): boolean {
-        logger.debug(`##in isTargetEventEtherem()`);
-        const tx = this.getTransactionFromEthereumEvent(event);
+
+    getTxIDFromEvent(ledgerEvent: LedgerEvent, targetIndex: number): string | null {
+        logger.debug(`##in getTxIDFromEvent`);
+        logger.debug(`##event: ${json2str(ledgerEvent)}`);
+
+        switch (ledgerEvent.verifierId) {
+              case config.cartradeInfo.ethereum.validatorID:
+                return this.getTxIDFromEventEtherem(ledgerEvent.data, targetIndex);
+              case config.cartradeInfo.fabric.validatorID:
+                return this.getTxIDFromEventFabric(ledgerEvent.data, targetIndex);
+            default:
+                logger.error(`##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`);
+        }
+        return null;
+    }
+
+
+    getTxIDFromEventEtherem(event: object, targetIndex: number): string | null {
+        logger.debug(`##in getTxIDFromEventEtherem()`);
+        const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
         if (tx == null) {
-            logger.error(`##ERR: invalid event: ${json2str(event)}`);
-            return;
+            logger.warn(`#getTxIDFromEventEtherem(): skip(not found tx)`);
+            return null;
         }
 
         try {
             const txId = tx['hash'];
 
-            if (!filter.hasOwnProperty('txId')) {
-                logger.warn(`eventFilter: not exist txId.`);
-                return true;
+            if (typeof txId !== 'string') {
+                logger.warn(`#getTxIDFromEventEtherem(): skip(invalid block, not found txId.), event: ${json2str(event)}`);
+                return null;
             }
-            const filterTxId = filter['txId'];
-            logger.debug(`####txId: ${txId}, filterTxId: ${filterTxId}, ret: ${txId === filterTxId}`);
 
-            return (txId === filterTxId);
+            logger.debug(`###getTxIDFromEventEtherem(): txId: ${txId}`);
+            return txId;
+
         }
         catch (err) {
-            logger.error(`##err: isTargetEventEtherem, err: ${err}, event: ${json2str(event)}`);
-            return false;
+            logger.error(`##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`);
+            return null;
         }
     }
 
-    isTargetEventFabric(event: object, filter: object): boolean {
-        logger.debug(`##in isTargetEventFabric()`);
-        const tx = this.getTransactionFromFabricEvent(event);
+
+    getTxIDFromEventFabric(event: object, targetIndex: number): string | null {
+        logger.debug(`##in getTxIDFromEventFabric()`);
+        const tx = this.getTransactionFromFabricEvent(event, targetIndex);
         if (tx == null) {
-            logger.warn(`##ERR: invalid event: ${json2str(event)}`);
-            return;
+            logger.warn(`#getTxIDFromEventFabric(): skip(not found tx)`);
+            return null;
         }
 
         try {
             const txId = tx['txId'];
 
-            if (!filter.hasOwnProperty('txId')) {
-                logger.warn(`eventFilter: not exist txId.`);
-                return true;
+            if (typeof txId !== 'string') {
+                logger.warn(`#getTxIDFromEventFabric(): skip(invalid block, not found txId.), event: ${json2str(event)}`);
+                return null;
             }
-            const filterTxId = filter['txId'];
-            logger.debug(`####txId: ${txId}, filterTxId: ${filterTxId}, ret: ${txId === filterTxId}`);
 
-            return (txId === filterTxId);
+            logger.debug(`###getTxIDFromEventFabric(): txId: ${txId}`);
+            return txId;
         }
         catch (err) {
-            logger.error(`##err: isTargetEventFabric, err: ${err}, event: ${json2str(event)}`);
-            return false;
+            logger.error(`##getTxIDFromEventFabric(): err: ${err}, event: ${json2str(event)}`);
+            return null;
         }
     }
 
+
+    hasTxIDInTransactions(txID: string): boolean {
+        logger.debug(`##in hasTxIDInTransactions(), txID: ${txID}`);
+        const transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(txID);
+        logger.debug(`##hasTxIDInTransactions(), ret: ${transactionInfo !== null}`);
+        return (transactionInfo !== null);
+    }
+
+
+    getEventDataNum(ledgerEvent: LedgerEvent): number {
+        logger.debug(`##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`);
+        const event = ledgerEvent.data;
+        let retEventNum = 0;
+
+        try {
+            switch (ledgerEvent.verifierId) {
+                case config.cartradeInfo.ethereum.validatorID:
+                    retEventNum = event['blockData']['transactions'].length;
+                    break;
+                case config.cartradeInfo.fabric.validatorID:
+                    retEventNum = event['blockData'].length;
+                    break;
+                default:
+                    logger.error(`##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`);
+                    break;
+            }
+            logger.debug(`##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`);
+            return retEventNum;
+        }
+        catch (err) {
+            logger.error(`##getEventDataNum(): invalid even, err: ${err}, event: ${event}`);
+            return 0;
+        }
+    }
 }

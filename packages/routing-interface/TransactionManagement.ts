@@ -6,46 +6,36 @@
  */
 
 import { Request } from 'express';
-// import { BusinessLogicCartrade } from '../examples/cartrade/BusinessLogicCartrade';
 import { BusinessLogicPlugin } from '../business-logic-plugin/BusinessLogicPlugin';
-import { BusinessLogicInquireCartradeStatus } from '../../examples/cartrade/BusinessLogicInquireCartradeStatus';
 import { BLPRegistry } from './util/BLPRegistry';
 import { LPInfoHolder } from './util/LPInfoHolder';
+import { json2str } from '../ledger-plugin/DriverCommon'
 import { VerifierBase } from '../ledger-plugin/VerifierBase';
-import { VerifierFabric } from '../ledger-plugin/VerifierFabric';
-import { VerifierEthereum } from '../ledger-plugin/VerifierEthereum';
-
-import { getTargetBLPInstance } from '../../examples/cartrade/BLP_config';
+import { VerifierEventListener, LedgerEvent } from '../ledger-plugin/LedgerPlugin';
+import { getTargetBLPInstance } from '../config/BLP_config';
+import { ConfigUtil } from './util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../config/default.json"), 'utf8'));
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = 'TransactionManagement';
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
-// TODO: for debug
-// Create a function that performs code evaluation using Function
-// function getClass(classname){return Function('return (' + classname + ')')();}
-
-// function getTargetBLPClass() {
-//    return BusinessLogicCartrade;
-// }
-
 export class TransactionManagement {
-    blpRegistry: BLPRegistry = null;                    // Verifier information used in business logic
-    connectInfo: LPInfoHolder = null;                   // connection information
-    verifierFabric: VerifierFabric = null;              // Verifier for fabric
-    verifierEthereum: VerifierEthereum = null;          // Verifier for ethereum
-    // businessLogicCartrade: BusinessLogicCartrade = null // BusinessLogic for cartrade
-    businessLogicPlugin: BusinessLogicPlugin = null // BusinessLogic for cartrade
-    // blpMap : Map<string, object>;
+    private blpRegistry: BLPRegistry = null;                    // Verifier information used in business logic
+    private connectInfo: LPInfoHolder = null;                   // connection information
+    private verifierArray: [] = [];                             // Verifier
+    // private txIDMapInfo: Map<string, string> = null;
+    private tradeIDMapInfo: Map<string, string> = null;
 
     constructor() {
         this.blpRegistry = new BLPRegistry();
         this.connectInfo = new LPInfoHolder();
         // this.blpMap = new Map();
+        // this.txIDMapInfo = new Map();
+        this.tradeIDMapInfo = new Map();
     }
 
 
@@ -61,41 +51,22 @@ export class TransactionManagement {
 
         // object judgment
         if (businessLogicID === "guks32pf") {
-            if (this.businessLogicPlugin == null) {
-                // Create an instance of BusinessLogicCartrade
-                // this.businessLogicPlugin = new BusinessLogicCartrade();
 
-                try {
-                    const blp = getTargetBLPInstance(businessLogicID);
-                    if (blp === null) {
-                        logger.warn(`##WARN: not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`);
-                        return;
-                    }
-                    this.businessLogicPlugin = blp;
-
-                    // TODO: for debug
-                    // Save Instance
-                    // logger.debug(`##(F)businessLogicID: ${businessLogicID}`);
-                    // this.blpMap.set(businessLogicID, this.businessLogicPlugin);
-                }
-                catch (err) {
-                    logger.error(`##ERR in startBusinessLogic, err: ${err}`);
-                }
-
-                logger.debug("created instance");
+            const blp = getTargetBLPInstance(businessLogicID);
+            if (blp === null) {
+                logger.warn(`##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`);
+                return;
             }
 
+            logger.debug("created instance");
+
             // Start BusinessLogicCartrade
-            this.businessLogicPlugin.startTransaction(req, businessLogicID, tradeID);
+            this.setTradeIDMapInfo(tradeID, businessLogicID);
+            blp.startTransaction(req, businessLogicID, tradeID);
             logger.debug("start cartrade");
         }
 
         return tradeID;
-    }
-
-    static getClass(classname) {
-        logger.debug(`##in getClass`);
-        return Function('return (' + classname + ')')();
     }
 
 
@@ -111,59 +82,169 @@ export class TransactionManagement {
             + ('0' + currentTime.getHours()).slice(-2)
             + ('0' + currentTime.getMinutes()).slice(-2)
             + ('0' + currentTime.getSeconds()).slice(-2)
-            + "-001";
+            + ('00' + currentTime.getMilliseconds()).slice(-3)
+            + "-001";   // NOTE: Serial number for the same time. Since the priority is low, it is fixed at "001" at this time.
         return tradeID;
     }
 
 
+    // Get state of operation
+    getOperationStatus(tradeID: string): object {
 
-    // Get state of cartrade
-    getCartradeOperationStatus(tradeID: string): string {
+        const businessLogicID = this.getBusinessLoginIDByTradeID(tradeID);
+        if (businessLogicID === null) {
+            logger.warn(`##getOperationStatus(): not found BusinessLogicPlugin. tradeID: ${tradeID}`);
+            return;
+        }
 
-        const businessLogicInquireCartradeStatus: BusinessLogicInquireCartradeStatus = new BusinessLogicInquireCartradeStatus();
-        const transactionStatusData: string = businessLogicInquireCartradeStatus.getCartradeOperationStatus(tradeID);
+        const blp = getTargetBLPInstance(businessLogicID);
+        if (blp === null) {
+            logger.warn(`##getOperationStatus(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`);
+            return;
+        }
+
+        const transactionStatusData = blp.getOperationStatus(tradeID);
 
         return transactionStatusData;
 
     }
 
 
-
     // Get Verifier
     getVerifier(validatorId: string): VerifierBase {
 
-        // Determine Verifier Type
-        if (validatorId === "84jUisrs") {
-            // for ethereum
-            // Return Verifier for ethereum
-            // If you have already made it, please reply. If you haven't made it yet, make it and reply.
-            if (this.verifierEthereum == null) {
-                const ledgerPluginInfoEthereum: string = this.connectInfo.getLegerPluginInfo(validatorId);
-                this.verifierEthereum = new VerifierEthereum(ledgerPluginInfoEthereum);
-                return this.verifierEthereum;
-            }
-            else {
-                return this.verifierEthereum;
-            }
+        // Return Verifier
+        // If you have already made it, please reply. If you haven't made it yet, make it and reply.
+        if (this.verifierArray[validatorId]) {
+            return this.verifierArray[validatorId];
         }
         else {
-            // For fabric
-            // Return Verifier for fabric
-            // If you have already made it, please reply. If you haven't made it yet, make it and reply.
-            if (this.verifierFabric == null) {
-                const ledgerPluginInfoFabric: string = this.connectInfo.getLegerPluginInfo(validatorId);
-                this.verifierFabric = new VerifierFabric(ledgerPluginInfoFabric);
-                return this.verifierFabric;
-            }
-            else {
-                return this.verifierFabric;
-            }
+            const ledgerPluginInfo: string = this.connectInfo.getLegerPluginInfo(validatorId);
+            // TODO: I want to manage an instance using the validatorId as a key instead of a dedicated member variable
+            this.verifierArray[validatorId] = new VerifierBase(ledgerPluginInfo);
+            logger.debug("##startMonitor");
+            this.verifierArray[validatorId].setEventListener(this);
+            this.verifierArray[validatorId].startMonitor();
+            return this.verifierArray[validatorId];
         }
+
     }
+
 
     // Get validator to use
     getValidatorToUse(businessLogicId: string): string {
         return this.blpRegistry.getBLPRegistryInfo(businessLogicId);
     }
 
+
+    // interface VerifierEventListener
+    onEvent(ledgerEvent: LedgerEvent): void {
+        logger.debug(`####in onEvent: event: ${json2str(ledgerEvent)}`);
+        const eventNum = this.getEventNum(ledgerEvent);
+        if (eventNum === 0) {
+            logger.warn(`onEvent(): invalid event, event num is zero., ledgerEvent.verifierId: ${ledgerEvent.verifierId}`);
+            return;
+        }
+
+        for (let i = 0; i < eventNum; i++) {
+            const blp = this.getBLPInstanceFromEvent(ledgerEvent, i);
+            if (blp !== null) {
+                logger.debug(`onEvent: call BLP#onEvent()`);
+                blp.onEvent(ledgerEvent, i);
+            }
+        }
+    }
+
+
+    private getEventNum(ledgerEvent: LedgerEvent): number {
+        logger.debug(`##getEventNum: event: ${ledgerEvent}`);
+        for (const businessLogicID of this.blpRegistry.getBusinessLogicIDList()) {
+            logger.debug(`####getEventNum(): businessLogicID: ${businessLogicID}`);
+            const blp = getTargetBLPInstance(businessLogicID);
+            if (blp === null) {
+                logger.warn(`getEventNum(): not found, businessLogicID: ${businessLogicID}`);
+                continue;
+            }
+
+            const eventNum = blp.getEventDataNum(ledgerEvent);
+            if (eventNum !== 0) {
+                logger.debug(`##getEventNum: target businessLogicID: ${businessLogicID}`);
+                return eventNum;
+            }
+        }
+
+        // not found.
+        logger.warn(`getEventNum(): not found(The corresponding BLP does not exist.)`);
+        return 0;
+    }
+
+
+    private getBLPInstanceFromEvent(ledgerEvent: LedgerEvent, targetIndex: number): BusinessLogicPlugin | null {
+        const txID = this.getTxIDFromEvent(ledgerEvent, targetIndex);
+        if (txID === null) {
+            logger.warn(`getBLPInstanceFromEvent: not found txID`);
+            return;
+        }
+        logger.debug(`getBLPInstanceFromEvent: txID: ${txID}`);
+
+        return this.getBLPInstanceFromTxID(txID);
+    }
+
+
+    private getTxIDFromEvent(ledgerEvent: LedgerEvent, targetIndex: number): string | null {
+        logger.debug(`##getTxIDFromEvent: event: ${ledgerEvent}`);
+        for (const businessLogicID of this.blpRegistry.getBusinessLogicIDList()) {
+            logger.debug(`####getTxIDFromEvent(): businessLogicID: ${businessLogicID}`);
+            const blp = getTargetBLPInstance(businessLogicID);
+            if (blp === null) {
+                logger.warn(`getTxIDFromEvent(): not found, businessLogicID: ${businessLogicID}`);
+                continue;
+            }
+
+            const txID = blp.getTxIDFromEvent(ledgerEvent, targetIndex);
+            if (txID !== null) {
+                logger.debug(`##getTxIDFromEvent: target blp: ${txID}`);
+                return txID;
+            }
+        }
+
+        // not found.
+        logger.warn(`getTxIDFromEvent(): not found(The corresponding BLP does not exist.)`);
+        return null;
+    }
+
+
+    private getBLPInstanceFromTxID(txID: string): BusinessLogicPlugin | null {
+        logger.debug(`##getBLPInstanceFromTxID: txID: ${txID}`);
+        for (const businessLogicID of this.blpRegistry.getBusinessLogicIDList()) {
+            logger.debug(`####getBLPInstanceFromTxID(): businessLogicID: ${businessLogicID}`);
+            const blp = getTargetBLPInstance(businessLogicID);
+            if (blp === null) {
+                logger.warn(`getBLPInstanceFromTxID(): not found, businessLogicID: ${businessLogicID}`);
+                continue;
+            }
+
+            if (blp.hasTxIDInTransactions(txID)) {
+                logger.debug(`####getBLPInstanceFromTxID(): found!, businessLogicID: ${businessLogicID}`);
+                return blp;
+            }
+        }
+
+        // not found.
+        logger.warn(`getBLPInstanceFromTxID(): not found(The corresponding BLP does not exist.)`);
+        return null;
+    }
+
+
+    private setTradeIDMapInfo(tradeID: string, businessLogicID: string): void {
+        this.tradeIDMapInfo.set(tradeID, businessLogicID);
+    }
+
+
+    private getBusinessLoginIDByTradeID(tradeID: string): string | null {
+        if (this.tradeIDMapInfo.has(tradeID)) {
+            return this.tradeIDMapInfo.get(tradeID);
+        }
+        return null;
+    }
 }

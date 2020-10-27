@@ -5,9 +5,12 @@
  * DBAccess.ts
  */
 
+import { ConfigUtil } from '../util/ConfigUtil';
+
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../config/default.json"), 'utf8'));
+const configDefault: any = ConfigUtil.getConfig();
+const configVerifier: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../config/verifier-config.json"), 'utf8'));
 
 export class DBAccess {
     ledgerPluginInfo: [];
@@ -20,14 +23,14 @@ export class DBAccess {
     getLedgerPluginInfo(): [] {
         // TODO: Future access to DB for connection information
 
-        this.ledgerPluginInfo = config.ledgerPluginInfo;
+        this.ledgerPluginInfo = configVerifier.ledgerPluginInfo;
         return this.ledgerPluginInfo;
     }
 
     getBLPRegistryInfo(): [] {
         // TODO: Future access to DB for business logic plugin information
 
-        this.blpRegistryInfo = config.blpRegistry;
+        this.blpRegistryInfo = configDefault.blpRegistry;
         return this.blpRegistryInfo;
     }
 }
