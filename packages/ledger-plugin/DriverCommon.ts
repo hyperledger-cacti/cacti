@@ -6,10 +6,11 @@
  */
 
 import { ApiInfo, RequestedData, } from './LedgerPlugin'
+import { ConfigUtil } from '../routing-interface/util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../config/default.json"), 'utf8'));
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = 'DriverCommon';
 const logger = getLogger(`${moduleName}`);

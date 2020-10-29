@@ -8,10 +8,11 @@
 import { Router, NextFunction, Request, Response } from 'express';
 import { TransactionManagement } from '../TransactionManagement';
 import { RIFError } from '../RIFError';
+import { ConfigUtil } from '../util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../config/default.json"), 'utf8'));
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = 'trades';
 const logger = getLogger(`${moduleName}`);
@@ -25,10 +26,9 @@ router.post('/', (req: Request, res: Response, next: NextFunction) => {
   try {
     const tradeID: string = transactionManagement.startBusinessLogic(req);
 
-    const resultString: string = '{"tradeID":"' + tradeID + '"}'
-    res.status(201).location(config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID).json(resultString);
+    const result = {tradeID: tradeID};
+    res.status(201).location(config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID).json(result);
 
-    //    res.send("Not Implemented (Request Execution of Trade)\n");
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
@@ -45,11 +45,9 @@ router.get('/:id', (req: Request, res: Response, next: NextFunction) => {
   try {
 
 
-    const resultString: string = transactionManagement.getCartradeOperationStatus(req.params.id);
+    const result = transactionManagement.getOperationStatus(req.params.id);
+    res.status(200).json(result);
 
-    res.status(200).json(resultString);
-
-    //    res.send("Not Implemented (Show Current Status of Trade" + ", id=" + req.params.id + ")\n" + resultString + "\n");
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);

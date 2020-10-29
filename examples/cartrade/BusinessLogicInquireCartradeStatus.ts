@@ -9,7 +9,7 @@ import { TransactionInfo } from './TransactionInfo';
 import { TransactionStatus } from './TransactionStatus';
 import { ResultTransactionStatusData } from './ResultTransactionStatusData';
 import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
-import * as fs from 'fs';
+import fs = require('fs');
 
 export class BusinessLogicInquireCartradeStatus extends BusinessLogicBase {
 
@@ -19,7 +19,7 @@ export class BusinessLogicInquireCartradeStatus extends BusinessLogicBase {
         super();
     }
 
-    getCartradeOperationStatus(tradeID: string): string {
+    getCartradeOperationStatus(tradeID: string): object {
 
         // Existence check of table file
         try {
@@ -69,8 +69,6 @@ export class BusinessLogicInquireCartradeStatus extends BusinessLogicBase {
         }
 
         // Reply acquired information
-        const resultTransactionStatusDataJson: string = JSON.stringify(resultTransactionStatusData);
-        return resultTransactionStatusDataJson;
+        return resultTransactionStatusData;
     }
 }
-

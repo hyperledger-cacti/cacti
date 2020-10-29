@@ -7,11 +7,12 @@
 
 import { Router, NextFunction, Request, Response } from 'express';
 import { RIFUtil } from '../util/RIFUtil';
+import { ConfigUtil } from '../util/ConfigUtil';
 import { RIFError, BadRequestError, InternalServerError } from '../RIFError';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../config/default.json"), 'utf8'));
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = 'login';
 const logger = getLogger(`${moduleName}`);

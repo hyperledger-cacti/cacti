@@ -5,8 +5,8 @@
  * BLP_config.ts
  */
 
-import { BusinessLogicPlugin } from '../../packages/business-logic-plugin/BusinessLogicPlugin';
-import { BusinessLogicCartrade } from './BusinessLogicCartrade';
+import { BusinessLogicPlugin } from '../../../packages/business-logic-plugin/BusinessLogicPlugin';
+import { BusinessLogicCartrade } from '../BusinessLogicCartrade';
 // import { BusinessLogicCartrade } from '../examples/cartrade/BusinessLogicXxxxTrade';
 
 export function getTargetBLPInstance(businessLogicID: string): BusinessLogicPlugin | null {
