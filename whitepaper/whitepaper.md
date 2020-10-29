@@ -775,24 +775,31 @@ NOTE: resource `trade` and `logic` are cannot be updated nor delete
 
 ### 5.3.2 Ledger plugin API
 
-Ledger plugin API is designed for allowing **Business Logic Plugin** to operate and/or monitor Ledger behind **Validator** component.
+Ledger plugin API is designed for allowing **Business Logic Plugin** to operate and/or monitor Ledger behind the components of **Verifier** and **Validator**.
 
-Each **Ledger plugin** can be implemented to provide common API which absorbs difference between integrating blockchain platforms.
-The developper can focus on implementing business logic of **Business Logic Plugin** in applicatio level once **Ledger plugin** for specific platform, ex. HLF or Besu, was implemented.
+**Validator** provides a common set of functions that abstract communication between **Verifier** and **Ledger**.  Please note that Validator will not have any privilege to manipulate assets on the Ledger behind it.
+**Verifier** can receive requests from **Business Logic Plugin** and reply responses and events asynchronously.
 
 APIs of Verifier and Validator are described as the following table:
 
-
-| No. | Component | API Name | Description |
-| --- | --- | --- | --- |
-| 1. | BLP -> Verifier | requestLedgerOperation | Request a verifier to execute a ledger operation |
-| 2. | BLP -> Verifier | getApiList | Get the list of available APIs on Verifier |
-| 3. | BLP -> Verifier | startMonitor | Request a verifier to start monitoring ledger |
-| 4. | BLP -> Verifier | stopMonitor | Rrequest a verifier to stop monitoring ledger |
-| 5. | Validator -> Verifier | connect | request a validator to start a bi-directional communication channel |
-| 6. | Validator -> Verifier | disconnect | request a validator to stop a bi-directional communication channel |
-| 7. | Validator -> Verifier | getVerifierInformation | Get the verifier information including version, name, ID, and other information |
-| 8. | Verifier -> Validator | getValidatorInformation | Get the validator information including version, name, ID, and other information |
+| No. | Component | API Name | Input | Description |
+| --- | --- | --- | --- | --- |
+| 1. | Verifier | getVerifierInformation | none | Get the verifier information including version, name, ID, and other information |
+| 2. | Verifier | getSmartContractList | none | Get the list of available smart contracts at the connected ledger |
+| 3. | Verifier | sendSignedTransaction | `signedTransaction`(string) | Request a verifier to execute a ledger operation |
+| 4. | Verifier | getBalance | `address`(string) | Get balance of a specific account |
+| 5. | Verifier | getParameter | `address`(string)<br>`key`(string) | Get a value of a key held by a smart contract |
+| 6. | Verifier | startMonitor | `clientId`(string)<br>`cb`(function) | Request a verifier to start monitoring ledger |
+| 7. | Verifier | stopMonitor | `clientId`(string) | Rrequest a verifier to stop monitoring ledger |
+| 8. | Verifier | connect | `validatorURL`(string)<br>authentication credential | request a validator to start a bi-directional communication channel via a verifier |
+| 9. | Verifier | disconnect | none | request a validator to stop a bi-directional communication channel via a verifier |
+| 10. | Validator | getValidatorInformation | `validatorURL`(string) | Get the validator information including version, name, ID, and other information |
+| 11. | Verifier | getSmartContractList | none | Get the list of available smart contracts at the connected ledger |
+| 12. | Validator | sendSignedTransaction | `signedTransaction`(string) | Send already-signed transactions to a ledger |
+| 13. | Validator | getBalance | `address`(string) | Get balance of a specific account |
+| 14. | Validator | getParameter | `address`(string)<br>`key`(string) | Get a value of a key held by a smart contract |
+| 15. | Validator | startMonitor | `clientId`(string)<br>`cb`(function) | Request a validator to start monitoring ledger |
+| 16. | Validator | stopMonitor | `clientId`(string) | Request a validator to stop monitoring ledger |
 
 The detail information is described as following:
 
@@ -801,26 +808,28 @@ The detail information is described as following:
 		```
 		interface Verifier {
 			// BLP -> Verifier
-			getApiList(): List<ApiInfo>;
-			requestLedgerOperation();
+			getSmartContractList(): List<ApiInfo>;
+			sendSignedTransaction();
+			getBalance();
+			getParameter();
 			startMonitor();
 			stopMonitor();
-			// Validator -> Verifier
 			connect();
 			disconnect();
+			// Validator -> Verifier
 			getVerifierInfo(): List<VerifierInfo>;
 		}
 		```
 
-		- class `ApiInfo`, `RequestedData`
+		- class `SmartContractInfo`, `RequestedData`
 			```
-			class ApiInfo {
-				apiType: string,
-				requestedData: List<RequestedData>
+			class SmartContractInfo {
+				address: string,
+				function: List<SmartContractFunction>
 			}
-			class RequestedData {
-				dataName: string,
-				dataType: string {"int", "string", ...}
+			class SmartContractFunction {
+				functionName: string,
+				functionArgs: List<string> (e.g. {"int", "string", ...})
 			}
 			```
 
@@ -838,49 +847,34 @@ The detail information is described as following:
 			}
 			```
 
-		- function `getApiList()`: `List<ApiInfo>`
+		- function `getSmartContractList()`: `List<SmartContractInfo>`
 			- description:
-				- Get the list of available APIs on Verifier
+				- Get the list of available smart contracts at the connected ledger
 			- input parameter:
 				- none
-			- output sample:
-				```
-				{
-					{
-						apiType: "sendSignedTransaction",
-						reqeustedData: {
-							signedTx: signedTx(string),
-						}
-					},
-					{
-						apiType: "getBalance",
-						reqeustedData: {
-							address: address(string),
-						}
-					}
-				}
-				```
 
-		- function `requestLedgerOperation()`:
+		- function `sendSignedTransaction()`: `Promise<LedgerEvent>`
 			- description:
-				- Request a verifier to execute a ledger operation
+				- Send already-signed transactions to a ledger
 			- input parameter:
-				```
-				var params = {
-					apiType: string,
-					progress: string {"escrow", "transfer", ...},
-					data: List<OperationData>
-				}
-				```
+				- `signedTransaction`(string): signed transaction which is already serialized to string
 
-		- class `OperationData`
-			```
-			class OperationData {
-				dataName: dataType
-			}
-			```
+		- function `getBalance()`: `Promise<LedgerEvent>`
+			- description:
+				- Get balance of a specific account
+				- If the connected ledger does not have any default currency system (e.g. Hyperledger fabric), the function is set to be blank)
+			- input parameter:
+				- `address`(string): an account address
 
-		- function `getVerifierInformation()`: `List<ApiInfo>`
+		- function `getParameter()`: `Promise<LedgerEvent>`
+			- description:
+				- Get a value of a key held by a smart contract
+				- If the connected ledger does not have any smart contract system (e.g. Bitcoin), the function is set to be blank)
+			- input parameter:
+				- `address`(string): an address of a smart contract
+				- `key`(string): a key held by the smart contract
+
+		- function `getVerifierInformation()`: `List<VerifierInfo>`
 			- description:
 				- Get the verifier information including version, name, ID, and other information
 			- input parameter:
@@ -890,13 +884,14 @@ The detail information is described as following:
 			- description:
 				- Request a verifier to start monitoring ledger
 			- input parameter:
-				- none
+				- `clientId`(string): Client ID of the monitoring start request source
+				- `cb`(function): Callback function that receives the monitoring result at any time
 
 		- function `stopMonitor()`:
 			- description:
 				- Request a verifier to stop monitoring ledger
 			- input parameter:
-				- none
+				- `clientId`(string): Client ID of the monitoring start request source
 
 		- function `connect()`:
 			- description:
@@ -904,7 +899,7 @@ The detail information is described as following:
 			- input parameter:
 				- none
 			- connecting profile:
-				- `validatorURL`
+				- `validatorURL`(string)
 				- authentication credential
 
 		- function `disconnect()`:
@@ -913,22 +908,21 @@ The detail information is described as following:
 			- input parameter:
 				- none
 			- connecting profile:
-				- `validatorURL`
-				- authentication credential
+				- none
 
 	- interface `Validator`
 		```
 		interface Validator {
 			// Verifier -> Validator
 			getValidatorInfo(): List<ValidatorInfo>
+			getSmartContractList();
+			sendSignedTransaction();
+			getBalance();
+			getParameter();
+			startMonitor();
+			stopMonitor();
 		}
 		```
-
-		- function `getValidatorInformation()`:
-			- description:
-				- Get the validator information including version, name, ID, and other information
-			- input parameter:
-				- `validatorURL`
 
 		- class `ValidatorInfo`
 			```
@@ -943,6 +937,52 @@ The detail information is described as following:
 				dataType: string {"int", "string", ...}
 			}
 			```
+
+		- function `getValidatorInformation()`:
+			- description:
+				- Get the validator information including version, name, ID, and other information
+			- input parameter:
+				- `validatorURL`(string)
+
+		- function `getSmartContractList()`: `List<SmartContractInfo>`
+			- description:
+				- Get the list of available smart contracts at the connected ledger
+			- input parameter:
+				- none
+
+		- function `sendSignedTransaction()`: `Promise<LedgerEvent>`
+			- description:
+				- Send already-signed transactions to a ledger
+			- input parameter:
+				- `signedTransaction`(string): signed transaction which is already serialized to string
+
+		- function `getBalance()`: `Promise<LedgerEvent>`
+			- description:
+				- Get balance of a specific account
+				- If the connected ledger does not have any default currency system (e.g. Hyperledger fabric), the function is set to be blank)
+			- input parameter:
+				- `address`(string) : an account address
+
+		- function `getParameter()`: `Promise<LedgerEvent>`
+			- description:
+				- Get a value of a key held by a smart contract
+				- If the connected ledger does not have any smart contract system (e.g. Bitcoin), the function is set to be blank)
+			- input parameter:
+				- `address`(string): an address of a smart contract
+				- `key`(string): a key held by the smart contract
+
+		- function `startMonitor()`: `Promise<LedgerEvent>`
+			- description:
+				- Request a verifier to start monitoring ledger
+			- input parameter:
+				- `clientId`(string): Client ID of the monitoring start request source
+				- `cb`(function): Callback function that receives the monitoring result at any time
+
+		- function `stopMonitor()`:
+			- description:
+				- Request a verifier to stop monitoring ledger
+			- input parameter:
+				- `clientId`(string): Client ID of the monitoring start request source
 
 ### 5.3.3 Exection of "business logic" at "Business Logic Plugin"
 
