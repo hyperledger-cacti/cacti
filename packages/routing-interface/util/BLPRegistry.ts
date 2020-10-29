@@ -6,10 +6,11 @@
  */
 
 import { DBAccess } from './DBAccess';
+import { ConfigUtil } from '../util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../config/default.json"), 'utf8'));
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = 'BLPRegistry';
 const logger = getLogger(`${moduleName}`);
@@ -38,5 +39,15 @@ export class BLPRegistry {
         } else {
             return JSON.stringify(this.blpRegistryInfo);
         }
+    }
+
+    getBusinessLogicIDList(): string[] {
+
+        const businessLogicIDList: string[] = [];
+        this.blpRegistryInfo.forEach(info => {
+            businessLogicIDList.push(info['businessLogicID']);
+        });
+
+        return businessLogicIDList;
     }
 }

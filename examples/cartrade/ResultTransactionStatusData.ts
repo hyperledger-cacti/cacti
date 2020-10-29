@@ -13,7 +13,7 @@ export class ResultTransactionStatusData {
         this.transactionStatus = new Array();
     }
 
-    stateInfo: string;
+    stateInfo: number;
     transactionStatus: TransactionStatus[];
 
 }

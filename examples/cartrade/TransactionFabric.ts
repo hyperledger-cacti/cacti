@@ -130,9 +130,9 @@ async function setupChannel(channelName) {
     // add peer to channel
     // const peerTLSCertPath = path.resolve(__dirname, './crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tlscacerts/org1.example.com-cert.pem');
     // const peerPEMCert = fs.readFileSync(peerTLSCertPath, 'utf8');
-    for (let i = 0; i < config.cartradeInfo.fabric.peers.length; i++) {
+    for (const peerInfo of config.cartradeInfo.fabric.peers) {
         const peer = client.newPeer(
-            config.cartradeInfo.fabric.peers[i].requests
+            peerInfo.requests
             /*{
                 pem: peerPEMCert,
                 'ssl-target-name-override': 'peer0.org1.example.com',
@@ -195,24 +195,24 @@ export function makeSignedProposal(ccFncName: string, ccArgs: string[]): Promise
             const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
 
             const targets = [];
-            for (let i = 0; i < config.cartradeInfo.fabric.peers.length; i++) {
-                const peer = channel.getPeer(config.cartradeInfo.fabric.peers[i].requests.split("//")[1]);
+            for (const peerInfo of config.cartradeInfo.fabric.peers) {
+                const peer = channel.getPeer(peerInfo.requests.split("//")[1]);
                 targets.push(peer);
             }
             const sendSignedProposalReq = { signedProposal, targets };
             const proposalResponses = await channel.sendSignedProposal(sendSignedProposalReq);
             logger.debug("successfully send signedProposal")
             let allGood: boolean = true;
-            for (let i = 0; i < proposalResponses.length; i++) {
+            for (const proposalResponse of proposalResponses) {
                 let oneGood = false;
-                if (proposalResponses && proposalResponses[i].response && proposalResponses[i].response.status === 200) {
-                    if (proposalResponses[i].response.payload) {
-                        invokeResponse = new String(proposalResponses[i].response.payload);
+                if (proposalResponses && proposalResponse.response && proposalResponse.response.status === 200) {
+                    if (proposalResponse.response.payload) {
+                        invokeResponse = proposalResponse.response.payload;
                     }
                     oneGood = true;
                 } else {
                     logger.debug('transaction proposal was bad');
-                    const resStr = proposalResponses[0].toString();
+                    const resStr = proposalResponse.toString();
                     const errMsg = resStr.replace("Error: ", "");
                     return reject(errMsg);
                 }

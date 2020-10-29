@@ -1,0 +1,83 @@
+{
+    "ledgerPluginInfo": [
+        {
+            "validatorID": "84jUisrs",
+            "validatorURL": "https://localhost:5050",
+            "ledgerInfo": {
+                "ledgerAbstract": "Go-Ethereum Ledger"
+            },
+            "apiInfo": [
+                {
+                    "apiType": "getNumericBalance",
+                    "requestedData": [
+                        {
+                            "dataName": "referedAddress",
+                            "dataType": "string"
+                        }
+                    ]
+                },
+                {
+                    "apiType": "transferNumericAsset",
+                    "requestedData": [
+                        {
+                            "dataName": "fromAddress",
+                            "dataType": "string"
+                        },
+                        {
+                            "dataName": "toAddress",
+                            "dataType": "string"
+                        },
+                        {
+                            "dataName": "amount",
+                            "dataType": "number"
+                        }
+                    ]
+                },
+                {
+                    "apiType": "sendRawTransaction",
+                    "requestedData": [
+                        {
+                            "dataName": "serializedTx",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "validatorID": "r9IS4dDf",
+            "validatorURL": "https://localhost:5040",
+            "ledgerInfo": {
+                "ledgerAbstract": "Fabric Ledger"
+            },
+            "apiInfo": [
+                {
+                    "apiType": "changeCarOwner",
+                    "requestedData": [
+                        {
+                            "dataName": "carId",
+                            "dataType": "string"
+                        },
+                        {
+                            "dataName": "newOwner",
+                            "dataType": "string"
+                        }
+                    ]
+                },
+                {
+                    "apiType": "sendSignedProposal",
+                    "requestedData": [
+                        {
+                            "dataName": "signedCommitProposal",
+                            "dataType": "string"
+                        },
+                        {
+                            "dataName": "commitReq",
+                            "dataType": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

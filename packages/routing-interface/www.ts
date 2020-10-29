@@ -12,12 +12,13 @@
  */
 
 import app from '../business-logic-plugin/app';
-import * as debugModule from 'debug';
-import * as http from 'http';
+import debugModule = require('debug');
+import http = require('http');
+import { ConfigUtil } from './util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../config/default.json"), 'utf8'));
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = 'www';
 const logger = getLogger(`${moduleName}`);
