@@ -4,24 +4,40 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Checks } from "../../../main/typescript";
 
-test("Checks", (t: Test) => {
-  test("Checks#nonBlankString()", (t2: Test) => {
+test("Checks", (tParent: Test) => {
+
+  test("Checks#nonBlankString()", (t: Test) => {
     const subject = uuidv4();
     const pattern = new RegExp(`${subject}`);
 
-    t2.throws(() => Checks.nonBlankString("", subject), pattern);
-    t2.throws(() => Checks.nonBlankString(" ", subject), pattern);
-    t2.throws(() => Checks.nonBlankString("\n", subject), pattern);
-    t2.throws(() => Checks.nonBlankString("\t", subject), pattern);
-    t2.throws(() => Checks.nonBlankString("\t\n", subject), pattern);
-    t2.throws(() => Checks.nonBlankString("\n\r", subject), pattern);
+    t.throws(() => Checks.nonBlankString("", subject), pattern);
+    t.throws(() => Checks.nonBlankString(" ", subject), pattern);
+    t.throws(() => Checks.nonBlankString("\n", subject), pattern);
+    t.throws(() => Checks.nonBlankString("\t", subject), pattern);
+    t.throws(() => Checks.nonBlankString("\t\n", subject), pattern);
+    t.throws(() => Checks.nonBlankString("\n\r", subject), pattern);
 
-    t2.doesNotThrow(() => Checks.nonBlankString("-"));
-    t2.doesNotThrow(() => Checks.nonBlankString(" a "));
-    t2.doesNotThrow(() => Checks.nonBlankString("\na\t"));
+    t.doesNotThrow(() => Checks.nonBlankString("-"));
+    t.doesNotThrow(() => Checks.nonBlankString(" a "));
+    t.doesNotThrow(() => Checks.nonBlankString("\na\t"));
 
-    t2.end();
+    t.end();
   });
 
-  t.end();
+  test("#truthy()", (t: Test) => {
+    t.throws(() => Checks.truthy(false));
+    t.throws(() => Checks.truthy(NaN));
+    t.throws(() => Checks.truthy(null));
+    t.throws(() => Checks.truthy(undefined));
+    t.throws(() => Checks.truthy(0));
+    t.throws(() => Checks.truthy(""));
+
+    t.doesNotThrow(() => Checks.truthy({}));
+    t.doesNotThrow(() => Checks.truthy([]));
+    t.doesNotThrow(() => Checks.truthy("OK"));
+
+    t.end();
+  });
+
+  tParent.end();
 });
