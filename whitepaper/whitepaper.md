@@ -117,6 +117,9 @@ Photo by Pontus Wellgraf on Unsplash
     - [5.6.3 Key/Value Storage Plugins](#563-keyvalue-storage-plugins)
     - [5.6.4 Serverside Keychain Plugins](#564-serverside-keychain-plugins)
     - [5.6.5 Manual Consortium Plugin](#565-manual-consortium-plugin)
+  - [5.7 Deployment Scenarios](#57-deployment-scenarios)
+    - [5.7.1 Production Deployment Example](#571-production-deployment-example)
+    - [5.7.2 Low Resource Deployment Example](#572-low-resource-deployment-example)
 - [6. Identities, Authentication, Authorization](#6-identities-authentication-authorization)
   - [6.1 Definition of Identities in Cactus](#61-definition-of-identities-in-cactus)
   - [6.2 Transaction Signing Modes, Key Ownership](#62-transaction-signing-modes-key-ownership)
@@ -1440,6 +1443,45 @@ provided here for ease of understanding:
 
 <img width="700" src="./plugin-consortium-manual-bootstrap-sequence-diagram.png">
 
+## 5.7 Deployment Scenarios
+
+There's a near-infinite possible deployment scenarios which is intended to be one of the benefits of using Cactus where
+you are not constrained by strong opinions imposed upon you by the framework but instead can tailor it to your needs
+while still getting value out of it.
+There's a set of building blocks (members, nodes, API server processes, plugin instances) that you can use when defining (founding) a consortium and these building blocks relate to each other in a way that can be expressed with an entity relationship diagram which can be seen below.
+The composability rules can be deducted from how the diagram elements (entities) are connected (related) to each other, e.g. the API server process can have any number of plugin instances in it and a node can contain any number of API server processes, and so on until the top level construct is reached: the consortium.
+
+<img width="400" src="./deployment-entity-relationship-diagram.png">
+
+Now, with these composability rules in mind, let us demonstrate a few different deployment scenarios (both expected and exotic ones) to showcase the framework's flexibility in this regard.
+
+### 5.7.1 Production Deployment Example
+
+Many different configurations are possible here as well.
+One way to have two members form a consortium and both of those members provide highly available, high throughput services is to have a deployment as shown on the below figure.
+What is important to note here is that this consortium has 2 nodes, 1 for each member
+and it is irrelevant how many API servers those nodes have internally because they
+all respond to requests through the network host/web domain that is tied to the
+node.
+One could say that API servers do not have a distinguishable identity relative to
+their peer API servers, only the higher-level nodes do.
+
+<img width="700" src="./deployment-production-example.png">
+
+### 5.7.2 Low Resource Deployment Example
+
+This is an example to showcase how you can pull up a full consortium even from
+within a single operating system process (API server) with multiple members and
+their respective nodes. It is not something that's recommended for a production
+grade environment, ever, but it is great for demos and integration tests where
+you have to simulate a fully functioning consortium with as little hardware footprint
+as possible to save on time and cost.
+
+The individual nodes/API servers are isolated by listening on seperate TCP ports
+of the machine they are hosted on:
+
+<img width="700" src="./deployment-low-resource-example.png">
+
 
 # 6. Identities, Authentication, Authorization
 
@@ -1556,7 +1598,10 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 
 **Tx submitter**: The entity submits the remote transaction to the API server plug-in on one of the ledgers.
 
-**API Server**: A module of Hyperledger Cactus which provides a unified interface to control/monitor Blockchain ledger behind it.
+**API Server**: A Cactus package that is the backbone of the plugin architecture and the host component for all plugins with the ability to automaticaly wire up plugins that come with their own web services (REST or asynchronous APIs through HTTP or WebSockets for example)
+
+**Cactus Node**: A set of identically configured API servers behind a single network host where the set size can range from 1 to infinity with the practical maximum being much lower of course. This logical distinction between node and API server is important because it allows consortium members to abstract away their private infrastructure details from the public consortium definition. For example if a consortium member wants to have a highly available, high throughput service, they will be forced to run a cluster of API servers behind a load balancer and/or reverse proxy to achieve these system properties and their API servers may also be in an auto-scaling group of a cloud provider or (in the future) even run as Lambda functions. To avoid having to update the consortium definiton (which requires a potentially costly consesus from other members) every time let's say an auto-scaling group adds a new API server to a node, the consortium member can define their presence in the consortium by declaring a single `Cactus Node` and then customize the underlying deployment as they see fit so long as they ensure that the previously agreed upon keys are used by the node and it is indeed accessible through the network host as declared by the `Cactus Node`.
+To get a better understanding of the various, near-infinite deplyoment scenarios, head over to the [Deployment Scenarios](#57-deployment-scenarios) sub-section of the [Architecture](#5-architecture) top level section.
 
 **Validator**: A module of Hyperledger Cactus which verifies validity of transaction to be sent out to the blockchain application.
 

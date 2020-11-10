@@ -1,0 +1,88 @@
+@startuml deployment-production-example
+
+!include <material/common>
+' To import the sprite file you DON'T need to place a prefix!
+!include <material/cellphone>
+!include <material/laptop_chromebook>
+!include <material/database>
+
+left to right direction
+
+title Deployment\nProduction Example\nHyperledger Cactus
+
+rectangle Consortium as consortium #EEEEEE {
+
+    rectangle Member_A as membera #00CC00 {
+      rectangle Data_Center_A #BBBBBB {
+        rectangle Load_Balancer_A as loadbalancera #00FFFF {
+          component "https://node-a.consortium.example.com" {
+          }
+        }
+        rectangle Node_A as nodea #CCCC00 {
+          rectangle API_Server_A_1 as apiservera1 #00BBBB {
+            rectangle Plugin_Ledger_Connector_A_1 as ledgerconnectora1 {
+            }
+            rectangle Plugin_Keychain_A_1 as keychaina1 {
+            }
+            rectangle Plugin_Consortium_Management_A_1 as consortiummanagementa1 {
+            }
+          }
+          rectangle API_Server_A_2 as apiservera2 #00BBBB {
+            rectangle Plugin_Ledger_Connector_A_2 as ledgerconnectora2 {
+            }
+            rectangle Plugin_Keychain_A_2 as keychaina2 {
+            }
+            rectangle Plugin_Consortium_Management_A_2 as consortiummanagementa2 {
+            }
+          }
+          rectangle API_Server_A_3 as apiservera3 #00BBBB {
+            rectangle Plugin_Ledger_Connector_A_3 as ledgerconnectora3 {
+            }
+            rectangle Plugin_Keychain_A_3 as keychaina3 {
+            }
+            rectangle Plugin_Consortium_Management_A_3 as consortiummanagementa3 {
+            }
+          }
+        }
+      }
+    }
+
+    rectangle Member_B as memberb #00CC00 {
+      rectangle Data_Center_B #BBBBBB {
+        rectangle Load_Balancer_B as loadbalancerb #00FFFF {
+          component "https://node-b.consortium.example.com" {
+          }
+        }
+        rectangle Node_B as nodeb #CCCC00 {
+          rectangle API_Server_B_1 as apiserverb1 #00BBBB {
+            rectangle Plugin_Ledger_Connector_B_1 as ledgerconnectorb1 {
+            }
+            rectangle Plugin_Keychain_B_1 as keychainb1 {
+            }
+            rectangle Plugin_Consortium_Management_B_1 as consortiummanagementb1 {
+            }
+          }
+          rectangle API_Server_B_2 as apiserverb2 #00BBBB {
+            rectangle Plugin_Ledger_Connector_B_2 as ledgerconnectorb2 {
+            }
+            rectangle Plugin_Keychain_B_2 as keychainb2 {
+            }
+            rectangle Plugin_Consortium_Management_B_2 as consortiummanagementb2 {
+            }
+          }
+          rectangle API_Server_B_3 as apiserverb3 #00BBBB {
+            rectangle Plugin_Ledger_Connector_B_3 as ledgerconnectorb3 {
+            }
+            rectangle Plugin_Keychain_B_3 as keychainb3 {
+            }
+            rectangle Plugin_Consortium_Management_B_3 as consortiummanagementb3 {
+            }
+          }
+        }
+      }
+    }
+}
+
+membera -[hidden]- memberb
+
+@enduml
