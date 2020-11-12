@@ -3,6 +3,8 @@ export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector"
 
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
+export * from "./generated/openapi/typescript-axios/index";
+
 export async function createPluginFactory(
   options?: any
 ): Promise<PluginFactoryLedgerConnector> {
