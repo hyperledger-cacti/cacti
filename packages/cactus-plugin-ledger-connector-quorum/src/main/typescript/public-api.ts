@@ -5,6 +5,8 @@ export {
   IPluginLedgerConnectorQuorumOptions,
 } from "./plugin-ledger-connector-quorum";
 
+export * from "./model-type-guards";
+
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
