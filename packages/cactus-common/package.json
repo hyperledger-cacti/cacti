@@ -74,6 +74,7 @@
   "devDependencies": {
     "@types/joi": "14.3.4",
     "@types/json-stable-stringify": "1.0.32",
-    "@types/secp256k1": "4.0.1"
+    "@types/secp256k1": "4.0.1",
+    "openapi-types": "7.0.1"
   }
 }
