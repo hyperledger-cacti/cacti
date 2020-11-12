@@ -74,7 +74,8 @@
     "loglevel-plugin-prefix": "0.8.4",
     "node-ssh": "11.0.0",
     "tar-stream": "2.1.2",
-    "typescript-optional": "2.0.1"
+    "typescript-optional": "2.0.1",
+    "web3": "1.2.7"
   },
   "devDependencies": {
     "@types/dockerode": "2.5.28",

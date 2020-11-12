@@ -1,8 +1,11 @@
+import { v4 as uuidv4 } from "uuid";
 import Docker, { Container, ContainerInfo } from "dockerode";
 import axios from "axios";
 import Joi from "joi";
 import tar from "tar-stream";
 import { EventEmitter } from "events";
+import Web3 from "web3";
+import { Account } from "web3-core";
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
@@ -104,6 +107,62 @@ export class BesuTestLedger implements ITestLedger {
 
       response.pipe(extract);
     });
+  }
+
+  /**
+   * Output is based on the standard 'dev' Besu genesis.json contents.
+   *
+   * @see https://github.com/hyperledger/besu/blob/1.5.1/config/src/main/resources/dev.json
+   */
+  public getGenesisAccountPubKey(): string {
+    return "627306090abaB3A6e1400e9345bC60c78a8BEf57";
+  }
+
+  /**
+   * Output is based on the standard 'dev' Besu genesis.json contents.
+   *
+   * @see https://github.com/hyperledger/besu/blob/1.5.1/config/src/main/resources/dev.json
+   */
+  public getGenesisAccountPrivKey(): string {
+    return "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3";
+  }
+
+  /**
+   * Creates a new ETH account from scratch on the ledger and then sends it a
+   * little seed money to get things started.
+   *
+   * @param [seedMoney=10e8] The amount of money to seed the new test account with.
+   */
+  public async createEthTestAccount(
+    seedMoney: number = 10e8
+  ): Promise<Account> {
+    const fnTag = `BesuTestLedger#getEthTestAccount()`;
+
+    const rpcApiHttpHost = await this.getRpcApiHttpHost();
+    const web3 = new Web3(rpcApiHttpHost);
+    const ethTestAccount = web3.eth.accounts.create(uuidv4());
+
+    const tx = await web3.eth.accounts.signTransaction(
+      {
+        from: this.getGenesisAccountPubKey(),
+        to: ethTestAccount.address,
+        value: seedMoney,
+        gas: 1000000,
+      },
+      this.getGenesisAccountPrivKey()
+    );
+
+    if (!tx.rawTransaction) {
+      throw new Error(`${fnTag} Signing transaction failed, reason unknown.`);
+    }
+
+    const receipt = await web3.eth.sendSignedTransaction(tx.rawTransaction);
+
+    if (receipt instanceof Error) {
+      throw receipt;
+    } else {
+      return ethTestAccount;
+    }
   }
 
   public async getBesuKeyPair(): Promise<IKeyPair> {
