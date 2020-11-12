@@ -69,6 +69,7 @@
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "@hyperledger/cactus-common": "0.2.0",
+    "@hyperledger/cactus-core": "0.2.0",
     "@hyperledger/cactus-core-api": "0.2.0",
     "@types/compression": "1.7.0",
     "axios": "0.19.2",

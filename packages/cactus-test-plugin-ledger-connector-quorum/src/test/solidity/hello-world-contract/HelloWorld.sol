@@ -5,10 +5,22 @@
 // With that said, there shouldn't be any reason to recompile this, like ever...
 // *****************************************************************************
 
-pragma solidity >0.5.0;
+pragma solidity >=0.7.0;
 
 contract HelloWorld {
- function sayHello () public pure returns (string memory) {
-   return 'Hello World!';
- }
+  string private name = "CaptainCactus";
+
+  function sayHello () public pure returns (string memory) {
+    return 'Hello World!';
+  }
+
+  function getName() public view returns (string memory)
+  {
+      return name;
+  }
+
+  function setName(string memory newName) public
+  {
+      name = newName;
+  }
 }

@@ -1,69 +1,85 @@
+import { Server } from "http";
+import { Server as SecureServer } from "https";
+
+import { Express } from "express";
+import { promisify } from "util";
+import { Optional } from "typescript-optional";
+import Web3 from "web3";
+
+import { ContractSendMethod } from "web3-eth-contract";
+import { TransactionReceipt } from "web3-eth";
+
 import {
   IPluginLedgerConnector,
   IWebServiceEndpoint,
   IPluginWebService,
   PluginAspect,
 } from "@hyperledger/cactus-core-api";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 
-import { promisify } from "util";
-import { Optional } from "typescript-optional";
-import { Server } from "http";
-import { Server as SecureServer } from "https";
-import Web3 from "web3";
 import {
-  Contract,
-  ContractSendMethod,
-  ContractOptions,
-  DeployOptions,
-  SendOptions,
-} from "web3-eth-contract/types/index";
-import { PromiEvent } from "web3-core/types/index";
-import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint";
+  Checks,
+  Logger,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
+
+import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
+
+import {
+  DeployContractSolidityBytecodeV1Request,
+  DeployContractSolidityBytecodeV1Response,
+  EthContractInvocationType,
+  InvokeContractV1Request,
+  InvokeContractV1Response,
+  RunTransactionRequest,
+  RunTransactionResponse,
+  Web3SigningCredential,
+  Web3SigningCredentialGethKeychainPassword,
+  Web3SigningCredentialPrivateKeyHex,
+  Web3SigningCredentialType,
+} from "./generated/openapi/typescript-axios/";
+
+import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
+import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
+import { isWeb3SigningCredentialNone } from "./model-type-guards";
 
 export interface IPluginLedgerConnectorQuorumOptions {
   rpcApiHttpHost: string;
-}
-
-/**
- * FIXME: This is under construction.
- */
-export interface ITransactionOptions {
-  privateKey?: string;
-}
-
-export interface IQuorumDeployContractOptions {
-  ethAccountUnlockPassword: string; // The decryption key for geth to unlock the account
-  fromAddress: string; // The address to use
-  contractSourceCode?: string; // if provided then compile the contract through the API
-  contractJsonArtifact?: { bytecode: string }; // use this if provided (the pre-compiled JSON artifact)
-  gas?: number;
-  gasPrice?: number;
+  logLevel?: LogLevelDesc;
 }
 
 export class PluginLedgerConnectorQuorum
-  implements IPluginLedgerConnector<any, Contract>, IPluginWebService {
-  private readonly web3: Web3;
+  implements
+    IPluginLedgerConnector<
+      DeployContractSolidityBytecodeV1Request,
+      DeployContractSolidityBytecodeV1Response,
+      RunTransactionRequest,
+      RunTransactionResponse
+    >,
+    IPluginWebService {
   private readonly log: Logger;
+  private readonly web3: Web3;
   private httpServer: Server | SecureServer | null = null;
 
+  public static readonly CLASS_NAME = "PluginLedgerConnectorQuorum";
+
+  public get className() {
+    return PluginLedgerConnectorQuorum.CLASS_NAME;
+  }
+
   constructor(public readonly options: IPluginLedgerConnectorQuorumOptions) {
-    if (!options) {
-      throw new Error(`PluginLedgerConnectorQuorum#ctor options falsy.`);
-    }
-    if (!options.rpcApiHttpHost) {
-      throw new Error(
-        `PluginLedgerConnectorQuorum#ctor options.rpcApiHttpHost falsy.`
-      );
-    }
+    const fnTag = `${this.className}#constructor()`;
+    Checks.truthy(options, `${fnTag} arg options`);
+    Checks.truthy(options.rpcApiHttpHost, `${fnTag} options.rpcApiHttpHost`);
+
+    const level = this.options.logLevel || "INFO";
+    const label = this.className;
+    this.log = LoggerProvider.getOrCreate({ level, label });
+
     const web3Provider = new Web3.providers.HttpProvider(
       this.options.rpcApiHttpHost
     );
     this.web3 = new Web3(web3Provider);
-    this.log = LoggerProvider.getOrCreate({
-      label: "plugin-ledger-connector-quorum",
-      level: "trace",
-    });
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {
@@ -79,19 +95,32 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async installWebServices(
-    expressApp: any
+    expressApp: Express
   ): Promise<IWebServiceEndpoint[]> {
     const endpoints: IWebServiceEndpoint[] = [];
     {
-      const pluginId = this.getId(); // @hyperledger/cactus-plugin-ledger-connector-quorum
-      const path = `/api/v1/plugins/${pluginId}/contract/deploy`;
-      const endpoint: IWebServiceEndpoint = new DeployContractEndpoint({
-        path,
-        plugin: this,
+      const endpoint = new DeployContractSolidityBytecodeEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
       });
-      expressApp.use(endpoint.getPath(), endpoint.getExpressRequestHandler());
+      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
-      this.log.info(`Registered contract deployment endpoint at ${path}`);
+    }
+    {
+      const endpoint = new RunTransactionEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new InvokeContractEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
     }
     return endpoints;
   }
@@ -104,77 +133,196 @@ export class PluginLedgerConnectorQuorum
     return PluginAspect.LEDGER_CONNECTOR;
   }
 
-  public async sendTransaction(options: ITransactionOptions): Promise<any> {
-    return this.web3.eth.sendTransaction(options as any);
+  public async invokeContract(
+    req: InvokeContractV1Request
+  ): Promise<InvokeContractV1Response> {
+    const fnTag = `${this.className}#invokeContract()`;
+
+    const { invocationType } = req;
+
+    let abi;
+    if (typeof req.contractAbi === "string") {
+      abi = JSON.parse(req.contractAbi);
+    } else {
+      abi = req.contractAbi;
+    }
+
+    const { contractAddress } = req;
+    const aContract = new this.web3.eth.Contract(abi, contractAddress);
+    const methodRef = aContract.methods[req.methodName];
+
+    Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
+
+    const method: ContractSendMethod = methodRef(...req.params);
+
+    if (req.invocationType === EthContractInvocationType.CALL) {
+      const callOutput = await (method as any).call(...req.params);
+      return { callOutput };
+    } else if (req.invocationType === EthContractInvocationType.SEND) {
+      if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
+        throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
+      }
+      const web3SigningCredential = req.web3SigningCredential as
+        | Web3SigningCredentialGethKeychainPassword
+        | Web3SigningCredentialPrivateKeyHex;
+
+      const payload = (method.send as any).request();
+      const { params } = payload;
+      const [transactionConfig] = params;
+      transactionConfig.from = web3SigningCredential.ethAccount;
+      transactionConfig.gas = req.gas;
+      transactionConfig.gasPrice = req.gasPrice;
+
+      const txReq: RunTransactionRequest = {
+        transactionConfig,
+        web3SigningCredential,
+        timeoutMs: req.timeoutMs || 60000,
+      };
+      const out = await this.transact(txReq);
+
+      return out;
+    } else {
+      throw new Error(`${fnTag} Unsupported invocation type ${invocationType}`);
+    }
   }
 
-  public instantiateContract(
-    contractJsonArtifact: any,
-    address?: string
-  ): Contract {
-    const contractOptions: ContractOptions = {};
-    return new this.web3.eth.Contract(
-      contractJsonArtifact.abi,
-      address,
-      contractOptions
+  public async transact(
+    req: RunTransactionRequest
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transact()`;
+
+    switch (req.web3SigningCredential.type) {
+      case Web3SigningCredentialType.GETHKEYCHAINPASSWORD: {
+        return this.transactGethKeychain(req);
+      }
+      case Web3SigningCredentialType.PRIVATEKEYHEX: {
+        return this.transactPrivateKey(req);
+      }
+      case Web3SigningCredentialType.NONE: {
+        if (req.transactionConfig.rawTransaction) {
+          return this.transactSigned(req.transactionConfig.rawTransaction);
+        } else {
+          throw new Error(
+            `${fnTag} Expected pre-signed raw transaction ` +
+              ` since signing credential is specified as` +
+              `Web3SigningCredentialType.NONE`
+          );
+        }
+      }
+      default: {
+        throw new Error(
+          `${fnTag} Unrecognized Web3SigningCredentialType: ` +
+            `${req.web3SigningCredential.type} Supported ones are: ` +
+            `${Object.values(Web3SigningCredentialType).join(";")}`
+        );
+      }
+    }
+  }
+
+  public async transactSigned(
+    rawTransaction: string
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactSigned()`;
+
+    const receipt = await this.web3.eth.sendSignedTransaction(rawTransaction);
+
+    if (receipt instanceof Error) {
+      this.log.debug(`${fnTag} Web3 sendSignedTransaction failed`, receipt);
+      throw receipt;
+    } else {
+      return { transactionReceipt: receipt };
+    }
+  }
+
+  public async transactGethKeychain(
+    txIn: RunTransactionRequest
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactGethKeychain()`;
+    const { sendTransaction } = this.web3.eth.personal;
+    const { transactionConfig, web3SigningCredential } = txIn;
+    const {
+      secret,
+    } = web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
+    try {
+      const txHash = await sendTransaction(transactionConfig, secret);
+      const transactionReceipt = await this.pollForTxReceipt(txHash);
+      return { transactionReceipt };
+    } catch (ex) {
+      throw new Error(
+        `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
+          `InnerException: ${ex.stack}`
+      );
+    }
+  }
+
+  public async transactPrivateKey(
+    req: RunTransactionRequest
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactPrivateKey()`;
+    const { transactionConfig, web3SigningCredential } = req;
+    const {
+      secret,
+    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+
+    const signedTx = await this.web3.eth.accounts.signTransaction(
+      transactionConfig,
+      secret
     );
+
+    if (signedTx.rawTransaction) {
+      return this.transactSigned(signedTx.rawTransaction);
+    } else {
+      throw new Error(
+        `${fnTag} Failed to sign eth transaction. ` +
+          `signedTransaction.rawTransaction is blank after .signTransaction().`
+      );
+    }
+  }
+
+  public async pollForTxReceipt(
+    txHash: string,
+    timeoutMs: number = 60000
+  ): Promise<TransactionReceipt> {
+    const fnTag = `${this.className}#pollForTxReceipt()`;
+    let txReceipt;
+    let timedOut = false;
+    let tries = 0;
+    const startedAt = new Date();
+
+    do {
+      txReceipt = await this.web3.eth.getTransactionReceipt(txHash);
+      tries++;
+      timedOut = Date.now() >= startedAt.getTime() + timeoutMs;
+    } while (!timedOut && !txReceipt);
+
+    if (!txReceipt) {
+      throw new Error(`${fnTag} Timed out ${timeoutMs}ms, polls=${tries}`);
+    } else {
+      return txReceipt;
+    }
   }
 
   public async deployContract(
-    options: IQuorumDeployContractOptions
-  ): Promise<Contract> {
-    const fnTag = "PluginLedgerConnectorQuorum#deployContract()";
-    if (!options.contractJsonArtifact) {
-      throw new Error(`${fnTag} options.contractJsonArtifact falsy.`);
+    req: DeployContractSolidityBytecodeV1Request
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#deployContract()`;
+    Checks.truthy(req, `${fnTag} req`);
+
+    if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
+      throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
     }
+    const web3SigningCredential = req.web3SigningCredential as
+      | Web3SigningCredentialGethKeychainPassword
+      | Web3SigningCredentialPrivateKeyHex;
 
-    const { fromAddress } = options;
-
-    try {
-      const unlocked: boolean = await this.web3.eth.personal.unlockAccount(
-        fromAddress,
-        options.ethAccountUnlockPassword,
-        3600
-      );
-      this.log.debug(`Web3 Account unlock outcome: ${unlocked}`);
-    } catch (ex) {
-      throw new Error(`${fnTag} failed to unlock ${fromAddress}: ${ex.stack}`);
-    }
-
-    const contract: Contract = this.instantiateContract(
-      options.contractJsonArtifact,
-      fromAddress
-    );
-    this.log.debug(`Instantiated contract OK`);
-
-    const deployOptions: DeployOptions = {
-      data: "0x" + options.contractJsonArtifact.bytecode,
-    };
-    this.log.debug(`Calling contract deployment...`);
-    const deployTask: ContractSendMethod = contract.deploy(deployOptions);
-    this.log.debug(`Called deploy task OK with options: `, { deployOptions });
-
-    const sendOptions: SendOptions = {
-      from: options.fromAddress,
-      gas: options.gas || 1000000,
-      gasPrice: `${options.gasPrice || 0}`,
-    };
-
-    this.log.debug(`Calling send on deploy task...`, { sendOptions });
-    const promiEventContract = deployTask.send(sendOptions);
-    this.log.debug(`Called send OK with options: `, { sendOptions });
-
-    try {
-      this.log.debug(`Starting await for contract deployment promise...`);
-      const deployedContract: Contract = await promiEventContract;
-      this.log.debug(`Deployed contract OK.`);
-      return deployedContract;
-    } catch (ex) {
-      throw new Error(`${fnTag} Failed to deploy contract: ${ex.stack}`);
-    }
-  }
-
-  public async addPublicKey(publicKeyHex: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    return this.transact({
+      transactionConfig: {
+        data: `0x${req.bytecode}`,
+        from: web3SigningCredential.ethAccount,
+        gas: req.gas,
+        gasPrice: req.gasPrice,
+      },
+      web3SigningCredential,
+    });
   }
 }

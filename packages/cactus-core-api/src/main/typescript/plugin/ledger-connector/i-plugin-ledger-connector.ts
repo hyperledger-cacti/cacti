@@ -3,16 +3,22 @@ import { ICactusPlugin } from "../i-cactus-plugin";
 /**
  * Common interface to be implemented by plugins which are implementing the connection to ledgers.
  */
-export interface IPluginLedgerConnector<T, K> extends ICactusPlugin {
+export interface IPluginLedgerConnector<
+  DeployIn,
+  DeployOut,
+  TransactIn,
+  TransactOut
+> extends ICactusPlugin {
   /**
-   * Deploys the Cactus build-in smart contract written for this ledger to manage the validator's public keys.
+   * Deploys a contract written for a ledger that the connector is aimed at
+   * supporting.
    */
-  deployContract(options?: T): Promise<K>;
+  deployContract(options?: DeployIn): Promise<DeployOut>;
 
   /**
-   * Adds the public key to the ledger state.
-   *
-   * @param publicKeyHex The HEX representation of a public key of a Cactus node.
+   * Executes a transaction on the target ledger of the connector plugin.
+   * @param options The options that is specific to the transaction and the
+   * type of ledger this connectir is targeted at.
    */
-  addPublicKey(publicKeyHex: string): Promise<void>;
+  transact(options?: TransactIn): Promise<TransactOut>;
 }
