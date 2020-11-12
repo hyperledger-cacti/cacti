@@ -4,15 +4,13 @@ import { JWS, JWK } from "jose";
 import jsonStableStringify from "json-stable-stringify";
 
 import {
+  Consortium,
+  JWSGeneral,
   IWebServiceEndpoint,
   IExpressRequestHandler,
 } from "@hyperledger/cactus-core-api";
 
-import {
-  GetNodeJwsResponse,
-  Consortium,
-  JWSGeneral,
-} from "../generated/openapi/typescript-axios";
+import { GetNodeJwsResponse } from "../generated/openapi/typescript-axios";
 
 import {
   Logger,

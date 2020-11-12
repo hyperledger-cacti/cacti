@@ -3,11 +3,14 @@ import { JWS, JWK } from "jose";
 import { v4 as uuidV4 } from "uuid";
 
 import {
-  GetNodeJwsEndpoint,
-  IGetNodeJwsEndpointOptions,
   CactusNode,
   Consortium,
   ConsortiumMember,
+} from "@hyperledger/cactus-core-api";
+
+import {
+  GetNodeJwsEndpoint,
+  IGetNodeJwsEndpointOptions,
 } from "../../../../main/typescript/public-api";
 
 test("Can provide JWS", async (t: Test) => {
@@ -28,6 +31,7 @@ test("Can provide JWS", async (t: Test) => {
     consortiumId,
     id: nodeId,
     plugins: [],
+    ledgers: [],
   };
 
   const member: ConsortiumMember = {

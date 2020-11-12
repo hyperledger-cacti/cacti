@@ -6,16 +6,13 @@ import { JWK, JWS } from "jose";
 import { v4 as uuidV4 } from "uuid";
 
 import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { Configuration, ApiClient } from "@hyperledger/cactus-api-client";
 import {
   IPluginConsortiumManualOptions,
   PluginConsortiumManual,
-  CactusNode,
-  CactusNodeMeta,
   DefaultApi,
-  Consortium,
+  Configuration,
 } from "@hyperledger/cactus-plugin-consortium-manual";
-import { PluginRegistry } from "@hyperledger/cactus-core-api";
+import { Consortium, PluginRegistry } from "@hyperledger/cactus-core-api";
 
 test("member node public keys and hosts are pre-shared", async (t: Test) => {
   const consortiumId = uuidV4();
@@ -78,8 +75,13 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
         name: "Example Corp 1",
         nodes: [
           {
+            consortiumId,
+            memberId: memberId1,
+            id: "Example_Cactus_Node_1",
             nodeApiHost: node1Host,
             publicKeyPem: pubKeyPem1,
+            ledgers: [],
+            plugins: [],
           },
         ],
       },
@@ -88,8 +90,13 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
         name: "Example Corp 2",
         nodes: [
           {
+            consortiumId,
+            memberId: memberId2,
+            id: "Example_Cactus_Node_2",
             nodeApiHost: node2Host,
             publicKeyPem: pubKeyPem2,
+            ledgers: [],
+            plugins: [],
           },
         ],
       },
@@ -98,8 +105,13 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
         name: "Example Corp 3",
         nodes: [
           {
+            consortiumId,
+            memberId: memberId3,
+            id: "Example_Cactus_Node_3",
             nodeApiHost: node3Host,
             publicKeyPem: pubKeyPem3,
+            ledgers: [],
+            plugins: [],
           },
         ],
       },
@@ -148,7 +160,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     t.comment(`AddressInfo: ${JSON.stringify(addressInfo1)}`);
 
     const configuration = new Configuration({ basePath: node1Host });
-    const api = new ApiClient(configuration).extendWith(DefaultApi);
+    const api = new DefaultApi(configuration);
     const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet();
     t.ok(res, "API response object is truthy");
     t.equal(res.status, 200, "Node JWS response status code is 200");
@@ -199,7 +211,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     t.comment(`AddressInfo: ${JSON.stringify(addressInfo2)}`);
 
     const configuration = new Configuration({ basePath: node2Host });
-    const api = new ApiClient(configuration).extendWith(DefaultApi);
+    const api = new DefaultApi(configuration);
     const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet();
     t.ok(res, "API response object is truthy");
     t.equal(res.status, 200, "Node JWS response status code is 200");
@@ -253,7 +265,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     t.comment(`AddressInfo: ${JSON.stringify(addressInfo3)}`);
 
     const configuration = new Configuration({ basePath: node3Host });
-    const api = new ApiClient(configuration).extendWith(DefaultApi);
+    const api = new DefaultApi(configuration);
     const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet();
     t.ok(res, "API response object is truthy");
     t.equal(res.status, 200, "Node JWS response status code is 200");
@@ -267,7 +279,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
   {
     const configuration = new Configuration({ basePath: node3Host });
-    const api = new ApiClient(configuration).extendWith(DefaultApi);
+    const api = new DefaultApi(configuration);
     const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet();
     t.equal(res.status, 200, "Consortium JWS response status code is 200");
     const getConsortiumJwsResponse = res.data;
@@ -286,7 +298,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
   {
     const configuration = new Configuration({ basePath: node2Host });
-    const api = new ApiClient(configuration).extendWith(DefaultApi);
+    const api = new DefaultApi(configuration);
     const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet();
     t.equal(res.status, 200, "Consortium JWS response status code is 200");
     const getConsortiumJwsResponse = res.data;
@@ -305,7 +317,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
   {
     const configuration = new Configuration({ basePath: node1Host });
-    const api = new ApiClient(configuration).extendWith(DefaultApi);
+    const api = new DefaultApi(configuration);
     const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet();
     t.equal(res.status, 200, "Consortium JWS response status code is 200");
     const getConsortiumJwsResponse = res.data;
