@@ -8,11 +8,14 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 
 import {
   EthContractInvocationType,
   PluginLedgerConnectorQuorum,
+  Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialType,
 } from "../../../../../main/typescript/public-api";
 
@@ -53,16 +56,30 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
   const [firstHighNetWorthAccount] = highNetWorthAccounts;
 
   const web3 = new Web3(rpcApiHttpHost);
+  const testEthAccount = web3.eth.accounts.create(uuidV4());
 
+  const keychainEntryKey = uuidV4();
+  const keychainEntryValue = testEthAccount.privateKey;
+  const keychainPlugin = new PluginKeychainMemory({
+    instanceId: uuidV4(),
+    keychainId: uuidV4(),
+    // pre-provision keychain with mock backend holding the private key of the
+    // test account that we'll reference while sending requests with the
+    // signing credential pointing to this keychain entry.
+    backend: new Map([[keychainEntryKey, keychainEntryValue]]),
+    logLevel,
+  });
+
+  // Instantiate connector with the keychain plugin that already has the
+  // private key we want to use for one of our tests
   const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
     {
       instanceId: uuidV4(),
       rpcApiHttpHost,
       logLevel,
-      pluginRegistry: new PluginRegistry(),
+      pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
     }
   );
-  const testEthAccount = web3.eth.accounts.create(uuidV4());
 
   await connector.transact({
     web3SigningCredential: {
@@ -254,6 +271,52 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PRIVATEKEYHEX,
       },
+    });
+    t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
+
+    t2.end();
+  });
+
+  test("invoke Web3SigningCredentialType.CACTUSKEYCHAINREF", async (t2: Test) => {
+    const newName = `DrCactus${uuidV4()}`;
+
+    const web3SigningCredential: Web3SigningCredentialCactusKeychainRef = {
+      ethAccount: testEthAccount.address,
+      keychainEntryKey,
+      keychainId: keychainPlugin.getKeychainId(),
+      type: Web3SigningCredentialType.CACTUSKEYCHAINREF,
+    };
+
+    const setNameOut = await connector.invokeContract({
+      contractAddress,
+      contractAbi: HelloWorldContractJson.abi,
+      invocationType: EthContractInvocationType.SEND,
+      methodName: "setName",
+      params: [newName],
+      gas: 1000000,
+      web3SigningCredential,
+    });
+    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+
+    const { callOutput: getNameOut } = await connector.invokeContract({
+      contractAddress,
+      contractAbi: HelloWorldContractJson.abi,
+      invocationType: EthContractInvocationType.CALL,
+      methodName: "getName",
+      params: [],
+      gas: 1000000,
+      web3SigningCredential,
+    });
+    t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
+
+    const getNameOut2 = await connector.invokeContract({
+      contractAddress,
+      contractAbi: HelloWorldContractJson.abi,
+      invocationType: EthContractInvocationType.SEND,
+      methodName: "getName",
+      params: [],
+      gas: 1000000,
+      web3SigningCredential,
     });
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
 
