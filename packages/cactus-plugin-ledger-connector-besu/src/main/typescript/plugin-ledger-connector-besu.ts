@@ -17,6 +17,8 @@ import {
   PluginAspect,
   ICactusPlugin,
   ICactusPluginOptions,
+  PluginRegistry,
+  IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -36,6 +38,7 @@ import {
   InvokeContractV1Response,
   RunTransactionRequest,
   RunTransactionResponse,
+  Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
@@ -48,6 +51,7 @@ import { isWeb3SigningCredentialNone } from "./model-type-guards";
 export interface IPluginLedgerConnectorBesuOptions
   extends ICactusPluginOptions {
   rpcApiHttpHost: string;
+  pluginRegistry: PluginRegistry;
   logLevel?: LogLevelDesc;
 }
 
@@ -64,6 +68,7 @@ export class PluginLedgerConnectorBesu
   private readonly instanceId: string;
   private readonly log: Logger;
   private readonly web3: Web3;
+  private readonly pluginRegistry: PluginRegistry;
   private httpServer: Server | SecureServer | null = null;
 
   public static readonly CLASS_NAME = "PluginLedgerConnectorBesu";
@@ -77,6 +82,7 @@ export class PluginLedgerConnectorBesu
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.rpcApiHttpHost, `${fnTag} options.rpcApiHttpHost`);
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
+    Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
@@ -87,6 +93,7 @@ export class PluginLedgerConnectorBesu
     );
     this.web3 = new Web3(web3Provider);
     this.instanceId = options.instanceId;
+    this.pluginRegistry = options.pluginRegistry;
   }
 
   public getInstanceId(): string {
@@ -203,6 +210,9 @@ export class PluginLedgerConnectorBesu
     const fnTag = `${this.className}#transact()`;
 
     switch (req.web3SigningCredential.type) {
+      case Web3SigningCredentialType.CACTUSKEYCHAINREF: {
+        return this.transactCactusKeychainRef(req);
+      }
       case Web3SigningCredentialType.GETHKEYCHAINPASSWORD: {
         return this.transactGethKeychain(req);
       }
@@ -288,6 +298,39 @@ export class PluginLedgerConnectorBesu
           `signedTransaction.rawTransaction is blank after .signTransaction().`
       );
     }
+  }
+
+  public async transactCactusKeychainRef(
+    req: RunTransactionRequest
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactCactusKeychainRef()`;
+    const { transactionConfig, web3SigningCredential } = req;
+    const {
+      ethAccount,
+      keychainEntryKey,
+      keychainId,
+    } = web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
+
+    // locate the keychain plugin that has access to the keychain backend
+    // denoted by the keychainID from the request.
+    const keychainPlugin = this.pluginRegistry
+      .findManyByAspect<IPluginKeychain>(PluginAspect.KEYCHAIN)
+      .find((k) => k.getKeychainId() === keychainId);
+
+    Checks.truthy(keychainPlugin, `${fnTag} keychain for ID:"${keychainId}"`);
+
+    // Now use the found keychain plugin to actually perform the lookup of
+    // the private key that we need to run the transaction.
+    const privateKeyHex = await keychainPlugin?.get<string>(keychainEntryKey);
+
+    return this.transactPrivateKey({
+      transactionConfig,
+      web3SigningCredential: {
+        ethAccount,
+        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        secret: privateKeyHex,
+      },
+    });
   }
 
   public async pollForTxReceipt(
