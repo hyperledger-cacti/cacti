@@ -1,5 +1,5 @@
 import { AddressInfo, ListenOptions } from "net";
-import { Server } from "http";
+import { Server, createServer } from "http";
 import { Server as SecureServer } from "https";
 import { Checks } from "./checks";
 
@@ -63,5 +63,42 @@ export class Servers {
 
       server.listen(listenOptions, onListeningHandler);
     });
+  }
+
+  /**
+   * Start an HTTP server on the preferred port provided in the parameter if
+   * possible, bind to a random (0) port otherwise.
+   *
+   * @param preferredPort The TCP port the caller would **prefer** to use if
+   * possible. If the preferred port is taken, it will bind the server to port
+   * zero instead which means that the operating system will randomly choose an
+   * available port and use that.
+   */
+  public static async startOnPreferredPort(
+    preferredPort?: number
+  ): Promise<Server> {
+    if (preferredPort) {
+      try {
+        return Servers.startOnPort(preferredPort);
+      } catch (ex) {
+        // if something else went wrong we still want to just give up
+        if (!ex.message.includes("EADDRINUSE")) {
+          throw ex;
+        }
+      }
+      return Servers.startOnPort(0);
+    } else {
+      return Servers.startOnPort(0);
+    }
+  }
+
+  public static async startOnPort(port: number): Promise<Server> {
+    const server: Server = await new Promise((resolve, reject) => {
+      const aServer: Server = createServer();
+      aServer.once("listening", () => resolve(aServer));
+      aServer.listen(port, "localhost");
+    });
+
+    return server;
   }
 }
