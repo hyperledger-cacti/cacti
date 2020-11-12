@@ -105,6 +105,25 @@ export class QuorumTestLedger implements ITestLedger {
     });
   }
 
+  /**
+   * Obtains the address of an account from the genesis allocation with a
+   * minimum balance of `minBalance`.
+   *
+   * @param minBalance The minimum balance to try and find a genesis account with.
+   *
+   * @throws {Error} If the balance is too high and there aren't any genesis
+   * accounts allocated with such a high balance then an exceptin is thrown.
+   */
+  public async getGenesisAccount(minBalance: number = 10e7): Promise<string> {
+    const { alloc } = await this.getGenesisJsObject();
+
+    const firstHighNetWorthAccount = Object.keys(alloc).find(
+      (addr) => parseInt(alloc[addr].balance, 10) > minBalance
+    ) as string;
+
+    return firstHighNetWorthAccount;
+  }
+
   public async getQuorumKeyPair(): Promise<IKeyPair> {
     const publicKey = await this.getFileContents("/nodekey");
     const privateKey = await this.getFileContents("/key");
