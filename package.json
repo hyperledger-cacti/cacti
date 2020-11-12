@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "run-ci": "./tools/ci.sh",
-    "configure": "npm i && lerna clean --yes && lerna bootstrap && npm-run-all build:dev:backend generate-api-server-config",
+    "configure": "npm i && lerna clean --yes && lerna bootstrap && npm-run-all build:dev generate-api-server-config",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
     "start:cockpit": "lerna run --scope '*/cactus-cockpit' --stream serve:proxy",
