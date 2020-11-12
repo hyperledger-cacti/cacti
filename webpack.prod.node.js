@@ -18,6 +18,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(js|ts)$/,
+        use: ["shebang-loader"],
+      },
+      {
         test: /\.ts$/,
         exclude: /node_modules/,
         use: [
