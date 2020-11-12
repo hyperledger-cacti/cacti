@@ -3,7 +3,6 @@ import {
   IPluginLedgerConnector,
   PluginAspect,
 } from "@hyperledger/cactus-core-api";
-import { any } from "joi";
 import Web3 from "web3";
 import EEAClient, { IWeb3InstanceExtended } from "web3-eea";
 
