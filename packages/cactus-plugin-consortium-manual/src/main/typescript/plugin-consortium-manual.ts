@@ -6,15 +6,19 @@ import express, { Express } from "express";
 import bodyParser from "body-parser";
 
 import {
+  Consortium,
   IPluginWebService,
   PluginAspect,
   PluginRegistry,
   IWebServiceEndpoint,
   ICactusPlugin,
 } from "@hyperledger/cactus-core-api";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  Logger,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 import { GetConsortiumEndpointV1 } from "./consortium/get-consortium-jws-endpoint-v1";
-import { Consortium } from "./generated/openapi/typescript-axios";
 import { GetNodeJwsEndpoint } from "./consortium/get-node-jws-endpoint-v1";
 
 export interface IWebAppOptions {
@@ -26,7 +30,7 @@ export interface IPluginConsortiumManualOptions {
   keyPairPem: string;
   consortium: Consortium;
   pluginRegistry?: PluginRegistry;
-  logLevel?: string;
+  logLevel?: LogLevelDesc;
   webAppOptions?: IWebAppOptions;
 }
 

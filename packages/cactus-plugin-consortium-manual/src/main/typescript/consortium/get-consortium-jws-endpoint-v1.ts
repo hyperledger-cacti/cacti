@@ -2,19 +2,17 @@ import { Express, Request, Response, NextFunction } from "express";
 import flatten from "lodash/flatten";
 import { AxiosResponse } from "axios";
 
-import { ApiClient } from "@hyperledger/cactus-api-client";
-
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
+  JWSGeneral,
+  JWSRecipient,
+  Consortium,
 } from "@hyperledger/cactus-core-api";
 
 import {
   Configuration,
   DefaultApi,
-  JWSGeneral,
-  JWSRecipient,
-  Consortium,
   GetNodeJwsResponse,
 } from "../generated/openapi/typescript-axios";
 
@@ -90,8 +88,7 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
       const requests: Promise<AxiosResponse<GetNodeJwsResponse>>[] = nodes
         .map((cnm) => cnm.nodeApiHost)
         .map((host) => new Configuration({ basePath: host }))
-        .map((configuration) => new ApiClient(configuration))
-        .map((apiClient) => apiClient.extendWith(DefaultApi))
+        .map((configuration) => new DefaultApi(configuration))
         .map((apiClient) =>
           apiClient.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet()
         );

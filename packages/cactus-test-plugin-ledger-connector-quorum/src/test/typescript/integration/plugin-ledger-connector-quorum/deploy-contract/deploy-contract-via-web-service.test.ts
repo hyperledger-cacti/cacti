@@ -15,6 +15,7 @@ import {
   Web3SigningCredentialType,
   DeployContractSolidityBytecodeV1Request,
   EthContractInvocationType,
+  Configuration,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 
 import {
@@ -25,11 +26,6 @@ import {
 
 import { ICactusPlugin, PluginRegistry } from "@hyperledger/cactus-core-api";
 import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
-import {
-  ApiClient,
-  Configuration,
-  HealthCheckResponse,
-} from "@hyperledger/cactus-api-client";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-deploy-contract-via-web-service",
@@ -102,17 +98,9 @@ test("deploys contract via REST API", async (t: Test) => {
   log.debug(`SDK base path: %s`, basePath);
 
   const configuration = new Configuration({ basePath });
-  const client = new ApiClient(configuration).extendWith(DefaultApi);
+  const client = new DefaultApi(configuration);
 
-  // 7. Issue an API call to the API server via the SDK verifying that the SDK and the API server both work
-  const healthcheckResponse: AxiosResponse<HealthCheckResponse> = await client.apiV1ApiServerHealthcheckGet();
-  t.ok(healthcheckResponse);
-  t.ok(healthcheckResponse.data);
-  t.ok(healthcheckResponse.data.success);
-  t.ok(healthcheckResponse.data.memoryUsage);
-  t.ok(healthcheckResponse.data.createdAt);
-
-  // 8. Assemble request to invoke the deploy contract method of the quorum ledger connector plugin via the REST API
+  // 7. Assemble request to invoke the deploy contract method of the quorum ledger connector plugin via the REST API
   const req: DeployContractSolidityBytecodeV1Request = {
     bytecode: HelloWorldContractJson.bytecode,
     web3SigningCredential: {
@@ -123,7 +111,7 @@ test("deploys contract via REST API", async (t: Test) => {
     gas: 1000000,
   };
 
-  // 9. Deploy smart contract by issuing REST API call
+  // 8. Deploy smart contract by issuing REST API call
   const res = await client.apiV1QuorumDeployContractSolidityBytecode(req);
   const contractAddress = res.data.transactionReceipt.contractAddress as string;
 

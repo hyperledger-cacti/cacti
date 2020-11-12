@@ -12,6 +12,10 @@
     "dist/*"
   ],
   "scripts": {
+    "export-open-api-spec": "ts-node src/main/typescript/openapi-spec.ts",
+    "pregenerate-sdk": "npm-run-all export-open-api-spec",
+    "generate-sdk": "openapi-generator generate --input-spec src/main/json/generated/openapi-spec.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
+    "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -63,7 +67,9 @@
     "@types/joi": "14.3.4"
   },
   "dependencies": {
+    "axios": "0.20.0",
     "joi": "14.3.1",
+    "openapi-types": "7.0.1",
     "typescript-optional": "2.0.1"
   }
 }

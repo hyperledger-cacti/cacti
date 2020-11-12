@@ -6,21 +6,18 @@ import { v4 as uuidV4 } from "uuid";
 import { JWK } from "jose";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { PluginRegistry } from "@hyperledger/cactus-core-api";
-import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
 import {
-  DefaultApi,
-  Configuration,
-  HealthCheckResponse,
-} from "@hyperledger/cactus-api-client";
+  CactusNode,
+  ConsortiumMember,
+  Consortium,
+  PluginRegistry,
+} from "@hyperledger/cactus-core-api";
+import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
 import {
   DefaultApi as DefaultApiPlugin,
   Configuration as ConfigurationPlugin,
   PluginConsortiumManual,
   IPluginConsortiumManualOptions,
-  CactusNode,
-  ConsortiumMember,
-  Consortium,
 } from "@hyperledger/cactus-plugin-consortium-manual";
 
 LoggerProvider.setLogLevel("TRACE");
@@ -39,7 +36,6 @@ tap.test(
 
     const keyPair = await JWK.generate("EC", "secp256k1");
     const keyPairPem = keyPair.toPEM(true);
-    const publicKeyPem = keyPair.toPEM(false);
 
     const consortiumName = "Example Corp. & Friends Crypto Consortium";
     const consortiumId = uuidV4();
@@ -53,6 +49,7 @@ tap.test(
       consortiumId,
       id: nodeId,
       plugins: [],
+      ledgers: [],
     };
 
     const member: ConsortiumMember = {
@@ -107,18 +104,6 @@ tap.test(
     const httpServer = apiServer.getHttpServerApi();
     const addressInfo: any = httpServer?.address();
     log.debug(`AddressInfo: `, addressInfo);
-    const CACTUS_API_HOST = `http://${addressInfo.address}:${addressInfo.port}`;
-
-    const configuration = new Configuration({ basePath: CACTUS_API_HOST });
-    const api = new DefaultApi(configuration);
-
-    // 7. Issue an API call to the API server via the main SDK verifying that the SDK and the API server both work
-    const healthcheckResponse: AxiosResponse<HealthCheckResponse> = await api.apiV1ApiServerHealthcheckGet();
-    assert.ok(healthcheckResponse);
-    assert.ok(healthcheckResponse.data);
-    assert.ok(healthcheckResponse.data.success);
-    assert.ok(healthcheckResponse.data.memoryUsage);
-    assert.ok(healthcheckResponse.data.createdAt);
 
     // 8. Get the dedicated HTTP server of the web service plugin
     const httpServerConsortium: Server = pluginConsortiumManual
