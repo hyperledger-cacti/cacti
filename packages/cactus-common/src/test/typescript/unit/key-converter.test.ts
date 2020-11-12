@@ -1,57 +1,41 @@
 import test, { Test } from "tape";
 
-import crypto from "crypto";
 import KeyEncoder from "key-encoder";
-import secp256k1 from "secp256k1";
 
-import { JsObjectSigner } from "../../../main/typescript/public-api";
+import {
+  JsObjectSigner,
+  Secp256k1Keys,
+} from "../../../main/typescript/public-api";
 
 import {
   KeyConverter,
   KeyFormat,
 } from "../../../main/typescript/key-converter";
 
-const keyConverter = new KeyConverter();
-
-let privKey: any;
-// generate secp256K1 private key
-do {
-  privKey = crypto.randomBytes(32);
-} while (!secp256k1.privateKeyVerify(privKey));
-
-// generate secp256K1 public key
-const pubKey = secp256k1.publicKeyCreate(privKey);
-
-const keyPairBuffer = { privateKey: privKey, publicKey: pubKey };
-
-const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
-const hexPublic = Buffer.from(pubKey).toString("hex");
-const pemPublic = keyEncoder.encodePublic(
-  Buffer.from(pubKey).toString("hex"),
-  "raw",
-  "pem"
-);
-const hexPrivate = privKey.toString("hex");
-const pemPrivate = keyEncoder.encodePrivate(
-  privKey.toString("hex"),
-  "raw",
-  "pem"
-);
-
 test("Test Public Raw key conversion", async (assert: Test) => {
+  const keyConverter = new KeyConverter();
+  const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
+  const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
+  const hexPublic = Buffer.from(keyPair.publicKey).toString("hex");
+  const pemPublic = keyEncoder.encodePublic(
+    Buffer.from(keyPair.publicKey).toString("hex"),
+    "raw",
+    "pem"
+  );
+
   const convertRawPrivate = keyConverter.publicKeyAs(
-    keyPairBuffer.publicKey,
+    keyPair.publicKey,
     KeyFormat.Raw,
     KeyFormat.Raw
   );
   assert.deepEquals(
-    keyPairBuffer.publicKey,
+    keyPair.publicKey,
     convertRawPrivate,
     "Public Raw => Raw conversion successful"
   );
 
   const convertHexPublic = keyConverter.publicKeyAs(
-    keyPairBuffer.publicKey,
+    keyPair.publicKey,
     KeyFormat.Raw,
     KeyFormat.Hex
   );
@@ -62,7 +46,7 @@ test("Test Public Raw key conversion", async (assert: Test) => {
   );
 
   const convertPemPublic = keyConverter.publicKeyAs(
-    keyPairBuffer.publicKey,
+    keyPair.publicKey,
     KeyFormat.Raw,
     KeyFormat.PEM
   );
@@ -76,13 +60,23 @@ test("Test Public Raw key conversion", async (assert: Test) => {
 });
 
 test("Test Public Hex key conversion", async (assert: Test) => {
+  const keyConverter = new KeyConverter();
+  const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
+  const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
+  const hexPublic = Buffer.from(keyPair.publicKey).toString("hex");
+  const pemPublic = keyEncoder.encodePublic(
+    Buffer.from(keyPair.publicKey).toString("hex"),
+    "raw",
+    "pem"
+  );
+
   const convertRawPublic = keyConverter.publicKeyAs(
     hexPublic,
     KeyFormat.Hex,
     KeyFormat.Raw
   );
   assert.deepEquals(
-    keyPairBuffer.publicKey,
+    keyPair.publicKey,
     convertRawPublic,
     "Public Hex => Raw conversion successful"
   );
@@ -113,13 +107,23 @@ test("Test Public Hex key conversion", async (assert: Test) => {
 });
 
 test("Test Public PEM key conversion", async (assert: Test) => {
+  const keyConverter = new KeyConverter();
+  const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
+  const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
+  const hexPublic = Buffer.from(keyPair.publicKey).toString("hex");
+  const pemPublic = keyEncoder.encodePublic(
+    Buffer.from(keyPair.publicKey).toString("hex"),
+    "raw",
+    "pem"
+  );
+
   const convertRawPublic = keyConverter.publicKeyAs(
     pemPublic,
     KeyFormat.PEM,
     KeyFormat.Raw
   );
   assert.deepEquals(
-    keyPairBuffer.publicKey,
+    keyPair.publicKey,
     convertRawPublic,
     "Public PEM => Raw conversion successful"
   );
@@ -150,19 +154,29 @@ test("Test Public PEM key conversion", async (assert: Test) => {
 });
 
 test("Test Private Raw key conversion", async (assert: Test) => {
+  const keyConverter = new KeyConverter();
+  const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
+  const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
+  const hexPrivate = keyPair.privateKey.toString("hex");
+  const pemPrivate = keyEncoder.encodePrivate(
+    keyPair.privateKey.toString("hex"),
+    "raw",
+    "pem"
+  );
+
   const convertRawPrivate = keyConverter.privateKeyAs(
-    keyPairBuffer.privateKey,
+    keyPair.privateKey,
     KeyFormat.Raw,
     KeyFormat.Raw
   );
   assert.deepEquals(
-    keyPairBuffer.privateKey,
+    keyPair.privateKey,
     convertRawPrivate,
     "Private Raw => Raw conversion successful"
   );
 
   const convertHexPrivate = keyConverter.privateKeyAs(
-    keyPairBuffer.privateKey,
+    keyPair.privateKey,
     KeyFormat.Raw,
     KeyFormat.Hex
   );
@@ -173,7 +187,7 @@ test("Test Private Raw key conversion", async (assert: Test) => {
   );
 
   const convertPemPrivate = keyConverter.privateKeyAs(
-    keyPairBuffer.privateKey,
+    keyPair.privateKey,
     KeyFormat.Raw,
     KeyFormat.PEM
   );
@@ -187,13 +201,23 @@ test("Test Private Raw key conversion", async (assert: Test) => {
 });
 
 test("Test Private Hex key conversion", async (assert: Test) => {
+  const keyConverter = new KeyConverter();
+  const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
+  const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
+  const hexPrivate = keyPair.privateKey.toString("hex");
+  const pemPrivate = keyEncoder.encodePrivate(
+    keyPair.privateKey.toString("hex"),
+    "raw",
+    "pem"
+  );
+
   const convertRawPrivate = keyConverter.privateKeyAs(
     hexPrivate,
     KeyFormat.Hex,
     KeyFormat.Raw
   );
   assert.deepEquals(
-    keyPairBuffer.privateKey,
+    keyPair.privateKey,
     convertRawPrivate,
     "Private Hex => Raw conversion successful"
   );
@@ -224,13 +248,23 @@ test("Test Private Hex key conversion", async (assert: Test) => {
 });
 
 test("Test Private PEM key conversion", async (assert: Test) => {
+  const keyConverter = new KeyConverter();
+  const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
+  const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
+  const hexPrivate = keyPair.privateKey.toString("hex");
+  const pemPrivate = keyEncoder.encodePrivate(
+    keyPair.privateKey.toString("hex"),
+    "raw",
+    "pem"
+  );
+
   const convertRawPrivate = keyConverter.privateKeyAs(
     pemPrivate,
     KeyFormat.PEM,
     KeyFormat.Raw
   );
   assert.deepEquals(
-    keyPairBuffer.privateKey,
+    keyPair.privateKey,
     convertRawPrivate,
     "Private PEM => Raw conversion successful"
   );
@@ -261,48 +295,46 @@ test("Test Private PEM key conversion", async (assert: Test) => {
 });
 
 test("Test invalide from key format", async (t: Test) => {
+  const keyConverter = new KeyConverter();
+  const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
   t.throws(() => {
     keyConverter.publicKeyAs(
-      keyPairBuffer.publicKey,
+      keyPair.publicKey,
       "abc" as KeyFormat,
       KeyFormat.PEM
     );
   }, "KeyConverter#publicKeyAs Invalid KeyFormat");
 
   t.throws(() => {
-    keyConverter.publicKeyAs(
-      keyPairBuffer.publicKey,
-      KeyFormat.Raw,
-      "abc" as any
-    );
+    keyConverter.publicKeyAs(keyPair.publicKey, KeyFormat.Raw, "abc" as any);
   }, "KeyConverter#publicKeyAs Invalid KeyFormat");
 
   t.throws(() => {
     keyConverter.privateKeyAs(
-      keyPairBuffer.privateKey,
+      keyPair.privateKey,
       "abc" as KeyFormat,
       KeyFormat.PEM
     );
   }, "KeyConverter#privateKeyAs Invalid KeyFormat");
 
   t.throws(() => {
-    keyConverter.privateKeyAs(
-      keyPairBuffer.privateKey,
-      KeyFormat.Raw,
-      "abc" as any
-    );
+    keyConverter.privateKeyAs(keyPair.privateKey, KeyFormat.Raw, "abc" as any);
   }, "KeyConverter#privateKeyAs Invalid KeyFormat");
 
   t.end();
 });
 
 test("correct signatures after conversion whirlwind", async (t: Test) => {
-  t.comment(`keyPair.privateKey: ${keyPairBuffer.privateKey}`);
+  const keyConverter = new KeyConverter();
+  const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
 
-  t.comment(`privateKey hex: ${keyPairBuffer.privateKey.toString("hex")}`);
+  t.comment(`keyPair.privateKey: ${keyPair.privateKey}`);
+
+  t.comment(`privateKey hex: ${keyPair.privateKey.toString("hex")}`);
 
   const privKeyPem = keyConverter.privateKeyAs(
-    keyPairBuffer.privateKey,
+    keyPair.privateKey,
     KeyFormat.Raw,
     KeyFormat.PEM
   );
@@ -321,11 +353,7 @@ test("correct signatures after conversion whirlwind", async (t: Test) => {
     KeyFormat.Raw
   );
   t.comment(`privKeyBuffer: ${privKeyRaw}`);
-  t.deepEquals(
-    keyPairBuffer.privateKey,
-    privKeyRaw,
-    "privKey equals privKeyRaw"
-  );
+  t.deepEquals(keyPair.privateKey, privKeyRaw, "privKey equals privKeyRaw");
 
   const privKeyPem2 = keyConverter.privateKeyAs(
     privKeyHex,
@@ -348,7 +376,7 @@ test("correct signatures after conversion whirlwind", async (t: Test) => {
   const payload = "hello";
 
   const signer1 = new JsObjectSigner({
-    privateKey: keyPairBuffer.privateKey,
+    privateKey: keyPair.privateKey,
   });
 
   const signer2 = new JsObjectSigner({
