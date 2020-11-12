@@ -18,4 +18,23 @@ export class Checks {
       throw new CodedError(message, code);
     }
   }
+
+  /**
+   * Verifies that a string is indeed not a blank string.
+   * Blank string can be one that only has whitespace characters for example.
+   *
+   * @param value The value that will be asserted for being a non-blank string.
+   * @param subject The error message if `value` is a blank string.
+   * @param code The code of the error if `checkResult is falsy.
+   */
+  public static nonBlankString(
+    value: any,
+    subject: string = "variable",
+    code: string = "-1"
+  ): void {
+    if (typeof value !== "string" || value.trim().length === 0) {
+      const message = `"${subject}" is a blank string. Need non-blank.`;
+      throw new CodedError(message, code);
+    }
+  }
 }
