@@ -1,33 +1,60 @@
 import {
-  ICactusPlugin,
+  Logger,
+  Checks,
+  LogLevelDesc,
+  LoggerProvider,
+} from "@hyperledger/cactus-common";
+import {
   ICactusPluginOptions,
-  IPluginKeychain,
   PluginAspect,
 } from "@hyperledger/cactus-core-api";
 
-import { Checks } from "@hyperledger/cactus-common";
-
-export interface IPluginKeychainOptions extends ICactusPluginOptions {
-  backend: Map<string, any>;
+export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
+  logLevel?: LogLevelDesc;
+  backend?: Map<string, any>;
+  keychainId: string;
 }
 
-export class PluginKeychainMemory implements ICactusPlugin, IPluginKeychain {
+export class PluginKeychainMemory {
+  public static readonly CLASS_NAME = "PluginKeychainMemory";
+
+  private readonly backend: Map<string, any>;
+  private readonly log: Logger;
   private readonly instanceId: string;
 
-  constructor(public readonly options: IPluginKeychainOptions) {
-    const fnTag = `PluginKeychainMemory#constructor()`;
-    if (!options) {
-      throw new Error(`${fnTag} options falsy.`);
-    }
-    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
-    if (!options.backend) {
-      options.backend = new Map();
-    }
-    this.instanceId = this.options.instanceId;
+  public get className() {
+    return PluginKeychainMemory.CLASS_NAME;
+  }
+
+  constructor(public readonly opts: IPluginKeychainMemoryOptions) {
+    const fnTag = `${this.className}#constructor()`;
+    Checks.truthy(opts, `${fnTag} arg options`);
+    Checks.truthy(opts.keychainId, `${fnTag} arg options.keychainId`);
+    Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
+    Checks.nonBlankString(opts.keychainId, `${fnTag} options.keychainId`);
+
+    this.backend = opts.backend || new Map();
+    Checks.truthy(this.backend, `${fnTag} arg options.backend`);
+
+    const level = this.opts.logLevel || "INFO";
+    const label = this.className;
+    this.log = LoggerProvider.getOrCreate({ level, label });
+
+    this.instanceId = this.opts.instanceId;
+
+    this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
+    this.log.warn(
+      `Never use ${this.className} in production. ` +
+        `It does not support encryption. It stores everything in plain text.`
+    );
   }
 
   public getInstanceId(): string {
     return this.instanceId;
+  }
+
+  public getKeychainId(): string {
+    return this.opts.keychainId;
   }
 
   public getPackageName(): string {
@@ -47,18 +74,18 @@ export class PluginKeychainMemory implements ICactusPlugin, IPluginKeychain {
   }
 
   async get<T>(key: string): Promise<T> {
-    return this.options.backend.get(key);
+    return this.backend.get(key);
   }
 
   async has(key: string): Promise<boolean> {
-    return this.options.backend.has(key);
+    return this.backend.has(key);
   }
 
   async set<T>(key: string, value: T): Promise<void> {
-    this.options.backend.set(key, value);
+    this.backend.set(key, value);
   }
 
   async delete<T>(key: string): Promise<void> {
-    this.options.backend.delete(key);
+    this.backend.delete(key);
   }
 }

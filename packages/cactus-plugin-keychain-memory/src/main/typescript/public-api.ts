@@ -1,4 +1,7 @@
-export { PluginKeychainMemory } from "./plugin-keychain-memory";
+export {
+  PluginKeychainMemory,
+  IPluginKeychainMemoryOptions,
+} from "./plugin-keychain-memory";
 export { PluginFactoryKeychain } from "./plugin-factory-keychain";
 
 import { PluginFactoryKeychain } from "./plugin-factory-keychain";
