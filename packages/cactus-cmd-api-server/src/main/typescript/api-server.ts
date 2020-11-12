@@ -161,11 +161,16 @@ export class ApiServer {
     const registry = new PluginRegistry({ plugins: [] });
     const { logLevel } = this.options.config;
     this.log.info(`Instantiated empty registry, invoking plugin factories...`);
+
     for (const pluginImport of this.options.config.plugins) {
       const { packageName, options } = pluginImport;
       this.log.info(`Creating plugin from package: ${packageName}`, options);
       const pluginOptions = { ...options, logLevel, pluginRegistry: registry };
-      const { createPluginFactory } = await import(packageName);
+
+      const {
+        createPluginFactory,
+      } = require(/* webpackIgnore: true */ packageName);
+
       const pluginFactory: PluginFactory<
         ICactusPlugin,
         any
