@@ -18,7 +18,8 @@ export function isIPluginWebService(
     typeof (pluginInstance as IPluginWebService).installWebServices ===
       "function" &&
     typeof (pluginInstance as IPluginWebService).getHttpServer === "function" &&
-    typeof (pluginInstance as IPluginWebService).getId === "function" &&
+    typeof (pluginInstance as IPluginWebService).getPackageName ===
+      "function" &&
     typeof (pluginInstance as IPluginWebService).getAspect === "function" &&
     typeof (pluginInstance as IPluginWebService).shutdown === "function"
   );

@@ -1,10 +1,14 @@
-import { IPluginKeychain, PluginAspect } from "@hyperledger/cactus-core-api";
+import {
+  ICactusPlugin,
+  IPluginKeychain,
+  PluginAspect,
+} from "@hyperledger/cactus-core-api";
 
 export interface IPluginKeychainOptions {
   backend: Map<string, any>;
 }
 
-export class PluginKeychainMemory implements IPluginKeychain {
+export class PluginKeychainMemory implements ICactusPlugin, IPluginKeychain {
   constructor(public readonly options: IPluginKeychainOptions) {
     if (!options) {
       throw new Error(`PluginKeychainMemory#ctor options falsy.`);
@@ -14,7 +18,7 @@ export class PluginKeychainMemory implements IPluginKeychain {
     }
   }
 
-  public getId(): string {
+  public getPackageName(): string {
     return `@hyperledger/cactus-plugin-keychain-memory`;
   }
 
