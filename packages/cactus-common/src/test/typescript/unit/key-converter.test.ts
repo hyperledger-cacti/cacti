@@ -12,7 +12,7 @@ import {
   KeyFormat,
 } from "../../../main/typescript/key-converter";
 
-test("Test Public Raw key conversion", async (assert: Test) => {
+test.skip("Test Public Raw key conversion", async (assert: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
   const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
@@ -59,7 +59,7 @@ test("Test Public Raw key conversion", async (assert: Test) => {
   assert.end();
 });
 
-test("Test Public Hex key conversion", async (assert: Test) => {
+test.skip("Test Public Hex key conversion", async (assert: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
   const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
@@ -106,7 +106,7 @@ test("Test Public Hex key conversion", async (assert: Test) => {
   assert.end();
 });
 
-test("Test Public PEM key conversion", async (assert: Test) => {
+test.skip("Test Public PEM key conversion", async (assert: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
   const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
@@ -153,7 +153,7 @@ test("Test Public PEM key conversion", async (assert: Test) => {
   assert.end();
 });
 
-test("Test Private Raw key conversion", async (assert: Test) => {
+test.skip("Test Private Raw key conversion", async (assert: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
   const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
@@ -200,7 +200,7 @@ test("Test Private Raw key conversion", async (assert: Test) => {
   assert.end();
 });
 
-test("Test Private Hex key conversion", async (assert: Test) => {
+test.skip("Test Private Hex key conversion", async (assert: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
   const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
@@ -247,7 +247,7 @@ test("Test Private Hex key conversion", async (assert: Test) => {
   assert.end();
 });
 
-test("Test Private PEM key conversion", async (assert: Test) => {
+test.skip("Test Private PEM key conversion", async (assert: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
   const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
@@ -294,7 +294,7 @@ test("Test Private PEM key conversion", async (assert: Test) => {
   assert.end();
 });
 
-test("Test invalide from key format", async (t: Test) => {
+test.skip("Test invalide from key format", async (t: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
 
@@ -325,7 +325,7 @@ test("Test invalide from key format", async (t: Test) => {
   t.end();
 });
 
-test("correct signatures after conversion whirlwind", async (t: Test) => {
+test.skip("correct signatures after conversion whirlwind", async (t: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
 
