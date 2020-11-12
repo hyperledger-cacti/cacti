@@ -90,7 +90,7 @@ export class PluginValidatorBesu implements IPluginWebService {
       webApp.use(bodyParser.json({ limit: "50mb" }));
 
       const address = await new Promise((resolve, reject) => {
-        const httpServer = webApp.listen(port, hostname, (err: any) => {
+        const httpServer = webApp.listen(port, hostname, (err?: any) => {
           if (err) {
             reject(err);
             this.log.error(`Failed to create dedicated HTTP server`, err);
