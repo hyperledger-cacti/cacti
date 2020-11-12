@@ -70,7 +70,7 @@ export class PluginKeychainMemory {
   }
 
   public getEncryptionAlgorithm(): string {
-    return "no-encryption-used-by-this-plugin";
+    return null as any;
   }
 
   async get<T>(key: string): Promise<T> {
