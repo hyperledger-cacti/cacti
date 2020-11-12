@@ -1,5 +1,6 @@
 // tslint:disable-next-line: no-var-requires
 const tap = require("tap");
+import { v4 as uuidv4 } from "uuid";
 import {
   PluginLedgerConnectorBesu,
   PluginFactoryLedgerConnector,
@@ -26,6 +27,7 @@ tap.test("deploys contract via .json file", async (assert: any) => {
   const factory = new PluginFactoryLedgerConnector();
   const connector: PluginLedgerConnectorBesu = await factory.create({
     rpcApiHttpHost,
+    instanceId: uuidv4(),
   });
 
   const options = {

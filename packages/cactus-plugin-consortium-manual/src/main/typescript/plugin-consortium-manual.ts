@@ -12,21 +12,24 @@ import {
   PluginRegistry,
   IWebServiceEndpoint,
   ICactusPlugin,
+  ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 import {
+  Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import { GetConsortiumEndpointV1 } from "./consortium/get-consortium-jws-endpoint-v1";
 import { GetNodeJwsEndpoint } from "./consortium/get-node-jws-endpoint-v1";
+import uuid from "uuid";
 
 export interface IWebAppOptions {
   port: number;
   hostname: string;
 }
 
-export interface IPluginConsortiumManualOptions {
+export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
   keyPairPem: string;
   consortium: Consortium;
   pluginRegistry?: PluginRegistry;
@@ -37,15 +40,23 @@ export interface IPluginConsortiumManualOptions {
 export class PluginConsortiumManual
   implements ICactusPlugin, IPluginWebService {
   private readonly log: Logger;
+  private readonly instanceId: string;
   private httpServer: Server | SecureServer | null = null;
 
   constructor(public readonly options: IPluginConsortiumManualOptions) {
+    const fnTag = `PluginConsortiumManual#constructor()`;
     if (!options) {
-      throw new Error(`PluginConsortiumManual#ctor options falsy.`);
+      throw new Error(`${fnTag} options falsy.`);
     }
+    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
     this.log = LoggerProvider.getOrCreate({
       label: "plugin-consortium-manual",
     });
+    this.instanceId = this.options.instanceId;
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
 
   public async shutdown(): Promise<void> {

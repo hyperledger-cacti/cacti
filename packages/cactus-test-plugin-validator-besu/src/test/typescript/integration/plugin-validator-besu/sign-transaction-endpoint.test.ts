@@ -1,5 +1,6 @@
 import test, { Test } from "tape";
 
+import { v4 as uuidv4 } from "uuid";
 import crypto from "crypto";
 import { createServer } from "http";
 import KeyEncoder from "key-encoder";
@@ -71,6 +72,7 @@ test("Test sign transaction endpoint", async (t: Test) => {
 
     // 3. Instantiate the web service consortium plugin
     const options: IPluginValidatorBesuOptions = {
+      instanceId: uuidv4(),
       rpcApiHttpHost: rcpHttpHost,
       keyPairPem: pemPrivate,
       pluginRegistry,

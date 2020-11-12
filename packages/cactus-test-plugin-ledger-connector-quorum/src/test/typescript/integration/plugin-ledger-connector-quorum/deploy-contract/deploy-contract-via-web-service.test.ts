@@ -56,10 +56,12 @@ test("deploys contract via REST API", async (t: Test) => {
   const config = configService.newExampleConfigConvict(cactusApiServerOptions);
   const plugins: ICactusPlugin[] = [];
 
-  const kvStoragePlugin = new PluginKVStorageMemory({ backend: new Map() });
+  const kvpOpts = { backend: new Map(), instanceId: uuidV4() };
+  const kvStoragePlugin = new PluginKVStorageMemory(kvpOpts);
   plugins.push(kvStoragePlugin);
 
   const ledgerConnectorQuorum = new PluginLedgerConnectorQuorum({
+    instanceId: uuidV4(),
     rpcApiHttpHost,
   });
   plugins.push(ledgerConnectorQuorum);

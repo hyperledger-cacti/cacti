@@ -1,5 +1,6 @@
 import {
   ICactusPlugin,
+  ICactusPluginOptions,
   IPluginLedgerConnector,
   PluginAspect,
 } from "@hyperledger/cactus-core-api";
@@ -7,12 +8,14 @@ import Web3 from "web3";
 import EEAClient, { IWeb3InstanceExtended } from "web3-eea";
 
 import {
+  Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-export interface IPluginLedgerConnectorBesuOptions {
+export interface IPluginLedgerConnectorBesuOptions
+  extends ICactusPluginOptions {
   rpcApiHttpHost: string;
   logLevel?: LogLevelDesc;
 }
@@ -72,14 +75,17 @@ export class PluginLedgerConnectorBesu
       IBesuTransactionIn,
       IBesuTransactionOut
     > {
+  private readonly instanceId: string;
   private readonly log: Logger;
   private readonly web3: Web3;
   private readonly web3Eea: IWeb3InstanceExtended;
 
   constructor(public readonly options: IPluginLedgerConnectorBesuOptions) {
+    const fnTag = `PluginLedgerConnectorBesu#constructor()`;
     if (!options) {
-      throw new Error(`PluginLedgerConnectorBesu#ctor options falsy.`);
+      throw new Error(`${fnTag} options falsy.`);
     }
+    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
     const web3Provider = new Web3.providers.HttpProvider(
       this.options.rpcApiHttpHost
     );
@@ -89,6 +95,11 @@ export class PluginLedgerConnectorBesu
     const level = options.logLevel || "INFO";
     const label = "plugin-ledger-connector-besu";
     this.log = LoggerProvider.getOrCreate({ level, label });
+    this.instanceId = this.options.instanceId;
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
 
   public getPackageName(): string {

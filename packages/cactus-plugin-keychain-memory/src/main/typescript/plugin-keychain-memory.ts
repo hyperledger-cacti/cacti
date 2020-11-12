@@ -1,21 +1,33 @@
 import {
   ICactusPlugin,
+  ICactusPluginOptions,
   IPluginKeychain,
   PluginAspect,
 } from "@hyperledger/cactus-core-api";
 
-export interface IPluginKeychainOptions {
+import { Checks } from "@hyperledger/cactus-common";
+
+export interface IPluginKeychainOptions extends ICactusPluginOptions {
   backend: Map<string, any>;
 }
 
 export class PluginKeychainMemory implements ICactusPlugin, IPluginKeychain {
+  private readonly instanceId: string;
+
   constructor(public readonly options: IPluginKeychainOptions) {
+    const fnTag = `PluginKeychainMemory#constructor()`;
     if (!options) {
-      throw new Error(`PluginKeychainMemory#ctor options falsy.`);
+      throw new Error(`${fnTag} options falsy.`);
     }
+    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
     if (!options.backend) {
       options.backend = new Map();
     }
+    this.instanceId = this.options.instanceId;
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
 
   public getPackageName(): string {

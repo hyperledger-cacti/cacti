@@ -131,11 +131,13 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
       const pluginRegistry = new PluginRegistry({ plugins: [] });
 
       const pluginQuorumConnector = new PluginLedgerConnectorQuorum({
+        instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost1,
         logLevel,
       });
 
       const options: IPluginConsortiumManualOptions = {
+        instanceId: uuidV4(),
         pluginRegistry,
         keyPairPem: keyPair1.toPEM(true),
         consortium,
@@ -169,11 +171,13 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
       const pluginRegistry = new PluginRegistry({ plugins: [] });
 
       const pluginQuorumConnector = new PluginLedgerConnectorQuorum({
+        instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost2,
         logLevel,
       });
 
       const options: IPluginConsortiumManualOptions = {
+        instanceId: uuidV4(),
         pluginRegistry,
         keyPairPem: keyPair2.toPEM(true),
         consortium,

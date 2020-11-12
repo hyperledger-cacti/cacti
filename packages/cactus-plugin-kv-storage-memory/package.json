@@ -59,6 +59,7 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
+    "@hyperledger/cactus-common": "^0.2.0",
     "@hyperledger/cactus-core-api": "^0.2.0",
     "joi": "14.3.1",
     "typescript-optional": "2.0.1"
