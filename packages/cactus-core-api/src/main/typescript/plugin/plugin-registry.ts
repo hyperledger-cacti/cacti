@@ -22,13 +22,12 @@ export class PluginRegistry {
   public readonly plugins: ICactusPlugin[];
 
   constructor(public readonly options: IPluginRegistryOptions = {}) {
+    const fnTag = `PluginRegistry#constructor()`;
     if (!options) {
-      throw new TypeError(`PluginRegistry#ctor options falsy`);
+      throw new TypeError(`${fnTag} options falsy`);
     }
     if (options.plugins && !Array.isArray(options.plugins)) {
-      throw new TypeError(
-        `PluginRegistry#ctor options.plugins truthy but non-Array`
-      );
+      throw new TypeError(`${fnTag} options.plugins truthy but non-Array`);
     }
     this.plugins = options.plugins || [];
   }
@@ -38,16 +37,16 @@ export class PluginRegistry {
   }
 
   /**
-   * The main difference between this method and `findOneById` is that this throws an Error if there was nothing to
-   * return. It is recommended to use this method over `findOneById` if you have a hard dependency on a certain
+   * The main difference between this method and `findOneByPackageName` is that this throws an Error if there was nothing to
+   * return. It is recommended to use this method over `findOneByPackageName` if you have a hard dependency on a certain
    * plugin being loaded for your code.
    *
-   * @param id The ID of the plugin that you are looking to obtain an instance of from the registry.
-   * @throws If there is no plugin in the registry by the ID specificed.
+   * @param packageName The package name of the plugin that you are looking to obtain an instance of from the registry.
+   * @throws If there is no plugin in the registry by the package name specificed.
    */
-  public getOneById<T extends ICactusPlugin>(id: string): T {
-    return this.findOneById(id).orElseThrow(
-      () => new Error(`Plugin ${id} not present in registry`)
+  public getOneById<T extends ICactusPlugin>(packageName: string): T {
+    return this.findOneByPackageName(packageName).orElseThrow(
+      () => new Error(`Plugin ${packageName} not present in registry`)
     ) as T;
   }
 
@@ -57,13 +56,21 @@ export class PluginRegistry {
     ) as T;
   }
 
-  public findOneById<T extends ICactusPlugin>(pluginId: string): Optional<T> {
-    const plugin = this.getPlugins().find((p) => p.getId() === pluginId);
+  public findOneByPackageName<T extends ICactusPlugin>(
+    packageName: string
+  ): Optional<T> {
+    const plugin = this.getPlugins().find(
+      (p) => p.getPackageName() === packageName
+    );
     return Optional.ofNullable(plugin as T);
   }
 
-  public findManyById<T extends ICactusPlugin>(id: string): T[] {
-    return this.getPlugins().filter((p) => p.getId() === id) as T[];
+  public findManyByPackageName<T extends ICactusPlugin>(
+    packageName: string
+  ): T[] {
+    return this.getPlugins().filter(
+      (p) => p.getPackageName() === packageName
+    ) as T[];
   }
 
   public findOneByAspect<T extends ICactusPlugin>(
@@ -81,14 +88,14 @@ export class PluginRegistry {
     return this.findOneByAspect(aspect).isPresent();
   }
 
-  public hasById(id: string): boolean {
-    return this.findOneById(id).isPresent();
+  public hasByPackageName(packageName: string): boolean {
+    return this.findOneByPackageName(packageName).isPresent();
   }
 
-  public deleteById(id: string): [number] {
+  public deleteByPackageName(packageName: string): [number] {
     let deleteCount: number = 0;
     this.plugins.forEach((p, i) => {
-      if (p.getId() === id) {
+      if (p.getPackageName() === packageName) {
         this.plugins.splice(i, 1);
         deleteCount++;
       }
@@ -103,14 +110,14 @@ export class PluginRegistry {
     if (!isICactusPlugin(plugin)) {
       throw new Error(`PluginRegistry#add() plugin not an ICactusPlugin`);
     }
-    const id = plugin.getId();
-    const hasConfclit = this.hasById(id);
+    const pkgName = plugin.getPackageName();
+    const hasConfclit = this.hasByPackageName(pkgName);
     if (hasConfclit && !replaceOnConflict) {
-      throw new Error(`PluginRegistry#add() already have plugin: ${id}`);
+      throw new Error(`PluginRegistry#add() already have plugin: ${pkgName}`);
     }
     let deleteCount: number = 0;
     if (replaceOnConflict) {
-      [deleteCount] = this.deleteById(plugin.getId());
+      [deleteCount] = this.deleteByPackageName(plugin.getPackageName());
     }
     this.getPlugins().push(plugin);
     return [deleteCount];

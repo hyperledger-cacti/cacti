@@ -14,6 +14,7 @@ import {
   IWebServiceEndpoint,
   IPluginWebService,
   PluginAspect,
+  ICactusPlugin,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -56,6 +57,7 @@ export class PluginLedgerConnectorQuorum
       RunTransactionRequest,
       RunTransactionResponse
     >,
+    ICactusPlugin,
     IPluginWebService {
   private readonly log: Logger;
   private readonly web3: Web3;
@@ -125,7 +127,7 @@ export class PluginLedgerConnectorQuorum
     return endpoints;
   }
 
-  public getId(): string {
+  public getPackageName(): string {
     return `@hyperledger/cactus-plugin-ledger-connector-quorum`;
   }
 

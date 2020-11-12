@@ -1,4 +1,5 @@
 import {
+  ICactusPlugin,
   IPluginLedgerConnector,
   PluginAspect,
 } from "@hyperledger/cactus-core-api";
@@ -58,6 +59,7 @@ export interface IBesuTransactionOut {
 
 export class PluginLedgerConnectorBesu
   implements
+    ICactusPlugin,
     IPluginLedgerConnector<
       IBesuDeployContractIn,
       IBesuDeployContractOut,
@@ -78,7 +80,7 @@ export class PluginLedgerConnectorBesu
     this.web3Eea = EEAClient(this.web3, 2018);
   }
 
-  public getId(): string {
+  public getPackageName(): string {
     return `@hyperledger/cactus-plugin-ledger-connectur-besu`;
   }
 

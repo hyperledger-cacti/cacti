@@ -1,10 +1,14 @@
-import { IPluginKVStorage, PluginAspect } from "@hyperledger/cactus-core-api";
+import {
+  ICactusPlugin,
+  IPluginKVStorage,
+  PluginAspect,
+} from "@hyperledger/cactus-core-api";
 
 export interface IPluginKVStorageOptions {
   backend: Map<string, any>;
 }
 
-export class PluginKVStorageMemory implements IPluginKVStorage {
+export class PluginKVStorageMemory implements ICactusPlugin, IPluginKVStorage {
   constructor(public readonly options: IPluginKVStorageOptions) {
     if (!options) {
       throw new Error(`PluginKVStorageMemory#ctor options falsy.`);
@@ -14,7 +18,7 @@ export class PluginKVStorageMemory implements IPluginKVStorage {
     }
   }
 
-  public getId(): string {
+  public getPackageName(): string {
     return `@hyperledger/cactus-plugin-kv-storage-memory`;
   }
 
