@@ -21,6 +21,7 @@ import {
   IQuorumGenesisOptions,
   IAccount,
 } from "@hyperledger/cactus-test-tooling";
+import { PluginRegistry } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "INFO";
 const log: Logger = LoggerProvider.getOrCreate({
@@ -58,6 +59,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       instanceId: uuidV4(),
       rpcApiHttpHost,
       logLevel,
+      pluginRegistry: new PluginRegistry(),
     }
   );
   const testEthAccount = web3.eth.accounts.create(uuidV4());

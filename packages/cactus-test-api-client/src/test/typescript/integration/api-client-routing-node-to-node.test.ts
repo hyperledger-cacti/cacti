@@ -134,6 +134,7 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
         instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost1,
         logLevel,
+        pluginRegistry: new PluginRegistry(),
       });
 
       const options: IPluginConsortiumManualOptions = {
@@ -174,6 +175,7 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
         instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost2,
         logLevel,
+        pluginRegistry: new PluginRegistry(),
       });
 
       const options: IPluginConsortiumManualOptions = {

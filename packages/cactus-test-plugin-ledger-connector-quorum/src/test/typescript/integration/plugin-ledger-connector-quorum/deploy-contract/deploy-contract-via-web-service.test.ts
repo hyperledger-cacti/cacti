@@ -63,6 +63,7 @@ test("deploys contract via REST API", async (t: Test) => {
   const ledgerConnectorQuorum = new PluginLedgerConnectorQuorum({
     instanceId: uuidV4(),
     rpcApiHttpHost,
+    pluginRegistry: new PluginRegistry(),
   });
   plugins.push(ledgerConnectorQuorum);
   const pluginRegistry = new PluginRegistry({ plugins });
