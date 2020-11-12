@@ -125,6 +125,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
     // 3. Instantiate the web service consortium plugin
     const options: IPluginConsortiumManualOptions = {
+      instanceId: uuidV4(),
       pluginRegistry,
       keyPairPem: keyPair1.toPEM(true),
       consortium,
@@ -177,6 +178,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     const pluginRegistry = new PluginRegistry({ plugins: [] });
 
     const options: IPluginConsortiumManualOptions = {
+      instanceId: uuidV4(),
       pluginRegistry,
       keyPairPem: keyPair2.toPEM(true),
       consortium,
@@ -230,6 +232,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
     // 3. Instantiate the web service consortium plugin
     const options: IPluginConsortiumManualOptions = {
+      instanceId: uuidV4(),
       pluginRegistry,
       keyPairPem: keyPair3.toPEM(true),
       consortium,

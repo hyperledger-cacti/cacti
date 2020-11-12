@@ -15,6 +15,7 @@ import {
   IPluginWebService,
   PluginAspect,
   ICactusPlugin,
+  ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -44,7 +45,8 @@ import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint"
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
 
-export interface IPluginLedgerConnectorQuorumOptions {
+export interface IPluginLedgerConnectorQuorumOptions
+  extends ICactusPluginOptions {
   rpcApiHttpHost: string;
   logLevel?: LogLevelDesc;
 }
@@ -59,6 +61,7 @@ export class PluginLedgerConnectorQuorum
     >,
     ICactusPlugin,
     IPluginWebService {
+  private readonly instanceId: string;
   private readonly log: Logger;
   private readonly web3: Web3;
   private httpServer: Server | SecureServer | null = null;
@@ -73,6 +76,7 @@ export class PluginLedgerConnectorQuorum
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.rpcApiHttpHost, `${fnTag} options.rpcApiHttpHost`);
+    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
@@ -82,6 +86,11 @@ export class PluginLedgerConnectorQuorum
       this.options.rpcApiHttpHost
     );
     this.web3 = new Web3(web3Provider);
+    this.instanceId = options.instanceId;
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {

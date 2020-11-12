@@ -55,6 +55,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
   const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
     {
+      instanceId: uuidV4(),
       rpcApiHttpHost,
       logLevel,
     }

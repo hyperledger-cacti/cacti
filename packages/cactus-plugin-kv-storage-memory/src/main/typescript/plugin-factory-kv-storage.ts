@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import { PluginFactory } from "@hyperledger/cactus-core-api";
 import {
   IPluginKVStorageOptions,
@@ -9,7 +11,10 @@ export class PluginFactoryKVStorage extends PluginFactory<
   IPluginKVStorageOptions
 > {
   async create(
-    options: IPluginKVStorageOptions = { backend: new Map() }
+    options: IPluginKVStorageOptions = {
+      backend: new Map(),
+      instanceId: uuidv4(),
+    }
   ): Promise<PluginKVStorageMemory> {
     return new PluginKVStorageMemory(options);
   }

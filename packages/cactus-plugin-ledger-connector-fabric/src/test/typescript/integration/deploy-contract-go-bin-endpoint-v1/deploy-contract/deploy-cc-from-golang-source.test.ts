@@ -3,6 +3,7 @@ import { AddressInfo } from "net";
 import path from "path";
 
 import test, { Test } from "tape";
+import { v4 as uuidv4 } from "uuid";
 
 import axios, { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
@@ -39,6 +40,7 @@ test("deploys contract from go source", async (t: Test) => {
   const adminSigningIdentity = await ledger.getAdminSigningIdentity();
 
   const pluginOpts: IPluginLedgerConnectorFabricOptions = {
+    instanceId: uuidv4(),
     opsApiHttpHost,
     connectionProfile,
     adminSigningIdentity,

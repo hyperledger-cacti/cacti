@@ -29,7 +29,8 @@ tap.test(
   "pulls up API server with consortium web service on different port",
   async (assert: any) => {
     // 1. Instantiate a key value storage plugin that works in memory (good here because we don't need persistence)
-    const kvStoragePlugin = new PluginKVStorageMemory({ backend: new Map() });
+    const opts = { backend: new Map(), instanceId: uuidV4() };
+    const kvStoragePlugin = new PluginKVStorageMemory(opts);
 
     // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
     const pluginRegistry = new PluginRegistry({ plugins: [kvStoragePlugin] });
@@ -69,6 +70,7 @@ tap.test(
     // Note that if we omitted the `webAppOptions` object that the web service plugin would default to installing itself
     // on the default port of the API server. This allows for flexibility in deployments.
     const options: IPluginConsortiumManualOptions = {
+      instanceId: uuidV4(),
       pluginRegistry,
       keyPairPem,
       consortium,

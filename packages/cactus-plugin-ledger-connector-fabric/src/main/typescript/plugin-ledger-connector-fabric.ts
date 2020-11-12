@@ -13,6 +13,7 @@ import {
   IPluginWebService,
   IWebServiceEndpoint,
   ICactusPlugin,
+  ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -27,7 +28,8 @@ import {
 } from "./deploy-contract-go-bin-endpoint-v1";
 import { ISigningIdentity } from "./i-fabric-signing-identity";
 
-export interface IPluginLedgerConnectorFabricOptions {
+export interface IPluginLedgerConnectorFabricOptions
+  extends ICactusPluginOptions {
   opsApiHttpHost: string;
   logLevel?: LogLevelDesc;
   webAppOptions?: any;
@@ -45,6 +47,7 @@ export class PluginLedgerConnectorFabric
     IPluginLedgerConnector<any, any, any, any>,
     ICactusPlugin,
     IPluginWebService {
+  private readonly instanceId: string;
   private readonly log: Logger;
 
   private httpServer: Server | SecureServer | undefined;
@@ -53,6 +56,9 @@ export class PluginLedgerConnectorFabric
     const fnTag = "PluginLedgerConnectorFabric#constructor()";
 
     Checks.truthy(options, `${fnTag} arg options`);
+    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
+
+    this.instanceId = options.instanceId;
 
     const level = this.options.logLevel || "INFO";
     const label = "plugin-ledger-connector-fabric";
@@ -64,6 +70,10 @@ export class PluginLedgerConnectorFabric
 
   public shutdown(): Promise<void> {
     throw new Error("Method not implemented.");
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
 
   public getPackageName(): string {

@@ -13,11 +13,13 @@ import {
   PluginRegistry,
   IWebServiceEndpoint,
   ICactusPlugin,
+  ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
+  Checks,
 } from "@hyperledger/cactus-common";
 
 import { BesuSignTransactionEndpointV1 } from "./besu/sign-transaction-endpoint-v1";
@@ -28,7 +30,7 @@ export interface IWebAppOptions {
   hostname: string;
 }
 
-export interface IPluginValidatorBesuOptions {
+export interface IPluginValidatorBesuOptions extends ICactusPluginOptions {
   rpcApiHttpHost: string;
   keyPairPem: string;
   pluginRegistry: PluginRegistry;
@@ -37,6 +39,7 @@ export interface IPluginValidatorBesuOptions {
 }
 
 export class PluginValidatorBesu implements ICactusPlugin, IPluginWebService {
+  private readonly instanceId: string;
   private readonly log: Logger;
   private httpServer: Server | SecureServer | null = null;
 
@@ -54,11 +57,17 @@ export class PluginValidatorBesu implements ICactusPlugin, IPluginWebService {
     if (!options.pluginRegistry) {
       throw new Error(`${fnTag} options.pluginRegistry falsy.`);
     }
+    Checks.truthy(options.instanceId, `${fnTag}#options.instanceId`);
 
     this.log = LoggerProvider.getOrCreate({
       label: "plugin-validator-besu",
       level: options.logLevel || "INFO",
     });
+    this.instanceId = options.instanceId;
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
 
   public async shutdown(): Promise<void> {
