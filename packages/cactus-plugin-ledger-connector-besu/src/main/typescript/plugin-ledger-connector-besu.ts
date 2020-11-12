@@ -6,8 +6,15 @@ import {
 import Web3 from "web3";
 import EEAClient, { IWeb3InstanceExtended } from "web3-eea";
 
+import {
+  Logger,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
+
 export interface IPluginLedgerConnectorBesuOptions {
   rpcApiHttpHost: string;
+  logLevel?: LogLevelDesc;
 }
 
 export interface IBesuDeployContractIn {
@@ -65,6 +72,7 @@ export class PluginLedgerConnectorBesu
       IBesuTransactionIn,
       IBesuTransactionOut
     > {
+  private readonly log: Logger;
   private readonly web3: Web3;
   private readonly web3Eea: IWeb3InstanceExtended;
 
@@ -77,6 +85,10 @@ export class PluginLedgerConnectorBesu
     );
     this.web3 = new Web3(web3Provider);
     this.web3Eea = EEAClient(this.web3, 2018);
+
+    const level = options.logLevel || "INFO";
+    const label = "plugin-ledger-connector-besu";
+    this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public getPackageName(): string {
