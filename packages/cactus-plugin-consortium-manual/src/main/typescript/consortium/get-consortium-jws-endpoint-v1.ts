@@ -1,12 +1,14 @@
-import { Request, Response, NextFunction } from "express";
-import { JWS, JWK } from "jose";
+import { Express, Request, Response, NextFunction } from "express";
 import flatten from "lodash/flatten";
+import { AxiosResponse } from "axios";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
+
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
 } from "@hyperledger/cactus-core-api";
+
 import {
   Configuration,
   DefaultApi,
@@ -15,12 +17,16 @@ import {
   Consortium,
   GetNodeJwsResponse,
 } from "../generated/openapi/typescript-axios";
+
 import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import { AxiosResponse } from "axios";
+
+import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+
+import { GetConsortiumEndpointV1 as Constants } from "./get-consortium-jws-endpoint-constants";
 
 export interface IGetConsortiumJwsEndpointOptions {
   keyPairPem: string;
@@ -57,10 +63,23 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
   }
 
   getPath(): string {
-    return this.options.path;
+    return Constants.HTTP_PATH;
   }
 
-  async handleRequest(req: Request, res: Response): Promise<void> {
+  getVerbLowerCase(): string {
+    return Constants.HTTP_VERB_LOWER_CASE;
+  }
+
+  registerExpress(app: Express): IWebServiceEndpoint {
+    registerWebServiceEndpoint(app, this);
+    return this;
+  }
+
+  async handleRequest(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const fnTag = "GetConsortiumJwsEndpointV1#handleRequest()";
     this.log.debug(`GET ${this.getPath()}`);
 

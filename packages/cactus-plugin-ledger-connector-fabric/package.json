@@ -67,6 +67,7 @@
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "@hyperledger/cactus-common": "0.2.0",
+    "@hyperledger/cactus-core": "0.2.0",
     "@hyperledger/cactus-core-api": "^0.2.0",
     "express": "4.17.1",
     "express-openapi-validator": "3.16.11",

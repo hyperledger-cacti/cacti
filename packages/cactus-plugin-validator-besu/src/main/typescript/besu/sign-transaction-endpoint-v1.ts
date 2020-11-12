@@ -1,11 +1,14 @@
-import { Request, Response } from "express";
+import { Express, Request, Response } from "express";
 import { Optional } from "typescript-optional";
 import Web3 from "web3";
+
+import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
 } from "@hyperledger/cactus-core-api";
+
 import {
   LogLevelDesc,
   Logger,
@@ -21,10 +24,11 @@ import {
   SignTransactionResponse,
 } from "../generated/openapi/typescript-axios/api";
 
+import { BesuSignTransactionEndpointV1 as Constants } from "./sign-transaction-endpoint-constants";
+
 export interface IBesuSignTransactionEndpointOptions {
   rpcApiHttpHost: string;
   keyPairPem: string;
-  path: string;
   logLevel?: LogLevelDesc;
 }
 
@@ -43,9 +47,6 @@ export class BesuSignTransactionEndpointV1 implements IWebServiceEndpoint {
     }
     if (!options.keyPairPem) {
       throw new Error(`${fnTag} options.keyPairPem falsy.`);
-    }
-    if (!options.path) {
-      throw new Error(`${fnTag} options.path falsy.`);
     }
 
     const keyConverter = new KeyConverter();
@@ -76,7 +77,16 @@ export class BesuSignTransactionEndpointV1 implements IWebServiceEndpoint {
   }
 
   getPath(): string {
-    return this.options.path;
+    return Constants.HTTP_PATH;
+  }
+
+  getVerbLowerCase(): string {
+    return Constants.HTTP_VERB_LOWER_CASE;
+  }
+
+  registerExpress(app: Express): IWebServiceEndpoint {
+    registerWebServiceEndpoint(app, this);
+    return this;
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {

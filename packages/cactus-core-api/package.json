@@ -59,6 +59,7 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "devDependencies": {
+    "@types/express": "4.17.8",
     "@types/joi": "14.3.4"
   },
   "dependencies": {

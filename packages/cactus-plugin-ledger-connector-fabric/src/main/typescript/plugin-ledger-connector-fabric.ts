@@ -40,7 +40,7 @@ export interface ITransactionOptions {
 }
 
 export class PluginLedgerConnectorFabric
-  implements IPluginLedgerConnector<any, any>, IPluginWebService {
+  implements IPluginLedgerConnector<any, any, any, any>, IPluginWebService {
   private readonly log: Logger;
 
   private httpServer: Server | SecureServer | undefined;
@@ -53,6 +53,9 @@ export class PluginLedgerConnectorFabric
     const level = this.options.logLevel || "INFO";
     const label = "plugin-ledger-connector-fabric";
     this.log = LoggerProvider.getOrCreate({ level, label });
+  }
+  transact(options?: any): Promise<any> {
+    throw new Error("Method not implemented.");
   }
 
   public shutdown(): Promise<void> {

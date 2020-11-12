@@ -24,7 +24,7 @@ export interface IWebAppOptions {
 export interface IPluginConsortiumManualOptions {
   keyPairPem: string;
   consortium: Consortium;
-  pluginRegistry: PluginRegistry;
+  pluginRegistry?: PluginRegistry;
   logLevel?: string;
   webAppOptions?: IWebAppOptions;
 }

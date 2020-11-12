@@ -1,11 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-import { Request, Response } from "express";
+import { Express, Request, Response } from "express";
 import temp from "temp";
 import { NodeSSH, Config as SshConfig, SSHExecCommandOptions } from "node-ssh";
-
-import Client from "fabric-client";
 
 import {
   Logger,
@@ -18,7 +16,11 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
 } from "@hyperledger/cactus-core-api";
+
+import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+
 import { ISigningIdentity } from "./i-fabric-signing-identity";
+import { DeployContractGoBinEndpointV1 as Constants } from "./deploy-contract-go-bin-endpoint-constants";
 
 export interface IDeployContractGoBinEndpointV1Options {
   logLevel?: LogLevelDesc;
@@ -51,8 +53,17 @@ export class DeployContractGoBinEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public getPath(): string {
-    return this.opts.path;
+  getPath(): string {
+    return Constants.HTTP_PATH;
+  }
+
+  getVerbLowerCase(): string {
+    return Constants.HTTP_VERB_LOWER_CASE;
+  }
+
+  registerExpress(app: Express): IWebServiceEndpoint {
+    registerWebServiceEndpoint(app, this);
+    return this;
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
