@@ -6,6 +6,7 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
 const packageNameNoScope = pkg.name.substring(pkg.name.lastIndexOf("/") + 1);
 const libraryName = `${packageNameNoScope}`;
 
+/** @type {import("webpack").Configuration} */
 module.exports = {
   entry: {
     [pkg.browser]: `${packageDir}/src/main/typescript/index.web.ts`,
