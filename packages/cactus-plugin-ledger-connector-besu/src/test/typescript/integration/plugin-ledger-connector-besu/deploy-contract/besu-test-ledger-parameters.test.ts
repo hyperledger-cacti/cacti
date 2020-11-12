@@ -1,42 +1,36 @@
-// tslint:disable-next-line: no-var-requires
-const tap = require("tap");
+import test, { Test } from "tape";
 import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
-tap.test(
-  "deploys a Besu node with the default configurations",
-  async (assert: any) => {
-    assert.plan(1);
 
-    // No options
-    const besuTestLedger = new BesuTestLedger();
+test("constructor does not throw with the default config", async (t: Test) => {
+  t.plan(1);
 
-    assert.ok(besuTestLedger);
-    assert.end();
-  }
-);
+  // No options
+  const besuTestLedger = new BesuTestLedger();
 
-tap.test(
-  "checks if simple Besu's environment variables are correctly passed",
-  async (assert: any) => {
-    assert.plan(2);
-    const simpleEnvVars = [
-      "BESU_MINER_ENABLED",
-      "BESU_NETWORK=dev",
-      "BESU_MIN_GAS_PRICE=0",
-    ];
+  t.ok(besuTestLedger);
+  t.end();
+});
 
-    const besuOptions = {
-      envVars: simpleEnvVars,
-    };
-    const besuTestLedger = new BesuTestLedger(besuOptions);
+test("Besu environment variables passed correctly", async (t: Test) => {
+  t.plan(2);
+  const simpleEnvVars = [
+    "BESU_MINER_ENABLED",
+    "BESU_NETWORK=dev",
+    "BESU_MIN_GAS_PRICE=0",
+  ];
 
-    assert.equal(besuTestLedger.envVars, simpleEnvVars);
-    assert.ok(besuTestLedger);
-    assert.end();
-  }
-);
+  const besuOptions = {
+    envVars: simpleEnvVars,
+  };
+  const besuTestLedger = new BesuTestLedger(besuOptions);
 
-tap.test("deploys a Besu Node on the Rinkeby network", async (assert: any) => {
-  assert.plan(2);
+  t.equal(besuTestLedger.envVars, simpleEnvVars);
+  t.ok(besuTestLedger);
+  t.end();
+});
+
+test("deploys a Besu Node on the Rinkeby network", async (t: Test) => {
+  t.plan(2);
   const rinkebyNetworkEnvVars = [
     "BESU_MOUNT_TYPE=bind",
     "BESU_MINER_ENABLED",
@@ -52,13 +46,13 @@ tap.test("deploys a Besu Node on the Rinkeby network", async (assert: any) => {
 
   const besuTestLedger = new BesuTestLedger(besuOptions);
 
-  assert.equal(besuTestLedger.envVars, rinkebyNetworkEnvVars);
-  assert.ok(besuTestLedger);
-  assert.end();
+  t.equal(besuTestLedger.envVars, rinkebyNetworkEnvVars);
+  t.ok(besuTestLedger);
+  t.end();
 });
 
-tap.test("deploys a Besu Node on the Ropsten network", async (assert: any) => {
-  assert.plan(2);
+test("deploys a Besu Node on the Ropsten network", async (t: Test) => {
+  t.plan(2);
   // const rinkebyNetworkParameters = "--mount type=bind,source=/<myvolume/besu/testnode>,target=/var/lib/besu hyperledger/besu:latest --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73--network=dev --min-gas-price=0";
   const rinkebyNetworkEnvVars = [
     "BESU_MOUNT_TYPE=bind",
@@ -75,13 +69,13 @@ tap.test("deploys a Besu Node on the Ropsten network", async (assert: any) => {
 
   const besuTestLedger = new BesuTestLedger(besuOptions);
 
-  assert.equal(besuTestLedger.envVars, rinkebyNetworkEnvVars);
-  assert.ok(besuTestLedger);
-  assert.end();
+  t.equal(besuTestLedger.envVars, rinkebyNetworkEnvVars);
+  t.ok(besuTestLedger);
+  t.end();
 });
 
-tap.test("deploys a Besu Node on the Goerli network", async (assert: any) => {
-  assert.plan(2);
+test("deploys a Besu Node on the Goerli network", async (t: Test) => {
+  t.plan(2);
   // const rinkebyNetworkParameters = "--mount type=bind,source=/<myvolume/besu/testnode>,target=/var/lib/besu hyperledger/besu:latest --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73--network=dev --min-gas-price=0";
   const rinkebyNetworkEnvVars = [
     "BESU_MOUNT_TYPE=bind",
@@ -98,27 +92,24 @@ tap.test("deploys a Besu Node on the Goerli network", async (assert: any) => {
 
   const besuTestLedger = new BesuTestLedger(besuOptions);
 
-  assert.equal(besuTestLedger.envVars, rinkebyNetworkEnvVars);
-  assert.ok(besuTestLedger);
-  assert.end();
+  t.equal(besuTestLedger.envVars, rinkebyNetworkEnvVars);
+  t.ok(besuTestLedger);
+  t.end();
 });
 
-tap.test(
-  "deploys a Besu Node on the Ethereum main network",
-  async (assert: any) => {
-    assert.plan(2);
-    const ethereumEnvVars = [
-      "BESU_TARGET=/var/lib/besu",
-      "BESU_PORT=30303:30303",
-      "BESU_RCP_HTTP_ENABLED",
-    ];
-    const besuOptions = {
-      envVars: ethereumEnvVars,
-    };
-    const besuTestLedger = new BesuTestLedger(besuOptions);
+test("deploys a Besu Node on the Ethereum main network", async (t: Test) => {
+  t.plan(2);
+  const ethereumEnvVars = [
+    "BESU_TARGET=/var/lib/besu",
+    "BESU_PORT=30303:30303",
+    "BESU_RCP_HTTP_ENABLED",
+  ];
+  const besuOptions = {
+    envVars: ethereumEnvVars,
+  };
+  const besuTestLedger = new BesuTestLedger(besuOptions);
 
-    assert.equal(besuTestLedger.envVars, ethereumEnvVars);
-    assert.ok(besuTestLedger);
-    assert.end();
-  }
-);
+  t.equal(besuTestLedger.envVars, ethereumEnvVars);
+  t.ok(besuTestLedger);
+  t.end();
+});
