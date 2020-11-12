@@ -1,11 +1,11 @@
 {
-  "name": "@hyperledger/cactus-api-client",
+  "name": "@hyperledger/cactus-test-api-client",
   "version": "0.2.0",
-  "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
-  "main": "dist/cactus-api-client.node.umd.js",
-  "mainMinified": "dist/cactus-api-client.node.umd.min.js",
-  "browser": "dist/cactus-api-client.web.umd.js",
-  "browserMinified": "dist/cactus-api-client.web.umd.min.js",
+  "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
+  "main": "dist/cactus-test-api-client.node.umd.js",
+  "mainMinified": "dist/cactus-test-api-client.node.umd.min.js",
+  "browser": "dist/cactus-test-api-client.web.umd.js",
+  "browserMinified": "dist/cactus-test-api-client.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/types/main/typescript/index.d.ts",
   "files": [
@@ -62,14 +62,22 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
+    "@hyperledger/cactus-cmd-api-server": "^0.2.0",
     "@hyperledger/cactus-common": "0.2.0",
     "@hyperledger/cactus-core-api": "^0.2.0",
     "@hyperledger/cactus-plugin-consortium-manual": "^0.2.0",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "^0.2.0",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "^0.2.0",
+    "@hyperledger/cactus-plugin-ledger-connector-quorum": "^0.2.0",
+    "@hyperledger/cactus-api-client": "^0.2.0",
     "axios": "0.19.2",
     "joi": "14.3.1",
-    "typescript-optional": "2.0.1"
+    "jose": "1.27.2",
+    "typescript-optional": "2.0.1",
+    "web3": "1.2.7"
   },
   "devDependencies": {
+    "@hyperledger/cactus-test-tooling": "0.2.0",
     "@types/joi": "14.3.4"
   }
 }

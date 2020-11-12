@@ -1,0 +1,55 @@
+@startuml Routing to Plugin Instances
+
+
+!include <material/common>
+' To import the sprite file you DON'T need to place a prefix!
+!include <material/cellphone>
+!include <material/laptop_chromebook>
+!include <material/database>
+
+title Routing to Plugin Instances\nDeployment Diagram\nHyperledger Cactus
+
+actor "User A" as usera <<human>>
+
+frame "End User Device" as enduserdevice {
+  frame "Business Application" as ba {
+    rectangle "Cactus SDK" as cactussdk {
+      rectangle "API Client" as apiclient {
+      }
+      rectangle "Client Side\nRouter" as clientsiderouter {
+      }
+    }
+  }
+}
+
+cloud "Public Internet" as publicinternet {
+}
+
+frame "Cactus Backend" as cactus {
+  rectangle "API Server A" as apia {
+    rectangle "Connector\nPlugin A" as connectorplugina {
+    }
+    rectangle "Connector\nPlugin B" as connectorpluginb {
+    }
+  }
+}
+
+
+frame "Ledgers" as ledgers {
+  MA_DATABASE(Gray, 1, ledger1, rectangle, "Ledger 1") {
+  }
+  MA_DATABASE(Gray, 1, ledger2, rectangle, "Ledger 2") {
+  }
+}
+
+usera => apiclient: TX: Ledger 1
+apiclient => clientsiderouter: TX: Ledger 1
+clientsiderouter => publicinternet: TX: Ledger 1
+
+publicinternet ==> connectorplugina: TX: Ledger 1
+publicinternet -[#AAAAAA]-> connectorpluginb
+
+connectorplugina ==> ledger1: TX: Ledger 1
+connectorpluginb -[#AAAAAA]-> ledger2
+
+@enduml
