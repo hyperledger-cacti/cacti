@@ -96,6 +96,7 @@ export class Servers {
     const server: Server = await new Promise((resolve, reject) => {
       const aServer: Server = createServer();
       aServer.once("listening", () => resolve(aServer));
+      aServer.once("error", (err: Error) => reject(err));
       aServer.listen(port, "localhost");
     });
 
