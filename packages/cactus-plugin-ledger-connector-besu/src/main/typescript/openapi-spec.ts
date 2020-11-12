@@ -43,6 +43,9 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
             $ref:
               "#/components/schemas/Web3SigningCredentialGethKeychainPassword",
           },
+          {
+            $ref: "#/components/schemas/Web3SigningCredentialCactusKeychainRef",
+          },
           { $ref: "#/components/schemas/Web3SigningCredentialPrivateKeyHex" },
           { $ref: "#/components/schemas/Web3SigningCredentialNone" },
         ],
@@ -73,6 +76,43 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
             description: "A geth keychain unlock password.",
             minLength: 0,
             maxLength: 65535,
+          },
+        },
+      },
+      Web3SigningCredentialCactusKeychainRef: {
+        type: "object",
+        required: ["type", "ethAccount", "keychainId", "keychainEntryKey"],
+        properties: {
+          type: {
+            $ref: "#/components/schemas/Web3SigningCredentialType",
+          },
+          ethAccount: {
+            type: "string",
+            description:
+              "The ethereum account (public key) that the credential " +
+              " belongs to. Basically the username in the traditional " +
+              " terminology of authentication.",
+            minLength: 64,
+            maxLength: 64,
+            nullable: false,
+          },
+          keychainEntryKey: {
+            type: "string",
+            description:
+              "The key to use when looking up the" +
+              " the keychain entry holding the secret pointed to by the " +
+              " keychainEntryKey parameter.",
+            minLength: 0,
+            maxLength: 1024,
+          },
+          keychainId: {
+            type: "string",
+            description:
+              "The keychain ID to use when looking up the" +
+              " the keychain plugin instance that will be used to retrieve" +
+              " the secret pointed to by the keychainEntryKey parameter.",
+            minLength: 0,
+            maxLength: 1024,
           },
         },
       },
@@ -114,7 +154,12 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
       },
       Web3SigningCredentialType: {
         type: "string",
-        enum: ["GETH_KEYCHAIN_PASSWORD", "PRIVATE_KEY_HEX", "NONE"],
+        enum: [
+          "CACTUS_KEYCHAIN_REF",
+          "GETH_KEYCHAIN_PASSWORD",
+          "PRIVATE_KEY_HEX",
+          "NONE",
+        ],
       },
       EthContractInvocationType: {
         type: "string",

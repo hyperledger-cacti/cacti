@@ -319,8 +319,39 @@ export interface SolidityContractJsonArtifact {
  * @type Web3SigningCredential
  * @export
  */
-export type Web3SigningCredential = Web3SigningCredentialGethKeychainPassword | Web3SigningCredentialNone | Web3SigningCredentialPrivateKeyHex;
+export type Web3SigningCredential = Web3SigningCredentialCactusKeychainRef | Web3SigningCredentialGethKeychainPassword | Web3SigningCredentialNone | Web3SigningCredentialPrivateKeyHex;
 
+/**
+ * 
+ * @export
+ * @interface Web3SigningCredentialCactusKeychainRef
+ */
+export interface Web3SigningCredentialCactusKeychainRef {
+    /**
+     * 
+     * @type {Web3SigningCredentialType}
+     * @memberof Web3SigningCredentialCactusKeychainRef
+     */
+    type: Web3SigningCredentialType;
+    /**
+     * The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.
+     * @type {string}
+     * @memberof Web3SigningCredentialCactusKeychainRef
+     */
+    ethAccount: string;
+    /**
+     * The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.
+     * @type {string}
+     * @memberof Web3SigningCredentialCactusKeychainRef
+     */
+    keychainEntryKey: string;
+    /**
+     * The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.
+     * @type {string}
+     * @memberof Web3SigningCredentialCactusKeychainRef
+     */
+    keychainId: string;
+}
 /**
  * 
  * @export
@@ -390,6 +421,7 @@ export interface Web3SigningCredentialPrivateKeyHex {
  * @enum {string}
  */
 export enum Web3SigningCredentialType {
+    CACTUSKEYCHAINREF = 'CACTUS_KEYCHAIN_REF',
     GETHKEYCHAINPASSWORD = 'GETH_KEYCHAIN_PASSWORD',
     PRIVATEKEYHEX = 'PRIVATE_KEY_HEX',
     NONE = 'NONE'
