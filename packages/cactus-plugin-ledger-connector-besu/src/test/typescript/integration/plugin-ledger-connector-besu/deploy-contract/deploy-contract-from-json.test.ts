@@ -1,5 +1,4 @@
-// tslint:disable-next-line: no-var-requires
-const tap = require("tap");
+import test, { Test } from "tape";
 import { v4 as uuidv4 } from "uuid";
 import {
   EthContractInvocationType,
@@ -10,11 +9,11 @@ import {
 import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 
-tap.test("deploys contract via .json file", async (assert: any) => {
+test("deploys contract via .json file", async (t: Test) => {
   const besuTestLedger = new BesuTestLedger();
   await besuTestLedger.start();
 
-  assert.tearDown(async () => {
+  test.onFinish(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
   });
@@ -37,10 +36,10 @@ tap.test("deploys contract via .json file", async (assert: any) => {
     },
     gas: 1000000,
   });
-  assert.ok(transactionReceipt, "TX Receipt truthy OK");
+  t.ok(transactionReceipt, "TX Receipt truthy OK");
 
   const { contractAddress } = transactionReceipt;
-  assert.ok(contractAddress, "TX Receipt Contract Address truthy OK");
+  t.ok(contractAddress, "TX Receipt Contract Address truthy OK");
 
   const { callOutput } = await connector.invokeContract({
     contractAbi: HelloWorldContractJson.abi,
@@ -53,8 +52,8 @@ tap.test("deploys contract via .json file", async (assert: any) => {
     },
   });
 
-  assert.ok(callOutput, "sayHello() call output truthy OK");
-  assert.equal(callOutput, "Hello World!", "sayHello() says Hello World! OK");
+  t.ok(callOutput, "sayHello() call output truthy OK");
+  t.equal(callOutput, "Hello World!", "sayHello() says Hello World! OK");
 
-  assert.end();
+  t.end();
 });
