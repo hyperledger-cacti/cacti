@@ -24,6 +24,8 @@
     "build:dev:common": "lerna exec --stream --scope '*/*common' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:core-api": "lerna exec --stream --scope '*/*core-api' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:test-tooling": "lerna exec --stream --scope '*/*test-tooling' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
+    "build:dev:plugin-ledger-connector-besu": "lerna exec --stream --scope '*/*connector-besu' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
+    "test:plugin-ledger-connector-besu": "tap --jobs=1 --timeout=60 \"packages/cactus-*-besu/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-quorum": "lerna exec --stream --scope '*/*connector-quorum' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "test:plugin-ledger-connector-quorum": "tap --jobs=1 --timeout=60 \"packages/cactus-*-quorum/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-fabric": "lerna exec --stream --scope '*/*connector-fabric' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
