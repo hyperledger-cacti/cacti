@@ -3,8 +3,12 @@
 ## Premise
 - Launch two Validators (For Ethereum and Fabric)
 	- for Ethereum:
-		- `/packages/ledger-plugin/go-ethereum/validator`
+		- `/packages/ledger-plugin/go-ethereum-ts/validator`
 		- "validatorUrl": `https://localhost:5050`,
+		1. cd `/packages/ledger-plugin/go-ethereum-ts/validator/src`
+		1. npm install
+		1. npm run build
+		1. npm run start
 	- for Fabric:
 		- `/packages/ledger-plugin/fabric/validator`
 		- "validatorUrl": `https://localhost:5040`,

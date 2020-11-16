@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus",
+  "name": "@hyperledger-labs/cactus",
   "private": true,
   "scripts": {
     "run-ci": "./tools/ci.sh",

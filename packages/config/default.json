@@ -14,5 +14,9 @@
         "rejectUnauthorized": false,
         "reconnection": false,
         "timeout": 20000
+    },
+    "verifier": {
+        "maxCounterRequestID":100,
+        "syncFunctionTimeoutMillisecond":5000
     }
 }

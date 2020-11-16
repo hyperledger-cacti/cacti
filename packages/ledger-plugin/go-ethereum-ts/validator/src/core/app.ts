@@ -1,38 +1,25 @@
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2019-2020 Fujitsu Laboratories Ltd.
  * SPDX-License-Identifier: Apache-2.0
- *
- * app.ts
+ * 
+ * app.js
+ */
+
+/* Summary:
+ * 
  */
 
 import { NextFunction, Request, Response } from 'express';
-
 import createError = require('http-errors');
 import express = require('express');
-import path = require('path');
 import cookieParser = require('cookie-parser');
-import logger = require('morgan');
 import bodyParser = require('body-parser');
-
-import indexRouter from '../routing-interface/routes/index';
-import loginRouter from '../routing-interface/routes/login';
-import tradesRouter from '../routing-interface/routes/trades';
-import balanceRouter from '../routing-interface/routes/balance';
 
 const app: express.Express = express();
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-app.use('/', indexRouter);
-app.use('/api/v1/bl/login/', loginRouter);
-app.use('/api/v1/bl/trades/', tradesRouter);
-app.use('/api/v1/bl/balance/', balanceRouter);
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
