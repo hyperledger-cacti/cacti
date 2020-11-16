@@ -26,6 +26,7 @@ export class VerifierBase implements Verifier {
     validatorID: string = "";
     validatorUrl: string = "";
     apiInfo: {} = null;
+    counterReqID: number = 1;
     eventListener: VerifierEventListener | null = null; // Listener for events from Ledger
 
     constructor(ledgerInfo: string) {
@@ -43,6 +44,7 @@ export class VerifierBase implements Verifier {
         return makeApiInfoList(this.apiInfo);
     };
 
+    // NOTE: This function will be deleted due to the updating of API functions
     requestLedgerOperation(param: LedgerOperation): void {
         logger.debug('call : requestLedgerOperation');
         try {
@@ -69,6 +71,75 @@ export class VerifierBase implements Verifier {
             throw err;
         }
     };
+    
+    execSyncFunction(param: LedgerOperation): Promise<any> {
+        return new Promise((resolve, reject) => {
+            logger.debug('call : execSyncFunction');
+            try {
+                logger.debug(`##in execSyncFunction, LedgerOperation = ${JSON.stringify(param)}`);
+                let responseFlag: boolean = false;
+                
+                const reqID = this.genarateReqID();
+                logger.debug(`##execSyncFunction, reqID = ${reqID}`);
+                
+                const socketOptions: {} = {
+                    rejectUnauthorized: config.socketOptions.rejectUnauthorized,
+                    reconnection: config.socketOptions.reconnection,
+                    timeout: config.socketOptions.timeout,
+                };
+                logger.debug(`socketOptions = ${JSON.stringify(socketOptions)}`);
+                const socket: Socket = io(this.validatorUrl, socketOptions);
+                socket.on("connect_error", (err: object) => {
+                    logger.error("##connect_error:", err);
+                    // end communication
+                    socket.disconnect();
+                    reject(err);
+                });
+                socket.on("connect_timeout", (err: object) => {
+                    logger.error("####Error:", err);
+                    // end communication
+                    socket.disconnect();
+                    reject(err);
+                });
+                socket.on("error", (err: object) => {
+                    logger.error("####Error:", err);
+                    socket.disconnect();
+                    reject(err);
+                });
+                socket.on("response", (result: any) => {
+                    logger.debug("#[recv]response, res: " + json2str(result));
+                    if (reqID === result.id) {
+                        responseFlag = true;
+                        logger.debug(`##execSyncFunction: resObj: ${JSON.stringify(result.resObj)}`);
+                        resolve(result.resObj);
+                    }
+                });
+
+                const apiType: string = param.apiType;
+                //const progress: string = param.progress;
+                let data: {} = param.data;
+                data["reqID"] = reqID;
+                const requestData: {} = {
+                    func: apiType,
+                    args: data
+                };
+                logger.debug('requestData : ' + JSON.stringify(requestData));
+                socket.emit('request', requestData);
+                logger.debug('set timeout');
+                
+                setTimeout(() => {
+                    if (responseFlag === false) {
+                        logger.debug('requestTimeout reqID : ' + reqID);
+                        resolve({"status":504, "amount":0});
+                    }
+                }, config.verifier.syncFunctionTimeoutMillisecond);
+            }
+            catch (err) {
+                logger.error(`##Error: execSyncFunction, ${err}`);
+                reject(err);
+            }
+        });
+    }
 
     startMonitor(): Promise<LedgerEvent> {
         return new Promise((resolve, reject) => {
@@ -173,6 +244,13 @@ export class VerifierBase implements Verifier {
         this.eventListener = eventListener;
         return;
     };
+    
+    genarateReqID(): string {
+        if (this.counterReqID > config.verifier.maxCounterRequestID) {
+            this.counterReqID = 1;
+        }
+        return `${this.validatorID}_${this.counterReqID++}`;
+    }
 
     // Validator -> Verifier
     // NOTE: The following methods are not implemented this time
