@@ -529,18 +529,19 @@ gets replaced by a traditional bank account holding USD.
 | Goals of Actors            | 1. `Consortium A`: Wants to be able to operate its services on the target blockchain while gaining its benefits such as better performance, lower cost, or enhanced privacy. |
 | Success Scenario           | Asset and data (including smart contracts) are available on the target blockchain, enabling `Consortium A`'s services to operate on the target blockchain.|
 | Success Criteria           | Migration starts at a set time, and all desired assets and data, as well as their histroy have been migrated in a decentralized way. |
-| Failure Criteria           | States of all assets and data on the target blockchain do not match the states on the source blockchain before migration, e.g., when transactions replayed on target blockchain are reordered. <br>`Consortium A` is unable to migrate to the target blockchain for several reasons, such as 
+| Failure Criteria           | States of all assets and data on the target blockchain do not match the states on the source blockchain before migration, e.g., when transactions replayed on target blockchain are reordered. <br>`Consortium A` is unable to migrate to the target blockchain for several reasons, such as
 inability to recreate the same smart contract logic, inability to arbitrary recreate native assets on target blockchain, and lack of access to private keys of external accounts. |
 | Prerequisites              | 1. `Consortium A` wants to migrate the assets and data on the source blockchain, and have chosen a desirable target blockchain.<br>2. Migration plan and window are informed to all members of the consortium, and they agree to the migration.<br>3. `Consortium A` has write and execute permissions on the target blockchain. |
 | Comments                   | * `Consortium A` is the governance body of services running on the source blockchain.<br> * Data include smart contracts and their data originating from the source blockchain. Depending on the use case, a subset of the assets and data may be recreated on the target blockchain.<br>* This use case relates to the use cases implying asset and data portability (e.g., 2.1). However, migration is mostly one-way and nonreversible.<br>* This use case provides blockchain portability; thus, retains blockchain properties across migration, reduces costs, time to migration, and foster blockchain adoption. |
 
 ---
+
 **Motivation**
 
-The suitability of a blockchain platform regarding a use case depends on the underlying blockchain properties. 
-As blockchain technologies are maturing at a fast pace, in particular private blockchains, its properties such as performance (i.e., throughput, latency, or finality), transaction fees, and privacy might change. 
-Also, blockchain platform changes, bug fixes, security, and governance issues may render an existing application/service suboptimal. 
-Further, business objectives such as the interest to launch own blockchain instance, partnerships, mergers, and acquisitions may motivate a migration. 
+The suitability of a blockchain platform regarding a use case depends on the underlying blockchain properties.
+As blockchain technologies are maturing at a fast pace, in particular private blockchains, its properties such as performance (i.e., throughput, latency, or finality), transaction fees, and privacy might change.
+Also, blockchain platform changes, bug fixes, security, and governance issues may render an existing application/service suboptimal.
+Further, business objectives such as the interest to launch own blockchain instance, partnerships, mergers, and acquisitions may motivate a migration.
 Consequently, this creates an imbalance between the user expectations and the applicability of the existing solution.
 It is, therefore, desirable for an organization/consortium to be able to replace the blockchain providing the infrastructure to a particular application/service.
 
@@ -562,7 +563,7 @@ Automatic smart contract migration (with or without translation) yields risks fo
 ### 3.8.3 Semi-Automatic Blockchain Migration
 
 By expressing a user's preferences in terms of functional and non-functional requirements, `Cactus` can recommend a set of suitable blockchains, as the target for the migration.
-Firstly, a user could know in real-time the characteristics of the target blockchain that would influence the migration decision. For instance, the platform can analyze the cost of writing data to Ethereum, Ether:USD exchange rate, average inter-block time, transaction throughput, and network hash rate [[3](#8-references)]. 
+Firstly, a user could know in real-time the characteristics of the target blockchain that would influence the migration decision. For instance, the platform can analyze the cost of writing data to Ethereum, Ether:USD exchange rate, average inter-block time, transaction throughput, and network hash rate [[3](#8-references)].
 Based on those characteristics and user-defined requirements, `Cactus` proposes a migration with indicators such as predicted cost, time to complete the migration, and the likelihood of success.
 For example, when transaction inclusion time or fee on Ethereum exceeds a threshold, `Cactus` may choose Polkadot platform, as it yields lower transaction inclusion time or fee. `Cactus` then safely migrate assets, data, and future transactions from Ethereum to Polkadot, without compromising the solution in production.
  This feature is more useful for public blockchains.
