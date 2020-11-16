@@ -787,8 +787,8 @@ APIs of Verifier and Validator are described as the following table:
 | 1. | Verifier | getVerifierInformation | none | Get the verifier information including version, name, ID, and other information |
 | 2. | Verifier | getSmartContractList | none | Get the list of available smart contracts at the connected ledger |
 | 3. | Verifier | sendSignedTransaction | `signedTransaction`(string) | Request a verifier to execute a ledger operation |
-| 4. | Verifier | getBalance | `address`(string) | Get balance of a specific account |
-| 5. | Verifier | getParameter | `address`(string)<br>`key`(string) | Get a value of a key held by a smart contract |
+| 4. | Verifier | getBalance | `address`(string) | Get balance of an account for native token on a ledger |
+| 5. | Verifier | execSyncFunction | `address`(string)<br>`funcName`(string)<br>`args`(string[]) | Execute a synchronous function held by a smart contract |
 | 6. | Verifier | startMonitor | `clientId`(string)<br>`cb`(function) | Request a verifier to start monitoring ledger |
 | 7. | Verifier | stopMonitor | `clientId`(string) | Rrequest a verifier to stop monitoring ledger |
 | 8. | Verifier | connect | `validatorURL`(string)<br>authentication credential | request a validator to start a bi-directional communication channel via a verifier |
@@ -796,8 +796,8 @@ APIs of Verifier and Validator are described as the following table:
 | 10. | Validator | getValidatorInformation | `validatorURL`(string) | Get the validator information including version, name, ID, and other information |
 | 11. | Verifier | getSmartContractList | none | Get the list of available smart contracts at the connected ledger |
 | 12. | Validator | sendSignedTransaction | `signedTransaction`(string) | Send already-signed transactions to a ledger |
-| 13. | Validator | getBalance | `address`(string) | Get balance of a specific account |
-| 14. | Validator | getParameter | `address`(string)<br>`key`(string) | Get a value of a key held by a smart contract |
+| 13. | Validator | getBalance | `address`(string) | Get balance of an account for native token on a ledger |
+| 14. | Validator | execSyncFunction | `address`(string)<br>`funcName`(string)<br>`args`(string[]) | Execute a synchronous function held by a smart contract |
 | 15. | Validator | startMonitor | `clientId`(string)<br>`cb`(function) | Request a validator to start monitoring ledger |
 | 16. | Validator | stopMonitor | `clientId`(string) | Request a validator to stop monitoring ledger |
 
@@ -811,7 +811,7 @@ The detail information is described as following:
 			getSmartContractList(): List<ApiInfo>;
 			sendSignedTransaction();
 			getBalance();
-			getParameter();
+			execSyncFunction();
 			startMonitor();
 			stopMonitor();
 			connect();
@@ -861,18 +861,19 @@ The detail information is described as following:
 
 		- function `getBalance()`: `Promise<LedgerEvent>`
 			- description:
-				- Get balance of a specific account
+				- Get balance of an account for native token on a ledger
 				- If the connected ledger does not have any default currency system (e.g. Hyperledger fabric), the function is set to be blank)
 			- input parameter:
 				- `address`(string): an account address
 
-		- function `getParameter()`: `Promise<LedgerEvent>`
+		- function `execSyncFunction()`: `Promise<LedgerEvent>`
 			- description:
-				- Get a value of a key held by a smart contract
+				- Execute a synchronous function held by a smart contract
 				- If the connected ledger does not have any smart contract system (e.g. Bitcoin), the function is set to be blank)
 			- input parameter:
 				- `address`(string): an address of a smart contract
-				- `key`(string): a key held by the smart contract
+				- `funcName`(string): a name of a synchronous function of the smart contract
+				- `args`(string[]): arguments for the synchronous function
 
 		- function `getVerifierInformation()`: `List<VerifierInfo>`
 			- description:
@@ -918,7 +919,7 @@ The detail information is described as following:
 			getSmartContractList();
 			sendSignedTransaction();
 			getBalance();
-			getParameter();
+			execSyncFunction();
 			startMonitor();
 			stopMonitor();
 		}
@@ -958,18 +959,19 @@ The detail information is described as following:
 
 		- function `getBalance()`: `Promise<LedgerEvent>`
 			- description:
-				- Get balance of a specific account
+				- Get balance of an account for native token on a ledger
 				- If the connected ledger does not have any default currency system (e.g. Hyperledger fabric), the function is set to be blank)
 			- input parameter:
 				- `address`(string) : an account address
 
-		- function `getParameter()`: `Promise<LedgerEvent>`
+		- function `execSyncFunction()`: `Promise<LedgerEvent>`
 			- description:
-				- Get a value of a key held by a smart contract
+				- Execute a synchronous function held by a smart contract
 				- If the connected ledger does not have any smart contract system (e.g. Bitcoin), the function is set to be blank)
 			- input parameter:
 				- `address`(string): an address of a smart contract
-				- `key`(string): a key held by the smart contract
+				- `funcName`(string): a name of a synchronous function of the smart contract
+				- `args`(string[]): arguments for the synchronous function
 
 		- function `startMonitor()`: `Promise<LedgerEvent>`
 			- description:
