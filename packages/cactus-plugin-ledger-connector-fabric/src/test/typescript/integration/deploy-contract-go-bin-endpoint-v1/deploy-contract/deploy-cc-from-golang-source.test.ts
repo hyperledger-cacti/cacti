@@ -1,14 +1,24 @@
 import fs from "fs";
 import { AddressInfo } from "net";
+import http from "http";
 import path from "path";
 
 import test, { Test } from "tape";
 import { v4 as uuidv4 } from "uuid";
 
+import express from "express";
+import bodyParser from "body-parser";
 import axios, { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
 
-import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
+import { FabricTestLedgerV1 } from "@hyperledger/cactus-test-tooling";
+
+import {
+  IListenOptions,
+  LogLevelDesc,
+  Servers,
+} from "@hyperledger/cactus-common";
+import { PluginRegistry } from "@hyperledger/cactus-core-api";
 
 import {
   PluginLedgerConnectorFabric,
@@ -16,13 +26,13 @@ import {
   ICompilationOptions,
 } from "../../../../../main/typescript/public-api";
 
-import { FabricTestLedgerV1 } from "@hyperledger/cactus-test-tooling";
+import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
+
 import { IPluginLedgerConnectorFabricOptions } from "../../../../../main/typescript/plugin-ledger-connector-fabric";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 test.skip("deploys contract from go source", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
-  const ledger = new FabricTestLedgerV1({});
+  const ledger = new FabricTestLedgerV1({ publishAllPorts: true });
   await ledger.start();
 
   const tearDown = async () => {
@@ -32,36 +42,36 @@ test.skip("deploys contract from go source", async (t: Test) => {
 
   test.onFinish(tearDown);
 
-  const connectionProfile = await ledger.getConnectionProfile();
+  const connectionProfile = await ledger.getConnectionProfileOrg1();
   t.ok(connectionProfile);
 
   const sshConfig = await ledger.getSshConfig();
-  const opsApiHttpHost = await ledger.getOpsApiHttpHost();
-  const adminSigningIdentity = await ledger.getAdminSigningIdentity();
 
+  const pluginRegistry = new PluginRegistry();
   const pluginOpts: IPluginLedgerConnectorFabricOptions = {
     instanceId: uuidv4(),
-    opsApiHttpHost,
-    connectionProfile,
-    adminSigningIdentity,
+    pluginRegistry,
     sshConfig,
     logLevel,
-    webAppOptions: { port: 0, hostname: "localhost" },
+    connectionProfile,
   };
   const plugin = new PluginLedgerConnectorFabric(pluginOpts);
 
-  const [ep] = await plugin.installWebServices(null);
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
+  const listenOptions: IListenOptions = {
+    hostname: "localhost",
+    port: 0,
+    server,
+  };
+  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+  const { address, port } = addressInfo;
+  test.onFinish(async () => await Servers.shutdown(server));
 
-  const httpServer = plugin
-    .getHttpServer()
-    .orElseThrow(() => new Error(`Missing HttpServer`));
+  const [endpoint] = await plugin.installWebServices(expressApp);
 
-  test.onFinish(() => httpServer.close());
-
-  const addressInfo = httpServer.address() as AddressInfo;
-  const { port } = addressInfo;
-
-  const url = `http://localhost:${port}${ep.getPath()}`;
+  const url = `http://localhost:${port}${endpoint.getPath()}`;
 
   const form = new FormData();
   const headers = form.getHeaders();

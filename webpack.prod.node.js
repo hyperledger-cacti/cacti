@@ -72,5 +72,6 @@ module.exports = {
     "swarm-js": "swarm-js",
     "node-ssh": "node-ssh",
     "fabric-client": "fabric-client",
+    "fabric-ca-client": "fabric-ca-client",
   },
 };

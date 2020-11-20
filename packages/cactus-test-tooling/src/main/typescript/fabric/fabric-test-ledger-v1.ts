@@ -1,15 +1,24 @@
 import path from "path";
-
-import Docker, { Container, ContainerInfo } from "dockerode";
-import { Config as SshConfig } from "node-ssh";
-import Client from "fabric-client";
-import axios from "axios";
-import Joi from "joi";
 import { EventEmitter } from "events";
+
+import Docker, {
+  Container,
+  ContainerCreateOptions,
+  ContainerInfo,
+} from "dockerode";
+import { Config as SshConfig } from "node-ssh";
+import {
+  X509WalletMixin,
+  InMemoryWallet,
+  Identity,
+  Gateway,
+} from "fabric-network";
+import FabricCAServices from "fabric-ca-client";
+import Joi from "joi";
 import { ITestLedger } from "../i-test-ledger";
 import { Containers } from "../common/containers";
-import { ISigningIdentity } from "./i-fabric-signing-identity";
 import {
+  Checks,
   Logger,
   LogLevelDesc,
   LoggerProvider,
@@ -19,9 +28,9 @@ import {
  * Contains options for Fabric container
  */
 export interface IFabricTestLedgerV1ConstructorOptions {
+  publishAllPorts: boolean;
   imageVersion?: string;
   imageName?: string;
-  opsApiHttpPort?: number;
   logLevel?: LogLevelDesc;
 }
 
@@ -31,7 +40,6 @@ export interface IFabricTestLedgerV1ConstructorOptions {
 const DEFAULT_OPTS = Object.freeze({
   imageVersion: "latest",
   imageName: "hyperledger/cactus-fabric-all-in-one",
-  opsApiHttpPort: 9443,
 });
 export const FABRIC_TEST_LEDGER_DEFAULT_OPTIONS = DEFAULT_OPTS;
 
@@ -39,36 +47,45 @@ export const FABRIC_TEST_LEDGER_DEFAULT_OPTIONS = DEFAULT_OPTS;
  * Provides validations for the Fabric container's options
  */
 const OPTS_JOI_SCHEMA: Joi.Schema = Joi.object().keys({
+  publishAllPorts: Joi.boolean().required(),
   imageVersion: Joi.string().min(5).required(),
-  imageName: Joi.string().min(1).required(),
-  opsApiHttpPort: Joi.number().integer().min(1024).max(65535).required(),
+  imageName: Joi.string()
+    .regex(/[a-z0-9]+(?:[._-]{1,2}[a-z0-9]+)*/)
+    .min(1)
+    .required(),
 });
 
 export const FABRIC_TEST_LEDGER_OPTIONS_JOI_SCHEMA = OPTS_JOI_SCHEMA;
 
 export class FabricTestLedgerV1 implements ITestLedger {
-  public readonly log: Logger;
+  public static readonly CLASS_NAME = "FabricTestLedgerV1";
+
   public readonly imageVersion: string;
   public readonly imageName: string;
-  public readonly opsApiHttpPort: number;
+  public readonly publishAllPorts: boolean;
+
+  private readonly log: Logger;
 
   private container: Container | undefined;
   private containerId: string | undefined;
 
+  public get className() {
+    return FabricTestLedgerV1.CLASS_NAME;
+  }
+
   constructor(public readonly options: IFabricTestLedgerV1ConstructorOptions) {
-    const fnTag = "FabricTestLedgerV1#constructor()";
-    if (!options) {
-      throw new TypeError(`${fnTag} options was falsy.`);
-    }
+    const fnTag = `${this.className}#constructor()`;
+    Checks.truthy(options, `${fnTag} arg options`);
+
+    const level = this.options.logLevel || "INFO";
+    const label = this.className;
+    this.log = LoggerProvider.getOrCreate({ level, label });
+
     this.imageVersion = options.imageVersion || DEFAULT_OPTS.imageVersion;
     this.imageName = options.imageName || DEFAULT_OPTS.imageName;
-    this.opsApiHttpPort = options.opsApiHttpPort || DEFAULT_OPTS.opsApiHttpPort;
+    this.publishAllPorts = options.publishAllPorts;
 
     this.validateConstructorOptions();
-    this.log = LoggerProvider.getOrCreate({
-      label: "fabric-test-ledger-v1",
-      level: options.logLevel || "INFO",
-    });
   }
 
   public getContainer(): Container {
@@ -84,99 +101,184 @@ export class FabricTestLedgerV1 implements ITestLedger {
     return `${this.imageName}:${this.imageVersion}`;
   }
 
-  public async getOpsApiHttpHost(): Promise<string> {
-    const ipAddress: string = "127.0.0.1";
-    const hostPort: number = await this.getOpsApiPublicPort();
-    return `http://${ipAddress}:${hostPort}/version`;
+  public getDefaultMspId(): string {
+    return "Org1MSP";
   }
 
-  public async getAdminFabricClient(): Promise<Client> {
-    const adminSigningIdentity = await this.getAdminSigningIdentity();
-    const { privateKeyPem, certificate, mspId } = adminSigningIdentity;
-
-    const connectionProfile = await this.getConnectionProfile();
-
-    const client: Client = Client.loadFromConfig(connectionProfile);
-    client.setAdminSigningIdentity(privateKeyPem, certificate, mspId);
-    return client;
+  public async createCaClient(): Promise<FabricCAServices> {
+    const fnTag = `${this.className}#createCaClient()`;
+    try {
+      const ccp = await this.getConnectionProfileOrg1();
+      const caInfo = ccp.certificateAuthorities["ca.org1.example.com"];
+      const { tlsCACerts, url: caUrl, caName } = caInfo;
+      const { pem: caTLSCACertPem } = tlsCACerts;
+      const tlsOptions = { trustedRoots: caTLSCACertPem, verify: false };
+      this.log.debug(`createCaClient() caName=%o caUrl=%o`, caName, caUrl);
+      this.log.debug(`createCaClient() tlsOptions=%o`, tlsOptions);
+      return new FabricCAServices(caUrl, tlsOptions, caName);
+    } catch (ex) {
+      this.log.error(`createCaClient() Failure:`, ex);
+      throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+    }
   }
 
-  /**
-   *
-   * @see https://hyperledger-fabric.readthedocs.io/en/release-1.4/developapps/connectionprofile.html#scenario
-   * @see https://hyperledger-fabric.readthedocs.io/en/release-1.4/developapps/connectionprofile.html#sample
-   */
-  public async getConnectionProfile(): Promise<any> {
-    const containerInfo = await this.getContainerInfo();
-    const peerGrpcPort = await Containers.getPublicPort(7051, containerInfo);
-    const ordererGrpcPort = await Containers.getPublicPort(7050, containerInfo);
+  public async enrollUser(wallet: InMemoryWallet): Promise<any> {
+    const fnTag = `${this.className}#enrollUser()`;
+    try {
+      const mspId = this.getDefaultMspId();
+      const enrollmentID = "user1";
+      const connectionProfile = await this.getConnectionProfileOrg1();
+      // Create a new gateway for connecting to our peer node.
+      const gateway = new Gateway();
+      const discovery = { enabled: true, asLocalhost: true };
+      const gatewayOptions = {
+        wallet,
+        identity: "admin",
+        discovery,
+      };
+      await gateway.connect(connectionProfile, gatewayOptions);
 
-    return {
-      name: "org.hyperledger.cactus.sample.fabric-all-in-one",
-      version: "1.0",
-      "x-type": "hlfv1",
-      description:
-        "Connection profile for the Cactus Fabric All-In-One " +
-        " test docker container image. Do NOT use in production.",
+      // Get the CA client object from the gateway for interacting with the CA.
+      // const ca = gateway.getClient().getCertificateAuthority();
+      const ca = await this.createCaClient();
+      const adminIdentity = gateway.getCurrentIdentity();
 
-      channels: {
-        mychannel: {
-          orderers: ["orderer0"],
-          peers: {
-            peer0: {},
+      // Register the user, enroll the user, and import the new identity into the wallet.
+      const registrationRequest = {
+        affiliation: "org1.department1",
+        enrollmentID,
+        role: "client",
+      };
+      const secret = await ca.register(registrationRequest, adminIdentity);
+      this.log.debug(`Registered client user "${enrollmentID}" OK`);
+
+      const enrollmentRequest = { enrollmentID, enrollmentSecret: secret };
+      const enrollment = await ca.enroll(enrollmentRequest);
+      this.log.debug(`Enrolled client user "${enrollmentID}" OK`);
+
+      const { certificate: cert, key } = enrollment;
+      const keyBytes = key.toBytes();
+
+      const identity = X509WalletMixin.createIdentity(mspId, cert, keyBytes);
+
+      await wallet.import(enrollmentID, identity);
+      this.log.debug(`Wallet import of "${enrollmentID}" OK`);
+
+      return [identity, wallet];
+    } catch (ex) {
+      this.log.error(`enrollUser() Failure:`, ex);
+      throw new Error(`${fnTag} Exception: ${ex?.message}`);
+    }
+  }
+
+  public async enrollAdmin(): Promise<[Identity, InMemoryWallet]> {
+    const fnTag = `${this.className}#enrollAdmin()`;
+    try {
+      const ca = await this.createCaClient();
+      const wallet = new InMemoryWallet(new X509WalletMixin());
+
+      // Enroll the admin user, and import the new identity into the wallet.
+      const request = { enrollmentID: "admin", enrollmentSecret: "adminpw" };
+      const enrollment = await ca.enroll(request);
+
+      const mspId = this.getDefaultMspId();
+      const { certificate: cert, key } = enrollment;
+      const keyBytes = key.toBytes();
+
+      const identity = X509WalletMixin.createIdentity(mspId, cert, keyBytes);
+      await wallet.import("admin", identity);
+
+      return [identity, wallet];
+    } catch (ex) {
+      this.log.error(`enrollAdmin() Failure:`, ex);
+      throw new Error(`${fnTag} Exception: ${ex?.message}`);
+    }
+  }
+
+  public async getConnectionProfileOrg1(): Promise<any> {
+    const fnTag = `${this.className}#getConnectionProfileOrg1()`;
+    const cInfo = await this.getContainerInfo();
+    const container = this.getContainer();
+    const ccpJsonPath = "/fabric-samples/first-network/connection-org1.json";
+    const ccpJson = await Containers.pullFile(container, ccpJsonPath);
+    const ccp = JSON.parse(ccpJson);
+
+    {
+      // peer0.org1.example.com
+      const privatePort = 7051;
+      const hostPort = await Containers.getPublicPort(privatePort, cInfo);
+      ccp.peers["peer0.org1.example.com"].url = `grpcs://localhost:${hostPort}`;
+    }
+    {
+      // peer1.org1.example.com
+      const privatePort = 8051;
+      const hostPort = await Containers.getPublicPort(privatePort, cInfo);
+      ccp.peers["peer1.org1.example.com"].url = `grpcs://localhost:${hostPort}`;
+    }
+    {
+      // ca_peerOrg1
+      const privatePort = 7054;
+      const hostPort = await Containers.getPublicPort(privatePort, cInfo);
+      const { certificateAuthorities: cas } = ccp;
+      cas["ca.org1.example.com"].url = `https://localhost:${hostPort}`;
+    }
+
+    // FIXME - this still doesn't work. At this moment the only successful tests
+    // we could run was with host ports bound to the matching ports of the internal
+    // containers and with discovery enabled.
+    // When discovery is disabled, it just doesn't yet work and these changes
+    // below are my attempts so far at making the connection profile work without
+    // discovery being turned on (which we cannot use when the ports are randomized
+    // on the host for the parent container)
+    if (this.publishAllPorts) {
+      // orderer.example.com
+
+      const privatePort = 7050;
+      const hostPort = await Containers.getPublicPort(privatePort, cInfo);
+      const url = `grpcs://localhost:${hostPort}`;
+      const ordererPemPath =
+        "/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem";
+      const pem = await Containers.pullFile(container, ordererPemPath);
+
+      ccp.orderers = {
+        "orderer.example.com": {
+          url,
+          grpcOptions: {
+            "ssl-target-name-override": "orderer.example.com",
+          },
+          tlsCACerts: {
+            pem,
           },
         },
-      },
+      };
 
-      organizations: {
-        Org1: {
-          mspid: "Org1MSP",
-          peers: ["peer0"],
+      ccp.channels = {
+        mychannel: {
+          orderers: ["orderer.example.com"],
+          peers: {
+            "peer0.org1.example.com": {
+              endorsingPeer: true,
+              chaincodeQuery: true,
+              ledgerQuery: true,
+              eventSource: true,
+              discover: true,
+            },
+          },
         },
-        OrdererOrg: {
-          mspid: "OrdererMSP",
-        },
-      },
+      };
 
-      orderers: {
-        orderer0: {
-          url: `grpc://localhost:${ordererGrpcPort}`,
-        },
-      },
-
-      peers: {
-        peer0: {
-          url: `grpc://localhost:${peerGrpcPort}`,
-        },
-      },
-    };
-  }
-
-  public async getAdminSigningIdentity(): Promise<ISigningIdentity> {
-    const container = this.getContainer();
-
-    const adminMspDir =
-      "/etc/hyperledger/fabric/crypto-config/peerOrganizations/org1.cactus.stream/users/Admin@org1.cactus.stream/msp/";
-    const keyStorePath = `${adminMspDir}keystore/`;
-
-    const fileList = await Containers.ls(container, "/");
-    this.log.debug("FILE LIST: %o", fileList);
-
-    const [privateKeyFile] = await Containers.ls(container, keyStorePath);
-    const privateKeyPath = path.join(keyStorePath, privateKeyFile);
-
-    const privateKeyPem = await Containers.pullFile(container, privateKeyPath);
-
-    const certPath = `${adminMspDir}signcerts/Admin\@org1.cactus.stream-cert.pem`;
-    const certificate = await Containers.pullFile(container, certPath);
-
-    const mspId = "Org1MSP";
-
-    return {
-      privateKeyPem,
-      certificate,
-      mspId,
-    };
+      // FIXME: Still have no idea if we can use these options to make it work
+      // with discovery
+      // {
+      //   const { grpcOptions } = ccp.peers["peer0.org1.example.com"];
+      //   grpcOptions.hostnameOverride = `localhost`;
+      // }
+      // {
+      //   const { grpcOptions } = ccp.peers["peer1.org1.example.com"];
+      //   grpcOptions.hostnameOverride = `localhost`;
+      // }
+    }
+    return ccp;
   }
 
   public async getSshConfig(): Promise<SshConfig> {
@@ -210,53 +312,62 @@ export class FabricTestLedgerV1 implements ITestLedger {
       await Containers.pullImage(containerNameAndTag);
     }
 
+    const createOptions: ContainerCreateOptions = {
+      ExposedPorts: {
+        "22/tcp": {}, // OpenSSH Server - TCP
+        "5984/tcp": {}, // couchdb0
+        "6984/tcp": {}, // couchdb1
+        "7050/tcp": {}, // orderer.example.com
+        "7051/tcp": {}, // peer0.org1.example.com
+        "7054/tcp": {}, // ca_peerOrg1
+        "7984/tcp": {}, // couchdb2
+        "8051/tcp": {}, // peer1.org1.example.com
+        "8054/tcp": {}, // ca_peerOrg2
+        "8984/tcp": {}, // couchdb3
+        "9001/tcp": {}, // supervisord web ui/dashboard
+        "9051/tcp": {}, // peer0.org2.example.com
+        "10051/tcp": {}, // peer1.org2.example.com
+      },
+
+      // This is a workaround needed for macOS which has issues with routing
+      // to docker container's IP addresses directly...
+      // https://stackoverflow.com/a/39217691
+
+      // needed for Docker-in-Docker support
+      // Privileged: true,
+      HostConfig: {
+        PublishAllPorts: this.publishAllPorts,
+        Privileged: true,
+        PortBindings: {
+          "22/tcp": [{ HostPort: "30022" }],
+          "7050/tcp": [{ HostPort: "7050" }],
+          "7051/tcp": [{ HostPort: "7051" }],
+          "7054/tcp": [{ HostPort: "7054" }],
+          "8051/tcp": [{ HostPort: "8051" }],
+          "8054/tcp": [{ HostPort: "8054" }],
+          "9051/tcp": [{ HostPort: "9051" }],
+          "10051/tcp": [{ HostPort: "10051" }],
+        },
+      },
+    };
+
+    // (createOptions as any).PortBindings = {
+    //   "22/tcp": [{ HostPort: "30022" }],
+    //   "7050/tcp": [{ HostPort: "7050" }],
+    //   "7051/tcp": [{ HostPort: "7051" }],
+    //   "7054/tcp": [{ HostPort: "7054" }],
+    //   "8051/tcp": [{ HostPort: "8051" }],
+    //   "8054/tcp": [{ HostPort: "8054" }],
+    //   "9051/tcp": [{ HostPort: "9051" }],
+    //   "10051/tcp": [{ HostPort: "10051" }],
+    // };
+
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
         containerNameAndTag,
         [],
         [],
-        {
-          Env: [
-            // `CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${networkMode}`,
-            "FABRIC_LOGGING_SPEC=DEBUG",
-            "CORE_PEER_ADDRESS=7051",
-            "CORE_VM_DOCKER_ATTACHSTDOUT=true",
-            "CORE_CHAINCODE_LOGGING_SHIM=debug",
-            "CORE_CHAINCODE_LOGGING_LEVEL=debug",
-          ],
-          PortBindings: {
-            "22/tcp": [{ HostPort: "30022" }],
-            "7050/tcp": [{ HostPort: "7050" }],
-            "7051/tcp": [{ HostPort: "7051" }],
-            "7052/tcp": [{ HostPort: "7052" }],
-            [`${this.opsApiHttpPort}/tcp`]: [
-              { HostPort: `${this.opsApiHttpPort}` },
-            ],
-          },
-          ExposedPorts: {
-            "22/tcp": {}, // OpenSSH Server - TCP
-            [`${this.opsApiHttpPort}/tcp`]: {}, // Fabric Peer GRPC - HTTP
-            "7050/tcp": {}, // Orderer GRPC - HTTP
-            "7051/tcp": {}, // Peer additional - HTTP
-            "7052/tcp": {}, // Peer Chaincode - HTTP
-            "7053/tcp": {}, // Peer additional - HTTP
-            "7054/tcp": {}, // Fabric CA - HTTP
-            "9001/tcp": {}, // supervisord - HTTP
-          },
-          // This is a workaround needed for macOS which has issues with routing
-          // to docker container's IP addresses directly...
-          // https://stackoverflow.com/a/39217691
-          // PublishAllPorts: true,
-
-          // needed for Docker-in-Docker support
-          Privileged: true,
-
-          // This is the fallback solution in case DinD does not work out
-          // The reason why this is less desirable compared to DinD is that
-          // it breaks the design principle of the AIO containers that they
-          // must be self contained and not depend on the host's file-system.
-          Binds: ["/var/run/:/host/var/run/"],
-        },
+        createOptions,
         {},
         (err: any) => {
           if (err) {
@@ -278,22 +389,21 @@ export class FabricTestLedgerV1 implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs: number = 120000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs: number = 180000): Promise<void> {
     const fnTag = "FabricTestLedgerV1#waitForHealthCheck()";
-    const httpUrl = await this.getOpsApiHttpHost();
     const startedAt = Date.now();
     let reachable: boolean = false;
     do {
       try {
-        const res = await axios.get(httpUrl);
-        reachable = res.status > 199 && res.status < 300;
+        const { Status } = await this.getContainerInfo();
+        reachable = Status.endsWith(" (healthy)");
       } catch (ex) {
         reachable = false;
         if (Date.now() >= startedAt + timeoutMs) {
           throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
         }
       }
-      await new Promise((resolve2) => setTimeout(resolve2, 100));
+      await new Promise((resolve2) => setTimeout(resolve2, 1000));
     } while (!reachable);
   }
 
@@ -328,11 +438,6 @@ export class FabricTestLedgerV1 implements ITestLedger {
     }
   }
 
-  public async getOpsApiPublicPort(): Promise<number> {
-    const containerInfo = await this.getContainerInfo();
-    return Containers.getPublicPort(this.opsApiHttpPort, containerInfo);
-  }
-
   public async getContainerIpAddress(): Promise<string> {
     const containerInfo = await this.getContainerInfo();
     return Containers.getContainerInternalIp(containerInfo);
@@ -344,7 +449,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       {
         imageVersion: this.imageVersion,
         imageName: this.imageName,
-        opsApiHttpPort: this.opsApiHttpPort,
+        publishAllPorts: this.publishAllPorts,
       },
       OPTS_JOI_SCHEMA
     );

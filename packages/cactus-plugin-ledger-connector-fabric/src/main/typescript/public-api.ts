@@ -1,3 +1,5 @@
+export * from "./generated/openapi/typescript-axios/index";
+
 export { PluginLedgerConnectorFabric } from "./plugin-ledger-connector-fabric";
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
