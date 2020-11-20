@@ -22,15 +22,288 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
- * @interface DeployContractGoBinV1Request
+ * @interface ConnectionProfile
  */
-export interface DeployContractGoBinV1Request {
+export interface ConnectionProfile {
+    [key: string]: object | any;
+
     /**
      * 
-     * @type {Array<any>}
-     * @memberof DeployContractGoBinV1Request
+     * @type {string}
+     * @memberof ConnectionProfile
      */
-    file: Array<any>;
+    name: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectionProfile
+     */
+    x_type?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectionProfile
+     */
+    description: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectionProfile
+     */
+    version: string;
+    /**
+     * 
+     * @type {ConnectionProfileClient}
+     * @memberof ConnectionProfile
+     */
+    client?: ConnectionProfileClient;
+    /**
+     * 
+     * @type {{ [key: string]: object; }}
+     * @memberof ConnectionProfile
+     */
+    channels?: { [key: string]: object; };
+    /**
+     * 
+     * @type {{ [key: string]: object; }}
+     * @memberof ConnectionProfile
+     */
+    organizations: { [key: string]: object; };
+    /**
+     * 
+     * @type {{ [key: string]: object; }}
+     * @memberof ConnectionProfile
+     */
+    orderers?: { [key: string]: object; };
+    /**
+     * 
+     * @type {{ [key: string]: object; }}
+     * @memberof ConnectionProfile
+     */
+    peers: { [key: string]: object; };
+    /**
+     * 
+     * @type {{ [key: string]: object; }}
+     * @memberof ConnectionProfile
+     */
+    certificateAuthorities?: { [key: string]: object; };
+}
+/**
+ * 
+ * @export
+ * @interface ConnectionProfileClient
+ */
+export interface ConnectionProfileClient {
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectionProfileClient
+     */
+    organization?: string;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+export enum DefaultEventHandlerStrategy {
+    MSPIDSCOPEALLFORTX = 'MSPID_SCOPE_ALLFORTX',
+    MSPIDSCOPEANYFORTX = 'MSPID_SCOPE_ANYFORTX',
+    NETWORKSCOPEALLFORTX = 'NETWORK_SCOPE_ALLFORTX',
+    NETWORKSCOPEANYFORTX = 'NETWORK_SCOPE_ANYFORTX'
+}
+
+/**
+ * 
+ * @export
+ * @interface DeployContractGoSourceV1Request
+ */
+export interface DeployContractGoSourceV1Request {
+    /**
+     * 
+     * @type {FileBase64}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    goSource: FileBase64;
+    /**
+     * 
+     * @type {FileBase64}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    goMod?: FileBase64;
+    /**
+     * The go module name that will be used for the go compilation process.
+     * @type {string}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    moduleName?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    pinnedDeps?: Array<string>;
+    /**
+     * Indicates to the go chaincode compiler of Cactus if it should do an actual go compilation with the contact source or if it should just execute the go mod tidy command.
+     * @type {boolean}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    modTidyOnly?: boolean | null;
+}
+/**
+ * 
+ * @export
+ * @interface DeployContractGoSourceV1Response
+ */
+export interface DeployContractGoSourceV1Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof DeployContractGoSourceV1Response
+     */
+    result: string;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+export enum FabricContractInvocationType {
+    SEND = 'FabricContractInvocationType.SEND',
+    CALL = 'FabricContractInvocationType.CALL'
+}
+
+/**
+ * Represents a file-system file that has a name and a body which holds the file contents as a Base64 encoded string
+ * @export
+ * @interface FileBase64
+ */
+export interface FileBase64 {
+    /**
+     * The file\'s contents encoded as a Base64 string.
+     * @type {string}
+     * @memberof FileBase64
+     */
+    body: string;
+    /**
+     * The name as referred to on a file system
+     * @type {string}
+     * @memberof FileBase64
+     */
+    filename: string;
+}
+/**
+ * 
+ * @export
+ * @interface GatewayDiscoveryOptions
+ */
+export interface GatewayDiscoveryOptions {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof GatewayDiscoveryOptions
+     */
+    asLocalhost?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof GatewayDiscoveryOptions
+     */
+    enabled?: boolean;
+}
+/**
+ * 
+ * @export
+ * @interface GatewayEventHandlerOptions
+ */
+export interface GatewayEventHandlerOptions {
+    /**
+     * 
+     * @type {number}
+     * @memberof GatewayEventHandlerOptions
+     */
+    commitTimeout?: number;
+    /**
+     * 
+     * @type {DefaultEventHandlerStrategy}
+     * @memberof GatewayEventHandlerOptions
+     */
+    strategy: DefaultEventHandlerStrategy;
+}
+/**
+ * 
+ * @export
+ * @interface InlineResponse501
+ */
+export interface InlineResponse501 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse501
+     */
+    message?: string;
+}
+/**
+ * 
+ * @export
+ * @interface RunTransactionRequest
+ */
+export interface RunTransactionRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RunTransactionRequest
+     */
+    keychainId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunTransactionRequest
+     */
+    keychainRef: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunTransactionRequest
+     */
+    channelName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunTransactionRequest
+     */
+    chainCodeId: string;
+    /**
+     * 
+     * @type {FabricContractInvocationType}
+     * @memberof RunTransactionRequest
+     */
+    invocationType: FabricContractInvocationType;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunTransactionRequest
+     */
+    functionName: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RunTransactionRequest
+     */
+    functionArgs: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface RunTransactionResponse
+ */
+export interface RunTransactionResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RunTransactionResponse
+     */
+    functionOutput: string;
 }
 
 /**
@@ -41,17 +314,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @summary Deploys a chaincode contract in the form of a go binary
-         * @param {Array<any>} file 
+         * @summary Deploys a chaincode contract in the form of a go sources.
+         * @param {DeployContractGoSourceV1Request} [deployContractGoSourceV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginLedgerConnectorFabricDeployContractGoBinPost: async (file: Array<any>, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'file' is not null or undefined
-            if (file === null || file === undefined) {
-                throw new RequiredError('file','Required parameter file was null or undefined when calling apiV1PluginsHyperledgerCactusPluginLedgerConnectorFabricDeployContractGoBinPost.');
-            }
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-bin`;
+        deployContractGoSourceV1: async (deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -61,16 +330,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-            const localVarFormParams = new FormData();
 
-            if (file) {
-            
-                localVarFormParams.append('file', file.join(COLLECTION_FORMATS.csv));
-            }
+
     
-    
-            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             const query = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
                 query.set(key, localVarQueryParameter[key]);
@@ -81,7 +345,53 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             localVarUrlObj.search = (new URLSearchParams(query)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = localVarFormParams;
+            const needsSerialization = (typeof deployContractGoSourceV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(deployContractGoSourceV1Request !== undefined ? deployContractGoSourceV1Request : {}) : (deployContractGoSourceV1Request || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Runs a transaction on a Fabric ledger.
+         * @param {RunTransactionRequest} runTransactionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTransactionV1: async (runTransactionRequest: RunTransactionRequest, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'runTransactionRequest' is not null or undefined
+            if (runTransactionRequest === null || runTransactionRequest === undefined) {
+                throw new RequiredError('runTransactionRequest','Required parameter runTransactionRequest was null or undefined when calling runTransactionV1.');
+            }
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof runTransactionRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(runTransactionRequest !== undefined ? runTransactionRequest : {}) : (runTransactionRequest || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -99,13 +409,27 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Deploys a chaincode contract in the form of a go binary
-         * @param {Array<any>} file 
+         * @summary Deploys a chaincode contract in the form of a go sources.
+         * @param {DeployContractGoSourceV1Request} [deployContractGoSourceV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1PluginsHyperledgerCactusPluginLedgerConnectorFabricDeployContractGoBinPost(file: Array<any>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginLedgerConnectorFabricDeployContractGoBinPost(file, options);
+        async deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractGoSourceV1Response>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Runs a transaction on a Fabric ledger.
+         * @param {RunTransactionRequest} runTransactionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).runTransactionV1(runTransactionRequest, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -122,13 +446,23 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @summary Deploys a chaincode contract in the form of a go binary
-         * @param {Array<any>} file 
+         * @summary Deploys a chaincode contract in the form of a go sources.
+         * @param {DeployContractGoSourceV1Request} [deployContractGoSourceV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginLedgerConnectorFabricDeployContractGoBinPost(file: Array<any>, options?: any): AxiosPromise<object> {
-            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginLedgerConnectorFabricDeployContractGoBinPost(file, options).then((request) => request(axios, basePath));
+        deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any): AxiosPromise<DeployContractGoSourceV1Response> {
+            return DefaultApiFp(configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Runs a transaction on a Fabric ledger.
+         * @param {RunTransactionRequest} runTransactionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
+            return DefaultApiFp(configuration).runTransactionV1(runTransactionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -142,14 +476,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export class DefaultApi extends BaseAPI {
     /**
      * 
-     * @summary Deploys a chaincode contract in the form of a go binary
-     * @param {Array<any>} file 
+     * @summary Deploys a chaincode contract in the form of a go sources.
+     * @param {DeployContractGoSourceV1Request} [deployContractGoSourceV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public apiV1PluginsHyperledgerCactusPluginLedgerConnectorFabricDeployContractGoBinPost(file: Array<any>, options?: any) {
-        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginLedgerConnectorFabricDeployContractGoBinPost(file, options).then((request) => request(this.axios, this.basePath));
+    public deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Runs a transaction on a Fabric ledger.
+     * @param {RunTransactionRequest} runTransactionRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: any) {
+        return DefaultApiFp(this.configuration).runTransactionV1(runTransactionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -1,10 +1,18 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 
-import express, { Express } from "express";
-import multer from "multer";
-import bodyParser from "body-parser";
+import "multer";
 import { Config as SshConfig } from "node-ssh";
+import {
+  DefaultEventHandlerOptions,
+  DefaultEventHandlerStrategies,
+  DiscoveryOptions,
+  Gateway,
+  GatewayOptions,
+  InMemoryWallet,
+  X509WalletMixin,
+} from "fabric-network";
+
 import { Optional } from "typescript-optional";
 
 import {
@@ -14,6 +22,7 @@ import {
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
+  PluginRegistry,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -22,50 +31,68 @@ import {
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
+
 import {
-  DeployContractGoBinEndpointV1,
-  IDeployContractGoBinEndpointV1Options,
-} from "./deploy-contract-go-bin-endpoint-v1";
-import { ISigningIdentity } from "./i-fabric-signing-identity";
+  IRunTransactionEndpointV1Options,
+  RunTransactionEndpointV1,
+} from "./run-transaction/run-transaction-endpoint-v1";
+
+import {
+  ConnectionProfile,
+  GatewayDiscoveryOptions,
+  GatewayEventHandlerOptions,
+  DeployContractGoSourceV1Request,
+  DeployContractGoSourceV1Response,
+  FabricContractInvocationType,
+  RunTransactionRequest,
+  RunTransactionResponse,
+} from "./generated/openapi/typescript-axios/index";
+
+import {
+  DeployContractGoSourceEndpointV1,
+  IDeployContractGoSourceEndpointV1Options,
+} from "./deploy-contract-go-source/deploy-contract-go-source-endpoint-v1";
 
 export interface IPluginLedgerConnectorFabricOptions
   extends ICactusPluginOptions {
-  opsApiHttpHost: string;
   logLevel?: LogLevelDesc;
-  webAppOptions?: any;
+  pluginRegistry: PluginRegistry;
   sshConfig: SshConfig;
-  connectionProfile: any;
-  adminSigningIdentity: ISigningIdentity;
-}
-
-export interface ITransactionOptions {
-  privateKey?: string;
+  connectionProfile: ConnectionProfile;
+  discoveryOptions?: GatewayDiscoveryOptions;
+  eventHandlerOptions?: GatewayEventHandlerOptions;
 }
 
 export class PluginLedgerConnectorFabric
   implements
-    IPluginLedgerConnector<any, any, any, any>,
+    IPluginLedgerConnector<
+      DeployContractGoSourceV1Request,
+      DeployContractGoSourceV1Response,
+      RunTransactionRequest,
+      RunTransactionResponse
+    >,
     ICactusPlugin,
     IPluginWebService {
+  public static readonly CLASS_NAME = "PluginLedgerConnectorFabric";
   private readonly instanceId: string;
   private readonly log: Logger;
 
-  private httpServer: Server | SecureServer | undefined;
-
-  constructor(public readonly options: IPluginLedgerConnectorFabricOptions) {
-    const fnTag = "PluginLedgerConnectorFabric#constructor()";
-
-    Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
-
-    this.instanceId = options.instanceId;
-
-    const level = this.options.logLevel || "INFO";
-    const label = "plugin-ledger-connector-fabric";
-    this.log = LoggerProvider.getOrCreate({ level, label });
+  public get className() {
+    return PluginLedgerConnectorFabric.CLASS_NAME;
   }
-  transact(options?: any): Promise<any> {
-    throw new Error("Method not implemented.");
+
+  constructor(public readonly opts: IPluginLedgerConnectorFabricOptions) {
+    const fnTag = `${this.className}#constructor()`;
+    Checks.truthy(opts, `${fnTag} arg options`);
+    Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
+    Checks.truthy(opts.pluginRegistry, `${fnTag} options.pluginRegistry`);
+    Checks.truthy(opts.connectionProfile, `${fnTag} options.connectionProfile`);
+
+    const level = this.opts.logLevel || "INFO";
+    const label = this.className;
+    this.log = LoggerProvider.getOrCreate({ level, label });
+
+    this.instanceId = opts.instanceId;
   }
 
   public shutdown(): Promise<void> {
@@ -77,31 +104,28 @@ export class PluginLedgerConnectorFabric
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connectur-fabric`;
+    return `@hyperledger/cactus-plugin-ledger-connector-fabric`;
   }
 
   public getAspect(): PluginAspect {
     return PluginAspect.LEDGER_CONNECTOR;
   }
 
-  public async sendTransaction(options: ITransactionOptions): Promise<any> {
-    const fnTag = "PluginLedgerConnectorFabric#sendTransaction()";
-    throw new Error(`${fnTag} Method not yet implemented.`);
+  public getHttpServer(): Optional<Server | SecureServer> {
+    return Optional.empty();
   }
 
-  public instantiateContract(contractJsonArtifact: any, address?: string): any {
-    const fnTag = "PluginLedgerConnectorFabric#instantiateContract()";
-    throw new Error(`${fnTag} Method not yet implemented.`);
-  }
-
-  public async deployContract(options: any): Promise<void> {
+  /**
+   * FIXME: Implement this feature of the connector.
+   *
+   * @param req The object containing all the necessary metadata and parameters
+   * in order to have the contract deployed.
+   */
+  public async deployContract(
+    req: DeployContractGoSourceV1Request
+  ): Promise<DeployContractGoSourceV1Response> {
     const fnTag = "PluginLedgerConnectorFabric#deployContract()";
-    throw new Error(`${fnTag} Method not yet implemented.`);
-  }
-
-  public async addPublicKey(publicKeyHex: string): Promise<void> {
-    const fnTag = "PluginLedgerConnectorFabric#addPublicKey()";
-    throw new Error(`${fnTag} Method not yet implemented.`);
+    throw new Error(`${fnTag} Not yet implemented!`);
   }
 
   public async installWebServices(
@@ -110,65 +134,111 @@ export class PluginLedgerConnectorFabric
     const { log } = this;
 
     log.info(`Installing web services for plugin ${this.getPackageName()}...`);
-    const webApp: Express = this.options.webAppOptions ? express() : expressApp;
-
-    // FIXME refactor this
-    // presence of webAppOptions implies that caller wants the plugin to configure it's own express instance on a custom
-    // host/port to listen on
-    if (this.options.webAppOptions) {
-      this.log.info(`Creating dedicated HTTP server...`);
-      const { port, hostname } = this.options.webAppOptions;
-
-      webApp.use(bodyParser.json({ limit: "50mb" }));
-
-      const address = await new Promise((resolve, reject) => {
-        const httpServer = webApp.listen(port, hostname, (err?: any) => {
-          if (err) {
-            reject(err);
-            this.log.error(`Failed to create dedicated HTTP server`, err);
-          } else {
-            this.httpServer = httpServer;
-            const theAddress = this.httpServer.address();
-            resolve(theAddress);
-          }
-        });
-      });
-      this.log.info(`Creation of HTTP server OK`, { address });
-    }
-
-    const { sshConfig, connectionProfile, adminSigningIdentity } = this.options;
-    const packageName = this.getPackageName();
-
-    const storage = multer.memoryStorage();
-    const upload = multer({ storage });
 
     const endpoints: IWebServiceEndpoint[] = [];
+
     {
-      const path = `/api/v1/plugins/${packageName}/deploy-contract-go-bin`;
-      const opts: IDeployContractGoBinEndpointV1Options = {
-        path,
-        sshConfig,
-        connectionProfile,
-        adminSigningIdentity,
-        logLevel: "TRACE",
+      const opts: IDeployContractGoSourceEndpointV1Options = {
+        connector: this,
+        logLevel: this.opts.logLevel,
       };
-      const endpoint = new DeployContractGoBinEndpointV1(opts);
-      webApp.post(
-        endpoint.getPath(),
-        upload.array("files", 1024),
-        endpoint.getExpressRequestHandler()
-      );
+      const endpoint = new DeployContractGoSourceEndpointV1(opts);
+      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
-      this.log.info(`Registered contract deployment endpoint at ${path}`);
     }
 
-    log.info(`Installed web svcs for plugin ${this.getPackageName()} OK`, {
-      endpoints,
-    });
+    {
+      const opts: IRunTransactionEndpointV1Options = {
+        connector: this,
+        logLevel: this.opts.logLevel,
+      };
+      const endpoint = new RunTransactionEndpointV1(opts);
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+
+    const pkg = this.getPackageName();
+    log.info(`Installed web services for plugin ${pkg} OK`, { endpoints });
+
     return endpoints;
   }
 
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
+  public async transact(
+    req: RunTransactionRequest
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transact()`;
+
+    const { connectionProfile } = this.opts;
+    const {
+      keychainId,
+      keychainRef,
+      channelName,
+      chainCodeId,
+      invocationType,
+      functionName: fnName,
+      functionArgs,
+    } = req;
+
+    const gateway = new Gateway();
+    const wallet = new InMemoryWallet(new X509WalletMixin());
+    const keychain = this.opts.pluginRegistry.findOneByKeychainId(keychainId);
+    this.log.debug("transact() obtained keychain by ID=%o OK", keychainId);
+
+    const fabricX509IdentityJson = await keychain.get<string>(keychainRef);
+    this.log.debug("transact() obtained keychain entry Key=%o OK", keychainRef);
+    const identity = JSON.parse(fabricX509IdentityJson);
+
+    try {
+      await wallet.import(keychainRef, identity);
+      this.log.debug("transact() imported identity to in-memory wallet OK");
+
+      const eventHandlerOptions: DefaultEventHandlerOptions = {
+        commitTimeout: this.opts.eventHandlerOptions?.commitTimeout,
+      };
+      if (this.opts.eventHandlerOptions?.strategy) {
+        eventHandlerOptions.strategy =
+          DefaultEventHandlerStrategies[
+            this.opts.eventHandlerOptions?.strategy
+          ];
+      }
+
+      const gatewayOptions: GatewayOptions = {
+        discovery: this.opts.discoveryOptions,
+        eventHandlerOptions,
+        identity: keychainRef,
+        wallet,
+      };
+
+      await gateway.connect(connectionProfile as any, gatewayOptions);
+      this.log.debug("transact() gateway connection established OK");
+
+      const network = await gateway.getNetwork(channelName);
+      const contract = network.getContract(chainCodeId);
+
+      let out: Buffer;
+      switch (invocationType) {
+        case FabricContractInvocationType.CALL: {
+          out = await contract.evaluateTransaction(fnName, ...functionArgs);
+          break;
+        }
+        case FabricContractInvocationType.SEND: {
+          out = await contract.submitTransaction(fnName, ...functionArgs);
+          break;
+        }
+        default: {
+          const message = `FabricContractInvocationType: ${invocationType}`;
+          throw new Error(`${fnTag} unknown ${message}`);
+        }
+      }
+      const outUtf8 = out.toString("utf-8");
+      const res: RunTransactionResponse = {
+        functionOutput: outUtf8,
+      };
+      this.log.debug(`transact() response: %o`, res);
+      return res;
+    } catch (ex) {
+      this.log.error(`transact() crashed: `, ex);
+      throw new Error(`${fnTag} Unable to run transaction: ${ex.message}`);
+    }
   }
 }

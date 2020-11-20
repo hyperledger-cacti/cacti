@@ -67,6 +67,7 @@
     "dockerode": "3.2.0",
     "extract-zip": "2.0.0",
     "fabric-client": "1.4.11",
+    "fabric-network": "1.4.14",
     "fs-extra": "9.0.0",
     "is-port-reachable": "3.0.0",
     "joi": "14.3.1",

@@ -1,48 +1,33 @@
-// tslint:disable-next-line: no-var-requires
-const tap = require("tap");
-import isPortReachable from "is-port-reachable";
-import { Container } from "dockerode";
+import test, { Test } from "tape";
 import { FabricTestLedgerV1 } from "../../../../../main/typescript/public-api";
 
-tap.test(
-  "# skip constructor throws if invalid input is provided",
-  (assert: any) => {
-    assert.ok(FabricTestLedgerV1);
-    assert.throws(() => new FabricTestLedgerV1({ imageVersion: "nope" }));
-    assert.end();
-  }
-);
+test("FabricTestLedgerV1#constructor()", (t: Test) => {
+  t.ok(FabricTestLedgerV1, "Importing FabricTestLedgerV1 class OK");
 
-tap.test(
-  "# skip constructor does not throw if valid input is provided",
-  (assert: any) => {
-    assert.ok(FabricTestLedgerV1);
-    // const options = { sshConnectionOptions };
-    assert.doesNotThrow(() => new FabricTestLedgerV1({}));
-    assert.end();
-  }
-);
+  t.throws(
+    () =>
+      new FabricTestLedgerV1({
+        imageVersion: "nope",
+        publishAllPorts: false,
+      }),
+    /"imageVersion" length must be at least 5 characters long/,
+    "throws if invalid imageVersion is provided OK"
+  );
 
-tap.test(
-  "# skip starts/stops/destroys a docker container",
-  async (assert: any) => {
-    const fabricTestLedger = new FabricTestLedgerV1({});
-    assert.tearDown(() => fabricTestLedger.stop());
-    assert.tearDown(() => fabricTestLedger.destroy());
+  t.throws(
+    () =>
+      new FabricTestLedgerV1({
+        imageName: "----",
+        publishAllPorts: false,
+      }),
+    /"imageName" with value (.*) fails to match the required pattern/,
+    "throws if empty string imageName is provided OK"
+  );
 
-    const container: Container = await fabricTestLedger.start();
-    assert.ok(container);
-    const ipAddress: string = await fabricTestLedger.getContainerIpAddress();
-    assert.ok(ipAddress);
-    assert.ok(ipAddress.length);
+  t.doesNotThrow(
+    () => new FabricTestLedgerV1({ publishAllPorts: false }),
+    "does not throw if valid input is provided OK"
+  );
 
-    const hostPort: number = await fabricTestLedger.getOpsApiPublicPort();
-    assert.ok(hostPort, "getOpsApiPublicPort() returns truthy OK");
-    assert.ok(isFinite(hostPort), "getOpsApiPublicPort() returns finite OK");
-
-    const isReachable = await isPortReachable(hostPort, { host: "localhost" });
-    assert.ok(isReachable, `HostPort ${hostPort} is reachable via localhost`);
-
-    assert.end();
-  }
-);
+  t.end();
+});
