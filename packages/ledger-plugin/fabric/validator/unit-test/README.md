@@ -15,7 +15,9 @@ This document describes the procedures for runnning fabric validator unit-test.
 - The fabcar container is already running
 	- ProcedureURL: https://github.com/hyperledger/cactus/blob/master/packages/ledger-plugin/fabric/validator/unit-test/fabric-docker/README.md
 
-## (a) Get car information
+## How to unit-test fabric validator
+- There are 2 unit-tests for fabric validator.
+### step1: Get car information
 - Target source: "queryCar.js"
 - This script is for getting car information recorded in fabcar.
 
@@ -27,7 +29,7 @@ This document describes the procedures for runnning fabric validator unit-test.
 		<pre>
 		Transaction has been evaluated, result is: [{"Key":"CAR0", "Record":{"colour":"blue","make":"Toyota","model":"Prius","owner":"Tomoko"}},{"Key":"CAR1", "Record":{"colour":"red","make":"Ford","model":"Mustang","owner":"Brad"}},{"Key":"CAR2", "Record":{"colour":"green","make":"Hyundai","model":"Tucson","owner":"Jin Soo"}},{"Key":"CAR3", "Record":{"colour":"yellow","make":"Volkswagen","model":"Passat","owner":"Max"}},{"Key":"CAR4", "Record":{"colour":"black","make":"Tesla","model":"S","owner":"Adriana"}},{"Key":"CAR5", "Record":{"colour":"purple","make":"Peugeot","model":"205","owner":"Michel"}},{"Key":"CAR6", "Record":{"colour":"white","make":"Chery","model":"S22L","owner":"Aarav"}},{"Key":"CAR7", "Record":{"colour":"violet","make":"Fiat","model":"Punto","owner":"Pari"}},{"Key":"CAR8", "Record":{"colour":"indigo","make":"Tata","model":"Nano","owner":"Valeria"}},{"Key":"CAR9", "Record":{"colour":"brown","make":"Holden","model":"Barina","owner":"Shotaro"}}]</pre> 
 
-## (b) Asset transfer
+### step2: Asset transfer
 - Target source: "validatorDriver_signTransactionOffline.js"
 - This script is for changing owner information.
 

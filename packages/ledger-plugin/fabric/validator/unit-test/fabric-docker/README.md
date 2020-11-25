@@ -33,6 +33,16 @@ Ensure that the next containers are started.
 	3a06daddc298        hyperledger/fabric-orderer                                                                               "orderer"                2 hours ago         Up 2 hours          0.0.0.0:7050->7050/tcp                           orderer.example.com
 	b722f3d14f6e        hyperledger/fabric-couchdb                                                                               "tini -- /docker-ent…"   2 hours ago         Up 2 hours          4369/tcp, 9100/tcp, 0.0.0.0:5984->5984/tcp       couchdb
 
+#### Remarks
+
+According to the report from some contributor, in some environment the command `./startFabric.sh` fails, due to version incompatibility between fabric and couchdb.  If you encounter the same situation, execute the following commands and re-execute this step:
+
+	curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.4.0
+	docker pull hyperledger/fabric-couchdb:0.4.14
+	docker tag hyperledger/fabric-couchdb:0.4.14 hyperledger/fabric-couchdb:latest
+
+
+
 ### 2) Registering an administrator user and general users
 
 Change to the following directory:
@@ -76,14 +86,3 @@ Copy and extract wallet.tar to the following target directory:
 [Deployment Method]
 
 	$ tar xvf wallet.tar
-
-## Remarks
-
-- According to the report from some contributor, in some environment the command `curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.4.0` fails to download coachdb and the following steps are failed.  If you encount the same situation, please execute the commands instead of that:
-	```
-	curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.4.0
-	docker pull hyperledger/fabric-couchdb:0.4.14
-	docker tag hyperledger/fabric-couchdb:0.4.14 hyperledger/fabric-couchdb:latest
-	```
-
-
