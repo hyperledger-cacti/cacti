@@ -52,7 +52,7 @@ const walletPath = path.resolve(__dirname, 'wallet');
 
 //Key and certificate issued by msp (User1@example.com)
 //const basic_network_path = "./fabric-docker/basic-network";
-const basic_network_path = path.resolve(__dirname, 'fabric-docker/basic-network');
+const basic_network_path = path.resolve(__dirname, 'fabric-docker/fabric-samples/basic-network');
 const privateKeyPath0 = basic_network_path + '/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/c75bd6911aca808941c3557ee7c97e90f3952e379497dc55eb903f31b50abc83_sk';
 const privateKeyPem0 = fs.readFileSync(privateKeyPath0, 'utf8');
 const certPath0 = basic_network_path + '/crypto-config/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/User1@org1.example.com-cert.pem';
@@ -420,4 +420,3 @@ function sendRequest() {
 
 setTimeout(requestStartMonitor, 2000); // TODO:
 setTimeout(sendRequest, 4000);
-
