@@ -11,7 +11,8 @@
 - Specify URL of the ledger node to connect to in "PluginConfig.js"
 
 ## Execution
-<pre>
+```
+./setup.sh
 cd core
 node ./bin/www.js 
-</pre>
+```

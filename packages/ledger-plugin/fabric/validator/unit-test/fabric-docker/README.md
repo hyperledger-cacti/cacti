@@ -77,3 +77,13 @@ Copy and extract wallet.tar to the following target directory:
 
 	$ tar xvf wallet.tar
 
+## Remarks
+
+- According to the report from some contributor, in some environment the command `curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.4.0` fails to download coachdb and the following steps are failed.  If you encount the same situation, please execute the commands instead of that:
+	```
+	curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.4.0
+	docker pull hyperledger/fabric-couchdb:0.4.14
+	docker tag hyperledger/fabric-couchdb:0.4.14 hyperledger/fabric-couchdb:latest
+	```
+
+
