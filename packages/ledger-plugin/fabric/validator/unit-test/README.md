@@ -31,7 +31,7 @@ This document describes the procedures for runnning fabric validator unit-test.
 
 ### step2: Asset transfer
 - Target source: "validatorDriver_signTransactionOffline.js"
-- This script is for changing owner information.
+- This script is for setting owner information.
 
 1) Check the private key of wallet/admin
 	- Get the filename which is replaced `-pub` with `-priv` in `unit-test/wallet/admin/`.
