@@ -62,12 +62,12 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.2.0",
+    "@hyperledger/cactus-common": "^0.2.0",
     "@hyperledger/cactus-core-api": "^0.2.0",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "0.2.0",
+    "@hyperledger/cactus-test-tooling": "^0.2.0",
     "@types/express": "4.17.8"
   }
 }

@@ -64,7 +64,7 @@
   "dependencies": {
     "@hyperledger/cactus-api-client": "^0.2.0",
     "@hyperledger/cactus-cmd-api-server": "^0.2.0",
-    "@hyperledger/cactus-common": "0.2.0",
+    "@hyperledger/cactus-common": "^0.2.0",
     "@hyperledger/cactus-core-api": "^0.2.0",
     "@hyperledger/cactus-plugin-consortium-manual": "^0.2.0",
     "@hyperledger/cactus-plugin-keychain-memory": "^0.2.0",
@@ -76,7 +76,7 @@
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "0.2.0",
+    "@hyperledger/cactus-test-tooling": "^0.2.0",
     "@types/joi": "14.3.4"
   }
 }

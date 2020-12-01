@@ -63,8 +63,8 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.2.0",
-    "@hyperledger/cactus-core": "0.2.0",
+    "@hyperledger/cactus-common": "^0.2.0",
+    "@hyperledger/cactus-core": "^0.2.0",
     "@hyperledger/cactus-core-api": "^0.2.0",
     "axios": "0.19.2",
     "body-parser": "1.19.0",
@@ -79,7 +79,7 @@
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-kv-storage-memory": "0.2.0",
+    "@hyperledger/cactus-plugin-kv-storage-memory": "^0.2.0",
     "@types/express": "4.17.8",
     "@types/joi": "14.3.4",
     "@types/json-stable-stringify": "1.0.32",
