@@ -1,0 +1,86 @@
+{
+  "name": "@hyperledger/cactus-example-supply-chain-business-logic-plugin",
+  "version": "0.2.0",
+  "description": "An example business logic plugin implementation for Cactus",
+  "main": "dist/cactus-example-supply-chain-business-logic-plugin.node.umd.js",
+  "mainMinified": "dist/cactus-example-supply-chain-business-logic-plugin.node.umd.min.js",
+  "browser": "dist/cactus-example-supply-chain-business-logic-plugin.web.umd.js",
+  "browserMinified": "dist/cactus-example-supply-chain-business-logic-plugin.web.umd.min.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/types/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "export-open-api-spec": "ts-node src/main/typescript/openapi-spec.ts",
+    "pregenerate-sdk": "npm-run-all export-open-api-spec",
+    "generate-sdk": "openapi-generator generate --input-spec src/main/json/generated/openapi-spec.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
+    "tsc": "tsc --project ./tsconfig.json",
+    "pretsc": "npm run generate-sdk",
+    "webpack": "npm-run-all webpack:dev webpack:prod",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
+    "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
+    "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "dependencies": {
+    "@hyperledger/cactus-common": "0.2.0",
+    "@hyperledger/cactus-core": "0.2.0",
+    "@hyperledger/cactus-core-api": "0.2.0",
+    "@hyperledger/cactus-plugin-consortium-manual": "0.2.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "^0.2.0",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "0.2.0",
+    "@hyperledger/cactus-plugin-ledger-connector-quorum": "0.2.0",
+    "@hyperledger/cactus-api-client": "0.2.0",
+    "async-exit-hook": "2.0.1",
+    "axios": "0.19.2",
+    "express": "4.17.1",
+    "openapi-types": "7.0.1",
+    "swarm-js": "0.1.40",
+    "typescript-optional": "2.0.1",
+    "uuid": "8.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.8",
+    "@types/uuid": "8.0.1"
+  }
+}

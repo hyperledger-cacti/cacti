@@ -1,0 +1,75 @@
+<ion-content padding>
+  <form [formGroup]="form" (ngSubmit)="onClickFormSubmit(form.value)">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Bamboo Harvest Details</ion-card-title>
+        <ion-card-subtitle></ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">ID</ion-label>
+          <ion-input id="id" type="text" readonly="readonly" formControlName="id">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Location</ion-label>
+          <ion-input id="location" type="text" maxlength="255"
+            placeholder="Refers to the location of the harvest" formControlName="location"></ion-input>
+        </ion-item>
+        <ion-label *ngIf="
+            form.controls.location.invalid &&
+            (form.controls.location.dirty || form.controls.location.touched)
+          " class="alert alert-danger">
+          <div *ngIf="form.controls.location.errors.required">
+            Location is required.
+          </div>
+          <div *ngIf="form.controls.location.errors.minlength">
+            Location must be at least 1 characters long.
+          </div>
+        </ion-label>
+
+        <ion-item>
+          <ion-label position="stacked">Started At (UTC)</ion-label>
+          <ion-datetime id="startedAt" formControlName="startedAt" value="new Date().toJSON()" display-timezone="utc"></ion-datetime>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Ended At (UTC)</ion-label>
+          <ion-datetime id="endedAt" formControlName="endedAt" value="new Date().toJSON()" display-timezone="utc"></ion-datetime>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Harvester</ion-label>
+          <ion-input id="harvester" type="text" maxlength="255"
+            placeholder="Refers to the harvester who performed the act" formControlName="harvester"></ion-input>
+        </ion-item>
+        <ion-label *ngIf="
+            form.controls.harvester.invalid &&
+            (form.controls.harvester.dirty || form.controls.harvester.touched)
+          " class="alert alert-danger">
+          <div *ngIf="form.controls.harvester.errors.required">
+            Harvester is required.
+          </div>
+          <div *ngIf="form.controls.harvester.errors.minlength">
+            Harvester must be at least 1 characters long.
+          </div>
+        </ion-label>
+
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-button id="btnCancel" (click)="onClickBtnCancel()" size="medium" color="warning">Cancel</ion-button>
+            </ion-col>
+            <ion-col>
+              <ion-button id="btnSubmit" type="submit" color="primary" class="ion-float-right" [disabled]="!form.valid">
+                Submit
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </form>
+</ion-content>
