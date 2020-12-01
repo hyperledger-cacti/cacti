@@ -1,6 +1,7 @@
 {
   "packages": [
-    "packages/cactus-*"
+    "packages/cactus-*",
+    "examples/cactus-*"
   ],
   "version": "fixed",
   "command": {
