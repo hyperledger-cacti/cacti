@@ -1,5 +1,7 @@
 export { ApiServer, IApiServerConstructorOptions } from "./api-server";
 
+export { launchApp } from "./cmd/cactus-api";
+
 export {
   ConfigService,
   IPluginImport,

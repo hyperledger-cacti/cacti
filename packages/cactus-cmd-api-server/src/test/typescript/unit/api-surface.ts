@@ -1,10 +1,8 @@
-// tslint:disable-next-line: no-var-requires
-const tap = require("tap");
-import { ApiServer } from "../../../main/typescript/public-api";
+import test, { Test } from "tape";
 
-tap.pass("Test file can be executed");
+import * as publicApi from "../../../main/typescript/public-api";
 
-tap.test("Library can be loaded", (assert: any) => {
-  assert.plan(1);
-  assert.ok(ApiServer);
+test("Library can be loaded", (t: Test) => {
+  t.ok(publicApi);
+  t.end();
 });

@@ -28,11 +28,16 @@ const main = async () => {
   }
 };
 
-main()
-  .then(() => {
+export async function launchApp(cliOpts?: any): Promise<void> {
+  try {
+    await main();
     log.info(`Cactus API server launched OK `);
-  })
-  .catch((ex) => {
+  } catch (ex) {
     log.error(`Cactus API server crashed: `, ex);
     process.exit(1);
-  });
+  }
+}
+
+if (require.main === module) {
+  launchApp();
+}
