@@ -7,9 +7,9 @@
  */
 export class BesuSignTransactionEndpointV1 {
   public static readonly HTTP_PATH: string =
-    "/api/v1/plugins/@hyperledger/cactus-plugin-validator-besu/sign-transaction";
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction";
 
   public static readonly HTTP_VERB_LOWER_CASE: string = "post";
 
-  public static readonly OPENAPI_OPERATION_ID: string = "besuSignTransactionV1";
+  public static readonly OPENAPI_OPERATION_ID: string = "signTransactionV1";
 }

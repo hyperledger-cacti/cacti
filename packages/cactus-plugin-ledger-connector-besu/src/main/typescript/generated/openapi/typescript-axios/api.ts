@@ -251,6 +251,44 @@ export interface RunTransactionResponse {
 /**
  * 
  * @export
+ * @interface SignTransactionRequest
+ */
+export interface SignTransactionRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof SignTransactionRequest
+     */
+    keychainId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SignTransactionRequest
+     */
+    keychainRef: string;
+    /**
+     * The transaction hash of ledger will be used to fetch the contain.
+     * @type {string}
+     * @memberof SignTransactionRequest
+     */
+    transactionHash: string;
+}
+/**
+ * 
+ * @export
+ * @interface SignTransactionResponse
+ */
+export interface SignTransactionResponse {
+    /**
+     * The signatures of ledger from the corresponding transaction hash.
+     * @type {string}
+     * @memberof SignTransactionResponse
+     */
+    signature: string;
+}
+/**
+ * 
+ * @export
  * @interface SolidityContractJsonArtifact
  */
 export interface SolidityContractJsonArtifact {
@@ -620,6 +658,51 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Obtain signatures of ledger from the corresponding transaction hash.
+         * @summary Obtain signatures of ledger from the corresponding transaction hash.
+         * @param {SignTransactionRequest} signTransactionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        signTransactionV1: async (signTransactionRequest: SignTransactionRequest, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'signTransactionRequest' is not null or undefined
+            if (signTransactionRequest === null || signTransactionRequest === undefined) {
+                throw new RequiredError('signTransactionRequest','Required parameter signTransactionRequest was null or undefined when calling signTransactionV1.');
+            }
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof signTransactionRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(signTransactionRequest !== undefined ? signTransactionRequest : {}) : (signTransactionRequest || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -671,6 +754,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
                 return axios.request(axiosRequestArgs);
             };
         },
+        /**
+         * Obtain signatures of ledger from the corresponding transaction hash.
+         * @summary Obtain signatures of ledger from the corresponding transaction hash.
+         * @param {SignTransactionRequest} signTransactionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async signTransactionV1(signTransactionRequest: SignTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignTransactionResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).signTransactionV1(signTransactionRequest, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
     }
 };
 
@@ -709,6 +806,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
             return DefaultApiFp(configuration).apiV1BesuRunTransaction(runTransactionRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Obtain signatures of ledger from the corresponding transaction hash.
+         * @summary Obtain signatures of ledger from the corresponding transaction hash.
+         * @param {SignTransactionRequest} signTransactionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        signTransactionV1(signTransactionRequest: SignTransactionRequest, options?: any): AxiosPromise<SignTransactionResponse> {
+            return DefaultApiFp(configuration).signTransactionV1(signTransactionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -754,6 +861,18 @@ export class DefaultApi extends BaseAPI {
      */
     public apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any) {
         return DefaultApiFp(this.configuration).apiV1BesuRunTransaction(runTransactionRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Obtain signatures of ledger from the corresponding transaction hash.
+     * @summary Obtain signatures of ledger from the corresponding transaction hash.
+     * @param {SignTransactionRequest} signTransactionRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public signTransactionV1(signTransactionRequest: SignTransactionRequest, options?: any) {
+        return DefaultApiFp(this.configuration).signTransactionV1(signTransactionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
