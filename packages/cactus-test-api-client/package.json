@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-test-api-client",
   "version": "0.2.0",
   "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
-  "main": "dist/cactus-test-api-client.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-api-client.node.umd.min.js",
   "browser": "dist/cactus-test-api-client.web.umd.js",
   "browserMinified": "dist/cactus-test-api-client.web.umd.min.js",

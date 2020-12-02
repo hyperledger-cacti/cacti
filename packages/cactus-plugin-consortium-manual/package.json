@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-plugin-consortium-manual",
   "version": "0.2.0",
   "description": "A web service plugin that provides management capabilities on a Cactus consortium as a whole for administrative purposes.",
-  "main": "dist/cactus-plugin-consortium-manual.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-consortium-manual.node.umd.min.js",
   "browser": "dist/cactus-plugin-consortium-manual.web.umd.js",
   "browserMinified": "dist/cactus-plugin-consortium-manual.web.umd.min.js",

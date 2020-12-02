@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "run-ci": "./tools/ci.sh",
-    "configure": "npm i && lerna clean --yes && lerna bootstrap && npm-run-all build:dev generate-api-server-config",
+    "configure": "npm i && lerna clean --yes && lerna bootstrap && npm-run-all build:dev:backend generate-api-server-config",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
     "start:cockpit": "lerna run --scope '*/cactus-cockpit' --stream serve:proxy",
@@ -19,7 +19,7 @@
     "build:prod:backend": "npm-run-all webpack:prod:node",
     "build:prod:frontend": "lerna run build:prod:frontend",
     "build:dev": "npm-run-all build:dev:backend webpack:dev:web build:dev:frontend",
-    "build:dev:backend": "npm-run-all lint clean generate-sdk tsc webpack:dev:node",
+    "build:dev:backend": "npm-run-all lint clean generate-sdk tsc",
     "build:dev:frontend": "lerna run build:dev:frontend",
     "build:dev:cmd-api-server": "lerna exec --stream --scope '*/*api-server' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:common": "lerna exec --stream --scope '*/*common' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",

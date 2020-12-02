@@ -8,7 +8,7 @@
   "files": [
     "dist/*"
   ],
-  "main": "dist/cactus-cmd-api-server.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-cmd-api-server.node.umd.min.js",
   "browser": "dist/cactus-cmd-api-server.web.umd.js",
   "browserMinified": "dist/cactus-cmd-api-server.web.umd.min.js",

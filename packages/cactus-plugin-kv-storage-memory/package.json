@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-plugin-kv-storage-memory",
   "version": "0.2.0",
   "description": "Key/value storage plugin that has an in-memory backend. Only makes sense to use it for local development/demo environments where there is only a single Cactus node running in your consortium.",
-  "main": "dist/cactus-plugin-kv-storage-memory.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-kv-storage-memory.node.umd.min.js",
   "browser": "dist/cactus-plugin-kv-storage-memory.web.umd.js",
   "browserMinified": "dist/cactus-plugin-kv-storage-memory.web.umd.min.js",

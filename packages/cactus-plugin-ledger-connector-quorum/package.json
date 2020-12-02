@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-plugin-ledger-connector-quorum",
   "version": "0.2.0",
   "description": "Allows Cactus nodes to connect to a Quorum ledger.",
-  "main": "dist/cactus-plugin-ledger-connector-quorum.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-ledger-connector-quorum.node.umd.min.js",
   "browser": "dist/cactus-plugin-ledger-connector-quorum.web.umd.js",
   "browserMinified": "dist/cactus-plugin-ledger-connector-quorum.web.umd.min.js",

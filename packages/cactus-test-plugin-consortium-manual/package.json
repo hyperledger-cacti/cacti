@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-test-plugin-consortium-manual",
   "version": "0.2.0",
   "description": "Integration tests for the Quorum ledger and the API server.",
-  "main": "dist/cactus-test-plugin-consortium-manual.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-plugin-consortium-manual.node.umd.min.js",
   "browser": "dist/cactus-test-plugin-consortium-manual.web.umd.js",
   "browserMinified": "dist/cactus-test-plugin-consortium-manual.web.umd.min.js",

@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-plugin-ledger-connector-besu",
   "version": "0.2.0",
   "description": "Allows Cactus nodes to connect to a Besu ledger.",
-  "main": "dist/cactus-plugin-ledger-connector-besu.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-ledger-connector-besu.node.umd.min.js",
   "browser": "dist/cactus-plugin-ledger-connector-besu.web.umd.js",
   "browserMinified": "dist/cactus-plugin-ledger-connector-besu.web.umd.min.js",

@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-example-supply-chain-backend",
   "version": "0.2.0",
   "description": "An example application showing how to use Cactus when implementing a supply chain application where two or more blockchains are sharing data with each other to achieve a certain business outcome beneficial to multiple parties (business organizations).",
-  "main": "dist/cactus-example-supply-chain-backend.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-example-supply-chain-backend.node.umd.min.js",
   "browser": "dist/cactus-example-supply-chain-backend.web.umd.js",
   "browserMinified": "dist/cactus-example-supply-chain-backend.web.umd.min.js",

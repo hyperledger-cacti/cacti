@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-plugin-keychain-memory",
   "version": "0.2.0",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing.",
-  "main": "dist/cactus-plugin-keychain-memory.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-keychain-memory.node.umd.min.js",
   "browser": "dist/cactus-plugin-keychain-memory.web.umd.js",
   "browserMinified": "dist/cactus-plugin-keychain-memory.web.umd.min.js",
