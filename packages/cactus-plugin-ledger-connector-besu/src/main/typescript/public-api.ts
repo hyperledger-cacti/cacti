@@ -1,4 +1,8 @@
-export { PluginLedgerConnectorBesu } from "./plugin-ledger-connector-besu";
+export {
+  E_KEYCHAIN_NOT_FOUND,
+  IPluginLedgerConnectorBesuOptions,
+  PluginLedgerConnectorBesu,
+} from "./plugin-ledger-connector-besu";
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";

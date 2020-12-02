@@ -5,7 +5,6 @@ import { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
 import Web3 from "web3";
-import EEAClient, { IWeb3InstanceExtended } from "web3-eea";
 
 import { ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
@@ -23,6 +22,11 @@ import {
 
 import {
   Checks,
+  CodedError,
+  IJsObjectSignerOptions,
+  JsObjectSigner,
+  KeyConverter,
+  KeyFormat,
   Logger,
   LoggerProvider,
   LogLevelDesc,
@@ -38,6 +42,8 @@ import {
   InvokeContractV1Response,
   RunTransactionRequest,
   RunTransactionResponse,
+  SignTransactionRequest,
+  SignTransactionResponse,
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialPrivateKeyHex,
@@ -47,6 +53,9 @@ import {
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
+import { BesuSignTransactionEndpointV1 } from "./web-services/sign-transaction-endpoint-v1";
+
+export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
 export interface IPluginLedgerConnectorBesuOptions
   extends ICactusPluginOptions {
@@ -134,6 +143,14 @@ export class PluginLedgerConnectorBesu
     }
     {
       const endpoint = new InvokeContractEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new BesuSignTransactionEndpointV1({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -378,5 +395,55 @@ export class PluginLedgerConnectorBesu
       },
       web3SigningCredential,
     });
+  }
+
+  public async signTransaction(
+    req: SignTransactionRequest
+  ): Promise<Optional<SignTransactionResponse>> {
+    const { pluginRegistry, rpcApiHttpHost, logLevel } = this.options;
+    const { keychainId, keychainRef, transactionHash } = req;
+
+    const converter = new KeyConverter();
+
+    const web3Provider = new Web3.providers.HttpProvider(rpcApiHttpHost);
+    const web3 = new Web3(web3Provider);
+
+    // Make sure the transaction exists on the ledger first...
+    const transaction = await web3.eth.getTransaction(transactionHash);
+    if (!transaction) {
+      return Optional.empty();
+    }
+
+    const keychains = pluginRegistry.findManyByAspect<IPluginKeychain>(
+      PluginAspect.KEYCHAIN
+    );
+
+    const keychain = keychains.find((kc) => kc.getKeychainId() === keychainId);
+
+    if (!keychain) {
+      const msg = `Keychain for ID ${keychainId} not found.`;
+      throw new CodedError(msg, E_KEYCHAIN_NOT_FOUND);
+    }
+
+    const pem: string = await keychain.get(keychainRef);
+
+    const pkRaw = converter.privateKeyAs(pem, KeyFormat.PEM, KeyFormat.Raw);
+
+    const jsObjectSignerOptions: IJsObjectSignerOptions = {
+      privateKey: pkRaw,
+      logLevel,
+    };
+
+    const jsObjectSigner = new JsObjectSigner(jsObjectSignerOptions);
+
+    if (transaction !== undefined && transaction !== null) {
+      const singData = jsObjectSigner.sign(transaction.input);
+      const signDataHex = Buffer.from(singData).toString("hex");
+
+      const resBody: SignTransactionResponse = { signature: signDataHex };
+      return Optional.ofNullable(resBody);
+    }
+
+    return Optional.empty();
   }
 }
