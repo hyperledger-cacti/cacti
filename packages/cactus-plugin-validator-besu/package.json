@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-plugin-validator-besu",
   "version": "0.2.0",
   "description": "A web service plugin that obtain signatures of ledger state from Cactus nodes.",
-  "main": "dist/cactus-plugin-validator-besu.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-validator-besu.node.umd.min.js",
   "browser": "dist/cactus-plugin-validator-besu.web.umd.js",
   "browserMinified": "dist/cactus-plugin-validator-besu.web.umd.min.js",

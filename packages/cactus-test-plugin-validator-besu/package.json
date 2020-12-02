@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-test-plugin-validator-besu",
   "version": "0.2.0",
   "description": "Integration tests for the Quorum ledger and the API server.",
-  "main": "dist/cactus-test-plugin-validator-besu.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-plugin-validator-besu.node.umd.min.js",
   "browser": "dist/cactus-test-plugin-validator-besu.web.umd.js",
   "browserMinified": "dist/cactus-test-plugin-cvalidator-besu.web.umd.min.js",

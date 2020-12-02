@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-test-plugin-ledger-connector-quorum",
   "version": "0.2.0",
   "description": "Integration tests for the Quorum ledger and the API server.",
-  "main": "dist/cactus-test-plugin-ledger-connector-quorum.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-plugin-ledger-connector-quorum.node.umd.min.js",
   "browser": "dist/cactus-test-plugin-ledger-connector-quorum.web.umd.js",
   "browserMinified": "dist/cactus-test-plugin-ledger-connector-quorum.web.umd.min.js",

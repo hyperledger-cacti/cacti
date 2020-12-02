@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-test-tooling",
   "version": "0.2.0",
   "description": "Swiss army knife for test development. Main goal is to make pulling up test/dummy ledgers on the fly for tests easy, especially for test cases that are about simulating clean ledger state or wiped ledger state, etc.",
-  "main": "dist/cactus-test-tooling.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-tooling.node.umd.min.js",
   "browser": "dist/cactus-test-tooling.web.umd.js",
   "browserMinified": "dist/cactus-test-tooling.web.umd.min.js",

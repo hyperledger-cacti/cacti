@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-core",
   "version": "0.2.0",
   "description": "Contains lower level abstractions/implementation that is to be shared by multiple other, higher level packages of the project.",
-  "main": "dist/cactus-core.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-core.node.umd.min.js",
   "browser": "dist/cactus-core.web.umd.js",
   "browserMinified": "dist/cactus-core.web.umd.min.js",

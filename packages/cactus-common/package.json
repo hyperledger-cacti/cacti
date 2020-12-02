@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-common",
   "version": "0.2.0",
   "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
-  "main": "dist/cactus-common.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-common.node.umd.min.js",
   "browser": "dist/cactus-common.web.umd.js",
   "browserMinified": "dist/cactus-common.web.umd.min.js",

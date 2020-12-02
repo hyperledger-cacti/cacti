@@ -2,7 +2,7 @@
   "name": "@hyperledger/cactus-plugin-ledger-connector-fabric",
   "version": "0.2.0",
   "description": "Allows Cactus nodes to connect to a Fabric ledger.",
-  "main": "dist/cactus-plugin-ledger-connector-fabric.node.umd.js",
+  "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-ledger-connector-fabric.node.umd.min.js",
   "browser": "dist/cactus-plugin-ledger-connector-fabric.web.umd.js",
   "browserMinified": "dist/cactus-plugin-ledger-connector-fabric.web.umd.min.js",
