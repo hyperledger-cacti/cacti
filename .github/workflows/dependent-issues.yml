@@ -2,7 +2,16 @@ name: Dependent Issues
 
 on:
   issues:
-  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
   schedule:
     - cron: '0 0 * * *' # schedule daily check
 
