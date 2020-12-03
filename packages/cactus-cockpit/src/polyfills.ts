@@ -63,3 +63,6 @@ import "zone.js/dist/zone"; // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+
+// @see https://github.com/hyperledger/cactus/issues/410
+window.process = require("process");
