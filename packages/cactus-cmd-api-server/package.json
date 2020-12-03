@@ -80,7 +80,7 @@
     "jose": "1.27.2",
     "js-sha3": "0.8.0",
     "node-fetch": "3.0.0-beta.9",
-    "node-forge": "0.9.1",
+    "node-forge": "0.10.0",
     "secp256k1": "4.0.0",
     "semver": "7.3.2",
     "sha3": "2.1.2",
