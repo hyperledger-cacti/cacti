@@ -172,12 +172,14 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 const transactionData: TransactionData = new TransactionData("transfer", "ledger002", result.txId);
                 this.transactionInfoManagement.setTransactionData(tradeInfo, transactionData);
 
-                // Set LedgerOperation
-                // logger.debug('secondTransaction data : ' + JSON.stringify(result.data));
-                const ledgerOperation: LedgerOperation = new LedgerOperation("sendSignedProposal", "", result.data);
+                // Set Parameter
+                //logger.debug('secondTransaction data : ' + JSON.stringify(result.data));
+                const contract = {"channelName": "mychannel"};
+                const method = {"method": "sendSignedProposal"};
+                const args = {"args": [result.data]};
 
                 // Run Verifier (Fabric)
-                verifierFabric.requestLedgerOperation(ledgerOperation);
+                verifierFabric.requestLedgerOperationNeo(contract, method, args);
             })
             .catch(err => {
                 logger.error(err);

@@ -49,11 +49,13 @@ export function makeRawTransaction(txParam: { fromAddress: string, fromAddressPk
                     // const gasPrice: string = web3.eth.getGasPrice();
 
                     const latestNonce = getLatestNonce(txParam.fromAddress);
+                    logger.debug(`#####(A) _nonce: ${_nonce}, latestNonce: ${latestNonce}`);
                     logger.debug(`####makeRawTransaction(): fromAddress: ${txParam.fromAddress}, txnCount: ${web3.utils.toHex(txnCount)}, latestNonce: ${web3.utils.toHex(latestNonce)}`);
                     if (txnCount <= latestNonce) {
                         txnCount = latestNonce + 1;
                         logger.debug(`####makeRawTransaction(): Adjust txnCount, fromAddress: ${txParam.fromAddress}, txnCount: ${web3.utils.toHex(txnCount)}, latestNonce: ${web3.utils.toHex(latestNonce)}`);
                     }
+                    logger.debug(`#####(B) _nonce: ${_nonce}, latestNonce: ${latestNonce}, txnCount: ${txnCount}`);
                     setLatestNonce(txParam.fromAddress, txnCount);
 
                     const privKey: Buffer = Buffer.from(txParam.fromAddressPkey, 'hex');
@@ -97,7 +99,8 @@ function getLatestNonce(fromAddress: string): number {
     if (mapFromAddressNonce.has(fromAddress)) {
         return mapFromAddressNonce.get(fromAddress);
     }
-    return 0;
+    //return 0;
+    return -1;
 }
 
 function setLatestNonce(fromAddress: string, nonce: number): void {
