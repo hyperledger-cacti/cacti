@@ -1,46 +1,23 @@
 # example-cartrade
 
-## Premise
-- Launch two Validators (For Ethereum and Fabric)
-	- for Ethereum:
-		- `/packages/ledger-plugin/go-ethereum-ts/validator`
-		- "validatorUrl": `https://localhost:5050`,
-		1. cd `/packages/ledger-plugin/go-ethereum-ts/validator/src`
-		1. npm install
-		1. npm run build
-		1. npm run start
-	- for Fabric:
-		- `/packages/ledger-plugin/fabric/validator`
-		- "validatorUrl": `https://localhost:5040`,
-
-- The following drivers are operating normally (* It is also necessary to check the operation.).
-	- for Ethereum:
-		- `/packages/ledger-plugin/go-ethereum/validator/unit-test/validatorDriver_getNumericBalance.js`
-	- for Fabric:
-		- `/packages/ledger-plugin/fabric/validator/unit-test/queryCar.js`
-		- `/packages/ledger-plugin/fabric/validator/unit-test/validatorDriver_signTransactionOffline.js`
-
 ## Boot method
-1. cd `/packages`
-1. npm install
-1. Modify the following information for your environment
+
+1. Before booting, please modify the following information for your environment
 	- applicationHostInfo.hostName (URL of the host on the Location header) on `/packages/config/default.json`
 	- applicationHostInfo.hostPort (The port number of Routing-interface http server) on `/packages/config/default.json`
-1. npm run package-build
-1. cd BIF-trial/examples/cartrade
-1. npm install
-1. Modify the following information for your environment
-	- corrected escrow account information, etc. on `/examples/cartrade/config/default.json`
-	- cartradeInfo.fabric.submitter.certificate (certificate for admin)
-	- cartradeInfo.fabric.submitter.pkey (admin private key)
-	- carriadeInfo.ethereum.fromAddressPkey (private key of fromAddress)
-	- cartradeInfo.ethereum.escrowAddress (Address of the escrow account)
-	- carriadeInfo.ethereum.escrowAddressPkey (secret key of the escrow account)
-	- **NOTE**: The parameters which do not modified on `/examples/cartrade/config/usersetting.json` are specified by the parameters on `/packages/config/default.json`
-1. npm run cartrade-build
-	- **NOTE**: The above operation `npm run cartrade-build` is operated for building a symbolic link of node_modules. So this operation only needs to be done once, and there is no need to do it a second time or later.
-1. npm run start
-	- cartrade application boots on port 5034.
+
+1. Start ledgers:
+	- `./script-start-ledgers.sh` 
+1. Build validators, packages, and the cartrade app:
+	- `./script-build-all.sh`
+1. Start validators and the cartrade app
+	- Please open three consoles and execute the following:.
+	- Start the validator for Fabric:
+		`./script-start-validator-fabric.sh`
+	- Start the validator for Ethereum:
+		`./script-start-validator-ethereum.sh`
+	- Start the cartrade app:
+		`./script-start-cartrade.sh`
 
 ## How to use this application
 - Run with curl, etc. Currently only POST is available.
@@ -80,7 +57,7 @@
 	- Example output
 		```
 		##queryCar Params: CAR1
-		Transaction has been evaluated, result is: {"colour":"red","make":"Ford","model":"Mustang","owner":"fuser02"}
+		Transaction has been evaluated, result is: {"colour":"red","make":"Ford","model":"Mustang","owner":"user02"}
 		```
 - How to change the ownership of the car by hand
 	- ``/packages/ledger-plugin/fabric/validator/unit-test/validatorDriver_signTransactionOffline.js``

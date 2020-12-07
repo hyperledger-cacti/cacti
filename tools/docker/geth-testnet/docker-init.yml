@@ -1,0 +1,15 @@
+# Copyright 2019-2020 Fujitsu Laboratories Ltd.
+# SPDX-License-Identifier: Apache-2.0
+version: '3'
+services:
+  # geth1
+  init-chain-geth1:
+    container_name: init-chain-ec1
+    image: ethereum/client-go:v1.8.27
+    tty: true
+    volumes:
+      - "$PWD/data-geth1:/root/data"
+      #- "$PWD/data-geth1/genesis.json:/root/data/genesis.json"
+    command: >
+      --datadir "/root/data"
+      init /root/data/genesis.json
