@@ -79,6 +79,9 @@ Photo by Pontus Wellgraf on Unsplash
   - [4.3 Working Policies](#43-working-policies)
 - [5. Architecture](#5-architecture)
   - [5.1 Integration patterns](#51-integration-patterns)
+  - [5.1.1 Deployment Scenarios](#511-deployment-scenarios)
+    - [5.1.1 Production Deployment Example](#511-production-deployment-example)
+    - [5.1.2 Low Resource Deployment Example](#512-low-resource-deployment-example)
   - [5.2 System architecture and basic flow](#52-system-architecture-and-basic-flow)
     - [5.2.1 Definition of key components in system architecture](#521-definition-of-key-components-in-system-architecture)
     - [5.2.2 Bootstrapping Cactus application](#522-bootstrapping-cactus-application)
@@ -117,9 +120,6 @@ Photo by Pontus Wellgraf on Unsplash
     - [5.6.3 Key/Value Storage Plugins](#563-keyvalue-storage-plugins)
     - [5.6.4 Serverside Keychain Plugins](#564-serverside-keychain-plugins)
     - [5.6.5 Manual Consortium Plugin](#565-manual-consortium-plugin)
-  - [5.7 Deployment Scenarios](#57-deployment-scenarios)
-    - [5.7.1 Production Deployment Example](#571-production-deployment-example)
-    - [5.7.2 Low Resource Deployment Example](#572-low-resource-deployment-example)
 - [6. Identities, Authentication, Authorization](#6-identities-authentication-authorization)
   - [6.1 Definition of Identities in Cactus](#61-definition-of-identities-in-cactus)
   - [6.2 Transaction Signing Modes, Key Ownership](#62-transaction-signing-modes-key-ownership)
@@ -701,6 +701,48 @@ Hyperledger Cactus has several integration patterns as the following.
 | 3.  | data-value transfer | D -> V  | check if value transfer is successful when data is transferred                                 |
 | 4.  | data transfer       | D -> D  | check if all D1 is copied on ledger 2 <br> (as D1 is data on ledger 1, D2 is data on ledger 2) |
 | 5.  | data merge          | D <-> D | check if D1 = D2 as a result <br> (as D1 is data on ledger 1, D2 is data on ledger 2)          |
+
+## 5.1.1 Deployment Scenarios
+
+There's a near-infinite possible deployment scenarios which is intended to be one of the benefits of using Cactus where
+you are not constrained by strong opinions imposed upon you by the framework but instead can tailor it to your needs
+while still getting value out of it.
+There's a set of building blocks (members, nodes, API server processes, plugin instances) that you can use when defining (founding) a consortium and these building blocks relate to each other in a way that can be expressed with an entity relationship diagram which can be seen below.
+The composability rules can be deducted from how the diagram elements (entities) are connected (related) to each other, e.g. the API server process can have any number of plugin instances in it and a node can contain any number of API server processes, and so on until the top level construct is reached: the consortium.
+
+> Consortium management does not relate to achieving consensus on data/transactions involving individual ledgers, merely about consensus on the metadata of a consortium.
+
+<img width="400" src="./deployment-entity-relationship-diagram.png">
+
+Now, with these composability rules in mind, let us demonstrate a few different deployment scenarios (both expected and exotic ones) to showcase the framework's flexibility in this regard.
+
+### 5.1.1 Production Deployment Example
+
+Many different configurations are possible here as well.
+One way to have two members form a consortium and both of those members provide highly available, high throughput services is to have a deployment as shown on the below figure.
+What is important to note here is that this consortium has 2 nodes, 1 for each member
+and it is irrelevant how many API servers those nodes have internally because they
+all respond to requests through the network host/web domain that is tied to the
+node.
+One could say that API servers do not have a distinguishable identity relative to
+their peer API servers, only the higher-level nodes do.
+
+<img width="700" src="./deployment-production-example.png">
+
+### 5.1.2 Low Resource Deployment Example
+
+This is an example to showcase how you can pull up a full consortium even from
+within a single operating system process (API server) with multiple members and
+their respective nodes. It is not something that's recommended for a production
+grade environment, ever, but it is great for demos and integration tests where
+you have to simulate a fully functioning consortium with as little hardware footprint
+as possible to save on time and cost.
+
+The individual nodes/API servers are isolated by listening on seperate TCP ports
+of the machine they are hosted on:
+
+<img width="700" src="./deployment-low-resource-example.png">
+
 
 ## 5.2 System architecture and basic flow
 
@@ -1442,47 +1484,6 @@ There's many other ways to perform the initial agreement that happens offline, b
 provided here for ease of understanding:
 
 <img width="700" src="./plugin-consortium-manual-bootstrap-sequence-diagram.png">
-
-## 5.7 Deployment Scenarios
-
-There's a near-infinite possible deployment scenarios which is intended to be one of the benefits of using Cactus where
-you are not constrained by strong opinions imposed upon you by the framework but instead can tailor it to your needs
-while still getting value out of it.
-There's a set of building blocks (members, nodes, API server processes, plugin instances) that you can use when defining (founding) a consortium and these building blocks relate to each other in a way that can be expressed with an entity relationship diagram which can be seen below.
-The composability rules can be deducted from how the diagram elements (entities) are connected (related) to each other, e.g. the API server process can have any number of plugin instances in it and a node can contain any number of API server processes, and so on until the top level construct is reached: the consortium.
-
-> Consortium management does not relate to achieving consensus on data/transactions involving individual ledgers, merely about consensus on the metadata of a consortium.
-
-<img width="400" src="./deployment-entity-relationship-diagram.png">
-
-Now, with these composability rules in mind, let us demonstrate a few different deployment scenarios (both expected and exotic ones) to showcase the framework's flexibility in this regard.
-
-### 5.7.1 Production Deployment Example
-
-Many different configurations are possible here as well.
-One way to have two members form a consortium and both of those members provide highly available, high throughput services is to have a deployment as shown on the below figure.
-What is important to note here is that this consortium has 2 nodes, 1 for each member
-and it is irrelevant how many API servers those nodes have internally because they
-all respond to requests through the network host/web domain that is tied to the
-node.
-One could say that API servers do not have a distinguishable identity relative to
-their peer API servers, only the higher-level nodes do.
-
-<img width="700" src="./deployment-production-example.png">
-
-### 5.7.2 Low Resource Deployment Example
-
-This is an example to showcase how you can pull up a full consortium even from
-within a single operating system process (API server) with multiple members and
-their respective nodes. It is not something that's recommended for a production
-grade environment, ever, but it is great for demos and integration tests where
-you have to simulate a fully functioning consortium with as little hardware footprint
-as possible to save on time and cost.
-
-The individual nodes/API servers are isolated by listening on seperate TCP ports
-of the machine they are hosted on:
-
-<img width="700" src="./deployment-low-resource-example.png">
 
 
 # 6. Identities, Authentication, Authorization
