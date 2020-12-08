@@ -704,9 +704,6 @@ Hyperledger Cactus has several integration patterns as the following.
 
 ## 5.1.1 Deployment Scenarios
 
-There's a near-infinite possible deployment scenarios which is intended to be one of the benefits of using Cactus where
-you are not constrained by strong opinions imposed upon you by the framework but instead can tailor it to your needs
-while still getting value out of it.
 There's a set of building blocks (members, nodes, API server processes, plugin instances) that you can use when defining (founding) a consortium and these building blocks relate to each other in a way that can be expressed with an entity relationship diagram which can be seen below.
 The composability rules can be deducted from how the diagram elements (entities) are connected (related) to each other, e.g. the API server process can have any number of plugin instances in it and a node can contain any number of API server processes, and so on until the top level construct is reached: the consortium.
 
