@@ -20,7 +20,7 @@ import { FabricTestLedgerV1 } from "@hyperledger/cactus-test-tooling";
 import { IPluginLedgerConnectorFabricOptions } from "../../../../../main/typescript/plugin-ledger-connector-fabric";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
-test("deploys contract from go source", async (t: Test) => {
+test.skip("deploys contract from go source", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
   const ledger = new FabricTestLedgerV1({});
   await ledger.start();
