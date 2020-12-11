@@ -43,7 +43,10 @@ export class Servers {
 
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.server, `${fnTag} arg options.server`);
-    Checks.truthy(options.port, `${fnTag} arg options.port`);
+    Checks.truthy(
+      options.port || options.port === 0,
+      `${fnTag} arg options.port`
+    );
     Checks.truthy(options.hostname, `${fnTag} arg options.hostname`);
     const { server, port, hostname } = options;
 
