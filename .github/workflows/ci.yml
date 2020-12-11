@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       fail-fast: true
-      max-parallel: 16
+      max-parallel: 1 # Fabric AIO image needs fixed host ports allocated
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04]
         node-version: [v12.13.0, v14.15.1]

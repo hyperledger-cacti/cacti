@@ -1,134 +1,117 @@
-# Dockerfile for Hyperledger fabric all-in-one development and experiments, including:
-# * fabric-peer
-# * fabric-orderer
-# * fabric-ca
-# * cryptogen
-# * configtxgen
-# * configtxlator
-
-# * gotools
-
-# Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
-# Data is stored under /var/hyperledger/db and /var/hyperledger/production
-
-# See https://stackoverflow.com/questions/55173477/hyperledger-fabric-dial-unix-host-var-run-docker-sock-connect-no-such-file-o
-# On why do we need Docker-in-Docker
+# We need to use the older, more stable v18 here because of
+# https://github.com/docker-library/docker/issues/170
+FROM docker:18.09.9-dind
 
 ARG FABRIC_VERSION=1.4.8
-ARG DIND_VERSION=19.03.12-dind
 
-FROM docker:$DIND_VERSION as dind
-FROM hyperledger/fabric-ca:$FABRIC_VERSION as ca
-FROM hyperledger/fabric-orderer:$FABRIC_VERSION as orderer
-FROM hyperledger/fabric-peer:$FABRIC_VERSION as peer
+WORKDIR /
 
-COPY --from=ca /usr/local/bin/fabric-ca-server /usr/local/bin/
-COPY --from=ca /usr/local/bin/fabric-ca-client /usr/local/bin/
-COPY --from=orderer /usr/local/bin/orderer /usr/local/bin/
-COPY --from=dind /usr/local/bin/dind /usr/local/bin/dind
+RUN apk update
+
+# Install dependencies of Docker Compose
+RUN apk add py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make
+
+# Install python/pip - We need this because DinD 18.x has Python 2
+# And we cannot upgrade to DinD 19 because of
+# https://github.com/docker-library/docker/issues/170
+ENV PYTHONUNBUFFERED=1
+RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
+RUN python3 -m ensurepip
+RUN pip3 install --no-cache --upgrade pip setuptools
+
+# Install Docker Compose which is a dependency of Fabric Samples
+RUN pip install docker-compose
+
+# Need git to clone the sources of the Fabric Samples repository from GitHub
+RUN apk add --no-cache git
+
+# Fabric Samples needs bash, sh is not good enough here
+RUN apk add --no-cache bash
+
+# Need curl to download the Fabric bootstrap script
+RUN apk add --no-cache curl
+
+# The file binary is used to inspect exectubles when debugging container image issues
+RUN apk add --no-cache file
+
+# Needed because the Fabric binaries need the GNU libc dynamic linker to be executed
+# and alpine does not have that by default
+# @see https://askubuntu.com/a/1035037/1008695
+# @see https://github.com/gliderlabs/docker-alpine/issues/219#issuecomment-254741346
+RUN apk add --no-cache libc6-compat
 
 ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
-ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
-ENV PROJECT_VERSION=1.4.8
+RUN mkdir -p $CACTUS_CFG_PATH
+# OpenSSH - need to have it so we can shell in and install/instantiate contracts
+RUN apk add --no-cache openssh augeas
 
-ARG KEYPATH=~/.ssh/id_rsa.pub
-ARG GO_VERSION=1.15
-ARG GO_SHA256=2d75848ac606061efe52a8068d0e647b35ce487a15bb52272c427df485193602
-ARG GO_TAR_GZ="go${GO_VERSION}.linux-amd64.tar.gz"
-
-RUN apt-get update
-
-# Required for DinD to work
-RUN apt-get install -y iptables bash
-
-# Install go - START
-RUN cd ~
-RUN wget https://golang.org/dl/${GO_TAR_GZ}
-
-##  Make sure the downloaded go tar file is what we want it to be not some malware
-RUN echo "${GO_SHA256} ${GO_TAR_GZ}" sha256sum --check --strict
-RUN tar -xvf ./${GO_TAR_GZ}
-RUN chown -R root:root ./go
-RUN mv go /usr/local
-
-RUN echo "export PATH=/usr/local/go/bin:$PATH" > /etc/environment
-# Install go - END
-
-# Set up Open-SSH server
-RUN apt-get install -y openssh-server augeas-tools
-
-# See below link to understand why this is necessary
-# https://serverfault.com/questions/721026/docker-container-sshopen-not-staying-up
-RUN mkdir /var/run/sshd
-
-RUN mkdir -p ~root/.ssh /etc/authorized_keys && chmod 700 ~root/.ssh/
+# Configure the OpenSSH server we just installed
 RUN augtool 'set /files/etc/ssh/sshd_config/AuthorizedKeysFile ".ssh/authorized_keys /etc/authorized_keys/%u"'
 RUN augtool 'set /files/etc/ssh/sshd_config/PermitRootLogin yes'
-RUN augtool 'set /files/etc/ssh/sshd_config/PasswordAuthentication yes'
+RUN augtool 'set /files/etc/ssh/sshd_config/PasswordAuthentication no'
 RUN augtool 'set /files/etc/ssh/sshd_config/Port 22'
-RUN cp -a /etc/ssh /etc/ssh.cache
+# Create the server's key - without this sshd will refuse to start
 RUN ssh-keygen -A
-RUN echo 'root:root' | chpasswd
-
-RUN chmod 700 ~/
-RUN chmod 700 ~/.ssh
-RUN touch ~/.ssh/authorized_keys
-RUN chmod 600 ~/.ssh/authorized_keys
-RUN mkdir -p $CACTUS_CFG_PATH
 
 # Generate an RSA keypair on the fly to avoid having to hardcode one in the image
 # which technically does not pose a security threat since this is only a development
-# image, but still it is just best not to tempt fate with things like private keys
-# So here we go:
+# image, but we do it like this anyway.
+RUN mkdir ~/.ssh
+RUN chmod 700 ~/.ssh/
+RUN touch ~/.ssh/authorized_keys
 RUN ["/bin/bash", "-c", "ssh-keygen -t rsa -N '' -f $CACTUS_CFG_PATH/fabric-aio-image <<< y"]
 RUN mv $CACTUS_CFG_PATH/fabric-aio-image $CACTUS_CFG_PATH/fabric-aio-image.key
-
 RUN cp $CACTUS_CFG_PATH/fabric-aio-image.pub ~/.ssh/authorized_keys
 
-RUN wget https://github.com/hyperledger/fabric/releases/download/v${PROJECT_VERSION}/hyperledger-fabric-linux-amd64-${PROJECT_VERSION}.tar.gz \
-    && tar -xvf hyperledger-fabric-linux-amd64-${PROJECT_VERSION}.tar.gz \
-    && rm hyperledger-fabric-linux-amd64-${PROJECT_VERSION}.tar.gz
+# Download and execute the Fabric bootstrap script, but instruct it with the -d
+# flag to avoid pulling docker images because during the build phase of this image
+# there is no docker daemon running yet so this has to happen in the CMD once a
+# container has been started from the image => see ./run-fabric-network-sh
+RUN curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/release-2.2/scripts/bootstrap.sh > /bootstrap.sh
+RUN chmod +x bootstrap.sh
+# Run the bootstrap here so that at least we can pre-fetch the git clone and the binary downloads resulting in
+# faster container startup speed since these steps will not have to be done, only the docker image pulls.
+RUN /bootstrap.sh $FABRIC_VERSION $FABRIC_VERSION -d
 
-RUN mkdir -p $FABRIC_CFG_PATH/config \
-    && mkdir -p /etc/hyperledger/fabric-ca-server \
-    && mkdir -p /etc/hyperledger/fabric-ca-server-config \
-    && mkdir -p /etc/hyperledger/fabric/orderer \
-    && mkdir -p /etc/hyperledger/fabric/peer
+# Install supervisord because we need to run the docker daemon and also the fabric network
+# meaning that we have multiple processes to run.
+RUN apk add --no-cache supervisor
+COPY supervisord.conf /etc/supervisord.conf
 
-COPY ./configtx.yaml $FABRIC_CFG_PATH
-COPY ./crypto-config.yaml $FABRIC_CFG_PATH
-COPY ./generate.sh $FABRIC_CFG_PATH
-COPY ./start_ca.sh /etc/hyperledger/fabric-ca-server
-COPY ./start_orderer.sh /etc/hyperledger/fabric/orderer
-COPY ./start_peer.sh /etc/hyperledger/fabric/peer
-COPY ./join_channel.sh /etc/hyperledger/fabric/peer
-RUN ./$FABRIC_CFG_PATH/generate.sh
+COPY run-fabric-network.sh /
 
-# SUPERVISORD
-RUN apt-get install -y supervisor
-RUN mkdir -p /var/log/supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# OpenSSH Server
-EXPOSE 22
-
-# fabric-orderer
-EXPOSE 7050
-
-# - Port 7053 used to be used for Events in older versions of Fabric,
-#   but it is not used in 1.4.1
-
-# fabric-peers
-EXPOSE 7051 7052
-
-# fabric-ca-server RESTful
-EXPOSE 7054
-
-# fabric-peer operations
-EXPOSE 9443
-
-# SUPERVISORD PORTS
+# supervisord web ui/dashboard
 EXPOSE 9001
 
+# peer1.org2.example.com
+EXPOSE 10051
+
+# peer0.org1.example.com
+EXPOSE 7051
+
+# peer0.org2.example.com
+EXPOSE 9051
+
+# peer1.org1.example.com
+EXPOSE 8051
+
+# orderer.example.com
+EXPOSE 7050
+
+# ca_peerOrg1
+EXPOSE 7054
+
+# ca_peerOrg2
+EXPOSE 8054
+
+# couchdb0, couchdb1, couchdb2, couchdb3
+EXPOSE 5984 6984 7984 8984
+
+# Extend the parent image's entrypoint
+# https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script
 ENTRYPOINT ["/usr/bin/supervisord"]
-CMD ["--configuration", "/etc/supervisor/conf.d/supervisord.conf", "--nodaemon"]
+CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]
+
+# We consider the container healthy once the default example fabcar contract has been deployed
+# and is responsive to queries as well
+HEALTHCHECK --interval=1s --timeout=5s --start-period=60s --retries=300 CMD docker exec cli peer chaincode query --channelID mychannel --name fabcar --ctor '{"Args": [], "Function": "queryAllCars"}'
