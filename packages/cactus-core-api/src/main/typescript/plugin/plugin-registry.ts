@@ -1,6 +1,7 @@
 import { Optional } from "typescript-optional";
 import { ICactusPlugin, isICactusPlugin } from "../plugin/i-cactus-plugin";
 import { PluginAspect } from "../plugin/plugin-aspect";
+import { IPluginKeychain } from "./keychain/i-plugin-keychain";
 
 /**
  * This interface describes the constructor options object that can be used to provide configuration parameters to
@@ -78,6 +79,21 @@ export class PluginRegistry {
   ): Optional<T> {
     const plugin = this.getPlugins().find((p) => p.getAspect() === aspect);
     return Optional.ofNullable(plugin as T);
+  }
+
+  public findOneByKeychainId<T extends IPluginKeychain>(keychainId: string): T {
+    const fnTag = "PluginRegistry#findOneByKeychainId()";
+    if (typeof keychainId !== "string" || keychainId.trim().length < 1) {
+      throw new Error(`${fnTag} need keychainId arg as non-blank string.`);
+    }
+
+    const plugin = this.findManyByAspect<IPluginKeychain>(
+      PluginAspect.KEYCHAIN
+    ).find((keychainPlugin) => keychainPlugin.getKeychainId() === keychainId);
+
+    return Optional.ofNullable(plugin as T).orElseThrow(
+      () => new Error(`${fnTag} No keychain found for ID ${keychainId}`)
+    );
   }
 
   public findManyByAspect<T extends ICactusPlugin>(aspect: PluginAspect): T[] {
