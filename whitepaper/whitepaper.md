@@ -78,8 +78,7 @@ Photo by Pontus Wellgraf on Unsplash
     - [4.2.4 Consortium Management](#424-consortium-management)
   - [4.3 Working Policies](#43-working-policies)
 - [5. Architecture](#5-architecture)
-  - [5.1 Integration patterns](#51-integration-patterns)
-  - [5.1.1 Deployment Scenarios](#511-deployment-scenarios)
+  - [5.1 Deployment Scenarios](#51-deployment-scenarios)
     - [5.1.1 Production Deployment Example](#511-production-deployment-example)
     - [5.1.2 Low Resource Deployment Example](#512-low-resource-deployment-example)
   - [5.2 System architecture and basic flow](#52-system-architecture-and-basic-flow)
@@ -688,7 +687,7 @@ After the forming of the consortium with it's initial set of members (one or mor
 
 # 5. Architecture
 
-## 5.1 Integration patterns
+## 5.1 Deployment Scenarios
 
 Hyperledger Cactus has several integration patterns as the following.
 
@@ -702,7 +701,6 @@ Hyperledger Cactus has several integration patterns as the following.
 | 4.  | data transfer       | D -> D  | check if all D1 is copied on ledger 2 <br> (as D1 is data on ledger 1, D2 is data on ledger 2) |
 | 5.  | data merge          | D <-> D | check if D1 = D2 as a result <br> (as D1 is data on ledger 1, D2 is data on ledger 2)          |
 
-## 5.1.1 Deployment Scenarios
 
 There's a set of building blocks (members, nodes, API server processes, plugin instances) that you can use when defining (founding) a consortium and these building blocks relate to each other in a way that can be expressed with an entity relationship diagram which can be seen below.
 The composability rules can be deducted from how the diagram elements (entities) are connected (related) to each other, e.g. the API server process can have any number of plugin instances in it and a node can contain any number of API server processes, and so on until the top level construct is reached: the consortium.
