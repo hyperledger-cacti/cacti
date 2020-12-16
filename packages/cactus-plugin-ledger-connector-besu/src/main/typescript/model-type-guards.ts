@@ -1,5 +1,4 @@
 import {
-  Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialNone,
   Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
@@ -15,10 +14,4 @@ export function isWeb3SigningCredentialNone(
   x: any
 ): x is Web3SigningCredentialNone {
   return x?.type && x?.type === Web3SigningCredentialType.NONE;
-}
-
-export function isWeb3SigningCredentialGethKeychainPassword(
-  x: any
-): x is Web3SigningCredentialGethKeychainPassword {
-  return x?.type && x?.type === Web3SigningCredentialType.GETHKEYCHAINPASSWORD;
 }

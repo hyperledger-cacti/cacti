@@ -357,7 +357,7 @@ export interface SolidityContractJsonArtifact {
  * @type Web3SigningCredential
  * @export
  */
-export type Web3SigningCredential = Web3SigningCredentialCactusKeychainRef | Web3SigningCredentialGethKeychainPassword | Web3SigningCredentialNone | Web3SigningCredentialPrivateKeyHex;
+export type Web3SigningCredential = Web3SigningCredentialCactusKeychainRef | Web3SigningCredentialNone | Web3SigningCredentialPrivateKeyHex;
 
 /**
  * 
@@ -389,31 +389,6 @@ export interface Web3SigningCredentialCactusKeychainRef {
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
     keychainId: string;
-}
-/**
- * 
- * @export
- * @interface Web3SigningCredentialGethKeychainPassword
- */
-export interface Web3SigningCredentialGethKeychainPassword {
-    /**
-     * 
-     * @type {Web3SigningCredentialType}
-     * @memberof Web3SigningCredentialGethKeychainPassword
-     */
-    type: Web3SigningCredentialType;
-    /**
-     * The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional terminology of authentication.
-     * @type {string}
-     * @memberof Web3SigningCredentialGethKeychainPassword
-     */
-    ethAccount: string;
-    /**
-     * A geth keychain unlock password.
-     * @type {string}
-     * @memberof Web3SigningCredentialGethKeychainPassword
-     */
-    secret: string;
 }
 /**
  * Using this denotes that there is no signing required because the transaction is pre-signed.
@@ -460,7 +435,6 @@ export interface Web3SigningCredentialPrivateKeyHex {
  */
 export enum Web3SigningCredentialType {
     CACTUSKEYCHAINREF = 'CACTUS_KEYCHAIN_REF',
-    GETHKEYCHAINPASSWORD = 'GETH_KEYCHAIN_PASSWORD',
     PRIVATEKEYHEX = 'PRIVATE_KEY_HEX',
     NONE = 'NONE'
 }
