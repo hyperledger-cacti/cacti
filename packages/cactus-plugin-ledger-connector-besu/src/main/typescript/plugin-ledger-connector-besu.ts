@@ -39,7 +39,6 @@ import {
   RunTransactionRequest,
   RunTransactionResponse,
   Web3SigningCredentialCactusKeychainRef,
-  Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
 } from "./generated/openapi/typescript-axios/";
@@ -180,9 +179,7 @@ export class PluginLedgerConnectorBesu
       if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
         throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
       }
-      const web3SigningCredential = req.web3SigningCredential as
-        | Web3SigningCredentialGethKeychainPassword
-        | Web3SigningCredentialPrivateKeyHex;
+      const web3SigningCredential = req.web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
       const payload = (method.send as any).request();
       const { params } = payload;
@@ -210,11 +207,11 @@ export class PluginLedgerConnectorBesu
     const fnTag = `${this.className}#transact()`;
 
     switch (req.web3SigningCredential.type) {
+      // Web3SigningCredentialType.GETHKEYCHAINPASSWORD is removed as Hyperledger Besu doesn't support the PERSONAL api
+      // for --rpc-http-api as per the discussion mentioned here
+      // https://chat.hyperledger.org/channel/besu-contributors?msg=GqQXfW3k79ygRtx5Q
       case Web3SigningCredentialType.CACTUSKEYCHAINREF: {
         return this.transactCactusKeychainRef(req);
-      }
-      case Web3SigningCredentialType.GETHKEYCHAINPASSWORD: {
-        return this.transactGethKeychain(req);
       }
       case Web3SigningCredentialType.PRIVATEKEYHEX: {
         return this.transactPrivateKey(req);
@@ -252,27 +249,6 @@ export class PluginLedgerConnectorBesu
       throw receipt;
     } else {
       return { transactionReceipt: receipt };
-    }
-  }
-
-  public async transactGethKeychain(
-    txIn: RunTransactionRequest
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactGethKeychain()`;
-    const { sendTransaction } = this.web3.eth.personal;
-    const { transactionConfig, web3SigningCredential } = txIn;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
-    try {
-      const txHash = await sendTransaction(transactionConfig, secret);
-      const transactionReceipt = await this.pollForTxReceipt(txHash);
-      return { transactionReceipt };
-    } catch (ex) {
-      throw new Error(
-        `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `InnerException: ${ex.stack}`
-      );
     }
   }
 
@@ -365,9 +341,7 @@ export class PluginLedgerConnectorBesu
     if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
       throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
     }
-    const web3SigningCredential = req.web3SigningCredential as
-      | Web3SigningCredentialGethKeychainPassword
-      | Web3SigningCredentialPrivateKeyHex;
+    const web3SigningCredential = req.web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
     return this.transact({
       transactionConfig: {

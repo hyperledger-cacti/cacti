@@ -40,10 +40,6 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
         },
         oneOf: [
           {
-            $ref:
-              "#/components/schemas/Web3SigningCredentialGethKeychainPassword",
-          },
-          {
             $ref: "#/components/schemas/Web3SigningCredentialCactusKeychainRef",
           },
           { $ref: "#/components/schemas/Web3SigningCredentialPrivateKeyHex" },
@@ -52,30 +48,6 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
         properties: {
           type: {
             $ref: "#/components/schemas/Web3SigningCredentialType",
-          },
-        },
-      },
-      Web3SigningCredentialGethKeychainPassword: {
-        type: "object",
-        required: ["type", "ethAccount", "secret"],
-        properties: {
-          type: {
-            $ref: "#/components/schemas/Web3SigningCredentialType",
-          },
-          ethAccount: {
-            type: "string",
-            description:
-              "The ethereum account (public key) that the credential " +
-              " belongs to. Basically the username in the traditional terminology of authentication.",
-            minLength: 64,
-            maxLength: 64,
-            nullable: false,
-          },
-          secret: {
-            type: "string",
-            description: "A geth keychain unlock password.",
-            minLength: 0,
-            maxLength: 65535,
           },
         },
       },

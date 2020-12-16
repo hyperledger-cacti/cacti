@@ -124,62 +124,6 @@ test("deploys contract via .json file", async (t: Test) => {
     );
   });
 
-  // FIXME: Stop skipping this test once the 'personal' API is enabled in the
-  // Besu Test Ledger image by default.
-  test.skip("invoke Web3SigningCredentialType.GETHKEYCHAINPASSWORD", async (t2: Test) => {
-    const newName = `DrCactus${uuidv4()}`;
-    const setNameOut = await connector.invokeContract({
-      contractAddress,
-      contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
-      methodName: "setName",
-      params: [newName],
-      web3SigningCredential: {
-        ethAccount: firstHighNetWorthAccount,
-        secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
-      },
-    });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
-
-    const getNameOut = await connector.invokeContract({
-      contractAddress,
-      contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
-      methodName: "getName",
-      params: [],
-      web3SigningCredential: {
-        ethAccount: firstHighNetWorthAccount,
-        secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
-      },
-    });
-    t2.ok(
-      getNameOut.transactionReceipt,
-      `getName() SEND invocation produced receipt OK`
-    );
-
-    const { callOutput: getNameOut2 } = await connector.invokeContract({
-      contractAddress,
-      contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.CALL,
-      methodName: "getName",
-      params: [],
-      web3SigningCredential: {
-        ethAccount: firstHighNetWorthAccount,
-        secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
-      },
-    });
-    t2.equal(
-      getNameOut2,
-      newName,
-      "setName() invocation #2 output is truthy OK"
-    );
-
-    t2.end();
-  });
-
   test("invoke Web3SigningCredentialType.NONE", async (t2: Test) => {
     const testEthAccount2 = web3.eth.accounts.create(uuidv4());
 
