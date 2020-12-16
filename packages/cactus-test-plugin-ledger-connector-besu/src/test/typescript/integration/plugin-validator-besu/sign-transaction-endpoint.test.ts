@@ -26,7 +26,7 @@ import {
   SignTransactionRequest,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
-import { PluginRegistry } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 

@@ -24,7 +24,7 @@ import {
   IQuorumGenesisOptions,
   IAccount,
 } from "@hyperledger/cactus-test-tooling";
-import { PluginRegistry } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "INFO";
 const log: Logger = LoggerProvider.getOrCreate({

@@ -16,9 +16,10 @@ import {
   PluginAspect,
   ICactusPlugin,
   ICactusPluginOptions,
-  PluginRegistry,
   IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
+
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
   Checks,

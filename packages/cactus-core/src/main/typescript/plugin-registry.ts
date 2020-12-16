@@ -1,7 +1,10 @@
 import { Optional } from "typescript-optional";
-import { ICactusPlugin, isICactusPlugin } from "../plugin/i-cactus-plugin";
-import { PluginAspect } from "../plugin/plugin-aspect";
-import { IPluginKeychain } from "./keychain/i-plugin-keychain";
+import {
+  ICactusPlugin,
+  IPluginKeychain,
+  isICactusPlugin,
+  PluginAspect,
+} from "@hyperledger/cactus-core-api";
 
 /**
  * This interface describes the constructor options object that can be used to provide configuration parameters to

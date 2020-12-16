@@ -1,12 +1,13 @@
 import test, { Test } from "tape";
 import { v4 as uuidv4 } from "uuid";
 
+import { PluginRegistry } from "../../../main/typescript/public-api";
+
 import {
   ICactusPlugin,
   IPluginKeychain,
   PluginAspect,
-  PluginRegistry,
-} from "../../../main/typescript/public-api";
+} from "@hyperledger/cactus-core-api";
 
 test("PluginRegistry", (tMain: Test) => {
   test("findOneByKeychainId() finds plugin by keychain ID", (t: Test) => {

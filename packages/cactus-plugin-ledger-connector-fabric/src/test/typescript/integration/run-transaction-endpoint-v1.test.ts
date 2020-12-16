@@ -8,7 +8,7 @@ import bodyParser from "body-parser";
 import express from "express";
 
 import { FabricTestLedgerV1 } from "@hyperledger/cactus-test-tooling";
-import { PluginRegistry } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
   IListenOptions,

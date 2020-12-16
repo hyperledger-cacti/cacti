@@ -6,7 +6,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import {
   PluginLedgerConnectorQuorum,

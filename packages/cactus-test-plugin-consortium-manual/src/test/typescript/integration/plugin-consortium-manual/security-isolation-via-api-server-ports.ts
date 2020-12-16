@@ -10,8 +10,9 @@ import {
   CactusNode,
   ConsortiumMember,
   Consortium,
-  PluginRegistry,
 } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+
 import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
 import {
   DefaultApi as DefaultApiPlugin,

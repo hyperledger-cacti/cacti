@@ -64,6 +64,7 @@
   "dependencies": {
     "@hyperledger/cactus-cockpit": "^0.2.0",
     "@hyperledger/cactus-common": "^0.2.0",
+    "@hyperledger/cactus-core": "^0.2.0",
     "@hyperledger/cactus-core-api": "^0.2.0",
     "@hyperledger/cactus-plugin-consortium-manual": "^0.2.0",
     "@hyperledger/cactus-plugin-keychain-memory": "^0.2.0",

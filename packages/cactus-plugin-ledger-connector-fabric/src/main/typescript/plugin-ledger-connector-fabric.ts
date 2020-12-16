@@ -22,8 +22,9 @@ import {
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
-  PluginRegistry,
 } from "@hyperledger/cactus-core-api";
+
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
   Logger,
