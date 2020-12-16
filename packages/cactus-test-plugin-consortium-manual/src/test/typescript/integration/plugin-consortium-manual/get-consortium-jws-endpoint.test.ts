@@ -12,7 +12,12 @@ import {
   DefaultApi,
   Configuration,
 } from "@hyperledger/cactus-plugin-consortium-manual";
-import { Consortium } from "@hyperledger/cactus-core-api";
+import {
+  CactusNode,
+  Consortium,
+  ConsortiumDatabase,
+  ConsortiumMember,
+} from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 test("member node public keys and hosts are pre-shared", async (t: Test) => {
@@ -66,57 +71,67 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
   const pubKeyPem3 = keyPair3.toPEM(false);
   t.comment(`Cactus Node 3 Public Key PEM: ${pubKeyPem3}`);
 
+  const node1: CactusNode = {
+    consortiumId,
+    memberId: memberId1,
+    id: "Example_Cactus_Node_1",
+    nodeApiHost: node1Host,
+    publicKeyPem: pubKeyPem1,
+    ledgerIds: [],
+    pluginInstanceIds: [],
+  };
+
+  const member1: ConsortiumMember = {
+    id: memberId1,
+    name: "Example Corp 1",
+    nodeIds: [node1.id],
+  };
+
+  const node2: CactusNode = {
+    consortiumId,
+    memberId: memberId2,
+    id: "Example_Cactus_Node_2",
+    nodeApiHost: node2Host,
+    publicKeyPem: pubKeyPem2,
+    ledgerIds: [],
+    pluginInstanceIds: [],
+  };
+
+  const member2: ConsortiumMember = {
+    id: memberId2,
+    name: "Example Corp 2",
+    nodeIds: [node2.id],
+  };
+
+  const node3: CactusNode = {
+    consortiumId,
+    memberId: memberId3,
+    id: "Example_Cactus_Node_3",
+    nodeApiHost: node3Host,
+    publicKeyPem: pubKeyPem3,
+    ledgerIds: [],
+    pluginInstanceIds: [],
+  };
+
+  const member3: ConsortiumMember = {
+    id: memberId3,
+    name: "Example Corp 3",
+    nodeIds: [node3.id],
+  };
+
   const consortium: Consortium = {
     id: consortiumId,
     mainApiHost: node1Host,
     name: consortiumName,
-    members: [
-      {
-        id: memberId1,
-        name: "Example Corp 1",
-        nodes: [
-          {
-            consortiumId,
-            memberId: memberId1,
-            id: "Example_Cactus_Node_1",
-            nodeApiHost: node1Host,
-            publicKeyPem: pubKeyPem1,
-            ledgers: [],
-            plugins: [],
-          },
-        ],
-      },
-      {
-        id: memberId2,
-        name: "Example Corp 2",
-        nodes: [
-          {
-            consortiumId,
-            memberId: memberId2,
-            id: "Example_Cactus_Node_2",
-            nodeApiHost: node2Host,
-            publicKeyPem: pubKeyPem2,
-            ledgers: [],
-            plugins: [],
-          },
-        ],
-      },
-      {
-        id: memberId3,
-        name: "Example Corp 3",
-        nodes: [
-          {
-            consortiumId,
-            memberId: memberId3,
-            id: "Example_Cactus_Node_3",
-            nodeApiHost: node3Host,
-            publicKeyPem: pubKeyPem3,
-            ledgers: [],
-            plugins: [],
-          },
-        ],
-      },
-    ],
+    memberIds: [memberId1, memberId2, memberId3],
+  };
+
+  const consortiumDatabase: ConsortiumDatabase = {
+    cactusNode: [node1, node2, node3],
+    consortium: [consortium],
+    consortiumMember: [member1, member2, member3],
+    ledger: [],
+    pluginInstance: [],
   };
 
   t.comment(`Setting up first node...`);
@@ -129,7 +144,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
       instanceId: uuidV4(),
       pluginRegistry,
       keyPairPem: keyPair1.toPEM(true),
-      consortium,
+      consortiumDatabase,
       logLevel: "trace",
     };
     const pluginConsortiumManual = new PluginConsortiumManual(options);
@@ -182,7 +197,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
       instanceId: uuidV4(),
       pluginRegistry,
       keyPairPem: keyPair2.toPEM(true),
-      consortium,
+      consortiumDatabase,
       logLevel: "trace",
     };
     const pluginConsortiumManual = new PluginConsortiumManual(options);
@@ -236,7 +251,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
       instanceId: uuidV4(),
       pluginRegistry,
       keyPairPem: keyPair3.toPEM(true),
-      consortium,
+      consortiumDatabase,
       logLevel: "trace",
     };
     const pluginConsortiumManual = new PluginConsortiumManual(options);

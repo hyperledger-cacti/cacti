@@ -38,35 +38,35 @@ export interface CactusNode {
      */
     publicKeyPem: string;
     /**
-     * The unique identifier of a Cactus node. Recommended to assign a value to this that is guaranteed to be unique in the whole consortium or better yet, globally anywhere.
+     * 
      * @type {string}
      * @memberof CactusNode
      */
     id: string;
     /**
-     * ID of the Cactus Consortium this node is in.
+     * 
      * @type {string}
      * @memberof CactusNode
      */
     consortiumId: string;
     /**
-     * ID of the Cactus Consortium member this node is operated by.
+     * 
      * @type {string}
      * @memberof CactusNode
      */
     memberId: string;
     /**
-     * Stores an array of Ledger entities that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions.
-     * @type {Array<Ledger>}
+     * Stores an array of Ledger entity IDs that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions.
+     * @type {Array<string>}
      * @memberof CactusNode
      */
-    ledgers: Array<Ledger>;
+    ledgerIds: Array<string>;
     /**
      * 
-     * @type {Array<CactusPlugin>}
+     * @type {Array<string>}
      * @memberof CactusNode
      */
-    plugins: Array<CactusPlugin>;
+    pluginInstanceIds: Array<string>;
 }
 /**
  * 
@@ -75,35 +75,35 @@ export interface CactusNode {
  */
 export interface CactusNodeAllOf {
     /**
-     * The unique identifier of a Cactus node. Recommended to assign a value to this that is guaranteed to be unique in the whole consortium or better yet, globally anywhere.
+     * 
      * @type {string}
      * @memberof CactusNodeAllOf
      */
     id: string;
     /**
-     * ID of the Cactus Consortium this node is in.
+     * 
      * @type {string}
      * @memberof CactusNodeAllOf
      */
     consortiumId: string;
     /**
-     * ID of the Cactus Consortium member this node is operated by.
+     * 
      * @type {string}
      * @memberof CactusNodeAllOf
      */
     memberId: string;
     /**
-     * Stores an array of Ledger entities that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions.
-     * @type {Array<Ledger>}
+     * Stores an array of Ledger entity IDs that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions.
+     * @type {Array<string>}
      * @memberof CactusNodeAllOf
      */
-    ledgers: Array<Ledger>;
+    ledgerIds: Array<string>;
     /**
      * 
-     * @type {Array<CactusPlugin>}
+     * @type {Array<string>}
      * @memberof CactusNodeAllOf
      */
-    plugins: Array<CactusPlugin>;
+    pluginInstanceIds: Array<string>;
 }
 /**
  * A Cactus node meta information
@@ -123,25 +123,6 @@ export interface CactusNodeMeta {
      * @memberof CactusNodeMeta
      */
     publicKeyPem: string;
-}
-/**
- * 
- * @export
- * @interface CactusPlugin
- */
-export interface CactusPlugin {
-    /**
-     * 
-     * @type {string}
-     * @memberof CactusPlugin
-     */
-    id: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CactusPlugin
-     */
-    packageName?: string;
 }
 /**
  * 
@@ -168,11 +149,48 @@ export interface Consortium {
      */
     mainApiHost: string;
     /**
-     * 
-     * @type {Array<ConsortiumMember>}
+     * The collection (array) of primary keys of consortium member entities that belong to this Consortium.
+     * @type {Array<string>}
      * @memberof Consortium
      */
-    members: Array<ConsortiumMember>;
+    memberIds: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface ConsortiumDatabase
+ */
+export interface ConsortiumDatabase {
+    /**
+     * A collection of Consortium entities. In practice this should only ever contain a single consortium, but we defined it as an array to keep the convention up with the rest of the collections defined in the Consortium data in general. Also, if we ever decide to somehow have some sort of consortium to consortium integration (which does not make much sense in the current frame of mind of the author in the year 2020) then having this as an array will have proven itself to be an excellent long term compatibility/extensibility decision indeed.
+     * @type {Array<Consortium>}
+     * @memberof ConsortiumDatabase
+     */
+    consortium: Array<Consortium>;
+    /**
+     * The complete collection of all ledger entities inexistence within the consortium.
+     * @type {Array<Ledger>}
+     * @memberof ConsortiumDatabase
+     */
+    ledger: Array<Ledger>;
+    /**
+     * The complete collection of all consortium member entities in existence within the consortium.
+     * @type {Array<ConsortiumMember>}
+     * @memberof ConsortiumDatabase
+     */
+    consortiumMember: Array<ConsortiumMember>;
+    /**
+     * The complete collection of all cactus nodes entities in existence within the consortium.
+     * @type {Array<CactusNode>}
+     * @memberof ConsortiumDatabase
+     */
+    cactusNode: Array<CactusNode>;
+    /**
+     * The complete collection of all plugin instance entities in existence within the consortium.
+     * @type {Array<PluginInstance>}
+     * @memberof ConsortiumDatabase
+     */
+    pluginInstance: Array<PluginInstance>;
 }
 /**
  * 
@@ -187,17 +205,17 @@ export interface ConsortiumMember {
      */
     id: string;
     /**
-     * 
+     * The human readable name a Consortium member can be referred to while making it easy for humans to distinguish this particular consortium member entity from any other ones.
      * @type {string}
      * @memberof ConsortiumMember
      */
     name: string;
     /**
      * 
-     * @type {Array<CactusNode>}
+     * @type {Array<string>}
      * @memberof ConsortiumMember
      */
-    nodes: Array<CactusNode>;
+    nodeIds: Array<string>;
 }
 /**
  * 
@@ -250,7 +268,7 @@ export interface JWSRecipient {
  */
 export interface Ledger {
     /**
-     * String that uniquely identifies a ledger within a Cactus consortium so that transactions can be routed to the correct ledger.
+     * 
      * @type {string}
      * @memberof Ledger
      */
@@ -263,10 +281,10 @@ export interface Ledger {
     ledgerType: LedgerType;
     /**
      * 
-     * @type {ConsortiumMember}
+     * @type {string}
      * @memberof Ledger
      */
-    operator?: ConsortiumMember;
+    consortiumMemberId?: string;
 }
 /**
  * Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.
@@ -284,4 +302,23 @@ export enum LedgerType {
     SAWTOOTH1X = 'SAWTOOTH_1X'
 }
 
+/**
+ * 
+ * @export
+ * @interface PluginInstance
+ */
+export interface PluginInstance {
+    /**
+     * 
+     * @type {string}
+     * @memberof PluginInstance
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PluginInstance
+     */
+    packageName: string;
+}
 

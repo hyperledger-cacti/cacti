@@ -16,15 +16,19 @@ import {
   Logger,
   LogLevelDesc,
   LoggerProvider,
+  Checks,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  registerWebServiceEndpoint,
+  ConsortiumRepository,
+} from "@hyperledger/cactus-core";
 
 import { GetNodeJwsEndpoint as Constants } from "./get-node-jws-endpoint-constants";
 
 export interface IGetNodeJwsEndpointOptions {
   keyPairPem: string;
-  consortium: Consortium;
+  consortiumRepo: ConsortiumRepository;
   path: string;
   logLevel?: LogLevelDesc;
 }
@@ -43,6 +47,8 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     if (!options.path) {
       throw new Error(`${fnTag} options.path falsy.`);
     }
+    Checks.truthy(options.consortiumRepo, `${fnTag} options.consortiumRepo`);
+
     const level = options.logLevel || "INFO";
     const label = "get-node-jws-endpoint-v1";
     this.log = LoggerProvider.getOrCreate({ level, label });
@@ -85,17 +91,18 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
 
   public async createJws(): Promise<JWSGeneral> {
     const fnTag = "GetNodeJwsEndpoint#createJws()";
-    const { keyPairPem, consortium } = this.options;
+    const { keyPairPem, consortiumRepo: repo } = this.options;
     try {
       const keyPair = JWK.asKey(keyPairPem);
-      const payload = jsonStableStringify({ consortium });
+      const payloadObject = { consortiumDatabase: repo.consortiumDatabase };
+      const payloadJson = jsonStableStringify(payloadObject);
       const _protected = {
         iat: Date.now(),
         jti: uuid.v4(),
         iss: "Hyperledger Cactus",
       };
       // TODO: double check if this casting is safe (it is supposed to be)
-      return JWS.sign.general(payload, keyPair, _protected) as JWSGeneral;
+      return JWS.sign.general(payloadJson, keyPair, _protected) as JWSGeneral;
     } catch (ex) {
       throw new Error(`${fnTag} ${ex.stack}`);
     }

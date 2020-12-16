@@ -10,6 +10,7 @@ import {
   CactusNode,
   ConsortiumMember,
   Consortium,
+  ConsortiumDatabase,
 } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
@@ -50,13 +51,13 @@ tap.test(
       publicKeyPem: keyPair.toPEM(false),
       consortiumId,
       id: nodeId,
-      plugins: [],
-      ledgers: [],
+      pluginInstanceIds: [],
+      ledgerIds: [],
     };
 
     const member: ConsortiumMember = {
       id: memberId,
-      nodes: [cactusNode],
+      nodeIds: [cactusNode.id],
       name: "Example Corp",
     };
 
@@ -64,7 +65,15 @@ tap.test(
       id: consortiumId,
       name: consortiumName,
       mainApiHost: "http://127.0.0.1:80",
-      members: [member],
+      memberIds: [member.id],
+    };
+
+    const consortiumDatabase: ConsortiumDatabase = {
+      cactusNode: [cactusNode],
+      consortiumMember: [member],
+      ledger: [],
+      pluginInstance: [],
+      consortium: [consortium],
     };
 
     // 3. Instantiate the web service consortium plugin which will host itself on a new TCP port for isolation/security
@@ -74,7 +83,7 @@ tap.test(
       instanceId: uuidV4(),
       pluginRegistry,
       keyPairPem,
-      consortium,
+      consortiumDatabase,
       logLevel: "trace",
       webAppOptions: {
         hostname: "127.0.0.1",

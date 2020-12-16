@@ -1,10 +1,8 @@
 import { Checks, IAsyncProvider, Objects } from "@hyperledger/cactus-common";
-import {
-  Consortium,
-  ConsortiumMember,
-  CactusNode,
-  Ledger,
-} from "@hyperledger/cactus-core-api";
+
+import { ConsortiumDatabase, Ledger } from "@hyperledger/cactus-core-api";
+
+import { ConsortiumRepository } from "@hyperledger/cactus-core";
 import { DefaultApi as ApiConsortium } from "@hyperledger/cactus-plugin-consortium-manual";
 import { DefaultConsortiumProvider } from "./default-consortium-provider";
 
@@ -78,7 +76,7 @@ export class ApiClient extends DefaultApi {
    *
    * @see {DefaultConsortiumProvider}
    */
-  public get defaultConsortiumProvider(): IAsyncProvider<Consortium> {
+  public get defaultConsortiumDbProvider(): IAsyncProvider<ConsortiumDatabase> {
     Checks.truthy(this.configuration, "ApiClient#configuration");
     const apiClient = new ApiConsortium(this.configuration);
     return new DefaultConsortiumProvider({ apiClient });
@@ -101,20 +99,21 @@ export class ApiClient extends DefaultApi {
    *
    * @param ledgerOrId The ID of the ledger to obtain an API client object for
    * or the `Ledger` object which will be used to get the ledgerId from.
-   * @param consortiumProvider The provider that can be used to retrieve the
+   * @param consortiumDbProvider The provider that can be used to retrieve the
    * consortium metadata at runtime for the purposes of looking up ledgers by
    * the provided `ledgerId` parameter.
    */
   public async ofLedger<T extends {}>(
     ledgerOrId: string | Ledger,
     ctor: new (configuration?: Configuration) => T,
-    consortiumProvider: IAsyncProvider<Consortium> = this
-      .defaultConsortiumProvider
+    consortiumDbProvider?: IAsyncProvider<ConsortiumDatabase>
   ): Promise<ApiClient & T> {
     const fnTags = "ApiClient#forLedgerId()";
 
+    const provider = consortiumDbProvider || this.defaultConsortiumDbProvider;
+
     Checks.truthy(ledgerOrId, `${fnTags}:ledgerOrId`);
-    Checks.truthy(consortiumProvider, `${fnTags}:consortiumProvider`);
+    Checks.truthy(provider, `${fnTags}:consortiumDbProvider`);
 
     let ledgerId: string;
     if (typeof ledgerOrId === "string") {
@@ -123,22 +122,16 @@ export class ApiClient extends DefaultApi {
       ledgerId = ledgerOrId.id;
     }
 
-    const consortium: Consortium = await consortiumProvider.get();
-    Checks.truthy(consortiumProvider, `${fnTags}:consortium`);
+    const db: ConsortiumDatabase = await provider.get();
+    const repo = new ConsortiumRepository({ db });
 
-    // Find a list of nodes in the consortium that have a connector plugin
-    // running that's associated with the ledger based on ledger ID.
-    const nodes = consortium.members
-      .map((member: ConsortiumMember) =>
-        member.nodes.filter((node: CactusNode) =>
-          node.ledgers.some((ledger: Ledger) => ledger.id === ledgerId)
-        )
-      )
-      .flat();
+    const nodes = repo.nodesWithLedger(ledgerId);
 
     // pick a random element from the array of nodes that have a connection to
     // the target ledger (based on the ledger ID)
-    const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+    const randomIdx = Math.floor(Math.random() * nodes.length);
+
+    const randomNode = nodes[randomIdx];
 
     const configuration = new Configuration({
       basePath: randomNode.nodeApiHost,
@@ -147,10 +140,3 @@ export class ApiClient extends DefaultApi {
     return new ApiClient(configuration).extendWith(ctor);
   }
 }
-
-// type UnionToIntersection<U> =
-//   (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
-
-// function extendWith<A extends any[]>(...args: A): UnionToIntersection<A[number]> { return null! }
-
-// extendWith(new DefaultApi(), new ApiConsortium());

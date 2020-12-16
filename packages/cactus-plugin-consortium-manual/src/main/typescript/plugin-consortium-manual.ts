@@ -6,7 +6,7 @@ import express, { Express } from "express";
 import bodyParser from "body-parser";
 
 import {
-  Consortium,
+  ConsortiumDatabase,
   IPluginWebService,
   PluginAspect,
   IWebServiceEndpoint,
@@ -14,7 +14,11 @@ import {
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import {
+  PluginRegistry,
+  IConsortiumRepositoryOptions,
+  ConsortiumRepository,
+} from "@hyperledger/cactus-core";
 
 import {
   Checks,
@@ -24,7 +28,6 @@ import {
 } from "@hyperledger/cactus-common";
 import { GetConsortiumEndpointV1 } from "./consortium/get-consortium-jws-endpoint-v1";
 import { GetNodeJwsEndpoint } from "./consortium/get-node-jws-endpoint-v1";
-import uuid from "uuid";
 
 export interface IWebAppOptions {
   port: number;
@@ -33,7 +36,7 @@ export interface IWebAppOptions {
 
 export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
   keyPairPem: string;
-  consortium: Consortium;
+  consortiumDatabase: ConsortiumDatabase;
   pluginRegistry?: PluginRegistry;
   logLevel?: LogLevelDesc;
   webAppOptions?: IWebAppOptions;
@@ -51,6 +54,10 @@ export class PluginConsortiumManual
       throw new Error(`${fnTag} options falsy.`);
     }
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
+    Checks.truthy(
+      options.consortiumDatabase,
+      `${fnTag} options.consortiumDatabase`
+    );
     this.log = LoggerProvider.getOrCreate({
       label: "plugin-consortium-manual",
     });
@@ -105,13 +112,16 @@ export class PluginConsortiumManual
       this.log.info(`Creation of HTTP server OK`, { address });
     }
 
-    const { consortium, keyPairPem } = this.options;
+    const { consortiumDatabase, keyPairPem } = this.options;
     const packageName = this.getPackageName();
+    const consortiumRepo = new ConsortiumRepository({
+      db: consortiumDatabase,
+    });
 
     const endpoints: IWebServiceEndpoint[] = [];
     {
       const path = `/api/v1/plugins/${packageName}/consortium/jws`;
-      const options = { path, keyPairPem, consortium };
+      const options = { path, keyPairPem, consortiumRepo };
       const endpoint = new GetConsortiumEndpointV1(options);
       webApp.get(endpoint.getPath(), endpoint.getExpressRequestHandler());
       endpoints.push(endpoint);
@@ -119,7 +129,7 @@ export class PluginConsortiumManual
     }
     {
       const path = `/api/v1/plugins/${packageName}/node/jws`;
-      const options = { path, keyPairPem, consortium };
+      const options = { path, keyPairPem, consortiumRepo };
       const endpoint = new GetNodeJwsEndpoint(options);
       webApp.get(endpoint.getPath(), endpoint.getExpressRequestHandler());
       endpoints.push(endpoint);

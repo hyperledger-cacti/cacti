@@ -7,7 +7,14 @@ import Web3 from "web3";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
 import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { Consortium, Ledger, LedgerType } from "@hyperledger/cactus-core-api";
+import {
+  CactusNode,
+  Consortium,
+  ConsortiumDatabase,
+  ConsortiumMember,
+  Ledger,
+  LedgerType,
+} from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   DefaultApi as QuorumApi,
@@ -58,43 +65,54 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
   const consortiumName = "Example Corp. & Friends Crypto Consortium";
   const memberId1 = uuidV4();
   const memberId2 = uuidV4();
+
+  const node1: CactusNode = {
+    nodeApiHost: node1Host,
+    publicKeyPem: pubKeyPem1,
+    consortiumId,
+    id: uuidV4(),
+    ledgerIds: [ledger1.id],
+    memberId: memberId1,
+    pluginInstanceIds: [],
+  };
+
+  const member1: ConsortiumMember = {
+    id: memberId1,
+    name: "Example Corp 1",
+    nodeIds: [node1.id],
+  };
+
+  const node2: CactusNode = {
+    nodeApiHost: node2Host,
+    publicKeyPem: pubKeyPem2,
+    consortiumId,
+    id: uuidV4(),
+    ledgerIds: [ledger2.id],
+    memberId: memberId2,
+    pluginInstanceIds: [],
+  };
+
+  const member2: ConsortiumMember = {
+    id: memberId2,
+    name: "Example Corp 2",
+    nodeIds: [node2.id],
+  };
+
   const consortium: Consortium = {
     id: consortiumId,
     mainApiHost: node1Host,
     name: consortiumName,
-    members: [
-      {
-        id: memberId1,
-        name: "Example Corp 1",
-        nodes: [
-          {
-            nodeApiHost: node1Host,
-            publicKeyPem: pubKeyPem1,
-            consortiumId,
-            id: uuidV4(),
-            ledgers: [ledger1],
-            memberId: memberId1,
-            plugins: [],
-          },
-        ],
-      },
-      {
-        id: memberId2,
-        name: "Example Corp 2",
-        nodes: [
-          {
-            nodeApiHost: node2Host,
-            publicKeyPem: pubKeyPem2,
-            consortiumId,
-            id: uuidV4(),
-            ledgers: [ledger2],
-            memberId: memberId2,
-            plugins: [],
-          },
-        ],
-      },
-    ],
+    memberIds: [member1.id, member2.id],
   };
+
+  const consortiumDatabase: ConsortiumDatabase = {
+    cactusNode: [node1, node2],
+    consortium: [consortium],
+    consortiumMember: [member1, member2],
+    ledger: [ledger1, ledger2],
+    pluginInstance: [],
+  };
+
   const mainApiClient = new ApiClient({ basePath: consortium.mainApiHost });
 
   test("Set Up Test ledgers, Consortium, Cactus Nodes", async (t2: Test) => {
@@ -137,7 +155,7 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
         instanceId: uuidV4(),
         pluginRegistry,
         keyPairPem: keyPair1.toPEM(true),
-        consortium,
+        consortiumDatabase,
         logLevel,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
@@ -178,7 +196,7 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
         instanceId: uuidV4(),
         pluginRegistry,
         keyPairPem: keyPair2.toPEM(true),
-        consortium,
+        consortiumDatabase,
         logLevel,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
