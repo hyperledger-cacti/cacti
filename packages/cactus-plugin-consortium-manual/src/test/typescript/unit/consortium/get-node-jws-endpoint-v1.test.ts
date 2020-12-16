@@ -5,8 +5,11 @@ import { v4 as uuidV4 } from "uuid";
 import {
   CactusNode,
   Consortium,
+  ConsortiumDatabase,
   ConsortiumMember,
 } from "@hyperledger/cactus-core-api";
+
+import { ConsortiumRepository } from "@hyperledger/cactus-core";
 
 import {
   GetNodeJwsEndpoint,
@@ -30,13 +33,13 @@ test("Can provide JWS", async (t: Test) => {
     publicKeyPem: keyPair.toPEM(false),
     consortiumId,
     id: nodeId,
-    plugins: [],
-    ledgers: [],
+    pluginInstanceIds: [],
+    ledgerIds: [],
   };
 
   const member: ConsortiumMember = {
     id: memberId,
-    nodes: [cactusNode],
+    nodeIds: [cactusNode.id],
     name: "Example Corp",
   };
 
@@ -44,11 +47,20 @@ test("Can provide JWS", async (t: Test) => {
     id: consortiumId,
     name: consortiumName,
     mainApiHost: "http://127.0.0.1:80",
-    members: [member],
+    memberIds: [member.id],
   };
 
+  const db: ConsortiumDatabase = {
+    cactusNode: [],
+    consortium: [],
+    consortiumMember: [],
+    ledger: [],
+    pluginInstance: [],
+  };
+  const consortiumRepo = new ConsortiumRepository({ db });
+
   const epOpts: IGetNodeJwsEndpointOptions = {
-    consortium,
+    consortiumRepo,
     keyPairPem,
     path: "/some-fake-path-for-http-requests",
   };
@@ -68,7 +80,7 @@ test("Can provide JWS", async (t: Test) => {
   if (typeof payload === "string") {
     t.fail(`JWS Verification result: ${payload}`);
   } else {
-    t.ok(payload.consortium, "JWS payload.consortium truthy");
+    t.ok(payload.consortiumDatabase, "JWS payload.consortiumDatabase truthy");
   }
 
   t.end();

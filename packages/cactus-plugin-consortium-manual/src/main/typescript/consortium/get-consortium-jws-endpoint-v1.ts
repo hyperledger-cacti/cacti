@@ -22,13 +22,16 @@ import {
   LoggerProvider,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  registerWebServiceEndpoint,
+  ConsortiumRepository,
+} from "@hyperledger/cactus-core";
 
 import { GetConsortiumEndpointV1 as Constants } from "./get-consortium-jws-endpoint-constants";
 
 export interface IGetConsortiumJwsEndpointOptions {
   keyPairPem: string;
-  consortium: Consortium;
+  consortiumRepo: ConsortiumRepository;
   path: string;
   logLevel?: LogLevelDesc;
 }
@@ -44,7 +47,7 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     if (!options.keyPairPem) {
       throw new Error(`${fnTag} options.keyPairPem falsy.`);
     }
-    if (!options.consortium) {
+    if (!options.consortiumRepo) {
       throw new Error(`${fnTag} options.consortium falsy.`);
     }
     if (!options.path) {
@@ -82,8 +85,7 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`GET ${this.getPath()}`);
 
     try {
-      const nodes2d = this.options.consortium.members?.map((m) => m.nodes);
-      const nodes = flatten(nodes2d);
+      const nodes = this.options.consortiumRepo.allNodes;
 
       const requests: Promise<AxiosResponse<GetNodeJwsResponse>>[] = nodes
         .map((cnm) => cnm.nodeApiHost)

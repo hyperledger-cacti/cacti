@@ -35,30 +35,136 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
   ],
   components: {
     schemas: {
+      PrimaryKey: {
+        type: "string",
+        minLength: 1,
+        maxLength: 128,
+        nullable: false,
+      },
+      ConsortiumMemberId: {
+        $ref: "#/components/schemas/PrimaryKey",
+        description:
+          "ID of Consortium member who operates the ledger (if any). " +
+          "Defined as an optional property in case the ledger is a " +
+          "permissionless and/or public one such as the Bitcoin or " +
+          "Ethereum mainnets.",
+      },
+      CactusNodeId: {
+        $ref: "#/components/schemas/PrimaryKey",
+        description:
+          "ID of a Cactus node that must uniquely distinguish it from all " +
+          "other Cactus nodes within a Consortium. Note that API server " +
+          "instances do not have their own identity the way a node does.",
+      },
+      ConsortiumId: {
+        $ref: "#/components/schemas/PrimaryKey",
+      },
+      LedgerId: {
+        description:
+          "String that uniquely identifies a ledger within a" +
+          " Cactus consortium so that transactions can be routed to the" +
+          " correct ledger.",
+        $ref: "#/components/schemas/PrimaryKey",
+      },
+      PluginInstanceId: {
+        description:
+          "String that uniquely identifies a plugin instance within a" +
+          " Cactus consortium so that requests can be addressed/routed " +
+          " directly to individual plugins when necessary.",
+        $ref: "#/components/schemas/PrimaryKey",
+      },
+      ConsortiumDatabase: {
+        required: [
+          "consortium",
+          "ledger",
+          "consortiumMember",
+          "cactusNode",
+          "pluginInstance",
+        ],
+        properties: {
+          consortium: {
+            description:
+              "A collection of Consortium entities. In practice " +
+              "this should only ever contain a single consortium, but we " +
+              "defined it as an array to keep the convention up with the" +
+              " rest of the collections defined in the Consortium data in " +
+              "general. Also, if we ever decide to somehow have some sort " +
+              "of consortium to consortium integration (which does not make " +
+              "much sense in the current frame of mind of the author in the " +
+              "year 2020) then having this as an array will have proven " +
+              "itself to be an excellent long term compatibility/" +
+              "extensibility decision indeed.",
+            type: "array",
+            items: {
+              $ref: "#/components/schemas/Consortium",
+            },
+            default: [],
+            minItems: 0,
+            maxItems: 2048,
+          },
+          ledger: {
+            description:
+              "The complete collection of all ledger entities in" +
+              "existence within the consortium.",
+            type: "array",
+            items: {
+              $ref: "#/components/schemas/Ledger",
+            },
+            default: [],
+            minItems: 0,
+            maxItems: 2048,
+          },
+          consortiumMember: {
+            description:
+              "The complete collection of all consortium member" +
+              " entities in existence within the consortium.",
+            type: "array",
+            items: {
+              $ref: "#/components/schemas/ConsortiumMember",
+            },
+            default: [],
+            minItems: 0,
+            maxItems: 2048,
+          },
+          cactusNode: {
+            description:
+              "The complete collection of all cactus nodes" +
+              " entities in existence within the consortium.",
+            type: "array",
+            items: {
+              $ref: "#/components/schemas/CactusNode",
+            },
+            default: [],
+            minItems: 0,
+            maxItems: 2048,
+          },
+          pluginInstance: {
+            description:
+              "The complete collection of all plugin instance" +
+              " entities in existence within the consortium.",
+            type: "array",
+            items: {
+              $ref: "#/components/schemas/PluginInstance",
+            },
+            default: [],
+            minItems: 0,
+            maxItems: 2048,
+          },
+        },
+      },
       Ledger: {
         type: "object",
         required: ["id", "ledgerType"],
         properties: {
           id: {
-            description:
-              "String that uniquely identifies a ledger within a" +
-              " Cactus consortium so that transactions can be routed to the" +
-              " correct ledger.",
-            type: "string",
-            nullable: false,
-            minLength: 1,
-            maxLength: 128,
+            $ref: "#/components/schemas/LedgerId",
           },
           ledgerType: {
             $ref: "#/components/schemas/LedgerType",
             nullable: false,
           },
-          operator: {
-            description:
-              "The consortium member who is operating the ledger. " +
-              "Defined as an optional property in case the ledger is a " +
-              "permissionless one such as the Bitcoin or Ethereum mainnets.",
-            $ref: "#/components/schemas/ConsortiumMember",
+          consortiumMemberId: {
+            $ref: "#/components/schemas/ConsortiumMemberId",
           },
         },
       },
@@ -83,10 +189,10 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
       },
       Consortium: {
         type: "object",
-        required: ["id", "name", "mainApiHost", "members"],
+        required: ["id", "name", "mainApiHost", "memberIds"],
         properties: {
           id: {
-            type: "string",
+            $ref: "#/components/schemas/ConsortiumId",
           },
           name: {
             type: "string",
@@ -94,11 +200,15 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
           mainApiHost: {
             type: "string",
           },
-          members: {
+          memberIds: {
+            description:
+              "The collection (array) of primary keys of" +
+              " consortium member entities that belong to this Consortium.",
             type: "array",
             items: {
-              $ref: "#/components/schemas/ConsortiumMember",
+              $ref: "#/components/schemas/ConsortiumMemberId",
             },
+            default: [],
             minItems: 1,
             maxItems: 2048,
             nullable: false,
@@ -107,27 +217,29 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
       },
       ConsortiumMember: {
         type: "object",
-        required: ["id", "name", "nodes"],
+        required: ["id", "name", "nodeIds"],
         properties: {
           id: {
-            type: "string",
-            minLength: 1,
-            maxLength: 2048,
-            nullable: false,
+            $ref: "#/components/schemas/ConsortiumMemberId",
           },
           name: {
             type: "string",
+            description:
+              "The human readable name a Consortium member can be " +
+              "referred to while making it easy for humans to distinguish " +
+              "this particular consortium member entity from any other ones.",
             minLength: 1,
             maxLength: 2048,
             nullable: false,
           },
-          nodes: {
+          nodeIds: {
             type: "array",
+            default: [],
             nullable: false,
             minItems: 1,
             maxItems: 2048,
             items: {
-              $ref: "#/components/schemas/CactusNode",
+              $ref: "#/components/schemas/CactusNodeId",
             },
           },
         },
@@ -175,42 +287,26 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
               "nodeApiHost",
               "memberId",
               "publicKeyPem",
-              "plugins",
-              "ledgers",
+              "pluginInstanceIds",
+              "ledgerIds",
             ],
             properties: {
               id: {
-                type: "string",
-                description:
-                  "The unique identifier of a Cactus node. Recommended" +
-                  " to assign a value to this that is guaranteed to be unique" +
-                  " in the whole consortium or better yet, globally anywhere.",
+                $ref: "#/components/schemas/CactusNodeId",
                 example: "809a76ba-cfb8-4045-a5c6-ed70a7314c25",
-                minLength: 1,
-                maxLength: 1024,
-                nullable: false,
               },
               consortiumId: {
-                type: "string",
+                $ref: "#/components/schemas/ConsortiumId",
                 description: "ID of the Cactus Consortium this node is in.",
                 example: "3e2670d9-2d14-45bd-96f5-33e2c4b4e3fb",
-                minLength: 1,
-                maxLength: 1024,
-                nullable: false,
               },
               memberId: {
-                type: "string",
-                description:
-                  "ID of the Cactus Consortium member this " +
-                  "node is operated by.",
+                $ref: "#/components/schemas/ConsortiumMemberId",
                 example: "b3674a28-e442-4feb-b1f3-8cbe46c20e5e",
-                minLength: 1,
-                maxLength: 1024,
-                nullable: false,
               },
-              ledgers: {
+              ledgerIds: {
                 description:
-                  "Stores an array of Ledger entities that are " +
+                  "Stores an array of Ledger entity IDs that are " +
                   "reachable (routable) via this Cactus Node. This " +
                   "information is used by the client side SDK API client to " +
                   "figure out at runtime where to send API requests that are " +
@@ -222,32 +318,29 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
                 maxItems: 2048,
                 default: [],
                 items: {
-                  $ref: "#/components/schemas/Ledger",
+                  $ref: "#/components/schemas/LedgerId",
                 },
               },
-              plugins: {
+              pluginInstanceIds: {
                 type: "array",
                 nullable: false,
                 minItems: 0,
                 maxItems: 2048,
                 default: [],
                 items: {
-                  $ref: "#/components/schemas/CactusPlugin",
+                  $ref: "#/components/schemas/PluginInstanceId",
                 },
               },
             },
           },
         ],
       },
-      CactusPlugin: {
+      PluginInstance: {
         type: "object",
-        required: ["id"],
+        required: ["id", "packageName"],
         properties: {
           id: {
-            type: "string",
-            minLength: 1,
-            maxLength: 1024,
-            nullable: false,
+            $ref: "PluginInstanceId",
           },
           packageName: {
             type: "string",

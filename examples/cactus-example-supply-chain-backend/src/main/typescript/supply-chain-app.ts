@@ -8,7 +8,9 @@ import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
 import {
   CactusNode,
   Consortium,
+  ConsortiumDatabase,
   ConsortiumMember,
+  Ledger,
   LedgerType,
 } from "@hyperledger/cactus-core-api";
 
@@ -110,13 +112,13 @@ export class SupplyChainApp {
     const keyPairB = await JWK.generate("EC", "secp256k1");
     const keyPairPemB = keyPairB.toPEM(true);
 
-    const consortium = this.createConsortium(
+    const consortiumDatabase = this.createConsortium(
       httpApiA,
       httpApiB,
       keyPairA,
       keyPairB
     );
-    const consortiumPrettyJson = JSON.stringify(consortium, null, 4);
+    const consortiumPrettyJson = JSON.stringify(consortiumDatabase, null, 4);
     this.log.info(`Created Consortium definition: %o`, consortiumPrettyJson);
 
     this.log.info(`Configuring Cactus Node for Ledger A...`);
@@ -127,7 +129,7 @@ export class SupplyChainApp {
       plugins: [
         new PluginConsortiumManual({
           instanceId: "PluginConsortiumManual_A",
-          consortium,
+          consortiumDatabase,
           keyPairPem: keyPairPemA,
           logLevel: this.options.logLevel,
         }),
@@ -168,7 +170,7 @@ export class SupplyChainApp {
       plugins: [
         new PluginConsortiumManual({
           instanceId: "PluginConsortiumManual_B",
-          consortium,
+          consortiumDatabase,
           keyPairPem: keyPairPemB,
           logLevel: this.options.logLevel,
         }),
@@ -219,7 +221,7 @@ export class SupplyChainApp {
     serverB: Server,
     keyPairA: JWK.ECKey,
     keyPairB: JWK.ECKey
-  ): Consortium {
+  ): ConsortiumDatabase {
     const consortiumName = "Example Supply Chain Consortium";
     const consortiumId = uuidv4();
 
@@ -234,20 +236,21 @@ export class SupplyChainApp {
       publicKeyPem: keyPairA.toPEM(false),
       consortiumId,
       id: nodeIdA,
-      plugins: [],
-      ledgers: [],
+      pluginInstanceIds: [],
+      ledgerIds: [],
     };
 
     const memberA: ConsortiumMember = {
       id: memberIdA,
-      nodes: [cactusNodeA],
+      nodeIds: [cactusNodeA.id],
       name: "Example Manufacturer Corp",
     };
 
-    cactusNodeA.ledgers.push({
+    const ledger1 = {
       id: "BesuDemoLedger",
       ledgerType: LedgerType.BESU1X,
-    });
+    };
+    cactusNodeA.ledgerIds.push(ledger1.id);
 
     const memberIdB = uuidv4();
     const nodeIdB = uuidv4();
@@ -260,29 +263,39 @@ export class SupplyChainApp {
       publicKeyPem: keyPairB.toPEM(false),
       consortiumId,
       id: nodeIdB,
-      plugins: [],
-      ledgers: [],
+      pluginInstanceIds: [],
+      ledgerIds: [],
     };
 
     const memberB: ConsortiumMember = {
       id: memberIdB,
-      nodes: [cactusNodeB],
+      nodeIds: [cactusNodeB.id],
       name: "Example Retailer Corp",
     };
 
-    cactusNodeB.ledgers.push({
+    const ledger2: Ledger = {
       id: "QuorumDemoLedger",
       ledgerType: LedgerType.QUORUM2X,
-    });
+    };
+
+    cactusNodeB.ledgerIds.push(ledger2.id);
 
     const consortium: Consortium = {
       id: consortiumId,
       name: consortiumName,
       mainApiHost: nodeApiHostA,
-      members: [memberA, memberB],
+      memberIds: [memberA.id, memberB.id],
     };
 
-    return consortium;
+    const consortiumDatabase: ConsortiumDatabase = {
+      cactusNode: [cactusNodeA, cactusNodeB],
+      consortium: [consortium],
+      consortiumMember: [memberA, memberB],
+      ledger: [ledger1, ledger2],
+      pluginInstance: [],
+    };
+
+    return consortiumDatabase;
   }
 
   public async startNode(

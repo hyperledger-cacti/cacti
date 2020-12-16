@@ -11,7 +11,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
 import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
-import { Consortium } from "@hyperledger/cactus-core-api";
+import { Consortium, ConsortiumDatabase } from "@hyperledger/cactus-core-api";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
@@ -411,40 +411,44 @@ export class ConfigService {
     const keyPair = JWK.generateSync("EC", "secp256k1", { use: "sig" }, true);
     const keyPairPem = keyPair.toPEM(true);
     const memberId1 = "Cactus_Example_Consortium_Member_1";
-    const consortium: Consortium = {
-      name: "Example Cactus Consortium",
-      id: uuidV4(),
-      mainApiHost: apiBaseUrl,
-      members: [
+    const nodeId1 = "Cactus_Example_Consortium_Node_1";
+    const consortium: ConsortiumDatabase = {
+      cactusNode: [
+        {
+          consortiumId: "Cactus_Example_Consortium",
+          id: nodeId1,
+          ledgerIds: [],
+          memberId: memberId1,
+          pluginInstanceIds: [],
+          nodeApiHost: apiBaseUrl,
+          publicKeyPem: keyPair.toPEM(false),
+        },
+      ],
+      consortiumMember: [
         {
           id: memberId1,
           name: "Example Cactus Consortium Member 1",
-          nodes: [
-            {
-              consortiumId: "Cactus_Example_Consortium",
-              id: "Cactus_Example_Consortium_Node_1",
-              ledgers: [],
-              memberId: memberId1,
-              plugins: [],
-              nodeApiHost: apiBaseUrl,
-              publicKeyPem: keyPair.toPEM(false),
-            },
-          ],
+          nodeIds: [nodeId1],
+        },
+      ],
+      ledger: [],
+      pluginInstance: [],
+      consortium: [
+        {
+          name: "Example Cactus Consortium",
+          id: uuidV4(),
+          mainApiHost: apiBaseUrl,
+          memberIds: [memberId1],
         },
       ],
     };
 
-    const cockpitTlsEnabled: boolean = (schema.cockpitTlsEnabled as SchemaObj)
-      .default;
+    const cockpitTlsEnabled = (schema.cockpitTlsEnabled as SchemaObj).default;
     const cockpitHost = (schema.cockpitHost as SchemaObj).default;
     const cockpitPort = (schema.cockpitPort as SchemaObj).default;
 
-    // const cockpitProtocol = cockpitTlsEnabled ? "https:" : "http";
-    // const cockpitBaseUrl = `${cockpitProtocol}//${cockpitHost}:${cockpitPort}`;
-
     const pkiGenerator = new SelfSignedPkiGenerator();
     const pkiServer: IPki = pkiGenerator.create("localhost");
-    // const pkiClient: IPki = pkiGenerator.create("localhost", pkiServer);
 
     const plugins = [
       {
