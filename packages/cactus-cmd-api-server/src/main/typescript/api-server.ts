@@ -22,8 +22,8 @@ import {
   ICactusPlugin,
   isIPluginWebService,
   IPluginWebService,
-  PluginRegistry,
 } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 import { ICactusApiServerOptions } from "./config/config-service";
 import { CACTUS_OPEN_API_JSON } from "./openapi-spec";
 import { Logger, LoggerProvider, Servers } from "@hyperledger/cactus-common";

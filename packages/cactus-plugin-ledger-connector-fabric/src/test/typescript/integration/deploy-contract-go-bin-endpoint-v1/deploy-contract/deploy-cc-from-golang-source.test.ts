@@ -18,7 +18,7 @@ import {
   LogLevelDesc,
   Servers,
 } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
   PluginLedgerConnectorFabric,

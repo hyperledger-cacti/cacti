@@ -12,7 +12,8 @@ import {
   DefaultApi,
   Configuration,
 } from "@hyperledger/cactus-plugin-consortium-manual";
-import { Consortium, PluginRegistry } from "@hyperledger/cactus-core-api";
+import { Consortium } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 test("member node public keys and hosts are pre-shared", async (t: Test) => {
   const consortiumId = uuidV4();

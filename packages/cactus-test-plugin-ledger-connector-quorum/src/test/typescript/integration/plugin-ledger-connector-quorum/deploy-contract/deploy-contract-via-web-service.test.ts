@@ -24,7 +24,8 @@ import {
   ICactusApiServerOptions,
 } from "@hyperledger/cactus-cmd-api-server";
 
-import { ICactusPlugin, PluginRegistry } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { ICactusPlugin } from "@hyperledger/cactus-core-api";
 import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
 
 const log: Logger = LoggerProvider.getOrCreate({

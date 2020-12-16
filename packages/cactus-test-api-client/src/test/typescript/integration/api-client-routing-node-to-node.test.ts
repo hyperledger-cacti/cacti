@@ -7,12 +7,8 @@ import Web3 from "web3";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
 import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import {
-  PluginRegistry,
-  Consortium,
-  Ledger,
-  LedgerType,
-} from "@hyperledger/cactus-core-api";
+import { Consortium, Ledger, LedgerType } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   DefaultApi as QuorumApi,
   PluginLedgerConnectorQuorum,

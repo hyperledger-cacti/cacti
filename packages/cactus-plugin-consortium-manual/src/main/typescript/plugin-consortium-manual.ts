@@ -9,11 +9,13 @@ import {
   Consortium,
   IPluginWebService,
   PluginAspect,
-  PluginRegistry,
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
+
+import { PluginRegistry } from "@hyperledger/cactus-core";
+
 import {
   Checks,
   Logger,

@@ -15,4 +15,3 @@ export {
   isICactusPlugin,
 } from "./plugin/i-cactus-plugin";
 export { PluginAspect } from "./plugin/plugin-aspect";
-export { PluginRegistry } from "./plugin/plugin-registry";

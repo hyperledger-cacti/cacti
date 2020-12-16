@@ -2,7 +2,6 @@ import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core-api";
 
 import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
 import { IPluginKeychainMemoryOptions } from "@hyperledger/cactus-plugin-keychain-memory";
