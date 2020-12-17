@@ -235,7 +235,7 @@ export interface JWSRecipient {
      * @type {string}
      * @memberof JWSRecipient
      */
-    _protected?: string;
+    protected?: string;
     /**
      * 
      * @type {{ [key: string]: object; }}

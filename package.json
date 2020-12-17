@@ -10,7 +10,7 @@
     "start:example-supply-chain": "node ./examples/supply-chain-app/node_modules/.bin/cactus-example-supply-chain-backend",
     "export-open-api-spec": "ts-node -e 'import(\"./packages/cactus-cmd-api-server/src/main/typescript/openapi-spec\").then((x) => x.exportToFileSystemAsJson());'",
     "pregenerate-sdk": "npm-run-all export-open-api-spec",
-    "generate-sdk": "openapi-generator generate --input-spec cactus-openapi-spec.json -g typescript-axios -o packages/cactus-api-client/src/main/typescript/generated/openapi/typescript-axios/",
+    "generate-sdk": "openapi-generator generate --input-spec cactus-openapi-spec.json -g typescript-axios -o packages/cactus-api-client/src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "clean": "lerna exec --stream --ignore '*/*cockpit' -- del-cli dist/** && del-cli packages/cactus-api-client/src/main/typescript/generated/openapi/typescript-axios/*",
     "lint": "lerna exec --stream --ignore '*/*cockpit' -- cross-env DEBUG= tslint --project tsconfig.json",
     "tsc": "lerna run tsc",

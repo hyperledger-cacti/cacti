@@ -14,7 +14,7 @@
   "scripts": {
     "export-open-api-spec": "ts-node -e 'import(\"./src/main/typescript/openapi-spec\").then((x) => x.exportToFileSystemAsJson());'",
     "pregenerate-sdk": "npm-run-all export-open-api-spec",
-    "generate-sdk": "openapi-generator generate --input-spec src/main/json/generated/openapi-spec.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
+    "generate-sdk": "openapi-generator generate --input-spec src/main/json/generated/openapi-spec.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "webpack": "npm-run-all webpack:dev webpack:prod",

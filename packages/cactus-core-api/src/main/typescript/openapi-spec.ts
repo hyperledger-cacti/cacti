@@ -278,9 +278,6 @@ export const CACTUS_OPEN_API_JSON: OpenAPIV3.Document = {
           signature: {
             type: "string",
           },
-          // In the generated models this shows up as _protected because it is
-          // a reserved keyword in Typescript. Opened an issue here about  this:
-          // https://github.com/OpenAPITools/openapi-generator/issues/7100
           protected: {
             type: "string",
           },
