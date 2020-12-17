@@ -2,7 +2,8 @@
 # https://github.com/docker-library/docker/issues/170
 FROM docker:18.09.9-dind
 
-ARG FABRIC_VERSION=1.4.8
+ARG FABRIC_VERSION=2.2.0
+ARG CA_VERSION=1.4.9
 
 WORKDIR /
 
@@ -33,6 +34,14 @@ RUN apk add --no-cache curl
 
 # The file binary is used to inspect exectubles when debugging container image issues
 RUN apk add --no-cache file
+
+# Download and setup path variables for Go
+RUN wget https://golang.org/dl/go1.15.5.linux-amd64.tar.gz
+RUN tar -xvf go1.15.5.linux-amd64.tar.gz
+RUN mv go /usr/local
+ENV GOROOT=/usr/local/go
+ENV GOPATH=/usr/local/go
+ENV PATH=$PATH:$GOPATH/bin
 
 # Needed because the Fabric binaries need the GNU libc dynamic linker to be executed
 # and alpine does not have that by default
@@ -71,7 +80,7 @@ RUN curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/release-2.2/s
 RUN chmod +x bootstrap.sh
 # Run the bootstrap here so that at least we can pre-fetch the git clone and the binary downloads resulting in
 # faster container startup speed since these steps will not have to be done, only the docker image pulls.
-RUN /bootstrap.sh $FABRIC_VERSION $FABRIC_VERSION -d
+RUN /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -d
 
 # Install supervisord because we need to run the docker daemon and also the fabric network
 # meaning that we have multiple processes to run.
@@ -79,6 +88,7 @@ RUN apk add --no-cache supervisor
 COPY supervisord.conf /etc/supervisord.conf
 
 COPY run-fabric-network.sh /
+COPY healthcheck.sh /
 
 # supervisord web ui/dashboard
 EXPOSE 9001
@@ -114,4 +124,4 @@ CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]
 
 # We consider the container healthy once the default example fabcar contract has been deployed
 # and is responsive to queries as well
-HEALTHCHECK --interval=1s --timeout=5s --start-period=60s --retries=300 CMD docker exec cli peer chaincode query --channelID mychannel --name fabcar --ctor '{"Args": [], "Function": "queryAllCars"}'
+HEALTHCHECK --interval=1s --timeout=5s --start-period=60s --retries=300 CMD ./healthcheck.sh

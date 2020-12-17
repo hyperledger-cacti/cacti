@@ -1,6 +1,8 @@
 import path from "path";
 import { EventEmitter } from "events";
 
+import compareVersions, { compare } from "compare-versions";
+
 import Docker, {
   Container,
   ContainerCreateOptions,
@@ -14,7 +16,7 @@ import {
   Gateway,
 } from "fabric-network";
 import FabricCAServices from "fabric-ca-client";
-import Joi from "joi";
+import Joi, { array } from "joi";
 import { ITestLedger } from "../i-test-ledger";
 import { Containers } from "../common/containers";
 import {
@@ -31,6 +33,7 @@ export interface IFabricTestLedgerV1ConstructorOptions {
   publishAllPorts: boolean;
   imageVersion?: string;
   imageName?: string;
+  envVars?: Map<string, string>;
   logLevel?: LogLevelDesc;
 }
 
@@ -40,6 +43,7 @@ export interface IFabricTestLedgerV1ConstructorOptions {
 const DEFAULT_OPTS = Object.freeze({
   imageVersion: "latest",
   imageName: "hyperledger/cactus-fabric-all-in-one",
+  envVars: new Map([["FABRIC_VERSION", "1.4.8"]]),
 });
 export const FABRIC_TEST_LEDGER_DEFAULT_OPTIONS = DEFAULT_OPTS;
 
@@ -53,6 +57,10 @@ const OPTS_JOI_SCHEMA: Joi.Schema = Joi.object().keys({
     .regex(/[a-z0-9]+(?:[._-]{1,2}[a-z0-9]+)*/)
     .min(1)
     .required(),
+  envVars: Joi.object().pattern(/.*/, [
+    Joi.string().required(),
+    Joi.string().min(1).required(),
+  ]),
 });
 
 export const FABRIC_TEST_LEDGER_OPTIONS_JOI_SCHEMA = OPTS_JOI_SCHEMA;
@@ -63,6 +71,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
   public readonly imageVersion: string;
   public readonly imageName: string;
   public readonly publishAllPorts: boolean;
+  public readonly envVars: Map<string, string>;
 
   private readonly log: Logger;
 
@@ -84,6 +93,12 @@ export class FabricTestLedgerV1 implements ITestLedger {
     this.imageVersion = options.imageVersion || DEFAULT_OPTS.imageVersion;
     this.imageName = options.imageName || DEFAULT_OPTS.imageName;
     this.publishAllPorts = options.publishAllPorts;
+    this.envVars = options.envVars || DEFAULT_OPTS.envVars;
+
+    if (compareVersions.compare(this.getFabricVersion(), "1.4", "<"))
+      this.log.warn(
+        `This version of Fabric ${this.getFabricVersion()} is unsupported`
+      );
 
     this.validateConstructorOptions();
   }
@@ -99,6 +114,10 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
   public getContainerImageName(): string {
     return `${this.imageName}:${this.imageVersion}`;
+  }
+
+  public getFabricVersion(): string {
+    return `${this.envVars.get("FABRIC_VERSION")}`;
   }
 
   public getDefaultMspId(): string {
@@ -126,7 +145,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const fnTag = `${this.className}#enrollUser()`;
     try {
       const mspId = this.getDefaultMspId();
-      const enrollmentID = "user1";
+      const enrollmentID = "user2";
       const connectionProfile = await this.getConnectionProfileOrg1();
       // Create a new gateway for connecting to our peer node.
       const gateway = new Gateway();
@@ -199,7 +218,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const fnTag = `${this.className}#getConnectionProfileOrg1()`;
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
-    const ccpJsonPath = "/fabric-samples/first-network/connection-org1.json";
+    const CCP_JSON_PATH_FABRIC_V1: string =
+      "/fabric-samples/first-network/connection-org1.json";
+    const CCP_JSON_PATH_FABRIC_V2: string =
+      "/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json";
+    const ccpJsonPath = compareVersions.compare(
+      this.getFabricVersion(),
+      "2.0",
+      "<"
+    )
+      ? CCP_JSON_PATH_FABRIC_V1
+      : CCP_JSON_PATH_FABRIC_V2;
     const ccpJson = await Containers.pullFile(container, ccpJsonPath);
     const ccp = JSON.parse(ccpJson);
 
@@ -209,7 +238,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
       ccp.peers["peer0.org1.example.com"].url = `grpcs://localhost:${hostPort}`;
     }
-    {
+    if (ccp.peers["peer1.org1.example.com"]) {
       // peer1.org1.example.com
       const privatePort = 8051;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
@@ -236,8 +265,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
       const privatePort = 7050;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
       const url = `grpcs://localhost:${hostPort}`;
-      const ordererPemPath =
+      const ORDERER_PEM_PATH_FABRIC_V1: string =
         "/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem";
+      const ORDERER_PEM_PATH_FABRIC_V2: string =
+        "/fabric-samples/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem";
+      const ordererPemPath = compareVersions.compare(
+        this.getFabricVersion(),
+        "2.0",
+        "<"
+      )
+        ? ORDERER_PEM_PATH_FABRIC_V1
+        : ORDERER_PEM_PATH_FABRIC_V2;
       const pem = await Containers.pullFile(container, ordererPemPath);
 
       ccp.orderers = {
@@ -301,6 +339,9 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
   public async start(omitPull: boolean = false): Promise<Container> {
     const containerNameAndTag = this.getContainerImageName();
+    const dockerEnvVars: string[] = new Array(...this.envVars).map(
+      (pairs) => `${pairs[0]}=${pairs[1]}`
+    );
 
     if (this.container) {
       await this.container.stop();
@@ -328,6 +369,8 @@ export class FabricTestLedgerV1 implements ITestLedger {
         "9051/tcp": {}, // peer0.org2.example.com
         "10051/tcp": {}, // peer1.org2.example.com
       },
+
+      Env: dockerEnvVars,
 
       // This is a workaround needed for macOS which has issues with routing
       // to docker container's IP addresses directly...
@@ -450,6 +493,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
         imageVersion: this.imageVersion,
         imageName: this.imageName,
         publishAllPorts: this.publishAllPorts,
+        envVars: this.envVars,
       },
       OPTS_JOI_SCHEMA
     );
