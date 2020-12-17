@@ -24,9 +24,9 @@ import {
   RunTransactionRequest,
   FabricContractInvocationType,
   DefaultEventHandlerStrategy,
-} from "../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api";
 
-import { IPluginLedgerConnectorFabricOptions } from "../../../main/typescript/plugin-ledger-connector-fabric";
+import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { DiscoveryOptions } from "fabric-network";
 
 /**
@@ -36,12 +36,18 @@ import { DiscoveryOptions } from "fabric-network";
  * ```
  */
 
-test("deploys contract from go source", async (t: Test) => {
+test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
 
   const ledger = new FabricTestLedgerV1({
     publishAllPorts: true,
     logLevel,
+    imageName: "hyperledger/cactus-fabric-all-in-one",
+    imageVersion: "2020-12-16-3ddfd8f-v2.2.0",
+    envVars: new Map([
+      ["FABRIC_VERSION", "2.2.0"],
+      ["CA_VERSION", "1.4.9"],
+    ]),
   });
 
   await ledger.start();
@@ -61,7 +67,7 @@ test("deploys contract from go source", async (t: Test) => {
 
   const keychainInstanceId = uuidv4();
   const keychainId = uuidv4();
-  const keychainEntryKey = "user1";
+  const keychainEntryKey = "user2";
   const keychainEntryValue = JSON.stringify(userIdentity);
 
   const keychainPlugin = new PluginKeychainMemory({

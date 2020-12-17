@@ -64,6 +64,7 @@
   "dependencies": {
     "@hyperledger/cactus-common": "^0.2.0",
     "axios": "0.19.2",
+    "compare-versions": "3.6.0",
     "dockerode": "3.2.0",
     "extract-zip": "2.0.0",
     "fabric-client": "1.4.11",
