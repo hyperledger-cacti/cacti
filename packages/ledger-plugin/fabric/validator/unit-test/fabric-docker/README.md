@@ -26,22 +26,12 @@ Ensure that the next containers are started.
 
 	$ docker ps
 	CONTAINER ID        IMAGE                                                                                                    COMMAND                  CREATED             STATUS              PORTS                                            NAMES
-	ec8289e32f06        dev-peer0.org1.example.com-fabcar-1.0-5c906e402ed29f20260ae42283216aa75549c571e2e380f3615826365d8269ba   "chaincode -peer.add…"   2 hours ago         Up 2 hours                                                           dev-peer0.org1.example.com-fabcar-1.0
+	ec8289e32f06        dev-peer0.org1.example.com-fabcar-1.0-5c906e402ed29f20260ae42283216aa75549c571e2e380f3615826365d8269ba   "chaincode -peer.add..."   2 hours ago         Up 2 hours                                                           dev-peer0.org1.example.com-fabcar-1.0
 	a468d622234a        hyperledger/fabric-tools                                                                                 "/bin/bash"              2 hours ago         Up 2 hours                                                           cli
 	80e28ca9fbcf        hyperledger/fabric-peer                                                                                  "peer node start"        2 hours ago         Up 2 hours          0.0.0.0:7051->7051/tcp, 0.0.0.0:7053->7053/tcp   peer0.org1.example.com
-	8391db445423        hyperledger/fabric-ca                                                                                    "sh -c 'fabric-ca-se…"   2 hours ago         Up 2 hours          0.0.0.0:7054->7054/tcp                           ca.example.com
+	8391db445423        hyperledger/fabric-ca                                                                                    "sh -c 'fabric-ca-se..."   2 hours ago         Up 2 hours          0.0.0.0:7054->7054/tcp                           ca.example.com
 	3a06daddc298        hyperledger/fabric-orderer                                                                               "orderer"                2 hours ago         Up 2 hours          0.0.0.0:7050->7050/tcp                           orderer.example.com
-	b722f3d14f6e        hyperledger/fabric-couchdb                                                                               "tini -- /docker-ent…"   2 hours ago         Up 2 hours          4369/tcp, 9100/tcp, 0.0.0.0:5984->5984/tcp       couchdb
-
-#### Remarks
-
-According to the report from some contributor, in some environment the command `./startFabric.sh` fails, due to version incompatibility between fabric and couchdb.  If you encounter the same situation, execute the following commands and re-execute this step:
-
-	curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.4.0
-	docker pull hyperledger/fabric-couchdb:0.4.14
-	docker tag hyperledger/fabric-couchdb:0.4.14 hyperledger/fabric-couchdb:latest
-
-
+	b722f3d14f6e        hyperledger/fabric-couchdb                                                                               "tini -- /docker-ent..."   2 hours ago         Up 2 hours          4369/tcp, 9100/tcp, 0.0.0.0:5984->5984/tcp       couchdb
 
 ### 2) Registering an administrator user and general users
 
@@ -86,3 +76,4 @@ Copy and extract wallet.tar to the following target directory:
 [Deployment Method]
 
 	$ tar xvf wallet.tar
+

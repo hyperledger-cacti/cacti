@@ -11,9 +11,11 @@ const fs = require('fs');
 const path = require('path');
 const configDefault: any = ConfigUtil.getConfig();
 const configVerifier: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../config/verifier-config.json"), 'utf8'));
+const configContract: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../config/contractInfo.json"), 'utf8'));
 
 export class DBAccess {
     ledgerPluginInfo: [];
+    contractInfo: [];
     blpRegistryInfo: [];
 
     constructor() {
@@ -25,6 +27,13 @@ export class DBAccess {
 
         this.ledgerPluginInfo = configVerifier.ledgerPluginInfo;
         return this.ledgerPluginInfo;
+    }
+
+    getContractInfo(): [] {
+        // TODO: Future access to DB for contract information
+
+        this.contractInfo = configContract.contractInfo;
+        return this.contractInfo;
     }
 
     getBLPRegistryInfo(): [] {

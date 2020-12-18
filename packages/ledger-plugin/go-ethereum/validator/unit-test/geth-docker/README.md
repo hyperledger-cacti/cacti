@@ -4,11 +4,11 @@
 
  README.md
 -->
-# geth-docker
+# BIF-trial(geth-docker)
 
 ## Explanation
-- The docker container "geth-docker" is required to run the unit-test for Validator of Ethereum-specific Ledger Plugin
-- Immediately after applying geth-docker, it is necessary to perform "a) initialization"
+- "geth-docker" is a module required to run "Validator"
+- Immediately after applying -geth-docker, it is necessary to perform "a) initialization"
 - How to start/stop will be explained follow
 
 ## a) Initialization
@@ -16,10 +16,10 @@
 <pre>
 ./init-account.sh
 </pre>
-- NOTE: 
-	- Please keep in your memo the addresses (ec1-accounts[0],[1],..,[4] and ec2-accounts[0],[1],..,[4]),
 
-- Sample output
+Please keep in your memo the addresses (ec1-accounts[0],[1],..,[4] and ec2-accounts[0],[1],..,[4]),
+
+* Sample output
 <pre>
  make-account-ec1-accounts[0]
  Creating network "ecenv_default" with the default driver
@@ -64,11 +64,13 @@
 </pre>
 
 ### 2) Editing initial block information
-- Change the "ADDRESS" in genesis/genesis-ec1.json(and genesis-ec2.json) to the address for ec1-accounts[0].
-	- Specify ec1-accounts [0] account for "genesis / genesis-ec1.json"
-	- Specify ec2-accounts [0] account for "genesis / genesis-ec2.json"
+* Change the "ADDRESS" in genesis/genesis-ec1.json(and genesis-ec2.json) to the address for ec1-accounts[0].
 
-- Sample output
+ * Specify ec1-accounts [0] account for "genesis / genesis-ec1.json"
+ * Specify ec2-accounts [0] account for "genesis / genesis-ec2.json"
+
+* Sample output
+
 <pre>
  "alloc"      : {
  	"ADDRESS":
@@ -92,13 +94,9 @@
 ./up.sh
 </pre>
 
+
 ## c) Stop geth-containers
 <pre>
 ./down.sh
-</pre>
-
-## d) Stop geth-containers and delete their information
-<pre>
-./delete.sh
 </pre>
 

@@ -12,4 +12,5 @@ import * as shell from 'shelljs';
 //        shell.cp('-R', 'src/routing-interface/views', 'dist/routing-interface/views/');
 shell.cp('-R', 'config/default.json', '../dist/packages/config/');
 shell.cp('-R', 'config/verifier-config.json', '../dist/packages/config/');
+shell.cp('-R', 'config/contractInfo.json', '../dist/packages/config/');
 shell.cp('-R', 'config/usersetting.json', '../dist/packages/config/');

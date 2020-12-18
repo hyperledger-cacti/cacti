@@ -29,7 +29,7 @@ router.get('/:account', (req: Request, res: Response, next: NextFunction) => {
     balanceManagement.getBalance(req.params.account).then(result => {
         logger.debug("result(getBalance) = " + JSON.stringify(result));
         res.status(200).json(result);
-    }).catch(function (err) {
+    }).catch((err) => {
         logger.error(err);
     });
 

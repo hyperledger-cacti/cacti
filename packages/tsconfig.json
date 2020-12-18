@@ -69,7 +69,10 @@
     "outDir": "../dist/packages"
   },
   "include": [
-    "./**/*.ts",
+    "./business-logic-plugin/*.ts",
+    "./config/*.ts",
+    "./ledger-plugin/*.ts",
+    "./routing-interface/**/*.ts",
   ],
   "exclude": [
     "copyStaticAssets.ts"
