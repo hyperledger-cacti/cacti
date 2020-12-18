@@ -7,7 +7,7 @@
     ],
     "logLevel": "debug",
     "applicationHostInfo": {
-        "hostName": "http://xxx.xxxxx.xxx:xxxx",
+        "hostName": "http://xxx.xxx.xxx.xxx",
         "hostPort": 5034
     },
     "socketOptions": {

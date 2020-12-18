@@ -1,16 +1,18 @@
+cd ../..
+
 ## Build validator for Fabric
-cd ../../packages/ledger-plugin/fabric/validator/src/
+cd ./packages/ledger-plugin/fabric/validator/src
 ./script-build-validator.sh
-cp -a ../../../../../examples/cartrade/build/wallet/ .
-cd ../../../../../
+cp -a ../../../../../examples/cartrade/build/wallet .
+cd ../../../../..
 
 ## build validator for Ethereum
-cd ./packages/ledger-plugin/go-ethereum/validator/src/
+cd ./packages/ledger-plugin/go-ethereum/validator/src
 ./script-build-validator.sh
-cd ../../../../../
+cd ../../../../..
 
 ## build packages
-cd ./packages/
+cd ./packages
 ./script-build-packages.sh
 cd ..
 

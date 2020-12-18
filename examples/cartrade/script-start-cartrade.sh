@@ -1,4 +1,4 @@
-cd ../../
+cd ../..
 
 ## Start cartrade app
 echo "[process] Start the routing interface and the cartrade app"

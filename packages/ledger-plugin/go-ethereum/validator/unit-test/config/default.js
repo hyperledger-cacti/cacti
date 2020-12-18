@@ -6,7 +6,13 @@
  */
 
 module.exports = {
-	// URL to validator.  Please write your IP address in the field of "YourIpAddress".
-	"validatorUrl" : 'https://YourIpAddress:5050',
-	"gethUrl" : 'http://localhost:8545'
+	// URL to validator
+	"validatorUrl" : 'https://localhost:5050',
+	"gethUrl" : 'http://localhost:8545',
+	
+	// forCustomChain 
+	"chainName":  'geth1',
+	"networkId":  10,
+	"chainId":  10
+
 };

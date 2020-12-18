@@ -4,15 +4,13 @@
  
  README.md
 -->
-# Fabric-specific 
+# BIF-trial(Validator)
 
 ## Assumption
-- A ledger (Hyperledger fabric node) to connect is already running
-- Specify URL of the ledger node to connect to in "PluginConfig.js"
+- fabric is running
 
-## Execution
-```
-./setup.sh
+## Run
+<pre>
 cd core
 node ./bin/www.js 
-```
+</pre>

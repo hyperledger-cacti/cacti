@@ -133,12 +133,14 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 const transactionData: TransactionData = new TransactionData("escrow", "ledger001", result.txId);
                 this.transactionInfoManagement.setTransactionData(tradeInfo, transactionData);
 
-                // Set LedgerOperation
+                // Set Parameter
                 logger.debug('firstTransaction data : ' + JSON.stringify(result.data));
-                const ledgerOperation: LedgerOperation = new LedgerOperation("sendRawTransaction", "", result.data);
+                const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
+                const method = {type: "web3Eth", command: "sendRawTransaction"};
+                const args = {"args": [result.data["serializedTx"]]};
 
-                // Run Verifier (Ethereum)
-                verifierEthereum.requestLedgerOperation(ledgerOperation);
+                // Run Verifier (Fabric)
+                verifierEthereum.requestLedgerOperationNeo(contract, method, args);
             })
             .catch(err => {
                 logger.error(err);
@@ -175,7 +177,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 // Set Parameter
                 //logger.debug('secondTransaction data : ' + JSON.stringify(result.data));
                 const contract = {"channelName": "mychannel"};
-                const method = {"method": "sendSignedProposal"};
+                const method = {"type": "sendSignedTransaction"};
                 const args = {"args": [result.data]};
 
                 // Run Verifier (Fabric)
@@ -222,7 +224,18 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 const ledgerOperation: LedgerOperation = new LedgerOperation("sendRawTransaction", "", result.data);
 
                 // Run Verifier (Ethereum)
-                verifierEthereum.requestLedgerOperation(ledgerOperation);
+                // verifierEthereum.requestLedgerOperation(ledgerOperation);
+
+                // TODO: Neo!!
+                // Set Parameter
+                const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
+                const method = {type: "web3Eth", command: "sendRawTransaction"};
+                const args = {"args": [result.data["serializedTx"]]};
+
+                // Run Verifier (Fabric)
+                verifierEthereum.requestLedgerOperationNeo(contract, method, args);
+
+
             })
             .catch(err => {
                 logger.error(err);

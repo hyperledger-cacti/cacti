@@ -4,15 +4,14 @@
  
  README.md
 -->
-# Validator of Ethereum-speicific Ledger Plugin 
+# BIF-trial(Validator)
 
 ## Assumption
-- A ledger (Ethereum node) to connect is already running
-- Specify URL of the ledger node to connect to in "provider" of "PluginConfig.js"
+- geth1(geth-docker) is running
+- Specify the geth1 URL to connect to with "validatorUrl" in "config/default.js"
 
-## Execution
-```
-./setup.sh
+## Run
+<pre>
 cd core
 node ./bin/www.js 
-```
+</pre>

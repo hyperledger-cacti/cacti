@@ -5,22 +5,16 @@
  * BalanceManagement.ts
  */
 
-import { Request } from 'express';
-import { BusinessLogicPlugin } from '../business-logic-plugin/BusinessLogicPlugin';
 import { LedgerOperation } from '../business-logic-plugin/LedgerOperation';
-import { BLPRegistry } from './util/BLPRegistry';
 import { LPInfoHolder } from './util/LPInfoHolder';
-import { json2str } from '../ledger-plugin/DriverCommon'
 import { VerifierBase } from '../ledger-plugin/VerifierBase';
-import { VerifierEventListener, LedgerEvent } from '../ledger-plugin/LedgerPlugin';
-import { getTargetBLPInstance } from '../config/BLP_config';
 import { ConfigUtil } from './util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-const moduleName = 'TransactionManagement';
+const moduleName = 'BalanceManagement';
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
@@ -39,13 +33,23 @@ export class BalanceManagement {
                 const ledgerPluginInfo: string = this.connectInfo.getLegerPluginInfo("84jUisrs");
                 this.verifierEthereum = new VerifierBase(ledgerPluginInfo);
             }
-            
-            const execData = {"referedAddress": account};
-            const ledgerOperation: LedgerOperation = new LedgerOperation("getNumericBalance", "", execData);
 
-            this.verifierEthereum.execSyncFunction(ledgerOperation).then(result => {
-                resolve(result);
-            }).catch(function (err) {
+            // for LedgerOperation
+            // const execData = {"referedAddress": account};
+            // const ledgerOperation: LedgerOperation = new LedgerOperation("getNumericBalance", "", execData);
+
+            // for Neo
+            const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
+            const method = {type: "web3Eth", command: "getBalance"};
+            const args = {"args": [account]};
+
+            this.verifierEthereum.execSyncFunctionNeo(contract, method, args).then(result => {
+                const response = {
+                    "status": result.status,
+                    "amount": parseFloat(result.data)
+                }
+                resolve(response);
+            }).catch((err) => {
                 logger.error(err);
                 reject(err);
             });
