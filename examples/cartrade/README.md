@@ -13,7 +13,8 @@ Before you begin, you need to check that you have all the prerequisites installe
 1. Before booting, please modify the following information for your environment
 	- `applicationHostInfo.hostName` (IP address of the host on the Location header) on `/packages/config/default.json`
 	- `applicationHostInfo.hostPort` (The port number of Routing-interface http server, the default is 5034) on `/packages/config/default.json`
-
+1. Go to the following directory:
+	- `cd cactus/examples/cartrade/`
 1. Start ledgers:
 	- `./script-start-ledgers.sh` 
 1. Build validators, packages, and the cartrade app:
