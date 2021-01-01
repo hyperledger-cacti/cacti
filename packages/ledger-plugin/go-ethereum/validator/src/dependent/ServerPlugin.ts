@@ -20,6 +20,7 @@ const logger = getLogger('ServerPlugin[' + process.pid + ']');
 logger.level = config.logLevel;
 // utility
 var SplugUtil = require('./PluginUtil.js');
+import { ValidatorAuthentication } from './ValidatorAuthentication';
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 var Web3 = require('web3');
 
@@ -302,11 +303,11 @@ export class ServerPlugin {
                 } else {
                     result = web3.eth[sendFunction]();
                 }
-
+                const signedResults = ValidatorAuthentication.sign({"result":result});
                 retObj = {
                     "resObj" : {
                         "status" : 200,
-                        "data" : result
+                        "data" : signedResults
                     }
                 };
                 logger.debug("##web3Eth: add reqID");
@@ -388,10 +389,11 @@ export class ServerPlugin {
                 }
                 logger.debug(`##contract: result: ${result}`);
 
+                const signedResults = ValidatorAuthentication.sign({"result":result});
                 retObj = {
                     "resObj" : {
                         "status" : 200,
-                        "data" : result
+                        "data" : signedResults
                     }
                 };
                 logger.debug("##contract: add reqID");

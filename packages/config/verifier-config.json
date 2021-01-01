@@ -3,6 +3,7 @@
         {
             "validatorID": "84jUisrs",
             "validatorURL": "https://localhost:5050",
+            "validatorKeyPath": "./validatorKey/84jUisrs/key84jUisrs.crt",
             "ledgerInfo": {
                 "ledgerAbstract": "Go-Ethereum Ledger"
             },
@@ -47,6 +48,7 @@
         {
             "validatorID": "r9IS4dDf",
             "validatorURL": "https://localhost:5040",
+            "validatorKeyPath": "./validatorKey/r9IS4dDf/keyr9IS4dDf.crt",
             "ledgerInfo": {
                 "ledgerAbstract": "Fabric Ledger"
             },

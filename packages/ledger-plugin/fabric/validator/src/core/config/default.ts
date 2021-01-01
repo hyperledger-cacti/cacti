@@ -10,11 +10,10 @@ export const config = {
     // Destination dependent definition values should be in lib/PluginConfig.js.
     "sslParam" : {
         "port" : 5040,
-        //"port" : 5041,
-        //"port" : 5042,
         "key" : './core/CA/connector.priv',
         "cert" : './core/CA/connector.crt'
     },
+    "validatorKeyPath": "../core/validatorKey/keyr9IS4dDf.priv",
     // Log level (trace/debug/info/warn/error/fatal)
     "logLevel" : "debug"
 };

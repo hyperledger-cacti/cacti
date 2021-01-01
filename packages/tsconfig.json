@@ -75,6 +75,7 @@
     "./routing-interface/**/*.ts",
   ],
   "exclude": [
-    "copyStaticAssets.ts"
+    "copyStaticAssets.ts",
+    "./ledger-plugin/ValidatorAuthentication.ts"
   ]
 }

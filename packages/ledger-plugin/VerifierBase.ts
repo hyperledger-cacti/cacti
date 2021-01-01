@@ -11,6 +11,7 @@ import { json2str, addSocket, getStoredSocket, deleteAndDisconnectSocke } from '
 import { LedgerOperation } from './../business-logic-plugin/LedgerOperation';
 import { Socket } from 'dgram';
 import { ConfigUtil } from '../routing-interface/util/ConfigUtil';
+import { VerifierAuthentication } from './VerifierAuthentication';
 
 const io = require('socket.io-client');
 
@@ -25,6 +26,7 @@ logger.level = config.logLevel;
 export class VerifierBase implements Verifier {
     validatorID: string = "";
     validatorUrl: string = "";
+    validatorKeyPath: string = "";
     apiInfo: {} = null;
     counterReqID: number = 1;
     eventListener: VerifierEventListener | null = null; // Listener for events from Ledger
@@ -34,6 +36,7 @@ export class VerifierBase implements Verifier {
         const ledgerInfoObj: {} = JSON.parse(ledgerInfo);
         this.validatorID = ledgerInfoObj['validatorID'];
         this.validatorUrl = ledgerInfoObj['validatorURL'];
+        this.validatorKeyPath = ledgerInfoObj['validatorKeyPath'];
         this.apiInfo = ledgerInfoObj['apiInfo'];
     }
 
@@ -216,8 +219,19 @@ export class VerifierBase implements Verifier {
                     if (reqID === result.id) {
                         responseFlag = true;
                         logger.debug(`##execSyncFunction: resObj: ${JSON.stringify(result.resObj)}`);
-                        // Result reply
-                        resolve(result.resObj);
+
+                        VerifierAuthentication.verify(this.validatorKeyPath, result.resObj.data).then(decodedData => {
+                            logger.debug(`decodedData = ${JSON.stringify(decodedData)}`);
+                            const resultObj = {
+                                "status": result.resObj.status,
+                                "data": decodedData.result
+                            }
+                            logger.debug(`resultObj = ${JSON.stringify(resultObj)}`);
+                            // Result reply
+                            resolve(resultObj);
+                        }).catch((err) => {
+                            logger.error(err);
+                        });
                     }
                 });
 
@@ -292,11 +306,22 @@ export class VerifierBase implements Verifier {
                     if (eventListener != null) {
                         // const eventFilter = eventListener.getEventFilter();
 
-                        const event = new LedgerEvent();
-                        event.verifierId = this.validatorID;
-                        event.data = res;
+                        VerifierAuthentication.verify(this.validatorKeyPath, res.blockData).then(decodedData => {
+                            logger.debug(`decodedData = ${JSON.stringify(decodedData)}`);
+                            const resultObj = {
+                                "status": res.status,
+                                "blockData": decodedData.blockData
+                            }
+                            logger.debug(`resultObj = ${JSON.stringify(resultObj)}`);
 
-                        eventListener.onEvent(event);
+                            const event = new LedgerEvent();
+                            event.verifierId = this.validatorID;
+                            event.data = resultObj;
+
+                            eventListener.onEvent(event);
+                        }).catch((err) => {
+                            logger.error(err);
+                        });
                     }
                     else {
                         logger.warn(`##skip eventListener`);

@@ -23,8 +23,5 @@
     "./core/bin/*.ts",
     "./core/config/*.ts",
     "./dependent/*.ts"
-  ],
-  "exclude": [
-    "copyStaticAssets.ts"
   ]
 }

@@ -20,6 +20,7 @@ const logger = getLogger('ServerPlugin[' + process.pid + ']');
 logger.level = config.logLevel;
 // utility
 var SplugUtil = require('./PluginUtil.js');
+import { ValidatorAuthentication } from './ValidatorAuthentication';
 // Read the library, SDK, etc. according to EC specifications as needed
 var fabric = require('./fabricaccess.js');
 
@@ -121,10 +122,11 @@ export class ServerPlugin {
                             logger.debug(`##evaluateTransaction(B6)`);
                             objRetValue = JSON.parse(returnvalue);
                         }
+                        const signedResults = ValidatorAuthentication.sign({"result":objRetValue});
                         retObj = {
                             "resObj" : {
                                 "status" : 200,
-                                "data": [objRetValue] // car information. Return as an array.
+                                "data": signedResults
                             }
                         };
                         if (reqID !== null) {
