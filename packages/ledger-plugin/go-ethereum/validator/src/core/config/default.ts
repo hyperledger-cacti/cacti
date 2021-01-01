@@ -14,6 +14,7 @@ export const config = {
         "key" : "./core/CA/connector.priv",
         "cert" : "./core/CA/connector.crt"
     },
+    "validatorKeyPath": "../core/validatorKey/key84jUisrs.priv",
     // Log level (trace/debug/info/warn/error/fatal)
     "logLevel" : "debug"
 }

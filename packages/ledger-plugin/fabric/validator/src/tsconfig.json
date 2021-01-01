@@ -19,12 +19,9 @@
     ]
   },
   "include": [
-    "core/*.ts",
-    "core/bin/*.ts",
-    "core/config/*.ts",
-    "dependent/*.ts"
-  ],
-  "exclude": [
-    "copyStaticAssets.ts"
+    "./core/*.ts",
+    "./core/bin/*.ts",
+    "./core/config/*.ts",
+    "./dependent/*.ts"
   ]
 }

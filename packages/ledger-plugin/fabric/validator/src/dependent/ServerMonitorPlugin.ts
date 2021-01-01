@@ -25,6 +25,8 @@ import { config } from '../core/config/default';
 import { getLogger } from "log4js";
 const logger = getLogger('ServerMonitorPlugin[' + process.pid + ']');
 logger.level = config.logLevel;
+// utility
+import { ValidatorAuthentication } from './ValidatorAuthentication';
 
 
 /*
@@ -119,9 +121,12 @@ export class ServerMonitorPlugin {
                         }
                     }
                     logger.info('*** SEND BLOCK DATA ***');
+                    logger.debug(`txlist = ${JSON.stringify(txlist)}`);
+                    const signedTxlist = ValidatorAuthentication.sign({"blockData":txlist});
+                    logger.debug(`signedTxlist = ${signedTxlist}`);
                     var retObj = {
                         "status"    : 200,
-                        "blockData" : txlist
+                        "blockData" : signedTxlist
                     };
                     cb(retObj);
 

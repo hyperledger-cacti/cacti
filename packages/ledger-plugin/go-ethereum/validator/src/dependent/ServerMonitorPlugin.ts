@@ -20,6 +20,8 @@ import { config } from '../core/config/default';
 import { getLogger } from "log4js";
 const logger = getLogger('ServerMonitorPlugin[' + process.pid + ']');
 logger.level = config.logLevel;
+// utility
+import { ValidatorAuthentication } from './ValidatorAuthentication';
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 var Web3 = require('web3');
 
@@ -69,12 +71,16 @@ export class ServerMonitorPlugin {
                         logger.info(trLength + " transactions in block " + blockData.number);
                         console.log('##[HL-BC] Validate transactions(D3)');
                         console.log('##[HL-BC] digital sign on valid transaction(D4)');
+
                         if (trLength > 0) {
                             logger.info('*** SEND BLOCK DATA ***');
+                            logger.debug(`blockData = ${JSON.stringify(blockData)}`);
+                            const signedBlockData = ValidatorAuthentication.sign({"blockData":blockData});
+                            logger.debug(`signedBlockData = ${signedBlockData}`);
                             // Notify only if transaction exists
                             var retObj = {
                                 "status"    : 200,
-                                "blockData" : blockData
+                                "blockData" : signedBlockData
                             };
                             cb(retObj);
                         }
