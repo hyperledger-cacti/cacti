@@ -5,7 +5,8 @@
     "build": "npm run build-ts && npm run copy-static-assets",
     "build-ts": "tsc",
     "tslint": "tslint -c tslint.json -p tsconfig.json './business-logic-plugin/*.ts' './ledger-plugin/*.ts' './routing-interface/**/*.ts'",
-    "copy-static-assets": "ts-node copyStaticAssets.ts"
+    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "test": "jest"
   },
   "dependencies": {
     "@types/node": "^14.0.24",
@@ -19,6 +20,7 @@
     "fabric-network": "~1.4.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "jsonwebtoken": "^8.5.1",
     "log4js": "^3.0.6",
     "morgan": "~1.9.1",
     "shelljs": "^0.8.4",
@@ -27,7 +29,10 @@
     "web3": "^1.2.9"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.19",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.4.4",
     "tslint": "6.0.0",
-    "typescript": "3.9.3"
+    "typescript": "^3.9.3"
   }
 }

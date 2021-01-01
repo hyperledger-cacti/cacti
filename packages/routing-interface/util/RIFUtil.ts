@@ -43,7 +43,7 @@ export class RIFUtil {
             return JSON.parse(jsonStr);
         }
         catch (error) {
-            logger.error(error)
+            // logger.error(error)
             return null;
         }
     }
