@@ -7,6 +7,8 @@
 	- `./script-build-packages.sh`
 
 ## How to use this sample auto-testing
+1. Go to the following directory:
+	- `cd /packages`
 1. Execute the following command:
 	- `npm run test`
 	- The sample of result is as the following:
