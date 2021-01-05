@@ -10,6 +10,7 @@ import { ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
 
 import {
+  ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
   IWebServiceEndpoint,
   IPluginWebService,
@@ -166,6 +167,12 @@ export class PluginLedgerConnectorBesu
 
   public getAspect(): PluginAspect {
     return PluginAspect.LEDGER_CONNECTOR;
+  }
+
+  public async getConsensusAlgorithmFamily(): Promise<
+    ConsensusAlgorithmFamily
+  > {
+    return ConsensusAlgorithmFamily.AUTHORITY;
   }
 
   public async invokeContract(

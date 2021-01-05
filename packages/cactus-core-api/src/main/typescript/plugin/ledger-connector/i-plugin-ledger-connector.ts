@@ -1,4 +1,5 @@
 import { ICactusPlugin } from "../i-cactus-plugin";
+import { ConsensusAlgorithmFamily } from "../../generated/openapi/typescript-axios/api";
 
 /**
  * Common interface to be implemented by plugins which are implementing the connection to ledgers.
@@ -21,4 +22,12 @@ export interface IPluginLedgerConnector<
    * type of ledger this connectir is targeted at.
    */
   transact(options?: TransactIn): Promise<TransactOut>;
+
+  /**
+   * Returns the family of algorithms in which the consensus algorithm used
+   * by the ledger (this connector is associated with) belongs in.
+   *
+   * @see {ConsensusAlgorithmFamily}
+   */
+  getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily>;
 }
