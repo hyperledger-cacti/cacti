@@ -16,6 +16,7 @@ import {
 import { Optional } from "typescript-optional";
 
 import {
+  ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
   PluginAspect,
   IPluginWebService,
@@ -114,6 +115,12 @@ export class PluginLedgerConnectorFabric
 
   public getHttpServer(): Optional<Server | SecureServer> {
     return Optional.empty();
+  }
+
+  public async getConsensusAlgorithmFamily(): Promise<
+    ConsensusAlgorithmFamily
+  > {
+    return ConsensusAlgorithmFamily.AUTHORITY;
   }
 
   /**
