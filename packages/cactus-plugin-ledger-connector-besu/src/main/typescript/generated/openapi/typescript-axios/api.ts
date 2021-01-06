@@ -435,6 +435,7 @@ export interface Web3SigningCredentialPrivateKeyHex {
  */
 export enum Web3SigningCredentialType {
     CACTUSKEYCHAINREF = 'CACTUS_KEYCHAIN_REF',
+    GETHKEYCHAINPASSWORD = 'GETH_KEYCHAIN_PASSWORD',
     PRIVATEKEYHEX = 'PRIVATE_KEY_HEX',
     NONE = 'NONE'
 }
