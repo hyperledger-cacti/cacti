@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core-api",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-core-api.node.umd.min.js",
