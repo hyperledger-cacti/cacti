@@ -11,15 +11,14 @@ import {
 } from "@hyperledger/cactus-common";
 import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
 import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
-import { Consortium, ConsortiumDatabase } from "@hyperledger/cactus-core-api";
+import {
+  ConsortiumDatabase,
+  PluginImport,
+  PluginImportType,
+} from "@hyperledger/cactus-core-api";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
-
-export interface IPluginImport {
-  packageName: string;
-  options?: any;
-}
 
 export interface ICactusApiServerOptions {
   configFile: string;
@@ -45,7 +44,7 @@ export interface ICactusApiServerOptions {
   apiTlsCertPem: string;
   apiTlsKeyPem: string;
   apiTlsClientCaPem: string;
-  plugins: IPluginImport[];
+  plugins: PluginImport[];
   keyPairPem: string;
   keychainSuffixKeyPairPem: string;
   minNodeVersion: string;
@@ -450,13 +449,15 @@ export class ConfigService {
     const pkiGenerator = new SelfSignedPkiGenerator();
     const pkiServer: IPki = pkiGenerator.create("localhost");
 
-    const plugins = [
+    const plugins: PluginImport[] = [
       {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
+        type: PluginImportType.LOCAL,
         options: {},
       },
       {
         packageName: "@hyperledger/cactus-plugin-consortium-manual",
+        type: PluginImportType.LOCAL,
         options: {
           keyPairPem,
           consortium,

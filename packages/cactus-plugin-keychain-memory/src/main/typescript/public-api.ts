@@ -1,3 +1,5 @@
+import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+
 export {
   PluginKeychainMemory,
   IPluginKeychainMemoryOptions,
@@ -7,7 +9,7 @@ export { PluginFactoryKeychain } from "./plugin-factory-keychain";
 import { PluginFactoryKeychain } from "./plugin-factory-keychain";
 
 export async function createPluginFactory(
-  options?: any
+  pluginFactoryOptions: IPluginFactoryOptions
 ): Promise<PluginFactoryKeychain> {
-  return new PluginFactoryKeychain();
+  return new PluginFactoryKeychain(pluginFactoryOptions);
 }

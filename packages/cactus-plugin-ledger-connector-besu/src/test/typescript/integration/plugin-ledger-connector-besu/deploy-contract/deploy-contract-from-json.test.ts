@@ -13,6 +13,7 @@ import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
+import { PluginImportType } from "@hyperledger/cactus-core-api";
 
 test("deploys contract via .json file", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -52,7 +53,9 @@ test("deploys contract via .json file", async (t: Test) => {
     logLevel,
   });
 
-  const factory = new PluginFactoryLedgerConnector();
+  const factory = new PluginFactoryLedgerConnector({
+    pluginImportType: PluginImportType.LOCAL,
+  });
   const connector: PluginLedgerConnectorBesu = await factory.create({
     rpcApiHttpHost,
     instanceId: uuidv4(),

@@ -9,9 +9,11 @@ export * from "./model-type-guards";
 
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
+import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
+
 export async function createPluginFactory(
-  options?: any
+  pluginFactoryOptions: IPluginFactoryOptions
 ): Promise<PluginFactoryLedgerConnector> {
-  return new PluginFactoryLedgerConnector();
+  return new PluginFactoryLedgerConnector(pluginFactoryOptions);
 }

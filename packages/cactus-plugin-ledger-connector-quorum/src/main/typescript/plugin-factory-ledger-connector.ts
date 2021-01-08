@@ -1,4 +1,7 @@
-import { PluginFactory } from "@hyperledger/cactus-core-api";
+import {
+  IPluginFactoryOptions,
+  PluginFactory,
+} from "@hyperledger/cactus-core-api";
 import {
   IPluginLedgerConnectorQuorumOptions,
   PluginLedgerConnectorQuorum,
@@ -6,11 +9,12 @@ import {
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorQuorum,
-  IPluginLedgerConnectorQuorumOptions
+  IPluginLedgerConnectorQuorumOptions,
+  IPluginFactoryOptions
 > {
   async create(
-    options: IPluginLedgerConnectorQuorumOptions
+    pluginOptions: IPluginLedgerConnectorQuorumOptions
   ): Promise<PluginLedgerConnectorQuorum> {
-    return new PluginLedgerConnectorQuorum(options);
+    return new PluginLedgerConnectorQuorum(pluginOptions);
   }
 }

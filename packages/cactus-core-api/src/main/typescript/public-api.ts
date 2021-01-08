@@ -20,3 +20,7 @@ export {
 } from "./plugin/i-cactus-plugin";
 
 export { PluginAspect } from "./plugin/plugin-aspect";
+
+export { IPluginFactoryOptions } from "./i-plugin-factory-options";
+
+export { PluginFactoryFactory } from "./plugin-factory-factory";

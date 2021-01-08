@@ -19,10 +19,11 @@ import bodyParser from "body-parser";
 import cors from "cors";
 
 import {
-  PluginFactory,
   ICactusPlugin,
   isIPluginWebService,
   IPluginWebService,
+  IPluginFactoryOptions,
+  PluginFactoryFactory,
 } from "@hyperledger/cactus-core-api";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -163,23 +164,25 @@ export class ApiServer {
 
   public async initPluginRegistry(): Promise<PluginRegistry> {
     const registry = new PluginRegistry({ plugins: [] });
-    const { logLevel } = this.options.config;
+    const { logLevel, plugins } = this.options.config;
     this.log.info(`Instantiated empty registry, invoking plugin factories...`);
 
-    for (const pluginImport of this.options.config.plugins) {
+    for (const pluginImport of plugins) {
       const { packageName, options } = pluginImport;
       this.log.info(`Creating plugin from package: ${packageName}`, options);
       const pluginOptions = { ...options, logLevel, pluginRegistry: registry };
 
-      const {
-        createPluginFactory,
-      } = require(/* webpackIgnore: true */ packageName);
+      const pluginPackage = require(/* webpackIgnore: true */ packageName);
+      const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
 
-      const pluginFactory: PluginFactory<
-        ICactusPlugin,
-        any
-      > = await createPluginFactory();
+      const pluginFactoryOptions: IPluginFactoryOptions = {
+        pluginImportType: pluginImport.type,
+      };
+
+      const pluginFactory = await createPluginFactory(pluginFactoryOptions);
+
       const plugin = await pluginFactory.create(pluginOptions);
+
       registry.add(plugin);
     }
 
