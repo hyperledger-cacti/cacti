@@ -72,7 +72,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "0.3.0",
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "0.3.0",
     "async-exit-hook": "2.0.1",
-    "axios": "0.19.2",
+    "axios": "0.21.1",
     "express": "4.17.1",
     "openapi-types": "7.0.1",
     "swarm-js": "0.1.40",
