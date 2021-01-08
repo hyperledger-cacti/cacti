@@ -13,10 +13,10 @@ jobs:
       fail-fast: true
       max-parallel: 1 # Fabric AIO image needs fixed host ports allocated
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04]
-        node-version: [v12.13.0, v14.15.1]
-        experimental: [false]
-        # include:
+        # os: [ubuntu-20.04, ubuntu-18.04]
+        # node-version: [v12.13.0, v14.15.1]
+        # experimental: [false]
+        include:
         #
         # # FIXME macOS does not work due to lack of docker support in GHA.
         # https://github.community/t/why-is-docker-not-installed-on-macos/17017
@@ -27,11 +27,12 @@ jobs:
         #     node-version: v12.13.0
         #     experimental: true
         #
-        # # FIXME
+        # FIXME
         # https://github.com/hyperledger/cactus/issues/171
-        #   - os: windows-2019 # Windows Server 2019
-        #     node-version: v12.13.0
-        #     experimental: true
+          # Windows Server 2019
+          - os: windows-2019
+            node-version: v12.13.0
+            experimental: true
 
     steps:
     # FIXME: These do not work on mac OS as of 2020-12-09
