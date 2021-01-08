@@ -2,16 +2,15 @@ import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+
+import { IPluginKeychainMemoryOptions } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginImportType } from "@hyperledger/cactus-core-api";
 
 import { ApiServer, ConfigService } from "../../../main/typescript/public-api";
-import { IPluginKeychainMemoryOptions } from "../../../../../cactus-plugin-keychain-memory/dist/types/main/typescript";
 
 const logLevel: LogLevelDesc = "TRACE";
 
 test("can import plugins at runtime (CLI)", async (t: Test) => {
-  const pluginRegistry = new PluginRegistry({ plugins: [] });
-
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
   apiServerOptions.configFile = "";
@@ -22,6 +21,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
   apiServerOptions.plugins = [
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
+      type: PluginImportType.LOCAL,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),

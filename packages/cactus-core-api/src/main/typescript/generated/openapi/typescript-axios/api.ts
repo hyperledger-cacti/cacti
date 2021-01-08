@@ -316,6 +316,41 @@ export enum LedgerType {
 /**
  * 
  * @export
+ * @interface PluginImport
+ */
+export interface PluginImport {
+    /**
+     * 
+     * @type {string}
+     * @memberof PluginImport
+     */
+    packageName: string;
+    /**
+     * 
+     * @type {PluginImportType}
+     * @memberof PluginImport
+     */
+    type: PluginImportType;
+    /**
+     * 
+     * @type {any}
+     * @memberof PluginImport
+     */
+    options?: any | null;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+export enum PluginImportType {
+    LOCAL = 'org.hyperledger.cactus.plugin_import_type.LOCAL',
+    REMOTE = 'org.hyperledger.cactus.plugin_import_type.REMOTE'
+}
+
+/**
+ * 
+ * @export
  * @interface PluginInstance
  */
 export interface PluginInstance {

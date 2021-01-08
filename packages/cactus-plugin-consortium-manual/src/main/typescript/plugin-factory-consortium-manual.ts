@@ -1,4 +1,7 @@
-import { PluginFactory } from "@hyperledger/cactus-core-api";
+import {
+  IPluginFactoryOptions,
+  PluginFactory,
+} from "@hyperledger/cactus-core-api";
 import {
   IPluginConsortiumManualOptions,
   PluginConsortiumManual,
@@ -6,11 +9,12 @@ import {
 
 export class PluginFactoryWebService extends PluginFactory<
   PluginConsortiumManual,
-  IPluginConsortiumManualOptions
+  IPluginConsortiumManualOptions,
+  IPluginFactoryOptions
 > {
   async create(
-    options: IPluginConsortiumManualOptions
+    pluginOptions: IPluginConsortiumManualOptions
   ): Promise<PluginConsortiumManual> {
-    return new PluginConsortiumManual(options);
+    return new PluginConsortiumManual(pluginOptions);
   }
 }

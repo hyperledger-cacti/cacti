@@ -5,6 +5,7 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
 import { IPluginKeychainMemoryOptions } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginImportType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -21,6 +22,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
   apiServerOptions.plugins = [
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
+      type: PluginImportType.LOCAL,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),
