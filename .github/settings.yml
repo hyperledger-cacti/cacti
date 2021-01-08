@@ -6,7 +6,7 @@ repository:
   name: cactus
   description: Hyperledger Cactus is a new approach to the blockchain interoperability problem
   homepage: https://wiki.hyperledger.org/display/cactus
-  default_branch: master
+  default_branch: main
   has_downloads: false
   has_issues: true
   has_projects: true
