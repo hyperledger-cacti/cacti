@@ -231,6 +231,38 @@ export interface ConsortiumMember {
 /**
  * 
  * @export
+ * @interface GetKeychainEntryRequest
+ */
+export interface GetKeychainEntryRequest {
+    /**
+     * The key for the entry to get from the keychain.
+     * @type {string}
+     * @memberof GetKeychainEntryRequest
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetKeychainEntryResponse
+ */
+export interface GetKeychainEntryResponse {
+    /**
+     * The key that was used to retrieve the value from the keychain.
+     * @type {string}
+     * @memberof GetKeychainEntryResponse
+     */
+    key: string;
+    /**
+     * The value associated with the requested key on the keychain.
+     * @type {string}
+     * @memberof GetKeychainEntryResponse
+     */
+    value: string;
+}
+/**
+ * 
+ * @export
  * @interface JWSGeneral
  */
 export interface JWSGeneral {
@@ -366,5 +398,37 @@ export interface PluginInstance {
      * @memberof PluginInstance
      */
     packageName: string;
+}
+/**
+ * 
+ * @export
+ * @interface SetKeychainEntryRequest
+ */
+export interface SetKeychainEntryRequest {
+    /**
+     * The key for the entry to set on the keychain.
+     * @type {string}
+     * @memberof SetKeychainEntryRequest
+     */
+    key: string;
+    /**
+     * The value that will be associated with the key on the keychain.
+     * @type {string}
+     * @memberof SetKeychainEntryRequest
+     */
+    value: string;
+}
+/**
+ * 
+ * @export
+ * @interface SetKeychainEntryResponse
+ */
+export interface SetKeychainEntryResponse {
+    /**
+     * The key that was used to set the value on the keychain.
+     * @type {string}
+     * @memberof SetKeychainEntryResponse
+     */
+    key: string;
 }
 
