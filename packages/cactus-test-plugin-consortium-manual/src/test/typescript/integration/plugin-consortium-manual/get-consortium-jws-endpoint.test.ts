@@ -178,7 +178,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
     const configuration = new Configuration({ basePath: node1Host });
     const api = new DefaultApi(configuration);
-    const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet();
+    const res = await api.getNodeJws();
     t.ok(res, "API response object is truthy");
     t.equal(res.status, 200, "Node JWS response status code is 200");
     t.ok(res.data, "Node JWS response.body is truthy");
@@ -230,7 +230,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
     const configuration = new Configuration({ basePath: node2Host });
     const api = new DefaultApi(configuration);
-    const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet();
+    const res = await api.getNodeJws();
     t.ok(res, "API response object is truthy");
     t.equal(res.status, 200, "Node JWS response status code is 200");
     t.ok(res.data, "Node2 JWS response.body is truthy");
@@ -285,7 +285,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
     const configuration = new Configuration({ basePath: node3Host });
     const api = new DefaultApi(configuration);
-    const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet();
+    const res = await api.getNodeJws();
     t.ok(res, "API response object is truthy");
     t.equal(res.status, 200, "Node JWS response status code is 200");
     t.ok(res.data, "Node3 JWS response.body is truthy");
@@ -299,7 +299,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
   {
     const configuration = new Configuration({ basePath: node3Host });
     const api = new DefaultApi(configuration);
-    const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet();
+    const res = await api.getConsortiumJws();
     t.equal(res.status, 200, "Consortium JWS response status code is 200");
     const getConsortiumJwsResponse = res.data;
     const consortiumJws = getConsortiumJwsResponse.jws;
@@ -318,7 +318,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
   {
     const configuration = new Configuration({ basePath: node2Host });
     const api = new DefaultApi(configuration);
-    const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet();
+    const res = await api.getConsortiumJws();
     t.equal(res.status, 200, "Consortium JWS response status code is 200");
     const getConsortiumJwsResponse = res.data;
     const consortiumJws = getConsortiumJwsResponse.jws;
@@ -337,7 +337,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
   {
     const configuration = new Configuration({ basePath: node1Host });
     const api = new DefaultApi(configuration);
-    const res = await api.apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet();
+    const res = await api.getConsortiumJws();
     t.equal(res.status, 200, "Consortium JWS response status code is 200");
     const getConsortiumJwsResponse = res.data;
     const consortiumJws = getConsortiumJwsResponse.jws;

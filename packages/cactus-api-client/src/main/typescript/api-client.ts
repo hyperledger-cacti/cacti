@@ -6,10 +6,7 @@ import { ConsortiumRepository } from "@hyperledger/cactus-core";
 import { DefaultApi as ApiConsortium } from "@hyperledger/cactus-plugin-consortium-manual";
 import { DefaultConsortiumProvider } from "./default-consortium-provider";
 
-import {
-  Configuration,
-  DefaultApi,
-} from "./generated/openapi/typescript-axios";
+import { Configuration, BaseAPI } from "@hyperledger/cactus-core-api";
 
 /**
  * Class responsible for providing additional functionality to the `DefaultApi`
@@ -29,7 +26,7 @@ import {
  * @see https://github.com/OpenAPITools/openapi-generator/blob/v5.0.0-beta2/modules/openapi-generator/src/main/resources/typescript-axios/apiInner.mustache#L337
  * @see https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/typescript-axios.md
  */
-export class ApiClient extends DefaultApi {
+export class ApiClient extends BaseAPI {
   /**
    *
    * @param ctor

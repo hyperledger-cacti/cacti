@@ -62,7 +62,6 @@ test("Can provide JWS", async (t: Test) => {
   const epOpts: IGetNodeJwsEndpointOptions = {
     consortiumRepo,
     keyPairPem,
-    path: "/some-fake-path-for-http-requests",
   };
   const pubKeyPem = keyPair.toPEM(false);
 

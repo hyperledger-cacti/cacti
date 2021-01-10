@@ -102,7 +102,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet: async (options: any = {}): Promise<RequestArgs> => {
+        getConsortiumJws: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -138,7 +138,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet: async (options: any = {}): Promise<RequestArgs> => {
+        getNodeJws: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -183,8 +183,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetConsortiumJwsResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options);
+        async getConsortiumJws(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetConsortiumJwsResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getConsortiumJws(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -196,8 +196,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetNodeJwsResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options);
+        async getNodeJws(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetNodeJwsResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getNodeJws(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -218,8 +218,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options?: any): AxiosPromise<GetConsortiumJwsResponse> {
-            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options).then((request) => request(axios, basePath));
+        getConsortiumJws(options?: any): AxiosPromise<GetConsortiumJwsResponse> {
+            return DefaultApiFp(configuration).getConsortiumJws(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -227,8 +227,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options?: any): AxiosPromise<GetNodeJwsResponse> {
-            return DefaultApiFp(configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options).then((request) => request(axios, basePath));
+        getNodeJws(options?: any): AxiosPromise<GetNodeJwsResponse> {
+            return DefaultApiFp(configuration).getNodeJws(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -247,8 +247,8 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options?: any) {
-        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet(options).then((request) => request(this.axios, this.basePath));
+    public getConsortiumJws(options?: any) {
+        return DefaultApiFp(this.configuration).getConsortiumJws(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -258,8 +258,8 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options?: any) {
-        return DefaultApiFp(this.configuration).apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet(options).then((request) => request(this.axios, this.basePath));
+    public getNodeJws(options?: any) {
+        return DefaultApiFp(this.configuration).getNodeJws(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

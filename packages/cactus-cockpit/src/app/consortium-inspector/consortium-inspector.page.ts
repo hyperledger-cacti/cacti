@@ -52,7 +52,7 @@ export class ConsortiumInspectorPage {
     const resHealthCheck = await apiClient.apiV1ApiServerHealthcheckGet();
     this.log.debug(`ApiServer HealthCheck Get:`, resHealthCheck.data);
 
-    const res = await apiClient.apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet();
+    const res = await apiClient.getConsortiumJws();
     this.jws = res.data.jws;
     const asJsonPreDecode = JSON.stringify(this.jws, null, 4);
     this.log.debug(`ConsortiumNodeJwtGet pre-decode: \n%o`, asJsonPreDecode);

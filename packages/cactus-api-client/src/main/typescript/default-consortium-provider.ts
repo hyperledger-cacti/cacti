@@ -4,7 +4,7 @@ import {
   LoggerProvider,
 } from "@hyperledger/cactus-common";
 import { Checks, IAsyncProvider } from "@hyperledger/cactus-common";
-import { Consortium, ConsortiumDatabase } from "@hyperledger/cactus-core-api";
+import { ConsortiumDatabase } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi,
   GetConsortiumJwsResponse,
@@ -59,7 +59,7 @@ export class DefaultConsortiumProvider
 
   public async get(): Promise<ConsortiumDatabase> {
     try {
-      const res = await this.options.apiClient.apiV1PluginsHyperledgerCactusPluginConsortiumManualConsortiumJwsGet();
+      const res = await this.options.apiClient.getConsortiumJws();
       return this.parseConsortiumJws(res.data);
     } catch (ex) {
       const innerException = (ex.toJSON && ex.toJSON()) || ex;

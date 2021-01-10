@@ -17,17 +17,21 @@ import { OpenApiValidator } from "express-openapi-validator";
 import compression from "compression";
 import bodyParser from "body-parser";
 import cors from "cors";
+
 import {
   PluginFactory,
   ICactusPlugin,
   isIPluginWebService,
   IPluginWebService,
 } from "@hyperledger/cactus-core-api";
+
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { ICactusApiServerOptions } from "./config/config-service";
-import { CACTUS_OPEN_API_JSON } from "./openapi-spec";
+
 import { Logger, LoggerProvider, Servers } from "@hyperledger/cactus-common";
 
+import { ICactusApiServerOptions } from "./config/config-service";
+import OAS from "../json/openapi.json";
+import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 export interface IApiServerConstructorOptions {
   pluginRegistry?: PluginRegistry;
   httpServerApi?: Server | SecureServer;
@@ -299,7 +303,11 @@ export class ApiServer {
         memoryUsage: process.memoryUsage(),
       });
     };
-    app.get("/api/v1/api-server/healthcheck", healthcheckHandler);
+
+    const { "/api/v1/api-server/healthcheck": oasPath } = OAS.paths;
+    const { http } = oasPath.get["x-hyperledger-cactus"];
+    const { path: httpPath, verbLowerCase: httpVerb } = http;
+    (app as any)[httpVerb](httpPath, healthcheckHandler);
 
     const registry = await this.getOrInitPluginRegistry();
 
@@ -341,7 +349,7 @@ export class ApiServer {
 
   createOpenApiValidator(): OpenApiValidator {
     return new OpenApiValidator({
-      apiSpec: CACTUS_OPEN_API_JSON,
+      apiSpec: OAS as OpenAPIV3.Document,
       validateRequests: true,
       validateResponses: false,
     });
