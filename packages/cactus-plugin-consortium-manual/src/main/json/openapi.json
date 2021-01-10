@@ -35,7 +35,7 @@
                 "properties": {
                     "jws": {
                         "description": "The JSON Web Signature of the Cactus node.",
-                        "$ref": "../../../../../cactus-core-api/src/main/json/generated/openapi-spec.json#/components/schemas/JWSGeneral",
+                        "$ref": "../../../../../cactus-core-api/src/main/json/openapi.json#/components/schemas/JWSGeneral",
                         "nullable": false
                     }
                 }
@@ -48,7 +48,7 @@
                 "properties": {
                     "jws": {
                         "description": "The JSON Web Signature of the Cactus consortium.",
-                        "$ref": "../../../../../cactus-core-api/src/main/json/generated/openapi-spec.json#/components/schemas/JWSGeneral",
+                        "$ref": "../../../../../cactus-core-api/src/main/json/openapi.json#/components/schemas/JWSGeneral",
                         "nullable": false,
                         "format": "The general format which is a JSON object, not a string."
                     }
@@ -59,6 +59,13 @@
     "paths": {
         "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws": {
             "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
+                    }
+                },
+                "operationId": "getConsortiumJws",
                 "summary": "Retrieves a consortium JWS",
                 "description": "The JWS asserting the consortium metadata (pub keys and hosts of nodes)",
                 "parameters": [],
@@ -78,6 +85,13 @@
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws": {
             "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"
+                    }
+                },
+                "operationId": "getNodeJws",
                 "summary": "Retrieves the JWT of a Cactus Node",
                 "parameters": [],
                 "responses": {

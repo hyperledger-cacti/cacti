@@ -15,6 +15,7 @@
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/types/main/typescript/index.d.ts",
   "scripts": {
+    "generate-sdk": "openapi-generator generate --input-spec src/main/json/openapi.json -g typescript-axios -o src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "tsc": "tsc --project ./tsconfig.json",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",

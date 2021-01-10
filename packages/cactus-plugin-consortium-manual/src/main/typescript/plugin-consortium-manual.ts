@@ -120,20 +120,20 @@ export class PluginConsortiumManual
 
     const endpoints: IWebServiceEndpoint[] = [];
     {
-      const path = `/api/v1/plugins/${packageName}/consortium/jws`;
-      const options = { path, keyPairPem, consortiumRepo };
+      const options = { keyPairPem, consortiumRepo };
       const endpoint = new GetConsortiumEndpointV1(options);
-      webApp.get(endpoint.getPath(), endpoint.getExpressRequestHandler());
+      const path = endpoint.getPath();
+      webApp.get(path, endpoint.getExpressRequestHandler());
       endpoints.push(endpoint);
-      this.log.info(`Registered contract deployment endpoint at ${path}`);
+      this.log.info(`Registered GetConsortiumEndpointV1 at ${path}`);
     }
     {
-      const path = `/api/v1/plugins/${packageName}/node/jws`;
-      const options = { path, keyPairPem, consortiumRepo };
+      const options = { keyPairPem, consortiumRepo };
       const endpoint = new GetNodeJwsEndpoint(options);
-      webApp.get(endpoint.getPath(), endpoint.getExpressRequestHandler());
+      const path = endpoint.getPath();
+      webApp.get(path, endpoint.getExpressRequestHandler());
       endpoints.push(endpoint);
-      this.log.info(`Registered contract deployment endpoint at ${path}`);
+      this.log.info(`Registered GetNodeJwsEndpoint at ${path}`);
     }
 
     log.info(`Installed web svcs for plugin ${this.getPackageName()} OK`, {

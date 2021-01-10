@@ -4,7 +4,6 @@ import { JWS, JWK } from "jose";
 import jsonStableStringify from "json-stable-stringify";
 
 import {
-  Consortium,
   JWSGeneral,
   IWebServiceEndpoint,
   IExpressRequestHandler,
@@ -24,12 +23,11 @@ import {
   ConsortiumRepository,
 } from "@hyperledger/cactus-core";
 
-import { GetNodeJwsEndpoint as Constants } from "./get-node-jws-endpoint-constants";
+import OAS from "../../json/openapi.json";
 
 export interface IGetNodeJwsEndpointOptions {
   keyPairPem: string;
   consortiumRepo: ConsortiumRepository;
-  path: string;
   logLevel?: LogLevelDesc;
 }
 
@@ -44,9 +42,6 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     if (!options.keyPairPem) {
       throw new Error(`${fnTag} options.keyPairPem falsy.`);
     }
-    if (!options.path) {
-      throw new Error(`${fnTag} options.path falsy.`);
-    }
     Checks.truthy(options.consortiumRepo, `${fnTag} options.consortiumRepo`);
 
     const level = options.logLevel || "INFO";
@@ -58,14 +53,25 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  getPath(): string {
-    return Constants.HTTP_PATH;
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"
+    ];
   }
 
-  getVerbLowerCase(): string {
-    return Constants.HTTP_VERB_LOWER_CASE;
+  public getOperationId(): string {
+    return this.getOasPath().get.operationId;
   }
 
+  public getPath(): string {
+    const oasPath = this.getOasPath();
+    return oasPath.get["x-hyperledger-cactus"].http.path;
+  }
+
+  public getVerbLowerCase(): string {
+    const oasPath = this.getOasPath();
+    return oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+  }
   registerExpress(app: Express): IWebServiceEndpoint {
     registerWebServiceEndpoint(app, this);
     return this;

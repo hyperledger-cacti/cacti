@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
     const apiClient = new ApiClient(configuration).extendWith(
       DefaultApiConsortium
     );
-    const res = await apiClient.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet();
+    const res = await apiClient.getNodeJws();
     const resHealthCheck = await apiClient.apiV1ApiServerHealthcheckGet();
     this.log.info(`ConsortiumNodeJwtGet`, res.data);
     this.log.info(`ApiServer HealthCheck Get:`, resHealthCheck.data);

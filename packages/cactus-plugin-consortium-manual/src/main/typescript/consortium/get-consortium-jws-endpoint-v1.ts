@@ -1,5 +1,4 @@
 import { Express, Request, Response, NextFunction } from "express";
-import flatten from "lodash/flatten";
 import { AxiosResponse } from "axios";
 
 import {
@@ -7,7 +6,6 @@ import {
   IExpressRequestHandler,
   JWSGeneral,
   JWSRecipient,
-  Consortium,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -27,12 +25,11 @@ import {
   ConsortiumRepository,
 } from "@hyperledger/cactus-core";
 
-import { GetConsortiumEndpointV1 as Constants } from "./get-consortium-jws-endpoint-constants";
+import OAS from "../../json/openapi.json";
 
 export interface IGetConsortiumJwsEndpointOptions {
   keyPairPem: string;
   consortiumRepo: ConsortiumRepository;
-  path: string;
   logLevel?: LogLevelDesc;
 }
 
@@ -50,9 +47,6 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     if (!options.consortiumRepo) {
       throw new Error(`${fnTag} options.consortium falsy.`);
     }
-    if (!options.path) {
-      throw new Error(`${fnTag} options.path falsy.`);
-    }
 
     const label = "get-consortium-jws-endpoint";
     const level = options.logLevel || "INFO";
@@ -63,12 +57,22 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  getPath(): string {
-    return Constants.HTTP_PATH;
+  public getOperationId(): string {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
+    ].get.operationId;
   }
 
-  getVerbLowerCase(): string {
-    return Constants.HTTP_VERB_LOWER_CASE;
+  public getPath(): string {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
+    ].get["x-hyperledger-cactus"].http.path;
+  }
+
+  public getVerbLowerCase(): string {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
+    ].get["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   registerExpress(app: Express): IWebServiceEndpoint {
@@ -87,13 +91,11 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     try {
       const nodes = this.options.consortiumRepo.allNodes;
 
-      const requests: Promise<AxiosResponse<GetNodeJwsResponse>>[] = nodes
+      const requests = nodes
         .map((cnm) => cnm.nodeApiHost)
         .map((host) => new Configuration({ basePath: host }))
         .map((configuration) => new DefaultApi(configuration))
-        .map((apiClient) =>
-          apiClient.apiV1PluginsHyperledgerCactusPluginConsortiumManualNodeJwsGet()
-        );
+        .map((apiClient) => apiClient.getNodeJws());
 
       const responses = await Promise.all(requests);
 
