@@ -30,3 +30,20 @@ export {
   FABRIC_TEST_LEDGER_DEFAULT_OPTIONS,
   FABRIC_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
 } from "./fabric/fabric-test-ledger-v1";
+
+export {
+  CactusKeychainVaultServer,
+  ICactusKeychainVaultServerOptions,
+  K_DEFAULT_KEYCHAIN_VAULT_HTTP_PORT,
+  K_DEFAULT_KEYCHAIN_VAULT_IMAGE_NAME,
+  K_DEFAULT_KEYCHAIN_VAULT_IMAGE_VERSION,
+} from "./cactus-keychain-vault-server/cactus-keychain-vault-server";
+
+export {
+  IVaultTestServerOptions,
+  VaultTestServer,
+  K_DEFAULT_VAULT_IMAGE_NAME,
+  K_DEFAULT_VAULT_IMAGE_VERSION,
+  K_DEFAULT_VAULT_HTTP_PORT,
+  K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
+} from "./vault-test-server/vault-test-server";

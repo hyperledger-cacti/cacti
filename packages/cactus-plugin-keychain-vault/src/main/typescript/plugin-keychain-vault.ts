@@ -3,6 +3,7 @@ import { Server as SecureServer } from "https";
 
 import { Express } from "express";
 import { Optional } from "typescript-optional";
+import Vault from "node-vault";
 
 import {
   Logger,
@@ -22,16 +23,32 @@ import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-en
 
 export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
-  backend?: Map<string, any>;
   keychainId: string;
+  /**
+   * API version to use when talking to the backing Vault instnace through
+   * the NodeJS vault-node client.
+   * Optional, defaults to `v1`
+   */
+  apiVersion?: string;
+  /**
+   * Network host where the backing Vault instance is accessible.
+   */
+  endpoint: string;
+  /**
+   * The `VAULT_TOKEN` which the backing Vault instance will accept as valid.
+   */
+  token: string;
 }
 
 export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
   public static readonly CLASS_NAME = "PluginKeychainVault";
 
-  private readonly backend: Map<string, any>;
+  private readonly apiVersion: string;
+  private readonly token: string;
+  private readonly endpoint: string;
   private readonly log: Logger;
   private readonly instanceId: string;
+  private readonly backend: Vault.client;
 
   public get className() {
     return PluginKeychainVault.CLASS_NAME;
@@ -44,21 +61,28 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
     Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
     Checks.nonBlankString(opts.keychainId, `${fnTag} options.keychainId`);
 
-    this.backend = opts.backend || new Map();
-    Checks.truthy(this.backend, `${fnTag} arg options.backend`);
+    Checks.nonBlankString(opts.endpoint, `${fnTag} options.endpoint`);
+    Checks.nonBlankString(opts.token, `${fnTag} options.token`);
 
     const level = this.opts.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
 
     this.instanceId = this.opts.instanceId;
+    this.token = this.opts.token;
+    this.endpoint = this.opts.endpoint;
+    this.apiVersion = this.opts.apiVersion || "v1";
+
+    this.backend = Vault({
+      apiVersion: this.apiVersion,
+      endpoint: this.endpoint,
+      token: this.token,
+    });
+    this.log.info(`Created Vault backend OK. Endpoint=${this.endpoint}`);
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
-    this.log.warn(
-      `Never use ${this.className} in production. ` +
-        `It does not support encryption. It stores everything in plain text.`
-    );
   }
+
   public async installWebServices(
     expressApp: Express
   ): Promise<IWebServiceEndpoint[]> {
@@ -116,18 +140,20 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
   }
 
   async get<T>(key: string): Promise<T> {
-    return this.backend.get(key);
+    const value = await this.backend.read(key);
+    return value;
   }
 
   async has(key: string): Promise<boolean> {
-    return this.backend.has(key);
+    const list = await this.backend.list(key);
+    return list.length > 0;
   }
 
   async set<T>(key: string, value: T): Promise<void> {
-    this.backend.set(key, value);
+    await this.backend.write(key, value);
   }
 
   async delete<T>(key: string): Promise<void> {
-    this.backend.delete(key);
+    await this.backend.delete(key);
   }
 }
