@@ -1,3 +1,5 @@
+export * from "./generated/openapi/typescript-axios/index";
+
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 
 import { PluginFactoryKeychain } from "./plugin-factory-keychain";

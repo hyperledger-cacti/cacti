@@ -35,6 +35,25 @@ export interface GetKeychainEntryRequest {
 /**
  * 
  * @export
+ * @interface GetKeychainEntryResponse
+ */
+export interface GetKeychainEntryResponse {
+    /**
+     * The key that was used to retrieve the value from the keychain.
+     * @type {string}
+     * @memberof GetKeychainEntryResponse
+     */
+    key: string;
+    /**
+     * The value associated with the requested key on the keychain.
+     * @type {string}
+     * @memberof GetKeychainEntryResponse
+     */
+    value: string;
+}
+/**
+ * 
+ * @export
  * @interface SetKeychainEntryRequest
  */
 export interface SetKeychainEntryRequest {
@@ -50,6 +69,19 @@ export interface SetKeychainEntryRequest {
      * @memberof SetKeychainEntryRequest
      */
     value: string;
+}
+/**
+ * 
+ * @export
+ * @interface SetKeychainEntryResponse
+ */
+export interface SetKeychainEntryResponse {
+    /**
+     * The key that was used to set the value on the keychain.
+     * @type {string}
+     * @memberof SetKeychainEntryResponse
+     */
+    key: string;
 }
 
 /**
@@ -164,7 +196,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getKeychainEntry(getKeychainEntryRequest: GetKeychainEntryRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async getKeychainEntry(getKeychainEntryRequest: GetKeychainEntryRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetKeychainEntryResponse>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getKeychainEntry(getKeychainEntryRequest, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -178,7 +210,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async setKeychainEntry(setKeychainEntryRequest: SetKeychainEntryRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async setKeychainEntry(setKeychainEntryRequest: SetKeychainEntryRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SetKeychainEntryResponse>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).setKeychainEntry(setKeychainEntryRequest, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -201,7 +233,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getKeychainEntry(getKeychainEntryRequest: GetKeychainEntryRequest, options?: any): AxiosPromise<void> {
+        getKeychainEntry(getKeychainEntryRequest: GetKeychainEntryRequest, options?: any): AxiosPromise<GetKeychainEntryResponse> {
             return DefaultApiFp(configuration).getKeychainEntry(getKeychainEntryRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -211,7 +243,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setKeychainEntry(setKeychainEntryRequest: SetKeychainEntryRequest, options?: any): AxiosPromise<void> {
+        setKeychainEntry(setKeychainEntryRequest: SetKeychainEntryRequest, options?: any): AxiosPromise<SetKeychainEntryResponse> {
             return DefaultApiFp(configuration).setKeychainEntry(setKeychainEntryRequest, options).then((request) => request(axios, basePath));
         },
     };
