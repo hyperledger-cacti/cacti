@@ -271,4 +271,50 @@ export class Containers {
       }
     });
   }
+
+  public static async getById(containerId: string): Promise<ContainerInfo> {
+    const fnTag = `Containers#getById()`;
+
+    Checks.nonBlankString(containerId, `${fnTag}:containerId`);
+
+    const docker = new Dockerode();
+    const containerInfos = await docker.listContainers({});
+    const aContainerInfo = containerInfos.find((ci) => ci.Id === containerId);
+
+    if (aContainerInfo) {
+      return aContainerInfo;
+    } else {
+      throw new Error(`${fnTag} no container by ID"${containerId}"`);
+    }
+  }
+
+  /**
+   * Awaits until a container identified by the containerId
+   * parameter becomes healthy.
+   * @param containerId The ID of the container to wait for the healthy status.
+   * @param timeoutMs How much (in milliseconds) do we wait before giving up.
+   */
+  public static async waitForHealthCheck(
+    containerId: string,
+    timeoutMs: number = 180000
+  ): Promise<void> {
+    const fnTag = "Containers#waitForHealthCheck()";
+
+    Checks.nonBlankString(containerId, `${fnTag}:containerId`);
+
+    const startedAt = Date.now();
+    let reachable: boolean = false;
+    do {
+      try {
+        const { Status } = await Containers.getById(containerId);
+        reachable = Status.endsWith(" (healthy)");
+      } catch (ex) {
+        reachable = false;
+        if (Date.now() >= startedAt + timeoutMs) {
+          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
+        }
+      }
+      await new Promise((resolve2) => setTimeout(resolve2, 1000));
+    } while (!reachable);
+  }
 }
