@@ -1,10 +1,10 @@
-import { IPluginKVStorage } from "../storage/key-value/i-plugin-kv-storage";
+import { ICactusPlugin } from "../i-cactus-plugin";
 
 /**
  * Common interface to be implemented by classes that act as plugins behind
  * keychains.
  */
-export interface IPluginKeychain extends IPluginKVStorage {
+export interface IPluginKeychain extends ICactusPlugin {
   rotateEncryptionKeys(): Promise<void>;
   getEncryptionAlgorithm(): string;
   /**
@@ -17,4 +17,9 @@ export interface IPluginKeychain extends IPluginKVStorage {
    * secrets.
    */
   getKeychainId(): string;
+
+  has(key: string): Promise<boolean>;
+  get<T>(key: string): Promise<T>;
+  set<T>(key: string, value: T): Promise<void>;
+  delete<T>(key: string): Promise<void>;
 }

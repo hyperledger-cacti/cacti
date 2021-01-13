@@ -452,10 +452,6 @@ export class ConfigService {
 
     const plugins = [
       {
-        packageName: "@hyperledger/cactus-plugin-kv-storage-memory",
-        options: {},
-      },
-      {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
         options: {},
       },
