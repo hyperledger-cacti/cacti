@@ -5,8 +5,6 @@ import { ICactusPlugin } from "../i-cactus-plugin";
  * keychains.
  */
 export interface IPluginKeychain extends ICactusPlugin {
-  rotateEncryptionKeys(): Promise<void>;
-  getEncryptionAlgorithm(): string;
   /**
    * Returns the unique identifier of the keychain pointed to (or backed) by
    * this `IPluginKeychain` instance.

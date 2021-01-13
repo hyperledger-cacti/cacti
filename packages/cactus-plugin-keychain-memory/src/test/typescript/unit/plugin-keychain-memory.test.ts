@@ -82,31 +82,5 @@ test("PluginKeychainMemory", (t1: Test) => {
     t.end();
   });
 
-  test("rotateEncryptionKeys() fails fast", async (t: Test) => {
-    const options: IPluginKeychainMemoryOptions = {
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
-    };
-    const plugin = new PluginKeychainMemory(options);
-
-    const promise = plugin.rotateEncryptionKeys();
-    const expected = /not implemented/;
-    await t.rejects(promise, expected, "rotateEncryptionKeys() rejects OK");
-
-    t.end();
-  });
-
-  test("getEncryptionAlgorithm() returns null", (t: Test) => {
-    const options: IPluginKeychainMemoryOptions = {
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
-    };
-    const plugin = new PluginKeychainMemory(options);
-
-    t.notok(plugin.getEncryptionAlgorithm(), "encryption algorithm falsy OK");
-
-    t.end();
-  });
-
   t1.end();
 });
