@@ -65,14 +65,6 @@ export class PluginKeychainMemory {
     return PluginAspect.KEYCHAIN;
   }
 
-  async rotateEncryptionKeys(): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
-  public getEncryptionAlgorithm(): string {
-    return null as any;
-  }
-
   async get<T>(key: string): Promise<T> {
     return this.backend.get(key);
   }
