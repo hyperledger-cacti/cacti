@@ -8,7 +8,7 @@
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
     "start:cockpit": "lerna run --scope '*/cactus-cockpit' --stream serve:proxy",
     "start:example-supply-chain": "node ./examples/supply-chain-app/node_modules/.bin/cactus-example-supply-chain-backend",
-    "clean": "lerna exec --stream --ignore '*/*cockpit' -- del-cli dist/** && del-cli packages/cactus-api-client/src/main/typescript/generated/openapi/typescript-axios/*",
+    "clean": "del-cli \"./packages/cactus-*/{dist,.nyc_output,src/main/typescript/generated/openapi/typescript-axios/*}\"",
     "lint": "lerna exec --stream --ignore '*/*cockpit' -- cross-env DEBUG= tslint --project tsconfig.json",
     "tsc": "lerna run tsc",
     "build": "npm-run-all build:dev build:prod",
