@@ -26,7 +26,7 @@ import {
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { ICactusPlugin } from "@hyperledger/cactus-core-api";
-import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-deploy-contract-via-web-service",
@@ -57,8 +57,11 @@ test("deploys contract via REST API", async (t: Test) => {
   const config = configService.newExampleConfigConvict(cactusApiServerOptions);
   const plugins: ICactusPlugin[] = [];
 
-  const kvpOpts = { backend: new Map(), instanceId: uuidV4() };
-  const kvStoragePlugin = new PluginKVStorageMemory(kvpOpts);
+  const kvStoragePlugin = new PluginKeychainMemory({
+    backend: new Map(),
+    instanceId: uuidV4(),
+    keychainId: uuidV4(),
+  });
   plugins.push(kvStoragePlugin);
 
   const ledgerConnectorQuorum = new PluginLedgerConnectorQuorum({

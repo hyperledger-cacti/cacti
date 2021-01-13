@@ -14,7 +14,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
-import { PluginKVStorageMemory } from "@hyperledger/cactus-plugin-kv-storage-memory";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   DefaultApi as DefaultApiPlugin,
   Configuration as ConfigurationPlugin,
@@ -31,8 +31,12 @@ tap.test(
   "pulls up API server with consortium web service on different port",
   async (assert: any) => {
     // 1. Instantiate a key value storage plugin that works in memory (good here because we don't need persistence)
-    const opts = { backend: new Map(), instanceId: uuidV4() };
-    const kvStoragePlugin = new PluginKVStorageMemory(opts);
+    const opts = {
+      backend: new Map(),
+      instanceId: uuidV4(),
+      keychainId: uuidV4(),
+    };
+    const kvStoragePlugin = new PluginKeychainMemory(opts);
 
     // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
     const pluginRegistry = new PluginRegistry({ plugins: [kvStoragePlugin] });
