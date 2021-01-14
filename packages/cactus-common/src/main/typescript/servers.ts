@@ -38,7 +38,7 @@ export class Servers {
     });
   }
 
-  public static async listen(options: IListenOptions): Promise<any> {
+  public static async listen(options: IListenOptions): Promise<AddressInfo> {
     const fnTag = "Servers#listen()";
 
     Checks.truthy(options, `${fnTag} arg options`);
@@ -47,6 +47,12 @@ export class Servers {
       options.port || options.port === 0,
       `${fnTag} arg options.port`
     );
+    Checks.truthy(
+      typeof options.port === "number",
+      `${fnTag} arg options.port is number`
+    );
+    Checks.truthy(isFinite(options.port), `${fnTag} arg finite options.port`);
+    Checks.truthy(options.port > -1, `${fnTag} arg positive options.port`);
     Checks.truthy(options.hostname, `${fnTag} arg options.hostname`);
     const { server, port, hostname } = options;
 
