@@ -3,7 +3,7 @@ import { AddressInfo } from "net";
 import test, { Test } from "tape";
 
 // import { ApiClient } from "../../../main/typescript/public-api";
-import { DefaultApi as ConsortiumApi } from "@hyperledger/cactus-plugin-consortium-manual";
+import { DefaultApi as ConsortiumManualApi } from "@hyperledger/cactus-plugin-consortium-manual";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
 import { DefaultConsortiumProvider } from "../../../main/typescript";
 
@@ -18,7 +18,7 @@ test("Reports failures with meaningful information", async (t: Test) => {
 
     const provider = new DefaultConsortiumProvider({
       logLevel,
-      apiClient: new ConsortiumApi({
+      apiClient: new ConsortiumManualApi({
         basePath: apiHost,
         baseOptions: {
           timeout: 100,
@@ -45,7 +45,7 @@ test("Reports failures with meaningful information", async (t: Test) => {
   test("Handles 4xx transparently", async (t2: Test) => {
     const provider = new DefaultConsortiumProvider({
       logLevel,
-      apiClient: new ConsortiumApi({
+      apiClient: new ConsortiumManualApi({
         basePath: "https://httpbin.org/status/400",
       }),
     });

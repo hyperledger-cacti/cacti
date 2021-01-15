@@ -3,16 +3,18 @@ import {
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
+
 import { Checks, IAsyncProvider } from "@hyperledger/cactus-common";
 import { ConsortiumDatabase } from "@hyperledger/cactus-core-api";
+
 import {
-  DefaultApi,
+  DefaultApi as ConsortiumManualApi,
   GetConsortiumJwsResponse,
 } from "@hyperledger/cactus-plugin-consortium-manual";
 
 export interface IDefaultConsortiumProviderOptions {
   logLevel?: LogLevelDesc;
-  apiClient: DefaultApi;
+  apiClient: ConsortiumManualApi;
 }
 
 export class DefaultConsortiumProvider

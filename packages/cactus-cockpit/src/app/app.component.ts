@@ -5,8 +5,6 @@ import { SplashScreen } from "@ionic-native/splash-screen/ngx";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
 
 import { LoggerProvider, Logger } from "@hyperledger/cactus-common";
-import { DefaultApi as DefaultApiConsortium } from "@hyperledger/cactus-plugin-consortium-manual";
-import { ApiClient, Configuration } from "@hyperledger/cactus-api-client";
 import { CACTUS_API_URL } from "src/constants";
 
 @Component({
@@ -48,18 +46,5 @@ export class AppComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.testApi();
-  }
-
-  async testApi(): Promise<void> {
-    const configuration = new Configuration({ basePath: this.cactusApiUrl });
-    const apiClient = new ApiClient(configuration).extendWith(
-      DefaultApiConsortium
-    );
-    const res = await apiClient.getNodeJws();
-    const resHealthCheck = await apiClient.apiV1ApiServerHealthcheckGet();
-    this.log.info(`ConsortiumNodeJwtGet`, res.data);
-    this.log.info(`ApiServer HealthCheck Get:`, resHealthCheck.data);
-  }
+  ngOnInit() {}
 }
