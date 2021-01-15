@@ -87,7 +87,7 @@
                         "path": "/api/v1/api-server/healthcheck"
                     }
                 },
-                "operationId": "getConsortiumJws",
+                "operationId": "getHealthCheck",
                 "parameters": [],
                 "responses": {
                     "200": {

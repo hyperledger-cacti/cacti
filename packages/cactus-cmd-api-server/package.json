@@ -16,6 +16,7 @@
   "types": "dist/types/main/typescript/index.d.ts",
   "scripts": {
     "generate-sdk": "openapi-generator generate --input-spec src/main/json/openapi.json -g typescript-axios -o src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
@@ -35,7 +36,10 @@
       "ignore": [
         "src/**/generated/*"
       ],
-      "extensions": ["ts", "json"],
+      "extensions": [
+        "ts",
+        "json"
+      ],
       "quiet": true,
       "verbose": false,
       "runOnChangeOnly": true
@@ -85,6 +89,7 @@
     "@hyperledger/cactus-core-api": "0.3.0",
     "@hyperledger/cactus-plugin-consortium-manual": "0.3.0",
     "@hyperledger/cactus-plugin-keychain-memory": "0.3.0",
+    "axios": "0.21.1",
     "body-parser": "1.19.0",
     "compression": "1.7.4",
     "convict": "6.0.0",

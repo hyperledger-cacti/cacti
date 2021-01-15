@@ -15,3 +15,5 @@ export {
   ForgePrivateKey,
   IPki,
 } from "./config/self-signed-pki-generator";
+
+export * from "./generated/openapi/typescript-axios/index";
