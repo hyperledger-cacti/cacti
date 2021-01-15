@@ -1,16 +1,21 @@
 import { Component, Inject } from "@angular/core";
-import { CACTUS_API_URL } from "src/constants";
+import * as JwtDecode from "jwt-decode";
+
 import {
   Logger,
   LoggerProvider,
   ILoggerOptions,
 } from "@hyperledger/cactus-common";
-import { Configuration, ApiClient } from "@hyperledger/cactus-api-client";
+
+import { ApiClient } from "@hyperledger/cactus-api-client";
+
 import {
-  DefaultApi as PluginConsortiumManualApi,
+  Configuration,
+  DefaultApi as ConsortiumManualApi,
   JWSGeneral,
 } from "@hyperledger/cactus-plugin-consortium-manual";
-import * as JwtDecode from "jwt-decode";
+
+import { CACTUS_API_URL } from "src/constants";
 
 @Component({
   selector: "app-folder",
@@ -44,13 +49,8 @@ export class ConsortiumInspectorPage {
 
   async onBtnClickInspect(): Promise<void> {
     this.log.debug(`onBtnClickInspect() apiHost=${this.apiHost}`);
-    const configuration = new Configuration({ basePath: this.cactusApiUrl });
-    const apiClient = new ApiClient(configuration).extendWith(
-      PluginConsortiumManualApi
-    );
-
-    const resHealthCheck = await apiClient.apiV1ApiServerHealthcheckGet();
-    this.log.debug(`ApiServer HealthCheck Get:`, resHealthCheck.data);
+    const config = new Configuration({ basePath: this.cactusApiUrl });
+    const apiClient = new ApiClient(config).extendWith(ConsortiumManualApi);
 
     const res = await apiClient.getConsortiumJws();
     this.jws = res.data.jws;
