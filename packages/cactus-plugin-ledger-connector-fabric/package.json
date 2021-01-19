@@ -83,6 +83,7 @@
     "@hyperledger/cactus-common": "0.3.0",
     "@hyperledger/cactus-core": "0.3.0",
     "@hyperledger/cactus-core-api": "0.3.0",
+    "bl": "1.2.3",
     "express": "4.17.1",
     "express-openapi-validator": "3.16.11",
     "fabric-client": "1.4.13",
