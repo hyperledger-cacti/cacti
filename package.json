@@ -93,7 +93,7 @@
     "ts-node": "8.9.1",
     "tslint": "6.0.0",
     "typescript": "4.0.3",
-    "webpack": "git+https://github.com/petermetz/webpack.git#a1021fd674dd24b13d759611b77b5d7057f7f0ea",
+    "webpack": "git+https://github.com/petermetz/webpack.git#cactus-webpack-ignore-require-calls-feature",
     "webpack-bundle-analyzer": "3.6.0",
     "webpack-cli": "3.3.11"
   },
