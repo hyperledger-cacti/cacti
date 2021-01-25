@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2019-2020 Fujitsu Laboratories Ltd.
  * SPDX-License-Identifier: Apache-2.0
  * 
  * www.js

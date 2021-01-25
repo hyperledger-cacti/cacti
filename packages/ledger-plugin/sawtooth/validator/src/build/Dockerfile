@@ -1,4 +1,4 @@
-# Copyright 2020 Hyperledger Cactus Contributors
+# Copyright 2019-2020 Fujitsu Laboratories Ltd.
 # SPDX-License-Identifier: Apache-2.0
 FROM hyperledger/fabric-ccenv:x86_64-1.0.4
 #ENV http_proxy $HTTP_PROXY

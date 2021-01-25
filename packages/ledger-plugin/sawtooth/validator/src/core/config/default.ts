@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2019-2020 Fujitsu Laboratories Ltd.
  * SPDX-License-Identifier: Apache-2.0
  * 
  * default.js
@@ -24,7 +24,7 @@ export const config = {
         },
         "pollingInterval": 5000
     },
-    "validatorKeyPath": "../core/validatorKey/keysUr7d10R.priv",
+    "validatorKeyPath": "../core/validatorKey/keySawtooth.priv",
     // Log level (trace/debug/info/warn/error/fatal)
     "logLevel" : "debug"
 }
