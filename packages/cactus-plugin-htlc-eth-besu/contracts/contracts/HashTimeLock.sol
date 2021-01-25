@@ -152,4 +152,14 @@ contract HashTimeLock {
             result = tempContract.status;
         }
     }
+
+    function contractExists(bytes32 id) public view returns (bool result) {
+        LockContract memory tempContract = contracts[id];
+
+        if (tempContract.status == INVALID) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
