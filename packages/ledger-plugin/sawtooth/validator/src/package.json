@@ -1,0 +1,35 @@
+{
+  "name": "connector",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ../dist/core/bin/www.js",
+    "debug": "nodemon --inspect ../dist/core/bin/www.js",
+    "build": "npm run copy-utility-assets && npm run build-ts && npm run copy-static-assets",
+    "build-ts": "tsc",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "copy-utility-assets": "ts-node copyUtilityAssets.ts",
+    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "init-sawtooth": "ln -s ../src/node_modules ../dist/node_modules"
+  },
+  "dependencies": {
+    "@types/node": "^14.14.5",
+    "body-parser": "~1.17.1",
+    "cbor": "^6.0.1",
+    "config": "^1.26.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~4.1.1",
+    "express": "~4.15.2",
+    "jsonwebtoken": "^8.5.1",
+    "log4js": "^3.0.6",
+    "morgan": "~1.8.1",
+    "serve-favicon": "~2.4.2",
+    "shelljs": "^0.8.4",
+    "socket.io": "^2.0.4",
+    "ts-node": "^9.0.0",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.3"
+  }
+}
