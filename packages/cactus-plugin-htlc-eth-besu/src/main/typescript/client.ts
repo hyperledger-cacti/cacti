@@ -1,20 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 import Web3 from 'web3';
-import request from 'request';
 import { environment } from './environment'
-import { Transaction } from 'ethereumjs-tx';
 import Helpers from './helpers'
 export default class Client {
-    private web3: any;
+
     public Helpers: Helpers;
+
+    private web3: Web3;
     private contracts: { [key: string]: any; } = {};
 
     constructor() {
         const node = environment.NODE!;
         console.log(`Creating new blockchain connection to`, node);
         this.web3 = new Web3(new Web3.providers.HttpProvider(node));
-
         console.log(`Loading contracts`);
         this.loadContracts(environment.CONTRACT_PATH!);
 
@@ -26,7 +25,7 @@ export default class Client {
     * @param functionName contract function name
     * @param paramsArray  parameters of the function
     * @param contractName string with contract name or contract instance
-    * @param contractAddress  (optional) contract address
+    * @param contractAddress (optional) contract address
     * @return object
     */
     async sendCall(functionName: string, paramsArray: any, contractName: string, contractAddress?: string) {
@@ -35,9 +34,8 @@ export default class Client {
                 var contract;
                 if (contractName && typeof contractName === 'string') {
                     contract = this.contracts[contractName];
-                    // If there is no such contract
+
                     if (typeof contract === 'undefined') {
-                        console.log('Contract name not recognized');
                         throw new Error('Contract name not recognized');
                     }
                     if (typeof contractAddress !== 'string') {
@@ -45,23 +43,124 @@ export default class Client {
                     }
                     contract.options.address = contractAddress;
                 }
-                else
+                else {
                     contract = contractName;
-                const contractCode = await this.web3.eth.getCode(contractAddress);
+                }
+                const contractCode = await this.web3.eth.getCode(contractAddress!);
                 if (contractCode === '0x')
                     throw new Error('There is no contract with the specified address');
-                console.log(`Call ${functionName} sent to contract ${contractName} @ ${contractAddress}`);
                 return await contract.methods[functionName](...paramsArray).call({
                     from: environment.ACCOUNT_ADDRESS
                 }).catch((revertReason: any) => console.log({ revertReason }));
             }
-            console.log('sendCall() needs a the name of the contract');
             throw new Error('sendCall() needs a the name of the contract');
         } catch (err) {
             throw err;
-
         }
     }
+
+    /**
+    * Creates a transaction ready to be signed with a user defined address
+    * @param functionName contract function name
+    * @param functionParams parameters of the function
+    * @param contractName name of contract
+    * @param contractAddress address of contract
+    * @param account sender account
+    * @param pKey sender privateKey for sign tx
+    * @param wei wei for payable functions
+    * @return transactionReceipt
+    */
+    async sendTx(functionName: string, functionParams: any[], contractName: string, contractAddress: string, account: string, pKey: string, wei: string) {
+        try {
+            const tx = await this.createTx(functionName, functionParams, contractName)
+            const signedTx = await this.signTx(pKey, tx, account, contractAddress, wei);
+            const transactionReceipt = await this.sendSignedTransaction(signedTx!)
+            return transactionReceipt;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    /**
+     * Creates a transaction ready to be signed with a user defined address
+     * @param functionName contract function name
+     * @param functionParamsArray parameters of the function
+     * @param contractName instance of contract
+     * @param contractAddress (optional) address of contract
+     * @return abi
+     */
+    private async createTx(functionName: string, functionParamsArray: any, contractName: string) {
+        try {
+            var contractInstance;
+            contractInstance = this.contracts[contractName];
+            const contractCode = await this.web3.eth.getCode(contractInstance._address);
+            if (contractCode === '0x') throw new Error('There is no contract with the specified address');
+            const bytecode = contractInstance.methods[functionName](...functionParamsArray).encodeABI();
+            return bytecode;
+        } catch (err) {
+            console.log(err);
+            throw new Error(err);
+        }
+    }
+
+    /**
+    * Signs the payload data, signing is done externally, used strictly for testing
+    * @param privateKey privateKey of account for sign
+    * @param bytecode transaction to be signed
+    * @param sender account to send
+    * @param contractAddress contract address to be sended
+    * @param gas (optional) estimated gas limit
+    * @param gasPrice (optional) estimated gas price
+    * @param value (optional) ether to be send
+    * @param nonce (optional) nonce of account
+    * @return signedTx
+    */
+    private async signTx(privateKey: string, bytecode: any, sender: string, contractAddress: string, value?: string, gas?: number, gasPrice?: string, nonce?: number) {
+        try {
+            if (!gas) gas = 6721975;
+            if (!nonce) nonce = await this.web3.eth.getTransactionCount(sender, "pending");
+            if (!gasPrice) gasPrice = this.web3.utils.toHex(await this.web3.eth.getGasPrice());
+            if (gasPrice == '0x0') gasPrice = '0x2312D00';
+            if (!value) {
+                value = "0x00";
+            } else {
+                value = this.web3.utils.toWei(value, "wei");
+            }
+
+            const transaction = {
+                from: sender,
+                nonce,
+                gasPrice,
+                gas,
+                to: contractAddress,
+                value,
+                data: bytecode,
+            };
+            const sign = await this.web3.eth.accounts.signTransaction(transaction, privateKey);
+            const signedTx = sign.rawTransaction;
+
+            return signedTx;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    /**
+     * Sends a signed transaction and provides the results in different callbacks for the different states of the transaction
+    * @param signedTx signed transaction
+    * @return transactionReceipt
+    */
+    private async sendSignedTransaction(signedTx: string) {
+        try {
+            let transactionReceipt = await this.web3.eth.sendSignedTransaction(signedTx)
+            return transactionReceipt
+        } catch (err) {
+            throw err;
+        }
+    }
+    /*
+    */
+
 
     /**
     * Loads all the contracts specified in the configuration contractsPath
@@ -70,15 +169,12 @@ export default class Client {
     */
     private async loadContracts(contractsPath: string) {
         const networkId = await this.web3.eth.net.getId();
-        fs.readdirSync(contractsPath).forEach(contractName => {
-            console.log("Contracts names: ")
-            console.log(contractName)
-            const filePath = path.join(contractsPath, contractName);
+        fs.readdirSync(contractsPath).forEach(contractNameWithExt => {
+            var splitted = contractNameWithExt.split(".", 1)
+            var contractName = splitted[0]
+            const filePath = path.join(contractsPath, contractNameWithExt);
             try {
                 var parsedContract = JSON.parse(fs.readFileSync(filePath, { encoding: 'utf-8' }));
-                if (parsedContract.networks[networkId] == undefined) {
-                    console.log(`Contract ${contractName} not deployed on network ${networkId}`);
-                }
                 var contractInfo: any = {
                     name: contractName,
                     abi: parsedContract.abi,
@@ -86,18 +182,11 @@ export default class Client {
                     address: parsedContract.networks[networkId].address
                 };
                 let contractInstance = new this.web3.eth.Contract(contractInfo.abi, contractInfo.address);
-                contractInstance.bytecode = contractInfo.bytecode;
                 this.contracts[contractInfo.name] = contractInstance;
-                console.log(`Contract ${contractInfo.name} loaded`);
             } catch (error) {
-                console.log(error.message);
-                /* istanbul ignore else */ // Depends on ganache only
-                if (error.message.substring('networkID is not defined')) {
-                    console.log('Node did not respond to query, maybe is down or unaccessible');
-                } else {
-                    console.log('Couldn load contract ' + filePath + ' as specified in config.js file');
-                }
+                throw error
             }
         });
     }
+
 }

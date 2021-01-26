@@ -1,5 +1,7 @@
+import Web3 from "web3";
+
 export default class Helpers {
-    private web3: any;
+    private web3: Web3;
     private contracts: { [key: string]: any; } = {};
     constructor(web3: any, contracts: { [key: string]: any; }) {
         this.web3 = web3;
