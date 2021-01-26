@@ -24,7 +24,7 @@ import { Configuration, BaseAPI } from "@hyperledger/cactus-core-api";
  * itself ends up being the act of routing).
  *
  * @see https://github.com/OpenAPITools/openapi-generator/blob/v5.0.0-beta2/modules/openapi-generator/src/main/resources/typescript-axios/apiInner.mustache#L337
- * @see https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/typescript-axios.md
+ * @see https://github.com/OpenAPITools/openapi-generator/blob/v5.0.0/docs/generators/typescript-axios.md
  */
 export class ApiClient extends BaseAPI {
   /**
