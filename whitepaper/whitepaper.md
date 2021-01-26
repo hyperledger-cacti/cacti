@@ -763,7 +763,7 @@ Key components are defined as follows:
 Validator ensure the determined result with attaching digital signature with "Validator key" which can be verified by "Verifier".
 - **Validator Server**: The server accepts a connection from Verifier, and it provides Validator API, which can be used for issuing signed transactions and monitoring Ledger behind it. The LedgerConnector will be implemented for interacting with the Ledger nodes.
 - **Verifier**: The entity accepts only sucussfully verified operation results by verifying the digital signature of the validator. Verifier will be instantiated by calling the VerifierFactory#create method with associated with the Validator to connect. Each Verifier may be temporarily enabled or disabled. Note that "Validator" is apart from "Verifier" over a bi-directional channel.
-- **Verifier Registry**: The information about active Verifier. The VerifierFactory uses this information to instantiate Verifier for the Business Logic Plugin. 
+- **Verifier Registry**: The information about active Verifier. The VerifierFactory uses this information to instantiate Verifier for the Business Logic Plugin.
 - ~~**Cactus Routing Interface**: The entity is a routing service between "Business Logic Plugin" and  "Ledger Plugin(s)". The entity is also a routing service between Business Logic Plugin and API calls from "Application user(s)".~~
 - ~~**Ledger-n**: DLT platforms(e.g. Ethereum, Quorum, Hyperledger Fabric, ...)~~
 
@@ -1512,7 +1512,7 @@ Various identities are used at Cactus Service API.
 
 **Wallet ID**
 * ID for the user identity which is associated with authentication credential at integrated `Ledger`.
-* It is recommended to store temporary credential here allowing minimal access to operate `Ledger` instead of giving full access with master secret.
+* It is recommended to store temporary credential here allowing minimal access to operate `Ledger` instead of giving full access with primary secret.
 * Service API enables user to add/update/delete authentication credential for the Wallet.
 
 **Ledger ID**
@@ -1627,7 +1627,7 @@ To get a better understanding of the various, near-infinite deplyoment scenarios
 
 **Identity Secret**: A private key or a password that - by design - is only ever known by the identity owner (unless stolen).
 
-**Credentials**: Could mean `user a`uthentication credentials/identity proofs in an IT application or any other credentials in the traditional sense of the word such as a proof that a person obtained a masters or PhD.
+**Credentials**: Could mean `user a` authentication credentials/identity proofs in an IT application or any other credentials in the traditional sense of the word such as a proof that a person obtained a bachelor's degree or a PhD.
 
 **Ledger/Network/Chain**: Synonymous words meaning referring largely to the same thing in this paper.
 
