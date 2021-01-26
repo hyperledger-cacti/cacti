@@ -12,7 +12,7 @@ Maintainers may be removed by explicit resignation, for prolonged inactivity (3 
 
 **Releases**
 
-A majority of the maintainers may decide to create a release of Cactus.  Any broader rules of Hyperledger pertaining to releases must be followed.  Once the project is mature, there will be a stable LTS (long term support) release branch, as well as the master branch for upcoming new features.
+A majority of the maintainers may decide to create a release of Cactus.  Any broader rules of Hyperledger pertaining to releases must be followed.  Once the project is mature, there will be a stable LTS (long term support) release branch, as well as the main branch for upcoming new features.
 
 **Making Feature/Enhancement Proposals**
 
@@ -25,7 +25,7 @@ Significant changes can be marked as such via the predefined label with the same
 To easily access the list of significant changes, navigate to the label:
 https://github.com/hyperledger/cactus/labels/Significant_Change
 
-We also recommend reading our CONTRIBUTING.md file (https://github.com/hyperledger/cactus/blob/master/CONTRIBUTING.md) for more information about contributing.
+We also recommend reading our CONTRIBUTING.md file (https://github.com/hyperledger/cactus/blob/main/CONTRIBUTING.md) for more information about contributing.
 
 **Approving Pull Requests**
 

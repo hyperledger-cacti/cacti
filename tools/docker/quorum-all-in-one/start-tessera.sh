@@ -17,7 +17,6 @@ echo Config type ${TESSERA_CONFIG_TYPE}
 #generating the two config flavors
 cat <<EOF > ${DDIR}/tessera-config-09.json
 {
-  "useWhiteList": false,
   "jdbc": {
     "username": "sa",
     "password": "",
