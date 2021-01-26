@@ -109,7 +109,7 @@
     "@types/ssh2": "0.5.44",
     "@types/temp": "0.8.34",
     "@types/uuid": "8.3.0",
-    "axios": "0.20.0",
+    "axios": "0.21.1",
     "form-data": "3.0.0"
   }
 }
