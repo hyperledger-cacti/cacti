@@ -13,7 +13,7 @@
 	curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.4.0
 Then, `fabric-samples` directory is made in the current directory, including `basic-network`, `bin`, `chaincode/fabcar`, and `fabcar`.
 
-- c.f.: https://hyperledger-fabric.readthedocs.io/en/release-1.4/install.html
+- c.f.: https://hyperledger-fabric.readthedocs.io/en/release-2.2/install.html
 - If you are behind an proxy environment, use the command that `curl -x http://yourProxyURL:yourProxyPortNumber` instead of `curl`
 
 ## b) Initialization
