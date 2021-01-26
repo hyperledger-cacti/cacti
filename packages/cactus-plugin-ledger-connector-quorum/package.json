@@ -83,7 +83,7 @@
     "@hyperledger/cactus-common": "0.3.0",
     "@hyperledger/cactus-core": "0.3.0",
     "@hyperledger/cactus-core-api": "0.3.0",
-    "axios": "0.20.0",
+    "axios": "0.21.1",
     "express": "4.17.1",
     "joi": "14.3.1",
     "openapi-types": "7.0.1",
