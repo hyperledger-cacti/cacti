@@ -1,7 +1,7 @@
 /*
  * Copyright 2019-2020 Fujitsu Laboratories Ltd.
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * PluginConfig_template.js
  */
 
@@ -12,5 +12,5 @@
  */
 
 module.exports = {
-	// Nothing special
+  // Nothing special
 };

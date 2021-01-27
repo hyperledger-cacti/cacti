@@ -5,29 +5,27 @@
  * ValidatorAuthentication.ts
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const jwt = require("jsonwebtoken");
-import { config } from '../core/config/default';
+import { config } from "../core/config/default";
 import { getLogger } from "log4js";
-const logger = getLogger('ValidatorAuthentication[' + process.pid + ']');
+const logger = getLogger("ValidatorAuthentication[" + process.pid + "]");
 logger.level = config.logLevel;
 
-const privateKey = fs.readFileSync(path.resolve(__dirname, config.validatorKeyPath));
+const privateKey = fs.readFileSync(
+  path.resolve(__dirname, config.validatorKeyPath)
+);
 
 export class ValidatorAuthentication {
+  static sign(payload: object): string {
+    const option = {
+      algorithm: "RS256",
+      expiresIn: "1000",
+    };
 
-    static sign(payload: object): string {
-
-        const option = {
-            algorithm: 'RS256',
-            expiresIn: '1000'
-        }
-
-        const signature: string = jwt.sign(payload, privateKey, option);
-        logger.debug(`signature = ${signature}`);
-        return signature;
-
-    }
-
+    const signature: string = jwt.sign(payload, privateKey, option);
+    logger.debug(`signature = ${signature}`);
+    return signature;
+  }
 }

@@ -12,7 +12,7 @@ const constants = {
   ACTIVE: "ACTIVE",
   REFUNDED: "REFUNDED",
   WITHDRAWN: "WITHDRAWN",
-  EXPIRED: "EXPIRED"
+  EXPIRED: "EXPIRED",
 };
 
 module.exports = constants;

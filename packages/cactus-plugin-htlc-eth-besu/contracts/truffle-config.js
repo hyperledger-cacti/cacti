@@ -3,8 +3,8 @@ module.exports = {
     development: {
       host: "127.0.0.1",
       port: 8545,
-      network_id: "*"
-    }
+      network_id: "*",
+    },
   },
   compilers: {
     solc: {
@@ -13,11 +13,11 @@ module.exports = {
       settings: {
         optimizer: {
           enabled: true,
-          runs: 200
+          runs: 200,
         },
-        evmVersion: "istanbul"
-      }
-    }
+        evmVersion: "istanbul",
+      },
+    },
   },
-  plugins: ["solidity-coverage"]
+  plugins: ["solidity-coverage"],
 };
