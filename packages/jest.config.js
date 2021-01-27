@@ -120,10 +120,7 @@ module.exports = {
   // roots: [
   //   "<rootDir>"
   // ],
-roots: [
-  "<rootDir>/ledger-plugin",
-  "<rootDir>/routing-interface"
-],
+  roots: ["<rootDir>/ledger-plugin", "<rootDir>/routing-interface"],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
@@ -183,9 +180,9 @@ roots: [
   //   "/node_modules/",
   //   "\\.pnp\\.[^\\/]+$"
   // ],
-transform: {
-  "^.+\\.(ts|tsx)$": "ts-jest"
-},
+  transform: {
+    "^.+\\.(ts|tsx)$": "ts-jest",
+  },
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

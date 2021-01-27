@@ -5,12 +5,12 @@
  * RIFUtil.test.ts
  */
 
-import { RIFUtil } from './RIFUtil';
+import { RIFUtil } from "./RIFUtil";
 
-test('test', () => {
-    const objJson = {aaa: "abc", bbb: "def"};
-    const strJson = JSON.stringify(objJson);
-    expect(RIFUtil.json2str(objJson)).toBe(strJson);
-    expect(RIFUtil.json2str(RIFUtil.str2json(strJson))).toBe(strJson);
-    expect(RIFUtil.str2json("abc")).toBeNull(); // for invalid value.
+test("test", () => {
+  const objJson = { aaa: "abc", bbb: "def" };
+  const strJson = JSON.stringify(objJson);
+  expect(RIFUtil.json2str(objJson)).toBe(strJson);
+  expect(RIFUtil.json2str(RIFUtil.str2json(strJson))).toBe(strJson);
+  expect(RIFUtil.str2json("abc")).toBeNull(); // for invalid value.
 });

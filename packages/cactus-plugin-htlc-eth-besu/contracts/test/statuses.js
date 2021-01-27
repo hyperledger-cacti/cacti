@@ -3,7 +3,7 @@ const {
   ACTIVE,
   REFUNDED,
   WITHDRAWN,
-  EXPIRED
+  EXPIRED,
 } = require("./constants.js");
 
 // Status codes to string values

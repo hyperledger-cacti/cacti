@@ -6,11 +6,11 @@
  */
 
 export class TxInfoData {
-    target: string;     // "escrow" or "transfer" or "settlement"
-    txInfo: string;
+  target: string; // "escrow" or "transfer" or "settlement"
+  txInfo: string;
 
-    constructor(target: string, txInfo: string) {
-        this.target = target;
-        this.txInfo = txInfo;   // JSON string
-    }
+  constructor(target: string, txInfo: string) {
+    this.target = target;
+    this.txInfo = txInfo; // JSON string
+  }
 }
