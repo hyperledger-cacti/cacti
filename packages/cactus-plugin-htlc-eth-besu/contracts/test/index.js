@@ -67,7 +67,7 @@ contract("HashTimeLock", () => {
       hashLock,
       receiverAddress,
       outputNetwork,
-      outputAddress
+      outputAddress,
     } = mockNewContract;
 
     const newContract = await contractInstance.newContract(
@@ -85,7 +85,6 @@ contract("HashTimeLock", () => {
 
     const getOneStatus = await contractInstance.getSingleStatus(contractId);
 
-
     assert(
       statuses[parseInt(getOneStatus)] === WITHDRAWN,
       `Expected WITHDRAWN, got ${statuses[parseInt(getOneStatus)]} instead`
@@ -100,7 +99,7 @@ contract("HashTimeLock", () => {
       hashLock,
       receiverAddress,
       outputNetwork,
-      outputAddress
+      outputAddress,
     } = mockNewContract;
 
     const newContract = await contractInstance.newContract(
@@ -128,11 +127,10 @@ contract("HashTimeLock", () => {
       hashLock,
       receiverAddress,
       outputNetwork,
-      outputAddress
+      outputAddress,
     } = mockNewContract;
 
-    const time = timestamp + 5
-
+    const time = timestamp + 5;
 
     const newContract = await contractInstance.newContract(
       outputAmount,
@@ -158,10 +156,10 @@ contract("HashTimeLock", () => {
       hashLock,
       receiverAddress,
       outputNetwork,
-      outputAddress
+      outputAddress,
     } = mockNewContract;
 
-    const time = timestamp + 10
+    const time = timestamp + 10;
 
     const newContract = await contractInstance.newContract(
       outputAmount,
@@ -193,7 +191,7 @@ contract("HashTimeLock", () => {
       hashLock,
       receiverAddress,
       outputNetwork,
-      outputAddress
+      outputAddress,
     } = mockNewContract;
     const newContract = await contractInstance.newContract(
       outputAmount,

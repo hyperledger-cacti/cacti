@@ -5,7 +5,7 @@
  * driver-common.ts
  */
 
-import {Verifier, ApiInfo, RequestedData, LedgerEvent, } from './ledger-plugin'
+import { Verifier, ApiInfo, RequestedData, LedgerEvent } from "./ledger-plugin";
 
 // for debug
 export function json2str(jsonObj: object) {
@@ -17,8 +17,8 @@ export function json2str(jsonObj: object) {
   }
 }
 
- // Validator test program.(socket.io client)
-var io = require('socket.io-client');
+// Validator test program.(socket.io client)
+var io = require("socket.io-client");
 //var config = require('config');
 
 export function makeApiInfoList(targetApiInfo: any): Array<ApiInfo> {
@@ -49,8 +49,8 @@ export function addSocket(socket: any): number {
 }
 
 export function getStoredSocket(index: number): any {
-    console.log(`##getSocket, index = ${index}`);
-	return(socketArray[index]);
+  console.log(`##getSocket, index = ${index}`);
+  return socketArray[index];
 }
 
 export function deleteAndDisconnectSocke(index: number) {
@@ -61,16 +61,11 @@ export function deleteAndDisconnectSocke(index: number) {
       if (socket.connected) {
         console.log(`##call disconnect, index = ${index}`);
         socket.disconnect();
-      }
-      else {
-        console.log(
-          `##already disconnected, index = ${index}`
-        );
+      } else {
+        console.log(`##already disconnected, index = ${index}`);
       }
     }
-  }
-  catch(err) {
+  } catch (err) {
     console.log(`##error:deleteAndDisconnectSocke, index = ${index}, ${err}`);
   }
 }
-

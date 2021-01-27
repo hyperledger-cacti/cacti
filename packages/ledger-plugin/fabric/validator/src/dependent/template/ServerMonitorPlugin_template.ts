@@ -1,7 +1,7 @@
 /*
  * Copyright 2019-2020 Fujitsu Laboratories Ltd.
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * ServerMonitorPlugin_template.js
  */
 
@@ -14,49 +14,46 @@
  */
 
 // configuration file
-var SplugConfig = require('./PluginConfig.js');
-var config = require('config');
+var SplugConfig = require("./PluginConfig.js");
+var config = require("config");
 // Log settings
-var log4js = require('log4js');
-var logger = log4js.getLogger('ServerMonitorPlugin[' + process.pid + ']');
+var log4js = require("log4js");
+var logger = log4js.getLogger("ServerMonitorPlugin[" + process.pid + "]");
 logger.level = config.logLevel;
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 
 /*
  * ServerMonitorPlugin
- * Class definitions of server monitoring 
+ * Class definitions of server monitoring
  */
 var ServerMonitorPlugin = class {
-	/*
-	 * constructors
-	 */
-	constructor(){
-		// Define dependent specific settings
-	}
+  /*
+   * constructors
+   */
+  constructor() {
+    // Define dependent specific settings
+  }
 
-	/*
-	 * startMonitor
-	 * Start Monitoring
-	 * @param {string} clientId: Client ID from which monitoring start request was made
-	 * @param {function} cb: A callback function that receives monitoring results at any time.
-	 */
-	startMonitor(clientId, cb) {
-		logger.info('*** START MONITOR ***');
-		logger.info('Client ID :' + clientId);
-		// Implement handling to receive events from an endchain and return them in a callback function
+  /*
+   * startMonitor
+   * Start Monitoring
+   * @param {string} clientId: Client ID from which monitoring start request was made
+   * @param {function} cb: A callback function that receives monitoring results at any time.
+   */
+  startMonitor(clientId, cb) {
+    logger.info("*** START MONITOR ***");
+    logger.info("Client ID :" + clientId);
+    // Implement handling to receive events from an endchain and return them in a callback function
+  }
 
-	}
-
-	/*
-	 * stopMonitor
-	 * monitoring stop
-	 * @param {string} clientId: Client ID from which monitoring stop request was made
-	 */
-	stopMonitor(clientId) {
-		// Implement a process to end EC monitoring
-	}
-
-}	/* class */
+  /*
+   * stopMonitor
+   * monitoring stop
+   * @param {string} clientId: Client ID from which monitoring stop request was made
+   */
+  stopMonitor(clientId) {
+    // Implement a process to end EC monitoring
+  }
+}; /* class */
 
 module.exports = ServerMonitorPlugin;
-

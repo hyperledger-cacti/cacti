@@ -5,37 +5,67 @@
  * TransactionManagement.ts
  */
 
-import { Request } from 'express';
-import { BusinessLogicPlugin } from '../business-logic-plugin/BusinessLogicPlugin';
-import { BLPRegistry } from './util/BLPRegistry';
-import { LPInfoHolder } from './util/LPInfoHolder';
-import { json2str } from '../ledger-plugin/DriverCommon'
-import { VerifierBase } from '../ledger-plugin/VerifierBase';
-import { VerifierEventListener, LedgerEvent } from '../ledger-plugin/LedgerPlugin';
-import { getTargetBLPInstance } from '../config/BLP_config';
-import { ConfigUtil } from './util/ConfigUtil';
+import { Request } from "express";
+import { BusinessLogicPlugin } from "../business-logic-plugin/BusinessLogicPlugin";
+import { BLPRegistry } from "./util/BLPRegistry";
+import { LPInfoHolder } from "./util/LPInfoHolder";
+import { json2str } from "../ledger-plugin/DriverCommon";
+import { VerifierBase } from "../ledger-plugin/VerifierBase";
+import {
+  VerifierEventListener,
+  LedgerEvent,
+} from "../ledger-plugin/LedgerPlugin";
+import { getTargetBLPInstance } from "../config/BLP_config";
+import { ConfigUtil } from "./util/ConfigUtil";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-const moduleName = 'TransactionManagement';
+const moduleName = "TransactionManagement";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 export class TransactionManagement {
-    private blpRegistry: BLPRegistry = null;                    // Verifier information used in business logic
-    private connectInfo: LPInfoHolder = null;                   // connection information
-    private verifierArray: [] = [];                             // Verifier
-    // private txIDMapInfo: Map<string, string> = null;
-    private tradeIDMapInfo: Map<string, string> = null;
+  private blpRegistry: BLPRegistry = null; // Verifier information used in business logic
+  private connectInfo: LPInfoHolder = null; // connection information
+  private verifierArray: [] = []; // Verifier
+  // private txIDMapInfo: Map<string, string> = null;
+  private tradeIDMapInfo: Map<string, string> = null;
 
-    constructor() {
-        this.blpRegistry = new BLPRegistry();
-        this.connectInfo = new LPInfoHolder();
-        // this.blpMap = new Map();
-        // this.txIDMapInfo = new Map();
-        this.tradeIDMapInfo = new Map();
+  constructor() {
+    this.blpRegistry = new BLPRegistry();
+    this.connectInfo = new LPInfoHolder();
+    // this.blpMap = new Map();
+    // this.txIDMapInfo = new Map();
+    this.tradeIDMapInfo = new Map();
+  }
+
+  // Start business logic
+  startBusinessLogic(req: Request): string {
+    // businessLogicID
+    const businessLogicID = req.body.businessLogicID;
+    logger.info(`businessLogicID: ${businessLogicID}`);
+    // tradeID Numbering/Setup
+    const tradeID = this.createTradeID();
+    logger.info(`tradeID: ${tradeID}`);
+
+    // object judgment
+    if (businessLogicID === "guks32pf") {
+      const blp = getTargetBLPInstance(businessLogicID);
+      if (blp === null) {
+        logger.warn(
+          `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`
+        );
+        return;
+      }
+
+      logger.debug("created instance");
+
+      // Start BusinessLogicCartrade
+      this.setTradeIDMapInfo(tradeID, businessLogicID);
+      blp.startTransaction(req, businessLogicID, tradeID);
+      logger.debug("start cartrade");
     }
 
 
@@ -69,44 +99,12 @@ export class TransactionManagement {
         return tradeID;
     }
 
-
-    createTradeID(): string {
-        // NOTE: tradeID is "(GMT date when the API was accepted) - (serial number)"
-
-        // TODO: Trailing number-generating part not implemented
-        //  NOTE: The last serial number is fixed "001" for 2020/9 months.
-        const currentTime: Date = new Date();
-        const tradeID: string = currentTime.getFullYear()
-            + ('0' + (currentTime.getMonth() + 1)).slice(-2)
-            + ('0' + currentTime.getDate()).slice(-2)
-            + ('0' + currentTime.getHours()).slice(-2)
-            + ('0' + currentTime.getMinutes()).slice(-2)
-            + ('0' + currentTime.getSeconds()).slice(-2)
-            + ('00' + currentTime.getMilliseconds()).slice(-3)
-            + "-001";   // NOTE: Serial number for the same time. Since the priority is low, it is fixed at "001" at this time.
-        return tradeID;
-    }
-
-
-    // Get state of operation
-    getOperationStatus(tradeID: string): object {
-
-        const businessLogicID = this.getBusinessLoginIDByTradeID(tradeID);
-        if (businessLogicID === null) {
-            logger.warn(`##getOperationStatus(): not found BusinessLogicPlugin. tradeID: ${tradeID}`);
-            return;
-        }
-
-        const blp = getTargetBLPInstance(businessLogicID);
-        if (blp === null) {
-            logger.warn(`##getOperationStatus(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`);
-            return;
-        }
-
-        const transactionStatusData = blp.getOperationStatus(tradeID);
-
-        return transactionStatusData;
-
+    const blp = getTargetBLPInstance(businessLogicID);
+    if (blp === null) {
+      logger.warn(
+        `##getOperationStatus(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`
+      );
+      return;
     }
 
 
@@ -129,11 +127,22 @@ export class TransactionManagement {
         }
 
     }
+  }
 
+  // Get validator to use
+  getValidatorToUse(businessLogicId: string): string {
+    return this.blpRegistry.getBLPRegistryInfo(businessLogicId);
+  }
 
-    // Get validator to use
-    getValidatorToUse(businessLogicId: string): string {
-        return this.blpRegistry.getBLPRegistryInfo(businessLogicId);
+  // interface VerifierEventListener
+  onEvent(ledgerEvent: LedgerEvent): void {
+    logger.debug(`####in onEvent: event: ${json2str(ledgerEvent)}`);
+    const eventNum = this.getEventNum(ledgerEvent);
+    if (eventNum === 0) {
+      logger.warn(
+        `onEvent(): invalid event, event num is zero., ledgerEvent.verifierId: ${ledgerEvent.verifierId}`
+      );
+      return;
     }
 
 
@@ -178,16 +187,21 @@ export class TransactionManagement {
         return 0;
     }
 
+    // not found.
+    logger.warn(
+      `getEventNum(): not found(The corresponding BLP does not exist.)`
+    );
+    return 0;
+  }
 
-    private getBLPInstanceFromEvent(ledgerEvent: LedgerEvent, targetIndex: number): BusinessLogicPlugin | null {
-        const txID = this.getTxIDFromEvent(ledgerEvent, targetIndex);
-        if (txID === null) {
-            logger.warn(`getBLPInstanceFromEvent: not found txID`);
-            return;
-        }
-        logger.debug(`getBLPInstanceFromEvent: txID: ${txID}`);
-
-        return this.getBLPInstanceFromTxID(txID);
+  private getBLPInstanceFromEvent(
+    ledgerEvent: LedgerEvent,
+    targetIndex: number
+  ): BusinessLogicPlugin | null {
+    const txID = this.getTxIDFromEvent(ledgerEvent, targetIndex);
+    if (txID === null) {
+      logger.warn(`getBLPInstanceFromEvent: not found txID`);
+      return;
     }
 
 
@@ -235,16 +249,21 @@ export class TransactionManagement {
         return null;
     }
 
+    // not found.
+    logger.warn(
+      `getBLPInstanceFromTxID(): not found(The corresponding BLP does not exist.)`
+    );
+    return null;
+  }
 
-    private setTradeIDMapInfo(tradeID: string, businessLogicID: string): void {
-        this.tradeIDMapInfo.set(tradeID, businessLogicID);
+  private setTradeIDMapInfo(tradeID: string, businessLogicID: string): void {
+    this.tradeIDMapInfo.set(tradeID, businessLogicID);
+  }
+
+  private getBusinessLoginIDByTradeID(tradeID: string): string | null {
+    if (this.tradeIDMapInfo.has(tradeID)) {
+      return this.tradeIDMapInfo.get(tradeID);
     }
-
-
-    private getBusinessLoginIDByTradeID(tradeID: string): string | null {
-        if (this.tradeIDMapInfo.has(tradeID)) {
-            return this.tradeIDMapInfo.get(tradeID);
-        }
-        return null;
-    }
+    return null;
+  }
 }

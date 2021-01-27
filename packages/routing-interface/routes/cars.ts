@@ -5,17 +5,17 @@
  * cars.ts
  */
 
-import { Router, NextFunction, Request, Response } from 'express';
-import { RIFUtil } from '../util/RIFUtil';
-import { ConfigUtil } from '../util/ConfigUtil';
-import { RIFError, BadRequestError, InternalServerError } from '../RIFError';
-import { CarsManagement } from '../CarsManagement';
+import { Router, NextFunction, Request, Response } from "express";
+import { RIFUtil } from "../util/RIFUtil";
+import { ConfigUtil } from "../util/ConfigUtil";
+import { RIFError, BadRequestError, InternalServerError } from "../RIFError";
+import { CarsManagement } from "../CarsManagement";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-const moduleName = 'cars';
+const moduleName = "cars";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
@@ -23,25 +23,27 @@ const router: Router = Router();
 const carsManagement: CarsManagement = new CarsManagement();
 
 /* GET query car. */
-router.get('/:carID', (req: Request, res: Response, next: NextFunction) => {
+router.get("/:carID", (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.debug(`start queryCar`);
 
-    carsManagement.queryCar(req.params.carID).then(result => {
+    carsManagement
+      .queryCar(req.params.carID)
+      .then((result) => {
         logger.debug("result(queryCar) = " + JSON.stringify(result));
         res.status(200).json(result);
-    }).catch((err) => {
+      })
+      .catch((err) => {
         logger.error(err);
-    });
-
+      });
   } catch (err) {
     logger.error(`##(queryCar)err name: ${err.constructor.name}`);
 
     if (err instanceof RIFError) {
-        logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
-        res.status(err.statusCode);
-        res.send(err.message);
-        return;
+      logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
+      res.status(err.statusCode);
+      res.send(err.message);
+      return;
     }
 
     logger.error(`##err in queryCar: ${err}`);
@@ -50,25 +52,27 @@ router.get('/:carID', (req: Request, res: Response, next: NextFunction) => {
 });
 
 /* GET query all cars. */
-router.get('/', (req: Request, res: Response, next: NextFunction) => {
+router.get("/", (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.debug(`start queryAllCars`);
 
-    carsManagement.queryAllCars().then(result => {
+    carsManagement
+      .queryAllCars()
+      .then((result) => {
         logger.debug("result(queryAllCars) = " + JSON.stringify(result));
         res.status(200).json(result);
-    }).catch((err) => {
+      })
+      .catch((err) => {
         logger.error(err);
-    });
-
+      });
   } catch (err) {
     logger.error(`##(queryAllCars)err name: ${err.constructor.name}`);
 
     if (err instanceof RIFError) {
-        logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
-        res.status(err.statusCode);
-        res.send(err.message);
-        return;
+      logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
+      res.status(err.statusCode);
+      res.send(err.message);
+      return;
     }
 
     logger.error(`##err in queryAllCars: ${err}`);

@@ -5,14 +5,14 @@
  * DriverCommon.ts
  */
 
-import { ApiInfo, RequestedData, } from './LedgerPlugin'
-import { ConfigUtil } from '../routing-interface/util/ConfigUtil';
+import { ApiInfo, RequestedData } from "./LedgerPlugin";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-const moduleName = 'DriverCommon';
+const moduleName = "DriverCommon";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
@@ -57,7 +57,7 @@ export function addSocket(socket: any): number {
 
 export function getStoredSocket(index: number): any {
   logger.debug(`##getSocket, index = ${index}`);
-  return (socketArray[index]);
+  return socketArray[index];
 }
 
 export function deleteAndDisconnectSocke(index: number) {
@@ -68,14 +68,11 @@ export function deleteAndDisconnectSocke(index: number) {
       if (socket.connected) {
         logger.debug(`##call disconnect, index = ${index}`);
         socket.disconnect();
-      }
-      else {
+      } else {
         logger.debug(`##already disconnected, index = ${index}`);
       }
     }
-  }
-  catch (err) {
+  } catch (err) {
     logger.warn(`##error:deleteAndDisconnectSocke, index = ${index}, ${err}`);
   }
 }
-
