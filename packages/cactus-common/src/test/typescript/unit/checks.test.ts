@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Checks } from "../../../main/typescript";
 
 test("Checks", (tParent: Test) => {
-
   test("Checks#nonBlankString()", (t: Test) => {
     const subject = uuidv4();
     const pattern = new RegExp(`${subject}`);
