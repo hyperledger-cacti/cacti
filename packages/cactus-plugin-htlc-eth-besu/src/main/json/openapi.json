@@ -1,201 +1,221 @@
 {
-    "openapi": "3.0.3",
-    "info": {
-      "title": "Hyperledger Cactus Plugin - HTLC-Eth Besu",
-      "version": "1.0",
-      "license": {
-        "name": "Apache 2.0",
-        "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
-      }
-    },
-    "servers": [
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cactus Plugin - HTLC-Eth Besu",
+    "version": "1.0",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+          "url": "https://www.cactus.stream/{basePath}",
+          "description": "Public test instance",
+          "variables": {
+              "basePath": {
+                  "default": ""
+              }
+          }
+      },
       {
-        "url": "https://api.server.test/v1"
+          "url": "http://localhost:4000/{basePath}",
+          "description": "Local test instance",
+          "variables": {
+              "basePath": {
+                  "default": ""
+              }
+          }
       }
-    ],
-    "components": {
-      "schemas": {
-        "newContractObj": {
-          "type": "object",
-          "properties": {
-            "outputAmount": {
-              "type": "integer",
-              "format": "uint256"
-            },
-            "expiration": {
-              "type": "integer",
-              "format": "uint256"
-            },
-            "hashLock": {
-              "type": "string",
-              "format": "bytes32"
-            },
-            "receiver": {
-              "type": "string"
-            },
-            "outputNetwork": {
-              "type": "string"
-            },
-            "outputAddress": {
-              "type": "string"
-            }
+  ],
+  "components": {
+    "schemas": {
+      "newContractObj": {
+        "type": "object",
+        "properties": {
+          "outputAmount": {
+            "type": "integer",
+            "format": "uint256"
+          },
+          "expiration": {
+            "type": "integer",
+            "format": "uint256"
+          },
+          "hashLock": {
+            "type": "string",
+            "format": "bytes32"
+          },
+          "receiver": {
+            "type": "string"
+          },
+          "outputNetwork": {
+            "type": "string"
+          },
+          "outputAddress": {
+            "type": "string"
           }
         }
-      },
-      "responses": {
-        "getStatusResp": {
-          "description": "Array ids uint256",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "uint256"
-                }
-              }
-            }
-          }
-        },
-        "getSingleStatusResp": {
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
+      }
+    },
+    "responses": {
+      "getStatusResp": {
+        "description": "Array ids uint256",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
                 "type": "integer",
                 "format": "uint256"
               }
             }
           }
-        },
-        "generalResp": {
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "string",
-                "format": "bytes32"
-              }
-            }
-          }
         }
-      }
-    },
-    "paths": {
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/newContract": {
-        "post": {
-          "requestBody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/newContractObj"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "successful operation",
-              "$ref": "#/components/responses/generalResp"
+      },
+      "getSingleStatusResp": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "integer",
+              "format": "uint256"
             }
           }
         }
       },
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw": {
-        "post": {
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "format": "bytes32"
-              }
-            },
-            {
-              "name": "secret",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "format": "bytes32"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "successful operation",
-              "$ref": "#/components/responses/generalResp"
-            }
-          }
-        }
-      },
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund": {
-        "post": {
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "format": "bytes32"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "successful operation",
-              "$ref": "#/components/responses/generalResp"
-            }
-          }
-        }
-      },
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/getStatus": {
-        "get": {
-          "parameters": [
-            {
-              "name": "ids",
-              "in": "query",
-              "required": true,
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "format": "bytes32"
-                }
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "successful operation",
-              "$ref": "#/components/responses/getStatusResp"
-            }
-          }
-        }
-      },
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/getSingleStatus": {
-        "get": {
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "format": "bytes32"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "successful operation",
-              "$ref": "#/components/responses/getSingleStatusResp"
+      "generalResp": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "string",
+              "format": "bytes32"
             }
           }
         }
       }
     }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/newContract": {
+      "post": {
+        "operationId": "newContract",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/newContractObj"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "$ref": "#/components/responses/generalResp"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw": {
+      "post": {
+        "operationId": "withdraw",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "bytes32"
+            }
+          },
+          {
+            "name": "secret",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "bytes32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "$ref": "#/components/responses/generalResp"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund": {
+      "post": {
+        "operationId": "refund",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "bytes32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "$ref": "#/components/responses/generalResp"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/getStatus": {
+      "get": {
+        "operationId": "getStatus",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "bytes32"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "$ref": "#/components/responses/getStatusResp"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/getSingleStatus": {
+      "get": {
+        "operationId": "getSingleStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "bytes32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "$ref": "#/components/responses/getSingleStatusResp"
+          }
+        }
+      }
+    }
   }
+}
