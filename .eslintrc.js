@@ -15,10 +15,20 @@ module.exports = {
     "no-prototype-builtins": "error",
     "@typescript-eslint/no-var-requires": "warn",
     "no-dupe-class-members": "off",
+<<<<<<< HEAD
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
       { ignoreRestSiblings: true },
+=======
+    "no-unused-vars": [
+      "warn",
+      {
+        vars: "all",
+        args: "after-used",
+        ignoreRestSiblings: false,
+      },
+>>>>>>> build(deps): migrate to ESLint+Prettier
     ],
     indent: ["off"],
     semi: ["error", "always"],
