@@ -84,7 +84,7 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
   }
 
   public async installWebServices(
-    expressApp: Express
+    expressApp: Express,
   ): Promise<IWebServiceEndpoint[]> {
     const endpoints: IWebServiceEndpoint[] = [];
 

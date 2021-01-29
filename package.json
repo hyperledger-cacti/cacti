@@ -9,7 +9,7 @@
     "start:cockpit": "lerna run --scope '*/cactus-cockpit' --stream serve:proxy",
     "start:example-supply-chain": "node ./examples/supply-chain-app/node_modules/.bin/cactus-example-supply-chain-backend",
     "clean": "del-cli \"./packages/cactus-*/{dist,.nyc_output,src/main/typescript/generated/openapi/typescript-axios/*}\"",
-    "lint": "lerna exec --stream --ignore '*/*cockpit' -- cross-env DEBUG= tslint --project tsconfig.json",
+    "lint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix",
     "tsc": "lerna run tsc",
     "watch": "lerna run --parallel watch",
     "build": "npm-run-all build:dev build:prod",
@@ -57,6 +57,8 @@
     "@types/tape": "4.13.0",
     "@types/tape-promise": "4.0.1",
     "@types/uuid": "3.4.6",
+    "@typescript-eslint/eslint-plugin": "4.14.1",
+    "@typescript-eslint/parser": "4.14.1",
     "buffer": "6.0.1",
     "cache-loader": "4.1.0",
     "commitizen": "4.2.2",
@@ -64,9 +66,12 @@
     "crypto-browserify": "3.12.0",
     "del-cli": "3.0.1",
     "electron": "9.4.0",
+    "eslint": "7.18.0",
+    "eslint-config-prettier": "7.2.0",
     "eslint-config-standard": "12.0.0",
     "eslint-plugin-import": "2.17.3",
     "eslint-plugin-node": "9.1.0",
+    "eslint-plugin-prettier": "3.3.1",
     "eslint-plugin-promise": "4.1.1",
     "eslint-plugin-standard": "4.0.0",
     "git-cz": "4.7.1",
@@ -91,7 +96,6 @@
     "tape-promise": "4.0.0",
     "ts-loader": "6.2.1",
     "ts-node": "8.9.1",
-    "tslint": "6.0.0",
     "typescript": "4.0.3",
     "webpack": "git+https://github.com/petermetz/webpack.git#cactus-webpack-ignore-require-calls-feature",
     "webpack-bundle-analyzer": "3.6.0",
@@ -109,7 +113,7 @@
     }
   },
   "lint-staged": {
-    "./**/*.{ts,js}": "prettier --write --config .prettierrc.json"
+    "*/*/src/**/*.{js,ts}": "eslint --fix"
   },
   "dependencies": {}
 }

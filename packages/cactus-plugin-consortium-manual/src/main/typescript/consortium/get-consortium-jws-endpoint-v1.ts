@@ -83,7 +83,7 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
   async handleRequest(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     const fnTag = "GetConsortiumJwsEndpointV1#handleRequest()";
     this.log.debug(`GET ${this.getPath()}`);
@@ -105,7 +105,7 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
         .map((apiResponse) => apiResponse.data)
         .map((getNodeJwsResponse) => getNodeJwsResponse.jws)
         .forEach((aJws: JWSGeneral) =>
-          aJws.signatures.forEach((signature) => signatures.push(signature))
+          aJws.signatures.forEach((signature) => signatures.push(signature)),
         );
 
       const [response] = responses;

@@ -37,7 +37,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
 
   await t.doesNotReject(
     apiServer.start(),
-    "failed to start API server with dynamic plugin imports configured for it..."
+    "failed to start API server with dynamic plugin imports configured for it...",
   );
   test.onFinish(() => apiServer.shutdown());
 });

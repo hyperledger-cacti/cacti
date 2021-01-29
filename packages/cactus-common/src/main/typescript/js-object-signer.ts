@@ -10,7 +10,7 @@ export type SignatureFunction = (msg: any, pkey: any) => any;
 export type VerifySignatureFunction = (
   msg: any,
   signature: any,
-  pubKey: Uint8Array
+  pubKey: Uint8Array,
 ) => boolean;
 export type HashFunction = (data: any) => string;
 
@@ -86,7 +86,7 @@ export class JsObjectSigner {
     return secp256k1.ecdsaVerify(
       signature,
       Buffer.from(this.dataHash(msg), `hex`),
-      pubKey
+      pubKey,
     );
   }
 

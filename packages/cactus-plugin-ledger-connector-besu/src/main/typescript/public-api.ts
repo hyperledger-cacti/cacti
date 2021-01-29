@@ -11,7 +11,7 @@ import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector"
 export * from "./generated/openapi/typescript-axios/index";
 
 export async function createPluginFactory(
-  pluginFactoryOptions: IPluginFactoryOptions
+  pluginFactoryOptions: IPluginFactoryOptions,
 ): Promise<PluginFactoryLedgerConnector> {
   return new PluginFactoryLedgerConnector(pluginFactoryOptions);
 }

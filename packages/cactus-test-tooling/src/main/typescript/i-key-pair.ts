@@ -4,7 +4,7 @@ export interface IKeyPair {
 }
 
 export function isIKeyPair(
-  allegedKeyPair: IKeyPair
+  allegedKeyPair: IKeyPair,
 ): allegedKeyPair is IKeyPair {
   return (
     typeof allegedKeyPair.privateKey === "string" &&

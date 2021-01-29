@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-var-requires
 const tap = require("tap");
 import { AddressInfo } from "net";
 import { TLSSocket } from "tls";
@@ -42,7 +41,7 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
   assert.ok(clientCert.keyPair, "clientCert.keyPair truthy");
   assert.ok(
     serverCert.certificate.verify(clientCert.certificate),
-    "Server cert verified client cert OK"
+    "Server cert verified client cert OK",
   );
 
   const serverOptions: ServerOptions = {
@@ -64,17 +63,20 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
     };
     const aServer: Server = createServer(serverOptions, listener);
     aServer.once("tlsClientError", (err: Error) =>
-      log.error("tlsClientError: %j", err)
+      log.error("tlsClientError: %j", err),
     );
     aServer.on("keylog", (data: Buffer, tlsSocket: TLSSocket) => {
       log.debug("keylog:tlsSocket.address(): %j", tlsSocket.address());
       log.debug("keylog:data: %j", data.toString("utf-8"));
     });
     aServer.on("OCSPRequest", (...args: any[]) =>
-      log.debug("OCSPRequest: %j", args)
+      log.debug("OCSPRequest: %j", args),
     );
     aServer.on("secureConnection", (tlsSocket: TLSSocket) =>
-      log.debug("secureConnection: tlsSocket.address() %j", tlsSocket.address())
+      log.debug(
+        "secureConnection: tlsSocket.address() %j",
+        tlsSocket.address(),
+      ),
     );
 
     aServer.once("listening", () => resolve(aServer));

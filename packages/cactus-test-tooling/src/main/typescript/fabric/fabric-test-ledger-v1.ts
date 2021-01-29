@@ -97,7 +97,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
     if (compareVersions.compare(this.getFabricVersion(), "1.4", "<"))
       this.log.warn(
-        `This version of Fabric ${this.getFabricVersion()} is unsupported`
+        `This version of Fabric ${this.getFabricVersion()} is unsupported`,
       );
 
     this.validateConstructorOptions();
@@ -218,14 +218,14 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const fnTag = `${this.className}#getConnectionProfileOrg1()`;
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
-    const CCP_JSON_PATH_FABRIC_V1: string =
+    const CCP_JSON_PATH_FABRIC_V1 =
       "/fabric-samples/first-network/connection-org1.json";
-    const CCP_JSON_PATH_FABRIC_V2: string =
+    const CCP_JSON_PATH_FABRIC_V2 =
       "/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json";
     const ccpJsonPath = compareVersions.compare(
       this.getFabricVersion(),
       "2.0",
-      "<"
+      "<",
     )
       ? CCP_JSON_PATH_FABRIC_V1
       : CCP_JSON_PATH_FABRIC_V2;
@@ -265,14 +265,14 @@ export class FabricTestLedgerV1 implements ITestLedger {
       const privatePort = 7050;
       const hostPort = await Containers.getPublicPort(privatePort, cInfo);
       const url = `grpcs://localhost:${hostPort}`;
-      const ORDERER_PEM_PATH_FABRIC_V1: string =
+      const ORDERER_PEM_PATH_FABRIC_V1 =
         "/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem";
-      const ORDERER_PEM_PATH_FABRIC_V2: string =
+      const ORDERER_PEM_PATH_FABRIC_V2 =
         "/fabric-samples/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem";
       const ordererPemPath = compareVersions.compare(
         this.getFabricVersion(),
         "2.0",
-        "<"
+        "<",
       )
         ? ORDERER_PEM_PATH_FABRIC_V1
         : ORDERER_PEM_PATH_FABRIC_V2;
@@ -337,10 +337,10 @@ export class FabricTestLedgerV1 implements ITestLedger {
     return sshConfig;
   }
 
-  public async start(omitPull: boolean = false): Promise<Container> {
+  public async start(omitPull = false): Promise<Container> {
     const containerNameAndTag = this.getContainerImageName();
     const dockerEnvVars: string[] = new Array(...this.envVars).map(
-      (pairs) => `${pairs[0]}=${pairs[1]}`
+      (pairs) => `${pairs[0]}=${pairs[1]}`,
     );
 
     if (this.container) {
@@ -416,7 +416,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
           if (err) {
             reject(err);
           }
-        }
+        },
       );
 
       eventEmitter.once("start", async (container: Container) => {
@@ -432,10 +432,10 @@ export class FabricTestLedgerV1 implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs: number = 180000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 180000): Promise<void> {
     const fnTag = "FabricTestLedgerV1#waitForHealthCheck()";
     const startedAt = Date.now();
-    let reachable: boolean = false;
+    let reachable = false;
     do {
       try {
         const { Status } = await this.getContainerInfo();
@@ -495,7 +495,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
         publishAllPorts: this.publishAllPorts,
         envVars: this.envVars,
       },
-      OPTS_JOI_SCHEMA
+      OPTS_JOI_SCHEMA,
     );
 
     if (result.error) {

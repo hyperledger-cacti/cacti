@@ -80,7 +80,7 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
   async handleRequest(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     try {
       this.log.debug(`GET ${this.getPath()}`);

@@ -58,7 +58,7 @@ export class PluginKeychainVaultRemoteAdapter
     Checks.truthy(opts.backend, `${fnTag} options.backend`);
     Checks.truthy(
       opts.backend instanceof DefaultApi,
-      `${fnTag} opts.backend instanceof DefaultApi`
+      `${fnTag} opts.backend instanceof DefaultApi`,
     );
 
     const level = this.opts.logLevel || "INFO";
@@ -81,7 +81,7 @@ export class PluginKeychainVaultRemoteAdapter
    * @param _expressApp
    */
   public async installWebServices(
-    _expressApp: Express
+    _expressApp: Express,
   ): Promise<IWebServiceEndpoint[]> {
     return [];
   }

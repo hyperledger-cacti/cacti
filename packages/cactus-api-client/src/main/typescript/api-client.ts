@@ -31,18 +31,18 @@ export class ApiClient extends BaseAPI {
    *
    * @param ctor
    */
-  public extendWith<T extends {}>(
-    ctor: new (configuration?: Configuration) => T
+  public extendWith<T extends any>(
+    ctor: new (configuration?: Configuration) => T,
   ): T & this {
     const instance = new ctor(this.configuration) as any;
     const self = this as any;
 
     Objects.getAllMethodNames(instance).forEach(
-      (method: string) => (self[method] = instance[method])
+      (method: string) => (self[method] = instance[method]),
     );
 
     Objects.getAllFieldNames(instance).forEach(
-      (field: string) => (self[field] = instance[field])
+      (field: string) => (self[field] = instance[field]),
     );
 
     return this as T & this;
@@ -81,7 +81,7 @@ export class ApiClient extends BaseAPI {
 
   public async ofLedger<T>(
     ledgerOrId: string | Ledger,
-    ctor: new (configuration?: Configuration) => T
+    ctor: new (configuration?: Configuration) => T,
   ): Promise<ApiClient & T>;
   /**
    * Constructs a new `ApiClient` object that is tied to whichever Cactus node
@@ -100,10 +100,10 @@ export class ApiClient extends BaseAPI {
    * consortium metadata at runtime for the purposes of looking up ledgers by
    * the provided `ledgerId` parameter.
    */
-  public async ofLedger<T extends {}>(
+  public async ofLedger<T extends any>(
     ledgerOrId: string | Ledger,
     ctor: new (configuration?: Configuration) => T,
-    consortiumDbProvider?: IAsyncProvider<ConsortiumDatabase>
+    consortiumDbProvider?: IAsyncProvider<ConsortiumDatabase>,
   ): Promise<ApiClient & T> {
     const fnTags = "ApiClient#forLedgerId()";
 

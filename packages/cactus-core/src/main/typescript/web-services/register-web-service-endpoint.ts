@@ -10,7 +10,7 @@ import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
  */
 export function registerWebServiceEndpoint(
   webApp: Express,
-  endpoint: IWebServiceEndpoint
+  endpoint: IWebServiceEndpoint,
 ): void {
   const fnTag = "registerWebServiceEndpoint";
   const httpVerb = endpoint.getVerbLowerCase();
@@ -23,7 +23,7 @@ export function registerWebServiceEndpoint(
   } catch (ex) {
     throw new Error(
       `${fnTag} Express verb method ${httpVerb} threw ` +
-        ` while registering endpoint: ${ex.message}`
+        ` while registering endpoint: ${ex.message}`,
     );
   }
 }

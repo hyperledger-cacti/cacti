@@ -18,7 +18,6 @@ const main = async () => {
 
   if (process.argv[2].includes("help")) {
     const helpText = ConfigService.getHelpText();
-    // tslint:disable-next-line: no-console
     console.log(helpText);
     log.info(`Effective Configuration:`);
     log.info(JSON.stringify(serverOptions, null, 4));

@@ -73,7 +73,7 @@ export class ChainCodeCompiler {
   }
 
   public async compile(
-    options: ICompilationOptions
+    options: ICompilationOptions,
   ): Promise<ICompilationResult> {
     const fnTag = "ChainCodeCompiler#compile()";
     Checks.truthy(options, `${fnTag} options`);

@@ -33,7 +33,7 @@ export const QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().ke
       .min(1024)
       .max(65535)
       .required(),
-  }
+  },
 );
 
 export class QuorumTestLedger implements ITestLedger {
@@ -45,7 +45,7 @@ export class QuorumTestLedger implements ITestLedger {
   private containerId: string | undefined;
 
   constructor(
-    public readonly options: IQuorumTestLedgerConstructorOptions = {}
+    public readonly options: IQuorumTestLedgerConstructorOptions = {},
   ) {
     if (!options) {
       throw new TypeError(`QuorumTestLedger#ctor options was falsy.`);
@@ -77,7 +77,7 @@ export class QuorumTestLedger implements ITestLedger {
   }
 
   public async getRpcApiHttpHost(): Promise<string> {
-    const ipAddress: string = "127.0.0.1";
+    const ipAddress = "127.0.0.1";
     const hostPort = await this.getRpcApiPublicPort();
     return `http://${ipAddress}:${hostPort}`;
   }
@@ -89,7 +89,7 @@ export class QuorumTestLedger implements ITestLedger {
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
-      let fileContents: string = "";
+      let fileContents = "";
       extract.on("entry", async (header: any, stream, next) => {
         stream.on("error", (err: Error) => {
           reject(err);
@@ -117,11 +117,11 @@ export class QuorumTestLedger implements ITestLedger {
    * @throws {Error} If the balance is too high and there aren't any genesis
    * accounts allocated with such a high balance then an exceptin is thrown.
    */
-  public async getGenesisAccount(minBalance: number = 10e7): Promise<string> {
+  public async getGenesisAccount(minBalance = 10e7): Promise<string> {
     const { alloc } = await this.getGenesisJsObject();
 
     const firstHighNetWorthAccount = Object.keys(alloc).find(
-      (addr) => parseInt(alloc[addr].balance, 10) > minBalance
+      (addr) => parseInt(alloc[addr].balance, 10) > minBalance,
     ) as string;
 
     return firstHighNetWorthAccount;
@@ -133,9 +133,7 @@ export class QuorumTestLedger implements ITestLedger {
    *
    * @param [seedMoney=10e8] The amount of money to seed the new test account with.
    */
-  public async createEthTestAccount(
-    seedMoney: number = 10e8
-  ): Promise<Account> {
+  public async createEthTestAccount(seedMoney = 10e8): Promise<Account> {
     const fnTag = `QuorumTestLedger#getEthTestAccount()`;
 
     const rpcApiHttpHost = await this.getRpcApiHttpHost();
@@ -150,7 +148,7 @@ export class QuorumTestLedger implements ITestLedger {
         to: ethTestAccount.address,
         value: seedMoney,
       },
-      ""
+      "",
     );
 
     return ethTestAccount;
@@ -164,7 +162,7 @@ export class QuorumTestLedger implements ITestLedger {
 
   public async getGenesisJsObject(): Promise<IQuorumGenesisOptions> {
     const quorumGenesisJson: string = await this.getFileContents(
-      "/genesis.json"
+      "/genesis.json",
     );
     return JSON.parse(quorumGenesisJson);
   }
@@ -213,7 +211,7 @@ export class QuorumTestLedger implements ITestLedger {
           if (err) {
             reject(err);
           }
-        }
+        },
       );
 
       eventEmitter.once("start", async (container: Container) => {
@@ -229,11 +227,11 @@ export class QuorumTestLedger implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs: number = 120000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 120000): Promise<void> {
     const fnTag = "QuorumTestLedger#waitForHealthCheck()";
     const httpUrl = await this.getRpcApiHttpHost();
     const startedAt = Date.now();
-    let reachable: boolean = false;
+    let reachable = false;
     do {
       try {
         const res = await axios.get(httpUrl);
@@ -261,8 +259,8 @@ export class QuorumTestLedger implements ITestLedger {
       } else {
         return reject(
           new Error(
-            `QuorumTestLedger#stop() Container was not running to begin with.`
-          )
+            `QuorumTestLedger#stop() Container was not running to begin with.`,
+          ),
         );
       }
     });
@@ -274,8 +272,8 @@ export class QuorumTestLedger implements ITestLedger {
     } else {
       return Promise.reject(
         new Error(
-          `QuorumTestLedger#destroy() Container was never created, nothing to destroy.`
-        )
+          `QuorumTestLedger#destroy() Container was never created, nothing to destroy.`,
+        ),
       );
     }
   }
@@ -336,7 +334,7 @@ export class QuorumTestLedger implements ITestLedger {
       }
     } else {
       throw new Error(
-        `QuorumTestLedger#getContainerIpAddress() cannot find container image ${this.containerImageName}`
+        `QuorumTestLedger#getContainerIpAddress() cannot find container image ${this.containerImageName}`,
       );
     }
   }
@@ -357,7 +355,7 @@ export class QuorumTestLedger implements ITestLedger {
                 resolve(output);
               }
             },
-            (event: any) => null // ignore the spammy docker download log, we get it in the output variable anyway
+            (event: any) => null, // ignore the spammy docker download log, we get it in the output variable anyway
           );
         }
       });
@@ -371,12 +369,12 @@ export class QuorumTestLedger implements ITestLedger {
         containerImageName: this.containerImageName,
         rpcApiHttpPort: this.rpcApiHttpPort,
       },
-      QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA
+      QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
     );
 
     if (validationResult.error) {
       throw new Error(
-        `QuorumTestLedger#ctor ${validationResult.error.annotate()}`
+        `QuorumTestLedger#ctor ${validationResult.error.annotate()}`,
       );
     }
   }

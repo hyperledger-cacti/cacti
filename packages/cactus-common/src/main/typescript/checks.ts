@@ -10,8 +10,8 @@ export class Checks {
    */
   public static truthy(
     checkResult: any,
-    subjectOfCheck: string = "variable",
-    code: string = "-1"
+    subjectOfCheck = "variable",
+    code = "-1",
   ): void {
     if (!checkResult) {
       const message = `"${subjectOfCheck}" is falsy, need a truthy value.`;
@@ -29,8 +29,8 @@ export class Checks {
    */
   public static nonBlankString(
     value: any,
-    subject: string = "variable",
-    code: string = "-1"
+    subject = "variable",
+    code = "-1",
   ): void {
     if (typeof value !== "string" || value.trim().length === 0) {
       const message = `"${subject}" is a blank string. Need non-blank.`;

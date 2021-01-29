@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-var-requires
 const tap = require("tap");
 import { AxiosResponse } from "axios";
 import { Server } from "http";
@@ -125,27 +124,27 @@ tap.test(
     const httpServerConsortium: Server = pluginConsortiumManual
       .getHttpServer()
       .orElseThrow(
-        () => new Error("PluginConsortiumManual HTTP server is not present")
+        () => new Error("PluginConsortiumManual HTTP server is not present"),
       );
     assert.ok(httpServerConsortium, "Get the plugin specific HTTP server");
     const addressInfoConsortium: any = httpServerConsortium.address();
     assert.ok(
       addressInfoConsortium,
-      "Get the plugin specific AddressInfo object"
+      "Get the plugin specific AddressInfo object",
     );
     assert.ok(
       addressInfoConsortium.port,
-      "plugin specific web app address info has a port"
+      "plugin specific web app address info has a port",
     );
     assert.ok(
       addressInfoConsortium.address,
-      "plugin specific web app address info has an address (host)"
+      "plugin specific web app address info has an address (host)",
     );
 
     // 9. Verify that the web service plugin is on a different port for security isolation
     assert.ok(
       addressInfoConsortium.port !== addressInfo.port,
-      "plugin specific and API server base port are different"
+      "plugin specific and API server base port are different",
     );
 
     const CACTUS_API_HOST2 = `http://${addressInfoConsortium.address}:${addressInfoConsortium.port}`;
@@ -160,5 +159,5 @@ tap.test(
     assert.ok(response.status === 200, "HTTP status code to equal 200");
 
     assert.end();
-  }
+  },
 );

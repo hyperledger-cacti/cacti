@@ -12,7 +12,7 @@ import { CACTUS_API_URL } from "src/constants";
   templateUrl: "app.component.html",
   styleUrls: ["app.component.scss"],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   public selectedIndex = 0;
   public appPages = [
     {
@@ -25,10 +25,10 @@ export class AppComponent implements OnInit {
   private readonly log: Logger;
 
   constructor(
-    private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
-    @Inject(CACTUS_API_URL) public readonly cactusApiUrl: string
+    private readonly platform: Platform,
+    private readonly splashScreen: SplashScreen,
+    private readonly statusBar: StatusBar,
+    @Inject(CACTUS_API_URL) public readonly cactusApiUrl: string,
   ) {
     this.log = LoggerProvider.getOrCreate({
       label: "app-component",
@@ -38,13 +38,11 @@ export class AppComponent implements OnInit {
     this.initializeApp();
   }
 
-  initializeApp() {
+  initializeApp(): void {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
       this.log.info("App initialized OK. Splashscreen was hidden.");
     });
   }
-
-  ngOnInit() {}
 }

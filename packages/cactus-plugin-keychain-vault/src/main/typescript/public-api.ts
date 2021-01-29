@@ -10,7 +10,7 @@ export {
 } from "./plugin-keychain-vault";
 
 export async function createPluginFactory(
-  pluginFactoryOptions: IPluginFactoryOptions
+  pluginFactoryOptions: IPluginFactoryOptions,
 ): Promise<PluginFactoryKeychain> {
   return new PluginFactoryKeychain(pluginFactoryOptions);
 }

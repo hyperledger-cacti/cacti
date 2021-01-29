@@ -24,11 +24,11 @@ test("tests for get the properties of object", async (assert: Test) => {
   assert.ok(Array.isArray(fieldNames), "expect an array of strings returned");
   assert.ok(
     fieldNames.length === arrayResultExpected.length,
-    "Arrays have same length"
+    "Arrays have same length",
   );
   assert.ok(
-    student.hasOwnProperty("course"),
-    '"course" property present in object'
+    Object.prototype.hasOwnProperty.call(student, "course"),
+    '"course" property present in object',
   );
   assert.ok(fieldNames.includes("course"), '"course" element present in array');
   assert.deepEqual(fieldNames, arrayResultExpected);
