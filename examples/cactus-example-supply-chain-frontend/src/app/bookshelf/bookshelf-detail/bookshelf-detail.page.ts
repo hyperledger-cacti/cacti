@@ -33,7 +33,7 @@ export class BookshelfDetailPage implements OnInit {
     private readonly baseClient: ApiClient,
     @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string,
     public readonly modalController: ModalController,
-    public readonly formBuilder: FormBuilder
+    public readonly formBuilder: FormBuilder,
   ) {
     this.log = LoggerProvider.getOrCreate({ label: "BookshelfDetailPage" });
   }
@@ -51,7 +51,7 @@ export class BookshelfDetailPage implements OnInit {
 
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.quorumLedgerId,
-      SupplyChainApi
+      SupplyChainApi,
     );
 
     if (!this.bookshelf) {

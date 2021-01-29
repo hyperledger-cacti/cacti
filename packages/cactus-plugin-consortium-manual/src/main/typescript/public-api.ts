@@ -22,7 +22,7 @@ import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 import { PluginFactoryWebService } from "./plugin-factory-consortium-manual";
 
 export async function createPluginFactory(
-  pluginFactoryOptions: IPluginFactoryOptions
+  pluginFactoryOptions: IPluginFactoryOptions,
 ): Promise<PluginFactoryWebService> {
   return new PluginFactoryWebService(pluginFactoryOptions);
 }

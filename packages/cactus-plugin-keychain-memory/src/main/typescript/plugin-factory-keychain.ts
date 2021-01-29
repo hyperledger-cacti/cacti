@@ -19,7 +19,7 @@ export class PluginFactoryKeychain extends PluginFactory<
       instanceId: uuidv4(),
       keychainId: uuidv4(),
       logLevel: "TRACE",
-    }
+    },
   ): Promise<PluginKeychainMemory> {
     return new PluginKeychainMemory(pluginOptions);
   }

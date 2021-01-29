@@ -25,12 +25,12 @@ export class KeyConverter {
   public publicKeyAs(
     key: string | Uint8Array,
     fromFormat: KeyFormat,
-    toFormat: KeyFormat
+    toFormat: KeyFormat,
   ): string | Uint8Array {
     this.validateKeyFormatValue(fromFormat);
     this.validateKeyFormatValue(toFormat);
 
-    let keyValue: string = "";
+    let keyValue = "";
     let convertToRaw = false;
 
     if (key instanceof Uint8Array) {
@@ -52,7 +52,7 @@ export class KeyConverter {
     let resultKey: string | Uint8Array = this.keyEncoder.encodePublic(
       keyValue,
       fromFormat,
-      toFormat
+      toFormat,
     );
 
     if (convertToRaw) {
@@ -71,7 +71,7 @@ export class KeyConverter {
   public privateKeyAs(
     key: string | Buffer,
     fromFormat: KeyFormat,
-    toFormat: KeyFormat
+    toFormat: KeyFormat,
   ): string | Buffer {
     this.validateKeyFormatValue(fromFormat);
     this.validateKeyFormatValue(toFormat);
@@ -96,7 +96,7 @@ export class KeyConverter {
     let resultKey: string | Buffer = this.keyEncoder.encodePrivate(
       keyValue,
       fromFormat,
-      toFormat
+      toFormat,
     );
 
     if (convertToRaw) {

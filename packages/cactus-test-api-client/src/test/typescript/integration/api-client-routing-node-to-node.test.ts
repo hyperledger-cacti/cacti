@@ -127,7 +127,7 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
     const { alloc } = await quorumTestLedger1.getGenesisJsObject();
 
     initialFundsAccount1 = Object.keys(alloc).find(
-      (addr) => parseInt(alloc[addr].balance, 10) > 10e7
+      (addr) => parseInt(alloc[addr].balance, 10) > 10e7,
     ) as string;
 
     const quorumTestLedger2 = new QuorumTestLedger();
@@ -138,7 +138,7 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
     });
     const rpcApiHttpHost2 = await quorumTestLedger2.getRpcApiHttpHost();
     initialFundsAccount2 = Object.keys(alloc).find(
-      (addr) => parseInt(alloc[addr].balance, 10) > 10e7
+      (addr) => parseInt(alloc[addr].balance, 10) > 10e7,
     ) as string;
 
     {

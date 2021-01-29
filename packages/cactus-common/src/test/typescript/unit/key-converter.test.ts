@@ -20,40 +20,40 @@ test.skip("Test Public Raw key conversion", async (assert: Test) => {
   const pemPublic = keyEncoder.encodePublic(
     Buffer.from(keyPair.publicKey).toString("hex"),
     "raw",
-    "pem"
+    "pem",
   );
 
   const convertRawPrivate = keyConverter.publicKeyAs(
     keyPair.publicKey,
     KeyFormat.Raw,
-    KeyFormat.Raw
+    KeyFormat.Raw,
   );
   assert.deepEquals(
     keyPair.publicKey,
     convertRawPrivate,
-    "Public Raw => Raw conversion successful"
+    "Public Raw => Raw conversion successful",
   );
 
   const convertHexPublic = keyConverter.publicKeyAs(
     keyPair.publicKey,
     KeyFormat.Raw,
-    KeyFormat.Hex
+    KeyFormat.Hex,
   );
   assert.equals(
     hexPublic,
     convertHexPublic,
-    "Public Raw => Hex conversion successful"
+    "Public Raw => Hex conversion successful",
   );
 
   const convertPemPublic = keyConverter.publicKeyAs(
     keyPair.publicKey,
     KeyFormat.Raw,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   assert.equals(
     pemPublic,
     convertPemPublic,
-    "Public Raw => PEM conversion successful"
+    "Public Raw => PEM conversion successful",
   );
 
   assert.end();
@@ -67,40 +67,40 @@ test.skip("Test Public Hex key conversion", async (assert: Test) => {
   const pemPublic = keyEncoder.encodePublic(
     Buffer.from(keyPair.publicKey).toString("hex"),
     "raw",
-    "pem"
+    "pem",
   );
 
   const convertRawPublic = keyConverter.publicKeyAs(
     hexPublic,
     KeyFormat.Hex,
-    KeyFormat.Raw
+    KeyFormat.Raw,
   );
   assert.deepEquals(
     keyPair.publicKey,
     convertRawPublic,
-    "Public Hex => Raw conversion successful"
+    "Public Hex => Raw conversion successful",
   );
 
   const convertHexublic = keyConverter.publicKeyAs(
     hexPublic,
     KeyFormat.Hex,
-    KeyFormat.Hex
+    KeyFormat.Hex,
   );
   assert.deepEquals(
     hexPublic,
     convertHexublic,
-    "Public Hex => Hex conversion successful"
+    "Public Hex => Hex conversion successful",
   );
 
   const convertPemPublic = keyConverter.publicKeyAs(
     hexPublic,
     KeyFormat.Hex,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   assert.deepEquals(
     pemPublic,
     convertPemPublic,
-    "Public Hex => PEM conversion successful"
+    "Public Hex => PEM conversion successful",
   );
 
   assert.end();
@@ -114,40 +114,40 @@ test.skip("Test Public PEM key conversion", async (assert: Test) => {
   const pemPublic = keyEncoder.encodePublic(
     Buffer.from(keyPair.publicKey).toString("hex"),
     "raw",
-    "pem"
+    "pem",
   );
 
   const convertRawPublic = keyConverter.publicKeyAs(
     pemPublic,
     KeyFormat.PEM,
-    KeyFormat.Raw
+    KeyFormat.Raw,
   );
   assert.deepEquals(
     keyPair.publicKey,
     convertRawPublic,
-    "Public PEM => Raw conversion successful"
+    "Public PEM => Raw conversion successful",
   );
 
   const convertHexPublic = keyConverter.publicKeyAs(
     pemPublic,
     KeyFormat.PEM,
-    KeyFormat.Hex
+    KeyFormat.Hex,
   );
   assert.deepEquals(
     hexPublic,
     convertHexPublic,
-    "Public PEM => Hex conversion successful"
+    "Public PEM => Hex conversion successful",
   );
 
   const convertPemPublic = keyConverter.publicKeyAs(
     pemPublic,
     KeyFormat.PEM,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   assert.deepEquals(
     pemPublic,
     convertPemPublic,
-    "Public PEM => PEM conversion successful"
+    "Public PEM => PEM conversion successful",
   );
 
   assert.end();
@@ -161,40 +161,40 @@ test.skip("Test Private Raw key conversion", async (assert: Test) => {
   const pemPrivate = keyEncoder.encodePrivate(
     keyPair.privateKey.toString("hex"),
     "raw",
-    "pem"
+    "pem",
   );
 
   const convertRawPrivate = keyConverter.privateKeyAs(
     keyPair.privateKey,
     KeyFormat.Raw,
-    KeyFormat.Raw
+    KeyFormat.Raw,
   );
   assert.deepEquals(
     keyPair.privateKey,
     convertRawPrivate,
-    "Private Raw => Raw conversion successful"
+    "Private Raw => Raw conversion successful",
   );
 
   const convertHexPrivate = keyConverter.privateKeyAs(
     keyPair.privateKey,
     KeyFormat.Raw,
-    KeyFormat.Hex
+    KeyFormat.Hex,
   );
   assert.equals(
     hexPrivate,
     convertHexPrivate,
-    "Private Raw => Hex conversion successful"
+    "Private Raw => Hex conversion successful",
   );
 
   const convertPemPrivate = keyConverter.privateKeyAs(
     keyPair.privateKey,
     KeyFormat.Raw,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   assert.equals(
     pemPrivate,
     convertPemPrivate,
-    "Private Raw => PEM conversion successful"
+    "Private Raw => PEM conversion successful",
   );
 
   assert.end();
@@ -208,40 +208,40 @@ test.skip("Test Private Hex key conversion", async (assert: Test) => {
   const pemPrivate = keyEncoder.encodePrivate(
     keyPair.privateKey.toString("hex"),
     "raw",
-    "pem"
+    "pem",
   );
 
   const convertRawPrivate = keyConverter.privateKeyAs(
     hexPrivate,
     KeyFormat.Hex,
-    KeyFormat.Raw
+    KeyFormat.Raw,
   );
   assert.deepEquals(
     keyPair.privateKey,
     convertRawPrivate,
-    "Private Hex => Raw conversion successful"
+    "Private Hex => Raw conversion successful",
   );
 
   const convertHexPrivate = keyConverter.privateKeyAs(
     hexPrivate,
     KeyFormat.Hex,
-    KeyFormat.Hex
+    KeyFormat.Hex,
   );
   assert.deepEquals(
     hexPrivate,
     convertHexPrivate,
-    "Private Hex => Hex conversion successful"
+    "Private Hex => Hex conversion successful",
   );
 
   const convertPemPrivate = keyConverter.privateKeyAs(
     hexPrivate,
     KeyFormat.Hex,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   assert.deepEquals(
     pemPrivate,
     convertPemPrivate,
-    "Private Hex => PEM conversion successful"
+    "Private Hex => PEM conversion successful",
   );
 
   assert.end();
@@ -255,40 +255,40 @@ test.skip("Test Private PEM key conversion", async (assert: Test) => {
   const pemPrivate = keyEncoder.encodePrivate(
     keyPair.privateKey.toString("hex"),
     "raw",
-    "pem"
+    "pem",
   );
 
   const convertRawPrivate = keyConverter.privateKeyAs(
     pemPrivate,
     KeyFormat.PEM,
-    KeyFormat.Raw
+    KeyFormat.Raw,
   );
   assert.deepEquals(
     keyPair.privateKey,
     convertRawPrivate,
-    "Private PEM => Raw conversion successful"
+    "Private PEM => Raw conversion successful",
   );
 
   const convertHexPrivate = keyConverter.privateKeyAs(
     pemPrivate,
     KeyFormat.PEM,
-    KeyFormat.Hex
+    KeyFormat.Hex,
   );
   assert.deepEquals(
     hexPrivate,
     convertHexPrivate,
-    "Private PEM => Hex conversion successful"
+    "Private PEM => Hex conversion successful",
   );
 
   const convertPemPrivate = keyConverter.privateKeyAs(
     pemPrivate,
     KeyFormat.PEM,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   assert.deepEquals(
     pemPrivate,
     convertPemPrivate,
-    "Private PEM => PEM conversion successful"
+    "Private PEM => PEM conversion successful",
   );
 
   assert.end();
@@ -302,7 +302,7 @@ test.skip("Test invalide from key format", async (t: Test) => {
     keyConverter.publicKeyAs(
       keyPair.publicKey,
       "abc" as KeyFormat,
-      KeyFormat.PEM
+      KeyFormat.PEM,
     );
   }, "KeyConverter#publicKeyAs Invalid KeyFormat");
 
@@ -314,7 +314,7 @@ test.skip("Test invalide from key format", async (t: Test) => {
     keyConverter.privateKeyAs(
       keyPair.privateKey,
       "abc" as KeyFormat,
-      KeyFormat.PEM
+      KeyFormat.PEM,
     );
   }, "KeyConverter#privateKeyAs Invalid KeyFormat");
 
@@ -336,21 +336,21 @@ test.skip("correct signatures after conversion whirlwind", async (t: Test) => {
   const privKeyPem = keyConverter.privateKeyAs(
     keyPair.privateKey,
     KeyFormat.Raw,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   t.comment(`privKeyPem: ${privKeyPem}`);
 
   const privKeyHex = keyConverter.privateKeyAs(
     privKeyPem,
     KeyFormat.PEM,
-    KeyFormat.Hex
+    KeyFormat.Hex,
   );
   t.comment(`privKeyHex: ${privKeyHex}`);
 
   const privKeyRaw = keyConverter.privateKeyAs(
     privKeyPem,
     KeyFormat.PEM,
-    KeyFormat.Raw
+    KeyFormat.Raw,
   );
   t.comment(`privKeyBuffer: ${privKeyRaw}`);
   t.deepEquals(keyPair.privateKey, privKeyRaw, "privKey equals privKeyRaw");
@@ -358,14 +358,14 @@ test.skip("correct signatures after conversion whirlwind", async (t: Test) => {
   const privKeyPem2 = keyConverter.privateKeyAs(
     privKeyHex,
     KeyFormat.Hex,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   t.comment(`privKeyPem2: ${privKeyPem2}`);
 
   const privKeyPem3 = keyConverter.privateKeyAs(
     privKeyRaw,
     KeyFormat.Raw,
-    KeyFormat.PEM
+    KeyFormat.PEM,
   );
   t.comment(`privKeyPem3: ${privKeyPem3}`);
 
@@ -383,21 +383,21 @@ test.skip("correct signatures after conversion whirlwind", async (t: Test) => {
     privateKey: keyConverter.privateKeyAs(
       privKeyPem2,
       KeyFormat.PEM,
-      KeyFormat.Raw
+      KeyFormat.Raw,
     ),
   });
   const signer3 = new JsObjectSigner({
     privateKey: keyConverter.privateKeyAs(
       privKeyPem3,
       KeyFormat.PEM,
-      KeyFormat.Raw
+      KeyFormat.Raw,
     ),
   });
   const signer4 = new JsObjectSigner({
     privateKey: keyConverter.privateKeyAs(
       privKeyHex,
       KeyFormat.Hex,
-      KeyFormat.Raw
+      KeyFormat.Raw,
     ),
   });
 

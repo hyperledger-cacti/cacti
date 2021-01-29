@@ -56,7 +56,7 @@ export class PluginConsortiumManual
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
     Checks.truthy(
       options.consortiumDatabase,
-      `${fnTag} options.consortiumDatabase`
+      `${fnTag} options.consortiumDatabase`,
     );
     this.log = LoggerProvider.getOrCreate({
       label: "plugin-consortium-manual",
@@ -82,7 +82,7 @@ export class PluginConsortiumManual
   }
 
   public async installWebServices(
-    expressApp: any
+    expressApp: any,
   ): Promise<IWebServiceEndpoint[]> {
     const { log } = this;
 

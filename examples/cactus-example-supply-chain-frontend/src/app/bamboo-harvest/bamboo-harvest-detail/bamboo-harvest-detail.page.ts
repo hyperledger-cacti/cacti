@@ -28,7 +28,7 @@ export class BambooHarvestDetailPage implements OnInit {
     private readonly baseClient: ApiClient,
     public readonly modalController: ModalController,
     public readonly formBuilder: FormBuilder,
-    @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string
+    @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string,
   ) {
     this.log = LoggerProvider.getOrCreate({ label: "BambooHarvestDetailPage" });
   }

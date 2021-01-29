@@ -80,7 +80,7 @@ export class Containers {
         {
           path: opts.dstFileDir,
         },
-        handler
+        handler,
       );
     });
   }
@@ -93,7 +93,7 @@ export class Containers {
    */
   static async pullFile(
     container: Container,
-    filePath: string
+    filePath: string,
   ): Promise<string> {
     Checks.truthy(container, "Containers#pullFile() container");
     Checks.truthy(filePath, "Containers#pullFile() filePath");
@@ -102,7 +102,7 @@ export class Containers {
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
-      let fileContents: string = "";
+      let fileContents = "";
       extract.on("entry", async (header: any, stream, next) => {
         stream.on("error", (err: Error) => {
           reject(err);
@@ -153,7 +153,7 @@ export class Containers {
    */
   public static async exec(
     container: Container,
-    cmd: string[]
+    cmd: string[],
   ): Promise<string> {
     const fnTag = "Containers#exec()";
     Checks.truthy(container, `${fnTag} container`);
@@ -173,7 +173,7 @@ export class Containers {
         if (err) {
           return reject(err);
         }
-        let output: string = "";
+        let output = "";
         stream.on("data", (data: Buffer) => {
           output += data.toString("utf-8");
         });
@@ -184,7 +184,7 @@ export class Containers {
 
   public static async getPublicPort(
     privatePort: number,
-    aContainerInfo: ContainerInfo
+    aContainerInfo: ContainerInfo,
   ): Promise<number> {
     const fnTag = `Containers#getPublicPort(privatePort=${privatePort})`;
     const { Ports: ports } = aContainerInfo;
@@ -207,7 +207,7 @@ export class Containers {
   }
 
   public static async getContainerInternalIp(
-    containerInfo: ContainerInfo
+    containerInfo: ContainerInfo,
   ): Promise<string> {
     const fnTag = "Containers#getContainerInternalIp()";
     Checks.truthy(containerInfo, `${fnTag} arg #1 containerInfo`);
@@ -225,7 +225,7 @@ export class Containers {
 
   public static pullImage(
     containerNameAndTag: string,
-    pullOptions: any = {}
+    pullOptions: any = {},
   ): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const docker = new Dockerode();
@@ -247,10 +247,10 @@ export class Containers {
               },
               // ignore the spammy docker download log, we get
               // it in the output variable anyway if needed
-              (event: any) => null
+              (event: any) => null,
             );
           }
-        }
+        },
       );
     });
   }
@@ -296,14 +296,14 @@ export class Containers {
    */
   public static async waitForHealthCheck(
     containerId: string,
-    timeoutMs: number = 180000
+    timeoutMs = 180000,
   ): Promise<void> {
     const fnTag = "Containers#waitForHealthCheck()";
 
     Checks.nonBlankString(containerId, `${fnTag}:containerId`);
 
     const startedAt = Date.now();
-    let reachable: boolean = false;
+    let reachable = false;
     do {
       try {
         const { Status } = await Containers.getById(containerId);

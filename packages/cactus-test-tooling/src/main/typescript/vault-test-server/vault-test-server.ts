@@ -50,11 +50,11 @@ export class VaultTestServer {
     return this._container as Container;
   }
 
-  public get className() {
+  public get className(): string {
     return VaultTestServer.CLASS_NAME;
   }
 
-  public get imageFqn() {
+  public get imageFqn(): string {
     return `${this.imageName}:${this.imageVersion}`;
   }
 
@@ -111,11 +111,11 @@ export class VaultTestServer {
           },
         },
         {},
-        (err: any) => {
+        (err: Error) => {
           if (err) {
             reject(err);
           }
-        }
+        },
       );
 
       eventEmitter.once("start", async (container: Container) => {
@@ -131,11 +131,11 @@ export class VaultTestServer {
     });
   }
 
-  public async stop(): Promise<any> {
-    await Containers.stop(this._container as any);
+  public async stop(): Promise<void> {
+    await Containers.stop(this._container as Docker.Container);
   }
 
-  public destroy(): Promise<any> {
+  public destroy(): Promise<void> {
     const fnTag = `${this.className}#destroy()`;
     if (this._container) {
       return this._container.remove();

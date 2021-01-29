@@ -26,7 +26,7 @@ export class BambooHarvestListPage implements OnInit {
   constructor(
     private readonly baseClient: ApiClient,
     private readonly modalController: ModalController,
-    @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string
+    @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string,
   ) {
     this.bambooHarvests = [];
     this.log = LoggerProvider.getOrCreate({ label: "BambooHarvestListPage" });
@@ -43,7 +43,7 @@ export class BambooHarvestListPage implements OnInit {
   async ngOnInit(): Promise<void> {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.quorumLedgerId,
-      SupplyChainApi
+      SupplyChainApi,
     );
     await this.loadData();
   }

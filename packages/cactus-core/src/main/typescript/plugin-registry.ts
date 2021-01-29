@@ -50,35 +50,35 @@ export class PluginRegistry {
    */
   public getOneById<T extends ICactusPlugin>(packageName: string): T {
     return this.findOneByPackageName(packageName).orElseThrow(
-      () => new Error(`Plugin ${packageName} not present in registry`)
+      () => new Error(`Plugin ${packageName} not present in registry`),
     ) as T;
   }
 
   public getOneByAspect<T extends ICactusPlugin>(aspect: PluginAspect): T {
     return this.findOneByAspect(aspect).orElseThrow(
-      () => new Error(`No plugin with aspect: ${aspect}`)
+      () => new Error(`No plugin with aspect: ${aspect}`),
     ) as T;
   }
 
   public findOneByPackageName<T extends ICactusPlugin>(
-    packageName: string
+    packageName: string,
   ): Optional<T> {
     const plugin = this.getPlugins().find(
-      (p) => p.getPackageName() === packageName
+      (p) => p.getPackageName() === packageName,
     );
     return Optional.ofNullable(plugin as T);
   }
 
   public findManyByPackageName<T extends ICactusPlugin>(
-    packageName: string
+    packageName: string,
   ): T[] {
     return this.getPlugins().filter(
-      (p) => p.getPackageName() === packageName
+      (p) => p.getPackageName() === packageName,
     ) as T[];
   }
 
   public findOneByAspect<T extends ICactusPlugin>(
-    aspect: PluginAspect
+    aspect: PluginAspect,
   ): Optional<T> {
     const plugin = this.getPlugins().find((p) => p.getAspect() === aspect);
     return Optional.ofNullable(plugin as T);
@@ -91,11 +91,11 @@ export class PluginRegistry {
     }
 
     const plugin = this.findManyByAspect<IPluginKeychain>(
-      PluginAspect.KEYCHAIN
+      PluginAspect.KEYCHAIN,
     ).find((keychainPlugin) => keychainPlugin.getKeychainId() === keychainId);
 
     return Optional.ofNullable(plugin as T).orElseThrow(
-      () => new Error(`${fnTag} No keychain found for ID ${keychainId}`)
+      () => new Error(`${fnTag} No keychain found for ID ${keychainId}`),
     );
   }
 
@@ -112,7 +112,7 @@ export class PluginRegistry {
   }
 
   public deleteByPackageName(packageName: string): [number] {
-    let deleteCount: number = 0;
+    let deleteCount = 0;
     this.plugins.forEach((p, i) => {
       if (p.getPackageName() === packageName) {
         this.plugins.splice(i, 1);
@@ -122,10 +122,7 @@ export class PluginRegistry {
     return [deleteCount];
   }
 
-  public add(
-    plugin: ICactusPlugin,
-    replaceOnConflict: boolean = false
-  ): [number] {
+  public add(plugin: ICactusPlugin, replaceOnConflict = false): [number] {
     if (!isICactusPlugin(plugin)) {
       throw new Error(`PluginRegistry#add() plugin not an ICactusPlugin`);
     }
@@ -134,7 +131,7 @@ export class PluginRegistry {
     if (hasConfclit && !replaceOnConflict) {
       throw new Error(`PluginRegistry#add() already have plugin: ${pkgName}`);
     }
-    let deleteCount: number = 0;
+    let deleteCount = 0;
     if (replaceOnConflict) {
       [deleteCount] = this.deleteByPackageName(plugin.getPackageName());
     }

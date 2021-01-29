@@ -1,7 +1,6 @@
 import os from "os";
 import path from "path";
 import { IncomingMessage } from "http";
-// tslint:disable-next-line: no-var-requires
 const tap = require("tap");
 import { v4 as uuidV4 } from "uuid";
 import fs from "fs-extra";

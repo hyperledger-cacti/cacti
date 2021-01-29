@@ -11,7 +11,7 @@ test("FabricTestLedgerV1#constructor()", (t: Test) => {
         publishAllPorts: false,
       }),
     /"imageVersion" length must be at least 5 characters long/,
-    "throws if invalid imageVersion is provided OK"
+    "throws if invalid imageVersion is provided OK",
   );
 
   t.throws(
@@ -21,12 +21,12 @@ test("FabricTestLedgerV1#constructor()", (t: Test) => {
         publishAllPorts: false,
       }),
     /"imageName" with value (.*) fails to match the required pattern/,
-    "throws if empty string imageName is provided OK"
+    "throws if empty string imageName is provided OK",
   );
 
   t.doesNotThrow(
     () => new FabricTestLedgerV1({ publishAllPorts: false }),
-    "does not throw if valid input is provided OK"
+    "does not throw if valid input is provided OK",
   );
 
   t.end();
