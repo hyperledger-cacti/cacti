@@ -13,7 +13,7 @@ export class PluginFactoryLedgerConnector extends PluginFactory<
   IPluginFactoryOptions
 > {
   async create(
-    pluginOptions: IPluginLedgerConnectorBesuOptions
+    pluginOptions: IPluginLedgerConnectorBesuOptions,
   ): Promise<PluginLedgerConnectorBesu> {
     return new PluginLedgerConnectorBesu(pluginOptions);
   }

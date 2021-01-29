@@ -28,8 +28,8 @@ export class Servers {
         if (err) {
           reject(
             new Error(
-              `Servers#shutdown() Failed to shut down server: ${err.stack}`
-            )
+              `Servers#shutdown() Failed to shut down server: ${err.stack}`,
+            ),
           );
         } else {
           resolve();
@@ -45,11 +45,11 @@ export class Servers {
     Checks.truthy(options.server, `${fnTag} arg options.server`);
     Checks.truthy(
       options.port || options.port === 0,
-      `${fnTag} arg options.port`
+      `${fnTag} arg options.port`,
     );
     Checks.truthy(
       typeof options.port === "number",
-      `${fnTag} arg options.port is number`
+      `${fnTag} arg options.port is number`,
     );
     Checks.truthy(isFinite(options.port), `${fnTag} arg finite options.port`);
     Checks.truthy(options.port > -1, `${fnTag} arg positive options.port`);
@@ -84,7 +84,7 @@ export class Servers {
    * available port and use that.
    */
   public static async startOnPreferredPort(
-    preferredPort?: number
+    preferredPort?: number,
   ): Promise<Server> {
     if (preferredPort) {
       try {

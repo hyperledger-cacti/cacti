@@ -75,7 +75,7 @@ export class SupplyChainAppDummyInfrastructure {
   }
 
   constructor(
-    public readonly options: ISupplyChainAppDummyInfrastructureOptions
+    public readonly options: ISupplyChainAppDummyInfrastructureOptions,
   ) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);

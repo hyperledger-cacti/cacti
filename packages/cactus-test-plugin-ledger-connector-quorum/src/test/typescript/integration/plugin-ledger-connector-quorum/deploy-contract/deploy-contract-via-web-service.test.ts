@@ -1,7 +1,6 @@
 import test, { Test } from "tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
-import { AxiosResponse } from "axios";
 import {
   QuorumTestLedger,
   IQuorumGenesisOptions,
@@ -27,6 +26,7 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { ICactusPlugin } from "@hyperledger/cactus-core-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { AddressInfo } from "net";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-deploy-contract-via-web-service",
@@ -88,7 +88,7 @@ test("deploys contract via REST API", async (t: Test) => {
   t.ok(quorumGenesisOptions.alloc);
 
   const highNetWorthAccounts: string[] = Object.keys(
-    quorumGenesisOptions.alloc
+    quorumGenesisOptions.alloc,
   ).filter((address: string) => {
     const anAccount: IAccount = quorumGenesisOptions.alloc[address];
     const balance: number = parseInt(anAccount.balance, 10);
@@ -98,7 +98,7 @@ test("deploys contract via REST API", async (t: Test) => {
 
   // 6. Instantiate the SDK dynamically with whatever port the API server ended up bound to (port 0)
   const httpServer = apiServer.getHttpServerApi();
-  const addressInfo: any = httpServer?.address();
+  const addressInfo = httpServer?.address() as AddressInfo;
   log.debug(`AddressInfo: `, addressInfo);
   const protocol = config.get("apiTlsEnabled") ? "https:" : "http:";
   const basePath = `${protocol}//${addressInfo.address}:${addressInfo.port}`;
@@ -167,11 +167,11 @@ test("deploys contract via REST API", async (t: Test) => {
     t2.ok(sayHelloRes.data.callOutput, "sayHello() callOutput truthy OK");
     t2.ok(
       typeof sayHelloRes.data.callOutput === "string",
-      "sayHello() callOutput is string type OK"
+      "sayHello() callOutput is string type OK",
     );
     t2.ok(
       sayHelloRes.data.callOutput === "Hello World!",
-      `sayHello() callOutput is "Hello World!" OK`
+      `sayHello() callOutput is "Hello World!" OK`,
     );
 
     const newName = `DrCactus${uuidV4()}`;
@@ -215,7 +215,7 @@ test("deploys contract via REST API", async (t: Test) => {
     t2.equal(
       typeof getName1Res.data.callOutput,
       "string",
-      `getName1Res.data.callOutput typeof string OK`
+      `getName1Res.data.callOutput typeof string OK`,
     );
     t2.equal(getName1Res.data.callOutput, newName, `getName1Res truthy OK`);
 
@@ -239,7 +239,7 @@ test("deploys contract via REST API", async (t: Test) => {
     t2.ok(getName2Res.data, `getName2Res.data truthy OK`);
     t2.notok(
       getName2Res.data.callOutput,
-      `getName2Res.data.callOutput falsy OK`
+      `getName2Res.data.callOutput falsy OK`,
     );
   });
 

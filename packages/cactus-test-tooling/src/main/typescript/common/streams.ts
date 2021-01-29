@@ -16,16 +16,16 @@ export class Streams {
         } else if (typeof err === "string") {
           reject(
             new Error(
-              `Streams#aggregate() stream failed internally with: ${err}`
-            )
+              `Streams#aggregate() stream failed internally with: ${err}`,
+            ),
           );
         } else {
           reject(
             new Error(
               `Streams#aggregate() stream failed internally with: ${JSON.stringify(
-                err
-              )}`
-            )
+                err,
+              )}`,
+            ),
           );
         }
       });

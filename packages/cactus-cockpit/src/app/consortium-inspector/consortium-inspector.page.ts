@@ -67,7 +67,7 @@ export class ConsortiumInspectorPage {
     this.decodedJwsJson = JSON.stringify(this.decodedJws, null, 4);
     this.log.debug(
       `ConsortiumNodeJwtGet post-decode: \n%o`,
-      this.decodedJwsJson
+      this.decodedJwsJson,
     );
   }
 }

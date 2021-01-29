@@ -8,7 +8,7 @@ import {
 
 test("PluginKeychainMemory", (t1: Test) => {
   t1.doesNotThrow(
-    () => new PluginKeychainMemory({ instanceId: "a", keychainId: "a" })
+    () => new PluginKeychainMemory({ instanceId: "a", keychainId: "a" }),
   );
 
   test("Validates constructor arg instanceId", (t: Test) => {
@@ -17,14 +17,14 @@ test("PluginKeychainMemory", (t1: Test) => {
         new PluginKeychainMemory({
           instanceId: null as any,
           keychainId: "valid-value",
-        })
+        }),
     );
     t.throws(
       () =>
         new PluginKeychainMemory({
           instanceId: "",
           keychainId: "valid-value",
-        })
+        }),
     );
     t.end();
   });
@@ -35,14 +35,14 @@ test("PluginKeychainMemory", (t1: Test) => {
         new PluginKeychainMemory({
           instanceId: "valid-value",
           keychainId: null as any,
-        })
+        }),
     );
     t.throws(
       () =>
         new PluginKeychainMemory({
           instanceId: "valid-value",
           keychainId: "",
-        })
+        }),
     );
     t.end();
   });

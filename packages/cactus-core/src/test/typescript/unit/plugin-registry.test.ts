@@ -40,12 +40,12 @@ test("PluginRegistry", (tMain: Test) => {
     t.throws(
       () => pluginRegistry.findOneByKeychainId(""),
       /need keychainId arg as non-blank string/,
-      "Check for keychain ID blankness OK"
+      "Check for keychain ID blankness OK",
     );
     t.throws(
       () => pluginRegistry.findOneByKeychainId("x"),
       /No keychain found for ID/,
-      "Throws for keychain not found OK"
+      "Throws for keychain not found OK",
     );
 
     t.end();

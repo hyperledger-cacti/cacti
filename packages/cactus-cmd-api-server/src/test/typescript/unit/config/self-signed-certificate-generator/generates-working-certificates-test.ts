@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-var-requires
 const tap = require("tap");
 import { AddressInfo } from "net";
 import { Server, createServer, request, RequestOptions } from "https";

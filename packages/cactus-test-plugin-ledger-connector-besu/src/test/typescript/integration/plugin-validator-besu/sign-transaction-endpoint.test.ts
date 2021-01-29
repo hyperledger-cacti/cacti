@@ -170,7 +170,7 @@ test("Test sign transaction endpoint", async (t: Test) => {
     t.equal(
       error.response.statusText,
       "Transaction not found",
-      "Response text are equal"
+      "Response text are equal",
     );
   }
 });

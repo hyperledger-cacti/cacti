@@ -7,7 +7,7 @@ import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
 export async function createPluginFactory(
-  pluginFactoryOptions: IPluginFactoryOptions
+  pluginFactoryOptions: IPluginFactoryOptions,
 ): Promise<PluginFactoryLedgerConnector> {
   return new PluginFactoryLedgerConnector(pluginFactoryOptions);
 }

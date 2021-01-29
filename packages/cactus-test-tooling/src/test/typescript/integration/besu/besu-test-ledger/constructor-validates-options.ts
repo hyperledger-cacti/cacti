@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-var-requires
 const tap = require("tap");
 import isPortReachable from "is-port-reachable";
 import { Container } from "dockerode";
@@ -20,7 +19,7 @@ tap.test(
     assert.ok(BesuTestLedger);
     assert.doesNotThrow(() => new BesuTestLedger());
     assert.end();
-  }
+  },
 );
 
 tap.test("starts/stops/destroys a docker container", async (assert: any) => {

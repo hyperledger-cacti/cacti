@@ -35,7 +35,7 @@ test("Reports failures with meaningful information", async (t: Test) => {
       t2.equal(
         typeof ex.message,
         "string",
-        "Thrown error.message type string OK"
+        "Thrown error.message type string OK",
       );
       t2.true(ex.message.includes("timeout"), "Has timeout in msg OK");
     }
@@ -59,11 +59,11 @@ test("Reports failures with meaningful information", async (t: Test) => {
       t2.equal(
         typeof ex.message,
         "string",
-        "Thrown error.message type string OK"
+        "Thrown error.message type string OK",
       );
       t2.true(
         ex.message.includes("status code 404"),
-        "Has Status Code in msg OK"
+        "Has Status Code in msg OK",
       );
     }
     t2.end();

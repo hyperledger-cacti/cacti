@@ -95,17 +95,17 @@ test("deploys contract via .json file", async (t: Test) => {
     t2.ok(deployOut, "deployContract() output is truthy OK");
     t2.ok(
       deployOut.transactionReceipt,
-      "deployContract() output.transactionReceipt is truthy OK"
+      "deployContract() output.transactionReceipt is truthy OK",
     );
     t2.ok(
       deployOut.transactionReceipt.contractAddress,
-      "deployContract() output.transactionReceipt.contractAddress is truthy OK"
+      "deployContract() output.transactionReceipt.contractAddress is truthy OK",
     );
 
     contractAddress = deployOut.transactionReceipt.contractAddress as string;
     t2.ok(
       typeof contractAddress === "string",
-      "contractAddress typeof string OK"
+      "contractAddress typeof string OK",
     );
 
     const { callOutput: helloMsg } = await connector.invokeContract({
@@ -123,7 +123,7 @@ test("deploys contract via .json file", async (t: Test) => {
     t2.ok(helloMsg, "sayHello() output is truthy");
     t2.true(
       typeof helloMsg === "string",
-      "sayHello() output is type of string"
+      "sayHello() output is type of string",
     );
   });
 
@@ -137,7 +137,7 @@ test("deploys contract via .json file", async (t: Test) => {
         value: 10e6,
         gas: 1000000,
       },
-      testEthAccount.privateKey
+      testEthAccount.privateKey,
     );
 
     await connector.transact({

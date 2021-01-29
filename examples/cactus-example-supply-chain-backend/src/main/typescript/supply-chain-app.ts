@@ -116,7 +116,7 @@ export class SupplyChainApp {
       httpApiA,
       httpApiB,
       keyPairA,
-      keyPairB
+      keyPairB,
     );
     const consortiumPrettyJson = JSON.stringify(consortiumDatabase, null, 4);
     this.log.info(`Created Consortium definition: %o`, consortiumPrettyJson);
@@ -220,7 +220,7 @@ export class SupplyChainApp {
     serverA: Server,
     serverB: Server,
     keyPairA: JWK.ECKey,
-    keyPairB: JWK.ECKey
+    keyPairB: JWK.ECKey,
   ): ConsortiumDatabase {
     const consortiumName = "Example Supply Chain Consortium";
     const consortiumId = uuidv4();
@@ -301,7 +301,7 @@ export class SupplyChainApp {
   public async startNode(
     httpServerApi: Server,
     httpServerCockpit: Server,
-    pluginRegistry: PluginRegistry
+    pluginRegistry: PluginRegistry,
   ): Promise<ApiServer> {
     const addressInfo = httpServerApi.address() as AddressInfo;
 

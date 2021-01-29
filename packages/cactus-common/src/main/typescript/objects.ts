@@ -56,7 +56,7 @@ export class Objects {
   public static getAllFieldNames(anObject: any): string[] {
     const allFieldNames = [];
     for (const propertyKey in anObject) {
-      if (anObject.hasOwnProperty(propertyKey)) {
+      if (Object.prototype.hasOwnProperty.call(anObject, propertyKey)) {
         allFieldNames.push(propertyKey);
       }
     }

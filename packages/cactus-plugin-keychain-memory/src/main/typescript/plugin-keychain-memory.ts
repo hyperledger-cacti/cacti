@@ -45,7 +45,7 @@ export class PluginKeychainMemory {
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
     this.log.warn(
       `Never use ${this.className} in production. ` +
-        `It does not support encryption. It stores everything in plain text.`
+        `It does not support encryption. It stores everything in plain text.`,
     );
   }
 

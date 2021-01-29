@@ -130,14 +130,14 @@ export class PluginLedgerConnectorFabric
    * in order to have the contract deployed.
    */
   public async deployContract(
-    req: DeployContractGoSourceV1Request
+    req: DeployContractGoSourceV1Request,
   ): Promise<DeployContractGoSourceV1Response> {
     const fnTag = "PluginLedgerConnectorFabric#deployContract()";
     throw new Error(`${fnTag} Not yet implemented!`);
   }
 
   public async installWebServices(
-    expressApp: any
+    expressApp: any,
   ): Promise<IWebServiceEndpoint[]> {
     const { log } = this;
 
@@ -172,7 +172,7 @@ export class PluginLedgerConnectorFabric
   }
 
   public async transact(
-    req: RunTransactionRequest
+    req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transact()`;
 

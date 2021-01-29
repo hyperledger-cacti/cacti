@@ -10,7 +10,7 @@ export class LoggerProvider {
     loggerOptions.level = loggerOptions.level || LoggerProvider.logLevel;
 
     let logger: Logger | undefined = LoggerProvider.loggers.get(
-      loggerOptions.label
+      loggerOptions.label,
     );
     if (!logger) {
       logger = new Logger(loggerOptions);
@@ -21,12 +21,12 @@ export class LoggerProvider {
 
   public static setLogLevel(
     logLevel: LogLevelDesc,
-    applyToCachedLoggers: boolean = true
+    applyToCachedLoggers = true,
   ) {
     LoggerProvider.logLevel = logLevel;
     if (applyToCachedLoggers) {
       LoggerProvider.loggers.forEach((logger: Logger) =>
-        logger.setLogLevel(logLevel as any)
+        logger.setLogLevel(logLevel as any),
       );
     }
   }

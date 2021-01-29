@@ -80,7 +80,7 @@ export interface ICactusPlugin {
 }
 
 export function isICactusPlugin(
-  pluginInstance: any
+  pluginInstance: any,
 ): pluginInstance is ICactusPlugin {
   return typeof pluginInstance?.getPackageName === "function";
 }

@@ -13,7 +13,7 @@ export class PluginFactoryWebService extends PluginFactory<
   IPluginFactoryOptions
 > {
   async create(
-    pluginOptions: IPluginConsortiumManualOptions
+    pluginOptions: IPluginConsortiumManualOptions,
   ): Promise<PluginConsortiumManual> {
     return new PluginConsortiumManual(pluginOptions);
   }

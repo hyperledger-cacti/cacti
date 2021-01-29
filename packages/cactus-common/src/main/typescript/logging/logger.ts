@@ -46,7 +46,7 @@ export class Logger {
     this.backend.setLevel(logLevel);
   }
 
-  public async shutdown(gracePeriodMillis: number = 60000): Promise<void> {
+  public async shutdown(gracePeriodMillis = 60000): Promise<void> {
     this.backend.info("Shut down logger OK.");
   }
 

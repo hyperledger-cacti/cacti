@@ -93,7 +93,7 @@ export class CactusKeychainVaultServer {
           if (err) {
             reject(err);
           }
-        }
+        },
       );
 
       eventEmitter.once("start", async (container: Container) => {
@@ -129,7 +129,7 @@ export class CactusKeychainVaultServer {
       const cInfo = await Containers.getById(this.containerId);
       return Containers.getPublicPort(
         K_DEFAULT_KEYCHAIN_VAULT_HTTP_PORT,
-        cInfo
+        cInfo,
       );
     } else {
       throw new Error(`${fnTag} Container ID not set. Did you call start()?`);

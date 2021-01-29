@@ -35,7 +35,7 @@ export class HttpEchoContainer implements ITestLedger {
   private containerId: string | undefined;
 
   constructor(
-    public readonly options: IHttpEchoContainerConstructorOptions = {}
+    public readonly options: IHttpEchoContainerConstructorOptions = {},
   ) {
     if (!options) {
       throw new TypeError(`HttpEchoContainer#ctor options was falsy.`);
@@ -94,16 +94,16 @@ export class HttpEchoContainer implements ITestLedger {
           if (err) {
             reject(err);
           }
-        }
+        },
       );
 
       eventEmitter.once("start", async (container: Container) => {
         this.container = container;
         this.containerId = container.id;
-        const host: string = "127.0.0.1";
+        const host = "127.0.0.1";
         const hostPort = await this.getPublicHttpPort();
         try {
-          let reachable: boolean = false;
+          let reachable = false;
           do {
             reachable = await isPortReachable(hostPort, { host });
             await new Promise((resolve2) => setTimeout(resolve2, 100));
@@ -129,8 +129,8 @@ export class HttpEchoContainer implements ITestLedger {
       } else {
         return reject(
           new Error(
-            `HttpEchoContainer#stop() Container was not running to begin with.`
-          )
+            `HttpEchoContainer#stop() Container was not running to begin with.`,
+          ),
         );
       }
     });
@@ -142,8 +142,8 @@ export class HttpEchoContainer implements ITestLedger {
     } else {
       return Promise.reject(
         new Error(
-          `HttpEchoContainer#destroy() Container was never created, nothing to destroy.`
-        )
+          `HttpEchoContainer#destroy() Container was never created, nothing to destroy.`,
+        ),
       );
     }
   }
@@ -223,7 +223,7 @@ export class HttpEchoContainer implements ITestLedger {
                 resolve(output);
               }
             },
-            (event: any) => null // ignore the spammy docker download log, we get it in the output variable anyway
+            (event: any) => null, // ignore the spammy docker download log, we get it in the output variable anyway
           );
         }
       });
@@ -237,12 +237,12 @@ export class HttpEchoContainer implements ITestLedger {
         imageName: this.imageName,
         httpPort: this.httpPort,
       },
-      OPTS_SCHEMA
+      OPTS_SCHEMA,
     );
 
     if (validationResult.error) {
       throw new Error(
-        `HttpEchoContainer#ctor ${validationResult.error.annotate()}`
+        `HttpEchoContainer#ctor ${validationResult.error.annotate()}`,
       );
     }
   }
