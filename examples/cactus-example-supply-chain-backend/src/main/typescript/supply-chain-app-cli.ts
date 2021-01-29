@@ -8,7 +8,6 @@ export async function launchApp(cliOpts?: any): Promise<void> {
   try {
     await supplyChainApp.start();
   } catch (ex) {
-    // tslint:disable-next-line: no-console
     console.error(`SupplyChainApp crashed. Existing...`, ex);
     await supplyChainApp.stop();
     process.exit(-1);

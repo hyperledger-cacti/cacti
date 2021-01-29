@@ -11,7 +11,7 @@ const routes: Routes = [
     path: "consortiums/inspector",
     loadChildren: () =>
       import("./consortium-inspector/consortium-inspector.module").then(
-        (m) => m.ConsortiumInspectorPageModule
+        (m) => m.ConsortiumInspectorPageModule,
       ),
   },
 ];

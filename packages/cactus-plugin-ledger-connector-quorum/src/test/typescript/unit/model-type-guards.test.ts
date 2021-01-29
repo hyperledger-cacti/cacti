@@ -21,11 +21,11 @@ test("Type guards for OpenAPI spec model type definitons", (t1: Test) => {
 
     t2.true(
       isWeb3SigningCredentialGethKeychainPassword(valid),
-      "Valid Web3SigningCredentialGethKeychainPassword recognized"
+      "Valid Web3SigningCredentialGethKeychainPassword recognized",
     );
     t2.false(
       isWeb3SigningCredentialGethKeychainPassword({}),
-      "Invalid Web3SigningCredentialGethKeychainPassword not recognized"
+      "Invalid Web3SigningCredentialGethKeychainPassword not recognized",
     );
     t2.end();
   });
@@ -39,11 +39,11 @@ test("Type guards for OpenAPI spec model type definitons", (t1: Test) => {
 
     t2.true(
       isWeb3SigningCredentialPrivateKeyHex(valid),
-      "Valid Web3SigningCredentialPrivateKeyHex recognized"
+      "Valid Web3SigningCredentialPrivateKeyHex recognized",
     );
     t2.false(
       isWeb3SigningCredentialPrivateKeyHex({}),
-      "Invalid Web3SigningCredentialPrivateKeyHex not recognized"
+      "Invalid Web3SigningCredentialPrivateKeyHex not recognized",
     );
     t2.end();
   });
@@ -55,11 +55,11 @@ test("Type guards for OpenAPI spec model type definitons", (t1: Test) => {
 
     t2.true(
       isWeb3SigningCredentialNone(valid),
-      "Valid Web3SigningCredentialNone recognized"
+      "Valid Web3SigningCredentialNone recognized",
     );
     t2.false(
       isWeb3SigningCredentialNone({}),
-      "Invalid Web3SigningCredentialNone not recognized"
+      "Invalid Web3SigningCredentialNone not recognized",
     );
     t2.end();
   });

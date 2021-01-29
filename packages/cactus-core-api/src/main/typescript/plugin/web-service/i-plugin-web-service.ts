@@ -11,7 +11,7 @@ export interface IPluginWebService extends ICactusPlugin {
 }
 
 export function isIPluginWebService(
-  pluginInstance: any
+  pluginInstance: any,
 ): pluginInstance is IPluginWebService {
   return (
     pluginInstance &&

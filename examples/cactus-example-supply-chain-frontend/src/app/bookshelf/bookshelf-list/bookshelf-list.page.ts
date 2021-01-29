@@ -24,7 +24,7 @@ export class BookshelfListPage implements OnInit {
   constructor(
     private readonly baseClient: ApiClient,
     private readonly modalController: ModalController,
-    @Inject(BESU_DEMO_LEDGER_ID) private readonly ledgerId: string
+    @Inject(BESU_DEMO_LEDGER_ID) private readonly ledgerId: string,
   ) {
     this.bookshelves = [];
     this.log = LoggerProvider.getOrCreate({ label: "BookshelfListPage" });
@@ -41,7 +41,7 @@ export class BookshelfListPage implements OnInit {
   async ngOnInit(): Promise<void> {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.ledgerId,
-      SupplyChainApi
+      SupplyChainApi,
     );
     await this.loadData();
   }

@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-var-requires
 const tap = require("tap");
 import * as publicApi from "../../../main/typescript/public-api";
 

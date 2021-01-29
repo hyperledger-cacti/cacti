@@ -91,7 +91,7 @@ export class PluginLedgerConnectorQuorum
     this.log = LoggerProvider.getOrCreate({ level, label });
 
     const web3Provider = new Web3.providers.HttpProvider(
-      this.options.rpcApiHttpHost
+      this.options.rpcApiHttpHost,
     );
     this.web3 = new Web3(web3Provider);
     this.instanceId = options.instanceId;
@@ -115,7 +115,7 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async installWebServices(
-    expressApp: Express
+    expressApp: Express,
   ): Promise<IWebServiceEndpoint[]> {
     const endpoints: IWebServiceEndpoint[] = [];
     {
@@ -160,7 +160,7 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async invokeContract(
-    req: InvokeContractV1Request
+    req: InvokeContractV1Request,
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
 
@@ -213,7 +213,7 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async transact(
-    req: RunTransactionRequest
+    req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transact()`;
 
@@ -234,7 +234,7 @@ export class PluginLedgerConnectorQuorum
           throw new Error(
             `${fnTag} Expected pre-signed raw transaction ` +
               ` since signing credential is specified as` +
-              `Web3SigningCredentialType.NONE`
+              `Web3SigningCredentialType.NONE`,
           );
         }
       }
@@ -242,14 +242,14 @@ export class PluginLedgerConnectorQuorum
         throw new Error(
           `${fnTag} Unrecognized Web3SigningCredentialType: ` +
             `${req.web3SigningCredential.type} Supported ones are: ` +
-            `${Object.values(Web3SigningCredentialType).join(";")}`
+            `${Object.values(Web3SigningCredentialType).join(";")}`,
         );
       }
     }
   }
 
   public async transactSigned(
-    rawTransaction: string
+    rawTransaction: string,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactSigned()`;
 
@@ -264,7 +264,7 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async transactGethKeychain(
-    txIn: RunTransactionRequest
+    txIn: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactGethKeychain()`;
     const { sendTransaction } = this.web3.eth.personal;
@@ -279,13 +279,13 @@ export class PluginLedgerConnectorQuorum
     } catch (ex) {
       throw new Error(
         `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `InnerException: ${ex.stack}`
+          `InnerException: ${ex.stack}`,
       );
     }
   }
 
   public async transactPrivateKey(
-    req: RunTransactionRequest
+    req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactPrivateKey()`;
     const { transactionConfig, web3SigningCredential } = req;
@@ -295,7 +295,7 @@ export class PluginLedgerConnectorQuorum
 
     const signedTx = await this.web3.eth.accounts.signTransaction(
       transactionConfig,
-      secret
+      secret,
     );
 
     if (signedTx.rawTransaction) {
@@ -303,13 +303,13 @@ export class PluginLedgerConnectorQuorum
     } else {
       throw new Error(
         `${fnTag} Failed to sign eth transaction. ` +
-          `signedTransaction.rawTransaction is blank after .signTransaction().`
+          `signedTransaction.rawTransaction is blank after .signTransaction().`,
       );
     }
   }
 
   public async transactCactusKeychainRef(
-    req: RunTransactionRequest
+    req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactCactusKeychainRef()`;
     const { transactionConfig, web3SigningCredential } = req;
@@ -343,7 +343,7 @@ export class PluginLedgerConnectorQuorum
 
   public async pollForTxReceipt(
     txHash: string,
-    timeoutMs: number = 60000
+    timeoutMs = 60000,
   ): Promise<TransactionReceipt> {
     const fnTag = `${this.className}#pollForTxReceipt()`;
     let txReceipt;
@@ -365,7 +365,7 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async deployContract(
-    req: DeployContractSolidityBytecodeV1Request
+    req: DeployContractSolidityBytecodeV1Request,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#deployContract()`;
     Checks.truthy(req, `${fnTag} req`);

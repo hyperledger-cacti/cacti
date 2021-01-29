@@ -1,5 +1,5 @@
 import test, { Test } from "tape";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { LoggerProvider } from "../../../../main/typescript/public-api";
 
 // FIXME(2020-11-12) this does not work becauase for some reason the stdout

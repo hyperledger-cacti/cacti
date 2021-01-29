@@ -51,7 +51,7 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
     Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
       opts.contractAddress,
-      `${fnTag} options.contractAddress`
+      `${fnTag} options.contractAddress`,
     );
 
     const level = this.opts.logLevel || "INFO";
@@ -79,7 +79,7 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
   async handleRequest(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     const tag = `${this.getVerbLowerCase().toUpperCase()} ${this.getPath()}`;
     try {

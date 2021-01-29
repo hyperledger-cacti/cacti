@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-var-requires
 const tap = require("tap");
 import { PluginKeychainMemory } from "../../../main/typescript/public-api";
 

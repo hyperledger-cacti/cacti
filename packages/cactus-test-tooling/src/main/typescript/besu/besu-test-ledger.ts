@@ -35,7 +35,7 @@ export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys
       .max(65535)
       .required(),
     envVars: Joi.array().allow(null).required(),
-  }
+  },
 );
 
 export class BesuTestLedger implements ITestLedger {
@@ -78,7 +78,7 @@ export class BesuTestLedger implements ITestLedger {
   }
 
   public async getRpcApiHttpHost(): Promise<string> {
-    const ipAddress: string = "127.0.0.1";
+    const ipAddress = "127.0.0.1";
     const hostPort: number = await this.getRpcApiPublicPort();
     return `http://${ipAddress}:${hostPort}`;
   }
@@ -90,7 +90,7 @@ export class BesuTestLedger implements ITestLedger {
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
-      let fileContents: string = "";
+      let fileContents = "";
       extract.on("entry", async (header: any, stream, next) => {
         stream.on("error", (err: Error) => {
           reject(err);
@@ -133,9 +133,7 @@ export class BesuTestLedger implements ITestLedger {
    *
    * @param [seedMoney=10e8] The amount of money to seed the new test account with.
    */
-  public async createEthTestAccount(
-    seedMoney: number = 10e8
-  ): Promise<Account> {
+  public async createEthTestAccount(seedMoney = 10e8): Promise<Account> {
     const fnTag = `BesuTestLedger#getEthTestAccount()`;
 
     const rpcApiHttpHost = await this.getRpcApiHttpHost();
@@ -149,7 +147,7 @@ export class BesuTestLedger implements ITestLedger {
         value: seedMoney,
         gas: 1000000,
       },
-      this.getGenesisAccountPrivKey()
+      this.getGenesisAccountPrivKey(),
     );
 
     if (!tx.rawTransaction) {
@@ -213,7 +211,7 @@ export class BesuTestLedger implements ITestLedger {
           if (err) {
             reject(err);
           }
-        }
+        },
       );
 
       eventEmitter.once("start", async (container: Container) => {
@@ -229,11 +227,11 @@ export class BesuTestLedger implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs: number = 120000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 120000): Promise<void> {
     const fnTag = "BesuTestLedger#waitForHealthCheck()";
     const httpUrl = await this.getRpcApiHttpHost();
     const startedAt = Date.now();
-    let reachable: boolean = false;
+    let reachable = false;
     do {
       try {
         const res = await axios.get(httpUrl);
@@ -350,7 +348,7 @@ export class BesuTestLedger implements ITestLedger {
                 resolve(output);
               }
             },
-            (event: any) => null // ignore the spammy docker download log, we get it in the output variable anyway
+            (event: any) => null, // ignore the spammy docker download log, we get it in the output variable anyway
           );
         }
       });
@@ -365,12 +363,12 @@ export class BesuTestLedger implements ITestLedger {
         rpcApiHttpPort: this.rpcApiHttpPort,
         envVars: this.envVars,
       },
-      BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA
+      BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
     );
 
     if (validationResult.error) {
       throw new Error(
-        `BesuTestLedger#ctor ${validationResult.error.annotate()}`
+        `BesuTestLedger#ctor ${validationResult.error.annotate()}`,
       );
     }
   }

@@ -11,7 +11,7 @@ const routes: Routes = [
     path: "bamboo-harvest-list",
     loadChildren: () =>
       import("./bamboo-harvest/bamboo-harvest.module").then(
-        (m) => m.BambooHarvestPageModule
+        (m) => m.BambooHarvestPageModule,
       ),
   },
   {

@@ -1,4 +1,3 @@
-// tslint:disable-next-line: no-var-requires
 import test, { Test } from "tape";
 
 import {
@@ -21,7 +20,7 @@ const hashFunction = (data: any): string => {
 const signFunction = (msg: any, pkey: any): any => {
   const signObj = secp256k1.ecdsaSign(
     Buffer.from(hashFunction(msg), `hex`),
-    Buffer.from(pkey, `hex`)
+    Buffer.from(pkey, `hex`),
   );
   return signObj.signature;
 };
@@ -29,12 +28,12 @@ const signFunction = (msg: any, pkey: any): any => {
 const verifySignFunction = (
   msg: any,
   signature: any,
-  pubKey: Uint8Array
+  pubKey: Uint8Array,
 ): boolean => {
   return secp256k1.ecdsaVerify(
     signature,
     Buffer.from(hashFunction(msg), `hex`),
-    pubKey
+    pubKey,
   );
 };
 

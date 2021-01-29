@@ -60,7 +60,7 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
   public async handleRequest(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);

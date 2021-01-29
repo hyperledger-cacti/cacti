@@ -9,5 +9,5 @@ import { PluginFactory } from "./plugin/plugin-factory";
  * of it (API server) via either ENV, CLI or a config file.
  */
 export type PluginFactoryFactory = (
-  pluginFactoryOptions: IPluginFactoryOptions
+  pluginFactoryOptions: IPluginFactoryOptions,
 ) => Promise<PluginFactory<ICactusPlugin, any, IPluginFactoryOptions>>;

@@ -51,11 +51,11 @@ export class SupplyChainCactusPlugin
     Checks.truthy(options.contracts, `${fnTag} arg options.contracts`);
     Checks.truthy(
       options.web3SigningCredential,
-      `${fnTag} arg options.web3SigningCredential`
+      `${fnTag} arg options.web3SigningCredential`,
     );
     Checks.truthy(
       options.quorumApiClient,
-      `${fnTag} arg options.quorumApiClient`
+      `${fnTag} arg options.quorumApiClient`,
     );
 
     const level = this.options.logLevel || "INFO";
@@ -65,7 +65,7 @@ export class SupplyChainCactusPlugin
   }
 
   public async installWebServices(
-    expressApp: any
+    expressApp: any,
   ): Promise<IWebServiceEndpoint[]> {
     const insertBambooHarvest = new InsertBambooHarvestEndpoint({
       contractAddress: this.options.contracts.bambooHarvestRepository.address,

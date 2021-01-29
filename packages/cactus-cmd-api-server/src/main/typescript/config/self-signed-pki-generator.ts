@@ -54,7 +54,7 @@ export class SelfSignedPkiGenerator {
   public configureCertificateParameters(
     keyPair: pki.rsa.KeyPair,
     certificate: pki.Certificate,
-    commonName: string
+    commonName: string,
   ): pki.Certificate {
     // 20 octets max for serial numbers of certs as per the standard
     const serialNumber = Strings.replaceAll(uuidV4(), "-", "").substring(0, 19);

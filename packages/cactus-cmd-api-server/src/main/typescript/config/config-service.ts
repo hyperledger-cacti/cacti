@@ -376,7 +376,7 @@ export class ConfigService {
    * ```
    */
   public newExampleConfigEnv(
-    cactusApiServerOptions?: ICactusApiServerOptions
+    cactusApiServerOptions?: ICactusApiServerOptions,
   ): { [key: string]: string } {
     cactusApiServerOptions = cactusApiServerOptions || this.newExampleConfig();
     const configSchema: any = ConfigService.getConfigSchema();
@@ -386,12 +386,12 @@ export class ConfigService {
         acc[schemaObj.env] = value;
         return acc;
       },
-      {}
+      {},
     );
   }
 
   public newExampleConfigConvict(
-    cactusApiServerOptions?: ICactusApiServerOptions
+    cactusApiServerOptions?: ICactusApiServerOptions,
   ): Config<ICactusApiServerOptions> {
     cactusApiServerOptions = cactusApiServerOptions || this.newExampleConfig();
     const env = this.newExampleConfigEnv(cactusApiServerOptions);
