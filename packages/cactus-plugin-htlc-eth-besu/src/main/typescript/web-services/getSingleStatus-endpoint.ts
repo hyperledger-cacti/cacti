@@ -11,7 +11,7 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import OAS from "../../json/openapi.json";
+
 export interface IGetSingleStatusEndpointOptions {
   logLevel?: LogLevelDesc;
 }
@@ -42,19 +42,19 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {
-    throw new Error("Method not implemented.");
-    // return this.handleRequest.bind(this);
+    return this.handleRequest.bind(this);
   }
+
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "GetSingleStatusEndpoint#handleRequest()";
     this.log.debug(`GET ${this.getPath()}`);
-    let id = req.params["id"];
+    const id = req.params["id"];
     try {
-      let result = this.client.sendCall(
+      const result = this.client.sendCall(
         "getSingleStatus",
         [id],
         "HashTimeLock",
-        "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1"
+        "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
       );
       res.send(result);
     } catch (ex) {
