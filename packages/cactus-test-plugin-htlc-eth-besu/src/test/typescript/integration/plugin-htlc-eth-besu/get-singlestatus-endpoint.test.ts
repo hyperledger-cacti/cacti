@@ -15,7 +15,7 @@ import {
 } from "@hyperledger/cactus-common";
 
 import {
-  IPluginHtlcEthBesu,
+  IPluginHtlcEthBesuOptions,
   PluginHtlcEthBesu,
 } from "@hyperledger/cactus-plugin-htlc-eth-besu";
 
@@ -49,7 +49,7 @@ test("Test sign transaction endpoint", async (t: Test) => {
   const jsObjectSigner = new JsObjectSigner(jsObjectSignerOptions);
 
   // 3. Instantiate the web service consortium plugin
-  const options: IPluginHtlcEthBesu = {
+  const options: IPluginHtlcEthBesuOptions = {
     instanceId: uuidv4(),
     rpcApiHttpHost,
     logLevel,
