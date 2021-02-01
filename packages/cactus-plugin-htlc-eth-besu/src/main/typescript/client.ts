@@ -3,18 +3,26 @@ import path from "path";
 import Web3 from "web3";
 import { environment } from "./environment";
 import Helpers from "./helpers";
-import EthereumTX from "ethereumjs-tx";
+import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 export default class Client {
-  public Helpers: Helpers;
-
+  private static readonly CLASS_NAME = "Client";
+  private readonly log: Logger;
   private web3: Web3;
   private contracts: { [key: string]: any } = {};
+  public Helpers: Helpers;
+
+  public get className(): string {
+    return Client.CLASS_NAME;
+  }
 
   constructor() {
+    const level = "INFO";
+    const label = this.className;
+    this.log = LoggerProvider.getOrCreate({ level, label });
     const node = environment.NODE!;
-    console.log(`Creating new blockchain connection to`, node);
+    this.log.info(`Creating new blockchain connection to ${node}`);
     this.web3 = new Web3(new Web3.providers.HttpProvider(node));
-    console.log(`Loading contracts`);
+    this.log.info(`Loading contracts`);
     this.loadContracts(environment.CONTRACT_PATH!);
 
     this.Helpers = new Helpers(this.web3, this.contracts);
@@ -206,8 +214,6 @@ export default class Client {
       throw err;
     }
   }
-  /*
-   */
 
   /**
    * Loads all the contracts specified in the configuration contractsPath
