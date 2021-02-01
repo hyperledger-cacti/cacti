@@ -26,7 +26,7 @@ import {
   DefaultApi as HtlcEthBesuApi,
 } from "../../../main/typescript/public-api";
 
-import HashTimeLockJson from "../../../../contracts/build/contracts/HashTimeLock.json";
+import HashTimeLockJson from "../../../contracts/build/contracts/HashTimeLock.json";
 import { AddressInfo } from "net";
 
 test("cross-ledger atomic swap with ETH HTLC", async (t: Test) => {
