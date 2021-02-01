@@ -1,10 +1,4 @@
-import {
-  NewContractObj,
-  DefaultApi,
-} from "./generated/openapi/typescript-axios/index";
-//TODO: import web-services
 import { GetSingleStatusEndpoint } from "./web-services/getSingleStatus-endpoint";
-import Client from "./client";
 import { Express } from "express";
 import { Optional } from "typescript-optional";
 import { Server } from "http";
@@ -17,21 +11,20 @@ import {
   IWebServiceEndpoint,
   PluginAspect,
 } from "@hyperledger/cactus-core-api";
-import { Logger, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 export interface IPluginHtlcEthBesuOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
 }
 export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
   public static readonly CLASS_NAME = "PluginHtlcEthBesu";
-  public get className() {
-    return PluginHtlcEthBesu.CLASS_NAME;
-  }
-  private client: Client;
   private readonly instanceId: string;
 
+  public get className(): string {
+    return PluginHtlcEthBesu.CLASS_NAME;
+  }
+
   constructor(public readonly opts: IPluginHtlcEthBesuOptions) {
-    this.client = new Client();
     this.instanceId = opts.instanceId;
   }
   /**
@@ -56,9 +49,9 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     return "@hyperledger/cactus-plugin-htlc-eth-besu";
   }
 
+  //TODO: Change to SWAP
   public getAspect(): PluginAspect {
     return PluginAspect.CONSORTIUM;
-    //return PluginAspect.ATOMIC_SWAP;
   }
 
   public async installWebServices(
