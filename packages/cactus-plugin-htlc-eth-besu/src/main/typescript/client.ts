@@ -32,12 +32,12 @@ export default class Client {
     functionName: string,
     paramsArray: any,
     contractName: string,
-    account: string
+    account: string,
   ) {
     try {
       if (contractName) {
-        var contract;
-        var contractAddress: string;
+        let contract;
+        let contractAddress: string;
         if (contractName && typeof contractName === "string") {
           contract = this.contracts[contractName];
 
@@ -83,20 +83,20 @@ export default class Client {
     contractAddress: string,
     account: string,
     pKey: string,
-    wei: string
+    wei: string,
   ) {
     try {
       const tx = await this.createTx(
         functionName,
         functionParams,
-        contractName
+        contractName,
       );
       const signedTx = await this.signTx(
         pKey,
         tx,
         account,
         contractAddress,
-        wei
+        wei,
       );
       const transactionReceipt = await this.sendSignedTransaction(signedTx!);
       return transactionReceipt;
@@ -116,18 +116,17 @@ export default class Client {
   private async createTx(
     functionName: string,
     functionParamsArray: any,
-    contractName: string
+    contractName: string,
   ) {
     try {
-      var contractInstance;
-      contractInstance = this.contracts[contractName];
+      const contractInstance = this.contracts[contractName];
       const contractCode = await this.web3.eth.getCode(
-        contractInstance._address
+        contractInstance._address,
       );
       if (contractCode === "0x")
         throw new Error("There is no contract with the specified address");
       const bytecode = contractInstance.methods[functionName](
-        ...functionParamsArray
+        ...functionParamsArray,
       ).encodeABI();
       return bytecode;
     } catch (err) {
@@ -156,7 +155,7 @@ export default class Client {
     value?: string,
     gas?: number,
     gasPrice?: string,
-    nonce?: number
+    nonce?: number,
   ) {
     try {
       if (!gas) gas = 6721975;
@@ -182,7 +181,7 @@ export default class Client {
       };
       const sign = await this.web3.eth.accounts.signTransaction(
         transaction,
-        privateKey
+        privateKey,
       );
       const signedTx = sign.rawTransaction;
 
@@ -199,8 +198,8 @@ export default class Client {
    */
   private async sendSignedTransaction(signedTx: string) {
     try {
-      let transactionReceipt = await this.web3.eth.sendSignedTransaction(
-        signedTx
+      const transactionReceipt = await this.web3.eth.sendSignedTransaction(
+        signedTx,
       );
       return transactionReceipt;
     } catch (err) {
@@ -218,22 +217,22 @@ export default class Client {
   private async loadContracts(contractsPath: string) {
     const networkId = await this.web3.eth.net.getId();
     fs.readdirSync(contractsPath).forEach((contractNameWithExt) => {
-      var splitted = contractNameWithExt.split(".", 1);
-      var contractName = splitted[0];
+      const splitted = contractNameWithExt.split(".", 1);
+      const contractName = splitted[0];
       const filePath = path.join(contractsPath, contractNameWithExt);
       try {
-        var parsedContract = JSON.parse(
-          fs.readFileSync(filePath, { encoding: "utf-8" })
+        const parsedContract = JSON.parse(
+          fs.readFileSync(filePath, { encoding: "utf-8" }),
         );
-        var contractInfo: any = {
+        const contractInfo: any = {
           name: contractName,
           abi: parsedContract.abi,
           bytecode: parsedContract.bytecode,
           address: parsedContract.networks[networkId].address,
         };
-        let contractInstance = new this.web3.eth.Contract(
+        const contractInstance = new this.web3.eth.Contract(
           contractInfo.abi,
-          contractInfo.address
+          contractInfo.address,
         );
         this.contracts[contractInfo.name] = contractInstance;
       } catch (error) {
