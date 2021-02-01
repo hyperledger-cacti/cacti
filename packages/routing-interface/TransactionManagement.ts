@@ -50,7 +50,7 @@ export class TransactionManagement {
         logger.info(`tradeID: ${tradeID}`);
 
         // object judgment
-        if (businessLogicID === "guks32pf") {
+        if ((businessLogicID === "guks32pf") || (businessLogicID === "h40Q9eMD")) {
 
             const blp = getTargetBLPInstance(businessLogicID);
             if (blp === null) {
@@ -111,7 +111,7 @@ export class TransactionManagement {
 
 
     // Get Verifier
-    getVerifier(validatorId: string): VerifierBase {
+    getVerifier(validatorId: string, monitorOptions = {}): VerifierBase {
 
         // Return Verifier
         // If you have already made it, please reply. If you haven't made it yet, make it and reply.
@@ -124,7 +124,7 @@ export class TransactionManagement {
             this.verifierArray[validatorId] = new VerifierBase(ledgerPluginInfo);
             logger.debug("##startMonitor");
             this.verifierArray[validatorId].setEventListener(this);
-            this.verifierArray[validatorId].startMonitor();
+            this.verifierArray[validatorId].startMonitor(monitorOptions);
             return this.verifierArray[validatorId];
         }
 
@@ -139,7 +139,7 @@ export class TransactionManagement {
 
     // interface VerifierEventListener
     onEvent(ledgerEvent: LedgerEvent): void {
-        logger.debug(`####in onEvent: event: ${json2str(ledgerEvent)}`);
+//        logger.debug(`####in onEvent: event: ${json2str(ledgerEvent)}`);
         const eventNum = this.getEventNum(ledgerEvent);
         if (eventNum === 0) {
             logger.warn(`onEvent(): invalid event, event num is zero., ledgerEvent.verifierId: ${ledgerEvent.verifierId}`);
@@ -157,7 +157,7 @@ export class TransactionManagement {
 
 
     private getEventNum(ledgerEvent: LedgerEvent): number {
-        logger.debug(`##getEventNum: event: ${ledgerEvent}`);
+//        logger.debug(`##getEventNum: event: ${ledgerEvent}`);
         for (const businessLogicID of this.blpRegistry.getBusinessLogicIDList()) {
             logger.debug(`####getEventNum(): businessLogicID: ${businessLogicID}`);
             const blp = getTargetBLPInstance(businessLogicID);
@@ -192,7 +192,7 @@ export class TransactionManagement {
 
 
     private getTxIDFromEvent(ledgerEvent: LedgerEvent, targetIndex: number): string | null {
-        logger.debug(`##getTxIDFromEvent: event: ${ledgerEvent}`);
+//        logger.debug(`##getTxIDFromEvent: event: ${ledgerEvent}`);
         for (const businessLogicID of this.blpRegistry.getBusinessLogicIDList()) {
             logger.debug(`####getTxIDFromEvent(): businessLogicID: ${businessLogicID}`);
             const blp = getTargetBLPInstance(businessLogicID);
@@ -224,10 +224,10 @@ export class TransactionManagement {
                 continue;
             }
 
-            if (blp.hasTxIDInTransactions(txID)) {
+//            if (blp.hasTxIDInTransactions(txID)) {
                 logger.debug(`####getBLPInstanceFromTxID(): found!, businessLogicID: ${businessLogicID}`);
                 return blp;
-            }
+//            }
         }
 
         // not found.
