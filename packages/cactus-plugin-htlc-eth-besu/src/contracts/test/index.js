@@ -19,7 +19,7 @@ contract("HashTimeLock", () => {
   it("should deploy contract", async () => {
     assert(
       contractInstance.address !== "",
-      `Expected valid hash for address, got ${contractInstance.address} instead`
+      `Expected valid hash for address, got ${contractInstance.address} instead`,
     );
   });
 
@@ -33,7 +33,7 @@ contract("HashTimeLock", () => {
   it("should create new contract", async () => {
     const newContract = await contractInstance.newContract(
       ...Object.values(mockNewContract),
-      { value: 1 }
+      { value: 1 },
     );
 
     txHash = newContract.logs[0].transactionHash;
@@ -47,7 +47,7 @@ contract("HashTimeLock", () => {
   it("should get one status", async () => {
     const newContract = await contractInstance.newContract(
       ...Object.values(mockNewContract),
-      { value: 1 }
+      { value: 1 },
     );
 
     const contractId = newContract.logs[0].args.id;
@@ -55,7 +55,7 @@ contract("HashTimeLock", () => {
 
     assert(
       statuses[parseInt(getOneStatus)] === ACTIVE,
-      `Expected ACTIVE, got ${statuses[parseInt(getOneStatus)]} instead`
+      `Expected ACTIVE, got ${statuses[parseInt(getOneStatus)]} instead`,
     );
   });
 
@@ -77,7 +77,7 @@ contract("HashTimeLock", () => {
       receiverAddress,
       outputNetwork,
       outputAddress,
-      { value: 1 }
+      { value: 1 },
     );
 
     const contractId = newContract.logs[0].args.id;
@@ -87,7 +87,7 @@ contract("HashTimeLock", () => {
 
     assert(
       statuses[parseInt(getOneStatus)] === WITHDRAWN,
-      `Expected WITHDRAWN, got ${statuses[parseInt(getOneStatus)]} instead`
+      `Expected WITHDRAWN, got ${statuses[parseInt(getOneStatus)]} instead`,
     );
   });
 
@@ -109,13 +109,13 @@ contract("HashTimeLock", () => {
       receiverAddress,
       outputNetwork,
       outputAddress,
-      { value: 1 }
+      { value: 1 },
     );
 
     const contractId = newContract.logs[0].args.id;
 
     await truffleAssert.reverts(
-      contractInstance.withdraw(contractId, invalidSecret)
+      contractInstance.withdraw(contractId, invalidSecret),
     );
   });
 
@@ -139,7 +139,7 @@ contract("HashTimeLock", () => {
       receiverAddress,
       outputNetwork,
       outputAddress,
-      { value: 1 }
+      { value: 1 },
     );
 
     const contractId = newContract.logs[0].args.id;
@@ -168,7 +168,7 @@ contract("HashTimeLock", () => {
       receiverAddress,
       outputNetwork,
       outputAddress,
-      { value: 1 }
+      { value: 1 },
     );
 
     const contractId = newContract.logs[0].args.id;
@@ -179,7 +179,7 @@ contract("HashTimeLock", () => {
 
     assert(
       statuses[parseInt(getOneStatus)] === REFUNDED,
-      `Expected REFUNDED, got ${statuses[parseInt(getOneStatus)]} instead`
+      `Expected REFUNDED, got ${statuses[parseInt(getOneStatus)]} instead`,
     );
   });
 
@@ -200,7 +200,7 @@ contract("HashTimeLock", () => {
       receiverAddress,
       outputNetwork,
       outputAddress,
-      { value: 1 }
+      { value: 1 },
     );
 
     const contractId = newContract.logs[0].args.id;
