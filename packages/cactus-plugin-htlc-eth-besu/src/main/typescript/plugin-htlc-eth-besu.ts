@@ -27,7 +27,7 @@ import {
   PluginLedgerConnectorBesu,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
-import HashTimeLockJson from "../../../contracts/build/contracts/HashTimeLock.json";
+import HashTimeLockJson from "../../contracts/build/contracts/HashTimeLock.json";
 
 export interface IPluginHtlcEthBesuOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
