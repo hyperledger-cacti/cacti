@@ -80,6 +80,15 @@
                     ]
                 }
             ]
+        },
+        {
+            "validatorID": "sUr7d10R",
+            "validatorURL": "https://localhost:5140",
+            "validatorKeyPath": "./validatorKey/sUr7d10R/keysUr7d10R.crt",
+            "ledgerInfo": {
+                "ledgerAbstract": "Sawtooth Ledger"
+            },
+            "apiInfo": []
         }
     ]
 }
