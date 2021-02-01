@@ -24,7 +24,7 @@ export const config = {
         },
         "pollingInterval": 5000
     },
-    "validatorKeyPath": "../core/validatorKey/keySawtooth.priv",
+    "validatorKeyPath": "../core/validatorKey/keysUr7d10R.priv",
     // Log level (trace/debug/info/warn/error/fatal)
     "logLevel" : "debug"
 }
