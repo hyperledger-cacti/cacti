@@ -43,6 +43,7 @@ export default class Client {
     account: string,
   ) {
     try {
+      this.log.info("Send call");
       if (contractName) {
         let contract;
         let contractAddress: string;
@@ -65,7 +66,7 @@ export default class Client {
           .call({
             from: account,
           })
-          .catch((revertReason: any) => console.log({ revertReason }));
+          .catch((revertReason: any) => this.log.error({ revertReason }));
       }
       throw new Error("sendCall() needs a the name of the contract");
     } catch (err) {
@@ -138,7 +139,6 @@ export default class Client {
       ).encodeABI();
       return bytecode;
     } catch (err) {
-      console.log(err);
       throw new Error(err);
     }
   }

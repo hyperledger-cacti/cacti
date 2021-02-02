@@ -117,7 +117,7 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw/:id/:secret": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw/{id}/{secret}": {
       "post": {
         "operationId": "withdraw",
         "parameters": [
@@ -148,7 +148,7 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund/:id": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund/{id}": {
       "post": {
         "operationId": "refund",
         "parameters": [
@@ -195,7 +195,7 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/getSingleStatus/:id": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/getSingleStatus/{id}": {
       "get": {
         "operationId": "getSingleStatus",
         "parameters": [
