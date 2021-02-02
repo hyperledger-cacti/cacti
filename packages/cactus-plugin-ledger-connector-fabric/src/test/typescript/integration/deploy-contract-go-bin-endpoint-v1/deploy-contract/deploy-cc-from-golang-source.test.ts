@@ -66,7 +66,7 @@ test.skip("deploys contract from go source", async (t: Test) => {
     server,
   };
   const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  const { address, port } = addressInfo;
+  const { port } = addressInfo;
   test.onFinish(async () => await Servers.shutdown(server));
 
   const [endpoint] = await plugin.installWebServices(expressApp);

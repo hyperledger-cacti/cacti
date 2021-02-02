@@ -27,7 +27,7 @@ const main = async () => {
   }
 };
 
-export async function launchApp(cliOpts?: any): Promise<void> {
+export async function launchApp(): Promise<void> {
   try {
     await main();
     log.info(`Cactus API server launched OK `);

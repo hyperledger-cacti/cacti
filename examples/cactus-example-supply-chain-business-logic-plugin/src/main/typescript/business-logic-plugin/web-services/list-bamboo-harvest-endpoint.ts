@@ -1,4 +1,4 @@
-import { Express, Request, Response, NextFunction } from "express";
+import { Express, Request, Response } from "express";
 
 import {
   Logger,
@@ -75,11 +75,7 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  async handleRequest(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async handleRequest(req: Request, res: Response): Promise<void> {
     const tag = `${this.getVerbLowerCase().toUpperCase()} ${this.getPath()}`;
     try {
       this.log.debug(`${tag}`);

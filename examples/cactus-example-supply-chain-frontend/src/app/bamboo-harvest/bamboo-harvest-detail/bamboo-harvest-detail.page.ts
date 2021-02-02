@@ -5,10 +5,7 @@ import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ModalController } from "@ionic/angular";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
-import {
-  BambooHarvest,
-  DefaultApi as SupplyChainApi,
-} from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+import { BambooHarvest } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 
 import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
@@ -55,13 +52,13 @@ export class BambooHarvestDetailPage implements OnInit {
     });
   }
 
-  onClickFormSubmit(value: any) {
+  public onClickFormSubmit(value: any): void {
     this.log.debug("form submitted", value);
     this.bambooHarvest = value;
     this.modalController.dismiss(this.bambooHarvest);
   }
 
-  onClickBtnCancel() {
+  public onClickBtnCancel(): void {
     this.log.debug("form submission cancelled by user");
     this.modalController.dismiss();
   }

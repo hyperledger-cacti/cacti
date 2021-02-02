@@ -245,9 +245,6 @@ export class Containers {
                   resolve(output);
                 }
               },
-              // ignore the spammy docker download log, we get
-              // it in the output variable anyway if needed
-              (event: any) => null,
             );
           }
         },
