@@ -21,11 +21,15 @@ import {
 
 import Client from "./client";
 import { GetSingleStatusEndpoint } from "./web-services/getSingleStatus-endpoint";
+import { GetStatusEndpoint } from "./web-services/getStatus-endpoint";
+import { NewContractEndpoint } from "./web-services/newContract-endpoint";
+import { RefundEndpoint } from "./web-services/refund-endpoint";
+import { WithdrawEndpoint } from "./web-services/withdraw-endpoint";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import {
+/*import {
   EthContractInvocationType,
   PluginLedgerConnectorBesu,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger/cactus-plugin-ledger-connector-besu";*/
 
 import HashTimeLockJson from "../../contracts/build/contracts/HashTimeLock.json";
 
@@ -94,6 +98,34 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
       endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
+    {
+      const endpoint = new GetStatusEndpoint({
+        logLevel: this.opts.logLevel,
+      });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new NewContractEndpoint({
+        logLevel: this.opts.logLevel,
+      });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new RefundEndpoint({
+        logLevel: this.opts.logLevel,
+      });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new WithdrawEndpoint({
+        logLevel: this.opts.logLevel,
+      });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
     //TODO: add other endpoints.
 
     return endpoints;
@@ -107,16 +139,16 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     const plugins = this.pluginRegistry.getPlugins();
     const plugin = plugins.find((p) => p.getInstanceId() === instanceId);
 
-    Checks.truthy(
+    /*    Checks.truthy(
       plugin instanceof PluginLedgerConnectorBesu,
       `${fnTag}:connector`,
     );
 
-    const connector = plugin as PluginLedgerConnectorBesu;
+    const connector = plugin as PluginLedgerConnectorBesu;*/
 
     // could work something like this but I'm just throwing this here without
     // testing for now...
-    await connector.invokeContract({
+    /*   await connector.invokeContract({
       contractAbi: HashTimeLockJson.abi,
       contractAddress: req.contractAddress,
       invocationType: EthContractInvocationType.SEND,
@@ -126,7 +158,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
       gas: req.gas,
       gasPrice: req.gasPrice,
       timeoutMs: req.timeoutMs,
-    });
+    });*/
 
     return;
   }
