@@ -32,7 +32,6 @@ import {
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
   DefaultApi as QuorumApi,
-  EthContractInvocationType,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 
 import {
@@ -41,10 +40,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 import { SupplyChainAppDummyInfrastructure } from "./infrastructure/supply-chain-app-dummy-infrastructure";
-import {
-  BambooHarvest,
-  SupplyChainCactusPlugin,
-} from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+import { SupplyChainCactusPlugin } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 
 export interface ISupplyChainAppOptions {
   logLevel?: LogLevelDesc;

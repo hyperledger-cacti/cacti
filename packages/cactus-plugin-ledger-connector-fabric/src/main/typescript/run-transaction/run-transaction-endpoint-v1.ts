@@ -10,7 +10,6 @@ import {
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
-  IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";

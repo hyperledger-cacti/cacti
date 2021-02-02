@@ -58,7 +58,8 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
   };
   test.onFinish(tearDownLedger);
 
-  const [_, adminWallet] = await ledger.enrollAdmin();
+  const enrollAdminOut = await ledger.enrollAdmin();
+  const adminWallet = enrollAdminOut[1];
   const [userIdentity] = await ledger.enrollUser(adminWallet);
 
   const connectionProfile = await ledger.getConnectionProfileOrg1();
@@ -132,7 +133,7 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    const cars = JSON.parse(res.data.functionOutput);
+    t.doesNotThrow(() => JSON.parse(res.data.functionOutput));
   }
 
   {

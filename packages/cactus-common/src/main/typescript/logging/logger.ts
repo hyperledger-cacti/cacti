@@ -1,8 +1,4 @@
-import libLogLevel, {
-  Logger as LogLevelLogger,
-  levels,
-  LogLevelDesc,
-} from "loglevel";
+import libLogLevel, { Logger as LogLevelLogger, LogLevelDesc } from "loglevel";
 import prefix from "loglevel-plugin-prefix";
 
 prefix.reg(libLogLevel);
@@ -46,7 +42,7 @@ export class Logger {
     this.backend.setLevel(logLevel);
   }
 
-  public async shutdown(gracePeriodMillis = 60000): Promise<void> {
+  public async shutdown(): Promise<void> {
     this.backend.info("Shut down logger OK.");
   }
 

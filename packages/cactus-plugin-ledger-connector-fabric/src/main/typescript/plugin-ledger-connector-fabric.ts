@@ -1,12 +1,12 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
+import { Express } from "express";
 
 import "multer";
 import { Config as SshConfig } from "node-ssh";
 import {
   DefaultEventHandlerOptions,
   DefaultEventHandlerStrategies,
-  DiscoveryOptions,
   Gateway,
   GatewayOptions,
   InMemoryWallet,
@@ -79,7 +79,7 @@ export class PluginLedgerConnectorFabric
   private readonly instanceId: string;
   private readonly log: Logger;
 
-  public get className() {
+  public get className(): string {
     return PluginLedgerConnectorFabric.CLASS_NAME;
   }
 
@@ -133,11 +133,11 @@ export class PluginLedgerConnectorFabric
     req: DeployContractGoSourceV1Request,
   ): Promise<DeployContractGoSourceV1Response> {
     const fnTag = "PluginLedgerConnectorFabric#deployContract()";
-    throw new Error(`${fnTag} Not yet implemented!`);
+    throw new Error(`${fnTag} Not yet implemented! ${req}`);
   }
 
   public async installWebServices(
-    expressApp: any,
+    expressApp: Express,
   ): Promise<IWebServiceEndpoint[]> {
     const { log } = this;
 

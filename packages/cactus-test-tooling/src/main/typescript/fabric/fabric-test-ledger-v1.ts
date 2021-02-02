@@ -1,7 +1,6 @@
-import path from "path";
 import { EventEmitter } from "events";
 
-import compareVersions, { compare } from "compare-versions";
+import compareVersions from "compare-versions";
 
 import Docker, {
   Container,
@@ -16,7 +15,7 @@ import {
   Gateway,
 } from "fabric-network";
 import FabricCAServices from "fabric-ca-client";
-import Joi, { array } from "joi";
+import Joi from "joi";
 import { ITestLedger } from "../i-test-ledger";
 import { Containers } from "../common/containers";
 import {
@@ -215,7 +214,6 @@ export class FabricTestLedgerV1 implements ITestLedger {
   }
 
   public async getConnectionProfileOrg1(): Promise<any> {
-    const fnTag = `${this.className}#getConnectionProfileOrg1()`;
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
     const CCP_JSON_PATH_FABRIC_V1 =
