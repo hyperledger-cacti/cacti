@@ -140,17 +140,19 @@ export class ChainCodeCompiler {
         Checks.truthy(proc.exitCode === 0, `0 exit code of go mod tidy`);
       }
 
-      {
-        const cmdArgs = ["mod", "vendor"];
-        const proc = await ngo(cmdArgs, { cwd: dirPath });
-        Checks.truthy(proc.exitCode === 0, `0 exit code of go mod vendor`);
-      }
+      if (!modTidyOnly) {
+        {
+          const cmdArgs = ["mod", "vendor"];
+          const proc = await ngo(cmdArgs, { cwd: dirPath });
+          Checks.truthy(proc.exitCode === 0, `0 exit code of go mod vendor`);
+        }
 
-      {
-        this.log.debug(`Running go process...`);
-        const proc = await ngo(["build"], { cwd: dirPath });
-        Checks.truthy(proc.exitCode === 0, `0 exit code of go build`);
-        this.log.debug(`Ran go process OK %o`, proc);
+        {
+          this.log.debug(`Running go process...`);
+          const proc = await ngo(["build"], { cwd: dirPath });
+          Checks.truthy(proc.exitCode === 0, `0 exit code of go build`);
+          this.log.debug(`Ran go process OK %o`, proc);
+        }
       }
 
       const binaryPath = path.join(dirPath, options.moduleName);

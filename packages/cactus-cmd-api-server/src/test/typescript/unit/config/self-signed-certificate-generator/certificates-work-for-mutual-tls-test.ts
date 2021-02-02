@@ -79,6 +79,7 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
       ),
     );
 
+    aServer.once("tlsClientError", (err: Error) => reject(err));
     aServer.once("listening", () => resolve(aServer));
     aServer.listen(0, "localhost");
     assert.tearDown(() => aServer.close());

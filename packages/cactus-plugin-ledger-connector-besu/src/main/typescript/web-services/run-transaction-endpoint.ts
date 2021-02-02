@@ -1,4 +1,4 @@
-import { Express, Request, Response, NextFunction } from "express";
+import { Express, Request, Response } from "express";
 
 import {
   Logger,
@@ -26,7 +26,7 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
 
   private readonly log: Logger;
 
-  public get className() {
+  public get className(): string {
     return RunTransactionEndpoint.CLASS_NAME;
   }
 
@@ -57,11 +57,7 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public async handleRequest(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     const reqBody = req.body;

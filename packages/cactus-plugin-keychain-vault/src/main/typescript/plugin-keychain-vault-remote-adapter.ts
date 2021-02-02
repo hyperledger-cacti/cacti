@@ -1,7 +1,6 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 
-import { Express } from "express";
 import { Optional } from "typescript-optional";
 
 import {
@@ -45,7 +44,7 @@ export class PluginKeychainVaultRemoteAdapter
   private readonly log: Logger;
   private readonly backend: DefaultApi;
 
-  public get className() {
+  public get className(): string {
     return PluginKeychainVaultRemoteAdapter.CLASS_NAME;
   }
 
@@ -80,9 +79,7 @@ export class PluginKeychainVaultRemoteAdapter
    *
    * @param _expressApp
    */
-  public async installWebServices(
-    _expressApp: Express,
-  ): Promise<IWebServiceEndpoint[]> {
+  public async installWebServices(): Promise<IWebServiceEndpoint[]> {
     return [];
   }
 
@@ -130,7 +127,7 @@ export class PluginKeychainVaultRemoteAdapter
     await this.backend.setKeychainEntry({ key, value: value as any });
   }
 
-  public async delete<T>(key: string): Promise<void> {
+  public async delete(key: string): Promise<void> {
     // FIXME Pretty sure vault can do delete so we don't have to hack it like this
     // but it cannot be done in this code until the rust code has been updated
     // to have that endpoint as well...

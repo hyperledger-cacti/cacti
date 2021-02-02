@@ -134,8 +134,6 @@ export class QuorumTestLedger implements ITestLedger {
    * @param [seedMoney=10e8] The amount of money to seed the new test account with.
    */
   public async createEthTestAccount(seedMoney = 10e8): Promise<Account> {
-    const fnTag = `QuorumTestLedger#getEthTestAccount()`;
-
     const rpcApiHttpHost = await this.getRpcApiHttpHost();
     const web3 = new Web3(rpcApiHttpHost);
     const ethTestAccount = web3.eth.accounts.create(uuidv4());
@@ -355,7 +353,6 @@ export class QuorumTestLedger implements ITestLedger {
                 resolve(output);
               }
             },
-            (event: any) => null, // ignore the spammy docker download log, we get it in the output variable anyway
           );
         }
       });

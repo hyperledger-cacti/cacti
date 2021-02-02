@@ -1,8 +1,6 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
-
 import { ApiServer, ConfigService } from "../../../main/typescript/public-api";
 
 import {

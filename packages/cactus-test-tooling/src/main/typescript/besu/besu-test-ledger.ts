@@ -348,7 +348,6 @@ export class BesuTestLedger implements ITestLedger {
                 resolve(output);
               }
             },
-            (event: any) => null, // ignore the spammy docker download log, we get it in the output variable anyway
           );
         }
       });

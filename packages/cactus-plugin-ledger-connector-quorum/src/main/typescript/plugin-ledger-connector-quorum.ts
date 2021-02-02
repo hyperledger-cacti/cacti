@@ -39,7 +39,6 @@ import {
   InvokeContractV1Response,
   RunTransactionRequest,
   RunTransactionResponse,
-  Web3SigningCredential,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialPrivateKeyHex,

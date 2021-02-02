@@ -1,5 +1,4 @@
-import { Express, Request, Response, NextFunction } from "express";
-import { AxiosResponse } from "axios";
+import { Express, Request, Response } from "express";
 
 import {
   IWebServiceEndpoint,
@@ -11,7 +10,6 @@ import {
 import {
   Configuration,
   DefaultApi,
-  GetNodeJwsResponse,
 } from "../generated/openapi/typescript-axios";
 
 import {
@@ -80,11 +78,7 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     return this;
   }
 
-  async handleRequest(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "GetConsortiumJwsEndpointV1#handleRequest()";
     this.log.debug(`GET ${this.getPath()}`);
 
