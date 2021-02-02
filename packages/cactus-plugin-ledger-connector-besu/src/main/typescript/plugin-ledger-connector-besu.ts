@@ -97,7 +97,6 @@ export class PluginLedgerConnectorBesu
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
-
     const web3Provider = new Web3.providers.HttpProvider(
       this.options.rpcApiHttpHost,
     );
