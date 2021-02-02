@@ -48,14 +48,20 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "GetSingleStatusEndpoint#handleRequest()";
     this.log.debug(`GET ${this.getPath()}`);
-    const id = req.params["id"];
+
+    const id = req.params.id;
+
+    this.log.info("Getting ID");
+    this.log.info("ID: " + id);
+
     try {
-      const result = this.client.sendCall(
+      const result = await this.client.sendCall(
         "getSingleStatus",
         [id],
         "HashTimeLock",
         "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
       );
+      this.log.info("RESULT: " + result);
       res.send(result);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);

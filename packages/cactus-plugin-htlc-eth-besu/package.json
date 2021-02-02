@@ -12,6 +12,7 @@
     "dist/*"
   ],
   "scripts": {
+    "start": "tsc --project ./tsconfig.json && node ./dist/lib/main/typescript/index.js",
     "generate-sdk": "openapi-generator generate --input-spec src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
@@ -86,6 +87,8 @@
     "@hyperledger/cactus-common": "0.3.0",
     "@hyperledger/cactus-core": "0.3.0",
     "@hyperledger/cactus-core-api": "0.3.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "0.3.0",
+    "@hyperledger/cactus-test-tooling": "0.3.0",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "0.3.0",
     "axios": "0.21.1",
     "express": "4.17.1",
