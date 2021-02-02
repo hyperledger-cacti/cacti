@@ -1,8 +1,7 @@
 const packageDir = process.cwd();
 const pkg = require(`${packageDir}/package.json`);
 const TerserPlugin = require("terser-webpack-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 const packageNameNoScope = pkg.name.substring(pkg.name.lastIndexOf("/") + 1);
 const libraryName = `${packageNameNoScope}`;
@@ -53,13 +52,7 @@ module.exports = {
   optimization: {
     minimizer: [new TerserPlugin()],
   },
-  plugins: [
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: "static",
-    //   openAnalyzer: false,
-    //   reportFilename: `${pkg.browserMinified}.html`,
-    // }),
-  ],
+  plugins: [new NodePolyfillPlugin()],
   output: {
     filename: "[name]",
     path: packageDir,
