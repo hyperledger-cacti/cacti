@@ -20,17 +20,14 @@ export class Servers {
    * @param server The server object that will be shut down.
    */
   public static async shutdown(server: Server | SecureServer): Promise<void> {
+    const fnTag = `Servers#shutdown()`;
     if (!server) {
-      throw new TypeError(`Servers#shutdown() server was falsy. Need object.`);
+      throw new TypeError(`${fnTag} server was falsy. Need object.`);
     }
     return new Promise<void>((resolve, reject) => {
-      server.close((err: any) => {
+      server.close((err: Error | undefined) => {
         if (err) {
-          reject(
-            new Error(
-              `Servers#shutdown() Failed to shut down server: ${err.stack}`,
-            ),
-          );
+          reject(new Error(`${fnTag} Failed to shut down server ${err.stack}`));
         } else {
           resolve();
         }
@@ -85,10 +82,11 @@ export class Servers {
    */
   public static async startOnPreferredPort(
     preferredPort?: number,
+    host = "127.0.0.1",
   ): Promise<Server> {
     if (preferredPort) {
       try {
-        return Servers.startOnPort(preferredPort);
+        return Servers.startOnPort(preferredPort, host);
       } catch (ex) {
         // if something else went wrong we still want to just give up
         if (!ex.message.includes("EADDRINUSE")) {
@@ -101,12 +99,15 @@ export class Servers {
     }
   }
 
-  public static async startOnPort(port: number): Promise<Server> {
+  public static async startOnPort(
+    port: number,
+    host = "127.0.0.1",
+  ): Promise<Server> {
     const server: Server = await new Promise((resolve, reject) => {
       const aServer: Server = createServer();
       aServer.once("listening", () => resolve(aServer));
       aServer.once("error", (err: Error) => reject(err));
-      aServer.listen(port, "localhost");
+      aServer.listen(port, host);
     });
 
     return server;
