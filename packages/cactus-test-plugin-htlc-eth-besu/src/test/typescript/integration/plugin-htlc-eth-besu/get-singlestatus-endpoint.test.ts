@@ -23,9 +23,9 @@ test("Test get single status endpoint", async (t: Test) => {
   });
 
   const addressInfo = httpServer.address() as AddressInfo;
-  t.comment(`HttpServer1 AddressInfo: ${JSON.stringify(addressInfo)}`);
+  t.comment(`HttpServer AddressInfo: ${JSON.stringify(addressInfo)}`);
   const node1Host = `http://${addressInfo.address}:${addressInfo.port}`;
-  t.comment(`Cactus Node 1 Host: ${node1Host}`);
+  t.comment(`Cactus Node Host: ${node1Host}`);
   const pluginRegistry = new PluginRegistry({});
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
@@ -50,7 +50,7 @@ test("Test get single status endpoint", async (t: Test) => {
   });
   await apiServer.start();
   t.comment("Start server");
-
+  test.onFinish(() => apiServer.shutdown());
   const configuration = new Configuration({
     basePath: node1Host,
   });
@@ -58,19 +58,11 @@ test("Test get single status endpoint", async (t: Test) => {
 
   const api = new DefaultApi(configuration);
   t.comment("Api generated");
+
   // Test for 200 valid response test case
-  test("Test get single status endpoint", async (t2: Test) => {
-    setTimeout(async () => {
-      const res = await api.getSingleStatus(
-        "0x60107340ab9546874a0d68958c1888babba0b0429a55751ea7bdf3ed38adc442",
-      );
-      t2.comment("Getting result");
-      console.log(res);
-      console.log(
-        "RESULT: " + res.status + " DATA: " + JSON.stringify(res.data),
-      );
-      t2.ok(res, "API response object is truthy");
-    }, 1800);
-  });
-  t.ok("End test 1");
+  const res = await api.getSingleStatus(
+    "0x60107340ab9546874a0d68958c1888babba0b0429a55751ea7bdf3ed38adc442",
+  );
+  t.comment("Getting result");
+  t.equal(res.status, 200);
 });
