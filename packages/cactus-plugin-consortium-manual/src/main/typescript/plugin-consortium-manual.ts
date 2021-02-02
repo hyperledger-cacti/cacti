@@ -14,11 +14,7 @@ import {
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 
-import {
-  PluginRegistry,
-  IConsortiumRepositoryOptions,
-  ConsortiumRepository,
-} from "@hyperledger/cactus-core";
+import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
 
 import {
   Checks,
@@ -82,7 +78,7 @@ export class PluginConsortiumManual
   }
 
   public async installWebServices(
-    expressApp: any,
+    expressApp: Express,
   ): Promise<IWebServiceEndpoint[]> {
     const { log } = this;
 
@@ -113,7 +109,6 @@ export class PluginConsortiumManual
     }
 
     const { consortiumDatabase, keyPairPem } = this.options;
-    const packageName = this.getPackageName();
     const consortiumRepo = new ConsortiumRepository({
       db: consortiumDatabase,
     });

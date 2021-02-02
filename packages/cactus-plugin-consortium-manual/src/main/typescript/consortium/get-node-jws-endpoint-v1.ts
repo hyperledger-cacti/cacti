@@ -1,5 +1,5 @@
 import uuid from "uuid";
-import { Express, Request, Response, NextFunction } from "express";
+import { Express, Request, Response } from "express";
 import { JWS, JWK } from "jose";
 import jsonStableStringify from "json-stable-stringify";
 
@@ -77,11 +77,7 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     return this;
   }
 
-  async handleRequest(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async handleRequest(req: Request, res: Response): Promise<void> {
     try {
       this.log.debug(`GET ${this.getPath()}`);
 

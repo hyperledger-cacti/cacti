@@ -2,11 +2,7 @@ import test, { Test } from "tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
 
-import {
-  Logger,
-  LoggerProvider,
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
@@ -27,10 +23,6 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "INFO";
-const log: Logger = LoggerProvider.getOrCreate({
-  label: "test-deploy-contract-from-json",
-  level: logLevel,
-});
 
 test("Quorum Ledger Connector Plugin", async (t: Test) => {
   const ledger = new QuorumTestLedger();

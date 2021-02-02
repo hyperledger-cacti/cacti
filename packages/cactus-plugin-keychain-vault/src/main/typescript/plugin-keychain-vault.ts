@@ -153,7 +153,7 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
     await this.backend.write(key, value);
   }
 
-  async delete<T>(key: string): Promise<void> {
+  async delete(key: string): Promise<void> {
     await this.backend.delete(key);
   }
 }

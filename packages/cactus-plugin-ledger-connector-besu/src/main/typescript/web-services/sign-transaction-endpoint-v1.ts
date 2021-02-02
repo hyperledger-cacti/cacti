@@ -1,6 +1,4 @@
 import { Express, Request, Response } from "express";
-import { Optional } from "typescript-optional";
-import Web3 from "web3";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
@@ -13,17 +11,10 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-  JsObjectSigner,
-  IJsObjectSignerOptions,
-  KeyConverter,
-  KeyFormat,
   Checks,
 } from "@hyperledger/cactus-common";
 
-import {
-  SignTransactionRequest,
-  SignTransactionResponse,
-} from "../generated/openapi/typescript-axios/api";
+import { SignTransactionRequest } from "../generated/openapi/typescript-axios/api";
 
 import { BesuSignTransactionEndpointV1 as Constants } from "./sign-transaction-endpoint-constants";
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";

@@ -117,8 +117,6 @@ test("Circular JSON Test", async (assert: Test) => {
   };
   const jsObjectSigner = new JsObjectSigner(jsObjectSignerOptions);
 
-  const date: Date = new Date();
-
   const obj: any = { a: "foo" };
   obj.b = obj;
 
@@ -209,8 +207,7 @@ test("Test missing required constructor field", async (assert: Test) => {
     const jsObjectSignerOptions: IJsObjectSignerOptions = {
       privateKey: undefined,
     };
-
-    const jsObjectSigner = new JsObjectSigner(jsObjectSignerOptions);
+    new JsObjectSigner(jsObjectSignerOptions);
   } catch (e) {
     assert.equal(e.message, "JsObjectSigner#ctor options.privateKey falsy.");
   }

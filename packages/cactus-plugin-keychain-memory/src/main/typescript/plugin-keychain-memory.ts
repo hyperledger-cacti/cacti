@@ -22,7 +22,7 @@ export class PluginKeychainMemory {
   private readonly log: Logger;
   private readonly instanceId: string;
 
-  public get className() {
+  public get className(): string {
     return PluginKeychainMemory.CLASS_NAME;
   }
 
@@ -77,7 +77,7 @@ export class PluginKeychainMemory {
     this.backend.set(key, value);
   }
 
-  async delete<T>(key: string): Promise<void> {
+  async delete(key: string): Promise<void> {
     this.backend.delete(key);
   }
 }
