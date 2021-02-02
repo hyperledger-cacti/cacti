@@ -22,9 +22,6 @@ export default class Client {
     const node = environment.NODE!;
     this.log.info(`Creating new blockchain connection to ${node}`);
     this.web3 = new Web3(new Web3.providers.HttpProvider(node));
-    this.log.info(`Loading contracts`);
-    this.loadContracts(environment.CONTRACT_PATH!);
-
     this.Helpers = new Helpers(this.web3, this.contracts);
   }
 
@@ -220,28 +217,33 @@ export default class Client {
    * @param contractsPath Paths with the compiled smart contracts
    * @return Map with the loaded contract instances
    */
-  private async loadContracts(contractsPath: string) {
+  public async loadContracts(contractsPath: string) {
     const networkId = await this.web3.eth.net.getId();
-    fs.readdirSync(contractsPath).forEach((contractNameWithExt) => {
+    fs.readdirSync(contractsPath).forEach(async (contractNameWithExt) => {
       const splitted = contractNameWithExt.split(".", 1);
       const contractName = splitted[0];
       const filePath = path.join(contractsPath, contractNameWithExt);
       try {
+        this.log.info("Contract name: " + contractName);
         const parsedContract = JSON.parse(
           fs.readFileSync(filePath, { encoding: "utf-8" }),
         );
-        const contractInfo: any = {
-          name: contractName,
-          abi: parsedContract.abi,
-          bytecode: parsedContract.bytecode,
-          address: parsedContract.networks[networkId].address,
-        };
+        if (parsedContract.networks[networkId] != undefined) {
+          if (parsedContract.networks[networkId].address == undefined) {
+            throw new Error("There is no contract with the specified address");
+          }
+        } else {
+          throw new Error("There is no contract with the specified address");
+        }
+
+        this.log.info("Address: " + parsedContract.networks[networkId].address);
         const contractInstance = new this.web3.eth.Contract(
-          contractInfo.abi,
-          contractInfo.address,
+          parsedContract.abi,
+          parsedContract.networks[networkId].address,
         );
-        this.contracts[contractInfo.name] = contractInstance;
+        this.contracts[contractName] = contractInstance;
       } catch (error) {
+        this.log.error(error);
         throw error;
       }
     });
