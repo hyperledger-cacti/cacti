@@ -1,4 +1,4 @@
-import uuid from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { Express, Request, Response } from "express";
 import { JWS, JWK } from "jose";
 import jsonStableStringify from "json-stable-stringify";
@@ -100,7 +100,7 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
       const payloadJson = jsonStableStringify(payloadObject);
       const _protected = {
         iat: Date.now(),
-        jti: uuid.v4(),
+        jti: uuidv4(),
         iss: "Hyperledger Cactus",
       };
       // TODO: double check if this casting is safe (it is supposed to be)
