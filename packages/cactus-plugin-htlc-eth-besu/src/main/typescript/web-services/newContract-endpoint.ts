@@ -49,17 +49,15 @@ export class NewContractEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "NewContractEndpoint#handleRequest()";
     this.log.debug(`POST ${this.getPath()}`);
-    await this.client.loadContracts(environment.CONTRACT_PATH!);
-    //TODO: check that it recovers the BODY correctly.
-    const request: NewContractObj = req.body as NewContractObj;
-    const outputAmount = request.outputAmount;
-    const expiration = request.expiration;
-    const hashLock = request.hashLock;
-    const receiver = request.receiver;
-    const outputNetwork = request.outputNetwork;
-    const outputAddress = request.outputAddress;
     try {
-      //TODO: check that it works and remove from here.
+      await this.client.loadContracts(environment.CONTRACT_PATH!);
+      const request: NewContractObj = req.body as NewContractObj;
+      const outputAmount = request.outputAmount;
+      const expiration = request.expiration;
+      const hashLock = request.hashLock;
+      const receiver = request.receiver;
+      const outputNetwork = request.outputNetwork;
+      const outputAddress = request.outputAddress;
       const result = await this.client.sendTx(
         "newContract",
         [
@@ -70,11 +68,11 @@ export class NewContractEndpoint implements IWebServiceEndpoint {
           outputNetwork,
           outputAddress,
         ],
-        "HashTimeLock",
-        "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
-        "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
-        "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d",
-        "1111",
+        environment.CONTRACT_NAME,
+        environment.CONTRACT_ADDRESS,
+        environment.ACCOUNT_ADDRESS,
+        environment.PRIVATE_KEY,
+        "100",
       );
       this.log.debug(`${fnTag} Result: ${result}`);
       res.send(result);
