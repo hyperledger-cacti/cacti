@@ -89,7 +89,7 @@ export default class Client {
     contractAddress: string,
     account: string,
     pKey: string,
-    wei: string,
+    wei?: string,
   ) {
     try {
       const tx = await this.createTx(
