@@ -11,6 +11,7 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { environment } from "../environment";
 
 export interface IGetStatusEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -18,7 +19,7 @@ export interface IGetStatusEndpointOptions {
 export class GetStatusEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetStatusEndpoint";
   private readonly log: Logger;
-  public get className() {
+  public get className(): string {
     return GetStatusEndpoint.CLASS_NAME;
   }
   private client: Client;
@@ -48,14 +49,17 @@ export class GetStatusEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "GetStatusEndpoint#handleRequest()";
     this.log.debug(`GET ${this.getPath()}`);
-    const ids = req.query["ids"];
     try {
-      const result = this.client.sendCall(
+      await this.client.loadContracts(environment.CONTRACT_PATH);
+      const query = req.query["ids"]?.toString();
+      const ids = query?.split(",");
+      const result = await this.client.sendCall(
         "getStatus",
         [ids],
         "HashTimeLock",
-        "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
+        environment.ACCOUNT_ADDRESS,
       );
+      this.log.debug(`${fnTag} Result: ${result}`);
       res.send(result);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
