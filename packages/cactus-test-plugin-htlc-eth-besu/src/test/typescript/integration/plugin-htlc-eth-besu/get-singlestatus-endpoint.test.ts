@@ -65,4 +65,13 @@ test("Test get single status endpoint", async (t: Test) => {
   );
   t.comment("Getting result");
   t.equal(res.status, 200);
+
+  //test for 500 not found test case
+  try {
+    await api.getSingleStatus(
+      "0xfake5ba7f06a8b01d0596589f73c19069e21c81e5013b91f408165d1bf623d32",
+    );
+  } catch (error) {
+    t.equal(error.response.status, 500, "HTTP response status are equal");
+  }
 });

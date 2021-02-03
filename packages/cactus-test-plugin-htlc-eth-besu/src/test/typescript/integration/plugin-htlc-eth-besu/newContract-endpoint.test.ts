@@ -74,4 +74,21 @@ test("Test new Contract endpoint", async (t: Test) => {
   t.comment("Getting result");
   t.equal(res.status, 200);
   t.ok("End test 1");
+
+  // Test for 500 not found test case
+  try {
+    const bodyObjF: NewContractObj = {
+      outputAmount: 0x04,
+      expiration: 2147483648,
+      hashLock:
+        "0x3c335ba7f06a8b01d0596589f73c19069e21c81e5013b91f408165d1bf623d32",
+      receiver: "0xFAKE8FDEE72ac11b5c542428B35EEF5769C409f0",
+      outputNetwork: "BTC",
+      outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
+    };
+    await api.newContract(bodyObjF);
+  } catch (error) {
+    t.equal(error.response.status, 500, "HTTP response status are equal");
+    t.ok("End test 2");
+  }
 });
