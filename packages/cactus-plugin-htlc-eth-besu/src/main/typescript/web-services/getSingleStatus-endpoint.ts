@@ -56,15 +56,12 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
     this.log.debug(`GET ${this.getPath()}`);
     await this.client.loadContracts(environment.CONTRACT_PATH!);
     const id = req.params.id;
-
-    this.log.debug(`${fnTag} Id: ${id}`);
-    //TODO: Modify endpoint for set account address
     try {
       const result = await this.client.sendCall(
         "getSingleStatus",
         [id],
-        "HashTimeLock",
-        "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
+        environment.CONTRACT_NAME,
+        environment.ACCOUNT_ADDRESS,
       );
       this.log.debug(`${fnTag} Result: ${result}`);
       res.send(result);

@@ -11,6 +11,7 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { environment } from "../environment";
 
 export interface IRefundEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -18,7 +19,7 @@ export interface IRefundEndpointOptions {
 export class RefundEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "RefundEndpoint";
   private readonly log: Logger;
-  public get className() {
+  public get className(): string {
     return RefundEndpoint.CLASS_NAME;
   }
   private client: Client;
@@ -48,18 +49,18 @@ export class RefundEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "RefundEndpoint#handleRequest()";
     this.log.debug(`POST ${this.getPath()}`);
-    const id = req.params["id"];
     try {
-      //TODO: check that it works and remove from here.
-      const result = this.client.sendTx(
+      const id = req.params["id"];
+      await this.client.loadContracts(environment.CONTRACT_PATH);
+      const result = await this.client.sendTx(
         "refund",
         [id],
-        "HashTimeLock",
-        "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
-        "",
-        "",
-        "",
+        environment.CONTRACT_NAME,
+        environment.CONTRACT_ADDRESS,
+        environment.ACCOUNT_ADDRESS,
+        environment.PRIVATE_KEY,
       );
+      this.log.debug(`${fnTag} Result: ${result}`);
       res.send(result);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
