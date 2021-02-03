@@ -50,7 +50,7 @@ test("Test get status endpoint", async (t: Test) => {
   });
   await apiServer.start();
   t.comment("Start server");
-  //test.onFinish(() => apiServer.shutdown());
+  test.onFinish(() => apiServer.shutdown());
   const configuration = new Configuration({
     basePath: node1Host,
   });
@@ -66,4 +66,18 @@ test("Test get status endpoint", async (t: Test) => {
   ]);
   t.comment("Getting result");
   t.equal(res.status, 200);
+  //Test for 500 not found test case
+  try {
+    await api.getStatus([
+      "0xfake5ba7f06a8b01d0596589f73c19069e21c81e5013b91f408165d1bf623d32",
+      "0x001",
+    ]);
+  } catch (error) {
+    t.equal(error.response.status, 500, "HTTP response status are equal");
+    t.equal(
+      error.response.statusText,
+      'invalid bytes32 value (arg="ids", coderType="bytes32", value="0xfake5ba7f06a8b01d0596589f73c19069e21c81e5013b91f408165d1bf623d32")',
+      "Response text are equal",
+    );
+  }
 });
