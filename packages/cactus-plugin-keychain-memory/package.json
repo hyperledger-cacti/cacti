@@ -81,9 +81,11 @@
     "@hyperledger/cactus-common": "0.3.0",
     "@hyperledger/cactus-core-api": "0.3.0",
     "joi": "14.3.1",
-    "typescript-optional": "2.0.1"
+    "typescript-optional": "2.0.1",
+    "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@types/joi": "14.3.4"
+    "@types/joi": "14.3.4",
+    "@types/uuid": "8.3.0"
   }
 }
