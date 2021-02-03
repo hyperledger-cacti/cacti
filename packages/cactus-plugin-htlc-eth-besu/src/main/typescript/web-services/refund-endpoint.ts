@@ -59,6 +59,7 @@ export class RefundEndpoint implements IWebServiceEndpoint {
         environment.CONTRACT_ADDRESS,
         environment.ACCOUNT_ADDRESS,
         environment.PRIVATE_KEY,
+        "100",
       );
       this.log.debug(`${fnTag} Result: ${result}`);
       res.send(result);
