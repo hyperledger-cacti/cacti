@@ -143,11 +143,11 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
       `${fnTag}:connector`,
     );
 
-    const connector = plugin as PluginLedgerConnectorBesu;
+    const connector = plugin as PluginLedgerConnectorBesu;*/
 
-    // could work something like this but I'm just throwing this here without
-    // testing for now...
-       await connector.invokeContract({
+  // could work something like this but I'm just throwing this here without
+  // testing for now...
+  /*   await connector.invokeContract({
       contractAbi: HashTimeLockJson.abi,
       contractAddress: req.contractAddress,
       invocationType: EthContractInvocationType.SEND,
