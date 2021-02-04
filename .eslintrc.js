@@ -15,10 +15,13 @@ module.exports = {
     "no-prototype-builtins": "error",
     "@typescript-eslint/no-var-requires": "warn",
     "no-dupe-class-members": "off",
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      { ignoreRestSiblings: true },
+    "no-unused-vars": [
+      "warn",
+      {
+        vars: "all",
+        args: "after-used",
+        ignoreRestSiblings: false,
+      },
     ],
     indent: ["off"],
     semi: ["error", "always"],
