@@ -461,6 +461,16 @@
                         "default": [],
                         "items": {}
                     },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
                     "gas": {
                         "oneOf": [
                             {

@@ -177,6 +177,12 @@ export interface InvokeContractV1Request {
      * @type {string | number}
      * @memberof InvokeContractV1Request
      */
+    value?: string | number;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof InvokeContractV1Request
+     */
     gas?: string | number;
     /**
      * 
