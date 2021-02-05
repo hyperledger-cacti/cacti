@@ -1,0 +1,354 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - HTLC ETH BESU ERC20",
+        "description": "Can perform basic tasks on a Besu ledger",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://www.cactus.stream/{basePath}",
+            "description": "Public test instance",
+            "variables": {
+                "basePath": {
+                    "default": ""
+                }
+            }
+        },
+        {
+            "url": "http://localhost:4000/{basePath}",
+            "description": "Local test instance",
+            "variables": {
+                "basePath": {
+                    "default": ""
+                }
+            }
+        }
+    ],
+    "components": {
+        "schemas": {
+            "NewContractRequest": {
+                "type": "object",
+                "required": [
+                    "contractAbi",
+                    "web3SigningCredential",
+                    "contractAddress",
+                    "invocationType",
+                    "methodName",
+                    "params"
+                ],
+                "properties": {
+                    "inputAmount": {
+                        "description": "Input amount to lock",
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "outputAmount": {
+                        "description": "Output amount to lock",
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "expiration": {
+                        "description": "Timestamp to expire the contract",
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "hashLock": {
+                        "description": "Hashlock needed to refund the amount",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "tokenAddress": {
+                        "description": "The token address",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "receiver": {
+                        "description": "The receiver address",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "outputNetwork": {
+                        "description": "The output network id",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "outputAddress": {
+                        "description": "The output addreess to receive the tokens",
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "NewContractResponse": {
+                "type": "object",
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    },
+                    "callOutput": {}
+                }
+            },
+            "RefundResponse": {
+                "type": "object",
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    },
+                    "callOutput": {}
+                }
+            },
+            "WithdrawRequest": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "secret"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Contract locked id",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "secret": {
+                        "description": "Secret need to unlock the contract",
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "WithdrawResponse": {
+                "type": "object",
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    },
+                    "callOutput": {}
+                }
+            },
+            "Web3TransactionReceipt": {
+                "type": "object",
+                "required": [
+                    "blockHash",
+                    "blockNumber",
+                    "transactionHash",
+                    "transactionIndex",
+                    "status",
+                    "from",
+                    "to",
+                    "gasUsed"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                    "status": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "transactionHash": {
+                        "type": "string",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                    },
+                    "transactionIndex": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "blockHash": {
+                        "type": "string",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                    },
+                    "blockNumber": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasUsed": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "from": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "to": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            }
+        },
+        "responses": {
+            "getStatusResponse": {
+                "description": "Array of status",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "format": "uint256"
+                      }
+                    }
+                  }
+                }
+              },
+            "getSingleStatusResponse": {
+                "description": "Status",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "integer",
+                      "format": "uint256"
+                    }
+                  }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw": {
+            "post": {
+                "operationId": "withdraw",
+                "summary": "Withdraw a hashtimelock contract",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WithdrawRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WithdrawResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status": {
+            "get": {
+                "operationId": "getStatus",
+                "summary": "Get array of status of a hashtimelock contract, the status are ( 0 - Invalid, 1 - Active, 2 - Refunded, 3 - Withdrawn, 4 - Expired)",
+                "parameters": [
+                  {
+                    "name": "ids",
+                    "in": "query",
+                    "required": true,
+                    "schema": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "bytes32"
+                      }
+                    }
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "OK",
+                    "$ref": "#/components/responses/getStatusResponse"
+                  }
+                }
+              }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status/{id}": {
+            "get": {
+                "operationId": "getSingleStatus",
+                "summary": "Get a status of a hashtimelock contract, the status are ( 0 - Invalid, 1 - Active, 2 - Refunded, 3 - Withdrawn, 4 - Expired)",
+                "parameters": [
+                  {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                      "type": "string",
+                      "format": "bytes32"
+                    }
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "OK",
+                    "$ref": "#/components/responses/getSingleStatusResponse"
+                  }
+                }
+              }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund/{id}": {
+            "post": {
+                "operationId": "refund",
+                "summary": "Refund a hashtimelock contract",
+                "parameters": [
+                    {
+                      "name": "id",
+                      "in": "path",
+                      "required": true,
+                      "schema": {
+                        "type": "string",
+                        "format": "bytes32"
+                      }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RefundResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract": {
+            "post": {
+                "operationId": "newContract",
+                "summary": "Create a new hashtimelock contract",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewContractRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NewContractResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

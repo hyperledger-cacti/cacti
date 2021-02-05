@@ -5,9 +5,13 @@
 // With that said, there shouldn't be any reason to recompile this, like ever...
 // *****************************************************************************
 
-pragma solidity >=0.7.0;
+pragma solidity ^0.8.0;
 
 contract HelloWorld {
+  constructor(string memory proposalNames) public {
+       name = proposalNames";
+  }
+
   string private name = "CaptainCactus";
 
   function sayHello () public pure returns (string memory) {
