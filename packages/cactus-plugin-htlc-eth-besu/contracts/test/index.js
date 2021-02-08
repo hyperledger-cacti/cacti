@@ -51,9 +51,7 @@ contract("HashTimeLock", () => {
     );
 
     const contractId = newContract.logs[0].args.id;
-    const getOneStatus = await contractInstance.methods["getStatus(bytes32)"](
-      contractId
-    );
+    const getOneStatus = await contractInstance.getSingleStatus(contractId);
 
     assert(
       statuses[parseInt(getOneStatus)] === ACTIVE,
@@ -64,7 +62,6 @@ contract("HashTimeLock", () => {
   // Successful withdraw
   it("should withdraw", async () => {
     const timestamp = await getTimestamp(txHash);
-    console.log(timestamp)
     const {
       outputAmount,
       hashLock,
@@ -86,9 +83,8 @@ contract("HashTimeLock", () => {
     const contractId = newContract.logs[0].args.id;
     await contractInstance.withdraw(contractId, secret);
 
-    const getOneStatus = await contractInstance.methods["getStatus(bytes32)"](
-      contractId
-    );
+    const getOneStatus = await contractInstance.getSingleStatus(contractId);
+
 
     assert(
       statuses[parseInt(getOneStatus)] === WITHDRAWN,
@@ -135,9 +131,12 @@ contract("HashTimeLock", () => {
       outputAddress
     } = mockNewContract;
 
+    const time = timestamp + 5
+
+
     const newContract = await contractInstance.newContract(
       outputAmount,
-      (timestamp + 2).toString(),
+      time,
       hashLock,
       receiverAddress,
       outputNetwork,
@@ -146,7 +145,7 @@ contract("HashTimeLock", () => {
     );
 
     const contractId = newContract.logs[0].args.id;
-    await timeout(2000);
+    await timeout(5000);
 
     await truffleAssert.reverts(contractInstance.withdraw(contractId, secret));
   });
@@ -161,9 +160,12 @@ contract("HashTimeLock", () => {
       outputNetwork,
       outputAddress
     } = mockNewContract;
+
+    const time = timestamp + 10
+
     const newContract = await contractInstance.newContract(
       outputAmount,
-      (timestamp + 4).toString(),
+      time,
       hashLock,
       receiverAddress,
       outputNetwork,
@@ -172,12 +174,11 @@ contract("HashTimeLock", () => {
     );
 
     const contractId = newContract.logs[0].args.id;
-    await timeout(2000);
+    await timeout(5000);
     await contractInstance.refund(contractId);
 
-    const getOneStatus = await contractInstance.methods["getStatus(bytes32)"](
-      contractId
-    );
+    const getOneStatus = await contractInstance.getSingleStatus(contractId);
+
     assert(
       statuses[parseInt(getOneStatus)] === REFUNDED,
       `Expected REFUNDED, got ${statuses[parseInt(getOneStatus)]} instead`
@@ -196,7 +197,7 @@ contract("HashTimeLock", () => {
     } = mockNewContract;
     const newContract = await contractInstance.newContract(
       outputAmount,
-      (timestamp + 6).toString(),
+      (timestamp + 1000).toString(),
       hashLock,
       receiverAddress,
       outputNetwork,
