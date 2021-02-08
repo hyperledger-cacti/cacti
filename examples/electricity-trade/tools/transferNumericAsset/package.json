@@ -1,0 +1,23 @@
+{
+  "name": "transferNumericAsset",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run build-ts && npm run copy-static-assets",
+    "build-ts": "tsc",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "copy-static-assets": "ts-node copyStaticAssets.ts"
+  },
+  "dependencies": {
+    "@types/node": "^14.14.5",
+    "config": "^1.26.1",
+    "ethereumjs-common": "^1.5.1",
+    "ethereumjs-tx": "^2.1.2",
+    "ts-node": "^9.0.0",
+    "web3": "^1.2.9",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.3"
+  }
+}
