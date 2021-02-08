@@ -1,0 +1,48 @@
+.git
+*/*/node_modules
+*/*/dist
+*/*/build
+
+.config.json
+.nyc_output/
+dist/
+.DS_Store
+node_modules/
+docs/main
+logs/
+jspm_packages/
+generated-sources/
+coverage/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# next.js build output
+.next
+
+# vscode files
+.vscode/*
+!.vscode/template.launch.json
+
+# Introperability App specifics
+examples/simple-asset-transfer/fabric/**/hfc-key-store/
+
+bin/
+.tmp/
+lerna-debug.log
+cactus-openapi-spec.json
+cactus-openapi-spec-*.json
+.npmrc
+*.log
