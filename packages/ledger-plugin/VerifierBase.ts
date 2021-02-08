@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2020-2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * VerifierBase.ts
@@ -261,7 +261,7 @@ export class VerifierBase implements Verifier {
         });
     }
 
-    startMonitor(): Promise<LedgerEvent> {
+    startMonitor(options = {}): Promise<LedgerEvent> {
         return new Promise((resolve, reject) => {
             logger.debug('call : startMonitor');
             // NOTE: Start the event monitor for the Validator and enable event reception.
@@ -334,7 +334,11 @@ export class VerifierBase implements Verifier {
                     // save socket
                     const sIndex: number = addSocket(socket);
                     logger.debug("##emit: startMonitor");
-                    socket.emit('startMonitor')
+                    if (Object.keys(options).length === 0) {
+                        socket.emit('startMonitor');
+                    } else {
+                        socket.emit('startMonitor', options);
+                    }
                     const ledgerEvent: LedgerEvent = new LedgerEvent();
                     ledgerEvent.id = String(sIndex);
                     logger.debug(`##startMonitor, ledgerEvent.id = ${ledgerEvent.id}`);

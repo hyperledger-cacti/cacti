@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * electricity-trade.ts
@@ -40,15 +40,15 @@ router.post('/', (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// Show Current Status of Trade
-router.get('/:account', (req: Request, res: Response, next: NextFunction) => {
-
-    res.status(200).json({"message": "Not implemented"});
-
-/*
+// Request Execution of Trade
+router.post('/meter/register/', (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = transactionManagement.getOperationStatus(req.params.id);
-    res.status(200).json(result);
+    const result: object = transactionManagement.setBusinessLogicConfig(req);
+    let status: number = 200;
+    if (result['action'] === "add") {
+        status = 201;
+    }
+    res.status(status).json(result);
 
   } catch (err) {
     if (err instanceof RIFError) {
@@ -59,8 +59,6 @@ router.get('/:account', (req: Request, res: Response, next: NextFunction) => {
 
     next(err);
   }
-*/
-
 });
 
 export default router;

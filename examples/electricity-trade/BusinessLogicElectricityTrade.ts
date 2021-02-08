@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * BusinessLogicElectricityTrade.ts
@@ -7,6 +7,8 @@
 
 import { Request } from 'express';
 import { RequestInfo } from './RequestInfo';
+import { MeterManagement } from './MeterManagement';
+import { MeterInfo } from './MeterInfo';
 import { TradeInfo } from '../../packages/routing-interface/TradeInfo';
 import { transactionManagement } from '../../packages/routing-interface/routes/index';
 import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
@@ -24,10 +26,12 @@ logger.level = config.logLevel;
 
 export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     businessLogicID: string;
+    meterManagement: MeterManagement;
 
     constructor(businessLogicID: string) {
         super();
         this.businessLogicID = businessLogicID;
+        this.meterManagement = new MeterManagement();
     }
 
     startTransaction(req: Request, businessLogicID: string, tradeID: string) {
@@ -66,7 +70,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
         const accountInfo = this.getAccountInfo(transactionSubset);
         if (Object.keys(accountInfo).length === 0) {
-            logger.debug(`remittanceTransaction(): skip (No target data)`);
+            logger.debug(`remittanceTransaction(): skip (No target meter)`);
             return;
         }
 
@@ -294,23 +298,33 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
     getAccountInfo(transactionSubset: object): object {
         const transactionInfo = {};
-        for (const customer of config.electricityTradeInfo.ethereum.account.customer) {
-            logger.debug(`customer = ${json2str(customer)}`);
-            if (transactionSubset['Name'] === customer.number) {
-                if (transactionSubset['Verb'] === "inc") {
-                    logger.debug('getAccountInfo(): A to B');
-                    transactionInfo['fromAddress'] = customer.accountA;
-                    transactionInfo['fromAddressPkey'] = config.electricityTradeInfo.ethereum.account.pKey[customer.accountA];
-                    transactionInfo['toAddress'] = customer.accountB;
-                }
-                else if (transactionSubset['Verb'] === "dec"){
-                    logger.debug('getAccountInfo(): B to A');
-                    transactionInfo['fromAddress'] = customer.accountB;
-                    transactionInfo['fromAddressPkey'] = config.electricityTradeInfo.ethereum.account.pKey[customer.accountB];
-                    transactionInfo['toAddress'] = customer.accountA;
-                }
-            }
+
+        // Get Meter Information.
+        const meterInfo: MeterInfo | null = this.meterManagement.getMeterInfo(transactionSubset['Name']);
+        if (meterInfo === null) {
+            logger.debug(`Not registered. meterID = ${transactionSubset['Name']}`);
+            return transactionInfo;
         }
+
+        logger.debug(`getAccountInfo(): Verb = ${transactionSubset['Verb']}`);
+        if (transactionSubset['Verb'] === "inc") {
+            logger.debug('getAccountInfo(): Verb = inc');
+            transactionInfo['fromAddress'] = "0x" + meterInfo.bankAccount;
+            transactionInfo['fromAddressPkey'] = meterInfo.bankAccountPKey;
+            transactionInfo['toAddress'] = "0x" + meterInfo.powerCompanyAccount;
+        }
+
         return transactionInfo;
     }
+
+    setConfig(meterParams: string[]) : object {
+
+        logger.debug("called setConfig()");
+
+        // add MeterInfo
+        const meterInfo = new MeterInfo(meterParams);
+        const result: {} = this.meterManagement.addMeterInfo(meterInfo);
+        return result;
+    }
+
 }

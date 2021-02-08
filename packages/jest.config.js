@@ -1,4 +1,11 @@
 /*
+ * Copyright 2020-2021 Hyperledger Cactus Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * jest.config.js
+ */
+
+/*
  * For a detailed explanation regarding each configuration property, visit:
  * https://jestjs.io/docs/en/configuration.html
  */
