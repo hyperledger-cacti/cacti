@@ -88,10 +88,10 @@ export class SupplyChainApp {
     const keychainIdB = "PluginKeychainMemory_B";
 
     // Reserve the ports where the Cactus nodes will run API servers, GUI
-    const httpApiA = await Servers.startOnPreferredPort(5000);
-    const httpApiB = await Servers.startOnPreferredPort(5100);
-    const httpGuiA = await Servers.startOnPreferredPort(6000);
-    const httpGuiB = await Servers.startOnPreferredPort(6100);
+    const httpApiA = await Servers.startOnPort(4000, "0.0.0.0");
+    const httpApiB = await Servers.startOnPort(4100, "0.0.0.0");
+    const httpGuiA = await Servers.startOnPort(3000, "0.0.0.0");
+    const httpGuiB = await Servers.startOnPort(3100, "0.0.0.0");
 
     const addressInfoA = httpApiA.address() as AddressInfo;
     const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
@@ -299,27 +299,23 @@ export class SupplyChainApp {
     httpServerCockpit: Server,
     pluginRegistry: PluginRegistry,
   ): Promise<ApiServer> {
-    const addressInfo = httpServerApi.address() as AddressInfo;
+    const addressInfoApi = httpServerApi.address() as AddressInfo;
+    const addressInfoCockpit = httpServerCockpit.address() as AddressInfo;
 
     const configService = new ConfigService();
-    const apiServerOptions = configService.newExampleConfig();
-    // FIXME: Plugin imports will only work once we have this merged and released in webpack
-    // https://github.com/webpack/webpack/pull/11316
-    apiServerOptions.plugins = [];
+    const config = configService.getOrCreate();
+    const properties = config.getProperties();
 
-    apiServerOptions.configFile = "";
-    apiServerOptions.apiCorsDomainCsv = "*";
-    apiServerOptions.apiPort = addressInfo.port;
-    apiServerOptions.apiTlsEnabled = false;
-    apiServerOptions.cockpitTlsEnabled = false;
-    apiServerOptions.cockpitPort = 0;
-    apiServerOptions.logLevel = this.options.logLevel || "INFO";
-    apiServerOptions.cockpitWwwRoot =
-      "./node_modules/@hyperledger/cactus-example-supply-chain-frontend/www/";
-    const config = configService.newExampleConfigConvict(apiServerOptions);
+    properties.plugins = [];
+    properties.configFile = "";
+    properties.apiPort = addressInfoApi.port;
+    properties.apiHost = addressInfoApi.address;
+    properties.cockpitHost = addressInfoCockpit.address;
+    properties.cockpitPort = addressInfoCockpit.port;
+    properties.logLevel = this.options.logLevel || "INFO";
 
     const apiServer = new ApiServer({
-      config: config.getProperties(),
+      config: properties,
       httpServerApi,
       httpServerCockpit,
       pluginRegistry,

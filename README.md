@@ -18,23 +18,20 @@ As blockchain technology proliferates, blockchain integration will become an inc
 
 ### Supply Chain Example
 
-```sh
-git clone https://github.com/hyperledger/cactus.git
-cd cactus
-npm install
-npm run configure
-cd examples/supply-chain-app/
-npm install --no-package-lock
-cd ../../
-npm run build:dev
-$ npm start:example-supply-chain
-...
-[2020-10-27T00:38:00.574Z] INFO (api-server): Cactus API reachable http://127.0.0.1:5000
-[2020-10-27T00:38:00.574Z] INFO (api-server): Cactus Cockpit reachable http://127.0.0.1:6000
-...
-[2020-10-27T00:38:00.574Z] INFO (api-server): Cactus API reachable http://127.0.0.1:5100
-[2020-10-27T00:38:00.574Z] INFO (api-server): Cactus Cockpit reachable http://127.0.0.1:6100
-```
+1. Run the following command to pull up the container that will run the example application and the test ledgers as well:
+    ```sh
+    docker run \
+      --rm \
+      --privileged \
+      -p 3000:3000 \
+      -p 3100:3100 \
+      -p 4000:4000 \
+      -p 4100:4100 \
+      hyperledger/cactus-example-supply-chain-app:2021-02-05-f89a37a
+    ```
+2. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3100`
+3. Visit http://localhost:3100 in a web browser with Javascript enabled
+4. Use the graphical user interface to create data on both ledgers and observe that a consistent view of the data from different ledgers is provided.
 
 Once the last command has finished executing, open link printed on the console with a web browser of your choice
 
