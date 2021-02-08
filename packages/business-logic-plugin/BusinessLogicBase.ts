@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2020-2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * BusinessLogicBase.ts
@@ -31,6 +31,11 @@ export class BusinessLogicBase implements BusinessLogicPlugin {
     }
 
     getOperationStatus(tradeID: string): object {
+        // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
+        return {};
+    }
+
+    setConfig(data: []): object {
         // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
         return {};
     }

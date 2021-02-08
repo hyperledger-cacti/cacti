@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2020-2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * TransactionManagement.ts
@@ -107,6 +107,35 @@ export class TransactionManagement {
 
         return transactionStatusData;
 
+    }
+
+
+    // Set business logic config
+    setBusinessLogicConfig(req: Request): object {
+
+        // businessLogicID
+        const businessLogicID = req.body.businessLogicID;
+        logger.info(`businessLogicID: ${businessLogicID}`);
+
+        // object judgment
+        let result: {} = {};
+        if (businessLogicID === "h40Q9eMD") {
+
+            const blp = getTargetBLPInstance(businessLogicID);
+            if (blp === null) {
+                logger.warn(`##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`);
+                return;
+            }
+
+            logger.debug("created instance");
+
+            // Set business logic config
+            logger.debug(`meterParams = ${req.body.meterParams}`);
+            result = blp.setConfig(req.body.meterParams);
+            logger.debug("set business logic config");
+        }
+
+        return result;
     }
 
 
