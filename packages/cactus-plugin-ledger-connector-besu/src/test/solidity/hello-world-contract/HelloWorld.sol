@@ -9,6 +9,7 @@ pragma solidity >=0.7.0;
 
 contract HelloWorld {
   string private name = "CaptainCactus";
+  string[] private names; 
 
   function sayHello () public pure returns (string memory) {
     return 'Hello World!';
@@ -19,8 +20,15 @@ contract HelloWorld {
       return name;
   }
 
+  function getNameByIndex(uint256 index) public view returns (string memory)
+  {
+      return names[index];
+  }
+
   function setName(string memory newName) public
   {
       name = newName;
+      names.push(newName);
   }
+
 }
