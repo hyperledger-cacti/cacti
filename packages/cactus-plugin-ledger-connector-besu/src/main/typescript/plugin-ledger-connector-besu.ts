@@ -198,7 +198,7 @@ export class PluginLedgerConnectorBesu
     const method: ContractSendMethod = methodRef(...req.params);
 
     if (req.invocationType === EthContractInvocationType.CALL) {
-      const callOutput = await (method as any).call(...req.params);
+      const callOutput = await (method as any).call();
       return { callOutput };
     } else if (req.invocationType === EthContractInvocationType.SEND) {
       if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
