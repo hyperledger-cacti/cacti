@@ -202,6 +202,25 @@ test("deploys contract via .json file", async (t: Test) => {
     });
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
 
+    const { callOutput } = await connector.invokeContract({
+      contractAddress,
+      contractAbi: HelloWorldContractJson.abi,
+      invocationType: EthContractInvocationType.CALL,
+      methodName: "getNameByIndex",
+      params: [0],
+      gas: 1000000,
+      web3SigningCredential: {
+        ethAccount: testEthAccount.address,
+        secret: testEthAccount.privateKey,
+        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+      },
+    });
+    t2.equal(
+      callOutput,
+      newName,
+      `getNameByIndex() output reflects the update OK`,
+    );
+
     t2.end();
   });
 
@@ -247,6 +266,21 @@ test("deploys contract via .json file", async (t: Test) => {
       web3SigningCredential,
     });
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
+
+    const { callOutput } = await connector.invokeContract({
+      contractAddress,
+      contractAbi: HelloWorldContractJson.abi,
+      invocationType: EthContractInvocationType.CALL,
+      methodName: "getNameByIndex",
+      params: [1],
+      gas: 1000000,
+      web3SigningCredential,
+    });
+    t2.equal(
+      callOutput,
+      newName,
+      `getNameByIndex() output reflects the update OK`,
+    );
 
     t2.end();
   });
