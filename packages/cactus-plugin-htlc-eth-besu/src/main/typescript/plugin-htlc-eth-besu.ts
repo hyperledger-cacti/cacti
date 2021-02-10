@@ -24,22 +24,23 @@ import { GetStatusEndpoint } from "./web-services/getStatus-endpoint";
 import { NewContractEndpoint } from "./web-services/newContract-endpoint";
 import { RefundEndpoint } from "./web-services/refund-endpoint";
 import { WithdrawEndpoint } from "./web-services/withdraw-endpoint";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-/*import {
-  EthContractInvocationType,
+import {
   PluginLedgerConnectorBesu,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";*/
+  RunTransactionResponse,
+  Web3SigningCredentialType,
+} from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 import HashTimeLockJson from "../contracts/build/contracts/HashTimeLock.json";
-
 export interface IPluginHtlcEthBesuOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
-  pluginRegistry: PluginRegistry;
+  instanceId: string;
+  connector: PluginLedgerConnectorBesu;
 }
 export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
   public static readonly CLASS_NAME = "PluginHtlcEthBesu";
   private readonly instanceId: string;
   private readonly log: Logger;
+  private readonly connector: PluginLedgerConnectorBesu;
   //private readonly pluginRegistry: PluginRegistry;
 
   public get className(): string {
@@ -50,6 +51,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} opts`);
     Checks.truthy(opts.instanceId, `${fnTag} opts.instanceId`);
+    Checks.truthy(opts.connector, `${fnTag} opts.pluginRegistry`);
     //Checks.truthy(opts.pluginRegistry, `${fnTag} opts.pluginRegistry`);
     Checks.nonBlankString(opts.instanceId, `${fnTag} opts.instanceId`);
 
@@ -58,6 +60,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     const level = opts.logLevel || "INFO";
     this.log = LoggerProvider.getOrCreate({ level, label: this.className });
     this.instanceId = opts.instanceId;
+    this.connector = opts.connector;
   }
   /**
    * Feature is deprecated, we won't need this method in the future.
@@ -82,7 +85,8 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
   }
 
   public getAspect(): PluginAspect {
-    return PluginAspect.ATOMIC_SWAP;
+    //return PluginAspect.ATOMIC_SWAP;
+    return PluginAspect.LEDGER_CONNECTOR;
   }
 
   public async installWebServices(
@@ -92,6 +96,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     {
       const endpoint = new GetSingleStatusEndpoint({
         logLevel: this.opts.logLevel,
+        connector: this.connector,
       });
       endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
@@ -99,6 +104,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     {
       const endpoint = new GetStatusEndpoint({
         logLevel: this.opts.logLevel,
+        connector: this.connector,
       });
       endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
@@ -106,6 +112,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     {
       const endpoint = new NewContractEndpoint({
         logLevel: this.opts.logLevel,
+        connector: this.connector,
       });
       endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
@@ -113,6 +120,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     {
       const endpoint = new RefundEndpoint({
         logLevel: this.opts.logLevel,
+        connector: this.connector,
       });
       endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
@@ -120,13 +128,40 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     {
       const endpoint = new WithdrawEndpoint({
         logLevel: this.opts.logLevel,
+        connector: this.connector,
       });
       endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
-    //TODO: add other endpoints.
-
     return endpoints;
+  }
+
+  public async initialize(
+    account: string,
+    privateKey: string,
+    type: Web3SigningCredentialType,
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#initialize()`;
+    const hashedTimeLockResponse = await this.connector.deployContract({
+      web3SigningCredential: {
+        ethAccount: account,
+        secret: privateKey,
+        type: type,
+      },
+      bytecode: HashTimeLockJson.bytecode,
+      gas: 4100500,
+    });
+    this.log.info("DEPLOY END: " + hashedTimeLockResponse);
+    this.log.debug(
+      "ACCOUNT: " + hashedTimeLockResponse.transactionReceipt.contractAddress,
+    );
+    this.log.debug(
+      `${fnTag} HashTimeLock Contract Response: ${JSON.stringify(
+        hashedTimeLockResponse,
+      )}`,
+    );
+
+    return hashedTimeLockResponse;
   }
 
   /*

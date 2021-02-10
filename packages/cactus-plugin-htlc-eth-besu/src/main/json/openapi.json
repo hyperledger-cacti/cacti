@@ -33,6 +33,10 @@
       "newContractObj": {
         "type": "object",
         "properties": {
+          "inputAmount": {
+            "type": "integer",
+            "format": "uint256"
+          },
           "outputAmount": {
             "type": "integer",
             "format": "uint256"

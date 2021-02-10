@@ -5,31 +5,38 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import Client from "../client";
 import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { environment } from "../environment";
+import {
+  EthContractInvocationType,
+  PluginLedgerConnectorBesu,
+  Web3SigningCredentialType,
+} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import HashTimeLockJson from "../../contracts/build/contracts/HashTimeLock.json";
 
 export interface IWithdrawEndpointOptions {
   logLevel?: LogLevelDesc;
+  connector: PluginLedgerConnectorBesu;
 }
 export class WithdrawEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "WithdrawEndpoint";
   private readonly log: Logger;
+  private readonly connector: PluginLedgerConnectorBesu;
+
   public get className(): string {
     return WithdrawEndpoint.CLASS_NAME;
   }
-  private client: Client;
   constructor(public readonly options: IWithdrawEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    const level = this.options.logLevel || "INFO";
+    const level = this.options.logLevel || "DEBUG";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
-    this.client = new Client();
+    this.connector = this.options.connector;
   }
   public getVerbLowerCase(): string {
     return "post";
@@ -50,17 +57,21 @@ export class WithdrawEndpoint implements IWebServiceEndpoint {
     const fnTag = "WithdrawEndpoint#handleRequest()";
     this.log.debug(`POST ${this.getPath()}`);
     try {
-      const id = req.params["id"];
-      const secret = req.params["secret"];
-      await this.client.loadContracts(environment.CONTRACT_PATH);
-      const result = await this.client.sendTx(
-        "withdraw",
-        [id, secret],
-        environment.CONTRACT_NAME,
-        environment.CONTRACT_ADDRESS,
-        environment.ACCOUNT_ADDRESS,
-        environment.PRIVATE_KEY,
-      );
+      const params = [req.params["id"], req.params["secret"]];
+
+      const result = await this.connector.invokeContract({
+        contractAbi: HashTimeLockJson.abi,
+        contractAddress: environment.CONTRACT_ADDRESS,
+        invocationType: EthContractInvocationType.SEND,
+        methodName: "withdraw",
+        params,
+        web3SigningCredential: {
+          ethAccount: environment.ACCOUNT_ADDRESS,
+          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+          secret: environment.PRIVATE_KEY,
+        },
+        gas: 40000000,
+      });
       this.log.debug(`${fnTag} Result: ${result}`);
       res.send(result);
     } catch (ex) {

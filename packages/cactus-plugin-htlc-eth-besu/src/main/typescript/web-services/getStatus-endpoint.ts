@@ -5,31 +5,39 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import Client from "../client";
+//import Client from "../client";
 import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { environment } from "../environment";
-
+import {
+  EthContractInvocationType,
+  PluginLedgerConnectorBesu,
+  Web3SigningCredentialType,
+} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import HashTimeLockJson from "../../contracts/build/contracts/HashTimeLock.json";
 export interface IGetStatusEndpointOptions {
   logLevel?: LogLevelDesc;
+  connector: PluginLedgerConnectorBesu;
 }
 export class GetStatusEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetStatusEndpoint";
   private readonly log: Logger;
+  private readonly connector: PluginLedgerConnectorBesu;
+
   public get className(): string {
     return GetStatusEndpoint.CLASS_NAME;
   }
-  private client: Client;
+
   constructor(public readonly options: IGetStatusEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
-    this.client = new Client();
+    this.connector = this.options.connector;
   }
   public getVerbLowerCase(): string {
     return "get";
@@ -50,15 +58,21 @@ export class GetStatusEndpoint implements IWebServiceEndpoint {
     const fnTag = "GetStatusEndpoint#handleRequest()";
     this.log.debug(`GET ${this.getPath()}`);
     try {
-      await this.client.loadContracts(environment.CONTRACT_PATH);
       const query = req.query["ids"]?.toString();
       const ids = query?.split(",");
-      const result = await this.client.sendCall(
-        "getStatus",
-        [ids],
-        "HashTimeLock",
-        environment.ACCOUNT_ADDRESS,
-      );
+
+      const result = await this.connector.invokeContract({
+        contractAbi: HashTimeLockJson.abi,
+        contractAddress: environment.CONTRACT_ADDRESS,
+        invocationType: EthContractInvocationType.CALL,
+        methodName: "getStatus",
+        params: [ids],
+        web3SigningCredential: {
+          ethAccount: environment.ACCOUNT_ADDRESS,
+          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+          secret: environment.PRIVATE_KEY,
+        },
+      });
       this.log.debug(`${fnTag} Result: ${result}`);
       res.send(result);
     } catch (ex) {
