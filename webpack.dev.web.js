@@ -1,7 +1,6 @@
 const packageDir = process.cwd();
 const pkg = require(`${packageDir}/package.json`);
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 const packageNameNoScope = pkg.name.substring(pkg.name.lastIndexOf("/") + 1);
 const libraryName = `${packageNameNoScope}`;
@@ -41,13 +40,7 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: "static",
-    //   openAnalyzer: false,
-    //   reportFilename: `${pkg.browser}.html`,
-    // }),
-  ],
+  plugins: [new NodePolyfillPlugin()],
   resolve: {
     extensions: [".ts", ".js"],
     fallback: {

@@ -86,7 +86,6 @@ test("Test get single status endpoint", async (t: Test) => {
   apiServerOptions.cockpitPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   const config = configService.newExampleConfigConvict(apiServerOptions);
-
   const apiServer = new ApiServer({
     httpServerApi: httpServer,
     config: config.getProperties(),
