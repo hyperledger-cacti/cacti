@@ -34,6 +34,8 @@
     "build:dev:plugin-ledger-connector-quorum": "lerna exec --stream --scope '*/*connector-quorum' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "test:plugin-ledger-connector-quorum": "tap --ts --jobs=1 --timeout=60 \"packages/cactus-*-quorum/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-fabric": "lerna exec --stream --scope '*/*connector-fabric' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
+    "build:dev:plugin-htlc-eth-besu": "lerna exec --stream --scope 'extensions/htlc/besu-eth' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
+    "test:plugin-htlc-besu": "tap --jobs=1 --timeout=600 \"packages/*htlc-eth-besu/src/test/typescript/{integration}/\"",
     "build:dev:plugin-consortium-manual": "lerna exec --stream --scope '*/*manual-consortium' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:example-supply-chain-backend": "lerna exec --stream --scope '*/*example-supply-chain-b*' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --display-modules --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:sdk": "lerna exec --stream --scope '*/*sdk' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
