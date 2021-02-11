@@ -88,6 +88,7 @@
     "@hyperledger/cactus-plugin-keychain-memory": "0.3.0",
     "@hyperledger/cactus-plugin-htlc-eth-besu": "0.3.0",
     "@hyperledger/cactus-test-tooling": "0.3.0",
+    "@hyperledger/cactus-plugin-ledger-connector-besu":"0.3.0",
     "axios": "0.21.1",
     "key-encoder": "2.0.3",
     "web3": "1.2.11",
