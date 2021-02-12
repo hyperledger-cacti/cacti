@@ -212,6 +212,7 @@ export class PluginLedgerConnectorBesu
       transactionConfig.from = web3SigningCredential.ethAccount;
       transactionConfig.gas = req.gas;
       transactionConfig.gasPrice = req.gasPrice;
+      transactionConfig.value = req.value;
 
       const txReq: RunTransactionRequest = {
         transactionConfig,
