@@ -40,7 +40,7 @@ export interface IFabricTestLedgerV1ConstructorOptions {
  * Provides default options for Fabric container
  */
 const DEFAULT_OPTS = Object.freeze({
-  imageVersion: "latest",
+  imageVersion: "2021-01-05-3400c06",
   imageName: "hyperledger/cactus-fabric-all-in-one",
   envVars: new Map([["FABRIC_VERSION", "1.4.8"]]),
 });
