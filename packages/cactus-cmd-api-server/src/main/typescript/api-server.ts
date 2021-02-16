@@ -92,6 +92,29 @@ export class ApiServer {
       });
     }
     this.prometheusExporter.setTotalPluginImports(this.getPluginImportsCount());
+    LoggerProvider.setLogLevel(options.config.logLevel);
+
+    if (this.options.httpServerApi) {
+      this.httpServerApi = this.options.httpServerApi;
+    } else if (this.options.config.apiTlsEnabled) {
+      this.httpServerApi = createSecureServer({
+        key: this.options.config.apiTlsKeyPem,
+        cert: this.options.config.apiTlsCertPem,
+      });
+    } else {
+      this.httpServerApi = createServer();
+    }
+
+    if (this.options.httpServerCockpit) {
+      this.httpServerCockpit = this.options.httpServerCockpit;
+    } else if (this.options.config.cockpitTlsEnabled) {
+      this.httpServerCockpit = createSecureServer({
+        key: this.options.config.cockpitTlsKeyPem,
+        cert: this.options.config.cockpitTlsCertPem,
+      });
+    } else {
+      this.httpServerCockpit = createServer();
+    }
 
     this.log = LoggerProvider.getOrCreate({
       label: "api-server",

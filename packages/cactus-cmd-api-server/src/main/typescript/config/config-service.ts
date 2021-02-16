@@ -4,18 +4,22 @@ import convict, { Schema, Config, SchemaObj } from "convict";
 import { ipaddress } from "convict-format-with-validator";
 import { v4 as uuidV4 } from "uuid";
 import { JWK, JWS } from "jose";
+import type { ClientMetadata } from "oidc-provider";
+
 import {
   LoggerProvider,
   Logger,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
-import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
+
 import {
   ConsortiumDatabase,
   PluginImport,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
+
+import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
+import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
@@ -446,8 +450,30 @@ export class ConfigService {
     const cockpitHost = (schema.cockpitHost as SchemaObj).default;
     const cockpitPort = (schema.cockpitPort as SchemaObj).default;
 
+    const cockpitProtocol = cockpitTlsEnabled ? "https:" : "http";
+    const cockpitBaseUrl = `${cockpitProtocol}//${cockpitHost}:${cockpitPort}`;
+
     const pkiGenerator = new SelfSignedPkiGenerator();
     const pkiServer: IPki = pkiGenerator.create("localhost");
+
+    const oidcClientMetadata: ClientMetadata = {
+      client_id: "oauth2-client-cactus-cockpit",
+      client_secret: "bar", // FIXME random generated UUID is needed here
+      redirect_uris: [
+        cockpitBaseUrl,
+        // ensure we have both localhost and 127.0.0.1 because the OIDC
+        // provider will complain if we try to use one over the other
+        cockpitBaseUrl.replace("127.0.0.1", "localhost"),
+      ],
+      response_types: ["code"],
+      scope: "openid email profile",
+      grant_types: ["authorization_code", "implicit"],
+      token_endpoint_auth_method: "none",
+      application_type: "web",
+      formats: {
+        AccessToken: "jwt",
+      },
+    };
 
     const plugins: PluginImport[] = [
       {
@@ -465,6 +491,37 @@ export class ConfigService {
           instanceId: uuidV4(),
           keyPairPem,
           consortiumDatabase,
+        },
+      },
+      {
+        packageName: "@hyperledger/cactus-plugin-web-service-oidc",
+        type: PluginImportType.LOCAL,
+        options: {
+          issuer: apiBaseUrl,
+          allowWithoutTls: false, // force secure configuration by default
+          allowLocalhost: false, // force secure configuration by default
+          oidcProviderConfig: {
+            features: {
+              encryption: {
+                enabled: true,
+              },
+              introspection: {
+                enabled: true,
+              },
+              revocation: {
+                enabled: true,
+              },
+              devInteractions: {
+                enabled: false,
+              },
+            },
+            claims: {
+              openid: ["sub"],
+              email: ["email", "email_verified"],
+            },
+            scopes: ["openid", "email", "profile"],
+            clients: [oidcClientMetadata],
+          },
         },
       },
     ];
