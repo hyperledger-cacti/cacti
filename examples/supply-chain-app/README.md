@@ -35,3 +35,12 @@ DOCKER_BUILDKIT=1 docker build -f ./examples/supply-chain-app/Dockerfile . -t sc
 # multiple different ledgers jus this one container.
 docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 4000:4000 -p 4100:4100 scaeb
 ```
+
+## Configuring and running the example as a process
+
+1. If the `cactus-example-supply-chain-frontend` is in another directory from the default or need expose the API in another port, check the `process.env`
+2. Execute the following command:
+   
+``` 
+ npm run start
+```
