@@ -18,7 +18,7 @@ export interface IQuorumTestLedgerConstructorOptions {
 }
 
 export const QUORUM_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageVersion: "latest",
+  containerImageVersion: "2021-01-08-7a055c3",
   containerImageName: "hyperledger/cactus-quorum-all-in-one",
   rpcApiHttpPort: 8545,
 });
