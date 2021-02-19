@@ -1,4 +1,4 @@
-# Copyright 2020 Hyperledger Cactus Contributors
+# Copyright 2021 Hyperledger Cactus Contributors
 # SPDX-License-Identifier: Apache-2.0
 FROM hyperledger/fabric-ccenv:x86_64-1.0.4
 #ENV http_proxy $HTTP_PROXY
