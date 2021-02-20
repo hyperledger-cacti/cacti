@@ -39,6 +39,11 @@ Once the last command has finished executing, open link printed on the console w
 
 - The guidance is [here](./examples/cartrade/README.md).
 
+### Electricity Trade Example
+
+- The guidance is [here](./examples/electricity-trade/README.md).
+
+
 ## Documentation
 
 * [Project Wiki](https://wiki.hyperledger.org/display/cactus): Schedule and logs of the maintainer meetings
