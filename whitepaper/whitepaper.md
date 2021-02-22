@@ -114,11 +114,18 @@ Photo by Pontus Wellgraf on Unsplash
     - [5.5.2 Transaction Protocol Negotiation](#552-transaction-protocol-negotiation)
   - [5.6 Plugin Architecture](#56-plugin-architecture)
     - [5.6.1 Ledger Connector Plugins](#561-ledger-connector-plugins)
-    - [5.6.2 Identity Federation Plugins](#562-identity-federation-plugins)
-      - [5.6.2.1 X.509 Certificate Plugin](#5621-x509-certificate-plugin)
-    - [5.6.3 Key/Value Storage Plugins](#563-keyvalue-storage-plugins)
-    - [5.6.4 Serverside Keychain Plugins](#564-serverside-keychain-plugins)
-    - [5.6.5 Manual Consortium Plugin](#565-manual-consortium-plugin)
+      - [5.6.1.1 Ledger Connector Besu Plugin](#5611-ledger-connector-besu-plugin)
+      - [5.6.1.2 Ledger Connector Fabric Plugin](#5612-ledger-connector-fabric-plugin)
+      - [5.6.1.3 Ledger Connector Quorum Plugin](#5613-ledger-connector-quorum-plugin)
+    - [5.6.2 HTLCs Plugins](#562-htlcs-plugins)
+      - [5.6.2.1 HTLC-ETH-Besu Plugin](#5621-htlc-eth-besu-plugin)
+      - [5.6.2.2 HTLC-ETH-ERC20-Besu Plugin](#5622-htlc-eth-erc20-besu-plugin)
+    - [5.6.3 Identity Federation Plugins](#563-identity-federation-plugins)
+      - [5.6.3.1 X.509 Certificate Plugin](#5631-x509-certificate-plugin)
+    - [5.6.4 Key/Value Storage Plugins](#564-keyvalue-storage-plugins)
+    - [5.6.5 Serverside Keychain Plugins](#565-serverside-keychain-plugins)
+    - [5.6.6 Manual Consortium Plugin](#566-manual-consortium-plugin)
+    - [5.6.7 Test Tooling](#567-test-tooling)
 - [6. Identities, Authentication, Authorization](#6-identities-authentication-authorization)
   - [6.1 Definition of Identities in Cactus](#61-definition-of-identities-in-cactus)
   - [6.2 Transaction Signing Modes, Key Ownership](#62-transaction-signing-modes-key-ownership)
@@ -1305,7 +1312,7 @@ export interface LedgerConnector {
 
 export enum TransactionFinality {
   GUARANTEED = "GUARANTEED",
-  NOT_GUARANTEED = "NOT_GUARANTEED
+  NOT_GUARANTEED = "NOT_GUARANTEED"
 }
 
 export enum PermissionScheme {
@@ -1314,8 +1321,41 @@ export enum PermissionScheme {
 }
 
 ```
+#### 5.6.1.1 Ledger Connector Besu Plugin
 
-### 5.6.2 Identity Federation Plugins
+This plugin provides `Cactus` a way to interact with Besu networks. Using this we can perform:
+* Deploy Smart-contracts through bytecode.
+* Build and sign transactions using different keystores.
+* Invoke smart-contract functions that we have deployed on the network.
+
+#### 5.6.1.2 Ledger Connector Fabric Plugin
+
+This plugin provides `Cactus` a way to interact with Fabric networks. Using this we can perform:
+* Deploy Golang chaincodes.
+* Make transactions.
+* Invoke chaincodes functions that we have deployed on the network.
+
+#### 5.6.1.3 Ledger Connector Quorum Plugin
+
+This plugin provides `Cactus` a way to interact with Quorum networks. Using this we can perform:
+* Deploy Smart-contracts through bytecode.
+* Build and sign transactions using different keystores.
+* Invoke smart-contract functions that we have deployed on the network.
+
+### 5.6.2 HTLCs Plugins
+
+Provides an API to deploy and interact with Hash Time Locked Contracts (HTLC), used for the exchange of assets in different blockchain networks.
+HTLC use hashlocks and timelocks to make payments. Requires that the receiver of a payment acknowledge having received this before a deadline or he will lose the ability to claim payment, returning this to rhe payer.
+
+#### 5.6.2.1 HTLC-ETH-Besu Plugin
+
+For the network Besu case, this plugin uses [Leger Connector Besu Plugin](#5611-ledger-connector-besu-plugin) to deploy an HTLC contarct on the network and provides an API to interact with the HTLC ETH swap contracts.
+
+#### 5.6.2.2 HTLC-ETH-ERC20-Besu Plugin
+For the network Besu case, this plugin uses [Leger Connector Besu Plugin](#5611-ledger-connector-besu-plugin) to deploy an HTLC and ERC20 contarct on the network and provides an API to interact with this.
+This plugin allow `Cactus` to interact with ERC-20 tokens in HTLC ETH swap contracts.
+
+### 5.6.3 Identity Federation Plugins
 
 Identity federation plugins operate inside the API Server and need to implement the interface of a common PassportJS Strategy:
 https://github.com/jaredhanson/passport-strategy#implement-authentication
@@ -1332,14 +1372,14 @@ abstract class IdentityFederationPlugin {
 }
 ```
 
-#### 5.6.2.1 X.509 Certificate Plugin
+#### 5.6.3.1 X.509 Certificate Plugin
 
 The X.509 Certificate plugin facilitates clients authentication by allowing them to present a certificate instead of operating with authentication tokens.
 This technically allows calling clients to assume the identities of the validator nodes through the REST API without having to have access to the signing private key of said validator node.
 
 PassportJS already has plugins written for client certificate validation, but we go one step further with this plugin by providing the option to obtain CA certificates from the validator nodes themselves at runtime.
 
-### 5.6.3 Key/Value Storage Plugins
+### 5.6.4 Key/Value Storage Plugins
 
 Key/Value Storage plugins allow the higher-level packages to store and retrieve configuration metadata for a `Cactus` cluster such as:
 * Who are the active validators and what are the hosts where said validators are accessible over a network?
@@ -1354,7 +1394,7 @@ interface KeyValueStoragePlugin {
 }
 ```
 
-### 5.6.4 Serverside Keychain Plugins
+### 5.6.5 Serverside Keychain Plugins
 
 The API surface of keychain plugins is roughly the equivalent of the key/value *Storage* plugins, but under the hood these are of course guaranteed to encrypt the stored data at rest by way of leveraging storage backends purpose built for storing and managing secrets.
 
@@ -1377,7 +1417,7 @@ interface KeychainPlugin extends KeyValueStoragePlugin {
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-### 5.6.5 Manual Consortium Plugin
+### 5.6.6 Manual Consortium Plugin
 
 This plugin is the default/simplest possible implementation of consortium management.
 It delegates the initial trust establishment to human actors to be done manually or offline if you will.
@@ -1485,6 +1525,10 @@ There's many other ways to perform the initial agreement that happens offline, b
 provided here for ease of understanding:
 
 <img width="700" src="./plugin-consortium-manual-bootstrap-sequence-diagram.png">
+
+### 5.6.7 Test Tooling
+
+Provides `Cactus` with a tool to test the diferent plugins of the proyect.
 
 
 # 6. Identities, Authentication, Authorization
