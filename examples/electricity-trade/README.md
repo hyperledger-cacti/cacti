@@ -6,7 +6,7 @@ Before you begin, you need to check that you have all the prerequisites installe
 - OS: Linux (recommend: Ubuntu18.04 or CentOS7)
 - Docker (recommend: v17.06.2-ce or greater)
 - Docker-compose (recommend: v1.14.0 or greater)
-- node.js (recommend: v12)
+- node.js v12 (recommend: v12.20.2 or greater)
 - The ports 5034, 5040, 5051 are available (If they are already used, the following processes can be done by changing the port number setting)
 
 ## Boot method
