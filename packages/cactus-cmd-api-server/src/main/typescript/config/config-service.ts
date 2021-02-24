@@ -411,7 +411,7 @@ export class ConfigService {
     const keyPairPem = keyPair.toPEM(true);
     const memberId1 = "Cactus_Example_Consortium_Member_1";
     const nodeId1 = "Cactus_Example_Consortium_Node_1";
-    const consortium: ConsortiumDatabase = {
+    const consortiumDatabase: ConsortiumDatabase = {
       cactusNode: [
         {
           consortiumId: "Cactus_Example_Consortium",
@@ -453,14 +453,18 @@ export class ConfigService {
       {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
         type: PluginImportType.LOCAL,
-        options: {},
+        options: {
+          instanceId: uuidV4(),
+          keychainId: uuidV4(),
+        },
       },
       {
         packageName: "@hyperledger/cactus-plugin-consortium-manual",
         type: PluginImportType.LOCAL,
         options: {
+          instanceId: uuidV4(),
           keyPairPem,
-          consortium,
+          consortiumDatabase,
         },
       },
     ];
