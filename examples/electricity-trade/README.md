@@ -90,8 +90,8 @@ Before you begin, you need to check that you have all the prerequisites installe
 		```
 	- Execute the intkey transaction:
 		```
-		intkey create_batch --key-name MI000001 --value-set 50 --value-inc 24`
-		`sawtooth batch submit -f batches.intkey --url http://rest-api:8008
+		intkey create_batch --key-name MI000001 --value-set 50 --value-inc 24
+		sawtooth batch submit -f batches.intkey --url http://rest-api:8008
 		```
 	- (In the above, the value of the key `MI000001` is set as 50, and increased by 24)
 	- After that, exit the docker bash:
