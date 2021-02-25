@@ -95,6 +95,7 @@
     "ngo": "2.6.2",
     "node-ssh": "11.0.0",
     "openapi-types": "7.0.1",
+    "prom-client": "13.0.0",
     "temp": "0.9.1",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.0",

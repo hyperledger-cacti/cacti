@@ -1,9 +1,41 @@
 # `@hyperledger/cactus-plugin-ledger-connector-fabric`
 
-> TODO: description
+## Prometheus Exporter
 
-## Usage
+This class creates a prometheus exporter, which scraps the transactions (total transaction count) for the use cases incorporating the use of Fabric connector plugin.
 
+
+### Usage
+The prometheus exporter object is initialized in the `PluginLedgerConnectorFabric` class constructor itself, so instantiating the object of the `PluginLedgerConnectorFabric` class, gives access to the exporter object.
+You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginLedgerConnectorFabricOptions` interface for `PluginLedgerConnectoFabric` constructor.
+
+`getPrometheusExporterMetricsEndpointV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime the `transact()` method of the `PluginLedgerConnectorFabric` class is called.
+
+### Prometheus Integration
+To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
+Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
+
+```(yaml)
+- job_name: 'fabric_ledger_connector_exporter'
+  metrics_path: api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
+  scrape_interval: 5s
+  static_configs:
+    - targets: ['{host}:{port}']
 ```
-// TODO: DEMONSTRATE API
-```
+
+Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/run-transaction-endpoint-v1.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
+`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`
+
+Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
+On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus_fabric_total_tx_count** and click **execute**
+
+### Helper code
+
+###### response.type.ts
+This file contains the various responses of the metrics.
+
+###### data-fetcher.ts
+This file contains functions encasing the logic to process the data points
+
+###### metrics.ts
+This file lists all the prometheus metrics and what they are used for.

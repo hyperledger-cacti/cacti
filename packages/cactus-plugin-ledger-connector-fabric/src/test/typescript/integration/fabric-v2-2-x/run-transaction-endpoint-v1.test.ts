@@ -113,6 +113,9 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
   test.onFinish(async () => await Servers.shutdown(server));
   const { address, port } = addressInfo;
   const apiHost = `http://${address}:${port}`;
+  t.comment(
+    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`,
+  );
   const apiClient = new FabricApi({ basePath: apiHost });
 
   await plugin.installWebServices(expressApp);
@@ -135,7 +138,6 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
     t.equal(res.status, 200);
     t.doesNotThrow(() => JSON.parse(res.data.functionOutput));
   }
-
   {
     const req: RunTransactionRequest = {
       keychainId,
@@ -174,5 +176,19 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
     t.equal(car277.Record.owner, carOwner, `Car has expected owner OK`);
   }
 
+  {
+    const res = await apiClient.getPrometheusExporterMetricsV1();
+    const promMetricsOutput =
+      "# HELP cactus_fabric_total_tx_count Total transactions executed\n" +
+      "# TYPE cactus_fabric_total_tx_count gauge\n" +
+      'cactus_fabric_total_tx_count{type="cactus_fabric_total_tx_count"} 3';
+    t.ok(res);
+    t.ok(res.data);
+    t.equal(res.status, 200);
+    t.true(
+      res.data.includes(promMetricsOutput),
+      "Total Transaction Count of 3 recorded as expected. RESULT OK",
+    );
+  }
   t.end();
 });
