@@ -2,7 +2,6 @@ import { AddressInfo } from "net";
 
 import test, { Test } from "tape";
 
-// import { ApiClient } from "../../../main/typescript/public-api";
 import { DefaultApi as ConsortiumManualApi } from "@hyperledger/cactus-plugin-consortium-manual";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
 import { DefaultConsortiumProvider } from "../../../main/typescript";
@@ -21,7 +20,7 @@ test("Reports failures with meaningful information", async (t: Test) => {
       apiClient: new ConsortiumManualApi({
         basePath: apiHost,
         baseOptions: {
-          timeout: 100,
+          timeout: 2000,
         },
       }),
     });
