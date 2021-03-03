@@ -14,9 +14,9 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { DeployContractSolidityBytecodeEndpoint as Constants } from "./deploy-contract-solidity-bytecode-endpoint-constants";
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
 import { DeployContractSolidityBytecodeV1Request } from "../generated/openapi/typescript-axios";
+import OAS from "../../json/openapi.json";
 
 export interface IDeployContractSolidityBytecodeOptions {
   logLevel?: LogLevelDesc;
@@ -43,12 +43,24 @@ export class DeployContractSolidityBytecodeEndpoint
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode"
+    ];
+  }
+
   public getPath(): string {
-    return Constants.HTTP_PATH;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return Constants.HTTP_VERB_LOWER_CASE;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.getOasPath().post.operationId;
   }
 
   public registerExpress(app: Express): IWebServiceEndpoint {

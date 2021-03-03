@@ -558,6 +558,12 @@
     "paths": {
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode"
+                    }
+                },
                 "operationId": "apiV1BesuDeployContractSolidityBytecode",
                 "summary": "Deploys the bytecode of a Solidity contract.",
                 "parameters": [],
@@ -586,6 +592,12 @@
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction"
+                    }
+                },
                 "operationId": "apiV1BesuRunTransaction",
                 "summary": "Executes a transaction on a besu ledger",
                 "parameters": [],
@@ -614,6 +626,12 @@
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract"
+                    }
+                },
                 "operationId": "apiV1BesuInvokeContract",
                 "summary": "Invokeds a contract on a besu ledger",
                 "parameters": [],
@@ -642,6 +660,12 @@
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"
+                    }
+                },
                 "operationId": "signTransactionV1",
                 "summary": "Obtain signatures of ledger from the corresponding transaction hash.",
                 "description": "Obtain signatures of ledger from the corresponding transaction hash.",

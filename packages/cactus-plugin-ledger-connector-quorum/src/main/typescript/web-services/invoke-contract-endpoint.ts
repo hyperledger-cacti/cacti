@@ -14,7 +14,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
 
-import { InvokeContractEndpoint as Constants } from "./invoke-contract-endpoint-constants";
+import OAS from "../../json/openapi.json";
 
 export interface IInvokeContractEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -40,12 +40,24 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"
+    ];
+  }
+
   public getPath(): string {
-    return Constants.HTTP_PATH;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return Constants.HTTP_VERB_LOWER_CASE;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.getOasPath().post.operationId;
   }
 
   registerExpress(webApp: Express): IWebServiceEndpoint {

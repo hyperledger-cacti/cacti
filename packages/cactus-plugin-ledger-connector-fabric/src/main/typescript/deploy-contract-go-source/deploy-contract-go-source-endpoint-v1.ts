@@ -15,8 +15,8 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { DeployContractGoSourceEndpointV1 as Constants } from "./deploy-contract-go-source-endpoint-constants";
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
+import OAS from "../../json/openapi.json";
 
 export interface IDeployContractGoSourceEndpointV1Options {
   logLevel?: LogLevelDesc;
@@ -46,12 +46,24 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
+    ];
+  }
+
   public getPath(): string {
-    return Constants.HTTP_PATH;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return Constants.HTTP_VERB_LOWER_CASE;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.getOasPath().post.operationId;
   }
 
   public registerExpress(app: Express): IWebServiceEndpoint {

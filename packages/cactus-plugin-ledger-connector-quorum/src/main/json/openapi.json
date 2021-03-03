@@ -533,6 +533,12 @@
     "paths": {
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode"
+                    }
+                },
                 "operationId": "apiV1QuorumDeployContractSolidityBytecode",
                 "summary": "Deploys the bytecode of a Solidity contract.",
                 "parameters": [],
@@ -561,6 +567,12 @@
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction"
+                    }
+                },
                 "operationId": "apiV1QuorumRunTransaction",
                 "summary": "Executes a transaction on a quorum ledger",
                 "parameters": [],
@@ -589,6 +601,12 @@
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"
+                    }
+                },
                 "operationId": "apiV1QuorumInvokeContract",
                 "summary": "Invokeds a contract on a quorum ledger",
                 "parameters": [],
