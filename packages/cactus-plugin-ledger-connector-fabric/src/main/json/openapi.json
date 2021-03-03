@@ -296,6 +296,12 @@
     "paths": {
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction"
+                    }
+                },
                 "operationId": "runTransactionV1",
                 "summary": "Runs a transaction on a Fabric ledger.",
                 "description": "",
@@ -329,6 +335,12 @@
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source": {
             "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
+                    }
+                },
                 "operationId": "deployContractGoSourceV1",
                 "summary": "Deploys a chaincode contract in the form of a go sources.",
                 "parameters": [],

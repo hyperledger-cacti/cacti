@@ -14,9 +14,9 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { RunTransactionEndpointV1 as Constants } from "./run-transaction-endpoint-constants";
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import { RunTransactionRequest } from "../generated/openapi/typescript-axios";
+import OAS from "../../json/openapi.json";
 
 export interface IRunTransactionEndpointV1Options {
   logLevel?: LogLevelDesc;
@@ -42,12 +42,24 @@ export class RunTransactionEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction"
+    ];
+  }
+
   public getPath(): string {
-    return Constants.HTTP_PATH;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return Constants.HTTP_VERB_LOWER_CASE;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.getOasPath().post.operationId;
   }
 
   public registerExpress(app: Express): IWebServiceEndpoint {

@@ -16,8 +16,8 @@ import {
 
 import { SignTransactionRequest } from "../generated/openapi/typescript-axios/api";
 
-import { BesuSignTransactionEndpointV1 as Constants } from "./sign-transaction-endpoint-constants";
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
+import OAS from "../../json/openapi.json";
 
 export interface IBesuSignTransactionEndpointOptions {
   connector: PluginLedgerConnectorBesu;
@@ -42,12 +42,24 @@ export class BesuSignTransactionEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"
+    ];
+  }
+
   getPath(): string {
-    return Constants.HTTP_PATH;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.path;
   }
 
   getVerbLowerCase(): string {
-    return Constants.HTTP_VERB_LOWER_CASE;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.getOasPath().post.operationId;
   }
 
   registerExpress(app: Express): IWebServiceEndpoint {
