@@ -1,13 +1,15 @@
 FROM paritytech/ci-linux:production
 LABEL AUTHORS="Rafael Belchior, Catarina Pedreira"
-LABEL VERSION="2021-11-01"
+LABEL VERSION="2021-09-10"
 LABEL org.opencontainers.image.source=https://github.com/hyperledger/cactus
 
 WORKDIR /
-ENV WORKING_DIR=/var/www/node-template
-ENV CONTAINER_NAME=contracts-node-template-cactus
-# Specify p2p protocol TCP port
-ENV PORT=9614
+ARG WORKING_DIR=/var/www/node-template
+ARG CONTAINER_NAME=contracts-node-template-cactus
+ARG PORT=9944
+ARG DOCKER_PORT=9944
+ARG CARGO_HOME=/var/www/node-template/.cargo
+EXPOSE ${PORT} ${DOCKER_PORT}
 
 # Specify HTTP RPC server TCP port
 ENV RPC_PORT=9618
@@ -45,4 +47,4 @@ RUN cargo install contracts-node --git https://github.com/paritytech/substrate-c
 COPY start.sh /
 
 RUN echo "*** Start Substrate node template ***"
-CMD /start.sh
+CMD [ "/var/www/node-template/.cargo/bin/substrate-contracts-node", "--dev"]

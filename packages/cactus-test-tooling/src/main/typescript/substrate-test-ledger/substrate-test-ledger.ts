@@ -58,7 +58,7 @@ export class SubstrateTestLedger {
     this._containerId = Optional.empty();
     this.imageName =
       opts.imageName || "ghcr.io/hyperledger/cactus-substrate-all-in-one";
-    this.imageTag = opts.imageTag || "2021-09-24---feat-1274";
+    this.imageTag = opts.imageTag || "2021-10-15---feat-1274";
     this.imageFqn = `${this.imageName}:${this.imageTag}`;
     this.envVars = opts.envVars || new Map();
     this.emitContainerLogs = Bools.isBooleanStrict(opts.emitContainerLogs)

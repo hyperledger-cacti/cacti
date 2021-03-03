@@ -8,11 +8,11 @@
         "Albertirsa",
         "ALLFORTX",
         "ANYFORTX",
-        "AWSSM",
         "APIV",
         "approveformyorg",
         "Authz",
         "authzn",
+        "AWSSM",
         "Besu",
         "Bools",
         "brioux",
@@ -46,6 +46,8 @@
         "GETHKEYCHAINPASSWORD",
         "ghcr",
         "gopath",
+        "goquorum",
+        "GRANPA",
         "grpc",
         "grpcs",
         "grpcwebtext",
@@ -132,8 +134,8 @@
         "uuidv",
         "vscc",
         "wasm",
-        "Xdai",
-        "goquorum"
+        "WSPROVIDER",
+        "Xdai"
     ],
     "dictionaries": [
         "typescript,node,npm,go,rust"

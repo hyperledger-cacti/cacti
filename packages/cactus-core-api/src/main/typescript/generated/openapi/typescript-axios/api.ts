@@ -144,7 +144,8 @@ export enum ConsensusAlgorithmFamiliesWithOutTxFinality {
 
 export enum ConsensusAlgorithmFamiliesWithTxFinality {
     Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
-    Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE'
+    Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE',
+    GRANPA = 'org.hyperledger.cactus.consensusalgorithm.GRANPA'
 }
 
 /**
@@ -156,7 +157,8 @@ export enum ConsensusAlgorithmFamiliesWithTxFinality {
 export enum ConsensusAlgorithmFamily {
     Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
     Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE',
-    Work = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK'
+    Work = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK',
+    GRANPA = 'org.hyperledger.cactus.consensusalgorithm.GRANPA'
 }
 
 /**

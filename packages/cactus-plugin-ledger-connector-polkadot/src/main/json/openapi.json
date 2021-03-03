@@ -1,0 +1,179 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cactus Plugin - Connector Polkadot",
+    "description": "Can perform basic tasks on a Polkadot parachain",
+    "version": "0.0.1",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://www.cactus.stream/{basePath}",
+      "description": "Public test instance",
+      "variables": {
+        "basePath": {
+          "default": ""
+        }
+      }
+    },
+    {
+      "url": "http://localhost:4000/{basePath}",
+      "description": "Local test instance",
+      "variables": {
+        "basePath": {
+          "default": ""
+        }
+      }
+    }
+  ],
+  "components": {
+    "schemas": {
+        "PrometheusExporterMetricsResponse": {
+          "type": "string",
+          "nullable": false
+        },
+        "TransactionInfoRequest": {
+          "type": "object",
+          "required": [
+          "accountAddress",
+          "transactionExpiration"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "accountAddress": {
+              "type": "object",
+              "nullable": false
+            },
+            "transactionExpiration":{
+              "type": "number",
+              "nullable": true
+            }
+          }
+        },
+        "TransactionInfoResponseData": {
+          "type": "object",
+          "required": [
+            "nonce",
+            "blockHash",
+            "era"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "nonce": {
+              "type": "object",
+              "nullable": false
+            },
+            "blockHash": {
+              "type": "object",
+              "nullable": false
+            },
+            "era": {
+              "type": "object",
+              "nullable": true
+            }
+          }
+        },
+        "TransactionInfoResponse": {
+          "type": "object",
+          "required": [
+            "responseContainer"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "responseContainer": {
+              "type": "object",
+              "required": [
+                "response_data",
+                "succeeded",
+                "message",
+                "error"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "response_data": {
+                  "$ref": "#/components/schemas/TransactionInfoResponseData",
+                  "nullable": false
+                },
+                "succeeded": {
+                  "type": "boolean",
+                  "nullable": false
+                },
+                "message": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "error": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "paths": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics": {
+      "get": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics"
+          }
+        },
+        "operationId": "getPrometheusExporterMetricsV1",
+        "summary": "Get the Prometheus Metrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info": {
+      "get": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info"
+          }
+        },
+        "operationId": "getTransactionInfo",
+        "summary": "Get the necessary Transaction Info",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+              "application/json": {
+                  "schema": {
+                      "$ref": "#/components/schemas/TransactionInfoRequest"
+                  }
+              }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "/json/": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
