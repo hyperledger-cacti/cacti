@@ -1,4 +1,3 @@
-/*
 import { PrometheusExporter } from "../../../main/typescript/prometheus-exporter/prometheus-exporter";
 import {
   IListenOptions,
@@ -31,7 +30,7 @@ import http from "http";
 import express from "express";
 
 // TODO automatically generate smart contract assets
-// import * as abi from "../../rust/fixtures/ink!/publicBulletin/target/ink/metadata.json";
+import * as abi from "../../rust/fixtures/ink/metadata.json";
 import * as fs from "fs";
 
 import test, { Test } from "tape-promise/tape";
@@ -52,7 +51,6 @@ test("BEFORE " + testCase, async (t: Test) => {
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
-
 
 test(testCase, async (t: Test) => {
   const connectorOptions: IPluginLedgerConnectorPolkadotOptions = {
@@ -181,11 +179,6 @@ test(testCase, async (t: Test) => {
     t.comment(`Signed transaction is: ${signedTransaction}`);
 
     t.ok(signedTransaction);
-    const signature = signedTransaction?.signature.toHex();
-
-    if (signature) {
-      t.assert(plugin.isHex(signature));
-    }
 
     const result = await plugin.writeStorage({
       transferSubmittable: signedTransaction,
@@ -198,4 +191,3 @@ test(testCase, async (t: Test) => {
     t.end();
   }
 });
-*/

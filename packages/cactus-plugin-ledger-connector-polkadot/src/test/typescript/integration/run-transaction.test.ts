@@ -1,4 +1,3 @@
-/*
 import { PrometheusExporter } from "../../../main/typescript/prometheus-exporter/prometheus-exporter";
 import { AddressInfo } from "net";
 import { isHex } from "@polkadot/util";
@@ -159,4 +158,3 @@ test.skip(testCase, async (t: Test) => {
   t.ok(result.success);
   t.ok(result.hash);
 });
-*/

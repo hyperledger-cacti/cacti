@@ -1,9 +1,8 @@
-/*
 import { PrometheusExporter } from "../../../main/typescript/prometheus-exporter/prometheus-exporter";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { SubstrateTestLedger } from "../../../../../cactus-test-tooling/src/main/typescript/substrate-test-ledger/substrate-test-ledger";
 
-//import * as abi from "../../rust/fixtures/ink!/publicBulletin/target/ink/metadata.json";
+import * as abi from "../../rust/fixtures/ink/metadata.json";
 import * as fs from "fs";
 
 import test, { Test } from "tape-promise/tape";
@@ -30,7 +29,6 @@ test("BEFORE " + testCase, async (t: Test) => {
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
-
 
 test(testCase, async (t: Test) => {
   const connectorOptions: IPluginLedgerConnectorPolkadotOptions = {
@@ -85,5 +83,3 @@ test(testCase, async (t: Test) => {
   t.ok((await result).success);
   t.end();
 });
-
-*/
