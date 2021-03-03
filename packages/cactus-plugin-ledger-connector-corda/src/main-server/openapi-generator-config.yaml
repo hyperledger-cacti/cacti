@@ -1,0 +1,28 @@
+additionalProperties:
+  title: "Hyperledger Cactus - Corda Ledger Connector Plugin Server"
+  groupId: org.hyperledger.cactus
+  artifactId: cactus-connector-corda-server
+  # TODO: Make sure this automatically gets bumped during releases so that it
+  # remains in sync with the package.json version number.
+  artifactVersion: 0.3.0
+  apiSuffix: PluginLedgerConnectorCorda
+  basePackage: org.hyperledger.cactus.plugin.ledger.connector.corda.server
+  packageName: org.hyperledger.cactus.plugin.ledger.connector.corda.server
+  apiPackage: org.hyperledger.cactus.plugin.ledger.connector.corda.server.api
+  modelPackage: org.hyperledger.cactus.plugin.ledger.connector.corda.server.model
+
+  enumPropertyNaming: UPPERCASE
+  delegatePattern: false
+  serviceImplementation: true
+  serviceInterface: true
+
+  # TODO:
+  # Currently the reactive flavor of the template does not seem to work
+  # When specified as true, it produces compiler errors such as:
+  # e: /kotlin-spring/src/test/kotlin/org/openapitools/api/ApiApiTest.kt: (11, 32): Unresolved reference: runBlockingTest
+  # e: /kotlin-spring/src/test/kotlin/org/openapitools/api/ApiApiTest.kt: (29, 43): Unresolved reference: runBlockingTest
+  # e: /kotlin-spring/src/test/kotlin/org/openapitools/api/ApiApiTest.kt: (31, 81): Suspend function 'cordaDeployContractJarsV1' should be called only from a coroutine or another suspend function
+  # e: /kotlin-spring/src/test/kotlin/org/openapitools/api/ApiApiTest.kt: (45, 39): Unresolved reference: runBlockingTest
+  # e: /kotlin-spring/src/test/kotlin/org/openapitools/api/ApiApiTest.kt: (47, 70): Suspend function 'cordaInvokeContractV1' should be called only from a coroutine or another suspend function
+  #
+  reactive: false

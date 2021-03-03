@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: Hyperledger Cactus - Corda Ledger Connector Plugin Server
+
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+server:
+  port: 8080
