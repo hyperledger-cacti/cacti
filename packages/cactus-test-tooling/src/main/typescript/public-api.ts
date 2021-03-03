@@ -14,6 +14,14 @@ export {
   QUORUM_TEST_LEDGER_DEFAULT_OPTIONS,
   QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
 } from "./quorum/quorum-test-ledger";
+
+export {
+  CordaTestLedger,
+  ICordaTestLedgerConstructorOptions,
+  CORDA_TEST_LEDGER_DEFAULT_OPTIONS,
+  JOI_SCHEMA as CORDA_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
+} from "./corda/corda-test-ledger";
+
 export * from "./quorum/i-quorum-genesis-options";
 export { Containers } from "./common/containers";
 
@@ -47,3 +55,17 @@ export {
   K_DEFAULT_VAULT_HTTP_PORT,
   K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
 } from "./vault-test-server/vault-test-server";
+
+export {
+  CORDA_CONNECTOR_DEFAULT_OPTIONS,
+  CORDA_CONNECTOR_OPTIONS_JOI_SCHEMA,
+  CordaConnectorContainer,
+  ICordaConnectorContainerOptions,
+} from "./corda-connector/corda-connector-container";
+
+export {
+  SAMPLE_CORDAPP_ROOT_DIRS,
+  SampleCordappEnum,
+} from "./corda/sample-cordapp-enum";
+
+export { Streams } from "./common/streams";

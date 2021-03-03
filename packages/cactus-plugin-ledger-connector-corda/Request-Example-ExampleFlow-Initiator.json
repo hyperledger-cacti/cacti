@@ -1,0 +1,76 @@
+{
+  "flowFullClassName" : "net.corda.samples.example.flows.ExampleFlow$Initiator",
+  "flowInvocationType" : "FLOW_DYNAMIC",
+  "params" : [ {
+    "jvmTypeKind" : "PRIMITIVE",
+    "jvmType" : {
+      "fqClassName" : "java.lang.Integer"
+    },
+    "primitiveValue" : 42,
+    "jvmCtorArgs" : null
+  }, {
+    "jvmTypeKind" : "REFERENCE",
+    "jvmType" : {
+      "fqClassName" : "net.corda.core.identity.Party"
+    },
+    "primitiveValue" : null,
+    "jvmCtorArgs" : [ {
+      "jvmTypeKind" : "REFERENCE",
+      "jvmType" : {
+        "fqClassName" : "net.corda.core.identity.CordaX500Name"
+      },
+      "primitiveValue" : null,
+      "jvmCtorArgs" : [ {
+        "jvmTypeKind" : "PRIMITIVE",
+        "jvmType" : {
+          "fqClassName" : "java.lang.String"
+        },
+        "primitiveValue" : "PartyB",
+        "jvmCtorArgs" : null
+      }, {
+        "jvmTypeKind" : "PRIMITIVE",
+        "jvmType" : {
+          "fqClassName" : "java.lang.String"
+        },
+        "primitiveValue" : "New York",
+        "jvmCtorArgs" : null
+      }, {
+        "jvmTypeKind" : "PRIMITIVE",
+        "jvmType" : {
+          "fqClassName" : "java.lang.String"
+        },
+        "primitiveValue" : "US",
+        "jvmCtorArgs" : null
+      } ]
+    }, {
+      "jvmTypeKind" : "REFERENCE",
+      "jvmType" : {
+        "fqClassName" : "net.corda.samples.example.PublicKeyImpl"
+      },
+      "primitiveValue" : null,
+      "jvmCtorArgs" : [ {
+        "jvmTypeKind" : "PRIMITIVE",
+        "jvmType" : {
+          "fqClassName" : "java.lang.String"
+        },
+        "primitiveValue" : "EdDSA",
+        "jvmCtorArgs" : null
+      }, {
+        "jvmTypeKind" : "PRIMITIVE",
+        "jvmType" : {
+          "fqClassName" : "java.lang.String"
+        },
+        "primitiveValue" : "X.509",
+        "jvmCtorArgs" : null
+      }, {
+        "jvmTypeKind" : "PRIMITIVE",
+        "jvmType" : {
+          "fqClassName" : "[B"
+        },
+        "primitiveValue" : "MCowBQYDK2VwAyEAoOv19eiCDJ7HzR9UrfwbFig7qcD1jkewKkkS4WF9kPA=",
+        "jvmCtorArgs" : null
+      } ]
+    } ]
+  } ],
+  "timeoutMs" : null
+}

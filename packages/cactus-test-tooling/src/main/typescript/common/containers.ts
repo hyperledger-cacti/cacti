@@ -94,6 +94,18 @@ export class Containers {
   static async pullFile(
     container: Container,
     filePath: string,
+    encoding:
+      | "ascii"
+      | "utf8"
+      | "utf-8"
+      | "utf16le"
+      | "ucs2"
+      | "ucs-2"
+      | "base64"
+      | "latin1"
+      | "binary"
+      | "hex"
+      | undefined = "utf-8",
   ): Promise<string> {
     Checks.truthy(container, "Containers#pullFile() container");
     Checks.truthy(filePath, "Containers#pullFile() filePath");
@@ -107,7 +119,7 @@ export class Containers {
         stream.on("error", (err: Error) => {
           reject(err);
         });
-        const chunks: string[] = await Streams.aggregate<string>(stream);
+        const chunks = await Streams.aggregate<string>(stream, encoding);
         fileContents += chunks.join("");
         stream.resume();
         next();
@@ -115,6 +127,46 @@ export class Containers {
 
       extract.on("finish", () => {
         resolve(fileContents);
+      });
+
+      response.pipe(extract);
+    });
+  }
+
+  /**
+   * Reads the contents of a file from a container's file system and returns a promise of that string.
+   *
+   * @param container The dockerode container to use when pulling the file.
+   * @param filePath The path on the container's own file system where the file you want pulled is located.
+   */
+  static async pullBinaryFile(
+    container: Container,
+    filePath: string,
+  ): Promise<Buffer> {
+    const fnTag = `Containers#pullFile()`;
+    Checks.truthy(container, `${fnTag} container`);
+    Checks.truthy(filePath, `${fnTag} filePath`);
+
+    const response: any = await container.getArchive({ path: filePath });
+    const extract: tar.Extract = tar.extract({ autoDestroy: true });
+
+    return new Promise((resolve, reject) => {
+      let buffer: Buffer;
+      extract.on("entry", async (header: any, stream, next) => {
+        stream.on("error", (err: Error) => {
+          reject(err);
+        });
+        const buffers = await Streams.aggregateToBuffer(stream);
+        if (buffer) {
+          reject(new Error(`${fnTag} Multiple entries from: ${filePath}`));
+        }
+        buffer = Buffer.concat(buffers);
+        stream.resume();
+        next();
+      });
+
+      extract.on("finish", () => {
+        resolve(buffer);
       });
 
       response.pipe(extract);
@@ -306,10 +358,17 @@ export class Containers {
         const { Status } = await Containers.getById(containerId);
         reachable = Status.endsWith(" (healthy)");
       } catch (ex) {
-        reachable = false;
+        // FIXME: if the container is slow to start this might trip with a
+        // false positive because there is no container YET in the beginning.
+        // if (ex.stack.includes(`no container by ID"${containerId}"`)) {
+        //   throw new Error(
+        //     `${fnTag} container crashed while awaiting healthheck -> ${ex.stack}`,
+        //   );
+        // }
         if (Date.now() >= startedAt + timeoutMs) {
           throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
         }
+        reachable = false;
       }
       await new Promise((resolve2) => setTimeout(resolve2, 1000));
     } while (!reachable);

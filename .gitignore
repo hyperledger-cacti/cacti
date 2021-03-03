@@ -41,3 +41,5 @@ cactus-openapi-spec.json
 cactus-openapi-spec-*.json
 .npmrc
 *.log
+build/
+.gradle/
