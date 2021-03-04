@@ -181,7 +181,7 @@ export class PluginLedgerConnectorQuorum
     const method: ContractSendMethod = methodRef(...req.params);
 
     if (req.invocationType === EthContractInvocationType.CALL) {
-      const callOutput = await (method as any).call(...req.params);
+      const callOutput = await (method as any).call();
       return { callOutput };
     } else if (req.invocationType === EthContractInvocationType.SEND) {
       if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
@@ -197,6 +197,7 @@ export class PluginLedgerConnectorQuorum
       transactionConfig.from = web3SigningCredential.ethAccount;
       transactionConfig.gas = req.gas;
       transactionConfig.gasPrice = req.gasPrice;
+      transactionConfig.value = req.value;
 
       const txReq: RunTransactionRequest = {
         transactionConfig,
