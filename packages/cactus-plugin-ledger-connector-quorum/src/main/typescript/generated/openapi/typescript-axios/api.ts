@@ -140,6 +140,12 @@ export interface InvokeContractV1Request {
      */
     value?: string | number;
     /**
+     * 
+     * @type {number}
+     * @memberof InvokeContractV1Request
+     */
+    nonce?: number;
+    /**
      * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND
      * @type {number}
      * @memberof InvokeContractV1Request
@@ -209,6 +215,12 @@ export interface QuorumTransactionConfig {
      * @memberof QuorumTransactionConfig
      */
     gasPrice?: string | number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuorumTransactionConfig
+     */
+    nonce?: number;
     /**
      * 
      * @type {string}

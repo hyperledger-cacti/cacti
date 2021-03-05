@@ -272,6 +272,9 @@
                             }
                         ]
                     },
+                    "nonce": {
+                        "type": "number"
+                    },
                     "data": {
                         "oneOf": [
                             {
@@ -490,6 +493,9 @@
                                 "type": "number"
                             }
                         ]
+                    },
+                    "nonce": {
+                        "type": "number"
                     },
                     "timeoutMs": {
                         "type": "number",

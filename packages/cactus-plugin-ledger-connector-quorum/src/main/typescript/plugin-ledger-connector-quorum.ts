@@ -194,10 +194,14 @@ export class PluginLedgerConnectorQuorum
       const payload = (method.send as any).request();
       const { params } = payload;
       const [transactionConfig] = params;
+      if (req.gas == undefined) {
+        req.gas = await this.web3.eth.estimateGas(transactionConfig);
+      }
       transactionConfig.from = web3SigningCredential.ethAccount;
       transactionConfig.gas = req.gas;
       transactionConfig.gasPrice = req.gasPrice;
       transactionConfig.value = req.value;
+      transactionConfig.nonce = req.nonce;
 
       const txReq: RunTransactionRequest = {
         transactionConfig,

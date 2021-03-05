@@ -65,6 +65,12 @@ export interface BesuTransactionConfig {
     gasPrice?: string | number;
     /**
      * 
+     * @type {number}
+     * @memberof BesuTransactionConfig
+     */
+    nonce?: number;
+    /**
+     * 
      * @type {string}
      * @memberof BesuTransactionConfig
      */
@@ -190,6 +196,12 @@ export interface InvokeContractV1Request {
      * @memberof InvokeContractV1Request
      */
     gasPrice?: string | number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvokeContractV1Request
+     */
+    nonce?: number;
     /**
      * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND
      * @type {number}
