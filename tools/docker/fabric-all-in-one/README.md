@@ -5,6 +5,10 @@
 
 An all in one fabric docker image with 1 peer, 1 orderer and 1 channel.
 
+## Usage
+
+### Visual Studio Code
+
 Example `.vscode/tasks.json` file for building/running the image:
 
 ```json
@@ -35,7 +39,19 @@ Example `.vscode/tasks.json` file for building/running the image:
 }
 ```
 
-## Running Fabric CLI Container Commands
+### Local Image Builds
+
+From the project root:
+
+```sh
+docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x -t faio2x
+```
+
+```sh
+docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x  -t faio14x
+```
+
+### Running Fabric CLI Container Commands
 
 For Fabric 1.4.x
 

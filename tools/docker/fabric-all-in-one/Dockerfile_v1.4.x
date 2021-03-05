@@ -1,6 +1,6 @@
 # We need to use the older, more stable v18 here because of
 # https://github.com/docker-library/docker/issues/170
-FROM docker:18.09.9-dind
+FROM docker:20.10.3-dind
 
 ARG FABRIC_VERSION=1.4.8
 ARG CA_VERSION=1.4.9
@@ -18,7 +18,12 @@ RUN apk add py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make
 ENV PYTHONUNBUFFERED=1
 RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 RUN python3 -m ensurepip
-RUN pip3 install --no-cache --upgrade pip setuptools
+RUN pip3 install --no-cache --upgrade "pip>=21" setuptools
+
+# Without this the docker-compose installation crashes, complaining about
+# a lack of rust compiler...
+# RUN pip install setuptools_rust
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 # Install Docker Compose which is a dependency of Fabric Samples
 RUN pip install docker-compose
