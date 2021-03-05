@@ -163,15 +163,38 @@ test("deploys contract via .json file", async (t: Test) => {
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
-      gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PRIVATEKEYHEX,
       },
+      nonce: 1,
     });
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
+    try {
+      const setNameOutInvalid = await connector.invokeContract({
+        contractAddress,
+        contractAbi: HelloWorldContractJson.abi,
+        invocationType: EthContractInvocationType.SEND,
+        methodName: "setName",
+        params: [newName],
+        gas: 1000000,
+        web3SigningCredential: {
+          ethAccount: testEthAccount.address,
+          secret: testEthAccount.privateKey,
+          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        },
+        nonce: 1,
+      });
+      t2.ifError(setNameOutInvalid);
+    } catch (error) {
+      t2.notStrictEqual(
+        error,
+        "Nonce too low",
+        "setName() invocation with invalid nonce",
+      );
+    }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractAddress,
       contractAbi: HelloWorldContractJson.abi,
@@ -258,8 +281,29 @@ test("deploys contract via .json file", async (t: Test) => {
       params: [newName],
       gas: 1000000,
       web3SigningCredential,
+      nonce: 4,
     });
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+
+    try {
+      const setNameOutInvalid = await connector.invokeContract({
+        contractAddress,
+        contractAbi: HelloWorldContractJson.abi,
+        invocationType: EthContractInvocationType.SEND,
+        methodName: "setName",
+        params: [newName],
+        gas: 1000000,
+        web3SigningCredential,
+        nonce: 4,
+      });
+      t2.ifError(setNameOutInvalid);
+    } catch (error) {
+      t2.notStrictEqual(
+        error,
+        "Nonce too low",
+        "setName() invocation with invalid nonce",
+      );
+    }
 
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractAddress,

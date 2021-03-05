@@ -150,8 +150,33 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         secret: "",
         type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
       },
+      nonce: 2,
     });
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+
+    try {
+      const setNameOutInvalid = await connector.invokeContract({
+        contractAddress,
+        contractAbi: HelloWorldContractJson.abi,
+        invocationType: EthContractInvocationType.SEND,
+        methodName: "setName",
+        params: [newName],
+        gas: 1000000,
+        web3SigningCredential: {
+          ethAccount: firstHighNetWorthAccount,
+          secret: "",
+          type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+        },
+        nonce: 2,
+      });
+      t2.ifError(setNameOutInvalid);
+    } catch (error) {
+      t2.notStrictEqual(
+        error,
+        "Nonce too low",
+        "setName() invocation with invalid nonce",
+      );
+    }
 
     const getNameOut = await connector.invokeContract({
       contractAddress,
@@ -227,15 +252,38 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
-      gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PRIVATEKEYHEX,
       },
+      nonce: 1,
     });
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
+    try {
+      const setNameOutInvalid = await connector.invokeContract({
+        contractAddress,
+        contractAbi: HelloWorldContractJson.abi,
+        invocationType: EthContractInvocationType.SEND,
+        methodName: "setName",
+        params: [newName],
+        gas: 1000000,
+        web3SigningCredential: {
+          ethAccount: testEthAccount.address,
+          secret: testEthAccount.privateKey,
+          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        },
+        nonce: 1,
+      });
+      t2.ifError(setNameOutInvalid);
+    } catch (error) {
+      t2.notStrictEqual(
+        error,
+        "Nonce too low",
+        "setName() invocation with invalid nonce",
+      );
+    }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractAddress,
       contractAbi: HelloWorldContractJson.abi,
@@ -287,9 +335,33 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       params: [newName],
       gas: 1000000,
       web3SigningCredential,
+      nonce: 3,
     });
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
+    try {
+      const setNameOutInvalid = await connector.invokeContract({
+        contractAddress,
+        contractAbi: HelloWorldContractJson.abi,
+        invocationType: EthContractInvocationType.SEND,
+        methodName: "setName",
+        params: [newName],
+        gas: 1000000,
+        web3SigningCredential: {
+          ethAccount: firstHighNetWorthAccount,
+          secret: "",
+          type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+        },
+        nonce: 3,
+      });
+      t2.ifError(setNameOutInvalid);
+    } catch (error) {
+      t2.notStrictEqual(
+        error,
+        "Nonce too low",
+        "setName() invocation with invalid nonce",
+      );
+    }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractAddress,
       contractAbi: HelloWorldContractJson.abi,
