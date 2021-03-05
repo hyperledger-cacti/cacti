@@ -63,7 +63,10 @@ RUN apk add --no-cache openssh augeas
 RUN augtool 'set /files/etc/ssh/sshd_config/AuthorizedKeysFile ".ssh/authorized_keys /etc/authorized_keys/%u"'
 RUN augtool 'set /files/etc/ssh/sshd_config/PermitRootLogin yes'
 RUN augtool 'set /files/etc/ssh/sshd_config/PasswordAuthentication no'
+RUN augtool 'set /files/etc/ssh/sshd_config/PermitEmptyPasswords no'
 RUN augtool 'set /files/etc/ssh/sshd_config/Port 22'
+RUN augtool 'set /files/etc/ssh/sshd_config/LogLevel DEBUG2'
+RUN augtool 'set /files/etc/ssh/sshd_config/LoginGraceTime 10'
 # Create the server's key - without this sshd will refuse to start
 RUN ssh-keygen -A
 
@@ -95,6 +98,9 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY run-fabric-network.sh /
 COPY healthcheck.sh /
 
+# OpenSSH Server (needed for chaincode deployment ) 
+EXPOSE 22
+
 # supervisord web ui/dashboard
 EXPOSE 9001
 
@@ -121,6 +127,11 @@ EXPOSE 8054
 
 # couchdb0, couchdb1, couchdb2, couchdb3
 EXPOSE 5984 6984 7984 8984
+
+RUN apk add --no-cache util-linux
+
+# FIXME - make it so that SSHd does not need this to work
+RUN echo "root:$(uuidgen)" | chpasswd
 
 # Extend the parent image's entrypoint
 # https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script
