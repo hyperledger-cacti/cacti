@@ -49,6 +49,10 @@ Once the last command has finished executing, open link printed on the console w
 * [Project Wiki](https://wiki.hyperledger.org/display/cactus): Schedule and logs of the maintainer meetings
 * [Whitepaper](./whitepaper/whitepaper.md): The official document on Cactus design specifications
 
+## Fast Developer Flow / Code Iterations
+
+![Fast Developer Flow / Code Iterations](./docs/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
+
 ## Contact
 * mailing list: [cactus@lists.hyperledger.org](mailto:cactus@lists.hyperledger.org)
 * rocketchat channel: [https://chat.hyperledger.org/channel/cactus](https://chat.hyperledger.org/channel/cactus).
