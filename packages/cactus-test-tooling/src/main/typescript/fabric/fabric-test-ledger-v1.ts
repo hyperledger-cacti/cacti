@@ -23,6 +23,7 @@ import {
   Logger,
   LogLevelDesc,
   LoggerProvider,
+  Bools,
 } from "@hyperledger/cactus-common";
 
 /*
@@ -34,6 +35,7 @@ export interface IFabricTestLedgerV1ConstructorOptions {
   imageName?: string;
   envVars?: Map<string, string>;
   logLevel?: LogLevelDesc;
+  emitContainerLogs?: boolean;
 }
 
 /*
@@ -70,6 +72,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
   public readonly imageVersion: string;
   public readonly imageName: string;
   public readonly publishAllPorts: boolean;
+  public readonly emitContainerLogs: boolean;
   public readonly envVars: Map<string, string>;
 
   private readonly log: Logger;
@@ -77,7 +80,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
   private container: Container | undefined;
   private containerId: string | undefined;
 
-  public get className() {
+  public get className(): string {
     return FabricTestLedgerV1.CLASS_NAME;
   }
 
@@ -92,6 +95,9 @@ export class FabricTestLedgerV1 implements ITestLedger {
     this.imageVersion = options.imageVersion || DEFAULT_OPTS.imageVersion;
     this.imageName = options.imageName || DEFAULT_OPTS.imageName;
     this.publishAllPorts = options.publishAllPorts;
+    this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
+      ? (options.emitContainerLogs as boolean)
+      : true;
     this.envVars = options.envVars || DEFAULT_OPTS.envVars;
 
     if (compareVersions.compare(this.getFabricVersion(), "1.4", "<"))
@@ -420,6 +426,16 @@ export class FabricTestLedgerV1 implements ITestLedger {
       eventEmitter.once("start", async (container: Container) => {
         this.container = container;
         this.containerId = container.id;
+
+        if (this.emitContainerLogs) {
+          const logOptions = { follow: true, stderr: true, stdout: true };
+          const logStream = await container.logs(logOptions);
+          logStream.on("data", (data: Buffer) => {
+            const fnTag = `[${this.getContainerImageName()}]`;
+            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          });
+        }
+
         try {
           await this.waitForHealthCheck();
           resolve(container);
