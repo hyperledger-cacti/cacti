@@ -54,7 +54,6 @@ export class BusinessLogicRunTransaction extends BusinessLogicBase {
         // Create trade information
         const tradeInfo: TradeInfo = new TradeInfo(requestInfo.businessLogicID, requestInfo.tradeID);
         
-        // TODO: Verifierを呼び出して、機能を実行する
         this.execTransaction(requestInfo, tradeInfo);
         
     }
@@ -65,7 +64,6 @@ export class BusinessLogicRunTransaction extends BusinessLogicBase {
         logger.debug("called execTransaction()");
 
         const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
-        // TODO: 暫定的に監視不要を指定（※第3パラメタ=false)
         const verifier = verifierFactory.getVerifier(useValidator['validatorID'][0], {}, false);
         logger.debug("getVerifier");
         
