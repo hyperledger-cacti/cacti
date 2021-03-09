@@ -165,6 +165,33 @@
                     "FabricContractInvocationType.CALL"
                 ]
             },
+            "SSHExecCommandResponse": {
+                "type": "object",
+                "required": [
+                    "stdout",
+                    "stderr",
+                    "code",
+                    "signal"
+                ],
+                "properties": {
+                    "stdout": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "stderr": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "code": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "signal": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            },
             "RunTransactionRequest": {
                 "type": "object",
                 "required": [
@@ -235,12 +262,136 @@
                     }
                 }
             },
+            "DeploymentTargetOrganization": {
+                "type": "object",
+                "required": [
+                    "CORE_PEER_LOCALMSPID",
+                    "CORE_PEER_ADDRESS",
+                    "CORE_PEER_MSPCONFIGPATH",
+                    "CORE_PEER_TLS_ROOTCERT_FILE",
+                    "ORDERER_TLS_ROOTCERT_FILE"
+                ],
+                "properties": {
+                    "CORE_PEER_LOCALMSPID": {
+                        "type": "string",
+                        "example": "Org1MSP",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_ADDRESS": {
+                        "type": "string",
+                        "example": "peer0.org1.example.com:7051",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_MSPCONFIGPATH": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_TLS_ROOTCERT_FILE": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "ORDERER_TLS_ROOTCERT_FILE": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    }
+                }
+            },
             "DeployContractGoSourceV1Request": {
                 "type": "object",
                 "required": [
-                    "goSource"
+                    "goSource",
+                    "targetOrganizations",
+                    "chainCodeVersion",
+                    "channelId",
+                    "policyDslSource",
+                    "targetPeerAddresses",
+                    "tlsRootCertFiles"
                 ],
                 "properties": {
+                    "policyDslSource": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false,
+                        "example": "AND('Org1MSP.member','Org2MSP.member')"
+                    },
+                    "tlsRootCertFiles": {
+                        "type": "string",
+                        "description": "The TLS root cert files that will be passed to the chaincode instantiation command.",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false,
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt"
+                    },
+                    "channelId": {
+                        "type": "string",
+                        "description": "The name of the Fabric channel where the contract will get instantiated.",
+                        "example": "mychannel",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "targetOrganizations": {
+                        "type": "array",
+                        "minItems": 1,
+                        "nullable": false,
+                        "maxItems": 1024,
+                        "items": {
+                            "$ref": "#/components/schemas/DeploymentTargetOrganization"
+                        }
+                    },
+                    "targetPeerAddresses": {
+                        "type": "array",
+                        "description": "An array of peer addresses where the contract will be instantiated.",
+                        "example": [
+                            "peer0.org1.example.com:7051"
+                        ],
+                        "minItems": 1,
+                        "maxItems": 2048,
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 4096
+                        }
+                    },
+                    "constructorArgs": {
+                        "type": "object",
+                        "example": "{} - An empty object literal can be sufficient if your contract does not have parameters.",
+                        "nullable": false,
+                        "properties": {
+                            "Args": {
+                                "type": "array",
+                                "minLength": 0,
+                                "maxLength": 2048,
+                                "items": {}
+                            }
+                        }
+                    },
+                    "chainCodeVersion": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "example": "1.0.0",
+                        "nullable": false
+                    },
                     "goSource": {
                         "description": "The your-smart-contract.go file where the functionality of your contract is implemented.",
                         "$ref": "#/components/schemas/FileBase64",
@@ -279,11 +430,19 @@
             "DeployContractGoSourceV1Response": {
                 "type": "object",
                 "required": [
-                    "result"
+                    "success",
+                    "installationCommandResponse",
+                    "instantiationCommandResponse"
                 ],
                 "properties": {
-                    "result": {
-                        "type": "string"
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "installationCommandResponse": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    },
+                    "instantiationCommandResponse": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
                     }
                 }
             },
@@ -335,14 +494,14 @@
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source": {
             "post": {
+                "operationId": "deployContractGoSourceV1",
+                "summary": "Deploys a chaincode contract in the form of a go sources.",
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
                         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
                     }
                 },
-                "operationId": "deployContractGoSourceV1",
-                "summary": "Deploys a chaincode contract in the form of a go sources.",
                 "parameters": [],
                 "requestBody": {
                     "content": {

@@ -1,15 +1,11 @@
-import fs from "fs";
 import { AddressInfo } from "net";
 import http from "http";
-import path from "path";
 
 import test, { Test } from "tape";
 import { v4 as uuidv4 } from "uuid";
 
 import express from "express";
 import bodyParser from "body-parser";
-import axios, { AxiosRequestConfig } from "axios";
-import FormData from "form-data";
 
 import { FabricTestLedgerV1 } from "@hyperledger/cactus-test-tooling";
 
@@ -21,18 +17,29 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
+  DefaultEventHandlerStrategy,
+  FabricContractInvocationType,
   PluginLedgerConnectorFabric,
-  ChainCodeCompiler,
-  ICompilationOptions,
 } from "../../../../../main/typescript/public-api";
 
 import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
 
+import { DefaultApi as FabricApi } from "../../../../../main/typescript/public-api";
+
 import { IPluginLedgerConnectorFabricOptions } from "../../../../../main/typescript/plugin-ledger-connector-fabric";
 
-test.skip("deploys contract from go source", async (t: Test) => {
-  const logLevel: LogLevelDesc = "TRACE";
-  const ledger = new FabricTestLedgerV1({ publishAllPorts: true });
+import { DiscoveryOptions } from "fabric-network";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+
+const logLevel: LogLevelDesc = "TRACE";
+
+test("deploys contract from go source", async (t: Test) => {
+  const ledger = new FabricTestLedgerV1({
+    emitContainerLogs: true,
+    publishAllPorts: true,
+    imageName: "hyperledger/cactus-fabric-all-in-one",
+    imageVersion: "2021-03-02-ssh-hotfix",
+  });
   await ledger.start();
 
   const tearDown = async () => {
@@ -43,19 +50,73 @@ test.skip("deploys contract from go source", async (t: Test) => {
   test.onFinish(tearDown);
 
   const connectionProfile = await ledger.getConnectionProfileOrg1();
-  t.ok(connectionProfile);
+  t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
 
+  const enrollAdminOut = await ledger.enrollAdmin();
+  const adminWallet = enrollAdminOut[1];
+  const [userIdentity] = await ledger.enrollUser(adminWallet);
   const sshConfig = await ledger.getSshConfig();
 
-  const pluginRegistry = new PluginRegistry();
-  const pluginOpts: IPluginLedgerConnectorFabricOptions = {
+  const keychainInstanceId = uuidv4();
+  const keychainId = uuidv4();
+  const keychainEntryKey = "user2";
+  const keychainEntryValue = JSON.stringify(userIdentity);
+
+  const keychainPlugin = new PluginKeychainMemory({
+    instanceId: keychainInstanceId,
+    keychainId,
+    logLevel,
+    backend: new Map([
+      [keychainEntryKey, keychainEntryValue],
+      ["some-other-entry-key", "some-other-entry-value"],
+    ]),
+  });
+
+  const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
+
+  const discoveryOptions: DiscoveryOptions = {
+    enabled: true,
+    asLocalhost: true,
+  };
+
+  // these below mirror how the fabric-samples sets up the configuration
+  const org1Env = {
+    CORE_PEER_LOCALMSPID: "Org1MSP",
+    CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
+    CORE_PEER_MSPCONFIGPATH:
+      "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
+    CORE_PEER_TLS_ROOTCERT_FILE:
+      "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
+    ORDERER_TLS_ROOTCERT_FILE:
+      "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+  };
+
+  // these below mirror how the fabric-samples sets up the configuration
+  const org2Env = {
+    CORE_PEER_LOCALMSPID: "Org2MSP",
+    CORE_PEER_ADDRESS: "peer0.org2.example.com:9051",
+    CORE_PEER_MSPCONFIGPATH:
+      "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp",
+    CORE_PEER_TLS_ROOTCERT_FILE:
+      "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt",
+    ORDERER_TLS_ROOTCERT_FILE:
+      "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+  };
+
+  const pluginOptions: IPluginLedgerConnectorFabricOptions = {
     instanceId: uuidv4(),
+    dockerBinary: "/usr/local/bin/docker",
     pluginRegistry,
+    cliContainerEnv: org1Env,
     sshConfig,
     logLevel,
     connectionProfile,
+    discoveryOptions,
+    eventHandlerOptions: {
+      strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+    },
   };
-  const plugin = new PluginLedgerConnectorFabric(pluginOpts);
+  const plugin = new PluginLedgerConnectorFabric(pluginOptions);
 
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
@@ -69,51 +130,76 @@ test.skip("deploys contract from go source", async (t: Test) => {
   const { port } = addressInfo;
   test.onFinish(async () => await Servers.shutdown(server));
 
-  const [endpoint] = await plugin.installWebServices(expressApp);
+  await plugin.installWebServices(expressApp);
+  const apiUrl = `http://localhost:${port}`;
 
-  const url = `http://localhost:${port}${endpoint.getPath()}`;
-
-  const form = new FormData();
-  const headers = form.getHeaders();
-
-  const compiler = new ChainCodeCompiler({ logLevel });
-
-  const opts: ICompilationOptions = {
-    fileName: "hello-world-contract.go",
-    moduleName: "hello-world-contract",
+  const apiClient = new FabricApi({ basePath: apiUrl });
+  const res = await apiClient.deployContractGoSourceV1({
+    targetPeerAddresses: ["peer0.org1.example.com:7051"],
+    tlsRootCertFiles:
+      "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
+    policyDslSource: "AND('Org1MSP.member','Org2MSP.member')",
+    channelId: "mychannel",
+    chainCodeVersion: "1.0.0",
+    constructorArgs: { Args: ["john", "99"] },
+    goSource: {
+      body: Buffer.from(HELLO_WORLD_CONTRACT_GO_SOURCE).toString("base64"),
+      filename: "hello-world.go",
+    },
+    moduleName: "hello-world",
+    targetOrganizations: [org1Env, org2Env],
     pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
-    modTidyOnly: true, // we just need the go.mod file so tidy only is enough
-    sourceCode: HELLO_WORLD_CONTRACT_GO_SOURCE,
-  };
+  });
 
-  const result = await compiler.compile(opts);
-  t.ok(result, "result OK");
-  t.ok(result.goVersionInfo, "result.goVersionInfo OK");
-  t.ok(result.goModFilePath, "result.goModFilePath OK");
-  t.ok(result.sourceFilePath, "result.sourceFilePath OK");
-  t.comment(result.goVersionInfo);
+  const {
+    installationCommandResponse,
+    instantiationCommandResponse,
+    success,
+  } = res.data;
 
-  const goModStream = fs.createReadStream(result.goModFilePath);
-  const sourceFileStream = fs.createReadStream(result.sourceFilePath);
+  t.comment(`CC installation out: ${installationCommandResponse.stdout}`);
+  t.comment(`CC installation err: ${installationCommandResponse.stderr}`);
+  t.comment(`CC instantiation out: ${instantiationCommandResponse.stdout}`);
+  t.comment(`CC instantiation err: ${instantiationCommandResponse.stderr}`);
 
-  // Second argument can take Buffer or Stream (lazily read during the request) too.
-  // Third argument is filename if you want to simulate a file upload. Otherwise omit.
-  form.append("files", sourceFileStream, path.basename(result.sourceFilePath));
-  form.append("files", goModStream, path.basename(result.goModFilePath));
+  t.equal(res.status, 200, "res.status === 200 OK");
+  t.true(success, "res.data.success === true");
 
-  const reqConfig: AxiosRequestConfig = {
-    headers,
-    maxContentLength: 128 * 1024 * 1024, // 128 MB
-    maxBodyLength: 128 * 1024 * 1024, // 128 MB,
-  };
-  t.comment(`Req.URL=${url}`);
-  const res = await axios.post(url, form, reqConfig);
-  const { status, data } = res;
+  // FIXME - without this wait it randomly fails with an error claiming that
+  // the endorsment was impossible to be obtained. The fabric-samples script
+  // does the same thing, it just waits 10 seconds for good measure so there
+  // might not be a way for us to avoid doing this, but if there is a way we
+  // absolutely should not have timeouts like this, anywhere...
+  await new Promise((resolve) => setTimeout(resolve, 20000));
 
-  t.comment(`res.status: ${res.status}`);
-  t.equal(status, 200, "res.status === 200 OK");
+  const testKey = uuidv4();
+  const testValue = uuidv4();
 
-  t.true(data.success, "res.data.success === true");
+  const setRes = await apiClient.runTransactionV1({
+    chainCodeId: "hello-world",
+    channelName: "mychannel",
+    functionArgs: [testKey, testValue],
+    functionName: "set",
+    invocationType: FabricContractInvocationType.SEND,
+    keychainId,
+    keychainRef: keychainEntryKey,
+  });
+  t.ok(setRes, "setRes truthy OK");
+  t.true(setRes.status > 199 && setRes.status < 300, "setRes status 2xx OK");
+  t.comment(`HelloWorld.set() ResponseBody: ${JSON.stringify(setRes.data)}`);
 
+  const getRes = await apiClient.runTransactionV1({
+    chainCodeId: "hello-world",
+    channelName: "mychannel",
+    functionArgs: [testKey],
+    functionName: "get",
+    invocationType: FabricContractInvocationType.CALL,
+    keychainId,
+    keychainRef: keychainEntryKey,
+  });
+  t.ok(getRes, "getRes truthy OK");
+  t.true(getRes.status > 199 && setRes.status < 300, "getRes status 2xx OK");
+  t.comment(`HelloWorld.get() ResponseBody: ${JSON.stringify(getRes.data)}`);
+  t.equal(getRes.data.functionOutput, testValue, "get returns UUID OK");
   t.end();
 });
