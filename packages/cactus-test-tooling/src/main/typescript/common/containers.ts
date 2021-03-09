@@ -373,4 +373,28 @@ export class Containers {
       await new Promise((resolve2) => setTimeout(resolve2, 1000));
     } while (!reachable);
   }
+
+  public static async pruneDockerResources(): Promise<void> {
+    const docker = new Dockerode();
+    try {
+      await docker.pruneContainers();
+    } catch (ex) {
+      console.warn(`Failed to prune docker containers: `, ex);
+    }
+    try {
+      await docker.pruneVolumes();
+    } catch (ex) {
+      console.warn(`Failed to prune docker volumes: `, ex);
+    }
+    try {
+      await docker.pruneImages();
+    } catch (ex) {
+      console.warn(`Failed to prune docker images: `, ex);
+    }
+    try {
+      await docker.pruneNetworks();
+    } catch (ex) {
+      console.warn(`Failed to prune docker networks: `, ex);
+    }
+  }
 }
