@@ -53,10 +53,11 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
 
   const ledger = new FabricTestLedgerV1({
+    emitContainerLogs: false,
     publishAllPorts: true,
     logLevel,
-    imageName: "hyperledger/cactus-fabric-all-in-one",
-    imageVersion: "2020-12-16-3ddfd8f-v2.2.0",
+    imageName: "hyperledger/cactus-fabric2-all-in-one",
+    imageVersion: "2021-03-08-hotfix-test-network",
     envVars: new Map([
       ["FABRIC_VERSION", "2.2.0"],
       ["CA_VERSION", "1.4.9"],
@@ -69,6 +70,7 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
     await ledger.stop();
     await ledger.destroy();
   };
+
   test.onFinish(tearDownLedger);
 
   const enrollAdminOut = await ledger.enrollAdmin();
@@ -105,6 +107,7 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
     instanceId: uuidv4(),
     pluginRegistry,
     sshConfig,
+    cliContainerEnv: {},
     logLevel,
     connectionProfile,
     discoveryOptions,
@@ -133,17 +136,19 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
 
   await plugin.installWebServices(expressApp);
 
-  const carId = "CAR277";
-  const carOwner = uuidv4();
+  const assetId = "asset277";
+  const assetOwner = uuidv4();
 
+  const channelName = "mychannel";
+  const chainCodeId = "basic";
   {
     const res = await apiClient.runTransactionV1({
       keychainId,
       keychainRef: keychainEntryKey,
-      channelName: "mychannel",
-      chainCodeId: "fabcar",
+      channelName,
+      chainCodeId,
       invocationType: FabricContractInvocationType.CALL,
-      functionName: "queryAllCars",
+      functionName: "GetAllAssets",
       functionArgs: [],
     } as RunTransactionRequest);
     t.ok(res);
@@ -155,11 +160,11 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
     const req: RunTransactionRequest = {
       keychainId,
       keychainRef: keychainEntryKey,
-      channelName: "mychannel",
+      channelName,
       invocationType: FabricContractInvocationType.SEND,
-      chainCodeId: "fabcar",
-      functionName: "createCar",
-      functionArgs: [carId, "Trabant", "601", "Blue", carOwner],
+      chainCodeId,
+      functionName: "CreateAsset",
+      functionArgs: [assetId, "yellow", "11", assetOwner, "199"],
     };
 
     const res = await apiClient.runTransactionV1(req);
@@ -172,21 +177,20 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
     const res = await apiClient.runTransactionV1({
       keychainId,
       keychainRef: keychainEntryKey,
-      channelName: "mychannel",
-      chainCodeId: "fabcar",
+      channelName,
+      chainCodeId,
       invocationType: FabricContractInvocationType.CALL,
-      functionName: "queryAllCars",
+      functionName: "GetAllAssets",
       functionArgs: [],
     } as RunTransactionRequest);
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    const cars = JSON.parse(res.data.functionOutput);
-    const car277 = cars.find((c: any) => c.Key === carId);
-    t.ok(car277, "Located Car record by its ID OK");
-    t.ok(car277.Record, `Car object has "Record" property OK`);
-    t.ok(car277.Record.owner, `Car object has "Record"."owner" property OK`);
-    t.equal(car277.Record.owner, carOwner, `Car has expected owner OK`);
+    const assets = JSON.parse(res.data.functionOutput);
+    const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
+    t.ok(asset277, "Located Asset record by its ID OK");
+    t.ok(asset277.owner, `Asset object has "owner" property OK`);
+    t.equal(asset277.owner, assetOwner, `Asset has expected owner OK`);
   }
 
   {

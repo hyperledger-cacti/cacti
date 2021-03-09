@@ -121,6 +121,48 @@ export enum DefaultEventHandlerStrategy {
 export interface DeployContractGoSourceV1Request {
     /**
      * 
+     * @type {string}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    policyDslSource: string;
+    /**
+     * The TLS root cert files that will be passed to the chaincode instantiation command.
+     * @type {string}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    tlsRootCertFiles: string;
+    /**
+     * The name of the Fabric channel where the contract will get instantiated.
+     * @type {string}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    channelId: string;
+    /**
+     * 
+     * @type {Array<DeploymentTargetOrganization>}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    targetOrganizations: Array<DeploymentTargetOrganization>;
+    /**
+     * An array of peer addresses where the contract will be instantiated.
+     * @type {Array<string>}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    targetPeerAddresses: Array<string>;
+    /**
+     * 
+     * @type {DeployContractGoSourceV1RequestConstructorArgs}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    constructorArgs?: DeployContractGoSourceV1RequestConstructorArgs;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeployContractGoSourceV1Request
+     */
+    chainCodeVersion: string;
+    /**
+     * 
      * @type {FileBase64}
      * @memberof DeployContractGoSourceV1Request
      */
@@ -153,15 +195,77 @@ export interface DeployContractGoSourceV1Request {
 /**
  * 
  * @export
+ * @interface DeployContractGoSourceV1RequestConstructorArgs
+ */
+export interface DeployContractGoSourceV1RequestConstructorArgs {
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof DeployContractGoSourceV1RequestConstructorArgs
+     */
+    Args?: Array<any>;
+}
+/**
+ * 
+ * @export
  * @interface DeployContractGoSourceV1Response
  */
 export interface DeployContractGoSourceV1Response {
     /**
      * 
-     * @type {string}
+     * @type {boolean}
      * @memberof DeployContractGoSourceV1Response
      */
-    result: string;
+    success: boolean;
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof DeployContractGoSourceV1Response
+     */
+    installationCommandResponse: SSHExecCommandResponse;
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof DeployContractGoSourceV1Response
+     */
+    instantiationCommandResponse: SSHExecCommandResponse;
+}
+/**
+ * 
+ * @export
+ * @interface DeploymentTargetOrganization
+ */
+export interface DeploymentTargetOrganization {
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrganization
+     */
+    CORE_PEER_LOCALMSPID: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrganization
+     */
+    CORE_PEER_ADDRESS: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrganization
+     */
+    CORE_PEER_MSPCONFIGPATH: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrganization
+     */
+    CORE_PEER_TLS_ROOTCERT_FILE: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrganization
+     */
+    ORDERER_TLS_ROOTCERT_FILE: string;
 }
 /**
  * 
@@ -304,6 +408,37 @@ export interface RunTransactionResponse {
      * @memberof RunTransactionResponse
      */
     functionOutput: string;
+}
+/**
+ * 
+ * @export
+ * @interface SSHExecCommandResponse
+ */
+export interface SSHExecCommandResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof SSHExecCommandResponse
+     */
+    stdout: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SSHExecCommandResponse
+     */
+    stderr: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SSHExecCommandResponse
+     */
+    code: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SSHExecCommandResponse
+     */
+    signal: string | null;
 }
 
 /**

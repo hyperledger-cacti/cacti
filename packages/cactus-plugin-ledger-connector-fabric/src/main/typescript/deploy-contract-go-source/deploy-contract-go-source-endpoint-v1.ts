@@ -16,6 +16,7 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
+import { DeployContractGoSourceV1Request } from "../generated/openapi/typescript-axios/index";
 import OAS from "../../json/openapi.json";
 
 export interface IDeployContractGoSourceEndpointV1Options {
@@ -28,7 +29,7 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
 
   private readonly log: Logger;
 
-  public get className() {
+  public get className(): string {
     return DeployContractGoSourceEndpointV1.CLASS_NAME;
   }
 
@@ -46,24 +47,18 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public getOasPath() {
+  public get oasPath() {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
     ];
   }
 
   public getPath(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
-  }
-
-  public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public registerExpress(app: Express): IWebServiceEndpoint {
@@ -72,23 +67,19 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = "DeployContractGoSourceEndpointV1#handleRequest()";
-    this.log.debug(`POST ${this.getPath()}`);
+    const fnTag = `${this.className}#handleRequest()`;
+    const verbUpper = this.getVerbLowerCase().toUpperCase();
+    this.log.debug(`${verbUpper} ${this.getPath()}`);
 
     try {
-      const message =
-        `${this.opts.connector.className} does not support ` +
-        ` contract deployment yet. This is a feature that is under ` +
-        ` development for now. Stay tuned!`;
-      const resBody = { message };
-      // const { connector } = this.opts;
-      // const reqBody = req.body as DeployContractGoSourceV1Request;
-      // const resBody = await connector.deployContract(reqBody);
-      res.status(HttpStatus.NOT_IMPLEMENTED);
+      const { connector } = this.opts;
+      const reqBody = req.body as DeployContractGoSourceV1Request;
+      const resBody = await connector.deployContract(reqBody);
+      res.status(HttpStatus.OK);
       res.json(resBody);
     } catch (ex) {
-      this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
+      this.log.error(`${fnTag} failed to serve contract deploy request`, ex);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR);
       res.statusMessage = ex.message;
       res.json({ error: ex.stack });
     }

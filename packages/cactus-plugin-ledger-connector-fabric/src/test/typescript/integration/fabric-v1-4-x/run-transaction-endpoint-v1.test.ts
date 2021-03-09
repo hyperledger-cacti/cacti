@@ -41,6 +41,7 @@ test("runs tx on a Fabric v1.4.8 ledger", async (t: Test) => {
 
   const ledger = new FabricTestLedgerV1({
     publishAllPorts: true,
+    emitContainerLogs: false,
     logLevel,
     imageName: "hyperledger/cactus-fabric-all-in-one",
     imageVersion: "2020-12-16-3ddfd8f-v1.4.8",
@@ -92,6 +93,7 @@ test("runs tx on a Fabric v1.4.8 ledger", async (t: Test) => {
     instanceId: uuidv4(),
     pluginRegistry,
     sshConfig,
+    cliContainerEnv: {},
     logLevel,
     connectionProfile,
     discoveryOptions,

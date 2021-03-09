@@ -9,7 +9,9 @@ import {
 
 import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
 
-test("compiles chaincode straight from go source code", async (t: Test) => {
+// FIXME - the chain code compiler will undergo a refactor to make it work via
+// SSH/docker exec. Until then, leave this test out.
+test.skip("compiles chaincode straight from go source code", async (t: Test) => {
   const compiler = new ChainCodeCompiler({ logLevel: "TRACE" });
 
   const opts: ICompilationOptions = {

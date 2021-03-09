@@ -33,7 +33,10 @@
       "ignore": [
         "src/**/generated/*"
       ],
-      "extensions": ["ts", "json"],
+      "extensions": [
+        "ts",
+        "json"
+      ],
       "quiet": true,
       "verbose": false,
       "runOnChangeOnly": true
@@ -83,6 +86,7 @@
     "@hyperledger/cactus-common": "0.3.0",
     "@hyperledger/cactus-core": "0.3.0",
     "@hyperledger/cactus-core-api": "0.3.0",
+    "axios": "0.21.1",
     "bl": "1.2.3",
     "express": "4.17.1",
     "express-openapi-validator": "3.16.11",
@@ -92,11 +96,10 @@
     "http-status-codes": "2.1.4",
     "joi": "14.3.1",
     "multer": "1.4.2",
-    "ngo": "2.6.2",
     "node-ssh": "11.0.0",
     "openapi-types": "7.0.1",
     "prom-client": "13.0.0",
-    "temp": "0.9.1",
+    "temp": "0.9.4",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.0",
     "web3": "1.2.7",
@@ -110,8 +113,6 @@
     "@types/multer": "1.4.4",
     "@types/ssh2": "0.5.44",
     "@types/temp": "0.8.34",
-    "@types/uuid": "8.3.0",
-    "axios": "0.21.1",
-    "form-data": "3.0.0"
+    "@types/uuid": "8.3.0"
   }
 }

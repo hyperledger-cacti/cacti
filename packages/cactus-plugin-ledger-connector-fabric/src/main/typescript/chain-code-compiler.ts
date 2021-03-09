@@ -59,7 +59,11 @@ export interface ICompilationResult {
   sourceFilePath: string;
   goModFilePath: string;
 }
-
+/**
+ * TODO: Refactor this to not use the ngo module at all and instead rely on
+ * SSH/docker exec-ing into environments where go is provided such as the
+ * Fabric CLI container.
+ */
 export class ChainCodeCompiler {
   private readonly log: Logger;
 
