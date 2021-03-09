@@ -7,7 +7,10 @@ import { v4 as uuidv4 } from "uuid";
 import bodyParser from "body-parser";
 import express from "express";
 
-import { FabricTestLedgerV1 } from "@hyperledger/cactus-test-tooling";
+import {
+  Containers,
+  FabricTestLedgerV1,
+} from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
@@ -37,6 +40,16 @@ import { DiscoveryOptions } from "fabric-network";
  */
 
 test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
+  // Always set to true when GitHub Actions is running the workflow.
+  // You can use this variable to differentiate when tests are being run locally or by GitHub Actions.
+  // @see https://docs.github.com/en/actions/reference/environment-variables
+  if (process.env.GITHUB_ACTIONS === "true") {
+    // Github Actions started to run out of disk space recently so we have this
+    // hack here to attempt to free up disk space when running inside a VM of
+    // the CI system.
+    await Containers.pruneDockerResources();
+  }
+
   const logLevel: LogLevelDesc = "TRACE";
 
   const ledger = new FabricTestLedgerV1({
