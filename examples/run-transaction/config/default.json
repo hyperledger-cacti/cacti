@@ -1,0 +1,8 @@
+{
+    "runTransactionInfo": {
+        "connector": {
+            "validatorID": "vIdAcnCF"
+        }
+    },
+    "logLevel": "debug"
+}

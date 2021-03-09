@@ -1,3 +1,9 @@
+/*
+ * Copyright 2020-2021 Hyperledger Cactus Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * getBalance.js
+ */
 const Web3 = require('web3');
 const web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));

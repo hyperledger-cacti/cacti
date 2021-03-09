@@ -26,7 +26,8 @@
     "shelljs": "^0.8.4",
     "socket.io": "^2.0.4",
     "ts-node": "8.9.1",
-    "web3": "^1.2.9"
+    "web3": "^1.2.9",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",

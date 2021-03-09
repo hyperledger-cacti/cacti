@@ -11,6 +11,7 @@ import { MeterManagement } from './MeterManagement';
 import { MeterInfo } from './MeterInfo';
 import { TradeInfo } from '../../packages/routing-interface/TradeInfo';
 import { transactionManagement } from '../../packages/routing-interface/routes/index';
+import { verifierFactory } from '../../packages/routing-interface/routes/index';
 import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
 import { makeRawTransaction } from './TransactionEthereum'
 import { LedgerEvent } from '../../packages/ledger-plugin/LedgerPlugin';
@@ -59,7 +60,8 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         const options = {
             "filterKey": config.electricityTradeInfo.sawtooth.filterKey
         }
-        const verifierSawtooth = transactionManagement.getVerifier(useValidator['validatorID'][0], options);
+//        const verifierSawtooth = transactionManagement.getVerifier(useValidator['validatorID'][0], options);
+        const verifierSawtooth = verifierFactory.getVerifier(useValidator['validatorID'][0], options);
         logger.debug("getVerifierSawtooth");
 
     }
@@ -86,7 +88,8 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         // Get Verifier Instance
         logger.debug(`##remittanceTransaction(): businessLogicID: ${this.businessLogicID}`);
         const useValidator = JSON.parse(transactionManagement.getValidatorToUse(this.businessLogicID));
-        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][1]);
+//        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][1]);
+        const verifierEthereum = verifierFactory.getVerifier(useValidator['validatorID'][1]);
         logger.debug("getVerifierEthereum");
 
         // Generate parameters for// sendRawTransaction

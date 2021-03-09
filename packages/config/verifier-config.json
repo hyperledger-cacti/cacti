@@ -89,6 +89,33 @@
                 "ledgerAbstract": "Sawtooth Ledger"
             },
             "apiInfo": []
+        },
+        {
+            "validatorID": "vIdAcnCB",
+            "validatorURL": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/",
+            "validatorKeyPath": "",
+            "ledgerInfo": {
+                "ledgerAbstract": "Cactus Besu Ledger via http connection"
+            },
+            "apiInfo": []
+        },
+        {
+            "validatorID": "vIdAcnCF",
+            "validatorURL": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/",
+            "validatorKeyPath": "",
+            "ledgerInfo": {
+                "ledgerAbstract": "Cactus Fabric Ledger via http connection"
+            },
+            "apiInfo": []
+        },
+        {
+            "validatorID": "vIdAcnCQ",
+            "host": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/",
+            "validatorKeyPath": "",
+            "ledgerInfo": {
+                "ledgerAbstract": "Cactus Quorum Ledger via http connection"
+            },
+            "apiInfo": []
         }
     ]
 }
