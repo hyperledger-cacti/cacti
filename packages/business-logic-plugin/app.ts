@@ -16,12 +16,10 @@ import bodyParser = require('body-parser');
 
 import indexRouter from   '../routing-interface/routes/index';
 import loginRouter from   '../routing-interface/routes/login';
-import tradesRouter from  '../routing-interface/routes/trades';
-import balanceRouter from '../routing-interface/routes/balance';
-import carsRouter from    '../routing-interface/routes/cars';
-import assetRouter from    '../routing-interface/routes/asset';
 import blockmonitorRouter from    '../routing-interface/routes/blockmonitor';
-import electricityTradeRouter from    '../routing-interface/routes/electricity-trade';
+import { ConfigUtil } from '../routing-interface/util/ConfigUtil';
+
+const config: any = ConfigUtil.getConfig();
 
 const app: express.Express = express();
 
@@ -35,12 +33,15 @@ app.use(bodyParser.json());
 
 app.use('/', indexRouter);
 app.use('/api/v1/bl/login/', loginRouter);
-app.use('/api/v1/bl/trades/', tradesRouter);
-app.use('/api/v1/bl/balance/', balanceRouter);
-app.use('/api/v1/bl/cars/', carsRouter);
-app.use('/api/v1/bl/asset/', assetRouter);
 app.use('/api/v1/bl/blockmonitor/', blockmonitorRouter);
-app.use('/api/v1/bl/electricity-trade/', electricityTradeRouter);
+
+// Dynamic loading
+console.debug(`start Dynamic loading.`);
+for (var appRouter of config.appRouters) {
+    console.debug(`path: ${appRouter.path}, routerJs: ${appRouter.routerJs}`);
+    app.use(appRouter.path, require(appRouter.routerJs).default);
+}
+
 
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {

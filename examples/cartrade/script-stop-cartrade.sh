@@ -1,3 +1,5 @@
+# Copyright 2020-2021 Hyperledger Cactus Contributors
+# SPDX-License-Identifier: Apache-2.0
 echo "[process] Stop the validators and the cartrade app"
 # stop the validator for Ethereum
 kill -9 $(lsof -t -i:5050)

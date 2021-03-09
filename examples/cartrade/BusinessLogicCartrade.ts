@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Hyperledger Cactus Contributors
+ * Copyright 2020-2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * BusinessLogicCartrade.ts
@@ -14,6 +14,7 @@ import { TransactionData } from './TransactionData';
 import { BusinessLogicInquireCartradeStatus } from './BusinessLogicInquireCartradeStatus';
 import { TxInfoData } from './TxInfoData';
 import { transactionManagement } from '../../packages/routing-interface/routes/index';
+import { verifierFactory } from '../../packages/routing-interface/routes/index';
 import { LedgerOperation } from '../../packages/business-logic-plugin/LedgerOperation';
 import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
 import { makeRawTransaction } from './TransactionEthereum'
@@ -106,7 +107,8 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         // Get Verifier Instance
         logger.debug(`##firstTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`);
         const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
-        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
+//        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
+        const verifierEthereum = verifierFactory.getVerifier(useValidator['validatorID'][0]);
         logger.debug("getVerifierEthereum");
 
         // TODO: get private key from
@@ -156,7 +158,8 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         // Get Verifier Instance
         logger.debug(`##secondTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`);
         const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
-        const verifierFabric = transactionManagement.getVerifier(useValidator['validatorID'][1]);
+//        const verifierFabric = transactionManagement.getVerifier(useValidator['validatorID'][1]);
+        const verifierFabric = verifierFactory.getVerifier(useValidator['validatorID'][1]);
         logger.debug("getVerifierFabric");
 
         // Generate parameters for sendSignedProposal(changeCarOwner)
@@ -195,7 +198,8 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         // Get Verifier Instance
         logger.debug(`##thirdTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`);
         const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
-        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
+//        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
+        const verifierEthereum = verifierFactory.getVerifier(useValidator['validatorID'][0]);
         logger.debug("getVerifierEthereum");
 
         // TODO: Get address of escrow and set parameter

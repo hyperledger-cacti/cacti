@@ -7,6 +7,10 @@
         {
             "businessLogicID": "h40Q9eMD",
             "validatorID": ["sUr7d10R", "84jUisrs"]
+        },
+        {
+            "businessLogicID": "j71S9gLN",
+            "validatorID": ["vIdAcnCF"]
         }
     ],
     "logLevel": "debug",
@@ -22,5 +26,6 @@
     "verifier": {
         "maxCounterRequestID":100,
         "syncFunctionTimeoutMillisecond":5000
-    }
+    },
+    "appRouters": []
 }

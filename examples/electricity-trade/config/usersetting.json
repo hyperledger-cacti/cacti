@@ -22,5 +22,15 @@
     "verifier": {
         "maxCounterRequestID":100,
         "syncFunctionTimeoutMillisecond":5000
-    }
+    },
+    "appRouters": [
+        {
+            "path": "/api/v1/bl/electricity-trade/",
+            "routerJs": "../../examples/electricity-trade/electricity-trade.js"
+        },
+        {
+            "path": "/api/v1/bl/balance/",
+            "routerJs": "../../examples/electricity-trade/balance.js"
+        }
+    ]
 }

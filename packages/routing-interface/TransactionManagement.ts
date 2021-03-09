@@ -25,14 +25,14 @@ logger.level = config.logLevel;
 
 export class TransactionManagement {
     private blpRegistry: BLPRegistry = null;                    // Verifier information used in business logic
-    private connectInfo: LPInfoHolder = null;                   // connection information
-    private verifierArray: [] = [];                             // Verifier
+//    private connectInfo: LPInfoHolder = null;                   // connection information
+//    private verifierArray: [] = [];                             // Verifier
     // private txIDMapInfo: Map<string, string> = null;
     private tradeIDMapInfo: Map<string, string> = null;
 
     constructor() {
         this.blpRegistry = new BLPRegistry();
-        this.connectInfo = new LPInfoHolder();
+//        this.connectInfo = new LPInfoHolder();
         // this.blpMap = new Map();
         // this.txIDMapInfo = new Map();
         this.tradeIDMapInfo = new Map();
@@ -50,7 +50,7 @@ export class TransactionManagement {
         logger.info(`tradeID: ${tradeID}`);
 
         // object judgment
-        if ((businessLogicID === "guks32pf") || (businessLogicID === "h40Q9eMD")) {
+        if ((businessLogicID === "guks32pf") || (businessLogicID === "h40Q9eMD") || (businessLogicID === "j71S9gLN")) {
 
             const blp = getTargetBLPInstance(businessLogicID);
             if (blp === null) {
@@ -138,7 +138,7 @@ export class TransactionManagement {
         return result;
     }
 
-
+/*
     // Get Verifier
     getVerifier(validatorId: string, monitorOptions = {}): VerifierBase {
 
@@ -158,7 +158,7 @@ export class TransactionManagement {
         }
 
     }
-
+*/
 
     // Get validator to use
     getValidatorToUse(businessLogicId: string): string {

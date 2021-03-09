@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  * 
  * queryCar.js
@@ -49,17 +49,17 @@ async function main() {
 
         // Evaluate the specified transaction.
         if (process.argv.length > 2) {
-			const key = process.argv[2];
-	        //console.log('##queryCar Params: ' + key);
-	        console.log(`##queryCar Params: ${key}`);
-	        const result = await contract.evaluateTransaction('queryCar', key);
-	        console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
-		}
-		else {
-	        console.log('##queryAllCars: ');
-	        const result = await contract.evaluateTransaction('queryAllCars');
-	        console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
-		}
+            const key = process.argv[2];
+            //console.log('##queryCar Params: ' + key);
+            console.log(`##queryCar Params: ${key}`);
+            const result = await contract.evaluateTransaction('queryCar', key);
+            console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
+        }
+        else {
+            console.log('##queryAllCars: ');
+            const result = await contract.evaluateTransaction('queryAllCars');
+            console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
+        }
 
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);

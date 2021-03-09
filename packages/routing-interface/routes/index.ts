@@ -7,9 +7,11 @@
 
 import { Router, NextFunction, Request, Response } from 'express';
 import { TransactionManagement } from '../TransactionManagement';
+import { VerifierFactory } from '../../ledger-plugin/VerifierFactory';
 
 const router: Router = Router();
 export const transactionManagement: TransactionManagement = new TransactionManagement();
+export const verifierFactory: VerifierFactory = new VerifierFactory();
 
 /* GET home page. */
 router.get('/', (req: Request, res: Response, next: NextFunction) => {

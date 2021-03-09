@@ -12,6 +12,7 @@ import { LedgerOperation } from './../business-logic-plugin/LedgerOperation';
 import { Socket } from 'dgram';
 import { ConfigUtil } from '../routing-interface/util/ConfigUtil';
 import { VerifierAuthentication } from './VerifierAuthentication';
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const io = require('socket.io-client');
 
@@ -256,6 +257,35 @@ export class VerifierBase implements Verifier {
             }
             catch (err) {
                 logger.error(`##Error: execSyncFunction, ${err}`);
+                reject(err);
+            }
+        });
+    }
+
+    requestLedgerOperationHttp(contract: object, method: object, args: object): Promise<any> {
+        return new Promise((resolve, reject) => {
+            try {
+                logger.debug(`##in requestLedgerOperationHttp, contract = ${JSON.stringify(contract)}, method = ${JSON.stringify(method)}, args = ${JSON.stringify(args)}`);
+
+                const httpReq = new XMLHttpRequest();
+                httpReq.onload = function() {
+                    // TODO: responding in JSON format?
+                    logger.debug(`responseObj = ${httpReq.responseText}`);
+                    const responseObj = JSON.parse(httpReq.responseText);
+                    logger.debug(`responseObj = ${JSON.stringify(responseObj)}`);
+                    resolve(responseObj);
+                };
+
+                logger.debug(`validatorUrl: ${this.validatorUrl}`);
+                httpReq.open('POST', this.validatorUrl + method['command']);
+                // httpReq.setRequestHeader('content-type', 'application/json');
+                httpReq.setRequestHeader('Content-Type', 'application/json');
+                // httpReq.send(args['args']);
+                logger.debug(`args['args']: ${JSON.stringify(args['args'])}`);
+                httpReq.send(JSON.stringify(args['args']));
+            }
+            catch (err) {
+                logger.error(`##Error: requestLedgerOperationHttp, ${err}`);
                 reject(err);
             }
         });

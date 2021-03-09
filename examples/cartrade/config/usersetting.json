@@ -18,5 +18,23 @@
     "verifier": {
         "maxCounterRequestID":100,
         "syncFunctionTimeoutMillisecond":5000
-    }
+    },
+    "appRouters": [
+        {
+            "path": "/api/v1/bl/trades/",
+            "routerJs": "../../examples/cartrade/trades.js"
+        },
+        {
+            "path": "/api/v1/bl/asset/",
+            "routerJs": "../../examples/cartrade/asset.js"
+        },
+        {
+            "path": "/api/v1/bl/balance/",
+            "routerJs": "../../examples/cartrade/balance.js"
+        },
+        {
+            "path": "/api/v1/bl/cars/",
+            "routerJs": "../../examples/cartrade/cars.js"
+        }
+    ]
 }
