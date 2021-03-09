@@ -3,7 +3,16 @@
 > This docker image is for `testing` and `development` only.
 > Do NOT use in production!
 
-An all in one fabric docker image with 1 peer, 1 orderer and 1 channel.
+An all in one fabric docker image with the `fabric-samples` repo fully embedded.
+
+## Usage
+
+### Building Local Image
+
+```sh
+DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x -t faio14x
+```
+### VSCode
 
 ## Usage
 
@@ -53,11 +62,11 @@ db676059b79e        faio2x              "/usr/bin/supervisor…"   9 minutes ago
 
 docker cp db676059b79e:/etc/hyperledger/cactus/fabric-aio-image.key ./fabric-aio-image.key
 
-ssh root@localhost -p 32924 -i fabric-aio-image.key 
+ssh root@localhost -p 32924 -i fabric-aio-image.key
 ```
 
 ```sh
-docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x  -t faio14x
+DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x  -t faio14x
 docker run --detach --privileged --publish-all --env FABRIC_VERSION=1.4.8 faio14x
 
 docker ps
