@@ -40,7 +40,7 @@
     "webpack:prod": "lerna run webpack:prod",
     "webpack:prod:web": "lerna run webpack:prod:web",
     "webpack:prod:node": "lerna run webpack:prod:node",
-    "test:all": "tap --node-arg=--max-old-space-size=4096 --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
+    "test:all": "tap --node-arg=--max-old-space-size=4096 --timeout=600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
     "test:unit": "tap --node-arg=--max-old-space-size=4096 --timeout=600 \"packages/cactus-*/src/test/typescript/unit/\"",
     "test:browser": "karma start karma.conf.js",
     "test:integration": "tap --node-arg=--max-old-space-size=4096 --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/integration/\"",
