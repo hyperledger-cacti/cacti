@@ -5,6 +5,8 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployC
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.NodeInfo
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -52,6 +54,17 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     fun invokeContractV1( @Valid @RequestBody(required = false) invokeContractV1Request: InvokeContractV1Request?
 ): ResponseEntity<InvokeContractV1Response> {
         return ResponseEntity(service.invokeContractV1(invokeContractV1Request), HttpStatus.valueOf(200))
+    }
+
+
+    @PostMapping(
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun listFlowsV1( @Valid @RequestBody(required = false) listFlowsV1Request: ListFlowsV1Request?
+): ResponseEntity<ListFlowsV1Response> {
+        return ResponseEntity(service.listFlowsV1(listFlowsV1Request), HttpStatus.valueOf(200))
     }
 
 

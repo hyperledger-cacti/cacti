@@ -196,6 +196,11 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         return dynamicInvoke(rpc.proxy, invokeContractV1Request!!)
     }
 
+    override fun listFlowsV1(listFlowsV1Request: ListFlowsV1Request?): ListFlowsV1Response {
+        val flows = rpc.proxy.registeredFlows()
+        return ListFlowsV1Response(flows)
+    }
+
     override fun networkMapV1(body: Any?): List<NodeInfo> {
 
         // FIXME: do not recreate the mapper for every request that we receive...

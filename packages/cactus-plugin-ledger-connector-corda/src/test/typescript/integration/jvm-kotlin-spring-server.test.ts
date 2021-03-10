@@ -71,7 +71,7 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   const connector = new CordaConnectorContainer({
     logLevel,
     imageName: "petermetz/cactus-connector-corda-server",
-    imageVersion: "2021-03-01-7e07b5b",
+    imageVersion: "2021-03-10-feat-624",
     envVars: [envVarSpringAppJson],
   });
   t.ok(CordaConnectorContainer, "CordaConnectorContainer instantaited OK");
@@ -104,6 +104,13 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   await connector.logDebugPorts();
   const apiUrl = await connector.getApiLocalhostUrl();
   const apiClient = new CordaApi({ basePath: apiUrl });
+
+  const flowsRes = await apiClient.listFlowsV1();
+  t.ok(flowsRes.status === 200, "flowsRes.status === 200 OK");
+  t.ok(flowsRes.data, "flowsRes.data truthy OK");
+  t.ok(flowsRes.data.flowNames, "flowsRes.data.flowNames truthy OK");
+  t.comment(`apiClient.listFlowsV1() => ${JSON.stringify(flowsRes.data)}`);
+
   const depRes = await apiClient.deployContractJarsV1({ jarFiles });
   t.ok(depRes, "Jar deployment response truthy OK");
   t.equal(depRes.status, 200, "Jar deployment status code === 200 OK");
