@@ -251,6 +251,32 @@ export enum JvmTypeKind {
 /**
  * 
  * @export
+ * @interface ListFlowsV1Request
+ */
+export interface ListFlowsV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof ListFlowsV1Request
+     */
+    filter?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ListFlowsV1Response
+ */
+export interface ListFlowsV1Response {
+    /**
+     * An array of strings storing the names of the flows as returned by the flowList Corda RPC.
+     * @type {Array<string>}
+     * @memberof ListFlowsV1Response
+     */
+    flowNames: Array<string>;
+}
+/**
+ * 
+ * @export
  * @interface NetworkHostAndPort
  */
 export interface NetworkHostAndPort {
@@ -457,6 +483,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * Responds with a list of the flows on the Corda node.
+         * @param {ListFlowsV1Request} [listFlowsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listFlowsV1: async (listFlowsV1Request?: ListFlowsV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof listFlowsV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(listFlowsV1Request !== undefined ? listFlowsV1Request : {}) : (listFlowsV1Request || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List<NodeInfo>
          * @param {object} [body] 
          * @param {*} [options] Override http request option.
@@ -534,6 +600,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Responds with a list of the flows on the Corda node.
+         * @param {ListFlowsV1Request} [listFlowsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listFlowsV1(listFlowsV1Request?: ListFlowsV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListFlowsV1Response>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).listFlowsV1(listFlowsV1Request, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List<NodeInfo>
          * @param {object} [body] 
          * @param {*} [options] Override http request option.
@@ -576,6 +655,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return DefaultApiFp(configuration).invokeContractV1(invokeContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
+         * Responds with a list of the flows on the Corda node.
+         * @param {ListFlowsV1Request} [listFlowsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listFlowsV1(listFlowsV1Request?: ListFlowsV1Request, options?: any): AxiosPromise<ListFlowsV1Response> {
+            return DefaultApiFp(configuration).listFlowsV1(listFlowsV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List<NodeInfo>
          * @param {object} [body] 
          * @param {*} [options] Override http request option.
@@ -616,6 +704,17 @@ export class DefaultApi extends BaseAPI {
      */
     public invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any) {
         return DefaultApiFp(this.configuration).invokeContractV1(invokeContractV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Responds with a list of the flows on the Corda node.
+     * @param {ListFlowsV1Request} [listFlowsV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listFlowsV1(listFlowsV1Request?: ListFlowsV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).listFlowsV1(listFlowsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

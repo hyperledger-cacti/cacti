@@ -235,6 +235,46 @@
                     }
                 }
             },
+            "ListFlowsV1Request": {
+                "type": "object",
+                "properties": {
+                    "filter": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ListFlowsV1Response": {
+                "type": "object",
+                "required": [
+                    "flowNames"
+                ],
+                "properties": {
+                    "flowNames": {
+                        "type": "array",
+                        "description": "An array of strings storing the names of the flows as returned by the flowList Corda RPC.",
+                        "example": [
+                            "net.corda.core.flows.ContractUpgradeFlow$Authorise",
+                            "net.corda.core.flows.ContractUpgradeFlow$Deauthorise",
+                            "net.corda.core.flows.ContractUpgradeFlow$Initiate",
+                            "net.corda.finance.flows.CashExitFlow",
+                            "net.corda.finance.flows.CashIssueAndPaymentFlow",
+                            "net.corda.finance.flows.CashIssueFlow",
+                            "net.corda.finance.flows.CashPaymentFlow",
+                            "net.corda.finance.internal.CashConfigDataFlow",
+                            "net.corda.samples.obligation.flows.IOUIssueFlow",
+                            "net.corda.samples.obligation.flows.IOUSettleFlow",
+                            "net.corda.samples.obligation.flows.IOUTransferFlow",
+                            "net.corda.samples.obligation.flows.SelfIssueCashFlow"
+                        ],
+                        "items": {
+                            "type": "string",
+                            "minItems": 0,
+                            "maxItems": 10e6
+                        },
+                        "default": []
+                    }
+                }
+            },
             "NetworkHostAndPort": {
                 "type": "object",
                 "required": [
@@ -256,17 +296,21 @@
             "PublicKey": {
                 "type": "object",
                 "description": "An instance of a java.security.PublicKey (which is an interface) implementation such as org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl",
-                "required": ["algorithm", "format", "encoded"],
+                "required": [
+                    "algorithm",
+                    "format",
+                    "encoded"
+                ],
                 "properties": {
-                    "algorithm" : {
+                    "algorithm": {
                         "type": "string",
                         "example": "EdDSA"
                     },
-                    "format" : {
+                    "format": {
                         "type": "string",
                         "example": "X.509"
                     },
-                    "encoded" : {
+                    "encoded": {
                         "type": "string",
                         "example": "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
                     }
@@ -484,7 +528,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref":  "#/components/schemas/NetworkMapV1Request"
+                                "$ref": "#/components/schemas/NetworkMapV1Request"
                             }
                         }
                     }
@@ -496,6 +540,40 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/NetworkMapV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows": {
+            "post": {
+                "operationId": "listFlowsV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "description": "Responds with a list of the flows on the Corda node.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ListFlowsV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListFlowsV1Response"
                                 }
                             }
                         }
