@@ -27,6 +27,7 @@ import {
   RunTransactionRequest,
   FabricContractInvocationType,
   DefaultEventHandlerStrategy,
+  FabricSigningCredential,
 } from "../../../../main/typescript/public-api";
 
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
@@ -141,10 +142,13 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
 
   const channelName = "mychannel";
   const chainCodeId = "basic";
+  const fabricSigningCredential: FabricSigningCredential = {
+    keychainId,
+    keychainRef: keychainEntryKey,
+  };
   {
     const res = await apiClient.runTransactionV1({
-      keychainId,
-      keychainRef: keychainEntryKey,
+      fabricSigningCredential,
       channelName,
       chainCodeId,
       invocationType: FabricContractInvocationType.CALL,
@@ -158,8 +162,7 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
   }
   {
     const req: RunTransactionRequest = {
-      keychainId,
-      keychainRef: keychainEntryKey,
+      fabricSigningCredential,
       channelName,
       invocationType: FabricContractInvocationType.SEND,
       chainCodeId,
@@ -175,8 +178,7 @@ test("runs tx on a Fabric v2.2.0 ledger", async (t: Test) => {
 
   {
     const res = await apiClient.runTransactionV1({
-      keychainId,
-      keychainRef: keychainEntryKey,
+      fabricSigningCredential,
       channelName,
       chainCodeId,
       invocationType: FabricContractInvocationType.CALL,
