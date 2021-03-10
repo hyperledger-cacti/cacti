@@ -34,6 +34,8 @@ export class PrometheusExporter {
   }
 
   public startMetricsCollection(): void {
-    promClient.collectDefaultMetrics();
+    const Registry = promClient.Registry;
+    const register = new Registry();
+    promClient.collectDefaultMetrics({ register });
   }
 }
