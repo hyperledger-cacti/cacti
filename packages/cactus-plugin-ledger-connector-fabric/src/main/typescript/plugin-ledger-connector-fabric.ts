@@ -439,8 +439,7 @@ export class PluginLedgerConnectorFabric
 
     const { connectionProfile } = this.opts;
     const {
-      keychainId,
-      keychainRef,
+      fabricSigningCredential,
       channelName,
       chainCodeId,
       invocationType,
@@ -450,15 +449,25 @@ export class PluginLedgerConnectorFabric
 
     const gateway = new Gateway();
     const wallet = new InMemoryWallet(new X509WalletMixin());
-    const keychain = this.opts.pluginRegistry.findOneByKeychainId(keychainId);
-    this.log.debug("transact() obtained keychain by ID=%o OK", keychainId);
+    const keychain = this.opts.pluginRegistry.findOneByKeychainId(
+      fabricSigningCredential.keychainId,
+    );
+    this.log.debug(
+      "transact() obtained keychain by ID=%o OK",
+      fabricSigningCredential.keychainId,
+    );
 
-    const fabricX509IdentityJson = await keychain.get<string>(keychainRef);
-    this.log.debug("transact() obtained keychain entry Key=%o OK", keychainRef);
+    const fabricX509IdentityJson = await keychain.get<string>(
+      fabricSigningCredential.keychainRef,
+    );
+    this.log.debug(
+      "transact() obtained keychain entry Key=%o OK",
+      fabricSigningCredential.keychainRef,
+    );
     const identity = JSON.parse(fabricX509IdentityJson);
 
     try {
-      await wallet.import(keychainRef, identity);
+      await wallet.import(fabricSigningCredential.keychainRef, identity);
       this.log.debug("transact() imported identity to in-memory wallet OK");
 
       const eventHandlerOptions: DefaultEventHandlerOptions = {
@@ -474,7 +483,7 @@ export class PluginLedgerConnectorFabric
       const gatewayOptions: GatewayOptions = {
         discovery: this.opts.discoveryOptions,
         eventHandlerOptions,
-        identity: keychainRef,
+        identity: fabricSigningCredential.keychainRef,
         wallet,
       };
 

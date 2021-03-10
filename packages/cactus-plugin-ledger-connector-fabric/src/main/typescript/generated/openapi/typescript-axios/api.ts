@@ -278,6 +278,25 @@ export enum FabricContractInvocationType {
 }
 
 /**
+ * 
+ * @export
+ * @interface FabricSigningCredential
+ */
+export interface FabricSigningCredential {
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricSigningCredential
+     */
+    keychainId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FabricSigningCredential
+     */
+    keychainRef: string;
+}
+/**
  * Represents a file-system file that has a name and a body which holds the file contents as a Base64 encoded string
  * @export
  * @interface FileBase64
@@ -355,16 +374,10 @@ export interface InlineResponse501 {
 export interface RunTransactionRequest {
     /**
      * 
-     * @type {string}
+     * @type {FabricSigningCredential}
      * @memberof RunTransactionRequest
      */
-    keychainId: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RunTransactionRequest
-     */
-    keychainRef: string;
+    fabricSigningCredential: FabricSigningCredential;
     /**
      * 
      * @type {string}

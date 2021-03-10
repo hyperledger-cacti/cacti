@@ -24,7 +24,10 @@ import {
 
 import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
 
-import { DefaultApi as FabricApi } from "../../../../../main/typescript/public-api";
+import {
+  DefaultApi as FabricApi,
+  FabricSigningCredential,
+} from "../../../../../main/typescript/public-api";
 
 import { IPluginLedgerConnectorFabricOptions } from "../../../../../main/typescript/plugin-ledger-connector-fabric";
 
@@ -174,6 +177,10 @@ test("deploys contract from go source", async (t: Test) => {
 
   const testKey = uuidv4();
   const testValue = uuidv4();
+  const fabricSigningCredential: FabricSigningCredential = {
+    keychainId,
+    keychainRef: keychainEntryKey,
+  };
 
   const setRes = await apiClient.runTransactionV1({
     chainCodeId: "hello-world",
@@ -181,8 +188,7 @@ test("deploys contract from go source", async (t: Test) => {
     functionArgs: [testKey, testValue],
     functionName: "set",
     invocationType: FabricContractInvocationType.SEND,
-    keychainId,
-    keychainRef: keychainEntryKey,
+    fabricSigningCredential,
   });
   t.ok(setRes, "setRes truthy OK");
   t.true(setRes.status > 199 && setRes.status < 300, "setRes status 2xx OK");
@@ -194,8 +200,7 @@ test("deploys contract from go source", async (t: Test) => {
     functionArgs: [testKey],
     functionName: "get",
     invocationType: FabricContractInvocationType.CALL,
-    keychainId,
-    keychainRef: keychainEntryKey,
+    fabricSigningCredential,
   });
   t.ok(getRes, "getRes truthy OK");
   t.true(getRes.status > 199 && setRes.status < 300, "getRes status 2xx OK");
