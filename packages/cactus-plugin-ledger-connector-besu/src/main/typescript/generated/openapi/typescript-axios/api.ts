@@ -231,6 +231,98 @@ export interface InvokeContractV1Response {
 /**
  * 
  * @export
+ * @interface InvokeContractV2Request
+ */
+export interface InvokeContractV2Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof InvokeContractV2Request
+     */
+    contractName: string;
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof InvokeContractV2Request
+     */
+    signingCredential: Web3SigningCredential;
+    /**
+     * 
+     * @type {EthContractInvocationType}
+     * @memberof InvokeContractV2Request
+     */
+    invocationType: EthContractInvocationType;
+    /**
+     * The name of the contract method to invoke.
+     * @type {string}
+     * @memberof InvokeContractV2Request
+     */
+    methodName: string;
+    /**
+     * The list of arguments to pass in to the contract method being invoked.
+     * @type {Array<any>}
+     * @memberof InvokeContractV2Request
+     */
+    params: Array<any>;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof InvokeContractV2Request
+     */
+    value?: string | number;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof InvokeContractV2Request
+     */
+    gas?: string | number;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof InvokeContractV2Request
+     */
+    gasPrice?: string | number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvokeContractV2Request
+     */
+    nonce?: number;
+    /**
+     * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND
+     * @type {number}
+     * @memberof InvokeContractV2Request
+     */
+    timeoutMs?: number;
+}
+/**
+ * 
+ * @export
+ * @interface InvokeContractV2Response
+ */
+export interface InvokeContractV2Response {
+    /**
+     * 
+     * @type {Web3TransactionReceipt}
+     * @memberof InvokeContractV2Response
+     */
+    transactionReceipt?: Web3TransactionReceipt;
+    /**
+     * 
+     * @type {any}
+     * @memberof InvokeContractV2Response
+     */
+    callOutput?: any | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof InvokeContractV2Response
+     */
+    success: boolean;
+}
+/**
+ * 
+ * @export
  * @interface RunTransactionRequest
  */
 export interface RunTransactionRequest {
@@ -652,6 +744,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 
+         * @summary Invokeds a contract on a besu ledger
+         * @param {InvokeContractV2Request} [invokeContractV2Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV2BesuInvokeContract: async (invokeContractV2Request?: InvokeContractV2Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v2/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof invokeContractV2Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(invokeContractV2Request !== undefined ? invokeContractV2Request : {}) : (invokeContractV2Request || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Obtain signatures of ledger from the corresponding transaction hash.
          * @summary Obtain signatures of ledger from the corresponding transaction hash.
          * @param {SignTransactionRequest} signTransactionRequest 
@@ -748,6 +881,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * 
+         * @summary Invokeds a contract on a besu ledger
+         * @param {InvokeContractV2Request} [invokeContractV2Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiV2BesuInvokeContract(invokeContractV2Request?: InvokeContractV2Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV2Response>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV2BesuInvokeContract(invokeContractV2Request, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Obtain signatures of ledger from the corresponding transaction hash.
          * @summary Obtain signatures of ledger from the corresponding transaction hash.
          * @param {SignTransactionRequest} signTransactionRequest 
@@ -799,6 +946,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
             return DefaultApiFp(configuration).apiV1BesuRunTransaction(runTransactionRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Invokeds a contract on a besu ledger
+         * @param {InvokeContractV2Request} [invokeContractV2Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiV2BesuInvokeContract(invokeContractV2Request?: InvokeContractV2Request, options?: any): AxiosPromise<InvokeContractV2Response> {
+            return DefaultApiFp(configuration).apiV2BesuInvokeContract(invokeContractV2Request, options).then((request) => request(axios, basePath));
         },
         /**
          * Obtain signatures of ledger from the corresponding transaction hash.
@@ -854,6 +1011,18 @@ export class DefaultApi extends BaseAPI {
      */
     public apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any) {
         return DefaultApiFp(this.configuration).apiV1BesuRunTransaction(runTransactionRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Invokeds a contract on a besu ledger
+     * @param {InvokeContractV2Request} [invokeContractV2Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public apiV2BesuInvokeContract(invokeContractV2Request?: InvokeContractV2Request, options?: any) {
+        return DefaultApiFp(this.configuration).apiV2BesuInvokeContract(invokeContractV2Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
