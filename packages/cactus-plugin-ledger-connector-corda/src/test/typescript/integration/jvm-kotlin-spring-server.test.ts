@@ -29,7 +29,7 @@ test("BEFORE " + testCase, async (t: Test) => {
 
 test(testCase, async (t: Test) => {
   const ledger = new CordaTestLedger({
-    imageName: "petermetz/cactus-corda-4-6-all-in-one-obligation",
+    imageName: "hyperledger/cactus-corda-4-6-all-in-one-obligation",
     imageVersion: "2021-03-04-ac0d32a",
     logLevel,
   });
@@ -66,6 +66,12 @@ test(testCase, async (t: Test) => {
   const internalIp = await internalIpV4();
   t.comment(`Internal IP (based on default gateway): ${internalIp}`);
   const springAppConfig = {
+    logging: {
+      level: {
+        root: "INFO",
+        "org.hyperledger.cactus.plugin.ledger.connector.corda.server": "DEBUG",
+      },
+    },
     cactus: {
       corda: {
         node: { host: internalIp },
@@ -80,8 +86,8 @@ test(testCase, async (t: Test) => {
 
   const connector = new CordaConnectorContainer({
     logLevel,
-    imageName: "petermetz/cactus-connector-corda-server",
-    imageVersion: "2021-03-10-feat-624",
+    imageName: "hyperledger/cactus-connector-corda-server",
+    imageVersion: "2021-03-10-feat-623",
     envVars: [envVarSpringAppJson],
   });
   t.ok(CordaConnectorContainer, "CordaConnectorContainer instantaited OK");
@@ -120,6 +126,21 @@ test(testCase, async (t: Test) => {
   t.ok(flowsRes.data, "flowsRes.data truthy OK");
   t.ok(flowsRes.data.flowNames, "flowsRes.data.flowNames truthy OK");
   t.comment(`apiClient.listFlowsV1() => ${JSON.stringify(flowsRes.data)}`);
+
+  const diagRes = await apiClient.diagnoseNodeV1();
+  t.ok(diagRes.status === 200, "diagRes.status === 200 OK");
+  t.ok(diagRes.data, "diagRes.data truthy OK");
+  t.ok(diagRes.data.nodeDiagnosticInfo, "nodeDiagnosticInfo truthy OK");
+  const ndi = diagRes.data.nodeDiagnosticInfo;
+  t.ok(ndi.cordapps, "ndi.cordapps truthy OK");
+  t.ok(Array.isArray(ndi.cordapps), "ndi.cordapps is Array truthy OK");
+  t.true((ndi.cordapps as []).length > 0, "ndi.cordapps non-empty true OK");
+  t.ok(ndi.vendor, "ndi.vendor truthy OK");
+  t.ok(ndi.version, "ndi.version truthy OK");
+  t.ok(ndi.revision, "ndi.revision truthy OK");
+  t.ok(ndi.platformVersion, "ndi.platformVersion truthy OK");
+
+  t.comment(`apiClient.diagnoseNodeV1() => ${JSON.stringify(diagRes.data)}`);
 
   const depRes = await apiClient.deployContractJarsV1({ jarFiles });
   t.ok(depRes, "Jar deployment response truthy OK");

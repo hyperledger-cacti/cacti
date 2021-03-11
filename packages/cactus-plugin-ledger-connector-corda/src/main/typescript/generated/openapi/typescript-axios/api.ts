@@ -69,6 +69,67 @@ export interface CordaX500Name {
     x500Principal: X500Principal;
 }
 /**
+ * A CordappInfo describes a single CorDapp currently installed on the node
+ * @export
+ * @interface CordappInfo
+ */
+export interface CordappInfo {
+    /**
+     * 
+     * @type {SHA256}
+     * @memberof CordappInfo
+     */
+    jarHash: SHA256;
+    /**
+     * The name of the licence this CorDapp is released under
+     * @type {string}
+     * @memberof CordappInfo
+     */
+    licence: string;
+    /**
+     * The minimum platform version the node must be at for the CorDapp to run
+     * @type {number}
+     * @memberof CordappInfo
+     */
+    minimumPlatformVersion: number;
+    /**
+     * The name of the JAR file that defines the CorDapp
+     * @type {string}
+     * @memberof CordappInfo
+     */
+    name: string;
+    /**
+     * The name of the CorDapp
+     * @type {string}
+     * @memberof CordappInfo
+     */
+    shortName: string;
+    /**
+     * The target platform version this CorDapp has been tested against
+     * @type {number}
+     * @memberof CordappInfo
+     */
+    targetPlatformVersion: number;
+    /**
+     * A description of what sort of CorDapp this is - either a contract, workflow, or a combination.
+     * @type {string}
+     * @memberof CordappInfo
+     */
+    type: string;
+    /**
+     * The vendor of this CorDapp
+     * @type {string}
+     * @memberof CordappInfo
+     */
+    vendor: string;
+    /**
+     * The version of this CorDapp
+     * @type {string}
+     * @memberof CordappInfo
+     */
+    version: string;
+}
+/**
  * 
  * @export
  * @interface DeployContractJarsBadRequestV1Response
@@ -106,6 +167,32 @@ export interface DeployContractJarsV1Request {
      * @memberof DeployContractJarsV1Request
      */
     jarFiles: Array<JarFile>;
+}
+/**
+ * 
+ * @export
+ * @interface DiagnoseNodeV1Request
+ */
+export interface DiagnoseNodeV1Request {
+    /**
+     * Optional property specifying which Corda Node should be the one being diagnosed in case the Connector has multiple connections established for different nodes (which is not yet a supported feature, but we want to keep this possibility open for the future).
+     * @type {Array<string>}
+     * @memberof DiagnoseNodeV1Request
+     */
+    nodeIds?: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface DiagnoseNodeV1Response
+ */
+export interface DiagnoseNodeV1Response {
+    /**
+     * 
+     * @type {NodeDiagnosticInfo}
+     * @memberof DiagnoseNodeV1Response
+     */
+    nodeDiagnosticInfo: NodeDiagnosticInfo;
 }
 /**
  * Determines which flow starting method will be used on the back-end when invoking the flow. Based on the value here the plugin back-end might invoke the rpc.startFlowDynamic() method or the rpc.startTrackedFlowDynamic() method. Streamed responses are aggregated and returned in a single response to HTTP callers who are not equipped to handle streams like WebSocket/gRPC/etc. do.
@@ -294,6 +381,43 @@ export interface NetworkHostAndPort {
     port: number;
 }
 /**
+ * A NodeDiagnosticInfo holds information about the current node version.
+ * @export
+ * @interface NodeDiagnosticInfo
+ */
+export interface NodeDiagnosticInfo {
+    /**
+     * A list of CorDapps currently installed on this node
+     * @type {Array<CordappInfo>}
+     * @memberof NodeDiagnosticInfo
+     */
+    cordapps: Array<CordappInfo>;
+    /**
+     * The platform version of this node. This number represents a released API version, and should be used to make functionality decisions (e.g. enabling an app feature only if an underlying platform feature exists)
+     * @type {number}
+     * @memberof NodeDiagnosticInfo
+     */
+    platformVersion: number;
+    /**
+     * The git commit hash this node was built from
+     * @type {string}
+     * @memberof NodeDiagnosticInfo
+     */
+    revision: string;
+    /**
+     * The vendor of this node
+     * @type {string}
+     * @memberof NodeDiagnosticInfo
+     */
+    vendor: string;
+    /**
+     * The current node version string, e.g. 4.3, 4.4-SNAPSHOT. Note that this string is effectively freeform, and so should only be used for providing diagnostic information. It should not be used to make functionality decisions (the platformVersion is a better fit for this).
+     * @type {string}
+     * @memberof NodeDiagnosticInfo
+     */
+    version: string;
+}
+/**
  * 
  * @export
  * @interface NodeInfo
@@ -375,6 +499,31 @@ export interface PublicKey {
     encoded: string;
 }
 /**
+ * SHA-256 is part of the SHA-2 hash function family. Generated hash is fixed size, 256-bits (32-bytes).
+ * @export
+ * @interface SHA256
+ */
+export interface SHA256 {
+    /**
+     * 
+     * @type {string}
+     * @memberof SHA256
+     */
+    bytes: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SHA256
+     */
+    offset: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SHA256
+     */
+    size: number;
+}
+/**
  * 
  * @export
  * @interface X500Principal
@@ -435,6 +584,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             const needsSerialization = (typeof deployContractJarsV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
             localVarRequestOptions.data =  needsSerialization ? JSON.stringify(deployContractJarsV1Request !== undefined ? deployContractJarsV1Request : {}) : (deployContractJarsV1Request || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Responds with diagnostic information about the Corda node
+         * @param {DiagnoseNodeV1Request} [diagnoseNodeV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        diagnoseNodeV1: async (diagnoseNodeV1Request?: DiagnoseNodeV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof diagnoseNodeV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(diagnoseNodeV1Request !== undefined ? diagnoseNodeV1Request : {}) : (diagnoseNodeV1Request || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -586,6 +775,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Responds with diagnostic information about the Corda node
+         * @param {DiagnoseNodeV1Request} [diagnoseNodeV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DiagnoseNodeV1Response>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).diagnoseNodeV1(diagnoseNodeV1Request, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * 
          * @summary Invokes a contract on a Corda ledger (e.g. a flow)
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
@@ -645,6 +847,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return DefaultApiFp(configuration).deployContractJarsV1(deployContractJarsV1Request, options).then((request) => request(axios, basePath));
         },
         /**
+         * Responds with diagnostic information about the Corda node
+         * @param {DiagnoseNodeV1Request} [diagnoseNodeV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: any): AxiosPromise<DiagnoseNodeV1Response> {
+            return DefaultApiFp(configuration).diagnoseNodeV1(diagnoseNodeV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Invokes a contract on a Corda ledger (e.g. a flow)
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
@@ -692,6 +903,17 @@ export class DefaultApi extends BaseAPI {
      */
     public deployContractJarsV1(deployContractJarsV1Request?: DeployContractJarsV1Request, options?: any) {
         return DefaultApiFp(this.configuration).deployContractJarsV1(deployContractJarsV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Responds with diagnostic information about the Corda node
+     * @param {DiagnoseNodeV1Request} [diagnoseNodeV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).diagnoseNodeV1(diagnoseNodeV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

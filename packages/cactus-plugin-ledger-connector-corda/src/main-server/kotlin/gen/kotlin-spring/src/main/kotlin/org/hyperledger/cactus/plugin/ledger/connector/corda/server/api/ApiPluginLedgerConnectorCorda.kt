@@ -3,6 +3,8 @@ package org.hyperledger.cactus.plugin.ledger.connector.corda.server.api
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsBadRequestV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsSuccessV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Request
@@ -43,6 +45,17 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     fun deployContractJarsV1( @Valid @RequestBody(required = false) deployContractJarsV1Request: DeployContractJarsV1Request?
 ): ResponseEntity<DeployContractJarsSuccessV1Response> {
         return ResponseEntity(service.deployContractJarsV1(deployContractJarsV1Request), HttpStatus.valueOf(200))
+    }
+
+
+    @PostMapping(
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun diagnoseNodeV1( @Valid @RequestBody(required = false) diagnoseNodeV1Request: DiagnoseNodeV1Request?
+): ResponseEntity<DiagnoseNodeV1Response> {
+        return ResponseEntity(service.diagnoseNodeV1(diagnoseNodeV1Request), HttpStatus.valueOf(200))
     }
 
 

@@ -3,13 +3,14 @@ package org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectWriter
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.springframework.stereotype.Service
 import net.corda.core.flows.FlowLogic
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowProgressHandle
+import net.corda.core.node.NodeDiagnosticInfo
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.loggerFor
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.api.ApiPluginLedgerConnectorCordaService
@@ -29,6 +30,14 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
 ) : ApiPluginLedgerConnectorCordaService {
 
     companion object {
+
+        // FIXME: do not recreate the mapper for every service implementation instance that we create...
+        val mapper: ObjectMapper = jacksonObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+
+        val writer: ObjectWriter = mapper.writer()
 
         val jcl: JarClassLoader = JarClassLoader(ApiPluginLedgerConnectorCordaServiceImpl::class.java.classLoader)
 
@@ -191,6 +200,19 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         }
     }
 
+    override fun diagnoseNodeV1(diagnoseNodeV1Request: DiagnoseNodeV1Request?): DiagnoseNodeV1Response {
+        val reader = mapper.readerFor(object : TypeReference<org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.NodeDiagnosticInfo?>() {})
+
+        val nodeDiagnosticInfoCorda = rpc.proxy.nodeDiagnosticInfo()
+
+        val json = writer.writeValueAsString(nodeDiagnosticInfoCorda)
+        logger.debug("NodeDiagnosticInfo JSON=\n{}", json)
+
+        val nodeDiagnosticInfoCactus = reader.readValue<org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.NodeDiagnosticInfo>(json)
+        logger.debug("Responding with marshalled org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.NodeDiagnosticInfo: {}", nodeDiagnosticInfoCactus)
+        return DiagnoseNodeV1Response(nodeDiagnosticInfo = nodeDiagnosticInfoCactus)
+    }
+
     override fun invokeContractV1(invokeContractV1Request: InvokeContractV1Request?): InvokeContractV1Response {
         Objects.requireNonNull(invokeContractV1Request, "InvokeContractV1Request must be non-null!")
         return dynamicInvoke(rpc.proxy, invokeContractV1Request!!)
@@ -202,20 +224,11 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
     }
 
     override fun networkMapV1(body: Any?): List<NodeInfo> {
-
-        // FIXME: do not recreate the mapper for every request that we receive...
-        val mapper = jacksonObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
-            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-
-        val writer = mapper.writer()
         val reader = mapper.readerFor(object : TypeReference<List<NodeInfo?>?>() {})
-
 
         val networkMapSnapshot = rpc.proxy.networkMapSnapshot()
         val networkMapJson = writer.writeValueAsString(networkMapSnapshot)
-        logger.debug("networkMapSnapshot=\n{}", networkMapJson)
+        logger.trace("networkMapSnapshot=\n{}", networkMapJson)
 
         val nodeInfoList = reader.readValue<List<NodeInfo>>(networkMapJson)
         logger.info("Returning {} NodeInfo elements in response.", nodeInfoList.size)
