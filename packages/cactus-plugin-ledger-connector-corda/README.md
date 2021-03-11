@@ -159,3 +159,91 @@ From the project root:
 ```sh
 DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -t cccs
 ```
+
+## Example NodeDiagnosticInfo JSON Response
+
+```json
+{
+  "version": "4.6",
+  "revision": "85e387ea730d9be7d6dc2b23caba1ee18305af74",
+  "platformVersion": 8,
+  "vendor": "Corda Open Source",
+  "cordapps": [
+    {
+      "type": "Workflow CorDapp",
+      "name": "workflows-1.0",
+      "shortName": "Obligation Flows",
+      "minimumPlatformVersion": 8,
+      "targetPlatformVersion": 8,
+      "version": "1",
+      "vendor": "Corda Open Source",
+      "licence": "Apache License, Version 2.0",
+      "jarHash": {
+        "bytes": "Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=",
+        "offset": 0,
+        "size": 32
+      }
+    },
+    {
+      "type": "CorDapp",
+      "name": "corda-confidential-identities-4.6",
+      "shortName": "corda-confidential-identities-4.6",
+      "minimumPlatformVersion": 1,
+      "targetPlatformVersion": 1,
+      "version": "Unknown",
+      "vendor": "Unknown",
+      "licence": "Unknown",
+      "jarHash": {
+        "bytes": "nqBwqHJMbLW80hmRbKEYk0eAknFiX8N40LKuGsD0bPo=",
+        "offset": 0,
+        "size": 32
+      }
+    },
+    {
+      "type": "Contract CorDapp",
+      "name": "corda-finance-contracts-4.6",
+      "shortName": "Corda Finance Demo",
+      "minimumPlatformVersion": 1,
+      "targetPlatformVersion": 8,
+      "version": "1",
+      "vendor": "R3",
+      "licence": "Open Source (Apache 2)",
+      "jarHash": {
+        "bytes": "a43Q/GJG6JKTZzq3U80P8L1DWWcB/D+Pl5uitEtAeQQ=",
+        "offset": 0,
+        "size": 32
+      }
+    },
+    {
+      "type": "Workflow CorDapp",
+      "name": "corda-finance-workflows-4.6",
+      "shortName": "Corda Finance Demo",
+      "minimumPlatformVersion": 1,
+      "targetPlatformVersion": 8,
+      "version": "1",
+      "vendor": "R3",
+      "licence": "Open Source (Apache 2)",
+      "jarHash": {
+        "bytes": "wXdD4Iy50RaWzPp7n9s1xwf4K4MB8eA1nmhPquTMvxg=",
+        "offset": 0,
+        "size": 32
+      }
+    },
+    {
+      "type": "Contract CorDapp",
+      "name": "contracts-1.0",
+      "shortName": "Obligation Contracts",
+      "minimumPlatformVersion": 8,
+      "targetPlatformVersion": 8,
+      "version": "1",
+      "vendor": "Corda Open Source",
+      "licence": "Apache License, Version 2.0",
+      "jarHash": {
+        "bytes": "grTZzN71Cpxw6rZe/U5SB6/ehl99B6VQ1+ZJEx1rixs=",
+        "offset": 0,
+        "size": 32
+      }
+    }
+  ]
+}
+```
