@@ -13,6 +13,7 @@ Before you begin, you need to check that you have all the prerequisites installe
 
 1. Before booting, please modify the following information for your environment
 	- `applicationHostInfo.hostName` (IP address of the host on the Location header) on `/packages/config/default.json`
+1. (Optional) Please modify the following information for your environment if necessary. This procedure should only be performed by users who cannot use port 5034.
 	- `applicationHostInfo.hostPort` (The port number of Routing-interface http server, the default is 5034) on `/packages/config/default.json`
 1. Go to the following directory:
 	- `cd cactus/examples/cartrade/`
