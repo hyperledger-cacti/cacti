@@ -1,8 +1,6 @@
 import promClient from "prom-client";
 import { Transactions } from "./response.type";
-import { totalTxCount } from "./metrics";
-
-export const K_CACTUS_FABRIC_TOTAL_TX_COUNT = "cactus_fabric_total_tx_count";
+import { totalTxCount, K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "./metrics";
 
 export interface IPrometheusExporterOptions {
   pollingIntervalInMin?: number;
@@ -28,7 +26,7 @@ export class PrometheusExporter {
 
   public async getPrometheusMetrics(): Promise<string> {
     const result = await promClient.register.getSingleMetricAsString(
-      "cactus_fabric_total_tx_count",
+      K_CACTUS_FABRIC_TOTAL_TX_COUNT,
     );
     return result;
   }
