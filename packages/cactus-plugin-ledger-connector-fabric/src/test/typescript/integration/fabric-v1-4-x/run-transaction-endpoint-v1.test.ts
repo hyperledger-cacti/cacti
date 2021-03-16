@@ -29,6 +29,7 @@ import {
 
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { DiscoveryOptions } from "fabric-network";
+import { K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "../../../../main/typescript/prometheus-exporter/metrics";
 
 /**
  * Use this to debug issues with the fabric node SDK
@@ -182,9 +183,16 @@ test("runs tx on a Fabric v1.4.8 ledger", async (t: Test) => {
   {
     const res = await apiClient.getPrometheusExporterMetricsV1();
     const promMetricsOutput =
-      "# HELP cactus_fabric_total_tx_count Total transactions executed\n" +
-      "# TYPE cactus_fabric_total_tx_count gauge\n" +
-      'cactus_fabric_total_tx_count{type="cactus_fabric_total_tx_count"} 3';
+      "# HELP " +
+      K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+      " Total transactions executed\n" +
+      "# TYPE " +
+      K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+      " gauge\n" +
+      K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+      '{type="' +
+      K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+      '"} 3';
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
