@@ -42,8 +42,8 @@ import {
   DeployContractSolidityBytecodeV1Response,
   EthContractInvocationType,
   InvokeContractV1Request,
-  InvokeContractV1Response,
   InvokeContractV2Request,
+  InvokeContractV1Response,
   InvokeContractV2Response,
   RunTransactionRequest,
   RunTransactionResponse,
@@ -298,19 +298,24 @@ export class PluginLedgerConnectorBesu
       const payload = (method.send as any).request();
       const { params } = payload;
       const [transactionConfig] = params;
+      if (req.gas == undefined) {
+        req.gas = await this.web3.eth.estimateGas(transactionConfig);
+      }
       transactionConfig.from = web3SigningCredential.ethAccount;
       transactionConfig.gas = req.gas;
       transactionConfig.gasPrice = req.gasPrice;
       transactionConfig.value = req.value;
+      transactionConfig.nonce = req.nonce;
       const txReq: RunTransactionRequest = {
         transactionConfig,
         web3SigningCredential,
         timeoutMs: req.timeoutMs || 60000,
       };
       const out = await this.transact(txReq);
-      const transactionReceipt = out.transactionReceipt;
-      const success = true;
-      return { success, transactionReceipt };
+      //const transactionReceipt = out.transactionReceipt;
+      const success = out.transactionReceipt.status;
+      const data = { success, out };
+      return data;
     } else {
       throw new Error(
         `${fnTag} Unsupported invocation type ${req.invocationType}`,
