@@ -4,6 +4,7 @@ import { Server as SecureServer } from "https";
 import { Express } from "express";
 import { Optional } from "typescript-optional";
 import Vault from "node-vault";
+import HttpStatus from "http-status-codes";
 
 import {
   Logger,
@@ -18,8 +19,18 @@ import {
   IWebServiceEndpoint,
   PluginAspect,
 } from "@hyperledger/cactus-core-api";
-import { GetKeychainEntryEndpointV1 } from "./web-services/get-keychain-entry-endpoint-v1";
-import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-endpoint-v1";
+
+// TODO: Writing the getExpressRequestHandler() method for
+// GetKeychainEntryEndpointV1 and SetKeychainEntryEndpointV1
+// import { GetKeychainEntryEndpointV1 } from "./web-services/get-keychain-entry-endpoint-v1";
+// import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-endpoint-v1";
+
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+
+import {
+  IGetPrometheusExporterMetricsEndpointV1Options,
+  GetPrometheusExporterMetricsEndpointV1,
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 
 export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -38,7 +49,19 @@ export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
    * The `VAULT_TOKEN` which the backing Vault instance will accept as valid.
    */
   token: string;
+  /**
+   * Prometheus Exporter object for metrics monitoring
+   */
+
+  prometheusExporter?: PrometheusExporter;
+
+  /**
+   * The HTTP path prefix where the KV Secrets Engine is mounted.
+   */
+  kvSecretsMountPath?: string;
 }
+
+export const K_DEFAULT_KV_SECRETS_MOUNT_PATH = "secret/";
 
 export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
   public static readonly CLASS_NAME = "PluginKeychainVault";
@@ -48,7 +71,9 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
   private readonly endpoint: string;
   private readonly log: Logger;
   private readonly instanceId: string;
+  private readonly kvSecretsMountPath: string;
   private readonly backend: Vault.client;
+  public prometheusExporter: PrometheusExporter;
 
   public get className() {
     return PluginKeychainVault.CLASS_NAME;
@@ -73,14 +98,37 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
     this.endpoint = this.opts.endpoint;
     this.apiVersion = this.opts.apiVersion || "v1";
 
+    this.kvSecretsMountPath =
+      opts.kvSecretsMountPath || K_DEFAULT_KV_SECRETS_MOUNT_PATH;
+    this.log.info(`this.kvSecretsMountPath=${this.kvSecretsMountPath}`);
+
     this.backend = Vault({
       apiVersion: this.apiVersion,
       endpoint: this.endpoint,
       token: this.token,
     });
+
+    this.prometheusExporter =
+      opts.prometheusExporter ||
+      new PrometheusExporter({ pollingIntervalInMin: 1 });
+    Checks.truthy(
+      this.prometheusExporter,
+      `${fnTag} options.prometheusExporter`,
+    );
+
     this.log.info(`Created Vault backend OK. Endpoint=${this.endpoint}`);
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+    return res;
   }
 
   public async installWebServices(
@@ -88,18 +136,29 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
   ): Promise<IWebServiceEndpoint[]> {
     const endpoints: IWebServiceEndpoint[] = [];
 
-    {
-      const ep = new GetKeychainEntryEndpointV1({
-        logLevel: this.opts.logLevel,
-      });
-      ep.registerExpress(expressApp);
-      endpoints.push(ep);
-    }
+    // TODO: Writing the getExpressRequestHandler() method for
+    // GetKeychainEntryEndpointV1 and SetKeychainEntryEndpointV1
 
+    // {
+    //   const ep = new GetKeychainEntryEndpointV1({
+    //     logLevel: this.opts.logLevel,
+    //   });
+    //   ep.registerExpress(expressApp);
+    //   endpoints.push(ep);
+    // }
+    // {
+    //   const ep = new SetKeychainEntryEndpointV1({
+    //     logLevel: this.opts.logLevel,
+    //   });
+    //   ep.registerExpress(expressApp);
+    //   endpoints.push(ep);
+    // }
     {
-      const ep = new SetKeychainEntryEndpointV1({
+      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+        plugin: this,
         logLevel: this.opts.logLevel,
-      });
+      };
+      const ep = new GetPrometheusExporterMetricsEndpointV1(opts);
       ep.registerExpress(expressApp);
       endpoints.push(ep);
     }
@@ -139,21 +198,69 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
     return null as any;
   }
 
-  async get<T>(key: string): Promise<T> {
-    const value = await this.backend.read(key);
-    return value;
+  protected pathFor(key: string): string {
+    return `${this.kvSecretsMountPath}${key}`;
   }
 
+  async get<T>(key: string): Promise<T> {
+    const fnTag = `${this.className}#get(key: string)`;
+    const path = this.pathFor(key);
+    try {
+      const res = await this.backend.read(path);
+      this.log.debug(`Response from Vault: %o`, () => JSON.stringify(res));
+      if (res?.data?.data?.value) {
+        return res.data.data.value;
+      } else {
+        throw new Error(
+          `${fnTag}: Invalid response received from Vault. Expected "response.data.data.value" property chain to be truthy`,
+        );
+      }
+    } catch (ex) {
+      if (ex?.response?.statusCode === HttpStatus.NOT_FOUND) {
+        return (null as unknown) as T;
+      } else {
+        this.log.error(`Retrieval of "${key}" crashed:`, ex);
+        throw ex;
+      }
+    }
+  }
+
+  /**
+   * Detects the presence of a key by trying to read it and then
+   * observing whether an HTTP 404 NOT FOUND error is returned or
+   * not and deciding whether the keychain has the entry ot not
+   * based on this.
+   */
   async has(key: string): Promise<boolean> {
-    const list = await this.backend.list(key);
-    return list.length > 0;
+    const path = this.pathFor(key);
+    try {
+      const res = await this.backend.read(path);
+      return res;
+    } catch (ex) {
+      // We have to make sure that the exception is either an expected
+      // or an unexpected one where the expeted exception is what we
+      // get when the key is not present in the keychain and anything
+      // else being an unexpected exception that we do not want to
+      // handle nor suppress under any circumstances since doing so
+      // would lead to silent failures or worse.
+      if (ex?.response?.statusCode === HttpStatus.NOT_FOUND) {
+        return false;
+      } else {
+        this.log.error(`Presence check of "${key}" crashed:`, ex);
+        throw ex;
+      }
+    }
   }
 
   async set<T>(key: string, value: T): Promise<void> {
-    await this.backend.write(key, value);
+    const path = this.pathFor(key);
+    await this.backend.write(path, { data: { value } });
+    this.prometheusExporter.setTotalKeyCounter(key, "set");
   }
 
   async delete(key: string): Promise<void> {
-    await this.backend.delete(key);
+    const path = this.pathFor(key);
+    await this.backend.delete(path);
+    this.prometheusExporter.setTotalKeyCounter(key, "delete");
   }
 }
