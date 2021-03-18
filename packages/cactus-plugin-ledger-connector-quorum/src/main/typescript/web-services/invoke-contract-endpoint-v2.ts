@@ -16,13 +16,13 @@ import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
 
 import OAS from "../../json/openapi.json";
 
-export interface IInvokeContractEndpointOptions {
+export interface IInvokeContractEndpointV2Options {
   logLevel?: LogLevelDesc;
   connector: PluginLedgerConnectorQuorum;
 }
 
 export class InvokeContractEndpointV2 implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "InvokeContractEndpoint";
+  public static readonly CLASS_NAME = "InvokeContractEndpointV2";
 
   private readonly log: Logger;
 
@@ -30,7 +30,7 @@ export class InvokeContractEndpointV2 implements IWebServiceEndpoint {
     return InvokeContractEndpointV2.CLASS_NAME;
   }
 
-  constructor(public readonly options: IInvokeContractEndpointOptions) {
+  constructor(public readonly options: IInvokeContractEndpointV2Options) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.connector, `${fnTag} arg options.connector`);

@@ -51,6 +51,7 @@ import {
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
+import { InvokeContractEndpointV2 } from "./web-services/invoke-contract-endpoint-v2";
 
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
@@ -144,6 +145,14 @@ export class PluginLedgerConnectorQuorum
     }
     {
       const endpoint = new InvokeContractEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new InvokeContractEndpointV2({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -274,6 +283,9 @@ export class PluginLedgerConnectorQuorum
       const payload = (method.send as any).request();
       const { params } = payload;
       const [transactionConfig] = params;
+      if (req.gas == undefined) {
+        req.gas = await this.web3.eth.estimateGas(transactionConfig);
+      }
       transactionConfig.from = web3SigningCredential.ethAccount;
       transactionConfig.gas = req.gas;
       transactionConfig.gasPrice = req.gasPrice;
@@ -284,9 +296,9 @@ export class PluginLedgerConnectorQuorum
         timeoutMs: req.timeoutMs || 60000,
       };
       const out = await this.transact(txReq);
-      const transactionReceipt = out.transactionReceipt;
-      const success = true;
-      return { success, transactionReceipt };
+      const success = out.transactionReceipt.status;
+      const data = { success, out };
+      return data;
     } else {
       throw new Error(
         `${fnTag} Unsupported invocation type ${req.invocationType}`,
