@@ -1,4 +1,4 @@
-import test, { Test } from "tape";
+import test, { Test } from "tape-promise/tape";
 
 import { v4 as uuidv4 } from "uuid";
 import { createServer } from "http";
@@ -16,7 +16,10 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
+import {
+  BesuTestLedger,
+  pruneDockerAllIfGithubAction,
+} from "@hyperledger/cactus-test-tooling";
 
 import {
   Configuration,
@@ -30,8 +33,16 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
-test("Test sign transaction endpoint", async (t: Test) => {
-  const logLevel: LogLevelDesc = "TRACE";
+const testCase = "Test sign transaction endpoint";
+const logLevel: LogLevelDesc = "TRACE";
+
+test("BEFORE " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  t.end();
+});
+
+test(testCase, async (t: Test) => {
   const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
   const keychainId = uuidv4();
   const keychainRef = uuidv4();
@@ -173,4 +184,10 @@ test("Test sign transaction endpoint", async (t: Test) => {
       "Response text are equal",
     );
   }
+});
+
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  t.end();
 });

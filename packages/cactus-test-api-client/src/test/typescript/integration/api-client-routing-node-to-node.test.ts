@@ -1,6 +1,6 @@
 import { AddressInfo } from "net";
 
-import test, { Test } from "tape";
+import test, { Test } from "tape-promise/tape";
 import { v4 as uuidV4 } from "uuid";
 import { JWK } from "jose";
 import Web3 from "web3";
@@ -21,7 +21,10 @@ import {
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
-import { QuorumTestLedger } from "@hyperledger/cactus-test-tooling";
+import {
+  pruneDockerAllIfGithubAction,
+  QuorumTestLedger,
+} from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
 
 import {
@@ -29,9 +32,16 @@ import {
   PluginConsortiumManual,
 } from "@hyperledger/cactus-plugin-consortium-manual";
 
-test("Routes to correct node based on ledger ID", async (t: Test) => {
-  const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "TRACE";
+const testCase = "Routes to correct node based on ledger ID";
 
+test("BEFORE " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  t.end();
+});
+
+test(testCase, async (t: Test) => {
   const ledger1: Ledger = {
     id: "my_cool_ledger_that_i_want_to_transact_on",
     ledgerType: LedgerType.QUORUM2X,
@@ -274,5 +284,11 @@ test("Routes to correct node based on ledger ID", async (t: Test) => {
     t2.end();
   });
 
+  t.end();
+});
+
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
   t.end();
 });
