@@ -1,13 +1,16 @@
 import http from "http";
 import { AddressInfo } from "net";
 
-import test, { Test } from "tape";
+import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
 import bodyParser from "body-parser";
 import express from "express";
 
-import { FabricTestLedgerV1 } from "@hyperledger/cactus-test-tooling";
+import {
+  FabricTestLedgerV1,
+  pruneDockerAllIfGithubAction,
+} from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
@@ -38,9 +41,16 @@ import { K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "../../../../main/typescript/prom
  * ```
  */
 
-test("runs tx on a Fabric v1.4.8 ledger", async (t: Test) => {
-  const logLevel: LogLevelDesc = "TRACE";
+const testCase = "runs tx on a Fabric v1.4.8 ledger";
+const logLevel: LogLevelDesc = "TRACE";
 
+test("BEFORE " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  t.end();
+});
+
+test(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     publishAllPorts: true,
     emitContainerLogs: false,
@@ -201,5 +211,11 @@ test("runs tx on a Fabric v1.4.8 ledger", async (t: Test) => {
       "Total Transaction Count of 3 recorded as expected. RESULT OK",
     );
   }
+  t.end();
+});
+
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
   t.end();
 });

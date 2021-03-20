@@ -1,4 +1,4 @@
-import test, { Test } from "tape";
+import test, { Test } from "tape-promise/tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
 
@@ -19,12 +19,20 @@ import {
   QuorumTestLedger,
   IQuorumGenesisOptions,
   IAccount,
+  pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
+const testCase = "Quorum Ledger Connector Plugin";
 const logLevel: LogLevelDesc = "INFO";
 
-test("Quorum Ledger Connector Plugin", async (t: Test) => {
+test("BEFORE " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  t.end();
+});
+
+test(testCase, async (t: Test) => {
   const ledger = new QuorumTestLedger();
   await ledger.start();
 
@@ -387,5 +395,11 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     t2.end();
   });
 
+  t.end();
+});
+
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
   t.end();
 });

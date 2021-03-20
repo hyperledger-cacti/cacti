@@ -1,13 +1,16 @@
 import { AddressInfo } from "net";
 import http from "http";
 
-import test, { Test } from "tape";
+import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
 import express from "express";
 import bodyParser from "body-parser";
 
-import { FabricTestLedgerV1 } from "@hyperledger/cactus-test-tooling";
+import {
+  FabricTestLedgerV1,
+  pruneDockerAllIfGithubAction,
+} from "@hyperledger/cactus-test-tooling";
 
 import {
   IListenOptions,
@@ -34,9 +37,16 @@ import { IPluginLedgerConnectorFabricOptions } from "../../../../../main/typescr
 import { DiscoveryOptions } from "fabric-network";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
+const testCase = "deploys contract from go source";
 const logLevel: LogLevelDesc = "TRACE";
 
-test("deploys contract from go source", async (t: Test) => {
+test("BEFORE " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  t.end();
+});
+
+test(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
@@ -206,5 +216,11 @@ test("deploys contract from go source", async (t: Test) => {
   t.true(getRes.status > 199 && setRes.status < 300, "getRes status 2xx OK");
   t.comment(`HelloWorld.get() ResponseBody: ${JSON.stringify(getRes.data)}`);
   t.equal(getRes.data.functionOutput, testValue, "get returns UUID OK");
+  t.end();
+});
+
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
   t.end();
 });

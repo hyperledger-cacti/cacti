@@ -1,7 +1,10 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as internalIpV4 } from "internal-ip";
 
-import { CordaTestLedger } from "@hyperledger/cactus-test-tooling";
+import {
+  CordaTestLedger,
+  pruneDockerAllIfGithubAction,
+} from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   SampleCordappEnum,
@@ -15,9 +18,16 @@ import {
   JvmTypeKind,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
 
+const testCase = "Tests are passing on the JVM side";
 const logLevel: LogLevelDesc = "TRACE";
 
-test("Tests are passing on the JVM side", async (t: Test) => {
+test("BEFORE " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  t.end();
+});
+
+test(testCase, async (t: Test) => {
   const ledger = new CordaTestLedger({
     imageName: "petermetz/cactus-corda-4-6-all-in-one-obligation",
     imageVersion: "2021-03-04-ac0d32a",
@@ -412,5 +422,11 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   // const jvmTestOk = output.some((it) => it.includes("BUILD SUCCESSFUL in"));
   // t.true(jvmTestOk, "JVM gradle tests appear to be successfuly OK");
 
+  t.end();
+});
+
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
   t.end();
 });

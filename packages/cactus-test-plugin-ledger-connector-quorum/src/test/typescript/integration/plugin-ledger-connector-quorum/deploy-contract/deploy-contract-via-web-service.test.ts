@@ -1,13 +1,18 @@
-import test, { Test } from "tape";
+import test, { Test } from "tape-promise/tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
 import {
   QuorumTestLedger,
   IQuorumGenesisOptions,
   IAccount,
+  pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  Logger,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 import {
   PluginLedgerConnectorQuorum,
   DefaultApi,
@@ -28,12 +33,21 @@ import { ICactusPlugin } from "@hyperledger/cactus-core-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { AddressInfo } from "net";
 
+const logLevel: LogLevelDesc = "TRACE";
+const testCase = "deploys contract via REST API";
+
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-deploy-contract-via-web-service",
-  level: "trace",
+  level: logLevel,
 });
 
-test("deploys contract via REST API", async (t: Test) => {
+test("BEFORE " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  t.end();
+});
+
+test(testCase, async (t: Test) => {
   // 1. Instantiate a ledger object
   const ledger = new QuorumTestLedger();
 
@@ -243,5 +257,11 @@ test("deploys contract via REST API", async (t: Test) => {
     );
   });
 
+  t.end();
+});
+
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didnt throw OK");
   t.end();
 });
