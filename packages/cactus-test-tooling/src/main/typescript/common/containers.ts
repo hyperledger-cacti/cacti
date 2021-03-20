@@ -6,7 +6,30 @@ import Dockerode from "dockerode";
 import tar from "tar-stream";
 import fs from "fs-extra";
 import { Streams } from "../common/streams";
-import { Checks, Strings } from "@hyperledger/cactus-common";
+import { Checks, LoggerProvider, Strings } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "loglevel";
+
+export interface IPruneDockerResourcesRequest {
+  logLevel?: LogLevelDesc;
+}
+
+/**
+ * Contains a combined report of the resource pruning performed
+ * by the similarly named utility method of the `Containers` class.
+ * All the properties are optional because the method does a best
+ * effort algorithm with the pruning meaning that all failures are
+ * ignored in favor of continuing with trying to prune other
+ * resources, meaning that all four pruning categories (container, volume, network, image)
+ * are attempted regardless of how many of them succeed or fail.
+ * Based on the above, it is never known for sure if the response object
+ * will contain all, some or none of it's properties at all.
+ */
+export interface IPruneDockerResourcesResponse {
+  containers?: Dockerode.PruneContainersInfo;
+  images?: Dockerode.PruneImagesInfo;
+  networks?: Dockerode.PruneNetworksInfo;
+  volumes?: Dockerode.PruneVolumesInfo;
+}
 
 export interface IPushFileFromFsOptions {
   /**
@@ -374,27 +397,58 @@ export class Containers {
     } while (!reachable);
   }
 
-  public static async pruneDockerResources(): Promise<void> {
+  /**
+   * Attempts to prune all docker resources that are unused on the current
+   * docker host in the following order:
+   * 1. Containers
+   * 2. Volumes
+   * 3. Images
+   * 4. Networks
+   *
+   * @returns A complete rundown of how each pruning process worked out
+   * where the properties pertaining to the pruning processes are `undefined`
+   * if they failed.
+   */
+  public static async pruneDockerResources(
+    req?: IPruneDockerResourcesRequest,
+  ): Promise<IPruneDockerResourcesResponse> {
+    const fnTag = `Containers#pruneDockerResources()`;
+    const level = req?.logLevel || "INFO";
+    const log = LoggerProvider.getOrCreate({ level, label: fnTag });
     const docker = new Dockerode();
+    let containers;
+    let volumes;
+    let images;
+    let networks;
     try {
-      await docker.pruneContainers();
+      containers = await docker.pruneContainers();
     } catch (ex) {
-      console.warn(`Failed to prune docker containers: `, ex);
+      log.warn(`Failed to prune docker containers: `, ex);
     }
     try {
-      await docker.pruneVolumes();
+      volumes = await docker.pruneVolumes();
     } catch (ex) {
-      console.warn(`Failed to prune docker volumes: `, ex);
+      log.warn(`Failed to prune docker volumes: `, ex);
     }
     try {
-      await docker.pruneImages();
+      images = await docker.pruneImages();
     } catch (ex) {
-      console.warn(`Failed to prune docker images: `, ex);
+      log.warn(`Failed to prune docker images: `, ex);
     }
     try {
-      await docker.pruneNetworks();
+      networks = await docker.pruneNetworks();
     } catch (ex) {
-      console.warn(`Failed to prune docker networks: `, ex);
+      log.warn(`Failed to prune docker networks: `, ex);
     }
+
+    const response: IPruneDockerResourcesResponse = {
+      containers,
+      images,
+      networks,
+      volumes,
+    };
+
+    log.debug(`Finished pruning all docker resources. Outcome: %o`, response);
+    return response;
   }
 }

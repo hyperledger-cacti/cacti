@@ -23,7 +23,11 @@ export {
 } from "./corda/corda-test-ledger";
 
 export * from "./quorum/i-quorum-genesis-options";
-export { Containers } from "./common/containers";
+export {
+  Containers,
+  IPruneDockerResourcesRequest,
+  IPruneDockerResourcesResponse,
+} from "./common/containers";
 
 export {
   HttpEchoContainer,
