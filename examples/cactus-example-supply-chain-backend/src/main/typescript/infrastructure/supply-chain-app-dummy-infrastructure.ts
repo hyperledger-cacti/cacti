@@ -1,7 +1,5 @@
 import { Account } from "web3-core";
-//import fs from "fs";
-//import path from "path";
-
+import { v4 as uuidv4 } from "uuid";
 import {
   Logger,
   Checks,
@@ -10,6 +8,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
@@ -20,14 +19,8 @@ import {
   QuorumTestLedger,
 } from "@hyperledger/cactus-test-tooling";
 
-import {
-  bytecode as BambooHarvestRepositoryBytecode,
-  abi as BambooHarvestRepositoryAbi,
-} from "../../json/generated/BambooHarvestRepository.json";
-import {
-  bytecode as BookshelfRepositoryBytecode,
-  abi as BookshelfRepositoryAbi,
-} from "../../json/generated/BookshelfRepository.json";
+import BambooHarvestRepositoryJSON from "../../json/generated/BambooHarvestRepository.json";
+import BookshelfRepositoryJSON from "../../json/generated/BookshelfRepository.json";
 import {
   IEthContractDeployment,
   ISupplyChainContractDeploymentInfo,
@@ -154,6 +147,19 @@ export class SupplyChainAppDummyInfrastructure {
       let bookshelfRepository: IEthContractDeployment;
       let shipmentRepository: IFabricContractDeployment;
 
+      const keychainPlugin = new PluginKeychainMemory({
+        instanceId: uuidv4(),
+        keychainId: uuidv4(),
+        logLevel: this.options.logLevel || "INFO",
+      });
+      keychainPlugin.set(
+        BookshelfRepositoryJSON.contractName,
+        BookshelfRepositoryJSON,
+      );
+      keychainPlugin.set(
+        BambooHarvestRepositoryJSON.contractName,
+        BambooHarvestRepositoryJSON,
+      );
       {
         this._quorumAccount = await this.quorum.createEthTestAccount(2000000);
         const rpcApiHttpHost = await this.quorum.getRpcApiHttpHost();
@@ -166,22 +172,23 @@ export class SupplyChainAppDummyInfrastructure {
         });
 
         const res = await connector.deployContract({
-          bytecode: BambooHarvestRepositoryBytecode,
-          gas: 1000000,
+          contractName: BambooHarvestRepositoryJSON.contractName,
+          bytecode: BambooHarvestRepositoryJSON.bytecode,
           web3SigningCredential: {
             ethAccount: this.quorumAccount.address,
             secret: this.quorumAccount.privateKey,
             type: Web3SigningCredentialType.PRIVATEKEYHEX,
           },
+          keychainId: keychainPlugin.getKeychainId(),
         });
         const {
           transactionReceipt: { contractAddress },
         } = res;
 
         bambooHarvestRepository = {
-          abi: BambooHarvestRepositoryAbi,
+          abi: BambooHarvestRepositoryJSON.abi,
           address: contractAddress as string,
-          bytecode: BambooHarvestRepositoryBytecode,
+          bytecode: BambooHarvestRepositoryJSON.bytecode,
         };
       }
 
@@ -197,22 +204,23 @@ export class SupplyChainAppDummyInfrastructure {
         });
 
         const res = await connector.deployContract({
-          bytecode: BookshelfRepositoryBytecode,
-          gas: 1000000,
+          contractName: BookshelfRepositoryJSON.contractName,
+          bytecode: BookshelfRepositoryJSON.bytecode,
           web3SigningCredential: {
             ethAccount: this.besuAccount.address,
             secret: this.besuAccount.privateKey,
             type: Web3SigningCredentialType.PRIVATEKEYHEX,
           },
+          keychainId: keychainPlugin.getKeychainId(),
         });
         const {
           transactionReceipt: { contractAddress },
         } = res;
 
         bookshelfRepository = {
-          abi: BookshelfRepositoryAbi,
+          abi: BookshelfRepositoryJSON.abi,
           address: contractAddress as string,
-          bytecode: BookshelfRepositoryBytecode,
+          bytecode: BookshelfRepositoryJSON.bytecode,
         };
       }
 

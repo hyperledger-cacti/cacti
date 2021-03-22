@@ -76,12 +76,16 @@ test(testCase, async (t: Test) => {
     instanceId: uuidV4(),
     keychainId: uuidV4(),
   });
+  kvStoragePlugin.set(
+    HelloWorldContractJson.contractName,
+    HelloWorldContractJson,
+  );
   plugins.push(kvStoragePlugin);
 
   const ledgerConnectorQuorum = new PluginLedgerConnectorQuorum({
     instanceId: uuidV4(),
     rpcApiHttpHost,
-    pluginRegistry: new PluginRegistry(),
+    pluginRegistry: new PluginRegistry({ plugins: [kvStoragePlugin] }),
   });
   plugins.push(ledgerConnectorQuorum);
   const pluginRegistry = new PluginRegistry({ plugins });
@@ -123,12 +127,14 @@ test(testCase, async (t: Test) => {
 
   // 7. Assemble request to invoke the deploy contract method of the quorum ledger connector plugin via the REST API
   const req: DeployContractSolidityBytecodeV1Request = {
+    contractName: HelloWorldContractJson.contractName,
     bytecode: HelloWorldContractJson.bytecode,
     web3SigningCredential: {
       ethAccount: firstHighNetWorthAccount,
       secret: "",
       type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
     },
+    keychainId: kvStoragePlugin.getKeychainId(),
     gas: 1000000,
   };
 

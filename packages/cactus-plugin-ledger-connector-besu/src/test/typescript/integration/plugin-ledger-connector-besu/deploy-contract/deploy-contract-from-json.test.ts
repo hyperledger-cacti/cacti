@@ -74,7 +74,10 @@ test(testCase, async (t: Test) => {
     backend: new Map([[keychainEntryKey, keychainEntryValue]]),
     logLevel,
   });
-
+  keychainPlugin.set(
+    HelloWorldContractJson.contractName,
+    HelloWorldContractJson,
+  );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.LOCAL,
   });
@@ -132,6 +135,8 @@ test(testCase, async (t: Test) => {
 
   test("deploys contract via .json file", async (t2: Test) => {
     const deployOut = await connector.deployContract({
+      keychainId: keychainPlugin.getKeychainId(),
+      contractName: HelloWorldContractJson.contractName,
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: besuKeyPair.privateKey,

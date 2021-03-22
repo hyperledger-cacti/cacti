@@ -401,10 +401,19 @@
             "DeployContractSolidityBytecodeV1Request": {
                 "type": "object",
                 "required": [
+                    "contractName",
                     "bytecode",
-                    "web3SigningCredential"
+                    "web3SigningCredential",
+                    "keychainId"
                 ],
                 "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "description": "The contract name for retrieve the contracts json on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
                     "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
                         "nullable": false
@@ -415,6 +424,13 @@
                         "minLength": 1,
                         "maxLength": 24576,
                         "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychainId for retrieve the contracts json.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
                     },
                     "gas": {
                         "type": "number",
@@ -613,6 +629,12 @@
                         "minimum": 0,
                         "default": 60000,
                         "nullable": false
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychainId for retrieve the contracts json.",
+                        "minLength": 1,
+                        "maxLength": 100  
                     }
                 }
             },

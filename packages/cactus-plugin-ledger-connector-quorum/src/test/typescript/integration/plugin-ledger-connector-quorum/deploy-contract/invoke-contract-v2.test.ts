@@ -1,7 +1,6 @@
 import test, { Test } from "tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
-import path from "path";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
@@ -25,10 +24,6 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "INFO";
 const contractName = "HelloWorld";
-const contractsPath = path.join(
-  __dirname,
-  "../../../../solidity/hello-world-contract/HelloWorld.json",
-);
 
 test("Quorum Ledger Connector Plugin", async (t: Test) => {
   const ledger = new QuorumTestLedger();
@@ -67,7 +62,10 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     backend: new Map([[keychainEntryKey, keychainEntryValue]]),
     logLevel,
   });
-
+  keychainPlugin.set(
+    HelloWorldContractJson.contractName,
+    HelloWorldContractJson,
+  );
   // Instantiate connector with the keychain plugin that already has the
   // private key we want to use for one of our tests
   const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
@@ -76,7 +74,6 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       rpcApiHttpHost,
       logLevel,
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-      contractsPath,
     },
   );
 
@@ -101,6 +98,8 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
   test("deploys contract via .json file", async (t2: Test) => {
     const deployOut = await connector.deployContract({
+      keychainId: keychainPlugin.getKeychainId(),
+      contractName: HelloWorldContractJson.contractName,
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -127,6 +126,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
     const { callOutput: helloMsg } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "sayHello",
       params: [],
@@ -147,6 +147,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     const newName = `DrCactus${uuidV4()}`;
     const setNameOut = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
@@ -162,6 +163,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     try {
       const setNameOutInvalid = await connector.invokeContractV2({
         contractName,
+        keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.SEND,
         methodName: "setName",
         params: [newName],
@@ -184,6 +186,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
     const getNameOut = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "getName",
       params: [],
@@ -197,6 +200,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
     const { callOutput: getNameOut2 } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "getName",
       params: [],
@@ -247,6 +251,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     const newName = `DrCactus${uuidV4()}`;
     const setNameOut = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
@@ -262,6 +267,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     try {
       const setNameOutInvalid = await connector.invokeContractV2({
         contractName,
+        keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.SEND,
         methodName: "setName",
         params: [newName],
@@ -283,6 +289,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     }
     const { callOutput: getNameOut } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "getName",
       params: [],
@@ -297,6 +304,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
     const getNameOut2 = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "getName",
       params: [],
@@ -324,6 +332,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
     const setNameOut = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
@@ -336,6 +345,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     try {
       const setNameOutInvalid = await connector.invokeContractV2({
         contractName,
+        keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.SEND,
         methodName: "setName",
         params: [newName],
@@ -357,6 +367,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     }
     const { callOutput: getNameOut } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "getName",
       params: [],
@@ -367,6 +378,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
     const getNameOut2 = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "getName",
       params: [],
