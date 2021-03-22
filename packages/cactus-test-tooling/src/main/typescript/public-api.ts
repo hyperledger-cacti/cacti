@@ -73,3 +73,6 @@ export {
 } from "./corda/sample-cordapp-enum";
 
 export { Streams } from "./common/streams";
+
+export { isRunningInGithubAction } from "./github-actions/is-running-in-github-action";
+export { pruneDockerAllIfGithubAction } from "./github-actions/prune-docker-all-if-github-action";
