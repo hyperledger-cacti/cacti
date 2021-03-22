@@ -81,7 +81,10 @@ test(testCase, async (t: Test) => {
     backend: new Map([[keychainEntryKey, keychainEntryValue]]),
     logLevel,
   });
-
+  keychainPlugin.set(
+    HelloWorldContractJson.contractName,
+    HelloWorldContractJson,
+  );
   // Instantiate connector with the keychain plugin that already has the
   // private key we want to use for one of our tests
   const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
@@ -134,6 +137,8 @@ test(testCase, async (t: Test) => {
 
   test("deploys contract via .json file", async (t2: Test) => {
     const deployOut = await connector.deployContract({
+      contractName: HelloWorldContractJson.contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",

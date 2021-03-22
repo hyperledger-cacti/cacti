@@ -26,6 +26,12 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  */
 export interface DeployContractSolidityBytecodeV1Request {
     /**
+     * The contract name for retrieve the contracts json on the keychain.
+     * @type {string}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    contractName: string;
+    /**
      * 
      * @type {Web3SigningCredential}
      * @memberof DeployContractSolidityBytecodeV1Request
@@ -37,6 +43,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     bytecode: string;
+    /**
+     * The keychainId for retrieve the contracts json.
+     * @type {string}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    keychainId: string;
     /**
      * 
      * @type {number}
@@ -237,6 +249,12 @@ export interface InvokeContractV2Request {
      * @memberof InvokeContractV2Request
      */
     timeoutMs?: number;
+    /**
+     * The keychainId for retrieve the contracts json.
+     * @type {string}
+     * @memberof InvokeContractV2Request
+     */
+    keychainId?: string;
 }
 /**
  * 

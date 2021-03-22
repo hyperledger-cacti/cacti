@@ -1,6 +1,5 @@
 import test, { Test } from "tape";
 import { v4 as uuidv4 } from "uuid";
-import path from "path";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   EthContractInvocationType,
@@ -16,10 +15,6 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
-const contractsPath = path.join(
-  __dirname,
-  "../../../../solidity/hello-world-contract/HelloWorld.json",
-);
 
 test("deploys contract via .json file", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -59,7 +54,10 @@ test("deploys contract via .json file", async (t: Test) => {
     backend: new Map([[keychainEntryKey, keychainEntryValue]]),
     logLevel,
   });
-
+  keychainPlugin.set(
+    HelloWorldContractJson.contractName,
+    HelloWorldContractJson,
+  );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.LOCAL,
   });
@@ -67,7 +65,6 @@ test("deploys contract via .json file", async (t: Test) => {
     rpcApiHttpHost,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-    contractsPath,
   });
 
   await connector.transact({
@@ -96,6 +93,8 @@ test("deploys contract via .json file", async (t: Test) => {
 
   test("deploys contract via .json file", async (t2: Test) => {
     const deployOut = await connector.deployContract({
+      keychainId: keychainPlugin.getKeychainId(),
+      contractName: HelloWorldContractJson.contractName,
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: besuKeyPair.privateKey,
@@ -122,6 +121,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const { callOutput: helloMsg } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "sayHello",
       params: [],
@@ -174,6 +174,7 @@ test("deploys contract via .json file", async (t: Test) => {
     const newName = `DrCactus${uuidv4()}`;
     const setNameOut = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
@@ -189,6 +190,7 @@ test("deploys contract via .json file", async (t: Test) => {
     try {
       const setNameOutInvalid = await connector.invokeContractV2({
         contractName,
+        keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.SEND,
         methodName: "setName",
         params: [newName],
@@ -210,6 +212,7 @@ test("deploys contract via .json file", async (t: Test) => {
     }
     const { callOutput: getNameOut } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "getName",
       params: [],
@@ -224,6 +227,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const getNameOut2 = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "getName",
       params: [],
@@ -238,6 +242,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const response = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "deposit",
       params: [],
@@ -253,6 +258,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const { callOutput } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "getNameByIndex",
       params: [0],
@@ -283,6 +289,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const setNameOut = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
@@ -295,6 +302,7 @@ test("deploys contract via .json file", async (t: Test) => {
     try {
       const setNameOutInvalid = await connector.invokeContractV2({
         contractName,
+        keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.SEND,
         methodName: "setName",
         params: [newName],
@@ -313,6 +321,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const { callOutput: getNameOut } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "getName",
       params: [],
@@ -323,6 +332,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const getNameOut2 = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "getName",
       params: [],
@@ -333,6 +343,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const response = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
       methodName: "deposit",
       params: [],
@@ -344,6 +355,7 @@ test("deploys contract via .json file", async (t: Test) => {
 
     const { callOutput: callOut } = await connector.invokeContractV2({
       contractName,
+      keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
       methodName: "getNameByIndex",
       params: [1],
