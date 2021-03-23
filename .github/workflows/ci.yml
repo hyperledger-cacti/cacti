@@ -61,6 +61,12 @@ jobs:
     - run: npm config delete proxy
     - run: npm config delete http-proxy
     - run: npm config delete https-proxy
+
+    # https://stackoverflow.com/a/15483897
+    - run: npm cache verify
+    - run: npm cache clean --force
+    - run: npm cache verify
+
     - run: npm ci
     - run: ./node_modules/.bin/lerna bootstrap
     - run: npm run build:dev:backend
