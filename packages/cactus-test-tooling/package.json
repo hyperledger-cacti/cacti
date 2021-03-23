@@ -31,7 +31,10 @@
       "ignore": [
         "src/**/generated/*"
       ],
-      "extensions": ["ts", "json"],
+      "extensions": [
+        "ts",
+        "json"
+      ],
       "quiet": true,
       "verbose": false,
       "runOnChangeOnly": true
@@ -91,6 +94,7 @@
     "loglevel": "1.6.7",
     "loglevel-plugin-prefix": "0.8.4",
     "node-ssh": "11.1.1",
+    "p-retry": "4.4.0",
     "tar-stream": "2.1.2",
     "typescript-optional": "2.0.1",
     "web3": "1.2.7"
@@ -100,8 +104,8 @@
     "@types/extract-zip": "1.6.2",
     "@types/fs-extra": "8.1.0",
     "@types/joi": "14.3.4",
-    "@types/ssh2": "0.5.44",
     "@types/node-ssh": "7.0.0",
+    "@types/ssh2": "0.5.44",
     "@types/tar-stream": "2.1.0"
   }
 }

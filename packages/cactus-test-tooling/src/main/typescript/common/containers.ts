@@ -5,9 +5,15 @@ import { Container, ContainerInfo } from "dockerode";
 import Dockerode from "dockerode";
 import tar from "tar-stream";
 import fs from "fs-extra";
+import pRetry from "p-retry";
 import { Streams } from "../common/streams";
-import { Checks, LoggerProvider, Strings } from "@hyperledger/cactus-common";
-import { LogLevelDesc } from "loglevel";
+import {
+  Checks,
+  LogLevelDesc,
+  LoggerProvider,
+  Strings,
+  ILoggerOptions,
+} from "@hyperledger/cactus-common";
 
 export interface IPruneDockerResourcesRequest {
   logLevel?: LogLevelDesc;
@@ -297,33 +303,62 @@ export class Containers {
       return NetworkSettings.Networks[networkNames[0]].IPAddress;
     }
   }
-
   public static pullImage(
-    containerNameAndTag: string,
-    pullOptions: any = {},
+    imageFqn: string,
+    options: any = {},
+    logLevel?: LogLevelDesc,
+  ): Promise<any[]> {
+    const defualtLoggerOptions: ILoggerOptions = {
+      label: "containers#pullImage()",
+      level: logLevel || "INFO",
+    };
+    const log = LoggerProvider.getOrCreate(defualtLoggerOptions);
+    const task = () => Containers.tryPullImage(imageFqn, options, logLevel);
+    const retryOptions: pRetry.Options = {
+      retries: 6,
+      onFailedAttempt: async (ex) => {
+        log.debug(`Failed attempt at pulling container image ${imageFqn}`, ex);
+      },
+    };
+    return pRetry(task, retryOptions);
+  }
+
+  public static tryPullImage(
+    imageFqn: string,
+    options: any = {},
+    logLevel?: LogLevelDesc,
   ): Promise<any[]> {
     return new Promise((resolve, reject) => {
+      const loggerOptions: ILoggerOptions = {
+        label: "containers#tryPullImage()",
+        level: logLevel || "INFO",
+      };
+      const log = LoggerProvider.getOrCreate(loggerOptions);
+
       const docker = new Dockerode();
-      docker.pull(
-        containerNameAndTag,
-        pullOptions,
-        (pullError: any, stream: any) => {
-          if (pullError) {
-            reject(pullError);
-          } else {
-            docker.modem.followProgress(
-              stream,
-              (progressError: any, output: any[]) => {
-                if (progressError) {
-                  reject(progressError);
-                } else {
-                  resolve(output);
-                }
-              },
-            );
-          }
-        },
-      );
+
+      const pullStreamStartedHandler = (pullError: any, stream: any) => {
+        if (pullError) {
+          log.error(`Could not even start ${imageFqn} pull:`, pullError);
+          reject(pullError);
+        } else {
+          log.debug(`Started ${imageFqn} pull progress stream OK`);
+          docker.modem.followProgress(
+            stream,
+            (progressError: any, output: any[]) => {
+              if (progressError) {
+                log.error(`Failed to finish ${imageFqn} pull:`, progressError);
+                reject(progressError);
+              } else {
+                log.debug(`Finished ${imageFqn} pull completely OK`);
+                resolve(output);
+              }
+            },
+          );
+        }
+      };
+
+      docker.pull(imageFqn, options, pullStreamStartedHandler);
     });
   }
 
