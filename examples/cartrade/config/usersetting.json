@@ -35,6 +35,10 @@
         {
             "path": "/api/v1/bl/cars/",
             "routerJs": "../../examples/cartrade/cars.js"
+        },
+        {
+            "path": "/api/v1/bl/template-trade/",
+            "routerJs": "../../examples/cartrade/template-trade.js"
         }
     ]
 }

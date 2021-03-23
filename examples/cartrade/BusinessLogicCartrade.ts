@@ -139,10 +139,14 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 logger.debug('firstTransaction data : ' + JSON.stringify(result.data));
                 const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
                 const method = {type: "web3Eth", command: "sendRawTransaction"};
+                const template = "default";
                 const args = {"args": [result.data["serializedTx"]]};
+                // const method = "default";
+                // const args = {"method": {type: "web3Eth", command: "sendRawTransaction"},"args": {"args": [result.data["serializedTx"]]}};
 
                 // Run Verifier (Fabric)
-                verifierEthereum.requestLedgerOperationNeo(contract, method, args);
+                //verifierEthereum.requestLedgerOperationNeo(contract, method, args);
+                verifierEthereum.sendSignedTransaction(contract, method, template, args);
             })
             .catch(err => {
                 logger.error(err);
@@ -181,10 +185,14 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 //logger.debug('secondTransaction data : ' + JSON.stringify(result.data));
                 const contract = {"channelName": "mychannel"};
                 const method = {"type": "sendSignedTransaction"};
+                const template = "default";
                 const args = {"args": [result.data]};
+                // const method = "default";
+                // const args = {"method": {"type": "sendSignedTransaction"},"args": {"args": [result.data]}};
 
                 // Run Verifier (Fabric)
-                verifierFabric.requestLedgerOperationNeo(contract, method, args);
+                // verifierFabric.requestLedgerOperationNeo(contract, method, args);
+                verifierFabric.sendSignedTransaction(contract, method, template, args);
             })
             .catch(err => {
                 logger.error(err);
@@ -234,10 +242,14 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 // Set Parameter
                 const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
                 const method = {type: "web3Eth", command: "sendRawTransaction"};
+                const template = "default";
                 const args = {"args": [result.data["serializedTx"]]};
+                // const method = "default";
+                // const args = {"method": {type: "web3Eth", command: "sendRawTransaction"}, "args": {"args": [result.data["serializedTx"]]}};
 
                 // Run Verifier (Fabric)
-                verifierEthereum.requestLedgerOperationNeo(contract, method, args);
+                // verifierEthereum.requestLedgerOperationNeo(contract, method, args);
+                verifierEthereum.sendSignedTransaction(contract, method, template, args);
 
 
             })

@@ -54,6 +54,7 @@ export class BusinessLogicRunTransaction extends BusinessLogicBase {
         // Create trade information
         const tradeInfo: TradeInfo = new TradeInfo(requestInfo.businessLogicID, requestInfo.tradeID);
         
+        // Call Verifier to perform the function
         this.execTransaction(requestInfo, tradeInfo);
         
     }
@@ -64,6 +65,7 @@ export class BusinessLogicRunTransaction extends BusinessLogicBase {
         logger.debug("called execTransaction()");
 
         const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
+        // TODO: Temporarily specify no monitoring required (# 3rd parameter = false)
         const verifier = verifierFactory.getVerifier(useValidator['validatorID'][0], {}, false);
         logger.debug("getVerifier");
         

@@ -40,9 +40,12 @@ export class BalanceManagement {
             // for Neo
             const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
             const method = {type: "web3Eth", command: "getBalance"};
+            const template = "default";
             const args = {"args": [account]};
+            // const method = "default";
+            // const args = {"method": {type: "web3Eth", command: "getBalance"}, "args": {"args": [account]}};
 
-            this.verifierEthereum.execSyncFunctionNeo(contract, method, args).then(result => {
+            this.verifierEthereum.execSyncFunction(contract, method, template, args).then(result => {
                 const response = {
                     "status": result.status,
                     "amount": parseFloat(result.data)

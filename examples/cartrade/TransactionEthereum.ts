@@ -5,6 +5,8 @@
  * TransactionEthereum.ts
  */
 
+import { TransactionSigner } from '../../packages/ledger-plugin/util/TransactionSigner';
+
 const ethJsCommon = require('ethereumjs-common').default;
 const ethJsTx = require('ethereumjs-tx').Transaction;
 const libWeb3 = require('web3');
@@ -28,17 +30,6 @@ export function makeRawTransaction(txParam: { fromAddress: string, fromAddressPk
             const provider = new libWeb3.providers.HttpProvider(config.cartradeInfo.ethereum.gethURL);
             const web3 = new libWeb3(provider);
 
-            // ethereumjs-tx2.1.2_support
-            const customCommon = ethJsCommon.forCustomChain(
-                config.cartradeInfo.ethereum.network,
-                {
-                    name: config.cartradeInfo.ethereum.chainName,
-                    networkId: config.cartradeInfo.ethereum.networkID,
-                    chainId: config.cartradeInfo.ethereum.chainID,
-                },
-                config.cartradeInfo.ethereum.hardfork
-            );
-
             // web3_v1.2.9_support
             web3.eth.getTransactionCount(txParam.fromAddress)
                 .then(_nonce => {
@@ -58,31 +49,18 @@ export function makeRawTransaction(txParam: { fromAddress: string, fromAddressPk
                     logger.debug(`#####(B) _nonce: ${_nonce}, latestNonce: ${latestNonce}, txnCount: ${txnCount}`);
                     setLatestNonce(txParam.fromAddress, txnCount);
 
-                    const privKey: Buffer = Buffer.from(txParam.fromAddressPkey, 'hex');
-                    logger.debug('##privKey=' + txParam.fromAddressPkey);
                     const rawTx: { nonce: number, to: string, value: number, gas: number } = {
                         "nonce": web3.utils.toHex(txnCount),
                         "to": txParam.toAddress,
                         "value": txParam.amount,
                         "gas": txParam.gas,
                     }
-                    logger.debug('txnCount=' + web3.utils.toHex(txnCount));
-                    logger.debug('##rawTx=' + JSON.stringify(rawTx));
-                    const tx = new ethJsTx(rawTx, { common: customCommon });
-                    tx.sign(privKey);
 
-                    // Get Transaction ID
-                    const hash: Buffer = tx.hash(true);
-                    const txId: string = '0x' + hash.toString('hex')
-                    logger.debug('##txId=' + txId);
-
-                    const serializedTx: Buffer = tx.serialize();
-                    const serializedTxHex: string = '0x' + serializedTx.toString('hex');
-                    logger.debug('##serializedTxHex=' + serializedTxHex);
+                    const signedTx = TransactionSigner.signTxEthereum(rawTx, txParam.fromAddressPkey);
 
                     const result: { data: {}, txId: string } = {
-                        data: { serializedTx: serializedTxHex },
-                        txId: txId
+                        data: { serializedTx: signedTx["serializedTx"] },
+                        txId: signedTx["txId"]
                     }
 
                     return resolve(result);
@@ -106,4 +84,3 @@ function getLatestNonce(fromAddress: string): number {
 function setLatestNonce(fromAddress: string, nonce: number): void {
     mapFromAddressNonce.set(fromAddress, nonce);
 }
-

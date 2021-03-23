@@ -1,17 +1,17 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  * 
  * default.js
  */
 
 module.exports = {
-	// URL to validator
-	//"validatorUrl" : 'https://localhost:5040',
-	"validatorUrl" : 'https://localhost:5041',
-	
-	// for fabric
-	"fabric":{
+    // URL to validator
+    //"validatorUrl" : 'https://localhost:5040',
+    "validatorUrl" : 'https://localhost:5041',
+    
+    // for fabric
+    "fabric":{
         "mspid": "Org1MSP",
         "keystore":"./wallet/admin", // TODO:
         "connUserName":"user1", // TODO:

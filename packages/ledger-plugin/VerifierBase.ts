@@ -23,6 +23,7 @@ import { getLogger } from "log4js";
 const moduleName = 'VerifierBase';
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
+const validatorRregistryConf: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../config/validator-registry.json"), 'utf8'));
 
 export class VerifierBase implements Verifier {
     validatorID: string = "";
@@ -77,6 +78,24 @@ export class VerifierBase implements Verifier {
         }
     };
 
+
+    // NOTE: Send Singed transaction command (entrance)
+    sendSignedTransaction(contract: object, method: object, template: string, args: object): void {
+        logger.debug(`call: sendSignedTransaction, contract = ${JSON.stringify(contract)}, method = ${JSON.stringify(method)}, template = ${template}, args = ${JSON.stringify(args)}, `);
+        if (this.isTemplateFunction("sendSignedTransaction", template)) {
+            this.execTemplateFunctionAsync("sendSignedTransaction", contract, template, args);
+        }
+        else {
+            // TODO:
+            // const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
+            // const method = {type: "web3Eth", command: "sendRawTransaction"};
+            // const args = {"args": [result.data["serializedTx"]]};
+
+            this.requestLedgerOperationNeo(contract, method, args);
+        }
+    }
+
+
     // NOTE: asynchronous command (repaired version)
     // TODO: Method name confirmation
     requestLedgerOperationNeo(contract: object, method: object, args: object): void {
@@ -103,92 +122,31 @@ export class VerifierBase implements Verifier {
         }
     };
 
-    // NOTE: Synchronous command
-    execSyncFunction(param: LedgerOperation): Promise<any> {
-        return new Promise((resolve, reject) => {
-            logger.debug('call : execSyncFunction');
-            try {
-                logger.debug(`##in execSyncFunction, LedgerOperation = ${JSON.stringify(param)}`);
-                let responseFlag: boolean = false;
 
-                // reqID generation
-                const reqID = this.genarateReqID();
-                logger.debug(`##execSyncFunction, reqID = ${reqID}`);
-
-                // Preparing socket
-                const socketOptions: {} = {
-                    rejectUnauthorized: config.socketOptions.rejectUnauthorized,
-                    reconnection: config.socketOptions.reconnection,
-                    timeout: config.socketOptions.timeout,
-                };
-                logger.debug(`socketOptions = ${JSON.stringify(socketOptions)}`);
-                const socket: Socket = io(this.validatorUrl, socketOptions);
-                socket.on("connect_error", (err: object) => {
-                    logger.error("##connect_error:", err);
-                    // end communication
-                    socket.disconnect();
-                    reject(err);
-                });
-                socket.on("connect_timeout", (err: object) => {
-                    logger.error("####Error:", err);
-                    // end communication
-                    socket.disconnect();
-                    reject(err);
-                });
-                socket.on("error", (err: object) => {
-                    logger.error("####Error:", err);
-                    socket.disconnect();
-                    reject(err);
-                });
-                socket.on("response", (result: any) => {
-                    logger.debug("#[recv]response, res: " + json2str(result));
-                    if (reqID === result.id) {
-                        responseFlag = true;
-                        logger.debug(`##execSyncFunction: resObj: ${JSON.stringify(result.resObj)}`);
-                        // Result reply
-                        resolve(result.resObj);
-                    }
-                });
-
-                // Call Validator
-                const apiType: string = param.apiType;
-                // const progress: string = param.progress;
-                const data: {} = param.data;
-                data["reqID"] = reqID;
-                const requestData: {} = {
-                    func: apiType,
-                    args: data
-                };
-                logger.debug('requestData : ' + JSON.stringify(requestData));
-                socket.emit('request', requestData);
-                logger.debug('set timeout');
-
-                // Time-out setting
-                setTimeout(() => {
-                    if (responseFlag === false) {
-                        logger.debug('requestTimeout reqID : ' + reqID);
-                        resolve({"status":504, "amount":0});
-                    }
-                }, config.verifier.syncFunctionTimeoutMillisecond);
-            }
-            catch (err) {
-                logger.error(`##Error: execSyncFunction, ${err}`);
-                reject(err);
-            }
-        });
+    // NOTE: Synchronous command (entrance)
+    execSyncFunction(contract: object, method: object, template: string, args: object): Promise<any> {
+        logger.debug(`call: execSyncFunction, contract = ${JSON.stringify(contract)}, method = ${JSON.stringify(method)}, template = ${template}, args = ${JSON.stringify(args)}, `);
+        if (this.isTemplateFunction("execSyncFunction", template)) {
+            return this.execTemplateFunction("execSyncFunction", contract, template, args);
+        }
+        else {
+            //return this.execSyncFunctionNeoXXX(contract, method, args);
+            return this.execSyncFunctionCallVerifier(contract, method, args);
+        }
     }
 
+
     // NOTE: Synchronous command (repaired version)
-    execSyncFunctionNeo(contract: object, method: object, args: object): Promise<any> {
+    execSyncFunctionCallVerifier(contract: object, method: object, args: object): Promise<any> {
         return new Promise((resolve, reject) => {
-            logger.debug('call : execSyncFunction');
+            logger.debug('call : execSyncFunctionCallVerifier');
             try {
-                logger.debug(`##in execSyncFunction, contract = ${JSON.stringify(contract)}, method = ${JSON.stringify(method)}, args = ${JSON.stringify(args)}, `);
+                logger.debug(`##in execSyncFunctionCallVerifier, contract = ${JSON.stringify(contract)}, method = ${JSON.stringify(method)}, args = ${JSON.stringify(args)}, `);
                 let responseFlag: boolean = false;
 
                 // reqID generation
                 const reqID = this.genarateReqID();
-                logger.debug(`##execSyncFunction, reqID = ${reqID}`);
+                logger.debug(`##execSyncFunctionCallVerifier, reqID = ${reqID}`);
 
                 // Preparing socket
                 const socketOptions: {} = {
@@ -219,7 +177,7 @@ export class VerifierBase implements Verifier {
                     logger.debug("#[recv]response, res: " + json2str(result));
                     if (reqID === result.id) {
                         responseFlag = true;
-                        logger.debug(`##execSyncFunction: resObj: ${JSON.stringify(result.resObj)}`);
+                        logger.debug(`##execSyncFunctionCallVerifier: resObj: ${JSON.stringify(result.resObj)}`);
 
                         VerifierAuthentication.verify(this.validatorKeyPath, result.resObj.data).then(decodedData => {
                             logger.debug(`decodedData = ${JSON.stringify(decodedData)}`);
@@ -256,11 +214,85 @@ export class VerifierBase implements Verifier {
                 }, config.verifier.syncFunctionTimeoutMillisecond);
             }
             catch (err) {
-                logger.error(`##Error: execSyncFunction, ${err}`);
+                logger.error(`##Error: execSyncFunctionCallVerifier, ${err}`);
                 reject(err);
             }
         });
     }
+
+
+    execTemplateFunction(functionName: string, contract: object, template: string, args: object): Promise<any> {
+        logger.debug(`##in execTemplateFunction, functionName: ${functionName}, contract = ${JSON.stringify(contract)}, template = ${template}, args = ${JSON.stringify(args)}, `);
+        
+        return new Promise((resolve, reject) => {
+            try {
+                for (const rec of validatorRregistryConf[functionName]) {
+                    logger.debug(`##rec.metho: ${rec["template"]}`);
+                    if (template === rec["template"]) {
+                        logger.debug(`##isTemplateFunction: ret = true`);
+                        const resultObj = {
+                            "status": 200,
+                            "template": template,
+                            "data": rec["value"]
+                        }
+                        logger.debug(`resultObj = ${JSON.stringify(resultObj)}`);
+                        // Result reply
+                        resolve(resultObj);
+                        return;
+                    }
+                }
+
+                // method not found.
+                logger.warn(`##Warning: execTemplateFunction: template not found, template: ${template}`);
+                resolve({"status":400, "msg": `BAD REQUEST(template not found, template: ${template})`});
+            }
+            catch (err) {
+                logger.error(`##Error: execTemplateFunction, ${err}`);
+                reject(err);
+            }
+        });
+    }
+
+
+    execTemplateFunctionAsync(functionName: string, contract: object, template: string, args: object): void {
+        logger.debug(`##in execTemplateFunctionAsync, functionName: ${functionName}, contract = ${JSON.stringify(contract)}, template = ${template}, args = ${JSON.stringify(args)}, `);
+        
+        // TODO: 未実装
+        for (const rec of validatorRregistryConf[functionName]) {
+            logger.debug(`##rec.template: ${rec["template"]}`);
+            if (template === rec["template"]) {
+                logger.debug(`##isTemplateFunction: ret = true`);
+                let dataValue = "";
+                if (template === "transfer") {
+                    dataValue = `{"transfer": { "_from": ${args["_from"]}, "_to": ${args["_to"]}, "value": ${args["value"]}, "contractID": ${args["contractID"]}, "tokenID": ${args["tokenID"]}}}`;
+                }
+                else {
+                    dataValue = rec["value"];
+                }
+                logger.debug(`##execTemplateFunctionAsync: template: ${template}, data: ${dataValue}`);
+                return;
+            }
+        }
+
+        // method not found.
+        logger.warn(`##Warning: execTemplateFunctionAsync: template not found, template: ${template}`);
+    }
+
+
+    isTemplateFunction(key: string, template: string): boolean {
+        logger.debug(`##call : isTemplateFunction, key: ${key}, template: ${template}`);
+
+        for (const rec of validatorRregistryConf[key]) {
+            logger.debug(`##rec.template: ${rec["method"]}`);
+            if (template === rec["template"]) {
+                logger.debug(`##isTemplateFunction: ret = true`);
+                return true;
+            }
+        }
+        logger.debug(`##isTemplateFunction: ret = false`);
+        return false;
+    }
+
 
     requestLedgerOperationHttp(contract: object, method: object, args: object): Promise<any> {
         return new Promise((resolve, reject) => {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * driver-common.ts
@@ -50,7 +50,7 @@ export function addSocket(socket: any): number {
 
 export function getStoredSocket(index: number): any {
     console.log(`##getSocket, index = ${index}`);
-	return(socketArray[index]);
+    return(socketArray[index]);
 }
 
 export function deleteAndDisconnectSocke(index: number) {
