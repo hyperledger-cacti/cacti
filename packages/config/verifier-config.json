@@ -95,7 +95,7 @@
             "validatorURL": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/",
             "validatorKeyPath": "",
             "ledgerInfo": {
-                "ledgerAbstract": "ACN Cactus Besu Ledger"
+                "ledgerAbstract": "Cactus Besu Ledger via http connection"
             },
             "apiInfo": []
         },
@@ -104,7 +104,7 @@
             "validatorURL": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/",
             "validatorKeyPath": "",
             "ledgerInfo": {
-                "ledgerAbstract": "ACN Cactus Fabric Ledger"
+                "ledgerAbstract": "Cactus Fabric Ledger via http connection"
             },
             "apiInfo": []
         },
@@ -113,7 +113,7 @@
             "host": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/",
             "validatorKeyPath": "",
             "ledgerInfo": {
-                "ledgerAbstract": "ACN Cactus Quorum Ledger"
+                "ledgerAbstract": "Cactus Quorum Ledger via http connection"
             },
             "apiInfo": []
         }
