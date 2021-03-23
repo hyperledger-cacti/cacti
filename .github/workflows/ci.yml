@@ -34,7 +34,7 @@ jobs:
         #     experimental: true
 
     steps:
-    # FIXME: These do not work on mac OS as of 2020-12-09
+    # FIzXME: These do not work on mac OS as of 2020-12-09
     # https://github.community/t/why-is-docker-not-installed-on-macos/17017
     # - name: Set up QEMU (ARM64 docker images once we are ready)
     #   uses: docker/setup-qemu-action@v1.0.1
