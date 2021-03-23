@@ -47,9 +47,12 @@ export class AssetManagement {
                 "abi": abi
             };
             const method = {type: "contract", command: "addAsset", function: "sendTransaction"};
+            const template = "default";
             const args = {"args": [amount, {from: coinbase}]};
+            // const method = "default";
+            // const args = {"method": {type: "contract", command: "addAsset", function: "sendTransaction"}, "args": {"args": [amount, {from: coinbase}]}};
 
-            this.verifierEthereum.execSyncFunctionNeo(contract, method, args).then(result => {
+            this.verifierEthereum.execSyncFunction(contract, method, template, args).then(result => {
                 const response = {
                     "status": result.status,
                     "Transaction hash": result.data
@@ -81,9 +84,12 @@ export class AssetManagement {
                 "abi": abi
             };
             const method = {type: "contract", command: "getAsset", function: "call"};
+            const template = "default";
             const args = {"args": []};
+            // const method = "default";
+            // const args = {"method": {type: "contract", command: "getAsset", function: "call"}, "args": {"args": []}};
 
-            this.verifierEthereum.execSyncFunctionNeo(contract, method, args).then(result => {
+            this.verifierEthereum.execSyncFunction(contract, method, template, args).then(result => {
                 const response = {
                     "status": result.status,
                     "asset": parseFloat(result.data)

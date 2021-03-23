@@ -35,9 +35,12 @@ export class CarsManagement {
 
             const contract = {"channelName": "mychannel", "contractName": "fabcar"};
             const method = {type: "evaluateTransaction", command: "queryCar"};
+            const template = "default";
             const args = {"args": [carID]};
+            // const method = "default";
+            // const args = {"method": {type: "evaluateTransaction", command: "queryCar"},"args": {"args": [carID]}};
 
-            this.verifierFabric.execSyncFunctionNeo(contract, method, args).then(result => {
+            this.verifierFabric.execSyncFunction(contract, method, template, args).then(result => {
                 resolve(result);
             }).catch((err) => {
                 logger.error(err);
@@ -57,9 +60,12 @@ export class CarsManagement {
 
             const contract = {"channelName": "mychannel", "contractName": "fabcar"};
             const method = {type: "evaluateTransaction", command: "queryAllCars"};
+            const template = "default";
             const args = {"args": []};
+            // const method = "default";
+            // const args = {"method": {type: "evaluateTransaction", command: "queryAllCars"}, "args": {"args": []}};
 
-            this.verifierFabric.execSyncFunctionNeo(contract, method, args).then(result => {
+            this.verifierFabric.execSyncFunction(contract, method, template, args).then(result => {
                 resolve(result);
             }).catch((err) => {
                 logger.error(err);

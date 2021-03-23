@@ -1,0 +1,36 @@
+{
+  "execSyncFunction": [
+    {
+      "template": "name",
+      "args": ["tokenID", "contractID"],
+      "value": "MyToken"
+    },
+    {
+      "template": "symbol",
+      "args": ["tokenID", "contractID"],
+      "value": "HIX"
+    },
+    {
+      "template": "decimals",
+      "args": ["tokenID", "contractID"],
+      "value": 8
+    },
+    {
+      "template": "totalSupply",
+      "args": ["tokenID", "contractID"],
+      "value": "success"
+    },
+    {
+      "template": "balanceOf",
+      "args": ["tokenID", "contractID", "owner"],
+      "value": "success"
+    }
+  ],
+  "sendSignedTransaction": [
+    {
+      "template": "transfer",
+      "args": ["_from", "_to", "tokenID", "contractID", "_value"],
+      "value": "success"
+    }
+  ]
+}

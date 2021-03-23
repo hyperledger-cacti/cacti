@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  * 
  * testDriver_sendSignedProposal.js
@@ -178,27 +178,27 @@ async function setupChannel(channelName) {
     for (var i = 0; i < config.fabric.peers.length; i++) {
         var peer = client.newPeer(
             config.fabric.peers[i].requests
-			/*{
-				pem: peerPEMCert,
-				'ssl-target-name-override': 'peer0.org1.example.com',
-			}
-			*/
+            /*{
+                pem: peerPEMCert,
+                'ssl-target-name-override': 'peer0.org1.example.com',
+            }
+            */
         );
         channel.addPeer(peer);
     }
 
     //add orderer to channel
-	/*
-	const ordererTLSCertPath = path.resolve(__dirname, './crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tlscacerts/example.com-cert.pem');
-	const ordererPEMCert = fs.readFileSync(ordererTLSCertPath, 'utf8');
-	*/
+    /*
+    const ordererTLSCertPath = path.resolve(__dirname, './crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tlscacerts/example.com-cert.pem');
+    const ordererPEMCert = fs.readFileSync(ordererTLSCertPath, 'utf8');
+    */
     const orderer = client.newOrderer(
         config.fabric.orderer.url
-		/*{
-			pem: ordererPEMCert,
-			'ssl-target-name-override': 'orderer.example.com',
-		}
-		*/
+        /*{
+            pem: ordererPEMCert,
+            'ssl-target-name-override': 'orderer.example.com',
+        }
+        */
     );
     channel.addOrderer(orderer);
     // TODO: channel.initialize() should not require an signning identity
@@ -224,12 +224,12 @@ async function Invoke(reqBody, isWait) {
                 channel = await setupChannel(config.fabric.channelName);
             }
 
-			/*
-			*  Endorse step
-			*/
+            /*
+            *  Endorse step
+            */
             const transactionProposalReq = {
-                fcn: reqBody.func,						//Chain code function name
-                args: [reqBody.args.carId, reqBody.args.newOwner],						//Chaincode argument
+                fcn: reqBody.func,                      //Chain code function name
+                args: [reqBody.args.carId, reqBody.args.newOwner],                      //Chaincode argument
                 chaincodeId: 'fabcar',
                 channelId: config.fabric.channelName,
             };
@@ -272,10 +272,10 @@ async function Invoke(reqBody, isWait) {
                 throw new Error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
             }
 
-			/**
-			 * End the endorse step.
-			 * Start to commit the tx.
-			 */
+            /**
+             * End the endorse step.
+             * Start to commit the tx.
+             */
             const commitReq = {
                 proposalResponses,
                 proposal,

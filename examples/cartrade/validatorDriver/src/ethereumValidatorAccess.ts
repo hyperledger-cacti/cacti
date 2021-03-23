@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * ethereumValidatorAccess.ts
@@ -128,7 +128,7 @@ class EthereumVerifier implements Verifier {
         //          - getNumericBalance
         //          - transferNumericAsset
         //          - sendRawTransaction
-	    return makeApiInfoList(apiInfoListForEthereum);
+        return makeApiInfoList(apiInfoListForEthereum);
     }
 
   checkNull(value: any, name: string) {
@@ -209,56 +209,56 @@ class EthereumVerifier implements Verifier {
             console.log('call : startMonitor');
             // NOTE: Start the event monitor for the Ethereum version of Validator and enable event reception.
             try {
-				//let targetValidatorUrl = "https://localhost:5050";
-				let soecktOptions = {
-				  rejectUnauthorized: false, // temporary avoidance since self-signed certificates are used
-				  reconnection: false,
-				  timeout: 20000,
-				};
-				
-				console.log(`##in startMonitor, targetValidatorUrl = ${targetValidatorUrl}`);
-				let socket = io(targetValidatorUrl, soecktOptions);
-				console.log("##startMonitor(A)");
+                //let targetValidatorUrl = "https://localhost:5050";
+                let soecktOptions = {
+                  rejectUnauthorized: false, // temporary avoidance since self-signed certificates are used
+                  reconnection: false,
+                  timeout: 20000,
+                };
+                
+                console.log(`##in startMonitor, targetValidatorUrl = ${targetValidatorUrl}`);
+                let socket = io(targetValidatorUrl, soecktOptions);
+                console.log("##startMonitor(A)");
 
-				socket.on("connect_error", (err: Object) => {
-				console.log("##connect_error:", err);
-			    // end communication
-			    socket.disconnect();
+                socket.on("connect_error", (err: Object) => {
+                console.log("##connect_error:", err);
+                // end communication
+                socket.disconnect();
                 reject(err);
-			  });
+              });
 
-			  socket.on("connect_timeout", (err: Object) => {
-			    console.log("####Error:", err);
-			    // end communication
-			    socket.disconnect();
+              socket.on("connect_timeout", (err: Object) => {
+                console.log("####Error:", err);
+                // end communication
+                socket.disconnect();
                 reject(err);
-			  });
+              });
 
-			  socket.on("error", (err: Object) => {
-			    console.log("####Error:", err);
-			    socket.disconnect();
+              socket.on("error", (err: Object) => {
+                console.log("####Error:", err);
+                socket.disconnect();
                 reject(err);
-			  });
+              });
 
-			  socket.on("eventReceived", function (res: any) {
-			    // output the data received from the client
-			    console.log("#[recv]eventReceived, res: " + json2str(res));
-			  });
+              socket.on("eventReceived", function (res: any) {
+                // output the data received from the client
+                console.log("#[recv]eventReceived, res: " + json2str(res));
+              });
 
-			  socket.on("connect", () => {
-			    console.log("#connect");
-			    // save socket
-			    let sIndex = addSocket(socket);
-			    console.log("##emit: startMonitor");
-			    socket.emit('startMonitor')
-		        let ledgerEvent = new LedgerEvent();
-		        ledgerEvent.id = String(sIndex);
-		        console.log(`##startMonitor, ledgerEvent.id = ${ledgerEvent.id}`);
-		        resolve(ledgerEvent);
-			  });
+              socket.on("connect", () => {
+                console.log("#connect");
+                // save socket
+                let sIndex = addSocket(socket);
+                console.log("##emit: startMonitor");
+                socket.emit('startMonitor')
+                let ledgerEvent = new LedgerEvent();
+                ledgerEvent.id = String(sIndex);
+                console.log(`##startMonitor, ledgerEvent.id = ${ledgerEvent.id}`);
+                resolve(ledgerEvent);
+              });
             }
             catch (err) {
-		        console.log(`##Error: startMonitor, ${err}`);
+                console.log(`##Error: startMonitor, ${err}`);
                 reject(err);
             }
         });
@@ -268,23 +268,23 @@ class EthereumVerifier implements Verifier {
         console.log(`##call : stopMonitor, param = ${param}`);
         // NOTE: Stop the Ethereum Validator event monitor.
         try {
-	        let socketIndex = parseInt(param);
-		    if (socketIndex < 0) {
-		      console.log(`##stopMonitor: invalid socketIndex = ${socketIndex}`);
-		      return;
-		    }
-		    let socket = getStoredSocket(socketIndex);
-		    socket.emit('stopMonitor')
-		    //deleteAndDisconnectSocke(socketIndex);
-		    setTimeout(() => {
-				console.log(`##call deleteAndDisconnectSocke, socketIndex = ${socketIndex}`);
-		    	deleteAndDisconnectSocke(socketIndex);
-		    }, 3000);
-		}
-		catch (err) {
-	        console.log(`##Error: stopMonitor, ${err}`);
-	        return 
-		}
+            let socketIndex = parseInt(param);
+            if (socketIndex < 0) {
+              console.log(`##stopMonitor: invalid socketIndex = ${socketIndex}`);
+              return;
+            }
+            let socket = getStoredSocket(socketIndex);
+            socket.emit('stopMonitor')
+            //deleteAndDisconnectSocke(socketIndex);
+            setTimeout(() => {
+                console.log(`##call deleteAndDisconnectSocke, socketIndex = ${socketIndex}`);
+                deleteAndDisconnectSocke(socketIndex);
+            }, 3000);
+        }
+        catch (err) {
+            console.log(`##Error: stopMonitor, ${err}`);
+            return 
+        }
     }
 }
 

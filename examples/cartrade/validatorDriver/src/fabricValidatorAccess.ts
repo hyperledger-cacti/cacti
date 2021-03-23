@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * fabricValidatorAccess.ts
@@ -46,16 +46,16 @@ const apiInfoListForFabric = [
 class FabricVerifier implements Verifier {
 
     /*
-	 * isExistFunction
-	 *
-	 * @param {String} funcName Function name to be judged
-	 *
-	 * @return {Boolean} true: exit /false: not exit
-	 *
-	 * @desc Determines if the specified function exists in that class.
-	 *       Make sure that the support status of the class can be determined by the class.
-	 *       Functions that you do not want to call directly need to be devised by implementing them outside of this class like utilities.
-	 */
+     * isExistFunction
+     *
+     * @param {String} funcName Function name to be judged
+     *
+     * @return {Boolean} true: exit /false: not exit
+     *
+     * @desc Determines if the specified function exists in that class.
+     *       Make sure that the support status of the class can be determined by the class.
+     *       Functions that you do not want to call directly need to be devised by implementing them outside of this class like utilities.
+     */
     isExistFunction(funcName) {
         console.log('call : isExistFunction');
         if (this[funcName] != undefined) {
@@ -139,10 +139,10 @@ class FabricVerifier implements Verifier {
             }
 
             if (typeof (param) == 'string') {
-	            console.log('##requestLedgerOperation : JSON.parse(param)');
+                console.log('##requestLedgerOperation : JSON.parse(param)');
                 param = JSON.parse(param);
             }
-	        console.log('##requestLedgerOperation(A)');
+            console.log('##requestLedgerOperation(A)');
             console.log('param : ' + JSON.stringify(param));
 
             var apiType = param.apiType;
@@ -239,7 +239,7 @@ class FabricVerifier implements Verifier {
 
                 socket.on("connect", () => {
                     console.log("#connect");
-				    // save socket
+                    // save socket
                     let sIndex = addSocket(socket);
                     console.log("##emit: startMonitor");
                     socket.emit('startMonitor')

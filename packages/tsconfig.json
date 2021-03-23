@@ -72,6 +72,7 @@
     "./business-logic-plugin/*.ts",
     "./config/*.ts",
     "./ledger-plugin/*.ts",
+    "./ledger-plugin/util/*.ts",
     "./routing-interface/**/*.ts"
   ],
   "exclude": [
