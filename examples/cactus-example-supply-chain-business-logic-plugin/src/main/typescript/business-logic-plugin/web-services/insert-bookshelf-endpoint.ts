@@ -22,10 +22,12 @@ import { InsertBookshelfRequest } from "../../generated/openapi/typescript-axios
 
 export interface IInsertBookshelfEndpointOptions {
   logLevel?: LogLevelDesc;
-  contractAddress: string;
-  contractAbi: any;
+  //  contractAddress: string;
+  //  contractAbi: any;
+  contractName: string;
   besuApi: BesuApi;
   web3SigningCredential: Web3SigningCredential;
+  keychainId: string;
 }
 
 export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
@@ -47,10 +49,10 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.besuApi, `${fnTag} options.besuApi`);
-    Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
-    Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
+    // Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
+    // Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
-      opts.contractAddress,
+      opts.contractName,
       `${fnTag} options.contractAddress`,
     );
 
@@ -85,13 +87,13 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
       const {
         data: { callOutput, transactionReceipt },
       } = await this.opts.besuApi.apiV1BesuInvokeContract({
-        contractAbi: this.opts.contractAbi,
-        contractAddress: this.opts.contractAddress,
+        contractName: this.opts.contractName,
         invocationType: EthContractInvocationType.SEND,
         methodName: "insertRecord",
         gas: 1000000,
         params: [bookshelf],
-        web3SigningCredential: this.opts.web3SigningCredential,
+        signingCredential: this.opts.web3SigningCredential,
+        keychainId: this.opts.keychainId,
       });
 
       const body = { callOutput, transactionReceipt };

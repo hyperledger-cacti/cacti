@@ -89,35 +89,39 @@ export class SupplyChainCactusPlugin
       return this.endpoints;
     }
     const insertBambooHarvest = new InsertBambooHarvestEndpoint({
-      contractAddress: this.options.contracts.bambooHarvestRepository.address,
-      contractAbi: this.options.contracts.bambooHarvestRepository.abi,
+      // contractAddress: this.options.contracts.bambooHarvestRepository.address,
+      // contractAbi: this.options.contracts.bambooHarvestRepository.abi,
+      contractName: this.options.contracts.bambooHarvestRepository.contractName,
       apiClient: this.options.quorumApiClient,
       web3SigningCredential: this.options
         .web3SigningCredential as Web3SigningCredential,
       logLevel: this.options.logLevel,
+      keychainId: this.options.contracts.bambooHarvestRepository.keychainId,
     });
 
     const listBambooHarvest = new ListBambooHarvestEndpoint({
-      contractAddress: this.options.contracts.bambooHarvestRepository.address,
-      contractAbi: this.options.contracts.bambooHarvestRepository.abi,
+      // contractAddress: this.options.contracts.bambooHarvestRepository.address,
+      // contractAbi: this.options.contracts.bambooHarvestRepository.abi,
+      contractName: this.options.contracts.bambooHarvestRepository.contractName,
       apiClient: this.options.quorumApiClient,
       logLevel: this.options.logLevel,
+      keychainId: this.options.contracts.bambooHarvestRepository.keychainId,
     });
 
     const insertBookshelf = new InsertBookshelfEndpoint({
-      contractAddress: this.options.contracts.bookshelfRepository.address,
-      contractAbi: this.options.contracts.bookshelfRepository.abi,
+      contractName: this.options.contracts.bookshelfRepository.contractName,
       besuApi: this.options.besuApiClient,
       web3SigningCredential: this.options
         .web3SigningCredential as Web3SigningCredential,
       logLevel: this.options.logLevel,
+      keychainId: this.options.contracts.bookshelfRepository.keychainId,
     });
 
     const listBookshelf = new ListBookshelfEndpoint({
-      contractAddress: this.options.contracts.bookshelfRepository.address,
-      contractAbi: this.options.contracts.bookshelfRepository.abi,
+      contractName: this.options.contracts.bookshelfRepository.contractName,
       besuApi: this.options.besuApiClient,
       logLevel: this.options.logLevel,
+      keychainId: this.options.contracts.bookshelfRepository.keychainId,
     });
 
     const insertShipment = new InsertShipmentEndpoint({

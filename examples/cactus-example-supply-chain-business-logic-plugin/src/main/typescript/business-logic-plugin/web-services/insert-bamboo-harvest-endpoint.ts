@@ -22,10 +22,11 @@ import { InsertBambooHarvestRequest } from "../../generated/openapi/typescript-a
 
 export interface IInsertBambooHarvestEndpointOptions {
   logLevel?: LogLevelDesc;
-  contractAddress: string;
-  contractAbi: any;
+  contractName: string;
+  //  contractAbi: any;
   apiClient: QuorumApi;
   web3SigningCredential: Web3SigningCredential;
+  keychainId: string;
 }
 
 export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
@@ -47,10 +48,10 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.apiClient, `${fnTag} options.apiClient`);
-    Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
-    Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
+    // Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
+    // Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
-      opts.contractAddress,
+      opts.contractName,
       `${fnTag} options.contractAddress`,
     );
 
@@ -83,18 +84,18 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
       this.log.debug(`${tag} %o`, bambooHarvest);
 
       const {
-        data: { callOutput, transactionReceipt },
+        data: { success, callOutput, transactionReceipt },
       } = await this.opts.apiClient.apiV1QuorumInvokeContract({
-        contractAbi: this.opts.contractAbi,
-        contractAddress: this.opts.contractAddress,
+        contractName: this.opts.contractName,
         invocationType: EthContractInvocationType.SEND,
         methodName: "insertRecord",
         gas: 1000000,
         params: [bambooHarvest],
-        web3SigningCredential: this.opts.web3SigningCredential,
+        signingCredential: this.opts.web3SigningCredential,
+        keychainId: this.opts.keychainId,
       });
 
-      const body = { callOutput, transactionReceipt };
+      const body = { success, callOutput, transactionReceipt };
       res.status(200);
       res.json(body);
     } catch (ex) {

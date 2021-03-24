@@ -26,7 +26,7 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
 
   private readonly log: Logger;
 
-  public get className() {
+  public get className(): string {
     return InvokeContractEndpoint.CLASS_NAME;
   }
 
