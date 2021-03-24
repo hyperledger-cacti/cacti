@@ -51,6 +51,7 @@
         "name": "solc",
         "version": "0.7.2+commit.51b20bc0"
     },
+    "networks":{},
     "ast": {
         "absolutePath": "/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-test-plugin-ledger-connector-quorum/src/test/solidity/hello-world-contract/HelloWorld.sol",
         "exportedSymbols": {

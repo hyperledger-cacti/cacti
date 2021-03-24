@@ -192,6 +192,8 @@ export class SupplyChainAppDummyInfrastructure {
           abi: BambooHarvestRepositoryJSON.abi,
           address: contractAddress as string,
           bytecode: BambooHarvestRepositoryJSON.bytecode,
+          contractName: BambooHarvestRepositoryJSON.contractName,
+          keychainId: keychainPlugin.getKeychainId(),
         };
       }
 
@@ -227,6 +229,8 @@ export class SupplyChainAppDummyInfrastructure {
           abi: BookshelfRepositoryJSON.abi,
           address: contractAddress as string,
           bytecode: BookshelfRepositoryJSON.bytecode,
+          contractName: BookshelfRepositoryJSON.contractName,
+          keychainId: keychainPlugin.getKeychainId(),
         };
       }
 

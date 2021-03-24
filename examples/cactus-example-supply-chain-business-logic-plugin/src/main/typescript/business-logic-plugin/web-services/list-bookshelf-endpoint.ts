@@ -22,9 +22,11 @@ import { BookshelfConverter } from "../../model/converter/bookshelf-converter";
 
 export interface IListBookshelfEndpointOptions {
   logLevel?: LogLevelDesc;
-  contractAddress: string;
-  contractAbi: any;
+  contractName: string;
+  // contractAddress: string;
+  //  contractAbi: any;
   besuApi: BesuApi;
+  keychainId: string;
 }
 
 export class ListBookshelfEndpoint implements IWebServiceEndpoint {
@@ -46,12 +48,9 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.besuApi, `${fnTag} options.besuApi`);
-    Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
-    Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
-    Checks.nonBlankString(
-      opts.contractAddress,
-      `${fnTag} options.contractAddress`,
-    );
+    // Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
+    // Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
+    Checks.nonBlankString(opts.contractName, `${fnTag} options.contractName`);
 
     const level = this.opts.logLevel || "INFO";
     const label = this.className;
@@ -81,15 +80,15 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
       this.log.debug(`${tag}`);
 
       const { data } = await this.opts.besuApi.apiV1BesuInvokeContract({
-        contractAbi: this.opts.contractAbi,
-        contractAddress: this.opts.contractAddress,
+        contractName: this.opts.contractName,
         invocationType: EthContractInvocationType.CALL,
         methodName: "getAllRecords",
         gas: 1000000,
         params: [],
-        web3SigningCredential: {
+        signingCredential: {
           type: Web3SigningCredentialType.NONE,
         },
+        keychainId: this.opts.keychainId,
       });
       const { callOutput } = data;
 

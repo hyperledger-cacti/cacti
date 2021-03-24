@@ -78,6 +78,7 @@
         "name": "solc",
         "version": "0.7.2+commit.51b20bc0"
     },
+    "networks": {},
     "ast": {
         "absolutePath": "/home/peter/a/blockchain/cactus/packages/cactus-example-supply-chain-backend/src/main/solidity/BookshelfRepository .sol",
         "exportedSymbols": {

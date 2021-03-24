@@ -22,9 +22,10 @@ import { BambooHarvestConverter } from "../../model/converter/bamboo-harvest-con
 
 export interface IListBambooHarvestEndpointOptions {
   logLevel?: LogLevelDesc;
-  contractAddress: string;
-  contractAbi: any;
+  contractName: string;
+  //  contractAbi: any;
   apiClient: QuorumApi;
+  keychainId: string;
 }
 
 export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
@@ -46,10 +47,10 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.apiClient, `${fnTag} options.apiClient`);
-    Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
-    Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
+    //  Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
+    //  Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
-      opts.contractAddress,
+      opts.contractName,
       `${fnTag} options.contractAddress`,
     );
 
@@ -81,15 +82,15 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
       this.log.debug(`${tag}`);
 
       const { data } = await this.opts.apiClient.apiV1QuorumInvokeContract({
-        contractAbi: this.opts.contractAbi,
-        contractAddress: this.opts.contractAddress,
+        contractName: this.opts.contractName,
         invocationType: EthContractInvocationType.CALL,
         methodName: "getAllRecords",
         gas: 1000000,
         params: [],
-        web3SigningCredential: {
+        signingCredential: {
           type: Web3SigningCredentialType.NONE,
         },
+        keychainId: this.opts.keychainId,
       });
       const { callOutput } = data;
 

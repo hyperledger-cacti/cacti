@@ -40,8 +40,6 @@ import {
   EthContractInvocationType,
   InvokeContractV1Request,
   InvokeContractV1Response,
-  InvokeContractV2Request,
-  InvokeContractV2Response,
   RunTransactionRequest,
   RunTransactionResponse,
   Web3SigningCredentialGethKeychainPassword,
@@ -53,7 +51,6 @@ import {
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
-import { InvokeContractEndpointV2 } from "./web-services/invoke-contract-endpoint-v2";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import {
@@ -184,13 +181,6 @@ export class PluginLedgerConnectorQuorum
       endpoints.push(endpoint);
     }
     {
-      const endpoint = new InvokeContractEndpointV2({
-        connector: this,
-        logLevel: this.options.logLevel,
-      });
-      endpoints.push(endpoint);
-    }
-    {
       const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
         connector: this,
         logLevel: this.options.logLevel,
@@ -220,64 +210,6 @@ export class PluginLedgerConnectorQuorum
     req: InvokeContractV1Request,
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
-
-    const { invocationType } = req;
-
-    let abi;
-    if (typeof req.contractAbi === "string") {
-      abi = JSON.parse(req.contractAbi);
-    } else {
-      abi = req.contractAbi;
-    }
-
-    const { contractAddress } = req;
-    const aContract = new this.web3.eth.Contract(abi, contractAddress);
-    const methodRef = aContract.methods[req.methodName];
-
-    Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
-
-    const method: ContractSendMethod = methodRef(...req.params);
-
-    if (req.invocationType === EthContractInvocationType.CALL) {
-      const callOutput = await (method as any).call();
-      return { callOutput };
-    } else if (req.invocationType === EthContractInvocationType.SEND) {
-      if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
-        throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
-      }
-      const web3SigningCredential = req.web3SigningCredential as
-        | Web3SigningCredentialGethKeychainPassword
-        | Web3SigningCredentialPrivateKeyHex;
-
-      const payload = (method.send as any).request();
-      const { params } = payload;
-      const [transactionConfig] = params;
-      if (req.gas == undefined) {
-        req.gas = await this.web3.eth.estimateGas(transactionConfig);
-      }
-      transactionConfig.from = web3SigningCredential.ethAccount;
-      transactionConfig.gas = req.gas;
-      transactionConfig.gasPrice = req.gasPrice;
-      transactionConfig.value = req.value;
-      transactionConfig.nonce = req.nonce;
-
-      const txReq: RunTransactionRequest = {
-        transactionConfig,
-        web3SigningCredential,
-        timeoutMs: req.timeoutMs || 60000,
-      };
-      const out = await this.transact(txReq);
-
-      return out;
-    } else {
-      throw new Error(`${fnTag} Unsupported invocation type ${invocationType}`);
-    }
-  }
-
-  public async invokeContractV2(
-    req: InvokeContractV2Request,
-  ): Promise<InvokeContractV2Response> {
-    const fnTag = `${this.className}#invokeContractV2()`;
     const contractName = req.contractName;
 
     if (req.keychainId != undefined) {

@@ -124,7 +124,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       "contractAddress typeof string OK",
     );
 
-    const { callOutput: helloMsg } = await connector.invokeContractV2({
+    const { callOutput: helloMsg } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
@@ -145,7 +145,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
   test("invoke Web3SigningCredentialType.GETHKEYCHAINPASSWORD", async (t2: Test) => {
     const newName = `DrCactus${uuidV4()}`;
-    const setNameOut = await connector.invokeContractV2({
+    const setNameOut = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
@@ -161,7 +161,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
     try {
-      const setNameOutInvalid = await connector.invokeContractV2({
+      const setNameOutInvalid = await connector.invokeContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.SEND,
@@ -184,7 +184,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       );
     }
 
-    const getNameOut = await connector.invokeContractV2({
+    const getNameOut = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
@@ -198,7 +198,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     });
     t2.ok(getNameOut.success, `getName() SEND invocation produced receipt OK`);
 
-    const { callOutput: getNameOut2 } = await connector.invokeContractV2({
+    const { callOutput: getNameOut2 } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
@@ -249,7 +249,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
 
   test("invoke Web3SigningCredentialType.PRIVATEKEYHEX", async (t2: Test) => {
     const newName = `DrCactus${uuidV4()}`;
-    const setNameOut = await connector.invokeContractV2({
+    const setNameOut = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
@@ -265,7 +265,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
     try {
-      const setNameOutInvalid = await connector.invokeContractV2({
+      const setNameOutInvalid = await connector.invokeContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.SEND,
@@ -287,7 +287,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         "setName() invocation with invalid nonce",
       );
     }
-    const { callOutput: getNameOut } = await connector.invokeContractV2({
+    const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
@@ -302,7 +302,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     });
     t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
 
-    const getNameOut2 = await connector.invokeContractV2({
+    const getNameOut2 = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
@@ -330,7 +330,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       type: Web3SigningCredentialType.CACTUSKEYCHAINREF,
     };
 
-    const setNameOut = await connector.invokeContractV2({
+    const setNameOut = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,
@@ -343,7 +343,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
     try {
-      const setNameOutInvalid = await connector.invokeContractV2({
+      const setNameOutInvalid = await connector.invokeContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.SEND,
@@ -365,7 +365,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         "setName() invocation with invalid nonce",
       );
     }
-    const { callOutput: getNameOut } = await connector.invokeContractV2({
+    const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.CALL,
@@ -376,7 +376,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
     });
     t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
 
-    const getNameOut2 = await connector.invokeContractV2({
+    const getNameOut2 = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
       invocationType: EthContractInvocationType.SEND,

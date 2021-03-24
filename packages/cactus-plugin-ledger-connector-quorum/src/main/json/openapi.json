@@ -469,100 +469,6 @@
             "InvokeContractV1Request": {
                 "type": "object",
                 "required": [
-                    "contractAbi",
-                    "web3SigningCredential",
-                    "contractAddress",
-                    "invocationType",
-                    "methodName",
-                    "params"
-                ],
-                "properties": {
-                    "web3SigningCredential": {
-                        "$ref": "#/components/schemas/Web3SigningCredential",
-                        "nullable": false
-                    },
-                    "contractAbi": {
-                        "description": "The application binary interface of the solidity contract",
-                        "type": "array",
-                        "items": {},
-                        "nullable": false
-                    },
-                    "contractAddress": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "invocationType": {
-                        "$ref": "#/components/schemas/EthContractInvocationType",
-                        "nullable": false,
-                        "description": "Indicates wether it is a CALL or a SEND type of  invocation where only SEND ends up creating an actual transaction on the ledger."
-                    },
-                    "methodName": {
-                        "description": "The name of the contract method to invoke.",
-                        "type": "string",
-                        "nullable": false,
-                        "minLength": 1,
-                        "maxLength": 2048
-                    },
-                    "params": {
-                        "description": "The list of arguments to pass in to the contract method being invoked.",
-                        "type": "array",
-                        "default": [],
-                        "items": {}
-                    },
-                    "gas": {
-                        "oneOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "number"
-                            }
-                        ]
-                    },
-                    "gasPrice": {
-                        "oneOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "number"
-                            }
-                        ]
-                    },
-                    "value": {
-                        "oneOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "number"
-                            }
-                        ]
-                    },
-                    "nonce": {
-                        "type": "number"
-                    },
-                    "timeoutMs": {
-                        "type": "number",
-                        "description": "The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND",
-                        "minimum": 0,
-                        "default": 60000,
-                        "nullable": false
-                    }
-                }
-            },
-            "InvokeContractV1Response": {
-                "type": "object",
-                "properties": {
-                    "transactionReceipt": {
-                        "$ref": "#/components/schemas/Web3TransactionReceipt"
-                    },
-                    "callOutput": {}
-                }
-            },
-            "InvokeContractV2Request": {
-                "type": "object",
-                "required": [
                     "contractName",
                     "signingCredential",
                     "invocationType",
@@ -644,7 +550,7 @@
                     }
                 }
             },
-            "InvokeContractV2Response": {
+            "InvokeContractV1Response": {
                 "type": "object",
                 "required": [
                     "success"
@@ -744,7 +650,7 @@
                     }
                 },
                 "operationId": "apiV1QuorumInvokeContract",
-                "summary": "Invokeds a contract on a quorum ledger",
+                "summary": "Invokeds a contract on a besu ledger",
                 "parameters": [],
                 "requestBody": {
                     "content": {
@@ -762,40 +668,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/InvokeContractV1Response"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v2/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract": {
-            "post": {
-                "x-hyperledger-cactus": {
-                    "http": {
-                        "verbLowerCase": "post",
-                        "path": "/api/v2/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"
-                    }
-                },
-                "operationId": "apiV2QuorumInvokeContract",
-                "summary": "Invokeds a contract on a besu ledger",
-                "parameters": [],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/InvokeContractV2Request"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/InvokeContractV2Response"
                                 }
                             }
                         }
