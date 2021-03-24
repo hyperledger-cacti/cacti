@@ -53,11 +53,18 @@ import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint"
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
 import { InvokeContractEndpointV2 } from "./web-services/invoke-contract-endpoint-v2";
 
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import {
+  GetPrometheusExporterMetricsEndpointV1,
+  IGetPrometheusExporterMetricsEndpointV1Options,
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
   rpcApiHttpHost: string;
-  pluginRegistry: PluginRegistry;
   logLevel?: LogLevelDesc;
+  prometheusExporter?: PrometheusExporter;
+  pluginRegistry: PluginRegistry;
   contractsPath?: string;
 }
 
@@ -72,6 +79,7 @@ export class PluginLedgerConnectorQuorum
     ICactusPlugin,
     IPluginWebService {
   private readonly pluginRegistry: PluginRegistry;
+  public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
   private readonly log: Logger;
   private readonly web3: Web3;
@@ -105,6 +113,26 @@ export class PluginLedgerConnectorQuorum
     this.instanceId = options.instanceId;
     this.pluginRegistry = options.pluginRegistry;
     this.contractsPath = options.contractsPath;
+
+    this.prometheusExporter =
+      options.prometheusExporter ||
+      new PrometheusExporter({ pollingIntervalInMin: 1 });
+    Checks.truthy(
+      this.prometheusExporter,
+      `${fnTag} options.prometheusExporter`,
+    );
+
+    this.prometheusExporter.startMetricsCollection();
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+    return res;
   }
 
   public getInstanceId(): string {
@@ -156,6 +184,15 @@ export class PluginLedgerConnectorQuorum
         connector: this,
         logLevel: this.options.logLevel,
       });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+    {
+      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+        connector: this,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
       endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
@@ -353,6 +390,7 @@ export class PluginLedgerConnectorQuorum
       this.log.debug(`${fnTag} Web3 sendSignedTransaction failed`, receipt);
       throw receipt;
     } else {
+      this.prometheusExporter.addCurrentTransaction();
       return { transactionReceipt: receipt };
     }
   }
