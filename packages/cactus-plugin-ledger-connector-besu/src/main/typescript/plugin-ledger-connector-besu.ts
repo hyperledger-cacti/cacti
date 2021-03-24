@@ -61,6 +61,11 @@ import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint"
 import { InvokeContractEndpointV2 } from "./web-services/invoke-contract-endpoint-v2";
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
 import { BesuSignTransactionEndpointV1 } from "./web-services/sign-transaction-endpoint-v1";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import {
+  GetPrometheusExporterMetricsEndpointV1,
+  IGetPrometheusExporterMetricsEndpointV1Options,
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
@@ -68,6 +73,7 @@ export interface IPluginLedgerConnectorBesuOptions
   extends ICactusPluginOptions {
   rpcApiHttpHost: string;
   pluginRegistry: PluginRegistry;
+  prometheusExporter?: PrometheusExporter;
   logLevel?: LogLevelDesc;
   contractsPath?: string;
 }
@@ -83,6 +89,7 @@ export class PluginLedgerConnectorBesu
     ICactusPlugin,
     IPluginWebService {
   private readonly instanceId: string;
+  public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly web3: Web3;
   private readonly pluginRegistry: PluginRegistry;
@@ -116,6 +123,25 @@ export class PluginLedgerConnectorBesu
     this.instanceId = options.instanceId;
     this.pluginRegistry = options.pluginRegistry;
     this.contractsPath = options.contractsPath;
+    this.prometheusExporter =
+      options.prometheusExporter ||
+      new PrometheusExporter({ pollingIntervalInMin: 1 });
+    Checks.truthy(
+      this.prometheusExporter,
+      `${fnTag} options.prometheusExporter`,
+    );
+
+    this.prometheusExporter.startMetricsCollection();
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+    return res;
   }
 
   public getInstanceId(): string {
@@ -175,6 +201,15 @@ export class PluginLedgerConnectorBesu
         connector: this,
         logLevel: this.options.logLevel,
       });
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+    {
+      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+        connector: this,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
       endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
@@ -388,6 +423,7 @@ export class PluginLedgerConnectorBesu
       this.log.debug(`${fnTag} sendSignedTransaction failed`, txPoolReceipt);
       throw txPoolReceipt;
     }
+    this.prometheusExporter.addCurrentTransaction();
 
     if (
       req.consistencyStrategy.receiptType === ReceiptType.NODETXPOOLACK &&
