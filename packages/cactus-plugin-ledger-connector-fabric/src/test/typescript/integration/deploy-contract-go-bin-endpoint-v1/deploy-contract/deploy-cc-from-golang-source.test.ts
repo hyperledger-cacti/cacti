@@ -54,6 +54,10 @@ test(testCase, async (t: Test) => {
     imageVersion: "2021-03-02-ssh-hotfix",
   });
   await ledger.start();
+  t.doesNotThrow(() => ledger.getContainer(), "Container is set OK");
+  const ledgerContainer = ledger.getContainer();
+  t.ok(ledgerContainer, "ledgerContainer truthy OK");
+  t.ok(ledgerContainer.id, "ledgerContainer.id truthy OK");
 
   const tearDown = async () => {
     await ledger.stop();
