@@ -250,8 +250,7 @@ export class CordaTestLedger implements ITestLedger {
   ): Promise<Base64File[]> {
     const fnTag = `${this.className}.pullCordappJars()`;
     Checks.truthy(sampleCordapp, `${fnTag}:sampleCordapp`);
-    // FIXME: uncomment this when done testing
-    // await this.buildCordapp(sampleCordapp);
+    await this.buildCordapp(sampleCordapp);
     const container = this.getContainer();
     const cordappRootDir = SAMPLE_CORDAPP_ROOT_DIRS[sampleCordapp];
 
