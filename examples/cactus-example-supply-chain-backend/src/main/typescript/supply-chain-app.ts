@@ -39,15 +39,25 @@ import {
   DefaultApi as BesuApi,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
-import { SupplyChainAppDummyInfrastructure } from "./infrastructure/supply-chain-app-dummy-infrastructure";
+import {
+  PluginLedgerConnectorFabric,
+  DefaultApi as FabricApi,
+  DefaultEventHandlerStrategy,
+} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+
+import {
+  SupplyChainAppDummyInfrastructure,
+  org1Env,
+} from "./infrastructure/supply-chain-app-dummy-infrastructure";
 import { SupplyChainCactusPlugin } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+import { DiscoveryOptions } from "fabric-network";
 
 export interface ISupplyChainAppOptions {
   logLevel?: LogLevelDesc;
 }
 
 export type ShutdownHook = () => Promise<void>;
-
+//TODO: Generate fabric connector and set in the pluginRegistry
 export class SupplyChainApp {
   private readonly log: Logger;
   private readonly shutdownHooks: ShutdownHook[];
@@ -84,14 +94,23 @@ export class SupplyChainApp {
     const besuAccount = await this.ledgers.besu.createEthTestAccount();
     const quorumAccount = await this.ledgers.quorum.createEthTestAccount();
 
+    const enrollAdminOut = await this.ledgers.fabric.enrollAdmin();
+    const adminWallet = enrollAdminOut[1];
+    const [userIdentity] = await this.ledgers.fabric.enrollUser(adminWallet);
+    const keychainEntryKey = "user2";
+    const keychainEntryValue = JSON.stringify(userIdentity);
+
     const keychainIdA = "PluginKeychainMemory_A";
     const keychainIdB = "PluginKeychainMemory_B";
+    const keychainIdC = "PluginKeychainMemory_C";
 
     // Reserve the ports where the Cactus nodes will run API servers, GUI
     const httpApiA = await Servers.startOnPort(4000, "0.0.0.0");
     const httpApiB = await Servers.startOnPort(4100, "0.0.0.0");
+    const httpApiC = await Servers.startOnPort(4200, "0.0.0.0");
     const httpGuiA = await Servers.startOnPort(3000, "0.0.0.0");
     const httpGuiB = await Servers.startOnPort(3100, "0.0.0.0");
+    const httpGuiC = await Servers.startOnPort(3200, "0.0.0.0");
 
     const addressInfoA = httpApiA.address() as AddressInfo;
     const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
@@ -99,8 +118,12 @@ export class SupplyChainApp {
     const addressInfoB = httpApiB.address() as AddressInfo;
     const nodeApiHostB = `http://localhost:${addressInfoB.port}`;
 
+    const addressInfoC = httpApiC.address() as AddressInfo;
+    const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
+
     const besuApiClient = new BesuApi({ basePath: nodeApiHostA });
     const quorumApiClient = new QuorumApi({ basePath: nodeApiHostB });
+    const fabricApiClient = new FabricApi({ basePath: nodeApiHostC });
 
     const keyPairA = await JWK.generate("EC", "secp256k1");
     const keyPairPemA = keyPairA.toPEM(true);
@@ -108,11 +131,16 @@ export class SupplyChainApp {
     const keyPairB = await JWK.generate("EC", "secp256k1");
     const keyPairPemB = keyPairB.toPEM(true);
 
+    const keyPairC = await JWK.generate("EC", "secp256k1");
+    const keyPairPemC = keyPairC.toPEM(true);
+
     const consortiumDatabase = this.createConsortium(
       httpApiA,
       httpApiB,
+      httpApiC,
       keyPairA,
       keyPairB,
+      keyPairC,
     );
     const consortiumPrettyJson = JSON.stringify(consortiumDatabase, null, 4);
     this.log.info(`Created Consortium definition: %o`, consortiumPrettyJson);
@@ -120,6 +148,9 @@ export class SupplyChainApp {
     this.log.info(`Configuring Cactus Node for Ledger A...`);
     const rpcApiHostA = await this.ledgers.besu.getRpcApiHttpHost();
     const rpcApiHostB = await this.ledgers.quorum.getRpcApiHttpHost();
+
+    const connectionProfile = await this.ledgers.fabric.getConnectionProfileOrg1();
+    const sshConfig = await this.ledgers.fabric.getSshConfig();
 
     const registryA = new PluginRegistry({
       plugins: [
@@ -135,6 +166,7 @@ export class SupplyChainApp {
           instanceId: uuidv4(),
           besuApiClient,
           quorumApiClient,
+          fabricApiClient,
           web3SigningCredential: {
             keychainEntryKey: besuAccount.address,
             keychainId: keychainIdA,
@@ -176,6 +208,7 @@ export class SupplyChainApp {
           instanceId: uuidv4(),
           besuApiClient,
           quorumApiClient,
+          fabricApiClient,
           web3SigningCredential: {
             keychainEntryKey: quorumAccount.address,
             keychainId: keychainIdB,
@@ -200,6 +233,56 @@ export class SupplyChainApp {
     registryB.add(quorumConnector);
 
     await this.startNode(httpApiB, httpGuiB, registryB);
+
+    this.log.info(`Configuring Cactus Node for Ledger C...`);
+
+    const registryC = new PluginRegistry({
+      plugins: [
+        new PluginConsortiumManual({
+          instanceId: "PluginConsortiumManual_C",
+          consortiumDatabase,
+          keyPairPem: keyPairPemC,
+          logLevel: "INFO",
+        }),
+        new SupplyChainCactusPlugin({
+          logLevel: "INFO",
+          contracts: contractsInfo,
+          instanceId: uuidv4(),
+          besuApiClient,
+          quorumApiClient,
+          fabricApiClient,
+          fabricEnviroment: org1Env,
+        }),
+        new PluginKeychainMemory({
+          instanceId: uuidv4(),
+          keychainId: keychainIdC,
+          backend: new Map([[keychainEntryKey, keychainEntryValue]]),
+        }),
+      ],
+    });
+
+    const discoveryOptions: DiscoveryOptions = {
+      enabled: true,
+      asLocalhost: true,
+    };
+
+    const fabricConnector = new PluginLedgerConnectorFabric({
+      instanceId: "PluginLedgerConnectorFabric_C",
+      dockerBinary: "/usr/local/bin/docker",
+      cliContainerEnv: org1Env,
+      connectionProfile: connectionProfile,
+      sshConfig: sshConfig,
+      logLevel: "INFO",
+      pluginRegistry: registryC,
+      discoveryOptions,
+      eventHandlerOptions: {
+        strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+      },
+    });
+
+    registryC.add(fabricConnector);
+
+    await this.startNode(httpApiC, httpGuiC, registryC);
   }
 
   public async stop(): Promise<void> {
@@ -215,8 +298,10 @@ export class SupplyChainApp {
   public createConsortium(
     serverA: Server,
     serverB: Server,
+    serverC: Server,
     keyPairA: JWK.ECKey,
     keyPairB: JWK.ECKey,
+    keyPairC: JWK.ECKey,
   ): ConsortiumDatabase {
     const consortiumName = "Example Supply Chain Consortium";
     const consortiumId = uuidv4();
@@ -276,18 +361,46 @@ export class SupplyChainApp {
 
     cactusNodeB.ledgerIds.push(ledger2.id);
 
+    const memberIdC = uuidv4();
+    const nodeIdC = uuidv4();
+    const addressInfoC = serverC.address() as AddressInfo;
+    const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
+
+    const cactusNodeC: CactusNode = {
+      nodeApiHost: nodeApiHostC,
+      memberId: memberIdC,
+      publicKeyPem: keyPairC.toPEM(false),
+      consortiumId,
+      id: nodeIdC,
+      pluginInstanceIds: [],
+      ledgerIds: [],
+    };
+
+    const memberC: ConsortiumMember = {
+      id: memberIdC,
+      nodeIds: [cactusNodeC.id],
+      name: "TODO",
+    };
+
+    const ledger3: Ledger = {
+      id: "FabricDemoLedger",
+      ledgerType: LedgerType.FABRIC14X,
+    };
+
+    cactusNodeC.ledgerIds.push(ledger3.id);
+
     const consortium: Consortium = {
       id: consortiumId,
       name: consortiumName,
       mainApiHost: nodeApiHostA,
-      memberIds: [memberA.id, memberB.id],
+      memberIds: [memberA.id, memberB.id, memberC.id],
     };
 
     const consortiumDatabase: ConsortiumDatabase = {
-      cactusNode: [cactusNodeA, cactusNodeB],
+      cactusNode: [cactusNodeA, cactusNodeB, cactusNodeC],
       consortium: [consortium],
-      consortiumMember: [memberA, memberB],
-      ledger: [ledger1, ledger2],
+      consortiumMember: [memberA, memberB, memberC],
+      ledger: [ledger1, ledger2, ledger3],
       pluginInstance: [],
     };
 

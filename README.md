@@ -25,9 +25,11 @@ As blockchain technology proliferates, blockchain integration will become an inc
       --privileged \
       -p 3000:3000 \
       -p 3100:3100 \
+      -p 3200:3200 \
       -p 4000:4000 \
       -p 4100:4100 \
-      hyperledger/cactus-example-supply-chain-app:2021-02-05-f89a37a
+      -p 4200:4200 \
+      hyperledger/cactus-example-supply-chain-app:2021-03-24-feat-362
     ```
 2. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3100`
 3. Visit http://localhost:3100 in a web browser with Javascript enabled

@@ -11,6 +11,28 @@
     },
     "components": {
         "schemas": {
+            "Shipment": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "bookshelfId"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024
+                    },
+                    "bookshelfId": {
+                        "description": "The foreign key ID referencing the bookshelfId that will go in the shipment.",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
             "Bookshelf": {
                 "type": "object",
                 "required": [
@@ -168,6 +190,49 @@
                         }
                     }
                 }
+            },
+            "InsertShipmentRequest": {
+                "type": "object",
+                "required": [
+                    "shipment"
+                ],
+                "properties": {
+                    "shipment": {
+                        "$ref": "#/components/schemas/Shipment"
+                    }
+                }
+            },
+            "InsertShipmentResponse": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                    "callOutput": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "transactionReceipt": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            },
+            "ListShipmentResponse": {
+                "type": "object",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "nullable": false,
+                        "default": [],
+                        "items": {
+                            "$ref": "#/components/schema/Shipment",
+                            "minItems": 0,
+                            "maxItems": 65535
+                        }
+                    }
+                }
             }
         }
     },
@@ -212,6 +277,65 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ListBookshelfResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment"
+                    }
+                },
+                "operationId": "apiV1InsertShipment",
+                "summary": "Inserts the provided Shipment entity to the ledger.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InsertShipmentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "CREATED",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InsertShipmentResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
+                    }
+                },
+                "operationId": "apiV1ListShipment",
+                "summary": "Lists all the Shipments entities stored on the ledger.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListShipmentResponse"
                                 }
                             }
                         }

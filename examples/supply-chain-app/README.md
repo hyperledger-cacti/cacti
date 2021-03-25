@@ -10,9 +10,11 @@
       --privileged \
       -p 3000:3000 \
       -p 3100:3100 \
+      -p 3200:3200 \
       -p 4000:4000 \
       -p 4100:4100 \
-      hyperledger/cactus-example-supply-chain-app:2021-02-05-f89a37a
+      -p 4200:4200 \
+      hyperledger/cactus-example-supply-chain-app:2021-03-24-feat-362
     ```
 2. Observe the example application pulling up in the logs
    1. the test ledger containers,
@@ -33,14 +35,14 @@ DOCKER_BUILDKIT=1 docker build -f ./examples/supply-chain-app/Dockerfile . -t sc
 # up ledger containers from within the container in order to have the example
 # be completely self-contained where you don't need to worry about running
 # multiple different ledgers jus this one container.
-docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 4000:4000 -p 4100:4100 scaeb
+docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:4000 -p 4100:4100 -p 4200:4200 scaeb
 ```
 
 ## Configuring and running the example as a process
 
 1. If the `cactus-example-supply-chain-frontend` is in another directory from the default or need expose the API in another port, check the `process.env`
 2. Execute the following command:
-   
-``` 
+
+```
  npm run start
 ```
