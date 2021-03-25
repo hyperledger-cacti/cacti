@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ "$PARTY_A_WEB_SRV_ENABLED" = "true" ]
 then
   curl -vv -i -X OPTIONS http://127.0.0.1:10009/web/iou/
