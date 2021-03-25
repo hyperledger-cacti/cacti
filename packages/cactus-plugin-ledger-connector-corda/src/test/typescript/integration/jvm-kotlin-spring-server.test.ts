@@ -90,7 +90,7 @@ test(testCase, async (t: Test) => {
     imageVersion: "2021-03-10-feat-623",
     envVars: [envVarSpringAppJson],
   });
-  t.ok(CordaConnectorContainer, "CordaConnectorContainer instantaited OK");
+  t.ok(CordaConnectorContainer, "CordaConnectorContainer instantiated OK");
 
   test.onFinish(async () => {
     try {
