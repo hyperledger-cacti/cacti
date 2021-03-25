@@ -36,21 +36,8 @@ test(testCase, async (t: Test) => {
   t.ok(ledger, "CordaTestLedger instantaited OK");
 
   test.onFinish(async () => {
-    try {
-      const logBuffer = ((await ledgerContainer.logs({
-        follow: false,
-        stdout: true,
-        stderr: true,
-      })) as unknown) as Buffer;
-      const logs = logBuffer.toString("utf-8");
-      t.comment(`[CordaAllInOne] ${logs}`);
-    } finally {
-      try {
-        await ledger.stop();
-      } finally {
-        await ledger.destroy();
-      }
-    }
+    await ledger.stop();
+    await ledger.destroy();
   });
   const ledgerContainer = await ledger.start();
   t.ok(ledgerContainer, "CordaTestLedger container truthy post-start() OK");
