@@ -13,6 +13,7 @@ import {
   BESU_DEMO_LEDGER_ID,
   CACTUS_API_URL,
   QUORUM_DEMO_LEDGER_ID,
+  FABRIC_DEMO_LEDGER_ID,
 } from "src/constants";
 import { ApiClient } from "@hyperledger/cactus-api-client";
 
@@ -46,6 +47,11 @@ const apiClient = new ApiClient({ basePath: cactusApiUrl });
       provide: BESU_DEMO_LEDGER_ID,
       // This has to match the ledger ID defined in supply-chain-app.ts
       useValue: "BesuDemoLedger",
+    },
+    {
+      provide: FABRIC_DEMO_LEDGER_ID,
+      // This has to match the ledger ID defined in supply-chain-app.ts
+      useValue: "FabricDemoLedger",
     },
     { provide: ApiClient, useValue: apiClient },
   ],

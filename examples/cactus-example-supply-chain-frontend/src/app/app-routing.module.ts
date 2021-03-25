@@ -19,6 +19,11 @@ const routes: Routes = [
     loadChildren: () =>
       import("./bookshelf/bookshelf.module").then((m) => m.BookshelfPageModule),
   },
+  {
+    path: "shipment-list",
+    loadChildren: () =>
+      import("./shipment/shipment.module").then((m) => m.ShipmentPageModule),
+  },
 ];
 
 @NgModule({

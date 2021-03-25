@@ -7,3 +7,6 @@ export const QUORUM_DEMO_LEDGER_ID = new InjectionToken<string>(
 export const BESU_DEMO_LEDGER_ID = new InjectionToken<string>(
   "BESU_DEMO_LEDGER_ID",
 );
+export const FABRIC_DEMO_LEDGER_ID = new InjectionToken<string>(
+  "FABRIC_DEMO_LEDGER_ID",
+);

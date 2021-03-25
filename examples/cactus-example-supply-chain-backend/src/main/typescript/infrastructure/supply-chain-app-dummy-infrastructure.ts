@@ -1,4 +1,6 @@
 import { Account } from "web3-core";
+//import fs from "fs";
+//import path from "path";
 
 import {
   Logger,
@@ -14,6 +16,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 import {
   BesuTestLedger,
+  FabricTestLedgerV1,
   QuorumTestLedger,
 } from "@hyperledger/cactus-test-tooling";
 
@@ -28,7 +31,26 @@ import {
 import {
   IEthContractDeployment,
   ISupplyChainContractDeploymentInfo,
+  IFabricContractDeployment,
+  //  OrgEnv,
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+import {
+  PluginLedgerConnectorFabric,
+  DefaultEventHandlerStrategy,
+} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import { DiscoveryOptions } from "fabric-network";
+import { SHIPMENT_CONTRACT_GO_SOURCE } from "../../go/shipment";
+
+export const org1Env = {
+  CORE_PEER_LOCALMSPID: "Org1MSP",
+  CORE_PEER_ADDRESS: "peer0.org1.example.com:7051",
+  CORE_PEER_MSPCONFIGPATH:
+    "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
+  CORE_PEER_TLS_ROOTCERT_FILE:
+    "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
+  ORDERER_TLS_ROOTCERT_FILE:
+    "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+};
 
 export interface ISupplyChainAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -50,6 +72,7 @@ export class SupplyChainAppDummyInfrastructure {
 
   public readonly besu: BesuTestLedger;
   public readonly quorum: QuorumTestLedger;
+  public readonly fabric: FabricTestLedgerV1;
   private readonly log: Logger;
   private _quorumAccount: Account | undefined;
   private _besuAccount: Account | undefined;
@@ -86,6 +109,11 @@ export class SupplyChainAppDummyInfrastructure {
 
     this.besu = new BesuTestLedger();
     this.quorum = new QuorumTestLedger();
+    this.fabric = new FabricTestLedgerV1({
+      publishAllPorts: true,
+      imageName: "hyperledger/cactus-fabric-all-in-one",
+      imageVersion: "2021-03-02-ssh-hotfix",
+    });
   }
 
   public async stop(): Promise<void> {
@@ -93,8 +121,8 @@ export class SupplyChainAppDummyInfrastructure {
       this.log.info(`Stopping...`);
       await Promise.all([
         this.besu.stop().then(() => this.besu.destroy()),
-
         this.quorum.stop().then(() => this.quorum.destroy()),
+        this.fabric.stop().then(() => this.fabric.destroy()),
       ]);
       this.log.info(`Stopped OK`);
     } catch (ex) {
@@ -106,7 +134,11 @@ export class SupplyChainAppDummyInfrastructure {
   public async start(): Promise<void> {
     try {
       this.log.info(`Starting dummy infrastructure...`);
-      await Promise.all([this.besu.start(), this.quorum.start()]);
+      await Promise.all([
+        this.besu.start(),
+        this.quorum.start(),
+        this.fabric.start(),
+      ]);
       this.log.info(`Started dummy infrastructure OK`);
     } catch (ex) {
       this.log.error(`Starting of dummy infrastructure crashed: `, ex);
@@ -120,6 +152,7 @@ export class SupplyChainAppDummyInfrastructure {
 
       let bambooHarvestRepository: IEthContractDeployment;
       let bookshelfRepository: IEthContractDeployment;
+      let shipmentRepository: IFabricContractDeployment;
 
       {
         this._quorumAccount = await this.quorum.createEthTestAccount(2000000);
@@ -183,9 +216,55 @@ export class SupplyChainAppDummyInfrastructure {
         };
       }
 
+      {
+        const connectionProfile = await this.fabric.getConnectionProfileOrg1();
+        const sshConfig = await this.fabric.getSshConfig();
+        const discoveryOptions: DiscoveryOptions = {
+          enabled: true,
+          asLocalhost: true,
+        };
+
+        const connector = new PluginLedgerConnectorFabric({
+          instanceId: "PluginLedgerConnectorFabric_Contract_Deployment",
+          dockerBinary: "/usr/local/bin/docker",
+          pluginRegistry: new PluginRegistry(),
+          sshConfig: sshConfig,
+          logLevel: this.options.logLevel || "INFO",
+          connectionProfile: connectionProfile,
+          cliContainerEnv: org1Env,
+          discoveryOptions: discoveryOptions,
+          eventHandlerOptions: {
+            strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+          },
+        });
+
+        const res = await connector.deployContract({
+          tlsRootCertFiles: org1Env.CORE_PEER_TLS_ROOTCERT_FILE as string,
+          targetPeerAddresses: [org1Env.CORE_PEER_ADDRESS as string],
+          policyDslSource: "OR('Org1MSP.member','Org2MSP.member')",
+          channelId: "mychannel",
+          chainCodeVersion: "1.0.0",
+          constructorArgs: { Args: [] },
+          goSource: {
+            body: Buffer.from(SHIPMENT_CONTRACT_GO_SOURCE).toString("base64"),
+            filename: "shipment.go",
+          },
+          moduleName: "shipment",
+          targetOrganizations: [org1Env],
+          pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+        });
+        this.log.debug(res);
+
+        shipmentRepository = {
+          chaincodeId: "shipment",
+          channelName: "mychannel",
+        };
+      }
+
       const out: ISupplyChainContractDeploymentInfo = {
         bambooHarvestRepository,
         bookshelfRepository,
+        shipmentRepository,
       };
 
       this.log.info(`Deployed smart contracts OK`);

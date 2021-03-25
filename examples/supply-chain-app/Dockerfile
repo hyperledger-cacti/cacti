@@ -130,6 +130,10 @@ EXPOSE 4100
 EXPOSE 3000
 # GUI #2
 EXPOSE 3100
+# API #3
+EXPOSE 4200
+# GUI #3
+EXPOSE 3200
 
 # Extend the parent image's entrypoint
 # https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script

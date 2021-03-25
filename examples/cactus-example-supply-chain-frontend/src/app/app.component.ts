@@ -22,6 +22,11 @@ export class AppComponent {
       url: "/bookshelf-list",
       icon: "book",
     },
+    {
+      title: "Shipment",
+      url: "/shipment-list",
+      icon: "cube",
+    },
   ];
 
   constructor(
