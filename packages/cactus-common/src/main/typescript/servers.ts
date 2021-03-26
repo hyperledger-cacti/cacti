@@ -86,7 +86,8 @@ export class Servers {
   ): Promise<Server> {
     if (preferredPort) {
       try {
-        return Servers.startOnPort(preferredPort, host);
+        const server = await Servers.startOnPort(preferredPort, host);
+        return server;
       } catch (ex) {
         // if something else went wrong we still want to just give up
         if (!ex.message.includes("EADDRINUSE")) {

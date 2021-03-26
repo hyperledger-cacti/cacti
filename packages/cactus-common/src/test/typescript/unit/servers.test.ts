@@ -1,4 +1,5 @@
 import { createServer } from "http";
+import { AddressInfo } from "net";
 
 import test, { Test } from "tape-promise/tape";
 
@@ -33,6 +34,35 @@ test("Servers", async (tParent: Test) => {
       );
       await Servers.shutdown(server);
     }
+
+    t.end();
+  });
+
+  test("Servers#startOnPreferredPort()", async (t: Test) => {
+    const prefPort = 4123;
+    const host = "0.0.0.0";
+    const portBlocker = createServer();
+    test.onFinish(() => portBlocker.close());
+    const listenOptionsBlocker = {
+      server: portBlocker,
+      hostname: host,
+      port: prefPort,
+    };
+    await Servers.listen(listenOptionsBlocker);
+
+    await t.doesNotReject(async () => {
+      const server = await Servers.startOnPreferredPort(prefPort, host);
+      test.onFinish(() => server.close());
+      t.ok(server, "Server returned truthy OK");
+      const addressInfo = server.address() as AddressInfo;
+      t.ok(addressInfo, "AddressInfo returned truthy OK");
+      t.ok(addressInfo.port, "AddressInfo.port returned truthy OK");
+      t.doesNotEqual(
+        addressInfo.port,
+        prefPort,
+        "Peferred and actually allocated ports are different, therefore fallback is considered successful OK",
+      );
+    }, "Servers.startOnPreferredPort falls back without throwing OK");
 
     t.end();
   });
