@@ -38,6 +38,7 @@ import {
 import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
 
 import {
+  ConsistencyStrategy,
   DeployContractSolidityBytecodeV1Request,
   DeployContractSolidityBytecodeV1Response,
   EthContractInvocationType,
@@ -45,6 +46,7 @@ import {
   InvokeContractV2Request,
   InvokeContractV1Response,
   InvokeContractV2Response,
+  ReceiptType,
   RunTransactionRequest,
   RunTransactionResponse,
   SignTransactionRequest,
@@ -238,7 +240,11 @@ export class PluginLedgerConnectorBesu
       const txReq: RunTransactionRequest = {
         transactionConfig,
         web3SigningCredential,
-        timeoutMs: req.timeoutMs || 60000,
+        consistencyStrategy: {
+          blockConfirmations: 0,
+          receiptType: ReceiptType.NODETXPOOLACK,
+          timeoutMs: req.timeoutMs || 60000,
+        },
       };
       const out = await this.transact(txReq);
 
@@ -309,7 +315,11 @@ export class PluginLedgerConnectorBesu
       const txReq: RunTransactionRequest = {
         transactionConfig,
         web3SigningCredential,
-        timeoutMs: req.timeoutMs || 60000,
+        consistencyStrategy: {
+          blockConfirmations: 0,
+          receiptType: ReceiptType.NODETXPOOLACK,
+          timeoutMs: req.timeoutMs || 60000,
+        },
       };
       const out = await this.transact(txReq);
       //const transactionReceipt = out.transactionReceipt;
@@ -340,7 +350,7 @@ export class PluginLedgerConnectorBesu
       }
       case Web3SigningCredentialType.NONE: {
         if (req.transactionConfig.rawTransaction) {
-          return this.transactSigned(req.transactionConfig.rawTransaction);
+          return this.transactSigned(req);
         } else {
           throw new Error(
             `${fnTag} Expected pre-signed raw transaction ` +
@@ -360,17 +370,56 @@ export class PluginLedgerConnectorBesu
   }
 
   public async transactSigned(
-    rawTransaction: string,
+    req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactSigned()`;
 
-    const receipt = await this.web3.eth.sendSignedTransaction(rawTransaction);
+    Checks.truthy(req.consistencyStrategy, `${fnTag}:req.consistencyStrategy`);
+    Checks.truthy(
+      req.transactionConfig.rawTransaction,
+      `${fnTag}:req.transactionConfig.rawTransaction`,
+    );
+    const rawTx = req.transactionConfig.rawTransaction as string;
+    this.log.debug("Starting web3.eth.sendSignedTransaction(rawTransaction) ");
+    const txPoolReceipt = await this.web3.eth.sendSignedTransaction(rawTx);
+    this.log.debug("Received preliminary receipt from Besu node.");
 
-    if (receipt instanceof Error) {
-      this.log.debug(`${fnTag} Web3 sendSignedTransaction failed`, receipt);
-      throw receipt;
-    } else {
-      return { transactionReceipt: receipt };
+    if (txPoolReceipt instanceof Error) {
+      this.log.debug(`${fnTag} sendSignedTransaction failed`, txPoolReceipt);
+      throw txPoolReceipt;
+    }
+
+    if (
+      req.consistencyStrategy.receiptType === ReceiptType.NODETXPOOLACK &&
+      req.consistencyStrategy.blockConfirmations > 0
+    ) {
+      throw new Error(
+        `${fnTag} Conflicting parameters for consistency` +
+          ` strategy: Cannot wait for >0 block confirmations AND only wait ` +
+          ` for the tx pool ACK at the same time.`,
+      );
+    }
+
+    switch (req.consistencyStrategy.receiptType) {
+      case ReceiptType.NODETXPOOLACK:
+        return { transactionReceipt: txPoolReceipt };
+      case ReceiptType.LEDGERBLOCKACK:
+        this.log.debug("Starting poll for ledger TX receipt ...");
+        const txHash = txPoolReceipt.transactionHash;
+        const { consistencyStrategy } = req;
+        const ledgerReceipt = await this.pollForTxReceipt(
+          txHash,
+          consistencyStrategy,
+        );
+        this.log.debug(
+          "Finished poll for ledger TX receipt: %o",
+          ledgerReceipt,
+        );
+        return { transactionReceipt: ledgerReceipt };
+      default:
+        throw new Error(
+          `${fnTag} Unrecognized ReceiptType: ${req.consistencyStrategy.receiptType}`,
+        );
     }
   }
 
@@ -389,7 +438,8 @@ export class PluginLedgerConnectorBesu
     );
 
     if (signedTx.rawTransaction) {
-      return this.transactSigned(signedTx.rawTransaction);
+      req.transactionConfig.rawTransaction = signedTx.rawTransaction;
+      return this.transactSigned(req);
     } else {
       throw new Error(
         `${fnTag} Failed to sign eth transaction. ` +
@@ -428,30 +478,46 @@ export class PluginLedgerConnectorBesu
         type: Web3SigningCredentialType.PRIVATEKEYHEX,
         secret: privateKeyHex,
       },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NODETXPOOLACK,
+        timeoutMs: 60000,
+      },
     });
   }
 
   public async pollForTxReceipt(
     txHash: string,
-    timeoutMs = 60000,
+    consistencyStrategy: ConsistencyStrategy,
   ): Promise<TransactionReceipt> {
     const fnTag = `${this.className}#pollForTxReceipt()`;
     let txReceipt;
     let timedOut = false;
     let tries = 0;
+    let confirmationCount = 0;
+    const timeoutMs = consistencyStrategy.timeoutMs || Number.MAX_SAFE_INTEGER;
     const startedAt = new Date();
 
     do {
-      txReceipt = await this.web3.eth.getTransactionReceipt(txHash);
       tries++;
       timedOut = Date.now() >= startedAt.getTime() + timeoutMs;
-    } while (!timedOut && !txReceipt);
+      if (timedOut) {
+        break;
+      }
+
+      txReceipt = await this.web3.eth.getTransactionReceipt(txHash);
+      if (!txReceipt) {
+        continue;
+      }
+
+      const latestBlockNo = await this.web3.eth.getBlockNumber();
+      confirmationCount = latestBlockNo - txReceipt.blockNumber;
+    } while (confirmationCount >= consistencyStrategy.blockConfirmations);
 
     if (!txReceipt) {
       throw new Error(`${fnTag} Timed out ${timeoutMs}ms, polls=${tries}`);
-    } else {
-      return txReceipt;
     }
+    return txReceipt;
   }
 
   public async deployContract(
@@ -471,6 +537,11 @@ export class PluginLedgerConnectorBesu
         from: web3SigningCredential.ethAccount,
         gas: req.gas,
         gasPrice: req.gasPrice,
+      },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NODETXPOOLACK,
+        timeoutMs: req.timeoutMs || 60000,
       },
       web3SigningCredential,
     });

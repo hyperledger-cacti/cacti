@@ -7,6 +7,7 @@ import {
   PluginLedgerConnectorBesu,
   PluginFactoryLedgerConnector,
   Web3SigningCredentialCactusKeychainRef,
+  ReceiptType,
 } from "../../../../../main/typescript/public-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -69,6 +70,7 @@ test(testCase, async (t: Test) => {
   });
   const connector: PluginLedgerConnectorBesu = await factory.create({
     rpcApiHttpHost,
+    logLevel,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
@@ -84,6 +86,11 @@ test(testCase, async (t: Test) => {
       to: testEthAccount.address,
       value: 10e9,
       gas: 1000000,
+    },
+    consistencyStrategy: {
+      blockConfirmations: 0,
+      receiptType: ReceiptType.NODETXPOOLACK,
+      timeoutMs: 60000,
     },
   });
 
@@ -157,6 +164,11 @@ test(testCase, async (t: Test) => {
       },
       transactionConfig: {
         rawTransaction,
+      },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NODETXPOOLACK,
+        timeoutMs: 60000,
       },
     });
 
