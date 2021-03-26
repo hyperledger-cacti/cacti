@@ -8,6 +8,7 @@ import {
   Logger,
   LoggerProvider,
   Checks,
+  Bools,
 } from "@hyperledger/cactus-common";
 
 import { Containers } from "../common/containers";
@@ -42,6 +43,7 @@ export interface ICordaConnectorContainerOptions {
   apiPort?: number;
   logLevel?: LogLevelDesc;
   envVars?: string[];
+  emitContainerLogs?: boolean;
 }
 
 /**
@@ -58,6 +60,7 @@ export class CordaConnectorContainer {
   public readonly imageVersion: string;
   public readonly imageName: string;
   public readonly apiPort: number;
+  public readonly emitContainerLogs: boolean;
   private container: Container | undefined;
   private containerId: string | undefined;
 
@@ -73,6 +76,10 @@ export class CordaConnectorContainer {
     this.imageName = opts.imageName || DEFAULTS.imageName;
 
     this.apiPort = opts.apiPort || DEFAULTS.apiPort;
+
+    this.emitContainerLogs = Bools.isBooleanStrict(opts.emitContainerLogs)
+      ? (opts.emitContainerLogs as boolean)
+      : true;
 
     this.envVars = opts.envVars ? opts.envVars : DEFAULTS.envVars;
     Checks.truthy(Array.isArray(this.envVars), `${fnTag}:envVars not an array`);
@@ -127,6 +134,14 @@ export class CordaConnectorContainer {
       eventEmitter.once("start", async (container: Container) => {
         this.container = container;
         this.containerId = container.id;
+        if (this.emitContainerLogs) {
+          const logOptions = { follow: true, stderr: true, stdout: true };
+          const logStream = await container.logs(logOptions);
+          logStream.on("data", (data: Buffer) => {
+            const fnTag = `[${this.getContainerImageName()}]`;
+            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          });
+        }
         try {
           await Containers.waitForHealthCheck(this.containerId);
           resolve(container);

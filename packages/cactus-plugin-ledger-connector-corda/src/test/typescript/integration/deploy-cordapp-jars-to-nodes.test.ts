@@ -86,33 +86,21 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   const connector = new CordaConnectorContainer({
     logLevel,
     imageName: "hyperledger/cactus-connector-corda-server",
-    imageVersion: "2021-03-16-feat-621",
+    imageVersion: "2021-03-24-feat-620",
+    // imageName: "cccs",
+    // imageVersion: "latest",
     envVars: [envVarSpringAppJson],
   });
   t.ok(CordaConnectorContainer, "CordaConnectorContainer instantiated OK");
 
   test.onFinish(async () => {
     try {
-      const logBuffer = ((await connectorContainer.logs({
-        follow: false,
-        stdout: true,
-        stderr: true,
-      })) as unknown) as Buffer;
-      const logs = logBuffer.toString("utf-8");
-      t.comment(`[CordaConnectorServer] ${logs}`);
+      await connector.stop();
     } finally {
-      try {
-        await connector.stop();
-      } finally {
-        await connector.destroy();
-      }
+      await connector.destroy();
     }
   });
 
-  // FIXME health checks with JMX appear to be working but this wait still seems
-  // to be necessary in order to make it work on the CI server (locally it
-  // works just fine without this as well...)
-  // await new Promise((r) => setTimeout(r, 120000));
   const connectorContainer = await connector.start();
   t.ok(connectorContainer, "CordaConnectorContainer started OK");
 

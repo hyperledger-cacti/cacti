@@ -209,6 +209,16 @@
                         "nullable": false,
                         "minLength": 1,
                         "maxLength": 65535
+                    },
+                    "constructorName": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "This parameter is used to specify that the function used to construct this JvmType is not a constructor function but instead is a factory function. Setting this parameter will cause the plugin to look up methods of the class denoted by fqClassName instead of its constructors.",
+                        "minLength": 1,
+                        "maxLength": 65535
+                    },
+                    "invocationTarget": {
+                        "$ref": "#/components/schemas/JvmObject"
                     }
                 }
             },
@@ -368,8 +378,9 @@
                     "cordappDeploymentConfigs": {
                         "type": "array",
                         "description": "The list of deployment configurations pointing to the nodes where the provided cordapp jar files are to be deployed .",
-                        "minLength": 1,
+                        "minLength": 0,
                         "maxLength": 1024,
+                        "default": [],
                         "items": {
                             "$ref": "#/components/schemas/CordappDeploymentConfig"
                         }

@@ -21,13 +21,10 @@ import net.schmizz.sshj.userauth.password.PasswordUtils
 import net.schmizz.sshj.xfer.InMemorySourceFile
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.api.ApiPluginLedgerConnectorCordaService
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.*
-import org.xeustechnologies.jcl.JarClassLoader
 import java.io.IOException
 import java.io.InputStream
 import java.lang.Exception
-import java.lang.IllegalStateException
 import java.lang.RuntimeException
-import java.lang.reflect.Constructor
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.IllegalArgumentException
@@ -44,6 +41,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
 ) : ApiPluginLedgerConnectorCordaService {
 
     companion object {
+        val logger = loggerFor<ApiPluginLedgerConnectorCordaServiceImpl>()
 
         // FIXME: do not recreate the mapper for every service implementation instance that we create...
         val mapper: ObjectMapper = jacksonObjectMapper()
@@ -53,122 +51,13 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
 
         val writer: ObjectWriter = mapper.writer()
 
-        val jcl: JarClassLoader = JarClassLoader(ApiPluginLedgerConnectorCordaServiceImpl::class.java.classLoader)
-
-        val logger = loggerFor<ApiPluginLedgerConnectorCordaServiceImpl>()
-
-        // If something is missing from here that's because they also missed at in the documentation:
-        // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html
-        val exoticTypes: Map<String, Class<*>> = mapOf(
-
-            "byte" to Byte::class.java,
-            "char" to Char::class.java,
-            "int" to Int::class.java,
-            "short" to Short::class.java,
-            "long" to Long::class.java,
-            "float" to Float::class.java,
-            "double" to Double::class.java,
-            "boolean" to Boolean::class.java,
-
-            "byte[]" to ByteArray::class.java,
-            "char[]" to CharArray::class.java,
-            "int[]" to IntArray::class.java,
-            "short[]" to ShortArray::class.java,
-            "long[]" to LongArray::class.java,
-            "float[]" to FloatArray::class.java,
-            "double[]" to DoubleArray::class.java,
-            "boolean[]" to BooleanArray::class.java
-        )
-    }
-
-    fun getOrInferType(fqClassName: String): Class<*> {
-        Objects.requireNonNull(fqClassName, "fqClassName must not be null for its type to be inferred.")
-
-        return if (exoticTypes.containsKey(fqClassName)) {
-            exoticTypes.getOrElse(
-                fqClassName,
-                { throw IllegalStateException("Could not locate Class<*> for $fqClassName Exotic JVM types map must have been modified on a concurrent threat.") })
-        } else {
-            try {
-                jcl.loadClass(fqClassName, true)
-            } catch (ex: ClassNotFoundException) {
-                Class.forName(fqClassName)
-            }
-        }
-    }
-
-    fun instantiate(jvmObject: JvmObject): Any? {
-        logger.info("Instantiating ... JvmObject={}", jvmObject)
-
-        val clazz = getOrInferType(jvmObject.jvmType.fqClassName)
-
-        when (jvmObject.jvmTypeKind) {
-            JvmTypeKind.REFERENCE -> {
-                if (jvmObject.jvmCtorArgs == null) {
-                    throw IllegalArgumentException("jvmObject.jvmCtorArgs cannot be null when jvmObject.jvmTypeKind == JvmTypeKind.REFERENCE")
-                }
-                val constructorArgs: Array<Any?> = jvmObject.jvmCtorArgs.map { x -> instantiate(x) }.toTypedArray()
-
-                when {
-                    List::class.java.isAssignableFrom(clazz) -> {
-                        return listOf(*constructorArgs)
-                    }
-                    Currency::class.java.isAssignableFrom(clazz) -> {
-                        // FIXME introduce a more dynamic/flexible way of handling classes with no public constructors....
-                        return Currency.getInstance(jvmObject.jvmCtorArgs.first().primitiveValue as String)
-                    }
-                    Array<Any>::class.java.isAssignableFrom(clazz) -> {
-                        // TODO verify that this actually works and also
-                        // if we need it at all since we already have lists covered
-                        return arrayOf(*constructorArgs)
-                    }
-                    else -> {
-                        val constructorArgTypes: List<Class<*>> =
-                            jvmObject.jvmCtorArgs.map { x -> getOrInferType(x.jvmType.fqClassName) }
-                        val constructor: Constructor<*>
-                        try {
-                            constructor = clazz.constructors
-                                .filter { c -> c.parameterCount == constructorArgTypes.size }
-                                .single { c ->
-                                    c.parameterTypes
-                                        .mapIndexed { index, clazz -> clazz.isAssignableFrom(constructorArgTypes[index]) }
-                                        .all { x -> x }
-                                }
-                        } catch (ex: NoSuchElementException) {
-                            val argTypes = jvmObject.jvmCtorArgs.joinToString(",") { x -> x.jvmType.fqClassName }
-                            val className = jvmObject.jvmType.fqClassName
-                            val constructorsAsStrings = clazz.constructors
-                                .mapIndexed { i, c -> "$className->Constructor#${i + 1}(${c.parameterTypes.joinToString { p -> p.name }})" }
-                                .joinToString(" ;; ")
-                            val targetConstructor = "Cannot find matching constructor for ${className}(${argTypes})"
-                            val availableConstructors =
-                                "Searched among the ${clazz.constructors.size} available constructors: $constructorsAsStrings"
-                            throw RuntimeException("$targetConstructor --- $availableConstructors")
-                        }
-
-                        logger.info("Constructor=${constructor}")
-                        constructorArgs.forEachIndexed { index, it -> logger.info("Constructor ARGS: #${index} -> $it") }
-                        val instance = constructor.newInstance(*constructorArgs)
-                        logger.info("Instantiated REFERENCE OK {}", instance)
-                        return instance
-                    }
-                }
-
-            }
-            JvmTypeKind.PRIMITIVE -> {
-                logger.info("Instantiated PRIMITIVE OK {}", jvmObject.primitiveValue)
-                return jvmObject.primitiveValue
-            }
-            else -> {
-                throw IllegalArgumentException("Unknown jvmObject.jvmTypeKind (${jvmObject.jvmTypeKind})")
-            }
-        }
+        val jsonJvmObjectDeserializer = JsonJvmObjectDeserializer()
     }
 
     fun dynamicInvoke(rpc: CordaRPCOps, req: InvokeContractV1Request): InvokeContractV1Response {
         @Suppress("UNCHECKED_CAST")
-        val classFlowLogic = getOrInferType(req.flowFullClassName) as Class<out FlowLogic<*>>
-        val params = req.params.map { p -> instantiate(p) }.toTypedArray()
+        val classFlowLogic = jsonJvmObjectDeserializer.getOrInferType(req.flowFullClassName) as Class<out FlowLogic<*>>
+        val params = req.params.map { p -> jsonJvmObjectDeserializer.instantiate(p) }.toTypedArray()
         logger.info("params={}", params)
 
         val flowHandle = when (req.flowInvocationType) {
@@ -365,7 +254,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
             }
             val deployedJarFileNames = deployContractJarsV1Request.jarFiles.map {
                 val jarFileInputStream = decoder.decode(it.contentBase64).inputStream()
-                jcl.add(jarFileInputStream)
+                jsonJvmObjectDeserializer.jcl.add(jarFileInputStream)
                 logger.info("Added jar to classpath of Corda Connector Plugin Server: ${it.filename}")
                 it.filename
             }

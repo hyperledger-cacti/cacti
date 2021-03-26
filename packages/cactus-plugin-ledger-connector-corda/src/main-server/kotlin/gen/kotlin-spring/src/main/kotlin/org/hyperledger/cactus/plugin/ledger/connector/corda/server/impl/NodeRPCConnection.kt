@@ -69,7 +69,24 @@ open class NodeRPCConnection(
             maxAttempts = 30
         )
 
-        rpcConnection = rpcClient.start(username, password, gracefulReconnect = gracefulReconnect)
+        // this workaround here is due to the Graceful Reconnect above not actually doing what it's supposed to
+        // either because it has a bug or because I misread the documentation.
+        // So this manual retry on top of the graceful reconnects is to make it resilient
+        var numberOfTriesRemaining = 5
+        while (numberOfTriesRemaining > 0) {
+            numberOfTriesRemaining--
+            try {
+                logger.info("Trying to connect to RPC numberOfTriesRemaining=$numberOfTriesRemaining")
+                rpcConnection = rpcClient.start(username, password, gracefulReconnect = gracefulReconnect)
+                break;
+            } catch (ex: net.corda.client.rpc.RPCException) {
+                logger.info("ManualReconnect:numberOfTriesRemaining=$numberOfTriesRemaining")
+                if (numberOfTriesRemaining <= 0) {
+                    throw ex
+                }
+            }
+        }
+
         proxy = rpcConnection.proxy
     }
 

@@ -32,7 +32,7 @@ test("BEFORE " + testCase, async (t: Test) => {
 test(testCase, async (t: Test) => {
   const ledger = new CordaTestLedger({
     imageName: "hyperledger/cactus-corda-4-6-all-in-one-obligation",
-    imageVersion: "2021-03-04-ac0d32a",
+    imageVersion: "2021-03-19-feat-686",
     logLevel,
   });
   t.ok(ledger, "CordaTestLedger instantaited OK");
@@ -52,8 +52,11 @@ test(testCase, async (t: Test) => {
   );
   t.comment(`Fetched ${jarFiles.length} cordapp jars OK`);
 
-  const internalIp = await internalIpV4();
+  const internalIpOrUndefined = await internalIpV4();
+  t.ok(internalIpOrUndefined, "Determined LAN IPv4 address successfully OK");
+  const internalIp = internalIpOrUndefined as string;
   t.comment(`Internal IP (based on default gateway): ${internalIp}`);
+
   const springAppConfig = {
     logging: {
       level: {
@@ -76,33 +79,21 @@ test(testCase, async (t: Test) => {
   const connector = new CordaConnectorContainer({
     logLevel,
     imageName: "hyperledger/cactus-connector-corda-server",
-    imageVersion: "2021-03-10-feat-623",
+    imageVersion: "2021-03-24-feat-620",
+    // imageName: "cccs",
+    // imageVersion: "latest",
     envVars: [envVarSpringAppJson],
   });
   t.ok(CordaConnectorContainer, "CordaConnectorContainer instantiated OK");
 
   test.onFinish(async () => {
     try {
-      const logBuffer = ((await connectorContainer.logs({
-        follow: false,
-        stdout: true,
-        stderr: true,
-      })) as unknown) as Buffer;
-      const logs = logBuffer.toString("utf-8");
-      t.comment(`[CordaConnectorServer] ${logs}`);
+      await connector.stop();
     } finally {
-      try {
-        await connector.stop();
-      } finally {
-        await connector.destroy();
-      }
+      await connector.destroy();
     }
   });
 
-  // FIXME health checks with JMX appear to be working but this wait still seems
-  // to be necessary in order to make it work on the CI server (locally it
-  // works just fine without this as well...)
-  // await new Promise((r) => setTimeout(r, 120000));
   const connectorContainer = await connector.start();
   t.ok(connectorContainer, "CordaConnectorContainer started OK");
 
@@ -187,6 +178,7 @@ test(testCase, async (t: Test) => {
                 jvmTypeKind: JvmTypeKind.REFERENCE,
                 jvmType: {
                   fqClassName: "java.util.Currency",
+                  constructorName: "getInstance",
                 },
 
                 jvmCtorArgs: [
@@ -359,6 +351,7 @@ test(testCase, async (t: Test) => {
                 jvmTypeKind: JvmTypeKind.REFERENCE,
                 jvmType: {
                   fqClassName: "java.util.Currency",
+                  constructorName: "getInstance",
                 },
 
                 jvmCtorArgs: [
@@ -398,44 +391,6 @@ test(testCase, async (t: Test) => {
   const res = await apiClient.invokeContractV1(req);
   t.ok(res, "InvokeContractV1Request truthy OK");
   t.equal(res.status, 200, "InvokeContractV1Request status code === 200 OK");
-
-  // const gradleProcess = spawn("./gradlew", ["test", "--stacktrace"], {
-  //   shell: true,
-  //   detached: true,
-  //   cwd:
-  //     "/home/peter/a/blockchain/cactus-origin/packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/",
-  //   env: {
-  //     SPRING_APPLICATION_JSON: springApplicationJson,
-  //   },
-  // });
-
-  // const output: string[] = [];
-  // gradleProcess.stdout.on("data", (data: Buffer) => {
-  //   const line = data.toString("utf-8");
-  //   t.comment(`[Gradle] stdout: ${line}`);
-  //   output.push(line);
-  // });
-
-  // gradleProcess.stderr.on("data", (data: Buffer) => {
-  //   const line = data.toString("utf-8");
-  //   t.comment(`[Gradle] stderr: ${line}`);
-  //   output.push(line);
-  // });
-
-  // const exitCode = await new Promise((resolve, reject) => {
-  //   const fiveMinMs = 5 * 60 * 1000;
-  //   const timeoutError = new Error("JVM Gradle tests timed out");
-  //   const timer = setTimeout(() => reject(timeoutError), fiveMinMs);
-  //   gradleProcess.once("close", (code: number) => {
-  //     clearInterval(timer);
-  //     t.comment(`[Gradle] child process exited with code ${code}`);
-  //     resolve(code);
-  //   });
-  // });
-  // t.strictEquals(exitCode, 0, "JVM Gradle exit code === 0 OK");
-
-  // const jvmTestOk = output.some((it) => it.includes("BUILD SUCCESSFUL in"));
-  // t.true(jvmTestOk, "JVM gradle tests appear to be successfuly OK");
 
   t.end();
 });
