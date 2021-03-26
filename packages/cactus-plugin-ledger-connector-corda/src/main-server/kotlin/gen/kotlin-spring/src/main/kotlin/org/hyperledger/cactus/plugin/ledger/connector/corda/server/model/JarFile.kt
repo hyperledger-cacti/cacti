@@ -14,6 +14,7 @@ import javax.validation.Valid
 /**
  * 
  * @param filename 
+ * @param hasDbMigrations Indicates whether the cordapp jar in question contains any embedded migrations that Cactus can/should execute between copying the jar into the cordapp directory and starting the node back up.
  * @param contentBase64 
  */
 data class JarFile(
@@ -21,6 +22,9 @@ data class JarFile(
     @get:NotNull  
     @get:Size(min=1,max=255)
     @field:JsonProperty("filename") val filename: kotlin.String,
+
+    @get:NotNull  
+    @field:JsonProperty("hasDbMigrations") val hasDbMigrations: kotlin.Boolean,
 
     @get:NotNull  
     @get:Size(min=1,max=1073741824)

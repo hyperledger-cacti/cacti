@@ -12,7 +12,9 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 
 import {
+  CordappDeploymentConfig,
   DefaultApi as CordaApi,
+  DeployContractJarsV1Request,
   FlowInvocationType,
   InvokeContractV1Request,
   JvmTypeKind,
@@ -56,7 +58,7 @@ test(testCase, async (t: Test) => {
     logging: {
       level: {
         root: "INFO",
-        "org.hyperledger.cactus.plugin.ledger.connector.corda.server": "DEBUG",
+        "org.hyperledger.cactus": "DEBUG",
       },
     },
     cactus: {
@@ -100,7 +102,7 @@ test(testCase, async (t: Test) => {
   // FIXME health checks with JMX appear to be working but this wait still seems
   // to be necessary in order to make it work on the CI server (locally it
   // works just fine without this as well...)
-  await new Promise((r) => setTimeout(r, 120000));
+  // await new Promise((r) => setTimeout(r, 120000));
   const connectorContainer = await connector.start();
   t.ok(connectorContainer, "CordaConnectorContainer started OK");
 
@@ -129,7 +131,12 @@ test(testCase, async (t: Test) => {
 
   t.comment(`apiClient.diagnoseNodeV1() => ${JSON.stringify(diagRes.data)}`);
 
-  const depRes = await apiClient.deployContractJarsV1({ jarFiles });
+  const cordappDeploymentConfigs: CordappDeploymentConfig[] = [];
+  const depReq: DeployContractJarsV1Request = {
+    jarFiles,
+    cordappDeploymentConfigs,
+  };
+  const depRes = await apiClient.deployContractJarsV1(depReq);
   t.ok(depRes, "Jar deployment response truthy OK");
   t.equal(depRes.status, 200, "Jar deployment status code === 200 OK");
   t.ok(depRes.data, "Jar deployment response body truthy OK");
@@ -419,7 +426,7 @@ test(testCase, async (t: Test) => {
   //   const fiveMinMs = 5 * 60 * 1000;
   //   const timeoutError = new Error("JVM Gradle tests timed out");
   //   const timer = setTimeout(() => reject(timeoutError), fiveMinMs);
-  //   gradleProcess.once("close", (code) => {
+  //   gradleProcess.once("close", (code: number) => {
   //     clearInterval(timer);
   //     t.comment(`[Gradle] child process exited with code ${code}`);
   //     resolve(code);

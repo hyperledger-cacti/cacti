@@ -22,6 +22,8 @@ export {
   JOI_SCHEMA as CORDA_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
 } from "./corda/corda-test-ledger";
 
+export { ICordappJarFile } from "./corda/cordapp-jar-file";
+
 export * from "./quorum/i-quorum-genesis-options";
 export {
   Containers,

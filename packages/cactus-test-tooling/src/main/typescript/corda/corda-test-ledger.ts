@@ -15,11 +15,12 @@ import {
   Checks,
   Bools,
 } from "@hyperledger/cactus-common";
-import { Base64File } from "../common/base64-file";
+
 import {
   SampleCordappEnum,
   SAMPLE_CORDAPP_ROOT_DIRS,
 } from "./sample-cordapp-enum";
+import { ICordappJarFile } from "./cordapp-jar-file";
 
 /*
  * Contains options for Corda container
@@ -247,14 +248,14 @@ export class CordaTestLedger implements ITestLedger {
 
   public async pullCordappJars(
     sampleCordapp: SampleCordappEnum,
-  ): Promise<Base64File[]> {
+  ): Promise<ICordappJarFile[]> {
     const fnTag = `${this.className}.pullCordappJars()`;
     Checks.truthy(sampleCordapp, `${fnTag}:sampleCordapp`);
     await this.buildCordapp(sampleCordapp);
     const container = this.getContainer();
     const cordappRootDir = SAMPLE_CORDAPP_ROOT_DIRS[sampleCordapp];
 
-    const jars: Base64File[] = [];
+    const jars: ICordappJarFile[] = [];
 
     {
       const jarRelativePath = "contracts/build/libs/contracts-1.0.jar";
@@ -264,6 +265,7 @@ export class CordaTestLedger implements ITestLedger {
       jars.push({
         contentBase64: jar.toString("base64"),
         filename: `${sampleCordapp}_contracts-1.0.jar`,
+        hasDbMigrations: false,
       });
       this.log.debug(`Pulled jar (%o bytes) %o`, jarPath, jar.length);
     }
@@ -276,6 +278,7 @@ export class CordaTestLedger implements ITestLedger {
       jars.push({
         contentBase64: jar.toString("base64"),
         filename: `${sampleCordapp}_workflows-1.0.jar`,
+        hasDbMigrations: true,
       });
       this.log.debug(`Pulled jar (%o bytes) %o`, jarPath, jar.length);
     }
@@ -298,7 +301,7 @@ export class CordaTestLedger implements ITestLedger {
     const cwd = SAMPLE_CORDAPP_ROOT_DIRS[sampleCordapp];
 
     try {
-      const cmd = `./gradlew build`;
+      const cmd = `./gradlew build -x test`;
       this.log.debug(`${fnTag}:CMD=%o, CWD=%o`, cmd, cwd);
       const response = await ssh.execCommand(cmd, { cwd });
       const { code, signal, stderr, stdout } = response;

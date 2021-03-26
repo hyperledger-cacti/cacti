@@ -172,7 +172,8 @@
                 "type": "object",
                 "required": [
                     "filename",
-                    "contentBase64"
+                    "contentBase64",
+                    "hasDbMigrations"
                 ],
                 "additionalProperties": true,
                 "properties": {
@@ -181,6 +182,11 @@
                         "nullable": false,
                         "minLength": 1,
                         "maxLength": 255
+                    },
+                    "hasDbMigrations": {
+                        "description": "Indicates whether the cordapp jar in question contains any embedded migrations that Cactus can/should execute between copying the jar into the cordapp directory and starting the node back up.",
+                        "type": "boolean",
+                        "nullable": false
                     },
                     "contentBase64": {
                         "type": "string",
@@ -244,12 +250,130 @@
                     }
                 }
             },
+            "CordappDeploymentConfig": {
+                "type": "object",
+                "required": ["sshCredentials", "rpcCredentials", "cordappDir", "cordaNodeStartCmd", "cordaJarPath", "nodeBaseDirPath"],
+                "properties": {
+                    "sshCredentials": {
+                        "$ref": "#/components/schemas/CordaNodeSshCredentials"
+                    },
+                    "rpcCredentials": {
+                        "$ref": "#/components/schemas/CordaRpcCredentials"
+                    },
+                    "cordaNodeStartCmd": {
+                        "type": "string",
+                        "description": "The shell command to execute in order to start back up a Corda node after having placed new jars in the cordapp directory of said node.",
+                        "example": "./build/nodes/runNodes",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false
+                    },
+                    "cordappDir": {
+                        "type": "string",
+                        "description": "The absolute file system path where the Corda Node is expecting deployed Cordapp jar files to be placed.",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "cordaJarPath": {
+                        "type": "string",
+                        "description": "The absolute file system path where the corda.jar file of the node can be found. This is used to execute database schema migrations where applicable (H2 database in use in development environments).",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "nodeBaseDirPath": {
+                        "type": "string",
+                        "description": "The absolute file system path where the base directory of the Corda node can be found. This is used to pass in to corda.jar when being invoked for certain tasks such as executing database schema migrations for a deployed contract.",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    }
+                }
+            },
+            "CordaRpcCredentials": {
+                "type": "object",
+                "required": ["hostname", "port", "username", "password"],
+                "properties": {
+                    "hostname": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false
+                    },
+                    "port": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 65535,
+                        "nullable": false
+                    },
+                    "username": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false
+                    }
+                }
+            },
+            "CordaNodeSshCredentials": {
+                "type": "object",
+                "required": ["username", "password", "hostname", "port", "hostKeyEntry"],
+                "properties": {
+                    "hostKeyEntry": {
+                        "type": "string",
+                        "example": "localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false
+                    },
+                    "username": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32,
+                        "nullable": false
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "nullable": false
+                    },
+                    "hostname": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "nullable": false
+                    },
+                    "port": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 65535,
+                        "nullable": false
+                    }
+                }
+            },
             "DeployContractJarsV1Request": {
                 "type": "object",
                 "required": [
-                    "jarFiles"
+                    "jarFiles",
+                    "cordappDeploymentConfigs"
                 ],
                 "properties": {
+                    "cordappDeploymentConfigs": {
+                        "type": "array",
+                        "description": "The list of deployment configurations pointing to the nodes where the provided cordapp jar files are to be deployed .",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "items": {
+                            "$ref": "#/components/schemas/CordappDeploymentConfig"
+                        }
+                    },
                     "jarFiles": {
                         "type": "array",
                         "nullable": false,

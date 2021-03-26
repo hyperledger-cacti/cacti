@@ -2,6 +2,7 @@ package org.hyperledger.cactus.plugin.ledger.connector.corda.server.model
 
 import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.CordappDeploymentConfig
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.JarFile
 import javax.validation.constraints.DecimalMax
 import javax.validation.constraints.DecimalMin
@@ -14,9 +15,15 @@ import javax.validation.Valid
 
 /**
  * 
+ * @param cordappDeploymentConfigs The list of deployment configurations pointing to the nodes where the provided cordapp jar files are to be deployed .
  * @param jarFiles 
  */
 data class DeployContractJarsV1Request(
+
+    @get:NotNull  
+    @field:Valid
+    @get:Size(min=1,max=1024)
+    @field:JsonProperty("cordappDeploymentConfigs") val cordappDeploymentConfigs: kotlin.collections.List<CordappDeploymentConfig>,
 
     @get:NotNull  
     @field:Valid
