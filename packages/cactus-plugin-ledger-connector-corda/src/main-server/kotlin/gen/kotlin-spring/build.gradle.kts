@@ -62,6 +62,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.12.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.1")
 
+    implementation("com.hierynomus:sshj:0.31.0")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")

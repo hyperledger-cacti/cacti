@@ -22,6 +22,74 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
+ * @interface CordaNodeSshCredentials
+ */
+export interface CordaNodeSshCredentials {
+    /**
+     * 
+     * @type {string}
+     * @memberof CordaNodeSshCredentials
+     */
+    hostKeyEntry: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CordaNodeSshCredentials
+     */
+    username: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CordaNodeSshCredentials
+     */
+    password: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CordaNodeSshCredentials
+     */
+    hostname: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CordaNodeSshCredentials
+     */
+    port: number;
+}
+/**
+ * 
+ * @export
+ * @interface CordaRpcCredentials
+ */
+export interface CordaRpcCredentials {
+    /**
+     * 
+     * @type {string}
+     * @memberof CordaRpcCredentials
+     */
+    hostname: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CordaRpcCredentials
+     */
+    port: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CordaRpcCredentials
+     */
+    username: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CordaRpcCredentials
+     */
+    password: string;
+}
+/**
+ * 
+ * @export
  * @interface CordaX500Name
  */
 export interface CordaX500Name {
@@ -67,6 +135,49 @@ export interface CordaX500Name {
      * @memberof CordaX500Name
      */
     x500Principal: X500Principal;
+}
+/**
+ * 
+ * @export
+ * @interface CordappDeploymentConfig
+ */
+export interface CordappDeploymentConfig {
+    /**
+     * 
+     * @type {CordaNodeSshCredentials}
+     * @memberof CordappDeploymentConfig
+     */
+    sshCredentials: CordaNodeSshCredentials;
+    /**
+     * 
+     * @type {CordaRpcCredentials}
+     * @memberof CordappDeploymentConfig
+     */
+    rpcCredentials: CordaRpcCredentials;
+    /**
+     * The shell command to execute in order to start back up a Corda node after having placed new jars in the cordapp directory of said node.
+     * @type {string}
+     * @memberof CordappDeploymentConfig
+     */
+    cordaNodeStartCmd: string;
+    /**
+     * The absolute file system path where the Corda Node is expecting deployed Cordapp jar files to be placed.
+     * @type {string}
+     * @memberof CordappDeploymentConfig
+     */
+    cordappDir: string;
+    /**
+     * The absolute file system path where the corda.jar file of the node can be found. This is used to execute database schema migrations where applicable (H2 database in use in development environments).
+     * @type {string}
+     * @memberof CordappDeploymentConfig
+     */
+    cordaJarPath: string;
+    /**
+     * The absolute file system path where the base directory of the Corda node can be found. This is used to pass in to corda.jar when being invoked for certain tasks such as executing database schema migrations for a deployed contract.
+     * @type {string}
+     * @memberof CordappDeploymentConfig
+     */
+    nodeBaseDirPath: string;
 }
 /**
  * A CordappInfo describes a single CorDapp currently installed on the node
@@ -161,6 +272,12 @@ export interface DeployContractJarsSuccessV1Response {
  * @interface DeployContractJarsV1Request
  */
 export interface DeployContractJarsV1Request {
+    /**
+     * The list of deployment configurations pointing to the nodes where the provided cordapp jar files are to be deployed .
+     * @type {Array<CordappDeploymentConfig>}
+     * @memberof DeployContractJarsV1Request
+     */
+    cordappDeploymentConfigs: Array<CordappDeploymentConfig>;
     /**
      * 
      * @type {Array<JarFile>}
@@ -274,6 +391,12 @@ export interface JarFile {
      * @memberof JarFile
      */
     filename: string;
+    /**
+     * Indicates whether the cordapp jar in question contains any embedded migrations that Cactus can/should execute between copying the jar into the cordapp directory and starting the node back up.
+     * @type {boolean}
+     * @memberof JarFile
+     */
+    hasDbMigrations: boolean;
     /**
      * 
      * @type {string}

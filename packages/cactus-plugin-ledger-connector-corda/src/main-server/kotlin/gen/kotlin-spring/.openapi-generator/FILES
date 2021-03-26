@@ -4,7 +4,10 @@ settings.gradle
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiPluginLedgerConnectorCorda.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiPluginLedgerConnectorCordaService.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiUtil.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordaNodeSshCredentials.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordaRpcCredentials.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordaX500Name.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordappDeploymentConfig.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordappInfo.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/DeployContractJarsBadRequestV1Response.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/DeployContractJarsSuccessV1Response.kt
