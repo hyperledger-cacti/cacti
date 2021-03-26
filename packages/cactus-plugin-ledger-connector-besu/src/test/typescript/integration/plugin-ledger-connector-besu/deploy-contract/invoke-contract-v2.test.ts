@@ -8,6 +8,7 @@ import {
   PluginLedgerConnectorBesu,
   PluginFactoryLedgerConnector,
   Web3SigningCredentialCactusKeychainRef,
+  ReceiptType,
 } from "../../../../../main/typescript/public-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
@@ -74,6 +75,10 @@ test("deploys contract via .json file", async (t: Test) => {
       ethAccount: firstHighNetWorthAccount,
       secret: besuKeyPair.privateKey,
       type: Web3SigningCredentialType.PRIVATEKEYHEX,
+    },
+    consistencyStrategy: {
+      blockConfirmations: 0,
+      receiptType: ReceiptType.NODETXPOOLACK,
     },
     transactionConfig: {
       from: firstHighNetWorthAccount,
@@ -149,6 +154,10 @@ test("deploys contract via .json file", async (t: Test) => {
     await connector.transact({
       web3SigningCredential: {
         type: Web3SigningCredentialType.NONE,
+      },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NODETXPOOLACK,
       },
       transactionConfig: {
         rawTransaction,

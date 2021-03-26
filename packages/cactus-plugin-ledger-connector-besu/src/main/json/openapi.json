@@ -31,6 +31,33 @@
     ],
     "components": {
         "schemas": {
+            "ReceiptType": {
+                "description": "Enumerates the possible types of receipts that can be waited for by someone or something that has requested the execution of a transaction on a ledger.",
+                "type": "string",
+                "enum": [
+                    "NODE_TX_POOL_ACK", 
+                    "LEDGER_BLOCK_ACK"
+                ]
+            },
+            "ConsistencyStrategy": {
+                "type": "object",
+                "required": ["receiptType", "blockConfirmations"],
+                "properties": {
+                    "receiptType": {
+                        "$ref": "#/components/schemas/ReceiptType"
+                    },
+                    "timeoutMs": {
+                        "type": "integer",
+                        "description": "The amount of milliseconds to wait for the receipt to arrive to the connector. Defaults to 0 which means to wait for an unlimited amount of time. Note that this wait may be interrupted still by other parts of the infrastructure such as load balancers cutting of HTTP requests after some time even if they are the type that is supposed to be kept alive. The question of re-entrancy is a broader topic not in scope to discuss here, but it is important to mention it.",
+                        "minimum": 0
+                    },
+                    "blockConfirmations": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "description": "The number of blocks to wait to be confirmed in addition to the block containing the transaction in question. Note that if the receipt type is set to only wait for node transaction pool ACK and this parameter is set to anything, but zero then the API will not accept the request due to conflicting parameters."
+                    }
+                }
+            },
             "Web3SigningCredential": {
                 "type": "object",
                 "required": [
@@ -343,7 +370,8 @@
                 "type": "object",
                 "required": [
                     "web3SigningCredential",
-                    "transactionConfig"
+                    "transactionConfig",
+                    "consistencyStrategy"
                 ],
                 "properties": {
                     "web3SigningCredential": {
@@ -354,12 +382,8 @@
                         "$ref": "#/components/schemas/BesuTransactionConfig",
                         "nullable": false
                     },
-                    "timeoutMs": {
-                        "type": "number",
-                        "description": "The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing.",
-                        "minimum": 0,
-                        "default": 60000,
-                        "nullable": false
+                    "consistencyStrategy": {
+                        "$ref": "#/components/schemas/ConsistencyStrategy"
                     }
                 }
             },
