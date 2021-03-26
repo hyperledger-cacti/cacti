@@ -22,7 +22,7 @@ data class DeployContractJarsV1Request(
 
     @get:NotNull  
     @field:Valid
-    @get:Size(min=1,max=1024)
+    @get:Size(min=0,max=1024)
     @field:JsonProperty("cordappDeploymentConfigs") val cordappDeploymentConfigs: kotlin.collections.List<CordappDeploymentConfig>,
 
     @get:NotNull  
