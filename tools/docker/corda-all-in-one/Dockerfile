@@ -96,8 +96,8 @@ EXPOSE 10014
 # Corda IOU Web GUIs for Node A,B,C
 # EXPOSE 10009 10012 10015
 
-# Jolokia
-# EXPOSE 7005 7006 7007 7008
+# Jolokia for Party A,B,C and Notary
+EXPOSE 7005 7006 7007 7008
 
 # P2P messaging (localhost bound), RPC, admin RPC
 # EXPOSE 10002 10003 10103
@@ -106,10 +106,13 @@ EXPOSE 10014
 # EXPOSE 10013 10014 10114
 
 COPY supervisord.conf /etc/supervisord.conf
-COPY run-corda-network.sh /
 COPY run-party-a-server.sh /
 COPY run-party-b-server.sh /
 COPY run-party-c-server.sh /
+COPY run-party-a-node.sh /
+COPY run-party-b-node.sh /
+COPY run-party-c-node.sh /
+COPY run-notary-node.sh /
 COPY healthcheck.sh /
 
 # By default we only run the absolute minimum which is a single party's node.
@@ -125,6 +128,8 @@ ENV PARTY_B_WEB_SRV_ENABLED="false"
 
 ENV PARTY_C_NODE_ENABLED="true"
 ENV PARTY_C_WEB_SRV_ENABLED="false"
+
+ENV NOTARY_NODE_ENABLED="true"
 
 # Extend the parent image's entrypoint
 # https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script
