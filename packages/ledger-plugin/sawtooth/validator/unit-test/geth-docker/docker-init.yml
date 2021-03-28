@@ -1,0 +1,44 @@
+# Copyright 2021 Hyperledger Cactus Contributors
+# SPDX-License-Identifier: Apache-2.0
+version: '3'
+services:
+  # ec1
+  make-account-ec1:
+    container_name: make-account-ec1
+    image: ethereum/client-go:v1.8.27
+    tty: true
+    volumes:
+      - "$PWD/data-ec1:/root/data"
+    command: >
+      --datadir "/root/data"
+      account new --password /dev/null > /root/data/log.txt
+  init-chain-ec1:
+    container_name: init-chain-ec1
+    image: ethereum/client-go:v1.8.27
+    tty: true
+    volumes:
+      - "$PWD/data-ec1:/root/data"
+      - "$PWD/genesis/genesis-ec1.json:/root/data/genesis.json"
+    command: >
+      --datadir "/root/data"
+      init /root/data/genesis.json
+  # ec2
+  make-account-ec2:
+    container_name: make-account-ec2
+    image: ethereum/client-go:v1.8.27
+    tty: true
+    volumes:
+      - "$PWD/data-ec2:/root/data"
+    command: >
+      --datadir "/root/data"
+      account new --password /dev/null > /root/data/log.txt
+  init-chain-ec2:
+    container_name: init-chain-ec2
+    image: ethereum/client-go:v1.8.27
+    tty: true
+    volumes:
+      - "$PWD/data-ec2:/root/data"
+      - "$PWD/genesis/genesis-ec2.json:/root/data/genesis.json"
+    command: >
+      --datadir "/root/data"
+      init /root/data/genesis.json

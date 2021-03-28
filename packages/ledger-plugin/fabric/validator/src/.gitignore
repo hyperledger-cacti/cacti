@@ -6,3 +6,4 @@ core/npm-debug.log
 dependent/wallet/
 core/wallet/
 wallet/
+dependent/ValidatorAuthentication.ts

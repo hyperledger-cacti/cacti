@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  * 
  * ServerPlugin_template.js
@@ -27,36 +27,36 @@ var SplugUtil = require('./PluginUtil.js');
  * Class definition for server plugins
  */
 var ServerPlugin = class {
-	/*
-	 * constructors
-	 */
-	constructor(){
-		// Define dependent specific settings
-	}
+    /*
+     * constructors
+     */
+    constructor(){
+        // Define dependent specific settings
+    }
 
-	/*
-	 * isExistFunction
-	 *
-	 * @param {String} funcName: The function name to check.
-	 *
-	 * @return {Boolean} true: Yes./false: does not exist.
-	 *
-	 * @desc Return if end-chain specific funtion is implemented
-	 *       Scope of this function is in this class
-	 *       Functions that should not be called directly should be implemented outside this class like utilities.
-	 */
-	isExistFunction(funcName) {
-		if(this[funcName]!=undefined) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    /*
+     * isExistFunction
+     *
+     * @param {String} funcName: The function name to check.
+     *
+     * @return {Boolean} true: Yes./false: does not exist.
+     *
+     * @desc Return if end-chain specific funtion is implemented
+     *       Scope of this function is in this class
+     *       Functions that should not be called directly should be implemented outside this class like utilities.
+     */
+    isExistFunction(funcName) {
+        if(this[funcName]!=undefined) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	// Define an arbitrary function and implement it according to specifications of end-chains
+    // Define an arbitrary function and implement it according to specifications of end-chains
 
 
-}	/* class */
+}   /* class */
 
 module.exports = ServerPlugin;
 

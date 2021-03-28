@@ -2,7 +2,7 @@
     "blpRegistry": [
         {
             "businessLogicID": "j71S9gLN",
-            "validatorID": ["vIdAcnCF"]
+            "validatorID": ["vIdO32CF"]
         }
     ],
     "logLevel": "debug",
@@ -12,8 +12,8 @@
     },
     "appRouters": [
         {
-            "path": "/api/v1/bl/run-transaction/",
-            "routerJs": "../../examples/run-transaction/run-transaction.js"
+            "path": "/api/v1/bl/test-run-transaction/",
+            "routerJs": "../../examples/test-run-transaction/test-run-transaction.js"
         }
     ]
 }

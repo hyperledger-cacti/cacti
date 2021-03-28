@@ -14,7 +14,7 @@ import { transactionManagement } from '../../packages/routing-interface/routes/i
 import { verifierFactory } from '../../packages/routing-interface/routes/index';
 import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
 //import { makeRawTransaction } from './TransactionEthereum'
-//import { LedgerEvent } from '../../packages/ledger-plugin/LedgerPlugin';
+import { LedgerEvent } from '../../packages/ledger-plugin/LedgerPlugin';
 import { json2str } from '../../packages/ledger-plugin/DriverCommon'
 
 const fs = require('fs');
@@ -65,12 +65,16 @@ export class BusinessLogicRunTransaction extends BusinessLogicBase {
         logger.debug("called execTransaction()");
 
         const useValidator = JSON.parse(transactionManagement.getValidatorToUse(tradeInfo.businessLogicID));
+        
         // TODO: Temporarily specify no monitoring required (# 3rd parameter = false)
         const verifier = verifierFactory.getVerifier(useValidator['validatorID'][0], {}, false);
         logger.debug("getVerifier");
         
+        // TODO: for Temporarily specify no monitoring required (# 3rd parameter = false)
+        verifier.setEventListener(transactionManagement);
+        
         const contract = {};
-        const method = {command: "run-transaction"};
+        const method = {command: "test-run-transaction"};
         const args = {"args": {
             "keychainId": requestInfo.keychainId,
             "keychainRef": requestInfo.keychainRef,
@@ -80,8 +84,43 @@ export class BusinessLogicRunTransaction extends BusinessLogicBase {
             "functionArgs": requestInfo.functionArgs
           }};
 
+        logger.debug(`##before call verifier.requestLedgerOperationHttp()`);
         verifier.requestLedgerOperationHttp(contract, method, args);
+        logger.debug(`##after call verifier.requestLedgerOperationHttp()`);
 
+    }
+
+
+    onEvent(ledgerEvent: LedgerEvent, targetIndex: number): void {
+        logger.debug(`##in BLP:onEvent()`);
+        logger.debug(`##onEvent(): ${json2str(ledgerEvent)}`);
+    }
+
+
+    getEventDataNum(ledgerEvent: LedgerEvent): number {
+        // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
+        // TODO:
+        logger.debug(`##in getEventDataNum(), ledgerEvent: ${JSON.stringify(ledgerEvent)}`);
+        const retEventNum = ledgerEvent.data['blockData'].length;
+        logger.debug(`##retEventNum: ${retEventNum}`);
+        return retEventNum;
+    }
+
+
+    getTxIDFromEvent(ledgerEvent: LedgerEvent, targetIndex: number): string | null {
+        // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
+        // TODO:
+        logger.debug(`##in getTxIDFromEvent(), ledgerEvent: ${JSON.stringify(ledgerEvent)}`);
+
+        const txId = ledgerEvent.data['txId'];
+
+        if (typeof txId !== 'string') {
+            logger.warn(`#getTxIDFromEvent(): skip(invalid block, not found txId.), event: ${json2str(ledgerEvent)}`);
+            return null;
+        }
+
+        logger.debug(`###getTxIDFromEvent(): txId: ${txId}`);
+        return txId;
     }
 
 

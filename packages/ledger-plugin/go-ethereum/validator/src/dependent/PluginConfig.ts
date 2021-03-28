@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  * 
  * PluginConfig.js
@@ -12,7 +12,7 @@
  */
 
 export const SplugConfig = {
-	// URL to operate and monitor
-	//"provider" : 'http://geth1:8545'
-	"provider" : 'http://localhost:8545'
+    // URL to operate and monitor
+    //"provider" : 'http://geth1:8545'
+    "provider" : 'http://localhost:8545'
 };

@@ -1,5 +1,5 @@
 {
-  "name": "run-transaction",
+  "name": "test-run-transaction",
   "private": true,
   "scripts": {
     "start": "node ../../dist/packages/routing-interface/www.js",
@@ -10,7 +10,7 @@
     "copy-static-assets": "ts-node copyStaticAssets.ts",
     "copy-blp-config": "ts-node copyBLPConfig.ts",
     "replace-blp-config-path": "ts-node replaceBLPConfigPath.ts",
-    "init-run-transaction": "ln -s ../examples/run-transaction/node_modules ../../dist/node_modules"
+    "init-test-run-transaction": "ln -s ../examples/test-run-transaction/node_modules ../../dist/node_modules"
   },
   "dependencies": {
     "@types/node": "^14.0.24",
