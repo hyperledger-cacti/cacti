@@ -1,6 +1,6 @@
-# run-transaction
+# test-run-transaction
 
-A proto-code of communication feature to http-type Validator for Verifier
+A proto-code of communication feature to http-typed Validator for Verifier
 
 ## Setup for communication app with http-server
 

@@ -257,7 +257,7 @@ export class VerifierBase implements Verifier {
     execTemplateFunctionAsync(functionName: string, contract: object, template: string, args: object): void {
         logger.debug(`##in execTemplateFunctionAsync, functionName: ${functionName}, contract = ${JSON.stringify(contract)}, template = ${template}, args = ${JSON.stringify(args)}, `);
         
-        // TODO: 未実装
+        // TODO: Unimplemented.
         for (const rec of validatorRregistryConf[functionName]) {
             logger.debug(`##rec.template: ${rec["template"]}`);
             if (template === rec["template"]) {
@@ -298,14 +298,32 @@ export class VerifierBase implements Verifier {
         return new Promise((resolve, reject) => {
             try {
                 logger.debug(`##in requestLedgerOperationHttp, contract = ${JSON.stringify(contract)}, method = ${JSON.stringify(method)}, args = ${JSON.stringify(args)}`);
+                const eventListener = this.eventListener;
+                const validatorID = this.validatorID;
 
                 const httpReq = new XMLHttpRequest();
                 httpReq.onload = function() {
-                    // TODO: responding in JSON format?
-                    logger.debug(`responseObj = ${httpReq.responseText}`);
-                    const responseObj = JSON.parse(httpReq.responseText);
-                    logger.debug(`responseObj = ${JSON.stringify(responseObj)}`);
-                    resolve(responseObj);
+                    try {
+                        // TODO: responding in JSON format?
+                        logger.debug(`responseObj = ${httpReq.responseText}`);
+                        const responseObj = JSON.parse(httpReq.responseText);
+                        logger.debug(`responseObj = ${JSON.stringify(responseObj)}`);
+
+                        logger.debug(`##make event`);
+                        const event = VerifierBase.makeOpenApiEvent(responseObj, validatorID);
+                        logger.debug(`##event: ${JSON.stringify(event)}`);
+                        logger.debug(`##eventListener: ${JSON.stringify(eventListener)}`);
+                        eventListener.onEvent(event);
+                        logger.debug(`##after onEvent()`);
+
+                        // resolve(responseObj);
+                    }
+                    catch (err) {
+                        logger.error(`##Error: requestLedgerOperationHttp#httpReq.onload, ${err}`);
+                    }
+                };
+                httpReq.onerror  = function() {
+                    logger.error(`##Error: requestLedgerOperationHttp#httpReq.onerror`);
                 };
 
                 logger.debug(`validatorUrl: ${this.validatorUrl}`);
@@ -315,6 +333,8 @@ export class VerifierBase implements Verifier {
                 // httpReq.send(args['args']);
                 logger.debug(`args['args']: ${JSON.stringify(args['args'])}`);
                 httpReq.send(JSON.stringify(args['args']));
+                
+                resolve("");
             }
             catch (err) {
                 logger.error(`##Error: requestLedgerOperationHttp, ${err}`);
@@ -322,6 +342,20 @@ export class VerifierBase implements Verifier {
             }
         });
     }
+
+
+    static makeOpenApiEvent(resp: object, validatorID: string): LedgerEvent {
+        logger.debug(`##in makeOpenApiEvent, resp = ${JSON.stringify(resp)}`);
+
+        const event = new LedgerEvent();
+        event.verifierId = validatorID;
+        // TODO: for debug
+        const txID = "openapi-txid-00001";
+        event.data = {"txId": txID, "blockData": [resp]};
+        logger.debug(`##event: ${JSON.stringify(event)}`);
+        return event;
+    }
+
 
     startMonitor(options = {}): Promise<LedgerEvent> {
         return new Promise((resolve, reject) => {
@@ -378,6 +412,7 @@ export class VerifierBase implements Verifier {
 
                             const event = new LedgerEvent();
                             event.verifierId = this.validatorID;
+                            logger.debug(`##event.verifierId: ${event.verifierId}`);
                             event.data = resultObj;
 
                             eventListener.onEvent(event);

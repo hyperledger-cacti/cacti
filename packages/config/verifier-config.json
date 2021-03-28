@@ -91,7 +91,7 @@
             "apiInfo": []
         },
         {
-            "validatorID": "vIdAcnCB",
+            "validatorID": "vIdO32CB",
             "validatorURL": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/",
             "validatorKeyPath": "",
             "ledgerInfo": {
@@ -100,7 +100,7 @@
             "apiInfo": []
         },
         {
-            "validatorID": "vIdAcnCF",
+            "validatorID": "vIdO32CF",
             "validatorURL": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/",
             "validatorKeyPath": "",
             "ledgerInfo": {
@@ -109,7 +109,7 @@
             "apiInfo": []
         },
         {
-            "validatorID": "vIdAcnCQ",
+            "validatorID": "vIdO32CQ",
             "host": "http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/",
             "validatorKeyPath": "",
             "ledgerInfo": {

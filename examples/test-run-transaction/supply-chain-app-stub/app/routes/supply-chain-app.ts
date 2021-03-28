@@ -1,3 +1,10 @@
+/*
+ * Copyright 2021 Hyperledger Cactus Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * supply-chain-app.ts
+ */
+
 import { Router, NextFunction, Request, Response } from 'express';
 
 const router: Router = Router();
@@ -25,12 +32,27 @@ router.post('/', (req: Request, res: Response, next: NextFunction) => {
     console.debug(`invocationType: ${req.body.invocationType}`);
     console.debug(`functionName: ${req.body.functionName}`);
     console.debug(`functionArgs: ${req.body.functionArgs}`);
-    res.status(200).send(JSON.stringify({"supply-chain-app": "POST..."}));
+    sleep(5, function() {
+        console.debug(`##send response`);
+        res.status(200).send(JSON.stringify({"supply-chain-app": "POST..."}));
+    });
 
   } catch (err) {
     next(err);
   }
 });
 
+
+function sleep(waitSec: number, callbackFunc: any) {
+    var spanedSec = 0;
+    var id = setInterval(function () {
+        spanedSec++;
+        if (spanedSec >= waitSec) {
+            clearInterval(id);
+            if (callbackFunc) callbackFunc();
+        }
+    }, 1000);
+ 
+}
 
 export default router;

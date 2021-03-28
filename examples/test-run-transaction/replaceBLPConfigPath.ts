@@ -8,7 +8,7 @@ const fs = require('fs')
 
 const targetFile = '../../dist/packages/config/BLP_config.js';
 const srcStr = '"../BusinessLogicRunTransaction"';
-const distStr = '"../../examples/run-transaction/BusinessLogicRunTransaction"';
+const distStr = '"../../examples/test-run-transaction/BusinessLogicRunTransaction"';
 
 fs.readFile(targetFile, 'utf8', (readErr, data) => {
   if (readErr) {
