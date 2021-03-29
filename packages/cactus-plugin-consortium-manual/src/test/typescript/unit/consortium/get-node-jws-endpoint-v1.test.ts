@@ -1,14 +1,31 @@
 import test, { Test } from "tape";
 import { JWS, JWK } from "jose";
+import express from "express";
+import bodyParser from "body-parser";
+import http from "http";
+import { AddressInfo } from "net";
 
-import { ConsortiumDatabase } from "@hyperledger/cactus-core-api";
+import { IListenOptions, Servers } from "@hyperledger/cactus-common";
+
+import { ConsortiumDatabase, CactusNode } from "@hyperledger/cactus-core-api";
 
 import { ConsortiumRepository } from "@hyperledger/cactus-core";
+
+import {
+  PluginConsortiumManual,
+  IPluginConsortiumManualOptions,
+} from "../../../../main/typescript/plugin-consortium-manual";
 
 import {
   GetNodeJwsEndpoint,
   IGetNodeJwsEndpointOptions,
 } from "../../../../main/typescript/public-api";
+
+import { v4 as uuidv4 } from "uuid";
+
+import { DefaultApi as ConsortiumManualApi } from "../../../../main/typescript/public-api";
+
+import { K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT } from "../../../../main/typescript/prometheus-exporter/metrics";
 
 test("Can provide JWS", async (t: Test) => {
   t.ok(GetNodeJwsEndpoint);
@@ -25,7 +42,40 @@ test("Can provide JWS", async (t: Test) => {
   };
   const consortiumRepo = new ConsortiumRepository({ db });
 
+  // Creating the PluginConsortiumManual object to observe the prometheus metrics.
+  const options: IPluginConsortiumManualOptions = {
+    instanceId: uuidv4(),
+    keyPairPem: keyPairPem,
+    consortiumDatabase: db,
+  };
+
+  const pluginConsortiumManual: PluginConsortiumManual = new PluginConsortiumManual(
+    options,
+  );
+
+  // Setting up of the api-server for hosting the endpoints defined in the openapi specs
+  // of the plugin
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
+  const listenOptions: IListenOptions = {
+    hostname: "0.0.0.0",
+    port: 0,
+    server,
+  };
+  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+  test.onFinish(async () => await Servers.shutdown(server));
+  const { address, port } = addressInfo;
+  const apiHost = `http://${address}:${port}`;
+  t.comment(
+    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics`,
+  );
+  const apiClient = new ConsortiumManualApi({ basePath: apiHost });
+
+  await pluginConsortiumManual.installWebServices(expressApp);
+
   const epOpts: IGetNodeJwsEndpointOptions = {
+    plugin: pluginConsortiumManual,
     consortiumRepo,
     keyPairPem,
   };
@@ -48,6 +98,73 @@ test("Can provide JWS", async (t: Test) => {
     t.fail(`JWS Verification result: ${payload}`);
   } else {
     t.ok(payload.consortiumDatabase, "JWS payload.consortiumDatabase truthy");
+  }
+
+  {
+    // The first check shall observe the cactus_consortium_manual_total_node_count metrics
+    // to be valued at zero, as the ConsortiumRepo object is initialized with an empty array of
+    // Cactus nodes.
+    const res = await apiClient.getPrometheusExporterMetricsV1();
+    const promMetricsOutput =
+      "# HELP " +
+      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT +
+      " Total cactus node count\n" +
+      "# TYPE " +
+      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT +
+      " gauge\n" +
+      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT +
+      '{type="' +
+      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT +
+      '"} 0';
+    t.ok(res);
+    t.ok(res.data);
+    t.equal(res.status, 200);
+    t.true(
+      res.data.includes(promMetricsOutput),
+      "Total Cactus Node Count of 0 recorded as expected. RESULT OK",
+    );
+  }
+
+  // Creating a dummy cactus node for adding it to the cactus node array
+  // and thus observing the change in prometheus exporter metrics (should increment by 1)
+  const dummyCactusNode: CactusNode = {
+    consortiumId: "",
+    id: "",
+    ledgerIds: [],
+    memberId: "",
+    nodeApiHost: "",
+    pluginInstanceIds: [],
+    publicKeyPem: "",
+  };
+
+  consortiumRepo.consortiumDatabase.cactusNode.push(dummyCactusNode);
+  // The invocation of the node JWS endpoint internally triggers the update
+  // of the metrics so after it has executed we can expect the metrics to
+  // show the new values for our assertions below
+  await apiClient.getNodeJws();
+
+  {
+    // The second check shall observe the cactus_consortium_manual_total_node_count metrics
+    // to be valued at One, as the Cactus node array is pushed with a dummy cactus node.
+    const res = await apiClient.getPrometheusExporterMetricsV1();
+    const promMetricsOutput =
+      "# HELP " +
+      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT +
+      " Total cactus node count\n" +
+      "# TYPE " +
+      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT +
+      " gauge\n" +
+      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT +
+      '{type="' +
+      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT +
+      '"} 1';
+    t.ok(res);
+    t.ok(res.data);
+    t.equal(res.status, 200);
+    t.true(
+      res.data.includes(promMetricsOutput),
+      "Total Cactus Node Count of 1 recorded as expected. RESULT OK",
+    );
   }
 
   t.end();
