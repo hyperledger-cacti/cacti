@@ -4,7 +4,7 @@
  
  README.md
 -->
-# BIF-trial(Validator)
+# Validator for Fabric
 
 ## Assumption
 - fabric is running
