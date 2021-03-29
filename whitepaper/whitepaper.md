@@ -759,7 +759,6 @@ The overall architecture is as the following figure.
 ### 5.2.1 Definition of key components in system architecture
 
 Key components are defined as follows:
-- ~~**Application user**: The entity submits API calls to "Cactus Routing Interface". Note: this component is exist outside of Cactus service system.~~
 - **Business Logic Plugin**: The entity executes business logic and provide integration services that are connected with multiple blockchains. The entity is composed by web application or smart contract on a blockchain. The entity is a single plugin and required for executing Hyperledger Cactus applications.
 - **CACTUS Node Server**: The server accepts a request from an End-user Application, and return a response depending on the status of the targeted trade. Trade ID will be assigned when a new trade is accepted.
 - **End-user Application**: The entity submits API calls to request a trade, which invokes a set of transactions on Ledger by the Business Logic Plugin.
@@ -771,8 +770,6 @@ Validator ensure the determined result with attaching digital signature with "Va
 - **Validator Server**: The server accepts a connection from Verifier, and it provides Validator API, which can be used for issuing signed transactions and monitoring Ledger behind it. The LedgerConnector will be implemented for interacting with the Ledger nodes.
 - **Verifier**: The entity accepts only sucussfully verified operation results by verifying the digital signature of the validator. Verifier will be instantiated by calling the VerifierFactory#create method with associated with the Validator to connect. Each Verifier may be temporarily enabled or disabled. Note that "Validator" is apart from "Verifier" over a bi-directional channel.
 - **Verifier Registry**: The information about active Verifier. The VerifierFactory uses this information to instantiate Verifier for the Business Logic Plugin.
-- ~~**Cactus Routing Interface**: The entity is a routing service between "Business Logic Plugin" and  "Ledger Plugin(s)". The entity is also a routing service between Business Logic Plugin and API calls from "Application user(s)".~~
-- ~~**Ledger-n**: DLT platforms(e.g. Ethereum, Quorum, Hyperledger Fabric, ...)~~
 
 ### 5.2.2 Bootstrapping Cactus application
 
