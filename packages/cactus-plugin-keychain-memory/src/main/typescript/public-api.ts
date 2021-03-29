@@ -1,3 +1,4 @@
+export * from "./generated/openapi/typescript-axios/index";
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 
 export {
