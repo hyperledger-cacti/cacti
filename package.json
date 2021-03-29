@@ -1,9 +1,11 @@
 {
   "name": "@hyperledger/cactus",
+  "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
   "private": true,
   "scripts": {
     "run-ci": "./tools/ci.sh",
     "configure": "npm i && lerna clean --yes && lerna bootstrap && npm-run-all build:dev:backend generate-api-server-config",
+    "configure-lite": "npm ci && lerna bootstrap && npm-run-all build:dev:backend generate-api-server-config",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
     "start:cockpit": "lerna run --scope '*/cactus-cockpit' --stream serve:proxy",
@@ -94,7 +96,7 @@
     "shebang-loader": "0.0.1",
     "source-map-loader": "0.2.4",
     "stream-browserify": "3.0.0",
-    "tap": "14.10.6",
+    "tap": "14.11.0",
     "tape": "5.0.1",
     "tape-promise": "4.0.0",
     "ts-loader": "6.2.1",
@@ -118,5 +120,7 @@
   "lint-staged": {
     "*/*/src/**/*.{js,ts}": "eslint --fix"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/ssh2": "0.5.46"
+  }
 }
