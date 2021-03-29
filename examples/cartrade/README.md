@@ -1,4 +1,10 @@
-# example-cartrade
+# Cactus car-trade
+
+## Abstract
+
+Cactus **car-trade** is a sample application where users can exchange car ownership (represented by Fabcar chaincode tokens on a Hyperledger Fabric blockchain) for ETH currency on a private Ethereum blockchain. The application takes the form of a "business logic plugin" which is a central point of our architecture.
+
+![car-trade image](./images/car-trade-image.png)
 
 ## Prerequisites
 
@@ -16,19 +22,42 @@ Before you begin, you need to check that you have all the prerequisites installe
 1. (Optional) Please modify the following information for your environment if necessary. This procedure should only be performed by users who cannot use port 5034.
 	- `applicationHostInfo.hostPort` (The port number of Routing-interface http server, the default is 5034) on `/packages/config/default.json`
 1. Go to the following directory:
-	- `cd cactus/examples/cartrade/`
+	```
+	cd cactus/examples/cartrade/
+	```
 1. Start ledgers:
-	- `./script-start-ledgers.sh` 
+	```
+	./script-start-ledgers.sh
+	```
+	- If the following containers are started when displaying the container list with the docker ps command, it will be fine.
+		```
+		CONTAINER ID        IMAGE                                                                                                    COMMAND                  CREATED              STATUS              PORTS                                                    NAMES
+		14b98ba40b66        dev-peer0.org1.example.com-fabcar-1.0-5c906e402ed29f20260ae42283216aa75549c571e2e380f3615826365d8269ba   "chaincode -peer.add…"   42 seconds ago       Up 40 seconds                                                                dev-peer0.org1.example.com-fabcar-1.0
+		d0efd7479bdd        hyperledger/fabric-tools                                                                                 "/bin/bash"              About a minute ago   Up 56 seconds                                                                cli
+		c9bd7ddfde7e        hyperledger/fabric-peer                                                                                  "peer node start"        About a minute ago   Up About a minute   0.0.0.0:7051->7051/tcp, 0.0.0.0:7053->7053/tcp           peer0.org1.example.com
+		d4f2b1a76626        hyperledger/fabric-couchdb                                                                               "tini -- /docker-ent…"   About a minute ago   Up About a minute   4369/tcp, 9100/tcp, 0.0.0.0:5984->5984/tcp               couchdb
+		53a79780f564        hyperledger/fabric-ca                                                                                    "sh -c 'fabric-ca-se…"   About a minute ago   Up About a minute   0.0.0.0:7054->7054/tcp                                   ca.example.com
+		aceb0e52e9c7        hyperledger/fabric-orderer                                                                               "orderer"                About a minute ago   Up About a minute   0.0.0.0:7050->7050/tcp                                   orderer.example.com
+		ec57c9f78d0d        ethereum/client-go:v1.8.27                                                                               "geth --rpc --networ…"   2 minutes ago        Up 2 minutes        8546/tcp, 0.0.0.0:8545->8545/tcp, 30303/tcp, 30303/udp   geth1
+		```
 1. Build validators, packages, and the cartrade app:
-	- `./script-build-all.sh`
+	```
+	./script-build-all.sh
+	```
 1. Start validators and the cartrade app
 	- Please open three consoles and execute the following:.
-	- Start the validator for Fabric on the first console:
-		`./script-start-validator-fabric.sh`
-	- Start the validator for Ethereum on the second console: 
-		`./script-start-validator-ethereum.sh`
-	- Start the cartrade app on the third console:
-		`./script-start-cartrade.sh`
+	- Start the validator for Fabric on the first console using the port 5050:
+		```
+		./script-start-validator-fabric.sh
+		```
+	- Start the validator for Ethereum on the second console using the port 5040: 
+		```
+		./script-start-validator-ethereum.sh
+		```
+	- Start the cartrade app on the third console using the port 5034:
+		```
+		./script-start-cartrade.sh
+		```
 
 ## How to use this application
 
@@ -65,3 +94,12 @@ Before you begin, you need to check that you have all the prerequisites installe
 		##queryCar Params: CAR1
 		Transaction has been evaluated, result is: {"colour":"red","make":"Ford","model":"Mustang","owner":"Cathy"}
 		```
+
+## How to stop the application and Docker containers
+
+1. Stop the above validators (`./script-start-validator-fabric.sh` and `./script-start-validator-ethereum.sh`) and the cartrade app (`./script-start-cartrade.sh`).
+	- Press Ctrl+C on the above three consoles.
+1. Stop the docker containers of Ethereum and Fabric
+	- Press the command `docker stop <CONTAINER ID>` to stop the container corresponding to the above containers which were launched by `./script-start-ledgers.sh` on the boot method. If you want to destroy the docker containers, press the command `docker rm <CONTAINER ID>` after the above.
+	- If any other docker containers are not running on your machine, you can destroy the Docker containers only with `docker ps -aq | xargs docker stop` and `docker ps -aq | xargs docker rm`.
+
