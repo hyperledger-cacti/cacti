@@ -4,7 +4,7 @@
 
  README.md
 -->
-# BIF-trial(geth-docker)
+# geth-docker
 
 ## Explanation
 - "geth-docker" is a module required to run "Validator"

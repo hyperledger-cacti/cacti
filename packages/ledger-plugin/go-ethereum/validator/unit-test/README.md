@@ -4,7 +4,7 @@
 
  README.md
 -->
-# BIF-trial(Validator Driver)
+# Validator Driver for Go-Ethereum
 
 ## Assumption
 - Validator1 (for Ethereum) is running

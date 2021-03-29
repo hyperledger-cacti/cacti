@@ -4,7 +4,7 @@
  
  README.md
 -->
-# BIF-trial(Validator)
+# Validator for Go-Ethereum
 
 ## Assumption
 - geth1(geth-docker) is running
