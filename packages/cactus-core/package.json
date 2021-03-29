@@ -31,7 +31,10 @@
       "ignore": [
         "src/**/generated/*"
       ],
-      "extensions": ["ts", "json"],
+      "extensions": [
+        "ts",
+        "json"
+      ],
       "quiet": true,
       "verbose": false,
       "runOnChangeOnly": true
@@ -80,10 +83,11 @@
   "dependencies": {
     "@hyperledger/cactus-common": "0.3.0",
     "@hyperledger/cactus-core-api": "0.3.0",
+    "express": "4.17.1",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "0.3.0",
-    "@types/express": "4.17.8"
+    "@types/express": "4.17.8",
+    "uuid": "8.3.2"
   }
 }

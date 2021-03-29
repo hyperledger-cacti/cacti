@@ -92,13 +92,11 @@
     "openapi-types": "7.0.1",
     "prom-client": "13.1.0",
     "typescript-optional": "2.0.1",
-    "web3": "1.2.7",
-    "web3-eea": "0.10.0"
+    "web3": "1.2.7"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "0.3.0",
     "@hyperledger/cactus-test-tooling": "0.3.0",
-    "@types/express": "4.17.8",
-    "@types/joi": "14.3.4"
+    "@types/express": "4.17.8"
   }
 }
