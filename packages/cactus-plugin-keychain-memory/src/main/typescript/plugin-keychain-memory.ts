@@ -7,12 +7,22 @@ import {
 import {
   ICactusPluginOptions,
   PluginAspect,
+  IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
+
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { Express } from "express";
+
+import {
+  IGetPrometheusExporterMetricsEndpointV1Options,
+  GetPrometheusExporterMetricsEndpointV1,
+} from "./get-prometheus-exporter-metrics/get-prometheus-exporter-metrics-endpoint-v1";
 
 export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   backend?: Map<string, any>;
   keychainId: string;
+  prometheusExporter?: PrometheusExporter;
 }
 
 export class PluginKeychainMemory {
@@ -21,6 +31,7 @@ export class PluginKeychainMemory {
   private readonly backend: Map<string, any>;
   private readonly log: Logger;
   private readonly instanceId: string;
+  public prometheusExporter: PrometheusExporter;
 
   public get className(): string {
     return PluginKeychainMemory.CLASS_NAME;
@@ -41,12 +52,53 @@ export class PluginKeychainMemory {
     this.log = LoggerProvider.getOrCreate({ level, label });
 
     this.instanceId = this.opts.instanceId;
+    this.prometheusExporter =
+      opts.prometheusExporter ||
+      new PrometheusExporter({ pollingIntervalInMin: 1 });
+    Checks.truthy(
+      this.prometheusExporter,
+      `${fnTag} options.prometheusExporter`,
+    );
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
     this.log.warn(
       `Never use ${this.className} in production. ` +
         `It does not support encryption. It stores everything in plain text.`,
     );
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+    return res;
+  }
+
+  public async installWebServices(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint[]> {
+    const { log } = this;
+
+    log.info(`Installing web services for plugin ${this.getPackageName()}...`);
+
+    const endpoints: IWebServiceEndpoint[] = [];
+    {
+      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+        plugin: this,
+        logLevel: this.opts.logLevel,
+      };
+      const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
+    }
+
+    const pkg = this.getPackageName();
+    log.info(`Installed web services for plugin ${pkg} OK`, { endpoints });
+
+    return endpoints;
   }
 
   public getInstanceId(): string {
@@ -75,9 +127,11 @@ export class PluginKeychainMemory {
 
   async set<T>(key: string, value: T): Promise<void> {
     this.backend.set(key, value);
+    this.prometheusExporter.setTotalKeyCounter(this.backend.size);
   }
 
   async delete(key: string): Promise<void> {
     this.backend.delete(key);
+    this.prometheusExporter.setTotalKeyCounter(this.backend.size);
   }
 }

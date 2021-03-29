@@ -12,6 +12,8 @@
     "dist/*"
   ],
   "scripts": {
+    "generate-sdk": "openapi-generator generate --input-spec src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
@@ -31,7 +33,10 @@
       "ignore": [
         "src/**/generated/*"
       ],
-      "extensions": ["ts", "json"],
+      "extensions": [
+        "ts",
+        "json"
+      ],
       "quiet": true,
       "verbose": false,
       "runOnChangeOnly": true
@@ -79,12 +84,17 @@
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "@hyperledger/cactus-common": "0.3.0",
+    "@hyperledger/cactus-core": "0.3.0",
     "@hyperledger/cactus-core-api": "0.3.0",
+    "axios": "0.21.1",
+    "express": "4.17.1",
     "joi": "14.3.1",
+    "prom-client": "13.1.0",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.2"
   },
   "devDependencies": {
+    "@types/express": "4.17.8",
     "@types/joi": "14.3.4",
     "@types/uuid": "8.3.0"
   }
