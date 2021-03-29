@@ -25,6 +25,12 @@ import {
 import { GetConsortiumEndpointV1 } from "./consortium/get-consortium-jws-endpoint-v1";
 import { GetNodeJwsEndpoint } from "./consortium/get-node-jws-endpoint-v1";
 
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+
+import {
+  IGetPrometheusExporterMetricsEndpointV1Options,
+  GetPrometheusExporterMetricsEndpointV1,
+} from "./consortium/get-prometheus-exporter-metrics-endpoint-v1";
 export interface IWebAppOptions {
   port: number;
   hostname: string;
@@ -33,6 +39,7 @@ export interface IWebAppOptions {
 export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
   keyPairPem: string;
   consortiumDatabase: ConsortiumDatabase;
+  prometheusExporter?: PrometheusExporter;
   pluginRegistry?: PluginRegistry;
   logLevel?: LogLevelDesc;
   webAppOptions?: IWebAppOptions;
@@ -40,6 +47,7 @@ export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
 
 export class PluginConsortiumManual
   implements ICactusPlugin, IPluginWebService {
+  public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly instanceId: string;
   private httpServer: Server | SecureServer | null = null;
@@ -58,10 +66,51 @@ export class PluginConsortiumManual
       label: "plugin-consortium-manual",
     });
     this.instanceId = this.options.instanceId;
+    this.prometheusExporter =
+      options.prometheusExporter ||
+      new PrometheusExporter({ pollingIntervalInMin: 1 });
+    Checks.truthy(
+      this.prometheusExporter,
+      `${fnTag} options.prometheusExporter`,
+    );
+    this.prometheusExporter.setNodeCount(this.getNodeCount());
   }
 
   public getInstanceId(): string {
     return this.instanceId;
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+    return res;
+  }
+
+  public getNodeCount(): number {
+    const consortiumDatabase: ConsortiumDatabase = this.options
+      .consortiumDatabase;
+    const consortiumRepo: ConsortiumRepository = new ConsortiumRepository({
+      db: consortiumDatabase,
+    });
+    return consortiumRepo.allNodes.length;
+  }
+
+  /**
+   * Updates the Node count Prometheus metric of the plugin.
+   * Note: This does not change the underlying consortium database at all,
+   * only affects **the metrics**.
+   */
+  public updateMetricNodeCount(): void {
+    const constortiumDatabase: ConsortiumDatabase = this.options
+      .consortiumDatabase;
+    const consortiumRepo: ConsortiumRepository = new ConsortiumRepository({
+      db: constortiumDatabase,
+    });
+    this.prometheusExporter.setNodeCount(consortiumRepo.allNodes.length);
   }
 
   public async shutdown(): Promise<void> {
@@ -123,12 +172,21 @@ export class PluginConsortiumManual
       this.log.info(`Registered GetConsortiumEndpointV1 at ${path}`);
     }
     {
-      const options = { keyPairPem, consortiumRepo };
+      const options = { keyPairPem, consortiumRepo, plugin: this };
       const endpoint = new GetNodeJwsEndpoint(options);
       const path = endpoint.getPath();
       webApp.get(path, endpoint.getExpressRequestHandler());
       endpoints.push(endpoint);
       this.log.info(`Registered GetNodeJwsEndpoint at ${path}`);
+    }
+    {
+      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+        plugin: this,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
+      endpoint.registerExpress(expressApp);
+      endpoints.push(endpoint);
     }
 
     log.info(`Installed web svcs for plugin ${this.getPackageName()} OK`, {

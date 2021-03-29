@@ -24,8 +24,10 @@ import {
 } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
+import { PluginConsortiumManual } from "../plugin-consortium-manual";
 
 export interface IGetNodeJwsEndpointOptions {
+  plugin: PluginConsortiumManual;
   keyPairPem: string;
   consortiumRepo: ConsortiumRepository;
   logLevel?: LogLevelDesc;
@@ -33,6 +35,7 @@ export interface IGetNodeJwsEndpointOptions {
 
 export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
   private readonly log: Logger;
+  private readonly plugin: PluginConsortiumManual;
 
   constructor(public readonly options: IGetNodeJwsEndpointOptions) {
     const fnTag = "GetNodeJwsEndpoint#constructor()";
@@ -43,6 +46,12 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
       throw new Error(`${fnTag} options.keyPairPem falsy.`);
     }
     Checks.truthy(options.consortiumRepo, `${fnTag} options.consortiumRepo`);
+    Checks.truthy(options.plugin, `${fnTag} options.plugin`);
+    Checks.truthy(
+      options.plugin instanceof PluginConsortiumManual,
+      `${fnTag} options.plugin instanceof PluginConsortiumManual`,
+    );
+    this.plugin = options.plugin;
 
     const level = options.logLevel || "INFO";
     const label = "get-node-jws-endpoint-v1";
@@ -95,6 +104,11 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     const fnTag = "GetNodeJwsEndpoint#createJws()";
     const { keyPairPem, consortiumRepo: repo } = this.options;
     try {
+      // TODO: move this logic here entirely to the plugin itself. We already
+      // have an issue open for it on GH most likely, someone may already be
+      // working on this very thing actually so please do double check prior
+      // to diving in and working on it to avoid redundant effort.
+      this.plugin.updateMetricNodeCount();
       const keyPair = JWK.asKey(keyPairPem);
       const payloadObject = { consortiumDatabase: repo.consortiumDatabase };
       const payloadJson = jsonStableStringify(payloadObject);
