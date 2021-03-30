@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-api-client",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-api-client.node.umd.min.js",
@@ -31,7 +31,10 @@
       "ignore": [
         "src/**/generated/*"
       ],
-      "extensions": ["ts", "json"],
+      "extensions": [
+        "ts",
+        "json"
+      ],
       "quiet": true,
       "verbose": false,
       "runOnChangeOnly": true
@@ -78,11 +81,9 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.3.0",
-    "@hyperledger/cactus-core": "0.3.0",
-    "@hyperledger/cactus-core-api": "0.3.0",
-    "@hyperledger/cactus-plugin-consortium-manual": "0.3.0"
-  },
-  "devDependencies": {
+    "@hyperledger/cactus-common": "0.4.0",
+    "@hyperledger/cactus-core": "0.4.0",
+    "@hyperledger/cactus-core-api": "0.4.0",
+    "@hyperledger/cactus-plugin-consortium-manual": "0.4.0"
   }
 }

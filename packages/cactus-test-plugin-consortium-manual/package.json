@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-plugin-consortium-manual",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Integration tests for the Quorum ledger and the API server.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-plugin-consortium-manual.node.umd.min.js",
@@ -31,7 +31,10 @@
       "ignore": [
         "src/**/generated/*"
       ],
-      "extensions": ["ts", "json"],
+      "extensions": [
+        "ts",
+        "json"
+      ],
       "quiet": true,
       "verbose": false,
       "runOnChangeOnly": true
@@ -78,15 +81,13 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "0.3.0",
-    "@hyperledger/cactus-common": "0.3.0",
-    "@hyperledger/cactus-core": "0.3.0",
-    "@hyperledger/cactus-core-api": "0.3.0",
-    "@hyperledger/cactus-plugin-consortium-manual": "0.3.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "0.3.0",
+    "@hyperledger/cactus-cmd-api-server": "0.4.0",
+    "@hyperledger/cactus-common": "0.4.0",
+    "@hyperledger/cactus-core": "0.4.0",
+    "@hyperledger/cactus-core-api": "0.4.0",
+    "@hyperledger/cactus-plugin-consortium-manual": "0.4.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "0.4.0",
     "axios": "0.21.1",
     "jose": "1.27.2"
-  },
-  "devDependencies": {
   }
 }

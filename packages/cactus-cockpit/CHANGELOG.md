@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/hyperledger/cactus/compare/v0.3.0...v0.4.0) (2021-03-30)
+
+
+### Bug Fixes
+
+* **general:** fixed unused deps and updated them ([b76a970](https://github.com/hyperledger/cactus/commit/b76a9703341c5a4cabe056e743338cbedebbeaad))
+* dci lint errors [#514](https://github.com/hyperledger/cactus/issues/514) ([99ab3af](https://github.com/hyperledger/cactus/commit/99ab3afa23b043d4d5b7d6f75db33d4256a11af9))
+* **cockpit:** compilation issues [#496](https://github.com/hyperledger/cactus/issues/496) ([fad9fff](https://github.com/hyperledger/cactus/commit/fad9fffb59136f1fdbcef4645a0da3ccd2913233))
+
+
+
+
+
 # [0.3.0](https://github.com/hyperledger/cactus/compare/v0.1.0...v0.3.0) (2021-01-06)
 
 
