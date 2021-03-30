@@ -3,7 +3,7 @@ FROM node:12.20.1-alpine3.12 as builder
 RUN apk update
 
 # Need JDK for the openapi-generator that is part of the build process
-RUN apk add --no-cache openjdk8=8.275.01-r0
+RUN apk add --no-cache openjdk8
 
 # Need git because some of our npm depedencies might be coming
 # straight from github instead of being an npm package on npmjs.com.
@@ -56,23 +56,23 @@ USER root
 RUN apk update
 
 # Add bash for convenience, sh has less features
-RUN apk add --no-cache bash=5.0.17-r0
+RUN apk add --no-cache bash
 
 # Need curl for healthchecks
-RUN apk add --no-cache curl=7.69.1-r3
+RUN apk add --no-cache curl
 
 # The file binary is used to inspect exectubles when debugging container image issues
-RUN apk add --no-cache file=5.38-r0
+RUN apk add --no-cache file
 
-RUN apk add --no-cache nodejs=12.20.1-r0
-RUN apk add --no-cache npm=12.20.1-r0
+RUN apk add --no-cache nodejs
+RUN apk add --no-cache npm
 
-RUN apk add --no-cache ca-certificates=20191127-r4
+RUN apk add --no-cache ca-certificates
 RUN apk add --no-cache tzdata
 
 # Install supervisord because we need to run the docker daemon and also the fabric network
 # meaning that we have multiple processes to run.
-RUN apk add --no-cache supervisor=4.2.0-r0
+RUN apk add --no-cache supervisor
 
 ARG APP=/usr/src/app/
 
