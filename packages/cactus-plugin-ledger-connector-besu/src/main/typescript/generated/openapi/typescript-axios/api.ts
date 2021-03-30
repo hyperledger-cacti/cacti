@@ -222,6 +222,18 @@ export interface InvokeContractV1Request {
      */
     params: Array<any>;
     /**
+     * The application binary interface of the solidity contract, optional parameter
+     * @type {Array<any>}
+     * @memberof InvokeContractV1Request
+     */
+    contractAbi?: Array<any>;
+    /**
+     * Address of the solidity contract, optional parameter
+     * @type {string}
+     * @memberof InvokeContractV1Request
+     */
+    contractAddress?: string;
+    /**
      * 
      * @type {string | number}
      * @memberof InvokeContractV1Request

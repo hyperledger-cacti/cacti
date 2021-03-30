@@ -166,7 +166,8 @@ test(testCase, async (t: Test) => {
 
     const { callOutput: helloMsg } = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.CALL,
       methodName: "sayHello",
       params: [],
@@ -220,7 +221,8 @@ test(testCase, async (t: Test) => {
     const newName = `DrCactus${uuidv4()}`;
     const setNameOut = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
@@ -236,7 +238,8 @@ test(testCase, async (t: Test) => {
     try {
       const setNameOutInvalid = await connector.invokeContract({
         contractName,
-        keychainId: keychainPlugin.getKeychainId(),
+        contractAbi: HelloWorldContractJson.abi,
+        contractAddress,
         invocationType: EthContractInvocationType.SEND,
         methodName: "setName",
         params: [newName],
@@ -258,7 +261,8 @@ test(testCase, async (t: Test) => {
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.CALL,
       methodName: "getName",
       params: [],
@@ -273,7 +277,8 @@ test(testCase, async (t: Test) => {
 
     const getNameOut2 = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.SEND,
       methodName: "getName",
       params: [],
@@ -288,7 +293,8 @@ test(testCase, async (t: Test) => {
 
     const response = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.SEND,
       methodName: "deposit",
       params: [],
@@ -304,7 +310,8 @@ test(testCase, async (t: Test) => {
 
     const { callOutput } = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.CALL,
       methodName: "getNameByIndex",
       params: [0],
@@ -336,7 +343,8 @@ test(testCase, async (t: Test) => {
 
     const setNameOut = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.SEND,
       methodName: "setName",
       params: [newName],
@@ -349,7 +357,8 @@ test(testCase, async (t: Test) => {
     try {
       const setNameOutInvalid = await connector.invokeContract({
         contractName,
-        keychainId: keychainPlugin.getKeychainId(),
+        contractAbi: HelloWorldContractJson.abi,
+        contractAddress,
         invocationType: EthContractInvocationType.SEND,
         methodName: "setName",
         params: [newName],
@@ -368,7 +377,8 @@ test(testCase, async (t: Test) => {
 
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.CALL,
       methodName: "getName",
       params: [],
@@ -379,7 +389,8 @@ test(testCase, async (t: Test) => {
 
     const getNameOut2 = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.SEND,
       methodName: "getName",
       params: [],
@@ -390,7 +401,8 @@ test(testCase, async (t: Test) => {
 
     const response = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.SEND,
       methodName: "deposit",
       params: [],
@@ -402,7 +414,8 @@ test(testCase, async (t: Test) => {
 
     const { callOutput } = await connector.invokeContract({
       contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAbi: HelloWorldContractJson.abi,
+      contractAddress,
       invocationType: EthContractInvocationType.CALL,
       methodName: "getNameByIndex",
       params: [1],
