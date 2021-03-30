@@ -23,6 +23,7 @@
 #!docs/README.md
 
 build.gradle.kts
+src/test/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiPluginLedgerConnectorCordaTest.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/impl/ApiPluginLedgerConnectorCordaServiceImpl.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/Application.kt
 .gitignore

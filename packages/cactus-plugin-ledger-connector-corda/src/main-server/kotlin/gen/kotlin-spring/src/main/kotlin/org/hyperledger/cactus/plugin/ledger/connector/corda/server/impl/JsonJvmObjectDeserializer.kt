@@ -10,6 +10,7 @@ import java.lang.RuntimeException
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.util.*
+import kotlin.collections.ArrayList
 
 // FIXME: Make it so that this has a memory, remembering the .jar files that were added before (file-system?) or
 // maybe use the keychain to save it there and then it can pre-populate at boot?
@@ -73,20 +74,92 @@ class JsonJvmObjectDeserializer(
                 val constructorArgs: Array<Any?> = jvmObject.jvmCtorArgs.map { x -> instantiate(x) }.toTypedArray()
 
                 when {
+                    DoubleArray::class.java.isAssignableFrom(clazz) -> {
+                        return constructorArgs
+                            .map { ca -> ca as Double }
+                            .toDoubleArray()
+                    }
+                    FloatArray::class.java.isAssignableFrom(clazz) -> {
+                        return constructorArgs
+                            .map { ca -> ca as Float }
+                            .toFloatArray()
+                    }
+                    LongArray::class.java.isAssignableFrom(clazz) -> {
+                        return constructorArgs
+                            .map { ca -> ca as Long }
+                            .toLongArray()
+                    }
+                    ShortArray::class.java.isAssignableFrom(clazz) -> {
+                        return constructorArgs
+                            .map { ca -> ca as Short }
+                            .toShortArray()
+                    }
+                    CharArray::class.java.isAssignableFrom(clazz) -> {
+                        return constructorArgs
+                            .map { ca -> ca as Char }
+                            .toCharArray()
+                    }
+                    BooleanArray::class.java.isAssignableFrom(clazz) -> {
+                        return constructorArgs
+                            .map { ca -> ca as Boolean }
+                            .toBooleanArray()
+                    }
+                    IntArray::class.java.isAssignableFrom(clazz) -> {
+                        return constructorArgs
+                            .map { ca -> ca as Int }
+                            .toIntArray()
+                    }
+                    ByteArray::class.java.isAssignableFrom(clazz) -> {
+                        return constructorArgs
+                            .map { ca -> ca as Byte }
+                            .toByteArray()
+                    }
+                    ArrayList::class.java.isAssignableFrom(clazz) -> {
+                        return arrayListOf(*constructorArgs)
+                    }
+                    Array<Any>::class.java.isAssignableFrom(clazz) -> {
+                        return arrayOf(*constructorArgs)
+                    }
                     List::class.java.isAssignableFrom(clazz) -> {
                         return listOf(*constructorArgs)
                     }
-                    Array<Any>::class.java.isAssignableFrom(clazz) -> {
-                        // TODO verify that this actually works and also
-                        // if we need it at all since we already have lists covered
-                        return arrayOf(*constructorArgs)
+                    Set::class.java.isAssignableFrom(clazz) -> {
+                        return setOf(*constructorArgs)
+                    }
+                    Map::class.java.isAssignableFrom(clazz) -> {
+                        val constructorArgsCasted = constructorArgs
+                            .map { ca -> ca as Pair<*, *> }
+                            .toTypedArray()
+
+                        return mapOf(*constructorArgsCasted)
                     }
                     jvmObject.jvmType.constructorName != null -> {
                         val methodArgTypes: List<Class<*>> =
                             jvmObject.jvmCtorArgs.map { x -> getOrInferType(x.jvmType.fqClassName) }
+
+                        var invocationTarget: Any? = null
+                        if (jvmObject.jvmType.invocationTarget != null) {
+                            try {
+                                logger.debug("Instantiating InvocationTarget: ${jvmObject.jvmType.invocationTarget}")
+                                invocationTarget = instantiate(jvmObject.jvmType.invocationTarget)
+                                logger.debug("Instantiated OK InvocationTarget: ${jvmObject.jvmType.invocationTarget}")
+                                logger.debug("InvocationTarget: $invocationTarget")
+                            } catch (ex: Exception) {
+                                val argTypes = jvmObject.jvmCtorArgs.joinToString(",") { x -> x.jvmType.fqClassName }
+                                val className = jvmObject.jvmType.fqClassName
+                                val constructorName = jvmObject.jvmType.constructorName
+                                val message = "Failed to instantiate invocation target for " +
+                                        "JvmType:${className}${constructorName}(${argTypes}) with an " +
+                                        "InvocationTarget: ${jvmObject.jvmType.invocationTarget}"
+                                throw InstantiationException(message, ex)
+                            }
+                        }
+
+                        val factoryClass: Class<*> = if (invocationTarget == null) clazz else invocationTarget::class.java
+
                         val factoryMethod: Method
                         try {
-                            factoryMethod = clazz.methods
+                            factoryMethod = factoryClass.methods
                                 .filter { c -> c.name == jvmObject.jvmType.constructorName }
                                 .filter { c -> c.parameterCount == methodArgTypes.size }
                                 .single { c ->
@@ -96,35 +169,18 @@ class JsonJvmObjectDeserializer(
                                 }
                         } catch (ex: NoSuchElementException) {
                             val argTypes = jvmObject.jvmCtorArgs.joinToString(",") { x -> x.jvmType.fqClassName }
-                            val className = jvmObject.jvmType.fqClassName
-                            val methodsAsStrings = clazz.constructors
-                                .mapIndexed { i, c -> "$className->Method#${i + 1}(${c.parameterTypes.joinToString { p -> p.name }})" }
-                                .joinToString(" ;; ")
-                            val targetMethod = "Cannot find matching method for ${className}(${argTypes})"
+                            val className = factoryClass.name
+                            val methodsAsStrings =
+                                factoryClass.methods.joinToString("\n") { c -> "$className#${c.name}(${c.parameterTypes.joinToString { p -> p.name }})" }
+                            val targetMethod = "Cannot find matching method for ${className}#${jvmObject.jvmType.constructorName}(${argTypes})"
                             val availableMethods =
-                                "Searched among the ${clazz.constructors.size} available methods: $methodsAsStrings"
-                            throw RuntimeException("$targetMethod --- $availableMethods")
+                                "Searched among the ${clazz.methods.size} available methods: $methodsAsStrings"
+                            throw ConstructorLookupException("$targetMethod --- $availableMethods")
                         }
 
                         logger.info("Constructor=${factoryMethod}")
                         constructorArgs.forEachIndexed { index, it -> logger.info("Constructor ARGS: #${index} -> $it") }
 
-                        var invocationTarget: Any? = null
-                        if (jvmObject.jvmType.invocationTarget != null) {
-                            try {
-                                logger.debug("Instantiating InvocationTarget: ${jvmObject.jvmType.invocationTarget}")
-                                invocationTarget = instantiate(jvmObject.jvmType.invocationTarget)
-                                logger.debug("Instantiated OK InvocationTarget: ${jvmObject.jvmType.invocationTarget}")
-                            } catch (ex: Exception) {
-                                val argTypes = jvmObject.jvmCtorArgs.joinToString(",") { x -> x.jvmType.fqClassName }
-                                val className = jvmObject.jvmType.fqClassName
-                                val constructorName = jvmObject.jvmType.constructorName
-                                val message = "Failed to instantiate invocation target for " +
-                                        "JvmType:${className}${constructorName}(${argTypes}) with an " +
-                                        "InvocationTarget: ${jvmObject.jvmType.invocationTarget}"
-                                throw RuntimeException(message, ex)
-                            }
-                        }
                         val instance = factoryMethod.invoke(invocationTarget, *constructorArgs)
                         logger.info("Instantiated REFERENCE OK {}", instance)
                         return instance
