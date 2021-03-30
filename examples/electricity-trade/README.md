@@ -30,6 +30,7 @@ Before you begin, you need to check that you have all the prerequisites installe
 	```
 	./script-start-ledgers.sh
 	```
+	- (NOTICE: Before executing the above, your account need to be added to the docker group (`usermod -a -G docker YourAccount` from root user))
 	- If the following containers are started when displaying the container list with the docker ps command, it will be fine.
 		```
 		CONTAINER ID        IMAGE                                              COMMAND                  CREATED             STATUS              PORTS                                                    NAMES
