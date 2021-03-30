@@ -19,19 +19,19 @@ function mainTask()
   if ! [ -x "$(command -v lscpu)" ]; then
     echo 'lscpu is not installed, skipping...'
   else
-    lscpu
+    lscpu || true
   fi
 
   if ! [ -x "$(command -v lsmem)" ]; then
     echo 'lsmem is not installed, skipping...'
   else
-    lsmem
+    lsmem || true
   fi
 
   if ! [ -x "$(command -v smem)" ]; then
     echo 'smem is not installed, skipping...'
   else
-    smem --abbreviate --totals --system
+    smem --abbreviate --totals --system || true
   fi
 
   # Travis does not have (nor need) nvm but CircleCI does have nvm and also
