@@ -42,6 +42,9 @@
       "runOnChangeOnly": true
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=10",
     "npm": ">=6"

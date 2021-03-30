@@ -62,7 +62,7 @@
     "typescript": "~3.9.5"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "engines": {
     "node": ">=10",
