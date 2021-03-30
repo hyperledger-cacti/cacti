@@ -226,6 +226,7 @@ export class PluginLedgerConnectorBesu
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
     const contractName = req.contractName;
+    let contractInstance: Contract;
 
     if (req.keychainId != undefined) {
       const networkId = await this.web3.eth.net.getId();
@@ -287,7 +288,19 @@ export class PluginLedgerConnectorBesu
       );
     }
 
-    const contractInstance = this.contracts[contractName];
+    contractInstance = this.contracts[contractName];
+    if (req.contractAbi != undefined) {
+      let abi;
+      if (typeof req.contractAbi === "string") {
+        abi = JSON.parse(req.contractAbi);
+      } else {
+        abi = req.contractAbi;
+      }
+
+      const { contractAddress } = req;
+      contractInstance = new this.web3.eth.Contract(abi, contractAddress);
+    }
+
     const methodRef = contractInstance.methods[req.methodName];
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
     const method: ContractSendMethod = methodRef(...req.params);
