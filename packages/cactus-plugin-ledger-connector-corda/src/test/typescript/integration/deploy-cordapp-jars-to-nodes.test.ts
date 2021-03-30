@@ -86,7 +86,7 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   const connector = new CordaConnectorContainer({
     logLevel,
     imageName: "hyperledger/cactus-connector-corda-server",
-    imageVersion: "2021-03-24-feat-620",
+    imageVersion: "2021-03-25-feat-622",
     // imageName: "cccs",
     // imageVersion: "latest",
     envVars: [envVarSpringAppJson],

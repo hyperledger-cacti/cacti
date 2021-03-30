@@ -4,9 +4,8 @@ WORKDIR /
 COPY ./kotlin/gen/kotlin-spring /kotlin-spring/
 
 WORKDIR /kotlin-spring/
-# We skip the tests because they require a working
-# Corda network which we do not want to set up.
-RUN gradle build -x test
+
+RUN gradle build
 WORKDIR /
 
 FROM openjdk:8u275-jre-slim-buster
