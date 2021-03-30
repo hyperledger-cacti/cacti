@@ -502,6 +502,17 @@
                         "default": [],
                         "items": {}
                     },
+                    "contractAbi": {
+                        "description": "The application binary interface of the solidity contract, optional parameter",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "description": "Address of the solidity contract, optional parameter",
+                        "type": "string",
+                        "nullable": false
+                    },
                     "value": {
                         "oneOf": [
                             {
