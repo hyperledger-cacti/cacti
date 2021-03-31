@@ -1,0 +1,15 @@
+Thank you for installaing {{ .Chart.Name }}.
+
+The relay server has been deployed as follows:
+
+   Name: {{ .Values.driver.name }}
+   Host: {{ .Values.driver.host }}
+   Port: {{ .Values.driver.port }}
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release try:
+
+   $ helm status {{ .Release.Name }}
+   $ helm get all {{ .Release.Name }}
+

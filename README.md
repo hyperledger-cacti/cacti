@@ -1,7 +1,7 @@
 # Weaver: DLT Interoperability
 
 ## Short Description
-A platform, a protocol suite, and a set of tools, to enable interoperation for data sharing and asset movements between independent networks built on heterogeneous blockchain, or more generally, distributed ledger, technologies, in a manner that preserves the core blockchain tenets of decentralization and security.
+A framework, with a family of protocols, to enable interoperation for data sharing and asset movements between independent networks built on heterogeneous DLTs in a manner that preserves the core blockchain tenets of decentralization and security.
 
 ## Scope of Lab
 - We aim to provide a framework that allows two independent networks, typically (though not limited to) permissioned ones, to interoperate on a need basis.
@@ -17,6 +17,19 @@ A platform, a protocol suite, and a set of tools, to enable interoperation for d
   * DLT-specific plugins called _drivers_ augment relay capabilities with query- and response-translation mechanisms.
 - Apart from the core platform features listed above, we provide SDK extensions for network application users to adapt existing apps for interoperability.
 - We will provide and maintain a basic _testnet_ for rapid prototyping and testing.
+For more details and illustrations, see the [project overview](./OVERVIEW.md).
+
+## Repository Structure
+- Documentation for blockchain practitioners who wish to use and experiment with our code is served [here](https://VRamakrishna.github.io/weaver-dlt-interoperability).
+  * To dive straight into running a basic setup and testing sample interoperation scenarios, start [here](https://VRamakrishna.github.io/weaver-dlt-interoperability/docs/external/getting-started).
+  * The source code for these documents lies [here](./documentation).
+- Comprehensive specifications of our architecture and protocol suite are written in the style of RFCs [here](./interop-rfcs).
+- Core Weaver components are implemented in the [core](./core) folder.
+- SDK extensions and libraries for DLT network applications to exercise Weaver interoperation capabilities are implemented in the [sdks](./sdks) folder.
+- Sample applications used for testing and benchmarking interoperation flows are implemented [here](./samples).
+- Common data structures and features used by different platform components and applications are implemented [here](./here).
+- Testing, experimentation, and evaluation frameworks, are implemented [here](./tests).
+  * An extensible _testnet_ is implemented in [network-setups](./tests/network-setups) to spin up basic Fabric and Corda networks and test data sharing (with proof) among them.
 
 ## Initial Committers
 - https://github.com/VRamakrishna
@@ -29,7 +42,7 @@ A platform, a protocol suite, and a set of tools, to enable interoperation for d
 - https://github.com/knarayan
 - https://github.com/dhinakaran2705
 - https://github.com//Yining-Hu
+- https://github.com/Vinayaka-Pandit
 
 ## Sponsor
 - https://github.com/lehors - TSC Member
-

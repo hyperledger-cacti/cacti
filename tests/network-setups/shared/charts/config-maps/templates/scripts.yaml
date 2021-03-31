@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cc-scripts
+data:
+  initCC.sh: |-
+{{ .Files.Get "scripts/initCC.sh" | indent 4}}
+  installCC.sh: |-
+{{ .Files.Get "scripts/installCC.sh" | indent 4}}
+---

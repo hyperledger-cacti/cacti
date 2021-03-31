@@ -1,0 +1,16 @@
+{
+  "securityDomain": "network1",
+  "rules": [
+    {
+      "principal": "-----BEGIN CERTIFICATE-----\nMIICrTCCAlSgAwIBAgIUHCW/0mWLashHHoswLqUhi+QpDG8wCgYIKoZIzj0EAwIw\ncjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\nEwZEdXJoYW0xGjAYBgNVBAoTEW9yZzEubmV0d29yazEuY29tMR0wGwYDVQQDExRj\nYS5vcmcxLm5ldHdvcmsxLmNvbTAeFw0yMDA3MjkwNDM2MDBaFw0yMTA3MjkwNDQx\nMDBaMF0xCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEUMBIG\nA1UEChMLSHlwZXJsZWRnZXIxDzANBgNVBAsTBmNsaWVudDEOMAwGA1UEAxMFdXNl\ncjEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASuh/rVCf8ODuw0IhnrM2iif2a7\nsGT8BIV1PEDU3SnqClmh+RV/3JyKl/TythzN/ZVnKE/tv5d3gVWbNstc97+So4Hc\nMIHZMA4GA1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQx/hLY\nCNG4ezCqvgTKC/WwuSVnmDAfBgNVHSMEGDAWgBTWD60+eCHbDyD33PWbCxVuQqMA\nqTAfBgNVHREEGDAWghRvYzUxMDM3NDczODAuaWJtLmNvbTBYBggqAwQFBgcIAQRM\neyJhdHRycyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6\nInVzZXIxIiwiaGYuVHlwZSI6ImNsaWVudCJ9fTAKBggqhkjOPQQDAgNHADBEAiAF\nnsL6UuxTmJK9nhdMMP5lV7xnyYl1WyDizEQsfwuOZwIgXcwnHOaUDWYjfXtFSI5y\nzZ9mr6PEkR4DtTHIRFaMV18=\n-----END CERTIFICATE-----",
+      "principalType": "ca",
+      "resource": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*",
+      "read": true
+    }
+  ],
+  "linearId": {
+    "id": "54a6b7d8-820b-42d3-8362-0bcd22452e50",
+    "externalId": ""
+  },
+  "participants": []
+}

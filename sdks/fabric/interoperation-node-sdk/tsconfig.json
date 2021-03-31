@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "outDir": "./build",
+        "allowJs": true,
+        "target": "es5",
+        "esModuleInterop": true,
+        "module": "commonjs"
+    },
+    "include": ["src/**/*", "index.js"],
+    "exclude": ["node_modules", "protos", "scripts", "test", "protos-js", "build"],
+    "skipLibCheck": true,        
+    "resolveJsonModule": true
+}

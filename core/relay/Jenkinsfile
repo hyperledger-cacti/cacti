@@ -1,0 +1,76 @@
+pipeline {
+    agent any
+
+    options {
+
+      // We only keep the most recent five builds.
+      buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5'))
+
+    }
+
+    environment {
+      DOCKER_CREDENTIALS = credentials('sannish.artifactory.apikey')
+      DOCKER_REGISTRY = 'res-dlt-interop-docker-local.artifactory.swg-devops.com'
+      GIT_CREDENTIALS = credentials('sannish1-access-token-github-ibm-com')
+      PROTOS_TAG = 'v0.20'
+    }
+
+    stages {
+
+        stage('Docker Login') {
+            steps {
+              sh '''
+                  docker login -u ${DOCKER_CREDENTIALS_USR} -p ${DOCKER_CREDENTIALS_PSW} ${DOCKER_REGISTRY}
+               '''
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+                  git clone  --depth 1 --branch ${PROTOS_TAG} https://${GIT_CREDENTIALS_PSW}:x-oauth-basic@github.ibm.com/dlt-interoperability/interop-protos.git protos
+                  make fingerprint.json
+                  docker build -t relay-server:latest -f Dockerfile.server .;
+            		'''
+            }
+        }
+
+
+      	stage('Push') {
+          steps {
+             sh '''
+          		 docker tag relay-server:latest ${DOCKER_REGISTRY}/dlt-interop/relay-server:latest
+          		 docker push ${DOCKER_REGISTRY}/dlt-interop/relay-server:latest
+             '''
+           }
+         }
+
+    }
+
+    post {
+
+      always {
+      	sh '''
+               docker logout ${DOCKER_REGISTRY}
+            '''
+      }
+      success {
+          setBuildStatus("Build complete", "SUCCESS");
+          slackSend (color: '#00FF00', message: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      }
+
+      failure {
+          setBuildStatus("Build failure", "FAILURE");
+      }
+    }
+}
+
+void setBuildStatus(String message, String state) {
+  step([
+      $class: "GitHubCommitStatusSetter",
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.ibm.com/dlt-interoperability/relay.git"],
+      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+      errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+  ]);
+}

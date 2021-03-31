@@ -1,0 +1,7 @@
+---
+  - name: Remove Helm installation
+    file: 
+      path: "{{ helm.bin_directory }}"
+      state: absent
+    tags:
+      - helm

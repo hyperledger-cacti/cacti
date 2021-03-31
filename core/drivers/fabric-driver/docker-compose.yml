@@ -1,0 +1,22 @@
+version: '2'
+services:
+  fabric-driver:
+    image: fabric-driver:latest
+    container_name: fabric-driver-${NETWORK_NAME}
+    environment:
+      - NETWORK_NAME=${NETWORK_NAME}
+      - RELAY_ENDPOINT=${RELAY_ENDPOINT}
+      - DRIVER_ENDPOINT=${DRIVER_ENDPOINT}
+      - CONNECTION_PROFILE=/ccp.json
+      - local=false
+    volumes:
+      - ${CONNECTION_PROFILE}:/ccp.json
+      - ./wallet-${NETWORK_NAME}:/fabric-driver/wallet-${NETWORK_NAME}
+    ports:
+      - "${DOCKER_PORT}:${DOCKER_PORT}"
+    command: sh -c "npm run dev"
+# This networks section is required for when the peers have networks specified
+networks:
+  default:
+    external:
+      name: ${EXTERNAL_NETWORK}

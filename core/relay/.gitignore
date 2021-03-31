@@ -1,0 +1,6 @@
+fingerprint.json
+/target
+proto-rs/*
+/protos
+!proto-rs/.gitkeep
+/db

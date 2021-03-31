@@ -1,0 +1,4 @@
+---
+id: team
+title: Team
+---

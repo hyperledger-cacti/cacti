@@ -1,0 +1,21 @@
+{
+ "relays" : [
+   {
+    "url"  : "http://localhost:8080",
+    "opts" : {
+     "name" : "relay1",
+     "mspid" : "org1"
+    }
+   },
+   {
+    "url"  : "https://localhost:8081",
+    "opts" : { 
+     "name" : "relay2",
+     "mspid" : "org2",
+     "keyfile" : "keyfile path",
+     "certfile" : "certificate path",
+     "cafile" : "cafile path"
+   }
+  }
+ ]
+}

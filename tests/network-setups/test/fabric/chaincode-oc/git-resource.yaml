@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: sacc-git
+  namespace: dlt-interop
+spec:
+  type: git
+  params:
+    - name: url
+      value: 'https://github.ibm.com/dlt-interoperability/network-setups.git'
+    - name: revision
+      value: feature/test-environment

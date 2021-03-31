@@ -1,0 +1,117 @@
+{
+  "name": "@res-dlt-interop/fabric-interop-sdk",
+  "description": "Supplemental library to 'fabric-client' with functions for relay-based cross-network interactions",
+  "keywords": [
+    "hyperledger",
+    "blockchain",
+    "interoperability"
+  ],
+  "version": "2.3.1-alpha.9",
+  "author": "V. Ramakrishna",
+  "tag": "latest",
+  "main": "build/index.js",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
+    "protos": "grpc_tools_node_protoc --proto_path=protos --proto_path=fabric-protos  --js_out=import_style=commonjs,binary:protos-js/ --grpc_out=grpc_js:protos-js/ --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` protos/relay/datatransfer.proto protos/networks/networks.proto protos/driver/driver.proto protos/common/ack.proto protos/common/query.proto protos/fabric/view_data.proto protos/common/state.proto protos/common/proofs.proto protos/common/verification_policy.proto fabric-protos/peer/proposal_response.proto fabric-protos/peer/proposal.proto fabric-protos/peer/chaincode.proto fabric-protos/common/policies.proto fabric-protos/msp/msp_principal.proto && protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts --ts_out=./protos-js -I ./protos -I ./fabric-protos protos/relay/datatransfer.proto protos/networks/networks.proto protos/driver/driver.proto protos/common/ack.proto protos/common/query.proto protos/fabric/view_data.proto protos/common/state.proto protos/common/proofs.proto protos/common/verification_policy.proto fabric-protos/peer/proposal_response.proto fabric-protos/peer/proposal.proto fabric-protos/peer/chaincode.proto fabric-protos/common/policies.proto fabric-protos/msp/msp_principal.proto",
+    "build": "tsc && cp -r protos-js build/",
+    "prepublishOnly": "npm test",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "docs": "typedoc --out docs/ src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.ibm.com/dlt-interoperability/interoperation-node-sdk.git"
+  },
+  "engines": {
+    "node": ">=10.15.3 <13.0",
+    "npm": "^6.14.4"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.1.3",
+    "@grpc/proto-loader": "^0.5.5",
+    "bn.js": "^4.11.3",
+    "bytebuffer": "^5.0.1",
+    "callsite": "^1.0.0",
+    "crypto": "^1.0.1",
+    "elliptic": "^6.2.3",
+    "fabric-client": "^1.4.1",
+    "fabric-common": "^2.2.0",
+    "fabric-network": "^2.2.0",
+    "fabric-protos": "^2.2.0",
+    "fs-extra": "^6.0.1",
+    "google-protobuf": "^3.13.0",
+    "grpc": "^1.24.3",
+    "grpc-tools": "^1.9.1",
+    "hoek": "^4.2.1",
+    "ignore-walk": "^3.0.0",
+    "js-sha3": "^0.7.0",
+    "js-yaml": "^3.9.0",
+    "jsrsasign": "^8.0.19",
+    "jssha": "^2.1.0",
+    "klaw": "^2.0.0",
+    "log4js": "^6.3.0",
+    "long": "^4.0.0",
+    "nano": "^6.4.4",
+    "nconf": "^0.10.0",
+    "pkcs11js": "^1.0.6",
+    "promise-settle": "^0.3.0",
+    "protobufjs": "5.0.3",
+    "request": "^2.88.0",
+    "sjcl": "1.0.7",
+    "sshpk": "^1.16.1",
+    "stream-buffers": "3.0.1",
+    "tar-stream": "1.6.1",
+    "url": "^0.11.0",
+    "uuid": "^8.3.1",
+    "winston": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.14",
+    "@typescript-eslint/eslint-plugin": "^3.5.0",
+    "@typescript-eslint/parser": "^3.5.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^7.11.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "grpc_tools_node_protoc_ts": "^5.0.1",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
+    "prettier": "^2.1.2",
+    "prettier-eslint": "^11.0.0",
+    "rewire": "^4.0.1",
+    "sinon": "^6.1.3",
+    "sinon-chai": "^3.3.0",
+    "ts-node": "^9.0.0",
+    "typedoc": "^0.19.2",
+    "typescript": "^4.0.5"
+  },
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "https://github.com/hyperledger/fabric/blob/master/LICENSE"
+    }
+  ],
+  "nyc": {
+    "exclude": [
+      "index.js",
+      "coverage/**",
+      "lib/impl",
+      "lib/msp",
+      "lib/protos",
+      "test/**"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "all": true
+  },
+  "publishConfig": {
+    "registry": "https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/"
+  }
+}

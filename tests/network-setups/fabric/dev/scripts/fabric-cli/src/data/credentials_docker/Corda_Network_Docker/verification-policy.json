@@ -1,0 +1,11 @@
+{
+  "securityDomain": "Corda_Network",
+  "identifiers": [
+    {
+      "pattern": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*",
+      "policy": {
+        "type": "Signature",
+        "criteria": ["PartyA"]
+      }
+    }]
+}

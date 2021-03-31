@@ -1,0 +1,41 @@
+name = "Fabric_Relay"
+port="9080"
+hostname="localhost"
+db_path="db/Fabric_Relay/requests"
+# This will be replaced by the task queue.
+remote_db_path="db/Fabric_Relay/remote_request"
+
+
+# FOR TLS
+cert_path="credentials/fabric_cert.pem"
+key_path="credentials/fabric_key"
+# tls=true
+
+[networks]
+[networks.network1]
+network="Fabric"
+[networks.Corda_Network]
+network="Corda"
+
+[relays]
+[relays.Corda_Relay]
+hostname="localhost"
+port="9081"
+[relays.Fabric_Relay2]
+hostname="localhost"
+port="9083"
+[relays.Fabric_Relay]
+hostname="localhost"
+port="9080"
+
+[drivers]
+[drivers.Fabric]
+hostname="localhost"
+port="9090"
+[drivers.Corda]
+hostname="localhost"
+port="9099"
+[drivers.Dummy]
+hostname="localhost"
+port="9092"
+

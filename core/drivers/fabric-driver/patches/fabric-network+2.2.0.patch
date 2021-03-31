@@ -1,0 +1,105 @@
+diff --git a/node_modules/fabric-network/lib/transaction.d.ts b/node_modules/fabric-network/lib/transaction.d.ts
+index 1255f26..9344f1d 100644
+--- a/node_modules/fabric-network/lib/transaction.d.ts
++++ b/node_modules/fabric-network/lib/transaction.d.ts
+@@ -84,7 +84,7 @@ export declare class Transaction {
+      * @throws {module:fabric-network.TimeoutError} If the transaction was successfully submitted to the orderer but
+      * timed out before a commit event was received from peers.
+      */
+-    submit(...args: string[]): Promise<Buffer>;
++    submit(...args: string[]): Promise<Object>;
+     /**
+      * Evaluate a transaction function and return its results.
+      * The transaction function will be evaluated on the endorsing peers but
+diff --git a/node_modules/fabric-network/lib/transaction.js b/node_modules/fabric-network/lib/transaction.js
+index b8a1bdc..8177482 100644
+--- a/node_modules/fabric-network/lib/transaction.js
++++ b/node_modules/fabric-network/lib/transaction.js
+@@ -172,7 +172,7 @@ class Transaction {
+         logger.debug('%s - build and send the endorsement', method);
+         // build the outbound request along with getting a new transactionId
+         // from the identity context
+-        endorsement.build(this.identityContext, proposalBuildRequest);
++        const proposal = endorsement.build(this.identityContext, proposalBuildRequest);
+         endorsement.sign(this.identityContext);
+         // ------- S E N D   P R O P O S A L
+         // This is where the request gets sent to the peers
+@@ -209,42 +209,42 @@ class Transaction {
+         const proposalResponse = await endorsement.send(proposalSendRequest);
+         try {
+             const result = getResponsePayload(proposalResponse);
+-            // ------- E V E N T   M O N I T O R
+-            const eventHandler = this.eventHandlerStrategyFactory(endorsement.getTransactionId(), this.contract.network);
+-            await eventHandler.startListening();
+-            const commit = endorsement.newCommit();
+-            commit.build(this.identityContext);
+-            commit.sign(this.identityContext);
+-            // -----  C O M M I T   E N D O R S E M E N T
+-            // this is where the endorsement results are sent to the orderer
+-            const commitSendRequest = {};
+-            if (isInteger(transactionOptions.commitTimeout)) {
+-                commitSendRequest.requestTimeout = transactionOptions.commitTimeout * 1000; // in ms;
+-            }
+-            if (proposalSendRequest.handler) {
+-                logger.debug('%s - use discovery to commit', method);
+-                commitSendRequest.handler = proposalSendRequest.handler;
+-            }
+-            else {
+-                logger.debug('%s - use the orderers assigned to the channel', method);
+-                commitSendRequest.targets = channel.getCommitters();
+-            }
+-            // by now we should have a discovery handler or use the target orderers
+-            // that have been assigned from the channel to perform the commit
+-            const commitResponse = await commit.send(commitSendRequest);
+-            logger.debug('%s - commit response %j', method, commitResponse);
+-            if (commitResponse.status !== 'SUCCESS') {
+-                const msg = `Failed to commit transaction %${endorsement.getTransactionId()}, orderer response status: ${commitResponse.status}`;
+-                logger.error('%s - %s', method, msg);
+-                eventHandler.cancelListening();
+-                throw new Error(msg);
+-            }
+-            else {
+-                logger.debug('%s - successful commit', method);
+-            }
+-            logger.debug('%s - wait for the transaction to be committed on the peer', method);
+-            await eventHandler.waitForEvents();
+-            return result;
++            // // ------- E V E N T   M O N I T O R
++            // const eventHandler = this.eventHandlerStrategyFactory(endorsement.getTransactionId(), this.contract.network);
++            // await eventHandler.startListening();
++            // const commit = endorsement.newCommit();
++            // commit.build(this.identityContext);
++            // commit.sign(this.identityContext);
++            // // -----  C O M M I T   E N D O R S E M E N T
++            // // this is where the endorsement results are sent to the orderer
++            // const commitSendRequest = {};
++            // if (isInteger(transactionOptions.commitTimeout)) {
++            //     commitSendRequest.requestTimeout = transactionOptions.commitTimeout * 1000; // in ms;
++            // }
++            // if (proposalSendRequest.handler) {
++            //     logger.debug('%s - use discovery to commit', method);
++            //     commitSendRequest.handler = proposalSendRequest.handler;
++            // }
++            // else {
++            //     logger.debug('%s - use the orderers assigned to the channel', method);
++            //     commitSendRequest.targets = channel.getCommitters();
++            // }
++            // // by now we should have a discovery handler or use the target orderers
++            // // that have been assigned from the channel to perform the commit
++            // const commitResponse = await commit.send(commitSendRequest);
++            // logger.debug('%s - commit response %j', method, commitResponse);
++            // if (commitResponse.status !== 'SUCCESS') {
++            //     const msg = `Failed to commit transaction %${endorsement.getTransactionId()}, orderer response status: ${commitResponse.status}`;
++            //     logger.error('%s - %s', method, msg);
++            //     eventHandler.cancelListening();
++            //     throw new Error(msg);
++            // }
++            // else {
++            //     logger.debug('%s - successful commit', method);
++            // }
++            // logger.debug('%s - wait for the transaction to be committed on the peer', method);
++            // await eventHandler.waitForEvents();
++            return {result, proposalResponse: proposalResponse.responses, proposal: proposal} ;
+         }
+         catch (err) {
+             err.responses = proposalResponse.responses;
