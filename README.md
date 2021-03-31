@@ -20,8 +20,8 @@ A framework, with a family of protocols, to enable interoperation for data shari
 For more details and illustrations, see the [project overview](./OVERVIEW.md).
 
 ## Repository Structure
-- Documentation for blockchain practitioners who wish to use and experiment with our code is served [here](https://VRamakrishna.github.io/weaver-dlt-interoperability).
-  * To dive straight into running a basic setup and testing sample interoperation scenarios, start [here](https://VRamakrishna.github.io/weaver-dlt-interoperability/docs/external/getting-started).
+- Documentation for blockchain practitioners who wish to use and experiment with our code is served [here](https://hyperledger-labs.github.io/weaver-dlt-interoperability).
+  * To dive straight into running a basic setup and testing sample interoperation scenarios, start [here](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/getting-started).
   * The source code for these documents lies [here](./documentation).
 - Comprehensive specifications of our architecture and protocol suite are written in the style of RFCs [here](./interop-rfcs).
 - Core Weaver components are implemented in the [core](./core) folder.
