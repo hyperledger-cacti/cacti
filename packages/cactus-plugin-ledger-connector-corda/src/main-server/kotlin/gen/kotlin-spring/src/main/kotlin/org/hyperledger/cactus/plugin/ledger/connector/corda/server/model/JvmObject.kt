@@ -11,7 +11,6 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
-import javax.validation.Valid
 
 /**
  * Can represent JVM primitive and reference types as well. The jvmTypeKind field indicates which one is being stored. If the jvmTypeKind field is set to REFERENCE then the jvmCtorArgs array is expected to be filled, otherwise (e.g. PRIMITIVE jvmTypeKind) it is expected that the primitiveValue property is filled with a primitive data type supported by the JSON standard such as strings, booleans, numbers, etc.
@@ -22,19 +21,14 @@ import javax.validation.Valid
  */
 data class JvmObject(
 
-    @get:NotNull  
-    @field:Valid
+    @get:NotNull 
     @field:JsonProperty("jvmTypeKind") val jvmTypeKind: JvmTypeKind,
 
-    @get:NotNull  
-    @field:Valid
+    @get:NotNull 
     @field:JsonProperty("jvmType") val jvmType: JvmType,
 
-    @field:Valid
     @field:JsonProperty("primitiveValue") val primitiveValue: kotlin.Any? = null,
-
-    @field:Valid
-    @get:Size(min=0,max=1024)
+@get:Size(min=0,max=1024) 
     @field:JsonProperty("jvmCtorArgs") val jvmCtorArgs: kotlin.collections.List<JvmObject>? = null
 ) {
 

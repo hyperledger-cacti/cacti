@@ -9,7 +9,6 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
-import javax.validation.Valid
 
 /**
  * 
@@ -21,25 +20,19 @@ import javax.validation.Valid
  */
 data class CordaNodeSshCredentials(
 
-    @get:NotNull  
-    @get:Size(min=1,max=65535)
+    @get:NotNull @get:Size(min=1,max=65535) 
     @field:JsonProperty("hostKeyEntry") val hostKeyEntry: kotlin.String,
 
-    @get:NotNull  
-    @get:Size(min=1,max=32)
+    @get:NotNull @get:Size(min=1,max=32) 
     @field:JsonProperty("username") val username: kotlin.String,
 
-    @get:NotNull  
-    @get:Size(min=1,max=4096)
+    @get:NotNull @get:Size(min=1,max=4096) 
     @field:JsonProperty("password") val password: kotlin.String,
 
-    @get:NotNull  
-    @get:Size(min=1,max=4096)
+    @get:NotNull @get:Size(min=1,max=4096) 
     @field:JsonProperty("hostname") val hostname: kotlin.String,
 
-    @get:NotNull  
-    @get:Min(1)
-    @get:Max(65535)
+    @get:NotNull @get:Min(1) @get:Max(65535) 
     @field:JsonProperty("port") val port: kotlin.Int
 ) {
 
