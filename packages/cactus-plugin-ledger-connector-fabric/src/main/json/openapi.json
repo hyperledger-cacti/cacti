@@ -216,15 +216,15 @@
             "RunTransactionRequest": {
                 "type": "object",
                 "required": [
-                    "fabricSigningCredential",
+                    "signingCredential",
                     "channelName",
-                    "chainCodeId",
+                    "contractName",
                     "invocationType",
-                    "functionName",
-                    "functionArgs"
+                    "methodName",
+                    "params"
                 ],
                 "properties": {
-                    "fabricSigningCredential": {
+                    "signingCredential": {
                         "$ref": "#/components/schemas/FabricSigningCredential",
                         "nullable": false
                     },
@@ -234,7 +234,7 @@
                         "maxLength": 100,
                         "nullable": false
                     },
-                    "chainCodeId": {
+                    "contractName": {
                         "type": "string",
                         "minLength": 1,
                         "maxLength": 100,
@@ -245,13 +245,13 @@
                         "nullable": false,
                         "description": "Indicates if it is a CALL or a SEND type of invocation where only SEND ends up creating an actual transaction on the ledger."
                     },
-                    "functionName": {
+                    "methodName": {
                         "type": "string",
                         "minLength": 1,
                         "maxLength": 100,
                         "nullable": false
                     },
-                    "functionArgs": {
+                    "params": {
                         "type": "array",
                         "nullable": false,
                         "default": [],
@@ -265,11 +265,16 @@
             "RunTransactionResponse": {
                 "type": "object",
                 "required": [
-                    "functionOutput"
+                    "functionOutput",
+                    "success"
                 ],
                 "properties": {
                     "functionOutput": {
                         "type": "string",
+                        "nullable": false
+                    },
+                    "success": {
+                        "type": "boolean",
                         "nullable": false
                     }
                 }

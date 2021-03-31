@@ -377,7 +377,7 @@ export interface RunTransactionRequest {
      * @type {FabricSigningCredential}
      * @memberof RunTransactionRequest
      */
-    fabricSigningCredential: FabricSigningCredential;
+    signingCredential: FabricSigningCredential;
     /**
      * 
      * @type {string}
@@ -389,7 +389,7 @@ export interface RunTransactionRequest {
      * @type {string}
      * @memberof RunTransactionRequest
      */
-    chainCodeId: string;
+    contractName: string;
     /**
      * 
      * @type {FabricContractInvocationType}
@@ -401,13 +401,13 @@ export interface RunTransactionRequest {
      * @type {string}
      * @memberof RunTransactionRequest
      */
-    functionName: string;
+    methodName: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof RunTransactionRequest
      */
-    functionArgs: Array<string>;
+    params: Array<string>;
 }
 /**
  * 
@@ -421,6 +421,12 @@ export interface RunTransactionResponse {
      * @memberof RunTransactionResponse
      */
     functionOutput: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RunTransactionResponse
+     */
+    success: boolean;
 }
 /**
  * 

@@ -76,15 +76,15 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
     try {
       this.log.debug(`${tag}`);
       const request: RunTransactionRequest = {
-        fabricSigningCredential: {
+        signingCredential: {
           keychainId: "PluginKeychainMemory_C",
           keychainRef: "user2",
         },
         channelName: "mychannel",
-        chainCodeId: "shipment",
+        contractName: "shipment",
         invocationType: FabricContractInvocationType.CALL,
-        functionName: "getListShipment",
-        functionArgs: [],
+        methodName: "getListShipment",
+        params: [],
       };
       const {
         data: { functionOutput },

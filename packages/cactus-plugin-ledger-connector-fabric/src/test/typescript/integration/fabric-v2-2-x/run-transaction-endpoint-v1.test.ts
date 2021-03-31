@@ -142,19 +142,19 @@ test(testCase, async (t: Test) => {
   const assetOwner = uuidv4();
 
   const channelName = "mychannel";
-  const chainCodeId = "basic";
-  const fabricSigningCredential: FabricSigningCredential = {
+  const contractName = "basic";
+  const signingCredential: FabricSigningCredential = {
     keychainId,
     keychainRef: keychainEntryKey,
   };
   {
     const res = await apiClient.runTransactionV1({
-      fabricSigningCredential,
+      signingCredential,
       channelName,
-      chainCodeId,
+      contractName,
       invocationType: FabricContractInvocationType.CALL,
-      functionName: "GetAllAssets",
-      functionArgs: [],
+      methodName: "GetAllAssets",
+      params: [],
     } as RunTransactionRequest);
     t.ok(res);
     t.ok(res.data);
@@ -163,12 +163,12 @@ test(testCase, async (t: Test) => {
   }
   {
     const req: RunTransactionRequest = {
-      fabricSigningCredential,
+      signingCredential,
       channelName,
       invocationType: FabricContractInvocationType.SEND,
-      chainCodeId,
-      functionName: "CreateAsset",
-      functionArgs: [assetId, "yellow", "11", assetOwner, "199"],
+      contractName,
+      methodName: "CreateAsset",
+      params: [assetId, "yellow", "11", assetOwner, "199"],
     };
 
     const res = await apiClient.runTransactionV1(req);
@@ -179,12 +179,12 @@ test(testCase, async (t: Test) => {
 
   {
     const res = await apiClient.runTransactionV1({
-      fabricSigningCredential,
+      signingCredential,
       channelName,
-      chainCodeId,
+      contractName,
       invocationType: FabricContractInvocationType.CALL,
-      functionName: "GetAllAssets",
-      functionArgs: [],
+      methodName: "GetAllAssets",
+      params: [],
     } as RunTransactionRequest);
     t.ok(res);
     t.ok(res.data);

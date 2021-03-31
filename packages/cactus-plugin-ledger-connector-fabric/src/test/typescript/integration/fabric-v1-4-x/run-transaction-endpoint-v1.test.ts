@@ -136,19 +136,19 @@ test(testCase, async (t: Test) => {
 
   const carId = "CAR277";
   const carOwner = uuidv4();
-  const fabricSigningCredential: FabricSigningCredential = {
+  const signingCredential: FabricSigningCredential = {
     keychainId,
     keychainRef: keychainEntryKey,
   };
 
   {
     const res = await apiClient.runTransactionV1({
-      fabricSigningCredential,
+      signingCredential,
       channelName: "mychannel",
-      chainCodeId: "fabcar",
+      contractName: "fabcar",
       invocationType: FabricContractInvocationType.CALL,
-      functionName: "queryAllCars",
-      functionArgs: [],
+      methodName: "queryAllCars",
+      params: [],
     } as RunTransactionRequest);
     t.ok(res);
     t.ok(res.data);
@@ -158,12 +158,12 @@ test(testCase, async (t: Test) => {
 
   {
     const req: RunTransactionRequest = {
-      fabricSigningCredential,
+      signingCredential,
       channelName: "mychannel",
       invocationType: FabricContractInvocationType.SEND,
-      chainCodeId: "fabcar",
-      functionName: "createCar",
-      functionArgs: [carId, "Trabant", "601", "Blue", carOwner],
+      contractName: "fabcar",
+      methodName: "createCar",
+      params: [carId, "Trabant", "601", "Blue", carOwner],
     };
 
     const res = await apiClient.runTransactionV1(req);
@@ -173,12 +173,12 @@ test(testCase, async (t: Test) => {
   }
   {
     const res = await apiClient.runTransactionV1({
-      fabricSigningCredential,
+      signingCredential,
       channelName: "mychannel",
-      chainCodeId: "fabcar",
+      contractName: "fabcar",
       invocationType: FabricContractInvocationType.CALL,
-      functionName: "queryAllCars",
-      functionArgs: [],
+      methodName: "queryAllCars",
+      params: [],
     } as RunTransactionRequest);
     t.ok(res);
     t.ok(res.data);

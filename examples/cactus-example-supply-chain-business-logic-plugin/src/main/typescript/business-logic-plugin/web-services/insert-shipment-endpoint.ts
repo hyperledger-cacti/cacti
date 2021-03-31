@@ -77,15 +77,15 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
       const { shipment } = req.body as InsertShipmentRequest;
       this.log.debug(`${tag} %o`, shipment);
       const request: RunTransactionRequest = {
-        fabricSigningCredential: {
+        signingCredential: {
           keychainId: "PluginKeychainMemory_C",
           keychainRef: "user2",
         },
         channelName: "mychannel",
-        chainCodeId: "shipment",
+        contractName: "shipment",
         invocationType: FabricContractInvocationType.SEND,
-        functionName: "insertShipment",
-        functionArgs: [shipment.id, shipment.bookshelfId],
+        methodName: "insertShipment",
+        params: [shipment.id, shipment.bookshelfId],
       };
       const {
         data: { functionOutput },
