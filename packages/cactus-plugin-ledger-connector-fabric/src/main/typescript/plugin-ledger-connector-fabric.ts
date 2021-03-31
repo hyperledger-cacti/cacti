@@ -439,35 +439,35 @@ export class PluginLedgerConnectorFabric
 
     const { connectionProfile } = this.opts;
     const {
-      fabricSigningCredential,
+      signingCredential,
       channelName,
-      chainCodeId,
+      contractName,
       invocationType,
-      functionName: fnName,
-      functionArgs,
+      methodName: fnName,
+      params,
     } = req;
 
     const gateway = new Gateway();
     const wallet = new InMemoryWallet(new X509WalletMixin());
     const keychain = this.opts.pluginRegistry.findOneByKeychainId(
-      fabricSigningCredential.keychainId,
+      signingCredential.keychainId,
     );
     this.log.debug(
       "transact() obtained keychain by ID=%o OK",
-      fabricSigningCredential.keychainId,
+      signingCredential.keychainId,
     );
 
     const fabricX509IdentityJson = await keychain.get<string>(
-      fabricSigningCredential.keychainRef,
+      signingCredential.keychainRef,
     );
     this.log.debug(
       "transact() obtained keychain entry Key=%o OK",
-      fabricSigningCredential.keychainRef,
+      signingCredential.keychainRef,
     );
     const identity = JSON.parse(fabricX509IdentityJson);
 
     try {
-      await wallet.import(fabricSigningCredential.keychainRef, identity);
+      await wallet.import(signingCredential.keychainRef, identity);
       this.log.debug("transact() imported identity to in-memory wallet OK");
 
       const eventHandlerOptions: DefaultEventHandlerOptions = {
@@ -483,7 +483,7 @@ export class PluginLedgerConnectorFabric
       const gatewayOptions: GatewayOptions = {
         discovery: this.opts.discoveryOptions,
         eventHandlerOptions,
-        identity: fabricSigningCredential.keychainRef,
+        identity: signingCredential.keychainRef,
         wallet,
       };
 
@@ -491,16 +491,19 @@ export class PluginLedgerConnectorFabric
       this.log.debug("transact() gateway connection established OK");
 
       const network = await gateway.getNetwork(channelName);
-      const contract = network.getContract(chainCodeId);
+      const contract = network.getContract(contractName);
 
       let out: Buffer;
+      let success: boolean;
       switch (invocationType) {
         case FabricContractInvocationType.CALL: {
-          out = await contract.evaluateTransaction(fnName, ...functionArgs);
+          out = await contract.evaluateTransaction(fnName, ...params);
+          success = true;
           break;
         }
         case FabricContractInvocationType.SEND: {
-          out = await contract.submitTransaction(fnName, ...functionArgs);
+          out = await contract.submitTransaction(fnName, ...params);
+          success = true;
           break;
         }
         default: {
@@ -511,6 +514,7 @@ export class PluginLedgerConnectorFabric
       const outUtf8 = out.toString("utf-8");
       const res: RunTransactionResponse = {
         functionOutput: outUtf8,
+        success,
       };
       this.log.debug(`transact() response: %o`, res);
       this.prometheusExporter.addCurrentTransaction();

@@ -191,30 +191,30 @@ test(testCase, async (t: Test) => {
 
   const testKey = uuidv4();
   const testValue = uuidv4();
-  const fabricSigningCredential: FabricSigningCredential = {
+  const signingCredential: FabricSigningCredential = {
     keychainId,
     keychainRef: keychainEntryKey,
   };
 
   const setRes = await apiClient.runTransactionV1({
-    chainCodeId: "hello-world",
+    contractName: "hello-world",
     channelName: "mychannel",
-    functionArgs: [testKey, testValue],
-    functionName: "set",
+    params: [testKey, testValue],
+    methodName: "set",
     invocationType: FabricContractInvocationType.SEND,
-    fabricSigningCredential,
+    signingCredential,
   });
   t.ok(setRes, "setRes truthy OK");
   t.true(setRes.status > 199 && setRes.status < 300, "setRes status 2xx OK");
   t.comment(`HelloWorld.set() ResponseBody: ${JSON.stringify(setRes.data)}`);
 
   const getRes = await apiClient.runTransactionV1({
-    chainCodeId: "hello-world",
+    contractName: "hello-world",
     channelName: "mychannel",
-    functionArgs: [testKey],
-    functionName: "get",
+    params: [testKey],
+    methodName: "get",
     invocationType: FabricContractInvocationType.CALL,
-    fabricSigningCredential,
+    signingCredential,
   });
   t.ok(getRes, "getRes truthy OK");
   t.true(getRes.status > 199 && setRes.status < 300, "getRes status 2xx OK");
