@@ -1,0 +1,13 @@
+version: '2'
+services:
+  corda-driver:
+    image: corda-driver
+    container_name: corda-driver
+    ports:
+      - "9099:9099"
+    command: sh -c "./bin/corda-driver"
+
+networks:
+  default:
+    external:
+      name: corda_default

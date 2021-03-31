@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-builder
+data:
+  build: |-
+{{ .Files.Get "external-service-builder/bin/build" | indent 4}}
+  detect: |-
+{{ .Files.Get "external-service-builder/bin/detect" | indent 4}}
+  release: |-
+{{ .Files.Get "external-service-builder/bin/release" | indent 4}}
+---

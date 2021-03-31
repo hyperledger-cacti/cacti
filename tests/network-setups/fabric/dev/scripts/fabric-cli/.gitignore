@@ -1,0 +1,15 @@
+.DS_Store
+node_modules
+npm-debug.log
+coverage
+.nyc_output
+dist
+build
+.vscode
+.env
+wallet/
+protos/
+protos-js/*
+.npmrc
+temp/
+config.json

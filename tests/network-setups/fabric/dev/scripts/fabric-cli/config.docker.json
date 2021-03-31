@@ -1,0 +1,10 @@
+{
+  "network1": {
+    "connProfilePath": "/fabric-cli/ccp-nw1.json",
+    "relayEndpoint": "relay-network1:9080"
+  },
+  "network2": {
+    "connProfilePath": "/fabric-cli/ccp-nw2.json",
+    "relayEndpoint": "relay-network2:9083"
+  }
+}

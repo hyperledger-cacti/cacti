@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_CREDENTIALS = credentials('sannish.artifactory.apikey')
+        DOCKER_REGISTRY = 'res-dlt-interop-docker-local.artifactory.swg-devops.com'
+    }
+
+    stages {
+        stage('Docker Login') {
+            steps {
+              sh '''
+                  docker login -u ${DOCKER_CREDENTIALS_USR} -p ${DOCKER_CREDENTIALS_PSW} ${DOCKER_REGISTRY}
+               '''
+            }
+        }
+        stage('Build') {
+            steps {
+                sh '''
+                  cd fabric/dev/scripts/fabric-cli
+                  head -1 .npmrc.template > .npmrc
+                  curl --header "X-JFrog-Art-Api: ${DOCKER_CREDENTIALS_PSW}" https://na.artifactory.swg-devops.com/artifactory/api/npm/auth >> .npmrc
+                  docker build -t fabric-cli:latest .
+                  cd -
+                  cd fabric/shared/chaincode/simplestate
+                  docker build -t simplestate:latest .
+            		'''
+            }
+        }
+
+        stage('Push - fabric-cli') {
+          steps {
+             sh '''
+               docker tag fabric-cli:latest ${DOCKER_REGISTRY}/dlt-interop/interop-fabric-cli:latest
+               docker push ${DOCKER_REGISTRY}/dlt-interop/interop-fabric-cli:latest
+             '''
+           }
+        }
+        stage('Push - simplestate') {
+          steps {
+             sh '''
+               docker tag simplestate:latest ${DOCKER_REGISTRY}/dlt-interop/chaincodes/simplestate:latest
+               docker push ${DOCKER_REGISTRY}/dlt-interop/chaincodes/simplestate:latest
+             '''
+           }
+        }
+    }
+
+    post {
+        always {
+          sh '''
+                 docker logout ${DOCKER_REGISTRY}
+              '''
+        }
+        success {
+            script {
+                slackSend(color: '#00FF00', message: "Deploy ${env.BUILD_NUMBER} of ${env.JOB_NAME} successful (${env.BUILD_URL})")
+            }
+        }
+        failure {
+            script {
+                slackSend(color: '#FF0000', message: "Deploy ${env.BUILD_NUMBER} of ${env.JOB_NAME} FAILED (${env.BUILD_URL})")
+            }
+        }
+    }
+}

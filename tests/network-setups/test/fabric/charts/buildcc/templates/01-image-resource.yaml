@@ -1,0 +1,12 @@
+{{- $ccImage := printf "%s/%s:%s" $.Values.network.chaincode.imageRegistry $.Values.network.chaincode.imageName $.Values.network.chaincode.imageTag -}}
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: {{ printf "%s-image" $.Values.network.chaincode.name }}
+spec:
+  type: image
+  params:
+    - name: url
+      value: {{ $ccImage }}
+
+---

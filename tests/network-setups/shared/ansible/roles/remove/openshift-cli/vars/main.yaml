@@ -1,0 +1,7 @@
+---
+
+openshift_cli:
+  bin_directory: "~/bin/oc"
+
+
+

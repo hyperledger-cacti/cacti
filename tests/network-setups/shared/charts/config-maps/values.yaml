@@ -1,0 +1,3 @@
+global:
+  network:
+    name: network1

@@ -1,0 +1,82 @@
+pipeline {
+    agent any
+
+    options {
+
+      // We only keep the most recent five builds.
+      buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5'))
+
+    }
+
+    environment {
+      DOCKER_CREDENTIALS = credentials('sannish.artifactory.apikey')
+      DOCKER_REGISTRY = 'res-dlt-interop-docker-local.artifactory.swg-devops.com'
+      GIT_CREDENTIALS = credentials('sannish1-access-token-github-ibm-com')
+    }
+
+    stages {
+
+        stage('Docker Login') {
+            steps {
+              sh '''
+                  docker login -u ${DOCKER_CREDENTIALS_USR} -p ${DOCKER_CREDENTIALS_PSW} ${DOCKER_REGISTRY}
+               '''
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sshagent(['sannish1-github-sshkey']) {
+                    sh 'sed -i "s,git@github.com:,https://github.com/,g" scripts/update-protos.sh'
+                    sh 'scripts/update-protos.sh'
+                }
+                sh '''
+                  if [ -d "./fabric-protos" ]
+                  then
+                    docker build -t fabric-driver:latest -f fabricDriver.dockerfile .;
+                  else
+                    echo "FAIL"
+                  fi
+            		'''
+            }
+        }
+
+
+      	stage('Push') {
+          steps {
+             sh '''
+          		 docker tag fabric-driver:latest ${DOCKER_REGISTRY}/dlt-interop/fabric-driver:latest
+          		 docker push ${DOCKER_REGISTRY}/dlt-interop/fabric-driver:latest
+             '''
+           }
+         }
+
+    }
+
+    post {
+
+      always {
+      	sh '''
+               docker logout ${DOCKER_REGISTRY}
+            '''
+      }
+      success {
+          setBuildStatus("Build complete", "SUCCESS");
+          slackSend (color: '#00FF00', message: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      }
+
+      failure {
+          setBuildStatus("Build failure", "FAILURE");
+      }
+    }
+}
+
+void setBuildStatus(String message, String state) {
+  step([
+      $class: "GitHubCommitStatusSetter",
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.ibm.com/sannish1/fabric-driver.git"],
+      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+      errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+  ]);
+}

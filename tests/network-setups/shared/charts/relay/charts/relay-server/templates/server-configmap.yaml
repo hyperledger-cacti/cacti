@@ -1,0 +1,20 @@
+{{- if $.Values.discovery.relays.dns -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Values.server.name }}-configmap
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  labels:
+{{ include "relay-server.labels" | indent 4 }}
+data: 
+{{- range $.Values.discovery.relays.dns.entries -}}
+  {{ .group }}.toml: |-
+  {{- range .entries }}
+    [relays.{{.name}}]
+    hostname={{ quote .host }}
+    port={{ quote .port }}
+    
+    
+  {{- end }}
+{{- end }}  
+{{- end -}}

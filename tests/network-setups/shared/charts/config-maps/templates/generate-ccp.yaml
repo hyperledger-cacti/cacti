@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: generate-ccp
+data:
+  ccp-generate.sh: |-
+{{ .Files.Get "generate-ccp/ccp-generate.sh" | indent 4}}
+  ccp-template.json: |-
+{{ .Files.Get "generate-ccp/ccp-template.json" | indent 4}}
+---

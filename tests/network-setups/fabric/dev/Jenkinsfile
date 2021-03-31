@@ -1,0 +1,24 @@
+#!/usr/local/bin/groovy
+pipeline {
+    agent any
+    stages {
+        stage('Init'){
+            steps{
+		echo "Cloning the repo.."
+            }
+        }
+        stage('Clone sources'){
+            steps{
+		echo "Cloning the repo.."
+                git url: 'git@github.ibm.com:dlt-interoperability/fabric-testnet.git'
+            }
+        }
+        stage('Setup'){
+            steps{
+		sh 'cd /${WORKSPACE}'
+		sh 'curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.1.0 1.4.7 0.4.20 -s'
+		sh '/${WORKSPACE}/network.sh up'
+            }
+        }
+    }
+}

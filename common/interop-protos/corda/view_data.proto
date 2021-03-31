@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package corda;
+
+option go_package = "/corda";
+
+message ViewData {
+    message Notarization {
+        string signature = 1;
+        string certificate = 2;
+        string id = 3;
+    }
+    repeated Notarization notarizations = 1;
+    // Bytes of InteropPayload
+    bytes payload = 2;
+}

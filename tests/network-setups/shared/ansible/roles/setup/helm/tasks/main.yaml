@@ -1,0 +1,17 @@
+---
+  - name: Ensure Helm Installation
+    include_role:
+      name: setup/simple-package
+    vars:
+      package:
+        name: "Helm"
+        install_path: "{{ helm.bin_directory }}"
+        url: "https://get.helm.sh/helm-{{ helm.version }}-{{ helm.os }}-{{ helm.arch }}.tar.gz"
+        unpack: True
+        command: "{{ helm.bin_directory }}/helm version --client --short"
+        cache: True
+        archive_path: "{{ helm.os }}-{{ helm.arch }}/"
+    tags:
+      - helm
+
+  
