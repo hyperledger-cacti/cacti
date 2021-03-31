@@ -11,7 +11,6 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
-import javax.validation.Valid
 
 /**
  * 
@@ -22,19 +21,15 @@ import javax.validation.Valid
  */
 data class InvokeContractV1Request(
 
-    @get:NotNull  
-    @get:Size(min=1,max=1024)
+    @get:NotNull @get:Size(min=1,max=1024) 
     @field:JsonProperty("flowFullClassName") val flowFullClassName: kotlin.String,
 
-    @get:NotNull  
-    @field:Valid
+    @get:NotNull 
     @field:JsonProperty("flowInvocationType") val flowInvocationType: FlowInvocationType,
 
-    @get:NotNull  
-    @field:Valid
+    @get:NotNull 
     @field:JsonProperty("params") val params: kotlin.collections.List<JvmObject>,
-
-    @get:DecimalMin("0")
+@get:DecimalMin("0")
     @field:JsonProperty("timeoutMs") val timeoutMs: java.math.BigDecimal? = null
 ) {
 

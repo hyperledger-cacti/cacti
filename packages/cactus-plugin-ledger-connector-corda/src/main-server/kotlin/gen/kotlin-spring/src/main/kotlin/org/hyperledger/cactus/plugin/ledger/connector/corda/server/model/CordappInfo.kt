@@ -10,7 +10,6 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
-import javax.validation.Valid
 
 /**
  * A CordappInfo describes a single CorDapp currently installed on the node
@@ -26,32 +25,31 @@ import javax.validation.Valid
  */
 data class CordappInfo(
 
-    @get:NotNull  
-    @field:Valid
+    @get:NotNull 
     @field:JsonProperty("jarHash") val jarHash: SHA256,
 
-    @get:NotNull  
+    @get:NotNull 
     @field:JsonProperty("licence") val licence: kotlin.String,
 
-    @get:NotNull  
+    @get:NotNull 
     @field:JsonProperty("minimumPlatformVersion") val minimumPlatformVersion: kotlin.Int,
 
-    @get:NotNull  
+    @get:NotNull 
     @field:JsonProperty("name") val name: kotlin.String,
 
-    @get:NotNull  
+    @get:NotNull 
     @field:JsonProperty("shortName") val shortName: kotlin.String,
 
-    @get:NotNull  
+    @get:NotNull 
     @field:JsonProperty("targetPlatformVersion") val targetPlatformVersion: kotlin.Int,
 
-    @get:NotNull  
+    @get:NotNull 
     @field:JsonProperty("type") val type: kotlin.String,
 
-    @get:NotNull  
+    @get:NotNull 
     @field:JsonProperty("vendor") val vendor: kotlin.String,
 
-    @get:NotNull  
+    @get:NotNull 
     @field:JsonProperty("version") val version: kotlin.String
 ) {
 
