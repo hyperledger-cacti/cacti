@@ -1,4 +1,3 @@
-
 - [Git Know How / Reading List](#git-know-how--reading-list)
 - [PR Checklist - Contributor/Developer](#pr-checklist---contributordeveloper)
 - [PR Checklist - Maintainer/Reviewer](#pr-checklist---maintainerreviewer)
