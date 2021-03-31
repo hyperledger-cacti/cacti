@@ -100,6 +100,7 @@
     "express-openapi-validator": "3.10.0",
     "jose": "1.27.2",
     "node-forge": "0.10.0",
+    "prom-client": "13.1.0",
     "semver": "7.3.2",
     "uuid": "7.0.2"
   },

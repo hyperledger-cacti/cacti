@@ -33,11 +33,14 @@ import { Logger, LoggerProvider, Servers } from "@hyperledger/cactus-common";
 import { ICactusApiServerOptions } from "./config/config-service";
 import OAS from "../json/openapi.json";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
+
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 export interface IApiServerConstructorOptions {
   pluginRegistry?: PluginRegistry;
   httpServerApi?: Server | SecureServer;
   httpServerCockpit?: Server | SecureServer;
   config: ICactusApiServerOptions;
+  prometheusExporter?: PrometheusExporter;
 }
 
 export class ApiServer {
@@ -45,6 +48,7 @@ export class ApiServer {
   private pluginRegistry: PluginRegistry | undefined;
   private readonly httpServerApi: Server | SecureServer;
   private readonly httpServerCockpit: Server | SecureServer;
+  public prometheusExporter: PrometheusExporter;
 
   constructor(public readonly options: IApiServerConstructorOptions) {
     if (!options) {
@@ -78,10 +82,34 @@ export class ApiServer {
       this.httpServerCockpit = createServer();
     }
 
+    if (this.options.prometheusExporter) {
+      this.prometheusExporter = this.options.prometheusExporter;
+    } else {
+      this.prometheusExporter = new PrometheusExporter({
+        pollingIntervalInMin: 1,
+      });
+    }
+    this.prometheusExporter.setTotalPluginImports(this.getPluginImportsCount());
+
     this.log = LoggerProvider.getOrCreate({
       label: "api-server",
       level: options.config.logLevel,
     });
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    this.prometheusExporter.setTotalPluginImports(this.getPluginImportsCount());
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+    return res;
+  }
+
+  public getPluginImportsCount(): number {
+    return this.pluginRegistry?.plugins.length || 0;
   }
 
   async start(): Promise<any> {
@@ -159,6 +187,9 @@ export class ApiServer {
         this.pluginRegistry = this.options.pluginRegistry;
       }
     }
+    await this.prometheusExporter.setTotalPluginImports(
+      await this.getPluginImportsCount(),
+    );
     return this.pluginRegistry;
   }
 
@@ -311,6 +342,28 @@ export class ApiServer {
     const { http } = oasPath.get["x-hyperledger-cactus"];
     const { path: httpPath, verbLowerCase: httpVerb } = http;
     (app as any)[httpVerb](httpPath, healthcheckHandler);
+
+    const prometheusExporterHandler = (req: Request, res: Response) => {
+      this.getPrometheusExporterMetrics().then((resBody) => {
+        res.status(200);
+        res.send(resBody);
+      });
+    };
+
+    const {
+      "/api/v1/api-server/get-prometheus-exporter-metrics": oasPathPrometheus,
+    } = OAS.paths;
+    const { http: httpPrometheus } = oasPathPrometheus.get[
+      "x-hyperledger-cactus"
+    ];
+    const {
+      path: httpPathPrometheus,
+      verbLowerCase: httpVerbPrometheus,
+    } = httpPrometheus;
+    (app as any)[httpVerbPrometheus](
+      httpPathPrometheus,
+      prometheusExporterHandler,
+    );
 
     const registry = await this.getOrInitPluginRegistry();
 
