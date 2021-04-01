@@ -1,13 +1,13 @@
 module.exports = {
   title: 'Weaver: DLT Interoperability Framework',
   tagline: 'Documentation',
-  url: 'https://VRamakrishna.github.io',
+  url: 'https://hyperledger-labs.github.io',
   baseUrl: '/weaver-dlt-interoperability/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'shared/favicon.ico',
-  organizationName: 'VRamakrishna',
-  projectName: 'VRamakrishna.github.io',
+  organizationName: 'hyperledger-labs',
+  projectName: 'hyperledger-labs.github.io',
   themeConfig: {
     navbar: {
       title: 'Weaver',
@@ -28,7 +28,7 @@ module.exports = {
           position: 'left'
         },
         {
-          href: 'https://github.com/VRamakrishna/weaver-dlt-interoperability',
+          href: 'https://github.com/hyperledger-labs/weaver-dlt-interoperability',
           label: 'GitHub',
           position: 'right',
         },
@@ -49,7 +49,7 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/VRamakrishna/weaver-dlt-interoperability/edit/master/',
+            'https://github.com/hyperledger-labs/weaver-dlt-interoperability/edit/master/',
         },        
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

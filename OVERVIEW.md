@@ -20,9 +20,9 @@ Toward the right of the figure, you can see functions in the semantic layer call
 - Data transfers
 - Asset transfers
 - Asset exchanges
-You can view details of these use cases (or _modes_ of interoperation) [here](https://VRamakrishna.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
+You can view details of these use cases (or _modes_ of interoperation) [here](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
 
-_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-netowrk identity management occurs on a separate plane from the information exchanges, and our vision for this is described [here](https://VRamakrishna.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [here](./interop-rfcs/models/identity/distributed-identity-management.md).
+_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-netowrk identity management occurs on a separate plane from the information exchanges, and our vision for this is described [here](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [here](./interop-rfcs/models/identity/distributed-identity-management.md).
 
 ## Architecture and Deployment
 

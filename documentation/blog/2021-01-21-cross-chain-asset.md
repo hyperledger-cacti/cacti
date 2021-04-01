@@ -3,7 +3,7 @@ slug: cross-chain-asset
 title: Enabling Cross-Chain Asset Exchange On Permissioned Blockchains
 author: Yining Hu, Ermyas Abebe, Dileban Karunamoorthy, Venkatraman Ramakrishna
 author_title: Contributors
-author_url: https://VRamakrishna.github.io/weaver-dlt-interoperability/
+author_url: https://hyperledger-labs.github.io/weaver-dlt-interoperability/
 tags: [enterprise, interoperability, asset-exchange]
 ---
 ## Introduction
@@ -74,4 +74,4 @@ In addition to following the same set of building blocks, core mechanisms and se
 ## Conclusion
 To summarise, in this article we tackle the problem of enabling cross-chain asset exchange on permissioned blockchains and evaluate the different requirements imposed by public blockchains and permissioned blockchains. We also articulate a set of desired properties to guide the design of cross-chain asset exchange protocols.
 
-For general-purpose interoperability of enterprise blockchains, we have developed the [Weaver](https://VRamakrishna.github.io/weaver-dlt-interoperability/) tool that incorporates a cross-chain state verification engine to enable cross-chain state sharing and verification. Please check out our documentation for implementation details and example applications.
+For general-purpose interoperability of enterprise blockchains, we have developed the [Weaver](https://hyperledger-labs.github.io/weaver-dlt-interoperability/) tool that incorporates a cross-chain state verification engine to enable cross-chain state sharing and verification. Please check out our documentation for implementation details and example applications.

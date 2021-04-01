@@ -12,7 +12,7 @@ const features = [
     imageUrl: 'shared/undraw_docusaurus_mountain.svg',
     description: (
       <>
-		  Graphene is designed to be agnostic to the underlying distributed ledger
+		  Weaver is designed to be agnostic to the underlying distributed ledger
 		  protocol and is based on as set of standard specifications.
       </>
     ),
@@ -31,7 +31,7 @@ const features = [
     imageUrl: 'shared/undraw_docusaurus_react.svg',
     description: (
       <>
-        A high availability architecture with flexible deployment models meets the needs of enterprises deploying Graphene.        
+        A high availability architecture with flexible deployment models meets the needs of enterprises deploying Weaver.
       </>
     ),
   },
