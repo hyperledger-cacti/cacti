@@ -20,16 +20,16 @@ A framework, with a family of protocols, to enable interoperation for data shari
 For more details and illustrations, see the [project overview](./OVERVIEW.md).
 
 ## Repository Structure
-- Documentation for blockchain practitioners who wish to use and experiment with our code is served [here](https://hyperledger-labs.github.io/weaver-dlt-interoperability).
-  * To dive straight into running a basic setup and testing sample interoperation scenarios, start [here](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/getting-started).
-  * The source code for these documents lies [here](./documentation).
-- Comprehensive specifications of our architecture and protocol suite are written in the style of RFCs [here](./interop-rfcs).
-- Core Weaver components are implemented in the [core](./core) folder.
-- SDK extensions and libraries for DLT network applications to exercise Weaver interoperation capabilities are implemented in the [sdks](./sdks) folder.
-- Sample applications used for testing and benchmarking interoperation flows are implemented [here](./samples).
-- Common data structures and features used by different platform components and applications are implemented [here](./here).
-- Testing, experimentation, and evaluation frameworks, are implemented [here](./tests).
-  * An extensible _testnet_ is implemented in [network-setups](./tests/network-setups) to spin up basic Fabric and Corda networks and test data sharing (with proof) among them.
+- Blockchain practitioners who wish to use and experiment with our code should check the [Documentation](https://hyperledger-labs.github.io/weaver-dlt-interoperability).
+  * To dive straight into running a basic setup and testing sample interoperation scenarios, start with [Getting Started](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/getting-started).
+  * The source code for the documents lies in the [documentation folder](./documentation).
+- Comprehensive specifications of our architecture and protocol suite are written in the style of RFCs and found in the [interop-rfcs folder](./interop-rfcs).
+- Core Weaver components are implemented in the [core folder](./core).
+- SDK extensions and libraries for DLT network applications to exercise Weaver interoperation capabilities are implemented in the [sdks folder](./sdks).
+- Sample applications used for testing and benchmarking interoperation flows are implemented in the [samples folder](./samples).
+- Common data structures and features used by different platform components and applications are implemented in the [common folder](./common).
+- Testing, experimentation, and evaluation frameworks, are implemented in the [tests](./tests) folder.
+  * An extensible _testnet_ is implemented in the [tests/network-setups folder](./tests/network-setups) to spin up basic Fabric and Corda networks and test data sharing (with proof) among them.
 
 ## Initial Committers
 - https://github.com/VRamakrishna

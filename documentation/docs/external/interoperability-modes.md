@@ -27,7 +27,7 @@ This refers to the change of ownership of an asset in a source network and a cor
 
 _For example_: two parties with both Bitcoin and Ethereum accounts may trade Bitcoin forEthereum based on an exchange rate agreed upon off-chain. We generalize this to permissioned networks, where it may be harder to provide guarantees of finality, and therby, atomicity.
 
-The figure below illustrates a typical asset exchange. Initially, Party X holds Asset M in Network A and Party Y holds Asset N in Network B. Through interoperation, an exchange occurs whereby Y holds M in A and X holds N in B. The changes in these two networks occur atomically. (_Note_: in such a use case, both X and Y must be members of both networks.) See [here](user-stories/financial-markets.md) for an example scenario illustrating asset exchanges.
+The figure below illustrates a typical asset exchange. Initially, Party X holds Asset M in Network A and Party Y holds Asset N in Network B. Through interoperation, an exchange occurs whereby Y holds M in A and X holds N in B. The changes in these two networks occur atomically. (_Note_: in such a use case, both X and Y must be members of both networks.) See [DvP in Financial Markets](user-stories/financial-markets.md) for an example scenario illustrating asset exchanges.
 
 ![alt text](/use-cases/asset-exchange.png)
 
@@ -36,7 +36,7 @@ Both the asset transfer and exchange patterns can be extrapolated to scenarios i
 ### Data Sharing
 This refers to the transfer of data from its source ledger to a consuming ledger. (In many scenarios, data records in one network ledger may need to be shared with another network ledger in order to drive forward a process on the latter.) The data transferred can be the result of invoking a contract or a database query. There are no technical limits to the number of times a given piece of data can be copied to other ledgers.
 
-The below figure illustrates this pattern, where initially, Data Record is maintained only on Network A's ledger, and through interoperation, a copy resides on Network B's ledger. (_Note_: the data record may be transformed within Network B during the sharing process before a transaction is committed to its ledger.) See [here](user-stories/global-trade.md) for an example scenario illustrating data sharing.
+The below figure illustrates this pattern, where initially, Data Record is maintained only on Network A's ledger, and through interoperation, a copy resides on Network B's ledger. (_Note_: the data record may be transformed within Network B during the sharing process before a transaction is committed to its ledger.) See [Global Trade](user-stories/global-trade.md) for an example scenario illustrating data sharing.
 
 ![alt text](/use-cases/data-transfer.png)
 

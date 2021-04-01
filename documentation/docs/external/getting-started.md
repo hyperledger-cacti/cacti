@@ -155,7 +155,7 @@ Prepare `fabric-cli` for configuration as follows:
   fabric-cli config set-file ./config.json
   ```
 
-See [here](#fabric-cli) for more information.
+See the [Fabric CLI](#fabric-cli) section for more information.
 
 Finally, to prepare both `network1` and `network2` for interoperation, run:
 

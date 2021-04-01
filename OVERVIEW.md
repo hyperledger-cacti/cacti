@@ -20,9 +20,9 @@ Toward the right of the figure, you can see functions in the semantic layer call
 - Data transfers
 - Asset transfers
 - Asset exchanges
-You can view details of these use cases (or _modes_ of interoperation) [here](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
+You can find details on these use cases (or _modes_ of interoperation) in [Interoperability Modes](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
 
-_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-netowrk identity management occurs on a separate plane from the information exchanges, and our vision for this is described [here](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [here](./interop-rfcs/models/identity/distributed-identity-management.md).
+_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-network identity management occurs on a separate plane from the information exchanges, and our vision for this is described in [Decentralized Identity](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [Distributed Identity Management for Interoperation](./interop-rfcs/models/identity/distributed-identity-management.md).
 
 ## Architecture and Deployment
 
@@ -51,6 +51,6 @@ Because relays are additional components introduced by Weaver into a DLT network
 
 ## Publications
 
-1. On the Interoperability of Distributed Ledgers, Medium.com: [link](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808)
-2. Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer, _Middleware 2019 - Industry Track_: [link](https://arxiv.org/abs/1911.01064)
-3. Verifiable Observation of Permissioned Ledgers, _ICBC 2021_: [link](https://arxiv.org/abs/2012.07339)
+1. [On the Interoperability of Distributed Ledgers, Medium.com](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808)
+2. [Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer, _Middleware 2019 - Industry Track_](https://arxiv.org/abs/1911.01064)
+3. [Verifiable Observation of Permissioned Ledgers, _ICBC 2021_](https://arxiv.org/abs/2012.07339)

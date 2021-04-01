@@ -4,7 +4,7 @@ title: Weaver Framework
 ---
 
 Weaver is a framework that enables scalable interconnectivity between disparate distributed ledgers in a manner that preserves core tenets of decentralisation and security.
-The framework, consisting of a family of protocols, is designed and built with the following key guiding principles, which are discussed further [here](design-principles.md):
+The framework, consisting of a family of protocols, is designed and built with the following key guiding principles, which are further discussed in [Design Principles](design-principles.md):
 - **Inclusiveness**: Avoid approaches that are specific to a particular DLT implementation and design.
 - **Independence**: Interoperable networks retain sovereignty on their own processes and access control rules.
 - **Minimum Trust**: Reduce trust to only what is essentials (i.e. identity providers in the network).
