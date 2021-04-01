@@ -47,11 +47,11 @@ Before you begin, you need to check that you have all the prerequisites installe
 	```
 1. Start validators and the cartrade app
 	- Please open three consoles and execute the following:.
-	- Start the validator for Fabric on the first console using the port 5050:
+	- Start the validator for Fabric on the first console using the port 5040:
 		```
 		./script-start-validator-fabric.sh
 		```
-	- Start the validator for Ethereum on the second console using the port 5040: 
+	- Start the validator for Ethereum on the second console using the port 5050: 
 		```
 		./script-start-validator-ethereum.sh
 		```
