@@ -33,4 +33,4 @@ Both claiming and refunding transactions can be performed unilaterally because d
 ![Corda HTLC](../resources/images/cordapp-htlc.png)
 
 ### Generalisability
-The hash lock encumbrance state and associated contract can be offered as reusable pieces as part of Graphene. These pieces are largely agnostic of the specifics of the application. They can further be instrumented to *emit* custom Graphene events making automation of the orchestration of cross-chain HTLCs possible.
+The hash lock encumbrance state and associated contract can be offered as reusable pieces as part of Weaver. These pieces are largely agnostic of the specifics of the application. They can further be instrumented to *emit* custom Weaver events making automation of the orchestration of cross-chain HTLCs possible.
