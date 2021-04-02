@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/hyperledger/cactus/compare/v0.4.0...v0.4.1) (2021-04-02)
+
+
+### Bug Fixes
+
+* **connector-corda:** regenerate kotlin backend with correct version ([34f8e17](https://github.com/hyperledger/cactus/commit/34f8e17a06a8b58647e8d5e59b9d32d15ef6c8ef))
+
+
+### Features
+
+* **corda-connector:** dsl to support collections, enums [#622](https://github.com/hyperledger/cactus/issues/622) ([78e6754](https://github.com/hyperledger/cactus/commit/78e675424ebed5bb36e5d076252a05a424e5a170))
+
+
+
+
+
 # [0.4.0](https://github.com/hyperledger/cactus/compare/v0.3.0...v0.4.0) (2021-03-30)
 
 

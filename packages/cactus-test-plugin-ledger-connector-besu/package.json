@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-plugin-ledger-connector-besu",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Integration tests for the Besu ledger and the API server.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-plugin-ledger-connector-besu.node.umd.min.js",
@@ -81,11 +81,11 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "0.4.0",
+    "@hyperledger/cactus-cmd-api-server": "0.4.1",
     "@hyperledger/cactus-common": "0.4.0",
-    "@hyperledger/cactus-core": "0.4.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "0.4.0",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "0.4.0",
+    "@hyperledger/cactus-core": "0.4.1",
+    "@hyperledger/cactus-plugin-keychain-memory": "0.4.1",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "0.4.1",
     "@hyperledger/cactus-test-tooling": "0.4.0",
     "key-encoder": "2.0.3",
     "web3": "1.2.11",
