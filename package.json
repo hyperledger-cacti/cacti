@@ -22,6 +22,7 @@
     "build:dev:backend": "npm-run-all lint clean tsc",
     "build:dev:frontend": "lerna run build:dev:frontend",
     "build:dev:cmd-api-server": "lerna exec --stream --scope '*/*api-server' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
+    "test:cmd-api-server": "tap --timeout=600 \"packages/cactus-*cmd-api-server/src/test/typescript/{unit,integration}/\"",
     "build:dev:common": "lerna exec --stream --scope '*/*common' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:core-api": "lerna exec --stream --scope '*/*core-api' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:test-tooling": "lerna exec --stream --scope '*/*test-tooling' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",

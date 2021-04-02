@@ -5,6 +5,7 @@ import tls from "tls";
 import { Server, createServer } from "http";
 import { Server as SecureServer } from "https";
 import { createServer as createSecureServer } from "https";
+import npm from "npm";
 import expressHttpProxy from "express-http-proxy";
 import express, {
   Express,
@@ -24,6 +25,7 @@ import {
   IPluginWebService,
   IPluginFactoryOptions,
   PluginFactoryFactory,
+  PluginImport,
 } from "@hyperledger/cactus-core-api";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -203,6 +205,8 @@ export class ApiServer {
       this.log.info(`Creating plugin from package: ${packageName}`, options);
       const pluginOptions = { ...options, logLevel, pluginRegistry: registry };
 
+      await this.installPluginPackage(pluginImport);
+
       const pluginPackage = require(/* webpackIgnore: true */ packageName);
       const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
 
@@ -218,6 +222,58 @@ export class ApiServer {
     }
 
     return registry;
+  }
+
+  private async installPluginPackage(
+    pluginImport: PluginImport,
+  ): Promise<void> {
+    const fnTag = `ApiServer#installPluginPackage()`;
+    const { packageName: pkgName } = pluginImport;
+
+    const npmLogHandler = (message: unknown) => {
+      this.log.debug(`${fnTag} [npm-log]:`, message);
+    };
+
+    const cleanUpNpmLogHandler = () => {
+      npm.off("log", npmLogHandler);
+    };
+
+    try {
+      this.log.info(`Installing ${pkgName} for plugin import`, pluginImport);
+      npm.on("log", npmLogHandler);
+
+      await new Promise<void>((resolve, reject) => {
+        npm.load((err?: Error) => {
+          if (err) {
+            this.log.error(`${fnTag} npm load fail:`, err);
+            const { message, stack } = err;
+            reject(new Error(`${fnTag} npm load fail: ${message}: ${stack}`));
+          } else {
+            npm.config.set("save", false);
+            npm.config.set("audit", false);
+            npm.config.set("progress", false);
+            resolve();
+          }
+        });
+      });
+
+      await new Promise<unknown>((resolve, reject) => {
+        const npmInstallHandler = (errInstall?: Error, result?: unknown) => {
+          if (errInstall) {
+            this.log.error(`${fnTag} npm install failed:`, errInstall);
+            const { message: m, stack } = errInstall;
+            reject(new Error(`${fnTag} npm install fail: ${m}: ${stack}`));
+          } else {
+            this.log.info(`Installed ${pkgName} OK`, result);
+            resolve(result);
+          }
+        };
+
+        npm.commands.install([pkgName], npmInstallHandler);
+      });
+    } finally {
+      cleanUpNpmLogHandler();
+    }
   }
 
   public async shutdown(): Promise<void> {
