@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # dummy_driver
 
 This is a dummy driver to be used for testing the relay so that you don't need to connect to a fabric or corda network.

@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Ansible Role for Download and Installation of Simple Packages
 
 This Ansible role facilitate the implementation of other tasks that naturally require the installation of one of more file in a single rooted directory structure.

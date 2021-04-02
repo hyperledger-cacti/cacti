@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Weaver Docs
 
 This repository contains documentation for Weaver users as well as protocol contributors.

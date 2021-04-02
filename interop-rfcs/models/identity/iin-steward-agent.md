@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # IIN Steward Agent in an Interoperation Identity Network
 
 * Authors: Venkatraman Ramakrishna

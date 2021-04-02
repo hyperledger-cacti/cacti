@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // handleExternalRequest contains the chaincode function to process an interop request
 // coming from a remote network
 package main

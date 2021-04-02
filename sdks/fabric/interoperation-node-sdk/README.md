@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # fabric-interop-sdk
 
 Client library functions to augment or complement the Fabric-Node-SDK library

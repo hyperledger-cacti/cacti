@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Environment Files Folder
 
 This folder contains the variables that are used by the playbooks in this repository.

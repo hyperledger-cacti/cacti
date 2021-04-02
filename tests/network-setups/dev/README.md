@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Local Development Setup
 
 This folder contains the setup of the networks that are run and deployed in the local environment.

@@ -1,3 +1,9 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 # This file contains the variables that are derived from the current configuration
 # parameters of the task and the defaults set in ../defaults/main.yaml. These are
 # essentially short-hands for file system locations that are internally managed by
