@@ -90,7 +90,7 @@ test(testCase, async (t: Test) => {
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
     hostname: "0.0.0.0",
-    port: 32845,
+    port: 0,
     server,
   };
   const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
