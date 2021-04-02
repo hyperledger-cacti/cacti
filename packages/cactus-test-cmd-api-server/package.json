@@ -85,8 +85,8 @@
     "@hyperledger/cactus-common": "0.4.0",
     "@hyperledger/cactus-core": "0.4.1",
     "@hyperledger/cactus-core-api": "0.4.1",
-    "@hyperledger/cactus-plugin-keychain-memory": "0.4.1",
-    "@hyperledger/cactus-plugin-keychain-vault": "0.4.1"
+    "@hyperledger/cactus-plugin-keychain-vault": "0.4.1",
+    "jose": "1.27.2"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "0.4.0"
