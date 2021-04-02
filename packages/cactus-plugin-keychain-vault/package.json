@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-vault",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A keychain implementation storing its entries in Hashicorp Vault. Actual logic is implemented in Rust.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-keychain-vault.node.umd.min.js",
@@ -84,8 +84,8 @@
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "@hyperledger/cactus-common": "0.4.0",
-    "@hyperledger/cactus-core": "0.4.0",
-    "@hyperledger/cactus-core-api": "0.4.0",
+    "@hyperledger/cactus-core": "0.4.1",
+    "@hyperledger/cactus-core-api": "0.4.1",
     "axios": "0.21.1",
     "express": "4.17.1",
     "http-status-codes": "2.1.4",

@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/petermetz/cactus/compare/v0.4.0...v0.4.1) (2021-04-02)
+
+
+### Bug Fixes
+
+* **connector-corda:** regenerate kotlin backend with correct version ([34f8e17](https://github.com/petermetz/cactus/commit/34f8e17a06a8b58647e8d5e59b9d32d15ef6c8ef))
+* **connector-fabric:** cve-2020-7774 Prototype Pollution high sev. [#745](https://github.com/petermetz/cactus/issues/745) ([6114cef](https://github.com/petermetz/cactus/commit/6114ceff5c078674993af319653dc770a2011983))
+* **docs:** supply chain example container image exact versions [#751](https://github.com/petermetz/cactus/issues/751) ([bfc9c19](https://github.com/petermetz/cactus/commit/bfc9c19969267e1db861ced28f4859251446570d))
+* **examples:** add explanations about docker group to examples/electricity-trade and examples/cartrade ([6174cbd](https://github.com/petermetz/cactus/commit/6174cbd32c8b849a6c736ff44dc5baa225b46f24))
+* **examples:** add explanations about docker group to examples/electricity-trade and examples/cartrade-2 ([74119a0](https://github.com/petermetz/cactus/commit/74119a05cc4b5416baeac0caba1a01ab4c7af936))
+* **ledger-plugin:** restore packages/package.json ([a93e451](https://github.com/petermetz/cactus/commit/a93e4511ca05dc242697e4bc91618318f9d4e85d))
+* **release:** package.json publish config non-public [#753](https://github.com/petermetz/cactus/issues/753) ([5a1b7a6](https://github.com/petermetz/cactus/commit/5a1b7a6eba9a18d4f7474a3c44d4a4035fc99e84))
+
+
+### Features
+
+* **api-server:** add prometheus exporter ([c348aa4](https://github.com/petermetz/cactus/commit/c348aa4f858536bca350af6abd524a5d345aacc7)), closes [#539](https://github.com/petermetz/cactus/issues/539)
+* **connector-fabric:** common interface ([c35cfe7](https://github.com/petermetz/cactus/commit/c35cfe755c75ae860fdf28eb7fc89215557635c5))
+* **corda-connector:** dsl to support collections, enums [#622](https://github.com/petermetz/cactus/issues/622) ([78e6754](https://github.com/petermetz/cactus/commit/78e675424ebed5bb36e5d076252a05a424e5a170))
+
+
+
+
+
 # [0.4.0](https://github.com/petermetz/cactus/compare/v0.3.0...v0.4.0) (2021-03-30)
 
 
