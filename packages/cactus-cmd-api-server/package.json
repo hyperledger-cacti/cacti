@@ -9,7 +9,7 @@
     "dist/*"
   ],
   "main": "dist/lib/main/typescript/index.js",
-  "mainMinified": "dist/cactus-cmd-api-server.node.umd.min.js",
+  "mainMinified": "dist/cactus-cmd-api-server.node.umd.js",
   "browser": "dist/cactus-cmd-api-server.web.umd.js",
   "browserMinified": "dist/cactus-cmd-api-server.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
@@ -25,7 +25,7 @@
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
     "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
-    "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
+    "webpack:prod:node": "echo 'SKIPPING script webpack:prod:node for @hyperledger/cactus-cmd-api-server' the dev bundle will be used as fallback until npm can be processed by the Webpack Terser."
   },
   "watch": {
     "tsc": {
