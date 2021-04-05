@@ -10,6 +10,23 @@ machine or if you are planning on contributing.
 
 The project uses Typescript for both back-end and front-end components.
 
+## Fast Developer Flow / Code Iterations
+
+We put a lot of thought and effort into making sure that fast developer iterations can be
+achieved (please file a bug if you feel otherwise) while working **on** the framework. 
+
+If you find yourself waiting too much for builds to finish, most of the time 
+that can be helped by using the `npm run watch` script which can automatically 
+recompile packages as you modify them (and only the packages that you have 
+modified, not everything).
+
+It also supports re-running the OpenAPI generator when you update any 
+`openapi.json` spec files that we use to describe our endpoints.
+
+The `npm run watch` script in action:
+
+![Fast Developer Flow / Code Iterations](./docs/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
+
 ## Getting Started
 
 * Install OS level dependencies:
