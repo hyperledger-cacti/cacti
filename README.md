@@ -55,6 +55,10 @@ Once the last command has finished executing, open link printed on the console w
 * mailing list: [cactus@lists.hyperledger.org](mailto:cactus@lists.hyperledger.org)
 * rocketchat channel: [https://chat.hyperledger.org/channel/cactus](https://chat.hyperledger.org/channel/cactus).
 
+## Build/Development Flow
+
+To go from zero to hero with project setup and working on your contributions: [BUILD.md](./BUILD.md)
+
 ## Contributing
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
