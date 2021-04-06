@@ -1,3 +1,9 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 # This section provides information about the server. More specifically
 # the name of the relay, its hostname, which is of use to create the
 # service name and the port the relay is going to listen to.

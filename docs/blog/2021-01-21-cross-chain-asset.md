@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 ---
 slug: cross-chain-asset
 title: Enabling Cross-Chain Asset Exchange On Permissioned Blockchains

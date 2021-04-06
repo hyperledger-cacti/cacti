@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Sample DLT Applications
 
 This folder houses implementations of various applications, ranging from toys to production-grade, on different DLTs that can be used to illustrate one or more interoperation scenario (i.e., protocol).

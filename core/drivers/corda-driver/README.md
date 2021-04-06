@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # corda-driver
 
 The Corda driver is used by the relays to interface with the Corda nodes. It

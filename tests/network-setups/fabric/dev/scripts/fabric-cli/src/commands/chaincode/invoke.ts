@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { GluegunCommand } from 'gluegun'
 import { invoke } from '../../helpers/fabric-functions'
 import logger from '../../helpers/logger'

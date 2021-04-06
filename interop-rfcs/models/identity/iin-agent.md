@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # IIN Agents in a DLT Network
 
 * Authors: Venkatraman Ramakrishna

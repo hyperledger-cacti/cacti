@@ -1,3 +1,9 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 # These variable resolve the full URLs to the two packages to download based on
 # the default settings and the specification of architecture, version, and operating
 # system supplied.

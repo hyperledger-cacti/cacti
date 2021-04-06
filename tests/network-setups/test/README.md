@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Integration Test Setup
 
 This folder contains the network definitions and the script logic that is used to setup and configure

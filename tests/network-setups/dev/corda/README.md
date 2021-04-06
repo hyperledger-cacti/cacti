@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 #  Local Development Setup
 
 This folder contains the configuration details and local scripts that are used to setup a local instance of the Corda Network containing the Interoperability CorDapp and the test application. 

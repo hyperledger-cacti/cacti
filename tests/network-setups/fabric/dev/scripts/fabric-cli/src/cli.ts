@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { build } from 'gluegun/build'
 import { customHelp } from './helpers/helpers'
 import * as path from 'path'

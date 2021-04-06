@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package com.cordaSimpleApplication.test.contract
 
 import com.cordaSimpleApplication.contract.SimpleContract

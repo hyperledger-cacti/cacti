@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Relay Server Helm Chart
 
 This Helm chart deploys an instance of a Relay Server and allows for customising the deployment of the relay via the default image built via the relay repository (suggested image is: `dlt-interop/relay-server`).

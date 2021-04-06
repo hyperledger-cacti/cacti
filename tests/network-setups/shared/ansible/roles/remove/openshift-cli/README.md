@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Ansible Role for OpenShift Container Plaform CLI  Binary Removal
 
 This role contains the tasks used to remove the installation of the OpenShift CLI binary. The tasks are all defined in the `tasks/main.yaml` file, which consumes the variables defined in `vars/main.yaml`. These are the variable currently supported:

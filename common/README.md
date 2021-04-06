@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Common Types and Structures used by Different Components
 
 Various data structures, patterns, templates, and message types, need to be defined and interpreted in a common way globally by various components that are exercised in any intstance of interoperation.

@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Ansible Role for the Installation of the Helm Binary 
 
 This folder contains the definition of the setup for the Helm binary (i.e. `helm`). This role defines a set of tasks that perform the following activities:

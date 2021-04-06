@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // This visitor generates the Abstract Syntax Tree that is constructed as a result
 // of parsing, and while walking the parser tree. It is a more abstract version of what is
 // parsed, which is more suitable for static analysis

@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Ansible Role for OpenShift Container Platform CLI Setup
 
 This folder contains the definition of the setup fole for the OpenShift CLI (i.e. `oc`). This role defines a set of tasks that perform the following activities:

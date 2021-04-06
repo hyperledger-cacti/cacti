@@ -1,3 +1,9 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 {{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
 {{- $configMapName := printf "%s-configtx" $.Values.global.network.name -}}
 {{- range $.Values.global.network.channels }}

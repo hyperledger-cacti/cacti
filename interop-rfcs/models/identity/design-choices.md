@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Design Choices for Identity Management
 
 - Authors: Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna

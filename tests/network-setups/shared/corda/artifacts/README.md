@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Directory Content
 
 This directory is meant to contain all the artifacts that are to be deployed in the Corda Network (i.e. Interoperability CorDapp and Test CordApp). The folder does not have checked in anything it is only a placeholder for artifacts, the developers are required to copy the artifacts here. 

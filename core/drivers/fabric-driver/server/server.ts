@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
 import ack_pb from '../protos-js/common/ack_pb';
 import fabricView from '../protos-js/fabric/view_data_pb';

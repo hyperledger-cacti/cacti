@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Interoperability RFCs
 
 The RFCs capture abstractions, models, protocols and data formats for facilitating cross-ledger communication. For newcomers we recommend starting with the protocol [overview]() document followed by the RFCs on _models_. Protocol engineers will find [RFC: 01-006](/models/relays.md) on the relay model a useful read and may progress on to reading one of the existing protocol design and implementations. If you are interested in adding support for a new ledger technology, see implementing a [new driver]() and implementing [interoperability modules]() for your ledger technology. Where relevant we use [ABNF](https://tools.ietf.org/html/rfc5234) for formal syntax definitions.

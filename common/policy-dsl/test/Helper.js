@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import antlr4 from "antlr4"
 
 import PolicyLexer from "../parser/PolicyLexer.js"
