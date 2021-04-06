@@ -43,6 +43,7 @@ For more details and illustrations, see the [project overview](./OVERVIEW.md).
 - https://github.com/dhinakaran2705
 - https://github.com//Yining-Hu
 - https://github.com/Vinayaka-Pandit
+- https://github.com/hyp0th3rmi4
 
 ## Sponsor
 - https://github.com/lehors - TSC Member
