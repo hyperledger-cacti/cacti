@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Your Protocol 0.9
 
 - Authors: [your name](you@github-email) -- email is optional

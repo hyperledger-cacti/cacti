@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // decoders contains all of our custom decoders to converting json `[]byte`s into structs.
 // We are using customs decoders for this since the default Unmarshal function doesn't error
 // when the json `[]byte` contains unknown fields

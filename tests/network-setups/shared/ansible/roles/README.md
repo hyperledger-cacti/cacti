@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Ansible Roles Main Folder
 
 This folder contains the Ansible roles used by the playbook. The roles are organised based on the type of activities that they perform:

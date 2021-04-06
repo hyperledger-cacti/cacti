@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Gateway, Wallets, Contract } from 'fabric-network'
 import { handlePromise } from './helpers'
 import * as FabricCAServices from 'fabric-ca-client'

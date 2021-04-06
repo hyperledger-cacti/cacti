@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Helm Charts for dlt-interop
 
   Before deploying to kubernetes, make sure kubeconfig is pointing to your k8s cluster.

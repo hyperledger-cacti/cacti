@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Policy DSL
 
 A verification policy defines the proof criteria that a requesting network requires of a remote network (see [Proof Verification Policies](./policy-proof-verification.md) for more information).

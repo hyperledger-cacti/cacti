@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // verficationpolicycc contains all the code related to the VerificiatonPolicy struct, including CRUD operations
 // and any related verification functions
 package main

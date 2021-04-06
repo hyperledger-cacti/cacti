@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Policy DSL
 
 This repo contains the `antlr` grammar file (`parser/Policy.g4`) for the verification policy DSL.

@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Relay Dummy Driver Helm Chart
 
 This Helm chart deploys an instance of Dumy Driver for testing purposes and allows for customising the deployment via the default image built via the relay repository (suggested image is: `dlt-interop/relay-driver`).

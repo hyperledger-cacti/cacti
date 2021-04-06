@@ -1,3 +1,9 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 {{- if (ne $.Values.global.cluster "OpenShift") -}}
 {{- $caName := printf "ca-orderers-%s" $.Values.global.network.name -}}
 apiVersion: networking.k8s.io/v1beta1

@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Ansible Role for the Installation of Hyperledger Fabric Tooling
 
 This role downloads and install the Hyperledger Fabric tools into the host. The package relies upon the services provided by the role `setup/simple-package` to download and install the archives required for the installation. These are:

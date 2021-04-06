@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // Tests to check that the AST is correctly generated from the parse tree
 // using MyParseTreeVisitor
 import test from "ava"

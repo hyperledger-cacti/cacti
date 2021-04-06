@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Ansible Playbooks for Setting Up a DLT Network
 
 This set of playbooks are designed to manage the deployment and configuration of the DLT networks in the test environment. The playbook also take care of installing the required dependencies to interact with the test environment.

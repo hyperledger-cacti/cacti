@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Relay
 
 The implementation of this relay conforms to the specifications outlined in the [interop-rfcs](../../interop-rfcs).

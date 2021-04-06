@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Distributed Identity Management for Interoperation
 
 * Authors: Venkatraman Ramakrishna

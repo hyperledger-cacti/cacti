@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Architectural Components for Protocol Implementations
 
 This folder contains implementations of the core capabilities that enable networks to interoperate.

@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // Generated from parser/Policy.g4 by ANTLR 4.9
 // jshint ignore: start
 import antlr4 from 'antlr4';

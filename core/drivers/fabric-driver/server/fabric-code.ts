@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Gateway, Wallets } from 'fabric-network';
 import { Endorser } from 'fabric-common';
 import * as path from 'path';

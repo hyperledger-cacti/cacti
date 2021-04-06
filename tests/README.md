@@ -1,3 +1,8 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Integration Tests and Testbeds for the Interoperation Framework
 
 This folder houses everything test-related, including cross-component integration tests and different kinds of testbeds for experimentation. In the future, it may also contain performance measurement and benchmarking code.
