@@ -28,7 +28,7 @@ For more details and illustrations, see the [project overview](./OVERVIEW.md).
 - Blockchain practitioners who wish to use and experiment with our code should check the [Documentation](https://hyperledger-labs.github.io/weaver-dlt-interoperability).
   * To dive straight into running a basic setup and testing sample interoperation scenarios, start with [Getting Started](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/getting-started).
   * The source code for the documents lies in the [docs folder](./docs).
-- Comprehensive specifications of our architecture and protocol suite are written in the style of RFCs and found in the [interop-rfcs folder](./interop-rfcs).
+- Comprehensive specifications of our architecture and protocol suite are written in the style of RFCs and found in the [rfcs folder](./rfcs).
 - Core Weaver components are implemented in the [core folder](./core).
 - SDK extensions and libraries for DLT network applications to exercise Weaver interoperation capabilities are implemented in the [sdks folder](./sdks).
 - Sample applications used for testing and benchmarking interoperation flows are implemented in the [samples folder](./samples).

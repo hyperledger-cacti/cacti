@@ -5,7 +5,7 @@
  -->
 # Relay
 
-The implementation of this relay conforms to the specifications outlined in the [interop-rfcs](../../interop-rfcs).
+The implementation of this relay conforms to the specifications outlined in the [rfcs](../../rfcs).
 
 Relay is a daemon for enabling cross-DLT interoperability. Relay implements the *Inter-Relay Protocol*, an RFC to-be of a protocol standard for linking distributed ledgers that implement different ledger protocols. 
 
@@ -35,7 +35,7 @@ To run relay dummy client test:
 
 `cargo run --bin client <port-number-of-requesting-relay> <address>`
 
-NOTE: Please read through the addressing specification in the [interop-rfcs](../../interop-rfcs/formats/addressing.md). Make sure the network-type has a running supported driver and is specified in the config.
+NOTE: Please read through the addressing specification in the [rfcs](../../rfcs/formats/addressing.md). Make sure the network-type has a running supported driver and is specified in the config.
 
 EXAMPLE:
 

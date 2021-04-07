@@ -27,7 +27,7 @@ Toward the right of the figure, you can see functions in the semantic layer call
 - Asset exchanges
 You can find details on these use cases (or _modes_ of interoperation) in [Interoperability Modes](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
 
-_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-network identity management occurs on a separate plane from the information exchanges, and our vision for this is described in [Decentralized Identity](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [Distributed Identity Management for Interoperation](./interop-rfcs/models/identity/distributed-identity-management.md).
+_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-network identity management occurs on a separate plane from the information exchanges, and our vision for this is described in [Decentralized Identity](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [Distributed Identity Management for Interoperation](./rfcs/models/identity/distributed-identity-management.md).
 
 ## Architecture and Deployment
 
@@ -44,7 +44,7 @@ For a data transfer use case, the following are the functions that are performed
 - Verification of proofs in the response by the requesting network
 The basis for this protocol is a priori knowledge of counterparty networks' membership providers' certificate chains.
 
-For more details, see the [RFCs](./interop-rfcs).
+For more details, see the [RFCs](./rfcs).
 
 The architecture of the relay, which we envision can be the basis of a universal DLT interoperability standard, is illustrated in the figure below. As mentioned above, there are both DLT-agnostic components as well as DLT-specific components called drivers. Relays can manage requests and responses for different interoperability modes as well as targets (other DLT networks or ERP systems).
 
