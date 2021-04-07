@@ -77,7 +77,8 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
   );
   const apiClient = new KeychainVaultApi({ basePath: apiHost });
 
-  await plugin.installWebServices(expressApp);
+  await plugin.getOrCreateWebServices();
+  await plugin.registerWebServices(expressApp);
 
   t.equal(plugin.getKeychainId(), options.keychainId, "Keychain ID set OK");
   t.equal(plugin.getInstanceId(), options.instanceId, "Instance ID set OK");

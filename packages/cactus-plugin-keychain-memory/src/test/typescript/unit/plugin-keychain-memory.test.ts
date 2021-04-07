@@ -82,7 +82,7 @@ test("PluginKeychainMemory", (t1: Test) => {
     );
     const apiClient = new KeychainMemoryApi({ basePath: apiHost });
 
-    await plugin.installWebServices(expressApp);
+    await plugin.getOrCreateWebServices(expressApp);
 
     t.equal(plugin.getKeychainId(), options.keychainId, "Keychain ID set OK");
     t.equal(plugin.getInstanceId(), options.instanceId, "Instance ID set OK");

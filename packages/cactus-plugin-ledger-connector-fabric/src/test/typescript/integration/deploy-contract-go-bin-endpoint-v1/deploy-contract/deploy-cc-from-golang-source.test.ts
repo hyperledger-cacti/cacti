@@ -147,7 +147,8 @@ test(testCase, async (t: Test) => {
   const { port } = addressInfo;
   test.onFinish(async () => await Servers.shutdown(server));
 
-  await plugin.installWebServices(expressApp);
+  await plugin.getOrCreateWebServices();
+  await plugin.registerWebServices(expressApp);
   const apiUrl = `http://localhost:${port}`;
 
   const apiClient = new FabricApi({ basePath: apiUrl });

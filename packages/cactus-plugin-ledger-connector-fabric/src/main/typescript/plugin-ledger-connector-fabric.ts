@@ -113,6 +113,7 @@ export class PluginLedgerConnectorFabric
   private readonly dockerBinary: string;
   private readonly cliContainerGoPath: string;
   public prometheusExporter: PrometheusExporter;
+  private endpoints: IWebServiceEndpoint[] | undefined;
 
   public get className(): string {
     return PluginLedgerConnectorFabric.CLASS_NAME;
@@ -387,9 +388,17 @@ export class PluginLedgerConnectorFabric
     }
   }
 
-  public async installWebServices(
-    expressApp: Express,
-  ): Promise<IWebServiceEndpoint[]> {
+  async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+    const webServices = await this.getOrCreateWebServices();
+    webServices.forEach((ws) => ws.registerExpress(app));
+    return webServices;
+  }
+
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
+    if (Array.isArray(this.endpoints)) {
+      return this.endpoints;
+    }
+
     const { log } = this;
 
     log.info(`Installing web services for plugin ${this.getPackageName()}...`);
@@ -402,7 +411,6 @@ export class PluginLedgerConnectorFabric
         logLevel: this.opts.logLevel,
       };
       const endpoint = new DeployContractGoSourceEndpointV1(opts);
-      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
 
@@ -412,7 +420,6 @@ export class PluginLedgerConnectorFabric
         logLevel: this.opts.logLevel,
       };
       const endpoint = new RunTransactionEndpointV1(opts);
-      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
 
@@ -422,7 +429,6 @@ export class PluginLedgerConnectorFabric
         logLevel: this.opts.logLevel,
       };
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
-      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
 

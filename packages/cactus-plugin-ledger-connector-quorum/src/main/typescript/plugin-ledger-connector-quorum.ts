@@ -89,6 +89,7 @@ export class PluginLedgerConnectorQuorum
     [name: string]: Contract;
   } = {};
 
+  private endpoints: IWebServiceEndpoint[] | undefined;
   public static readonly CLASS_NAME = "PluginLedgerConnectorQuorum";
 
   public get className(): string {
@@ -151,16 +152,22 @@ export class PluginLedgerConnectorQuorum
     }
   }
 
-  public async installWebServices(
-    expressApp: Express,
-  ): Promise<IWebServiceEndpoint[]> {
+  async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+    const webServices = await this.getOrCreateWebServices();
+    webServices.forEach((ws) => ws.registerExpress(app));
+    return webServices;
+  }
+
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
+    if (Array.isArray(this.endpoints)) {
+      return this.endpoints;
+    }
     const endpoints: IWebServiceEndpoint[] = [];
     {
       const endpoint = new DeployContractSolidityBytecodeEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
-      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
     {
@@ -168,7 +175,6 @@ export class PluginLedgerConnectorQuorum
         connector: this,
         logLevel: this.options.logLevel,
       });
-      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
     {
@@ -176,7 +182,6 @@ export class PluginLedgerConnectorQuorum
         connector: this,
         logLevel: this.options.logLevel,
       });
-      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
     {
@@ -184,7 +189,6 @@ export class PluginLedgerConnectorQuorum
         connector: this,
         logLevel: this.options.logLevel,
       });
-      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
     {
@@ -193,9 +197,9 @@ export class PluginLedgerConnectorQuorum
         logLevel: this.options.logLevel,
       };
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
-      endpoint.registerExpress(expressApp);
       endpoints.push(endpoint);
     }
+    this.endpoints = endpoints;
     return endpoints;
   }
 

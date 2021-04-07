@@ -72,7 +72,8 @@ test("Can provide JWS", async (t: Test) => {
   );
   const apiClient = new ConsortiumManualApi({ basePath: apiHost });
 
-  await pluginConsortiumManual.installWebServices(expressApp);
+  await pluginConsortiumManual.getOrCreateWebServices();
+  await pluginConsortiumManual.registerWebServices(expressApp);
 
   const epOpts: IGetNodeJwsEndpointOptions = {
     plugin: pluginConsortiumManual,

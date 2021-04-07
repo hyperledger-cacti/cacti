@@ -39,6 +39,8 @@ export class PluginLedgerConnectorCorda
   private readonly instanceId: string;
   private readonly log: Logger;
 
+  private endpoints: IWebServiceEndpoint[] | undefined;
+
   public get className(): string {
     return DeployContractJarsEndpoint.CLASS_NAME;
   }
@@ -84,10 +86,18 @@ export class PluginLedgerConnectorCorda
     throw new Error("Method not implemented.");
   }
 
-  public async installWebServices(
-    expressApp: Express,
-  ): Promise<IWebServiceEndpoint[]> {
-    this.log.info(`Installing web services for ${this.getPackageName()}...`);
+  async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+    const webServices = await this.getOrCreateWebServices();
+    webServices.forEach((ws) => ws.registerExpress(app));
+    return webServices;
+  }
+
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
+    if (Array.isArray(this.endpoints)) {
+      return this.endpoints;
+    }
+    const pkgName = this.getPackageName();
+    this.log.info(`Instantiating web services for ${pkgName}...`);
     const endpoints: IWebServiceEndpoint[] = [];
     {
       const endpoint = new DeployContractJarsEndpoint({
@@ -98,12 +108,9 @@ export class PluginLedgerConnectorCorda
         cordaStopCmd: this.options.cordaStopCmd,
       });
 
-      endpoint.registerExpress(expressApp);
-
       endpoints.push(endpoint);
-
-      this.log.info(`Registered endpoint at ${endpoint.getPath()}`);
     }
+    this.log.info(`Instantiated endpoints of ${pkgName}`);
     return endpoints;
   }
 

@@ -73,6 +73,7 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
   private readonly instanceId: string;
   private readonly kvSecretsMountPath: string;
   private readonly backend: Vault.client;
+  private endpoints: IWebServiceEndpoint[] | undefined;
   public prometheusExporter: PrometheusExporter;
 
   public get className() {
@@ -131,9 +132,16 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
     return res;
   }
 
-  public async installWebServices(
-    expressApp: Express,
-  ): Promise<IWebServiceEndpoint[]> {
+  async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+    const webServices = await this.getOrCreateWebServices();
+    webServices.forEach((ws) => ws.registerExpress(app));
+    return webServices;
+  }
+
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
+    if (Array.isArray(this.endpoints)) {
+      return this.endpoints;
+    }
     const endpoints: IWebServiceEndpoint[] = [];
 
     // TODO: Writing the getExpressRequestHandler() method for
@@ -159,9 +167,10 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
         logLevel: this.opts.logLevel,
       };
       const ep = new GetPrometheusExporterMetricsEndpointV1(opts);
-      ep.registerExpress(expressApp);
       endpoints.push(ep);
     }
+
+    this.endpoints = endpoints;
 
     return endpoints;
   }
