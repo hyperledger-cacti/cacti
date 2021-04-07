@@ -136,7 +136,8 @@ test(testCase, async (t: Test) => {
   );
   const apiClient = new FabricApi({ basePath: apiHost });
 
-  await plugin.installWebServices(expressApp);
+  await plugin.getOrCreateWebServices();
+  await plugin.registerWebServices(expressApp);
 
   const assetId = "asset277";
   const assetOwner = uuidv4();

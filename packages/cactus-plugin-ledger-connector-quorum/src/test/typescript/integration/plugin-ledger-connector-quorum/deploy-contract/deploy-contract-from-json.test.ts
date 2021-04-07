@@ -110,7 +110,8 @@ test(testCase, async (t: Test) => {
   );
   const apiClient = new QuorumApi({ basePath: apiHost });
 
-  await connector.installWebServices(expressApp);
+  await connector.getOrCreateWebServices();
+  await connector.registerWebServices(expressApp);
 
   await connector.transact({
     web3SigningCredential: {

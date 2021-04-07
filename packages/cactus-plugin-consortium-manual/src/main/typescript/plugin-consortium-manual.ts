@@ -50,6 +50,7 @@ export class PluginConsortiumManual
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly instanceId: string;
+  private endpoints: IWebServiceEndpoint[] | undefined;
   private httpServer: Server | SecureServer | null = null;
 
   constructor(public readonly options: IPluginConsortiumManualOptions) {
@@ -126,16 +127,11 @@ export class PluginConsortiumManual
     }
   }
 
-  public async installWebServices(
-    expressApp: Express,
+  public async registerWebServices(
+    app: Express,
   ): Promise<IWebServiceEndpoint[]> {
-    const { log } = this;
+    const webApp: Express = this.options.webAppOptions ? express() : app;
 
-    log.info(`Installing web services for plugin ${this.getPackageName()}...`);
-    const webApp: Express = this.options.webAppOptions ? express() : expressApp;
-
-    // presence of webAppOptions implies that caller wants the plugin to configure it's own express instance on a custom
-    // host/port to listen on
     if (this.options.webAppOptions) {
       this.log.info(`Creating dedicated HTTP server...`);
       const { port, hostname } = this.options.webAppOptions;
@@ -157,6 +153,22 @@ export class PluginConsortiumManual
       this.log.info(`Creation of HTTP server OK`, { address });
     }
 
+    const webServices = await this.getOrCreateWebServices();
+    webServices.forEach((ws) => ws.registerExpress(webApp));
+    return webServices;
+  }
+
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
+    const { log } = this;
+    const pkgName = this.getPackageName();
+
+    if (this.endpoints) {
+      return this.endpoints;
+    }
+    log.info(`Creating web services for plugin ${pkgName}...`);
+    // presence of webAppOptions implies that caller wants the plugin to configure it's own express instance on a custom
+    // host/port to listen on
+
     const { consortiumDatabase, keyPairPem } = this.options;
     const consortiumRepo = new ConsortiumRepository({
       db: consortiumDatabase,
@@ -166,18 +178,16 @@ export class PluginConsortiumManual
     {
       const options = { keyPairPem, consortiumRepo };
       const endpoint = new GetConsortiumEndpointV1(options);
-      const path = endpoint.getPath();
-      webApp.get(path, endpoint.getExpressRequestHandler());
       endpoints.push(endpoint);
-      this.log.info(`Registered GetConsortiumEndpointV1 at ${path}`);
+      const path = endpoint.getPath();
+      this.log.info(`Instantiated GetConsortiumEndpointV1 at ${path}`);
     }
     {
       const options = { keyPairPem, consortiumRepo, plugin: this };
       const endpoint = new GetNodeJwsEndpoint(options);
       const path = endpoint.getPath();
-      webApp.get(path, endpoint.getExpressRequestHandler());
       endpoints.push(endpoint);
-      this.log.info(`Registered GetNodeJwsEndpoint at ${path}`);
+      this.log.info(`Instantiated GetNodeJwsEndpoint at ${path}`);
     }
     {
       const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
@@ -185,13 +195,13 @@ export class PluginConsortiumManual
         logLevel: this.options.logLevel,
       };
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
-      endpoint.registerExpress(expressApp);
+      const path = endpoint.getPath();
       endpoints.push(endpoint);
+      this.log.info(`Instantiated GetNodeJwsEndpoint at ${path}`);
     }
+    this.endpoints = endpoints;
 
-    log.info(`Installed web svcs for plugin ${this.getPackageName()} OK`, {
-      endpoints,
-    });
+    log.info(`Instantiated web svcs for plugin ${pkgName} OK`, { endpoints });
     return endpoints;
   }
 

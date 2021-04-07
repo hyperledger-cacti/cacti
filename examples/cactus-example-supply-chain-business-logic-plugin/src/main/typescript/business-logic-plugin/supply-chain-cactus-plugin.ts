@@ -1,4 +1,6 @@
 import { Optional } from "typescript-optional";
+import { Express } from "express";
+
 import {
   Logger,
   Checks,
@@ -18,6 +20,7 @@ import {
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { InsertBambooHarvestEndpoint } from "./web-services/insert-bamboo-harvest-endpoint";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+
 import { ListBambooHarvestEndpoint } from "./web-services/list-bamboo-harvest-endpoint";
 import { ISupplyChainContractDeploymentInfo } from "../i-supply-chain-contract-deployment-info";
 import { InsertBookshelfEndpoint } from "./web-services/insert-bookshelf-endpoint";
@@ -51,6 +54,8 @@ export class SupplyChainCactusPlugin
   private readonly log: Logger;
   private readonly instanceId: string;
 
+  private endpoints: IWebServiceEndpoint[] | undefined;
+
   public get className(): string {
     return SupplyChainCactusPlugin.CLASS_NAME;
   }
@@ -73,9 +78,16 @@ export class SupplyChainCactusPlugin
     this.instanceId = options.instanceId;
   }
 
-  public async installWebServices(
-    expressApp: any,
-  ): Promise<IWebServiceEndpoint[]> {
+  async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+    const webServices = await this.getOrCreateWebServices();
+    webServices.forEach((ws) => ws.registerExpress(app));
+    return webServices;
+  }
+
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
+    if (Array.isArray(this.endpoints)) {
+      return this.endpoints;
+    }
     const insertBambooHarvest = new InsertBambooHarvestEndpoint({
       contractAddress: this.options.contracts.bambooHarvestRepository.address,
       contractAbi: this.options.contracts.bambooHarvestRepository.abi,
@@ -84,7 +96,6 @@ export class SupplyChainCactusPlugin
         .web3SigningCredential as Web3SigningCredential,
       logLevel: this.options.logLevel,
     });
-    insertBambooHarvest.registerExpress(expressApp);
 
     const listBambooHarvest = new ListBambooHarvestEndpoint({
       contractAddress: this.options.contracts.bambooHarvestRepository.address,
@@ -92,7 +103,6 @@ export class SupplyChainCactusPlugin
       apiClient: this.options.quorumApiClient,
       logLevel: this.options.logLevel,
     });
-    listBambooHarvest.registerExpress(expressApp);
 
     const insertBookshelf = new InsertBookshelfEndpoint({
       contractAddress: this.options.contracts.bookshelfRepository.address,
@@ -102,7 +112,6 @@ export class SupplyChainCactusPlugin
         .web3SigningCredential as Web3SigningCredential,
       logLevel: this.options.logLevel,
     });
-    insertBookshelf.registerExpress(expressApp);
 
     const listBookshelf = new ListBookshelfEndpoint({
       contractAddress: this.options.contracts.bookshelfRepository.address,
@@ -110,21 +119,18 @@ export class SupplyChainCactusPlugin
       besuApi: this.options.besuApiClient,
       logLevel: this.options.logLevel,
     });
-    listBookshelf.registerExpress(expressApp);
 
     const insertShipment = new InsertShipmentEndpoint({
       logLevel: this.options.logLevel,
       fabricApi: this.options.fabricApiClient,
     });
-    insertShipment.registerExpress(expressApp);
 
     const listShipment = new ListShipmentEndpoint({
       logLevel: this.options.logLevel,
       fabricApi: this.options.fabricApiClient,
     });
 
-    listShipment.registerExpress(expressApp);
-    return [
+    this.endpoints = [
       insertBambooHarvest,
       listBambooHarvest,
       insertBookshelf,
@@ -132,6 +138,7 @@ export class SupplyChainCactusPlugin
       insertShipment,
       listShipment,
     ];
+    return this.endpoints;
   }
 
   public getHttpServer(): Optional<any> {

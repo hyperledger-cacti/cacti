@@ -118,6 +118,7 @@
     "@types/node-forge": "0.9.3",
     "@types/npm": "2.0.31",
     "@types/semver": "7.3.1",
-    "@types/uuid": "7.0.2"
+    "@types/uuid": "7.0.2",
+    "@types/xml2js": "0.4.8"
   }
 }

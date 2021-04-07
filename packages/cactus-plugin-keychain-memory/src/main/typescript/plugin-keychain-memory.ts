@@ -77,7 +77,7 @@ export class PluginKeychainMemory {
     return res;
   }
 
-  public async installWebServices(
+  public async getOrCreateWebServices(
     expressApp: Express,
   ): Promise<IWebServiceEndpoint[]> {
     const { log } = this;

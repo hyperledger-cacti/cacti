@@ -1,6 +1,7 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 
+import { Express } from "express";
 import { Optional } from "typescript-optional";
 
 import {
@@ -79,8 +80,13 @@ export class PluginKeychainVaultRemoteAdapter
    *
    * @param _expressApp
    */
-  public async installWebServices(): Promise<IWebServiceEndpoint[]> {
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
     return [];
+  }
+
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  public registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+    return this.getOrCreateWebServices();
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {

@@ -372,20 +372,12 @@ export class ApiServer {
     return addressInfo;
   }
 
-  async startApiServer(): Promise<AddressInfo> {
-    const app: Application = express();
-    app.use(compression());
-
-    const apiCorsDomainCsv = this.options.config.apiCorsDomainCsv;
-    const allowedDomains = apiCorsDomainCsv.split(",");
-    const corsMiddleware = this.createCorsMiddleware(allowedDomains);
-    app.use(corsMiddleware);
-
-    app.use(bodyParser.json({ limit: "50mb" }));
-
-    const openApiValidator = this.createOpenApiValidator();
-    await openApiValidator.install(app);
-
+  /**
+   * Installs the own endpoints of the API server such as the ones providing
+   * healthcheck and monitoring information.
+   * @param app
+   */
+  async getOrCreateWebServices(app: express.Application): Promise<void> {
     const healthcheckHandler = (req: Request, res: Response) => {
       res.json({
         success: true,
@@ -420,16 +412,34 @@ export class ApiServer {
       httpPathPrometheus,
       prometheusExporterHandler,
     );
+  }
 
-    const registry = await this.getOrInitPluginRegistry();
+  async startApiServer(): Promise<AddressInfo> {
+    const pluginRegistry = await this.getOrInitPluginRegistry();
+
+    const app: Application = express();
+    app.use(compression());
+
+    const apiCorsDomainCsv = this.options.config.apiCorsDomainCsv;
+    const allowedDomains = apiCorsDomainCsv.split(",");
+    const corsMiddleware = this.createCorsMiddleware(allowedDomains);
+    app.use(corsMiddleware);
+
+    app.use(bodyParser.json({ limit: "50mb" }));
+
+    const openApiValidator = this.createOpenApiValidator();
+    await openApiValidator.install(app);
+
+    this.getOrCreateWebServices(app); // The API server's own endpoints
 
     this.log.info(`Starting to install web services...`);
 
-    const webServicesInstalled = registry
+    const webServicesInstalled = pluginRegistry
       .getPlugins()
       .filter((pluginInstance) => isIPluginWebService(pluginInstance))
-      .map((pluginInstance: ICactusPlugin) => {
-        return (pluginInstance as IPluginWebService).installWebServices(app);
+      .map(async (plugin: ICactusPlugin) => {
+        await (plugin as IPluginWebService).getOrCreateWebServices();
+        return (plugin as IPluginWebService).registerWebServices(app);
       });
 
     const endpoints2D = await Promise.all(webServicesInstalled);
