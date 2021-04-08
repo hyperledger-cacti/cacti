@@ -1,12 +1,13 @@
+---
+id: financial-markets
+title: DvP in Financial Markets
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: financial-markets
-title: DvP in Financial Markets
----
 
 In traditional financial markets parties trade assets such as securities and derivatives for cash or other assets. To reduce risk, various clearing and settlement processes and intermediaries are often involved. One form of settlement is a DvP (delivery versus payment) where the transfer of securities is performed only in the event of a corresponding payment. This arrangement reduces principal risk by ensuring that both parties receive their end of the exchange. However, settlement in financial markets are slow and time consuming. It also involves counterparty risks and requires intermediaries.
 

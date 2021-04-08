@@ -1,12 +1,13 @@
+---
+id: interoperability-modes
+title: Interoperability Modes
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: interoperability-modes
-title: Interoperability Modes
----
 
 ## Modes of Interoperability
 

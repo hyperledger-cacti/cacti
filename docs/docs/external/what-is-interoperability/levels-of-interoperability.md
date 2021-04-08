@@ -1,12 +1,13 @@
+---
+id: levels-of-interoperability
+title: Levels of Interoperability
+--- 
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: levels-of-interoperability
-title: Levels of Interoperability
---- 
 
 Established models of information systems interoperability stratify interoperability concerns into multiple levels. This includes technical, syntactic, semantic and application levels as shown below. 
 

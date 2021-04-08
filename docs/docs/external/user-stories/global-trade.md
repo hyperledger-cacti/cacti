@@ -1,12 +1,13 @@
+---
+id: global-trade
+title: Global Trade
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: global-trade
-title: Global Trade
----
 
 The examples in this page cover the __global trade__ application domain and the __data sharing__ pattern.
 

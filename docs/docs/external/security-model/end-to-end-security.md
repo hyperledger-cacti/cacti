@@ -1,12 +1,14 @@
+---
+id: end-to-end-security
+title: End-to-End Security
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: end-to-end-security
-title: End-to-End Security
----
+
 ## Relay Security Model
 
 ## A Relayer of Cryptographic Proofs

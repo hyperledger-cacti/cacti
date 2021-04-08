@@ -1,12 +1,13 @@
+---
+id: decentralized-identity
+title: Decentralized Identity
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: decentralized-identity
-title: Decentralized Identity
----
 
 Interoperation for asset or data transfers/exchanges relies on a message-passing infratructure and pan-network data processing modules, as we have seen in earlier pages. But there is yet another crucial basis these data processing modules need to satisfy our design principles of network independence and avoidance of trust parties. This is the ability of a network as a whole and of its individual members to accurately identify and authenticate another network's members.
 
