@@ -148,3 +148,6 @@ The process above is illustrated with a few more details in the sequence of prot
 ![alt text](../../../static/architecture-assets/protocol-get-info-phase.jpg)
 
 ![alt text](../../../static/architecture-assets/protocol-update-info-phase.jpg)
+
+### References
+Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Chander Govindarajan, Dushyant Behl, Dileban Karunamoorthy, Ermyas Abebe, Sandip Chakraborty, [Decentralized Cross-Network Identity Management for Blockchain Interoperation](https://arxiv.org/abs/2104.03277), _ICBC 2021_
