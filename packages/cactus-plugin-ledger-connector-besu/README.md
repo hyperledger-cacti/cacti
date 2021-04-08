@@ -7,6 +7,7 @@ This plugin provides `Cactus` a way to interact with Besu networks. Using this w
 ## Summary
 
   - [Getting Started](#getting-started)
+  - [Architecture](#architecture)
   - [Usage](#usage)
   - [Prometheus Exporter](#prometheus-exporter)
   - [Runing the tests](#running-the-tests)
@@ -33,6 +34,25 @@ In the project root folder, run this command to compile the plugin and create th
 ```sh
 npm run tsc
 ```
+
+### Architecture
+The sequence diagrams for various endpoints are mentioned below
+
+#### run-transaction-endpoint
+![run-transaction-endpoint sequence diagram](docs/architecture/images/run-transaction-endpoint.png)
+The above diagram shows the sequence diagram of run-transaction-endpoint. User A (One of the many Users) interacts with the API Client which in turn, calls the API server. API server then executes transact() method which is explained in detailed in the subsequent diagrams.
+![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
+The above diagram shows the sequence diagraom of transact() method of the PluginLedgerConnectorBesu class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the type of Web3SigningCredentialType, corresponsing responses are sent back to the caller.  
+![run-transaction-endpoint transactCactusKeychainRef() method](docs/architecture/images/run-transaction-endpoint-transact-cactuskeychainref.png)
+The above diagram shows transactCactusKeychainReference() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is CACTUSKEYCHAINREF. This method inturn calls transactPrivateKey() which calls the signTransaction() method of web3 library. 
+![runtransaction-endpoint transactPrivateKey() method](docs/architecture/images/run-transaction-endpoint-transact-privatekey.png)
+The above diagram shows transactPrivateKey() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is PRIVATEKEYHEX. This method then calls the signTransaction() method of the web3 library.
+![run-transaction-endpoint transactSigned() method](docs/architecture/images/run-transaction-endpoint-transact-signed.png)
+The above diagram shows transactSigned() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is NONE. This method calls the sendSignedTransaction() of the web3 library and then calls pollForTxReceipt() method.
+![run-transaction-endpoint pollForTxReceipt() method](docs/architecture/images/run-transaction-endpoint-transact-pollfortxreceipt.png)
+The above diagram shows pollForTxReceipt() method which is called by the transactSigned() method as described in the previous sequence diagram. This method waits for the block confirmation in a loop and then sends the corresponding response back to the caller.
+
+### Usage
 
 To use this import public-api and create new **PluginFactoryLedgerConnector**. Then use it to create a connector.
 ```typescript
@@ -83,7 +103,7 @@ enum Web3SigningCredentialType {
 
 This class creates a prometheus exporter, which scrapes the transactions (total transaction count) for the use cases incorporating the use of Besu connector plugin.
 
-### Usage
+### Prometheus Exporter Usage
 The prometheus exporter object is initialized in the `PluginLedgerConnectorBesu` class constructor itself, so instantiating the object of the `PluginLedgerConnectorBesu` class, gives access to the exporter object.
 You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginLedgerConnectorBesuOptions` interface for `PluginLedgerConnectoBesu` constructor.
 
