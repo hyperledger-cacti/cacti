@@ -1,12 +1,13 @@
+---
+id: design-principles
+title: Design Principles
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: design-principles
-title: Design Principles
----
 
 We list principles and considerations that guide the design of a framework for interoperability between decentralized networks, along with associated reasoning. Our present solution, though a work-in-progress, attempts to adhere to these principles.
 

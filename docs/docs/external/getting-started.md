@@ -1,12 +1,13 @@
+---
+id: getting-started
+title: Getting Started
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: getting-started
-title: Getting Started
----
 
 This document details how to get the system running end-to-end locally.
 

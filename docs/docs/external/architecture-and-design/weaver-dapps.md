@@ -1,12 +1,13 @@
+---
+id: weaver-dapps
+title: Weaver Dapps
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: weaver-dapps
-title: Weaver Dapps
----
 
 As mentioned in the [overview](./overview.md), DLTs that integrate with Weaver must contain an interop (IOP) module to facilitate interoperation between ledgers. The interop module contains all the logic responsible for membership, verification policies and access control policies (refer to the RFCs for more information on these). Below shows the architecture of how these interop modules work with the two currently supported DLTs, Fabric and Corda.
 

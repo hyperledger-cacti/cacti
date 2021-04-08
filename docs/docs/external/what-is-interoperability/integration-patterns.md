@@ -1,12 +1,13 @@
+---
+id: integration-patterns
+title: Integration Patterns
+--- 
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: integration-patterns
-title: Integration Patterns
---- 
 
 Integration patterns are well-known reusable solutions for integrating systems together. A number of patterns exist for addressing various types integration problems. The specific pattern applied in practice depends on the nature of the integration problem, the overall objective of the integration task, trade-offs in alternate approaches, and potential risks.
 

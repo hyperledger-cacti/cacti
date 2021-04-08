@@ -1,18 +1,19 @@
-<!--
- Copyright IBM Corp. All Rights Reserved.
-
- SPDX-License-Identifier: CC-BY-4.0
- -->
 ---
 id: publications
 title: Publications
 ---
 
-## 2020
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
+
+## 2021
 
 ### Verifiable Observation of Permissioned Ledgers
 
-*IEEE International Conference on Blockchain and Cryptocurrency*, 2020
+*IEEE International Conference on Blockchain and Cryptocurrency*, 2021
 
 Ermyas Abebe, Yining Hu, Allison Irvin, Dileban Karunamoorthy, Vinayaka Pandit, Venkatraman Ramakrishna, Jiangshan Yu
 
@@ -20,11 +21,11 @@ Ermyas Abebe, Yining Hu, Allison Irvin, Dileban Karunamoorthy, Vinayaka Pandit, 
 
 ### Decentralized Cross-Network Identity Management for Blockchain Interoperation
 
-*IEEE International Conference on Blockchain and Cryptocurrency*, 2020
+*IEEE International Conference on Blockchain and Cryptocurrency*, 2021
 
 Bishakh Chandra Ghosh, Sandip Chakraborty, Venkatraman Ramakrishna, Chander Govindarajan,Dushyant Behl, Dileban Karunamoorthy, Ermyas Abebe
 
-[`[arXiv]`](https://arxiv.org/)
+[`[arXiv]`](https://arxiv.org/abs/2104.03277)
 
 
 ## 2019

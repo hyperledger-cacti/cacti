@@ -1,12 +1,13 @@
+---
+id: introduction
+title: Weaver Framework
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: introduction
-title: Weaver Framework
----
 
 Weaver is a framework that enables scalable interconnectivity between disparate distributed ledgers in a manner that preserves core tenets of decentralisation and security.
 The framework, consisting of a family of protocols, is designed and built with the following key guiding principles, which are further discussed in [Design Principles](design-principles.md):

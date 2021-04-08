@@ -1,12 +1,13 @@
+---
+id: understanding-interoperability
+title: Understanding Interoperability
+--- 
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: understanding-interoperability
-title: Understanding Interoperability
---- 
 
 Permissioned DLTs have been gaining significant traction in industry since their inception. They have enabled enterprises to harness the innovation of public blockchains, while adhering to the privacy, confidentiality and regulatory constraints that businesses operate under. Permissioned DLTs offer enterprises an infrastructure for managing inter-firm asset, data and business workflow, without the need for a central intermediary that introduces additional sources of risk. Businesses are able to transact directly while reducing counter-party risk and mitigating the need for costly and time-consuming dispute resolution processes, often involving legal and judicial systems. Thus far, the application of this technology has enabled digitisation and disintermediation of many entrenched industry processes, resulting in significant improvements in efficiency, transparency, risk and fraud.
 

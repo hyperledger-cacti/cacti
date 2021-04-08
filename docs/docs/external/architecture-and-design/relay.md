@@ -1,12 +1,13 @@
+---
+id: relay
+title: Relay
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: relay
-title: Relay
----
 
 ![](/architecture-assets/relay_architecture.png)
 

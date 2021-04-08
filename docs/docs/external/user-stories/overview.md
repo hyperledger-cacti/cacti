@@ -1,12 +1,13 @@
+---
+id: overview
+title: Overview
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: overview
-title: Overview
----
 
 In the [introduction](../interoperability-modes.md), we listed various modes (or patterns) of interoperation like asset transfers, asset exchanges, and data sharing. In IT parlance, we can think of this as a _horizontal_ classification of use cases for interoperability. In this section of the documentation, we will discuss the _verticals_, or application domains, that exemplify the use and necessity of interoperation mechanisms.
 

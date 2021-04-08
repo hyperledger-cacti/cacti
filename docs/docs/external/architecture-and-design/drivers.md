@@ -1,12 +1,13 @@
+---
+id: drivers
+title: Drivers
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: drivers
-title: Drivers
----
 
 The driver is responsible for all communication between the relay and its network. In the previous sections we have thought about the driver as a component of the relay. We have done this because conceptually it makes sense to think about it like that. However, in our reference implementation we have made it a seperate process which communicates with the relay via gRPC, as shown below. There are two main reasons for this:
 

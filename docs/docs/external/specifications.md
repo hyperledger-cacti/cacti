@@ -1,12 +1,13 @@
+---
+id: specifications
+title: Specifications
+--- 
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: specifications
-title: Specifications
---- 
 
 The Weaver specifications ([RFCs](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/main/rfcs)) capture abstractions, models, protocols and data formats for enabling cross-ledger communication.
 

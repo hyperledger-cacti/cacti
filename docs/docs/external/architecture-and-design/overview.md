@@ -1,12 +1,13 @@
+---
+id: overview
+title: Overview
+---
+
 <!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
----
-id: overview
-title: Overview
----
 
 The below diagram shows a high level architecture diagram of the Weaver framework.
 
