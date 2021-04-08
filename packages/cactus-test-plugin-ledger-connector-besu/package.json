@@ -89,6 +89,6 @@
     "@hyperledger/cactus-test-tooling": "0.4.0",
     "key-encoder": "2.0.3",
     "web3": "1.2.11",
-    "web3-eea": "0.9.0"
+    "web3-eea": "0.10.0"
   }
 }
