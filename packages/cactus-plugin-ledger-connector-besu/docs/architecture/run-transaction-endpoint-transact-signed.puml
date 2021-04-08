@@ -1,0 +1,35 @@
+@startuml Sequence Diagram - transact method
+
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransactSigned() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "transactSigned()" as ts
+participant "web3.eth.sendSignedTransaction()" as wesst
+
+caller -> ts: req
+activate caller
+group #e6e632 if web3SigningCredential == NONE
+    activate ts
+    ts -> wesst: rawTransaction
+    activate wesst
+    wesst --> ts: txPoolReceipt
+    deactivate wesst
+    group #ecec66 if ReceiptType == NODETXPOOLACK
+    ts --> caller: returns [txPoolReceipt] as resBody
+    else #f2f299 ReceiptType == LEDGERBLOCKACK
+    ts -> ts: pollForTxReceipt(txHash, consistencyStrategy)
+    ts --> caller: return [ledgerReceipt as transactionReceipt] as resBody
+    else #LightCoral 
+    ts --> caller: throw Error: Unrecognized ReceiptType
+    deactivate ts
+    end
+end
+deactivate caller
+
+
+@enduml

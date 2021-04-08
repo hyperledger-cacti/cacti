@@ -1,0 +1,30 @@
+@startuml Sequence Diagram - transact method
+
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransactPrivateKey() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "transactPrivateKey()" as tpk
+participant "web3.eth.accounts.signTransaction()" as weas
+
+caller -> tpk: req
+activate caller
+alt #LightGreen web3SigningCredential == PRIVATEKEYHEX
+    group #LightGray if defined: signedTx.rawTransaction
+        activate tpk
+        tpk -> weas: [transactionConfig, secret]
+        activate weas
+        weas --> tpk: return [signedTx]
+        deactivate weas
+        tpk --> caller: return [req with rawTransaction] as resBody
+    else #LightCoral
+        tpk --> caller: throw Error: Failed to sign eth transaction. signedTransaction.rawTransaction is blank after .signTransaction()
+        deactivate tpk
+    end
+end
+
+@enduml
