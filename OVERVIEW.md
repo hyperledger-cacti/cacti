@@ -56,6 +56,7 @@ Because relays are additional components introduced by Weaver into a DLT network
 
 ## Publications
 
-1. [On the Interoperability of Distributed Ledgers, Medium.com](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808)
-2. [Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer, _Middleware 2019 - Industry Track_](https://arxiv.org/abs/1911.01064)
-3. [Verifiable Observation of Permissioned Ledgers, _ICBC 2021_](https://arxiv.org/abs/2012.07339)
+1. Dileban Karunamoorthy and Ermyas Abebe, [On the Interoperability of Distributed Ledgers](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808), _Medium.com_
+2. Ermyas Abebe, Dushyant Behl, Chander Govindarajan, Yining Hu, Dileban Karunamoorthy, Petr Novotny, Vinayaka Pandit, Venkatraman Ramakrishna, Christian Vecchiola, [Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer](https://arxiv.org/abs/1911.01064), _Middleware 2019 - Industry Track_
+3. Ermyas Abebe, Yining Hu, Allison Irvin, Dileban Karunamoorthy, Vinayaka Pandit, Venkatraman Ramakrishna, Jiangshan Yu, [Verifiable Observation of Permissioned Ledgers](https://arxiv.org/abs/2012.07339), _ICBC 2021_
+4. Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Chander Govindarajan, Dushyant Behl, Dileban Karunamoorthy, Ermyas Abebe, Sandip Chakraborty, [Decentralized Cross-Network Identity Management for Blockchain Interoperation](https://arxiv.org/abs/2104.03277), _ICBC 2021_
