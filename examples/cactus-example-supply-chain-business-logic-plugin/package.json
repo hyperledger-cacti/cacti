@@ -96,7 +96,6 @@
     "axios": "0.21.1",
     "express": "4.17.1",
     "openapi-types": "7.0.1",
-    "swarm-js": "0.1.40",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.0"
   },

@@ -227,7 +227,7 @@ export class PluginLedgerConnectorQuorum
     }
 
     const { contractAddress } = req;
-    const aContract = new this.web3.eth.Contract(abi, contractAddress);
+    const aContract = new Contract(abi, contractAddress);
     const methodRef = aContract.methods[req.methodName];
 
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
@@ -320,7 +320,7 @@ export class PluginLedgerConnectorQuorum
         contractJSON.networks = network;
         keychainPlugin.set(contractName, contractJSON);
       }
-      const contract = new this.web3.eth.Contract(
+      const contract = new Contract(
         contractJSON.abi,
         contractJSON.networks[networkId].address,
       );
@@ -575,7 +575,7 @@ export class PluginLedgerConnectorQuorum
           req.contractName,
         )) as any;
         this.log.info(JSON.stringify(contractJSON));
-        const contract = new this.web3.eth.Contract(
+        const contract = new Contract(
           contractJSON.abi,
           receipt.transactionReceipt.contractAddress,
         );
