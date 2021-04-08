@@ -27,7 +27,7 @@ Toward the right of the figure, you can see functions in the semantic layer call
 - Asset exchanges
 You can find details on these use cases (or _modes_ of interoperation) in [Interoperability Modes](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
 
-_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-network identity management occurs on a separate plane from the information exchanges, and our vision for this is described in [Decentralized Identity](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [Distributed Identity Management for Interoperation](./interop-rfcs/models/identity/distributed-identity-management.md).
+_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-network identity management occurs on a separate plane from the information exchanges, and our vision for this is described in [Decentralized Identity](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [Distributed Identity Management for Interoperation](./rfcs/models/identity/distributed-identity-management.md).
 
 ## Architecture and Deployment
 
@@ -44,7 +44,7 @@ For a data transfer use case, the following are the functions that are performed
 - Verification of proofs in the response by the requesting network
 The basis for this protocol is a priori knowledge of counterparty networks' membership providers' certificate chains.
 
-For more details, see the [RFCs](./interop-rfcs).
+For more details, see the [RFCs](./rfcs).
 
 The architecture of the relay, which we envision can be the basis of a universal DLT interoperability standard, is illustrated in the figure below. As mentioned above, there are both DLT-agnostic components as well as DLT-specific components called drivers. Relays can manage requests and responses for different interoperability modes as well as targets (other DLT networks or ERP systems).
 
@@ -56,6 +56,7 @@ Because relays are additional components introduced by Weaver into a DLT network
 
 ## Publications
 
-1. [On the Interoperability of Distributed Ledgers, Medium.com](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808)
-2. [Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer, _Middleware 2019 - Industry Track_](https://arxiv.org/abs/1911.01064)
-3. [Verifiable Observation of Permissioned Ledgers, _ICBC 2021_](https://arxiv.org/abs/2012.07339)
+1. Dileban Karunamoorthy and Ermyas Abebe, [On the Interoperability of Distributed Ledgers](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808), _Medium.com_
+2. Ermyas Abebe, Dushyant Behl, Chander Govindarajan, Yining Hu, Dileban Karunamoorthy, Petr Novotny, Vinayaka Pandit, Venkatraman Ramakrishna, Christian Vecchiola, [Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer](https://arxiv.org/abs/1911.01064), _Middleware 2019 - Industry Track_
+3. Ermyas Abebe, Yining Hu, Allison Irvin, Dileban Karunamoorthy, Vinayaka Pandit, Venkatraman Ramakrishna, Jiangshan Yu, [Verifiable Observation of Permissioned Ledgers](https://arxiv.org/abs/2012.07339), _ICBC 2021_
+4. Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Chander Govindarajan, Dushyant Behl, Dileban Karunamoorthy, Ermyas Abebe, Sandip Chakraborty, [Decentralized Cross-Network Identity Management for Blockchain Interoperation](https://arxiv.org/abs/2104.03277), _ICBC 2021_

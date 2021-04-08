@@ -8,19 +8,20 @@ Changes to this list can be done by submitting a PR which is approved by a simpl
 
 | Name | GitHub | Chat | email
 |------|--------|------|----------------------
-| Venkatraman Ramakrishna | [Vramakrishna][Vramakrishna] |  | <vramakr2@in.ibm.com>
+| Venkatraman Ramakrishna | [VRamakrishna][VRamakrishna] |  | <vramakr2@in.ibm.com>
 | Ermyas Abebe | [ermyas][ermyas] |  | <etabebe@au1.ibm.com>
 | Nick Waywood | [nwaywood][nwaywood] |  | <>
-| Dileban Karunamoorthy | [dileban][dileban] |  | <>
-| Allison Irvin | [airvin][airvin] |  | <>
-|  | [AntTargett][AntTargett] |  | <>
-|  | [sanvenDev][sanvenDev] |  | <>
-|  | [knarayan][knarayan] |  | <>
-|  | [dhinakaran2705][dhinakaran2705] |  | <>
-| Yining Hu | [Yining-Hu][Yining-Hu] |  | <>
-| [Vinayaka Pandit | [Vinayaka-Pandit][Vinayaka-Pandit] |  | <pvinayak@in.ibm.com>
+| Dileban Karunamoorthy | [dileban][dileban] |  | <dileban@gmail.com>
+| Allison Irvin | [airvin][airvin] |  | <allison.irvin2@gmail.com>
+| Antony Targett | [AntTargett][AntTargett] |  | <antony.targett@gmail.com>
+| Sandeep Nishad | [sanvenDev][sanvenDev] |  | <sannish1@in.ibm.com>
+| Krishnasuri Narayanam | [knarayan][knarayan] |  | <knaraya3@in.ibm.com>
+| Dhinakaran Vinayagamurthy | [dhinakaran2705][dhinakaran2705] |  | <dvinaya1@in.ibm.com>
+| Yining Hu | [Yining-Hu][Yining-Hu] |  | <hulyric@gmail.com>
+| Vinayaka Pandit | [Vinayaka-Pandit][Vinayaka-Pandit] |  | <pvinayak@in.ibm.com>
+| Christian Vecchiola | [Christian-Vecchiola][Christian-Vecchiola] |  | <christian.vecchiola@au1.ibm.com>
 
-[Vramakrishna]: https://github.com/Vramakrishna
+[VRamakrishna]: https://github.com/VRamakrishna
 [ermyas]: https://github.com/ermyas
 [nwaywood]: https://github.com/nwaywood
 [dileban]: https://github.com/dileban
@@ -31,3 +32,4 @@ Changes to this list can be done by submitting a PR which is approved by a simpl
 [dhinakaran2705]: https://github.com/dhinakaran2705
 [Yining-Hu]: https://github.com//Yining-Hu
 [Vinayaka-Pandit]: https://github.com/Vinayaka-Pandit
+[Christian-Vecchiola]: https://github.com/hyp0th3rmi4
