@@ -164,16 +164,19 @@ export class SupplyChainAppDummyInfrastructure {
         this._quorumAccount = await this.quorum.createEthTestAccount(2000000);
         const rpcApiHttpHost = await this.quorum.getRpcApiHttpHost();
 
+        const pluginRegistry = new PluginRegistry();
+        pluginRegistry.add(keychainPlugin);
         const connector = new PluginLedgerConnectorQuorum({
           instanceId: "PluginLedgerConnectorQuorum_Contract_Deployment",
           rpcApiHttpHost,
           logLevel: this.options.logLevel,
-          pluginRegistry: new PluginRegistry(),
+          pluginRegistry,
         });
 
         const res = await connector.deployContract({
           contractName: BambooHarvestRepositoryJSON.contractName,
           bytecode: BambooHarvestRepositoryJSON.bytecode,
+          gas: 1000000,
           web3SigningCredential: {
             ethAccount: this.quorumAccount.address,
             secret: this.quorumAccount.privateKey,
@@ -196,16 +199,19 @@ export class SupplyChainAppDummyInfrastructure {
         this._besuAccount = await this.besu.createEthTestAccount(2000000);
         const rpcApiHttpHost = await this.besu.getRpcApiHttpHost();
 
+        const pluginRegistry = new PluginRegistry();
+        pluginRegistry.add(keychainPlugin);
         const connector = new PluginLedgerConnectorBesu({
           instanceId: "PluginLedgerConnectorBesu_Contract_Deployment",
           rpcApiHttpHost,
           logLevel: this.options.logLevel,
-          pluginRegistry: new PluginRegistry(),
+          pluginRegistry,
         });
 
         const res = await connector.deployContract({
           contractName: BookshelfRepositoryJSON.contractName,
           bytecode: BookshelfRepositoryJSON.bytecode,
+          gas: 1000000,
           web3SigningCredential: {
             ethAccount: this.besuAccount.address,
             secret: this.besuAccount.privateKey,
@@ -232,10 +238,12 @@ export class SupplyChainAppDummyInfrastructure {
           asLocalhost: true,
         };
 
+        const pluginRegistry = new PluginRegistry();
+        pluginRegistry.add(keychainPlugin);
         const connector = new PluginLedgerConnectorFabric({
           instanceId: "PluginLedgerConnectorFabric_Contract_Deployment",
           dockerBinary: "/usr/local/bin/docker",
-          pluginRegistry: new PluginRegistry(),
+          pluginRegistry,
           sshConfig: sshConfig,
           logLevel: this.options.logLevel || "INFO",
           connectionProfile: connectionProfile,
