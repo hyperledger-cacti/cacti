@@ -15,14 +15,14 @@ start-interop:	start-interop-network1 start-interop-network2
 
 
 .PHONY: start-network1
-start-network1:	.fabric-setup
+start-network1:	.fabric-setup setup-cc
 	./network.sh up createChannel -ca -nw network1
-	./network.sh deployCC -ch simplestate -nw network1	
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1	
 
 .PHONY:	start-network2
-start-network2: .fabric-setup
+start-network2: .fabric-setup setup-cc
 	./network.sh up createChannel -ca -nw network2
-	./network.sh deployCC -ch simplestate -nw network2	
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2	
 
 .PHONY: start-interop-network1
 start-interop-network1:	start-network1 setup-interop-network1
@@ -42,6 +42,11 @@ setup-interop-network2: setup-interop-cc
 .PHONY: setup-interop-cc
 setup-interop-cc:
 	./scripts/setupCCLocal.sh
+
+.PHONY: setup-cc
+setup-cc:
+	./scripts/setupAppCC.sh $(CHAINCODE_NAME)
+
 
 .fabric-setup: 
 	curl -sSL https://bit.ly/2ysbOFE | bash -s -- $(FABRIC_VERSION) $(FABRIC_CA_VERSION) $(FABRIC_COUCH_VERSION) -s	
