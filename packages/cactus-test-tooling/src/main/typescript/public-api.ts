@@ -70,6 +70,14 @@ export {
 } from "./corda-connector/corda-connector-container";
 
 export {
+  IKeycloakContainerOptions,
+  K_DEFAULT_KEYCLOAK_HTTP_PORT,
+  K_DEFAULT_KEYCLOAK_IMAGE_NAME,
+  K_DEFAULT_KEYCLOAK_IMAGE_VERSION,
+  KeycloakContainer,
+} from "./keycloak/keycloak-container";
+
+export {
   SAMPLE_CORDAPP_ROOT_DIRS,
   SampleCordappEnum,
 } from "./corda/sample-cordapp-enum";
