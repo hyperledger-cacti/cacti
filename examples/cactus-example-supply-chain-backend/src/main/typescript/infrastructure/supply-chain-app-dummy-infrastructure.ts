@@ -70,7 +70,7 @@ export class SupplyChainAppDummyInfrastructure {
   private _quorumAccount: Account | undefined;
   private _besuAccount: Account | undefined;
 
-  public get quorumAccount() {
+  public get quorumAccount(): Account {
     if (!this._quorumAccount) {
       throw new Error(`Must call deployContracts() first.`);
     } else {
@@ -78,7 +78,7 @@ export class SupplyChainAppDummyInfrastructure {
     }
   }
 
-  public get besuAccount() {
+  public get besuAccount(): Account {
     if (!this._besuAccount) {
       throw new Error(`Must call deployContracts() first.`);
     } else {
@@ -86,7 +86,7 @@ export class SupplyChainAppDummyInfrastructure {
     }
   }
 
-  public get className() {
+  public get className(): string {
     return SupplyChainAppDummyInfrastructure.CLASS_NAME;
   }
 
