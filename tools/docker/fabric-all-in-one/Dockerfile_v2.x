@@ -142,7 +142,7 @@ RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/ hyperledger/fabric-ca:
 # Download and execute the Fabric bootstrap script, but instruct it with the -d
 # flag to avoid pulling docker images because during the build phase of this image
 # there is no docker daemon running yet
-RUN curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/2f69b4222e9c9090b5c1ca235c1b59687566f13e/scripts/bootstrap.sh > /bootstrap.sh
+RUN curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/54e27a66812845985c5c067d7f5244a05c6e719b/scripts/bootstrap.sh > /bootstrap.sh
 RUN chmod +x bootstrap.sh
 # Run the bootstrap here so that at least we can pre-fetch the git clone and the binary downloads resulting in
 # faster container startup speed since these steps will not have to be done, only the docker image pulls.
