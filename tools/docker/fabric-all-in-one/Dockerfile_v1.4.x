@@ -84,7 +84,7 @@ RUN cp $CACTUS_CFG_PATH/fabric-aio-image.pub ~/.ssh/authorized_keys
 # flag to avoid pulling docker images because during the build phase of this image
 # there is no docker daemon running yet so this has to happen in the CMD once a
 # container has been started from the image => see ./run-fabric-network-sh
-RUN curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/release-2.2/scripts/bootstrap.sh > /bootstrap.sh
+RUN curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/54e27a66812845985c5c067d7f5244a05c6e719b/scripts/bootstrap.sh > /bootstrap.sh
 RUN chmod +x bootstrap.sh
 # Run the bootstrap here so that at least we can pre-fetch the git clone and the binary downloads resulting in
 # faster container startup speed since these steps will not have to be done, only the docker image pulls.
@@ -98,7 +98,7 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY run-fabric-network.sh /
 COPY healthcheck.sh /
 
-# OpenSSH Server (needed for chaincode deployment ) 
+# OpenSSH Server (needed for chaincode deployment )
 EXPOSE 22
 
 # supervisord web ui/dashboard
