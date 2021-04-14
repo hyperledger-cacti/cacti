@@ -277,6 +277,7 @@ export class SupplyChainApp {
       discoveryOptions,
       eventHandlerOptions: {
         strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+        commitTimeout: 300,
       },
     });
 
