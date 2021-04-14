@@ -70,8 +70,11 @@ function mainTask()
     npm run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Second (#2) try of tests succeeded OK."
   } ||
   {
+    # If the third try fails then the execution will reach the last echo and the exit 1 statement
+    # ensuring that the script crashes if 3 out of 3 test runs have failed.
     echo "$(date +%FT%T%z) [CI] Second (#2) try of tests failed starting third and last try now..."
-    npm run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Third (#3) try of tests succeeded OK."
+    npm run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Third (#3) try of tests succeeded OK." || \
+      echo "$(date +%FT%T%z) [CI] Third (#3) try of tests failed so giving up at this point" ; exit 1
   }
 
   # The webpack production build needs more memory than the default allocation
