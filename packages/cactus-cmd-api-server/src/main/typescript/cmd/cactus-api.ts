@@ -16,7 +16,7 @@ const main = async () => {
 
   LoggerProvider.setLogLevel(serverOptions.logLevel);
 
-  if (process.argv[2].includes("help")) {
+  if (process.argv[2]?.includes("help")) {
     const helpText = ConfigService.getHelpText();
     console.log(helpText);
     log.info(`Effective Configuration:`);
