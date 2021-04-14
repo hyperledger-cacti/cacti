@@ -23,6 +23,7 @@ import {
   DefaultEventHandlerStrategy,
   FabricContractInvocationType,
   PluginLedgerConnectorFabric,
+  SSHExecCommandResponse,
 } from "../../../../../main/typescript/public-api";
 
 import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
@@ -171,18 +172,21 @@ test(testCase, async (t: Test) => {
   });
 
   const {
-    installationCommandResponse,
-    instantiationCommandResponse,
+    installationCommandResponses: installations,
+    instantiationCommandResponse: instantiation,
     success,
   } = res.data;
 
-  t.comment(`CC installation out: ${installationCommandResponse.stdout}`);
-  t.comment(`CC installation err: ${installationCommandResponse.stderr}`);
-  t.comment(`CC instantiation out: ${instantiationCommandResponse.stdout}`);
-  t.comment(`CC instantiation err: ${instantiationCommandResponse.stderr}`);
+  installations.forEach((icr: SSHExecCommandResponse, idx: number) => {
+    t.comment(`CC installation ${idx} out: ${icr.stdout}`);
+    t.comment(`CC installation ${idx} err: ${icr.stderr}`);
+  });
 
-  t.equal(res.status, 200, "res.status === 200 OK");
-  t.true(success, "res.data.success === true");
+  t.comment(`CC instantiation out: ${instantiation.stdout}`);
+  t.comment(`CC instantiation err: ${instantiation.stderr}`);
+
+  t.equal(res.status, 200, "deployContractGoSourceV1 res.status === 200 OK");
+  t.true(success, "deployContractGoSourceV1 res.data.success === true");
 
   // FIXME - without this wait it randomly fails with an error claiming that
   // the endorsment was impossible to be obtained. The fabric-samples script

@@ -206,13 +206,14 @@ export class PluginLedgerConnectorFabric
     req: DeployContractGoSourceV1Request,
   ): Promise<DeployContractGoSourceV1Response> {
     const fnTag = `${this.className}#deployContract()`;
+    const { log } = this;
 
     const ssh = new NodeSSH();
     await ssh.connect(this.opts.sshConfig);
-    this.log.debug(`SSH connection OK`);
+    log.debug(`SSH connection OK`);
 
     try {
-      this.log.debug(`${fnTag} Deploying .go source: ${req.goSource.filename}`);
+      log.debug(`${fnTag} Deploying .go source: ${req.goSource.filename}`);
 
       Checks.truthy(req.goSource, `${fnTag}:req.goSource`);
 
@@ -223,21 +224,21 @@ export class PluginLedgerConnectorFabric
       // The module name of the chain-code, for example this will extract
       // ccName to be "hello-world" from a filename of "hello-world.go"
       const inferredModuleName = path.basename(req.goSource.filename, ".go");
-      this.log.debug(`Inferred module name: ${inferredModuleName}`);
+      log.debug(`Inferred module name: ${inferredModuleName}`);
       const ccName = req.moduleName || inferredModuleName;
-      this.log.debug(`Determined ChainCode name: ${ccName}`);
+      log.debug(`Determined ChainCode name: ${ccName}`);
 
       const remoteDirPath = path.join(this.cliContainerGoPath, "src/", ccName);
-      this.log.debug(`Remote dir path on CLI container: ${remoteDirPath}`);
+      log.debug(`Remote dir path on CLI container: ${remoteDirPath}`);
 
       const localFilePath = path.join(tmpDirPath, req.goSource.filename);
       fs.writeFileSync(localFilePath, req.goSource.body, "base64");
 
       const remoteFilePath = path.join(remoteDirPath, req.goSource.filename);
 
-      this.log.debug(`SCP from/to %o => %o`, localFilePath, remoteFilePath);
+      log.debug(`SCP from/to %o => %o`, localFilePath, remoteFilePath);
       await ssh.putFile(localFilePath, remoteFilePath);
-      this.log.debug(`SCP OK %o`, remoteFilePath);
+      log.debug(`SCP OK %o`, remoteFilePath);
 
       const sshCmdOptions: SSHExecCommandOptions = {
         execOptions: {
@@ -278,52 +279,53 @@ export class PluginLedgerConnectorFabric
       );
 
       const copyToCliCmd = `${dockerBinary} cp ${remoteFilePath} cli:${remoteFilePath}`;
-      this.log.debug(`Copy to CLI Container CMD: ${copyToCliCmd}`);
+      log.debug(`Copy to CLI Container CMD: ${copyToCliCmd}`);
       const copyToCliRes = await ssh.execCommand(copyToCliCmd, sshCmdOptions);
-      this.log.debug(`Copy to CLI Container CMD Response: %o`, copyToCliRes);
+      log.debug(`Copy to CLI Container CMD Response: %o`, copyToCliRes);
       Checks.truthy(copyToCliRes.code === null, `copyToCliRes.code === null`);
 
       {
         const goModInitCmd = `${dockerBuildCmd} go mod init ${ccName}`;
-        this.log.debug(`go mod init CMD: ${goModInitCmd}`);
+        log.debug(`go mod init CMD: ${goModInitCmd}`);
         const goModInitRes = await ssh.execCommand(goModInitCmd, sshCmdOptions);
-        this.log.debug(`go mod init CMD Response: %o`, goModInitRes);
+        log.debug(`go mod init CMD Response: %o`, goModInitRes);
         Checks.truthy(goModInitRes.code === null, `goModInitRes.code === null`);
       }
 
       const pinnedDeps = req.pinnedDeps || [];
       for (const dep of pinnedDeps) {
         const goGetCmd = `${dockerBuildCmd} go get ${dep}`;
-        this.log.debug(`go get CMD: ${goGetCmd}`);
+        log.debug(`go get CMD: ${goGetCmd}`);
         const goGetRes = await ssh.execCommand(goGetCmd, sshCmdOptions);
-        this.log.debug(`go get CMD Response: %o`, goGetRes);
+        log.debug(`go get CMD Response: %o`, goGetRes);
         Checks.truthy(goGetRes.code === null, `goGetRes.code === null`);
       }
 
       {
         const goModTidyCmd = `${dockerBuildCmd} go mod tidy`;
-        this.log.debug(`go mod tidy CMD: ${goModTidyCmd}`);
+        log.debug(`go mod tidy CMD: ${goModTidyCmd}`);
         const goModTidyRes = await ssh.execCommand(goModTidyCmd, sshCmdOptions);
-        this.log.debug(`go mod tidy CMD Response: %o`, goModTidyRes);
+        log.debug(`go mod tidy CMD Response: %o`, goModTidyRes);
         Checks.truthy(goModTidyRes.code === null, `goModTidyRes.code === null`);
       }
 
       {
         const goVendorCmd = `${dockerBuildCmd} go mod vendor`;
-        this.log.debug(`go mod vendor CMD: ${goVendorCmd}`);
+        log.debug(`go mod vendor CMD: ${goVendorCmd}`);
         const goVendorRes = await ssh.execCommand(goVendorCmd, sshCmdOptions);
-        this.log.debug(`go mod vendor CMD Response: %o`, goVendorRes);
+        log.debug(`go mod vendor CMD Response: %o`, goVendorRes);
         Checks.truthy(goVendorRes.code === null, `goVendorRes.code === null`);
       }
 
       {
         const goBuildCmd = `${dockerBuildCmd} go build`;
-        this.log.debug(`go build CMD: ${goBuildCmd}`);
+        log.debug(`go build CMD: ${goBuildCmd}`);
         const goBuildRes = await ssh.execCommand(goBuildCmd, sshCmdOptions);
-        this.log.debug(`go build CMD Response: %o`, goBuildRes);
+        log.debug(`go build CMD Response: %o`, goBuildRes);
         Checks.truthy(goBuildRes.code === null, `goBuildRes.code === null`);
       }
 
+      const installationCommandResponses: SSHExecCommandResponse[] = [];
       // https://github.com/hyperledger/fabric-samples/blob/release-1.4/fabcar/startFabric.sh
       for (const org of req.targetOrganizations) {
         const env =
@@ -332,7 +334,7 @@ export class PluginLedgerConnectorFabric
           ` --env CORE_PEER_MSPCONFIGPATH=${org.CORE_PEER_MSPCONFIGPATH}` +
           ` --env CORE_PEER_TLS_ROOTCERT_FILE=${org.CORE_PEER_TLS_ROOTCERT_FILE}`;
 
-        await this.sshExec(
+        const anInstallationCommandResponse = await this.sshExec(
           dockerBinary +
             ` exec ${env} cli peer chaincode install` +
             ` --name ${ccName} ` +
@@ -343,6 +345,8 @@ export class PluginLedgerConnectorFabric
           ssh,
           sshCmdOptions,
         );
+
+        installationCommandResponses.push(anInstallationCommandResponse);
       }
 
       let success = true;
@@ -357,26 +361,26 @@ export class PluginLedgerConnectorFabric
         ` --version ${req.chainCodeVersion} ` +
         ` --ctor '${ctorArgsJson}' ` +
         ` --channelID ${req.channelId} ` +
-        ` --peerAddresses ${req.targetPeerAddresses[0]}` +
+        ` --peerAddresses ${req.targetPeerAddresses[0]} ` +
         ` --lang golang ` +
         ` --tlsRootCertFiles ${req.tlsRootCertFiles}` +
         ` --policy "${req.policyDslSource}"` +
         ` --tls --cafile ${ordererCaFile}`;
 
-      this.log.debug(`Instantiate CMD: %o`, instantiateCmd);
-      const instantiateCmdRes = await ssh.execCommand(
+      log.debug(`Instantiate CMD: %o`, instantiateCmd);
+      const instantiationCommandResponse = await ssh.execCommand(
         instantiateCmd,
         sshCmdOptions,
       );
 
-      this.log.debug(`Instantiate CMD Response: %o`, instantiateCmdRes);
-      success = success && instantiateCmdRes.code === null;
+      log.debug(`Instantiate CMD Response:%o`, instantiationCommandResponse);
+      success = success && instantiationCommandResponse.code === null;
 
-      this.log.debug(`EXIT doDeploy()`);
+      log.debug(`EXIT doDeploy()`);
       const res: DeployContractGoSourceV1Response = {
         success,
-        installationCommandResponse: {} as any,
-        instantiationCommandResponse: instantiateCmdRes,
+        installationCommandResponses,
+        instantiationCommandResponse,
       };
       return res;
     } finally {
@@ -477,7 +481,7 @@ export class PluginLedgerConnectorFabric
       this.log.debug("transact() imported identity to in-memory wallet OK");
 
       const eventHandlerOptions: DefaultEventHandlerOptions = {
-        commitTimeout: this.opts.eventHandlerOptions?.commitTimeout,
+        commitTimeout: this.opts.eventHandlerOptions?.commitTimeout || 300,
       };
       if (this.opts.eventHandlerOptions?.strategy) {
         eventHandlerOptions.strategy =
@@ -493,7 +497,12 @@ export class PluginLedgerConnectorFabric
         wallet,
       };
 
-      await gateway.connect(connectionProfile as any, gatewayOptions);
+      this.log.debug(`discovery=%o`, gatewayOptions.discovery);
+      this.log.debug(`eventHandlerOptions=%o`, eventHandlerOptions);
+      await gateway.connect(
+        connectionProfile as ConnectionProfile,
+        gatewayOptions,
+      );
       this.log.debug("transact() gateway connection established OK");
 
       const network = await gateway.getNetwork(channelName);
