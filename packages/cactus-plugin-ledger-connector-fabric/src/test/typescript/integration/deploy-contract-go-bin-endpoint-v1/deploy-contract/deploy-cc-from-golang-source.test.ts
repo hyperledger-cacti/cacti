@@ -131,6 +131,7 @@ test(testCase, async (t: Test) => {
     discoveryOptions,
     eventHandlerOptions: {
       strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+      commitTimeout: 300,
     },
   };
   const plugin = new PluginLedgerConnectorFabric(pluginOptions);
