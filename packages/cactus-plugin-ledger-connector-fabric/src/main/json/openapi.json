@@ -377,7 +377,7 @@
                     },
                     "targetPeerAddresses": {
                         "type": "array",
-                        "description": "An array of peer addresses where the contract will be instantiated.",
+                        "description": "An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the offical Fabric samples repository and therefore it is assumed to be correct usage.",
                         "example": [
                             "peer0.org1.example.com:7051"
                         ],
@@ -448,15 +448,18 @@
                 "type": "object",
                 "required": [
                     "success",
-                    "installationCommandResponse",
+                    "installationCommandResponses",
                     "instantiationCommandResponse"
                 ],
                 "properties": {
                     "success": {
                         "type": "boolean"
                     },
-                    "installationCommandResponse": {
-                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    "installationCommandResponses": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SSHExecCommandResponse"
+                        }
                     },
                     "instantiationCommandResponse": {
                         "$ref": "#/components/schemas/SSHExecCommandResponse"
