@@ -6,6 +6,11 @@ import tar from "tar-stream";
 import { EventEmitter } from "events";
 import Web3 from "web3";
 import { Account } from "web3-core";
+import {
+  LogLevelDesc,
+  Logger,
+  LoggerProvider,
+} from "@hyperledger/cactus-common";
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
@@ -15,6 +20,7 @@ export interface IBesuTestLedgerConstructorOptions {
   containerImageName?: string;
   rpcApiHttpPort?: number;
   envVars?: string[];
+  logLevel?: LogLevelDesc;
 }
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
@@ -44,6 +50,7 @@ export class BesuTestLedger implements ITestLedger {
   public readonly rpcApiHttpPort: number;
   public readonly envVars: string[];
 
+  private readonly log: Logger;
   private container: Container | undefined;
   private containerId: string | undefined;
 
@@ -62,6 +69,9 @@ export class BesuTestLedger implements ITestLedger {
     this.envVars = options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
 
     this.validateConstructorOptions();
+    const label = "besu-test-ledger";
+    const level = options.logLevel || "INFO";
+    this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public getContainer(): Container {
@@ -176,7 +186,7 @@ export class BesuTestLedger implements ITestLedger {
   }
 
   public async start(): Promise<Container> {
-    const containerNameAndTag = this.getContainerImageName();
+    const imageFqn = this.getContainerImageName();
 
     if (this.container) {
       await this.container.stop();
@@ -184,11 +194,13 @@ export class BesuTestLedger implements ITestLedger {
     }
     const docker = new Docker();
 
-    await this.pullContainerImage(containerNameAndTag);
+    this.log.debug(`Pulling container image ${imageFqn} ...`);
+    await this.pullContainerImage(imageFqn);
+    this.log.debug(`Pulled ${imageFqn} OK. Starting container...`);
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
-        containerNameAndTag,
+        imageFqn,
         [],
         [],
         {
@@ -215,10 +227,12 @@ export class BesuTestLedger implements ITestLedger {
       );
 
       eventEmitter.once("start", async (container: Container) => {
+        this.log.debug(`Started container OK. Waiting for healthcheck...`);
         this.container = container;
         this.containerId = container.id;
         try {
           await this.waitForHealthCheck();
+          this.log.debug(`Healthcheck passing OK.`);
           resolve(container);
         } catch (ex) {
           reject(ex);
