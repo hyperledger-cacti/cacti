@@ -157,7 +157,7 @@ export class PluginLedgerConnectorBesu
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
-    webServices.forEach((ws) => ws.registerExpress(app));
+    await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
     return webServices;
   }
 

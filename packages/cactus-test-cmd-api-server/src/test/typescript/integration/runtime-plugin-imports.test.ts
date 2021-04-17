@@ -3,7 +3,11 @@ import { v4 as uuidv4 } from "uuid";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "TRACE";
@@ -13,6 +17,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
 
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
+  apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;

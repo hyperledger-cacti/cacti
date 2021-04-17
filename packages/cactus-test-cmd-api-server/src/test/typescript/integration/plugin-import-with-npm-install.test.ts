@@ -9,7 +9,11 @@ import {
   ConsortiumDatabase,
 } from "@hyperledger/cactus-core-api";
 
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -27,6 +31,7 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
 
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
+  apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;

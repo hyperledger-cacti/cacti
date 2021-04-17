@@ -7,6 +7,7 @@ import OAS from "../../json/openapi.json";
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
+  IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -14,6 +15,7 @@ import {
   Logger,
   LoggerProvider,
   Checks,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
 import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
@@ -56,8 +58,20 @@ export class GetPrometheusExporterMetricsEndpointV1
     ].get["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
-  registerExpress(app: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(app, this);
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    // TODO: make this an injectable dependency in the constructor
+    return {
+      get: async () => ({
+        isProtected: true,
+        requiredRoles: [],
+      }),
+    };
+  }
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 

@@ -6,7 +6,11 @@ import { JWK } from "jose";
 import Web3 from "web3";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 import {
   CactusNode,
   Consortium,
@@ -172,6 +176,7 @@ test(testCase, async (t: Test) => {
 
       const configService = new ConfigService();
       const apiServerOptions = configService.newExampleConfig();
+      apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
       apiServerOptions.configFile = "";
       apiServerOptions.apiCorsDomainCsv = "*";
       apiServerOptions.apiPort = addressInfo1.port;
@@ -213,6 +218,7 @@ test(testCase, async (t: Test) => {
 
       const configService = new ConfigService();
       const apiServerOptions = configService.newExampleConfig();
+      apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
       apiServerOptions.configFile = "";
       apiServerOptions.apiCorsDomainCsv = "*";
       apiServerOptions.apiPort = addressInfo2.port;
