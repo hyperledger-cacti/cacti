@@ -7,7 +7,11 @@ import { AddressInfo } from "net";
 import Web3 from "web3";
 import EEAClient, { IWeb3InstanceExtended } from "web3-eea";
 
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 import {
   JsObjectSigner,
   IJsObjectSignerOptions,
@@ -102,6 +106,7 @@ test(testCase, async (t: Test) => {
   // 4. Create the API Server object that we embed in this test
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
+  apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = addressInfo1.port;

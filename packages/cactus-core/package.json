@@ -84,6 +84,7 @@
     "@hyperledger/cactus-common": "0.4.0",
     "@hyperledger/cactus-core-api": "0.4.1",
     "express": "4.17.1",
+    "express-jwt-authz": "2.4.1",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {

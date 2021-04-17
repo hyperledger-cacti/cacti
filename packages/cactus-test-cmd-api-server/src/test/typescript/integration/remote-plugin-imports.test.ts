@@ -1,7 +1,11 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
@@ -61,6 +65,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
 
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
+  apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;

@@ -24,6 +24,7 @@ import {
 
 import {
   ApiServer,
+  AuthorizationProtocol,
   ConfigService,
   ICactusApiServerOptions,
 } from "@hyperledger/cactus-cmd-api-server";
@@ -66,6 +67,7 @@ test(testCase, async (t: Test) => {
 
   const configService = new ConfigService();
   const cactusApiServerOptions: ICactusApiServerOptions = configService.newExampleConfig();
+  cactusApiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   cactusApiServerOptions.configFile = "";
   cactusApiServerOptions.apiCorsDomainCsv = "*";
   cactusApiServerOptions.apiTlsEnabled = false;

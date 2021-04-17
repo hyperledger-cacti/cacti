@@ -4,7 +4,11 @@ import { Server } from "http";
 import { v4 as uuidV4 } from "uuid";
 import { JWK } from "jose";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 import {
   CactusNode,
   ConsortiumMember,
@@ -98,6 +102,7 @@ tap.test(
     // 4. Create the API Server object that we embed in this test
     const configService = new ConfigService();
     const apiServerOptions = configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
     apiServerOptions.apiCorsDomainCsv = "*";
     apiServerOptions.apiPort = 0;

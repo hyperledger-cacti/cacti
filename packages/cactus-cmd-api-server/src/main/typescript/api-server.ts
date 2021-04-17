@@ -37,6 +37,7 @@ import OAS from "../json/openapi.json";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { AuthorizerFactory } from "./authzn/authorizer-factory";
 export interface IApiServerConstructorOptions {
   pluginRegistry?: PluginRegistry;
   httpServerApi?: Server | SecureServer;
@@ -46,11 +47,27 @@ export interface IApiServerConstructorOptions {
 }
 
 export class ApiServer {
+  public static readonly CLASS_NAME = "ApiServer";
+  public static readonly E_POST_CRASH_SHUTDOWN =
+    "API server failed to shut itself down, will ignore this because we were already crashing anyway...";
+  public static readonly E_NON_EXEMPT_UNPROTECTED_ENDPOINTS =
+    `Non-exempt unprotected endpoints found. ` +
+    `You can allow them as unprotected via the configuration of the ` +
+    `API server by specifying an array of patterns in the property ` +
+    `"unprotectedEndpointExemptions" of "authorizationConfigJson". ` +
+    `This mechanism is meant to foster DevOps where both dev & ops ` +
+    `work together in making secure application deployments a reality. ` +
+    `The comma separated list of unprotected endpoints that were not marked as exempt: `;
+
   private readonly log: Logger;
   private pluginRegistry: PluginRegistry | undefined;
   private readonly httpServerApi: Server | SecureServer;
   private readonly httpServerCockpit: Server | SecureServer;
   public prometheusExporter: PrometheusExporter;
+
+  public get className(): string {
+    return ApiServer.CLASS_NAME;
+  }
 
   constructor(public readonly options: IApiServerConstructorOptions) {
     if (!options) {
@@ -114,7 +131,10 @@ export class ApiServer {
     return this.pluginRegistry?.plugins.length || 0;
   }
 
-  async start(): Promise<any> {
+  async start(): Promise<{
+    addressInfoCockpit: AddressInfo;
+    addressInfoApi: AddressInfo;
+  }> {
     this.checkNodeVersion();
     const tlsMaxVersion = this.options.config.tlsDefaultMaxVersion;
     this.log.info("Setting tls.DEFAULT_MAX_VERSION to %s...", tlsMaxVersion);
@@ -146,8 +166,12 @@ export class ApiServer {
       const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
       this.log.error(errorMessage);
       this.log.error(`Attempting shutdown...`);
-      await this.shutdown();
-      this.log.info(`Server shut down OK`);
+      try {
+        await this.shutdown();
+        this.log.info(`Server shut down after crash OK`);
+      } catch (ex) {
+        this.log.error(ApiServer.E_POST_CRASH_SHUTDOWN, ex);
+      }
       throw new Error(errorMessage);
     }
   }
@@ -197,31 +221,40 @@ export class ApiServer {
 
   public async initPluginRegistry(): Promise<PluginRegistry> {
     const registry = new PluginRegistry({ plugins: [] });
-    const { logLevel, plugins } = this.options.config;
+    const { plugins } = this.options.config;
     this.log.info(`Instantiated empty registry, invoking plugin factories...`);
 
     for (const pluginImport of plugins) {
-      const { packageName, options } = pluginImport;
-      this.log.info(`Creating plugin from package: ${packageName}`, options);
-      const pluginOptions = { ...options, logLevel, pluginRegistry: registry };
-
-      await this.installPluginPackage(pluginImport);
-
-      const pluginPackage = require(/* webpackIgnore: true */ packageName);
-      const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
-
-      const pluginFactoryOptions: IPluginFactoryOptions = {
-        pluginImportType: pluginImport.type,
-      };
-
-      const pluginFactory = await createPluginFactory(pluginFactoryOptions);
-
-      const plugin = await pluginFactory.create(pluginOptions);
-
+      const plugin = await this.instantiatePlugin(pluginImport, registry);
       registry.add(plugin);
     }
 
     return registry;
+  }
+
+  private async instantiatePlugin(
+    pluginImport: PluginImport,
+    registry: PluginRegistry,
+  ): Promise<ICactusPlugin> {
+    const { logLevel } = this.options.config;
+    const { packageName, options } = pluginImport;
+    this.log.info(`Creating plugin from package: ${packageName}`, options);
+    const pluginOptions = { ...options, logLevel, pluginRegistry: registry };
+
+    await this.installPluginPackage(pluginImport);
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const pluginPackage = require(/* webpackIgnore: true */ packageName);
+    const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
+
+    const pluginFactoryOptions: IPluginFactoryOptions = {
+      pluginImportType: pluginImport.type,
+    };
+
+    const pluginFactory = await createPluginFactory(pluginFactoryOptions);
+
+    const plugin = await pluginFactory.create(pluginOptions);
+    return plugin;
   }
 
   private async installPluginPackage(
@@ -292,13 +325,13 @@ export class ApiServer {
     await Promise.all(webServicesShutdown);
     this.log.info(`Stopped ${webServicesShutdown.length} WS plugin(s) OK`);
 
-    if (this.httpServerApi) {
+    if (this.httpServerApi?.listening) {
       this.log.info(`Closing HTTP server of the API...`);
       await Servers.shutdown(this.httpServerApi);
       this.log.info(`Close HTTP server of the API OK`);
     }
 
-    if (this.httpServerCockpit) {
+    if (this.httpServerCockpit?.listening) {
       this.log.info(`Closing HTTP server of the cockpit ...`);
       await Servers.shutdown(this.httpServerCockpit);
       this.log.info(`Close HTTP server of the cockpit OK`);
@@ -415,6 +448,15 @@ export class ApiServer {
   }
 
   async startApiServer(): Promise<AddressInfo> {
+    const { options } = this;
+    const { config } = options;
+    const {
+      authorizationConfigJson: authzConf,
+      authorizationProtocol: authzProtocol,
+      logLevel,
+    } = config;
+    const apiServerOptions = config;
+
     const pluginRegistry = await this.getOrInitPluginRegistry();
 
     const app: Application = express();
@@ -424,8 +466,21 @@ export class ApiServer {
     const allowedDomains = apiCorsDomainCsv.split(",");
     const corsMiddleware = this.createCorsMiddleware(allowedDomains);
     app.use(corsMiddleware);
-
     app.use(bodyParser.json({ limit: "50mb" }));
+
+    const authzFactoryOptions = { apiServerOptions, pluginRegistry, logLevel };
+    const authzFactory = new AuthorizerFactory(authzFactoryOptions);
+    await authzFactory.initOnce();
+    const authorizerO = await authzFactory.createMiddleware(
+      authzProtocol,
+      authzConf,
+    );
+    if (authorizerO.isPresent()) {
+      const authorizer = authorizerO.get();
+      this.checkNonExemptUnprotectedEps(authzFactory);
+      app.use(authorizer);
+      this.log.info(`Authorization request handler configured OK.`);
+    }
 
     const openApiValidator = this.createOpenApiValidator();
     await openApiValidator.install(app);
@@ -438,8 +493,10 @@ export class ApiServer {
       .getPlugins()
       .filter((pluginInstance) => isIPluginWebService(pluginInstance))
       .map(async (plugin: ICactusPlugin) => {
-        await (plugin as IPluginWebService).getOrCreateWebServices();
-        return (plugin as IPluginWebService).registerWebServices(app);
+        const p = plugin as IPluginWebService;
+        await p.getOrCreateWebServices();
+        const webSvcs = await p.registerWebServices(app);
+        return webSvcs;
       });
 
     const endpoints2D = await Promise.all(webServicesInstalled);
@@ -461,12 +518,28 @@ export class ApiServer {
     this.httpServerApi.on("request", app);
 
     // the address() method returns a string for unix domain sockets and null
-    // if the server is not listening but we don't car about any of those cases
+    // if the server is not listening but we don't care about any of those cases
     // so the casting here should be safe. Famous last words... I know.
     const addressInfo = this.httpServerApi.address() as AddressInfo;
     this.log.info(`Cactus API net.AddressInfo`, addressInfo);
 
     return addressInfo;
+  }
+
+  private checkNonExemptUnprotectedEps(factory: AuthorizerFactory): void {
+    const { config } = this.options;
+    const { authorizationConfigJson } = config;
+    const { unprotectedEndpointExemptions } = authorizationConfigJson;
+
+    const nonExempts = factory.unprotectedEndpoints.filter(
+      (nse) =>
+        !unprotectedEndpointExemptions.some((pt) => nse.getPath().match(pt)),
+    );
+    if (nonExempts.length > 0) {
+      const csv = nonExempts.join(", ");
+      const { E_NON_EXEMPT_UNPROTECTED_ENDPOINTS } = ApiServer;
+      throw new Error(`${E_NON_EXEMPT_UNPROTECTED_ENDPOINTS} ${csv}`);
+    }
   }
 
   createOpenApiValidator(): OpenApiValidator {

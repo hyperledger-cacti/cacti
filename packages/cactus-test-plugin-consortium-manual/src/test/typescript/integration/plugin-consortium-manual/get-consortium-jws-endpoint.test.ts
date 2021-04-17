@@ -5,7 +5,11 @@ import test, { Test } from "tape";
 import { JWK, JWS } from "jose";
 import { v4 as uuidV4 } from "uuid";
 
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 import {
   IPluginConsortiumManualOptions,
   PluginConsortiumManual,
@@ -152,6 +156,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     // 4. Create the API Server object that we embed in this test
     const configService = new ConfigService();
     const apiServerOptions = configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
     apiServerOptions.apiCorsDomainCsv = "*";
     apiServerOptions.apiPort = addressInfo1.port;
@@ -205,6 +210,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     // 4. Create the API Server object that we embed in this test
     const configService = new ConfigService();
     const apiServerOptions = configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
     apiServerOptions.apiCorsDomainCsv = "*";
     apiServerOptions.apiPort = addressInfo2.port;
@@ -259,6 +265,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     // 4. Create the API Server object that we embed in this test
     const configService = new ConfigService();
     const apiServerOptions = configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
     apiServerOptions.apiCorsDomainCsv = "*";
     apiServerOptions.apiPort = addressInfo3.port;

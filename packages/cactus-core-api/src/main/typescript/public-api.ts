@@ -25,3 +25,8 @@ export { PluginAspect } from "./plugin/plugin-aspect";
 export { IPluginFactoryOptions } from "./i-plugin-factory-options";
 
 export { PluginFactoryFactory } from "./plugin-factory-factory";
+
+export {
+  IEndpointAuthzOptions,
+  isIEndpointAuthzOptions,
+} from "./plugin/web-service/i-endpoint-authz-options";
