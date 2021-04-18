@@ -1,7 +1,12 @@
 name: Cactus CI Github Workflow
 
 # Triggers the workflow on push or pull request events
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, dev]
+
+  pull_request:
+    branches: [main, dev]
 
 jobs:
   build:
