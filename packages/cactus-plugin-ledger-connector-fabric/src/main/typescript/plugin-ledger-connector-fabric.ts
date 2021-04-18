@@ -33,7 +33,10 @@ import {
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import {
+  consensusHasTransactionFinality,
+  PluginRegistry,
+} from "@hyperledger/cactus-core";
 
 import {
   Logger,
@@ -184,7 +187,11 @@ export class PluginLedgerConnectorFabric
   > {
     return ConsensusAlgorithmFamily.AUTHORITY;
   }
+  public async hasTransactionFinality(): Promise<boolean> {
+    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
 
+    return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
+  }
   private async sshExec(
     cmd: string,
     label: string,

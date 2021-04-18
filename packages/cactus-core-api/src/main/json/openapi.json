@@ -68,6 +68,24 @@
                     "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
                 ]
             },
+            "ConsensusAlgorithmFamiliesWithTxFinality":{
+                "type": "string",
+                "description": "Enumerates a list of consensus algorithm families that provide immediate finality",
+                "enum": [
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY",
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"
+                ]
+
+            },
+            "ConsensusAlgorithmFamiliesWithOutTxFinality":{
+                "description":"Enumerates a list of consensus algorithm families that do not provide immediate finality",
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
+                ],
+                "x-enum-varnames": ["WORK"]
+
+            },
             "PrimaryKey": {
                 "type": "string",
                 "minLength": 1,
