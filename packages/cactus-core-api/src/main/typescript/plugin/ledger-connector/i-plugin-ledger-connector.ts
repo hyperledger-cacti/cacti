@@ -30,4 +30,5 @@ export interface IPluginLedgerConnector<
    * @see {ConsensusAlgorithmFamily}
    */
   getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily>;
+  hasTransactionFinality(): Promise<boolean>;
 }

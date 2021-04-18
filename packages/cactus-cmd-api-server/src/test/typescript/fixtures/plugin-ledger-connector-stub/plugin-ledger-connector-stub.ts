@@ -14,7 +14,10 @@ import {
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import {
+  PluginRegistry,
+  consensusHasTransactionFinality,
+} from "@hyperledger/cactus-core";
 
 import {
   Checks,
@@ -128,7 +131,11 @@ export class PluginLedgerConnectorStub
   > {
     return ConsensusAlgorithmFamily.AUTHORITY;
   }
+  public async hasTransactionFinality(): Promise<boolean> {
+    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
 
+    return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
+  }
   public async transact(req: unknown): Promise<unknown> {
     const fnTag = `${this.className}#transact()`;
     Checks.truthy(req, `${fnTag} req`);

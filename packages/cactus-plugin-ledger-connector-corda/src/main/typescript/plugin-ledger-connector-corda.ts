@@ -13,7 +13,7 @@ import {
   ICactusPluginOptions,
   ConsensusAlgorithmFamily,
 } from "@hyperledger/cactus-core-api";
-
+import { consensusHasTransactionFinality } from "@hyperledger/cactus-core";
 import {
   Checks,
   Logger,
@@ -94,6 +94,11 @@ export class PluginLedgerConnectorCorda
     ConsensusAlgorithmFamily
   > {
     return ConsensusAlgorithmFamily.AUTHORITY;
+  }
+  public async hasTransactionFinality(): Promise<boolean> {
+    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+
+    return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
 
   public getAspect(): PluginAspect {

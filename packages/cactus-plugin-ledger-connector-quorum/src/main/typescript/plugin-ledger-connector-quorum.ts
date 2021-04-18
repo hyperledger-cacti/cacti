@@ -23,7 +23,10 @@ import {
   IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import {
+  PluginRegistry,
+  consensusHasTransactionFinality,
+} from "@hyperledger/cactus-core";
 
 import {
   Checks,
@@ -205,7 +208,11 @@ export class PluginLedgerConnectorQuorum
   > {
     return ConsensusAlgorithmFamily.AUTHORITY;
   }
+  public async hasTransactionFinality(): Promise<boolean> {
+    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
 
+    return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
+  }
   public async invokeContract(
     req: InvokeContractV1Request,
   ): Promise<InvokeContractV1Response> {
