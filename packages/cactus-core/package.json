@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core",
-  "version": "0.4.1",
+  "version": "1.0.0-rc.0",
   "description": "Contains lower level abstractions/implementation that is to be shared by multiple other, higher level packages of the project.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-core.node.umd.min.js",
@@ -81,8 +81,8 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.4.0",
-    "@hyperledger/cactus-core-api": "0.4.1",
+    "@hyperledger/cactus-common": "1.0.0-rc.0",
+    "@hyperledger/cactus-core-api": "1.0.0-rc.0",
     "express": "4.17.1",
     "typescript-optional": "2.0.1"
   },

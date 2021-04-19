@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-rc.0](https://github.com/petermetz/cactus/compare/v0.4.1...v1.0.0-rc.0) (2021-04-19)
+
+
+### Bug Fixes
+
+* **cmd-api-server:** no CLI args causes crash [#794](https://github.com/petermetz/cactus/issues/794) ([a285b96](https://github.com/petermetz/cactus/commit/a285b96785792cd29f450bfc1cc066067c82f558))
+* **deps:** elliptic upgrade to >6.5.3 for CVE-2020-28498 ([d75b9af](https://github.com/petermetz/cactus/commit/d75b9af764241ab2e10914769412201fb040b1ed))
+* **examples:** supply chain backend bundle build RAM [#766](https://github.com/petermetz/cactus/issues/766) ([f5c5d82](https://github.com/petermetz/cactus/commit/f5c5d82ef3ae327f057da94ea12a224f9b4d78c6))
+* **test:** eliminate CVE-2020-8203 in besu connector test pkg ([6411933](https://github.com/petermetz/cactus/commit/6411933a167711152165d86a260d5f49d272746d))
+* **tools:** ci.sh retry mechanism no longer ignores last failure ([b5e751e](https://github.com/petermetz/cactus/commit/b5e751e405d0c612f71c50fa964600134d25e0c2))
+* **tools:** use latest fabric bootstrap.sh script for AIO image ([b298b76](https://github.com/petermetz/cactus/commit/b298b76a03382fa2729b89a6066b693e3c072582))
+* **whitepaper:** build fails on Ubuntu 18 due to glibc 2.29 [#703](https://github.com/petermetz/cactus/issues/703) ([ec22a0f](https://github.com/petermetz/cactus/commit/ec22a0fc94929ae0fe8b44f93ce20f44847ec176))
+* keychain to registry, uuid dep, add back missing gas req parameter ([4635d81](https://github.com/petermetz/cactus/commit/4635d817a719bcdaa2a3bf1b4aa3b5d8cc1f6961))
+
+
+### Features
+
+* **api-server:** ability to install plugins at runtime [#764](https://github.com/petermetz/cactus/issues/764) ([8dda0f6](https://github.com/petermetz/cactus/commit/8dda0f61937c6e1a85afee0345af44b1bfa09c0a))
+* **besu:** add sequence diagram of run transaction endpoint ([754a11a](https://github.com/petermetz/cactus/commit/754a11a449d9a67dd8d6ebecbeb1b65cefa71b7f)), closes [#755](https://github.com/petermetz/cactus/issues/755)
+* **cmd-api-server:** user defined type guard isHealthcheckResponse ([16077d4](https://github.com/petermetz/cactus/commit/16077d42ec7edce4999d77cfbca5c02177d15fa6))
+* **connector-besu, connector-quorum:** filesystem replaced by keychain ([14d1790](https://github.com/petermetz/cactus/commit/14d17904442723450790644653ff18dda79dfa5e))
+* **core:** add plugin registry log level constructor arg ([1652b33](https://github.com/petermetz/cactus/commit/1652b33255c211e87e33ceb3e421cb9fb4182502))
+* **core-api:** decouple web service install & registration [#771](https://github.com/petermetz/cactus/issues/771) ([b50e148](https://github.com/petermetz/cactus/commit/b50e148f43c0b27138471c972aab391486e761e6))
+* **test-tooling:** add besu test ledger log level constructor arg ([60ee32f](https://github.com/petermetz/cactus/commit/60ee32fb0e65e8325194a8798dd8cde093a141d3)), closes [#780](https://github.com/petermetz/cactus/issues/780)
+* **test-tooling:** add keycloak container ([f1abb3e](https://github.com/petermetz/cactus/commit/f1abb3e8d2e05aa18008da176753b240528e95e6))
+
+
+
+
+
 ## [0.4.1](https://github.com/petermetz/cactus/compare/v0.4.0...v0.4.1) (2021-04-02)
 
 
