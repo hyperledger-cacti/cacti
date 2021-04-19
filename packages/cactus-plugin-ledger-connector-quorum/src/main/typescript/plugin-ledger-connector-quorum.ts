@@ -5,8 +5,11 @@ import { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
 import Web3 from "web3";
-
-import { Contract, ContractSendMethod } from "web3-eth-contract";
+// The strange way of obtaining the contract class here is like this because
+// web3-eth internally sub-classes the Contract class at runtime
+// @see https://stackoverflow.com/a/63639280/698470
+const Contract = new Web3().eth.Contract;
+import { ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
 
 import {
@@ -83,7 +86,8 @@ export class PluginLedgerConnectorQuorum
   private readonly web3: Web3;
   private httpServer: Server | SecureServer | null = null;
   private contracts: {
-    [name: string]: Contract;
+    // @see https://stackoverflow.com/a/63639280/698470
+    [name: string]: InstanceType<typeof Contract>;
   } = {};
 
   private endpoints: IWebServiceEndpoint[] | undefined;
@@ -227,7 +231,7 @@ export class PluginLedgerConnectorQuorum
     }
 
     const { contractAddress } = req;
-    const aContract = new Contract(abi, contractAddress);
+    const aContract = new this.web3.eth.Contract(abi, contractAddress);
     const methodRef = aContract.methods[req.methodName];
 
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
@@ -320,7 +324,7 @@ export class PluginLedgerConnectorQuorum
         contractJSON.networks = network;
         keychainPlugin.set(contractName, contractJSON);
       }
-      const contract = new Contract(
+      const contract = new this.web3.eth.Contract(
         contractJSON.abi,
         contractJSON.networks[networkId].address,
       );
@@ -575,7 +579,7 @@ export class PluginLedgerConnectorQuorum
           req.contractName,
         )) as any;
         this.log.info(JSON.stringify(contractJSON));
-        const contract = new Contract(
+        const contract = new this.web3.eth.Contract(
           contractJSON.abi,
           receipt.transactionReceipt.contractAddress,
         );
