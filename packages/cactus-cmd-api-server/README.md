@@ -8,10 +8,17 @@
 - [Deployment Scenarios](#deployment-scenarios)
   - [Production Deployment Example](#production-deployment-example)
   - [Low Resource Deployment Example](#low-resource-deployment-example)
+- [Containerization](#containerization)
+  - [Building the container image locally](#building-the-container-image-locally)
+  - [Running the container image locally](#running-the-container-image-locally)
+  - [Testing API calls with the container](#testing-api-calls-with-the-container)
 - [Prometheus Exporter](#prometheus-exporter)
   - [Usage Prometheus](#usage-prometheus)
   - [Prometheus Integration](#prometheus-integration)
-  - [Helper Code](#helper-code)
+  - [Helper code](#helper-code)
+        - [response.type.ts](#responsetypets)
+        - [data-fetcher.ts](#data-fetcherts)
+        - [metrics.ts](#metricsts)
 - [FAQ](#faq)
   - [What is the difference between a Cactus Node and a Cactus API Server?](#what-is-the-difference-between-a-cactus-node-and-a-cactus-api-server)
   - [Is the API server horizontally scalable?](#is-the-api-server-horizontally-scalable)
@@ -199,6 +206,155 @@ The individual nodes/API servers are isolated by listening on seperate TCP ports
 of the machine they are hosted on:
 
 ![deployment-low-resource-example.png](https://github.com/hyperledger/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-low-resource-example.png)
+
+## Containerization
+
+### Building the container image locally
+
+In the Cactus project root say:
+
+```sh
+DOCKER_BUILDKIT=1 docker build -f ./packages/cactus-cmd-api-server/Dockerfile . -t cas -t cactus-api-server
+```
+
+Build with a specific version of the npm package:
+```sh
+DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=fix-quorum-contract-types -f ./packages/cactus-cmd-api-server/Dockerfile . -t cas -t cactus-api-server
+```
+
+### Running the container image locally
+
+Before running the examples here you need to build the image locally.
+See section [Building the container image locally](#building-the-container-image-locally) for details on how to do that.
+
+Once you've built the container, the following commands should work:
+
+- Launch container - no plugins, default configuration
+
+  ```sh
+  docker run \
+    --rm \
+    --publish 3000:3000 \
+    --publish 4000:4000 \
+    cas
+  ```
+
+- Launch container with plugins of your choice (keychain, consortium connector, etc.) 
+
+  ```sh
+    docker run \
+    --rm \
+    --publish 3000:3000 \
+    --publish 4000:4000 \
+    cas \
+      ./node_modules/.bin/cactusapi \
+      --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": { "connectionProfile": {}, "instanceId": "some-unique-instance-id"}}]'
+  ```
+
+- Launch container with plugin configuration as an **environment variable**:
+  ```sh
+  docker run \
+    --rm \
+    --publish 3000:3000 \
+    --publish 4000:4000 \
+    --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
+    cas
+  ```
+
+- Launch container with plugin configuration as a **CLI argument**:
+  ```sh
+  docker run \
+    --rm \
+    --publish 3000:3000 \
+    --publish 4000:4000 \
+    cas \
+      ./node_modules/.bin/cactusapi \
+      --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]'
+  ```
+
+- Launch container with **configuration file** mounted from host machine:
+  ```sh
+
+  echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' > cactus.json
+
+  docker run \
+    --rm \
+    --publish 3000:3000 \
+    --publish 4000:4000 \
+    --mount type=bind,source="$(pwd)"/cactus.json,target=/cactus.json \
+    cas \
+      ./node_modules/.bin/cactusapi \
+      --config-file=/cactus.json
+  ```
+
+### Testing API calls with the container
+
+Don't have a Besu network on hand to test with? Test or develop against our Besu All-In-One container!
+
+1. Terminal Window 1 (Ledger)
+    ```sh
+    docker run --publish 8545:8545 hyperledger/cactus-besu-all-in-one:latest
+    ```
+
+2. Terminal Window 2 (Cactus API Server)
+    ```sh
+    docker run \
+      --network host \
+      --rm \
+      --publish 3000:3000 \
+      --publish 4000:4000 \
+      --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
+      cas
+    ```
+
+3. Terminal Window 3 (curl - replace eth accounts as needed)
+    ```sh
+    curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "web3SigningCredential": {
+          "ethAccount": "627306090abaB3A6e1400e9345bC60c78a8BEf57",
+          "secret": "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3",
+          "type": "PRIVATE_KEY_HEX"
+        },
+        "consistencyStrategy": {
+          "blockConfirmations": 0,
+          "receiptType": "NODE_TX_POOL_ACK"
+        },
+        "transactionConfig": {
+          "from": "627306090abaB3A6e1400e9345bC60c78a8BEf57",
+          "to": "f17f52151EbEF6C7334FAD080c5704D77216b732",
+          "value": 1,
+          "gas": 10000000
+        }
+    }'
+    ```
+
+4. The above should produce a response that looks similar to this:
+
+    ```json
+    {
+        "success": true,
+        "data": {
+            "transactionReceipt": {
+                "blockHash": "0x7c97c038a5d3bd84613fe23ed442695276d5d2df97f4e7c4f10ca06765033ffd",
+                "blockNumber": 1218,
+                "contractAddress": null,
+                "cumulativeGasUsed": 21000,
+                "from": "0x627306090abab3a6e1400e9345bc60c78a8bef57",
+                "gasUsed": 21000,
+                "logs": [],
+                "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                "status": true,
+                "to": "0xf17f52151ebef6c7334fad080c5704d77216b732",
+                "transactionHash": "0xc7fcb46c735bdc696d500bfc70c72595a2b8c31813929e5c61d9a5aec3376d6f",
+                "transactionIndex": 0
+            }
+        }
+    }
+    ```
+
+
 
 ## Prometheus Exporter
 This class creates a prometheus exporter, which scrapes the total Cactus node count.
