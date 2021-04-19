@@ -1,4 +1,4 @@
-# Hyperledger Cactus SDK Build Instructions
+# Hyperledger Cactus Build Instructions
 
 This is the place to start if you want to give Cactus a spin on your local
 machine or if you are planning on contributing.
@@ -128,3 +128,25 @@ At this point, with the running API server, you can
 
 We recommend you use WSL or WSL2 or any Linux VM. We test most frequently on
 Ubuntu LTS which at the time of this writing means 18.04 and/or 20.04.
+
+## Build Script Decision Tree
+
+The `npm run watch` script should cover 99% of the cases when it comes to working
+on Cactus code and having it recompile, but for that last 1% you'll need to
+get your hands dirty with the rest of the build scripts. Usually this is only
+needed when you are adding new dependencies (npm packages) as part of something
+that you are implementing.
+
+There are a lot of different build scripts in Cactus in order to provide contributors
+fine(r) grained control over what parts of the framework they wish build.
+
+> Q: Why the complexity of so many build scripts?
+>
+> A: We could just keep it simple with a single build script that builds everything
+always, but that would be a nightmare to wait for after having changed a single
+line of code for example.
+
+To figure out which script could work for rebuilding Cactus, please follow
+the following decision tree (and keep in mind that we have `npm run watch` too)
+
+![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
