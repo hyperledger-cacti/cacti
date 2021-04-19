@@ -211,7 +211,7 @@ export class PluginLedgerConnectorQuorum
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
     const contractName = req.contractName;
-    let contractInstance: Contract;
+    let contractInstance: InstanceType<typeof Contract>;
 
     if (req.keychainId != undefined) {
       const networkId = await this.web3.eth.net.getId();
@@ -262,7 +262,11 @@ export class PluginLedgerConnectorQuorum
         contractJSON.networks[networkId].address,
       );
       this.contracts[contractName] = contract;
-    } else {
+    } else if (
+      req.keychainId == undefined &&
+      req.contractAbi == undefined &&
+      req.contractAddress == undefined
+    ) {
       throw new Error(
         `${fnTag} Cannot invoke a contract without contract instance, the keychainId param is needed`,
       );
