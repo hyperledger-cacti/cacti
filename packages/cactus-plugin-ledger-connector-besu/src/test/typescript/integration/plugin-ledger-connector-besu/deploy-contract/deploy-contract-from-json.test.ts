@@ -164,6 +164,7 @@ test(testCase, async (t: Test) => {
     );
 
     const { callOutput: helloMsg } = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.CALL,
@@ -218,6 +219,7 @@ test(testCase, async (t: Test) => {
   test("invoke Web3SigningCredentialType.PRIVATEKEYHEX", async (t2: Test) => {
     const newName = `DrCactus${uuidv4()}`;
     const setNameOut = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.SEND,
@@ -234,6 +236,7 @@ test(testCase, async (t: Test) => {
 
     try {
       const setNameOutInvalid = await connector.invokeContract({
+        contractName: HelloWorldContractJson.contractName,
         contractAbi: HelloWorldContractJson.abi,
         contractAddress,
         invocationType: EthContractInvocationType.SEND,
@@ -256,6 +259,7 @@ test(testCase, async (t: Test) => {
       );
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.CALL,
@@ -271,6 +275,7 @@ test(testCase, async (t: Test) => {
     t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
 
     const getNameOut2 = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.SEND,
@@ -286,6 +291,7 @@ test(testCase, async (t: Test) => {
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
 
     const response = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.SEND,
@@ -302,6 +308,7 @@ test(testCase, async (t: Test) => {
     t2.ok(response, "deposit() payable invocation output is truthy OK");
 
     const { callOutput } = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.CALL,
@@ -334,6 +341,7 @@ test(testCase, async (t: Test) => {
     };
 
     const setNameOut = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.SEND,
@@ -347,6 +355,7 @@ test(testCase, async (t: Test) => {
 
     try {
       const setNameOutInvalid = await connector.invokeContract({
+        contractName: HelloWorldContractJson.contractName,
         contractAbi: HelloWorldContractJson.abi,
         contractAddress,
         invocationType: EthContractInvocationType.SEND,
@@ -366,6 +375,7 @@ test(testCase, async (t: Test) => {
     }
 
     const { callOutput: getNameOut } = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.CALL,
@@ -377,6 +387,7 @@ test(testCase, async (t: Test) => {
     t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
 
     const getNameOut2 = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.SEND,
@@ -388,6 +399,7 @@ test(testCase, async (t: Test) => {
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
 
     const response = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.SEND,
@@ -400,6 +412,7 @@ test(testCase, async (t: Test) => {
     t2.ok(response, "deposit() payable invocation output is truthy OK");
 
     const { callOutput } = await connector.invokeContract({
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
       contractAddress,
       invocationType: EthContractInvocationType.CALL,

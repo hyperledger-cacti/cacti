@@ -282,7 +282,11 @@ export class PluginLedgerConnectorBesu
         contractJSON.networks[networkId].address,
       );
       this.contracts[contractName] = contract;
-    } else {
+    } else if (
+      req.keychainId == undefined &&
+      req.contractAbi == undefined &&
+      req.contractAddress == undefined
+    ) {
       throw new Error(
         `${fnTag} Cannot invoke a contract without contract instance, the keychainId param is needed`,
       );
