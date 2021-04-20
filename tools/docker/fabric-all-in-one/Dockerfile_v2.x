@@ -131,13 +131,19 @@ RUN apk add --no-cache jq
 RUN curl -sSL https://raw.githubusercontent.com/moby/moby/dedf8528a51c6db40686ed6676e9486d1ed5f9c0/contrib/download-frozen-image-v2.sh > /download-frozen-image-v2.sh
 RUN chmod +x /download-frozen-image-v2.sh
 
-RUN mkdir -p /etc/hyperledger/fabric
-RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/ hyperledger/fabric-peer:${FABRIC_VERSION}
-RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/ hyperledger/fabric-orderer:${FABRIC_VERSION}
-RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/ hyperledger/fabric-ccenv:${FABRIC_VERSION}
-RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/ hyperledger/fabric-tools:${FABRIC_VERSION}
-RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/ hyperledger/fabric-baseos:${FABRIC_VERSION}
-RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/ hyperledger/fabric-ca:${CA_VERSION}
+RUN mkdir -p /etc/hyperledger/fabric/fabric-peer/
+RUN mkdir -p /etc/hyperledger/fabric/fabric-orderer/
+RUN mkdir -p /etc/hyperledger/fabric/fabric-ccenv/
+RUN mkdir -p /etc/hyperledger/fabric/fabric-tools/
+RUN mkdir -p /etc/hyperledger/fabric/fabric-baseos/
+RUN mkdir -p /etc/hyperledger/fabric/fabric-ca/
+
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-peer/ hyperledger/fabric-peer:${FABRIC_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-orderer/ hyperledger/fabric-orderer:${FABRIC_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ccenv/ hyperledger/fabric-ccenv:${FABRIC_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-tools/ hyperledger/fabric-tools:${FABRIC_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-baseos/ hyperledger/fabric-baseos:${FABRIC_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ca/ hyperledger/fabric-ca:${CA_VERSION}
 
 # Download and execute the Fabric bootstrap script, but instruct it with the -d
 # flag to avoid pulling docker images because during the build phase of this image
@@ -163,6 +169,8 @@ ENV CORE_PEER_TLS_ROOTCERT_FILE=/fabric-samples/test-network/organizations/peerO
 ENV CORE_PEER_MSPCONFIGPATH=/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
 ENV CORE_PEER_ADDRESS=localhost:7051
 ENV COMPOSE_PROJECT_NAME=cactusfabrictestnetwork
+ENV FABRIC_VERSION=${FABRIC_VERSION}
+ENV CA_VERSION=${CA_VERSION}
 
 # Extend the parent image's entrypoint
 # https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script

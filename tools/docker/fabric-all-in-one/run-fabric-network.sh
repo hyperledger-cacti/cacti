@@ -16,14 +16,24 @@ function main()
   local SPECIAL=""
   semverParseInto "${FABRIC_VERSION}" MAJOR MINOR PATCH SPECIAL
 
-  tar -cC '/etc/hyperledger/fabric/' . | docker load
+  tar -cC '/etc/hyperledger/fabric/fabric-peer/' . | docker load
+  tar -cC '/etc/hyperledger/fabric/fabric-orderer/' . | docker load
+  tar -cC '/etc/hyperledger/fabric/fabric-ccenv/' . | docker load
+  tar -cC '/etc/hyperledger/fabric/fabric-tools/' . | docker load
+  tar -cC '/etc/hyperledger/fabric/fabric-ca/' . | docker load
 
-  /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -b -s
 
   echo "[FabricAIO] >>> Parsed MAJOR version of Fabric as ${MAJOR}"
 
   if [ "$MAJOR" -gt 1 ]; then
     # Major version is 2 or newer (we'll deal with 3.x when it is released)
+
+    # Fabric 2.x has this new image called fabric-baseos so we need to load that
+    # as well when we detect that we are running Fabrix 2.x not 1.x
+    tar -cC '/etc/hyperledger/fabric/fabric-baseos/' . | docker load
+  
+    /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -b -s
+
     cd /fabric-samples/test-network/
     echo "[FabricAIO] >>> pulling up test network..."
     ./network.sh up -ca
@@ -34,6 +44,7 @@ function main()
     echo "[FabricAIO] >>> contract deployed OK."
     echo "[FabricAIO] >>> container healthcheck should begin passing in about 5-15 seconds..."
   else
+    /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -b -s
     # Major version is 1.x or earlier (assumption is 1.4.x only)
     cd /fabric-samples/fabcar/
     ./startFabric.sh
