@@ -8,6 +8,7 @@ This plugin provides `Cactus` a way to interact with Fabric networks. Using this
 ## Summary
 
   - [Getting Started](#getting-started)
+  - [Architecture](#architecture)
   - [Usage](#usage)
   - [Runing the tests](#running-the-tests)
   - [Built With](#built-with)
@@ -33,6 +34,15 @@ In the project root folder, run this command to compile the plugin and create th
 ```sh
 npm run tsc
 ```
+### Architecture
+The sequence diagrams for various endpoints are mentioned below
+
+#### run-transaction-endpoint
+![run-transaction-endpoint sequence diagram](docs/architecture/images/run-transaction-endpoint.png)
+The above diagram shows the sequence diagram of run-transaction-endpoint. User A (One of the many Users) interacts with the API Client which in turn, calls the API server. API server then executes transact() method which is explained in detailed in the subsequent diagram.
+![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
+The above diagram shows the sequence diagraom of transact() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the invocationType (FabricContractInvocationType.CALL, FabricCOntractInvocationType.SEND), corresponding responses are send back to the caller.
+
 ## Usage
 
 To use this import public-api and create new **PluginLedgerConnectorFabric** and **ChainCodeCompiler**. 
