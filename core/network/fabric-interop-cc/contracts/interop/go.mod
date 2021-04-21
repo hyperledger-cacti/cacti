@@ -1,4 +1,4 @@
-module github.ibm.com/dlt-interoperability/fabric-interop-cc/contracts/interop
+module github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
 
 go 1.14
 
