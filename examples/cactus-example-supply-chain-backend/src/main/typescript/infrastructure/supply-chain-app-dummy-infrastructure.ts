@@ -213,6 +213,8 @@ export class SupplyChainAppDummyInfrastructure {
         const res = await connector.deployContract({
           contractName: BookshelfRepositoryJSON.contractName,
           bytecode: BookshelfRepositoryJSON.bytecode,
+          contractAbi: BookshelfRepositoryJSON.abi,
+          constructorArgs: [],
           gas: 1000000,
           web3SigningCredential: {
             ethAccount: this.besuAccount.address,

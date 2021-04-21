@@ -35,7 +35,7 @@
                 "description": "Enumerates the possible types of receipts that can be waited for by someone or something that has requested the execution of a transaction on a ledger.",
                 "type": "string",
                 "enum": [
-                    "NODE_TX_POOL_ACK", 
+                    "NODE_TX_POOL_ACK",
                     "LEDGER_BLOCK_ACK"
                 ]
             },
@@ -402,9 +402,11 @@
                 "type": "object",
                 "required": [
                     "contractName",
+                    "contractAbi",
                     "bytecode",
                     "web3SigningCredential",
-                    "keychainId"
+                    "keychainId",
+                    "constructorArgs"
                 ],
                 "properties": {
                     "contractName": {
@@ -413,6 +415,17 @@
                         "minLength": 1,
                         "maxLength": 100,
                         "nullable": false
+                    },
+                    "contractAbi": {
+                        "description": "The application binary interface of the solidity contract",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "constructorArgs": {
+                        "type": "array",
+                        "items": {},
+                        "default": []
                     },
                     "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
@@ -540,7 +553,7 @@
                         "type": "string",
                         "description": "The keychainId for retrieve the contracts json.",
                         "minLength": 1,
-                        "maxLength": 100  
+                        "maxLength": 100
                     }
                 }
             },

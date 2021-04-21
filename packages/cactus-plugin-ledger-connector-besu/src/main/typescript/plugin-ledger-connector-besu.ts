@@ -546,12 +546,22 @@ export class PluginLedgerConnectorBesu
       }
       const networkId = await this.web3.eth.net.getId();
 
+      const tmpContract = new this.web3.eth.Contract(req.contractAbi);
+      const deployment = tmpContract.deploy({
+        data: req.bytecode,
+        arguments: req.constructorArgs,
+      });
+
+      this.log.debug(`Deployment object of contract: %o`, deployment);
+      const encodedAbi = deployment.encodeABI();
+      const data = `0x${encodedAbi}`;
+
       const web3SigningCredential = req.web3SigningCredential as
         | Web3SigningCredentialPrivateKeyHex
         | Web3SigningCredentialCactusKeychainRef;
       const receipt = await this.transact({
         transactionConfig: {
-          data: `0x${req.bytecode}`,
+          data,
           from: web3SigningCredential.ethAccount,
           gas: req.gas,
           gasPrice: req.gasPrice,
