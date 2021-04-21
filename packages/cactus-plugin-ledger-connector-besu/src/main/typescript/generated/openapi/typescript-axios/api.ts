@@ -114,6 +114,18 @@ export interface DeployContractSolidityBytecodeV1Request {
      */
     contractName: string;
     /**
+     * The application binary interface of the solidity contract
+     * @type {Array<any>}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    contractAbi: Array<any>;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    constructorArgs: Array<any>;
+    /**
      * 
      * @type {Web3SigningCredential}
      * @memberof DeployContractSolidityBytecodeV1Request
