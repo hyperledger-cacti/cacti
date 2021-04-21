@@ -13,3 +13,4 @@ protos-js/*
 .npmrc
 temp/
 config.json
+package-lock.json
