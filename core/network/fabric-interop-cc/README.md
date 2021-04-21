@@ -13,9 +13,9 @@
 
 ## Installation
 
--   `make protos` - Pull the latest interop-protos and generate proto go files
+-   `make protos-local` - Copy the latest protos directory from main folder and update local copy of fabric-protos directory
 -   `make build` - Build the chaincode binary
--   `make` - `make protos` and `make build`
+-   `make` - `make protos-local` and `make build`
 -   `make clean` - Deletes the binary
 
 ## Testing
