@@ -24,8 +24,8 @@
     "url": "https://github.ibm.com/dlt-interoperability/interoperation-node-sdk.git"
   },
   "engines": {
-    "node": ">=10.15.3 <13.0",
-    "npm": "^6.14.4"
+    "node": ">=10.15.3 <=15.14.1",
+    "npm": "^7.7.6"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.1.3",
@@ -35,10 +35,9 @@
     "callsite": "^1.0.0",
     "crypto": "^1.0.1",
     "elliptic": "^6.2.3",
-    "fabric-client": "^1.4.1",
-    "fabric-common": "^2.2.0",
-    "fabric-network": "^2.2.0",
-    "fabric-protos": "^2.2.0",
+    "fabric-common": "^2.2.5",
+    "fabric-network": "^2.2.5",
+    "fabric-protos": "^2.2.5",
     "fs-extra": "^6.0.1",
     "google-protobuf": "^3.13.0",
     "grpc": "^1.24.3",
@@ -86,8 +85,8 @@
     "sinon": "^6.1.3",
     "sinon-chai": "^3.3.0",
     "ts-node": "^9.0.0",
-    "typedoc": "^0.19.2",
-    "typescript": "^4.0.5"
+    "typedoc": "^0.20.35",
+    "typescript": "^4.2.4"
   },
   "license": "Apache-2.0",
   "licenses": [
