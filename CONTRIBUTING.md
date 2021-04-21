@@ -20,6 +20,7 @@
   - [Building the SDK](#building-the-sdk)
   - [Adding a new public npm dependency to one of the packages:](#adding-a-new-public-npm-dependency-to-one-of-the-packages)
   - [Adding a sibling package npm dependency to one of the packages:](#adding-a-sibling-package-npm-dependency-to-one-of-the-packages)
+  - [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
   - [On Reproducible Builds](#on-reproducible-builds)
 
 Thank you for your interest to contribute to Hyperledger Cactus! :tada:
@@ -512,6 +513,8 @@ npx lerna add web3@latest --scope '*/*plugin-ledger-connector-besu' --exact # [-
 
 If you are adding a development dependency you can use the `--dev` option and `--peer` for a peer dependency.
 
+After running any `lerna add` command you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
+
 ### Adding a sibling package npm dependency to one of the packages:
 
 For example the `cactus-test-tooling` can be added as a dev dependency to the besu ledger connector plugin's package this way:
@@ -525,6 +528,20 @@ Or add the common library to allow you the usage of the logger for example:
 ```sh
 npx lerna add @hyperledger/cactus-common --scope '*/*plugin-ledger-connector-quorum' --exact --dev
 ```
+
+After running any `lerna add` command you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
+
+### Reload VSCode Window After Adding Dependencies
+
+If you added a new dependency and VSCode is showing an error when you try to
+import it, then sometimes the issue is just a matter of nudging VSCode to reload
+the Typescript definitions from scratch so that it "notices" the new dependency
+you just added.
+
+The recommended way of doing this is by hitting the `F1` key (or whatever you
+have bound the command menu to) and then searching and selecting `Developer: Reload Window`
+As a simpler alternative you can also just quit and relaunch the VSCode application
+of course.
 
 ### On Reproducible Builds
 
