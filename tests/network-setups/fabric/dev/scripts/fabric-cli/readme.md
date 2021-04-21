@@ -49,7 +49,7 @@ NOTE: If installing this way it is required to set up the env and config through
 
 NOTE: If you are using a linux system make sure that `lib64` is installed
 
-Tested on Node v10.16.3 requires Node >= 10.15.3 < 13.0
+Tested on Node v10.16.3 requires Node >= 10.15.3 < 15.14.1
 
 Set up `.env` by copying across the `.env.template` and updating the values
 
