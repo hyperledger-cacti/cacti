@@ -13,7 +13,7 @@ import (
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	"github.ibm.com/dlt-interoperability/fabric-interop-cc/contracts/interop/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
 )
 
 const verificationPolicyObjectType = "verificationPolicy"
