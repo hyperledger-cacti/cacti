@@ -40,6 +40,9 @@ RUN apk add --no-cache curl
 # The file binary is used to inspect exectubles when debugging container image issues
 RUN apk add --no-cache file
 
+# Need NodeJS tooling for the Typescript contracts
+RUN apk add --no-cache npm nodejs
+
 # Download and setup path variables for Go
 RUN wget https://golang.org/dl/go1.15.5.linux-amd64.tar.gz
 RUN tar -xvf go1.15.5.linux-amd64.tar.gz
@@ -134,6 +137,7 @@ RUN chmod +x /download-frozen-image-v2.sh
 RUN mkdir -p /etc/hyperledger/fabric/fabric-peer/
 RUN mkdir -p /etc/hyperledger/fabric/fabric-orderer/
 RUN mkdir -p /etc/hyperledger/fabric/fabric-ccenv/
+RUN mkdir -p /etc/hyperledger/fabric/fabric-nodeenv/
 RUN mkdir -p /etc/hyperledger/fabric/fabric-tools/
 RUN mkdir -p /etc/hyperledger/fabric/fabric-baseos/
 RUN mkdir -p /etc/hyperledger/fabric/fabric-ca/
@@ -141,6 +145,7 @@ RUN mkdir -p /etc/hyperledger/fabric/fabric-ca/
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-peer/ hyperledger/fabric-peer:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-orderer/ hyperledger/fabric-orderer:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ccenv/ hyperledger/fabric-ccenv:${FABRIC_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-nodeenv/ hyperledger/fabric-nodeenv:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-tools/ hyperledger/fabric-tools:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-baseos/ hyperledger/fabric-baseos:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ca/ hyperledger/fabric-ca:${CA_VERSION}
