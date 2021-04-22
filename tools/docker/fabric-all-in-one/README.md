@@ -53,7 +53,7 @@ Example `.vscode/tasks.json` file for building/running the image:
 From the project root:
 
 ```sh
-docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x -t faio2x
+DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x -t faio2x
 docker run --detach --privileged --publish-all --env FABRIC_VERSION=2.2.0 faio2x
 
 docker ps
