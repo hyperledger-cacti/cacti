@@ -54,7 +54,14 @@
                 "enum": [
                     "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY",
                     "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE",
-                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK",
+                    "org.hyperledger.cactus.consensusalgorithm.SUBSTRATE"  
+                ],
+                "x-enum-varnames": [
+                    "Authority",
+                    "Stake",
+                    "Work",
+                    "Substrate"
                 ]
             },
             "ConsensusAlgorithmFamiliesWithTxFinality": {
@@ -62,7 +69,13 @@
                 "description": "Enumerates a list of consensus algorithm families that provide immediate finality",
                 "enum": [
                     "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY",
-                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE",
+                    "org.hyperledger.cactus.consensusalgorithm.SUBSTRATE"
+                ],
+                "x-enum-varnames": [
+                    "Authority",
+                    "Stake",
+                    "Substrate"
                 ]
             },
             "ConsensusAlgorithmFamiliesWithOutTxFinality": {

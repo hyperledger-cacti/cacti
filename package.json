@@ -50,6 +50,7 @@
     "test:plugin-ledger-connector-iroha": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*-iroha/src/test/typescript/{unit,integration}/\"",
     "test:plugin-htlc-besu": "tap --jobs=1 --timeout=600 \"packages/*htlc-eth-besu/src/test/typescript/{integration}/\"",
     "test:plugin-ledger-connector-corda": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*-corda/src/test/typescript/{unit,integration}/\"",
+    "build:dev:plugin-ledger-connector-polkadot": "lerna exec --stream --scope '*/*connector-polkadot' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "lerna run webpack:dev",
     "webpack:dev:web": "lerna run webpack:dev:web",

@@ -21,6 +21,7 @@
         "cids",
         "Corda",
         "Cordapp",
+        "couchdb",
         "dclm",
         "DHTAPI",
         "DockerOde",
@@ -82,6 +83,9 @@
         "Oidc",
         "oneofs",
         "onsi",
+        "ccid",
+        "adminpw",
+        "caio",
         "OpenAPI",
         "openethereum",
         "organisation",
@@ -114,6 +118,7 @@
         "uuidv",
         "vscc",
         "wasm",
+        "WSPROVIDER",
         "Xdai"
     ],
     "dictionaries": [

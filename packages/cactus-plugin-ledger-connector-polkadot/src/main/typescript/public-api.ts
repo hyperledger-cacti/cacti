@@ -1,6 +1,13 @@
-//export * from "./generated/openapi/typescript-axios/index";
+export * from "./generated/openapi/typescript-axios/index";
 
-export { PluginLedgerConnectorPolkadot } from "./plugin-ledger-connector-polkadot";
+export {
+  PluginLedgerConnectorPolkadot,
+  IPluginLedgerConnectorPolkadotOptions,
+  RunTransactionRequest,
+  DeployContractInkBytecodeRequest,
+  ReadStorageRequest,
+  WriteStorageRequest,
+} from "./plugin-ledger-connector-polkadot";
 export { PluginFactoryLedgerConnectorPolkadot } from "./plugin-factory-ledger-connector-polkadot";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
