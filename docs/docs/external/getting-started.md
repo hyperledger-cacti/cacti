@@ -118,7 +118,7 @@ The `fabric-cli` source code is located in the `tests/network-setups/fabric/dev/
 
 If you are using a Linux system, make sure that lib64 is installed.
 
-_Note_: The setup and running instructions below were tested with Nodei.js v10.16.3.
+_Note_: The setup and running instructions below were tested with Node.js v10.16.3 and v15.14.1.
 
 #### Installation
 
@@ -158,8 +158,12 @@ Prepare `fabric-cli` for configuration as follows:
 - Run the following commands:
   ```
   fabric-cli env set-file ./.env
+  ```
+- If you haven't specified CONFIG_PATH environment variable in .env, then run this:
+  ```
   fabric-cli config set-file ./config.json
   ```
+  **NOTE:** Only one thing is required, either specify CONFIG_PATH in .env file or run the above command, not both.
 
 See the [Fabric CLI](#fabric-cli) section for more information.
 
