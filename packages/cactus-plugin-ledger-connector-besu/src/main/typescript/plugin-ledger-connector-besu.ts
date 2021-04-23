@@ -5,6 +5,7 @@ import { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
 import Web3 from "web3";
+import { AbiItem } from "web3-utils";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
@@ -531,6 +532,7 @@ export class PluginLedgerConnectorBesu
     if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
       throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
     }
+    const { contractName } = req;
     if (req.keychainId != undefined && req.contractName != undefined) {
       const keychainPlugin = this.pluginRegistry.findOneByKeychainId(
         req.keychainId,
@@ -552,14 +554,14 @@ export class PluginLedgerConnectorBesu
         arguments: req.constructorArgs,
       });
 
-      this.log.debug(`Deployment object of contract: %o`, deployment);
-      const encodedAbi = deployment.encodeABI();
-      const data = `0x${encodedAbi}`;
+      const abi = deployment.encodeABI();
+      const data = abi.startsWith("0x") ? abi : `0x${abi}`;
+      this.log.debug(`Deploying "${req.contractName}" with data %o`, data);
 
       const web3SigningCredential = req.web3SigningCredential as
         | Web3SigningCredentialPrivateKeyHex
         | Web3SigningCredentialCactusKeychainRef;
-      const receipt = await this.transact({
+      const runTxResponse = await this.transact({
         transactionConfig: {
           data,
           from: web3SigningCredential.ethAccount,
@@ -573,29 +575,38 @@ export class PluginLedgerConnectorBesu
         },
         web3SigningCredential,
       });
-      if (
-        receipt.transactionReceipt.status &&
-        receipt.transactionReceipt.contractAddress != undefined &&
-        receipt.transactionReceipt.contractAddress != null
-      ) {
-        const address = { address: receipt.transactionReceipt.contractAddress };
-        const contractJSON = (await keychainPlugin.get(
-          req.contractName,
-        )) as any;
-        this.log.info(JSON.stringify(contractJSON));
-        const contract = new this.web3.eth.Contract(
-          contractJSON.abi,
-          receipt.transactionReceipt.contractAddress,
-        );
-        this.contracts[req.contractName] = contract;
 
-        const network = { [networkId]: address };
-        contractJSON.networks = network;
+      const keychainHasContract = await keychainPlugin.has(contractName);
+      if (keychainHasContract) {
+        this.log.debug(`Keychain has the contract, updating networks...`);
 
-        keychainPlugin.set(req.contractName, contractJSON);
+        const { transactionReceipt: receipt } = runTxResponse;
+        const { status, contractAddress } = receipt;
+
+        if (status && contractAddress) {
+          const networkInfo = { address: contractAddress };
+
+          type SolcJson = {
+            abi: AbiItem[];
+            networks: unknown;
+          };
+          const contractJSON = await keychainPlugin.get<SolcJson>(contractName);
+
+          this.log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
+
+          const contract = new this.web3.eth.Contract(
+            contractJSON.abi,
+            contractAddress,
+          );
+          this.contracts[contractName] = contract;
+
+          const network = { [networkId]: networkInfo };
+          contractJSON.networks = network;
+
+          keychainPlugin.set(contractName, contractJSON);
+        }
       }
-
-      return receipt;
+      return runTxResponse;
     }
     throw new Error(
       `${fnTag} Cannot deploy contract without keychainId and the contractName`,
