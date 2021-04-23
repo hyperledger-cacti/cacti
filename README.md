@@ -54,6 +54,7 @@ Once the last command has finished executing, open link printed on the console w
 * [Build](./BUILD.md): Instructions on how to set up the project for development
 
   ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
+* [FAQ](./FAQ.md): A collection of frequently asked questions
 
 ## Contact
 * mailing list: [cactus@lists.hyperledger.org](mailto:cactus@lists.hyperledger.org)
