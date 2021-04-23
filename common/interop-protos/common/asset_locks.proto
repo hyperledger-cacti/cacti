@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package common.asset_locks;
+option go_package = "/common";
+
+message AssetLock {
+  enum LockMechanism {
+    HTLC = 0;
+  }
+  LockMechanism lockMechanism = 1;
+  bytes lockInfo = 2;
+}
+
+message AssetLockHTLC {
+  string recipient = 1;
+  bytes hash = 2;
+  uint64 expiryTimeMillis = 3;
+  enum TimeSpec {
+    EPOCH = 0;
+    DURATION = 1;
+  }
+  TimeSpec timeSpec = 4;
+}
