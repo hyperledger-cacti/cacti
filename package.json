@@ -43,8 +43,9 @@
     "webpack:prod": "lerna run webpack:prod",
     "webpack:prod:web": "lerna run webpack:prod:web",
     "webpack:prod:node": "lerna run webpack:prod:node",
-    "test:all": "tap --node-arg=--max-old-space-size=4096 --timeout=3600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
+    "test:all": "tap --node-arg=--max-old-space-size=4096 --timeout=3600 \"packages/cactus-*/src/test/typescript/{unit,integration,benchmark}/\"",
     "test:unit": "tap --node-arg=--max-old-space-size=4096 --timeout=600 \"packages/cactus-*/src/test/typescript/unit/\"",
+    "test:benchmark": "tap --jobs=1 --no-timeout  \"packages/cactus-*/src/test/typescript/benchmark/\"",
     "test:browser": "karma start karma.conf.js",
     "test:integration": "tap --node-arg=--max-old-space-size=4096 --jobs=1 --timeout=3600 \"packages/cactus-*/src/test/typescript/integration/\"",
     "changelog": "conventional-changelog --infile CHANGELOG.md --outfile CHANGELOG.md && git add CHANGELOG.md",
@@ -122,6 +123,7 @@
     "*/*/src/**/*.{js,ts}": "eslint --fix"
   },
   "dependencies": {
-    "@types/ssh2": "0.5.46"
+    "@types/ssh2": "0.5.46",
+    "artillery": "1.7.2"
   }
 }
