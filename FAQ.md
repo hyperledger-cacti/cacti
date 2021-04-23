@@ -63,3 +63,18 @@ by replacing its contents
 with something like this for example:
 
 `"lint": "echo OK",`
+
+## What are the minimum and recommended hardware specs? Do you have a cool story about this?
+
+> If and when people read this in the future, always inflate the numbers 
+> a bit as we continue to add more and more tests every day (test automation is
+> very important to us)
+
+- **The bare minimum** for general development (building the code, running the tests,
+ etc) would be around **2 CPU cores (4 threads) and 6 GB RAM free/available**.
+
+- **A recommended** setup would be for a dev machine in my opinion is **16 GB RAM 4 CPU**
+**cores (8 threads)** and of course SSD for persistent storage.
+
+- Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only 
+tests that failed were the Corda ones because those are hungrier than the others.
