@@ -250,6 +250,7 @@ export class SupplyChainAppDummyInfrastructure {
           instanceId: "PluginLedgerConnectorFabric_Contract_Deployment",
           dockerBinary: "/usr/local/bin/docker",
           pluginRegistry,
+          peerBinary: "peer",
           sshConfig: sshConfig,
           logLevel: this.options.logLevel || "INFO",
           connectionProfile: connectionProfile,
@@ -260,7 +261,7 @@ export class SupplyChainAppDummyInfrastructure {
           },
         });
 
-        const res = await connector.deployContract({
+        const res = await connector.deployContractGoSourceV1({
           tlsRootCertFiles: org1Env.CORE_PEER_TLS_ROOTCERT_FILE as string,
           targetPeerAddresses: [org1Env.CORE_PEER_ADDRESS as string],
           policyDslSource: "OR('Org1MSP.member','Org2MSP.member')",

@@ -269,6 +269,7 @@ export class SupplyChainApp {
     const fabricConnector = new PluginLedgerConnectorFabric({
       instanceId: "PluginLedgerConnectorFabric_C",
       dockerBinary: "/usr/local/bin/docker",
+      peerBinary: "peer",
       cliContainerEnv: org1Env,
       connectionProfile: connectionProfile,
       sshConfig: sshConfig,

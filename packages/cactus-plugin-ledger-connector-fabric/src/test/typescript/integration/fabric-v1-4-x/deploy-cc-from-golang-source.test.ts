@@ -24,16 +24,16 @@ import {
   FabricContractInvocationType,
   PluginLedgerConnectorFabric,
   SSHExecCommandResponse,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api";
 
-import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
+import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
 
 import {
   DefaultApi as FabricApi,
   FabricSigningCredential,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api";
 
-import { IPluginLedgerConnectorFabricOptions } from "../../../../../main/typescript/plugin-ledger-connector-fabric";
+import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 
 import { DiscoveryOptions } from "fabric-network";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -125,6 +125,7 @@ test(testCase, async (t: Test) => {
     instanceId: uuidv4(),
     dockerBinary: "/usr/local/bin/docker",
     pluginRegistry,
+    peerBinary: "/fabric-samples/bin/peer",
     cliContainerEnv: org1Env,
     sshConfig,
     logLevel,
