@@ -24,8 +24,8 @@
     "url": "https://github.ibm.com/dlt-interoperability/interoperation-node-sdk.git"
   },
   "engines": {
-    "node": ">=10.15.3 <=15.14.1",
-    "npm": "^7.7.6"
+    "node": ">=10.15.3 <=16.0.0",
+    "npm": "^7.10.0"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.1.3",
