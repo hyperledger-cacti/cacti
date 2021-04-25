@@ -110,6 +110,7 @@ test(testCase, async (t: Test) => {
     pluginRegistry,
     sshConfig,
     cliContainerEnv: {},
+    peerBinary: "/fabric-samples/bin/peer",
     logLevel,
     connectionProfile,
     discoveryOptions,

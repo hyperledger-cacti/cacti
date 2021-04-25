@@ -18,24 +18,24 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
-import { DeployContractGoSourceV1Request } from "../generated/openapi/typescript-axios/index";
+import { DeployContractV1Request } from "../generated/openapi/typescript-axios/index";
 import OAS from "../../json/openapi.json";
 
-export interface IDeployContractGoSourceEndpointV1Options {
+export interface IDeployContractEndpointV1Options {
   logLevel?: LogLevelDesc;
   connector: PluginLedgerConnectorFabric;
 }
 
-export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "DeployContractGoSourceEndpointV1";
+export class DeployContractEndpointV1 implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "DeployContractEndpointV1";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return DeployContractGoSourceEndpointV1.CLASS_NAME;
+    return DeployContractEndpointV1.CLASS_NAME;
   }
 
-  constructor(public readonly opts: IDeployContractGoSourceEndpointV1Options) {
+  constructor(public readonly opts: IDeployContractEndpointV1Options) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.connector, `${fnTag} arg options.connector`);
@@ -49,9 +49,9 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): any {
+  public get oasPath() {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract"
     ];
   }
 
@@ -61,6 +61,13 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
 
   public getVerbLowerCase(): string {
     return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
+    return this;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -73,13 +80,6 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     };
   }
 
-  public async registerExpress(
-    expressApp: Express,
-  ): Promise<IWebServiceEndpoint> {
-    await registerWebServiceEndpoint(expressApp, this);
-    return this;
-  }
-
   async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = `${this.className}#handleRequest()`;
     const verbUpper = this.getVerbLowerCase().toUpperCase();
@@ -87,8 +87,8 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
 
     try {
       const { connector } = this.opts;
-      const reqBody = req.body as DeployContractGoSourceV1Request;
-      const resBody = await connector.deployContractGoSourceV1(reqBody);
+      const reqBody = req.body as DeployContractV1Request;
+      const resBody = await connector.deployContract(reqBody);
       res.status(HttpStatus.OK);
       res.json(resBody);
     } catch (ex) {

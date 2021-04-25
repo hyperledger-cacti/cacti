@@ -52,6 +52,63 @@
                     }
                 }
             },
+            "ChainCodeLifeCycleCommandResponses": {
+                "type": "object",
+                "required": [
+                    "queryInstalledList", "approveForMyOrgList", "installList"
+                ],
+                "properties": {
+                    "packaging": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    },
+                    "installList": {
+                        "items": {
+                            "$ref": "#/components/schemas/SSHExecCommandResponse"
+                        },
+                        "minItems": 1
+                    },
+                    "queryInstalledList": {
+                        "items": {
+                            "$ref": "#/components/schemas/SSHExecCommandResponse"
+                        },
+                        "minItems": 1
+                    },
+                    "approveForMyOrgList": {
+                        "items": {
+                            "$ref": "#/components/schemas/SSHExecCommandResponse"
+                        },
+                        "minItems": 1
+                    },
+                    "commit": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    },
+                    "queryCommitted": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    },
+                    "init": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    }
+                }
+            },
+            "ChainCodeProgrammingLanguage": {
+                "type": "string",
+                "description": "Enumerates the supported source code programming languages of Hyperledger Fabric",
+                "enum": [
+                    "golang",
+                    "javascript",
+                    "typescript",
+                    "java"
+                ]
+            },
+            "ChainCodeLanguageRuntime": {
+                "type": "string",
+                "description": "Enumerates the supported programming language runtimes of Hyperledger Fabric",
+                "enum": [
+                    "golang",
+                    "node",
+                    "java"
+                ]
+            },
             "ConnectionProfile": {
                 "type": "object",
                 "required": [
@@ -115,7 +172,6 @@
             },
             "GatewayDiscoveryOptions": {
                 "type": "object",
-                "required": [],
                 "additionalProperties": false,
                 "properties": {
                     "asLocalhost": {
@@ -176,6 +232,14 @@
                         "nullable": false,
                         "minLength": 1,
                         "maxLength": 255
+                    },
+                    "filepath": {
+                        "description": "The relative path of the file, if it should be placed in a sub-directory",
+                        "example": "./my/sub-folder/structure/",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 512
                     }
                 }
             },
@@ -289,6 +353,65 @@
                     "ORDERER_TLS_ROOTCERT_FILE"
                 ],
                 "properties": {
+                    "CORE_PEER_LOCALMSPID": {
+                        "type": "string",
+                        "example": "Org1MSP",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_ADDRESS": {
+                        "type": "string",
+                        "example": "peer0.org1.example.com:7051",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_MSPCONFIGPATH": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_TLS_ROOTCERT_FILE": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "ORDERER_TLS_ROOTCERT_FILE": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    }
+                }
+            },
+            "DeploymentTargetOrgFabric2x": {
+                "type": "object",
+                "required": [
+                    "CORE_PEER_LOCALMSPID",
+                    "CORE_PEER_ADDRESS",
+                    "CORE_PEER_MSPCONFIGPATH",
+                    "CORE_PEER_TLS_ROOTCERT_FILE",
+                    "ORDERER_TLS_ROOTCERT_FILE"
+                ],
+                "properties": {
+                    "transient": {
+                        "type": "string",
+                        "description": "Transient map of arguments in JSON encoding",
+                        "example": "orderer.example.com:7050",
+                        "minLength": 1,
+                        "maxLength": 1073741824
+                    },
                     "CORE_PEER_LOCALMSPID": {
                         "type": "string",
                         "example": "Org1MSP",
@@ -466,6 +589,160 @@
                     }
                 }
             },
+            "DeployContractV1Request": {
+                "type": "object",
+                "required": [
+                    "caFile",
+                    "sourceFiles",
+                    "targetOrganizations",
+                    "ccName",
+                    "ccLabel",
+                    "ccVersion",
+                    "ccSequence",
+                    "channelId",
+                    "ccLang",
+                    "orderer",
+                    "ordererTLSHostnameOverride"
+                ],
+                "properties": {
+                    "ccLang": {
+                        "$ref": "#/components/schemas/ChainCodeProgrammingLanguage"
+                    },
+                    "caFile": {
+                        "type": "string",
+                        "description": "File-system path pointing at the CA file.",
+                        "example": "${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+                        "minLength": 1,
+                        "maxLength": 4096
+                    },
+                    "orderer": {
+                        "type": "string",
+                        "description": "Ordering service endpoint specified as <hostname or IP address>:<port>",
+                        "example": "orderer.example.com:7050",
+                        "minLength": 1,
+                        "maxLength": 65535
+                    },
+                    "ordererTLSHostnameOverride": {
+                        "type": "string",
+                        "description": "The hostname override to use when validating the TLS connection to the orderer",
+                        "example": "orderer.example.com:7050",
+                        "minLength": 1,
+                        "maxLength": 65535
+                    },
+                    "connTimeout": {
+                        "type": "integer",
+                        "description": "Timeout for client to connect (default 3s)",
+                        "nullable": false
+                    },
+                    "signaturePolicy": {
+                        "type": "string",
+                        "description": "Passed in to the peer via the --signature-policy argument on the command line. See also: https://hyperledger-fabric.readthedocs.io/en/release-2.2/endorsement-policies.html#setting-chaincode-level-endorsement-policies",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false,
+                        "example": "AND('Org1MSP.member','Org2MSP.member')"
+                    },
+                    "collectionsConfigFile": {
+                        "type": "string",
+                        "description": "Name of the collections config file as present in the sourceFiles array of the request.",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "channelId": {
+                        "type": "string",
+                        "description": "The name of the Fabric channel where the contract will get instantiated.",
+                        "example": "mychannel",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "targetOrganizations": {
+                        "type": "array",
+                        "minItems": 1,
+                        "nullable": false,
+                        "maxItems": 1024,
+                        "items": {
+                            "$ref": "#/components/schemas/DeploymentTargetOrganization"
+                        }
+                    },
+                    "constructorArgs": {
+                        "type": "object",
+                        "example": "{} - An empty object literal can be sufficient if your contract does not have parameters.",
+                        "nullable": false,
+                        "properties": {
+                            "Args": {
+                                "type": "array",
+                                "minLength": 0,
+                                "maxLength": 2048,
+                                "items": {}
+                            }
+                        }
+                    },
+                    "ccSequence": {
+                        "type": "number",
+                        "example": 1,
+                        "nullable": false
+                    },
+                    "ccVersion": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "example": "1.0.0",
+                        "nullable": false
+                    },
+                    "ccName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "example": "my-hello-world-contract",
+                        "nullable": false
+                    },
+                    "ccLabel": {
+                        "description": "Human readable label to uniquely identify the contract. Recommended to include in this at least the contract name and the exact version in order to make it easily distinguishable from other deployments of the same contract.",
+                        "example": "hello-world-contract",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "sourceFiles": {
+                        "description": "The your-smart-contract.go file where the functionality of your contract is implemented.",
+                        "items": {
+                            "$ref": "#/components/schemas/FileBase64"
+                        },
+                        "minItems": 1,
+                        "maxItems": 65535,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeployContractV1Response": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "packageIds",
+                    "lifecycle"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "packageIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "f8c8e06bfc27771028c4bbc3564341887881e29b92a844c66c30bac0ff83966e",
+                            "minLength": 1,
+                            "maxLength": 4096,
+                            "nullable": false
+                        }
+                    },
+                    "lifecycle": {
+                        "$ref": "#/components/schemas/ChainCodeLifeCycleCommandResponses"
+                    }
+                }
+            },
             "PrometheusExporterMetricsResponse": {
                 "type": "string",
                 "nullable": false
@@ -539,6 +816,58 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/DeployContractGoSourceV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "501": {
+                        "description": "Not implemented",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "nullable": false,
+                                            "minLength": 1,
+                                            "maxLength": 2048
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract": {
+            "post": {
+                "operationId": "deployContractV1",
+                "summary": "Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The 'v1' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract"
+                    }
+                },
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractV1Response"
                                 }
                             }
                         }

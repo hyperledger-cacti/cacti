@@ -20,6 +20,78 @@ import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
+ * Enumerates the supported programming language runtimes of Hyperledger Fabric
+ * @export
+ * @enum {string}
+ */
+export enum ChainCodeLanguageRuntime {
+    Golang = 'golang',
+    Node = 'node',
+    Java = 'java'
+}
+
+/**
+ * 
+ * @export
+ * @interface ChainCodeLifeCycleCommandResponses
+ */
+export interface ChainCodeLifeCycleCommandResponses {
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    packaging?: SSHExecCommandResponse;
+    /**
+     * 
+     * @type {Array<SSHExecCommandResponse>}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    installList: Array<SSHExecCommandResponse>;
+    /**
+     * 
+     * @type {Array<SSHExecCommandResponse>}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    queryInstalledList: Array<SSHExecCommandResponse>;
+    /**
+     * 
+     * @type {Array<SSHExecCommandResponse>}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    approveForMyOrgList: Array<SSHExecCommandResponse>;
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    commit?: SSHExecCommandResponse;
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    queryCommitted?: SSHExecCommandResponse;
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    init?: SSHExecCommandResponse;
+}
+/**
+ * Enumerates the supported source code programming languages of Hyperledger Fabric
+ * @export
+ * @enum {string}
+ */
+export enum ChainCodeProgrammingLanguage {
+    Golang = 'golang',
+    Javascript = 'javascript',
+    Typescript = 'typescript',
+    Java = 'java'
+}
+
+/**
  * 
  * @export
  * @interface ConnectionProfile
@@ -233,6 +305,171 @@ export interface DeployContractGoSourceV1Response {
 /**
  * 
  * @export
+ * @interface DeployContractV1Request
+ */
+export interface DeployContractV1Request {
+    /**
+     * 
+     * @type {ChainCodeProgrammingLanguage}
+     * @memberof DeployContractV1Request
+     */
+    ccLang: ChainCodeProgrammingLanguage;
+    /**
+     * File-system path pointing at the CA file.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    caFile: string;
+    /**
+     * Ordering service endpoint specified as <hostname or IP address>:<port>
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    orderer: string;
+    /**
+     * The hostname override to use when validating the TLS connection to the orderer
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    ordererTLSHostnameOverride: string;
+    /**
+     * Timeout for client to connect (default 3s)
+     * @type {number}
+     * @memberof DeployContractV1Request
+     */
+    connTimeout?: number;
+    /**
+     * Passed in to the peer via the --signature-policy argument on the command line. See also: https://hyperledger-fabric.readthedocs.io/en/release-2.2/endorsement-policies.html#setting-chaincode-level-endorsement-policies
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    signaturePolicy?: string;
+    /**
+     * Name of the collections config file as present in the sourceFiles array of the request.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    collectionsConfigFile?: string;
+    /**
+     * The name of the Fabric channel where the contract will get instantiated.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    channelId: string;
+    /**
+     * 
+     * @type {Array<DeploymentTargetOrganization>}
+     * @memberof DeployContractV1Request
+     */
+    targetOrganizations: Array<DeploymentTargetOrganization>;
+    /**
+     * 
+     * @type {DeployContractGoSourceV1RequestConstructorArgs}
+     * @memberof DeployContractV1Request
+     */
+    constructorArgs?: DeployContractGoSourceV1RequestConstructorArgs;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractV1Request
+     */
+    ccSequence: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    ccVersion: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    ccName: string;
+    /**
+     * Human readable label to uniquely identify the contract. Recommended to include in this at least the contract name and the exact version in order to make it easily distinguishable from other deployments of the same contract.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    ccLabel: string;
+    /**
+     * The your-smart-contract.go file where the functionality of your contract is implemented.
+     * @type {Array<FileBase64>}
+     * @memberof DeployContractV1Request
+     */
+    sourceFiles: Array<FileBase64>;
+}
+/**
+ * 
+ * @export
+ * @interface DeployContractV1Response
+ */
+export interface DeployContractV1Response {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DeployContractV1Response
+     */
+    success: boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof DeployContractV1Response
+     */
+    packageIds: Array<string>;
+    /**
+     * 
+     * @type {ChainCodeLifeCycleCommandResponses}
+     * @memberof DeployContractV1Response
+     */
+    lifecycle: ChainCodeLifeCycleCommandResponses;
+}
+/**
+ * 
+ * @export
+ * @interface DeploymentTargetOrgFabric2x
+ */
+export interface DeploymentTargetOrgFabric2x {
+    /**
+     * Transient map of arguments in JSON encoding
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    _transient?: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    CORE_PEER_LOCALMSPID: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    CORE_PEER_ADDRESS: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    CORE_PEER_MSPCONFIGPATH: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    CORE_PEER_TLS_ROOTCERT_FILE: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    ORDERER_TLS_ROOTCERT_FILE: string;
+}
+/**
+ * 
+ * @export
  * @interface DeploymentTargetOrganization
  */
 export interface DeploymentTargetOrganization {
@@ -314,6 +551,12 @@ export interface FileBase64 {
      * @memberof FileBase64
      */
     filename: string;
+    /**
+     * The relative path of the file, if it should be placed in a sub-directory
+     * @type {string}
+     * @memberof FileBase64
+     */
+    filepath?: string;
 }
 /**
  * 
@@ -509,6 +752,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployContractV1: async (deployContractV1Request?: DeployContractV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                query.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof deployContractV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(deployContractV1Request !== undefined ? deployContractV1Request : {}) : (deployContractV1Request || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -613,6 +897,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractV1Response>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).deployContractV1(deployContractV1Request, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -659,6 +957,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any): AxiosPromise<DeployContractV1Response> {
+            return DefaultApiFp(configuration).deployContractV1(deployContractV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -696,6 +1004,18 @@ export class DefaultApi extends BaseAPI {
      */
     public deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any) {
         return DefaultApiFp(this.configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+     * @param {DeployContractV1Request} [deployContractV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).deployContractV1(deployContractV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

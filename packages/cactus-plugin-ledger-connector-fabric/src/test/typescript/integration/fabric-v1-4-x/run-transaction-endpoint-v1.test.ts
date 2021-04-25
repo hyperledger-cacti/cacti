@@ -104,6 +104,7 @@ test(testCase, async (t: Test) => {
   const pluginOptions: IPluginLedgerConnectorFabricOptions = {
     instanceId: uuidv4(),
     pluginRegistry,
+    peerBinary: "/fabric-samples/bin/peer",
     sshConfig,
     cliContainerEnv: {},
     logLevel,
