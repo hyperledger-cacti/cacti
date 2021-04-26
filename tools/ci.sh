@@ -11,6 +11,17 @@ echo $BASH_VERSION
 STARTED_AT=`date +%s`
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_ROOT_DIR="$SCRIPT_DIR/.."
+CHANGED_FILES="$(git diff-index --name-only HEAD --)"
+
+function checkWorkTreeStatus()
+{
+  git update-index -q --refresh
+  new_changed_files="$(git diff-index --name-only HEAD --)"
+  if [ "${CHANGED_FILES}" != "${new_changed_files}" ]; then
+    echo >&2 "Changes in the git index have been detected!"
+    exit 1
+  fi
+}
 
 function mainTask()
 {
@@ -89,6 +100,7 @@ function mainTask()
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))
   echo "$(date +%FT%T%z) [CI] SUCCESS - runtime=$runtime seconds."
+  checkWorkTreeStatus
   exit 0
 }
 
