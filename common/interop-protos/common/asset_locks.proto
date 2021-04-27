@@ -9,6 +9,7 @@ message AssetLock {
   }
   LockMechanism lockMechanism = 1;
   bytes lockInfo = 2;
+  bytes claimInfo = 3;
 }
 
 message AssetLockHTLC {
@@ -20,4 +21,9 @@ message AssetLockHTLC {
     DURATION = 1;
   }
   TimeSpec timeSpec = 4;
+}
+
+message AssetClaimHTLC {
+  string claimant = 1;
+  bytes hashPreimage = 2;
 }
