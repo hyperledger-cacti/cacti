@@ -135,7 +135,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
     try {
       unlinkSync("./report.json");
     } catch (err) {
-      log.error(err);
+      log.error(`Could not remove report.json from filesystem.`, err);
     }
   }
 });
@@ -145,7 +145,7 @@ async function fireArtilleryCommand(t: Test) {
     const artilleryCommand = `artillery run ${artilleryScriptLocation} --output report.json`;
     await shell_exec(artilleryCommand);
   } catch (err) {
-    log.error(err);
+    log.error(`Failed to run artilerry execution.`, err);
     t.fail(`Test failed. Err: ${err}`);
   }
 }
