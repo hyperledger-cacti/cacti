@@ -1,6 +1,10 @@
 export * from "./generated/openapi/typescript-axios/index";
 
-export { PluginLedgerConnectorFabric } from "./plugin-ledger-connector-fabric";
+export {
+  PluginLedgerConnectorFabric,
+  IPluginLedgerConnectorFabricOptions,
+} from "./plugin-ledger-connector-fabric";
+
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
