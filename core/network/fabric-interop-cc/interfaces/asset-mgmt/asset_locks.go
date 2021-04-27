@@ -38,6 +38,91 @@ func (am *AssetManagement) Configure(interopChaincodeId string) {
 
 
 // Ledger transaction (invocation) functions
+
+func (am *AssetManagement) AddFungibleAssetCount(stub shim.ChaincodeStubInterface, assetType string, numUnits int) (bool, error) {
+    var errorMsg string
+
+    if len(am.interopChaincodeId) == 0 {
+        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+
+    if len(assetType) == 0 {
+        errorMsg = "Empty asset type"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    if numUnits <= 0 {
+        errorMsg = "Invalid number of asset units"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("AddFungibleAssetCount"), []byte(assetType), []byte(strconv.Itoa(numUnits))}, "")
+    fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+    if iccResp.GetStatus() != shim.OK {
+        return false, fmt.Errorf(string(iccResp.GetPayload()))
+    }
+    fmt.Printf("%d units of asset type %s added to the record\n", numUnits, assetType)
+    return true, nil
+}
+
+func (am *AssetManagement) GetTotalFungibleAssetCount(stub shim.ChaincodeStubInterface, assetType string) (int, error) {
+    var errorMsg string
+
+    if len(am.interopChaincodeId) == 0 {
+        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        log.Error(errorMsg)
+        return -1, errors.New(errorMsg)
+    }
+
+    if len(assetType) == 0 {
+        errorMsg = "Empty asset type"
+        log.Error(errorMsg)
+        return -1, errors.New(errorMsg)
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetTotalFungibleAssetCount"), []byte(assetType)}, "")
+    fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+    if iccResp.GetStatus() != shim.OK {
+        return -1, fmt.Errorf(string(iccResp.GetPayload()))
+    }
+    numUnits, err := strconv.Atoi(string(iccResp.Payload))
+    if err != nil {
+        log.Error(err.Error())
+        return -1, err
+    }
+    fmt.Printf("%d units of asset type %s declared\n", numUnits, assetType)
+    return numUnits, nil
+}
+
+func (am *AssetManagement) GetUnlockedFungibleAssetCount(stub shim.ChaincodeStubInterface, assetType string) (int, error) {
+    var errorMsg string
+
+    if len(am.interopChaincodeId) == 0 {
+        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        log.Error(errorMsg)
+        return -1, errors.New(errorMsg)
+    }
+
+    if len(assetType) == 0 {
+        errorMsg = "Empty asset type"
+        log.Error(errorMsg)
+        return -1, errors.New(errorMsg)
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetUnlockedFungibleAssetCount"), []byte(assetType)}, "")
+    fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+    if iccResp.GetStatus() != shim.OK {
+        return -1, fmt.Errorf(string(iccResp.GetPayload()))
+    }
+    numUnits, err := strconv.Atoi(string(iccResp.Payload))
+    if err != nil {
+        log.Error(err.Error())
+        return -1, err
+    }
+    fmt.Printf("%d units of asset type %s available\n", numUnits, assetType)
+    return numUnits, nil
+}
+
 func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetType string, assetId string, lockInfo *common.AssetLock) (bool, error) {
     if (lockInfo.LockMechanism == common.AssetLock_HTLC) {
         lockInfoHTLC := &common.AssetLockHTLC{}
