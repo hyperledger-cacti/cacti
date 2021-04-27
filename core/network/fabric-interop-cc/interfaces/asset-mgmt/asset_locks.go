@@ -286,11 +286,79 @@ func (am *AssetManagement) IsFungibleAssetLocked(stub shim.ChaincodeStubInterfac
     return isLocked, nil
 }
 
-func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, lockedByAddress string, hashPreimage string, assetType string, assetId string) (bool, error) {
+func (am *AssetManagement) ClaimAssetHTLC(stub shim.ChaincodeStubInterface, assetType string, assetId string, locker string, lockHashPreimage []byte) (bool, error) {
+    var errorMsg string
+
+    if len(am.interopChaincodeId) == 0 {
+        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+
+    if len(assetType) == 0 {
+        errorMsg = "Empty asset type"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    if len(assetId) == 0 {
+        errorMsg = "Empty asset ID"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    if len(locker) == 0 {
+        errorMsg = "Empty locker"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    if len(lockHashPreimage) == 0 {
+        errorMsg = "Empty lock hash preimage"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimAssetHTLC"), []byte(assetType), []byte(assetId), []byte(locker), lockHashPreimage}, "")
+    fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+    if iccResp.GetStatus() != shim.OK {
+        return false, fmt.Errorf(string(iccResp.GetPayload()))
+    }
+    fmt.Printf("Claimed asset %s of type %s locked by %s\n", assetId, assetType, locker)
     return true, nil
 }
 
-func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, lockedByAddress string, hashPreimage string, assetType string, numUnits int) (bool, error) {
+func (am *AssetManagement) ClaimFungibleAssetHTLC(stub shim.ChaincodeStubInterface, assetType string, numUnits int, locker string, lockHashPreimage []byte) (bool, error) {
+    var errorMsg string
+
+    if len(am.interopChaincodeId) == 0 {
+        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+
+    if len(assetType) == 0 {
+        errorMsg = "Empty asset type"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    if numUnits <= 0 {
+        errorMsg = "Invalid number of asset units"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    if len(locker) == 0 {
+        errorMsg = "Empty locker"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    if len(lockHashPreimage) == 0 {
+        errorMsg = "Empty lock hash preimage"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimFungibleAssetHTLC"), []byte(assetType), []byte(strconv.Itoa(numUnits)), []byte(locker), lockHashPreimage}, "")
+    fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+    if iccResp.GetStatus() != shim.OK {
+        return false, fmt.Errorf(string(iccResp.GetPayload()))
+    }
+    fmt.Printf("Claimed %d units of asset of type %s locked by %s\n", numUnits, assetType, locker)
     return true, nil
 }
 
