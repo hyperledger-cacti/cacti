@@ -383,7 +383,7 @@ func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetTyp
             log.Error(err.Error())
             return false, err
         }
-        return am.ClaimAssetHTLC(stub, assetType, assetId, claimInfoHTLC.Claimant, claimInfoHTLC.HashPreimage)
+        return am.ClaimAssetHTLC(stub, assetType, assetId, claimInfoHTLC.Locker, claimInfoHTLC.HashPreimage)
     } else {
 		log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
         return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
@@ -440,7 +440,7 @@ func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, 
             log.Error(err.Error())
             return false, err
         }
-        return am.ClaimFungibleAssetHTLC(stub, assetType, numUnits, claimInfoHTLC.Claimant, claimInfoHTLC.HashPreimage)
+        return am.ClaimFungibleAssetHTLC(stub, assetType, numUnits, claimInfoHTLC.Locker, claimInfoHTLC.HashPreimage)
     } else {
 		log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
         return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)

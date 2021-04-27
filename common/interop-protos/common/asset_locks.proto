@@ -24,6 +24,6 @@ message AssetLockHTLC {
 }
 
 message AssetClaimHTLC {
-  string claimant = 1;
+  string locker = 1;
   bytes hashPreimage = 2;
 }
