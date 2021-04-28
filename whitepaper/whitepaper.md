@@ -235,35 +235,33 @@ The ledger transfer has a high degree of interference between the blockchains si
 
 Legend:
 
-<img src="https://render.githubusercontent.com/render/math?math=O_1 =\text{ Object 1}">
+![](https://render.githubusercontent.com/render/math?math=O_1=) Object 1
 
-<img src="https://render.githubusercontent.com/render/math?math=O_1^{begin}= \text{ State of object } \quad\!\!\!\! O_1 \quad \!\! \! \! \text{ at the beginning of transaction}">
+![](https://render.githubusercontent.com/render/math?math=O_1^{begin}=) State of object *O<sub>1</sub>* at the beginning of transaction
 
-<img src="https://render.githubusercontent.com/render/math?math=O_2^{begin} = \text{ State of object } \quad\!\!\!\! O_2 \quad\!\!\!\! \text{ at the beginning of transaction}">
+![](https://render.githubusercontent.com/render/math?math=O_2^{begin}=) State of object *O<sub>2</sub>* at the beginning of transaction
 
-<img src="https://render.githubusercontent.com/render/math?math=O_1^{end} = \text{ State of object } \quad\!\!\!\! O_1 \quad\!\!\!\! \text{ at the end of transaction}">
+![](https://render.githubusercontent.com/render/math?math=O_1^{end}=) State of object *O<sub>1</sub>* at the end of transaction
 
-<img src="https://render.githubusercontent.com/render/math?math=O_2^{end} = \text{ State of object } \quad\!\!\!\! O_2 \quad\!\!\!\! \text{ at the end of transaction}">
+![](https://render.githubusercontent.com/render/math?math=O_2^{end}=) State of object *O<sub>2</sub>* at the end of transaction
 
-<img src="https://render.githubusercontent.com/render/math?math=\overline{O}_1^{end} = \text{ Representation of object } \quad\!\!\!\! O_1\quad\!\!\!\! \text{ at the end of transaction in another blockchain}">
+*<span style="text-decoration:overline">O</span><sub>1</sub><sup>end</sup>* = Representation of object *O<sub>1</sub>* at the end of transaction in another blockchain
 
-<img src="https://render.githubusercontent.com/render/math?math=\overline{O}_2^{end} = \text{ Representation of object } \quad\!\!\!\! O_2 \quad\!\!\!\! \text{ at the end of transaction in another blockchain}">
+*<span style="text-decoration:overline">O</span><sub>2</sub><sup>end</sup>* = Representation of object } *O<sub>2</sub>* at the end of transaction in another blockchain
 
-<img src="https://render.githubusercontent.com/render/math?math=T_1 =\text{ Transaction 1}">
+![](https://render.githubusercontent.com/render/math?math=T_1=) Transaction 1
 
-<img src="https://render.githubusercontent.com/render/math?math=T_2 =\text{ Transaction 2}">
+![](https://render.githubusercontent.com/render/math?math=T_2=) Transaction 2
 
-<img src="https://render.githubusercontent.com/render/math?math=\overline{T}_1 = \text{ Representation of transaction 1 } \quad\!\!\!\! (T_1) \quad\!\!\!\! \text{ in another blockchain}">
+*<span style="text-decoration:overline">T</span><sub>1</sub>* = Representation of transaction 1 (T<sub>1</sub>) in another blockchain
 
-<img src="https://render.githubusercontent.com/render/math?math=\overline{T}_2 = \text{ Representation of transaction 2 } \quad\!\!\!\! (T_2) \quad\!\!\!\! \text{ in another blockchain}">
+*<span style="text-decoration:overline">T</span><sub>1</sub>* = Representation of transaction 2 (T<sub>2</sub>) in another blockchain
 
-<img src="https://render.githubusercontent.com/render/math?math=E_1 =\text{ Event 1}">
+![](https://render.githubusercontent.com/render/math?math=E_1=) Event 1
 
-<img src="https://render.githubusercontent.com/render/math?math=E_2(O_1||T_1||E_1) = \text{ Event 2 depends on }\quad\!\!\!\! O_1 \quad\!\!\!\!\text{ or }\quad\!\!\!\!T_1\quad\!\!\!\! \text{ or }\quad\!\!\!\!E_1">
+![](https://render.githubusercontent.com/render/math?math=E_2(O_1||T_1||E_1)=) Event 2 depends on *O<sub>1</sub>*  or *T<sub>1</sub>* or *E<sub>1</sub>*
 
-<img src="https://render.githubusercontent.com/render/math?math=T_2(O_1||T_1||E_1) = \text{ Transaction 2 depends on }\quad\!\!\!\!O_1\quad\!\!\!\! \text{ or } \quad\!\!\!\!T_1\quad\!\!\!\! \text{ or }\quad\!\!\!\!E_1">
-
-
+![](https://render.githubusercontent.com/render/math?math=T_2(O_1||T_1||E_1)=) Transaction 2 depends on *O<sub>1</sub>* or *T<sub>1</sub>* or *E<sub>1</sub>*
 
 
 
@@ -1686,6 +1684,7 @@ A recent survey classifies blockchain interoperability studies in three categori
 Each category serves particular use cases.
 
 ![rw](./related-work-categories.png)
+
 
 Cryptocurrency-directed interoperability approaches identify and define different strategies for chain interoperability across public blockchains, most of them implementing cryptocurrencies.
 
