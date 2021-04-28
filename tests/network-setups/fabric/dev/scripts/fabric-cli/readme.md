@@ -49,7 +49,7 @@ NOTE: If installing this way it is required to set up the env and config through
 
 NOTE: If you are using a linux system make sure that `lib64` is installed
 
-Tested on Node v10.16.3 requires Node >= 10.15.3 < 15.14.1
+Tested on Node v11.14.0 requires Node >= 11.14.0 <= 16.0.0
 
 Set up `.env` by copying across the `.env.template` and updating the values
 
@@ -59,7 +59,7 @@ Set up `config.json` by adding the connection profile and relay port for each ne
 
 Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
 
-Have `yarn` installed and have Node >= 10.15.3 < 13.0
+Have `yarn` installed and have Node >= 11.14.0 <= 16.0.0
 
 Run `yarn` to install dependencies. 
 
