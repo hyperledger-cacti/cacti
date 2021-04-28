@@ -15,7 +15,7 @@ import (
     "github.com/golang/protobuf/proto"
     "github.com/hyperledger/fabric-chaincode-go/shim"
     log "github.com/sirupsen/logrus"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/protos-go/common"
+    "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/protos-go/common"
 )
 
 
@@ -124,10 +124,10 @@ func (am *AssetManagement) GetUnlockedFungibleAssetCount(stub shim.ChaincodeStub
 }
 
 func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetType string, assetId string, lockInfo *common.AssetLock) (bool, error) {
-    if (lockInfo.LockMechanism == common.AssetLock_HTLC) {
+    if (lockInfo.LockMechanism == common.LockMechanism_HTLC) {
         lockInfoHTLC := &common.AssetLockHTLC{}
         if len(lockInfo.LockInfo) == 0 {
-		    log.Error("Empty lock info")
+            log.Error("Empty lock info")
             return false, fmt.Errorf("Empty lock info")
         }
         err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
@@ -137,7 +137,7 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetType
         }
         return am.LockAssetHTLC(stub, assetType, assetId, lockInfoHTLC.Recipient, lockInfoHTLC.Hash, int64(lockInfoHTLC.ExpiryTimeMillis))
     } else {
-		log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
         return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
     }
 }
@@ -187,10 +187,10 @@ func (am *AssetManagement) LockAssetHTLC(stub shim.ChaincodeStubInterface, asset
 }
 
 func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, assetType string, numUnits int, lockInfo *common.AssetLock) (bool, error) {
-    if (lockInfo.LockMechanism == common.AssetLock_HTLC) {
+    if (lockInfo.LockMechanism == common.LockMechanism_HTLC) {
         lockInfoHTLC := &common.AssetLockHTLC{}
         if len(lockInfo.LockInfo) == 0 {
-		    log.Error("Empty lock info")
+            log.Error("Empty lock info")
             return false, fmt.Errorf("Empty lock info")
         }
         err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
@@ -200,7 +200,7 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
         }
         return am.LockFungibleAssetHTLC(stub, assetType, numUnits, lockInfoHTLC.Recipient, lockInfoHTLC.Hash, int64(lockInfoHTLC.ExpiryTimeMillis))
     } else {
-		log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
         return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
     }
 }
@@ -371,22 +371,22 @@ func (am *AssetManagement) IsFungibleAssetLocked(stub shim.ChaincodeStubInterfac
     return isLocked, nil
 }
 
-func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetType string, assetId string, lockInfo *common.AssetLock) (bool, error) {
-    if (lockInfo.LockMechanism == common.AssetLock_HTLC) {
+func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetType string, assetId string, claimInfo *common.AssetClaim) (bool, error) {
+    if (claimInfo.LockMechanism == common.LockMechanism_HTLC) {
         claimInfoHTLC := &common.AssetClaimHTLC{}
-        if len(lockInfo.ClaimInfo) == 0 {
-		    log.Error("Empty claim info")
+        if len(claimInfo.ClaimInfo) == 0 {
+            log.Error("Empty claim info")
             return false, fmt.Errorf("Empty claim info")
         }
-        err := proto.Unmarshal(lockInfo.ClaimInfo, claimInfoHTLC)
+        err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
         if err != nil {
             log.Error(err.Error())
             return false, err
         }
         return am.ClaimAssetHTLC(stub, assetType, assetId, claimInfoHTLC.Locker, claimInfoHTLC.HashPreimage)
     } else {
-		log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        log.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+        return false, fmt.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
     }
 }
 
@@ -428,22 +428,22 @@ func (am *AssetManagement) ClaimAssetHTLC(stub shim.ChaincodeStubInterface, asse
     return true, nil
 }
 
-func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, assetType string, numUnits int, lockInfo *common.AssetLock) (bool, error) {
-    if (lockInfo.LockMechanism == common.AssetLock_HTLC) {
+func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, assetType string, numUnits int, claimInfo *common.AssetClaim) (bool, error) {
+    if (claimInfo.LockMechanism == common.LockMechanism_HTLC) {
         claimInfoHTLC := &common.AssetClaimHTLC{}
-        if len(lockInfo.ClaimInfo) == 0 {
-		    log.Error("Empty claim info")
+        if len(claimInfo.ClaimInfo) == 0 {
+            log.Error("Empty claim info")
             return false, fmt.Errorf("Empty claim info")
         }
-        err := proto.Unmarshal(lockInfo.ClaimInfo, claimInfoHTLC)
+        err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
         if err != nil {
             log.Error(err.Error())
             return false, err
         }
         return am.ClaimFungibleAssetHTLC(stub, assetType, numUnits, claimInfoHTLC.Locker, claimInfoHTLC.HashPreimage)
     } else {
-		log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        log.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+        return false, fmt.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
     }
 }
 

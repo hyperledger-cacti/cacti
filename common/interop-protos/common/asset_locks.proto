@@ -3,13 +3,18 @@ syntax = "proto3";
 package common.asset_locks;
 option go_package = "/common";
 
+enum LockMechanism {
+  HTLC = 0;
+}
+
 message AssetLock {
-  enum LockMechanism {
-    HTLC = 0;
-  }
   LockMechanism lockMechanism = 1;
   bytes lockInfo = 2;
-  bytes claimInfo = 3;
+}
+
+message AssetClaim {
+  LockMechanism lockMechanism = 1;
+  bytes claimInfo = 2;
 }
 
 message AssetLockHTLC {

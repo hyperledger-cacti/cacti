@@ -12,7 +12,7 @@ import (
     "time"
     "strconv"
 
-	"github.com/stretchr/testify/require"
+    "github.com/stretchr/testify/require"
     "github.com/hyperledger/fabric-chaincode-go/shim"
     "github.com/hyperledger/fabric-chaincode-go/shimtest"
     pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -207,7 +207,7 @@ func TestAssetLock(t *testing.T) {
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
-        LockMechanism: common.AssetLock_HTLC,
+        LockMechanism: common.LockMechanism_HTLC,
         LockInfo: lockInfoBytes,
     }
 
@@ -382,7 +382,7 @@ func TestFungibleAssetLock(t *testing.T) {
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
-        LockMechanism: common.AssetLock_HTLC,
+        LockMechanism: common.LockMechanism_HTLC,
         LockInfo: lockInfoBytes,
     }
 
@@ -844,13 +844,13 @@ func TestAssetClaim(t *testing.T) {
         HashPreimage: nil,
     }
     claimInfoBytes, _ := proto.Marshal(claimInfoHTLC)
-    lockInfo := &common.AssetLock {
-        LockMechanism: common.AssetLock_HTLC,
+    claimInfo := &common.AssetClaim {
+        LockMechanism: common.LockMechanism_HTLC,
         ClaimInfo: claimInfoBytes,
     }
 
     // Test failure when interop CC is not set
-    claimSuccess, err := amcc.ClaimAsset(amstub, assetType, assetId, lockInfo)
+    claimSuccess, err := amcc.ClaimAsset(amstub, assetType, assetId, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
@@ -859,35 +859,35 @@ func TestAssetClaim(t *testing.T) {
     // Test failures when any of the essential parameters are not supplied
     claimInfoHTLC.Locker = ""
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, assetId, lockInfo)     // Empty lock info (bytes)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, assetId, claimInfo)     // Empty lock info (bytes)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
     claimInfoHTLC.Locker = locker
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimAsset(amstub, "", assetId, lockInfo)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimAsset(amstub, "", assetId, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
-    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, "", lockInfo)
+    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, "", claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
     claimInfoHTLC.Locker = ""
     claimInfoHTLC.HashPreimage = hashPreimage
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, assetId, lockInfo)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, assetId, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
     claimInfoHTLC.Locker = locker
     claimInfoHTLC.HashPreimage = []byte{}
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, assetId, lockInfo)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, assetId, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
@@ -904,8 +904,10 @@ func TestAssetClaim(t *testing.T) {
         ExpiryTimeMillis: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
-    lockInfo.LockInfo = lockInfoBytes
-    lockInfo.ClaimInfo = []byte{}
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
+    }
     lockSuccess, err = amcc.LockAsset(amstub, assetType, assetId, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
@@ -919,9 +921,8 @@ func TestAssetClaim(t *testing.T) {
     claimInfoHTLC.Locker = locker
     claimInfoHTLC.HashPreimage = hashPreimage
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.LockInfo = []byte{}
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, assetId, lockInfo)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimAsset(amstub, assetType, assetId, claimInfo)
     require.NoError(t, err)
     require.True(t, claimSuccess)
 
@@ -1017,13 +1018,13 @@ func TestFungibleAssetClaim(t *testing.T) {
         HashPreimage: nil,
     }
     claimInfoBytes, _ := proto.Marshal(claimInfoHTLC)
-    lockInfo := &common.AssetLock {
-        LockMechanism: common.AssetLock_HTLC,
+    claimInfo := &common.AssetClaim {
+        LockMechanism: common.LockMechanism_HTLC,
         ClaimInfo: claimInfoBytes,
     }
 
     // Test failure when interop CC is not set
-    claimSuccess, err := amcc.ClaimFungibleAsset(amstub, assetType, numUnits, lockInfo)
+    claimSuccess, err := amcc.ClaimFungibleAsset(amstub, assetType, numUnits, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
@@ -1032,35 +1033,35 @@ func TestFungibleAssetClaim(t *testing.T) {
     // Test failures when any of the essential parameters are not supplied
     claimInfoHTLC.Locker = ""
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, numUnits, lockInfo)     // Empty lock info (bytes)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, numUnits, claimInfo)     // Empty lock info (bytes)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
     claimInfoHTLC.Locker = locker
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, "", numUnits, lockInfo)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, "", numUnits, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
-    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, -1, lockInfo)
+    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, -1, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
     claimInfoHTLC.Locker = ""
     claimInfoHTLC.HashPreimage = hashPreimage
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, numUnits, lockInfo)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, numUnits, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
     claimInfoHTLC.Locker = locker
     claimInfoHTLC.HashPreimage = []byte{}
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, numUnits, lockInfo)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, numUnits, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
@@ -1081,8 +1082,10 @@ func TestFungibleAssetClaim(t *testing.T) {
         ExpiryTimeMillis: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
-    lockInfo.LockInfo = lockInfoBytes
-    lockInfo.ClaimInfo = []byte{}
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
+    }
     lockSuccess, err = amcc.LockFungibleAsset(amstub, assetType, numUnits, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
@@ -1096,9 +1099,8 @@ func TestFungibleAssetClaim(t *testing.T) {
     claimInfoHTLC.Locker = locker
     claimInfoHTLC.HashPreimage = hashPreimage
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
-    lockInfo.LockInfo = []byte{}
-    lockInfo.ClaimInfo = claimInfoBytes
-    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, numUnits, lockInfo)
+    claimInfo.ClaimInfo = claimInfoBytes
+    claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetType, numUnits, claimInfo)
     require.NoError(t, err)
     require.True(t, claimSuccess)
 
