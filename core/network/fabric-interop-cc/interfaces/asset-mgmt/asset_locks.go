@@ -485,7 +485,7 @@ func (am *AssetManagement) ClaimFungibleAssetHTLC(stub shim.ChaincodeStubInterfa
     return true, nil
 }
 
-func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetType string, assetId string) (bool, error) {
+func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetType string, assetId string, lockRecipient string) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
@@ -504,7 +504,12 @@ func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetTy
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockAsset"), []byte(assetType), []byte(assetId)}, "")
+    if len(lockRecipient) == 0 {
+        errorMsg = "Empty lock recipient"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockAsset"), []byte(assetType), []byte(assetId), []byte(lockRecipient)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, fmt.Errorf(string(iccResp.GetPayload()))
@@ -513,7 +518,7 @@ func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetTy
     return true, nil
 }
 
-func (am *AssetManagement) UnlockFungibleAsset(stub shim.ChaincodeStubInterface, assetType string, numUnits int) (bool, error) {
+func (am *AssetManagement) UnlockFungibleAsset(stub shim.ChaincodeStubInterface, assetType string, numUnits int, lockRecipient string) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
@@ -532,7 +537,12 @@ func (am *AssetManagement) UnlockFungibleAsset(stub shim.ChaincodeStubInterface,
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockFungibleAsset"), []byte(assetType), []byte(strconv.Itoa(numUnits))}, "")
+    if len(lockRecipient) == 0 {
+        errorMsg = "Empty lock recipient"
+        log.Error(errorMsg)
+        return false, errors.New(errorMsg)
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockFungibleAsset"), []byte(assetType), []byte(strconv.Itoa(numUnits)), []byte(lockRecipient)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, fmt.Errorf(string(iccResp.GetPayload()))
