@@ -1,8 +1,17 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as internalIpV4 } from "internal-ip";
+import { v4 as uuidv4 } from "uuid";
+import http from "http";
+import bodyParser from "body-parser";
+import express from "express";
+import { AddressInfo } from "net";
 
 import { CordaTestLedger } from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import {
+  LogLevelDesc,
+  IListenOptions,
+  Servers,
+} from "@hyperledger/cactus-common";
 import {
   SampleCordappEnum,
   CordaConnectorContainer,
@@ -16,6 +25,12 @@ import {
   InvokeContractV1Request,
   JvmTypeKind,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
+
+import {
+  IPluginLedgerConnectorCordaOptions,
+  PluginLedgerConnectorCorda,
+} from "../../../main/typescript/plugin-ledger-connector-corda";
+import { K_CACTUS_CORDA_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -296,6 +311,80 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   const res = await apiClient.invokeContractV1(req);
   t.ok(res, "InvokeContractV1Request truthy OK");
   t.equal(res.status, 200, "InvokeContractV1Request status code === 200 OK");
+
+  const pluginOptions: IPluginLedgerConnectorCordaOptions = {
+    instanceId: uuidv4(),
+    corDappsDir: corDappsDirPartyA,
+    sshConfigAdminShell: sshConfig,
+  };
+
+  const plugin = new PluginLedgerConnectorCorda(pluginOptions);
+
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
+  const listenOptions: IListenOptions = {
+    hostname: "0.0.0.0",
+    port: 0,
+    server,
+  };
+  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+  test.onFinish(async () => await Servers.shutdown(server));
+  const { address, port } = addressInfo;
+  const apiHost = `http://${address}:${port}`;
+  t.comment(
+    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics`,
+  );
+  const apiClient1 = new CordaApi({ basePath: apiHost });
+
+  await plugin.getOrCreateWebServices();
+  await plugin.registerWebServices(expressApp);
+
+  {
+    plugin.transact();
+    const promRes = await apiClient1.getPrometheusExporterMetricsV1();
+    const promMetricsOutput =
+      "# HELP " +
+      K_CACTUS_CORDA_TOTAL_TX_COUNT +
+      " Total transactions executed\n" +
+      "# TYPE " +
+      K_CACTUS_CORDA_TOTAL_TX_COUNT +
+      " gauge\n" +
+      K_CACTUS_CORDA_TOTAL_TX_COUNT +
+      '{type="' +
+      K_CACTUS_CORDA_TOTAL_TX_COUNT +
+      '"} 1';
+    t.ok(promRes);
+    t.ok(promRes.data);
+    t.equal(promRes.status, 200);
+    t.true(
+      promRes.data.includes(promMetricsOutput),
+      "Total Transaction Count of 1 recorded as expected. RESULT OK",
+    );
+
+    // Executing transaction to increment the Total transaction count metrics
+    plugin.transact();
+
+    const promRes1 = await apiClient1.getPrometheusExporterMetricsV1();
+    const promMetricsOutput1 =
+      "# HELP " +
+      K_CACTUS_CORDA_TOTAL_TX_COUNT +
+      " Total transactions executed\n" +
+      "# TYPE " +
+      K_CACTUS_CORDA_TOTAL_TX_COUNT +
+      " gauge\n" +
+      K_CACTUS_CORDA_TOTAL_TX_COUNT +
+      '{type="' +
+      K_CACTUS_CORDA_TOTAL_TX_COUNT +
+      '"} 2';
+    t.ok(promRes1);
+    t.ok(promRes1.data);
+    t.equal(promRes1.status, 200);
+    t.true(
+      promRes1.data.includes(promMetricsOutput1),
+      "Total Transaction Count of 2 recorded as expected. RESULT OK",
+    );
+  }
 
   t.end();
 });

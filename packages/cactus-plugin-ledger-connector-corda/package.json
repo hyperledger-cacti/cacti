@@ -89,6 +89,7 @@
     "@hyperledger/cactus-core-api": "0.4.1",
     "axios": "0.21.1",
     "express-openapi-validator": "4.10.5",
+    "prom-client": "13.0.0",
     "internal-ip": "6.2.0",
     "joi": "14.3.1",
     "node-ssh": "11.1.0",
