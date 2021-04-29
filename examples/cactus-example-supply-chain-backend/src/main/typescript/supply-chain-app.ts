@@ -14,7 +14,7 @@ import {
   LedgerType,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
 
 import {
   LogLevelDesc,
@@ -152,6 +152,8 @@ export class SupplyChainApp {
     const connectionProfile = await this.ledgers.fabric.getConnectionProfileOrg1();
     const sshConfig = await this.ledgers.fabric.getSshConfig();
 
+    const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
+
     const registryA = new PluginRegistry({
       plugins: [
         new PluginConsortiumManual({
@@ -159,6 +161,7 @@ export class SupplyChainApp {
           consortiumDatabase,
           keyPairPem: keyPairPemA,
           logLevel: this.options.logLevel,
+          consortiumRepo,
         }),
         new SupplyChainCactusPlugin({
           logLevel: this.options.logLevel,
@@ -201,6 +204,7 @@ export class SupplyChainApp {
           consortiumDatabase,
           keyPairPem: keyPairPemB,
           logLevel: this.options.logLevel,
+          consortiumRepo,
         }),
         new SupplyChainCactusPlugin({
           logLevel: this.options.logLevel,
@@ -243,6 +247,7 @@ export class SupplyChainApp {
           consortiumDatabase,
           keyPairPem: keyPairPemC,
           logLevel: "INFO",
+          consortiumRepo,
         }),
         new SupplyChainCactusPlugin({
           logLevel: "INFO",

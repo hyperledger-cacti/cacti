@@ -19,7 +19,7 @@ import {
   Ledger,
   LedgerType,
 } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
 import {
   DefaultApi as QuorumApi,
   PluginLedgerConnectorQuorum,
@@ -127,6 +127,8 @@ test(testCase, async (t: Test) => {
     pluginInstance: [],
   };
 
+  const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
+
   const mainApiClient = new ApiClient({ basePath: consortium.mainApiHost });
 
   test("Set Up Test ledgers, Consortium, Cactus Nodes", async (t2: Test) => {
@@ -171,6 +173,7 @@ test(testCase, async (t: Test) => {
         keyPairPem: keyPair1.toPEM(true),
         consortiumDatabase,
         logLevel,
+        consortiumRepo,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
 
@@ -213,6 +216,7 @@ test(testCase, async (t: Test) => {
         keyPairPem: keyPair2.toPEM(true),
         consortiumDatabase,
         logLevel,
+        consortiumRepo,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
 
