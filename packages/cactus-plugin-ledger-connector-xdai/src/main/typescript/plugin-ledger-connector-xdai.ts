@@ -21,6 +21,7 @@ import {
   IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
+import { consensusHasTransactionFinality } from "@hyperledger/cactus-core";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
@@ -120,6 +121,11 @@ export class PluginLedgerConnectorXdai
     );
 
     this.prometheusExporter.startMetricsCollection();
+  }
+
+  public async hasTransactionFinality(): Promise<boolean> {
+    const consensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    return consensusHasTransactionFinality(consensusAlgorithmFamily);
   }
 
   public getPrometheusExporter(): PrometheusExporter {
