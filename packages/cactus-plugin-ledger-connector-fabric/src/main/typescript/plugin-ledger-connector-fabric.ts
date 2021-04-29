@@ -17,6 +17,7 @@ import {
   DefaultEventHandlerStrategies,
   Gateway,
   GatewayOptions,
+  Identity,
   InMemoryWallet,
   X509WalletMixin,
 } from "fabric-network";
@@ -83,6 +84,7 @@ import {
   IDeployContractEndpointV1Options,
 } from "./deploy-contract/deploy-contract-endpoint-v1";
 import { sourceLangToRuntimeLang } from "./peer/source-lang-to-runtime-lang";
+import FabricCAServices from "fabric-ca-client";
 
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
@@ -170,8 +172,8 @@ export class PluginLedgerConnectorFabric
     this.prometheusExporter.startMetricsCollection();
   }
 
-  public shutdown(): Promise<void> {
-    throw new Error("Method not implemented.");
+  public async shutdown(): Promise<void> {
+    return;
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -893,6 +895,60 @@ export class PluginLedgerConnectorFabric
     } catch (ex) {
       this.log.error(`transact() crashed: `, ex);
       throw new Error(`${fnTag} Unable to run transaction: ${ex.message}`);
+    }
+  }
+
+  /**
+   * @param caId The key of the CA in the Fabric connection profile's
+   * `certificateAuthorities` attribute.
+   * @returns The instantiated `FabricCAServices` object.
+   */
+  public async createCaClient(caId: string): Promise<FabricCAServices> {
+    const fnTag = `${this.className}#createCaClient()`;
+    try {
+      const ccp = this.opts.connectionProfile;
+      if (!ccp.certificateAuthorities) {
+        throw new Error(`${fnTag} conn. profile certificateAuthorities falsy.`);
+      }
+      const caInfo = ccp.certificateAuthorities[caId] as Record<string, any>;
+      const { tlsCACerts, url: caUrl, caName } = caInfo;
+      const { pem: caTLSCACertPem } = tlsCACerts;
+      const tlsOptions = { trustedRoots: caTLSCACertPem, verify: false };
+      this.log.debug(`createCaClient() caName=%o caUrl=%o`, caName, caUrl);
+      this.log.debug(`createCaClient() tlsOptions=%o`, tlsOptions);
+      return new FabricCAServices(caUrl, tlsOptions, caName);
+    } catch (ex) {
+      this.log.error(`createCaClient() Failure:`, ex);
+      throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+    }
+  }
+
+  public async enrollAdmin(
+    caId: string,
+    identityId: string,
+    mspId: string,
+    enrollmentID: string,
+    enrollmentSecret: string,
+  ): Promise<[Identity, InMemoryWallet]> {
+    const fnTag = `${this.className}#enrollAdmin()`;
+    try {
+      const ca = await this.createCaClient(caId);
+      const wallet = new InMemoryWallet(new X509WalletMixin());
+
+      // Enroll the admin user, and import the new identity into the wallet.
+      const request = { enrollmentID, enrollmentSecret };
+      const enrollment = await ca.enroll(request);
+
+      const { certificate: cert, key } = enrollment;
+      const keyBytes = key.toBytes();
+
+      const identity = X509WalletMixin.createIdentity(mspId, cert, keyBytes);
+      await wallet.import(identityId, identity);
+
+      return [identity, wallet];
+    } catch (ex) {
+      this.log.error(`enrollAdmin() Failure:`, ex);
+      throw new Error(`${fnTag} Exception: ${ex?.message}`);
     }
   }
 }
