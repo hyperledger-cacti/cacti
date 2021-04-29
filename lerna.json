@@ -1,7 +1,8 @@
 {
   "packages": [
     "packages/cactus-*",
-    "examples/cactus-*"
+    "examples/cactus-*",
+    "examples/carbon-accounting/pkg/cactus-*"
   ],
   "version": "0.4.1",
   "command": {
