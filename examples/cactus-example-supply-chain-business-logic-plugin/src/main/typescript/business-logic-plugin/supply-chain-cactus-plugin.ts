@@ -162,6 +162,6 @@ export class SupplyChainCactusPlugin
   }
 
   public getAspect(): PluginAspect {
-    return PluginAspect.WEB_SERVICE;
+    return PluginAspect.BUSINESS_LOGIC;
   }
 }
