@@ -18,7 +18,7 @@ import {
 
 import {
   GetNodeJwsEndpoint,
-  IGetNodeJwsEndpointOptions,
+  //  IGetNodeJwsEndpointOptions,
 } from "../../../../main/typescript/public-api";
 
 import { v4 as uuidv4 } from "uuid";
@@ -47,6 +47,7 @@ test("Can provide JWS", async (t: Test) => {
     instanceId: uuidv4(),
     keyPairPem: keyPairPem,
     consortiumDatabase: db,
+    consortiumRepo,
   };
 
   const pluginConsortiumManual: PluginConsortiumManual = new PluginConsortiumManual(
@@ -75,16 +76,9 @@ test("Can provide JWS", async (t: Test) => {
   await pluginConsortiumManual.getOrCreateWebServices();
   await pluginConsortiumManual.registerWebServices(expressApp);
 
-  const epOpts: IGetNodeJwsEndpointOptions = {
-    plugin: pluginConsortiumManual,
-    consortiumRepo,
-    keyPairPem,
-  };
   const pubKeyPem = keyPair.toPEM(false);
 
-  const ep = new GetNodeJwsEndpoint(epOpts);
-
-  const jws = await ep.createJws();
+  const jws = await pluginConsortiumManual.getNodeJws();
   t.ok(jws, "created JWS is truthy");
   t.ok(typeof jws === "object", "created JWS is an object");
 

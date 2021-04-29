@@ -3,21 +3,17 @@ import { Express, Request, Response } from "express";
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
-  JWSGeneral,
-  JWSRecipient,
   IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
-import {
-  Configuration,
-  DefaultApi,
-} from "../generated/openapi/typescript-axios";
+import { GetConsortiumJwsResponse } from "../generated/openapi/typescript-axios";
 
 import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
   IAsyncProvider,
+  Checks,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -26,8 +22,10 @@ import {
 } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
+import { PluginConsortiumManual } from "../plugin-consortium-manual";
 
 export interface IGetConsortiumJwsEndpointOptions {
+  plugin: PluginConsortiumManual;
   keyPairPem: string;
   consortiumRepo: ConsortiumRepository;
   logLevel?: LogLevelDesc;
@@ -35,6 +33,7 @@ export interface IGetConsortiumJwsEndpointOptions {
 
 export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
   private readonly log: Logger;
+  private readonly plugin: PluginConsortiumManual;
 
   constructor(public readonly options: IGetConsortiumJwsEndpointOptions) {
     const fnTag = "GetConsortiumJwsEndpoint#constructor()";
@@ -47,6 +46,12 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     if (!options.consortiumRepo) {
       throw new Error(`${fnTag} options.consortium falsy.`);
     }
+    Checks.truthy(options.plugin, `${fnTag} options.plugin`);
+    Checks.truthy(
+      options.plugin instanceof PluginConsortiumManual,
+      `${fnTag} options.plugin instanceof PluginConsortiumManual`,
+    );
+    this.plugin = options.plugin;
 
     const label = "get-consortium-jws-endpoint";
     const level = options.logLevel || "INFO";
@@ -97,30 +102,9 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`GET ${this.getPath()}`);
 
     try {
-      const nodes = this.options.consortiumRepo.allNodes;
+      const jws = await this.options.plugin.getConsortiumJws();
 
-      const requests = nodes
-        .map((cnm) => cnm.nodeApiHost)
-        .map((host) => new Configuration({ basePath: host }))
-        .map((configuration) => new DefaultApi(configuration))
-        .map((apiClient) => apiClient.getNodeJws());
-
-      const responses = await Promise.all(requests);
-
-      const signatures: JWSRecipient[] = [];
-
-      responses
-        .map((apiResponse) => apiResponse.data)
-        .map((getNodeJwsResponse) => getNodeJwsResponse.jws)
-        .forEach((aJws: JWSGeneral) =>
-          aJws.signatures.forEach((signature) => signatures.push(signature)),
-        );
-
-      const [response] = responses;
-      const jws = response.data.jws;
-      jws.signatures = signatures;
-
-      const body = { jws };
+      const body: GetConsortiumJwsResponse = { jws };
       res.status(200);
       res.json(body);
     } catch (ex) {
