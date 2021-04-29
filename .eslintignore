@@ -8,7 +8,7 @@
 # packages/routing-interface/
 # packages/config/
 
-# **/dist/**
+**/dist/**
 # **/node_modules/**
 # **/build/**
 # **/coverage/**

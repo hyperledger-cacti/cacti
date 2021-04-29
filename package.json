@@ -10,6 +10,7 @@
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
     "start:cockpit": "lerna run --scope '*/cactus-cockpit' --stream serve:proxy",
     "start:example-supply-chain": "cd ./examples/supply-chain-app/ && npm i --no-package-lock && npm run start",
+    "start:example-carbon-accounting": "CONFIG_FILE=examples/cactus-example-carbon-accounting-backend/example-config.json node examples/cactus-example-carbon-accounting-backend/dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "clean": "del-cli \"./packages/cactus-*/{dist,.nyc_output,src/main/typescript/generated/openapi/typescript-axios/*}\"",
     "lint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix",
     "tsc": "lerna run tsc",
