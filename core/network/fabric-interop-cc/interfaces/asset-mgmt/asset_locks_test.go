@@ -158,7 +158,7 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
             return shim.Success(nil)
         }
     }
-    if function == "GetAllLockedAssets" {
+    if function == "GetAllLockedAssets" || function == "GetAllAssetsLockedUntil" {
         assets := []string{}
         for key, val := range cc.assetLockMap {
             assets = append(assets, key + ":" + val)
@@ -184,6 +184,12 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         }
         assetsBytes, _ := json.Marshal(assets)
         return shim.Success(assetsBytes)
+    }
+    if function == "GetAssetTimeToRelease" {
+        return shim.Success([]byte(strconv.Itoa(len(cc.assetLockMap))))
+    }
+    if function == "GetFungibleAssetTimeToRelease" {
+        return shim.Success([]byte(strconv.Itoa(len(cc.fungibleAssetLockMap))))
     }
     return shim.Error(fmt.Sprintf("Invalid invoke function name: %s", function))
 }
@@ -1472,12 +1478,10 @@ func TestAssetListFunctions(t *testing.T) {
     getSuccess, err = amcc.GetAllNonFungibleLockedAssets(amstub, recipient, locker)
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllFungibleLockedAssets(amstub, recipient, locker)
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     associateInteropCCInstance(amcc, amstub)
 
@@ -1485,47 +1489,38 @@ func TestAssetListFunctions(t *testing.T) {
     getSuccess, err = amcc.GetAllLockedAssets(amstub, "", "")
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllLockedAssets(amstub, locker, locker)
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllLockedAssets(amstub, recipient, recipient)
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllNonFungibleLockedAssets(amstub, "", "")
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllNonFungibleLockedAssets(amstub, locker, locker)
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllNonFungibleLockedAssets(amstub, recipient, recipient)
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllFungibleLockedAssets(amstub, "", "")
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllFungibleLockedAssets(amstub, locker, locker)
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     getSuccess, err = amcc.GetAllFungibleLockedAssets(amstub, recipient, recipient)
     require.Error(t, err)
     require.Equal(t, 0, len(getSuccess))
-    require.Equal(t, len(getSuccess), 0)
 
     // Lock an asset
     currTime := time.Now()
@@ -1589,4 +1584,145 @@ func TestAssetListFunctions(t *testing.T) {
     getSuccess, err = amcc.GetAllFungibleLockedAssets(amstub, recipient, locker)
     require.NoError(t, err)
     require.Equal(t, 2, len(getSuccess))
+}
+
+func TestAssetTimeFunctions(t *testing.T) {
+    amcc, amstub := createAssetMgmtCCInstance()
+    assetType := "bond"
+    assetId := "A001"
+    fungibleAssetType := "cbdc"
+    totalUnits := 10000
+    numUnits := 1000
+    recipient := "Bob"
+    locker := clientId
+    hash := []byte("j8r484r484")
+    assetAgreement := &common.AssetAgreement {
+        Type: assetType,
+        Id: assetId,
+        Recipient: recipient,
+        Locker: locker,
+    }
+    fungibleAssetAgreement := &common.FungibleAssetAgreement {
+        Type: assetType,
+        NumUnits: int32(numUnits),
+        Recipient: recipient,
+        Locker: locker,
+    }
+
+    // Test failure when interop CC is not set
+    getSuccess, err := amcc.GetAssetTimeToRelease(amstub, assetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    currTime := time.Now()
+    endTime := currTime.Add(30 * time.Second)     // 30 seconds time window
+    getListSuccess, err := amcc.GetAllAssetsLockedUntil(amstub, endTime.UnixNano()/(1000*1000))
+    require.Error(t, err)
+    require.Equal(t, 0, len(getListSuccess))
+
+    associateInteropCCInstance(amcc, amstub)
+
+    // Test failures when parameters are invalid
+    assetAgreement.Type = ""
+    getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    assetAgreement.Type = assetType
+    assetAgreement.Id = ""
+    getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    assetAgreement.Id = assetId
+    assetAgreement.Recipient = ""
+    assetAgreement.Locker = ""
+    getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    assetAgreement.Recipient = locker
+    assetAgreement.Locker = locker
+    getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    assetAgreement.Recipient = recipient
+    assetAgreement.Locker = recipient
+    getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    fungibleAssetAgreement.Type = ""
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    fungibleAssetAgreement.Type = fungibleAssetType
+    fungibleAssetAgreement.NumUnits = -1
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    fungibleAssetAgreement.NumUnits = int32(numUnits)
+    fungibleAssetAgreement.Recipient = ""
+    fungibleAssetAgreement.Locker = ""
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    fungibleAssetAgreement.Recipient = locker
+    fungibleAssetAgreement.Locker = locker
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    fungibleAssetAgreement.Recipient = recipient
+    fungibleAssetAgreement.Locker = recipient
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    require.Error(t, err)
+    require.Equal(t, int64(-1), getSuccess)
+
+    getListSuccess, err = amcc.GetAllAssetsLockedUntil(amstub, -1)
+    require.Error(t, err)
+    require.Equal(t, 0, len(getListSuccess))
+
+    // Lock an asset
+    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
+    lockSuccess, err := amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    require.NoError(t, err)
+    require.True(t, lockSuccess)
+
+    // Test success
+    assetAgreement.Recipient = recipient
+    assetAgreement.Locker = locker
+    getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
+    require.NoError(t, err)
+    require.Less(t, int64(0), getSuccess)
+
+    // Declare total fungible asset count
+    addSuccess, err := amcc.AddFungibleAssetCount(amstub, fungibleAssetType, totalUnits)
+    require.NoError(t, err)
+    require.True(t, addSuccess)
+
+    // Lock a fungible asset
+    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, fungibleAssetType, numUnits, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    require.NoError(t, err)
+    require.True(t, lockSuccess)
+
+    // Test success
+    fungibleAssetAgreement.Recipient = recipient
+    fungibleAssetAgreement.Locker = locker
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    require.NoError(t, err)
+    require.Less(t, int64(0), getSuccess)
+
+    // Test success
+    getListSuccess, err = amcc.GetAllAssetsLockedUntil(amstub, endTime.UnixNano()/(1000*1000))
+    require.NoError(t, err)
+    require.Equal(t, 2, len(getListSuccess))
 }

@@ -655,7 +655,7 @@ func (am *AssetManagement) GetAllFungibleLockedAssets(stub shim.ChaincodeStubInt
 
 // 'lockRecipient': if blank, assume caller
 // 'locker': if blank, assume caller
-func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterface, assetType string, assetId string, lockRecipient string, locker string) (int64, error) {
+func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetAgreement) (int64, error) {
     var infoMsg, errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
@@ -664,12 +664,12 @@ func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterfac
         return -1, errors.New(errorMsg)
     }
 
-    if len(assetType) == 0 {
+    if len(assetAgreement.Type) == 0 {
         errorMsg = "Empty asset type"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
-    if len(assetId) == 0 {
+    if len(assetAgreement.Id) == 0 {
         errorMsg = "Empty asset ID"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
@@ -680,27 +680,27 @@ func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterfac
         return -1, err
     }
     myself := string(myselfBytes)
-    if len(lockRecipient) == 0 {
+    if len(assetAgreement.Recipient) == 0 {
         infoMsg = "Empty lock recipient; assuming caller"
         log.Info(infoMsg)
-        lockRecipient = myself
+        assetAgreement.Recipient = myself
     }
-    if len(locker) == 0 {
+    if len(assetAgreement.Locker) == 0 {
         infoMsg = "Empty locker; assuming caller"
         log.Info(infoMsg)
-        locker = myself
+        assetAgreement.Locker = myself
     }
-    if lockRecipient == locker {
+    if assetAgreement.Recipient == assetAgreement.Locker {
         errorMsg = "Invalid query: locker identical to recipient"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
-    if lockRecipient != myself && locker != myself {
+    if assetAgreement.Recipient != myself && assetAgreement.Locker != myself {
         errorMsg = "Query not permitted, as caller is neither locker nor recipient"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetAssetTimeToRelease"), []byte(assetType), []byte(assetId), []byte(lockRecipient), []byte(locker)}, "")
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetAssetTimeToRelease"), []byte(assetAgreement.Type), []byte(assetAgreement.Id), []byte(assetAgreement.Recipient), []byte(assetAgreement.Locker)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return -1, fmt.Errorf(string(iccResp.GetPayload()))
@@ -712,13 +712,13 @@ func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterfac
     }
     lockExpiryTimeSec := timeToRelease/1000
     lockExpiryTimeNano := (timeToRelease - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
-    fmt.Printf("Asset %s of type %s locked until %+v\n", assetId, assetType, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
+    fmt.Printf("Asset %s of type %s locked until %+v\n", assetAgreement.Id, assetAgreement.Type, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
     return timeToRelease, nil
 }
 
 // 'lockRecipient': if blank, assume caller
 // 'locker': if blank, assume caller
-func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStubInterface, assetType string, numUnits int, lockRecipient string, locker string) (int64, error) {
+func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetAgreement) (int64, error) {
     var infoMsg, errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
@@ -727,12 +727,12 @@ func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStub
         return -1, errors.New(errorMsg)
     }
 
-    if len(assetType) == 0 {
+    if len(assetAgreement.Type) == 0 {
         errorMsg = "Empty asset type"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
-    if numUnits <= 0 {
+    if assetAgreement.NumUnits <= 0 {
         errorMsg = "Invalid number of asset units"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
@@ -743,27 +743,27 @@ func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStub
         return -1, err
     }
     myself := string(myselfBytes)
-    if len(lockRecipient) == 0 {
+    if len(assetAgreement.Recipient) == 0 {
         infoMsg = "Empty lock recipient; assuming caller"
         log.Info(infoMsg)
-        lockRecipient = myself
+        assetAgreement.Recipient = myself
     }
-    if len(locker) == 0 {
+    if len(assetAgreement.Locker) == 0 {
         infoMsg = "Empty locker; assuming caller"
         log.Info(infoMsg)
-        locker = myself
+        assetAgreement.Locker = myself
     }
-    if lockRecipient == locker {
+    if assetAgreement.Recipient == assetAgreement.Locker {
         errorMsg = "Invalid query: locker identical to recipient"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
-    if lockRecipient != myself && locker != myself {
+    if assetAgreement.Recipient != myself && assetAgreement.Locker != myself {
         errorMsg = "Query not permitted, as caller is neither locker nor recipient"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetFungibleAssetTimeToRelease"), []byte(assetType), []byte(strconv.Itoa(numUnits)), []byte(lockRecipient), []byte(locker)}, "")
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetFungibleAssetTimeToRelease"), []byte(assetAgreement.Type), []byte(strconv.Itoa(int(assetAgreement.NumUnits))), []byte(assetAgreement.Recipient), []byte(assetAgreement.Locker)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return -1, fmt.Errorf(string(iccResp.GetPayload()))
@@ -775,11 +775,11 @@ func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStub
     }
     lockExpiryTimeSec := timeToRelease/1000
     lockExpiryTimeNano := (timeToRelease - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
-    fmt.Printf("%d units of asset type %s locked until %+v\n", numUnits, assetType, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
+    fmt.Printf("%d units of asset type %s locked until %+v\n", assetAgreement.NumUnits, assetAgreement.Type, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
     return timeToRelease, nil
 }
 
-// Assumption is that the caller is either the recipient or the locker in each element in the list, but we will let the interop CC take are of it
+// Assumption is that the caller is either the recipient or the locker in each element in the list, but we will let the interop CC take care of it
 func (am *AssetManagement) GetAllAssetsLockedUntil(stub shim.ChaincodeStubInterface, lockExpiryTimeMillis int64) ([]string, error) {
     var errorMsg string
     var assets []string
