@@ -4,3 +4,4 @@
 /protos-js
 .env
 /fabric-protos
+package-lock.json
