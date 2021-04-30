@@ -327,25 +327,6 @@ func (am *AssetManagement) IsFungibleAssetLocked(stub shim.ChaincodeStubInterfac
 }
 
 func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetAgreement, claimInfo *common.AssetClaim) (bool, error) {
-    if (claimInfo.LockMechanism == common.LockMechanism_HTLC) {
-        claimInfoHTLC := &common.AssetClaimHTLC{}
-        if len(claimInfo.ClaimInfo) == 0 {
-            log.Error("Empty claim info")
-            return false, fmt.Errorf("Empty claim info")
-        }
-        err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
-        if err != nil {
-            log.Error(err.Error())
-            return false, err
-        }
-        return am.ClaimAssetHTLC(stub, assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker, claimInfoHTLC.HashPreimage)
-    } else {
-        log.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
-    }
-}
-
-func (am *AssetManagement) ClaimAssetHTLC(stub shim.ChaincodeStubInterface, assetType string, assetId string, locker string, lockHashPreimage []byte) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
@@ -354,55 +335,61 @@ func (am *AssetManagement) ClaimAssetHTLC(stub shim.ChaincodeStubInterface, asse
         return false, errors.New(errorMsg)
     }
 
-    if len(assetType) == 0 {
+    if (claimInfo.LockMechanism != common.LockMechanism_HTLC) {
+        log.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+        return false, fmt.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+    }
+    claimInfoHTLC := &common.AssetClaimHTLC{}
+    if len(claimInfo.ClaimInfo) == 0 {
+        log.Error("Empty claim info")
+        return false, fmt.Errorf("Empty claim info")
+    }
+    err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+
+    if len(assetAgreement.Type) == 0 {
         errorMsg = "Empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(assetId) == 0 {
+    if len(assetAgreement.Id) == 0 {
         errorMsg = "Empty asset ID"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(locker) == 0 {
+    if len(assetAgreement.Locker) == 0 {
         errorMsg = "Empty locker"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(lockHashPreimage) == 0 {
+    if len(claimInfoHTLC.HashPreimage) == 0 {
         errorMsg = "Empty lock hash preimage"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimAssetHTLC"), []byte(assetType), []byte(assetId), []byte(locker), lockHashPreimage}, "")
+    assetAgreementBytes, err := proto.Marshal(assetAgreement)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    claimInfoBytes, err := proto.Marshal(claimInfoHTLC)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimAsset"), assetAgreementBytes, claimInfoBytes}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, fmt.Errorf(string(iccResp.GetPayload()))
     }
-    fmt.Printf("Claimed asset %s of type %s locked by %s\n", assetId, assetType, locker)
+    fmt.Printf("Claimed asset %s of type %s locked by %s\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Locker)
     return true, nil
 }
 
 func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetAgreement, claimInfo *common.AssetClaim) (bool, error) {
-    if (claimInfo.LockMechanism == common.LockMechanism_HTLC) {
-        claimInfoHTLC := &common.AssetClaimHTLC{}
-        if len(claimInfo.ClaimInfo) == 0 {
-            log.Error("Empty claim info")
-            return false, fmt.Errorf("Empty claim info")
-        }
-        err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
-        if err != nil {
-            log.Error(err.Error())
-            return false, err
-        }
-        return am.ClaimFungibleAssetHTLC(stub, assetAgreement.Type, int(assetAgreement.NumUnits), assetAgreement.Locker, claimInfoHTLC.HashPreimage)
-    } else {
-        log.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
-    }
-}
-
-func (am *AssetManagement) ClaimFungibleAssetHTLC(stub shim.ChaincodeStubInterface, assetType string, numUnits int, locker string, lockHashPreimage []byte) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
@@ -411,32 +398,57 @@ func (am *AssetManagement) ClaimFungibleAssetHTLC(stub shim.ChaincodeStubInterfa
         return false, errors.New(errorMsg)
     }
 
-    if len(assetType) == 0 {
+    if (claimInfo.LockMechanism != common.LockMechanism_HTLC) {
+        log.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+        return false, fmt.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+    }
+    claimInfoHTLC := &common.AssetClaimHTLC{}
+    if len(claimInfo.ClaimInfo) == 0 {
+        log.Error("Empty claim info")
+        return false, fmt.Errorf("Empty claim info")
+    }
+    err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+
+    if len(assetAgreement.Type) == 0 {
         errorMsg = "Empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if numUnits <= 0 {
+    if assetAgreement.NumUnits <= 0 {
         errorMsg = "Invalid number of asset units"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(locker) == 0 {
+    if len(assetAgreement.Locker) == 0 {
         errorMsg = "Empty locker"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(lockHashPreimage) == 0 {
+    if len(claimInfoHTLC.HashPreimage) == 0 {
         errorMsg = "Empty lock hash preimage"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimFungibleAssetHTLC"), []byte(assetType), []byte(strconv.Itoa(numUnits)), []byte(locker), lockHashPreimage}, "")
+    assetAgreementBytes, err := proto.Marshal(assetAgreement)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    claimInfoBytes, err := proto.Marshal(claimInfoHTLC)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimFungibleAsset"), assetAgreementBytes, claimInfoBytes}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, fmt.Errorf(string(iccResp.GetPayload()))
     }
-    fmt.Printf("Claimed %d units of asset of type %s locked by %s\n", numUnits, assetType, locker)
+    fmt.Printf("Claimed %d units of asset of type %s locked by %s\n", assetAgreement.NumUnits, assetAgreement.Type, assetAgreement.Locker)
     return true, nil
 }
 
