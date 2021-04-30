@@ -264,7 +264,7 @@ func TestAssetLockHTLC(t *testing.T) {
     require.False(t, lockSuccess)
 
     // Test success
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, 0)         // Invalid expiry time: should still succeed
+    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, 0)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -455,7 +455,7 @@ func TestFungibleAssetLockHTLC(t *testing.T) {
     require.NoError(t, err)
     require.True(t, addSuccess)
 
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)         // Invalid expiry time: should still succeed
+    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1438,7 +1438,7 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     require.Equal(t, unlockedCount, totalUnits)
 
     // Lock some units of an asset
-    lockSuccess, err := amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)         // Invalid expiry time: should still succeed
+    lockSuccess, err := amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 

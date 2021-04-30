@@ -120,10 +120,6 @@ func (am *AssetManagement) LockAssetHTLC(stub shim.ChaincodeStubInterface, asset
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    currEpochMillis := time.Now().UnixNano() / (1000 * 1000)
-    if (lockExpiryTimeMillis <= currEpochMillis) {
-        lockExpiryTimeMillis = currEpochMillis + defaultTimeLockMillis
-    }
     iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockAssetHTLC"), []byte(assetType), []byte(assetId), []byte(lockRecipient), lockHash, []byte(strconv.FormatInt(lockExpiryTimeMillis, 10))}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
@@ -186,10 +182,6 @@ func (am *AssetManagement) LockFungibleAssetHTLC(stub shim.ChaincodeStubInterfac
         errorMsg = "Empty lock hash value"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
-    }
-    currEpochMillis := time.Now().UnixNano() / (1000 * 1000)
-    if (lockExpiryTimeMillis <= currEpochMillis) {
-        lockExpiryTimeMillis = currEpochMillis + defaultTimeLockMillis
     }
     iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockFungibleAssetHTLC"), []byte(assetType), []byte(strconv.Itoa(numUnits)), []byte(lockRecipient), lockHash, []byte(strconv.FormatInt(lockExpiryTimeMillis, 10))}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
