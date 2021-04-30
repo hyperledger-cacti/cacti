@@ -72,24 +72,27 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         return shim.Success([]byte(strconv.Itoa(cc.fungibleAssetUnlockedCount[args[0]])))
     }
     caller, _ := stub.GetCreator()
-    if function == "LockAssetHTLC" {
-        key := args[0] + ":" + args[1]
-        val := string(caller) + ":" + args[2]
+    if function == "LockAsset" {
+        assetAgreement := &common.AssetAgreement{}
+        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        key := assetAgreement.Type + ":" + assetAgreement.Id
+        val := string(caller) + ":" + assetAgreement.Recipient
         if cc.assetLockMap[key] != "" {
-            return shim.Error(fmt.Sprintf("Asset of type %s and ID %s is already locked", args[0], args[1]))
+            return shim.Error(fmt.Sprintf("Asset of type %s and ID %s is already locked", assetAgreement.Type, assetAgreement.Id))
         }
         cc.assetLockMap[key] = val
         return shim.Success(nil)
     }
-    if function == "LockFungibleAssetHTLC" {    // We are only going to lock once or twice in each unit test function, so bookkeeping doesn't need to be thorough
-        key := args[0] + ":" + args[1]
-        val := string(caller) + ":" + args[2]
-        numUnits, _ := strconv.Atoi(args[1])
-        if cc.fungibleAssetUnlockedCount[args[0]] < numUnits {
-            return shim.Error(fmt.Sprintf("Requested %d units of asset type %s; only %d available", numUnits, args[0], cc.fungibleAssetUnlockedCount[args[0]]))
+    if function == "LockFungibleAsset" {    // We are only going to lock once or twice in each unit test function, so bookkeeping doesn't need to be thorough
+        assetAgreement := &common.FungibleAssetAgreement{}
+        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        key := assetAgreement.Type + ":" + strconv.Itoa(int(assetAgreement.NumUnits))
+        val := string(caller) + ":" + assetAgreement.Recipient
+        if cc.fungibleAssetUnlockedCount[assetAgreement.Type] < int(assetAgreement.NumUnits) {
+            return shim.Error(fmt.Sprintf("Requested %d units of asset type %s; only %d available", assetAgreement.NumUnits, assetAgreement.Type, cc.fungibleAssetUnlockedCount[assetAgreement.Type]))
         }
         cc.fungibleAssetLockMap[key] = val
-        cc.fungibleAssetUnlockedCount[args[0]] = cc.fungibleAssetUnlockedCount[args[0]] - numUnits
+        cc.fungibleAssetUnlockedCount[assetAgreement.Type] = cc.fungibleAssetUnlockedCount[assetAgreement.Type] - int(assetAgreement.NumUnits)
         return shim.Success(nil)
     }
     if function == "IsAssetLocked" {
@@ -219,78 +222,6 @@ func associateInteropCCInstance(amcc *AssetManagement, stub *shimtest.MockStub) 
 
 
 // Unit test functions
-func TestAssetLockHTLC(t *testing.T) {
-    amcc, amstub := createAssetMgmtCCInstance()
-    assetType := "bond"
-    assetId := "A001"
-    newAssetId := "A002"
-    recipient := "Bob"
-    locker := clientId
-    hash := []byte("j8r484r484")
-    assetAgreement := &common.AssetAgreement {
-        Type: assetType,
-        Id: assetId,
-        Recipient: recipient,
-        Locker: locker,
-    }
-
-    // Test failure when interop CC is not set
-    lockSuccess, err := amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    associateInteropCCInstance(amcc, amstub)
-
-    // Test failures when any of the essential parameters are not supplied
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, "", assetId, recipient, hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, "", recipient, hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, "", hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, []byte{}, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    // Confirm that asset is not locked
-    lockSuccess, err = amcc.IsAssetLocked(amstub, assetAgreement)
-    require.NoError(t, err)
-    require.False(t, lockSuccess)
-
-    // Test success
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, 0)
-    require.NoError(t, err)
-    require.True(t, lockSuccess)
-
-    // Confirm that asset is locked
-    lockSuccess, err = amcc.IsAssetLocked(amstub, assetAgreement)
-    require.NoError(t, err)
-    require.True(t, lockSuccess)
-
-    // Test failure when we try to lock an already locked asset
-    currTime := time.Now()
-    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, expiryTime.UnixNano()/(1000*1000))
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    // Test success
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, newAssetId, recipient, hash, expiryTime.UnixNano()/(1000*1000))
-    require.NoError(t, err)
-    require.True(t, lockSuccess)
-
-    // Confirm that asset is locked
-    lockSuccess, err = amcc.IsAssetLocked(amstub, assetAgreement)
-    require.NoError(t, err)
-    require.True(t, lockSuccess)
-}
-
 func TestAssetLock(t *testing.T) {
     amcc, amstub := createAssetMgmtCCInstance()
     assetType := "bond"
@@ -397,88 +328,6 @@ func TestAssetLock(t *testing.T) {
 
     // Confirm that asset is locked
     lockSuccess, err = amcc.IsAssetLocked(amstub, assetAgreement)
-    require.NoError(t, err)
-    require.True(t, lockSuccess)
-}
-
-func TestFungibleAssetLockHTLC(t *testing.T) {
-    amcc, amstub := createAssetMgmtCCInstance()
-    assetType := "cbdc"
-    totalUnits := 10000
-    numUnits := 1000
-    recipient := "Bob"
-    locker := clientId
-    hash := []byte("j8r484r484")
-    assetAgreement := &common.FungibleAssetAgreement {
-        Type: assetType,
-        NumUnits: int32(numUnits),
-        Recipient: recipient,
-        Locker: locker,
-    }
-
-    // Test failure when interop CC is not set
-    lockSuccess, err := amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    associateInteropCCInstance(amcc, amstub)
-
-    // Test failures when any of the essential parameters are not supplied
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, "", numUnits, recipient, hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, -1, recipient, hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, "", hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, []byte{}, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    // Confirm that asset is not locked
-    lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, assetAgreement)
-    require.NoError(t, err)
-    require.False(t, lockSuccess)
-
-    // Test failure when there is no unit balance (total not declared yet)
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    // Test success
-    addSuccess, err := amcc.AddFungibleAssetCount(amstub, assetType, totalUnits)
-    require.NoError(t, err)
-    require.True(t, addSuccess)
-
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)
-    require.NoError(t, err)
-    require.True(t, lockSuccess)
-
-    // Confirm that asset is locked
-    lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, assetAgreement)
-    require.NoError(t, err)
-    require.True(t, lockSuccess)
-
-    // Test failure when there is insufficient unit balance for the requested units
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, totalUnits, recipient, hash, 0)
-    require.Error(t, err)
-    require.False(t, lockSuccess)
-
-    // Test success wih a different number of units
-    currTime := time.Now()
-    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, 2 * numUnits, recipient, hash, expiryTime.UnixNano()/(1000*1000))
-    require.NoError(t, err)
-    require.True(t, lockSuccess)
-
-    // Confirm that asset is locked
-    assetAgreement.NumUnits = int32(2 * numUnits)
-    lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, assetAgreement)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 }
@@ -618,6 +467,15 @@ func TestIsAssetLocked(t *testing.T) {
         Recipient: recipient,
         Locker: locker,
     }
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: 0,
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
+    }
 
     // Test failure when interop CC is not set
     lockSuccess, err := amcc.IsAssetLocked(amstub, assetAgreement)
@@ -668,7 +526,7 @@ func TestIsAssetLocked(t *testing.T) {
     require.False(t, lockSuccess)
 
     // Test success of query after asset is locked
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, 0)
+    lockSuccess, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -691,7 +549,7 @@ func TestIsAssetLocked(t *testing.T) {
     require.False(t, lockSuccess)
 
     // Test success of query after asset is locked and unlocked
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, 0)
+    lockSuccess, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -719,6 +577,15 @@ func TestIsFungibleAssetLocked(t *testing.T) {
         NumUnits: int32(numUnits),
         Recipient: recipient,
         Locker: locker,
+    }
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: 0,
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
     }
 
     // Test failure when interop CC is not set
@@ -774,7 +641,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     require.NoError(t, err)
     require.True(t, addSuccess)
 
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -801,7 +668,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     require.NoError(t, err)
     require.True(t, addSuccess)
 
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -827,6 +694,17 @@ func TestAssetUnlock(t *testing.T) {
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
+    }
+    currTime := time.Now()
+    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
     }
 
     // Test failure when interop CC is not set
@@ -867,9 +745,7 @@ func TestAssetUnlock(t *testing.T) {
 
     // Test success
     // First, lock an asset
-    currTime := time.Now()
-    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    lockSuccess, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -911,6 +787,17 @@ func TestFungibleAssetUnlock(t *testing.T) {
         NumUnits: int32(numUnits),
         Recipient: recipient,
         Locker: locker,
+    }
+    currTime := time.Now()
+    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
     }
 
     // Test failure when interop CC is not set
@@ -955,9 +842,7 @@ func TestFungibleAssetUnlock(t *testing.T) {
     require.NoError(t, err)
     require.True(t, addSuccess)
 
-    currTime := time.Now()
-    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1000,6 +885,17 @@ func TestAssetClaimHTLC(t *testing.T) {
         Recipient: recipient,
         Locker: locker,
     }
+    currTime := time.Now()
+    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
+    }
 
     // Test failure when interop CC is not set
     claimSuccess, err := amcc.ClaimAssetHTLC(amstub, assetType, assetId, locker, hashPreimage)
@@ -1037,9 +933,7 @@ func TestAssetClaimHTLC(t *testing.T) {
 
     // Test success
     // First, lock an asset
-    currTime := time.Now()
-    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    lockSuccess, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1196,6 +1090,17 @@ func TestFungibleAssetClaimHTLC(t *testing.T) {
         Recipient: recipient,
         Locker: locker,
     }
+    currTime := time.Now()
+    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
+    }
 
     // Test failure when interop CC is not set
     claimSuccess, err := amcc.ClaimFungibleAssetHTLC(amstub, assetType, numUnits, locker, hashPreimage)
@@ -1237,9 +1142,7 @@ func TestFungibleAssetClaimHTLC(t *testing.T) {
     require.NoError(t, err)
     require.True(t, addSuccess)
 
-    currTime := time.Now()
-    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1393,6 +1296,20 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     numUnits := 1000
     recipient := "Bob"
     hash := []byte("j8r484r484")
+    fungibleAssetAgreement := &common.FungibleAssetAgreement {
+        Type: assetType,
+        NumUnits: int32(numUnits),
+        Recipient: recipient,
+    }
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: 0,
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
+    }
 
     // Test failure when interop CC is not set
     addSuccess, err := amcc.AddFungibleAssetCount(amstub, assetType, totalUnits)
@@ -1438,7 +1355,7 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     require.Equal(t, unlockedCount, totalUnits)
 
     // Lock some units of an asset
-    lockSuccess, err := amcc.LockFungibleAssetHTLC(amstub, assetType, numUnits, recipient, hash, 0)
+    lockSuccess, err := amcc.LockFungibleAsset(amstub, fungibleAssetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1469,6 +1386,29 @@ func TestAssetListFunctions(t *testing.T) {
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
+    assetAgreement := &common.AssetAgreement {
+        Type: assetType,
+        Id: assetId,
+        Recipient: recipient,
+        Locker: locker,
+    }
+    fungibleAssetAgreement := &common.FungibleAssetAgreement {
+        Type: fungibleAssetType,
+        NumUnits: int32(numUnits),
+        Recipient: recipient,
+        Locker: locker,
+    }
+    currTime := time.Now()
+    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
+    }
 
     // Test failure when interop CC is not set
     getSuccess, err := amcc.GetAllLockedAssets(amstub, recipient, locker)
@@ -1523,9 +1463,7 @@ func TestAssetListFunctions(t *testing.T) {
     require.Equal(t, 0, len(getSuccess))
 
     // Lock an asset
-    currTime := time.Now()
-    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockSuccess, err := amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    lockSuccess, err := amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1539,7 +1477,8 @@ func TestAssetListFunctions(t *testing.T) {
     require.Equal(t, 1, len(getSuccess))
 
     // Lock another asset
-    lockSuccess, err = amcc.LockAssetHTLC(amstub, assetType, newAssetId, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    assetAgreement.Id = newAssetId
+    lockSuccess, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1558,7 +1497,7 @@ func TestAssetListFunctions(t *testing.T) {
     require.True(t, addSuccess)
 
     // Lock a fungible asset
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, fungibleAssetType, numUnits, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1572,7 +1511,8 @@ func TestAssetListFunctions(t *testing.T) {
     require.Equal(t, 1, len(getSuccess))
 
     // Lock more fungible asset
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, fungibleAssetType, 2 * numUnits, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    fungibleAssetAgreement.NumUnits = int32(2 * numUnits)
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1608,6 +1548,17 @@ func TestAssetTimeFunctions(t *testing.T) {
         Recipient: recipient,
         Locker: locker,
     }
+    currTime := time.Now()
+    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
+    lockInfoHTLC := &common.AssetLockHTLC {
+        Hash: hash,
+        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+    }
+    lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+    lockInfo := &common.AssetLock {
+        LockMechanism: common.LockMechanism_HTLC,
+        LockInfo: lockInfoBytes,
+    }
 
     // Test failure when interop CC is not set
     getSuccess, err := amcc.GetAssetTimeToRelease(amstub, assetAgreement)
@@ -1618,7 +1569,6 @@ func TestAssetTimeFunctions(t *testing.T) {
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
-    currTime := time.Now()
     endTime := currTime.Add(30 * time.Second)     // 30 seconds time window
     getListSuccess, err := amcc.GetAllAssetsLockedUntil(amstub, endTime.UnixNano()/(1000*1000))
     require.Error(t, err)
@@ -1692,8 +1642,7 @@ func TestAssetTimeFunctions(t *testing.T) {
     require.Equal(t, 0, len(getListSuccess))
 
     // Lock an asset
-    expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockSuccess, err := amcc.LockAssetHTLC(amstub, assetType, assetId, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    lockSuccess, err := amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1710,7 +1659,7 @@ func TestAssetTimeFunctions(t *testing.T) {
     require.True(t, addSuccess)
 
     // Lock a fungible asset
-    lockSuccess, err = amcc.LockFungibleAssetHTLC(amstub, fungibleAssetType, numUnits, recipient, hash, expiryTime.UnixNano()/(1000*1000))
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 

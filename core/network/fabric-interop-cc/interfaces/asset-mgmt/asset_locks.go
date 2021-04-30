@@ -69,29 +69,6 @@ func (am *AssetManagement) AddFungibleAssetCount(stub shim.ChaincodeStubInterfac
 }
 
 func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetAgreement, lockInfo *common.AssetLock) (bool, error) {
-    if (lockInfo.LockMechanism == common.LockMechanism_HTLC) {
-        lockInfoHTLC := &common.AssetLockHTLC{}
-        if len(lockInfo.LockInfo) == 0 {
-            log.Error("Empty lock info")
-            return false, fmt.Errorf("Empty lock info")
-        }
-        err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-        if err != nil {
-            log.Error(err.Error())
-            return false, err
-        }
-        if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-            log.Error("Only EPOCH time is supported at present")
-            return false, fmt.Errorf("Only EPOCH time is supported at present")
-        }
-        return am.LockAssetHTLC(stub, assetAgreement.Type, assetAgreement.Id, assetAgreement.Recipient, lockInfoHTLC.Hash, int64(lockInfoHTLC.ExpiryTimeMillis))
-    } else {
-        log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-    }
-}
-
-func (am *AssetManagement) LockAssetHTLC(stub shim.ChaincodeStubInterface, assetType string, assetId string, lockRecipient string, lockHash []byte, lockExpiryTimeMillis int64) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
@@ -100,61 +77,67 @@ func (am *AssetManagement) LockAssetHTLC(stub shim.ChaincodeStubInterface, asset
         return false, errors.New(errorMsg)
     }
 
-    if len(assetType) == 0 {
+    if (lockInfo.LockMechanism != common.LockMechanism_HTLC) {
+        log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+    }
+    lockInfoHTLC := &common.AssetLockHTLC{}
+    if len(lockInfo.LockInfo) == 0 {
+        log.Error("Empty lock info")
+        return false, fmt.Errorf("Empty lock info")
+    }
+    err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+        log.Error("Only EPOCH time is supported at present")
+        return false, fmt.Errorf("Only EPOCH time is supported at present")
+    }
+
+    if len(assetAgreement.Type) == 0 {
         errorMsg = "Empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(assetId) == 0 {
+    if len(assetAgreement.Id) == 0 {
         errorMsg = "Empty asset ID"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(lockRecipient) == 0 {
+    if len(assetAgreement.Recipient) == 0 {
         errorMsg = "Empty lock recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(lockHash) == 0 {
+    if len(lockInfoHTLC.Hash) == 0 {
         errorMsg = "Empty lock hash value"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockAssetHTLC"), []byte(assetType), []byte(assetId), []byte(lockRecipient), lockHash, []byte(strconv.FormatInt(lockExpiryTimeMillis, 10))}, "")
+    assetAgreementBytes, err := proto.Marshal(assetAgreement)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    lockInfoBytes, err := proto.Marshal(lockInfoHTLC)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockAsset"), assetAgreementBytes, lockInfoBytes}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, fmt.Errorf(string(iccResp.GetPayload()))
     }
-    lockExpiryTimeSec := lockExpiryTimeMillis/1000
-    lockExpiryTimeNano := (lockExpiryTimeMillis - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
-    fmt.Printf("Asset %s of type %s locked for %s until %+v\n", assetId, assetType, lockRecipient, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
+    lockExpiryTimeSec := int64(lockInfoHTLC.ExpiryTimeMillis)/1000
+    lockExpiryTimeNano := (int64(lockInfoHTLC.ExpiryTimeMillis) - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
+    fmt.Printf("Asset %s of type %s locked for %s until %+v\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Recipient, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
     return true, nil
 }
 
 func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetAgreement, lockInfo *common.AssetLock) (bool, error) {
-    if (lockInfo.LockMechanism == common.LockMechanism_HTLC) {
-        lockInfoHTLC := &common.AssetLockHTLC{}
-        if len(lockInfo.LockInfo) == 0 {
-            log.Error("Empty lock info")
-            return false, fmt.Errorf("Empty lock info")
-        }
-        err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-        if err != nil {
-            log.Error(err.Error())
-            return false, err
-        }
-        if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-            log.Error("Only EPOCH time is supported at present")
-            return false, fmt.Errorf("Only EPOCH time is supported at present")
-        }
-        return am.LockFungibleAssetHTLC(stub, assetAgreement.Type, int(assetAgreement.NumUnits), assetAgreement.Recipient, lockInfoHTLC.Hash, int64(lockInfoHTLC.ExpiryTimeMillis))
-    } else {
-        log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-    }
-}
-
-func (am *AssetManagement) LockFungibleAssetHTLC(stub shim.ChaincodeStubInterface, assetType string, numUnits int, lockRecipient string, lockHash []byte, lockExpiryTimeMillis int64) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
@@ -163,34 +146,63 @@ func (am *AssetManagement) LockFungibleAssetHTLC(stub shim.ChaincodeStubInterfac
         return false, errors.New(errorMsg)
     }
 
-    if len(assetType) == 0 {
+    if (lockInfo.LockMechanism != common.LockMechanism_HTLC) {
+        log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+    }
+    lockInfoHTLC := &common.AssetLockHTLC{}
+    if len(lockInfo.LockInfo) == 0 {
+        log.Error("Empty lock info")
+        return false, fmt.Errorf("Empty lock info")
+    }
+    err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+        log.Error("Only EPOCH time is supported at present")
+        return false, fmt.Errorf("Only EPOCH time is supported at present")
+    }
+
+    if len(assetAgreement.Type) == 0 {
         errorMsg = "Empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if numUnits <= 0 {
+    if assetAgreement.NumUnits <= 0 {
         errorMsg = "Invalid number of asset units"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(lockRecipient) == 0 {
+    if len(assetAgreement.Recipient) == 0 {
         errorMsg = "Empty lock recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(lockHash) == 0 {
+    if len(lockInfoHTLC.Hash) == 0 {
         errorMsg = "Empty lock hash value"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockFungibleAssetHTLC"), []byte(assetType), []byte(strconv.Itoa(numUnits)), []byte(lockRecipient), lockHash, []byte(strconv.FormatInt(lockExpiryTimeMillis, 10))}, "")
+    assetAgreementBytes, err := proto.Marshal(assetAgreement)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    lockInfoBytes, err := proto.Marshal(lockInfoHTLC)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockFungibleAsset"), assetAgreementBytes, lockInfoBytes}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, fmt.Errorf(string(iccResp.GetPayload()))
     }
-    lockExpiryTimeSec := lockExpiryTimeMillis/1000
-    lockExpiryTimeNano := (lockExpiryTimeMillis - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
-    fmt.Printf("%d units of asset type %s locked for %s until %+v\n", numUnits, assetType, lockRecipient, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
+    lockExpiryTimeSec := int64(lockInfoHTLC.ExpiryTimeMillis)/1000
+    lockExpiryTimeNano := (int64(lockInfoHTLC.ExpiryTimeMillis) - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
+    fmt.Printf("%d units of asset type %s locked for %s until %+v\n", assetAgreement.NumUnits, assetAgreement.Type, assetAgreement.Recipient, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
     return true, nil
 }
 
