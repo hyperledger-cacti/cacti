@@ -14,11 +14,13 @@ import {
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
+import { Containers } from "../common/containers";
 
 export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;
   containerImageName?: string;
   rpcApiHttpPort?: number;
+  rpcApiWsPort?: number;
   envVars?: string[];
   logLevel?: LogLevelDesc;
 }
@@ -27,6 +29,7 @@ export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "2021-01-08-7a055c3",
   containerImageName: "hyperledger/cactus-besu-all-in-one",
   rpcApiHttpPort: 8545,
+  rpcApiWsPort: 8546,
   envVars: ["BESU_NETWORK=dev"],
 });
 
@@ -48,6 +51,7 @@ export class BesuTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
   public readonly rpcApiHttpPort: number;
+  public readonly rpcApiWsPort: number;
   public readonly envVars: string[];
 
   private readonly log: Logger;
@@ -66,6 +70,8 @@ export class BesuTestLedger implements ITestLedger {
       BESU_TEST_LEDGER_DEFAULT_OPTIONS.containerImageName;
     this.rpcApiHttpPort =
       options.rpcApiHttpPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
+    this.rpcApiWsPort =
+      options.rpcApiWsPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort;
     this.envVars = options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
 
     this.validateConstructorOptions();
@@ -91,6 +97,14 @@ export class BesuTestLedger implements ITestLedger {
     const ipAddress = "127.0.0.1";
     const hostPort: number = await this.getRpcApiPublicPort();
     return `http://${ipAddress}:${hostPort}`;
+  }
+
+  public async getRpcApiWsHost(): Promise<string> {
+    const { rpcApiWsPort } = this;
+    const ipAddress = "127.0.0.1";
+    const containerInfo = await this.getContainerInfo();
+    const port = await Containers.getPublicPort(rpcApiWsPort, containerInfo);
+    return `ws://${ipAddress}:${port}`;
   }
 
   public async getFileContents(filePath: string): Promise<string> {
@@ -206,7 +220,7 @@ export class BesuTestLedger implements ITestLedger {
         {
           ExposedPorts: {
             [`${this.rpcApiHttpPort}/tcp`]: {}, // besu RPC - HTTP
-            "8546/tcp": {}, // besu RPC - WebSocket
+            [`${this.rpcApiWsPort}/tcp`]: {}, // besu RPC - WebSocket
             "8888/tcp": {}, // orion Client Port - HTTP
             "8080/tcp": {}, // orion Node Port - HTTP
             "9001/tcp": {}, // supervisord - HTTP
