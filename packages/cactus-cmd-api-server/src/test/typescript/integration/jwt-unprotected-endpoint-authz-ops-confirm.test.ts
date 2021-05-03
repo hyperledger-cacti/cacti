@@ -27,17 +27,18 @@ test(testCase, async (t: Test) => {
   try {
     const jwtKeyPair = await JWK.generate("RSA", 4096);
     const jwtPublicKey = jwtKeyPair.toPEM(false);
-    const middlewareOptions: expressJwt.Options = {
+    const expressJwtOptions: expressJwt.Options = {
       algorithms: ["RS256"],
       secret: jwtPublicKey,
       audience: uuidv4(),
       issuer: uuidv4(),
     };
-    t.ok(middlewareOptions, "Express JWT config truthy OK");
+    t.ok(expressJwtOptions, "Express JWT config truthy OK");
 
     const authorizationConfig: IAuthorizationConfig = {
       unprotectedEndpointExemptions: [],
-      middlewareOptions,
+      expressJwtOptions,
+      socketIoJwtOptions: { secret: jwtPublicKey },
     };
 
     const pluginRegistry = new PluginRegistry();

@@ -81,6 +81,19 @@ export interface MemoryUsage {
      */
     arrayBuffers?: number;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+export enum WatchHealthcheckV1 {
+    Subscribe = 'org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Subscribe',
+    Next = 'org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Next',
+    Unsubscribe = 'org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Unsubscribe',
+    Error = 'org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Error',
+    Complete = 'org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Complete'
+}
+
 
 /**
  * DefaultApi - axios parameter creator

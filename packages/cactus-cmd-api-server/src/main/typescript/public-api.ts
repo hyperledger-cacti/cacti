@@ -18,6 +18,10 @@ export {
 
 export * from "./generated/openapi/typescript-axios/index";
 
+export { ApiServerApiClient } from "./api-client/api-server-api-client";
+export { ApiServerApiClientConfiguration } from "./api-client/api-server-api-client";
+export { IApiServerApiClientOptions } from "./api-client/api-server-api-client";
+
 export { isHealthcheckResponse } from "./model/is-healthcheck-response-type-guard";
 export { isExpressJwtOptions } from "./authzn/is-express-jwt-options-type-guard";
 
