@@ -14,6 +14,11 @@ import compression from "compression";
 import bodyParser from "body-parser";
 import cors from "cors";
 
+import { Server as SocketIoServer } from "socket.io";
+import type { ServerOptions as SocketIoServerOptions } from "socket.io";
+import type { Socket as SocketIoSocket } from "socket.io";
+import { authorize as authorizeSocket } from "@thream/socketio-jwt";
+
 import {
   ICactusPlugin,
   isIPluginWebService,
@@ -21,6 +26,7 @@ import {
   IPluginFactoryOptions,
   PluginFactoryFactory,
   PluginImport,
+  Constants,
 } from "@hyperledger/cactus-core-api";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -33,9 +39,13 @@ import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { AuthorizerFactory } from "./authzn/authorizer-factory";
+import { WatchHealthcheckV1 } from "./generated/openapi/typescript-axios";
+import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-endpoint";
 export interface IApiServerConstructorOptions {
   pluginRegistry?: PluginRegistry;
   httpServerApi?: Server | SecureServer;
+  wsServerApi?: SocketIoServer;
+  wsOptions?: SocketIoServerOptions;
   httpServerCockpit?: Server | SecureServer;
   config: ICactusApiServerOptions;
   prometheusExporter?: PrometheusExporter;
@@ -58,6 +68,9 @@ export class ApiServer {
   private pluginRegistry: PluginRegistry | undefined;
   private readonly httpServerApi: Server | SecureServer;
   private readonly httpServerCockpit: Server | SecureServer;
+  private readonly wsApi: SocketIoServer;
+  private readonly expressApi: Application;
+  private readonly expressCockpit: Application;
   public prometheusExporter: PrometheusExporter;
 
   public get className(): string {
@@ -95,6 +108,10 @@ export class ApiServer {
     } else {
       this.httpServerCockpit = createServer();
     }
+
+    this.wsApi = new SocketIoServer();
+    this.expressApi = express();
+    this.expressCockpit = express();
 
     if (this.options.prometheusExporter) {
       this.prometheusExporter = this.options.prometheusExporter;
@@ -334,6 +351,7 @@ export class ApiServer {
   }
 
   async startCockpitFileServer(): Promise<AddressInfo> {
+    const { expressCockpit: app } = this;
     const cockpitWwwRoot = this.options.config.cockpitWwwRoot;
     this.log.info(`wwwRoot: ${cockpitWwwRoot}`);
 
@@ -372,7 +390,6 @@ export class ApiServer {
       },
     });
 
-    const app: Application = express();
     app.use("/api/v*", apiProxyMiddleware);
     app.use(compression());
     app.use(corsMiddleware);
@@ -406,6 +423,9 @@ export class ApiServer {
    * @param app
    */
   async getOrCreateWebServices(app: express.Application): Promise<void> {
+    const { log } = this;
+    const { logLevel } = this.options.config;
+
     const healthcheckHandler = (req: Request, res: Response) => {
       res.json({
         success: true,
@@ -418,6 +438,25 @@ export class ApiServer {
     const { http } = oasPath.get["x-hyperledger-cactus"];
     const { path: httpPath, verbLowerCase: httpVerb } = http;
     (app as any)[httpVerb](httpPath, healthcheckHandler);
+
+    this.wsApi.on("connection", (socket: SocketIoSocket) => {
+      const { id } = socket;
+      const transport = socket.conn.transport.name; // in most cases, "polling"
+      log.debug(`Socket connected. ID=${id} transport=%o`, transport);
+
+      socket.conn.on("upgrade", () => {
+        const upgradedTransport = socket.conn.transport.name; // in most cases, "websocket"
+        log.debug(`Socket upgraded ID=${id} transport=%o`, upgradedTransport);
+      });
+
+      socket.on(WatchHealthcheckV1.Subscribe, () =>
+        new WatchHealthcheckV1Endpoint({
+          process,
+          socket,
+          logLevel,
+        }).subscribe(),
+      );
+    });
 
     const prometheusExporterHandler = (req: Request, res: Response) => {
       this.getPrometheusExporterMetrics().then((resBody) => {
@@ -443,7 +482,7 @@ export class ApiServer {
   }
 
   async startApiServer(): Promise<AddressInfo> {
-    const { options } = this;
+    const { options, expressApi: app, wsApi } = this;
     const { config } = options;
     const {
       authorizationConfigJson: authzConf,
@@ -454,7 +493,6 @@ export class ApiServer {
 
     const pluginRegistry = await this.getOrInitPluginRegistry();
 
-    const app: Application = express();
     app.use(compression());
 
     const apiCorsDomainCsv = this.options.config.apiCorsDomainCsv;
@@ -490,7 +528,7 @@ export class ApiServer {
       .map(async (plugin: ICactusPlugin) => {
         const p = plugin as IPluginWebService;
         await p.getOrCreateWebServices();
-        const webSvcs = await p.registerWebServices(app, null as any);
+        const webSvcs = await p.registerWebServices(app, wsApi);
         return webSvcs;
       });
 
@@ -517,6 +555,23 @@ export class ApiServer {
     // so the casting here should be safe. Famous last words... I know.
     const addressInfo = this.httpServerApi.address() as AddressInfo;
     this.log.info(`Cactus API net.AddressInfo`, addressInfo);
+
+    const wsOptions = {
+      path: Constants.SocketIoConnectionPathV1,
+      serveClient: false,
+      ...this.options.wsOptions,
+    } as SocketIoServerOptions;
+
+    this.wsApi.attach(this.httpServerApi, wsOptions);
+
+    const socketIoAuthorizer = authorizeSocket({
+      ...authzConf.socketIoJwtOptions,
+      onAuthentication: (decodedToken) => {
+        this.log.debug("Socket authorized OK: %o", decodedToken);
+      },
+    });
+
+    this.wsApi.use(socketIoAuthorizer);
 
     return addressInfo;
   }

@@ -38,26 +38,29 @@ test(testCase, async (t: Test) => {
 
     const jwtKeyPair = await JWK.generate("RSA", 4096);
     const jwtPublicKey = jwtKeyPair.toPEM(false);
-    const middlewareOptions: expressJwt.Options = {
+    const expressJwtOptions: expressJwt.Options = {
       algorithms: ["RS256"],
       secret: jwtPublicKey,
       audience: uuidv4(),
       issuer: uuidv4(),
     };
-    t.ok(middlewareOptions, "Express JWT config truthy OK");
+    t.ok(expressJwtOptions, "Express JWT config truthy OK");
 
     const jwtPayload = { name: "Peter", location: "London" };
     const jwtSignOptions: JWT.SignOptions = {
       algorithm: "RS256",
-      issuer: middlewareOptions.issuer,
-      audience: middlewareOptions.audience,
+      issuer: expressJwtOptions.issuer,
+      audience: expressJwtOptions.audience,
     };
     const tokenGood = JWT.sign(jwtPayload, jwtKeyPair, jwtSignOptions);
     // const tokenBad = JWT.sign(jwtPayload, jwtKeyPair);
 
     const authorizationConfig: IAuthorizationConfig = {
       unprotectedEndpointExemptions: [],
-      middlewareOptions,
+      expressJwtOptions,
+      socketIoJwtOptions: {
+        secret: jwtPublicKey,
+      },
     };
 
     const configService = new ConfigService();

@@ -70,7 +70,10 @@
         "ealen",
         "approveformyorg",
         "jboss",
-        "Sprintf"
+        "Sprintf",
+        "thream",
+        "socketio",
+        "Albertirsa"
     ],
     "dictionaries": [
         "typescript,node,npm,go"

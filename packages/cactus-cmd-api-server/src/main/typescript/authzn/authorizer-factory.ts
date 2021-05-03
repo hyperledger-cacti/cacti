@@ -76,20 +76,29 @@ export class AuthorizerFactory {
     authzConf: IAuthorizationConfig,
   ): Promise<RequestHandler> {
     const fnTag = `${this.className}#createExpressJwtMiddleware()`;
+    const { log } = this;
     const { E_BAD_EXPRESS_JWT_OPTIONS } = AuthorizerFactory;
-    const { middlewareOptions } = authzConf;
-    if (!isExpressJwtOptions(middlewareOptions)) {
+    const { expressJwtOptions, socketIoPath } = authzConf;
+    if (!isExpressJwtOptions(expressJwtOptions)) {
       throw new Error(`${fnTag}: ${E_BAD_EXPRESS_JWT_OPTIONS}`);
     }
 
     const options: expressJwt.Options = {
       audience: "org.hyperledger.cactus", // default that can be overridden
-      ...middlewareOptions,
+      ...expressJwtOptions,
     };
     const unprotectedEndpoints = this.unprotectedEndpoints.map((e) => {
       // type pathFilter = string | RegExp | { url: string | RegExp, methods?: string[], method?: string | string[] };
       return { url: e.getPath(), method: e.getVerbLowerCase() };
     });
+    if (socketIoPath) {
+      log.info("SocketIO path configuration detected: %o", socketIoPath);
+      // const exemption = { url: new RegExp(`${socketIoPath}.*`), method: "get" };
+      // unprotectedEndpoints.push(exemption as any);
+      log.info(
+        "Exempted SocketIO path from express-jwt authorization. Using @thream/socketio-jwt instead)",
+      );
+    }
     return expressJwt(options).unless({ path: unprotectedEndpoints });
   }
 

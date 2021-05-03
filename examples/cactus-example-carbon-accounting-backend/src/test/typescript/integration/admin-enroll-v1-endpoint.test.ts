@@ -46,13 +46,14 @@ test("BEFORE " + testCase, async (t: Test) => {
 test(testCase, async (t: Test) => {
   const jwtKeyPair = await JWK.generate("RSA", 4096);
   const jwtPublicKey = jwtKeyPair.toPEM(false);
-  const middlewareOptions: expressJwt.Options = {
+  const expressJwtOptions: expressJwt.Options = {
     algorithms: ["RS256"],
     secret: jwtPublicKey,
     audience: "carbon-accounting-tool-servers-hostname-here",
     issuer: uuidv4(),
   };
-  t.ok(middlewareOptions, "Express JWT config truthy OK");
+  t.ok(expressJwtOptions, "Express JWT config truthy OK");
+  const socketIoJwtOptions = { secret: jwtPublicKey };
 
   const httpGui = await Servers.startOnPreferredPort(3000);
   t.true(httpGui.listening, `httpGui.listening === true`);
@@ -67,7 +68,8 @@ test(testCase, async (t: Test) => {
 
   const authorizationConfig: IAuthorizationConfig = {
     unprotectedEndpointExemptions: [],
-    middlewareOptions,
+    expressJwtOptions,
+    socketIoJwtOptions,
   };
 
   const configService = new ConfigService();
@@ -109,8 +111,8 @@ test(testCase, async (t: Test) => {
   };
   const jwtSignOptions: JWT.SignOptions = {
     algorithm: "RS256",
-    issuer: middlewareOptions.issuer,
-    audience: middlewareOptions.audience,
+    issuer: expressJwtOptions.issuer,
+    audience: expressJwtOptions.audience,
   };
   const tokenWithScope = JWT.sign(jwtPayload, jwtKeyPair, jwtSignOptions);
   const verification = JWT.verify(tokenWithScope, jwtKeyPair, jwtSignOptions);
