@@ -101,7 +101,7 @@
     "express-jwt-authz": "2.4.1",
     "express-openapi-validator": "3.10.0",
     "http-status-codes": "2.1.4",
-    "jose": "1.27.2",
+    "jose": "1.28.1",
     "node-forge": "0.10.0",
     "npm": "7.8.0",
     "prom-client": "13.1.0",
