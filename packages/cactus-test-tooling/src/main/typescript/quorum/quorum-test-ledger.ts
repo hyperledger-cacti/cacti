@@ -171,7 +171,7 @@ export class QuorumTestLedger implements ITestLedger {
     return { publicKey, privateKey };
   }
 
-  public async start(): Promise<Container> {
+  public async start(omitPull = false): Promise<Container> {
     const containerNameAndTag = this.getContainerImageName();
 
     if (this.container) {
@@ -180,7 +180,9 @@ export class QuorumTestLedger implements ITestLedger {
     }
     const docker = new Docker();
 
-    await this.pullContainerImage(containerNameAndTag);
+    if (!omitPull) {
+      await this.pullContainerImage(containerNameAndTag);
+    }
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
