@@ -20,11 +20,6 @@ import (
 )
 
 
-const(
-    defaultTimeLockMillis = 5 * 60 * 1000      // 5 minutes
-)
-
-
 // AssetManagement provides functions to manage asset locks by calling suitable functions in the interop contract
 type AssetManagement struct {
     shim.Chaincode
