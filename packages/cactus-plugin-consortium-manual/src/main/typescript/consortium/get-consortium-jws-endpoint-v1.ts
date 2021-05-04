@@ -75,19 +75,19 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
   public getOperationId(): string {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
-    ].get.operationId;
+    ].post.operationId;
   }
 
   public getPath(): string {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
-    ].get["x-hyperledger-cactus"].http.path;
+    ].post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
-    ].get["x-hyperledger-cactus"].http.verbLowerCase;
+    ].post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public async registerExpress(
@@ -99,7 +99,7 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
 
   async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "GetConsortiumJwsEndpointV1#handleRequest()";
-    this.log.debug(`GET ${this.getPath()}`);
+    this.log.debug(`POST ${this.getPath()}`);
 
     try {
       const jws = await this.options.plugin.getConsortiumJws();
