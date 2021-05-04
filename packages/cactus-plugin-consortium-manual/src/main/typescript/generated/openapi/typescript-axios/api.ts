@@ -99,10 +99,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * The JWS asserting the consortium metadata (pub keys and hosts of nodes)
          * @summary Retrieves a consortium JWS
+         * @param {object} [body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getConsortiumJws: async (options: any = {}): Promise<RequestArgs> => {
+        getConsortiumJws: async (body?: object, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -110,12 +111,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             const query = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
                 query.set(key, localVarQueryParameter[key]);
@@ -126,6 +129,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             localVarUrlObj.search = (new URLSearchParams(query)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -135,10 +140,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Retrieves the JWT of a Cactus Node
+         * @param {object} [body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getNodeJws: async (options: any = {}): Promise<RequestArgs> => {
+        getNodeJws: async (body?: object, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -146,12 +152,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             const query = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
                 query.set(key, localVarQueryParameter[key]);
@@ -162,6 +170,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             localVarUrlObj.search = (new URLSearchParams(query)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -216,11 +226,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * The JWS asserting the consortium metadata (pub keys and hosts of nodes)
          * @summary Retrieves a consortium JWS
+         * @param {object} [body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getConsortiumJws(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetConsortiumJwsResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getConsortiumJws(options);
+        async getConsortiumJws(body?: object, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetConsortiumJwsResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getConsortiumJws(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -229,11 +240,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Retrieves the JWT of a Cactus Node
+         * @param {object} [body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getNodeJws(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetNodeJwsResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getNodeJws(options);
+        async getNodeJws(body?: object, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetNodeJwsResponse>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getNodeJws(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -264,20 +276,22 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * The JWS asserting the consortium metadata (pub keys and hosts of nodes)
          * @summary Retrieves a consortium JWS
+         * @param {object} [body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getConsortiumJws(options?: any): AxiosPromise<GetConsortiumJwsResponse> {
-            return DefaultApiFp(configuration).getConsortiumJws(options).then((request) => request(axios, basePath));
+        getConsortiumJws(body?: object, options?: any): AxiosPromise<GetConsortiumJwsResponse> {
+            return DefaultApiFp(configuration).getConsortiumJws(body, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Retrieves the JWT of a Cactus Node
+         * @param {object} [body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getNodeJws(options?: any): AxiosPromise<GetNodeJwsResponse> {
-            return DefaultApiFp(configuration).getNodeJws(options).then((request) => request(axios, basePath));
+        getNodeJws(body?: object, options?: any): AxiosPromise<GetNodeJwsResponse> {
+            return DefaultApiFp(configuration).getNodeJws(body, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -301,23 +315,25 @@ export class DefaultApi extends BaseAPI {
     /**
      * The JWS asserting the consortium metadata (pub keys and hosts of nodes)
      * @summary Retrieves a consortium JWS
+     * @param {object} [body] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getConsortiumJws(options?: any) {
-        return DefaultApiFp(this.configuration).getConsortiumJws(options).then((request) => request(this.axios, this.basePath));
+    public getConsortiumJws(body?: object, options?: any) {
+        return DefaultApiFp(this.configuration).getConsortiumJws(body, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Retrieves the JWT of a Cactus Node
+     * @param {object} [body] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getNodeJws(options?: any) {
-        return DefaultApiFp(this.configuration).getNodeJws(options).then((request) => request(this.axios, this.basePath));
+    public getNodeJws(body?: object, options?: any) {
+        return DefaultApiFp(this.configuration).getNodeJws(body, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

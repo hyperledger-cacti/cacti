@@ -77,17 +77,17 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return this.getOasPath().get.operationId;
+    return this.getOasPath().post.operationId;
   }
 
   public getPath(): string {
     const oasPath = this.getOasPath();
-    return oasPath.get["x-hyperledger-cactus"].http.path;
+    return oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const oasPath = this.getOasPath();
-    return oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public async registerExpress(
