@@ -525,7 +525,7 @@ func TestIsAssetLocked(t *testing.T) {
     assetAgreement.Recipient = recipient
     assetAgreement.Locker = "Somebody"
     lockSuccess, err = amcc.IsAssetLocked(amstub, assetAgreement)        // Neither locker nor recipient is the caller
-    require.Error(t, err)
+    require.NoError(t, err)
     require.False(t, lockSuccess)
 
     // Test success of query when no asset is locked
@@ -644,7 +644,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     assetAgreement.Recipient = recipient
     assetAgreement.Locker = "Somebody"
     lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, assetAgreement)        // Neither locker nor recipient is the caller
-    require.Error(t, err)
+    require.NoError(t, err)
     require.False(t, lockSuccess)
 
     // Test success of query when no asset is locked
