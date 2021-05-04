@@ -39,18 +39,18 @@ func (am *AssetManagement) AddFungibleAssetCount(stub shim.ChaincodeStubInterfac
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if len(assetType) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if numUnits <= 0 {
-        errorMsg = "Invalid number of asset units"
+        errorMsg = "invalid number of asset units"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -63,23 +63,23 @@ func (am *AssetManagement) AddFungibleAssetCount(stub shim.ChaincodeStubInterfac
     return true, nil
 }
 
-func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetAgreement, lockInfo *common.AssetLock) (bool, error) {
+func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement, lockInfo *common.AssetLock) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if (lockInfo.LockMechanism != common.LockMechanism_HTLC) {
-        log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        log.Errorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        return false, fmt.Errorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
     }
     lockInfoHTLC := &common.AssetLockHTLC{}
     if len(lockInfo.LockInfo) == 0 {
-        log.Error("Empty lock info")
-        return false, fmt.Errorf("Empty lock info")
+        log.Error("empty lock info")
+        return false, fmt.Errorf("empty lock info")
     }
     err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
     if err != nil {
@@ -87,27 +87,27 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgre
         return false, err
     }
     if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-        log.Error("Only EPOCH time is supported at present")
-        return false, fmt.Errorf("Only EPOCH time is supported at present")
+        log.Error("only EPOCH time is supported at present")
+        return false, fmt.Errorf("only EPOCH time is supported at present")
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Id) == 0 {
-        errorMsg = "Empty asset ID"
+        errorMsg = "empty asset ID"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Recipient) == 0 {
-        errorMsg = "Empty lock recipient"
+        errorMsg = "empty lock recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(lockInfoHTLC.Hash) == 0 {
-        errorMsg = "Empty lock hash value"
+        errorMsg = "empty lock hash value"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -126,29 +126,27 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgre
     if iccResp.GetStatus() != shim.OK {
         return false, fmt.Errorf(string(iccResp.GetPayload()))
     }
-    lockExpiryTimeSec := int64(lockInfoHTLC.ExpiryTimeMillis)/1000
-    lockExpiryTimeNano := (int64(lockInfoHTLC.ExpiryTimeMillis) - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
-    fmt.Printf("Asset %s of type %s locked for %s until %+v\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Recipient, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
+    fmt.Printf("Asset %s of type %s locked for %s until %+v\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Recipient, time.Unix(int64(lockInfoHTLC.ExpiryTimeSecs), 0))
     return true, nil
 }
 
-func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetAgreement, lockInfo *common.AssetLock) (bool, error) {
+func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetExchangeAgreement, lockInfo *common.AssetLock) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if (lockInfo.LockMechanism != common.LockMechanism_HTLC) {
-        log.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        log.Errorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
+        return false, fmt.Errorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
     }
     lockInfoHTLC := &common.AssetLockHTLC{}
     if len(lockInfo.LockInfo) == 0 {
-        log.Error("Empty lock info")
-        return false, fmt.Errorf("Empty lock info")
+        log.Error("empty lock info")
+        return false, fmt.Errorf("empty lock info")
     }
     err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
     if err != nil {
@@ -156,27 +154,27 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
         return false, err
     }
     if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-        log.Error("Only EPOCH time is supported at present")
-        return false, fmt.Errorf("Only EPOCH time is supported at present")
+        log.Error("only EPOCH time is supported at present")
+        return false, fmt.Errorf("only EPOCH time is supported at present")
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if assetAgreement.NumUnits <= 0 {
-        errorMsg = "Invalid number of asset units"
+        errorMsg = "invalid number of asset units"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Recipient) == 0 {
-        errorMsg = "Empty lock recipient"
+        errorMsg = "empty lock recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(lockInfoHTLC.Hash) == 0 {
-        errorMsg = "Empty lock hash value"
+        errorMsg = "empty lock hash value"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -195,29 +193,27 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
     if iccResp.GetStatus() != shim.OK {
         return false, fmt.Errorf(string(iccResp.GetPayload()))
     }
-    lockExpiryTimeSec := int64(lockInfoHTLC.ExpiryTimeMillis)/1000
-    lockExpiryTimeNano := (int64(lockInfoHTLC.ExpiryTimeMillis) - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
-    fmt.Printf("%d units of asset type %s locked for %s until %+v\n", assetAgreement.NumUnits, assetAgreement.Type, assetAgreement.Recipient, time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
+    fmt.Printf("%d units of asset type %s locked for %s until %+v\n", assetAgreement.NumUnits, assetAgreement.Type, assetAgreement.Recipient, time.Unix(int64(lockInfoHTLC.ExpiryTimeSecs), 0))
     return true, nil
 }
 
 // If 'assetAgreement.Locker' or 'assetAgreement.Recipient' is blank, assume it's the caller
-func (am *AssetManagement) IsAssetLocked(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetAgreement) (bool, error) {
+func (am *AssetManagement) IsAssetLocked(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement) (bool, error) {
     var infoMsg, errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Id) == 0 {
-        errorMsg = "Empty asset ID"
+        errorMsg = "empty asset ID"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -228,22 +224,22 @@ func (am *AssetManagement) IsAssetLocked(stub shim.ChaincodeStubInterface, asset
     }
     myself := string(myselfBytes)
     if len(assetAgreement.Recipient) == 0 {
-        infoMsg = "Empty lock recipient; assuming caller"
+        infoMsg = "empty lock recipient; assuming caller"
         log.Info(infoMsg)
         assetAgreement.Recipient = myself
     }
     if len(assetAgreement.Locker) == 0 {
-        infoMsg = "Empty locker; assuming caller"
+        infoMsg = "empty locker; assuming caller"
         log.Info(infoMsg)
         assetAgreement.Locker = myself
     }
     if assetAgreement.Recipient == assetAgreement.Locker {
-        errorMsg = "Invalid query: locker identical to recipient"
+        errorMsg = "invalid query: locker identical to recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if assetAgreement.Recipient != myself && assetAgreement.Locker != myself {
-        errorMsg = "Query not permitted, as caller is neither locker nor recipient"
+        errorMsg = "query not permitted, as caller is neither locker nor recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -262,22 +258,22 @@ func (am *AssetManagement) IsAssetLocked(stub shim.ChaincodeStubInterface, asset
 }
 
 // If 'assetAgreement.Locker' or 'assetAgreement.Recipient' is blank, assume it's the caller
-func (am *AssetManagement) IsFungibleAssetLocked(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetAgreement) (bool, error) {
+func (am *AssetManagement) IsFungibleAssetLocked(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetExchangeAgreement) (bool, error) {
     var infoMsg, errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if assetAgreement.NumUnits <= 0 {
-        errorMsg = "Invalid number of asset units"
+        errorMsg = "invalid number of asset units"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -288,22 +284,22 @@ func (am *AssetManagement) IsFungibleAssetLocked(stub shim.ChaincodeStubInterfac
     }
     myself := string(myselfBytes)
     if len(assetAgreement.Recipient) == 0 {
-        infoMsg = "Empty lock recipient; assuming caller"
+        infoMsg = "empty lock recipient; assuming caller"
         log.Info(infoMsg)
         assetAgreement.Recipient = myself
     }
     if len(assetAgreement.Locker) == 0 {
-        infoMsg = "Empty locker; assuming caller"
+        infoMsg = "empty locker; assuming caller"
         log.Info(infoMsg)
         assetAgreement.Locker = myself
     }
     if assetAgreement.Recipient == assetAgreement.Locker {
-        errorMsg = "Invalid query: locker identical to recipient"
+        errorMsg = "invalid query: locker identical to recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if assetAgreement.Recipient != myself && assetAgreement.Locker != myself {
-        errorMsg = "Query not permitted, as caller is neither locker nor recipient"
+        errorMsg = "query not permitted, as caller is neither locker nor recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -321,23 +317,23 @@ func (am *AssetManagement) IsFungibleAssetLocked(stub shim.ChaincodeStubInterfac
     return isLocked, nil
 }
 
-func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetAgreement, claimInfo *common.AssetClaim) (bool, error) {
+func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement, claimInfo *common.AssetClaim) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if (claimInfo.LockMechanism != common.LockMechanism_HTLC) {
-        log.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+        log.Errorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+        return false, fmt.Errorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
     }
     claimInfoHTLC := &common.AssetClaimHTLC{}
     if len(claimInfo.ClaimInfo) == 0 {
-        log.Error("Empty claim info")
-        return false, fmt.Errorf("Empty claim info")
+        log.Error("empty claim info")
+        return false, fmt.Errorf("empty claim info")
     }
     err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
     if err != nil {
@@ -346,22 +342,22 @@ func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgr
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Id) == 0 {
-        errorMsg = "Empty asset ID"
+        errorMsg = "empty asset ID"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Locker) == 0 {
-        errorMsg = "Empty locker"
+        errorMsg = "empty locker"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(claimInfoHTLC.HashPreimage) == 0 {
-        errorMsg = "Empty lock hash preimage"
+        errorMsg = "empty lock hash preimage"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -384,23 +380,23 @@ func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgr
     return true, nil
 }
 
-func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetAgreement, claimInfo *common.AssetClaim) (bool, error) {
+func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetExchangeAgreement, claimInfo *common.AssetClaim) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if (claimInfo.LockMechanism != common.LockMechanism_HTLC) {
-        log.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
-        return false, fmt.Errorf("Unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+        log.Errorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
+        return false, fmt.Errorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
     }
     claimInfoHTLC := &common.AssetClaimHTLC{}
     if len(claimInfo.ClaimInfo) == 0 {
-        log.Error("Empty claim info")
-        return false, fmt.Errorf("Empty claim info")
+        log.Error("empty claim info")
+        return false, fmt.Errorf("empty claim info")
     }
     err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
     if err != nil {
@@ -409,22 +405,22 @@ func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, 
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if assetAgreement.NumUnits <= 0 {
-        errorMsg = "Invalid number of asset units"
+        errorMsg = "invalid number of asset units"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Locker) == 0 {
-        errorMsg = "Empty locker"
+        errorMsg = "empty locker"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(claimInfoHTLC.HashPreimage) == 0 {
-        errorMsg = "Empty lock hash preimage"
+        errorMsg = "empty lock hash preimage"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -447,27 +443,27 @@ func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, 
     return true, nil
 }
 
-func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetAgreement) (bool, error) {
+func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Id) == 0 {
-        errorMsg = "Empty asset ID"
+        errorMsg = "empty asset ID"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Recipient) == 0 {
-        errorMsg = "Empty lock recipient"
+        errorMsg = "empty lock recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -480,27 +476,27 @@ func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetAg
     return true, nil
 }
 
-func (am *AssetManagement) UnlockFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetAgreement) (bool, error) {
+func (am *AssetManagement) UnlockFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetExchangeAgreement) (bool, error) {
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if assetAgreement.NumUnits <= 0 {
-        errorMsg = "Invalid number of asset units"
+        errorMsg = "invalid number of asset units"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
     if len(assetAgreement.Recipient) == 0 {
-        errorMsg = "Empty lock recipient"
+        errorMsg = "empty lock recipient"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
@@ -520,13 +516,13 @@ func (am *AssetManagement) GetTotalFungibleAssetCount(stub shim.ChaincodeStubInt
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
 
     if len(assetType) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
@@ -548,13 +544,13 @@ func (am *AssetManagement) GetUnlockedFungibleAssetCount(stub shim.ChaincodeStub
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
 
     if len(assetType) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
@@ -576,13 +572,13 @@ func (am *AssetManagement) GetTotalFungibleLockedAssets(stub shim.ChaincodeStubI
     var errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
 
     if len(assetType) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
@@ -607,7 +603,7 @@ func (am *AssetManagement) GetAllLockedAssetsFunc(stub shim.ChaincodeStubInterfa
     var assets []string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return []string{}, errors.New(errorMsg)
     }
@@ -619,22 +615,22 @@ func (am *AssetManagement) GetAllLockedAssetsFunc(stub shim.ChaincodeStubInterfa
     }
     myself := string(myselfBytes)
     if len(lockRecipient) == 0 {
-        infoMsg = "Empty lock recipient; assuming caller"
+        infoMsg = "empty lock recipient; assuming caller"
         log.Info(infoMsg)
         lockRecipient = myself
     }
     if len(locker) == 0 {
-        infoMsg = "Empty locker; assuming caller"
+        infoMsg = "empty locker; assuming caller"
         log.Info(infoMsg)
         locker = myself
     }
     if lockRecipient == locker {
-        errorMsg = "Invalid query: locker identical to recipient"
+        errorMsg = "invalid query: locker identical to recipient"
         log.Error(errorMsg)
         return []string{}, errors.New(errorMsg)
     }
     if lockRecipient != myself && locker != myself {
-        errorMsg = "Query not permitted, as caller is neither locker nor recipient"
+        errorMsg = "query not permitted, as caller is neither locker nor recipient"
         log.Error(errorMsg)
         return []string{}, errors.New(errorMsg)
     }
@@ -666,22 +662,22 @@ func (am *AssetManagement) GetAllFungibleLockedAssets(stub shim.ChaincodeStubInt
 
 // 'lockRecipient': if blank, assume caller
 // 'locker': if blank, assume caller
-func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetAgreement) (int64, error) {
+func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement) (int64, error) {
     var infoMsg, errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
     if len(assetAgreement.Id) == 0 {
-        errorMsg = "Empty asset ID"
+        errorMsg = "empty asset ID"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
@@ -692,22 +688,22 @@ func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterfac
     }
     myself := string(myselfBytes)
     if len(assetAgreement.Recipient) == 0 {
-        infoMsg = "Empty lock recipient; assuming caller"
+        infoMsg = "empty lock recipient; assuming caller"
         log.Info(infoMsg)
         assetAgreement.Recipient = myself
     }
     if len(assetAgreement.Locker) == 0 {
-        infoMsg = "Empty locker; assuming caller"
+        infoMsg = "empty locker; assuming caller"
         log.Info(infoMsg)
         assetAgreement.Locker = myself
     }
     if assetAgreement.Recipient == assetAgreement.Locker {
-        errorMsg = "Invalid query: locker identical to recipient"
+        errorMsg = "invalid query: locker identical to recipient"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
     if assetAgreement.Recipient != myself && assetAgreement.Locker != myself {
-        errorMsg = "Query not permitted, as caller is neither locker nor recipient"
+        errorMsg = "query not permitted, as caller is neither locker nor recipient"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
@@ -729,22 +725,22 @@ func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterfac
 
 // 'lockRecipient': if blank, assume caller
 // 'locker': if blank, assume caller
-func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetAgreement) (int64, error) {
+func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetExchangeAgreement) (int64, error) {
     var infoMsg, errorMsg string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
 
     if len(assetAgreement.Type) == 0 {
-        errorMsg = "Empty asset type"
+        errorMsg = "empty asset type"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
     if assetAgreement.NumUnits <= 0 {
-        errorMsg = "Invalid number of asset units"
+        errorMsg = "invalid number of asset units"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
@@ -755,22 +751,22 @@ func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStub
     }
     myself := string(myselfBytes)
     if len(assetAgreement.Recipient) == 0 {
-        infoMsg = "Empty lock recipient; assuming caller"
+        infoMsg = "empty lock recipient; assuming caller"
         log.Info(infoMsg)
         assetAgreement.Recipient = myself
     }
     if len(assetAgreement.Locker) == 0 {
-        infoMsg = "Empty locker; assuming caller"
+        infoMsg = "empty locker; assuming caller"
         log.Info(infoMsg)
         assetAgreement.Locker = myself
     }
     if assetAgreement.Recipient == assetAgreement.Locker {
-        errorMsg = "Invalid query: locker identical to recipient"
+        errorMsg = "invalid query: locker identical to recipient"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
     if assetAgreement.Recipient != myself && assetAgreement.Locker != myself {
-        errorMsg = "Query not permitted, as caller is neither locker nor recipient"
+        errorMsg = "query not permitted, as caller is neither locker nor recipient"
         log.Error(errorMsg)
         return -1, errors.New(errorMsg)
     }
@@ -791,22 +787,22 @@ func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStub
 }
 
 // Assumption is that the caller is either the recipient or the locker in each element in the list, but we will let the interop CC take care of it
-func (am *AssetManagement) GetAllAssetsLockedUntil(stub shim.ChaincodeStubInterface, lockExpiryTimeMillis int64) ([]string, error) {
+func (am *AssetManagement) GetAllAssetsLockedUntil(stub shim.ChaincodeStubInterface, lockExpiryTimeSecs int64) ([]string, error) {
     var errorMsg string
     var assets []string
 
     if len(am.interopChaincodeId) == 0 {
-        errorMsg = "Interoperation chaincode ID not set. Run the 'Configure(...) function first."
+        errorMsg = "interoperation chaincode ID not set. Run the 'Configure(...)' function first."
         log.Error(errorMsg)
         return []string{}, errors.New(errorMsg)
     }
 
-    if lockExpiryTimeMillis <= 0 {
-        errorMsg = "Invalid expiry time"
+    if lockExpiryTimeSecs <= 0 {
+        errorMsg = "invalid expiry time"
         log.Error(errorMsg)
         return []string{}, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetAllAssetsLockedUntil"), []byte(strconv.FormatInt(lockExpiryTimeMillis, 10))}, "")
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetAllAssetsLockedUntil"), []byte(strconv.FormatInt(lockExpiryTimeSecs, 10))}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return []string{}, fmt.Errorf(string(iccResp.GetPayload()))
@@ -816,8 +812,6 @@ func (am *AssetManagement) GetAllAssetsLockedUntil(stub shim.ChaincodeStubInterf
         log.Error(err.Error())
         return []string{}, err
     }
-    lockExpiryTimeSec := lockExpiryTimeMillis/1000
-    lockExpiryTimeNano := (lockExpiryTimeMillis - (lockExpiryTimeSec * 1000)) * (1000 * 1000)     // Convert milliseconds to nanoseconds
-    fmt.Printf("Obtained info for %d assets locked until %+v\n", len(assets), time.Unix(lockExpiryTimeSec, lockExpiryTimeNano))
+    fmt.Printf("Obtained info for %d assets locked until %+v\n", len(assets), time.Unix(lockExpiryTimeSecs, 0))
     return assets, nil
 }

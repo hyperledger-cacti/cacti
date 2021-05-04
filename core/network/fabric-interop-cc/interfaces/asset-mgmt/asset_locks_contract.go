@@ -35,10 +35,10 @@ func (amc *AssetManagementContract) AddFungibleAssetCount(ctx contractapi.Transa
 }
 
 func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto, lockInfoSerializedProto string) (bool, error) {
-    assetAgreement := &common.AssetAgreement{}
+    assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return false, fmt.Errorf("Empty asset agreement")
+        log.Error("empty asset agreement")
+        return false, fmt.Errorf("empty asset agreement")
     }
     err := proto.Unmarshal([]byte(assetAgreementSerializedProto), assetAgreement)
     if err != nil {
@@ -47,8 +47,8 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
     }
     lockInfo := &common.AssetLock{}
     if len(lockInfoSerializedProto) == 0 {
-        log.Error("Empty lock info")
-        return false, fmt.Errorf("Empty lock info")
+        log.Error("empty lock info")
+        return false, fmt.Errorf("empty lock info")
     }
     err = proto.Unmarshal([]byte(lockInfoSerializedProto), lockInfo)
     if err != nil {
@@ -58,21 +58,21 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
     return amc.assetManagement.LockAsset(ctx.GetStub(), assetAgreement, lockInfo)
 }
 
-func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementSerializedProto, lockInfoSerializedProto string) (bool, error) {
-    assetAgreement := &common.FungibleAssetAgreement{}
-    if len(fungibleAssetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return false, fmt.Errorf("Empty asset agreement")
+func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto, lockInfoSerializedProto string) (bool, error) {
+    assetAgreement := &common.FungibleAssetExchangeAgreement{}
+    if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
+        log.Error("empty asset agreement")
+        return false, fmt.Errorf("empty asset agreement")
     }
-    err := proto.Unmarshal([]byte(fungibleAssetAgreementSerializedProto), assetAgreement)
+    err := proto.Unmarshal([]byte(fungibleAssetExchangeAgreementSerializedProto), assetAgreement)
     if err != nil {
         log.Error(err.Error())
         return false, err
     }
     lockInfo := &common.AssetLock{}
     if len(lockInfoSerializedProto) == 0 {
-        log.Error("Empty lock info")
-        return false, fmt.Errorf("Empty lock info")
+        log.Error("empty lock info")
+        return false, fmt.Errorf("empty lock info")
     }
     err = proto.Unmarshal([]byte(lockInfoSerializedProto), lockInfo)
     if err != nil {
@@ -83,10 +83,10 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
 }
 
 func (amc *AssetManagementContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto string) (bool, error) {
-    assetAgreement := &common.AssetAgreement{}
+    assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return false, fmt.Errorf("Empty asset agreement")
+        log.Error("empty asset agreement")
+        return false, fmt.Errorf("empty asset agreement")
     }
     err := proto.Unmarshal([]byte(assetAgreementSerializedProto), assetAgreement)
     if err != nil {
@@ -96,13 +96,13 @@ func (amc *AssetManagementContract) IsAssetLocked(ctx contractapi.TransactionCon
     return amc.assetManagement.IsAssetLocked(ctx.GetStub(), assetAgreement)
 }
 
-func (amc *AssetManagementContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementSerializedProto string) (bool, error) {
-    assetAgreement := &common.FungibleAssetAgreement{}
-    if len(fungibleAssetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return false, fmt.Errorf("Empty asset agreement")
+func (amc *AssetManagementContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto string) (bool, error) {
+    assetAgreement := &common.FungibleAssetExchangeAgreement{}
+    if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
+        log.Error("empty asset agreement")
+        return false, fmt.Errorf("empty asset agreement")
     }
-    err := proto.Unmarshal([]byte(fungibleAssetAgreementSerializedProto), assetAgreement)
+    err := proto.Unmarshal([]byte(fungibleAssetExchangeAgreementSerializedProto), assetAgreement)
     if err != nil {
         log.Error(err.Error())
         return false, err
@@ -111,10 +111,10 @@ func (amc *AssetManagementContract) IsFungibleAssetLocked(ctx contractapi.Transa
 }
 
 func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto, claimInfoSerializedProto string) (bool, error) {
-    assetAgreement := &common.AssetAgreement{}
+    assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return false, fmt.Errorf("Empty asset agreement")
+        log.Error("empty asset agreement")
+        return false, fmt.Errorf("empty asset agreement")
     }
     err := proto.Unmarshal([]byte(assetAgreementSerializedProto), assetAgreement)
     if err != nil {
@@ -123,8 +123,8 @@ func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContex
     }
     claimInfo := &common.AssetClaim{}
     if len(claimInfoSerializedProto) == 0 {
-        log.Error("Empty claim info")
-        return false, fmt.Errorf("Empty claim info")
+        log.Error("empty claim info")
+        return false, fmt.Errorf("empty claim info")
     }
     err = proto.Unmarshal([]byte(claimInfoSerializedProto), claimInfo)
     if err != nil {
@@ -134,21 +134,21 @@ func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContex
     return amc.assetManagement.ClaimAsset(ctx.GetStub(), assetAgreement, claimInfo)
 }
 
-func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementSerializedProto, claimInfoSerializedProto string) (bool, error) {
-    assetAgreement := &common.FungibleAssetAgreement{}
-    if len(fungibleAssetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return false, fmt.Errorf("Empty asset agreement")
+func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto, claimInfoSerializedProto string) (bool, error) {
+    assetAgreement := &common.FungibleAssetExchangeAgreement{}
+    if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
+        log.Error("empty asset agreement")
+        return false, fmt.Errorf("empty asset agreement")
     }
-    err := proto.Unmarshal([]byte(fungibleAssetAgreementSerializedProto), assetAgreement)
+    err := proto.Unmarshal([]byte(fungibleAssetExchangeAgreementSerializedProto), assetAgreement)
     if err != nil {
         log.Error(err.Error())
         return false, err
     }
     claimInfo := &common.AssetClaim{}
     if len(claimInfoSerializedProto) == 0 {
-        log.Error("Empty claim info")
-        return false, fmt.Errorf("Empty claim info")
+        log.Error("empty claim info")
+        return false, fmt.Errorf("empty claim info")
     }
     err = proto.Unmarshal([]byte(claimInfoSerializedProto), claimInfo)
     if err != nil {
@@ -159,10 +159,10 @@ func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.Transacti
 }
 
 func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto string) (bool, error) {
-    assetAgreement := &common.AssetAgreement{}
+    assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return false, fmt.Errorf("Empty asset agreement")
+        log.Error("empty asset agreement")
+        return false, fmt.Errorf("empty asset agreement")
     }
     err := proto.Unmarshal([]byte(assetAgreementSerializedProto), assetAgreement)
     if err != nil {
@@ -172,13 +172,13 @@ func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionConte
     return amc.assetManagement.UnlockAsset(ctx.GetStub(), assetAgreement)
 }
 
-func (amc *AssetManagementContract) UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementSerializedProto string) (bool, error) {
-    assetAgreement := &common.FungibleAssetAgreement{}
-    if len(fungibleAssetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return false, fmt.Errorf("Empty asset agreement")
+func (amc *AssetManagementContract) UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto string) (bool, error) {
+    assetAgreement := &common.FungibleAssetExchangeAgreement{}
+    if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
+        log.Error("empty asset agreement")
+        return false, fmt.Errorf("empty asset agreement")
     }
-    err := proto.Unmarshal([]byte(fungibleAssetAgreementSerializedProto), assetAgreement)
+    err := proto.Unmarshal([]byte(fungibleAssetExchangeAgreementSerializedProto), assetAgreement)
     if err != nil {
         log.Error(err.Error())
         return false, err
@@ -214,10 +214,10 @@ func (amc *AssetManagementContract) GetAllFungibleLockedAssets(ctx contractapi.T
 }
 
 func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto string) (int64, error) {
-    assetAgreement := &common.AssetAgreement{}
+    assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return -1, fmt.Errorf("Empty asset agreement")
+        log.Error("empty asset agreement")
+        return -1, fmt.Errorf("empty asset agreement")
     }
     err := proto.Unmarshal([]byte(assetAgreementSerializedProto), assetAgreement)
     if err != nil {
@@ -227,13 +227,13 @@ func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.Transa
     return amc.assetManagement.GetAssetTimeToRelease(ctx.GetStub(), assetAgreement)
 }
 
-func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementSerializedProto string) (int64, error) {
-    assetAgreement := &common.FungibleAssetAgreement{}
-    if len(fungibleAssetAgreementSerializedProto) == 0 {
-        log.Error("Empty asset agreement")
-        return -1, fmt.Errorf("Empty asset agreement")
+func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto string) (int64, error) {
+    assetAgreement := &common.FungibleAssetExchangeAgreement{}
+    if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
+        log.Error("empty asset agreement")
+        return -1, fmt.Errorf("empty asset agreement")
     }
-    err := proto.Unmarshal([]byte(fungibleAssetAgreementSerializedProto), assetAgreement)
+    err := proto.Unmarshal([]byte(fungibleAssetExchangeAgreementSerializedProto), assetAgreement)
     if err != nil {
         log.Error(err.Error())
         return -1, err
@@ -241,6 +241,6 @@ func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractap
     return amc.assetManagement.GetFungibleAssetTimeToRelease(ctx.GetStub(), assetAgreement)
 }
 
-func (amc *AssetManagementContract) GetAllAssetsLockedUntil(ctx contractapi.TransactionContextInterface, lockExpiryTimeMillis int64) ([]string, error) {
-    return amc.assetManagement.GetAllAssetsLockedUntil(ctx.GetStub(), lockExpiryTimeMillis)
+func (amc *AssetManagementContract) GetAllAssetsLockedUntil(ctx contractapi.TransactionContextInterface, lockExpiryTimeSecs int64) ([]string, error) {
+    return amc.assetManagement.GetAllAssetsLockedUntil(ctx.GetStub(), lockExpiryTimeSecs)
 }

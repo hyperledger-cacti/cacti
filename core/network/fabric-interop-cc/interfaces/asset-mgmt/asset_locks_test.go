@@ -44,6 +44,8 @@ func (cc *InteropCC) Init(stub shim.ChaincodeStubInterface) pb.Response {
     return shim.Success(nil)
 }
 
+// This logic is not meant to comprehensively cover all the functionality offered by the Fabric Interop CC
+// Minimal bookkeeping of asset locks is implemented here to run unit tests for the 'asset_locks' base class functions
 func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     fmt.Println("Invoking Mock Fabric Interop CC")
     function, args := stub.GetFunctionAndParameters()
@@ -73,7 +75,7 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     }
     caller, _ := stub.GetCreator()
     if function == "LockAsset" {
-        assetAgreement := &common.AssetAgreement{}
+        assetAgreement := &common.AssetExchangeAgreement{}
         _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
         key := assetAgreement.Type + ":" + assetAgreement.Id
         val := string(caller) + ":" + assetAgreement.Recipient
@@ -84,7 +86,7 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         return shim.Success(nil)
     }
     if function == "LockFungibleAsset" {    // We are only going to lock once or twice in each unit test function, so bookkeeping doesn't need to be thorough
-        assetAgreement := &common.FungibleAssetAgreement{}
+        assetAgreement := &common.FungibleAssetExchangeAgreement{}
         _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
         key := assetAgreement.Type + ":" + strconv.Itoa(int(assetAgreement.NumUnits))
         val := string(caller) + ":" + assetAgreement.Recipient
@@ -138,7 +140,7 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         }
     }
     if function == "ClaimAsset" {
-        assetAgreement := &common.AssetAgreement{}
+        assetAgreement := &common.AssetExchangeAgreement{}
         _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
         expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
         expectedVal := assetAgreement.Locker + ":" + string(caller)
@@ -152,7 +154,7 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         }
     }
     if function == "ClaimFungibleAsset" {
-        assetAgreement := &common.FungibleAssetAgreement{}
+        assetAgreement := &common.FungibleAssetExchangeAgreement{}
         _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
         expectedKey := assetAgreement.Type + ":" + strconv.Itoa(int(assetAgreement.NumUnits))
         expectedVal := assetAgreement.Locker + ":" + string(caller)
@@ -236,14 +238,14 @@ func TestAssetLock(t *testing.T) {
     hash := []byte("j8r484r484")
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: nil,
-        ExpiryTimeMillis: 0,
+        ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
         LockMechanism: common.LockMechanism_HTLC,
         LockInfo: lockInfoBytes,
     }
-    assetAgreement := &common.AssetAgreement {
+    assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
         Recipient: recipient,
@@ -317,7 +319,7 @@ func TestAssetLock(t *testing.T) {
     // Test failure when we try to lock an already locked asset
     currTime := time.Now()
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockInfoHTLC.ExpiryTimeMillis = uint64(expiryTime.UnixNano()/(1000*1000))
+    lockInfoHTLC.ExpiryTimeSecs = uint64(expiryTime.Unix())
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
     lockSuccess, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
@@ -346,14 +348,14 @@ func TestFungibleAssetLock(t *testing.T) {
     hash := []byte("j8r484r484")
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: nil,
-        ExpiryTimeMillis: 0,
+        ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
         LockMechanism: common.LockMechanism_HTLC,
         LockInfo: lockInfoBytes,
     }
-    assetAgreement := &common.FungibleAssetAgreement {
+    assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: int32(numUnits),
         Recipient: recipient,
@@ -436,7 +438,7 @@ func TestFungibleAssetLock(t *testing.T) {
     // Test failure when there is insufficient unit balance for the requested units
     currTime := time.Now()
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
-    lockInfoHTLC.ExpiryTimeMillis = uint64(expiryTime.UnixNano()/(1000*1000))
+    lockInfoHTLC.ExpiryTimeSecs = uint64(expiryTime.Unix())
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
     assetAgreement.NumUnits = int32(totalUnits)
@@ -465,7 +467,7 @@ func TestIsAssetLocked(t *testing.T) {
     locker := clientId
     hash := []byte("j8r484r484")
     hashPreimage := []byte("asset-exchange-scenario")
-    assetAgreement := &common.AssetAgreement {
+    assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
         Recipient: recipient,
@@ -473,7 +475,7 @@ func TestIsAssetLocked(t *testing.T) {
     }
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: 0,
+        ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -584,7 +586,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     locker := clientId
     hash := []byte("j8r484r484")
     hashPreimage := []byte("asset-exchange-scenario")
-    assetAgreement := &common.FungibleAssetAgreement {
+    assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: int32(numUnits),
         Recipient: recipient,
@@ -592,7 +594,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     }
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: 0,
+        ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -709,7 +711,7 @@ func TestAssetUnlock(t *testing.T) {
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
-    assetAgreement := &common.AssetAgreement {
+    assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
         Recipient: recipient,
@@ -719,7 +721,7 @@ func TestAssetUnlock(t *testing.T) {
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+        ExpiryTimeSecs: uint64(expiryTime.Unix()),
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -802,7 +804,7 @@ func TestFungibleAssetUnlock(t *testing.T) {
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
-    assetAgreement := &common.FungibleAssetAgreement {
+    assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: int32(numUnits),
         Recipient: recipient,
@@ -812,7 +814,7 @@ func TestFungibleAssetUnlock(t *testing.T) {
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+        ExpiryTimeSecs: uint64(expiryTime.Unix()),
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -907,7 +909,7 @@ func TestAssetClaim(t *testing.T) {
         LockMechanism: common.LockMechanism_HTLC,
         ClaimInfo: claimInfoBytes,
     }
-    assetAgreement := &common.AssetAgreement {
+    assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
         Recipient: recipient,
@@ -969,7 +971,7 @@ func TestAssetClaim(t *testing.T) {
     // First, lock an asset
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: 0,
+        ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -1021,7 +1023,7 @@ func TestFungibleAssetClaim(t *testing.T) {
         LockMechanism: common.LockMechanism_HTLC,
         ClaimInfo: claimInfoBytes,
     }
-    assetAgreement := &common.FungibleAssetAgreement {
+    assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: int32(numUnits),
         Recipient: recipient,
@@ -1087,7 +1089,7 @@ func TestFungibleAssetClaim(t *testing.T) {
 
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: 0,
+        ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -1129,14 +1131,14 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     numUnits := 1000
     recipient := "Bob"
     hash := []byte("j8r484r484")
-    fungibleAssetAgreement := &common.FungibleAssetAgreement {
+    fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: int32(numUnits),
         Recipient: recipient,
     }
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: 0,
+        ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -1188,7 +1190,7 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     require.Equal(t, unlockedCount, totalUnits)
 
     // Lock some units of an asset
-    lockSuccess, err := amcc.LockFungibleAsset(amstub, fungibleAssetAgreement, lockInfo)
+    lockSuccess, err := amcc.LockFungibleAsset(amstub, fungibleAssetExchangeAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1219,13 +1221,13 @@ func TestAssetListFunctions(t *testing.T) {
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
-    assetAgreement := &common.AssetAgreement {
+    assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
     }
-    fungibleAssetAgreement := &common.FungibleAssetAgreement {
+    fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
         Type: fungibleAssetType,
         NumUnits: int32(numUnits),
         Recipient: recipient,
@@ -1235,7 +1237,7 @@ func TestAssetListFunctions(t *testing.T) {
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+        ExpiryTimeSecs: uint64(expiryTime.Unix()),
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -1330,7 +1332,7 @@ func TestAssetListFunctions(t *testing.T) {
     require.True(t, addSuccess)
 
     // Lock a fungible asset
-    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetAgreement, lockInfo)
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetExchangeAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1344,8 +1346,8 @@ func TestAssetListFunctions(t *testing.T) {
     require.Equal(t, 1, len(getSuccess))
 
     // Lock more fungible asset
-    fungibleAssetAgreement.NumUnits = int32(2 * numUnits)
-    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetAgreement, lockInfo)
+    fungibleAssetExchangeAgreement.NumUnits = int32(2 * numUnits)
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetExchangeAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
@@ -1369,13 +1371,13 @@ func TestAssetTimeFunctions(t *testing.T) {
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
-    assetAgreement := &common.AssetAgreement {
+    assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
     }
-    fungibleAssetAgreement := &common.FungibleAssetAgreement {
+    fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: int32(numUnits),
         Recipient: recipient,
@@ -1385,7 +1387,7 @@ func TestAssetTimeFunctions(t *testing.T) {
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
     lockInfoHTLC := &common.AssetLockHTLC {
         Hash: hash,
-        ExpiryTimeMillis: uint64(expiryTime.UnixNano()/(1000*1000)),
+        ExpiryTimeSecs: uint64(expiryTime.Unix()),
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
     lockInfo := &common.AssetLock {
@@ -1398,12 +1400,12 @@ func TestAssetTimeFunctions(t *testing.T) {
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
-    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
     endTime := currTime.Add(30 * time.Second)     // 30 seconds time window
-    getListSuccess, err := amcc.GetAllAssetsLockedUntil(amstub, endTime.UnixNano()/(1000*1000))
+    getListSuccess, err := amcc.GetAllAssetsLockedUntil(amstub, endTime.Unix())
     require.Error(t, err)
     require.Equal(t, 0, len(getListSuccess))
 
@@ -1440,33 +1442,33 @@ func TestAssetTimeFunctions(t *testing.T) {
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
-    fungibleAssetAgreement.Type = ""
-    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    fungibleAssetExchangeAgreement.Type = ""
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
-    fungibleAssetAgreement.Type = fungibleAssetType
-    fungibleAssetAgreement.NumUnits = -1
-    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    fungibleAssetExchangeAgreement.Type = fungibleAssetType
+    fungibleAssetExchangeAgreement.NumUnits = -1
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
-    fungibleAssetAgreement.NumUnits = int32(numUnits)
-    fungibleAssetAgreement.Recipient = ""
-    fungibleAssetAgreement.Locker = ""
-    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    fungibleAssetExchangeAgreement.NumUnits = int32(numUnits)
+    fungibleAssetExchangeAgreement.Recipient = ""
+    fungibleAssetExchangeAgreement.Locker = ""
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
-    fungibleAssetAgreement.Recipient = locker
-    fungibleAssetAgreement.Locker = locker
-    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    fungibleAssetExchangeAgreement.Recipient = locker
+    fungibleAssetExchangeAgreement.Locker = locker
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
-    fungibleAssetAgreement.Recipient = recipient
-    fungibleAssetAgreement.Locker = recipient
-    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    fungibleAssetExchangeAgreement.Recipient = recipient
+    fungibleAssetExchangeAgreement.Locker = recipient
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
     require.Equal(t, int64(-1), getSuccess)
 
@@ -1492,19 +1494,19 @@ func TestAssetTimeFunctions(t *testing.T) {
     require.True(t, addSuccess)
 
     // Lock a fungible asset
-    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetAgreement, lockInfo)
+    lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetExchangeAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
     // Test success
-    fungibleAssetAgreement.Recipient = recipient
-    fungibleAssetAgreement.Locker = locker
-    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetAgreement)
+    fungibleAssetExchangeAgreement.Recipient = recipient
+    fungibleAssetExchangeAgreement.Locker = locker
+    getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.NoError(t, err)
     require.Less(t, int64(0), getSuccess)
 
     // Test success
-    getListSuccess, err = amcc.GetAllAssetsLockedUntil(amstub, endTime.UnixNano()/(1000*1000))
+    getListSuccess, err = amcc.GetAllAssetsLockedUntil(amstub, endTime.Unix())
     require.NoError(t, err)
     require.Equal(t, 2, len(getListSuccess))
 }
