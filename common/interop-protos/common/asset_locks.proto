@@ -40,7 +40,7 @@ message AssetExchangeAgreement {
 
 message FungibleAssetExchangeAgreement {
   string type = 1;
-  int32 numUnits = 2;
+  uint64 numUnits = 2;
   string locker = 3;
   string recipient = 4;
 }

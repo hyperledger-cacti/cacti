@@ -341,8 +341,8 @@ func TestAssetLock(t *testing.T) {
 func TestFungibleAssetLock(t *testing.T) {
     amcc, amstub := createAssetMgmtCCInstance()
     assetType := "cbdc"
-    totalUnits := 10000
-    numUnits := 1000
+    totalUnits := uint64(10000)
+    numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
@@ -357,7 +357,7 @@ func TestFungibleAssetLock(t *testing.T) {
     }
     assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
-        NumUnits: int32(numUnits),
+        NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
     }
@@ -386,7 +386,7 @@ func TestFungibleAssetLock(t *testing.T) {
     require.False(t, lockSuccess)
 
     assetAgreement.Type = assetType
-    assetAgreement.NumUnits = -1
+    assetAgreement.NumUnits = 0
     lockSuccess, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.Error(t, err)
     require.False(t, lockSuccess)
@@ -395,7 +395,7 @@ func TestFungibleAssetLock(t *testing.T) {
     lockInfoHTLC.Hash = hash
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
-    assetAgreement.NumUnits = int32(numUnits)
+    assetAgreement.NumUnits = numUnits
     lockSuccess, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.Error(t, err)
     require.False(t, lockSuccess)
@@ -441,19 +441,19 @@ func TestFungibleAssetLock(t *testing.T) {
     lockInfoHTLC.ExpiryTimeSecs = uint64(expiryTime.Unix())
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
-    assetAgreement.NumUnits = int32(totalUnits)
+    assetAgreement.NumUnits = uint64(totalUnits)
     lockSuccess, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.Error(t, err)
     require.False(t, lockSuccess)
 
     // Test success wih a different number of units
-    assetAgreement.NumUnits = int32(2 * numUnits)
+    assetAgreement.NumUnits = 2 * numUnits
     lockSuccess, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
 
     // Confirm that asset is locked
-    assetAgreement.NumUnits = int32(2 * numUnits)
+    assetAgreement.NumUnits = 2 * numUnits
     lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, assetAgreement)
     require.NoError(t, err)
     require.True(t, lockSuccess)
@@ -580,15 +580,15 @@ func TestIsAssetLocked(t *testing.T) {
 func TestIsFungibleAssetLocked(t *testing.T) {
     amcc, amstub := createAssetMgmtCCInstance()
     assetType := "cbdc"
-    totalUnits := 10000
-    numUnits := 1000
+    totalUnits := uint64(10000)
+    numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
     hashPreimage := []byte("asset-exchange-scenario")
     assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
-        NumUnits: int32(numUnits),
+        NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
     }
@@ -624,13 +624,13 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     require.False(t, lockSuccess)
 
     assetAgreement.Type = assetType
-    assetAgreement.NumUnits = int32(-1)
+    assetAgreement.NumUnits = 0
     lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, assetAgreement)
     require.Error(t, err)
     require.False(t, lockSuccess)
 
     // Test failures when parameters are invalid
-    assetAgreement.NumUnits = int32(numUnits)
+    assetAgreement.NumUnits = numUnits
     assetAgreement.Recipient = ""
     lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, assetAgreement)
     require.Error(t, err)
@@ -799,14 +799,14 @@ func TestAssetUnlock(t *testing.T) {
 func TestFungibleAssetUnlock(t *testing.T) {
     amcc, amstub := createAssetMgmtCCInstance()
     assetType := "cbdc"
-    totalUnits := 10000
-    numUnits := 1000
+    totalUnits := uint64(10000)
+    numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
     assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
-        NumUnits: int32(numUnits),
+        NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
     }
@@ -836,12 +836,12 @@ func TestFungibleAssetUnlock(t *testing.T) {
     require.False(t, unlockSuccess)
 
     assetAgreement.Type = assetType
-    assetAgreement.NumUnits = int32(-1)
+    assetAgreement.NumUnits = 0
     unlockSuccess, err = amcc.UnlockFungibleAsset(amstub, assetAgreement)
     require.Error(t, err)
     require.False(t, unlockSuccess)
 
-    assetAgreement.NumUnits = int32(numUnits)
+    assetAgreement.NumUnits = numUnits
     assetAgreement.Recipient = ""
     unlockSuccess, err = amcc.UnlockFungibleAsset(amstub, assetAgreement)
     require.Error(t, err)
@@ -1009,8 +1009,8 @@ func TestAssetClaim(t *testing.T) {
 func TestFungibleAssetClaim(t *testing.T) {
     amcc, amstub := createAssetMgmtCCInstance()
     assetType := "cbdc"
-    totalUnits := 10000
-    numUnits := 1000
+    totalUnits := uint64(10000)
+    numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
@@ -1025,7 +1025,7 @@ func TestFungibleAssetClaim(t *testing.T) {
     }
     assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
-        NumUnits: int32(numUnits),
+        NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
     }
@@ -1054,7 +1054,7 @@ func TestFungibleAssetClaim(t *testing.T) {
     require.False(t, claimSuccess)
 
     assetAgreement.Type = assetType
-    assetAgreement.NumUnits = int32(-1)
+    assetAgreement.NumUnits = 0
     claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetAgreement, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
@@ -1063,7 +1063,7 @@ func TestFungibleAssetClaim(t *testing.T) {
     claimInfoHTLC.HashPreimage = hashPreimage
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
     claimInfo.ClaimInfo = claimInfoBytes
-    assetAgreement.NumUnits = int32(numUnits)
+    assetAgreement.NumUnits = numUnits
     claimSuccess, err = amcc.ClaimFungibleAsset(amstub, assetAgreement, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
@@ -1127,13 +1127,13 @@ func TestFungibleAssetClaim(t *testing.T) {
 func TestFungibleAssetCountFunctions(t *testing.T) {
     amcc, amstub := createAssetMgmtCCInstance()
     assetType := "cbdc"
-    totalUnits := 10000
-    numUnits := 1000
+    totalUnits := uint64(10000)
+    numUnits := uint64(1000)
     recipient := "Bob"
     hash := []byte("j8r484r484")
     fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
-        NumUnits: int32(numUnits),
+        NumUnits: numUnits,
         Recipient: recipient,
     }
     lockInfoHTLC := &common.AssetLockHTLC {
@@ -1158,7 +1158,7 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     require.Error(t, err)
     require.False(t, addSuccess)
 
-    addSuccess, err = amcc.AddFungibleAssetCount(amstub, assetType, -1)
+    addSuccess, err = amcc.AddFungibleAssetCount(amstub, assetType, 0)
     require.Error(t, err)
     require.False(t, addSuccess)
 
@@ -1182,7 +1182,7 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     // Test locked count success
     lockedCount, err := amcc.GetTotalFungibleLockedAssets(amstub, assetType)
     require.NoError(t, err)
-    require.Equal(t, lockedCount, 0)
+    require.Equal(t, lockedCount, uint64(0))
 
     // Test unlocked count success
     unlockedCount, err = amcc.GetUnlockedFungibleAssetCount(amstub, assetType)
@@ -1216,8 +1216,8 @@ func TestAssetListFunctions(t *testing.T) {
     assetId := "A001"
     newAssetId := "A002"
     fungibleAssetType := "cbdc"
-    totalUnits := 10000
-    numUnits := 1000
+    totalUnits := uint64(10000)
+    numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
@@ -1229,7 +1229,7 @@ func TestAssetListFunctions(t *testing.T) {
     }
     fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
         Type: fungibleAssetType,
-        NumUnits: int32(numUnits),
+        NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
     }
@@ -1346,7 +1346,7 @@ func TestAssetListFunctions(t *testing.T) {
     require.Equal(t, 1, len(getSuccess))
 
     // Lock more fungible asset
-    fungibleAssetExchangeAgreement.NumUnits = int32(2 * numUnits)
+    fungibleAssetExchangeAgreement.NumUnits = 2 * numUnits
     lockSuccess, err = amcc.LockFungibleAsset(amstub, fungibleAssetExchangeAgreement, lockInfo)
     require.NoError(t, err)
     require.True(t, lockSuccess)
@@ -1366,8 +1366,8 @@ func TestAssetTimeFunctions(t *testing.T) {
     assetType := "bond"
     assetId := "A001"
     fungibleAssetType := "cbdc"
-    totalUnits := 10000
-    numUnits := 1000
+    totalUnits := uint64(10000)
+    numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
     hash := []byte("j8r484r484")
@@ -1379,7 +1379,7 @@ func TestAssetTimeFunctions(t *testing.T) {
     }
     fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
-        NumUnits: int32(numUnits),
+        NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
     }
@@ -1398,14 +1398,14 @@ func TestAssetTimeFunctions(t *testing.T) {
     // Test failure when interop CC is not set
     getSuccess, err := amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     endTime := currTime.Add(30 * time.Second)     // 30 seconds time window
-    getListSuccess, err := amcc.GetAllAssetsLockedUntil(amstub, endTime.Unix())
+    getListSuccess, err := amcc.GetAllAssetsLockedUntil(amstub, uint64(endTime.Unix()))
     require.Error(t, err)
     require.Equal(t, 0, len(getListSuccess))
 
@@ -1415,64 +1415,64 @@ func TestAssetTimeFunctions(t *testing.T) {
     assetAgreement.Type = ""
     getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     assetAgreement.Type = assetType
     assetAgreement.Id = ""
     getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     assetAgreement.Id = assetId
     assetAgreement.Recipient = ""
     assetAgreement.Locker = ""
     getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     assetAgreement.Recipient = locker
     assetAgreement.Locker = locker
     getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     assetAgreement.Recipient = recipient
     assetAgreement.Locker = recipient
     getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     fungibleAssetExchangeAgreement.Type = ""
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     fungibleAssetExchangeAgreement.Type = fungibleAssetType
-    fungibleAssetExchangeAgreement.NumUnits = -1
+    fungibleAssetExchangeAgreement.NumUnits = 0
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
-    fungibleAssetExchangeAgreement.NumUnits = int32(numUnits)
+    fungibleAssetExchangeAgreement.NumUnits = numUnits
     fungibleAssetExchangeAgreement.Recipient = ""
     fungibleAssetExchangeAgreement.Locker = ""
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     fungibleAssetExchangeAgreement.Recipient = locker
     fungibleAssetExchangeAgreement.Locker = locker
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
     fungibleAssetExchangeAgreement.Recipient = recipient
     fungibleAssetExchangeAgreement.Locker = recipient
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
-    require.Equal(t, int64(-1), getSuccess)
+    require.Equal(t, uint64(0), getSuccess)
 
-    getListSuccess, err = amcc.GetAllAssetsLockedUntil(amstub, -1)
+    getListSuccess, err = amcc.GetAllAssetsLockedUntil(amstub, 0)
     require.Error(t, err)
     require.Equal(t, 0, len(getListSuccess))
 
@@ -1486,7 +1486,7 @@ func TestAssetTimeFunctions(t *testing.T) {
     assetAgreement.Locker = locker
     getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.NoError(t, err)
-    require.Less(t, int64(0), getSuccess)
+    require.Less(t, uint64(0), getSuccess)
 
     // Declare total fungible asset count
     addSuccess, err := amcc.AddFungibleAssetCount(amstub, fungibleAssetType, totalUnits)
@@ -1503,10 +1503,10 @@ func TestAssetTimeFunctions(t *testing.T) {
     fungibleAssetExchangeAgreement.Locker = locker
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.NoError(t, err)
-    require.Less(t, int64(0), getSuccess)
+    require.Less(t, uint64(0), getSuccess)
 
     // Test success
-    getListSuccess, err = amcc.GetAllAssetsLockedUntil(amstub, endTime.Unix())
+    getListSuccess, err = amcc.GetAllAssetsLockedUntil(amstub, uint64(endTime.Unix()))
     require.NoError(t, err)
     require.Equal(t, 2, len(getListSuccess))
 }

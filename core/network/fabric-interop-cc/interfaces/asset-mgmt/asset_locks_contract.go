@@ -30,7 +30,7 @@ func (amc *AssetManagementContract) Configure(interopChaincodeId string) {
 
 // Ledger transaction (invocation) functions
 
-func (amc *AssetManagementContract) AddFungibleAssetCount(ctx contractapi.TransactionContextInterface, assetType string, numUnits int) (bool, error) {
+func (amc *AssetManagementContract) AddFungibleAssetCount(ctx contractapi.TransactionContextInterface, assetType string, numUnits uint64) (bool, error) {
     return amc.assetManagement.AddFungibleAssetCount(ctx.GetStub(), assetType, numUnits)
 }
 
@@ -189,15 +189,15 @@ func (amc *AssetManagementContract) UnlockFungibleAsset(ctx contractapi.Transact
 
 // Ledger query functions
 
-func (amc *AssetManagementContract) GetTotalFungibleAssetCount(ctx contractapi.TransactionContextInterface, assetType string) (int, error) {
+func (amc *AssetManagementContract) GetTotalFungibleAssetCount(ctx contractapi.TransactionContextInterface, assetType string) (uint64, error) {
     return amc.assetManagement.GetTotalFungibleAssetCount(ctx.GetStub(), assetType)
 }
 
-func (amc *AssetManagementContract) GetUnlockedFungibleAssetCount(ctx contractapi.TransactionContextInterface, assetType string) (int, error) {
+func (amc *AssetManagementContract) GetUnlockedFungibleAssetCount(ctx contractapi.TransactionContextInterface, assetType string) (uint64, error) {
     return amc.assetManagement.GetUnlockedFungibleAssetCount(ctx.GetStub(), assetType)
 }
 
-func (amc *AssetManagementContract) GetTotalFungibleLockedAssets(ctx contractapi.TransactionContextInterface, assetType string) (int, error) {
+func (amc *AssetManagementContract) GetTotalFungibleLockedAssets(ctx contractapi.TransactionContextInterface, assetType string) (uint64, error) {
     return amc.assetManagement.GetTotalFungibleLockedAssets(ctx.GetStub(), assetType)
 }
 
@@ -213,34 +213,34 @@ func (amc *AssetManagementContract) GetAllFungibleLockedAssets(ctx contractapi.T
     return amc.assetManagement.GetAllFungibleLockedAssets(ctx.GetStub(), lockRecipient, locker)
 }
 
-func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto string) (int64, error) {
+func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto string) (uint64, error) {
     assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
-        return -1, fmt.Errorf("empty asset agreement")
+        return 0, fmt.Errorf("empty asset agreement")
     }
     err := proto.Unmarshal([]byte(assetAgreementSerializedProto), assetAgreement)
     if err != nil {
         log.Error(err.Error())
-        return -1, err
+        return 0, err
     }
     return amc.assetManagement.GetAssetTimeToRelease(ctx.GetStub(), assetAgreement)
 }
 
-func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto string) (int64, error) {
+func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto string) (uint64, error) {
     assetAgreement := &common.FungibleAssetExchangeAgreement{}
     if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
-        return -1, fmt.Errorf("empty asset agreement")
+        return 0, fmt.Errorf("empty asset agreement")
     }
     err := proto.Unmarshal([]byte(fungibleAssetExchangeAgreementSerializedProto), assetAgreement)
     if err != nil {
         log.Error(err.Error())
-        return -1, err
+        return 0, err
     }
     return amc.assetManagement.GetFungibleAssetTimeToRelease(ctx.GetStub(), assetAgreement)
 }
 
-func (amc *AssetManagementContract) GetAllAssetsLockedUntil(ctx contractapi.TransactionContextInterface, lockExpiryTimeSecs int64) ([]string, error) {
+func (amc *AssetManagementContract) GetAllAssetsLockedUntil(ctx contractapi.TransactionContextInterface, lockExpiryTimeSecs uint64) ([]string, error) {
     return amc.assetManagement.GetAllAssetsLockedUntil(ctx.GetStub(), lockExpiryTimeSecs)
 }
