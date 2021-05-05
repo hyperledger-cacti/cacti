@@ -2,9 +2,6 @@ FROM node:12.20.1-alpine3.12 as builder
 
 RUN apk update
 
-# Need JDK for the openapi-generator that is part of the build process
-RUN apk add --no-cache openjdk8
-
 # Need git because some of our npm depedencies might be coming
 # straight from github instead of being an npm package on npmjs.com.
 RUN apk add --no-cache git
