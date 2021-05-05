@@ -557,11 +557,7 @@ export class PluginLedgerConnectorBesu
         keychainPlugin,
         `${fnTag} keychain for ID:"${req.keychainId}"`,
       );
-      if (!keychainPlugin.has(req.contractName)) {
-        throw new Error(
-          `${fnTag} Cannot create an instance of the contract because the contractName and the contractName on the keychain does not match`,
-        );
-      }
+
       const networkId = await this.web3.eth.net.getId();
 
       const tmpContract = new this.web3.eth.Contract(req.contractAbi);
@@ -621,6 +617,10 @@ export class PluginLedgerConnectorBesu
 
           keychainPlugin.set(contractName, contractJSON);
         }
+      } else {
+        throw new Error(
+          `${fnTag} Cannot create an instance of the contract because the contractName and the contractName on the keychain does not match`,
+        );
       }
       return runTxResponse;
     }
