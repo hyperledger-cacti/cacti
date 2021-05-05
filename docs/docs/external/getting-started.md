@@ -41,16 +41,16 @@ Before starting, make sure you have the following software installed on your hos
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Latest version)
-- Golang: [sample instructions](https://golang.org/dl/) (Version 1.14 or above)
-- Java (JDK and JRE): [sample instructions](https://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html) (Version 8)
-- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 10 or above)
+- Golang: [sample instructions](https://golang.org/dl/) (Version 1.15 or above)
+- Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
+- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 16 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Rust: [sample instructions](https://www.rust-lang.org/tools/install)
-- Protoc (Protobuf compiler): _Golang should alread be installed and configured._
+- Protoc (Protobuf compiler): _Golang should already be installed and configured._
   * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugin.
     ```
     apt-get install protobuf-compiler
-    go install google.golang.org/protobuf/cmd/protoc-gen-go
+    go get -u google.golang.org/protobuf/cmd/protoc-gen-go
     ```
   * If the above method installs an older version of `protoc` (check using `protoc --version`), say below 3.12.x, you should download pre-compiled binaries instead. (With an older version, you may see errors while attempting to launch and setup the Fabric networks).
     ```
@@ -118,7 +118,7 @@ The `fabric-cli` source code is located in the `tests/network-setups/fabric/dev/
 
 If you are using a Linux system, make sure that lib64 is installed.
 
-_Note_: The setup and running instructions below were tested with Nodei.js v10.16.3.
+_Note_: The setup and running instructions below were tested with all Node.js versions from v11.14.0 to v16.0.0.
 
 #### Installation
 
@@ -158,8 +158,12 @@ Prepare `fabric-cli` for configuration as follows:
 - Run the following commands:
   ```
   fabric-cli env set-file ./.env
+  ```
+- If you haven't specified CONFIG_PATH environment variable in .env, then run this:
+  ```
   fabric-cli config set-file ./config.json
   ```
+  **NOTE:** Only one thing is required, either specify CONFIG_PATH in .env file or run the above command, not both.
 
 See the [Fabric CLI](#fabric-cli) section for more information.
 

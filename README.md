@@ -52,3 +52,7 @@ For more details and illustrations, see the [project overview](./OVERVIEW.md).
 
 ## Sponsor
 - https://github.com/lehors - TSC Member
+
+# Former Members
+- https://github.com/ChanderG
+- https://github.com/dushyantbehl
