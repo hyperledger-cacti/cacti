@@ -34,7 +34,6 @@ The `npm run watch` script in action:
     * WSL1 or WSL2 or any virtual machine running Ubuntu LTS
   * Git
   * NodeJS 12 or newer LTS (we recommend using nvm if available for your OS)
-  * OpenJDK 11
   * Docker Engine
   * Docker Compose
 

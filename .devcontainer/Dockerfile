@@ -27,12 +27,6 @@ RUN apt-get update \
 RUN apt-get update \
     && apt-get install software-properties-common -y
 
-# Install openJDK 8
-RUN apt-get update \
-    && apt-add-repository 'deb http://security.debian.org/debian-security stretch/updates main' \
-    && apt-get update \
-    && apt-get install openjdk-8-jdk -y
-
 # Install pip3
 RUN apt-get update \
     && apt-get install python3-pip -y
