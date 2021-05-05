@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package common.asset_locks;
+option go_package = "/common";
+
+enum LockMechanism {
+  HTLC = 0;
+}
+
+message AssetLock {
+  LockMechanism lockMechanism = 1;
+  bytes lockInfo = 2;
+}
+
+message AssetClaim {
+  LockMechanism lockMechanism = 1;
+  bytes claimInfo = 2;
+}
+
+message AssetLockHTLC {
+  bytes hash = 1;
+  uint64 expiryTimeSecs = 2;
+  enum TimeSpec {
+    EPOCH = 0;
+    DURATION = 1;
+  }
+  TimeSpec timeSpec = 3;
+}
+
+message AssetClaimHTLC {
+  bytes hashPreimage = 1;
+}
+
+message AssetExchangeAgreement {
+  string type = 1;
+  string id = 2;
+  string locker = 3;
+  string recipient = 4;
+}
+
+message FungibleAssetExchangeAgreement {
+  string type = 1;
+  uint64 numUnits = 2;
+  string locker = 3;
+  string recipient = 4;
+}
