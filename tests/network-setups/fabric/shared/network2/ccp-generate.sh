@@ -30,7 +30,7 @@ function yaml_ccp {
 
 ORG=1
 P0PORT=9051
-CAPORT=8054
+CAPORT=5054
 PEERPEM=$1/peerOrganizations/org1.network2.com/tlsca/tlsca.org1.network2.com-cert.pem
 CAPEM=$1/peerOrganizations/org1.network2.com/ca/ca.org1.network2.com-cert.pem
 

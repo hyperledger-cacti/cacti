@@ -39,13 +39,13 @@ peers:
         zj0EAwIDSAAwRQIhAIXfeRAsncZc27UCqjZ4bmHa0amXQ7O13hfZ3LL2y8IlAiBY
         OHAT54dE18TlgT2rrxNBu2LPlFw2fzfmt7lE6uJeZg==
         -----END CERTIFICATE-----
-        
+
     grpcOptions:
       ssl-target-name-override: peer0.org1.network2.com
       hostnameOverride: peer0.org1.network2.com
 certificateAuthorities:
   ca.org1.network2.com:
-    url: https://localhost:8054
+    url: https://localhost:5054
     caName: ca-org1
     tlsCACerts:
       pem: |
@@ -63,6 +63,6 @@ certificateAuthorities:
         zj0EAwIDSAAwRQIhAIXfeRAsncZc27UCqjZ4bmHa0amXQ7O13hfZ3LL2y8IlAiBY
         OHAT54dE18TlgT2rrxNBu2LPlFw2fzfmt7lE6uJeZg==
         -----END CERTIFICATE-----
-        
+
     httpOptions:
       verify: false
