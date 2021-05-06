@@ -48,7 +48,7 @@
                     },
                     "timeoutMs": {
                         "type": "integer",
-                        "description": "The amount of milliseconds to wait for the receipt to arrive to the connector. Defaults to 0 which means to wait for an unlimited amount of time. Note that this wait may be interrupted still by other parts of the infrastructure such as load balancers cutting of HTTP requests after some time even if they are the type that is supposed to be kept alive. The question of re-entrancy is a broader topic not in scope to discuss here, but it is important to mention it.",
+                        "description": "The amount of milliseconds to wait for the receipt to arrive to the connector. Defaults to 0 which means to wait for an unlimited amount of time. Note that this wait may be interrupted still by other parts of the infrastructure such as load balancers cutting of HTTP requests after some time even if they are the type that is supposed to be kept alive. The question of re-entrance is a broader topic not in scope to discuss here, but it is important to mention it.",
                         "minimum": 0
                     },
                     "blockConfirmations": {
@@ -657,7 +657,7 @@
                     }
                 },
                 "operationId": "invokeContractV1",
-                "summary": "Invokeds a contract on a xdai ledger",
+                "summary": "Invokes a contract on a xdai ledger",
                 "parameters": [],
                 "requestBody": {
                     "content": {

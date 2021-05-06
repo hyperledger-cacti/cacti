@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Hyperledger Core API
- * Contains/describes the core API types for Cactus. Does not describe actual endpoints on its own as this is left to the implementing plugins who can import and re-use commonLy needed type definitions from this specification. One example of said commonly used type definitons would be the types related to consortium management, cactus nodes, ledgers, etc..
+ * Contains/describes the core API types for Cactus. Does not describe actual endpoints on its own as this is left to the implementing plugins who can import and re-use commonly needed type definitions from this specification. One example of said commonly used type definitions would be the types related to consortium management, cactus nodes, ledgers, etc..
  *
  * The version of the OpenAPI document: 0.2.0
  * 
@@ -20,7 +20,7 @@ import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
- * A Cactus node can be a single server, or a set of servers behind a loand balancer acting as one.
+ * A Cactus node can be a single server, or a set of servers behind a load balancer acting as one.
  * @export
  * @interface CactusNode
  */
@@ -144,7 +144,7 @@ export enum ConsensusAlgorithmFamiliesWithTxFinality {
 }
 
 /**
- * Enumerates a list of consensus algorithm families in existence. Does not intend to be an exhaustive list, just a practical one, meaning that we only include items here that are relevant to Hyperledger Cactus in fulfilling its own duties. This can be extended later as more sophisticated features of Cactus get implemented. This enum is meant to be first and foremest a useful abstraction for achieving practical tasks, not an encyclopedia and therefore we ask of everyone that this to be extended only in ways that serve a practical purpose for the runtime behavior of Cactus or Cactus plugins in general. The bottom line is that we can accept this enum being not 100% accurate as long as it 100% satisfies what it was designed to do.
+ * Enumerates a list of consensus algorithm families in existence. Does not intend to be an exhaustive list, just a practical one, meaning that we only include items here that are relevant to Hyperledger Cactus in fulfilling its own duties. This can be extended later as more sophisticated features of Cactus get implemented. This enum is meant to be first and foremost a useful abstraction for achieving practical tasks, not an encyclopedia and therefore we ask of everyone that this to be extended only in ways that serve a practical purpose for the runtime behavior of Cactus or Cactus plugins in general. The bottom line is that we can accept this enum being not 100% accurate as long as it 100% satisfies what it was designed to do.
  * @export
  * @enum {string}
  */
@@ -198,7 +198,7 @@ export interface ConsortiumDatabase {
      */
     consortium: Array<Consortium>;
     /**
-     * The complete collection of all ledger entities inexistence within the consortium.
+     * The complete collection of all ledger entities in existence within the consortium.
      * @type {Array<Ledger>}
      * @memberof ConsortiumDatabase
      */

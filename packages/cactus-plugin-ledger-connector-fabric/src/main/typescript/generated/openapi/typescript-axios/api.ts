@@ -216,7 +216,7 @@ export interface DeployContractGoSourceV1Request {
      */
     targetOrganizations: Array<DeploymentTargetOrganization>;
     /**
-     * An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the offical Fabric samples repository and therefore it is assumed to be correct usage.
+     * An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the official Fabric samples repository and therefore it is assumed to be correct usage.
      * @type {Array<string>}
      * @memberof DeployContractGoSourceV1Request
      */

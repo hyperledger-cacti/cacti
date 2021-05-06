@@ -35,7 +35,7 @@ export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   keychainId: string;
   /**
-   * API version to use when talking to the backing Vault instnace through
+   * API version to use when talking to the backing Vault instance through
    * the NodeJS vault-node client.
    * Optional, defaults to `v1`
    */

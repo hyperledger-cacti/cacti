@@ -308,11 +308,11 @@ export class Containers {
     options: any = {},
     logLevel?: LogLevelDesc,
   ): Promise<any[]> {
-    const defualtLoggerOptions: ILoggerOptions = {
+    const defaultLoggerOptions: ILoggerOptions = {
       label: "containers#pullImage()",
       level: logLevel || "INFO",
     };
-    const log = LoggerProvider.getOrCreate(defualtLoggerOptions);
+    const log = LoggerProvider.getOrCreate(defaultLoggerOptions);
     const task = () => Containers.tryPullImage(imageFqn, options, logLevel);
     const retryOptions: pRetry.Options = {
       retries: 6,

@@ -15,7 +15,7 @@ import { QueryResult, WorldState } from "../util/worldstate";
 import { getYearFromDate } from "./emissions-calc";
 import { UtilityLookupItemInterface } from "./utilityLookupItem";
 
-const UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFER =
+const UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFIER =
   "org.hyperledger.blockchain-carbon-accounting.utilityemissionsfactoritem";
 
 export interface UtilityEmissionsFactorInterface {
@@ -47,7 +47,7 @@ export class UtilityEmissionsFactor extends State {
       _factor.division_id,
     ]);
     this.factor = _factor;
-    this.factor.class = UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFER;
+    this.factor.class = UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFIER;
     this.factor.key = this.getKey();
   }
   toBuffer(): Uint8Array {
@@ -97,7 +97,7 @@ export class UtilityEmissionsFactorState extends WorldState<
         queryString = `{
                 "selector" : {
                   "class": {
-                     "$eq": "${UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFER}"
+                     "$eq": "${UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFIER}"
                   },
                   "division_id" : {
                     "$eq": "${divisionID}"
@@ -114,7 +114,7 @@ export class UtilityEmissionsFactorState extends WorldState<
         queryString = `{
             "selector" : {
               "class": {
-                 "$eq": "${UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFER}"
+                 "$eq": "${UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFIER}"
               },
               "division_id" : {
                 "$eq": "${divisionID}"

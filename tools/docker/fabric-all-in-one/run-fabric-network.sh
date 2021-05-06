@@ -29,7 +29,7 @@ function main()
     # Major version is 2 or newer (we'll deal with 3.x when it is released)
 
     # Fabric 2.x has this new image called fabric-baseos so we need to load that
-    # as well when we detect that we are running Fabrix 2.x not 1.x
+    # as well when we detect that we are running Fabric 2.x not 1.x
     tar -cC '/etc/hyperledger/fabric/fabric-nodeenv/' . | docker load
     tar -cC '/etc/hyperledger/fabric/fabric-baseos/' . | docker load
   

@@ -37,12 +37,12 @@ import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript
 import { DiscoveryOptions } from "fabric-network";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
-const testCase = "deploys Fabrix 2.x contract from typescript source";
+const testCase = "deploys Fabric 2.x contract from typescript source";
 const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
@@ -306,7 +306,7 @@ test(testCase, async (t: Test) => {
   Checks.truthy(queryCommitted, `queryCommitted truthy OK`);
 
   // FIXME - without this wait it randomly fails with an error claiming that
-  // the endorsment was impossible to be obtained. The fabric-samples script
+  // the endorsement was impossible to be obtained. The fabric-samples script
   // does the same thing, it just waits 10 seconds for good measure so there
   // might not be a way for us to avoid doing this, but if there is a way we
   // absolutely should not have timeouts like this, anywhere...
@@ -366,6 +366,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

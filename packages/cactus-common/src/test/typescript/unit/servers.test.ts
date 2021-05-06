@@ -60,7 +60,7 @@ test("Servers", async (tParent: Test) => {
       t.doesNotEqual(
         addressInfo.port,
         prefPort,
-        "Peferred and actually allocated ports are different, therefore fallback is considered successful OK",
+        "Preferred and actually allocated ports are different, therefore fallback is considered successful OK",
       );
     }, "Servers.startOnPreferredPort falls back without throwing OK");
 

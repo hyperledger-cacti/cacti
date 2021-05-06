@@ -19,7 +19,7 @@ export interface IPluginLedgerConnector<
   /**
    * Executes a transaction on the target ledger of the connector plugin.
    * @param options The options that is specific to the transaction and the
-   * type of ledger this connectir is targeted at.
+   * type of ledger this connection is targeted at.
    */
   transact(options?: TransactIn): Promise<TransactOut>;
 
