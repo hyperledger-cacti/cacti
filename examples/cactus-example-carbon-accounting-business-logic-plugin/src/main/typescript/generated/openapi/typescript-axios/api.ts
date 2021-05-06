@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Hyperledger Cactus Example - Carbon Accounting App
- * Demonstrates how a business use case can be satisifedwith Cactus when multiple distinct ledgers are involved.
+ * Demonstrates how a business use case can be satisfied with Cactus when multiple distinct ledgers are involved.
  *
  * The version of the OpenAPI document: 0.2.0
  * 

@@ -256,7 +256,7 @@ export class SupplyChainApp {
           besuApiClient,
           quorumApiClient,
           fabricApiClient,
-          fabricEnviroment: org1Env,
+          fabricEnvironment: org1Env,
         }),
         new PluginKeychainMemory({
           instanceId: uuidv4(),

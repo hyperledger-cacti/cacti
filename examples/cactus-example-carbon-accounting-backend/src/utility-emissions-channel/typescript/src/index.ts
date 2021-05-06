@@ -408,7 +408,7 @@ class EmissionsChaincode {
     args: string[],
   ): Promise<ChaincodeResponse> {
     logger.info(`importUtilityIdentifier method called with args : ${args}`);
-    // uuid is required for importing utility identifer
+    // uuid is required for importing utility identifier
     if (args.length < 1) {
       logger.error(
         `${ErrInvalidNumberOfArgument} : importUtilityIdentifier method requires at-least 1 argument, but got ${args.length}`,
@@ -469,7 +469,7 @@ class EmissionsChaincode {
     args: string[],
   ): Promise<ChaincodeResponse> {
     logger.info(`updateUtilityIdentifier method called with args : ${args}`);
-    // uuid is required for importing utility identifer
+    // uuid is required for importing utility identifier
     if (args.length < 1) {
       logger.error(
         `${ErrInvalidNumberOfArgument} : updateUtilityIdentifier method requires at-least 1 argument, but got ${args.length}`,

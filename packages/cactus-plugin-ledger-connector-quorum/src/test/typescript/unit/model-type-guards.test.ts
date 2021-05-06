@@ -11,7 +11,7 @@ import {
   Web3SigningCredentialNone,
 } from "../../../main/typescript/public-api";
 
-test("Type guards for OpenAPI spec model type definitons", (t1: Test) => {
+test("Type guards for OpenAPI spec model type definitions", (t1: Test) => {
   test("isWeb3SigningCredentialGethKeychainPassword()", (t2: Test) => {
     const valid: Web3SigningCredentialGethKeychainPassword = {
       secret: "yes",

@@ -90,7 +90,7 @@ test(testCase, async (t: Test) => {
 
     const jwtPayload = {
       name: "Peter",
-      location: "Albertirsa",
+      location: "London",
       scope: [...RunTransactionEndpoint.OAUTH2_SCOPES],
     };
     const jwtSignOptions: JWT.SignOptions = {

@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Hyperledger Cactus Plugin - Consortium Web Service
- * Manage a Cactus consortium through the APIs. Needs administrative priviliges.
+ * Manage a Cactus consortium through the APIs. Needs administrative privileges.
  *
  * The version of the OpenAPI document: 0.0.1
  * 

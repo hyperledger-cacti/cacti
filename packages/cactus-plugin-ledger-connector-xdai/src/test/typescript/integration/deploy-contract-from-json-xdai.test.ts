@@ -37,7 +37,7 @@ const contractName = "HelloWorld";
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
@@ -437,6 +437,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

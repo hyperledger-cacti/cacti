@@ -83,7 +83,7 @@ export class AuthorizerFactory {
     }
 
     const options: expressJwt.Options = {
-      audience: "org.hyperledger.cactus", // default that can be overriden
+      audience: "org.hyperledger.cactus", // default that can be overridden
       ...middlewareOptions,
     };
     const unprotectedEndpoints = this.unprotectedEndpoints.map((e) => {

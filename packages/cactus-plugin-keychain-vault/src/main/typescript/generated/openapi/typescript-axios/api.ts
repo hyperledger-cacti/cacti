@@ -93,7 +93,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Retrieves the contents of a keychain entry from the backend.
-         * @param {GetKeychainEntryRequest} getKeychainEntryRequest Requst body to obtain a keychain entry via its key
+         * @param {GetKeychainEntryRequest} getKeychainEntryRequest Request body to obtain a keychain entry via its key
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -174,7 +174,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Sets a value under a key on the keychain backend.
-         * @param {SetKeychainEntryRequest} setKeychainEntryRequest Requst body to write/update a keychain entry via its key
+         * @param {SetKeychainEntryRequest} setKeychainEntryRequest Request body to write/update a keychain entry via its key
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -228,7 +228,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Retrieves the contents of a keychain entry from the backend.
-         * @param {GetKeychainEntryRequest} getKeychainEntryRequest Requst body to obtain a keychain entry via its key
+         * @param {GetKeychainEntryRequest} getKeychainEntryRequest Request body to obtain a keychain entry via its key
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -255,7 +255,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Sets a value under a key on the keychain backend.
-         * @param {SetKeychainEntryRequest} setKeychainEntryRequest Requst body to write/update a keychain entry via its key
+         * @param {SetKeychainEntryRequest} setKeychainEntryRequest Request body to write/update a keychain entry via its key
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -278,7 +278,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Retrieves the contents of a keychain entry from the backend.
-         * @param {GetKeychainEntryRequest} getKeychainEntryRequest Requst body to obtain a keychain entry via its key
+         * @param {GetKeychainEntryRequest} getKeychainEntryRequest Request body to obtain a keychain entry via its key
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -297,7 +297,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Sets a value under a key on the keychain backend.
-         * @param {SetKeychainEntryRequest} setKeychainEntryRequest Requst body to write/update a keychain entry via its key
+         * @param {SetKeychainEntryRequest} setKeychainEntryRequest Request body to write/update a keychain entry via its key
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -317,7 +317,7 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Retrieves the contents of a keychain entry from the backend.
-     * @param {GetKeychainEntryRequest} getKeychainEntryRequest Requst body to obtain a keychain entry via its key
+     * @param {GetKeychainEntryRequest} getKeychainEntryRequest Request body to obtain a keychain entry via its key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
@@ -340,7 +340,7 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Sets a value under a key on the keychain backend.
-     * @param {SetKeychainEntryRequest} setKeychainEntryRequest Requst body to write/update a keychain entry via its key
+     * @param {SetKeychainEntryRequest} setKeychainEntryRequest Request body to write/update a keychain entry via its key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi

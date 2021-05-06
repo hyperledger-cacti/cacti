@@ -40,7 +40,7 @@ export class ShipmentDetailPage implements OnInit {
 
   public get supplyChainApi(): SupplyChainApi {
     if (!this._supplyChainApi) {
-      throw new Error(`InvalidStateError: _supplyChainApi not initialzied.`);
+      throw new Error(`InvalidStateError: _supplyChainApi not initialized.`);
     } else {
       return this._supplyChainApi;
     }

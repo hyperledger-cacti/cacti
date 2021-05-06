@@ -661,7 +661,7 @@
                     }
                 },
                 "operationId": "apiV1QuorumInvokeContract",
-                "summary": "Invokeds a contract on a besu ledger",
+                "summary": "Invokes a contract on a besu ledger",
                 "parameters": [],
                 "requestBody": {
                     "content": {

@@ -588,7 +588,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Invokeds a contract on a besu ledger
+         * @summary Invokes a contract on a besu ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -729,7 +729,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Invokeds a contract on a besu ledger
+         * @summary Invokes a contract on a besu ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -789,7 +789,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Invokeds a contract on a besu ledger
+         * @summary Invokes a contract on a besu ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -840,7 +840,7 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
-     * @summary Invokeds a contract on a besu ledger
+     * @summary Invokes a contract on a besu ledger
      * @param {InvokeContractV1Request} [invokeContractV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

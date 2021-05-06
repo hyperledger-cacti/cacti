@@ -42,7 +42,7 @@ export interface ISupplyChainCactusPluginOptions {
   besuApiClient: BesuApi;
   fabricApiClient: FabricApi;
   web3SigningCredential?: Web3SigningCredential;
-  fabricEnviroment?: NodeJS.ProcessEnv;
+  fabricEnvironment?: NodeJS.ProcessEnv;
   contracts: ISupplyChainContractDeploymentInfo;
 }
 

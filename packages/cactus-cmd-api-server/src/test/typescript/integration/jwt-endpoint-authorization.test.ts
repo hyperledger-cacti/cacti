@@ -46,7 +46,7 @@ test(testCase, async (t: Test) => {
     };
     t.ok(middlewareOptions, "Express JWT config truthy OK");
 
-    const jwtPayload = { name: "Peter", location: "Albertirsa" };
+    const jwtPayload = { name: "Peter", location: "London" };
     const jwtSignOptions: JWT.SignOptions = {
       algorithm: "RS256",
       issuer: middlewareOptions.issuer,

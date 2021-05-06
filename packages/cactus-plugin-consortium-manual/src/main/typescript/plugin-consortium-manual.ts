@@ -116,10 +116,10 @@ export class PluginConsortiumManual
    * only affects **the metrics**.
    */
   public updateMetricNodeCount(): void {
-    const constortiumDatabase: ConsortiumDatabase = this.options
+    const consortiumDatabase: ConsortiumDatabase = this.options
       .consortiumDatabase;
     const consortiumRepo: ConsortiumRepository = new ConsortiumRepository({
-      db: constortiumDatabase,
+      db: consortiumDatabase,
     });
     this.prometheusExporter.setNodeCount(consortiumRepo.allNodes.length);
   }

@@ -37,7 +37,7 @@ export class BambooHarvestDetailPage implements OnInit {
       this.bambooHarvest = {
         id: uuidv4(),
         harvester: "Captain Lumberjack Logging Corporation",
-        location: "Pīpīwai Trail, Hana, HI 96713, United States",
+        location: "London, NW1 2DB, United Kingdom",
         startedAt: new Date(2020, 6, 10, 7, 0, 0, 0).toJSON(),
         endedAt: new Date(2020, 6, 10, 16, 0, 0, 0).toJSON(),
       };

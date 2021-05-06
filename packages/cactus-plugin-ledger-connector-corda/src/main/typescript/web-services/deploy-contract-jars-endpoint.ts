@@ -84,7 +84,7 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
   }
 
   /**
-   * Returns the `operationId` that connects this endpoint to it's definiton in
+   * Returns the `operationId` that connects this endpoint to it's definition in
    * the openapi-spec.ts file.
    */
   public get operationId(): string {
