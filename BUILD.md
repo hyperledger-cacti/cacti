@@ -13,14 +13,14 @@ The project uses Typescript for both back-end and front-end components.
 ## Fast Developer Flow / Code Iterations
 
 We put a lot of thought and effort into making sure that fast developer iterations can be
-achieved (please file a bug if you feel otherwise) while working **on** the framework. 
+achieved (please file a bug if you feel otherwise) while working **on** the framework.
 
-If you find yourself waiting too much for builds to finish, most of the time 
-that can be helped by using the `npm run watch` script which can automatically 
-recompile packages as you modify them (and only the packages that you have 
+If you find yourself waiting too much for builds to finish, most of the time
+that can be helped by using the `npm run watch` script which can automatically
+recompile packages as you modify them (and only the packages that you have
 modified, not everything).
 
-It also supports re-running the OpenAPI generator when you update any 
+It also supports re-running the OpenAPI generator when you update any
 `openapi.json` spec files that we use to describe our endpoints.
 
 The `npm run watch` script in action:
@@ -58,15 +58,13 @@ git config --system core.longpaths true
 cd cactus
 ```
 
-* Run the CI script (takes a long time, 10+ minutes on an average laptop)
+* Run the initial configuration script (can take a long time, 10+ minutes on a low-spec laptop)
 
 ```sh
-./tools/ci.sh
+npm run configure
 ```
 
-At this point you should have all packages built and verified with the full
-test suite including unit and integration tests that leverage docker containers
-to run ledgers, contract deployments, etc.
+At this point you should have all packages built for development.
 
 You can start making your changes (use your own fork and a feature branch)
 or just run existing tests and debug them to see how things fit together.
