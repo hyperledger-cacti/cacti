@@ -4,7 +4,7 @@
     "examples/cactus-*",
     "examples/carbon-accounting/pkg/cactus-*"
   ],
-  "version": "0.4.1",
+  "version": "0.5.0-alpha.0",
   "command": {
     "version": {
       "message": "chore(release): publish"

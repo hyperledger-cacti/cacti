@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0-alpha.0](https://github.com/hyperledger/cactus/compare/v0.4.1...v0.5.0-alpha.0) (2021-05-06)
+
+
+### Features
+
+* **corda:** prometheus exporter metrics integration ([9f37755](https://github.com/hyperledger/cactus/commit/9f3775580381cbdf314c6a75188114315d1844c6)), closes [#535](https://github.com/hyperledger/cactus/issues/535)
+* **core-api:** decouple web service install & registration [#771](https://github.com/hyperledger/cactus/issues/771) ([b50e148](https://github.com/hyperledger/cactus/commit/b50e148f43c0b27138471c972aab391486e761e6))
+* **core-api:** hasTransactionFinality() on connector API [#354](https://github.com/hyperledger/cactus/issues/354) ([a2d0582](https://github.com/hyperledger/cactus/commit/a2d058218780e5e4c81e5f847cc875879a946e3f))
+* **core-api:** jwt authorization [#770](https://github.com/hyperledger/cactus/issues/770) ([2016750](https://github.com/hyperledger/cactus/commit/2016750849b4333bb4dd78897468771f0642a4f5))
+
+
+
+
+
 ## [0.4.1](https://github.com/hyperledger/cactus/compare/v0.4.0...v0.4.1) (2021-04-02)
 
 
