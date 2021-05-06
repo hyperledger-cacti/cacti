@@ -12,7 +12,7 @@
 
 # Background
 
-This is an identity plane protocol to exchange identity information between two interoperating networks. This establishes a basis (or trust anchor) for proof-based data transfer. For background and component information, start [here](../../models/distributed-identity-management.md).
+This is an identity plane protocol to exchange identity information between two interoperating networks. This establishes a basis (or trust anchor) for proof-based data transfer. For background and component information, start [here](../../models/identity/distributed-identity-management.md).
 (You can also check out our [ICBC 2021 research paper](https://arxiv.org/abs/2104.03277) on this topic.)
 
 

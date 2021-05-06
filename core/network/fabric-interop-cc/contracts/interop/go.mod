@@ -1,6 +1,6 @@
 module github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
 
-go 1.14
+go 1.16
 
 require (
 	github.com/golang/protobuf v1.4.0

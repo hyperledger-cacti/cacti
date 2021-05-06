@@ -121,4 +121,4 @@ There are three distinct phases of this protocol serving separate functions, tho
 
 _TODO: Remove and revoke a network unit_
 
-A full specification of this protocol is provided [here](../../protocols/id-config-sharing-protocol/README.md).
+A full specification of this protocol is provided [here](../../protocols/id-config-sharing/README.md).
