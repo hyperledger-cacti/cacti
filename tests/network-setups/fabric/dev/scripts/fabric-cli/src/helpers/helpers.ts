@@ -33,6 +33,7 @@ const signMessage = (message, privateKey) => {
   return sign.sign(privateKey)
 }
 // Basic function to add data to network, it assumes function is CREATE
+// TODO: Pass function name as parameter
 const addData = ({
   filename,
   networkName,
@@ -69,12 +70,12 @@ const addData = ({
   })
 }
 
-// Custom Command help is to generate the help text used when running --help on a command. 
+// Custom Command help is to generate the help text used when running --help on a command.
 // 1. If usage string is provided print usage section
 // 2. if example string is provided print example section
 // 3. if options list has options provided print options section
 // 4. If there are subcommands it will print subcommands, this uses the commandRoot array where each item are the commands in order.
-// Logic is also in place to fix spacing based on length. 
+// Logic is also in place to fix spacing based on length.
 const commandHelp = (
   print: GluegunPrint,
   toolbox: Toolbox,
@@ -131,7 +132,7 @@ const commandHelp = (
 }
 
 // Custom Help is used as the default help when running --help on no commands.
-// filters out subcommands by using the root of each toplevel command and filters them out. When adding a command it will need to be added to the array to filter out. 
+// filters out subcommands by using the root of each toplevel command and filters them out. When adding a command it will need to be added to the array to filter out.
 const customHelp = (toolbox: Toolbox): void => {
   toolbox.print.info(toolbox.print.colors.bold('VERSION'))
   toolbox.print.info('')
@@ -228,7 +229,7 @@ const readJSONFromFile = (jsonfile, logger = console) => {
 // Used for getting network configuration from config.json file.
 const getNetworkConfig = (
   networkId: string
-): { relayEndpoint: string; connProfilePath: string; username?: string } => {
+): { relayEndpoint?: string; connProfilePath: string; username?: string; mspId?:string; channelName?: string; chaincode?: string } => {
   const configPath = process.env.CONFIG_PATH
     ? path.join(process.env.CONFIG_PATH)
     : path.join(__dirname, '../../config.json')
@@ -238,12 +239,13 @@ const getNetworkConfig = (
       logger.error(
         `Network: ${networkId} does not exist in the config.json file`
       )
-      return { relayEndpoint: '', connProfilePath: '', username: '' }
+      return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', channelName: '', chaincode: '' }
     }
+    // console.log(configJSON[networkId])
     return configJSON[networkId]
   } catch (err) {
     logger.error(`Network: ${networkId} does not exist in the config.json file`)
-    return { relayEndpoint: '', connProfilePath: '', username: '' }
+    return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', channelName: '', chaincode: '' }
   }
 }
 export {
