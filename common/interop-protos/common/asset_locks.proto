@@ -18,7 +18,7 @@ message AssetClaim {
 }
 
 message AssetLockHTLC {
-  bytes hash = 1;
+  bytes hashBase64 = 1;
   uint64 expiryTimeSecs = 2;
   enum TimeSpec {
     EPOCH = 0;
@@ -28,7 +28,7 @@ message AssetLockHTLC {
 }
 
 message AssetClaimHTLC {
-  bytes hashPreimage = 1;
+  bytes hashPreimageBase64 = 1;
 }
 
 message AssetExchangeAgreement {
