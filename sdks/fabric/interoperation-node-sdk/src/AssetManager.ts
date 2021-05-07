@@ -44,7 +44,7 @@ function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, rec
 function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
 {
     const lockInfoHTLC = new assetLocksPb.AssetLockHTLC();
-    lockInfoHTLC.setHash(hashValue);
+    lockInfoHTLC.setHashbase64(hashValue);
     lockInfoHTLC.setExpirytimesecs(expiryTimeSecs);
     lockInfoHTLC.setTimespec(assetLocksPb.AssetLockHTLC.TimeSpec.EPOCH)
     const lockInfoHTLCSerialized = lockInfoHTLC.serializeBinary();
@@ -58,7 +58,7 @@ function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
 function createAssetClaimInfoSerialized(hashPreimage)
 {
     const claimInfoHTLC = new assetLocksPb.AssetClaimHTLC();
-    claimInfoHTLC.setHashpreimage(Buffer.from(hashPreimage).toString('base64'));
+    claimInfoHTLC.setHashpreimagebase64(Buffer.from(hashPreimage).toString('base64'));
     const claimInfoHTLCSerialized = claimInfoHTLC.serializeBinary();
     const claimInfo = new assetLocksPb.AssetClaim();
     claimInfo.setLockmechanism(assetLocksPb.LockMechanism.HTLC);
@@ -67,7 +67,7 @@ function createAssetClaimInfoSerialized(hashPreimage)
 }
 
 // Create a SHA-256 hash over an ASCII string
-function createSHA256Hash(preimage)
+function createSHA256HashBase64(preimage)
 {
     return crypto.createHash('sha256').update(preimage).digest('base64');
 }
@@ -123,7 +123,7 @@ const createHTLC = async (
         }
 
         // Hash the preimage
-        hashValue = createSHA256Hash(preimage);
+        hashValue = createSHA256HashBase64(preimage);
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
@@ -195,7 +195,7 @@ const createFungibleHTLC = async (
         }
 
         // Hash the preimage
-        hashValue = createSHA256Hash(preimage);
+        hashValue = createSHA256HashBase64(preimage);
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
