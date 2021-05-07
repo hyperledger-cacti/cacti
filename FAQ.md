@@ -7,6 +7,7 @@
 - [Prototyping something and the linter blocking my builds is slowing me down needlessly](#prototyping-something-and-the-linter-blocking-my-builds-is-slowing-me-down-needlessly)
 - [What are the minimum and recommended hardware specs? Do you have a cool story about this?](#what-are-the-minimum-and-recommended-hardware-specs-do-you-have-a-cool-story-about-this)
 - [Why do all the tests bind the HTTP/S listeners to a random port?](#why-do-all-the-tests-bind-the-https-listeners-to-a-random-port)
+- [HTTP requests sent with Postman/curl/etc. hang if I'm debugging a test case with VSCode, why?](#http-requests-sent-with-postmancurletc-hang-if-im-debugging-a-test-case-with-vscode-why)
 
 ## Where does the project name come from?
 
@@ -68,7 +69,7 @@ with something like this for example:
 
 ## What are the minimum and recommended hardware specs? Do you have a cool story about this?
 
-> If and when people read this in the future, always inflate the numbers 
+> If and when people read this in the future, always inflate the numbers
 > a bit as we continue to add more and more tests every day (test automation is
 > very important to us)
 
@@ -78,7 +79,7 @@ with something like this for example:
 - **A recommended** setup would be for a dev machine in my opinion is **16 GB RAM 4 CPU**
 **cores (8 threads)** and of course SSD for persistent storage.
 
-- Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only 
+- Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only
 tests that failed were the Corda ones because those are hungrier than the others.
 
 
@@ -94,3 +95,12 @@ likely triple if we started running tests sequentially.
 The best workaround to this for now is to just set the port manually to a fixed
 number when you are debugging a specific test case and then set it back to zero
 prior to sending your pull request.
+## HTTP requests sent with Postman/curl/etc. hang if I'm debugging a test case with VSCode, why?
+
+When you use the execution stops on a breakpoint, that suspends all activities
+from happening not just the test case's code itself. Meaning that your HTTP
+request will not be processed by the API server / plugin until you let the execution
+proceed via the UI/shortcuts of the debugger.
+
+Once you let the execution continue, requests that previously appeared to be
+hanging should finish successfully.
