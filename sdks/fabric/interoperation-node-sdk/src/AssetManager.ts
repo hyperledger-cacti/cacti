@@ -19,24 +19,24 @@ const logger = log4js.getLogger("InteroperableHelper");
 
 
 // Create an asset exchange agreement structure
-function createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, locker)
+function createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, lockerECert)
 {
     const assetExchangeAgreement = new assetLocksPb.AssetExchangeAgreement();
     assetExchangeAgreement.setType(assetType);
     assetExchangeAgreement.setId(assetID);
     assetExchangeAgreement.setRecipient(recipientECert);
-    assetExchangeAgreement.setLocker(locker);
+    assetExchangeAgreement.setLocker(lockerECert);
     return assetExchangeAgreement.serializeBinary().toString();
 }
 
 // Create a fungible asset exchange agreement structure
-function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, locker)
+function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, lockerECert)
 {
     const assetExchangeAgreement = new assetLocksPb.FungibleAssetExchangeAgreement();
     assetExchangeAgreement.setType(assetType);
     assetExchangeAgreement.setNumunits(numUnits);
     assetExchangeAgreement.setRecipient(recipientECert);
-    assetExchangeAgreement.setLocker(locker);
+    assetExchangeAgreement.setLocker(lockerECert);
     return assetExchangeAgreement.serializeBinary().toString();
 }
 
@@ -147,7 +147,7 @@ const createHTLC = async (
 
 /**
  * First/second step of a Hashed Time Lock Contract
- * - Lock a unique asset instance using a hash
+ * - Lock a set of fungible assets using a hash
  **/
 const createFungibleHTLC = async (
     contract: Contract,
@@ -270,7 +270,7 @@ const claimAssetInHTLC = async (
 
 /**
  * Latter step of a Hashed Time Lock Contract
- * - Claim a fungible asset instance using a hash preimage
+ * - Claim a set of fungible assets using a hash preimage
  **/
 const claimFungibleAssetInHTLC = async (
     contract: Contract,
@@ -319,6 +319,194 @@ const claimFungibleAssetInHTLC = async (
     return result;
 };
 
+/**
+ * Rollback step of a Hashed Time Lock Contract
+ * - Reclaim a unique asset instance
+ **/
+const reclaimAssetInHTLC = async (
+    contract: Contract,
+    assetType: string,
+    assetID: string,
+    recipientECert: string,
+): Promise<any> => {
+
+    if (!contract)
+    {
+        logger.error("Contract handle not supplied");
+        return false;
+    }
+    if (!assetType)
+    {
+        logger.error("Asset type not supplied");
+        return false;
+    }
+    if (!assetID)
+    {
+        logger.error("Asset ID not supplied");
+        return false;
+    }
+    if (!recipientECert)
+    {
+        logger.error("Recipient ECert not supplied");
+        return false;
+    }
+
+    const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, "");
+
+    // Normal invoke function
+    const [result, submitError] = await helpers.handlePromise(
+        contract.submitTransaction("UnlockAsset", assetExchangeAgreementStr),
+    );
+    if (submitError) {
+        throw new Error(`UnlockAsset submitTransaction Error: ${submitError}`);
+    }
+    return result;
+};
+
+/**
+ * Rollback step of a Hashed Time Lock Contract
+ * - Reclaim a set of fungible assets
+ **/
+const reclaimFungibleAssetInHTLC = async (
+    contract: Contract,
+    assetType: string,
+    numUnits: number,
+    recipientECert: string,
+): Promise<any> => {
+
+    if (!contract)
+    {
+        logger.error("Contract handle not supplied");
+        return false;
+    }
+    if (!assetType)
+    {
+        logger.error("Asset type not supplied");
+        return false;
+    }
+    if (numUnits <= 0)
+    {
+        logger.error("Asset count must be a positive integer");
+        return false;
+    }
+    if (!recipientECert)
+    {
+        logger.error("Recipient ECert not supplied");
+        return false;
+    }
+
+    const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, "");
+
+    // Normal invoke function
+    const [result, submitError] = await helpers.handlePromise(
+        contract.submitTransaction("UnlockFungibleAsset", assetExchangeAgreementStr),
+    );
+    if (submitError) {
+        throw new Error(`UnlockFungibleAsset submitTransaction Error: ${submitError}`);
+    }
+    return result;
+};
+
+/**
+ * Query the state of a Hashed Time Lock Contract
+ * - Determine if a unique asset instance is locked by a given party for another given party
+ **/
+const isAssetLockedInHTLC = async (
+    contract: Contract,
+    assetType: string,
+    assetID: string,
+    recipientECert: string,
+    lockerECert: string,
+): Promise<any> => {
+
+    if (!contract)
+    {
+        logger.error("Contract handle not supplied");
+        return false;
+    }
+    if (!assetType)
+    {
+        logger.error("Asset type not supplied");
+        return false;
+    }
+    if (!assetID)
+    {
+        logger.error("Asset ID not supplied");
+        return false;
+    }
+    if (!recipientECert)
+    {
+        logger.error("Recipient ECert not supplied");
+        return false;
+    }
+    if (!lockerECert)
+    {
+        logger.error("Locker ECert not supplied");
+        return false;
+    }
+
+    const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, lockerECert);
+
+    // Normal invoke function
+    const [result, evaluateError] = await helpers.handlePromise(
+        contract.evaluateTransaction("IsAssetLocked", assetExchangeAgreementStr),
+    );
+    if (evaluateError) {
+        throw new Error(`IsAssetLocked evaluateTransaction Error: ${evaluateError}`);
+    }
+    return result;
+};
+
+/**
+ * Query the state of a Hashed Time Lock Contract
+ * - Determine if a set of fungible assets is locked by a given party for another given party
+ **/
+const isFungibleAssetLockedInHTLC = async (
+    contract: Contract,
+    assetType: string,
+    numUnits: number,
+    recipientECert: string,
+    lockerECert: string,
+): Promise<any> => {
+
+    if (!contract)
+    {
+        logger.error("Contract handle not supplied");
+        return false;
+    }
+    if (!assetType)
+    {
+        logger.error("Asset type not supplied");
+        return false;
+    }
+    if (numUnits <= 0)
+    {
+        logger.error("Asset count must be a positive integer");
+        return false;
+    }
+    if (!recipientECert)
+    {
+        logger.error("Recipient ECert not supplied");
+        return false;
+    }
+    if (!lockerECert)
+    {
+        logger.error("Locker ECert not supplied");
+        return false;
+    }
+
+    const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, lockerECert);
+
+    // Normal invoke function
+    const [result, evaluateError] = await helpers.handlePromise(
+        contract.evaluateTransaction("IsFungibleAssetLocked", assetExchangeAgreementStr),
+    );
+    if (evaluateError) {
+        throw new Error(`IsFungibleAssetLocked evaluateTransaction Error: ${evaluateError}`);
+    }
+    return result;
+};
+
 export {
     createAssetExchangeAgreementSerialized,
     createFungibleAssetExchangeAgreementSerialized,
@@ -328,8 +516,8 @@ export {
     createFungibleHTLC,
     claimAssetInHTLC,
     claimFungibleAssetInHTLC,
-    /*isAssetLockedInHTLC,
-    isFungibleAssetLockedInHTLC,
     reclaimAssetInHTLC,
-    reclaimFungibleAssetInHTLC,*/
+    reclaimFungibleAssetInHTLC,
+    isAssetLockedInHTLC,
+    isFungibleAssetLockedInHTLC,
 };
