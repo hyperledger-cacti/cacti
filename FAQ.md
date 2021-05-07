@@ -5,6 +5,8 @@
 - [How can I not re-build the whole project every time I make a small change?](#how-can-i-not-re-build-the-whole-project-every-time-i-make-a-small-change)
 - [Why do you need all these packages/monorepo? It looks complicated!](#why-do-you-need-all-these-packagesmonorepo-it-looks-complicated)
 - [Prototyping something and the linter blocking my builds is slowing me down needlessly](#prototyping-something-and-the-linter-blocking-my-builds-is-slowing-me-down-needlessly)
+- [What are the minimum and recommended hardware specs? Do you have a cool story about this?](#what-are-the-minimum-and-recommended-hardware-specs-do-you-have-a-cool-story-about-this)
+- [Why do all the tests bind the HTTP/S listeners to a random port?](#why-do-all-the-tests-bind-the-https-listeners-to-a-random-port)
 
 ## Where does the project name come from?
 
@@ -78,3 +80,17 @@ with something like this for example:
 
 - Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only 
 tests that failed were the Corda ones because those are hungrier than the others.
+
+
+## Why do all the tests bind the HTTP/S listeners to a random port?
+
+This makes it much more cumbersome to do debugging while a test case is running.
+The reason why we need it is because if we always used the same ports, we could
+only run the tests one at a time so that they don't butt heads when allocating
+their ports. This is not really feasible as the full test suite is already
+taking above an hour at the time of this writing to execute and that would
+likely triple if we started running tests sequentially.
+
+The best workaround to this for now is to just set the port manually to a fixed
+number when you are debugging a specific test case and then set it back to zero
+prior to sending your pull request.
