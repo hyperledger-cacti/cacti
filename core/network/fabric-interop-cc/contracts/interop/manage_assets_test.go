@@ -10,11 +10,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"crypto/sha1"
+	"encoding/base64"
 
 	"github.com/stretchr/testify/require"
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
 )
+
+// function to generate "SHA256" hash for a given preimage
+func generateHash(preimage string) string {
+	hasher := sha1.New()
+	hasher.Write([]byte(preimage))
+	shaHash := hasher.Sum(nil)
+	fmt.Println("shaHash:", string(shaHash))
+	//shaBase64 := base64.URLEncoding.EncodeToString(shaHash)
+	shaBase64 := base64.StdEncoding.EncodeToString(shaHash)
+	fmt.Println("Hash for the preimage ", preimage, " is ", shaBase64)
+	return shaBase64
+}
 
 func TestLockAsset(t *testing.T) {
 	ctx, _, interopcc := prepMockStub()
@@ -147,11 +161,12 @@ func TestClaimAsset(t *testing.T) {
 	assetId := "A001"
 	recipient := "Bob"
 	locker := "Alice"
-	hash := []byte("j8r484r484")
-	preimage := []byte("j8r484r484")
+	preimage := "abcd"
+	hashBase64 := generateHash(preimage)
+	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
 
 	lockInfoHTLC := &common.AssetLockHTLC {
-		Hash: hash,
+		Hash: []byte(hashBase64),
 		ExpiryTimeSecs: 300,
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -165,7 +180,7 @@ func TestClaimAsset(t *testing.T) {
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
 
 	claimInfo := &common.AssetClaimHTLC {
-		HashPreimage: preimage,
+		HashPreimage: []byte(preimageBase64),
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
@@ -174,7 +189,7 @@ func TestClaimAsset(t *testing.T) {
 	require.NoError(t, err)
 	fmt.Println("Completed locking as asset. Proceed to test claim asset.")
 
-	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient, Hash: string(hash), ExpiryTimeSecs: 300}
+	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: 300}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 
@@ -182,6 +197,18 @@ func TestClaimAsset(t *testing.T) {
 	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
 	require.NoError(t, err)
 	fmt.Println("Test success as expected since the asset agreement is specified properly.")
+
+	wrongPreimage := "abc"
+	wrongPreimageBase64 := base64.StdEncoding.EncodeToString([]byte(wrongPreimage))
+	wrongClaimInfo := &common.AssetClaimHTLC {
+		HashPreimage: []byte(wrongPreimageBase64),
+	}
+	wrongClaimInfoBytes, _ := proto.Marshal(wrongClaimInfo)
+
+	// Test failure with claim information not specified properly
+	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(wrongClaimInfoBytes))
+	require.Error(t, err)
+	fmt.Println("Test failed as expected with error:", err)
 
 	assetAgreement.Locker = "Charlie"
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)

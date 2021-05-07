@@ -13,6 +13,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"crypto/sha1"
+	"encoding/base64"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/golang/protobuf/proto"
@@ -179,6 +181,33 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 	return true, nil
 }
 
+/*
+ * Below function checks if hashBase64 is the hash for the preimage preimageBase64.
+ * Both the preimage and hash are passed in base64 form.
+ */
+func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, error) {
+	preimage, err := base64.StdEncoding.DecodeString(preimageBase64)
+	if err != nil {
+		errorMsg := fmt.Sprintf("Base64 decode preimage error: %s", err)
+		log.Error(errorMsg)
+		return false, errors.New(errorMsg)
+	}
+
+	hasher := sha1.New()
+	hasher.Write([]byte(preimage))
+	shaHash := hasher.Sum(nil)
+	//shaHashBase64 := base64.URLEncoding.EncodeToString(shaHash)
+	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
+
+	if shaHashBase64 == hashBase64 {
+		fmt.Printf("checkIfCorrectPreimage: preimage %s is passed correctly.\n", preimage)
+	} else {
+		fmt.Printf("checkIfCorrectPreimage: preimage %s is not passed correctly.\n", preimage)
+		return false, nil
+	}
+	return true, nil
+}
+
 // ClaimAsset cc is used to record claim of an asset on the ledger
 func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, claimInfoBytes string) error {
 
@@ -227,15 +256,21 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	}
 
 	if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		errorMsg := fmt.Sprintf("Cannot claim asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
+		errorMsg := fmt.Sprintf("Can not claim asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	// compute the hash from the preimage
-	hash := string(claimInfo.HashPreimage)
-	if hash != assetLockVal.Hash {
-		errorMsg := fmt.Sprintf("Cannot claim asset of type %s and ID %s as the hash preimage %s is not matching", assetAgreement.Type, assetAgreement.Id, claimInfo.HashPreimage)
+	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimage), string(assetLockVal.Hash))
+	if err != nil {
+		errorMsg := fmt.Sprintf("Claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	if isCorrectPreimage == false {
+		errorMsg := fmt.Sprintf("Can not claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
@@ -244,9 +279,9 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
-		errorMessage := fmt.Sprintf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
-		log.Error(errorMessage)
-		return errors.New(errorMessage)
+		errorMsg := fmt.Sprintf("Failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
 	}
 
 	return nil
