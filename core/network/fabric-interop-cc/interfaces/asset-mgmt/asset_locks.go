@@ -244,7 +244,12 @@ func (am *AssetManagement) IsAssetLocked(stub shim.ChaincodeStubInterface, asset
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("IsAssetLocked"), []byte(assetAgreement.Type), []byte(assetAgreement.Id), []byte(assetAgreement.Recipient), []byte(assetAgreement.Locker)}, "")
+    assetAgreementBytes, err := proto.Marshal(assetAgreement)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("IsAssetLocked"), assetAgreementBytes}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, errors.New(string(iccResp.GetPayload()))
@@ -467,7 +472,12 @@ func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetAg
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockAsset"), []byte(assetAgreement.Type), []byte(assetAgreement.Id), []byte(assetAgreement.Recipient)}, "")
+    assetAgreementBytes, err := proto.Marshal(assetAgreement)
+    if err != nil {
+        log.Error(err.Error())
+        return false, err
+    }
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockAsset"), assetAgreementBytes}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, errors.New(string(iccResp.GetPayload()))
