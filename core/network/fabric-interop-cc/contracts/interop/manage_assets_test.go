@@ -117,41 +117,118 @@ func TestIsAssetLocked(t *testing.T) {
 		Locker: locker,
 	}
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
-
 	// Lock asset as per the agreement specified
 	err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.NoError(t, err)
 	fmt.Println("Completed locking as asset. Proceed to test if asset is locked or not.")
 
+
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: "Charlie"}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
-
 	// Test failure with asset agreement not specified properly
 	isAssetLocked, err := interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
 	fmt.Println("Test failed as expected with error:", err)
 
+
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
-
 	// Test success with asset agreement specified properly
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
 	fmt.Println("Test succeeded as expected since the asset agreement is specified properly.")
 
+
 	assetLockVal = AssetLockValue{Locker: "Dave", Recipient: recipient}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
-
 	// Test failure with asset agreement not specified properly
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
 	fmt.Println("Test failed as expected with error:", err)
+
+
+	assetAgreement = &common.AssetExchangeAgreement {
+		Type: assetType,
+		Id: assetId,
+		Recipient: recipient,
+		// arbitrary locker specification
+		Locker: "*",
+	}
+	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
+	// Test success with asset agreement specified to include arbitrary locker
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	require.NoError(t, err)
+	require.True(t, isAssetLocked)
+	fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker.")
+
+
+	assetAgreement = &common.AssetExchangeAgreement {
+		Type: assetType,
+		Id: assetId,
+		// wrong recipient specification
+		Recipient: "Charlie",
+		// arbitrary locker specification
+		Locker: "*",
+	}
+	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
+	// Test failure with asset agreement specified to include arbitrary locker and wrong recipient
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	require.Error(t, err)
+	require.False(t, isAssetLocked)
+	fmt.Println("Test failed as expected with error:", err)
+
+
+	assetAgreement = &common.AssetExchangeAgreement {
+		Type: assetType,
+		Id: assetId,
+		// arbitrary recipient specification
+		Recipient: "*",
+		Locker: "Dave",
+	}
+	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
+	// Test success with asset agreement specified to include arbitrary recipient
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	require.NoError(t, err)
+	require.True(t, isAssetLocked)
+	fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary recipient.")
+
+
+	assetAgreement = &common.AssetExchangeAgreement {
+		Type: assetType,
+		Id: assetId,
+		// arbitrary recipient specification
+		Recipient: "*",
+		// wrong locker specification
+		Locker: "Charlie",
+	}
+	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
+	// Test failure with asset agreement specified to include arbitrary locker and wrong locker
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	require.Error(t, err)
+	require.False(t, isAssetLocked)
+	fmt.Println("Test failed as expected with error:", err)
+
+
+	assetAgreement = &common.AssetExchangeAgreement {
+		Type: assetType,
+		Id: assetId,
+		// arbitrary recipient specification
+		Recipient: "*",
+		// arbitrary locker specification
+		Locker: "*",
+	}
+	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
+	// Test success with asset agreement specified to include arbitrary locker
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	require.NoError(t, err)
+	require.True(t, isAssetLocked)
+	fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker and arbitrary recipient.")
 }
 
 func TestClaimAsset(t *testing.T) {

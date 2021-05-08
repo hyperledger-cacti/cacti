@@ -172,8 +172,23 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 	}
 	fmt.Printf("assetLockVal: %+v\n", assetLockVal)
 
-	if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
+	// '*' for recipient or locker in the query implies that the seeks status for an arbitrary recipient or locker respectively
+	if assetAgreement.Locker == "*" && assetAgreement.Recipient == "*" {
+		return true, nil
+	} else if assetAgreement.Locker == "*" && assetLockVal.Recipient == assetAgreement.Recipient {
+		return true, nil
+	} else if assetAgreement.Locker == "*" && assetLockVal.Recipient != assetAgreement.Recipient {
+		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Recipient)
+		log.Error(errorMsg)
+		return false, errors.New(errorMsg)
+	} else if assetAgreement.Recipient == "*" && assetLockVal.Locker == assetAgreement.Locker {
+		return true, nil
+	} else if assetAgreement.Recipient == "*" && assetLockVal.Locker != assetAgreement.Locker {
+		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked by %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker)
+		log.Error(errorMsg)
+		return false, errors.New(errorMsg)
+	} else if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
+		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker, assetAgreement.Recipient)
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	}
