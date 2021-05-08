@@ -12,9 +12,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"crypto/sha1"
 	"encoding/base64"
+	"time"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/golang/protobuf/proto"
@@ -27,17 +27,6 @@ type AssetLockValue struct {
 	Recipient	string	`json:"recipient"`
 	Hash	string	`json:"hash"`
 	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
-}
-
-type FungibleAssetLockValueChunk struct {
-	Locker	string	`json:"locker"`
-	Recipient	string	`json:"recipient"`
-	Hash	string	`json:"hash"`
-	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
-}
-
-type FungibleAssetLockValue struct {
-	FungibleAssetLockValueChunks	[]FungibleAssetLockValueChunk	`json:"fungibleAssetLockValueChunk"`
 }
 
 // LockAsset cc is used to record locking of an asset on the ledger
@@ -60,6 +49,12 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	}
 	//display the requested asset agreement
 	fmt.Printf("lockInfoHTLC: %+v\n", lockInfoHTLC)
+
+	if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+		errorMsg := "only EPOCH time is supported at present"
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
 
 	assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
 	assetLockVal := AssetLockValue{Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
@@ -125,11 +120,17 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 		return errors.New(errorMsg)
 	}
 
-	// TODO -- Check if expiry time is elapsed
+	// Check if expiry time is elapsed
+	currentTimeSecs := time.Now().UnixNano() / int64(time.Second)
+	if uint64(currentTimeSecs) < assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("Cannot unlock asset of type %s and ID %s as the expiry time is not yet elapsed", assetAgreement.Type, assetAgreement.Id)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
-		errorMessage := fmt.Sprintf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+		errorMessage := fmt.Sprintf("Failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
 		log.Error(errorMessage)
 		return errors.New(errorMessage)
 	}
@@ -290,7 +291,13 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		return errors.New(errorMsg)
 	}
 
-	// TODO -- check if the expiry time is not elapsed
+	// Check if expiry time is elapsed
+	currentTimeSecs := time.Now().UnixNano() / int64(time.Second)
+	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("Can not claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
@@ -300,62 +307,4 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	}
 
 	return nil
-}
-
-// LockFungibleAsset cc is used to record locking of an fungible asset on the ledger
-func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, FungibleAssetAgreementBytes string, lockInfoBytes string) error {
-
-	fungibleAssetAgreement := &common.FungibleAssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(FungibleAssetAgreementBytes), fungibleAssetAgreement)
-	if err != nil {
-		log.Error(err.Error())
-		return err
-	}
-	//display the requested fungible asset agreement
-	fmt.Printf("fungibleAssetExchangeAgreement: %+v\n", fungibleAssetAgreement)
-
-	lockInfoHTLC := &common.AssetLockHTLC{}
-	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfoHTLC)
-	if err != nil {
-		log.Error(err.Error())
-		return err
-	}
-	//display the passed lock information
-	fmt.Printf("lockInfoHTLC: %+v\n", lockInfoHTLC)
-
-	// TODO: check if all the validations pass (e.g., hash, expirty time)
-
-	assetLockKey := fungibleAssetAgreement.Type + ":" + strconv.Itoa(int(fungibleAssetAgreement.NumUnits))
-	assetLockValueChunk := FungibleAssetLockValueChunk{Locker: fungibleAssetAgreement.Locker, Recipient: fungibleAssetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
-	assetLockVal := FungibleAssetLockValue{}
-
-	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
-	if err != nil {
-		log.Error(err.Error())
-		return err
-	}
-
-        if assetLockValBytes != nil {
-		err = json.Unmarshal(assetLockValBytes, &assetLockVal)
-		if err != nil {
-			errorMsg := fmt.Sprintf("Unmarshal error: %s", err)
-			log.Error(errorMsg)
-			return errors.New(errorMsg)
-		}
-		fmt.Println("LockFungibleAsset: inside if, assetLockVal=", assetLockVal.FungibleAssetLockValueChunks)
-		assetLockVal.FungibleAssetLockValueChunks = append(assetLockVal.FungibleAssetLockValueChunks, assetLockValueChunk)
-	} else {
-		assetLockValueChunks := make([]FungibleAssetLockValueChunk, 0)
-		assetLockValueChunks = append(assetLockValueChunks, assetLockValueChunk)
-		assetLockVal.FungibleAssetLockValueChunks = assetLockValueChunks
-		fmt.Println("LockFungibleAsset: inside else, assetLockVal=", assetLockVal.FungibleAssetLockValueChunks)
-	}
-
-	assetLockValBytes, err = json.Marshal(assetLockVal)
-	if err != nil {
-		errorMsg := fmt.Sprintf("Marshal error: %s", err)
-		log.Error(errorMsg)
-		return errors.New(errorMsg)
-	}
-	return ctx.GetStub().PutState(assetLockKey, assetLockValBytes)
 }
