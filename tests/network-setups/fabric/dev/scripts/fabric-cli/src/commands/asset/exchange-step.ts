@@ -174,6 +174,9 @@ const command: GluegunCommand = {
                         user2CertN1,
                         hash_secret,
                         timeout2)
+        if (!res.result) {
+          throw new Error()
+        }
         spinner.info(`Asset Locked: ${res.result}`)
       } catch(error) {
           print.error(`Could not Lock Asset in ${options['network1']}`)
@@ -209,6 +212,9 @@ const command: GluegunCommand = {
                         user1CertN2,
                         hash_secret,
                         timeout)
+        if (!res.result) {
+          throw new Error()
+        }
         spinner.info(`Fungible Asset Locked: ${res.result}`)
       } catch(error) {
           print.error(`Could not Lock Fungible Asset in ${options['network2']}`)
@@ -245,7 +251,10 @@ const command: GluegunCommand = {
                         fungibleAssetAmt,
                         user2CertN2,
                         secret)
-        spinner.info(`Fungible Asset Claimed: ${res.result}`)
+        if (!res) {
+          throw new Error()
+        }
+        spinner.info(`Fungible Asset Claimed: ${res}`)
       } catch(error) {
           print.error(`Could not claim fungible asset in ${options['network2']}`)
           res = AssetManager.reclaimFungibleAssetInHTLC(network2.contract, fungibleAssetType, fungibleAssetAmt, user1CertN2);
@@ -263,7 +272,10 @@ const command: GluegunCommand = {
                         assetId,
                         user1CertN1,
                         secret)
-        spinner.info(`Asset Claimed: ${res.result}`)
+        if (!res) {
+          throw new Error()
+        }
+        spinner.info(`Asset Claimed: ${res}`)
       } catch(error) {
           print.error(`Could not claim asset in ${options['network1']}`)
           res = AssetManager.reclaimFungibleAssetInHTLC(network2.contract, fungibleAssetType, fungibleAssetAmt, user1CertN2);
@@ -293,7 +305,7 @@ const waitTillLock = async (contract, assetType, param1, param2, recipient, lock
       res = await AssetManager.isFungibleAssetLockedInHTLC(contract, param1, param2, recipient, locker)
     }
     spinner.info(Promise.resolve(res))
-    flag = res.result == requiredResponse
+    flag = res == requiredResponse
     tries += 1
     if (!flag) {
       setTimeout(function timer() {
