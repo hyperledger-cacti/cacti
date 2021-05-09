@@ -16,9 +16,9 @@ const ASSETTYPE_ASSET = 0
 const ASSETTYPE_FUNGIBLEASSET = 1
 
 const command: GluegunCommand = {
-  name: 'exchange',
+  name: 'exchange-all',
   alias: ['-e'],
-  description: 'Asset Exchange.',
+  description: 'Asset Exchange All steps.',
   run: async toolbox => {
     const {
       print,
@@ -63,7 +63,7 @@ const command: GluegunCommand = {
           }
         ],
         command,
-        ['asset', 'exchange']
+        ['asset', 'exchange-all']
       )
       return
     }
@@ -172,8 +172,8 @@ const command: GluegunCommand = {
                 ASSETTYPE_ASSET,
                 assetType,
                 assetId,
-                user1CertN1,
                 user2CertN1,
+                user1CertN1,
                 spinner,
                 true,
                 'Waiting for Asset to be locked...');
@@ -193,7 +193,7 @@ const command: GluegunCommand = {
       spinner.info(`Fungible Asset Locked: ${res.result}`)
     } catch(error) {
         print.error(`Could not Lock Fungible Asset in ${options['network2']}`)
-        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId);
+        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId, user2CertN1, user1CertN1);
         spinner.fail(`Error`)
         return
     }
@@ -202,15 +202,15 @@ const command: GluegunCommand = {
                 ASSETTYPE_FUNGIBLEASSET,
                 fungibleAssetType,
                 fungibleAssetAmt,
-                user2CertN2,
                 user1CertN2,
+                user2CertN2,
                 spinner,
                 true,
                 'Waiting for Fungible Asset to be locked...');
     if (!res) {
       print.error(`Fungible Asset is not Locked in ${options['network2']}`)
       spinner.fail(`Error`)
-      res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId);
+      res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId, user2CertN1, user1CertN1);
       return
     }
 
@@ -224,8 +224,8 @@ const command: GluegunCommand = {
       spinner.info(`Fungible Asset Claimed: ${res.result}`)
     } catch(error) {
         print.error(`Could not claim fungible asset in ${options['network2']}`)
-        res = AssetManager.reclaimFungibleAssetInHTLC(network2.contract, fungibleAssetType, fungibleAssetAmt);
-        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId);
+        res = AssetManager.reclaimFungibleAssetInHTLC(network2.contract, fungibleAssetType, fungibleAssetAmt, user1CertN2);
+        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId, user2CertN1, user1CertN1);
         spinner.fail(`Error`)
         return
     }
@@ -239,8 +239,8 @@ const command: GluegunCommand = {
       spinner.info(`Asset Claimed: ${res.result}`)
     } catch(error) {
         print.error(`Could not claim asset in ${options['network1']}`)
-        res = AssetManager.reclaimFungibleAssetInHTLC(network2.contract, fungibleAssetType, fungibleAssetAmt);
-        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId);
+        res = AssetManager.reclaimFungibleAssetInHTLC(network2.contract, fungibleAssetType, fungibleAssetAmt, user1CertN2);
+        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId, user2CertN1, user1CertN1);
         spinner.fail(`Error`)
         return
     }
@@ -249,17 +249,17 @@ const command: GluegunCommand = {
   }
 }
 
-const waitTillLock = async (contract, assetType, param1, param2, user1, user2, spinner, requiredResponse, waitMessage) => {
+const waitTillLock = async (contract, assetType, param1, param2, recipient, locker, spinner, requiredResponse, waitMessage) => {
   var flag = false
   var tries = 0
   const MAX_TRIES = 10
   var res
   while (!flag && tries <= MAX_TRIES) {
     if (assetType == ASSETTYPE_ASSET) {
-      res = await AssetManager.isAssetLockedInHTLC(contract, param1, param2, user1, user2)
+      res = await AssetManager.isAssetLockedInHTLC(contract, param1, param2, recipient, locker)
     }
     else if (assetType == ASSETTYPE_FUNGIBLEASSET) {
-      res = await AssetManager.isFungibleAssetLockedInHTLC(contract, param1, param2, user1, user2)
+      res = await AssetManager.isFungibleAssetLockedInHTLC(contract, param1, param2, recipient, locker)
     }
     spinner.info(Promise.resolve(res))
     flag = res.result == requiredResponse
