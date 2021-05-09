@@ -12,7 +12,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"time"
 
@@ -205,7 +205,7 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, err
 		return false, errors.New(errorMsg)
 	}
 
-	hasher := sha1.New()
+	hasher := sha256.New()
 	hasher.Write([]byte(preimage))
 	shaHash := hasher.Sum(nil)
 	//shaHashBase64 := base64.URLEncoding.EncodeToString(shaHash)

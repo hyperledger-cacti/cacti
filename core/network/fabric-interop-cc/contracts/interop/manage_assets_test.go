@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
-	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"time"
 
@@ -26,7 +26,7 @@ const(
 
 // function to generate "SHA256" hash for a given preimage
 func generateHash(preimage string) string {
-	hasher := sha1.New()
+	hasher := sha256.New()
 	hasher.Write([]byte(preimage))
 	shaHash := hasher.Sum(nil)
 	log.Info(fmt.Println("shaHash:", string(shaHash)))
