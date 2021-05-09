@@ -163,7 +163,7 @@ const command: GluegunCommand = {
     // console.log(user2CertN1)
 
     var res
-    if (options['step']==true) {
+    if (options['step']===true) {
         spinner.fail('Asset Exchange: Invalid Step number. Exiting.')
     }
     else if (options['step']=='1') {
