@@ -16,6 +16,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/golang/protobuf/proto"
+	log "github.com/sirupsen/logrus"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
 )
 
@@ -28,10 +29,10 @@ func generateHash(preimage string) string {
 	hasher := sha1.New()
 	hasher.Write([]byte(preimage))
 	shaHash := hasher.Sum(nil)
-	fmt.Println("shaHash:", string(shaHash))
+	log.Info(fmt.Println("shaHash:", string(shaHash)))
 	//shaBase64 := base64.URLEncoding.EncodeToString(shaHash)
 	shaBase64 := base64.StdEncoding.EncodeToString(shaHash)
-	fmt.Println("Hash for the preimage ", preimage, " is ", shaBase64)
+	log.Info(fmt.Println("Hash for the preimage ", preimage, " is ", shaBase64))
 	return shaBase64
 }
 
@@ -74,7 +75,7 @@ func TestLockAsset(t *testing.T) {
 	// Test failure by trying to lock an asset that is already locked
 	err = interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	// no need to set chaincodeStub.GetStateReturns below since the error is hit before GetState() ledger access in LockAsset()
 	lockInfoHTLC = &common.AssetLockHTLC {
@@ -88,7 +89,7 @@ func TestLockAsset(t *testing.T) {
 	// Test failure with lock information not specified properly
 	err = interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 }
 
 func TestUnLockAsset(t *testing.T) {
@@ -123,7 +124,7 @@ func TestUnLockAsset(t *testing.T) {
 	// Lock asset as per the agreement specified
 	err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.NoError(t, err)
-	fmt.Println("Completed locking as asset. Proceed to test unlock asset.")
+	log.Info(fmt.Println("Completed locking as asset. Proceed to test unlock asset."))
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
@@ -137,7 +138,7 @@ func TestUnLockAsset(t *testing.T) {
 	// Test failure with asset agreement specified for unlock which was not locked earlier
 	err = interopcc.UnLockAsset(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	// Assume that the asset is locked by Alice for Bob; then trying to unlock the asset by Alice for Charlie should fail since the locking is done for a different recipient
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: "Charlie"}
@@ -146,7 +147,7 @@ func TestUnLockAsset(t *testing.T) {
 	// Test failure with asset id being locked for a different <locker, recipient>
 	err = interopcc.UnLockAsset(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	// lock for sometime in the future for testing UnLockAsset functionality
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs)}
@@ -155,7 +156,7 @@ func TestUnLockAsset(t *testing.T) {
 	// Test failure of unlock asset with expiry time not yet elapsed
 	err = interopcc.UnLockAsset(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 }
 
 func TestIsAssetLocked(t *testing.T) {
@@ -186,7 +187,7 @@ func TestIsAssetLocked(t *testing.T) {
 	// Lock asset as per the agreement specified
 	err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.NoError(t, err)
-	fmt.Println("Completed locking as asset. Proceed to test if asset is locked or not.")
+	log.Info(fmt.Println("Completed locking as asset. Proceed to test if asset is locked or not."))
 
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: "Charlie"}
@@ -196,7 +197,7 @@ func TestIsAssetLocked(t *testing.T) {
 	isAssetLocked, err := interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient}
@@ -206,7 +207,7 @@ func TestIsAssetLocked(t *testing.T) {
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
-	fmt.Println("Test succeeded as expected since the asset agreement is specified properly.")
+	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified properly."))
 
 
 	assetLockVal = AssetLockValue{Locker: "Dave", Recipient: recipient}
@@ -216,7 +217,7 @@ func TestIsAssetLocked(t *testing.T) {
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 
 	assetAgreement = &common.AssetExchangeAgreement {
@@ -231,7 +232,7 @@ func TestIsAssetLocked(t *testing.T) {
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
-	fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker.")
+	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker."))
 
 
 	assetAgreement = &common.AssetExchangeAgreement {
@@ -247,7 +248,7 @@ func TestIsAssetLocked(t *testing.T) {
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 
 	assetAgreement = &common.AssetExchangeAgreement {
@@ -262,7 +263,7 @@ func TestIsAssetLocked(t *testing.T) {
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
-	fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary recipient.")
+	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary recipient."))
 
 
 	assetAgreement = &common.AssetExchangeAgreement {
@@ -278,7 +279,7 @@ func TestIsAssetLocked(t *testing.T) {
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 
 	assetAgreement = &common.AssetExchangeAgreement {
@@ -294,7 +295,7 @@ func TestIsAssetLocked(t *testing.T) {
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
-	fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker and arbitrary recipient.")
+	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker and arbitrary recipient."))
 }
 
 func TestClaimAsset(t *testing.T) {
@@ -332,7 +333,7 @@ func TestClaimAsset(t *testing.T) {
 	// Lock asset as per the agreement specified
 	err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.NoError(t, err)
-	fmt.Println("Completed locking as asset. Proceed to test claim asset.")
+	log.Info(fmt.Println("Completed locking as asset. Proceed to test claim asset."))
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs)}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
@@ -341,7 +342,7 @@ func TestClaimAsset(t *testing.T) {
 	// Test success with asset agreement specified properly
 	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
 	require.NoError(t, err)
-	fmt.Println("Test success as expected since the asset agreement and claim information are specified properly.")
+	log.Info(fmt.Println("Test success as expected since the asset agreement and claim information are specified properly."))
 
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: uint64(currentTimeSecs - defaultTimeLockSecs)}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
@@ -349,7 +350,7 @@ func TestClaimAsset(t *testing.T) {
 	// Test failure with expiry time elapsed to claim the asset
 	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	wrongPreimage := "abc"
 	wrongPreimageBase64 := base64.StdEncoding.EncodeToString([]byte(wrongPreimage))
@@ -361,7 +362,7 @@ func TestClaimAsset(t *testing.T) {
 	// Test failure with claim information not specified properly
 	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(wrongClaimInfoBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	assetAgreement.Locker = "Charlie"
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
@@ -369,7 +370,7 @@ func TestClaimAsset(t *testing.T) {
 	// Test failure with asset agreement specified not properly
 	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	assetAgreement.Locker = locker
 	assetAgreement.Id = "A002"
@@ -379,7 +380,7 @@ func TestClaimAsset(t *testing.T) {
 	// Test failure with asset agreement specified not properly
 	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	// lock for sometime in the future for testing UnLockAsset functionality
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs)}
@@ -388,5 +389,5 @@ func TestClaimAsset(t *testing.T) {
 	// Test failure of unlock asset with expiry time not yet elapsed
 	err = interopcc.UnLockAsset(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
-	fmt.Println("Test failed as expected with error:", err)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
 }

@@ -39,7 +39,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return err
 	}
 	//display the requested asset agreement
-	fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement)
+	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
 
 	lockInfoHTLC := &common.AssetLockHTLC{}
 	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfoHTLC)
@@ -48,7 +48,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return err
 	}
 	//display the requested asset agreement
-	fmt.Printf("lockInfoHTLC: %+v\n", lockInfoHTLC)
+	log.Info(fmt.Printf("lockInfoHTLC: %+v\n", lockInfoHTLC))
 
 	if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
 		errorMsg := "only EPOCH time is supported at present"
@@ -90,7 +90,7 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 	//display the requested asset agreement
-	fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement)
+	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
 
 	assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
 
@@ -148,7 +148,7 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 		return false, err
 	}
 	//display the requested asset agreement
-	fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement)
+	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
 
 	assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
 
@@ -171,19 +171,15 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	}
-	fmt.Printf("assetLockVal: %+v\n", assetLockVal)
+	log.Info(fmt.Printf("assetLockVal: %+v\n", assetLockVal))
 
-	// '*' for recipient or locker in the query implies that the seeks status for an arbitrary recipient or locker respectively
-	if assetAgreement.Locker == "*" && assetAgreement.Recipient == "*" {
-		return true, nil
-	} else if assetAgreement.Locker == "*" && assetLockVal.Recipient == assetAgreement.Recipient {
+	// '*' for recipient or locker in the query implies that the query seeks status for an arbitrary recipient or locker respectively
+	if (assetAgreement.Locker == "*" || assetLockVal.Locker == assetAgreement.Locker) && (assetAgreement.Recipient == "*" || assetLockVal.Recipient == assetAgreement.Recipient) {
 		return true, nil
 	} else if assetAgreement.Locker == "*" && assetLockVal.Recipient != assetAgreement.Recipient {
 		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Recipient)
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
-	} else if assetAgreement.Recipient == "*" && assetLockVal.Locker == assetAgreement.Locker {
-		return true, nil
 	} else if assetAgreement.Recipient == "*" && assetLockVal.Locker != assetAgreement.Locker {
 		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked by %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker)
 		log.Error(errorMsg)
@@ -216,9 +212,9 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, err
 	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
 
 	if shaHashBase64 == hashBase64 {
-		fmt.Printf("checkIfCorrectPreimage: preimage %s is passed correctly.\n", preimage)
+		log.Info(fmt.Printf("checkIfCorrectPreimage: preimage %s is passed correctly.\n", preimage))
 	} else {
-		fmt.Printf("checkIfCorrectPreimage: preimage %s is not passed correctly.\n", preimage)
+		log.Info(fmt.Printf("checkIfCorrectPreimage: preimage %s is not passed correctly.\n", preimage))
 		return false, nil
 	}
 	return true, nil
@@ -234,20 +230,18 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		return err
 	}
 	// display the requested asset agreement
-	fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement)
+	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
 
 	claimInfo := &common.AssetClaimHTLC{}
 	err = proto.Unmarshal([]byte(claimInfoBytes), claimInfo)
 	if err != nil {
-		//log.Error(err.Error())
-		return err
 		errorMsg := fmt.Sprintf("Unmarshal error: %s", err)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	// display the claim information
-	fmt.Printf("claimInfo: %+v\n", claimInfo)
+	log.Info(fmt.Printf("claimInfo: %+v\n", claimInfo))
 
 	assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
 
