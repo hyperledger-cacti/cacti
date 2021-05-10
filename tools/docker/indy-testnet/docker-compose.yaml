@@ -1,0 +1,76 @@
+version: '3'
+
+services: 
+  indy_pool:
+    container_name: indy_pool
+    image: indy_pool
+    build:
+      context: ${INDY_SDK_ROOT}
+      dockerfile: indy-pool.dockerfile
+      args:
+      - HTTP_PROXY=$HTTP_PROXY
+      - http_proxy=$HTTP_PROXY
+      - HTTPS_PROXY=$HTTP_PROXY
+      - https_proxy=$HTTP_PROXY
+      - FTP_PROXY=$HTTP_PROXY
+      - ftp_proxy=$HTTP_proxy
+      - NO_PROXY=$NO_PROXY
+      - no_proxy=$no_proxy
+    environment:
+    - HTTP_PROXY=$HTTP_PROXY
+    - http_proxy=$HTTP_PROXY
+    - HTTPS_PROXY=$HTTP_PROXY
+    - https_proxy=$HTTP_PROXY
+    - FTP_PROXY=$HTTP_PROXY
+    - ftp_proxy=$HTTP_proxy
+    - NO_PROXY=$NO_PROXY
+    - no_proxy=$no_proxy
+    ports: 
+    - "9701:9701"
+    - "9702:9702"
+    - "9703:9703"
+    - "9704:9704"
+    - "9705:9705"
+    - "9706:9706"
+    - "9707:9707"
+    - "9708:9708"
+    networks:
+      indy_net:
+        ipv4_address: 172.16.0.2
+    volumes:
+    - ./sandbox:/var/lib/indy/sandbox/
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+      dockerfile: custom-nginx.dockerfile
+    image: sfuji822/nginx
+    ports: 
+      - "10080:80"
+    networks:
+      indy_net:
+        ipv4_address: 172.16.0.3
+
+  validator:
+    container_name: validator
+    build:
+      context: ./validator
+      dockerfile: valipy.dockerfile
+    image: valipy
+    ports:
+      - "80:80"
+    networks:
+      indy_net:
+        ipv4_address: 172.16.0.4
+
+
+networks:
+  indy_net:
+    name: indy_net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24
+
