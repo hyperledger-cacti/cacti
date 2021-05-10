@@ -66,7 +66,7 @@ func TestReadAsset(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	expectedAsset := &simpleasset.Asset{ID: "asset1"}
+	expectedAsset := &simpleasset.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
@@ -91,7 +91,7 @@ func TestUpdateFaceValue(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	expectedAsset := &simpleasset.Asset{ID: "asset1"}
+	expectedAsset := &simpleasset.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
@@ -114,7 +114,7 @@ func TestUpdateMaturityDate(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	expectedAsset := &simpleasset.Asset{ID: "asset1"}
+	expectedAsset := &simpleasset.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
@@ -137,7 +137,7 @@ func TestDeleteAsset(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	asset := &simpleasset.Asset{ID: "asset1"}
+	asset := &simpleasset.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
 	require.NoError(t, err)
 
@@ -161,7 +161,7 @@ func TestUpdateOwner(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	asset := &simpleasset.Asset{ID: "asset1"}
+	asset := &simpleasset.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
 	require.NoError(t, err)
 
@@ -176,7 +176,7 @@ func TestUpdateOwner(t *testing.T) {
 }
 
 func TestGetAllAssets(t *testing.T) {
-	asset := &simpleasset.Asset{ID: "asset1"}
+	asset := &simpleasset.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
 	require.NoError(t, err)
 
@@ -193,7 +193,7 @@ func TestGetAllAssets(t *testing.T) {
 	assetTransfer := &simpleasset.SmartContract{}
 	assets, err := assetTransfer.GetAllAssets(transactionContext)
 	require.NoError(t, err)
-	require.Equal(t, []*simpleasset.Asset{asset}, assets)
+	require.Equal(t, []*simpleasset.BondAsset{asset}, assets)
 
 	iterator.HasNextReturns(true)
 	iterator.NextReturns(nil, fmt.Errorf("failed retrieving next item"))

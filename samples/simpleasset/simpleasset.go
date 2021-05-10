@@ -10,12 +10,12 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-// SmartContract provides functions for managing an Asset
+// SmartContract provides functions for managing an BondAsset
 type SmartContract struct {
 	contractapi.Contract
 }
 
-type Asset struct {
+type BondAsset struct {
 	ID            string      `json:"id"`
 	AssetType     string      `json:"assettype"`
 	Owner         string      `json:"owner"`
@@ -27,7 +27,7 @@ type Asset struct {
 
 // InitLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
-	assets := []Asset{
+	assets := []BondAsset{
 		{ID: "a1", AssetType: "type1", Issuer: "Treasury" , Owner: "", FaceValue: 300,
 			 MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
 		{ID: "a2", AssetType: "type1", Issuer: "Treasury" , Owner: "", FaceValue: 400,
@@ -63,7 +63,7 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 		return fmt.Errorf("the asset %s already exists", id)
 	}
 
-	asset := Asset{
+	asset := BondAsset{
 		ID: id,
 		AssetType: assettype,
 		Owner: owner,
@@ -80,7 +80,7 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 }
 
 // ReadAsset returns the asset stored in the world state with given id.
-func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, id string) (*Asset, error) {
+func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, id string) (*BondAsset, error) {
 	assetJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from world state: %v", err)
@@ -89,7 +89,7 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, i
 		return nil, fmt.Errorf("the asset %s does not exist", id)
 	}
 
-	var asset Asset
+	var asset BondAsset
 	err = json.Unmarshal(assetJSON, &asset)
 	if err != nil {
 		return nil, err
@@ -181,7 +181,7 @@ func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterf
 }
 
 // GetAllAssets returns all assets found in world state
-func (s *SmartContract) GetAllAssets(ctx contractapi.TransactionContextInterface) ([]*Asset, error) {
+func (s *SmartContract) GetAllAssets(ctx contractapi.TransactionContextInterface) ([]*BondAsset, error) {
 	// range query with empty string for startKey and endKey does an
 	// open-ended query of all assets in the chaincode namespace.
 	resultsIterator, err := ctx.GetStub().GetStateByRange("", "")
@@ -190,14 +190,14 @@ func (s *SmartContract) GetAllAssets(ctx contractapi.TransactionContextInterface
 	}
 	defer resultsIterator.Close()
 
-	var assets []*Asset
+	var assets []*BondAsset
 	for resultsIterator.HasNext() {
 		queryResponse, err := resultsIterator.Next()
 		if err != nil {
 			return nil, err
 		}
 
-		var asset Asset
+		var asset BondAsset
 		err = json.Unmarshal(queryResponse.Value, &asset)
 		if err != nil {
 			return nil, err
