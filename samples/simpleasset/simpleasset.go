@@ -223,8 +223,8 @@ func main() {
 				Address: os.Getenv("CHAINCODE_ADDRESS"),
 				CC:      chaincode,
 				TLSProps: shim.TLSProperties{
-										Disabled: true,
-									},
+					Disabled: true,
+				},
 		}
 		// Start the chaincode external server
 		err = server.Start()
