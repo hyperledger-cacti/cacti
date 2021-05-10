@@ -30,7 +30,6 @@ func generateHash(preimage string) string {
 	hasher.Write([]byte(preimage))
 	shaHash := hasher.Sum(nil)
 	log.Info(fmt.Println("shaHash:", string(shaHash)))
-	//shaBase64 := base64.URLEncoding.EncodeToString(shaHash)
 	shaBase64 := base64.StdEncoding.EncodeToString(shaHash)
 	log.Info(fmt.Println("Hash for the preimage ", preimage, " is ", shaBase64))
 	return shaBase64
@@ -45,12 +44,12 @@ func TestLockAsset(t *testing.T) {
 	locker := "Alice"
 	preimage := "abcd"
 	hashBase64 := generateHash(preimage)
-	currentTimeSecs := time.Now().UnixNano() / int64(time.Second)
+	currentTimeSecs := uint64(time.Now().Unix())
 
 	lockInfoHTLC := &common.AssetLockHTLC {
 		Hash: []byte(hashBase64),
 		// lock for next 5 minutes
-		ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs),
+		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -81,7 +80,7 @@ func TestLockAsset(t *testing.T) {
 	lockInfoHTLC = &common.AssetLockHTLC {
 		Hash: []byte(hashBase64),
 		// lock for next 5 mintues
-		ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs),
+		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		// TimeSpec of AssetLockHTLC_DURATION is not currently supported
 		TimeSpec: common.AssetLockHTLC_DURATION,
 	}
@@ -101,12 +100,12 @@ func TestUnLockAsset(t *testing.T) {
 	locker := "Alice"
 	preimage := "abcd"
 	hashBase64 := generateHash(preimage)
-	currentTimeSecs := time.Now().UnixNano() / int64(time.Second)
+	currentTimeSecs := uint64(time.Now().Unix())
 
 	lockInfoHTLC := &common.AssetLockHTLC {
 		Hash: []byte(hashBase64),
 		// lock for sometime in the past for testing UnLockAsset functionality
-		ExpiryTimeSecs: uint64(currentTimeSecs - defaultTimeLockSecs),
+		ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -150,7 +149,7 @@ func TestUnLockAsset(t *testing.T) {
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	// lock for sometime in the future for testing UnLockAsset functionality
-	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs)}
+	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure of unlock asset with expiry time not yet elapsed
@@ -168,11 +167,11 @@ func TestIsAssetLocked(t *testing.T) {
 	locker := "Alice"
 	preimage := "abcd"
 	hashBase64 := generateHash(preimage)
-	currentTimeSecs := time.Now().UnixNano() / int64(time.Second)
+	currentTimeSecs := uint64(time.Now().Unix())
 
 	lockInfoHTLC := &common.AssetLockHTLC {
 		Hash: []byte(hashBase64),
-		ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs),
+		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -200,7 +199,7 @@ func TestIsAssetLocked(t *testing.T) {
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 
-	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient}
+	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test success with asset agreement specified properly
@@ -210,7 +209,17 @@ func TestIsAssetLocked(t *testing.T) {
 	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified properly."))
 
 
-	assetLockVal = AssetLockValue{Locker: "Dave", Recipient: recipient}
+	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs}
+	assetLockValBytes, _ = json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
+	// Test failure with expiry time elapsed already
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	require.Error(t, err)
+	require.False(t, isAssetLocked)
+	log.Info(fmt.Println("Test failed as expected with error:", err))
+
+
+	assetLockVal = AssetLockValue{Locker: "Dave", Recipient: recipient, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with asset agreement not specified properly
@@ -308,11 +317,11 @@ func TestClaimAsset(t *testing.T) {
 	preimage := "abcd"
 	hashBase64 := generateHash(preimage)
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
-	currentTimeSecs := time.Now().UnixNano() / int64(time.Second)
+	currentTimeSecs := uint64(time.Now().Unix())
 
 	lockInfoHTLC := &common.AssetLockHTLC {
 		Hash: []byte(hashBase64),
-		ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs),
+		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -335,7 +344,7 @@ func TestClaimAsset(t *testing.T) {
 	require.NoError(t, err)
 	log.Info(fmt.Println("Completed locking as asset. Proceed to test claim asset."))
 
-	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs)}
+	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 
@@ -344,7 +353,7 @@ func TestClaimAsset(t *testing.T) {
 	require.NoError(t, err)
 	log.Info(fmt.Println("Test success as expected since the asset agreement and claim information are specified properly."))
 
-	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: uint64(currentTimeSecs - defaultTimeLockSecs)}
+	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with expiry time elapsed to claim the asset
@@ -383,7 +392,7 @@ func TestClaimAsset(t *testing.T) {
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	// lock for sometime in the future for testing UnLockAsset functionality
-	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: uint64(currentTimeSecs + defaultTimeLockSecs)}
+	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure of unlock asset with expiry time not yet elapsed

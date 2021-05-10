@@ -23,12 +23,22 @@ import (
 )
 
 type AssetLockValue struct {
-	Locker	string	`json:"locker"`
+	ContractId	string	`json:"contractId"`
+	Locker		string	`json:"locker"`
 	Recipient	string	`json:"recipient"`
-	Hash	string	`json:"hash"`
+	Hash		string	`json:"hash"`
 	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
 }
 
+// function to generate contract id as "SHA256" hash based on the asset lock key (which is combination of asset type and asset it)
+func generateAssetLockKeyAndContractId(assetAgreement *common.AssetExchangeAgreement) (string, string) {
+	hasher := sha256.New()
+	assetLockKey := assetAgreement.Type + assetAgreement.Id
+	hasher.Write([]byte(assetLockKey))
+	shaHash := hasher.Sum(nil)
+	shaBase64 := base64.StdEncoding.EncodeToString(shaHash)
+	return assetLockKey, shaBase64
+}
 // LockAsset cc is used to record locking of an asset on the ledger
 func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, lockInfoBytes string) error {
 
@@ -56,8 +66,9 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return errors.New(errorMsg)
 	}
 
-	assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
-	assetLockVal := AssetLockValue{Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+	//assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
+	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
+	assetLockVal := AssetLockValue{ContractId: contractId, Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -65,15 +76,15 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return err
 	}
 
-        if assetLockValBytes != nil {
-		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is already locked", assetAgreement.Type, assetAgreement.Id)
+	if assetLockValBytes != nil {
+		errorMsg := fmt.Sprintf("asset of type %s and ID %s is already locked", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	assetLockValBytes, err = json.Marshal(assetLockVal)
 	if err != nil {
-		errorMsg := fmt.Sprintf("Marshal error: %s", err)
+		errorMsg := fmt.Sprintf("marshal error: %s", err)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
@@ -101,7 +112,7 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 	}
 
         if assetLockValBytes == nil {
-		errorMsg := fmt.Sprintf("No asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+		errorMsg := fmt.Sprintf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
@@ -109,28 +120,28 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 	assetLockVal := AssetLockValue{}
 	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
 	if err != nil {
-		errorMsg := fmt.Sprintf("Unmarshal error: %s", err)
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		errorMsg := fmt.Sprintf("Cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
+		errorMsg := fmt.Sprintf("cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	// Check if expiry time is elapsed
-	currentTimeSecs := time.Now().UnixNano() / int64(time.Second)
+	currentTimeSecs := uint64(time.Now().Unix())
 	if uint64(currentTimeSecs) < assetLockVal.ExpiryTimeSecs {
-		errorMsg := fmt.Sprintf("Cannot unlock asset of type %s and ID %s as the expiry time is not yet elapsed", assetAgreement.Type, assetAgreement.Id)
+		errorMsg := fmt.Sprintf("cannot unlock asset of type %s and ID %s as the expiry time is not yet elapsed", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+		errorMessage := fmt.Sprintf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
 		log.Error(errorMessage)
 		return errors.New(errorMessage)
 	}
@@ -158,8 +169,8 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 		return false, err
 	}
 
-        if assetLockValBytes == nil {
-		errorMsg := fmt.Sprintf("No asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+	if assetLockValBytes == nil {
+		errorMsg := fmt.Sprintf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	}
@@ -167,25 +178,33 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 	assetLockVal := AssetLockValue{}
 	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
 	if err != nil {
-		errorMsg := fmt.Sprintf("Unmarshal error: %s", err)
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	}
 	log.Info(fmt.Printf("assetLockVal: %+v\n", assetLockVal))
 
+	// Check if expiry time is elapsed
+	currentTimeSecs := uint64(time.Now().Unix())
+	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("expiry time for asset of type %s and ID %s is already elapsed", assetAgreement.Type, assetAgreement.Id)
+		log.Error(errorMsg)
+		return false, errors.New(errorMsg)
+	}
+
 	// '*' for recipient or locker in the query implies that the query seeks status for an arbitrary recipient or locker respectively
 	if (assetAgreement.Locker == "*" || assetLockVal.Locker == assetAgreement.Locker) && (assetAgreement.Recipient == "*" || assetLockVal.Recipient == assetAgreement.Recipient) {
 		return true, nil
 	} else if assetAgreement.Locker == "*" && assetLockVal.Recipient != assetAgreement.Recipient {
-		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Recipient)
+		errorMsg := fmt.Sprintf("asset of type %s and ID %s is not locked for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Recipient)
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	} else if assetAgreement.Recipient == "*" && assetLockVal.Locker != assetAgreement.Locker {
-		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked by %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker)
+		errorMsg := fmt.Sprintf("asset of type %s and ID %s is not locked by %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker)
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	} else if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		errorMsg := fmt.Sprintf("Asset of type %s and ID %s is not locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker, assetAgreement.Recipient)
+		errorMsg := fmt.Sprintf("asset of type %s and ID %s is not locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker, assetAgreement.Recipient)
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	}
@@ -200,7 +219,7 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, error) {
 	preimage, err := base64.StdEncoding.DecodeString(preimageBase64)
 	if err != nil {
-		errorMsg := fmt.Sprintf("Base64 decode preimage error: %s", err)
+		errorMsg := fmt.Sprintf("base64 decode preimage error: %s", err)
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	}
@@ -208,7 +227,6 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, err
 	hasher := sha256.New()
 	hasher.Write([]byte(preimage))
 	shaHash := hasher.Sum(nil)
-	//shaHashBase64 := base64.URLEncoding.EncodeToString(shaHash)
 	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
 
 	if shaHashBase64 == hashBase64 {
@@ -235,7 +253,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	claimInfo := &common.AssetClaimHTLC{}
 	err = proto.Unmarshal([]byte(claimInfoBytes), claimInfo)
 	if err != nil {
-		errorMsg := fmt.Sprintf("Unmarshal error: %s", err)
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
@@ -252,7 +270,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	}
 
         if assetLockValBytes == nil {
-		errorMsg := fmt.Sprintf("No asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+		errorMsg := fmt.Sprintf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
@@ -260,13 +278,13 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	assetLockVal := AssetLockValue{}
 	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
 	if err != nil {
-		errorMsg := fmt.Sprintf("Unmarshal error: %s", err)
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		errorMsg := fmt.Sprintf("Can not claim asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
+		errorMsg := fmt.Sprintf("cannot claim asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
@@ -274,28 +292,28 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	// compute the hash from the preimage
 	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimage), string(assetLockVal.Hash))
 	if err != nil {
-		errorMsg := fmt.Sprintf("Claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
+		errorMsg := fmt.Sprintf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	if isCorrectPreimage == false {
-		errorMsg := fmt.Sprintf("Can not claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
+		errorMsg := fmt.Sprintf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	// Check if expiry time is elapsed
-	currentTimeSecs := time.Now().UnixNano() / int64(time.Second)
+	currentTimeSecs := uint64(time.Now().Unix())
 	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
-		errorMsg := fmt.Sprintf("Can not claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
+		errorMsg := fmt.Sprintf("cannot claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
-		errorMsg := fmt.Sprintf("Failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+		errorMsg := fmt.Sprintf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
