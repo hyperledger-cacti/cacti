@@ -16,12 +16,12 @@ type SmartContract struct {
 }
 
 type Asset struct {
-	ID							string 			`json:"id"`
-	AssetType				string 			`json:"assettype"`
-	Owner						string 			`json:"owner"`
-	Issuer					string 			`json:"issuer"`
-	FaceValue				int					`json:"facevalue"`
-	MaturityDate		time.Time		`json:"maturitydate"`
+	ID            string      `json:"id"`
+	AssetType     string      `json:"assettype"`
+	Owner         string      `json:"owner"`
+	Issuer        string      `json:"issuer"`
+	FaceValue     int         `json:"facevalue"`
+	MaturityDate  time.Time   `json:"maturitydate"`
 }
 
 
@@ -64,12 +64,12 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	asset := Asset{
-		ID:							id,
-		AssetType:			assettype,
-		Owner:					owner,
-		Issuer:					issuer,
-		FaceValue:			faceValue,
-		MaturityDate:		maturityDate,
+		ID: id,
+		AssetType: assettype,
+		Owner: owner,
+		Issuer: issuer,
+		FaceValue: faceValue,
+		MaturityDate: maturityDate,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
