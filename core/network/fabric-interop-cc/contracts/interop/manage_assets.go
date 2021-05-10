@@ -66,7 +66,6 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return errors.New(errorMsg)
 	}
 
-	//assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
 	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
 	assetLockVal := AssetLockValue{ContractId: contractId, Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
 
@@ -103,7 +102,7 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 	//display the requested asset agreement
 	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
 
-	assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
+	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -161,7 +160,7 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 	//display the requested asset agreement
 	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
 
-	assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
+	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -261,7 +260,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	// display the claim information
 	log.Info(fmt.Printf("claimInfo: %+v\n", claimInfo))
 
-	assetLockKey := assetAgreement.Type + ":" + assetAgreement.Id
+	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -289,6 +288,14 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		return errors.New(errorMsg)
 	}
 
+	// Check if expiry time is elapsed
+	currentTimeSecs := uint64(time.Now().Unix())
+	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("cannot claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
 	// compute the hash from the preimage
 	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimage), string(assetLockVal.Hash))
 	if err != nil {
@@ -299,14 +306,6 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 
 	if isCorrectPreimage == false {
 		errorMsg := fmt.Sprintf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
-		log.Error(errorMsg)
-		return errors.New(errorMsg)
-	}
-
-	// Check if expiry time is elapsed
-	currentTimeSecs := uint64(time.Now().Unix())
-	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
-		errorMsg := fmt.Sprintf("cannot claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
 	}
