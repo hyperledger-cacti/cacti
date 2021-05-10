@@ -16,12 +16,12 @@ type SmartContract struct {
 }
 
 type Asset struct {
-	ID             string 			`json:"id"`
-	AssetType      string 			`json:"assettype"`
-	Owner          string 			`json:"owner"`
-	Issuer         string 			`json:"issuer"`
-	FaceValue 		 int    			`json:"facevalue"`
-	MaturityDate 	 time.Time    `json:"maturitydate"`
+	ID							string 			`json:"id"`
+	AssetType				string 			`json:"assettype"`
+	Owner						string 			`json:"owner"`
+	Issuer					string 			`json:"issuer"`
+	FaceValue				int					`json:"facevalue"`
+	MaturityDate		time.Time		`json:"maturitydate"`
 }
 
 
@@ -55,7 +55,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 
 // CreateAsset issues a new asset to the world state with given details.
 func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id string, assettype string, owner string, issuer string, faceValue int, maturityDate time.Time) error {
-	exists, err := s.isAssetExists(ctx, id)
+	exists, err := s.AssetExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -64,12 +64,12 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	asset := Asset{
-		ID:             id,
-		AssetType:           assettype,
-		Owner:          owner,
-		Issuer:         issuer,
-		FaceValue: 		faceValue,
-		MaturityDate: 	maturityDate,
+		ID:							id,
+		AssetType:			assettype,
+		Owner:					owner,
+		Issuer:					issuer,
+		FaceValue:			faceValue,
+		MaturityDate:		maturityDate,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
@@ -100,7 +100,7 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, i
 
 // DeleteAsset deletes an given asset from the world state.
 func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, id string) error {
-	exists, err := s.isAssetExists(ctx, id)
+	exists, err := s.AssetExists(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface,
 }
 
 // AssetExists returns true when asset with given ID exists in world state
-func (s *SmartContract) isAssetExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
+func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
 	assetJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
 		return false, fmt.Errorf("failed to read from world state: %v", err)
