@@ -49,15 +49,15 @@ func TestCreateAsset(t *testing.T) {
 	transactionContext.GetStubReturns(chaincodeStub)
 
 	assetTransfer := simpleasset.SmartContract{}
-	err := assetTransfer.CreateAsset(transactionContext, "", "", "", "", 0, time.Now())
+	err := assetTransfer.CreateAsset(transactionContext, "", "", "", 0, time.Now())
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns([]byte{}, nil)
-	err = assetTransfer.CreateAsset(transactionContext, "asset1", "", "", "", 0, time.Now())
+	err = assetTransfer.CreateAsset(transactionContext, "asset1", "", "", 0, time.Now())
 	require.EqualError(t, err, "the asset asset1 already exists")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = assetTransfer.CreateAsset(transactionContext, "asset1", "", "", "", 0, time.Now())
+	err = assetTransfer.CreateAsset(transactionContext, "asset1", "", "", 0, time.Now())
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 }
 

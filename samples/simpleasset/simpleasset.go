@@ -17,7 +17,6 @@ type SmartContract struct {
 
 type BondAsset struct {
 	ID            string      `json:"id"`
-	AssetType     string      `json:"assettype"`
 	Owner         string      `json:"owner"`
 	Issuer        string      `json:"issuer"`
 	FaceValue     int         `json:"facevalue"`
@@ -28,13 +27,13 @@ type BondAsset struct {
 // InitLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	assets := []BondAsset{
-		{ID: "a1", AssetType: "type1", Issuer: "Treasury" , Owner: "", FaceValue: 300,
+		{ID: "a1", Issuer: "Treasury" , Owner: "", FaceValue: 300,
 			 MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
-		{ID: "a2", AssetType: "type1", Issuer: "Treasury" , Owner: "", FaceValue: 400,
+		{ID: "a2", Issuer: "Treasury" , Owner: "", FaceValue: 400,
 			 MaturityDate: time.Date(2022, time.July, 1, 12, 0, 0, 0, time.UTC)},
-		{ID: "a3", AssetType: "type2", Issuer: "Treasury" , Owner: "", FaceValue: 1000,
+		{ID: "a3", Issuer: "Treasury" , Owner: "", FaceValue: 1000,
 			 MaturityDate: time.Date(2023, time.April, 1, 12, 0, 0, 0, time.UTC) },
-		{ID: "a4", AssetType: "type3", Issuer: "Treasury" , Owner: "", FaceValue: 2000,
+		{ID: "a4", Issuer: "Treasury" , Owner: "", FaceValue: 2000,
 			 MaturityDate: time.Date(2025, time.April, 1, 12, 0, 0, 0, time.UTC) },
 	}
 
@@ -54,7 +53,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 }
 
 // CreateAsset issues a new asset to the world state with given details.
-func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id string, assettype string, owner string, issuer string, faceValue int, maturityDate time.Time) error {
+func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id string, owner string, issuer string, faceValue int, maturityDate time.Time) error {
 	exists, err := s.AssetExists(ctx, id)
 	if err != nil {
 		return err
@@ -65,7 +64,6 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 
 	asset := BondAsset{
 		ID: id,
-		AssetType: assettype,
 		Owner: owner,
 		Issuer: issuer,
 		FaceValue: faceValue,
