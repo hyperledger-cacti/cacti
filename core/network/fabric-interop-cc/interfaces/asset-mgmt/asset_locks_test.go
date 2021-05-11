@@ -98,8 +98,10 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         return shim.Success(nil)
     }
     if function == "IsAssetLocked" {
-        expectedKey := args[0] + ":" + args[1]
-        expectedVal := args[3] + ":" + args[2]
+        assetAgreement := &common.AssetExchangeAgreement{}
+        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
+        expectedVal := assetAgreement.Locker + ":" + assetAgreement.Recipient
         if cc.assetLockMap[expectedKey] == expectedVal {
             return shim.Success([]byte("true"))
         } else {
@@ -116,12 +118,14 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         }
     }
     if function == "UnlockAsset" {
-        expectedKey := args[0] + ":" + args[1]
-        expectedVal := string(caller) + ":" + args[2]
+        assetAgreement := &common.AssetExchangeAgreement{}
+        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
+        expectedVal := string(caller) + ":" + assetAgreement.Recipient
         if cc.assetLockMap[expectedKey] == "" {
-            return shim.Error(fmt.Sprintf("No asset of type %s and ID %s is locked", args[0], args[1]))
+            return shim.Error(fmt.Sprintf("No asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id))
         } else if cc.assetLockMap[expectedKey] != expectedVal {
-            return shim.Error(fmt.Sprintf("Cannot unlock asset of type %s and ID %s as it is locked by %s for %s", args[0], args[1], string(caller), args[2]))
+            return shim.Error(fmt.Sprintf("Cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, string(caller), assetAgreement.Recipient))
         } else {
             delete(cc.assetLockMap, expectedKey)
             return shim.Success(nil)
