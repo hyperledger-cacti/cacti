@@ -65,14 +65,14 @@ func TestLockAsset(t *testing.T) {
 	// chaincodeStub.GetStateReturns should return nil to be able to lock the asset
 	chaincodeStub.GetStateReturns(nil, nil)
 	// Test success with asset agreement specified properly
-	err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.NoError(t, err)
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure by trying to lock an asset that is already locked
-	err = interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err = interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -86,7 +86,7 @@ func TestLockAsset(t *testing.T) {
 	}
 	lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
 	// Test failure with lock information not specified properly
-	err = interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err = interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 }
@@ -121,7 +121,7 @@ func TestUnLockAsset(t *testing.T) {
 	// chaincodeStub.GetStateReturns should return nil to be able to lock the asset
 	chaincodeStub.GetStateReturns(nil, nil)
 	// Lock asset as per the agreement specified
-	err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.NoError(t, err)
 	log.Info(fmt.Println("Completed locking as asset. Proceed to test unlock asset."))
 
@@ -184,7 +184,7 @@ func TestIsAssetLocked(t *testing.T) {
 	}
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
 	// Lock asset as per the agreement specified
-	err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.NoError(t, err)
 	log.Info(fmt.Println("Completed locking as asset. Proceed to test if asset is locked or not."))
 
@@ -340,7 +340,7 @@ func TestClaimAsset(t *testing.T) {
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
 	// Lock asset as per the agreement specified
-	err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
 	require.NoError(t, err)
 	log.Info(fmt.Println("Completed locking as asset. Proceed to test claim asset."))
 

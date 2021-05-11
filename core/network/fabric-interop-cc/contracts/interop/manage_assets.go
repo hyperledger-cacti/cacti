@@ -40,30 +40,30 @@ func generateAssetLockKeyAndContractId(assetAgreement *common.AssetExchangeAgree
 	return assetLockKey, shaBase64
 }
 // LockAsset cc is used to record locking of an asset on the ledger
-func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, lockInfoBytes string) error {
+func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, lockInfoBytes string) (string, error) {
 
 	assetAgreement := &common.AssetExchangeAgreement{}
 	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
-		return err
+		return "", err
 	}
 	//display the requested asset agreement
-	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
+	log.Info(fmt.Sprintf("assetExchangeAgreement: %+v\n", assetAgreement))
 
 	lockInfoHTLC := &common.AssetLockHTLC{}
 	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfoHTLC)
 	if err != nil {
 		log.Error(err.Error())
-		return err
+		return "", err
 	}
 	//display the requested asset agreement
-	log.Info(fmt.Printf("lockInfoHTLC: %+v\n", lockInfoHTLC))
+	log.Info(fmt.Sprintf("lockInfoHTLC: %+v\n", lockInfoHTLC))
 
 	if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
 		errorMsg := "only EPOCH time is supported at present"
 		log.Error(errorMsg)
-		return errors.New(errorMsg)
+		return "", errors.New(errorMsg)
 	}
 
 	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
@@ -72,22 +72,41 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
 		log.Error(err.Error())
-		return err
+		return "", err
 	}
 
 	if assetLockValBytes != nil {
 		errorMsg := fmt.Sprintf("asset of type %s and ID %s is already locked", assetAgreement.Type, assetAgreement.Id)
 		log.Error(errorMsg)
-		return errors.New(errorMsg)
+		return "", errors.New(errorMsg)
 	}
 
 	assetLockValBytes, err = json.Marshal(assetLockVal)
 	if err != nil {
 		errorMsg := fmt.Sprintf("marshal error: %s", err)
 		log.Error(errorMsg)
-		return errors.New(errorMsg)
+		return "", errors.New(errorMsg)
 	}
-	return ctx.GetStub().PutState(assetLockKey, assetLockValBytes)
+
+	err = ctx.GetStub().PutState(assetLockKey, assetLockValBytes)
+	if err != nil {
+		log.Error(err.Error())
+		return "", err
+	}
+
+	assetLockKeyBytes, err := json.Marshal(assetLockKey)
+	if err != nil {
+		errorMsg := fmt.Sprintf("marshal error: %s", err)
+		log.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	err = ctx.GetStub().PutState(string(contractId), assetLockKeyBytes)
+	if err != nil {
+		log.Error(err.Error())
+		return "", err
+	}
+	return contractId, nil
 }
 
 // UnLockAsset cc is used to record unlocking of an asset on the ledger
@@ -100,7 +119,7 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 	//display the requested asset agreement
-	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
+	log.Info(fmt.Sprintf("assetExchangeAgreement: %+v\n", assetAgreement))
 
 	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
 
@@ -158,7 +177,7 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 		return false, err
 	}
 	//display the requested asset agreement
-	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
+	log.Info(fmt.Sprintf("assetExchangeAgreement: %+v\n", assetAgreement))
 
 	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
 
@@ -181,7 +200,7 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 		log.Error(errorMsg)
 		return false, errors.New(errorMsg)
 	}
-	log.Info(fmt.Printf("assetLockVal: %+v\n", assetLockVal))
+	log.Info(fmt.Sprintf("assetLockVal: %+v\n", assetLockVal))
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
@@ -229,9 +248,9 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, err
 	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
 
 	if shaHashBase64 == hashBase64 {
-		log.Info(fmt.Printf("checkIfCorrectPreimage: preimage %s is passed correctly.\n", preimage))
+		log.Info(fmt.Sprintf("checkIfCorrectPreimage: preimage %s is passed correctly.\n", preimage))
 	} else {
-		log.Info(fmt.Printf("checkIfCorrectPreimage: preimage %s is not passed correctly.\n", preimage))
+		log.Info(fmt.Sprintf("checkIfCorrectPreimage: preimage %s is not passed correctly.\n", preimage))
 		return false, nil
 	}
 	return true, nil
@@ -247,7 +266,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		return err
 	}
 	// display the requested asset agreement
-	log.Info(fmt.Printf("assetExchangeAgreement: %+v\n", assetAgreement))
+	log.Info(fmt.Sprintf("assetExchangeAgreement: %+v\n", assetAgreement))
 
 	claimInfo := &common.AssetClaimHTLC{}
 	err = proto.Unmarshal([]byte(claimInfoBytes), claimInfo)
@@ -258,7 +277,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	}
 
 	// display the claim information
-	log.Info(fmt.Printf("claimInfo: %+v\n", claimInfo))
+	log.Info(fmt.Sprintf("claimInfo: %+v\n", claimInfo))
 
 	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
 
