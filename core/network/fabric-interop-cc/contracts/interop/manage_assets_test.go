@@ -368,7 +368,10 @@ func TestClaimAsset(t *testing.T) {
 	}
 	wrongClaimInfoBytes, _ := proto.Marshal(wrongClaimInfo)
 
-	// Test failure with claim information not specified properly
+	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
+	assetLockValBytes, _ = json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
+	// Test failure with claim information (i.e., preimage) not specified properly
 	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(wrongClaimInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
@@ -386,17 +389,8 @@ func TestClaimAsset(t *testing.T) {
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 	chaincodeStub.GetStateReturns(nil, nil)
 
-	// Test failure with asset agreement specified not properly
+	// Test failure with asset agreement (i.e., asset id) specified not properly
 	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
-	require.Error(t, err)
-	log.Info(fmt.Println("Test failed as expected with error:", err))
-
-	// lock for sometime in the future for testing UnLockAsset functionality
-	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
-	assetLockValBytes, _ = json.Marshal(assetLockVal)
-	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
-	// Test failure of unlock asset with expiry time not yet elapsed
-	err = interopcc.UnLockAsset(ctx, string(assetAgreementBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 }
