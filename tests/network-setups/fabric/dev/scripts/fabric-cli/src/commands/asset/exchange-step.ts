@@ -9,7 +9,6 @@ import { fabricHelper } from '../../helpers/fabric-functions'
 import logger from '../../helpers/logger'
 import { commandHelp, getNetworkConfig, handlePromise } from '../../helpers/helpers'
 import { AssetManager } from '@res-dlt-interop/fabric-interop-sdk'
-// import { AssetManager } from '../../helpers/AssetExchange'
 
 var crypto = require('crypto');
 const ASSETTYPE_ASSET = 0
