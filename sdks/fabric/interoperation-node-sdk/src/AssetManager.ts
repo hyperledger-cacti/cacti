@@ -67,11 +67,20 @@ function createAssetClaimInfoSerialized(hashPreimage)
 }
 
 // Create a SHA-256 hash over an ASCII string
-function createSHA256HashBase64(preimage)
+function createSHA256HashBase64(preimage: string)
 {
     return crypto.createHash('sha256').update(preimage).digest('base64');
 }
 
+// Create a secure pseudo-random preimage of a given length
+function generateRandomHashPreimage(strLength: number)
+{
+    if (!strLength || strLength <= 0)
+    {
+        strLength = 20;         // Default length
+    }
+    return crypto.randomBytes(strLength).toString();
+}
 
 /**
  * First/second step of a Hashed Time Lock Contract
@@ -82,6 +91,7 @@ const createHTLC = async (
     assetType: string,
     assetID: string,
     recipientECert: string,
+    hashPreimage: string,
     hashValue: string,
     expiryTimeSecs: number,
 ): Promise<{ preimage: any; result: any }> => {
@@ -107,7 +117,7 @@ const createHTLC = async (
         return { preimage: "", result: false };
     }
 
-    let defaultExpiryTimeSecs = 0, preimage = "";
+    let defaultExpiryTimeSecs = 0;
     if (hashValue && hashValue.length > 0)
     {
         defaultExpiryTimeSecs = 5 * 60     // 5 mins: this is the 't' used to time out the second contract of the HTLC pair
@@ -115,15 +125,13 @@ const createHTLC = async (
     else
     {
         defaultExpiryTimeSecs = 10 * 60     // 10 mins: this is the '2t' used to time out the first contract of the HTLC pair
-
-        // Create a random preimage of 20 bytes
-        for (let i = 0 ; i < 20 ; i++)
+        if (!hashPreimage || hashPreimage.length == 0)
         {
-            preimage += String.fromCharCode(Math.floor(Math.random() * 256))
+            // Generate the preimage
+            hashPreimage = generateRandomHashPreimage(-1);
         }
-
         // Hash the preimage
-        hashValue = createSHA256HashBase64(preimage);
+        hashValue = createSHA256HashBase64(hashPreimage);
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
@@ -142,7 +150,7 @@ const createHTLC = async (
     if (submitError) {
         throw new Error(`LockAsset submitTransaction Error: ${submitError}`);
     }
-    return { preimage: preimage, result: result };
+    return { preimage: hashPreimage, result: result };
 };
 
 /**
@@ -154,6 +162,7 @@ const createFungibleHTLC = async (
     assetType: string,
     numUnits: number,
     recipientECert: string,
+    hashPreimage: string,
     hashValue: string,
     expiryTimeSecs: number,
 ): Promise<{ preimage: any; result: any }> => {
@@ -179,7 +188,7 @@ const createFungibleHTLC = async (
         return { preimage: "", result: false };
     }
 
-    let defaultExpiryTimeSecs = 0, preimage = "";
+    let defaultExpiryTimeSecs = 0;
     if (hashValue && hashValue.length > 0)
     {
         defaultExpiryTimeSecs = 5 * 60     // 5 mins: this is the 't' used to time out the second contract of the HTLC pair
@@ -187,15 +196,13 @@ const createFungibleHTLC = async (
     else
     {
         defaultExpiryTimeSecs = 10 * 60     // 10 mins: this is the '2t' used to time out the first contract of the HTLC pair
-
-        // Create a random preimage of 20 bytes
-        for (let i = 0 ; i < 20 ; i++)
+        if (!hashPreimage || hashPreimage.length == 0)
         {
-            preimage += String.fromCharCode(Math.floor(Math.random() * 256))
+            // Generate the preimage
+            hashPreimage = generateRandomHashPreimage(-1);
         }
-
         // Hash the preimage
-        hashValue = createSHA256HashBase64(preimage);
+        hashValue = createSHA256HashBase64(hashPreimage);
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
@@ -214,7 +221,7 @@ const createFungibleHTLC = async (
     if (submitError) {
         throw new Error(`LockFungibleAsset submitTransaction Error: ${submitError}`);
     }
-    return { preimage: preimage, result: result };
+    return { preimage: hashPreimage, result: result };
 };
 
 /**
