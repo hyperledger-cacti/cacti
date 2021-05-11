@@ -66,19 +66,31 @@ const command: GluegunCommand = {
       )
       return
     }
-    if (array.length < 1) {
-      print.error('Not enough arguments supplied')
-      return
-    }
     if (options.debug === 'true') {
       logger.level = 'debug'
       logger.debug('Debugging is enabled')
     }
+    if (array.length < 1) {
+      print.error('Not enough arguments supplied')
+      return
+    }
+    if (!options['network1'] || !options['network2'])
+    {
+      print.error('--network1 and --network2 both needs to specified')
+      return
+    }
 
-    const secret = options['secret']
-    const hash_secret = crypto.createHash('sha256').update(secret).digest('base64');
+    // Hash Pre-image
+    let secret = ''
+    let hash_secret = ''
+    if (options['secret'])
+    {
+      secret = options['secret']
+      hash_secret = crypto.createHash('sha256').update(secret).digest('base64');
+    }
 
-    var timeout, timeout2;
+    // Timeout
+    var timeout=0, timeout2=0;
     const currTime = Math.floor(Date.now()/1000);
     if (options['timeout-epoch']) {
       let duration = options['timeout-epoch'] - currTime
@@ -90,6 +102,7 @@ const command: GluegunCommand = {
       timeout2=currTime + 2 * options['timeout-duration']
     }
 
+    // Read params
     const params = array[0].split(':')
     const user1 = params[0]
     const assetType = params[1]
@@ -98,7 +111,8 @@ const command: GluegunCommand = {
     const fungibleAssetType = params[4]
     const fungibleAssetAmt = params[5]
 
-    // console.log(secret, timeout)
+    // For debugging purpose
+    // console.log(secret, hash_secret, timeout)
     // console.log(user1, assetType, assetId)
     // console.log(user2, fungibleAssetType, fungibleAssetAmt)
 
@@ -141,14 +155,15 @@ const command: GluegunCommand = {
 
 
     const user1IdN1 = await network1.wallet.get(user1)
-    const user1CertN1 = (user1IdN1).credentials.certificate;
+    const user1CertN1 = (user1IdN1).credentials.certificate
     const user1IdN2 = await network2.wallet.get(user1)
-    const user1CertN2 = (user1IdN2).credentials.certificate;
+    const user1CertN2 = (user1IdN2).credentials.certificate
 
     const user2IdN1 = await network1.wallet.get(user2)
-    const user2CertN1 = (user2IdN1).credentials.certificate;
+    const user2CertN1 = (user2IdN1).credentials.certificate
     const user2IdN2 = await network2.wallet.get(user2)
-    const user2CertN2 = (user2IdN2).credentials.certificate;
+    const user2CertN2 = (user2IdN2).credentials.certificate
+
     // console.log(user1CertN2)
     // console.log(user2CertN1)
 

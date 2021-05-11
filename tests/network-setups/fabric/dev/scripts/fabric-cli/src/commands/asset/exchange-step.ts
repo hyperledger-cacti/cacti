@@ -83,11 +83,23 @@ const command: GluegunCommand = {
       print.error('Step number not provided.')
       return
     }
+    if (!options['network1'] || !options['network2'])
+    {
+      print.error('--network1 and --network2 both needs to specified')
+      return
+    }
 
-    const secret = options['secret']
-    const hash_secret = crypto.createHash('sha256').update(secret).digest('base64');
+    // Hash Pre-image
+    let secret = ''
+    let hash_secret = ''
+    if (options['secret'])
+    {
+      secret = options['secret']
+      hash_secret = crypto.createHash('sha256').update(secret).digest('base64');
+    }
 
-    var timeout, timeout2;
+    // Timeout
+    var timeout=0, timeout2=0;
     const currTime = Math.floor(Date.now()/1000);
     if (options['timeout-epoch']) {
       let duration = options['timeout-epoch'] - currTime
