@@ -1,19 +1,13 @@
-package simpleasset
+package main
 
 import (
 	"encoding/json"
 	"fmt"
 	"time"
-	"os"
 
-	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-// SmartContract provides functions for managing an BondAsset
-type SmartContract struct {
-	contractapi.Contract
-}
 
 type BondAsset struct {
 	ID            string      `json:"id"`
@@ -25,7 +19,7 @@ type BondAsset struct {
 
 
 // InitLedger adds a base set of assets to the ledger
-func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
+func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextInterface) error {
 	assets := []BondAsset{
 		{ID: "a1", Issuer: "Treasury" , Owner: "", FaceValue: 300,
 			 MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
@@ -204,33 +198,4 @@ func (s *SmartContract) GetAllAssets(ctx contractapi.TransactionContextInterface
 	}
 
 	return assets, nil
-}
-
-func main() {
-	chaincode, err := contractapi.NewChaincode(new(SmartContract))
-
-	if err != nil {
-		fmt.Printf("Error create SimpleAsset chaincode: %s", err.Error())
-		return
-	}
-
-	_, ok := os.LookupEnv("EXTERNAL_SERVICE")
-	if ok {
-		server := &shim.ChaincodeServer{
-				CCID:    os.Getenv("CHAINCODE_CCID"),
-				Address: os.Getenv("CHAINCODE_ADDRESS"),
-				CC:      chaincode,
-				TLSProps: shim.TLSProperties{
-					Disabled: true,
-				},
-		}
-		// Start the chaincode external server
-		err = server.Start()
-	} else {
-		err = chaincode.Start()
-	}
-	if err != nil {
-		fmt.Printf("Error starting SimpleAsset chaincode: %s", err.Error())
-	}
-
 }
