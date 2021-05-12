@@ -590,3 +590,80 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	require.NoError(t, err)
 	fmt.Printf("Test success as expected since a valid contractId is specified.\n")
 }
+
+func TestIsAssetLockedUsingContractId(t *testing.T) {
+	ctx, chaincodeStub, interopcc := prepMockStub()
+
+	assetType := "bond"
+	assetId := "A001"
+	locker := "Alice"
+	recipient := "Bob"
+	preimage := "abcd"
+
+	hashBase64 := generateSHA256HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+
+	assetAgreement := &common.AssetExchangeAgreement {
+		Type: assetType,
+		Id: assetId,
+		Recipient: recipient,
+		Locker: locker,
+	}
+	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
+
+	// Test failure with GetState(contractId) fail to read the world state
+	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
+	isAssetLocked, err := interopcc.IsAssetLockedUsingContractId(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "unable to retrieve contractId " + contractId)
+	require.False(t, isAssetLocked)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure with not a valid contractId being passed as the arguement
+	chaincodeStub.GetStateReturnsOnCall(1, nil, nil)
+	isAssetLocked, err = interopcc.IsAssetLockedUsingContractId(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "no contractId " + contractId + " exists on the ledger")
+	require.False(t, isAssetLocked)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure with GetState(assetLockKey) fail to read from the world state
+	assetLockKeyBytes, _ := json.Marshal(assetLockKey)
+	chaincodeStub.GetStateReturnsOnCall(2, assetLockKeyBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(3, nil, fmt.Errorf("unable to retrieve asset %s", assetLockKey))
+	isAssetLocked, err = interopcc.IsAssetLockedUsingContractId(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "failed to retrieve from the world state: unable to retrieve asset " + assetLockKey)
+	require.False(t, isAssetLocked)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure under the scenario that the contractId is valid but there is no asset locked with the assetLockKey
+	chaincodeStub.GetStateReturnsOnCall(4, assetLockKeyBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(5, nil, nil)
+	isAssetLocked, err = interopcc.IsAssetLockedUsingContractId(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "contractId " + contractId + " is not associated with any currently locked asset")
+	require.False(t, isAssetLocked)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure for query if asset is locked with lock expiry time elapsed already
+	chaincodeStub.GetStateReturnsOnCall(6, assetLockKeyBytes, nil)
+	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs}
+	assetLockValBytes, _ := json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturnsOnCall(7, assetLockValBytes, nil)
+	isAssetLocked, err = interopcc.IsAssetLockedUsingContractId(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "expiry time for asset associated with contractId " + contractId + " is already elapsed")
+	require.False(t, isAssetLocked)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test success with asset being queried using contractId
+	chaincodeStub.GetStateReturnsOnCall(8, assetLockKeyBytes, nil)
+	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
+	assetLockValBytes, _ = json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturnsOnCall(9, assetLockValBytes, nil)
+	isAssetLocked, err = interopcc.IsAssetLockedUsingContractId(ctx, contractId)
+	require.NoError(t, err)
+	require.True(t, isAssetLocked)
+	fmt.Printf("Test success as expected since a valid contractId is specified.\n")
+}

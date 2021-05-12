@@ -485,3 +485,23 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 
 	return nil
 }
+
+// IsAssetLocked cc is used to query the ledger and findout if an asset is locked or not (this uses the contractId)
+func (s *SmartContract) IsAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+
+	_, assetLockVal, err := fetchAssetLockUsingContractId(ctx, contractId)
+	if err != nil {
+		log.Error(err.Error())
+		return false, err
+	}
+
+	// Check if expiry time is elapsed
+	currentTimeSecs := uint64(time.Now().Unix())
+	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("expiry time for asset associated with contractId %s is already elapsed", contractId)
+		log.Error(errorMsg)
+		return false, errors.New(errorMsg)
+	}
+
+	return true, nil
+}
