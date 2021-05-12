@@ -117,7 +117,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", errors.New(errorMsg)
 	}
 
-	err = ctx.GetStub().PutState("ContractId_" + string(contractId), assetLockKeyBytes)
+	err = ctx.GetStub().PutState(contractIdPrefix + string(contractId), assetLockKeyBytes)
 	if err != nil {
 		log.Error(err.Error())
 		return "", err
@@ -352,43 +352,54 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	return nil
 }
 
-// UnLockAsset cc is used to record unlocking of an asset on the ledger (this uses the contractId)
-func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
-
-	assetLockKeyBytes, err := ctx.GetStub().GetState("ContractId_" + contractId)
+// function to fetch the asset-lock <key, value> from the ledger using contractId
+func fetchAssetLockUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, AssetLockValue, error) {
+	var assetLockVal = AssetLockValue{}
+	var assetLockKey string = ""
+	assetLockKeyBytes, err := ctx.GetStub().GetState(contractIdPrefix + contractId)
 	if err != nil {
 		log.Error(err.Error())
-		return err
+		return assetLockKey, assetLockVal, err
 	}
 
-        if assetLockKeyBytes == nil {
+	if assetLockKeyBytes == nil {
 		errorMsg := fmt.Sprintf("no contractId %s exists on the ledger", contractId)
 		log.Error(errorMsg)
-		return errors.New(errorMsg)
+		return assetLockKey, assetLockVal, errors.New(errorMsg)
 	}
 
-	assetLockKey := string(assetLockKeyBytes)
+	assetLockKey = string(assetLockKeyBytes)
 	log.Infof("contractId: %s and assetLockKey: %s\n", contractId, assetLockKey)
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
-		return fmt.Errorf("failed to retrieve from the world state: %v", err)
-		//log.Error(err.Error())
-		//return err
+		return assetLockKey, assetLockVal, fmt.Errorf("failed to retrieve from the world state: %v", err)
 	}
 
-        if assetLockValBytes == nil {
+	if assetLockValBytes == nil {
 		errorMsg := fmt.Sprintf("contractId %s is not associated with any currently locked asset", contractId)
 		log.Error(errorMsg)
-		return errors.New(errorMsg)
+		return assetLockKey, assetLockVal, errors.New(errorMsg)
 	}
 
-	assetLockVal := AssetLockValue{}
+	//assetLockVal := AssetLockValue{}
 	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
 	if err != nil {
 		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
 		log.Error(errorMsg)
-		return errors.New(errorMsg)
+		return assetLockKey, assetLockVal, errors.New(errorMsg)
+	}
+	return assetLockKey, assetLockVal, nil
+}
+
+
+// UnLockAsset cc is used to record unlocking of an asset on the ledger (this uses the contractId)
+func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
+
+	assetLockKey, assetLockVal, err := fetchAssetLockUsingContractId(ctx, contractId)
+	if err != nil {
+		log.Error(err.Error())
+		return err
 	}
 
 	// Check if expiry time is elapsed
@@ -406,9 +417,68 @@ func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionCo
 		return errors.New(errorMessage)
 	}
 
-	err = ctx.GetStub().DelState("ContractId_" + contractId)
+	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of asset unlock: %v", contractId, err)
+		log.Error(errorMessage)
+		return errors.New(errorMessage)
+	}
+
+	return nil
+}
+
+// ClaimAsset cc is used to record claim of an asset on the ledger (this uses the contractId)
+func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytes string) error {
+
+	assetLockKey, assetLockVal, err := fetchAssetLockUsingContractId(ctx, contractId)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	claimInfo := &common.AssetClaimHTLC{}
+	err = proto.Unmarshal([]byte(claimInfoBytes), claimInfo)
+	if err != nil {
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	// display the claim information
+	log.Info(fmt.Sprintf("claimInfo: %+v\n", claimInfo))
+
+	// Check if expiry time is elapsed
+	currentTimeSecs := uint64(time.Now().Unix())
+	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("cannot claim asset associated with contractId %s as the expiry time is already elapsed", contractId)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	// compute the hash from the preimage
+	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimage), string(assetLockVal.Hash))
+	if err != nil {
+		errorMsg := fmt.Sprintf("claim asset associated with contractId %s failed with error: %v", contractId, err)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	if isCorrectPreimage == false {
+		errorMsg := fmt.Sprintf("cannot claim asset associated with contractId %s as the hash preimage is not matching", contractId)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	err = ctx.GetStub().DelState(assetLockKey)
+	if err != nil {
+		errorMessage := fmt.Sprintf("failed to delete lock for the asset associated with the contractId %s: %+v", contractId, err)
+		log.Error(errorMessage)
+		return errors.New(errorMessage)
+	}
+
+	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
+	if err != nil {
+		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of asset claim: %+v", contractId, err)
 		log.Error(errorMessage)
 		return errors.New(errorMessage)
 	}
