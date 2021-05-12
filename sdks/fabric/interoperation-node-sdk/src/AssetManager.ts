@@ -116,15 +116,15 @@ const createHTLC = async (
         logger.error("Recipient ECert not supplied");
         return { preimage: "", result: false };
     }
-
-    let defaultExpiryTimeSecs = 0;
-    if (hashValue && hashValue.length > 0)
+    const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
+    if (expiryTimeSecs <= currTimeSecs)
     {
-        defaultExpiryTimeSecs = 5 * 60     // 5 mins: this is the 't' used to time out the second contract of the HTLC pair
+        logger.error("Supplied expiry time invalid or in the past: %s; current time: %s", new Date(expiryTimeSecs).toISOString(), new Date(currTimeSecs).toISOString());
+        return { preimage: "", result: false };
     }
-    else
+
+    if (!hashValue || hashValue.length == 0)
     {
-        defaultExpiryTimeSecs = 10 * 60     // 10 mins: this is the '2t' used to time out the first contract of the HTLC pair
         if (!hashPreimage || hashPreimage.length == 0)
         {
             // Generate the preimage
@@ -132,12 +132,6 @@ const createHTLC = async (
         }
         // Hash the preimage
         hashValue = createSHA256HashBase64(hashPreimage);
-    }
-    const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
-    if (expiryTimeSecs <= currTimeSecs)
-    {
-        logger.warn("Supplied HTLC expiry time is invalid or in the past: %d", expiryTimeSecs);
-        expiryTimeSecs = currTimeSecs + defaultExpiryTimeSecs;
     }
 
     const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, "");
@@ -187,15 +181,15 @@ const createFungibleHTLC = async (
         logger.error("Recipient ECert not supplied");
         return { preimage: "", result: false };
     }
-
-    let defaultExpiryTimeSecs = 0;
-    if (hashValue && hashValue.length > 0)
+    const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
+    if (expiryTimeSecs <= currTimeSecs)
     {
-        defaultExpiryTimeSecs = 5 * 60     // 5 mins: this is the 't' used to time out the second contract of the HTLC pair
+        logger.error("Supplied expiry time invalid or in the past: %s; current time: %s", new Date(expiryTimeSecs).toISOString(), new Date(currTimeSecs).toISOString());
+        return { preimage: "", result: false };
     }
-    else
+
+    if (!hashValue || hashValue.length == 0)
     {
-        defaultExpiryTimeSecs = 10 * 60     // 10 mins: this is the '2t' used to time out the first contract of the HTLC pair
         if (!hashPreimage || hashPreimage.length == 0)
         {
             // Generate the preimage
@@ -203,12 +197,6 @@ const createFungibleHTLC = async (
         }
         // Hash the preimage
         hashValue = createSHA256HashBase64(hashPreimage);
-    }
-    const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
-    if (expiryTimeSecs <= currTimeSecs)
-    {
-        logger.warn("Supplied HTLC expiry time is invalid or in the past: %d", expiryTimeSecs);
-        expiryTimeSecs = currTimeSecs + defaultExpiryTimeSecs;
     }
 
     const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, "");
