@@ -419,7 +419,6 @@ func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface
 	return assetLockKey, assetLockVal, nil
 }
 
-
 // UnLockAsset cc is used to record unlocking of an asset on the ledger (this uses the contractId)
 func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
 
@@ -693,6 +692,33 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of fungible asset claim: %+v", contractId, err)
+		log.Error(errorMessage)
+		return errors.New(errorMessage)
+	}
+
+	return nil
+}
+
+// UnLockFungibleAsset cc is used to record unlocking of a fungible asset on the ledger
+func (s *SmartContract) UnLockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) error {
+
+	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	// Check if expiry time is elapsed
+	currentTimeSecs := uint64(time.Now().Unix())
+	if uint64(currentTimeSecs) < assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("cannot unlock fungible asset associated with the contractId %s as the expiry time is not yet elapsed", contractId)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
+	if err != nil {
+		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of fungible asset unlock: %v", contractId, err)
 		log.Error(errorMessage)
 		return errors.New(errorMessage)
 	}
