@@ -113,7 +113,7 @@ func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface,
 	return assetJSON != nil, nil
 }
 // AssetExists returns true when asset with given ID exists in world state
-func (s *SmartContract) isAssetReleased(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
+func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
 	asset, err := s.ReadAsset(ctx, id)
 	if err != nil {
 		return false, err
