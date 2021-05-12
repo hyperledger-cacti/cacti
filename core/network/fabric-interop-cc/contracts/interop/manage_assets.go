@@ -30,15 +30,31 @@ type AssetLockValue struct {
 	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
 }
 
-// function to generate contract id as "SHA256" hash based on the asset lock key (which is combination of asset type and asset it)
-func generateAssetLockKeyAndContractId(assetAgreement *common.AssetExchangeAgreement) (string, string) {
+const(
+	assetKeyPrefix		= "AssetKey_"	// prefix for the map, asset-key --> asset-object
+	assetKeyDelimiter	= "_"		// delimiter for the asset-key
+	contractIdPrefix	= "ContractId_"	// prefix for the map, contractId --> asset-key
+)
+
+// function to generate a "SHA256" hash in base64 format for a given the preimage
+func generateSHA256HashInBase64Form(preimage string) string {
 	hasher := sha256.New()
-	assetLockKey := assetAgreement.Type + assetAgreement.Id
-	hasher.Write([]byte(assetLockKey))
+	hasher.Write([]byte(preimage))
 	shaHash := hasher.Sum(nil)
-	shaBase64 := base64.StdEncoding.EncodeToString(shaHash)
-	return assetLockKey, shaBase64
+	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
+	return shaHashBase64
 }
+
+/*
+ * Function to generate asset-lock key (which is combination of asset-type and asset-id)
+ * and contract-id (which is a hash on asset-lock key)
+ */
+func generateAssetLockKeyAndContractId(assetAgreement *common.AssetExchangeAgreement) (string, string) {
+	assetLockKey := assetKeyPrefix + assetAgreement.Type + assetKeyDelimiter + assetAgreement.Id
+	contractId := generateSHA256HashInBase64Form(assetLockKey)
+	return assetLockKey, contractId
+}
+
 // LockAsset cc is used to record locking of an asset on the ledger
 func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, lockInfoBytes string) (string, error) {
 
@@ -101,7 +117,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", errors.New(errorMsg)
 	}
 
-	err = ctx.GetStub().PutState(string(contractId), assetLockKeyBytes)
+	err = ctx.GetStub().PutState("ContractId_" + string(contractId), assetLockKeyBytes)
 	if err != nil {
 		log.Error(err.Error())
 		return "", err
@@ -231,10 +247,11 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 }
 
 /*
- * Below function checks if hashBase64 is the hash for the preimage preimageBase64.
+ * Function to check if hashBase64 is the hash for the preimage preimageBase64.
  * Both the preimage and hash are passed in base64 form.
  */
 func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, error) {
+	funName := "checkIfCorrectPreimage"
 	preimage, err := base64.StdEncoding.DecodeString(preimageBase64)
 	if err != nil {
 		errorMsg := fmt.Sprintf("base64 decode preimage error: %s", err)
@@ -242,15 +259,11 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, err
 		return false, errors.New(errorMsg)
 	}
 
-	hasher := sha256.New()
-	hasher.Write([]byte(preimage))
-	shaHash := hasher.Sum(nil)
-	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
-
+	shaHashBase64 := generateSHA256HashInBase64Form(string(preimage))
 	if shaHashBase64 == hashBase64 {
-		log.Info(fmt.Sprintf("checkIfCorrectPreimage: preimage %s is passed correctly.\n", preimage))
+		log.Info(fmt.Sprintf("%s: preimage %s is passed correctly.\n", funName, preimage))
 	} else {
-		log.Info(fmt.Sprintf("checkIfCorrectPreimage: preimage %s is not passed correctly.\n", preimage))
+		log.Info(fmt.Sprintf("%s: preimage %s is not passed correctly.\n", funName, preimage))
 		return false, nil
 	}
 	return true, nil
@@ -334,6 +347,70 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		errorMsg := fmt.Sprintf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
 		log.Error(errorMsg)
 		return errors.New(errorMsg)
+	}
+
+	return nil
+}
+
+// UnLockAsset cc is used to record unlocking of an asset on the ledger (this uses the contractId)
+func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
+
+	assetLockKeyBytes, err := ctx.GetStub().GetState("ContractId_" + contractId)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+        if assetLockKeyBytes == nil {
+		errorMsg := fmt.Sprintf("no contractId %s exists on the ledger", contractId)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	assetLockKey := string(assetLockKeyBytes)
+	log.Infof("contractId: %s and assetLockKey: %s\n", contractId, assetLockKey)
+
+	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve from the world state: %v", err)
+		//log.Error(err.Error())
+		//return err
+	}
+
+        if assetLockValBytes == nil {
+		errorMsg := fmt.Sprintf("contractId %s is not associated with any currently locked asset", contractId)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	assetLockVal := AssetLockValue{}
+	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
+	if err != nil {
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	// Check if expiry time is elapsed
+	currentTimeSecs := uint64(time.Now().Unix())
+	if uint64(currentTimeSecs) < assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("cannot unlock asset associated with the contractId %s as the expiry time is not yet elapsed", contractId)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	err = ctx.GetStub().DelState(assetLockKey)
+	if err != nil {
+		errorMessage := fmt.Sprintf("failed to delete lock for the asset associated with the contractId %s: %v", contractId, err)
+		log.Error(errorMessage)
+		return errors.New(errorMessage)
+	}
+
+	err = ctx.GetStub().DelState("ContractId_" + contractId)
+	if err != nil {
+		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of asset unlock: %v", contractId, err)
+		log.Error(errorMessage)
+		return errors.New(errorMessage)
 	}
 
 	return nil
