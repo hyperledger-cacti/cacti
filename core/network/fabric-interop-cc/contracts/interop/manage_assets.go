@@ -647,3 +647,55 @@ func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContext
 
 	return true, nil
 }
+
+// ClaimFungibleAsset cc is used to record claim of a fungible asset on the ledger
+func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytes string) error {
+
+	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	claimInfo := &common.AssetClaimHTLC{}
+	err = proto.Unmarshal([]byte(claimInfoBytes), claimInfo)
+	if err != nil {
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	// display the claim information
+	log.Info(fmt.Sprintf("claimInfo: %+v\n", claimInfo))
+
+	// Check if expiry time is elapsed
+	currentTimeSecs := uint64(time.Now().Unix())
+	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("cannot claim fungible asset associated with contractId %s as the expiry time is already elapsed", contractId)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	// compute the hash from the preimage
+	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimage), string(assetLockVal.Hash))
+	if err != nil {
+		errorMsg := fmt.Sprintf("claim fungible asset associated with contractId %s failed with error: %v", contractId, err)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	if isCorrectPreimage == false {
+		errorMsg := fmt.Sprintf("cannot claim fungible asset associated with contractId %s as the hash preimage is not matching", contractId)
+		log.Error(errorMsg)
+		return errors.New(errorMsg)
+	}
+
+	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
+	if err != nil {
+		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of fungible asset claim: %+v", contractId, err)
+		log.Error(errorMessage)
+		return errors.New(errorMessage)
+	}
+
+	return nil
+}
