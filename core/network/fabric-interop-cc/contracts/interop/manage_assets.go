@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"crypto/sha256"
 	"encoding/base64"
 	"time"
@@ -22,8 +23,19 @@ import (
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
 )
 
+// Object used in the map, <asset-type, asset-id> --> <contractId, locker, recipient, ...> (for non-fungible assets)
 type AssetLockValue struct {
 	ContractId	string	`json:"contractId"`
+	Locker		string	`json:"locker"`
+	Recipient	string	`json:"recipient"`
+	Hash		string	`json:"hash"`
+	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
+}
+
+// Object used in the map, contractId --> <asset-type, num-units, locker, ...> (for fungible assets)
+type FungibleAssetLockValue struct {
+	Type		string	`json:"type"`
+	NumUnits	uint64	`json:"numUnits"`
 	Locker		string	`json:"locker"`
 	Recipient	string	`json:"recipient"`
 	Hash		string	`json:"hash"`
@@ -47,12 +59,28 @@ func generateSHA256HashInBase64Form(preimage string) string {
 
 /*
  * Function to generate asset-lock key (which is combination of asset-type and asset-id)
- * and contract-id (which is a hash on asset-lock key)
+ * and contract-id (which is a hash on asset-lock key) for the non-fungible asset locking on the ledger
  */
 func generateAssetLockKeyAndContractId(assetAgreement *common.AssetExchangeAgreement) (string, string) {
 	assetLockKey := assetKeyPrefix + assetAgreement.Type + assetKeyDelimiter + assetAgreement.Id
 	contractId := generateSHA256HashInBase64Form(assetLockKey)
 	return assetLockKey, contractId
+}
+
+/*
+ * Function to generate contract-id for fungible asset-locking on the ledger (which is
+ * a hash on the attributes of the fungible asset exchange agreement)
+ */
+func generateFungibleAssetLockContractId(assetAgreement *common.FungibleAssetExchangeAgreement) string {
+	// There can be multiple fungible asset lock agreement between the same parties for the same <asset-type, quantity>.
+	// Use the current time to generate a different hash if the request gets repeated. It's the caller's responsibility
+	// to ensure that the request didn't get repeated uniterntionally.
+	currentTimeSecs := uint64(time.Now().Unix())
+
+	preimage := assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
+			assetAgreement.Locker + assetAgreement.Recipient +  strconv.Itoa(int(currentTimeSecs))
+	contractId := generateSHA256HashInBase64Form(preimage)
+	return contractId
 }
 
 // LockAsset cc is used to record locking of an asset on the ledger
@@ -73,7 +101,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		log.Error(err.Error())
 		return "", err
 	}
-	//display the requested asset agreement
+	//display the passed lock information
 	log.Info(fmt.Sprintf("lockInfoHTLC: %+v\n", lockInfoHTLC))
 
 	if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
@@ -373,7 +401,7 @@ func fetchAssetLockUsingContractId(ctx contractapi.TransactionContextInterface, 
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
-		return assetLockKey, assetLockVal, fmt.Errorf("failed to retrieve from the world state: %v", err)
+		return assetLockKey, assetLockVal, fmt.Errorf("failed to retrieve from the world state: %+v", err)
 	}
 
 	if assetLockValBytes == nil {
@@ -504,4 +532,71 @@ func (s *SmartContract) IsAssetLockedUsingContractId(ctx contractapi.Transaction
 	}
 
 	return true, nil
+}
+
+// LockFungibleAsset cc is used to record locking of a group of fungible assets of an asset-type on the ledger
+func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, FungibleAssetAgreementBytes string, lockInfoBytes string) (string, error) {
+
+	assetAgreement := &common.FungibleAssetExchangeAgreement{}
+	err := proto.Unmarshal([]byte(FungibleAssetAgreementBytes), assetAgreement)
+	if err != nil {
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
+		log.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	//display the requested fungible asset agreement
+	log.Infof("fungibleAssetExchangeAgreement: %+v\n", assetAgreement)
+
+	lockInfoHTLC := &common.AssetLockHTLC{}
+	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfoHTLC)
+	if err != nil {
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
+		log.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	//display the passed lock information
+	log.Info(fmt.Sprintf("lockInfoHTLC: %+v\n", lockInfoHTLC))
+
+	if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+		errorMsg := "only EPOCH time is supported at present"
+		log.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	// generate the contractId for the fungible asset lock agreement
+	contractId := generateFungibleAssetLockContractId(assetAgreement)
+
+	assetLockVal := FungibleAssetLockValue{Type: assetAgreement.Type, NumUnits: assetAgreement.NumUnits, Locker: assetAgreement.Locker,
+		Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+
+	assetLockValBytes, err := ctx.GetStub().GetState(contractId)
+	if err != nil {
+		errorMsg := fmt.Sprintf("failed to retrieve from the world state: %+v", err)
+		log.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	if assetLockValBytes != nil {
+		errorMsg := fmt.Sprintf("contractId %s already exists for the requested fungible asset agreement", contractId)
+		log.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	assetLockValBytes, err = json.Marshal(assetLockVal)
+	if err != nil {
+		errorMsg := fmt.Sprintf("marshal error: %s", err)
+		log.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	err = ctx.GetStub().PutState(contractId, assetLockValBytes)
+	if err != nil {
+		errorMsg := fmt.Sprintf("failed to write to the world state: %+v", err)
+		log.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	return contractId, nil
 }

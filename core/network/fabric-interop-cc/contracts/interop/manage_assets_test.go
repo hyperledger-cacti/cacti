@@ -667,3 +667,79 @@ func TestIsAssetLockedUsingContractId(t *testing.T) {
 	require.True(t, isAssetLocked)
 	fmt.Printf("Test success as expected since a valid contractId is specified.\n")
 }
+
+func TestLockFungibleAsset(t *testing.T) {
+	ctx, chaincodeStub, interopcc := prepMockStub()
+
+	assetType := "cbdc"
+	numUnits := uint64(10)
+	locker := "Alice"
+	recipient := "Bob"
+	preimage := "abcd"
+
+	hashBase64 := generateSHA256HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+
+	assetAgreement := &common.FungibleAssetExchangeAgreement {
+		Type: assetType,
+		NumUnits: numUnits,
+		Locker: locker,
+		Recipient: recipient,
+	}
+	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
+	contractId := generateFungibleAssetLockContractId(assetAgreement)
+
+	// Test failure with TimeSpec that is part of lock information not being currently supported
+	// no need to set chaincodeStub.GetStateReturns below since the error is hit before GetState() ledger access
+	lockInfoHTLC := &common.AssetLockHTLC {
+		Hash: []byte(hashBase64),
+		// lock for next 5 mintues
+		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
+		// TimeSpec of AssetLockHTLC_DURATION is not currently supported
+		TimeSpec: common.AssetLockHTLC_DURATION,
+	}
+	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	require.Error(t, err)
+	require.EqualError(t, err, "only EPOCH time is supported at present")
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure with GetState(contractId) fail to read the world state
+	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
+	lockInfoHTLC = &common.AssetLockHTLC {
+		Hash: []byte(hashBase64),
+		// lock for next 5 mintues
+		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
+		// TimeSpec of AssetLockHTLC_EPOCH is only supported currently
+		TimeSpec: common.AssetLockHTLC_EPOCH,
+	}
+	lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
+	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	require.Error(t, err)
+	require.EqualError(t, err, "failed to retrieve from the world state: unable to retrieve contractId " + contractId)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure with contractId already existing on the ledger
+	assetLockVal := FungibleAssetLockValue{Type: assetType, NumUnits: numUnits, Locker: locker, Recipient: recipient,
+			Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+	assetLockValBytes, _ := json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
+	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	require.Error(t, err)
+	require.EqualError(t, err, "contractId " + contractId + " already exists for the requested fungible asset agreement")
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure with PutState failing to write to the ledger
+	chaincodeStub.GetStateReturns(nil, nil)
+	chaincodeStub.PutStateReturnsOnCall(0, fmt.Errorf("unable to write the fungible asset lock to the ledger for contractId %s", contractId))
+	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	require.Error(t, err)
+	require.EqualError(t, err, "failed to write to the world state: unable to write the fungible asset lock to the ledger for contractId " + contractId)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test success with fungible asset agreement specified properly
+	chaincodeStub.GetStateReturns(nil, nil)
+	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	require.NoError(t, err)
+	fmt.Println("Test success as expected since the fungible asset agreement is specified properly.")
+}
