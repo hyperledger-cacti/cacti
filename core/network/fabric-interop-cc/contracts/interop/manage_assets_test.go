@@ -743,3 +743,61 @@ func TestLockFungibleAsset(t *testing.T) {
 	require.NoError(t, err)
 	fmt.Println("Test success as expected since the fungible asset agreement is specified properly.")
 }
+
+func TestIsFungibleAssetLocked(t *testing.T) {
+	ctx, chaincodeStub, interopcc := prepMockStub()
+
+	assetType := "cbdc"
+	numUnits := uint64(10)
+	locker := "Alice"
+	recipient := "Bob"
+	preimage := "abcd"
+
+	hashBase64 := generateSHA256HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+
+	assetAgreement := &common.FungibleAssetExchangeAgreement {
+		Type: assetType,
+		NumUnits: numUnits,
+		Locker: locker,
+		Recipient: recipient,
+	}
+	contractId := generateFungibleAssetLockContractId(assetAgreement)
+
+	// Test failure with GetState(contractId) fail to read the world state
+	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
+	isAssetLocked, err := interopcc.IsFungibleAssetLocked(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "failed to retrieve from the world state: unable to retrieve contractId " + contractId)
+	require.False(t, isAssetLocked)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure under the scenario that the contractId is not valid and there is no fungible asset locked with it
+	chaincodeStub.GetStateReturnsOnCall(1, nil, nil)
+	isAssetLocked, err = interopcc.IsFungibleAssetLocked(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "contractId " + contractId + " is not associated with any currently locked fungible asset")
+	require.False(t, isAssetLocked)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test failure for query if fungible asset is locked with lock expiry time elapsed already
+	assetLockVal := FungibleAssetLockValue{Type: assetType, NumUnits: numUnits, Locker: locker, Recipient: recipient,
+			Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs}
+	assetLockValBytes, _ := json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturnsOnCall(2, assetLockValBytes, nil)
+	isAssetLocked, err = interopcc.IsFungibleAssetLocked(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "expiry time for fungible asset associated with contractId " + contractId + " is already elapsed")
+	require.False(t, isAssetLocked)
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test success with asset being queried using contractId
+	assetLockVal = FungibleAssetLockValue{Type: assetType, NumUnits: numUnits, Locker: locker, Recipient: recipient,
+			Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
+	assetLockValBytes, _ = json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturnsOnCall(3, assetLockValBytes, nil)
+	isAssetLocked, err = interopcc.IsFungibleAssetLocked(ctx, contractId)
+	require.NoError(t, err)
+	require.True(t, isAssetLocked)
+	fmt.Printf("Test success as expected since a valid contractId is specified.\n")
+}

@@ -381,7 +381,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 }
 
 // function to fetch the asset-lock <key, value> from the ledger using contractId
-func fetchAssetLockUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, AssetLockValue, error) {
+func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, AssetLockValue, error) {
 	var assetLockVal = AssetLockValue{}
 	var assetLockKey string = ""
 	assetLockKeyBytes, err := ctx.GetStub().GetState(contractIdPrefix + contractId)
@@ -410,7 +410,6 @@ func fetchAssetLockUsingContractId(ctx contractapi.TransactionContextInterface, 
 		return assetLockKey, assetLockVal, errors.New(errorMsg)
 	}
 
-	//assetLockVal := AssetLockValue{}
 	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
 	if err != nil {
 		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
@@ -424,7 +423,7 @@ func fetchAssetLockUsingContractId(ctx contractapi.TransactionContextInterface, 
 // UnLockAsset cc is used to record unlocking of an asset on the ledger (this uses the contractId)
 func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
 
-	assetLockKey, assetLockVal, err := fetchAssetLockUsingContractId(ctx, contractId)
+	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -458,7 +457,7 @@ func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionCo
 // ClaimAsset cc is used to record claim of an asset on the ledger (this uses the contractId)
 func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytes string) error {
 
-	assetLockKey, assetLockVal, err := fetchAssetLockUsingContractId(ctx, contractId)
+	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -514,10 +513,10 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 	return nil
 }
 
-// IsAssetLocked cc is used to query the ledger and findout if an asset is locked or not (this uses the contractId)
+// IsAssetLocked cc is used to query the ledger and find out if an asset is locked or not (this uses the contractId)
 func (s *SmartContract) IsAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
 
-	_, assetLockVal, err := fetchAssetLockUsingContractId(ctx, contractId)
+	_, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
 		log.Error(err.Error())
 		return false, err
@@ -591,7 +590,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 		return "", errors.New(errorMsg)
 	}
 
-	err = ctx.GetStub().PutState(contractId, assetLockValBytes)
+	err = ctx.GetStub().PutState(contractIdPrefix + contractId, assetLockValBytes)
 	if err != nil {
 		errorMsg := fmt.Sprintf("failed to write to the world state: %+v", err)
 		log.Error(errorMsg)
@@ -599,4 +598,52 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 	}
 
 	return contractId, nil
+}
+
+// function to fetch the fungible asset-lock value from the ledger using contractId
+func fetchFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (FungibleAssetLockValue, error) {
+	var assetLockVal = FungibleAssetLockValue{}
+
+	assetLockValBytes, err := ctx.GetStub().GetState(contractIdPrefix + contractId)
+	if err != nil {
+		errorMsg := fmt.Sprintf("failed to retrieve from the world state: %+v", err)
+		log.Error(errorMsg)
+		return assetLockVal, errors.New(errorMsg)
+	}
+
+	if assetLockValBytes == nil {
+		errorMsg := fmt.Sprintf("contractId %s is not associated with any currently locked fungible asset", contractId)
+		log.Error(errorMsg)
+		return assetLockVal, errors.New(errorMsg)
+	}
+
+	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
+	if err != nil {
+		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
+		log.Error(errorMsg)
+		return assetLockVal, errors.New(errorMsg)
+	}
+	log.Infof("contractId: %s and fungibleAssetLockVal: %+v\n", contractId, assetLockVal)
+
+	return assetLockVal, nil
+}
+
+// IsFungibleAssetLocked cc is used to query the ledger and find out if a fungible asset is locked or not
+func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+
+	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
+	if err != nil {
+		log.Error(err.Error())
+		return false, err
+	}
+
+	// Check if expiry time is elapsed
+	currentTimeSecs := uint64(time.Now().Unix())
+	if uint64(currentTimeSecs) >= assetLockVal.ExpiryTimeSecs {
+		errorMsg := fmt.Sprintf("expiry time for fungible asset associated with contractId %s is already elapsed", contractId)
+		log.Error(errorMsg)
+		return false, errors.New(errorMsg)
+	}
+
+	return true, nil
 }
