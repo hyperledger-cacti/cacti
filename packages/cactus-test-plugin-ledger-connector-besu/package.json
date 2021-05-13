@@ -66,8 +66,11 @@
     "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.3",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "1.0.0-rc.3",
     "@hyperledger/cactus-test-tooling": "1.0.0-rc.3",
+    "@hyperledger/cactus-plugin-consortium-manual": "1.0.0-rc.3",
+    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
     "key-encoder": "2.0.3",
     "web3": "1.5.2",
-    "web3-eea": "0.11.0"
+    "web3-eea": "0.11.0",
+    "jose": "4.1.0"
   }
 }

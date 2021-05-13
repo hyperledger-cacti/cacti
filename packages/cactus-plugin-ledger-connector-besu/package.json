@@ -69,9 +69,11 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
+    "@hyperledger/cactus-cmd-api-server": "1.0.0-rc.3",
     "@hyperledger/cactus-common": "1.0.0-rc.3",
     "@hyperledger/cactus-core": "1.0.0-rc.3",
     "@hyperledger/cactus-core-api": "1.0.0-rc.3",
+    "@hyperledger/cactus-plugin-consortium-manual": "1.0.0-rc.3",
     "axios": "0.21.4",
     "express": "4.17.1",
     "joi": "17.4.2",
@@ -85,7 +87,9 @@
     "web3-core": "1.5.2",
     "web3-eea": "0.11.0",
     "web3-eth": "1.5.2",
-    "web3-utils": "1.5.2"
+    "web3-utils": "1.5.2",
+    "jose": "4.1.0",
+    "key-encoder": "2.0.3"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.3",

@@ -6,6 +6,7 @@ import KeyEncoder from "key-encoder";
 import { AddressInfo } from "net";
 import Web3 from "web3";
 import EEAClient, { IWeb3InstanceExtended } from "web3-eea";
+import { JWK, JWS } from "jose";
 
 import {
   ApiServer,
@@ -13,8 +14,6 @@ import {
   ConfigService,
 } from "@hyperledger/cactus-cmd-api-server";
 import {
-  JsObjectSigner,
-  IJsObjectSignerOptions,
   Secp256k1Keys,
   KeyFormat,
   LogLevelDesc,
@@ -31,9 +30,22 @@ import {
   IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
   SignTransactionRequest,
+  NodeHostsProviderType,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import {
+  CactusNode,
+  Consortium,
+  ConsortiumDatabase,
+  ConsortiumMember,
+} from "@hyperledger/cactus-core-api";
+import {
+  IPluginConsortiumManualOptions,
+  PluginConsortiumManual,
+  DefaultApi as DefaultApiConsortium,
+  Configuration as ConfigurationConsortium,
+} from "@hyperledger/cactus-plugin-consortium-manual";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
@@ -47,6 +59,113 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 test(testCase, async (t: Test) => {
+  const consortiumId = uuidv4();
+  const consortiumName = "Example Consortium";
+  const pluginConsortiumId = uuidv4();
+
+  const memberId1 = uuidv4();
+
+  const httpServerC = createServer();
+  await new Promise((resolve, reject) => {
+    httpServerC.once("error", reject);
+    httpServerC.once("listening", resolve);
+    httpServerC.listen(0, "127.0.0.1");
+  });
+  const addressInfoC = httpServerC.address() as AddressInfo;
+  t.comment(`HttpServer1 AddressInfo: ${JSON.stringify(addressInfoC)}`);
+  const nodeCHost = `http://${addressInfoC.address}:${addressInfoC.port}`;
+  t.comment(`Cactus Node1 Consortium Host: ${nodeCHost}`);
+
+  const keyPairC = await JWK.generate("EC", "secp256k1");
+  const pubKeyPemC = keyPairC.toPEM(false);
+  t.comment(`Cactus Node 1 Public Key PEM: ${pubKeyPemC}`);
+
+  const node1: CactusNode = {
+    consortiumId,
+    memberId: memberId1,
+    id: "Example_Cactus_Node_1",
+    nodeApiHost: nodeCHost,
+    publicKeyPem: pubKeyPemC,
+    ledgerIds: [],
+    pluginInstanceIds: [],
+  };
+
+  const member1: ConsortiumMember = {
+    id: memberId1,
+    name: "Corp 1",
+    nodeIds: [node1.id],
+  };
+
+  const consortium: Consortium = {
+    id: consortiumId,
+    mainApiHost: nodeCHost,
+    name: consortiumName,
+    memberIds: [memberId1],
+  };
+
+  const consortiumDatabase: ConsortiumDatabase = {
+    cactusNode: [node1],
+    consortium: [consortium],
+    consortiumMember: [member1],
+    ledger: [],
+    pluginInstance: [],
+  };
+
+  const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
+  t.comment(`Setting up first node...`);
+  const pluginRegistry = new PluginRegistry({ plugins: [] });
+  {
+    // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
+    //const pluginRegistry = new PluginRegistry({ plugins: [] });
+
+    // 3. Instantiate the web service consortium plugin
+    const options: IPluginConsortiumManualOptions = {
+      instanceId: pluginConsortiumId,
+      pluginRegistry,
+      keyPairPem: keyPairC.toPEM(true),
+      consortiumDatabase,
+      logLevel: "trace",
+      consortiumRepo,
+    };
+
+    const pluginConsortiumManual = new PluginConsortiumManual(options);
+
+    // 4. Create the API Server object that we embed in this test
+    const configService = new ConfigService();
+    const apiServerOptions = configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiServerOptions.configFile = "";
+    apiServerOptions.apiCorsDomainCsv = "*";
+    apiServerOptions.apiPort = addressInfoC.port;
+    apiServerOptions.cockpitPort = 0;
+    apiServerOptions.apiTlsEnabled = false;
+    const config = configService.newExampleConfigConvict(apiServerOptions);
+
+    pluginRegistry.add(pluginConsortiumManual);
+
+    const apiServer = new ApiServer({
+      httpServerApi: httpServerC,
+      config: config.getProperties(),
+      pluginRegistry,
+    });
+
+    // 5. make sure the API server is shut down when the testing if finished.
+    test.onFinish(() => apiServer.shutdown());
+
+    // 6. Start the API server which is now listening on port A and it's healthcheck works through the main SDK
+    await apiServer.start();
+
+    // 7. Instantiate the main SDK dynamically with whatever port the API server ended up bound to (port 0)
+    t.comment(`AddressInfo: ${JSON.stringify(addressInfoC)}`);
+
+    const configuration = new ConfigurationConsortium({ basePath: nodeCHost });
+    const api = new DefaultApiConsortium(configuration);
+    const res = await api.getNodeJws();
+    t.ok(res, "API response object is truthy");
+  }
+  t.comment(`Set up first node OK`);
+
+  ///////////////////////////////
   const keyEncoder: KeyEncoder = new KeyEncoder("secp256k1");
   const keychainId = uuidv4();
   const keychainRef = uuidv4();
@@ -87,14 +206,9 @@ test(testCase, async (t: Test) => {
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
   const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
 
-  const jsObjectSignerOptions: IJsObjectSignerOptions = {
-    privateKey: keyHex,
-    logLevel,
-  };
-  const jsObjectSigner = new JsObjectSigner(jsObjectSignerOptions);
-
   // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
-  const pluginRegistry = new PluginRegistry({ plugins: [keychain] });
+  // const pluginRegistry = new PluginRegistry({ plugins: [keychain] });
+  pluginRegistry.add(keychain);
 
   // 3. Instantiate the web service consortium plugin
   const options: IPluginLedgerConnectorBesuOptions = {
@@ -159,13 +273,14 @@ test(testCase, async (t: Test) => {
   const transactionHash = await web3Eea.eea.sendRawTransaction(contractOptions);
 
   const transaction = await web3.eth.getTransaction(transactionHash);
-  const singData = jsObjectSigner.sign(transaction.input);
-  const signDataHex = Buffer.from(singData).toString("hex");
+  const signData = JWS.sign(transaction.input, keyPairC);
 
   const request: SignTransactionRequest = {
     keychainId,
     keychainRef,
     transactionHash: transactionHash,
+    nodeHostsProvider: NodeHostsProviderType.ConsortiumPlugin,
+    consortiumPluginId: pluginConsortiumId,
   };
 
   const configuration = new BesuApiClientOptions({ basePath: node1Host });
@@ -174,7 +289,27 @@ test(testCase, async (t: Test) => {
   // Test for 200 valid response test case
   const res = await api.signTransactionV1(request);
   t.ok(res, "API response object is truthy");
-  t.deepEquals(signDataHex, res.data.signature, "Signature data are equal");
+  t.ok(res.data, "API response data is truthy");
+  t.ok(res.data.signature, "API response data.signature is truthy");
+
+  const referenceVerifyOut = JWS.verify(signData, keyPairC, {
+    complete: true,
+    parse: true,
+  });
+  t.ok(referenceVerifyOut, "referenceVerifyOut truthy OK");
+
+  const responseVerifyOut = JWS.verify(
+    Buffer.from(res.data.signature, "hex").toString("utf-8"),
+    keyPairC,
+    { complete: true, parse: true },
+  );
+  t.ok(responseVerifyOut, "responseVerifyOut truthy OK");
+
+  t.deepEquals(
+    responseVerifyOut,
+    referenceVerifyOut,
+    "Signature data are equal",
+  );
 
   // Test for 404 Transaction not found test case
   try {
@@ -183,6 +318,7 @@ test(testCase, async (t: Test) => {
       keychainRef: "fake",
       transactionHash:
         "0x46eac4d1d1ff81837698cbab38862a428ddf042f92855a72010de2771a7b704d",
+      nodeHostsProvider: NodeHostsProviderType.ConsortiumPlugin,
     };
     await api.signTransactionV1(notFoundRequest);
   } catch (error) {

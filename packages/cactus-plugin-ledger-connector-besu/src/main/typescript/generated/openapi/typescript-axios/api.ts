@@ -567,6 +567,25 @@ export interface GetBlockV1Response {
 /**
  * 
  * @export
+ * @interface GetNodeSignatureRequest
+ */
+export interface GetNodeSignatureRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetNodeSignatureRequest
+     */
+    keyPairPem: string;
+    /**
+     * The transaction hash of ledger will be used to fetch the contain.
+     * @type {string}
+     * @memberof GetNodeSignatureRequest
+     */
+    transactionHash: string;
+}
+/**
+ * 
+ * @export
  * @interface GetPastLogsV1Request
  */
 export interface GetPastLogsV1Request {
@@ -751,6 +770,17 @@ export interface InvokeContractV1Response {
     success: boolean;
 }
 /**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export enum NodeHostsProviderType {
+    ConsortiumPlugin = 'CONSORTIUM_PLUGIN',
+    Request = 'REQUEST'
+}
+
+/**
  * Enumerates the possible types of receipts that can be waited for by someone or something that has requested the execution of a transaction on a ledger.
  * @export
  * @enum {string}
@@ -829,6 +859,30 @@ export interface SignTransactionRequest {
      * @memberof SignTransactionRequest
      */
     transactionHash: string;
+    /**
+     * Percentage of valid signatures required.
+     * @type {number}
+     * @memberof SignTransactionRequest
+     */
+    threshold?: number;
+    /**
+     * consortiumPluginId for the consortium manual plugin
+     * @type {string}
+     * @memberof SignTransactionRequest
+     */
+    consortiumPluginId?: string;
+    /**
+     * Array of node API hosts
+     * @type {Array<string>}
+     * @memberof SignTransactionRequest
+     */
+    nodeHosts?: Array<string>;
+    /**
+     * 
+     * @type {NodeHostsProviderType}
+     * @memberof SignTransactionRequest
+     */
+    nodeHostsProvider: NodeHostsProviderType;
 }
 /**
  * 
@@ -842,6 +896,24 @@ export interface SignTransactionResponse {
      * @memberof SignTransactionResponse
      */
     signature: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SignTransactionResponse
+     */
+    validSignatures?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SignTransactionResponse
+     */
+    percentageValidSignatures?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SignTransactionResponse
+     */
+    isAccepted?: boolean;
 }
 /**
  * 
@@ -1323,6 +1395,42 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * Obtain the signature of the current node.
+         * @summary Obtain the signature of the current node.
+         * @param {GetNodeSignatureRequest} getNodeSignatureRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNodeSignatureV1: async (getNodeSignatureRequest: GetNodeSignatureRequest, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'getNodeSignatureRequest' is not null or undefined
+            assertParamExists('getNodeSignatureV1', 'getNodeSignatureRequest', getNodeSignatureRequest)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-node-signature`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getNodeSignatureRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Gets past logs, matching the given options.
          * @param {GetPastLogsV1Request} [getPastLogsV1Request] 
@@ -1579,6 +1687,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Obtain the signature of the current node.
+         * @summary Obtain the signature of the current node.
+         * @param {GetNodeSignatureRequest} getNodeSignatureRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getNodeSignatureV1(getNodeSignatureRequest: GetNodeSignatureRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignTransactionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getNodeSignatureV1(getNodeSignatureRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @summary Gets past logs, matching the given options.
          * @param {GetPastLogsV1Request} [getPastLogsV1Request] 
@@ -1692,6 +1811,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getBlockV1(getBlockV1Request?: GetBlockV1Request, options?: any): AxiosPromise<GetBlockV1Response> {
             return localVarFp.getBlockV1(getBlockV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Obtain the signature of the current node.
+         * @summary Obtain the signature of the current node.
+         * @param {GetNodeSignatureRequest} getNodeSignatureRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNodeSignatureV1(getNodeSignatureRequest: GetNodeSignatureRequest, options?: any): AxiosPromise<SignTransactionResponse> {
+            return localVarFp.getNodeSignatureV1(getNodeSignatureRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1808,6 +1937,18 @@ export class DefaultApi extends BaseAPI {
      */
     public getBlockV1(getBlockV1Request?: GetBlockV1Request, options?: any) {
         return DefaultApiFp(this.configuration).getBlockV1(getBlockV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Obtain the signature of the current node.
+     * @summary Obtain the signature of the current node.
+     * @param {GetNodeSignatureRequest} getNodeSignatureRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getNodeSignatureV1(getNodeSignatureRequest: GetNodeSignatureRequest, options?: any) {
+        return DefaultApiFp(this.configuration).getNodeSignatureV1(getNodeSignatureRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

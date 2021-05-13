@@ -931,12 +931,20 @@
                     }
                 }
             },
+            "NodeHostsProviderType":{
+                "type": "string",
+                "enum": [
+                    "CONSORTIUM_PLUGIN",
+                    "REQUEST"
+                ]
+            },
             "SignTransactionRequest": {
                 "type": "object",
                 "required": [
                     "transactionHash",
                     "keychainId",
-                    "keychainRef"
+                    "keychainRef",
+                    "nodeHostsProvider"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -958,6 +966,24 @@
                         "minLength": 0,
                         "maxLength": 2048,
                         "nullable": false
+                    },
+                    "threshold":{
+                        "description": "Percentage of valid signatures required.",
+                        "type": "number"
+                    },
+                    "consortiumPluginId":{
+                        "description": "consortiumPluginId for the consortium manual plugin",
+                        "type": "string"
+                    },
+                    "nodeHosts":{
+                        "description": "Array of node API hosts",
+                        "type": "array",
+                        "items": {
+                            "type":"string"
+                        }
+                    },
+                    "nodeHostsProvider":{
+                        "$ref": "#/components/schemas/NodeHostsProviderType"
                     }
                 }
             },
@@ -969,6 +995,36 @@
                 "properties": {
                     "signature": {
                         "description": "The signatures of ledger from the corresponding transaction hash.",
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "validSignatures":{
+                        "type": "number"
+                    },
+                    "percentageValidSignatures":{
+                        "type": "number"
+                    },
+                    "isAccepted":{
+                        "type": "boolean"
+                    }
+
+                }
+            },
+            "GetNodeSignatureRequest": {
+                "type": "object",
+                "required": [
+                    "keyPairPem",
+                    "transactionHash"
+                ],
+                "properties": {
+                    "keyPairPem": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "transactionHash": {
+                        "description": "The transaction hash of ledger will be used to fetch the contain.",
                         "type": "string",
                         "minLength": 0,
                         "maxLength": 2048,
@@ -1344,6 +1400,45 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-node-signature": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-node-signature"
+                    }
+                },
+                "operationId": "getNodeSignatureV1",
+                "summary": "Obtain the signature of the current node.",
+                "description": "Obtain the signature of the current node.",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetNodeSignatureRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SignTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not able to find the corresponding tranaction from the transaction hash"
                     }
                 }
             }

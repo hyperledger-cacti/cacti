@@ -1,5 +1,6 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
+import { JWK, JWS } from "jose";
 
 import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
@@ -31,6 +32,7 @@ import {
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
+  //  IPluginConsortium,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -41,10 +43,6 @@ import {
 import {
   Checks,
   CodedError,
-  IJsObjectSignerOptions,
-  JsObjectSigner,
-  KeyConverter,
-  KeyFormat,
   Logger,
   LoggerProvider,
   LogLevelDesc,
@@ -64,6 +62,7 @@ import {
   RunTransactionRequest,
   RunTransactionResponse,
   SignTransactionRequest,
+  GetNodeSignatureRequest,
   SignTransactionResponse,
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialPrivateKeyHex,
@@ -74,11 +73,16 @@ import {
   GetBlockV1Response,
   GetBesuRecordV1Request,
   GetBesuRecordV1Response,
+  NodeHostsProviderType,
+  Configuration,
+  DefaultApi,
 } from "./generated/openapi/typescript-axios";
 
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
 import { BesuSignTransactionEndpointV1 } from "./web-services/sign-transaction-endpoint-v1";
+import { BesuGetNodeSignatureV1 } from "./web-services/get-node-signature-v1-endpoint";
+
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import {
   GetPrometheusExporterMetricsEndpointV1,
@@ -93,6 +97,8 @@ import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint"
 import { GetBlockEndpoint } from "./web-services/get-block-v1-endpoint-";
 import { GetBesuRecordEndpointV1 } from "./web-services/get-besu-record-endpoint-v1";
 import { AbiItem } from "web3-utils";
+
+import { PluginConsortiumManual } from "@hyperledger/cactus-plugin-consortium-manual";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
@@ -285,6 +291,13 @@ export class PluginLedgerConnectorBesu
         logLevel: this.options.logLevel,
       };
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new BesuGetNodeSignatureV1({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
       endpoints.push(endpoint);
     }
     this.endpoints = endpoints;
@@ -843,10 +856,18 @@ export class PluginLedgerConnectorBesu
   public async signTransaction(
     req: SignTransactionRequest,
   ): Promise<Optional<SignTransactionResponse>> {
-    const { pluginRegistry, rpcApiHttpHost, logLevel } = this.options;
-    const { keychainId, keychainRef, transactionHash } = req;
+    const fnTag = `${this.className}#signTransaction()`;
+    const { pluginRegistry, rpcApiHttpHost /*logLevel*/ } = this.options;
+    const {
+      keychainId,
+      transactionHash,
+      nodeHostsProvider,
+      consortiumPluginId,
+      threshold,
+    } = req;
 
-    const converter = new KeyConverter();
+    let validSignatures = 0;
+    const invalidSignatures = 0;
 
     const web3Provider = new Web3.providers.HttpProvider(rpcApiHttpHost);
     const web3 = new Web3(web3Provider);
@@ -864,22 +885,114 @@ export class PluginLedgerConnectorBesu
       throw new CodedError(msg, E_KEYCHAIN_NOT_FOUND);
     }
 
-    const pem: string = await keychain.get(keychainRef);
+    if (nodeHostsProvider === NodeHostsProviderType.ConsortiumPlugin) {
+      const consortium = this.pluginRegistry.plugins.find(
+        (plugin) => plugin.getInstanceId() == consortiumPluginId,
+      ) as PluginConsortiumManual;
+      //PluginConsortiumManual
+      //IPluginConsortium<unknown, unknown, unknown, unknown>
 
-    const pkRaw = converter.privateKeyAs(pem, KeyFormat.PEM, KeyFormat.Raw);
+      if (consortium === undefined) {
+        throw new Error(`${fnTag} Consortium plugin not found`);
+      }
 
-    const jsObjectSignerOptions: IJsObjectSignerOptions = {
-      privateKey: pkRaw,
-      logLevel,
-    };
+      const keyPairPem = consortium.options.keyPairPem;
+      const totalNodes = consortium.getNodeCount();
 
-    const jsObjectSigner = new JsObjectSigner(jsObjectSignerOptions);
+      //Get consortium nodes
+      //const nodesAll = consortium.options.consortiumRepo.allNodes;
+      const nodesAll = await consortium.getConsortiumJws();
+
+      this.log.info("ALL NODES");
+      this.log.info(nodesAll);
+
+      //Get host nodes
+      const requests = nodesAll.signatures
+        .map((cnm) => cnm.signature)
+        .map((host) => new Configuration({ basePath: host }))
+        .map((configuration) => new DefaultApi(configuration))
+        .map((apiClient) =>
+          apiClient.getNodeSignatureV1({
+            keyPairPem: consortium.options.keyPairPem,
+            transactionHash: transactionHash,
+          } as GetNodeSignatureRequest),
+        );
+      const responses = await Promise.all(requests);
+
+      responses
+        .map((apiResponse) => apiResponse.data)
+        .map((signTransactionResponse) => signTransactionResponse.isAccepted)
+        .forEach((isAccepted) => {
+          if (isAccepted == true) {
+            validSignatures = +1;
+          }
+        });
+
+      const keyPair = JWK.asKey(keyPairPem);
+      const signData = JWS.sign(transaction.input, keyPair);
+
+      //TODO:
+      this.log.debug(invalidSignatures);
+      const signDataHex = Buffer.from(signData).toString("hex");
+
+      const validPercentage = (validSignatures * 100) / totalNodes;
+      let isAccepted = false;
+      if (threshold !== undefined && validPercentage >= threshold) {
+        isAccepted = true;
+      }
+      const resBody: SignTransactionResponse = {
+        signature: signDataHex,
+        validSignatures,
+        percentageValidSignatures: validPercentage,
+        isAccepted,
+      };
+      return Optional.ofNullable(resBody);
+    }
+    if (nodeHostsProvider === NodeHostsProviderType.Request) {
+      if (!req.nodeHosts) {
+        throw new Error(`${fnTag} "nodeHosts" parameter is necessary`);
+      }
+    }
+
+    return Optional.empty();
+  }
+
+  public async getNodeSignature(
+    req: GetNodeSignatureRequest,
+  ): Promise<Optional<SignTransactionResponse>> {
+    const { rpcApiHttpHost } = this.options;
+    const { keyPairPem, transactionHash } = req;
+
+    const web3Provider = new Web3.providers.HttpProvider(rpcApiHttpHost);
+
+    const web3 = new Web3(web3Provider);
+
+    // Make sure the transaction exists on the ledger first...
+    const transaction = await web3.eth.getTransaction(transactionHash);
+    if (!transaction) {
+      return Optional.empty();
+    }
 
     if (transaction !== undefined && transaction !== null) {
-      const singData = jsObjectSigner.sign(transaction.input);
-      const signDataHex = Buffer.from(singData).toString("hex");
+      const keyPair = JWK.asKey(keyPairPem);
+      const signData = JWS.sign(transactionHash, keyPair);
+      const signDataHex = Buffer.from(signData).toString("hex");
+      let isAccepted: boolean;
 
-      const resBody: SignTransactionResponse = { signature: signDataHex };
+      try {
+        JWS.verify(signData, keyPair, {
+          complete: true,
+          parse: true,
+        });
+        isAccepted = true;
+      } catch (ex) {
+        isAccepted = false;
+      }
+
+      const resBody: SignTransactionResponse = {
+        signature: signDataHex,
+        isAccepted,
+      };
       return Optional.ofNullable(resBody);
     }
 
