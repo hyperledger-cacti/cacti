@@ -56,28 +56,34 @@ func generateSHA256HashInBase64Form(preimage string) string {
 	return shaHashBase64
 }
 
+// function to return the key to fetch an element from the map using contractId
+func generateContractIdMapKey(contractId string) string {
+	return contractIdPrefix + contractId
+}
+
 /*
  * Function to generate asset-lock key (which is combination of asset-type and asset-id)
  * and contract-id (which is a hash on asset-lock key) for the non-fungible asset locking on the ledger
  */
-func generateAssetLockKeyAndContractId(assetAgreement *common.AssetExchangeAgreement) (string, string) {
-	assetLockKey := assetKeyPrefix + assetAgreement.Type + assetKeyDelimiter + assetAgreement.Id
+func generateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) (string, string, error) {
+	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{assetAgreement.Type, assetAgreement.Id})
+	if err != nil {
+		errorMsg := fmt.Sprintf("error while creating composite key: %+v", err)
+		log.Error(errorMsg)
+		return "", "", errors.New(errorMsg)
+	}
+
 	contractId := generateSHA256HashInBase64Form(assetLockKey)
-	return assetLockKey, contractId
+	return assetLockKey, contractId, nil
 }
 
 /*
  * Function to generate contract-id for fungible asset-locking on the ledger (which is
  * a hash on the attributes of the fungible asset exchange agreement)
  */
-func generateFungibleAssetLockContractId(assetAgreement *common.FungibleAssetExchangeAgreement) string {
-	// There can be multiple fungible asset lock agreement between the same parties for the same <asset-type, quantity>.
-	// Use the current time to generate a different hash if the request gets repeated. It's the caller's responsibility
-	// to ensure that the request didn't get repeated unintentionally.
-	currentTimeSecs := uint64(time.Now().Unix())
-
+func generateFungibleAssetLockContractId(ctx contractapi.TransactionContextInterface, assetAgreement *common.FungibleAssetExchangeAgreement) string {
 	preimage := assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
-			assetAgreement.Locker + assetAgreement.Recipient +  strconv.Itoa(int(currentTimeSecs))
+			assetAgreement.Locker + assetAgreement.Recipient + ctx.GetStub().GetTxID()
 	contractId := generateSHA256HashInBase64Form(preimage)
 	return contractId
 }
@@ -109,7 +115,12 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", errors.New(errorMsg)
 	}
 
-	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
+	assetLockKey, contractId, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
+	if err != nil {
+		log.Error(err.Error())
+		return "", err
+	}
+
 	assetLockVal := AssetLockValue{Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
@@ -144,7 +155,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", errors.New(errorMsg)
 	}
 
-	err = ctx.GetStub().PutState(contractIdPrefix + string(contractId), assetLockKeyBytes)
+	err = ctx.GetStub().PutState(generateContractIdMapKey(string(contractId)), assetLockKeyBytes)
 	if err != nil {
 		log.Error(err.Error())
 		return "", err
@@ -164,7 +175,11 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 	//display the requested asset agreement
 	log.Info(fmt.Sprintf("assetExchangeAgreement: %+v\n", assetAgreement))
 
-	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
+	assetLockKey, _, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -222,7 +237,11 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 	//display the requested asset agreement
 	log.Info(fmt.Sprintf("assetExchangeAgreement: %+v\n", assetAgreement))
 
-	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
+	assetLockKey, _, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
+	if err != nil {
+		log.Error(err.Error())
+		return false, err
+	}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -319,7 +338,11 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	// display the claim information
 	log.Info(fmt.Sprintf("claimInfo: %+v\n", claimInfo))
 
-	assetLockKey, _ := generateAssetLockKeyAndContractId(assetAgreement)
+	assetLockKey, _, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -383,7 +406,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, AssetLockValue, error) {
 	var assetLockVal = AssetLockValue{}
 	var assetLockKey string = ""
-	assetLockKeyBytes, err := ctx.GetStub().GetState(contractIdPrefix + contractId)
+	assetLockKeyBytes, err := ctx.GetStub().GetState(generateContractIdMapKey(contractId))
 	if err != nil {
 		log.Error(err.Error())
 		return assetLockKey, assetLockVal, err
@@ -442,7 +465,7 @@ func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionCo
 		return errors.New(errorMessage)
 	}
 
-	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
+	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of asset unlock: %v", contractId, err)
 		log.Error(errorMessage)
@@ -501,7 +524,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 		return errors.New(errorMessage)
 	}
 
-	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
+	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of asset claim: %+v", contractId, err)
 		log.Error(errorMessage)
@@ -563,7 +586,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 	}
 
 	// generate the contractId for the fungible asset lock agreement
-	contractId := generateFungibleAssetLockContractId(assetAgreement)
+	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
 	assetLockVal := FungibleAssetLockValue{Type: assetAgreement.Type, NumUnits: assetAgreement.NumUnits, Locker: assetAgreement.Locker,
 		Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
@@ -588,7 +611,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 		return "", errors.New(errorMsg)
 	}
 
-	err = ctx.GetStub().PutState(contractIdPrefix + contractId, assetLockValBytes)
+	err = ctx.GetStub().PutState(generateContractIdMapKey(contractId), assetLockValBytes)
 	if err != nil {
 		errorMsg := fmt.Sprintf("failed to write to the world state: %+v", err)
 		log.Error(errorMsg)
@@ -602,7 +625,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 func fetchFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (FungibleAssetLockValue, error) {
 	var assetLockVal = FungibleAssetLockValue{}
 
-	assetLockValBytes, err := ctx.GetStub().GetState(contractIdPrefix + contractId)
+	assetLockValBytes, err := ctx.GetStub().GetState(generateContractIdMapKey(contractId))
 	if err != nil {
 		errorMsg := fmt.Sprintf("failed to retrieve from the world state: %+v", err)
 		log.Error(errorMsg)
@@ -688,7 +711,7 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 		return errors.New(errorMsg)
 	}
 
-	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
+	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of fungible asset claim: %+v", contractId, err)
 		log.Error(errorMessage)
@@ -715,7 +738,7 @@ func (s *SmartContract) UnLockFungibleAsset(ctx contractapi.TransactionContextIn
 		return errors.New(errorMsg)
 	}
 
-	err = ctx.GetStub().DelState(contractIdPrefix + contractId)
+	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
 		errorMessage := fmt.Sprintf("failed to delete the contractId %s as part of fungible asset unlock: %v", contractId, err)
 		log.Error(errorMessage)

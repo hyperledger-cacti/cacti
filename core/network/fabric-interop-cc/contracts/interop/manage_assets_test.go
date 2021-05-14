@@ -401,7 +401,7 @@ func TestUnLockAssetUsingContractId(t *testing.T) {
 		Recipient: recipient,
 		Locker: locker,
 	}
-	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
+	assetLockKey, contractId, _ := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 
 	// Test failure with GetState(contractId) fail to read the world state
 	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
@@ -496,7 +496,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 		Recipient: recipient,
 		Locker: locker,
 	}
-	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
+	assetLockKey, contractId, _ := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 
 	claimInfo := &common.AssetClaimHTLC {
 		HashPreimage: []byte(preimageBase64),
@@ -609,7 +609,7 @@ func TestIsAssetLockedQueryUsingContractId(t *testing.T) {
 		Recipient: recipient,
 		Locker: locker,
 	}
-	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
+	assetLockKey, contractId, _ := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 
 	// Test failure with GetState(contractId) fail to read the world state
 	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
@@ -687,7 +687,7 @@ func TestLockFungibleAsset(t *testing.T) {
 		Recipient: recipient,
 	}
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
-	contractId := generateFungibleAssetLockContractId(assetAgreement)
+	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
 	// Test failure with TimeSpec that is part of lock information not being currently supported
 	// no need to set chaincodeStub.GetStateReturns below since the error is hit before GetState() ledger access
@@ -762,7 +762,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
 		Locker: locker,
 		Recipient: recipient,
 	}
-	contractId := generateFungibleAssetLockContractId(assetAgreement)
+	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
 	// Test failure with GetState(contractId) fail to read the world state
 	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
@@ -821,7 +821,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 		Locker: locker,
 		Recipient: recipient,
 	}
-	contractId := generateFungibleAssetLockContractId(assetAgreement)
+	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
 	claimInfo := &common.AssetClaimHTLC {
 		HashPreimage: []byte(preimageBase64),
@@ -903,7 +903,7 @@ func TestUnLockFungibleAsset(t *testing.T) {
 		Locker: locker,
 		Recipient: recipient,
 	}
-	contractId := generateFungibleAssetLockContractId(assetAgreement)
+	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
 	// Test failure with GetState(contractId) fail to read the world state
 	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
