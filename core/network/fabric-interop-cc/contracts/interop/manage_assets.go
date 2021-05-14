@@ -25,7 +25,6 @@ import (
 
 // Object used in the map, <asset-type, asset-id> --> <contractId, locker, recipient, ...> (for non-fungible assets)
 type AssetLockValue struct {
-	ContractId	string	`json:"contractId"`
 	Locker		string	`json:"locker"`
 	Recipient	string	`json:"recipient"`
 	Hash		string	`json:"hash"`
@@ -48,7 +47,7 @@ const(
 	contractIdPrefix	= "ContractId_"	// prefix for the map, contractId --> asset-key
 )
 
-// function to generate a "SHA256" hash in base64 format for a given the preimage
+// function to generate a "SHA256" hash in base64 format for a given preimage
 func generateSHA256HashInBase64Form(preimage string) string {
 	hasher := sha256.New()
 	hasher.Write([]byte(preimage))
@@ -74,7 +73,7 @@ func generateAssetLockKeyAndContractId(assetAgreement *common.AssetExchangeAgree
 func generateFungibleAssetLockContractId(assetAgreement *common.FungibleAssetExchangeAgreement) string {
 	// There can be multiple fungible asset lock agreement between the same parties for the same <asset-type, quantity>.
 	// Use the current time to generate a different hash if the request gets repeated. It's the caller's responsibility
-	// to ensure that the request didn't get repeated uniterntionally.
+	// to ensure that the request didn't get repeated unintentionally.
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	preimage := assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
@@ -111,7 +110,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	}
 
 	assetLockKey, contractId := generateAssetLockKeyAndContractId(assetAgreement)
-	assetLockVal := AssetLockValue{ContractId: contractId, Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+	assetLockVal := AssetLockValue{Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -513,7 +512,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 }
 
 // IsAssetLocked cc is used to query the ledger and find out if an asset is locked or not (this uses the contractId)
-func (s *SmartContract) IsAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
 
 	_, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
@@ -533,10 +532,10 @@ func (s *SmartContract) IsAssetLockedUsingContractId(ctx contractapi.Transaction
 }
 
 // LockFungibleAsset cc is used to record locking of a group of fungible assets of an asset-type on the ledger
-func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, FungibleAssetAgreementBytes string, lockInfoBytes string) (string, error) {
+func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementBytes string, lockInfoBytes string) (string, error) {
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(FungibleAssetAgreementBytes), assetAgreement)
+	err := proto.Unmarshal([]byte(fungibleAssetAgreementBytes), assetAgreement)
 	if err != nil {
 		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
 		log.Error(errorMsg)
