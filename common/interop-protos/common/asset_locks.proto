@@ -44,3 +44,17 @@ message FungibleAssetExchangeAgreement {
   string locker = 3;
   string recipient = 4;
 }
+
+message AssetContractHTLC {
+  string contractId = 1;
+  AssetExchangeAgreement agreement = 2;
+  AssetLockHTLC lock = 3;
+  AssetClaimHTLC claim = 4;
+}
+
+message FungibleAssetContractHTLC {
+  string contractId = 1;
+  FungibleAssetExchangeAgreement agreement = 2;
+  AssetLockHTLC lock = 3;
+  AssetClaimHTLC claim = 4;
+}
