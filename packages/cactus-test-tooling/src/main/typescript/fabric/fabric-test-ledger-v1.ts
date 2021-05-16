@@ -25,6 +25,7 @@ import {
   LoggerProvider,
   Bools,
 } from "@hyperledger/cactus-common";
+import Dockerode from "dockerode";
 
 /*
  * Contains options for Fabric container
@@ -470,10 +471,27 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
   public async destroy(): Promise<any> {
     const fnTag = "FabricTestLedgerV1#destroy()";
-    if (this.container) {
-      return this.container.remove();
-    } else {
-      throw new Error(`${fnTag} Containernot found, nothing to destroy.`);
+    try {
+      if (this.container) {
+        const docker = new Dockerode();
+        const containerInfo = await this.container.inspect();
+        const volumes = containerInfo.Mounts;
+        await this.container.remove();
+        volumes.forEach(async (volume) => {
+          this.log.debug("Removing volume: ", volume);
+          if (volume.Name) {
+            const volumeToDelete = docker.getVolume(volume.Name);
+            await volumeToDelete.remove();
+          } else {
+            this.log.debug("Volume", volume, "could not be removed");
+          }
+        });
+      } else {
+        throw new Error(`${fnTag} Container not found, nothing to destroy.`);
+      }
+    } catch (error) {
+      this.log.debug(error);
+      throw new Error(`${fnTag}": ${error}"`);
     }
   }
 
