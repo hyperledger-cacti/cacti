@@ -518,20 +518,153 @@ const isFungibleAssetLockedInHTLC = async (
     return result;
 };
 
-/*const StartHTLCAssetLockEventListener = (
+const StartHTLCAssetLockListener = (
     contract: Contract,
-    lockCallback: (c: Contract, i: string, t: string, n: number, r: string, p: string, v: string) => any,
+    lockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, v: string) => any,
+    contractId: string,
     assetType: string,
     assetId: string,
     recipientECert: string,
     lockerECert: string,
 ): void => {
     const listener: ContractListener = async (event) => {
-        if (event.eventName === 'LockAssetHTLC') {
-            const assetLockContractInfo = event.payload.toString('utf8');
+        if (event.eventName === 'LockAsset') {
+            const assetLockContractInfo: assetLocksPb.AssetContractHTLC = assetLocksPb.AssetContractHTLC.deserializeBinary(event.payload);
+            const infoContractId = assetLockContractInfo.getContractid();
+            if (contractId && contractId.length > 0) {
+                if (infoContractId.length > 0 && infoContractId !== contractId) {
+                    return;
+                }
+            }
+            const infoAssetType = assetLockContractInfo.getAgreement().getType();
+            if (assetType && assetType.length > 0) {
+                if (infoAssetType.length > 0 && infoAssetType !== assetType) {
+                    return;
+                }
+            }
+            const infoAssetId = assetLockContractInfo.getAgreement().getId();
+            if (assetId && assetId.length > 0) {
+                if (infoAssetId.length > 0 && infoAssetId !== assetId) {
+                    return;
+                }
+            }
+            const infoRecipient = assetLockContractInfo.getAgreement().getRecipient();
+            if (recipientECert && recipientECert.length > 0) {
+                if (infoRecipient.length > 0 && infoRecipient !== recipientECert) {
+                    return;
+                }
+            }
+            const infoLocker = assetLockContractInfo.getAgreement().getLocker();
+            if (lockerECert && lockerECert.length > 0) {
+                if (infoLocker.length > 0 && infoLocker !== lockerECert) {
+                    return;
+                }
+            }
+            // All filters passed
+            const hashBase64 = assetLockContractInfo.getLock().getHashbase64();
+            const hashValue: string = Buffer.from(hashBase64.toString(), 'base64').toString('utf8');
+            lockCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hashValue);
         }
     };
-}*/
+}
+
+const StartHTLCAssetClaimListener = (
+    contract: Contract,
+    claimCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, p: string) => any,
+    contractId: string,
+    assetType: string,
+    assetId: string,
+    recipientECert: string,
+    lockerECert: string,
+): void => {
+    const listener: ContractListener = async (event) => {
+        if (event.eventName === 'ClaimAsset') {
+            const assetLockContractInfo: assetLocksPb.AssetContractHTLC = assetLocksPb.AssetContractHTLC.deserializeBinary(event.payload);
+            const infoContractId = assetLockContractInfo.getContractid();
+            if (contractId && contractId.length > 0) {
+                if (infoContractId.length > 0 && infoContractId !== contractId) {
+                    return;
+                }
+            }
+            const infoAssetType = assetLockContractInfo.getAgreement().getType();
+            if (assetType && assetType.length > 0) {
+                if (infoAssetType.length > 0 && infoAssetType !== assetType) {
+                    return;
+                }
+            }
+            const infoAssetId = assetLockContractInfo.getAgreement().getId();
+            if (assetId && assetId.length > 0) {
+                if (infoAssetId.length > 0 && infoAssetId !== assetId) {
+                    return;
+                }
+            }
+            const infoRecipient = assetLockContractInfo.getAgreement().getRecipient();
+            if (recipientECert && recipientECert.length > 0) {
+                if (infoRecipient.length > 0 && infoRecipient !== recipientECert) {
+                    return;
+                }
+            }
+            const infoLocker = assetLockContractInfo.getAgreement().getLocker();
+            if (lockerECert && lockerECert.length > 0) {
+                if (infoLocker.length > 0 && infoLocker !== lockerECert) {
+                    return;
+                }
+            }
+            // All filters passed
+            const hashPreimageBase64 = assetLockContractInfo.getClaim().getHashpreimagebase64();
+            const hashPreimage: string = Buffer.from(hashPreimageBase64.toString(), 'base64').toString('utf8');
+            claimCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hashPreimage);
+        }
+    };
+}
+
+const StartHTLCAssetUnlockListener = (
+    contract: Contract,
+    unlockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string) => any,
+    contractId: string,
+    assetType: string,
+    assetId: string,
+    recipientECert: string,
+    lockerECert: string,
+): void => {
+    const listener: ContractListener = async (event) => {
+        if (event.eventName === 'UnlockAsset') {
+            const assetLockContractInfo: assetLocksPb.AssetContractHTLC = assetLocksPb.AssetContractHTLC.deserializeBinary(event.payload);
+            const infoContractId = assetLockContractInfo.getContractid();
+            if (contractId && contractId.length > 0) {
+                if (infoContractId.length > 0 && infoContractId !== contractId) {
+                    return;
+                }
+            }
+            const infoAssetType = assetLockContractInfo.getAgreement().getType();
+            if (assetType && assetType.length > 0) {
+                if (infoAssetType.length > 0 && infoAssetType !== assetType) {
+                    return;
+                }
+            }
+            const infoAssetId = assetLockContractInfo.getAgreement().getId();
+            if (assetId && assetId.length > 0) {
+                if (infoAssetId.length > 0 && infoAssetId !== assetId) {
+                    return;
+                }
+            }
+            const infoRecipient = assetLockContractInfo.getAgreement().getRecipient();
+            if (recipientECert && recipientECert.length > 0) {
+                if (infoRecipient.length > 0 && infoRecipient !== recipientECert) {
+                    return;
+                }
+            }
+            const infoLocker = assetLockContractInfo.getAgreement().getLocker();
+            if (lockerECert && lockerECert.length > 0) {
+                if (infoLocker.length > 0 && infoLocker !== lockerECert) {
+                    return;
+                }
+            }
+            // All filters passed
+            unlockCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker);
+        }
+    };
+}
 
 export {
     createAssetExchangeAgreementSerialized,
