@@ -14,7 +14,7 @@ import crypto from "crypto";
 import fabproto6 from "fabric-protos";
 import * as helpers from "./helpers";
 import assetLocksPb from "../protos-js/common/asset_locks_pb";
-import { Contract } from "fabric-network";
+import { Contract, ContractListener } from "fabric-network";
 const logger = log4js.getLogger("InteroperableHelper");
 
 
@@ -94,6 +94,7 @@ const createHTLC = async (
     hashPreimage: string,
     hashValue: string,
     expiryTimeSecs: number,
+    timeoutCallback: (c: Contract, t: string, i: string, r: string, p: string, v: string) => any,
 ): Promise<{ preimage: any; result: any }> => {
 
     if (!contract)
@@ -144,6 +145,13 @@ const createHTLC = async (
     if (submitError) {
         throw new Error(`LockAsset submitTransaction Error: ${submitError}`);
     }
+
+    if (timeoutCallback)
+    {
+        // Start timer for lock expiration
+        setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, assetType, assetID, recipientECert, hashPreimage, hashValue);
+    }
+
     return { preimage: hashPreimage, result: result };
 };
 
@@ -159,33 +167,34 @@ const createFungibleHTLC = async (
     hashPreimage: string,
     hashValue: string,
     expiryTimeSecs: number,
+    timeoutCallback: (c: Contract, i: string, t: string, n: number, r: string, p: string, v: string) => any,
 ): Promise<{ preimage: any; result: any }> => {
 
     if (!contract)
     {
         logger.error("Contract handle not supplied");
-        return { preimage: "", result: false };
+        return { preimage: "", result: "" };
     }
     if (!assetType)
     {
         logger.error("Asset type not supplied");
-        return { preimage: "", result: false };
+        return { preimage: "", result: "" };
     }
     if (numUnits <= 0)
     {
         logger.error("Asset count must be a positive integer");
-        return { preimage: "", result: false };
+        return { preimage: "", result: "" };
     }
     if (!recipientECert)
     {
         logger.error("Recipient ECert not supplied");
-        return { preimage: "", result: false };
+        return { preimage: "", result: "" };
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
     {
         logger.error("Supplied expiry time invalid or in the past: %s; current time: %s", new Date(expiryTimeSecs).toISOString(), new Date(currTimeSecs).toISOString());
-        return { preimage: "", result: false };
+        return { preimage: "", result: "" };
     }
 
     if (!hashValue || hashValue.length == 0)
@@ -203,13 +212,20 @@ const createFungibleHTLC = async (
     const lockInfoStr = createAssetLockInfoSerialized(hashValue, expiryTimeSecs);
 
     // Normal invoke function
-    const [result, submitError] = await helpers.handlePromise(
+    const [contractId, submitError] = await helpers.handlePromise(
         contract.submitTransaction("LockFungibleAsset", assetExchangeAgreementStr, lockInfoStr),
     );
     if (submitError) {
         throw new Error(`LockFungibleAsset submitTransaction Error: ${submitError}`);
     }
-    return { preimage: hashPreimage, result: result };
+
+    if (timeoutCallback)
+    {
+        // Start timer for lock expiration
+        setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, contractId, assetType, numUnits, recipientECert, hashPreimage, hashValue);
+    }
+
+    return { preimage: hashPreimage, result: contractId };
 };
 
 /**
@@ -501,6 +517,21 @@ const isFungibleAssetLockedInHTLC = async (
     }
     return result;
 };
+
+/*const StartHTLCAssetLockEventListener = (
+    contract: Contract,
+    lockCallback: (c: Contract, i: string, t: string, n: number, r: string, p: string, v: string) => any,
+    assetType: string,
+    assetId: string,
+    recipientECert: string,
+    lockerECert: string,
+): void => {
+    const listener: ContractListener = async (event) => {
+        if (event.eventName === 'LockAssetHTLC') {
+            const assetLockContractInfo = event.payload.toString('utf8');
+        }
+    };
+}*/
 
 export {
     createAssetExchangeAgreementSerialized,

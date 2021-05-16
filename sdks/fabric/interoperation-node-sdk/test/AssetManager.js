@@ -53,6 +53,10 @@ describe("AssetManager", () => {
         return userIdentity;
     }
 
+    async function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     beforeEach(async () => {
         await initializeWallet();
         const network = sinon.createStubInstance(NetworkImpl);
@@ -129,12 +133,22 @@ describe("AssetManager", () => {
             expect(assetLockInvocation.preimage.length).to.be.above(0);
             expect(assetLockInvocation.result).to.be.a('boolean');
             expect(assetLockInvocation.result).to.equal(true);
-            assetLockInvocation = await assetManager.createHTLC(amc, assetType, assetID, recipientECert, "some-preimage", "", expiryTimeSecs);
+            const hashPreimage = "some-preimage";
+            assetLockInvocation = await assetManager.createHTLC(amc, assetType, assetID, recipientECert, hashPreimage, "", expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
-            expect(assetLockInvocation.preimage).to.be.a("string");
-            expect(assetLockInvocation.preimage.length).to.be.above(0);
+            expect(assetLockInvocation.preimage).to.equal(hashPreimage);
             expect(assetLockInvocation.result).to.be.a('boolean');
             expect(assetLockInvocation.result).to.equal(true);
+            const testAttr = assetType + ':' + assetID + ':' + recipientECert + ':' + hashPreimage + ':' + hashValue;
+            const timeoutCb = function(c, t, i, r, p, v) {
+                console.log('Asset lock TIMEOUT at', Date());
+                c.testAttr = t + ':' + i + ':' + r + ':' + p + ':' + v;
+            };
+            expiryTimeSecs = Math.floor(Date.now()/1000) + 3;   // 3 seconds
+            assetLockInvocation = await assetManager.createHTLC(amc, assetType, assetID, recipientECert, hashPreimage, hashValue, expiryTimeSecs, timeoutCb);
+            await sleep(4000);
+            expect(amc).to.have.own.property('testAttr');
+            expect(amc.testAttr).to.equal(testAttr);
         });
     });
 
@@ -142,7 +156,7 @@ describe("AssetManager", () => {
         let amcStub;
 
         beforeEach(() => {
-            amcStub = sinon.stub(amc, "submitTransaction").resolves(false);
+            amcStub = sinon.stub(amc, "submitTransaction").resolves("");
         });
 
         it("asset lock fails with invalid parameters", async () => {
@@ -151,32 +165,32 @@ describe("AssetManager", () => {
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
             expect(assetLockInvocation.preimage).to.be.a("string");
             expect(assetLockInvocation.preimage.length).to.equal(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(false);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal('');
             assetLockInvocation = await assetManager.createFungibleHTLC(amc, "", numUnits, recipientECert, "", "", expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
             expect(assetLockInvocation.preimage).to.be.a("string");
             expect(assetLockInvocation.preimage.length).to.equal(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(false);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal('');
             assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, -1, recipientECert, "", "", expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
             expect(assetLockInvocation.preimage).to.be.a("string");
             expect(assetLockInvocation.preimage.length).to.equal(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(false);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal('');
             assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, "", "", "", expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
             expect(assetLockInvocation.preimage).to.be.a("string");
             expect(assetLockInvocation.preimage.length).to.equal(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(false);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal('');
             assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, recipientECert, "", "", expiryTimeSecs - 600);    // Expiry time in the past
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
             expect(assetLockInvocation.preimage).to.be.a("string");
             expect(assetLockInvocation.preimage.length).to.equal(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(false);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal('');
         });
 
         it("submit asset lock invocation", async () => {
@@ -184,32 +198,43 @@ describe("AssetManager", () => {
             const hashValue = "abcdef123456";
             let expiryTimeSecs = Math.floor(Date.now()/1000) + 300;   // Convert epoch milliseconds to seconds and add 5 minutes
             let lockInfoStr = assetManager.createAssetLockInfoSerialized(hashValue, expiryTimeSecs);
-            amcStub.withArgs("LockFungibleAsset", assetAgreementStr, lockInfoStr).resolves(true);
+            const contractId = "CONTRACT-1234";
+            amcStub.withArgs("LockFungibleAsset", assetAgreementStr, lockInfoStr).resolves(contractId);
             let assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, recipientECert, "", hashValue, expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
             expect(assetLockInvocation.preimage).to.be.a("string");
             expect(assetLockInvocation.preimage.length).to.equal(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(true);
-            amcStub.withArgs("LockFungibleAsset", assetAgreementStr, sinon.match.any).resolves(true);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal(contractId);
+            amcStub.withArgs("LockFungibleAsset", assetAgreementStr, sinon.match.any).resolves(contractId);
             assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, recipientECert, "", hashValue, expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
             expect(assetLockInvocation.preimage).to.be.a("string");
             expect(assetLockInvocation.preimage.length).to.equal(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(true);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal(contractId);
             assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, recipientECert, "", "", expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
             expect(assetLockInvocation.preimage).to.be.a("string");
             expect(assetLockInvocation.preimage.length).to.be.above(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(true);
-            assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, recipientECert, "some-preimage", "", expiryTimeSecs);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal(contractId);
+            const hashPreimage = "some-preimage";
+            assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, recipientECert, hashPreimage, "", expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('preimage', 'result');
-            expect(assetLockInvocation.preimage).to.be.a("string");
-            expect(assetLockInvocation.preimage.length).to.be.above(0);
-            expect(assetLockInvocation.result).to.be.a('boolean');
-            expect(assetLockInvocation.result).to.equal(true);
+            expect(assetLockInvocation.preimage).to.equal(hashPreimage);
+            expect(assetLockInvocation.result).to.be.a('string');
+            expect(assetLockInvocation.result).to.equal(contractId);
+            const testAttr = contractId + ':' + fungibleAssetType + ':' + numUnits + ':' + recipientECert + ':' + hashPreimage + ':' + hashValue;
+            const timeoutCb = function(c, i, t, n, r, p, v) {
+                console.log('Fungible asset lock TIMEOUT at', Date());
+                c.testAttr = i + ':' + t + ':' + n + ':' + r + ':' + p + ':' + v;
+            };
+            expiryTimeSecs = Math.floor(Date.now()/1000) + 3;   // 3 seconds
+            assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, recipientECert, hashPreimage, hashValue, expiryTimeSecs, timeoutCb);
+            await sleep(4000);
+            expect(amc).to.have.own.property('testAttr');
+            expect(amc.testAttr).to.equal(testAttr);
         });
     });
 
