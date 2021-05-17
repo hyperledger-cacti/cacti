@@ -285,9 +285,7 @@ const claimAssetInHTLC = async (
  **/
 const claimFungibleAssetInHTLC = async (
     contract: Contract,
-    assetType: string,
-    numUnits: number,
-    lockerECert: string,
+    contractId: string,
     hashPreimage: string,
 ): Promise<any> => {
 
@@ -296,19 +294,9 @@ const claimFungibleAssetInHTLC = async (
         logger.error("Contract handle not supplied");
         return false;
     }
-    if (!assetType)
+    if (!contractId)
     {
-        logger.error("Asset type not supplied");
-        return false;
-    }
-    if (numUnits <= 0)
-    {
-        logger.error("Asset count must be a positive integer");
-        return false;
-    }
-    if (!lockerECert)
-    {
-        logger.error("Locker ECert not supplied");
+        logger.error("contract ID not supplied");
         return false;
     }
     if (!hashPreimage)
@@ -317,12 +305,11 @@ const claimFungibleAssetInHTLC = async (
         return false;
     }
 
-    const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, "", lockerECert);
     const claimInfoStr = createAssetClaimInfoSerialized(hashPreimage);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("ClaimFungibleAsset", assetExchangeAgreementStr, claimInfoStr),
+        contract.submitTransaction("ClaimFungibleAsset", contractId, claimInfoStr),
     );
     if (submitError) {
         throw new Error(`ClaimFungibleAsset submitTransaction Error: ${submitError}`);
@@ -380,9 +367,7 @@ const reclaimAssetInHTLC = async (
  **/
 const reclaimFungibleAssetInHTLC = async (
     contract: Contract,
-    assetType: string,
-    numUnits: number,
-    recipientECert: string,
+    contractId: string,
 ): Promise<any> => {
 
     if (!contract)
@@ -390,27 +375,15 @@ const reclaimFungibleAssetInHTLC = async (
         logger.error("Contract handle not supplied");
         return false;
     }
-    if (!assetType)
+    if (!contractId)
     {
-        logger.error("Asset type not supplied");
+        logger.error("contract ID not supplied");
         return false;
     }
-    if (numUnits <= 0)
-    {
-        logger.error("Asset count must be a positive integer");
-        return false;
-    }
-    if (!recipientECert)
-    {
-        logger.error("Recipient ECert not supplied");
-        return false;
-    }
-
-    const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, "");
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("UnlockFungibleAsset", assetExchangeAgreementStr),
+        contract.submitTransaction("UnlockFungibleAsset", contractId),
     );
     if (submitError) {
         throw new Error(`UnlockFungibleAsset submitTransaction Error: ${submitError}`);
@@ -474,10 +447,7 @@ const isAssetLockedInHTLC = async (
  **/
 const isFungibleAssetLockedInHTLC = async (
     contract: Contract,
-    assetType: string,
-    numUnits: number,
-    recipientECert: string,
-    lockerECert: string,
+    contractId: string,
 ): Promise<any> => {
 
     if (!contract)
@@ -485,32 +455,15 @@ const isFungibleAssetLockedInHTLC = async (
         logger.error("Contract handle not supplied");
         return false;
     }
-    if (!assetType)
+    if (!contractId)
     {
-        logger.error("Asset type not supplied");
+        logger.error("contract ID not supplied");
         return false;
     }
-    if (numUnits <= 0)
-    {
-        logger.error("Asset count must be a positive integer");
-        return false;
-    }
-    if (!recipientECert)
-    {
-        logger.error("Recipient ECert not supplied");
-        return false;
-    }
-    if (!lockerECert)
-    {
-        logger.error("Locker ECert not supplied");
-        return false;
-    }
-
-    const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, lockerECert);
 
     // Normal invoke function
     const [result, evaluateError] = await helpers.handlePromise(
-        contract.evaluateTransaction("IsFungibleAssetLocked", assetExchangeAgreementStr),
+        contract.evaluateTransaction("IsFungibleAssetLocked", contractId),
     );
     if (evaluateError) {
         throw new Error(`IsFungibleAssetLocked evaluateTransaction Error: ${evaluateError}`);
@@ -521,13 +474,13 @@ const isFungibleAssetLockedInHTLC = async (
 const StartHTLCEventListener = (
     contract: Contract,
     eventName: string,
-    eventCallback: Function,
     contractId: string,
     assetType: string,
     assetId: string,
     numUnits: number,
     recipientECert: string,
     lockerECert: string,
+    eventCallback: Function,
 ): void => {
     const listener: ContractListener = async (event) => {
         if (event.eventName === eventName) {
@@ -606,76 +559,171 @@ const StartHTLCEventListener = (
 
 const StartHTLCAssetLockListener = (
     contract: Contract,
-    lockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, v: string) => any,
     contractId: string,
     assetType: string,
     assetId: string,
     recipientECert: string,
     lockerECert: string,
+    lockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, v: string) => any,
 ): void => {
-    StartHTLCEventListener(contract, 'LockAsset', lockCallback, contractId, assetType, assetId, -1, recipientECert, lockerECert);
+    StartHTLCEventListener(contract, 'LockAsset', contractId, assetType, assetId, -1, recipientECert, lockerECert, lockCallback);
 }
 
 const StartHTLCAssetClaimListener = (
     contract: Contract,
-    claimCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, p: string) => any,
     contractId: string,
     assetType: string,
     assetId: string,
     recipientECert: string,
     lockerECert: string,
+    claimCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, p: string) => any,
 ): void => {
-    StartHTLCEventListener(contract, 'ClaimAsset', claimCallback, contractId, assetType, assetId, -1, recipientECert, lockerECert);
+    StartHTLCEventListener(contract, 'ClaimAsset', contractId, assetType, assetId, -1, recipientECert, lockerECert, claimCallback);
 }
 
 const StartHTLCAssetUnlockListener = (
     contract: Contract,
-    unlockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string) => any,
     contractId: string,
     assetType: string,
     assetId: string,
     recipientECert: string,
     lockerECert: string,
+    unlockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string) => any,
 ): void => {
-    StartHTLCEventListener(contract, 'UnlockAsset', unlockCallback, contractId, assetType, assetId, -1, recipientECert, lockerECert);
+    StartHTLCEventListener(contract, 'UnlockAsset', contractId, assetType, assetId, -1, recipientECert, lockerECert, unlockCallback);
 }
 
 const StartHTLCFungibleAssetLockListener = (
     contract: Contract,
-    lockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, v: string) => any,
     contractId: string,
     assetType: string,
     numUnits: number,
     recipientECert: string,
     lockerECert: string,
+    lockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, v: string) => any,
 ): void => {
-    StartHTLCEventListener(contract, 'LockFungibleAsset', lockCallback, contractId, assetType, "", numUnits, recipientECert, lockerECert);
+    StartHTLCEventListener(contract, 'LockFungibleAsset', contractId, assetType, "", numUnits, recipientECert, lockerECert, lockCallback);
 }
 
 const StartHTLCFungibleAssetClaimListener = (
     contract: Contract,
-    claimCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, p: string) => any,
     contractId: string,
     assetType: string,
     numUnits: number,
     recipientECert: string,
     lockerECert: string,
+    claimCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, p: string) => any,
 ): void => {
-    StartHTLCEventListener(contract, 'ClaimFungibleAsset', claimCallback, contractId, assetType, "", numUnits, recipientECert, lockerECert);
+    StartHTLCEventListener(contract, 'ClaimFungibleAsset', contractId, assetType, "", numUnits, recipientECert, lockerECert, claimCallback);
 }
 
 const StartHTLCFungibleAssetUnlockListener = (
     contract: Contract,
-    unlockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string) => any,
     contractId: string,
     assetType: string,
     numUnits: number,
     recipientECert: string,
     lockerECert: string,
+    unlockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string) => any,
 ): void => {
-    StartHTLCEventListener(contract, 'UnlockFungibleAsset', unlockCallback, contractId, assetType, "", numUnits, recipientECert, lockerECert);
+    StartHTLCEventListener(contract, 'UnlockFungibleAsset', contractId, assetType, "", numUnits, recipientECert, lockerECert, unlockCallback);
 }
 
+const HTLCAssetLocked = async (
+    contract: Contract,
+    contractId: string,
+    assetType: string,
+    assetId: string,
+    recipientECert: string,
+    lockerECert: string,
+): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const waitForLock = (contract, contractId, assetType, assetId, recipientECert, lockerECert, hashValue) => {
+            resolve(hashValue);
+        };
+        StartHTLCAssetLockListener(contract, contractId, assetType, assetId, recipientECert, lockerECert, waitForLock);
+    });
+}
+
+const HTLCAssetClaimed = async (
+    contract: Contract,
+    contractId: string,
+    assetType: string,
+    assetId: string,
+    recipientECert: string,
+    lockerECert: string,
+): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const waitForClaim = (contract, contractId, assetType, assetId, recipientECert, lockerECert, hashPreimage) => {
+            resolve(hashPreimage);
+        };
+        StartHTLCAssetClaimListener(contract, contractId, assetType, assetId, recipientECert, lockerECert, waitForClaim);
+    });
+}
+
+const HTLCAssetUnlocked = async (
+    contract: Contract,
+    contractId: string,
+    assetType: string,
+    assetId: string,
+    recipientECert: string,
+    lockerECert: string,
+): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const waitForUnlock = (contract, contractId, assetType, assetId, recipientECert, lockerECert) => {
+            resolve();
+        };
+        StartHTLCAssetUnlockListener(contract, contractId, assetType, assetId, recipientECert, lockerECert, waitForUnlock);
+    });
+}
+
+const HTLCFungibleAssetLocked = async (
+    contract: Contract,
+    contractId: string,
+    assetType: string,
+    numUnits: number,
+    recipientECert: string,
+    lockerECert: string,
+): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const waitForLock = (contract, contractId, assetType, numUnits, recipientECert, lockerECert, hashValue) => {
+            resolve(hashValue);
+        };
+        StartHTLCFungibleAssetLockListener(contract, contractId, assetType, numUnits, recipientECert, lockerECert, waitForLock);
+    });
+}
+
+const HTLCFungibleAssetClaimed = async (
+    contract: Contract,
+    contractId: string,
+    assetType: string,
+    numUnits: number,
+    recipientECert: string,
+    lockerECert: string,
+): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const waitForClaim = (contract, contractId, assetType, numUnits, recipientECert, lockerECert, hashPreimage) => {
+            resolve(hashPreimage);
+        };
+        StartHTLCFungibleAssetClaimListener(contract, contractId, assetType, numUnits, recipientECert, lockerECert, waitForClaim);
+    });
+}
+
+const HTLCFungibleAssetUnlocked = async (
+    contract: Contract,
+    contractId: string,
+    assetType: string,
+    numUnits: number,
+    recipientECert: string,
+    lockerECert: string,
+): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const waitForUnlock = (contract, contractId, assetType, numUnits, recipientECert, lockerECert) => {
+            resolve();
+        };
+        StartHTLCFungibleAssetUnlockListener(contract, contractId, assetType, numUnits, recipientECert, lockerECert, waitForUnlock);
+    });
+}
 
 export {
     createAssetExchangeAgreementSerialized,

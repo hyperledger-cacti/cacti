@@ -277,34 +277,28 @@ describe("AssetManager", () => {
     describe("claim fungible asset locked in HTLC", () => {
         let amcStub;
         const hashPreimage = "xyz+123-*ty%";
+        const contractId = "CONTRACT-1234";
 
         beforeEach(() => {
             amcStub = sinon.stub(amc, "submitTransaction").resolves(false);
         });
 
         it("asset claim fails with invalid parameters", async () => {
-            let assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(null, fungibleAssetType, numUnits, lockerECert, hashPreimage);
+            let assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(null, contractId, hashPreimage);
             expect(assetClaimInvocation).to.be.a('boolean');
             expect(assetClaimInvocation).to.equal(false);
-            assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, "", numUnits, lockerECert, hashPreimage);
+            assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, "", hashPreimage);
             expect(assetClaimInvocation).to.be.a('boolean');
             expect(assetClaimInvocation).to.equal(false);
-            assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, fungibleAssetType, -1, lockerECert, hashPreimage);
-            expect(assetClaimInvocation).to.be.a('boolean');
-            expect(assetClaimInvocation).to.equal(false);
-            assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, fungibleAssetType, numUnits, "", hashPreimage);
-            expect(assetClaimInvocation).to.be.a('boolean');
-            expect(assetClaimInvocation).to.equal(false);
-            assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, fungibleAssetType, numUnits, lockerECert, "");
+            assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, contractId, "");
             expect(assetClaimInvocation).to.be.a('boolean');
             expect(assetClaimInvocation).to.equal(false);
         });
 
         it("submit asset claim invocation", async () => {
-            let assetAgreementStr = assetManager.createFungibleAssetExchangeAgreementSerialized(fungibleAssetType, numUnits, "", lockerECert);
             let claimInfoStr = assetManager.createAssetClaimInfoSerialized(hashPreimage);
-            amcStub.withArgs("ClaimFungibleAsset", assetAgreementStr, claimInfoStr).resolves(true);
-            let assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, fungibleAssetType, numUnits, lockerECert, hashPreimage);
+            amcStub.withArgs("ClaimFungibleAsset", contractId, claimInfoStr).resolves(true);
+            let assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, contractId, hashPreimage);
             expect(assetClaimInvocation).to.be.a('boolean');
             expect(assetClaimInvocation).to.equal(true);
         });
@@ -343,30 +337,24 @@ describe("AssetManager", () => {
 
     describe("reclaim fungible asset locked in HTLC", () => {
         let amcStub;
+        const contractId = "CONTRACT-1234";
 
         beforeEach(() => {
             amcStub = sinon.stub(amc, "submitTransaction").resolves(false);
         });
 
         it("asset reclaim fails with invalid parameters", async () => {
-            let assetReclaimInvocation = await assetManager.reclaimFungibleAssetInHTLC(null, fungibleAssetType, numUnits, recipientECert);
+            let assetReclaimInvocation = await assetManager.reclaimFungibleAssetInHTLC(null, contractId);
             expect(assetReclaimInvocation).to.be.a('boolean');
             expect(assetReclaimInvocation).to.equal(false);
-            assetReclaimInvocation = await assetManager.reclaimFungibleAssetInHTLC(amc, "", numUnits, recipientECert);
-            expect(assetReclaimInvocation).to.be.a('boolean');
-            expect(assetReclaimInvocation).to.equal(false);
-            assetReclaimInvocation = await assetManager.reclaimFungibleAssetInHTLC(amc, fungibleAssetType, -1, recipientECert);
-            expect(assetReclaimInvocation).to.be.a('boolean');
-            expect(assetReclaimInvocation).to.equal(false);
-            assetReclaimInvocation = await assetManager.reclaimFungibleAssetInHTLC(amc, fungibleAssetType, numUnits, "");
+            assetReclaimInvocation = await assetManager.reclaimFungibleAssetInHTLC(amc, "");
             expect(assetReclaimInvocation).to.be.a('boolean');
             expect(assetReclaimInvocation).to.equal(false);
         });
 
         it("submit asset claim invocation", async () => {
-            let assetAgreementStr = assetManager.createFungibleAssetExchangeAgreementSerialized(fungibleAssetType, numUnits, recipientECert, "");
-            amcStub.withArgs("UnlockFungibleAsset", assetAgreementStr).resolves(true);
-            let assetReclaimInvocation = await assetManager.reclaimFungibleAssetInHTLC(amc, fungibleAssetType, numUnits, recipientECert);
+            amcStub.withArgs("UnlockFungibleAsset", contractId).resolves(true);
+            let assetReclaimInvocation = await assetManager.reclaimFungibleAssetInHTLC(amc, contractId);
             expect(assetReclaimInvocation).to.be.a('boolean');
             expect(assetReclaimInvocation).to.equal(true);
         });
@@ -408,33 +396,24 @@ describe("AssetManager", () => {
 
     describe("check fungible asset lock status in HTLC", () => {
         let amcStub;
+        const contractId = "CONTRACT-1234";
 
         beforeEach(() => {
             amcStub = sinon.stub(amc, "evaluateTransaction").resolves(false);
         });
 
         it("asset lock status check fails with invalid parameters", async () => {
-            let assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(null, fungibleAssetType, numUnits, recipientECert, lockerECert);
+            let assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(null, contractId);
             expect(assetLockQuery).to.be.a('boolean');
             expect(assetLockQuery).to.equal(false);
-            assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(amc, "", numUnits, recipientECert, lockerECert);
-            expect(assetLockQuery).to.be.a('boolean');
-            expect(assetLockQuery).to.equal(false);
-            assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(amc, fungibleAssetType, -1, recipientECert, lockerECert);
-            expect(assetLockQuery).to.be.a('boolean');
-            expect(assetLockQuery).to.equal(false);
-            assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(amc, fungibleAssetType, numUnits, "", lockerECert);
-            expect(assetLockQuery).to.be.a('boolean');
-            expect(assetLockQuery).to.equal(false);
-            assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(amc, fungibleAssetType, numUnits, recipientECert, "");
+            assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(amc, "");
             expect(assetLockQuery).to.be.a('boolean');
             expect(assetLockQuery).to.equal(false);
         });
 
         it("submit asset lock status query", async () => {
-            let assetAgreementStr = assetManager.createFungibleAssetExchangeAgreementSerialized(fungibleAssetType, numUnits, recipientECert, lockerECert);
-            amcStub.withArgs("IsFungibleAssetLocked", assetAgreementStr).resolves(true);
-            let assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(amc, fungibleAssetType, numUnits, recipientECert, lockerECert);
+            amcStub.withArgs("IsFungibleAssetLocked", contractId).resolves(true);
+            let assetLockQuery = await assetManager.isFungibleAssetLockedInHTLC(amc, contractId);
             expect(assetLockQuery).to.be.a('boolean');
             expect(assetLockQuery).to.equal(true);
         });
