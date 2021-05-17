@@ -60,7 +60,7 @@ func TestReadTokenAssetType(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	expectedAsset := &TokenAssetType{Issuer: "CentralBank", FaceValue: 10}
+	expectedAsset := &TokenAssetType{Issuer: "CentralBank", Value: 10}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
