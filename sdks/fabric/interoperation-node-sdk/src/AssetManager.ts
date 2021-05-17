@@ -744,4 +744,10 @@ export {
     StartHTLCFungibleAssetLockListener,
     StartHTLCFungibleAssetClaimListener,
     StartHTLCFungibleAssetUnlockListener,
+    HTLCAssetLocked,
+    HTLCAssetClaimed,
+    HTLCAssetUnlocked,
+    HTLCFungibleAssetLocked,
+    HTLCFungibleAssetClaimed,
+    HTLCFungibleAssetUnlocked,
 };
