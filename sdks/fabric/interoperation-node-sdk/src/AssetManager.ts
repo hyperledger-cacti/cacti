@@ -518,18 +518,27 @@ const isFungibleAssetLockedInHTLC = async (
     return result;
 };
 
-const StartHTLCAssetLockListener = (
+const StartHTLCEventListener = (
     contract: Contract,
-    lockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, v: string) => any,
+    eventName: string,
+    eventCallback: Function,
     contractId: string,
     assetType: string,
     assetId: string,
+    numUnits: number,
     recipientECert: string,
     lockerECert: string,
 ): void => {
     const listener: ContractListener = async (event) => {
-        if (event.eventName === 'LockAsset') {
-            const assetLockContractInfo: assetLocksPb.AssetContractHTLC = assetLocksPb.AssetContractHTLC.deserializeBinary(event.payload);
+        if (event.eventName === eventName) {
+            let assetLockContractInfo;
+            if (eventName.includes('Fungible')) {
+                const eventInfo: assetLocksPb.FungibleAssetContractHTLC = assetLocksPb.FungibleAssetContractHTLC.deserializeBinary(event.payload);
+                assetLockContractInfo = eventInfo;
+            } else {
+                const eventInfo: assetLocksPb.AssetContractHTLC = assetLocksPb.AssetContractHTLC.deserializeBinary(event.payload);
+                assetLockContractInfo = eventInfo;
+            }
             const infoContractId = assetLockContractInfo.getContractid();
             if (contractId && contractId.length > 0) {
                 if (infoContractId.length > 0 && infoContractId !== contractId) {
@@ -542,10 +551,18 @@ const StartHTLCAssetLockListener = (
                     return;
                 }
             }
-            const infoAssetId = assetLockContractInfo.getAgreement().getId();
-            if (assetId && assetId.length > 0) {
-                if (infoAssetId.length > 0 && infoAssetId !== assetId) {
+            let infoNumUnits: number, infoAssetId: string;
+            if (eventName.includes('Fungible')) {
+                infoNumUnits = assetLockContractInfo.getAgreement().getNumunits();
+                if (infoNumUnits !== numUnits) {
                     return;
+                }
+            } else {
+                infoAssetId = assetLockContractInfo.getAgreement().getId();
+                if (assetId && assetId.length > 0) {
+                    if (infoAssetId.length > 0 && infoAssetId !== assetId) {
+                        return;
+                    }
                 }
             }
             const infoRecipient = assetLockContractInfo.getAgreement().getRecipient();
@@ -561,11 +578,42 @@ const StartHTLCAssetLockListener = (
                 }
             }
             // All filters passed
-            const hashBase64 = assetLockContractInfo.getLock().getHashbase64();
-            const hashValue: string = Buffer.from(hashBase64.toString(), 'base64').toString('utf8');
-            lockCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hashValue);
+            if (eventName === 'LockAsset' || eventName === 'LockFungibleAsset') {
+                const hashBase64 = assetLockContractInfo.getLock().getHashbase64();
+                const hashValue: string = Buffer.from(hashBase64.toString(), 'base64').toString('utf8');
+                if (eventName === 'LockAsset') {
+                    eventCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hashValue);
+                } else {
+                    eventCallback(contract, infoContractId, infoAssetType, infoNumUnits, infoRecipient, infoLocker, hashValue);
+                }
+            } else if (eventName === 'ClaimAsset' || eventName === 'ClaimFungibleAsset') {
+                const hashPreimageBase64 = assetLockContractInfo.getClaim().getHashpreimagebase64();
+                const hashPreimage: string = Buffer.from(hashPreimageBase64.toString(), 'base64').toString('utf8');
+                if (eventName === 'ClaimAsset') {
+                    eventCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hashPreimage);
+                } else {
+                    eventCallback(contract, infoContractId, infoAssetType, infoNumUnits, infoRecipient, infoLocker, hashPreimage);
+                }
+            } else if (eventName === 'UnlockAsset') {
+                eventCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker);
+            } else if (eventName === 'UnlockFungibleAsset') {
+                eventCallback(contract, infoContractId, infoAssetType, infoNumUnits, infoRecipient, infoLocker);
+            }
         }
     };
+    contract.addContractListener(listener);
+}
+
+const StartHTLCAssetLockListener = (
+    contract: Contract,
+    lockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, v: string) => any,
+    contractId: string,
+    assetType: string,
+    assetId: string,
+    recipientECert: string,
+    lockerECert: string,
+): void => {
+    StartHTLCEventListener(contract, 'LockAsset', lockCallback, contractId, assetType, assetId, -1, recipientECert, lockerECert);
 }
 
 const StartHTLCAssetClaimListener = (
@@ -577,45 +625,7 @@ const StartHTLCAssetClaimListener = (
     recipientECert: string,
     lockerECert: string,
 ): void => {
-    const listener: ContractListener = async (event) => {
-        if (event.eventName === 'ClaimAsset') {
-            const assetLockContractInfo: assetLocksPb.AssetContractHTLC = assetLocksPb.AssetContractHTLC.deserializeBinary(event.payload);
-            const infoContractId = assetLockContractInfo.getContractid();
-            if (contractId && contractId.length > 0) {
-                if (infoContractId.length > 0 && infoContractId !== contractId) {
-                    return;
-                }
-            }
-            const infoAssetType = assetLockContractInfo.getAgreement().getType();
-            if (assetType && assetType.length > 0) {
-                if (infoAssetType.length > 0 && infoAssetType !== assetType) {
-                    return;
-                }
-            }
-            const infoAssetId = assetLockContractInfo.getAgreement().getId();
-            if (assetId && assetId.length > 0) {
-                if (infoAssetId.length > 0 && infoAssetId !== assetId) {
-                    return;
-                }
-            }
-            const infoRecipient = assetLockContractInfo.getAgreement().getRecipient();
-            if (recipientECert && recipientECert.length > 0) {
-                if (infoRecipient.length > 0 && infoRecipient !== recipientECert) {
-                    return;
-                }
-            }
-            const infoLocker = assetLockContractInfo.getAgreement().getLocker();
-            if (lockerECert && lockerECert.length > 0) {
-                if (infoLocker.length > 0 && infoLocker !== lockerECert) {
-                    return;
-                }
-            }
-            // All filters passed
-            const hashPreimageBase64 = assetLockContractInfo.getClaim().getHashpreimagebase64();
-            const hashPreimage: string = Buffer.from(hashPreimageBase64.toString(), 'base64').toString('utf8');
-            claimCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hashPreimage);
-        }
-    };
+    StartHTLCEventListener(contract, 'ClaimAsset', claimCallback, contractId, assetType, assetId, -1, recipientECert, lockerECert);
 }
 
 const StartHTLCAssetUnlockListener = (
@@ -627,44 +637,45 @@ const StartHTLCAssetUnlockListener = (
     recipientECert: string,
     lockerECert: string,
 ): void => {
-    const listener: ContractListener = async (event) => {
-        if (event.eventName === 'UnlockAsset') {
-            const assetLockContractInfo: assetLocksPb.AssetContractHTLC = assetLocksPb.AssetContractHTLC.deserializeBinary(event.payload);
-            const infoContractId = assetLockContractInfo.getContractid();
-            if (contractId && contractId.length > 0) {
-                if (infoContractId.length > 0 && infoContractId !== contractId) {
-                    return;
-                }
-            }
-            const infoAssetType = assetLockContractInfo.getAgreement().getType();
-            if (assetType && assetType.length > 0) {
-                if (infoAssetType.length > 0 && infoAssetType !== assetType) {
-                    return;
-                }
-            }
-            const infoAssetId = assetLockContractInfo.getAgreement().getId();
-            if (assetId && assetId.length > 0) {
-                if (infoAssetId.length > 0 && infoAssetId !== assetId) {
-                    return;
-                }
-            }
-            const infoRecipient = assetLockContractInfo.getAgreement().getRecipient();
-            if (recipientECert && recipientECert.length > 0) {
-                if (infoRecipient.length > 0 && infoRecipient !== recipientECert) {
-                    return;
-                }
-            }
-            const infoLocker = assetLockContractInfo.getAgreement().getLocker();
-            if (lockerECert && lockerECert.length > 0) {
-                if (infoLocker.length > 0 && infoLocker !== lockerECert) {
-                    return;
-                }
-            }
-            // All filters passed
-            unlockCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker);
-        }
-    };
+    StartHTLCEventListener(contract, 'UnlockAsset', unlockCallback, contractId, assetType, assetId, -1, recipientECert, lockerECert);
 }
+
+const StartHTLCFungibleAssetLockListener = (
+    contract: Contract,
+    lockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, v: string) => any,
+    contractId: string,
+    assetType: string,
+    numUnits: number,
+    recipientECert: string,
+    lockerECert: string,
+): void => {
+    StartHTLCEventListener(contract, 'LockFungibleAsset', lockCallback, contractId, assetType, "", numUnits, recipientECert, lockerECert);
+}
+
+const StartHTLCFungibleAssetClaimListener = (
+    contract: Contract,
+    claimCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, p: string) => any,
+    contractId: string,
+    assetType: string,
+    numUnits: number,
+    recipientECert: string,
+    lockerECert: string,
+): void => {
+    StartHTLCEventListener(contract, 'ClaimFungibleAsset', claimCallback, contractId, assetType, "", numUnits, recipientECert, lockerECert);
+}
+
+const StartHTLCFungibleAssetUnlockListener = (
+    contract: Contract,
+    unlockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string) => any,
+    contractId: string,
+    assetType: string,
+    numUnits: number,
+    recipientECert: string,
+    lockerECert: string,
+): void => {
+    StartHTLCEventListener(contract, 'UnlockFungibleAsset', unlockCallback, contractId, assetType, "", numUnits, recipientECert, lockerECert);
+}
+
 
 export {
     createAssetExchangeAgreementSerialized,
@@ -679,4 +690,10 @@ export {
     reclaimFungibleAssetInHTLC,
     isAssetLockedInHTLC,
     isFungibleAssetLockedInHTLC,
+    StartHTLCAssetLockListener,
+    StartHTLCAssetClaimListener,
+    StartHTLCAssetUnlockListener,
+    StartHTLCFungibleAssetLockListener,
+    StartHTLCFungibleAssetClaimListener,
+    StartHTLCFungibleAssetUnlockListener,
 };
