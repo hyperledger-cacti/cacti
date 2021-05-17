@@ -221,6 +221,34 @@ io.on('connection', function(client) {
                 logger.error('Detail    :' + JSON.stringify(errObj));
                 client.emit("connector_error", errObj);
             });
+        } else if (methodType === "function") {
+            const func = args["method"].command;
+            // Check for the existence of the specified function and call it if it exists.
+            if (Splug.isExistFunction(func)) {
+                // Can be called with Server plugin function name.
+                Splug[func](args)
+                .then((respObj) => {
+                    logger.info('*** RESPONSE ***');
+                    logger.info('Client ID :' + client.id);
+                    logger.info('Response  :' + JSON.stringify(respObj));
+                    client.emit("response", respObj);
+                })
+                .catch((errObj) => {
+                    logger.error('*** ERROR ***');
+                    logger.error('Client ID :' + client.id);
+                    logger.error('Detail    :' + JSON.stringify(errObj));
+                    client.emit("connector_error", errObj);
+                });
+            } else {
+                // No such function
+                const emsg = "Function " + func + " not found!";
+                logger.error(emsg);
+                const retObj = {
+                    "status" : 504,
+                    "errorDetail" : emsg
+                };
+                client.emit("connector_error", retObj);
+            }
         } else {
             // No such function
             const emsg = "method.type " + methodType + " not found!";

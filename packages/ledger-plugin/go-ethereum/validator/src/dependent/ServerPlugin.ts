@@ -102,7 +102,6 @@ export class ServerPlugin {
                         "amount" : amountVal
                     }
                 };
-                logger.debug("##getNumericBalance: add reqID");
                 if (reqID !== undefined) {
                     retObj["id"] = reqID;
                 }
@@ -117,7 +116,6 @@ export class ServerPlugin {
                         "errorDetail" : emsg
                     }
                 };
-                logger.debug("##getNumericBalance: add reqID");
                 if (reqID !== undefined) {
                     retObj["id"] = reqID;
                 }
@@ -189,7 +187,6 @@ export class ServerPlugin {
                         "txid" : res
                     }
                 };
-                logger.debug("##transferNumericAsset: add reqID");
                 if (reqID !== undefined) {
                     retObj["reqID"] = reqID;
                 }
@@ -204,7 +201,6 @@ export class ServerPlugin {
                         "errorDetail" : emsg
                     }
                 };
-                logger.debug("##transferNumericAsset: add reqID");
                 if (reqID !== undefined) {
                     retObj["reqID"] = reqID;
                 }
@@ -213,6 +209,166 @@ export class ServerPlugin {
             }
         });
     }
+
+
+    /*
+     * getNonce
+     * Get nonce. nonce is transaction count.
+     *
+     * @param {Object} args JSON Object
+     * {
+     *      "targetAddress":<target account>,
+     *      "reqID":<request ID> (option)
+     * }
+     * @return {Object} JSON object
+     */
+    getNonce(args) {
+        // * The Web3 API can be used synchronously, but each function is always an asynchronous specification because of the use of other APIs such as REST,
+        return new Promise((resolve, reject) => {
+            logger.info("getNonce start");
+            var retObj = {};
+
+            var targetAddress = args.args.args.args[0];
+            var reqID = args['reqID'];
+
+
+            if(targetAddress === undefined) {
+                let emsg = "JSON parse error!";
+                logger.info(emsg);
+                retObj = {
+                    "resObj" : {
+                        "status" : 504,
+                        "errorDetail" : emsg
+                    }
+                };
+                return reject(retObj);
+            }
+            
+            // var ethargs = '0x' + targetAddress;
+            var ethargs = targetAddress;
+            logger.debug(`getNonce(): ethargs: ${ethargs}, targetAddress: ${targetAddress}`);
+            // Handling exceptions to absorb the difference of interest.
+            try {
+                var web3 = new Web3();
+                web3.setProvider(new web3.providers.HttpProvider(SplugConfig.provider));
+                var txnCount = web3.eth.getTransactionCount(ethargs);
+                logger.info(`getNonce(): txnCount: ${txnCount}`);
+                var hexStr = web3.toHex(txnCount);
+                logger.info(`getNonce(): hexStr: ${hexStr}`);
+                const result = {
+                    "nonce" : txnCount,
+                    "nonceHex" : hexStr
+                };
+                logger.debug(`getNonce(): result: ${result}`);
+                
+                const signedResults = ValidatorAuthentication.sign({"result":result});
+                logger.debug(`getNonce(): signedResults: ${signedResults}`);
+                retObj = {
+                    "resObj" : {
+                        "status" : 200,
+                        "data" : signedResults
+                    }
+                };
+                if (reqID !== undefined) {
+                    retObj["id"] = reqID;
+                }
+                logger.debug(`##getNonce: retObj: ${JSON.stringify(retObj)}`);
+                return resolve(retObj);
+            } catch (e) {
+                let emsg = e.toString().replace(/Error: /g , "");
+                logger.error(emsg);
+                retObj = {
+                    "resObj" : {
+                        "status" : 504,
+                        "errorDetail" : emsg
+                    }
+                };
+                if (reqID !== undefined) {
+                    retObj["id"] = reqID;
+                }
+                logger.debug(`##getNonce: retObj: ${JSON.stringify(retObj)}`);
+                return reject(retObj);
+            }
+        });
+    }
+
+
+    /*
+     * toHex
+     * Convert to hex string.
+     *
+     * @param {Object} args JSON Object
+     * {
+     *      "value":<value>,
+     *      "reqID":<request ID> (option)
+     * }
+     * @return {Object} JSON object
+     */
+    toHex(args) {
+        // * The Web3 API can be used synchronously, but each function is always an asynchronous specification because of the use of other APIs such as REST,
+        return new Promise((resolve, reject) => {
+            logger.info("toHex start");
+            var retObj = {};
+
+            var targetValue = args.args.args.args[0];
+            var reqID = args['reqID'];
+
+
+            if(targetValue === undefined) {
+                let emsg = "JSON parse error!";
+                logger.info(emsg);
+                retObj = {
+                    "resObj" : {
+                        "status" : 504,
+                        "errorDetail" : emsg
+                    }
+                };
+                return reject(retObj);
+            }
+            
+            logger.debug(`toHex(): targetValue: ${targetValue}`);
+            // Handling exceptions to absorb the difference of interest.
+            try {
+                var web3 = new Web3();
+                web3.setProvider(new web3.providers.HttpProvider(SplugConfig.provider));
+                var hexStr = web3.toHex(targetValue);
+                logger.info(`toHex(): hexStr: ${hexStr}`);
+                const result = {
+                    "hexStr" : hexStr
+                };
+                logger.debug(`toHex(): result: ${result}`);
+                
+                const signedResults = ValidatorAuthentication.sign({"result":result});
+                logger.debug(`toHex(): signedResults: ${signedResults}`);
+                retObj = {
+                    "resObj" : {
+                        "status" : 200,
+                        "data" : signedResults
+                    }
+                };
+                if (reqID !== undefined) {
+                    retObj["id"] = reqID;
+                }
+                logger.debug(`##toHex: retObj: ${JSON.stringify(retObj)}`);
+                return resolve(retObj);
+            } catch (e) {
+                let emsg = e.toString().replace(/Error: /g , "");
+                logger.error(emsg);
+                retObj = {
+                    "resObj" : {
+                        "status" : 504,
+                        "errorDetail" : emsg
+                    }
+                };
+                if (reqID !== undefined) {
+                    retObj["id"] = reqID;
+                }
+                logger.debug(`##toHex: retObj: ${JSON.stringify(retObj)}`);
+                return reject(retObj);
+            }
+        });
+    }
+
 
     /*
      * sendRawTransaction
@@ -310,7 +466,6 @@ export class ServerPlugin {
                         "data" : signedResults
                     }
                 };
-                logger.debug("##web3Eth: add reqID");
                 if (reqID !== undefined) {
                     retObj["id"] = reqID;
                 }
@@ -325,7 +480,6 @@ export class ServerPlugin {
                         "errorDetail" : emsg
                     }
                 };
-                logger.debug("##web3Eth: add reqID");
                 if (reqID !== undefined) {
                     retObj["id"] = reqID;
                 }
@@ -396,7 +550,6 @@ export class ServerPlugin {
                         "data" : signedResults
                     }
                 };
-                logger.debug("##contract: add reqID");
                 if (reqID !== undefined) {
                     retObj["id"] = reqID;
                 }
@@ -411,7 +564,6 @@ export class ServerPlugin {
                         "errorDetail" : emsg
                     }
                 };
-                logger.debug("##contract: add reqID");
                 if (reqID !== undefined) {
                     retObj["id"] = reqID;
                 }
