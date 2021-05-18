@@ -12,3 +12,5 @@ import * as InteroperableHelper from "../src/InteroperableHelper";
 export { InteroperableHelper };
 import * as RelayHelper from "../src/Relay";
 export { RelayHelper };
+import * as AssetManager from "../src/AssetManager";
+export { AssetManager };
