@@ -7,7 +7,7 @@
 import { GluegunCommand } from 'gluegun'
 import { Toolbox } from 'gluegun/build/types/domain/toolbox'
 import { GluegunPrint } from 'gluegun/build/types/toolbox/print-types'
-import { invoke, Query } from './fabric-functions'
+import { fabricHelper, invoke, Query } from './fabric-functions'
 import * as crypto from 'crypto'
 import { promisify } from 'util'
 import * as fs from 'fs'
@@ -33,6 +33,83 @@ const signMessage = (message, privateKey) => {
   return sign.sign(privateKey)
 }
 // Basic function to add data to network, it assumes function is CREATE
+// TODO: Pass function name as parameter
+const addAssets = ({
+  dataFilePath,
+  networkName,
+  connProfilePath,
+  query,
+  mspId = global.__DEFAULT_MSPID__,
+  channelName,
+  contractName,
+  ccFunc,
+  ccType,
+  logger
+}: {
+  dataFilePath: string
+  networkName: string
+  connProfilePath: string
+  query?: Query
+  mspId?: string
+  channelName?: string
+  contractName?: string
+  ccFunc?: string
+  ccType: string
+  logger?: any
+}): void => {
+  const filepath = path.resolve(dataFilePath)
+  const data = JSON.parse(fs.readFileSync(filepath).toString())
+  const valuesList = Object.entries(data)
+  valuesList.forEach(async (item: [string, string]) => {
+    const currentQuery = query
+      ? query
+      : {
+          channel: channelName,
+          contractName: contractName
+            ? contractName
+            : 'simpleasset',
+          ccFunc: '',
+          args: []
+        }
+
+    const { gateway, contract, wallet } = await fabricHelper({
+      channel: channelName,
+      contractName: contractName,
+      connProfilePath: connProfilePath,
+      networkName: networkName,
+      mspId: mspId,
+      userString: item[1]['owner']
+    })
+    const userId = await wallet.get(item[1]['owner'])
+    const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
+
+    if (ccType == 'bond') {
+      currentQuery.ccFunc = 'CreateAsset'
+      currentQuery.args = [...currentQuery.args, item[1]['id'], userCert, item[1]['issuer'], item[1]['facevalue'], item[1]['maturitydate']]
+    } else if (ccType == 'token') {
+      currentQuery.ccFunc = 'IssueTokenAssets'
+      currentQuery.args = [...currentQuery.args, item[1]['tokenassettype'], item[1]['numunits'], userCert]
+    }
+    console.log(currentQuery)
+    try {
+      const read = await contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
+      const state = Buffer.from(read).toString()
+      if (state) {
+        logger.debug(`Response From Network: ${state}`)
+      } else {
+        logger.debug('No Response from network')
+      }
+
+      // Disconnect from the gateway.
+      await gateway.disconnect()
+      return state
+    } catch (error) {
+      console.error(`Failed to submit transaction: ${error}`)
+      throw new Error(error)
+    }
+  })
+}
+
 const addData = ({
   filename,
   networkName,
@@ -69,12 +146,12 @@ const addData = ({
   })
 }
 
-// Custom Command help is to generate the help text used when running --help on a command. 
+// Custom Command help is to generate the help text used when running --help on a command.
 // 1. If usage string is provided print usage section
 // 2. if example string is provided print example section
 // 3. if options list has options provided print options section
 // 4. If there are subcommands it will print subcommands, this uses the commandRoot array where each item are the commands in order.
-// Logic is also in place to fix spacing based on length. 
+// Logic is also in place to fix spacing based on length.
 const commandHelp = (
   print: GluegunPrint,
   toolbox: Toolbox,
@@ -131,7 +208,7 @@ const commandHelp = (
 }
 
 // Custom Help is used as the default help when running --help on no commands.
-// filters out subcommands by using the root of each toplevel command and filters them out. When adding a command it will need to be added to the array to filter out. 
+// filters out subcommands by using the root of each toplevel command and filters them out. When adding a command it will need to be added to the array to filter out.
 const customHelp = (toolbox: Toolbox): void => {
   toolbox.print.info(toolbox.print.colors.bold('VERSION'))
   toolbox.print.info('')
@@ -228,7 +305,7 @@ const readJSONFromFile = (jsonfile, logger = console) => {
 // Used for getting network configuration from config.json file.
 const getNetworkConfig = (
   networkId: string
-): { relayEndpoint: string; connProfilePath: string; username?: string } => {
+): { relayEndpoint?: string; connProfilePath: string; username?: string; mspId?:string; channelName?: string; chaincode?: string } => {
   const configPath = process.env.CONFIG_PATH
     ? path.join(process.env.CONFIG_PATH)
     : path.join(__dirname, '../../config.json')
@@ -238,12 +315,13 @@ const getNetworkConfig = (
       logger.error(
         `Network: ${networkId} does not exist in the config.json file`
       )
-      return { relayEndpoint: '', connProfilePath: '', username: '' }
+      return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', channelName: '', chaincode: '' }
     }
+    // console.log(configJSON[networkId])
     return configJSON[networkId]
   } catch (err) {
     logger.error(`Network: ${networkId} does not exist in the config.json file`)
-    return { relayEndpoint: '', connProfilePath: '', username: '' }
+    return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', channelName: '', chaincode: '' }
   }
 }
 export {
@@ -256,5 +334,6 @@ export {
   signMessage,
   getNetworkConfig,
   validKeys,
-  configKeys
+  configKeys,
+  addAssets
 }
