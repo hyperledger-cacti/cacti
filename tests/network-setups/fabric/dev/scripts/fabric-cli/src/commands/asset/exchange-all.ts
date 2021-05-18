@@ -169,6 +169,7 @@ const command: GluegunCommand = {
 
     var res
     try {
+      spinner.info(`Trying Asset Lock: ${assetType}, ${assetId}`)
       res = await AssetManager.createHTLC(network1.contract,
                       assetType,
                       assetId,
@@ -189,6 +190,7 @@ const command: GluegunCommand = {
 
     var contractId
     try {
+      spinner.info(`Trying Fungible Asset Lock: ${fungibleAssetType}, ${fungibleAssetAmt}`)
       res = await AssetManager.createFungibleHTLC(network2.contract,
                       fungibleAssetType,
                       fungibleAssetAmt,
@@ -210,6 +212,7 @@ const command: GluegunCommand = {
     }
 
     try {
+      spinner.info(`Trying Fungible Asset Claim: ${contractId}`)
       res = AssetManager.claimFungibleAssetInHTLC(network2.contract,
                       contractId,
                       secret)
@@ -235,6 +238,7 @@ const command: GluegunCommand = {
 
 
     try {
+      spinner.info(`Trying Fungible Asset Claim: ${assetType} ${assetId}`)
       res = AssetManager.claimAssetInHTLC(network1.contract,
                       assetType,
                       assetId,
