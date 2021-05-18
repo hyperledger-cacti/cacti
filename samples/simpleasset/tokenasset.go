@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	// log "github.com/sirupsen/logrus"
 )
 
 type TokenAssetType struct {
@@ -172,6 +173,9 @@ func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface, 
 	if err != nil {
 		return -1, fmt.Errorf("failed to read owner's wallet from world state: %v", err)
 	}
+	if walletJSON == nil {
+		return -1, fmt.Errorf("owner does not have a wallet.")
+	}
 
 	var wallet TokenWallet
 	err = json.Unmarshal(walletJSON, &wallet)
@@ -194,8 +198,11 @@ func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInter
 // Helper Functions for token asset
 func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, id string, tokenAssetType string, numUnits int) error {
 	walletJSON, err := ctx.GetStub().GetState(id)
+	if err != nil {
+		return err
+	}
 	var wallet TokenWallet
-	if err == nil {
+	if walletJSON != nil {
 		err = json.Unmarshal(walletJSON, &wallet)
 		if err != nil {
 			return err
@@ -222,6 +229,9 @@ func subTokenAssetsHelper(ctx contractapi.TransactionContextInterface, id string
 	var wallet TokenWallet
 	if err != nil {
 		return err
+	}
+	if walletJSON == nil {
+		return fmt.Errorf("owner does not have a wallet.")
 	}
 
 	err = json.Unmarshal(walletJSON, &wallet)
