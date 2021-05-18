@@ -223,9 +223,9 @@ func TestAssetLock(t *testing.T) {
     newAssetId := "A002"
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: nil,
+        HashBase64: nil,
         ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -270,7 +270,7 @@ func TestAssetLock(t *testing.T) {
     require.False(t, lockSuccess)
 
     assetAgreement.Recipient = ""
-    lockInfoHTLC.Hash = hash
+    lockInfoHTLC.HashBase64 = hash
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
     assetAgreement.Id = assetId
@@ -279,7 +279,7 @@ func TestAssetLock(t *testing.T) {
     require.False(t, lockSuccess)
 
     assetAgreement.Recipient = recipient
-    lockInfoHTLC.Hash = []byte{}
+    lockInfoHTLC.HashBase64 = []byte{}
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
     lockSuccess, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
@@ -292,7 +292,7 @@ func TestAssetLock(t *testing.T) {
     require.False(t, lockSuccess)
 
     // Test success
-    lockInfoHTLC.Hash = hash
+    lockInfoHTLC.HashBase64 = hash
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
     lockSuccess, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
@@ -332,9 +332,9 @@ func TestFungibleAssetLock(t *testing.T) {
     numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: nil,
+        HashBase64: nil,
         ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -375,7 +375,7 @@ func TestFungibleAssetLock(t *testing.T) {
     require.Error(t, err)
 
     assetAgreement.Recipient = ""
-    lockInfoHTLC.Hash = hash
+    lockInfoHTLC.HashBase64 = hash
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
     assetAgreement.NumUnits = numUnits
@@ -383,7 +383,7 @@ func TestFungibleAssetLock(t *testing.T) {
     require.Error(t, err)
 
     assetAgreement.Recipient = recipient
-    lockInfoHTLC.Hash = []byte{}
+    lockInfoHTLC.HashBase64 = []byte{}
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
     contractId, err := amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
@@ -394,8 +394,8 @@ func TestFungibleAssetLock(t *testing.T) {
     require.Error(t, err)
     require.False(t, lockSuccess)
 
-    // Test success when both asset agreement and lock information are provided
-    lockInfoHTLC.Hash = hash
+    // Test failure when there is no unit balance (total not declared yet)
+    lockInfoHTLC.HashBase64 = hash
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
     contractId, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
@@ -423,8 +423,8 @@ func TestIsAssetLocked(t *testing.T) {
     assetId := "A001"
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
-    hashPreimage := []byte("asset-exchange-scenario")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
+    hashPreimage := []byte("YW5jaXNjbzEeMBwGA1UE")
     assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
@@ -432,7 +432,7 @@ func TestIsAssetLocked(t *testing.T) {
         Locker: locker,
     }
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -441,7 +441,7 @@ func TestIsAssetLocked(t *testing.T) {
         LockInfo: lockInfoBytes,
     }
     claimInfoHTLC := &common.AssetClaimHTLC {
-        HashPreimage: hashPreimage,
+        HashPreimageBase64: hashPreimage,
     }
     claimInfoBytes, _ := proto.Marshal(claimInfoHTLC)
     claimInfo := &common.AssetClaim {
@@ -541,8 +541,8 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
-    hashPreimage := []byte("asset-exchange-scenario")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
+    hashPreimage := []byte("YW5jaXNjbzEeMBwGA1UE")
     assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: numUnits,
@@ -550,7 +550,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
         Locker: locker,
     }
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -559,7 +559,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
         LockInfo: lockInfoBytes,
     }
     claimInfoHTLC := &common.AssetClaimHTLC {
-        HashPreimage: hashPreimage,
+        HashPreimageBase64: hashPreimage,
     }
     claimInfoBytes, _ := proto.Marshal(claimInfoHTLC)
     claimInfo := &common.AssetClaim {
@@ -626,7 +626,7 @@ func TestAssetUnlock(t *testing.T) {
     assetId := "A001"
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
@@ -636,7 +636,7 @@ func TestAssetUnlock(t *testing.T) {
     currTime := time.Now()
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: uint64(expiryTime.Unix()),
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -718,7 +718,7 @@ func TestFungibleAssetUnlock(t *testing.T) {
     numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: numUnits,
@@ -728,7 +728,7 @@ func TestFungibleAssetUnlock(t *testing.T) {
     currTime := time.Now()
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: uint64(expiryTime.Unix()),
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -796,10 +796,10 @@ func TestAssetClaim(t *testing.T) {
     assetId := "A001"
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
-    hashPreimage := []byte("asset-exchange-scenario")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
+    hashPreimage := []byte("YW5jaXNjbzEeMBwGA1UE")
     claimInfoHTLC := &common.AssetClaimHTLC {
-        HashPreimage: nil,
+        HashPreimageBase64: nil,
     }
     claimInfoBytes, _ := proto.Marshal(claimInfoHTLC)
     claimInfo := &common.AssetClaim {
@@ -843,7 +843,7 @@ func TestAssetClaim(t *testing.T) {
     require.False(t, claimSuccess)
 
     assetAgreement.Locker = ""
-    claimInfoHTLC.HashPreimage = hashPreimage
+    claimInfoHTLC.HashPreimageBase64 = hashPreimage
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
     claimInfo.ClaimInfo = claimInfoBytes
     assetAgreement.Id = assetId
@@ -852,7 +852,7 @@ func TestAssetClaim(t *testing.T) {
     require.False(t, claimSuccess)
 
     assetAgreement.Locker = locker
-    claimInfoHTLC.HashPreimage = []byte{}
+    claimInfoHTLC.HashPreimageBase64 = []byte{}
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
     claimInfo.ClaimInfo = claimInfoBytes
     claimSuccess, err = amcc.ClaimAsset(amstub, assetAgreement, claimInfo)
@@ -867,7 +867,7 @@ func TestAssetClaim(t *testing.T) {
     // Test success
     // First, lock an asset
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -886,7 +886,7 @@ func TestAssetClaim(t *testing.T) {
 
     // Now claim the asset
     assetAgreement.Locker = locker
-    claimInfoHTLC.HashPreimage = hashPreimage
+    claimInfoHTLC.HashPreimageBase64 = hashPreimage
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
     claimInfo.ClaimInfo = claimInfoBytes
     setCreator(amstub, recipient)
@@ -909,10 +909,10 @@ func TestFungibleAssetClaim(t *testing.T) {
     numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
-    hashPreimage := []byte("asset-exchange-scenario")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
+    hashPreimage := []byte("YW5jaXNjbzEeMBwGA1UE")
     claimInfoHTLC := &common.AssetClaimHTLC {
-        HashPreimage: nil,
+        HashPreimageBase64: nil,
     }
     claimInfoBytes, _ := proto.Marshal(claimInfoHTLC)
     claimInfo := &common.AssetClaim {
@@ -941,7 +941,7 @@ func TestFungibleAssetClaim(t *testing.T) {
 
     // Test success
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -959,7 +959,7 @@ func TestFungibleAssetClaim(t *testing.T) {
 
     // Now claim the asset
     assetAgreement.Locker = locker
-    claimInfoHTLC.HashPreimage = hashPreimage
+    claimInfoHTLC.HashPreimageBase64 = hashPreimage
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
     claimInfo.ClaimInfo = claimInfoBytes
     setCreator(amstub, recipient)
@@ -981,14 +981,14 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     assetType := "cbdc"
     numUnits := uint64(1000)
     recipient := "Bob"
-    hash := []byte("j8r484r484")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
         Type: assetType,
         NumUnits: numUnits,
         Recipient: recipient,
     }
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: 0,
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -1025,7 +1025,7 @@ func TestAssetListFunctions(t *testing.T) {
     numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
@@ -1041,7 +1041,7 @@ func TestAssetListFunctions(t *testing.T) {
     currTime := time.Now()
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: uint64(expiryTime.Unix()),
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
@@ -1167,7 +1167,7 @@ func TestAssetTimeFunctions(t *testing.T) {
     numUnits := uint64(1000)
     recipient := "Bob"
     locker := clientId
-    hash := []byte("j8r484r484")
+    hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.AssetExchangeAgreement {
         Type: assetType,
         Id: assetId,
@@ -1183,7 +1183,7 @@ func TestAssetTimeFunctions(t *testing.T) {
     currTime := time.Now()
     expiryTime := currTime.Add(time.Minute)     // expires in 1 minute
     lockInfoHTLC := &common.AssetLockHTLC {
-        Hash: hash,
+        HashBase64: hash,
         ExpiryTimeSecs: uint64(expiryTime.Unix()),
     }
     lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)

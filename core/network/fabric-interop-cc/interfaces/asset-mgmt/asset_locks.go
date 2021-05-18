@@ -91,7 +91,7 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgre
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
     }
-    if len(lockInfoHTLC.Hash) == 0 {
+    if len(lockInfoHTLC.HashBase64) == 0 {
         errorMsg = "empty lock hash value"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
@@ -161,7 +161,7 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
         log.Error(errorMsg)
         return "", errors.New(errorMsg)
     }
-    if len(lockInfoHTLC.Hash) == 0 {
+    if len(lockInfoHTLC.HashBase64) == 0 {
         errorMsg = "empty lock hash value"
         log.Error(errorMsg)
         return "", errors.New(errorMsg)
@@ -317,7 +317,7 @@ func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgr
         log.Error(err.Error())
         return false, err
     }
-    if len(claimInfoHTLC.HashPreimage) == 0 {
+    if len(claimInfoHTLC.HashPreimageBase64) == 0 {
         errorMsg = "empty lock hash preimage"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)
@@ -372,7 +372,7 @@ func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, 
         log.Error(err.Error())
         return false, err
     }
-    if len(claimInfoHTLC.HashPreimage) == 0 {
+    if len(claimInfoHTLC.HashPreimageBase64) == 0 {
         errorMsg = "empty lock hash preimage"
         log.Error(errorMsg)
         return false, errors.New(errorMsg)

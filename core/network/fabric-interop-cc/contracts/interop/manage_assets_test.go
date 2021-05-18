@@ -35,7 +35,7 @@ func TestLockAsset(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	lockInfoHTLC := &common.AssetLockHTLC {
-		Hash: []byte(hashBase64),
+		HashBase64: []byte(hashBase64),
 		// lock for next 5 minutes
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
@@ -66,7 +66,7 @@ func TestLockAsset(t *testing.T) {
 
 	// no need to set chaincodeStub.GetStateReturns below since the error is hit before GetState() ledger access in LockAsset()
 	lockInfoHTLC = &common.AssetLockHTLC {
-		Hash: []byte(hashBase64),
+		HashBase64: []byte(hashBase64),
 		// lock for next 5 mintues
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		// TimeSpec of AssetLockHTLC_DURATION is not currently supported
@@ -91,7 +91,7 @@ func TestUnLockAsset(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	lockInfoHTLC := &common.AssetLockHTLC {
-		Hash: []byte(hashBase64),
+		HashBase64: []byte(hashBase64),
 		// lock for sometime in the past for testing UnLockAsset functionality
 		ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
@@ -158,7 +158,7 @@ func TestIsAssetLocked(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	lockInfoHTLC := &common.AssetLockHTLC {
-		Hash: []byte(hashBase64),
+		HashBase64: []byte(hashBase64),
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
@@ -308,7 +308,7 @@ func TestClaimAsset(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	lockInfoHTLC := &common.AssetLockHTLC {
-		Hash: []byte(hashBase64),
+		HashBase64: []byte(hashBase64),
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
@@ -323,7 +323,7 @@ func TestClaimAsset(t *testing.T) {
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
 
 	claimInfo := &common.AssetClaimHTLC {
-		HashPreimage: []byte(preimageBase64),
+		HashPreimageBase64: []byte(preimageBase64),
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
@@ -352,7 +352,7 @@ func TestClaimAsset(t *testing.T) {
 	wrongPreimage := "abc"
 	wrongPreimageBase64 := base64.StdEncoding.EncodeToString([]byte(wrongPreimage))
 	wrongClaimInfo := &common.AssetClaimHTLC {
-		HashPreimage: []byte(wrongPreimageBase64),
+		HashPreimageBase64: []byte(wrongPreimageBase64),
 	}
 	wrongClaimInfoBytes, _ := proto.Marshal(wrongClaimInfo)
 
@@ -499,7 +499,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	assetLockKey, contractId, _ := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 
 	claimInfo := &common.AssetClaimHTLC {
-		HashPreimage: []byte(preimageBase64),
+		HashPreimageBase64: []byte(preimageBase64),
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
@@ -549,7 +549,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	wrongPreimage := "abc"
 	wrongPreimageBase64 := base64.StdEncoding.EncodeToString([]byte(wrongPreimage))
 	wrongClaimInfo := &common.AssetClaimHTLC {
-		HashPreimage: []byte(wrongPreimageBase64),
+		HashPreimageBase64: []byte(wrongPreimageBase64),
 	}
 	wrongClaimInfoBytes, _ := proto.Marshal(wrongClaimInfo)
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
@@ -692,7 +692,7 @@ func TestLockFungibleAsset(t *testing.T) {
 	// Test failure with TimeSpec that is part of lock information not being currently supported
 	// no need to set chaincodeStub.GetStateReturns below since the error is hit before GetState() ledger access
 	lockInfoHTLC := &common.AssetLockHTLC {
-		Hash: []byte(hashBase64),
+		HashBase64: []byte(hashBase64),
 		// lock for next 5 mintues
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		// TimeSpec of AssetLockHTLC_DURATION is not currently supported
@@ -707,7 +707,7 @@ func TestLockFungibleAsset(t *testing.T) {
 	// Test failure with GetState(contractId) fail to read the world state
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
 	lockInfoHTLC = &common.AssetLockHTLC {
-		Hash: []byte(hashBase64),
+		HashBase64: []byte(hashBase64),
 		// lock for next 5 mintues
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		// TimeSpec of AssetLockHTLC_EPOCH is only supported currently
@@ -721,7 +721,7 @@ func TestLockFungibleAsset(t *testing.T) {
 
 	// Test failure with contractId already existing on the ledger
 	assetLockVal := FungibleAssetLockValue{Type: assetType, NumUnits: numUnits, Locker: locker, Recipient: recipient,
-			Hash: string(lockInfoHTLC.Hash), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+			Hash: string(lockInfoHTLC.HashBase64), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
@@ -824,7 +824,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
 	claimInfo := &common.AssetClaimHTLC {
-		HashPreimage: []byte(preimageBase64),
+		HashPreimageBase64: []byte(preimageBase64),
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
@@ -856,7 +856,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 	wrongPreimage := "abc"
 	wrongPreimageBase64 := base64.StdEncoding.EncodeToString([]byte(wrongPreimage))
 	wrongClaimInfo := &common.AssetClaimHTLC {
-		HashPreimage: []byte(wrongPreimageBase64),
+		HashPreimageBase64: []byte(wrongPreimageBase64),
 	}
 	wrongClaimInfoBytes, _ := proto.Marshal(wrongClaimInfo)
 	assetLockVal = FungibleAssetLockValue{Type: assetType, NumUnits: numUnits, Locker: locker, Recipient: recipient,

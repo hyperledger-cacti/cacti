@@ -18,7 +18,7 @@ message AssetClaim {
 }
 
 message AssetLockHTLC {
-  bytes hash = 1;
+  bytes hashBase64 = 1;
   uint64 expiryTimeSecs = 2;
   enum TimeSpec {
     EPOCH = 0;
@@ -28,7 +28,7 @@ message AssetLockHTLC {
 }
 
 message AssetClaimHTLC {
-  bytes hashPreimage = 1;
+  bytes hashPreimageBase64 = 1;
 }
 
 message AssetExchangeAgreement {
@@ -43,4 +43,18 @@ message FungibleAssetExchangeAgreement {
   uint64 numUnits = 2;
   string locker = 3;
   string recipient = 4;
+}
+
+message AssetContractHTLC {
+  string contractId = 1;
+  AssetExchangeAgreement agreement = 2;
+  AssetLockHTLC lock = 3;
+  AssetClaimHTLC claim = 4;
+}
+
+message FungibleAssetContractHTLC {
+  string contractId = 1;
+  FungibleAssetExchangeAgreement agreement = 2;
+  AssetLockHTLC lock = 3;
+  AssetClaimHTLC claim = 4;
 }
