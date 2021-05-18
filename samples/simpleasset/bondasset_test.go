@@ -48,15 +48,21 @@ func TestCreateAsset(t *testing.T) {
 	transactionContext.GetStubReturns(chaincodeStub)
 
 	simpleAsset := SmartContract{}
-	err := simpleAsset.CreateAsset(transactionContext, "", "", "", 0, time.Now())
+	err := simpleAsset.CreateAsset(transactionContext, "", "", "", 0, "02 Jan 26 15:04 MST")
 	require.NoError(t, err)
 
+	err = simpleAsset.CreateAsset(transactionContext, "", "", "", 0, "02 Jan 06 15:04 MST")
+	require.EqualError(t, err, "maturity date can not be in past.")
+
+	err = simpleAsset.CreateAsset(transactionContext, "", "", "", 0, "")
+	require.EqualError(t, err, "maturity date provided is not in correct format, please use this format: 02 Jan 06 15:04 MST")
+
 	chaincodeStub.GetStateReturns([]byte{}, nil)
-	err = simpleAsset.CreateAsset(transactionContext, "asset1", "", "", 0, time.Now())
+	err = simpleAsset.CreateAsset(transactionContext, "asset1", "", "", 0, "")
 	require.EqualError(t, err, "the asset asset1 already exists")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = simpleAsset.CreateAsset(transactionContext, "asset1", "", "", 0, time.Now())
+	err = simpleAsset.CreateAsset(transactionContext, "asset1", "", "", 0, "")
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 }
 

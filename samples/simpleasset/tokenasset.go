@@ -5,11 +5,12 @@ import (
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	// log "github.com/sirupsen/logrus"
 )
 
 type TokenAssetType struct {
-	Issuer                string            `json:"issuer"`
-	FaceValue             int               `json:"facevalue"`
+	Issuer            string            `json:"issuer"`
+	Value             int               `json:"value"`
 }
 type TokenWallet struct {
 	WalletMap            map[string]int    `json:"walletlist"`
@@ -26,7 +27,7 @@ func (s *SmartContract) InitTokenAssetLedger(ctx contractapi.TransactionContextI
 }
 
 // CreateTokenAssetType issues a new token asset type to the world state with given details.
-func (s *SmartContract) CreateTokenAssetType(ctx contractapi.TransactionContextInterface, tokenAssetType string, issuer string, faceValue int) (bool, error) {
+func (s *SmartContract) CreateTokenAssetType(ctx contractapi.TransactionContextInterface, tokenAssetType string, issuer string, value int) (bool, error) {
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return false, err
@@ -37,7 +38,7 @@ func (s *SmartContract) CreateTokenAssetType(ctx contractapi.TransactionContextI
 
 	asset := TokenAssetType{
 		Issuer: issuer,
-		FaceValue: faceValue,
+		Value: value,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
@@ -172,6 +173,9 @@ func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface, 
 	if err != nil {
 		return -1, fmt.Errorf("failed to read owner's wallet from world state: %v", err)
 	}
+	if walletJSON == nil {
+		return -1, fmt.Errorf("owner does not have a wallet.")
+	}
 
 	var wallet TokenWallet
 	err = json.Unmarshal(walletJSON, &wallet)
@@ -194,8 +198,11 @@ func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInter
 // Helper Functions for token asset
 func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, id string, tokenAssetType string, numUnits int) error {
 	walletJSON, err := ctx.GetStub().GetState(id)
+	if err != nil {
+		return err
+	}
 	var wallet TokenWallet
-	if err == nil {
+	if walletJSON != nil {
 		err = json.Unmarshal(walletJSON, &wallet)
 		if err != nil {
 			return err
@@ -222,6 +229,9 @@ func subTokenAssetsHelper(ctx contractapi.TransactionContextInterface, id string
 	var wallet TokenWallet
 	if err != nil {
 		return err
+	}
+	if walletJSON == nil {
+		return fmt.Errorf("owner does not have a wallet.")
 	}
 
 	err = json.Unmarshal(walletJSON, &wallet)
