@@ -20,11 +20,14 @@ export type Query = {
   args: string[]
   ccFunc: string
 }
+
 const walletSetup = async (
   networkName: string,
-  walletPath: string,
   ccp: any,
   mspId: string,
+  userName: string,
+  userPwd: string = '',
+  register: boolean = false,
   logger: any = console
 ) => {
   // Create a new CA client for interacting with the CA.
@@ -35,14 +38,19 @@ const walletSetup = async (
   const ca = new FabricCAServices(caURL)
   const ident = ca.newIdentityService()
 
+  const walletPath = process.env.WALLET_PATH
+    ? process.env.WALLET_PATH
+    : path.join(__dirname, '../', `wallet-${networkName}`)
   const wallet = await Wallets.newFileSystemWallet(walletPath)
+
+  logger.info(`Wallet Setup: wallet path: ${walletPath}`)
 
   // build a user object for authenticating with the CA        // Check to see if we've already enrolled the admin user.
   let adminIdentity = await wallet.get('admin')
 
   if (adminIdentity) {
     logger.debug(
-      'An identity for the admin user "admin" already exists in the wallet'
+      'An identity for the admin user "admin" already exists in the wallet.'
     )
   } else {
     // Enroll the admin user, and import the new identity into the wallet.
@@ -61,20 +69,49 @@ const walletSetup = async (
     await wallet.put('admin', x509Identity)
     adminIdentity = await wallet.get('admin')
   }
-  const userName = `User1@org1.${networkName}.com`
   const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type)
   const adminUser = await provider.getUserContext(adminIdentity, 'admin')
   const identity = await wallet.get(userName)
   if (!identity) {
     // Register the user, enroll the user, and import the new identity into the wallet.
-    const secret = await ca.register(
-      {
-        affiliation: 'org1.department1',
-        enrollmentID: userName,
-        role: 'client'
-      },
-      adminUser
-    )
+    if (!register) {
+      logger.error(`Identiy ${userName} does not exist. Please add user in the network.\n`)
+      return
+    }
+    var secret;
+    try {
+      if (!userPwd) {
+        secret = await ca.register(
+          {
+            affiliation: 'org1.department1',
+            enrollmentID: userName,
+            role: 'client'
+          },
+          adminUser
+        )
+      }
+      else {
+        secret = await ca.register(
+          {
+            affiliation: 'org1.department1',
+            enrollmentID: userName,
+            enrollmentSecret: userPwd,
+            maxEnrollments: 100,
+            role: 'client'
+          },
+          adminUser
+        )
+      }
+      logger.info(`Wallet Setup: Sucessful ${secret}`)
+    } catch(error) {
+      if (!userPwd) {
+        throw new Error('WalletSetup: User Secret not provided, cannot enroll already registered user without secret')
+      }
+      secret = userPwd
+      logger.info(`User already registered: ${error}`)
+      throw new Error('WalletSetup: Max enrollment reached, cannot enroll again.')
+
+    }
     const enrollment = await ca.enroll({
       enrollmentID: userName,
       enrollmentSecret: secret
@@ -88,6 +125,9 @@ const walletSetup = async (
       type: 'X.509'
     }
     await wallet.put(userName, x509Identity)
+  }
+  else {
+    logger.info(`Identiy ${userName} already exists.\n`)
   }
 
   return wallet
@@ -342,7 +382,9 @@ async function fabricHelper({
   networkName,
   mspId = global.__DEFAULT_MSPID__,
   logger = console,
-  discoverEnabled = true
+  discoverEnabled = true,
+  userString = '',
+  userPwd = ''
 }: {
   channel: string
   contractName: string
@@ -351,16 +393,22 @@ async function fabricHelper({
   mspId?: string
   discoverEnabled?: boolean
   logger?: any
+  userString?: string
+  userPwd?: string
 }): Promise<{ gateway: Gateway; contract: Contract; wallet: any }> {
   // load the network configuration
   const ccpPath = path.resolve(__dirname, connProfilePath)
   const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'))
-  const userString = `User1@org1.${networkName}.com`
   // Create a new file system based wallet for managing identities.
-  const walletPath = process.env.WALLET_PATH
-    ? process.env.WALLET_PATH
-    : path.join(__dirname, '../', `wallet-${networkName}`)
-  const wallet = await walletSetup(networkName, walletPath, ccp, mspId, logger)
+  // const walletPath = process.env.WALLET_PATH
+  //   ? process.env.WALLET_PATH
+  //   : path.join(__dirname, '../', `wallet-${networkName}`)
+
+  if (!userString) {
+    userString = `User1@org1.${networkName}.com`
+  }
+
+  const wallet = await walletSetup(networkName, ccp, mspId, userString, userPwd, true, logger)
   // Check to see if we've already enrolled the user.
   const identity = await wallet.get(userString)
   if (!identity) {
@@ -379,7 +427,6 @@ async function fabricHelper({
       asLocalhost: process.env.LOCAL === 'false' ? false : true
     }
   })
-
   const network = await gateway.getNetwork(channel)
   // Get the contract from the network.
   const contract = network.getContract(contractName)
@@ -481,7 +528,9 @@ const getKeyAndCertForRemoteRequestbyUserName = async (
   return { key: privKey, cert: identity.credentials.certificate }
 }
 
+
 export {
+  walletSetup,
   invoke,
   query,
   fabricHelper,
