@@ -48,22 +48,10 @@ const(
 )
 
 // helper functions to log and return errors
-func logAndReturnErrorfBool(retVal bool, format string, args ...interface{}) (bool, error) {
+func logThenErrorf(format string, args ...interface{}) error {
     errorMsg := fmt.Sprintf(format, args...)
     log.Error(errorMsg)
-    return retVal, errors.New(errorMsg)
-}
-
-func logAndReturnErrorfInt(retVal int, format string, args ...interface{}) (int, error) {
-    errorMsg := fmt.Sprintf(format, args...)
-    log.Error(errorMsg)
-    return retVal, errors.New(errorMsg)
-}
-
-func logAndReturnErrorfString(retVal string, format string, args ...interface{}) (string, error) {
-    errorMsg := fmt.Sprintf(format, args...)
-    log.Error(errorMsg)
-    return retVal, errors.New(errorMsg)
+    return errors.New(errorMsg)
 }
 
 // function to generate a "SHA256" hash in base64 format for a given preimage
@@ -87,9 +75,7 @@ func generateContractIdMapKey(contractId string) string {
 func generateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) (string, string, error) {
 	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{assetAgreement.Type, assetAgreement.Id})
 	if err != nil {
-		errorMsg := fmt.Sprintf("error while creating composite key: %+v", err)
-		log.Error(errorMsg)
-		return "", "", errors.New(errorMsg)
+		return "", "", logThenErrorf("error while creating composite key: %+v", err)
 	}
 
 	contractId := generateSHA256HashInBase64Form(assetLockKey)
@@ -129,9 +115,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	log.Infof("lockInfoHTLC: %+v\n", lockInfoHTLC)
 
 	if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-		errorMsg := "only EPOCH time is supported at present"
-		log.Error(errorMsg)
-		return "", errors.New(errorMsg)
+		return "", logThenErrorf("only EPOCH time is supported at present")
 	}
 
 	assetLockKey, contractId, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
@@ -149,16 +133,12 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	}
 
 	if assetLockValBytes != nil {
-		errorMsg := fmt.Sprintf("asset of type %s and ID %s is already locked", assetAgreement.Type, assetAgreement.Id)
-		log.Error(errorMsg)
-		return "", errors.New(errorMsg)
+		return "", logThenErrorf("asset of type %s and ID %s is already locked", assetAgreement.Type, assetAgreement.Id)
 	}
 
 	assetLockValBytes, err = json.Marshal(assetLockVal)
 	if err != nil {
-		errorMsg := fmt.Sprintf("marshal error: %s", err)
-		log.Error(errorMsg)
-		return "", errors.New(errorMsg)
+		return "", logThenErrorf("marshal error: %+v", err)
 	}
 
 	err = ctx.GetStub().PutState(assetLockKey, assetLockValBytes)
@@ -169,9 +149,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 
 	assetLockKeyBytes, err := json.Marshal(assetLockKey)
 	if err != nil {
-		errorMsg := fmt.Sprintf("marshal error: %s", err)
-		log.Error(errorMsg)
-		return "", errors.New(errorMsg)
+		return "", logThenErrorf("marshal error: %+v", err)
 	}
 
 	err = ctx.GetStub().PutState(generateContractIdMapKey(string(contractId)), assetLockKeyBytes)

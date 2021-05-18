@@ -471,6 +471,17 @@ const isFungibleAssetLockedInHTLC = async (
     return result;
 };
 
+
+/**
+ * HTLC Lifecycle Events
+ * - Developers should note that event emission and actions in response occur on a best effort basis.
+ * - Also, there is no guarantee that a particular event (lock, claim, reclaim) will ever get emitted
+ * - Therefore, the calling (or listening) logic should incorporate suitable fallbacks and timeouts.
+ **/
+
+/**
+ * The below functions trigger callbacks passed as arguments when a matching event is received from the contract layer
+ **/
 const StartHTLCEventListener = (
     contract: Contract,
     eventName: string,
@@ -629,6 +640,10 @@ const StartHTLCFungibleAssetUnlockListener = (
     StartHTLCEventListener(contract, 'UnlockFungibleAsset', contractId, assetType, "", numUnits, recipientECert, lockerECert, unlockCallback);
 }
 
+/**
+ * The below functions return promises for HTLC events.
+ * Developers can use 'await' to synchronously manage asset swapping logic.
+ **/
 const HTLCAssetLocked = async (
     contract: Contract,
     contractId: string,
