@@ -51,6 +51,8 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
         log.Error(err.Error())
         return false, err
     }
+
+    // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.LockAsset(ctx.GetStub(), assetAgreement, lockInfo)
     if retVal && err == nil {
         lockInfoHTLC := &common.AssetLockHTLC{}
@@ -94,6 +96,8 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
         log.Error(err.Error())
         return "", err
     }
+
+    // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.LockFungibleAsset(ctx.GetStub(), assetAgreement, lockInfo)
     if err == nil {
         lockInfoHTLC := &common.AssetLockHTLC{}
@@ -160,6 +164,8 @@ func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContex
         log.Error(err.Error())
         return false, err
     }
+
+    // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.ClaimAsset(ctx.GetStub(), assetAgreement, claimInfo)
     if retVal && err == nil {
         claimInfoHTLC := &common.AssetClaimHTLC{}
@@ -197,6 +203,8 @@ func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.Transacti
         log.Error(err.Error())
         return false, err
     }
+
+    // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.ClaimFungibleAsset(ctx.GetStub(), contractId, claimInfo)
     if retVal && err == nil {
         claimInfoHTLC := &common.AssetClaimHTLC{}
@@ -230,6 +238,8 @@ func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionConte
         log.Error(err.Error())
         return false, err
     }
+
+    // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.UnlockAsset(ctx.GetStub(), assetAgreement)
     if retVal && err == nil {
         contractInfo := &common.AssetContractHTLC{
@@ -252,6 +262,8 @@ func (amc *AssetManagementContract) UnlockFungibleAsset(ctx contractapi.Transact
         log.Error("empty contract id")
         return false, fmt.Errorf("empty contract id")
     }
+
+    // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.UnlockFungibleAsset(ctx.GetStub(), contractId)
     if retVal && err == nil {
         contractInfo := &common.AssetContractHTLC{
