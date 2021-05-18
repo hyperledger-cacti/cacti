@@ -21,14 +21,10 @@ type BondAsset struct {
 // InitLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextInterface) error {
 	assets := []BondAsset{
-		{ID: "a1", Issuer: "Treasury" , Owner: "", FaceValue: 300,
+		{ID: "a01", Issuer: "Treasury" , Owner: "", FaceValue: 300,
 			 MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
-		{ID: "a2", Issuer: "Treasury" , Owner: "", FaceValue: 400,
+		{ID: "a02", Issuer: "Treasury" , Owner: "", FaceValue: 400,
 			 MaturityDate: time.Date(2022, time.July, 1, 12, 0, 0, 0, time.UTC)},
-		{ID: "a3", Issuer: "Treasury" , Owner: "", FaceValue: 1000,
-			 MaturityDate: time.Date(2023, time.April, 1, 12, 0, 0, 0, time.UTC) },
-		{ID: "a4", Issuer: "Treasury" , Owner: "", FaceValue: 2000,
-			 MaturityDate: time.Date(2025, time.April, 1, 12, 0, 0, 0, time.UTC) },
 	}
 
 	for _, asset := range assets {
@@ -47,7 +43,7 @@ func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextIn
 }
 
 // CreateAsset issues a new asset to the world state with given details.
-func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id string, owner string, issuer string, faceValue int, maturityDate time.Time) error {
+func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id string, owner string, issuer string, faceValue int, maturityDate string) error {
 	exists, err := s.AssetExists(ctx, id)
 	if err != nil {
 		return err
@@ -56,12 +52,21 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 		return fmt.Errorf("the asset %s already exists", id)
 	}
 
+	md_time, err := time.Parse(time.RFC822, maturityDate)
+	if err != nil {
+		return fmt.Errorf("maturity date provided is not in correct format, please use this format: %s", time.RFC822)
+	}
+
+	if md_time.Before(time.Now()) {
+		return fmt.Errorf("maturity date can not be in past.")
+	}
+
 	asset := BondAsset{
 		ID: id,
 		Owner: owner,
 		Issuer: issuer,
 		FaceValue: faceValue,
-		MaturityDate: maturityDate,
+		MaturityDate: md_time,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {

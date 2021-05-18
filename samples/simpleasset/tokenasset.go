@@ -8,8 +8,8 @@ import (
 )
 
 type TokenAssetType struct {
-	Issuer                string            `json:"issuer"`
-	FaceValue             int               `json:"facevalue"`
+	Issuer            string            `json:"issuer"`
+	Value             int               `json:"value"`
 }
 type TokenWallet struct {
 	WalletMap            map[string]int    `json:"walletlist"`
@@ -26,7 +26,7 @@ func (s *SmartContract) InitTokenAssetLedger(ctx contractapi.TransactionContextI
 }
 
 // CreateTokenAssetType issues a new token asset type to the world state with given details.
-func (s *SmartContract) CreateTokenAssetType(ctx contractapi.TransactionContextInterface, tokenAssetType string, issuer string, faceValue int) (bool, error) {
+func (s *SmartContract) CreateTokenAssetType(ctx contractapi.TransactionContextInterface, tokenAssetType string, issuer string, value int) (bool, error) {
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return false, err
@@ -37,7 +37,7 @@ func (s *SmartContract) CreateTokenAssetType(ctx contractapi.TransactionContextI
 
 	asset := TokenAssetType{
 		Issuer: issuer,
-		FaceValue: faceValue,
+		Value: value,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
