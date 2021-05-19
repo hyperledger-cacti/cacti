@@ -80,15 +80,15 @@ const addAssets = ({
       mspId: mspId,
       userString: item[1]['owner']
     })
-    // const userId = await wallet.get(item[1]['owner'])
-    // const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
+    const userId = await wallet.get(item[1]['owner'])
+    const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
 
     if (ccType == 'bond') {
       currentQuery.ccFunc = 'CreateAsset'
-      currentQuery.args = [...currentQuery.args, item[1]['id'], item[1]['owner'], item[1]['issuer'], item[1]['facevalue'], item[1]['maturitydate']]
+      currentQuery.args = [...currentQuery.args, item[1]['id'], userCert, item[1]['issuer'], item[1]['facevalue'], item[1]['maturitydate']]
     } else if (ccType == 'token') {
       currentQuery.ccFunc = 'IssueTokenAssets'
-      currentQuery.args = [...currentQuery.args, item[1]['tokenassettype'], item[1]['numunits'], item[1]['owner']]
+      currentQuery.args = [...currentQuery.args, item[1]['tokenassettype'], item[1]['numunits'], userCert]
     }
     console.log(currentQuery)
     try {
