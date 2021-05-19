@@ -26,13 +26,13 @@ const(
 
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator() 
 func getCreator() string {
-        serializedIdentity := &mspProtobuf.SerializedIdentity{}
+	serializedIdentity := &mspProtobuf.SerializedIdentity{}
 	eCertBytes, _ := base64.StdEncoding.DecodeString(getTxCreatorECertBase64())
 	serializedIdentity.IdBytes = []byte(eCertBytes)
-        serializedIdentity.Mspid = "ca.org1.example.com"
-        serializedIdentityBytes, _ := proto.Marshal(serializedIdentity)
+	serializedIdentity.Mspid = "ca.org1.example.com"
+	serializedIdentityBytes, _ := proto.Marshal(serializedIdentity)
 
-        return string(serializedIdentityBytes)
+	return string(serializedIdentityBytes)
 }
 
 // function that supplies the ECert in base64 for the transaction creator
