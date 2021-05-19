@@ -99,13 +99,14 @@ func generateFungibleAssetLockContractId(ctx contractapi.TransactionContextInter
  * If the locker is set already, it ensures that the locker is same as the creator of the transaction.
  */
 func validateAndSetLockerOfAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
-	txCreator, err := ctx.GetStub().GetCreator()
+	txCreatorBytes, err := ctx.GetStub().GetCreator()
 	if err != nil {
 		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
 	}
+	txCreator := string(txCreatorBytes)
 	if len(assetAgreement.Locker) == 0 {
-		assetAgreement.Locker = string(txCreator)
-	} else if assetAgreement.Locker != string(txCreator) {
+		assetAgreement.Locker = txCreator
+	} else if assetAgreement.Locker != txCreator {
 		return fmt.Errorf("locker %s in the asset agreement is not same as the transaction creator %s", assetAgreement.Locker, txCreator)
 	}
 
@@ -118,13 +119,14 @@ func validateAndSetLockerOfAssetAgreement(ctx contractapi.TransactionContextInte
  * If the locker is set already, it ensures that the locker is same as the creator of the transaction.
  */
 func validateAndSetLockerOfFungibleAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.FungibleAssetExchangeAgreement) error {
-	txCreator, err := ctx.GetStub().GetCreator()
+	txCreatorBytes, err := ctx.GetStub().GetCreator()
 	if err != nil {
 		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
 	}
+	txCreator := string(txCreatorBytes)
 	if len(assetAgreement.Locker) == 0 {
-		assetAgreement.Locker = string(txCreator)
-	} else if assetAgreement.Locker != string(txCreator) {
+		assetAgreement.Locker = txCreator
+	} else if assetAgreement.Locker != txCreator {
 		return fmt.Errorf("locker %s in the fungible asset agreement is not same as the transaction creator %s", assetAgreement.Locker, txCreator)
 	}
 
@@ -137,31 +139,15 @@ func validateAndSetLockerOfFungibleAssetAgreement(ctx contractapi.TransactionCon
  * If the recipeint is set already, it ensures that the recipient is same as the creator of the transaction.
  */
 func validateAndSetRecipientOfAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
-	txCreator, err := ctx.GetStub().GetCreator()
+	txCreatorBytes, err := ctx.GetStub().GetCreator()
 	if err != nil {
 		return fmt.Errorf("unable to get the transaction creator information")
 	}
+	txCreator := string(txCreatorBytes)
 	if len(assetAgreement.Recipient) == 0 {
-		assetAgreement.Recipient = string(txCreator)
-	} else if assetAgreement.Recipient != string(txCreator) {
+		assetAgreement.Recipient = txCreator
+	} else if assetAgreement.Recipient != txCreator {
 		return fmt.Errorf("recipient %s in the asset agreement is not same as the transaction creator %s", assetAgreement.Recipient, txCreator)
-	}
-
-	return nil
-}
-
-// Function to check if one of the locker or the recipient are the creator of the transaction.
-func validateAndSetPartiesOfAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
-	txCreator, err := ctx.GetStub().GetCreator()
-	if err != nil {
-		return fmt.Errorf("unable to get the transaction creator information")
-	}
-	if len(assetAgreement.Locker) == 0 {
-		assetAgreement.Locker = string(txCreator)
-	} else if len(assetAgreement.Recipient) == 0 {
-		assetAgreement.Recipient = string(txCreator)
-	} else if assetAgreement.Locker != string(txCreator) && assetAgreement.Recipient != string(txCreator) {
-		return fmt.Errorf("neither of locker %s or recipient %s in the asset agreement are not same as the transaction creator %s", assetAgreement.Locker, assetAgreement.Recipient, txCreator)
 	}
 
 	return nil
@@ -266,7 +252,7 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
 
-	err = validateAndSetPartiesOfAssetAgreement(ctx, assetAgreement)
+	err = validateAndSetLockerOfAssetAgreement(ctx, assetAgreement)
 	if err != nil {
 		return logThenErrorf("error in validation of asset agreement parties: %+v", err)
 	}
@@ -682,15 +668,6 @@ func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.Transa
 		return false, err
 	}
 
-	txCreator, err := ctx.GetStub().GetCreator()
-	if err != nil {
-		return false, fmt.Errorf("unable to get the transaction creator information: %+v", err)
-	}
-
-	if assetLockVal.Locker != string(txCreator) && assetLockVal.Recipient != string(txCreator) {
-		return false, fmt.Errorf("caller %s is neither of the locker or the recipient of the asset locked", txCreator)
-	}
-
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= assetLockVal.ExpiryTimeSecs {
@@ -819,15 +796,6 @@ func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContext
 	if err != nil {
 		log.Error(err.Error())
 		return false, err
-	}
-
-	txCreator, err := ctx.GetStub().GetCreator()
-	if err != nil {
-		return false, fmt.Errorf("unable to get the transaction creator information: %+v", err)
-	}
-
-	if assetLockVal.Locker != string(txCreator) && assetLockVal.Recipient != string(txCreator) {
-		return false, fmt.Errorf("caller %s is neither of the locker or the recipient of the fungible asset locked", txCreator)
 	}
 
 	// Check if expiry time is elapsed

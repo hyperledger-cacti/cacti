@@ -155,17 +155,7 @@ func TestIsAssetLocked(t *testing.T) {
 	assetId := "A001"
 	recipient := "Bob"
 	locker := "Alice"
-	preimage := "abcd"
-	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
-
-	lockInfoHTLC := &common.AssetLockHTLC {
-		HashBase64: []byte(hashBase64),
-		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
-		TimeSpec: common.AssetLockHTLC_EPOCH,
-	}
-	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -174,10 +164,6 @@ func TestIsAssetLocked(t *testing.T) {
 		Locker: locker,
 	}
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
-	// Lock asset as per the agreement specified
-	_, err := interopcc.LockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
-	require.NoError(t, err)
-	log.Info(fmt.Println("Completed locking as asset. Proceed to test if asset is locked or not."))
 
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: "Charlie"}
@@ -596,7 +582,6 @@ func TestIsAssetLockedQueryUsingContractId(t *testing.T) {
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -751,7 +736,6 @@ func TestIsFungibleAssetLocked(t *testing.T) {
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement {
 		Type: assetType,
