@@ -27,19 +27,17 @@ const(
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator() 
 func getCreator() string {
         serializedIdentity := &mspProtobuf.SerializedIdentity{}
-        serializedIdentity.IdBytes = []byte("-----BEGIN CERTIFICATE-----\nMIICUTCCAfigAwIBAgIRANjiggTtaHDFFkHiB7VxO7MwCgYIKoZIzj0EAwIwczELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY2lzY28xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2NhLm9yZzEuZXhhbXBsZS5jb20wHhcNMTkwNDAxMDg0NTAwWhcNMjkwMzI5MDg0NTAwWjBzMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEZMBcGA1UEChMQb3JnMS5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3JnMS5leGFtcGxlLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOeea4B6S9e9r/6TXfEeAfgqk5WipvYhGoxh5dFn+X4m3vQvSBXnTWKW73eSgKIsPw9tLCW+peorVs11gbywbcGjbTBrMA4GA1UdDwEB/wQEAwIBpjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDwYDVR0TAQH/BAUwAwEB/zApBgNVHQ4EIgQg1c2GfbSkxTZLH3esPWwsieVE5AhY4sOB5F8a/hs9Z8UwCgYIKoZIzj0EAwIDRwAwRAIgRdgY+5ob03jV2KK1Vv6bdNq3cKXw4pxMUv90VNsKGu0CIA8CILkvDeh74ABD0zACdn+ANC2UT6JNT6wzTsK7pXuL\n-----END CERTIFICATE-----")
+	eCertBytes, _ := base64.StdEncoding.DecodeString(getTxCreatorECertBase64())
+	serializedIdentity.IdBytes = []byte(eCertBytes)
         serializedIdentity.Mspid = "ca.org1.example.com"
         serializedIdentityBytes, _ := proto.Marshal(serializedIdentity)
 
         return string(serializedIdentityBytes)
 }
 
-// function that extracts the ECert from the identity information returned by ctx.GetStub().GetCreator()
+// function that supplies the ECert in base64 for the transaction creator
 func getTxCreatorECertBase64() string {
-	serializedIdentity := &mspProtobuf.SerializedIdentity{}
-	_ = proto.Unmarshal([]byte(getCreator()), serializedIdentity)
-	eCertBase64 := base64.StdEncoding.EncodeToString(serializedIdentity.IdBytes)
-	fmt.Printf("eCertBase64: %s\n", eCertBase64)
+	eCertBase64 := "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNVVENDQWZpZ0F3SUJBZ0lSQU5qaWdnVHRhSERGRmtIaUI3VnhPN013Q2dZSUtvWkl6ajBFQXdJd2N6RUxNQWtHQTFVRUJoTUNWVk14RXpBUkJnTlZCQWdUQ2tOaGJHbG1iM0p1YVdFeEZqQVVCZ05WQkFjVERWTmhiaUJHY21GdVkybHpZMjh4R1RBWEJnTlZCQW9URUc5eVp6RXVaWGhoYlhCc1pTNWpiMjB4SERBYUJnTlZCQU1URTJOaExtOXlaekV1WlhoaGJYQnNaUzVqYjIwd0hoY05NVGt3TkRBeE1EZzBOVEF3V2hjTk1qa3dNekk1TURnME5UQXdXakJ6TVFzd0NRWURWUVFHRXdKVlV6RVRNQkVHQTFVRUNCTUtRMkZzYVdadmNtNXBZVEVXTUJRR0ExVUVCeE1OVTJGdUlFWnlZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTVM1bGVHRnRjR3hsTG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1YjNKbk1TNWxlR0Z0Y0d4bExtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCT2VlYTRCNlM5ZTlyLzZUWGZFZUFmZ3FrNVdpcHZZaEdveGg1ZEZuK1g0bTN2UXZTQlhuVFdLVzczZVNnS0lzUHc5dExDVytwZW9yVnMxMWdieXdiY0dqYlRCck1BNEdBMVVkRHdFQi93UUVBd0lCcGpBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFnWUlLd1lCQlFVSEF3RXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXBCZ05WSFE0RUlnUWcxYzJHZmJTa3hUWkxIM2VzUFd3c2llVkU1QWhZNHNPQjVGOGEvaHM5WjhVd0NnWUlLb1pJemowRUF3SURSd0F3UkFJZ1JkZ1krNW9iMDNqVjJLSzFWdjZiZE5xM2NLWHc0cHhNVXY5MFZOc0tHdTBDSUE4Q0lMa3ZEZWg3NEFCRDB6QUNkbitBTkMyVVQ2Sk5UNnd6VHNLN3BYdUwKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ=="
 
 	return eCertBase64
 }
