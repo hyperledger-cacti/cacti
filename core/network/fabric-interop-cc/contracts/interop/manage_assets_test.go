@@ -33,6 +33,7 @@ func TestLockAsset(t *testing.T) {
 	preimage := "abcd"
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
+	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
 
 	lockInfoHTLC := &common.AssetLockHTLC {
 		HashBase64: []byte(hashBase64),
@@ -53,7 +54,7 @@ func TestLockAsset(t *testing.T) {
 	// chaincodeStub.GetStateReturns should return nil to be able to lock the asset
 	chaincodeStub.GetStateReturns(nil, nil)
 	// Test success with asset agreement specified properly
-	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err := interopcc.LockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.NoError(t, err)
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient}
@@ -89,6 +90,7 @@ func TestUnLockAsset(t *testing.T) {
 	preimage := "abcd"
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
+	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
 
 	lockInfoHTLC := &common.AssetLockHTLC {
 		HashBase64: []byte(hashBase64),
@@ -109,7 +111,7 @@ func TestUnLockAsset(t *testing.T) {
 	// chaincodeStub.GetStateReturns should return nil to be able to lock the asset
 	chaincodeStub.GetStateReturns(nil, nil)
 	// Lock asset as per the agreement specified
-	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err := interopcc.LockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.NoError(t, err)
 	log.Info(fmt.Println("Completed locking as asset. Proceed to test unlock asset."))
 
@@ -117,13 +119,13 @@ func TestUnLockAsset(t *testing.T) {
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test success with asset agreement specified properly
-	err = interopcc.UnLockAsset(ctx, string(assetAgreementBytes))
+	err = interopcc.UnLockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.NoError(t, err)
 
 	// Let GetState() to return nil to simulate the case that unlocking an asset which is not locked is not possible
 	chaincodeStub.GetStateReturns(nil, nil)
 	// Test failure with asset agreement specified for unlock which was not locked earlier
-	err = interopcc.UnLockAsset(ctx, string(assetAgreementBytes))
+	err = interopcc.UnLockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -132,7 +134,7 @@ func TestUnLockAsset(t *testing.T) {
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with asset id being locked for a different <locker, recipient>
-	err = interopcc.UnLockAsset(ctx, string(assetAgreementBytes))
+	err = interopcc.UnLockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -153,16 +155,7 @@ func TestIsAssetLocked(t *testing.T) {
 	assetId := "A001"
 	recipient := "Bob"
 	locker := "Alice"
-	preimage := "abcd"
-	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
-
-	lockInfoHTLC := &common.AssetLockHTLC {
-		HashBase64: []byte(hashBase64),
-		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
-		TimeSpec: common.AssetLockHTLC_EPOCH,
-	}
-	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -171,10 +164,6 @@ func TestIsAssetLocked(t *testing.T) {
 		Locker: locker,
 	}
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
-	// Lock asset as per the agreement specified
-	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
-	require.NoError(t, err)
-	log.Info(fmt.Println("Completed locking as asset. Proceed to test if asset is locked or not."))
 
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: "Charlie"}
@@ -191,7 +180,7 @@ func TestIsAssetLocked(t *testing.T) {
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test success with asset agreement specified properly
-	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
 	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified properly."))
@@ -201,7 +190,7 @@ func TestIsAssetLocked(t *testing.T) {
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with expiry time elapsed already
-	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
@@ -211,7 +200,7 @@ func TestIsAssetLocked(t *testing.T) {
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with asset agreement not specified properly
-	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
@@ -226,7 +215,7 @@ func TestIsAssetLocked(t *testing.T) {
 	}
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 	// Test success with asset agreement specified to include arbitrary locker
-	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
 	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker."))
@@ -242,7 +231,7 @@ func TestIsAssetLocked(t *testing.T) {
 	}
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 	// Test failure with asset agreement specified to include arbitrary locker and wrong recipient
-	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
@@ -257,7 +246,7 @@ func TestIsAssetLocked(t *testing.T) {
 	}
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 	// Test success with asset agreement specified to include arbitrary recipient
-	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
 	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary recipient."))
@@ -273,7 +262,7 @@ func TestIsAssetLocked(t *testing.T) {
 	}
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 	// Test failure with asset agreement specified to include arbitrary locker and wrong locker
-	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
@@ -289,7 +278,7 @@ func TestIsAssetLocked(t *testing.T) {
 	}
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 	// Test success with asset agreement specified to include arbitrary locker
-	isAssetLocked, err = interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.NoError(t, err)
 	require.True(t, isAssetLocked)
 	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker and arbitrary recipient."))
@@ -306,13 +295,7 @@ func TestClaimAsset(t *testing.T) {
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
 	currentTimeSecs := uint64(time.Now().Unix())
-
-	lockInfoHTLC := &common.AssetLockHTLC {
-		HashBase64: []byte(hashBase64),
-		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
-		TimeSpec: common.AssetLockHTLC_EPOCH,
-	}
-	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+	chaincodeStub.GetCreatorReturns([]byte(recipient), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -327,17 +310,12 @@ func TestClaimAsset(t *testing.T) {
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
-	// Lock asset as per the agreement specified
-	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
-	require.NoError(t, err)
-	log.Info(fmt.Println("Completed locking as asset. Proceed to test claim asset."))
-
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 
 	// Test success with asset agreement specified properly
-	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
+	err := interopcc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.NoError(t, err)
 	log.Info(fmt.Println("Test success as expected since the asset agreement and claim information are specified properly."))
 
@@ -394,6 +372,7 @@ func TestUnLockAssetUsingContractId(t *testing.T) {
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
+	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -489,6 +468,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
 	currentTimeSecs := uint64(time.Now().Unix())
+	chaincodeStub.GetCreatorReturns([]byte(recipient), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -505,14 +485,14 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 
 	// Test failure with GetState(contractId) fail to read the world state
 	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
-	err := interopcc.ClaimAssetUsingContractId(ctx, contractId, string(claimInfoBytes))
+	err := interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "unable to retrieve contractId " + contractId)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
 
 	// Test failure with not a valid contractId being passed as the arguement
 	chaincodeStub.GetStateReturnsOnCall(1, nil, nil)
-	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "no contractId " + contractId + " exists on the ledger")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -521,7 +501,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	assetLockKeyBytes, _ := json.Marshal(assetLockKey)
 	chaincodeStub.GetStateReturnsOnCall(2, assetLockKeyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(3, nil, fmt.Errorf("unable to retrieve asset %s", assetLockKey))
-	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "failed to retrieve from the world state: unable to retrieve asset " + assetLockKey)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -529,7 +509,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	// Test failure under the scenario that the contractId is valid but there is no asset locked with the assetLockKey
 	chaincodeStub.GetStateReturnsOnCall(4, assetLockKeyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(5, nil, nil)
-	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "contractId " + contractId + " is not associated with any currently locked asset")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -539,7 +519,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturnsOnCall(7, assetLockValBytes, nil)
-	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "cannot claim asset associated with contractId " + contractId + " as the expiry time is already elapsed")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -555,7 +535,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturnsOnCall(9, assetLockValBytes, nil)
-	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, string(wrongClaimInfoBytes))
+	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(wrongClaimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "cannot claim asset associated with contractId " + contractId + " as the hash preimage is not matching")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -564,7 +544,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(10, assetLockKeyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(11, assetLockValBytes, nil)
 	chaincodeStub.DelStateReturnsOnCall(0, fmt.Errorf("unable to delete asset with key %s from world state", assetLockKey))
-	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "failed to delete lock for the asset associated with the contractId " +
 		contractId + ": unable to delete asset with key " + assetLockKey + " from world state")
@@ -575,7 +555,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(13, assetLockValBytes, nil)
 	chaincodeStub.DelStateReturnsOnCall(1, nil)
 	chaincodeStub.DelStateReturnsOnCall(2, fmt.Errorf("unable to delete contractId from world state"))
-	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "failed to delete the contractId " +
 		contractId + " as part of asset claim: unable to delete contractId from world state")
@@ -586,7 +566,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(15, assetLockValBytes, nil)
 	chaincodeStub.DelStateReturnsOnCall(3, nil)
 	chaincodeStub.DelStateReturnsOnCall(4, nil)
-	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimAssetUsingContractId(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.NoError(t, err)
 	fmt.Printf("Test success as expected since a valid contractId is specified.\n")
 }
@@ -688,6 +668,7 @@ func TestLockFungibleAsset(t *testing.T) {
 	}
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
 	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
+	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
 
 	// Test failure with TimeSpec that is part of lock information not being currently supported
 	// no need to set chaincodeStub.GetStateReturns below since the error is hit before GetState() ledger access
@@ -699,7 +680,7 @@ func TestLockFungibleAsset(t *testing.T) {
 		TimeSpec: common.AssetLockHTLC_DURATION,
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
-	_, err := interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err := interopcc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "only EPOCH time is supported at present")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -714,7 +695,7 @@ func TestLockFungibleAsset(t *testing.T) {
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
 	lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
-	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err = interopcc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "failed to retrieve from the world state: unable to retrieve contractId " + contractId)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -724,7 +705,7 @@ func TestLockFungibleAsset(t *testing.T) {
 			Hash: string(lockInfoHTLC.HashBase64), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
-	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err = interopcc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "contractId " + contractId + " already exists for the requested fungible asset agreement")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -732,14 +713,14 @@ func TestLockFungibleAsset(t *testing.T) {
 	// Test failure with PutState failing to write to the ledger
 	chaincodeStub.GetStateReturns(nil, nil)
 	chaincodeStub.PutStateReturnsOnCall(0, fmt.Errorf("unable to write the fungible asset lock to the ledger for contractId %s", contractId))
-	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err = interopcc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "failed to write to the world state: unable to write the fungible asset lock to the ledger for contractId " + contractId)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
 
 	// Test success with fungible asset agreement specified properly
 	chaincodeStub.GetStateReturns(nil, nil)
-	_, err = interopcc.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err = interopcc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.NoError(t, err)
 	fmt.Println("Test success as expected since the fungible asset agreement is specified properly.")
 }
@@ -814,6 +795,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
 	currentTimeSecs := uint64(time.Now().Unix())
+	chaincodeStub.GetCreatorReturns([]byte(recipient), nil)
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement {
 		Type: assetType,
@@ -830,14 +812,14 @@ func TestClaimFungibleAsset(t *testing.T) {
 
 	// Test failure with GetState(contractId) fail to read the world state
 	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("unable to retrieve contractId %s", contractId))
-	err := interopcc.ClaimFungibleAsset(ctx, contractId, string(claimInfoBytes))
+	err := interopcc.ClaimFungibleAsset(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "failed to retrieve from the world state: unable to retrieve contractId " + contractId)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
 
 	// Test failure under the scenario that the contractId is not valid and there is no fungible asset locked with it
 	chaincodeStub.GetStateReturnsOnCall(1, nil, nil)
-	err = interopcc.ClaimFungibleAsset(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimFungibleAsset(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "contractId " + contractId + " is not associated with any currently locked fungible asset")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -847,7 +829,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 			Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturnsOnCall(2, assetLockValBytes, nil)
-	err = interopcc.ClaimFungibleAsset(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimFungibleAsset(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "cannot claim fungible asset associated with contractId " + contractId + " as the expiry time is already elapsed")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -863,7 +845,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 			Hash: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturnsOnCall(3, assetLockValBytes, nil)
-	err = interopcc.ClaimFungibleAsset(ctx, contractId, string(wrongClaimInfoBytes))
+	err = interopcc.ClaimFungibleAsset(ctx, contractId, base64.StdEncoding.EncodeToString(wrongClaimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "cannot claim fungible asset associated with contractId " + contractId + " as the hash preimage is not matching")
 	fmt.Printf("Test failed as expected with error: %s\n", err)
@@ -871,7 +853,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 	// Test failure with DelState failing on contractId
 	chaincodeStub.GetStateReturnsOnCall(4, assetLockValBytes, nil)
 	chaincodeStub.DelStateReturnsOnCall(0, fmt.Errorf("unable to delete contractId from world state"))
-	err = interopcc.ClaimFungibleAsset(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimFungibleAsset(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "failed to delete the contractId " +
 		contractId + " as part of fungible asset claim: unable to delete contractId from world state")
@@ -880,7 +862,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 	// Test success with asset being claimed using contractId
 	chaincodeStub.GetStateReturnsOnCall(5, assetLockValBytes, nil)
 	chaincodeStub.DelStateReturnsOnCall(1, nil)
-	err = interopcc.ClaimFungibleAsset(ctx, contractId, string(claimInfoBytes))
+	err = interopcc.ClaimFungibleAsset(ctx, contractId, base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.NoError(t, err)
 	fmt.Printf("Test success as expected since a valid contractId is specified.\n")
 }
@@ -896,6 +878,7 @@ func TestUnLockFungibleAsset(t *testing.T) {
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
+	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement {
 		Type: assetType,
