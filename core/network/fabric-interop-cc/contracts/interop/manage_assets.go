@@ -168,10 +168,15 @@ func validateAndSetPartiesOfAssetAgreement(ctx contractapi.TransactionContextInt
 }
 
 // LockAsset cc is used to record locking of an asset on the ledger
-func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, lockInfoBytes string) (string, error) {
+func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
+
+	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
+	if err != nil {
+		return "", fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
 		return "", err
@@ -182,6 +187,11 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	err = validateAndSetLockerOfAssetAgreement(ctx, assetAgreement)
 	if err != nil {
 		return "", logThenErrorf("error in locker validation: %+v", err)
+	}
+
+	lockInfoBytes, err := base64.StdEncoding.DecodeString(lockInfoBytesBase64)
+	if err != nil {
+		return "", fmt.Errorf("error in base64 decode of lock information: %+v", err)
 	}
 
 	lockInfoHTLC := &common.AssetLockHTLC{}
@@ -240,10 +250,15 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 }
 
 // UnLockAsset cc is used to record unlocking of an asset on the ledger
-func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string) error {
+func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) error {
+
+	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -307,10 +322,15 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 }
 
 // IsAssetLocked cc is used to query the ledger and findout if an asset is locked or not
-func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementBytes string) (bool, error) {
+func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (bool, error) {
+
+	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
+	if err != nil {
+		return false, fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
 		return false, err
@@ -397,10 +417,15 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, err
 }
 
 // ClaimAsset cc is used to record claim of an asset on the ledger
-func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, claimInfoBytes string) error {
+func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, claimInfoBytesBase64 string) error {
+
+	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -411,6 +436,11 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	err = validateAndSetRecipientOfAssetAgreement(ctx, assetAgreement)
 	if err != nil {
 		return logThenErrorf("error in recipient validation: %+v", err)
+	}
+
+	claimInfoBytes, err := base64.StdEncoding.DecodeString(claimInfoBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of claim information: %+v", err)
 	}
 
 	claimInfo := &common.AssetClaimHTLC{}
@@ -571,7 +601,7 @@ func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionCo
 }
 
 // ClaimAsset cc is used to record claim of an asset on the ledger (this uses the contractId)
-func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytes string) error {
+func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
 
 	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
@@ -586,6 +616,11 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 
 	if assetLockVal.Recipient != string(txCreator) {
 		return fmt.Errorf("asset is not locked for %s to claim", string(txCreator))
+	}
+
+	claimInfoBytes, err := base64.StdEncoding.DecodeString(claimInfoBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of claim information: %+v", err)
 	}
 
 	claimInfo := &common.AssetClaimHTLC{}
@@ -668,10 +703,15 @@ func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.Transa
 }
 
 // LockFungibleAsset cc is used to record locking of a group of fungible assets of an asset-type on the ledger
-func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementBytes string, lockInfoBytes string) (string, error) {
+func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
+
+	fungibleAssetAgreementBytes, err := base64.StdEncoding.DecodeString(fungibleAssetAgreementBytesBase64)
+	if err != nil {
+		return "", fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(fungibleAssetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(fungibleAssetAgreementBytes), assetAgreement)
 	if err != nil {
 		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
 		log.Error(errorMsg)
@@ -684,6 +724,11 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 	err = validateAndSetLockerOfFungibleAssetAgreement(ctx, assetAgreement)
 	if err != nil {
 		return "", logThenErrorf("error in locker validation: %+v", err)
+	}
+
+	lockInfoBytes, err := base64.StdEncoding.DecodeString(lockInfoBytesBase64)
+	if err != nil {
+		return "", fmt.Errorf("error in base64 decode of lock information: %+v", err)
 	}
 
 	lockInfoHTLC := &common.AssetLockHTLC{}
@@ -797,7 +842,7 @@ func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContext
 }
 
 // ClaimFungibleAsset cc is used to record claim of a fungible asset on the ledger
-func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytes string) error {
+func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
 
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
@@ -812,6 +857,11 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 
 	if assetLockVal.Recipient != string(txCreator) {
 		return fmt.Errorf("asset is not locked for %s to claim", string(txCreator))
+	}
+
+	claimInfoBytes, err := base64.StdEncoding.DecodeString(claimInfoBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of claim information: %+v", err)
 	}
 
 	claimInfo := &common.AssetClaimHTLC{}
