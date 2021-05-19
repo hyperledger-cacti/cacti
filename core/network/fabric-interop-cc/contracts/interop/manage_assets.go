@@ -93,17 +93,92 @@ func generateFungibleAssetLockContractId(ctx contractapi.TransactionContextInter
 	return contractId
 }
 
+/*
+ * Function to validate the locker in asset agreement.
+ * If locker is not set, it will be set to the caller.
+ * If the locker is set already, it ensures that the locker is same as the creator of the transaction.
+ */
+func validateAndSetLockerOfAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
+	txCreatorBytes, err := ctx.GetStub().GetCreator()
+	if err != nil {
+		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
+	}
+	txCreator := string(txCreatorBytes)
+	if len(assetAgreement.Locker) == 0 {
+		assetAgreement.Locker = txCreator
+	} else if assetAgreement.Locker != txCreator {
+		return fmt.Errorf("locker %s in the asset agreement is not same as the transaction creator %s", assetAgreement.Locker, txCreator)
+	}
+
+	return nil
+}
+
+/*
+ * Function to validate the locker in fungible asset agreement.
+ * If locker is not set, it will be set to the caller.
+ * If the locker is set already, it ensures that the locker is same as the creator of the transaction.
+ */
+func validateAndSetLockerOfFungibleAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.FungibleAssetExchangeAgreement) error {
+	txCreatorBytes, err := ctx.GetStub().GetCreator()
+	if err != nil {
+		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
+	}
+	txCreator := string(txCreatorBytes)
+	if len(assetAgreement.Locker) == 0 {
+		assetAgreement.Locker = txCreator
+	} else if assetAgreement.Locker != txCreator {
+		return fmt.Errorf("locker %s in the fungible asset agreement is not same as the transaction creator %s", assetAgreement.Locker, txCreator)
+	}
+
+	return nil
+}
+
+/*
+ * Function to validate the recipient in asset agreement.
+ * If recipient is not set, it will be set to the caller.
+ * If the recipeint is set already, it ensures that the recipient is same as the creator of the transaction.
+ */
+func validateAndSetRecipientOfAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
+	txCreatorBytes, err := ctx.GetStub().GetCreator()
+	if err != nil {
+		return fmt.Errorf("unable to get the transaction creator information")
+	}
+	txCreator := string(txCreatorBytes)
+	if len(assetAgreement.Recipient) == 0 {
+		assetAgreement.Recipient = txCreator
+	} else if assetAgreement.Recipient != txCreator {
+		return fmt.Errorf("recipient %s in the asset agreement is not same as the transaction creator %s", assetAgreement.Recipient, txCreator)
+	}
+
+	return nil
+}
+
 // LockAsset cc is used to record locking of an asset on the ledger
-func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, lockInfoBytes string) (string, error) {
+func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
+
+	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
+	if err != nil {
+		return "", fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
 		return "", err
 	}
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
+
+	err = validateAndSetLockerOfAssetAgreement(ctx, assetAgreement)
+	if err != nil {
+		return "", logThenErrorf("error in locker validation: %+v", err)
+	}
+
+	lockInfoBytes, err := base64.StdEncoding.DecodeString(lockInfoBytesBase64)
+	if err != nil {
+		return "", fmt.Errorf("error in base64 decode of lock information: %+v", err)
+	}
 
 	lockInfoHTLC := &common.AssetLockHTLC{}
 	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfoHTLC)
@@ -161,16 +236,26 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 }
 
 // UnLockAsset cc is used to record unlocking of an asset on the ledger
-func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string) error {
+func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) error {
+
+	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
 		return err
 	}
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
+
+	err = validateAndSetLockerOfAssetAgreement(ctx, assetAgreement)
+	if err != nil {
+		return logThenErrorf("error in validation of asset agreement parties: %+v", err)
+	}
 
 	assetLockKey, _, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 	if err != nil {
@@ -223,10 +308,15 @@ func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface,
 }
 
 // IsAssetLocked cc is used to query the ledger and findout if an asset is locked or not
-func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementBytes string) (bool, error) {
+func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (bool, error) {
+
+	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
+	if err != nil {
+		return false, fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
 		return false, err
@@ -313,16 +403,31 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, err
 }
 
 // ClaimAsset cc is used to record claim of an asset on the ledger
-func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes string, claimInfoBytes string) error {
+func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, claimInfoBytesBase64 string) error {
+
+	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
 		log.Error(err.Error())
 		return err
 	}
 	// display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
+
+	err = validateAndSetRecipientOfAssetAgreement(ctx, assetAgreement)
+	if err != nil {
+		return logThenErrorf("error in recipient validation: %+v", err)
+	}
+
+	claimInfoBytes, err := base64.StdEncoding.DecodeString(claimInfoBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of claim information: %+v", err)
+	}
 
 	claimInfo := &common.AssetClaimHTLC{}
 	err = proto.Unmarshal([]byte(claimInfoBytes), claimInfo)
@@ -447,6 +552,15 @@ func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionCo
 		return err
 	}
 
+	txCreator, err := ctx.GetStub().GetCreator()
+	if err != nil {
+		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
+	}
+
+	if assetLockVal.Locker != string(txCreator) {
+		return fmt.Errorf("asset is not locked for %s to unlock", string(txCreator))
+	}
+
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs < assetLockVal.ExpiryTimeSecs {
@@ -473,12 +587,26 @@ func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionCo
 }
 
 // ClaimAsset cc is used to record claim of an asset on the ledger (this uses the contractId)
-func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytes string) error {
+func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
 
 	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
 		log.Error(err.Error())
 		return err
+	}
+
+	txCreator, err := ctx.GetStub().GetCreator()
+	if err != nil {
+		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
+	}
+
+	if assetLockVal.Recipient != string(txCreator) {
+		return fmt.Errorf("asset is not locked for %s to claim", string(txCreator))
+	}
+
+	claimInfoBytes, err := base64.StdEncoding.DecodeString(claimInfoBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of claim information: %+v", err)
 	}
 
 	claimInfo := &common.AssetClaimHTLC{}
@@ -552,10 +680,15 @@ func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.Transa
 }
 
 // LockFungibleAsset cc is used to record locking of a group of fungible assets of an asset-type on the ledger
-func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementBytes string, lockInfoBytes string) (string, error) {
+func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
+
+	fungibleAssetAgreementBytes, err := base64.StdEncoding.DecodeString(fungibleAssetAgreementBytesBase64)
+	if err != nil {
+		return "", fmt.Errorf("error in base64 decode of asset agreement: %+v", err)
+	}
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement{}
-	err := proto.Unmarshal([]byte(fungibleAssetAgreementBytes), assetAgreement)
+	err = proto.Unmarshal([]byte(fungibleAssetAgreementBytes), assetAgreement)
 	if err != nil {
 		errorMsg := fmt.Sprintf("unmarshal error: %s", err)
 		log.Error(errorMsg)
@@ -564,6 +697,16 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 
 	//display the requested fungible asset agreement
 	log.Infof("fungibleAssetExchangeAgreement: %+v\n", assetAgreement)
+
+	err = validateAndSetLockerOfFungibleAssetAgreement(ctx, assetAgreement)
+	if err != nil {
+		return "", logThenErrorf("error in locker validation: %+v", err)
+	}
+
+	lockInfoBytes, err := base64.StdEncoding.DecodeString(lockInfoBytesBase64)
+	if err != nil {
+		return "", fmt.Errorf("error in base64 decode of lock information: %+v", err)
+	}
 
 	lockInfoHTLC := &common.AssetLockHTLC{}
 	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfoHTLC)
@@ -667,12 +810,26 @@ func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContext
 }
 
 // ClaimFungibleAsset cc is used to record claim of a fungible asset on the ledger
-func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytes string) error {
+func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
 
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
 		log.Error(err.Error())
 		return err
+	}
+
+	txCreator, err := ctx.GetStub().GetCreator()
+	if err != nil {
+		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
+	}
+
+	if assetLockVal.Recipient != string(txCreator) {
+		return fmt.Errorf("asset is not locked for %s to claim", string(txCreator))
+	}
+
+	claimInfoBytes, err := base64.StdEncoding.DecodeString(claimInfoBytesBase64)
+	if err != nil {
+		return fmt.Errorf("error in base64 decode of claim information: %+v", err)
 	}
 
 	claimInfo := &common.AssetClaimHTLC{}
@@ -725,6 +882,15 @@ func (s *SmartContract) UnLockFungibleAsset(ctx contractapi.TransactionContextIn
 	if err != nil {
 		log.Error(err.Error())
 		return err
+	}
+
+	txCreator, err := ctx.GetStub().GetCreator()
+	if err != nil {
+		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
+	}
+
+	if assetLockVal.Locker != string(txCreator) {
+		return fmt.Errorf("asset is not locked for %s to unlock", string(txCreator))
 	}
 
 	// Check if expiry time is elapsed
