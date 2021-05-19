@@ -15,6 +15,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/golang/protobuf/proto"
+	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	log "github.com/sirupsen/logrus"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
 )
@@ -23,17 +24,37 @@ const(
 	defaultTimeLockSecs = 5 * 60		// 5 minutes
 )
 
+// function that supplies value that is to be returned by ctx.GetStub().GetCreator() 
+func getCreator() string {
+        serializedIdentity := &mspProtobuf.SerializedIdentity{}
+        serializedIdentity.IdBytes = []byte("-----BEGIN CERTIFICATE-----\nMIICUTCCAfigAwIBAgIRANjiggTtaHDFFkHiB7VxO7MwCgYIKoZIzj0EAwIwczELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY2lzY28xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2NhLm9yZzEuZXhhbXBsZS5jb20wHhcNMTkwNDAxMDg0NTAwWhcNMjkwMzI5MDg0NTAwWjBzMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEZMBcGA1UEChMQb3JnMS5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3JnMS5leGFtcGxlLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOeea4B6S9e9r/6TXfEeAfgqk5WipvYhGoxh5dFn+X4m3vQvSBXnTWKW73eSgKIsPw9tLCW+peorVs11gbywbcGjbTBrMA4GA1UdDwEB/wQEAwIBpjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDwYDVR0TAQH/BAUwAwEB/zApBgNVHQ4EIgQg1c2GfbSkxTZLH3esPWwsieVE5AhY4sOB5F8a/hs9Z8UwCgYIKoZIzj0EAwIDRwAwRAIgRdgY+5ob03jV2KK1Vv6bdNq3cKXw4pxMUv90VNsKGu0CIA8CILkvDeh74ABD0zACdn+ANC2UT6JNT6wzTsK7pXuL\n-----END CERTIFICATE-----")
+        serializedIdentity.Mspid = "ca.org1.example.com"
+        serializedIdentityBytes, _ := proto.Marshal(serializedIdentity)
+
+        return string(serializedIdentityBytes)
+}
+
+// function that extracts the ECert from the identity information returned by ctx.GetStub().GetCreator()
+func getTxCreatorECertBase64() string {
+	serializedIdentity := &mspProtobuf.SerializedIdentity{}
+	_ = proto.Unmarshal([]byte(getCreator()), serializedIdentity)
+	eCertBase64 := base64.StdEncoding.EncodeToString(serializedIdentity.IdBytes)
+	fmt.Printf("eCertBase64: %s\n", eCertBase64)
+
+	return eCertBase64
+}
+
 func TestLockAsset(t *testing.T) {
 	ctx, chaincodeStub, interopcc := prepMockStub()
 
 	assetType := "bond"
 	assetId := "A001"
 	recipient := "Bob"
-	locker := "Alice"
+	locker := getTxCreatorECertBase64()
 	preimage := "abcd"
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	lockInfoHTLC := &common.AssetLockHTLC {
 		HashBase64: []byte(hashBase64),
@@ -86,11 +107,11 @@ func TestUnLockAsset(t *testing.T) {
 	assetType := "bond"
 	assetId := "A001"
 	recipient := "Bob"
-	locker := "Alice"
+	locker := getTxCreatorECertBase64()
 	preimage := "abcd"
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	lockInfoHTLC := &common.AssetLockHTLC {
 		HashBase64: []byte(hashBase64),
@@ -289,13 +310,13 @@ func TestClaimAsset(t *testing.T) {
 
 	assetType := "bond"
 	assetId := "A001"
-	recipient := "Bob"
+	recipient := getTxCreatorECertBase64()
 	locker := "Alice"
 	preimage := "abcd"
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(recipient), nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -366,13 +387,13 @@ func TestUnLockAssetUsingContractId(t *testing.T) {
 
 	assetType := "bond"
 	assetId := "A001"
-	locker := "Alice"
+	locker := getTxCreatorECertBase64()
 	recipient := "Bob"
 	preimage := "abcd"
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -653,7 +674,7 @@ func TestLockFungibleAsset(t *testing.T) {
 
 	assetType := "cbdc"
 	numUnits := uint64(10)
-	locker := "Alice"
+	locker := getTxCreatorECertBase64()
 	recipient := "Bob"
 	preimage := "abcd"
 
@@ -668,7 +689,7 @@ func TestLockFungibleAsset(t *testing.T) {
 	}
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
 	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
-	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	// Test failure with TimeSpec that is part of lock information not being currently supported
 	// no need to set chaincodeStub.GetStateReturns below since the error is hit before GetState() ledger access
@@ -789,13 +810,13 @@ func TestClaimFungibleAsset(t *testing.T) {
 	assetType := "cbdc"
 	numUnits := uint64(10)
 	locker := "Alice"
-	recipient := "Bob"
+	recipient := getTxCreatorECertBase64()
 	preimage := "abcd"
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(recipient), nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement {
 		Type: assetType,
@@ -872,13 +893,13 @@ func TestUnLockFungibleAsset(t *testing.T) {
 
 	assetType := "cbdc"
 	numUnits := uint64(10)
-	locker := "Alice"
+	locker := getTxCreatorECertBase64()
 	recipient := "Bob"
 	preimage := "abcd"
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(locker), nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement {
 		Type: assetType,
