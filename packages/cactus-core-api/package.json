@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core-api",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-core-api.node.umd.min.js",
@@ -86,7 +86,7 @@
     "@types/express": "4.17.8"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "0.4.0",
+    "@hyperledger/cactus-common": "0.5.0",
     "axios": "0.21.1",
     "express": "4.17.1",
     "typescript-optional": "2.0.1"

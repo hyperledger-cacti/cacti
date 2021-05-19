@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-corda",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Allows Cactus nodes to connect to a Corda ledger.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-ledger-connector-corda.node.umd.min.js",
@@ -84,20 +84,20 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.4.0",
-    "@hyperledger/cactus-core": "0.4.1",
-    "@hyperledger/cactus-core-api": "0.4.1",
+    "@hyperledger/cactus-common": "0.5.0",
+    "@hyperledger/cactus-core": "0.5.0",
+    "@hyperledger/cactus-core-api": "0.5.0",
     "axios": "0.21.1",
     "express-openapi-validator": "4.10.5",
-    "prom-client": "13.0.0",
     "internal-ip": "6.2.0",
     "joi": "14.3.1",
     "node-ssh": "11.1.0",
+    "prom-client": "13.0.0",
     "temp": "0.9.1",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "0.4.0",
+    "@hyperledger/cactus-test-tooling": "0.5.0",
     "@types/express": "4.17.8",
     "@types/joi": "14.3.4",
     "@types/multer": "1.4.5",
