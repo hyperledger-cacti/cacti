@@ -154,15 +154,21 @@ const command: GluegunCommand = {
     })
 
 
-    const user1IdN1 = await network1.wallet.get(user1)
-    const user1CertN1 = Buffer.from((user1IdN1).credentials.certificate).toString('base64')
-    const user1IdN2 = await network2.wallet.get(user1)
-    const user1CertN2 = Buffer.from((user1IdN2).credentials.certificate).toString('base64')
+    // const user1IdN1 = await network1.wallet.get(user1)
+    // const user1CertN1 = Buffer.from((user1IdN1).credentials.certificate).toString('base64')
+    // const user1IdN2 = await network2.wallet.get(user1)
+    // const user1CertN2 = Buffer.from((user1IdN2).credentials.certificate).toString('base64')
+    //
+    // const user2IdN1 = await network1.wallet.get(user2)
+    // const user2CertN1 = Buffer.from((user2IdN1).credentials.certificate).toString('base64')
+    // const user2IdN2 = await network2.wallet.get(user2)
+    // const user2CertN2 = Buffer.from((user2IdN2).credentials.certificate).toString('base64')
 
-    const user2IdN1 = await network1.wallet.get(user2)
-    const user2CertN1 = Buffer.from((user2IdN1).credentials.certificate).toString('base64')
-    const user2IdN2 = await network2.wallet.get(user2)
-    const user2CertN2 = Buffer.from((user2IdN2).credentials.certificate).toString('base64')
+
+    const user1CertN1 = user1
+    const user1CertN2 = user1
+    const user2CertN1 = user2
+    const user2CertN2 = user2
 
     // console.log(user1CertN2)
     // console.log(user2CertN1)

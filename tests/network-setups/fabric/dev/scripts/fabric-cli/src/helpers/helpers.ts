@@ -72,41 +72,42 @@ const addAssets = ({
           args: []
         }
 
-    const { gateway, contract, wallet } = await fabricHelper({
-      channel: channelName,
-      contractName: contractName,
-      connProfilePath: connProfilePath,
-      networkName: networkName,
-      mspId: mspId,
-      userString: item[1]['owner']
-    })
-    const userId = await wallet.get(item[1]['owner'])
-    const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
+    // const { gateway, contract, wallet } = await fabricHelper({
+    //   channel: channelName,
+    //   contractName: contractName,
+    //   connProfilePath: connProfilePath,
+    //   networkName: networkName,
+    //   mspId: mspId,
+    //   userString: item[1]['owner']
+    // })
+    // const userId = await wallet.get(item[1]['owner'])
+    // const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
 
     if (ccType == 'bond') {
       currentQuery.ccFunc = 'CreateAsset'
-      currentQuery.args = [...currentQuery.args, item[1]['id'], userCert, item[1]['issuer'], item[1]['facevalue'], item[1]['maturitydate']]
+      currentQuery.args = [...currentQuery.args, item[1]['id'], item[1]['owner'], item[1]['issuer'], item[1]['facevalue'], item[1]['maturitydate']]
     } else if (ccType == 'token') {
       currentQuery.ccFunc = 'IssueTokenAssets'
-      currentQuery.args = [...currentQuery.args, item[1]['tokenassettype'], item[1]['numunits'], userCert]
+      currentQuery.args = [...currentQuery.args, item[1]['tokenassettype'], item[1]['numunits'], item[1]['owner']]
     }
     console.log(currentQuery)
-    try {
-      const read = await contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
-      const state = Buffer.from(read).toString()
-      if (state) {
-        logger.debug(`Response From Network: ${state}`)
-      } else {
-        logger.debug('No Response from network')
-      }
-
-      // Disconnect from the gateway.
-      await gateway.disconnect()
-      return state
-    } catch (error) {
-      console.error(`Failed to submit transaction: ${error}`)
-      throw new Error(error)
-    }
+    invoke(currentQuery, connProfilePath, networkName, mspId, logger)
+    // try {
+    //   const read = await contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
+    //   const state = Buffer.from(read).toString()
+    //   if (state) {
+    //     logger.debug(`Response From Network: ${state}`)
+    //   } else {
+    //     logger.debug('No Response from network')
+    //   }
+    //
+    //   // Disconnect from the gateway.
+    //   await gateway.disconnect()
+    //   return state
+    // } catch (error) {
+    //   console.error(`Failed to submit transaction: ${error}`)
+    //   throw new Error(error)
+    // }
   })
 }
 
