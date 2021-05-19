@@ -6,11 +6,13 @@ import (
 
   "github.com/hyperledger/fabric-chaincode-go/shim"
   "github.com/hyperledger/fabric-contract-api-go/contractapi"
+  am "github.com/hyperledger-labs/weaver/samples/simpleasset/asset-mgmt"
 )
 
 // SmartContract provides functions for managing an BondAsset and TokenAsset
 type SmartContract struct {
 	contractapi.Contract
+    am.AssetManagementContract
 }
 
 func main() {
