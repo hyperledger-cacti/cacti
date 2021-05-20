@@ -53,7 +53,7 @@ const command: GluegunCommand = {
       logger.debug('Debugging is enabled')
     }
     let userid = ''
-    if options['user'] {
+    if (options['user']) {
       userid = options['user']
     }
 

@@ -31,15 +31,7 @@ const command: GluegunCommand = {
           {
             name: '--step',
             description:
-              'Step number of asset exchange protocol:\n
-                1: LockAsset \n
-                2: IsAssetLocked \n
-                3: LockFungibleAsset \n
-                4: IsFungibleAssetLocked \n
-                5: ClaimFungibleAsset \n
-                6: ClaimAsset\n
-                7: UnlockAsset\n
-                8: UnlockFungibleAsset'
+              'Step number of asset exchange protocol: \n1: LockAsset \n2: IsAssetLocked \n3: LockFungibleAsset \n4: IsFungibleAssetLocked \n5: ClaimFungibleAsset \n6: ClaimAsset\n7: UnlockAsset\n8: UnlockFungibleAsset'
           },
           {
             name: '--target-network',
@@ -79,9 +71,7 @@ const command: GluegunCommand = {
           {
             name: '--param',
             description:
-              'Param: AssetType:AssetId for Non-Fungible Assets\n
-                FungibleAssetType:NumUnits for Fungible Assets\n
-                (Required for steps 1-3)'
+              'Param: AssetType:AssetId for Non-Fungible Assets \nFungibleAssetType:NumUnits for Fungible Assets \n(Required for steps 1-3)'
           },
           {
             name: '--debug',
@@ -140,8 +130,8 @@ const command: GluegunCommand = {
     }
 
     let param1, param2
-    if (option['param']) {
-      const params = option['param'].split(':')
+    if (options['param']) {
+      const params = options['param'].split(':')
       param1 = params[0]
       param2 = params[1]
     }
@@ -261,7 +251,6 @@ const command: GluegunCommand = {
         if (!res.result) {
           throw new Error()
         }
-        contractId = res.result
         spinner.info(`Fungible Asset Locked, ContractId: ${res.result}, preimage: ${res.preimage}`)
       } catch(error) {
           print.error(`Could not Lock Fungible Asset in ${options['target-network']}`)
@@ -357,7 +346,7 @@ const command: GluegunCommand = {
         return
       }
       try {
-        spinner.info(`Trying Asset Claim: ${assetType} ${assetId}`)
+        spinner.info(`Trying Asset Claim: ${param1} ${param2}`)
         res = await AssetManager.claimAssetInHTLC(networkR.contract,
                         param1,
                         param2,
@@ -431,7 +420,7 @@ const command: GluegunCommand = {
       const contractId = options['contract-id']
       try {
         spinner.info(`Trying Fungible Asset Unlock, contractId: ${contractId}`)
-        res = await res = await AssetManager.reclaimFungibleAssetInHTLC(networkL.contract,
+        res = await AssetManager.reclaimFungibleAssetInHTLC(networkL.contract,
                                       contractId);
         if (!res) {
           throw new Error()
