@@ -13,6 +13,7 @@ import (
     "strconv"
     "encoding/json"
     "strings"
+    "crypto/sha256"
     "encoding/base64"
 
     "github.com/stretchr/testify/require"
@@ -42,6 +43,15 @@ func (cc *InteropCC) Init(stub shim.ChaincodeStubInterface) pb.Response {
     cc.fungibleAssetLockMap = make(map[string]string)
     cc.fungibleAssetLockedCount = make(map[string]int)
     return shim.Success(nil)
+}
+
+// function to generate a "SHA256" hash in base64 format for a given preimage
+func generateSHA256HashInBase64Form(preimage string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(preimage))
+	shaHash := hasher.Sum(nil)
+	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
+	return shaHashBase64
 }
 
 // This logic is not meant to comprehensively cover all the functionality offered by the Fabric Interop CC
