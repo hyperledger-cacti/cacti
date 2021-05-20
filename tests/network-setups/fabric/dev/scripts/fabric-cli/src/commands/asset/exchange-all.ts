@@ -225,7 +225,7 @@ const command: GluegunCommand = {
       spinner.info(`Fungible Asset Locked: ${res.result}`)
     } catch(error) {
         print.error(`Could not Lock Fungible Asset in ${options['network2']}`)
-        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+        res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
@@ -263,8 +263,8 @@ const command: GluegunCommand = {
       spinner.info(`Fungible Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim fungible asset in ${options['network2']}`)
-        res = AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
-        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+        res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
+        res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
@@ -305,8 +305,8 @@ const command: GluegunCommand = {
       spinner.info(`Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim asset in ${options['network1']}`)
-        res = AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
-        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+        res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
+        res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
