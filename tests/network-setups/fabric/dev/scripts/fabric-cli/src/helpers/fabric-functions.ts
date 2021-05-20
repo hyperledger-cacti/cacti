@@ -384,7 +384,8 @@ async function fabricHelper({
   logger = console,
   discoverEnabled = true,
   userString = '',
-  userPwd = ''
+  userPwd = '',
+  registerUser = true
 }: {
   channel: string
   contractName: string
@@ -395,6 +396,7 @@ async function fabricHelper({
   logger?: any
   userString?: string
   userPwd?: string
+  registerUser?: boolean
 }): Promise<{ gateway: Gateway; contract: Contract; wallet: any }> {
   // load the network configuration
   const ccpPath = path.resolve(__dirname, connProfilePath)
@@ -408,7 +410,7 @@ async function fabricHelper({
     userString = `User1@org1.${networkName}.com`
   }
 
-  const wallet = await walletSetup(networkName, ccp, mspId, userString, userPwd, true, logger)
+  const wallet = await walletSetup(networkName, ccp, mspId, userString, userPwd, registerUser, logger)
   // Check to see if we've already enrolled the user.
   const identity = await wallet.get(userString)
   if (!identity) {
@@ -438,6 +440,8 @@ async function query(
   connProfilePath: string,
   networkName: string,
   mspId = global.__DEFAULT_MSPID__,
+  userString = '',
+  registerUser = true,
   logger: any = console
 ): Promise<string> {
   logger.debug('Running invoke on fabric network')
@@ -450,9 +454,12 @@ async function query(
     const { contract, gateway } = await fabricHelper({
       channel: query.channel,
       contractName: query.contractName,
-      connProfilePath,
-      networkName,
-      mspId
+      connProfilePath: connProfilePath,
+      networkName: networkName,
+      mspId: mspId,
+      logger: logger,
+      userString: userString,
+      registerUser: registerUser
     })
     const read = await contract.evaluateTransaction(query.ccFunc, ...query.args)
     const state = Buffer.from(read).toString()
@@ -474,6 +481,8 @@ async function invoke(
   connProfilePath: string,
   networkName: string,
   mspId = global.__DEFAULT_MSPID__,
+  userString = '',
+  registerUser = true,
   logger: any = console
 ): Promise<string> {
   logger.debug('Running invoke on fabric network')
@@ -481,10 +490,12 @@ async function invoke(
     const { contract, gateway } = await fabricHelper({
       channel: query.channel,
       contractName: query.contractName,
-      connProfilePath,
-      networkName,
-      mspId,
-      logger
+      connProfilePath: connProfilePath,
+      networkName: networkName,
+      mspId: mspId,
+      logger: logger,
+      userString: userString,
+      registerUser: registerUser
     })
     logger.debug(
       `CCFunc: ${query.ccFunc} 'CCArgs: ${JSON.stringify(query.args)}`

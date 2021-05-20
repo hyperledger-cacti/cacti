@@ -78,7 +78,8 @@ const addAssets = ({
       connProfilePath: connProfilePath,
       networkName: networkName,
       mspId: mspId,
-      userString: item[1]['owner']
+      userString: item[1]['owner'],
+      registerUser: false
     })
     const userId = await wallet.get(item[1]['owner'])
     const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
