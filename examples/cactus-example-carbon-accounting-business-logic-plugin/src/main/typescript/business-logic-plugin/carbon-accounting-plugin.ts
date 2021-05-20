@@ -144,7 +144,7 @@ export class CarbonAccountingPlugin
   }
 
   public getAspect(): PluginAspect {
-    return PluginAspect.WEB_SERVICE;
+    return PluginAspect.BUSINESS_LOGIC;
   }
 
   public async enrollAdminV1(
