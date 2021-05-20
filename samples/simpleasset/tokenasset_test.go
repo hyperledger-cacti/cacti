@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"encoding/base64"
 
+	"github.com/golang/protobuf/proto"
+	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger-labs/weaver/samples/simpleasset/mocks"
 	"github.com/stretchr/testify/require"
 )
@@ -228,11 +231,41 @@ func TestGetBalance(t *testing.T) {
 	bal, err = simpleToken.GetBalance(transactionContext, "", "")
 	require.EqualError(t, err, "failed to read from world state: Failed to read state")
 
-	// Owner doesn't have a wallet
 	chaincodeStub.GetStateReturnsOnCall(3, bytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(4, nil, fmt.Errorf("Failed to read state"))
 	bal, err = simpleToken.GetBalance(transactionContext, "", "")
 	require.EqualError(t, err, "failed to read owner's wallet from world state: Failed to read state")
+}
+
+func TestGetMyWallet(t *testing.T) {
+	chaincodeStub := &mocks.ChaincodeStub{}
+	transactionContext := &mocks.TransactionContext{}
+	transactionContext.GetStubReturns(chaincodeStub)
+
+	walletMap := make(map[string]int)
+	walletMap["token1"] = 5
+	expectedRes := createKeyValuePairs(walletMap)
+	expectedAsset := &TokenWallet{WalletMap: walletMap}
+	bytes, err := json.Marshal(expectedAsset)
+	require.NoError(t, err)
+
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
+
+	simpleToken := SmartContract{}
+	// Successful GetBalance case
+	chaincodeStub.GetStateReturnsOnCall(0, bytes, nil)
+	bal, err := simpleToken.GetMyWallet(transactionContext)
+	require.NoError(t, err)
+	require.Equal(t, bal, expectedRes)
+
+	chaincodeStub.GetStateReturnsOnCall(1, nil, fmt.Errorf("Failed to read state"))
+	bal, err = simpleToken.GetMyWallet(transactionContext)
+	require.EqualError(t, err, "failed to read owner's wallet from world state: Failed to read state")
+
+	// Owner doesn't have a wallet
+	chaincodeStub.GetStateReturnsOnCall(2, nil, nil)
+	bal, err = simpleToken.GetMyWallet(transactionContext)
+	require.EqualError(t, err, "owner does not have a wallet.")
 }
 
 func TestTokenAssetsExist(t *testing.T) {
@@ -264,4 +297,22 @@ func TestTokenAssetsExist(t *testing.T) {
 	res, err = simpleToken.TokenAssetsExist(transactionContext, "", 0, "")
 	require.EqualError(t, err, "failed to read from world state: Failed to read state")
 	require.Equal(t, res, false)
+}
+
+// function that supplies value that is to be returned by ctx.GetStub().GetCreator()
+func getCreator() string {
+	serializedIdentity := &mspProtobuf.SerializedIdentity{}
+	eCertBytes, _ := base64.StdEncoding.DecodeString(getTestTxCreatorECertBase64())
+	serializedIdentity.IdBytes = []byte(eCertBytes)
+	serializedIdentity.Mspid = "ca.org1.example.com"
+	serializedIdentityBytes, _ := proto.Marshal(serializedIdentity)
+
+	return string(serializedIdentityBytes)
+}
+
+// function that supplies the ECert in base64 for the transaction creator
+func getTestTxCreatorECertBase64() string {
+	eCertBase64 := "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNVVENDQWZpZ0F3SUJBZ0lSQU5qaWdnVHRhSERGRmtIaUI3VnhPN013Q2dZSUtvWkl6ajBFQXdJd2N6RUxNQWtHQTFVRUJoTUNWVk14RXpBUkJnTlZCQWdUQ2tOaGJHbG1iM0p1YVdFeEZqQVVCZ05WQkFjVERWTmhiaUJHY21GdVkybHpZMjh4R1RBWEJnTlZCQW9URUc5eVp6RXVaWGhoYlhCc1pTNWpiMjB4SERBYUJnTlZCQU1URTJOaExtOXlaekV1WlhoaGJYQnNaUzVqYjIwd0hoY05NVGt3TkRBeE1EZzBOVEF3V2hjTk1qa3dNekk1TURnME5UQXdXakJ6TVFzd0NRWURWUVFHRXdKVlV6RVRNQkVHQTFVRUNCTUtRMkZzYVdadmNtNXBZVEVXTUJRR0ExVUVCeE1OVTJGdUlFWnlZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTVM1bGVHRnRjR3hsTG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1YjNKbk1TNWxlR0Z0Y0d4bExtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCT2VlYTRCNlM5ZTlyLzZUWGZFZUFmZ3FrNVdpcHZZaEdveGg1ZEZuK1g0bTN2UXZTQlhuVFdLVzczZVNnS0lzUHc5dExDVytwZW9yVnMxMWdieXdiY0dqYlRCck1BNEdBMVVkRHdFQi93UUVBd0lCcGpBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFnWUlLd1lCQlFVSEF3RXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXBCZ05WSFE0RUlnUWcxYzJHZmJTa3hUWkxIM2VzUFd3c2llVkU1QWhZNHNPQjVGOGEvaHM5WjhVd0NnWUlLb1pJemowRUF3SURSd0F3UkFJZ1JkZ1krNW9iMDNqVjJLSzFWdjZiZE5xM2NLWHc0cHhNVXY5MFZOc0tHdTBDSUE4Q0lMa3ZEZWg3NEFCRDB6QUNkbitBTkMyVVQ2Sk5UNnd6VHNLN3BYdUwKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ=="
+
+	return eCertBase64
 }
