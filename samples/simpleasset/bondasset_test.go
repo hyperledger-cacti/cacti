@@ -180,6 +180,39 @@ func TestUpdateOwner(t *testing.T) {
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 }
 
+func TestGetMyAssets(t *testing.T) {
+	asset := &BondAsset{ID: "asset1", Owner: getTestTxCreatorECertBase64()}
+	bytes, err := json.Marshal(asset)
+	require.NoError(t, err)
+
+	iterator := &mocks.StateQueryIterator{}
+	iterator.HasNextReturnsOnCall(0, true)
+	iterator.HasNextReturnsOnCall(1, false)
+	iterator.NextReturns(&queryresult.KV{Value: bytes}, nil)
+
+	chaincodeStub := &mocks.ChaincodeStub{}
+	transactionContext := &mocks.TransactionContext{}
+	transactionContext.GetStubReturns(chaincodeStub)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
+
+	chaincodeStub.GetStateByRangeReturns(iterator, nil)
+	simpleAsset := &SmartContract{}
+	assets, err := simpleAsset.GetAllAssets(transactionContext)
+	require.NoError(t, err)
+	require.Equal(t, []*BondAsset{asset}, assets)
+
+	iterator.HasNextReturns(true)
+	iterator.NextReturns(nil, fmt.Errorf("failed retrieving next item"))
+	assets, err = simpleAsset.GetAllAssets(transactionContext)
+	require.EqualError(t, err, "failed retrieving next item")
+	require.Nil(t, assets)
+
+	chaincodeStub.GetStateByRangeReturns(nil, fmt.Errorf("failed retrieving all assets"))
+	assets, err = simpleAsset.GetAllAssets(transactionContext)
+	require.EqualError(t, err, "failed retrieving all assets")
+	require.Nil(t, assets)
+}
+
 func TestGetAllAssets(t *testing.T) {
 	asset := &BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)

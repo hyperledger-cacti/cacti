@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package main
+package assetmgmt
 
 import (
     "fmt"
@@ -13,6 +13,7 @@ import (
     "strconv"
     "encoding/json"
     "strings"
+    "encoding/base64"
 
     "github.com/stretchr/testify/require"
     "github.com/hyperledger/fabric-chaincode-go/shim"
@@ -54,7 +55,8 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     caller, _ := stub.GetCreator()
     if function == "LockAsset" {
         assetAgreement := &common.AssetExchangeAgreement{}
-        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        arg0, _ := base64.StdEncoding.DecodeString(args[0])
+        _ = proto.Unmarshal([]byte(arg0), assetAgreement)
         key := assetAgreement.Type + ":" + assetAgreement.Id
         val := string(caller) + ":" + assetAgreement.Recipient
         if cc.assetLockMap[key] != "" {
@@ -65,7 +67,8 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     }
     if function == "LockFungibleAsset" {    // We are only going to lock once or twice in each unit test function, so bookkeeping doesn't need to be thorough
         assetAgreement := &common.FungibleAssetExchangeAgreement{}
-        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        arg0, _ := base64.StdEncoding.DecodeString(args[0])
+        _ = proto.Unmarshal([]byte(arg0), assetAgreement)
 	val := assetAgreement.Type + ":" + strconv.Itoa(int(assetAgreement.NumUnits)) + ":" + string(caller) + ":" + assetAgreement.Recipient
         contractId := generateSHA256HashInBase64Form(val)
         cc.fungibleAssetLockMap[contractId] = val
@@ -78,7 +81,8 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     }
     if function == "IsAssetLocked" {
         assetAgreement := &common.AssetExchangeAgreement{}
-        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        arg0, _ := base64.StdEncoding.DecodeString(args[0])
+        _ = proto.Unmarshal([]byte(arg0), assetAgreement)
         expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
         expectedVal := assetAgreement.Locker + ":" + assetAgreement.Recipient
         if cc.assetLockMap[expectedKey] == expectedVal {
@@ -102,7 +106,8 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     }
     if function == "UnlockAsset" {
         assetAgreement := &common.AssetExchangeAgreement{}
-        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        arg0, _ := base64.StdEncoding.DecodeString(args[0])
+        _ = proto.Unmarshal([]byte(arg0), assetAgreement)
         expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
         expectedVal := string(caller) + ":" + assetAgreement.Recipient
         if cc.assetLockMap[expectedKey] == "" {
@@ -130,7 +135,8 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     }
     if function == "ClaimAsset" {
         assetAgreement := &common.AssetExchangeAgreement{}
-        _ = proto.Unmarshal([]byte(args[0]), assetAgreement)
+        arg0, _ := base64.StdEncoding.DecodeString(args[0])
+        _ = proto.Unmarshal([]byte(arg0), assetAgreement)
         expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
         expectedVal := assetAgreement.Locker + ":" + string(caller)
         if cc.assetLockMap[expectedKey] == "" {

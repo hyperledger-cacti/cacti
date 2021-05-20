@@ -79,3 +79,4 @@ clean:	stop
 	+rm -rf bin
 	+rm -rf config
 	+rm .fabric-setup
+	+rm -rf ../shared/chaincode/*

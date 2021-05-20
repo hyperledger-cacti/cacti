@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package main
+package assetmgmt
 
 import (
     "fmt"
+    "encoding/base64"
 
     "github.com/golang/protobuf/proto"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
@@ -30,7 +31,20 @@ func (amc *AssetManagementContract) Configure(interopChaincodeId string) {
 
 // Ledger transaction (invocation) functions
 
-func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto, lockInfoSerializedProto string) (bool, error) {
+func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (bool, error) {
+
+    // Decoding from base64
+    assetAgreementSerializedProto, err64 := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return false, err64
+    }
+    lockInfoSerializedProto, err64 := base64.StdEncoding.DecodeString(lockInfoSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return false, err64
+    }
+
     assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
@@ -75,7 +89,20 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
     return retVal, err
 }
 
-func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto, lockInfoSerializedProto string) (string, error) {
+func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+
+    // Decoding from base64
+    fungibleAssetExchangeAgreementSerializedProto, err64 := base64.StdEncoding.DecodeString(fungibleAssetExchangeAgreementSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return "", err64
+    }
+    lockInfoSerializedProto, err64 := base64.StdEncoding.DecodeString(lockInfoSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return "", err64
+    }
+
     assetAgreement := &common.FungibleAssetExchangeAgreement{}
     if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
@@ -121,7 +148,15 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
     return retVal, err
 }
 
-func (amc *AssetManagementContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto string) (bool, error) {
+func (amc *AssetManagementContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
+
+    // Decoding from base64
+    assetAgreementSerializedProto, err64 := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return false, err64
+    }
+
     assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
@@ -143,7 +178,20 @@ func (amc *AssetManagementContract) IsFungibleAssetLocked(ctx contractapi.Transa
     return amc.assetManagement.IsFungibleAssetLocked(ctx.GetStub(), contractId)
 }
 
-func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto, claimInfoSerializedProto string) (bool, error) {
+func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
+
+    // Decoding from base64
+    assetAgreementSerializedProto, err64 := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return false, err64
+    }
+    claimInfoSerializedProto, err64 := base64.StdEncoding.DecodeString(claimInfoSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return false, err64
+    }
+
     assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
@@ -188,7 +236,15 @@ func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContex
     return retVal, err
 }
 
-func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto string) (bool, error) {
+func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+
+    // Decoding from base64
+    claimInfoSerializedProto, err64 := base64.StdEncoding.DecodeString(claimInfoSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return false, err64
+    }
+
     if len(contractId) == 0 {
         log.Error("empty contract id")
         return false, fmt.Errorf("empty contract id")
@@ -227,7 +283,15 @@ func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.Transacti
     return retVal, err
 }
 
-func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto string) (bool, error) {
+func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
+
+    // Decoding from base64
+    assetAgreementSerializedProto, err64 := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return false, err64
+    }
+
     assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
@@ -300,7 +364,15 @@ func (amc *AssetManagementContract) GetAllFungibleLockedAssets(ctx contractapi.T
     return amc.assetManagement.GetAllFungibleLockedAssets(ctx.GetStub(), lockRecipient, locker)
 }
 
-func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto string) (uint64, error) {
+func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (uint64, error) {
+
+    // Decoding from base64
+    assetAgreementSerializedProto, err64 := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return 0, err64
+    }
+
     assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
@@ -314,7 +386,15 @@ func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.Transa
     return amc.assetManagement.GetAssetTimeToRelease(ctx.GetStub(), assetAgreement)
 }
 
-func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto string) (uint64, error) {
+func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string) (uint64, error) {
+
+    // Decoding from base64
+    fungibleAssetExchangeAgreementSerializedProto, err64 := base64.StdEncoding.DecodeString(fungibleAssetExchangeAgreementSerializedProto64)
+    if err64 != nil {
+      log.Error(err64.Error())
+      return 0, err64
+    }
+
     assetAgreement := &common.FungibleAssetExchangeAgreement{}
     if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")

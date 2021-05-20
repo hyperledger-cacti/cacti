@@ -26,7 +26,7 @@ function createAssetExchangeAgreementSerialized(assetType, assetID, recipientECe
     assetExchangeAgreement.setId(assetID);
     assetExchangeAgreement.setRecipient(recipientECert);
     assetExchangeAgreement.setLocker(lockerECert);
-    return assetExchangeAgreement.serializeBinary().toString();
+    return Buffer.from(assetExchangeAgreement.serializeBinary()).toString('base64');
 }
 
 // Create a fungible asset exchange agreement structure
@@ -37,33 +37,33 @@ function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, rec
     assetExchangeAgreement.setNumunits(numUnits);
     assetExchangeAgreement.setRecipient(recipientECert);
     assetExchangeAgreement.setLocker(lockerECert);
-    return assetExchangeAgreement.serializeBinary().toString();
+    return Buffer.from(assetExchangeAgreement.serializeBinary()).toString('base64');
 }
 
 // Create an asset lock structure
 function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
 {
     const lockInfoHTLC = new assetLocksPb.AssetLockHTLC();
-    lockInfoHTLC.setHashbase64(hashValue);
+    lockInfoHTLC.setHashbase64(Buffer.from(hashValue));
     lockInfoHTLC.setExpirytimesecs(expiryTimeSecs);
     lockInfoHTLC.setTimespec(assetLocksPb.AssetLockHTLC.TimeSpec.EPOCH)
     const lockInfoHTLCSerialized = lockInfoHTLC.serializeBinary();
     const lockInfo = new assetLocksPb.AssetLock();
     lockInfo.setLockmechanism(assetLocksPb.LockMechanism.HTLC);
     lockInfo.setLockinfo(lockInfoHTLCSerialized);
-    return lockInfo.serializeBinary().toString();
+    return Buffer.from(lockInfo.serializeBinary()).toString('base64');
 }
 
 // Create an asset claim structure
 function createAssetClaimInfoSerialized(hashPreimage)
 {
     const claimInfoHTLC = new assetLocksPb.AssetClaimHTLC();
-    claimInfoHTLC.setHashpreimagebase64(Buffer.from(hashPreimage).toString('base64'));
+    claimInfoHTLC.setHashpreimagebase64(Buffer.from(Buffer.from(hashPreimage).toString('base64')));
     const claimInfoHTLCSerialized = claimInfoHTLC.serializeBinary();
     const claimInfo = new assetLocksPb.AssetClaim();
     claimInfo.setLockmechanism(assetLocksPb.LockMechanism.HTLC);
     claimInfo.setClaiminfo(claimInfoHTLCSerialized);
-    return claimInfo.serializeBinary().toString();
+    return Buffer.from(claimInfo.serializeBinary()).toString('base64');
 }
 
 // Create a SHA-256 hash over an ASCII string
