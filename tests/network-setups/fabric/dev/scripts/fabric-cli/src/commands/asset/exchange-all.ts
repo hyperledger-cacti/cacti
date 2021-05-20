@@ -186,6 +186,8 @@ const command: GluegunCommand = {
     // console.log(user2CertN1)
 
     var res
+    var contractId
+    
     try {
       spinner.info(`Trying Asset Lock: ${assetType}, ${assetId}`)
       res = await AssetManager.createHTLC(network1U1.contract,
@@ -206,7 +208,6 @@ const command: GluegunCommand = {
         return
     }
 
-    var contractId
     try {
       spinner.info(`Trying Fungible Asset Lock: ${fungibleAssetType}, ${fungibleAssetAmt}`)
       res = await AssetManager.createFungibleHTLC(network2U2.contract,
@@ -224,14 +225,14 @@ const command: GluegunCommand = {
       spinner.info(`Fungible Asset Locked: ${res.result}`)
     } catch(error) {
         print.error(`Could not Lock Fungible Asset in ${options['network2']}`)
-        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+        res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
-
+    
     try {
       spinner.info(`Trying Fungible Asset Claim: ${contractId}`)
-      res = AssetManager.claimFungibleAssetInHTLC(network2U1.contract,
+      res = await AssetManager.claimFungibleAssetInHTLC(network2U1.contract,
                       contractId,
                       secret)
       if (!res) {
@@ -244,20 +245,34 @@ const command: GluegunCommand = {
             args: []
           }
       currentQuery1.args = [...currentQuery1.args, fungibleAssetType, fungibleAssetAmt, user2CertN2, user1CertN2]
-      invoke(currentQuery1, net2Config.connProfilePath, options['network2'], net2Config.mspId, logger)
+      try {
+          const read = await network2U1.contract.submitTransaction(currentQuery1.ccFunc, ...currentQuery1.args)
+          const state = Buffer.from(read).toString()
+          if (state) {
+            logger.debug(`Response From Network: ${state}`)
+          } else {
+            logger.debug('No Response from network')
+          }
+
+          // Disconnect from the gateway.
+          await network2U1.gateway.disconnect()
+        } catch (error) {
+          console.error(`Failed to submit transaction: ${error}`)
+          throw new Error(error)
+        }
       spinner.info(`Fungible Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim fungible asset in ${options['network2']}`)
-        res = AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
-        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+        res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
+        res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
-
+    
 
     try {
-      spinner.info(`Trying Fungible Asset Claim: ${assetType} ${assetId}`)
-      res = AssetManager.claimAssetInHTLC(network1U2.contract,
+      spinner.info(`Trying Asset Claim: ${assetType} ${assetId}`)
+      res = await AssetManager.claimAssetInHTLC(network1U2.contract,
                       assetType,
                       assetId,
                       user1CertN1,
@@ -272,12 +287,26 @@ const command: GluegunCommand = {
             args: []
           }
       currentQuery2.args = [...currentQuery2.args, assetId, user2CertN1]
-      invoke(currentQuery2, net1Config.connProfilePath, options['network1'], net1Config.mspId, logger)
+      try {
+          const read = await network1U2.contract.submitTransaction(currentQuery2.ccFunc, ...currentQuery2.args)
+          const state = Buffer.from(read).toString()
+          if (state) {
+            logger.debug(`Response From Network: ${state}`)
+          } else {
+            logger.debug('No Response from network')
+          }
+
+          // Disconnect from the gateway.
+          await network1U2.gateway.disconnect()
+        } catch (error) {
+          console.error(`Failed to submit transaction: ${error}`)
+          throw new Error(error)
+        }
       spinner.info(`Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim asset in ${options['network1']}`)
-        res = AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
-        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+        res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
+        res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
@@ -286,7 +315,7 @@ const command: GluegunCommand = {
   }
 }
 
-const waitTillLock = async (contract, assetType, param1, param2, recipient, locker, spinner, requiredResponse, waitMessage) => {
+/*const waitTillLock = async (contract, assetType, param1, param2, recipient, locker, spinner, requiredResponse, waitMessage) => {
   var flag = false
   var tries = 0
   const MAX_TRIES = 10
@@ -309,6 +338,6 @@ const waitTillLock = async (contract, assetType, param1, param2, recipient, lock
   }
 
   return flag
-}
+}*/
 
 module.exports = command
