@@ -21,13 +21,18 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli chaincode invoke --local-network=network1  mychannel interop  Create '["test", "teststate"]'`,
-        'fabric-cli chaincode invoke --local-network=<network1|network2> <channel-name> <contract-name> <function-name> <args>',
+        `fabric-cli chaincode invoke --local-network=network1 mychannel interop  Create '["test", "teststate"]'`,
+        'fabric-cli chaincode invoke --local-network=<network1|network2> --user=<user-id> <channel-name> <contract-name> <function-name> <args>',
         [
           {
             name: '--local-network',
             description:
               'local-network network for command. <network1|network2>'
+          },
+          {
+            name: '--user',
+            description:
+              'user for chaincode invoke. (Optional: Default user is used)'
           },
           {
             name: '--debug',
@@ -48,10 +53,17 @@ const command: GluegunCommand = {
       logger.level = 'debug'
       logger.debug('Debugging is enabled')
     }
+    let userid = ''
+    if (options['user']) {
+      userid = options['user']
+    }
+
     const spinner = print.spin(`Invoking chaincode`)
-    const connProfilePath = getNetworkConfig(options['local-network'])
-      .connProfilePath
-    if (!connProfilePath) {
+
+    const netConfig = getNetworkConfig(options['local-network'])
+    const connProfilePath = netConfig.connProfilePath
+    const mspId = netConfig.mspId
+    if (!connProfilePath || !mspId) {
       print.error(
         `Please use a valid --local-network. No valid environment found for ${options['local-network']} `
       )
@@ -69,7 +81,9 @@ const command: GluegunCommand = {
         },
         connProfilePath,
         options['local-network'],
-        global.__DEFAULT_MSPID__,
+        mspId,
+        userid,
+        true,
         logger
       )
       spinner.succeed(`Response from network: ${JSON.stringify(result)} `)

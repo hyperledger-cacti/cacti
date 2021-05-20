@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package main
+package assetmgmt
 
 import (
     "fmt"
@@ -106,7 +106,10 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgre
         log.Error(err.Error())
         return false, err
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockAsset"), assetAgreementBytes, lockInfoBytes}, "")
+    assetAgreementBytes64 := base64.StdEncoding.EncodeToString(assetAgreementBytes)
+    lockInfoBytes64 := base64.StdEncoding.EncodeToString(lockInfoBytes)
+
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockAsset"), []byte(assetAgreementBytes64), []byte(lockInfoBytes64)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, errors.New(string(iccResp.GetPayload()))
@@ -176,7 +179,10 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
         log.Error(err.Error())
         return "", err
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockFungibleAsset"), assetAgreementBytes, lockInfoBytes}, "")
+    assetAgreementBytes64 := base64.StdEncoding.EncodeToString(assetAgreementBytes)
+    lockInfoBytes64 := base64.StdEncoding.EncodeToString(lockInfoBytes)
+
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockFungibleAsset"), []byte(assetAgreementBytes64), []byte(lockInfoBytes64)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return "", errors.New(string(iccResp.GetPayload()))
@@ -232,7 +238,8 @@ func (am *AssetManagement) IsAssetLocked(stub shim.ChaincodeStubInterface, asset
         log.Error(err.Error())
         return false, err
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("IsAssetLocked"), assetAgreementBytes}, "")
+    assetAgreementBytes64 := base64.StdEncoding.EncodeToString(assetAgreementBytes)
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("IsAssetLocked"), []byte(assetAgreementBytes64)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, errors.New(string(iccResp.GetPayload()))
@@ -332,7 +339,9 @@ func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgr
         log.Error(err.Error())
         return false, err
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimAsset"), assetAgreementBytes, claimInfoBytes}, "")
+    assetAgreementBytes64 := base64.StdEncoding.EncodeToString(assetAgreementBytes)
+    claimInfoBytes64 := base64.StdEncoding.EncodeToString(claimInfoBytes)
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimAsset"), []byte(assetAgreementBytes64), []byte(claimInfoBytes64)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, errors.New(string(iccResp.GetPayload()))
@@ -382,7 +391,8 @@ func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, 
         log.Error(err.Error())
         return false, err
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimFungibleAsset"), []byte(contractId), claimInfoBytes}, "")
+    claimInfoBytes64 := base64.StdEncoding.EncodeToString(claimInfoBytes)
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("ClaimFungibleAsset"), []byte(contractId), []byte(claimInfoBytes64)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, errors.New(string(iccResp.GetPayload()))
@@ -420,7 +430,8 @@ func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetAg
         log.Error(err.Error())
         return false, err
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockAsset"), assetAgreementBytes}, "")
+    assetAgreementBytes64 := base64.StdEncoding.EncodeToString(assetAgreementBytes)
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockAsset"), []byte(assetAgreementBytes64)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, errors.New(string(iccResp.GetPayload()))

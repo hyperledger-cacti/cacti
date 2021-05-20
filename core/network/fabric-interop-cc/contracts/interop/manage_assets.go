@@ -576,7 +576,7 @@ func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionCo
 		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
 	}
 
-	// transaction creator needs to be the locker of the locked fungible asset 
+	// transaction creator needs to be the locker of the locked fungible asset
 	if assetLockVal.Locker != txCreatorECertBase64 {
 		return fmt.Errorf("asset is not locked for %s to unlock", txCreatorECertBase64)
 	}
@@ -615,13 +615,13 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 		return err
 	}
 
-	txCreator, err := ctx.GetStub().GetCreator()
+	txCreatorECertBase64, err := getECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
 	}
 
-	if assetLockVal.Recipient != string(txCreator) {
-		return fmt.Errorf("asset is not locked for %s to claim", string(txCreator))
+	if assetLockVal.Recipient != string(txCreatorECertBase64) {
+		return fmt.Errorf("asset is not locked for %s to claim", string(txCreatorECertBase64))
 	}
 
 	claimInfoBytes, err := base64.StdEncoding.DecodeString(claimInfoBytesBase64)
@@ -843,7 +843,7 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
 	}
 
-	// transaction creator needs to be the recipient of the locked fungible asset 
+	// transaction creator needs to be the recipient of the locked fungible asset
 	if assetLockVal.Recipient != txCreatorECertBase64 {
 		return fmt.Errorf("asset is not locked for %s to claim", txCreatorECertBase64)
 	}
@@ -910,7 +910,7 @@ func (s *SmartContract) UnLockFungibleAsset(ctx contractapi.TransactionContextIn
 		return fmt.Errorf("unable to get the transaction creator information: %+v", err)
 	}
 
-	// transaction creator needs to be the locker of the locked fungible asset 
+	// transaction creator needs to be the locker of the locked fungible asset
 	if assetLockVal.Locker != txCreatorECertBase64 {
 		return fmt.Errorf("asset is not locked for %s to unlock", txCreatorECertBase64)
 	}

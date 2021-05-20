@@ -177,6 +177,26 @@ func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterf
 	return ctx.GetStub().PutState(id, assetJSON)
 }
 
+func (s *SmartContract) GetMyAssets(ctx contractapi.TransactionContextInterface) ([]*BondAsset, error) {
+	owner, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return nil, err
+	}
+	assets, err := s.GetAllAssets(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var myassets []*BondAsset
+
+	for _, asset := range assets {
+		if asset.Owner == owner {
+			myassets = append(myassets, asset)
+		}
+	}
+	return myassets, nil
+}
+
 // GetAllAssets returns all assets found in world state
 func (s *SmartContract) GetAllAssets(ctx contractapi.TransactionContextInterface) ([]*BondAsset, error) {
 	// range query with empty string for startKey and endKey does an
