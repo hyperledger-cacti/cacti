@@ -28,7 +28,7 @@ import (
 type AssetLockValue struct {
 	Locker		string	`json:"locker"`
 	Recipient	string	`json:"recipient"`
-	Hash		string	`json:"hash"`
+	HashBase64	string	`json:"hashBase64"`
 	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
 }
 
@@ -38,7 +38,7 @@ type FungibleAssetLockValue struct {
 	NumUnits	uint64	`json:"numUnits"`
 	Locker		string	`json:"locker"`
 	Recipient	string	`json:"recipient"`
-	Hash		string	`json:"hash"`
+	HashBase64	string	`json:"hashBase64"`
 	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
 }
 
@@ -215,7 +215,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", logThenErrorf(err.Error())
 	}
 
-	assetLockVal := AssetLockValue{Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.HashBase64), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+	assetLockVal := AssetLockValue{Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, HashBase64: string(lockInfoHTLC.HashBase64), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -451,7 +451,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	}
 
 	// compute the hash from the preimage
-	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimageBase64), string(assetLockVal.Hash))
+	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimageBase64), string(assetLockVal.HashBase64))
 	if err != nil {
 		return logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
 	}
@@ -575,7 +575,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 	}
 
 	// compute the hash from the preimage
-	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimageBase64), string(assetLockVal.Hash))
+	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimageBase64), string(assetLockVal.HashBase64))
 	if err != nil {
 		return logThenErrorf("claim asset associated with contractId %s failed with error: %v", contractId, err)
 	}
@@ -658,7 +658,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
 	assetLockVal := FungibleAssetLockValue{Type: assetAgreement.Type, NumUnits: assetAgreement.NumUnits, Locker: assetAgreement.Locker,
-		Recipient: assetAgreement.Recipient, Hash: string(lockInfoHTLC.HashBase64), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+		Recipient: assetAgreement.Recipient, HashBase64: string(lockInfoHTLC.HashBase64), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(contractId)
 	if err != nil {
@@ -760,7 +760,7 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 	}
 
 	// compute the hash from the preimage
-	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimageBase64), string(assetLockVal.Hash))
+	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfo.HashPreimageBase64), string(assetLockVal.HashBase64))
 	if err != nil {
 		return logThenErrorf("claim fungible asset associated with contractId %s failed with error: %v", contractId, err)
 	}
