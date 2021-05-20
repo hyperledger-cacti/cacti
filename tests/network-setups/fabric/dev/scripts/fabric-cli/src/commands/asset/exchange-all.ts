@@ -256,7 +256,7 @@ const command: GluegunCommand = {
 
           // Disconnect from the gateway.
           await network2U1.gateway.disconnect()
-        } catch (error) {
+      } catch (error) {
           console.error(`Failed to submit transaction: ${error}`)
           throw new Error(error)
       }
@@ -298,7 +298,7 @@ const command: GluegunCommand = {
 
           // Disconnect from the gateway.
           await network1U2.gateway.disconnect()
-        } catch (error) {
+      } catch (error) {
           console.error(`Failed to submit transaction: ${error}`)
           throw new Error(error)
       }
