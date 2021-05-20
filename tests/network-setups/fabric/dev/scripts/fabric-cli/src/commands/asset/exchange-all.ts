@@ -135,7 +135,7 @@ const command: GluegunCommand = {
       return
     }
 
-    const network1 = await fabricHelper({
+    const network1U1 = await fabricHelper({
       channel: net1Config.channelName,
       contractName: net1Config.chaincode,
       connProfilePath: net1Config.connProfilePath,
@@ -144,7 +144,25 @@ const command: GluegunCommand = {
       userString: user1
     })
 
-    const network2 = await fabricHelper({
+    const network1U2 = await fabricHelper({
+      channel: net1Config.channelName,
+      contractName: net1Config.chaincode,
+      connProfilePath: net1Config.connProfilePath,
+      networkName: options['network1'],
+      mspId: net1Config.mspId,
+      userString: user2
+    })
+
+    const network2U1 = await fabricHelper({
+      channel: net2Config.channelName,
+      contractName: net2Config.chaincode,
+      connProfilePath: net2Config.connProfilePath,
+      networkName: options['network2'],
+      mspId: net2Config.mspId,
+      userString: user1
+    })
+
+    const network2U2 = await fabricHelper({
       channel: net2Config.channelName,
       contractName: net2Config.chaincode,
       connProfilePath: net2Config.connProfilePath,
@@ -154,14 +172,14 @@ const command: GluegunCommand = {
     })
 
 
-    const user1IdN1 = await network1.wallet.get(user1)
+    const user1IdN1 = await network1U1.wallet.get(user1)
     const user1CertN1 = Buffer.from((user1IdN1).credentials.certificate).toString('base64')
-    const user1IdN2 = await network2.wallet.get(user1)
+    const user1IdN2 = await network2U1.wallet.get(user1)
     const user1CertN2 = Buffer.from((user1IdN2).credentials.certificate).toString('base64')
 
-    const user2IdN1 = await network1.wallet.get(user2)
+    const user2IdN1 = await network1U2.wallet.get(user2)
     const user2CertN1 = Buffer.from((user2IdN1).credentials.certificate).toString('base64')
-    const user2IdN2 = await network2.wallet.get(user2)
+    const user2IdN2 = await network2U2.wallet.get(user2)
     const user2CertN2 = Buffer.from((user2IdN2).credentials.certificate).toString('base64')
 
     // console.log(user1CertN2)
@@ -170,7 +188,7 @@ const command: GluegunCommand = {
     var res
     try {
       spinner.info(`Trying Asset Lock: ${assetType}, ${assetId}`)
-      res = await AssetManager.createHTLC(network1.contract,
+      res = await AssetManager.createHTLC(network1U1.contract,
                       assetType,
                       assetId,
                       user2CertN1,
@@ -191,7 +209,7 @@ const command: GluegunCommand = {
     var contractId
     try {
       spinner.info(`Trying Fungible Asset Lock: ${fungibleAssetType}, ${fungibleAssetAmt}`)
-      res = await AssetManager.createFungibleHTLC(network2.contract,
+      res = await AssetManager.createFungibleHTLC(network2U2.contract,
                       fungibleAssetType,
                       fungibleAssetAmt,
                       user1CertN2,
@@ -206,14 +224,14 @@ const command: GluegunCommand = {
       spinner.info(`Fungible Asset Locked: ${res.result}`)
     } catch(error) {
         print.error(`Could not Lock Fungible Asset in ${options['network2']}`)
-        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId, user2CertN1);
+        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
 
     try {
       spinner.info(`Trying Fungible Asset Claim: ${contractId}`)
-      res = AssetManager.claimFungibleAssetInHTLC(network2.contract,
+      res = AssetManager.claimFungibleAssetInHTLC(network2U1.contract,
                       contractId,
                       secret)
       if (!res) {
@@ -230,8 +248,8 @@ const command: GluegunCommand = {
       spinner.info(`Fungible Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim fungible asset in ${options['network2']}`)
-        res = AssetManager.reclaimFungibleAssetInHTLC(network2.contract, contractId);
-        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId, user2CertN1);
+        res = AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
+        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
@@ -239,7 +257,7 @@ const command: GluegunCommand = {
 
     try {
       spinner.info(`Trying Fungible Asset Claim: ${assetType} ${assetId}`)
-      res = AssetManager.claimAssetInHTLC(network1.contract,
+      res = AssetManager.claimAssetInHTLC(network1U2.contract,
                       assetType,
                       assetId,
                       user1CertN1,
@@ -258,8 +276,8 @@ const command: GluegunCommand = {
       spinner.info(`Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim asset in ${options['network1']}`)
-        res = AssetManager.reclaimFungibleAssetInHTLC(network2.contract, contractId);
-        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId, user2CertN1);
+        res = AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
+        res = AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
         return
     }
