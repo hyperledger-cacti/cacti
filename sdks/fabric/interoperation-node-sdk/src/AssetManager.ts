@@ -44,7 +44,7 @@ function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, rec
 function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
 {
     const lockInfoHTLC = new assetLocksPb.AssetLockHTLC();
-    lockInfoHTLC.setHashbase64(hashValue);
+    lockInfoHTLC.setHashbase64(Buffer.from(hashValue));
     lockInfoHTLC.setExpirytimesecs(expiryTimeSecs);
     lockInfoHTLC.setTimespec(assetLocksPb.AssetLockHTLC.TimeSpec.EPOCH)
     const lockInfoHTLCSerialized = lockInfoHTLC.serializeBinary();
@@ -58,7 +58,7 @@ function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
 function createAssetClaimInfoSerialized(hashPreimage)
 {
     const claimInfoHTLC = new assetLocksPb.AssetClaimHTLC();
-    claimInfoHTLC.setHashpreimagebase64(Buffer.from(hashPreimage).toString('base64'));
+    claimInfoHTLC.setHashpreimagebase64(Buffer.from(Buffer.from(hashPreimage).toString('base64')));
     const claimInfoHTLCSerialized = claimInfoHTLC.serializeBinary();
     const claimInfo = new assetLocksPb.AssetClaim();
     claimInfo.setLockmechanism(assetLocksPb.LockMechanism.HTLC);
