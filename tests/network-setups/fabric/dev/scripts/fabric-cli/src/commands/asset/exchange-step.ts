@@ -10,9 +10,7 @@ import logger from '../../helpers/logger'
 import { commandHelp, getNetworkConfig, handlePromise } from '../../helpers/helpers'
 import { AssetManager } from '@res-dlt-interop/fabric-interop-sdk'
 
-var crypto = require('crypto');
-const ASSETTYPE_ASSET = 0
-const ASSETTYPE_FUNGIBLEASSET = 1
+var crypto = require('crypto')
 
 const command: GluegunCommand = {
   name: 'exchange-step',
@@ -27,38 +25,63 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli asset exchange-step --step=1 --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:Type1:a04:alice:token1:100`,
-        'fabric-cli asset exchange-step --step=<1-6> --network1=<network1|network2> --network2=<network1|network2> --secret=<secret> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> <params>',
+        `fabric-cli asset exchange-step --step=1 --target-network=network1 --secret=secrettext --timeout-duration=100 --locker=bob --recipient=alice --param=Type1:a04`,
+        'fabric-cli asset exchange-step --step=<1-6> --target-network=<network1|network2> --secret=<secret> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> --locker=<locker-userid> --recipient=<recipient-userid> --secret=<preimage> --contract-id=<contract-id> --param=<param>',
         [
           {
             name: '--step',
             description:
-              'Step number of asset exchange protocol. >=1 and <=6'
+              'Step number of asset exchange protocol:\n
+                1: LockAsset \n
+                2: IsAssetLocked \n
+                3: LockFungibleAsset \n
+                4: IsFungibleAssetLocked \n
+                5: ClaimFungibleAsset \n
+                6: ClaimAsset\n
+                7: UnlockAsset\n
+                8: UnlockFungibleAsset'
           },
           {
-            name: '--network1',
+            name: '--target-network',
             description:
-              'Asset network for command. <network1|network2>'
-          },
-          {
-            name: '--network2',
-            description:
-              'Fungible Asset network for command. <network1|network2>'
+              'Target network for command. <network1|network2>'
           },
           {
             name: '--secret',
             description:
-              'secret text to be used Asset owner to hash lock'
+              'secret text to be used Asset owner to hash lock. (Required for step 5, 6)'
           },
           {
             name: '--timeout-epoch',
             description:
-              'Timeout in epoch in seconds. Use only one of the timeout options.'
+              'Timeout in epoch in seconds. Use only one of the timeout options. (Only required for Step 1,3)'
           },
           {
             name: '--timeout-duration',
             description:
-              'Timeout duration in seconds. Use only one of the timeout options.'
+              'Timeout duration in seconds. Use only one of the timeout options. (Only required for Step 1,3)'
+          },
+          {
+            name: '--locker',
+            description:
+              'Locker User Id: Must be already registered in target-network (Required for All steps)'
+          },
+          {
+            name: '--recipient',
+            description:
+              'Recipient User Id: Must be already registered in target-network (Required for All steps)'
+          },
+          {
+            name: '--contract-id',
+            description:
+              'Contract Id: Required for step 4,5 i.e. IsFungibleAssetLocked/ClaimFungibleAsset'
+          },
+          {
+            name: '--param',
+            description:
+              'Param: AssetType:AssetId for Non-Fungible Assets\n
+                FungibleAssetType:NumUnits for Fungible Assets\n
+                (Required for steps 1-3)'
           },
           {
             name: '--debug',
@@ -71,10 +94,6 @@ const command: GluegunCommand = {
       )
       return
     }
-    if (array.length < 1) {
-      print.error('Not enough arguments supplied')
-      return
-    }
     if (options.debug === 'true') {
       logger.level = 'debug'
       logger.debug('Debugging is enabled')
@@ -83,11 +102,20 @@ const command: GluegunCommand = {
       print.error('Step number not provided.')
       return
     }
-    if (!options['network1'] || !options['network2'])
+    if (!options['target-network'])
     {
-      print.error('--network1 and --network2 both needs to specified')
+      print.error('--target-network needs to specified')
       return
     }
+    if (!options['locker'] || !options['recipient'])
+    {
+      print.error('Locker and Recipient both needs to be specified')
+      return
+    }
+
+    // Locker and Recipient
+    const locker = options['locker']
+    const recipient = options['recipient']
 
     // Hash Pre-image
     let secret = ''
@@ -111,97 +139,67 @@ const command: GluegunCommand = {
       timeout2=currTime + 2 * options['timeout-duration']
     }
 
-    const params = array[0].split(':')
-    const user1 = params[0]
-    const assetType = params[1]
-    const assetId = params[2]
-    const user2 = params[3]
-    const fungibleAssetType = params[4]
-    const fungibleAssetAmt = parseInt(params[5])
-
-    // console.log(secret, timeout)
-    // console.log(user1, assetType, assetId)
-    // console.log(user2, fungibleAssetType, fungibleAssetAmt)
+    let param1, param2
+    if (option['param']) {
+      const params = option['param'].split(':')
+      param1 = params[0]
+      param2 = params[1]
+    }
 
     const spinner = print.spin(`Asset Exchange:\n`)
 
-    const net1Config = getNetworkConfig(options['network1'])
-    const net2Config = getNetworkConfig(options['network2'])
-    if (!net1Config.connProfilePath || !net1Config.channelName || !net1Config.chaincode) {
+    const netConfig = getNetworkConfig(options['target-network'])
+    if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
       print.error(
-        `Please use a valid --network1. No valid environment found for ${options['network1']} `
-      )
-      spinner.fail(`Error`)
-      return
-    }
-    if (!net2Config.connProfilePath || !net2Config.channelName || !net2Config.chaincode) {
-      print.error(
-        `Please use a valid --network2. No valid environment found for ${options['network2']} `
+        `Please use a valid --target-network. No valid environment found for ${options['target-network']} `
       )
       spinner.fail(`Error`)
       return
     }
 
-    const network1U1 = await fabricHelper({
-      channel: net1Config.channelName,
-      contractName: net1Config.chaincode,
-      connProfilePath: net1Config.connProfilePath,
-      networkName: options['network1'],
-      mspId: net1Config.mspId,
-      userString: user1
+    const networkL = await fabricHelper({
+      channel: netConfig.channelName,
+      contractName: netConfig.chaincode,
+      connProfilePath: netConfig.connProfilePath,
+      networkName: options['target-network'],
+      mspId: netConfig.mspId,
+      userString: locker
     })
 
-    const network1U2 = await fabricHelper({
-      channel: net1Config.channelName,
-      contractName: net1Config.chaincode,
-      connProfilePath: net1Config.connProfilePath,
-      networkName: options['network1'],
-      mspId: net1Config.mspId,
-      userString: user2
+    const networkR = await fabricHelper({
+      channel: netConfig.channelName,
+      contractName: netConfig.chaincode,
+      connProfilePath: netConfig.connProfilePath,
+      networkName: options['target-network'],
+      mspId: netConfig.mspId,
+      userString: recipient
     })
 
-    const network2U1 = await fabricHelper({
-      channel: net2Config.channelName,
-      contractName: net2Config.chaincode,
-      connProfilePath: net2Config.connProfilePath,
-      networkName: options['network2'],
-      mspId: net2Config.mspId,
-      userString: user1
-    })
+    const lockerId = await networkL.wallet.get(locker)
+    const lockerCert = Buffer.from((lockerId).credentials.certificate).toString('base64')
 
-    const network2U2 = await fabricHelper({
-      channel: net2Config.channelName,
-      contractName: net2Config.chaincode,
-      connProfilePath: net2Config.connProfilePath,
-      networkName: options['network2'],
-      mspId: net2Config.mspId,
-      userString: user2
-    })
-
-
-    const user1IdN1 = await network1U1.wallet.get(user1)
-    const user1CertN1 = Buffer.from((user1IdN1).credentials.certificate).toString('base64')
-    const user1IdN2 = await network2U1.wallet.get(user1)
-    const user1CertN2 = Buffer.from((user1IdN2).credentials.certificate).toString('base64')
-
-    const user2IdN1 = await network1U2.wallet.get(user2)
-    const user2CertN1 = Buffer.from((user2IdN1).credentials.certificate).toString('base64')
-    const user2IdN2 = await network2U2.wallet.get(user2)
-    const user2CertN2 = Buffer.from((user2IdN2).credentials.certificate).toString('base64')
+    const recipientId = await networkR.wallet.get(recipient)
+    const recipientCert = Buffer.from((recipientId).credentials.certificate).toString('base64')
 
     var res
-    var contractId
 
     if (options['step']===true) {
         spinner.fail('Asset Exchange: Invalid Step number. Exiting.')
     }
     else if (options['step']=='1') {
+      if (!options['param']) {
+        print.error(
+          `Please provide a asset type and id in --param`
+        )
+        spinner.fail(`Error`)
+        return
+      }
       try {
-        spinner.info(`Trying Asset Lock: ${assetType}, ${assetId}`)
-        res = await AssetManager.createHTLC(network1U1.contract,
-                        assetType,
-                        assetId,
-                        user2CertN1,
+        spinner.info(`Trying Asset Lock: ${param1}, ${param2} by ${locker} for ${recipient}`)
+        res = await AssetManager.createHTLC(networkL.contract,
+                        param1,
+                        param2,
+                        recipientCert,
                         secret,
                         hash_secret,
                         timeout2,
@@ -209,9 +207,9 @@ const command: GluegunCommand = {
         if (!res.result) {
           throw new Error()
         }
-        spinner.info(`Asset Locked: ${res.result}`)
+        spinner.info(`Asset Locked: ${res.result}, preimage: ${res.preimage}`)
       } catch(error) {
-          print.error(`Could not Lock Asset in ${options['network1']}`)
+          print.error(`Could not Lock Asset in ${options['target-network']}`)
           spinner.fail(`Error`)
           return
       }
@@ -219,30 +217,43 @@ const command: GluegunCommand = {
     }
 
     else if (options['step']=='2') {
-      res = await waitTillLock(network1.contract,
-                  ASSETTYPE_ASSET,
-                  assetType,
-                  assetId,
-                  user2CertN1,
-                  user1CertN1,
-                  spinner,
-                  true,
-                  'Waiting for Asset to be locked...');
-      if (!res) {
-        print.error(`Asset is not Locked in ${options['network1']}`)
+      if (!options['param']) {
+        print.error(
+          `Please provide a asset type and id in --param`
+        )
         spinner.fail(`Error`)
         return
+      }
+      try {
+        spinner.info(`Testing if asset is locked: ${param1}, ${param2} by ${locker} for ${recipient}`)
+        res = await AssetManager.isAssetLockedInHTLC(networkR.contract,
+                        param1,
+                        param2,
+                        recipientCert,
+                        lockerCert)
+        spinner.info(`Is Asset Locked Return: ${res}`)
+      } catch(error) {
+          print.error(`Could not call isAssetLockedInHTLC in ${options['target-network']}`)
+          spinner.fail(`Error`)
+          return
       }
       spinner.succeed('Asset Exchange: Step 2 Complete.')
     }
 
     else if (options['step']=='3') {
+      if (!options['param']) {
+        print.error(
+          `Please provide a fungible asset type and num of units in --param`
+        )
+        spinner.fail(`Error`)
+        return
+      }
       try {
-        spinner.info(`Trying Fungible Asset Lock: ${fungibleAssetType}, ${fungibleAssetAmt}`)
-        res = await AssetManager.createFungibleHTLC(network2U2.contract,
-                        fungibleAssetType,
-                        fungibleAssetAmt,
-                        user1CertN2,
+        spinner.info(`Trying Fungible Asset Lock: ${param1}, ${param2} by ${locker} for ${recipient}`)
+        res = await AssetManager.createFungibleHTLC(networkL.contract,
+                        param1,
+                        param2,
+                        recipientCert,
                         secret,
                         hash_secret,
                         timeout,
@@ -251,10 +262,9 @@ const command: GluegunCommand = {
           throw new Error()
         }
         contractId = res.result
-        spinner.info(`Fungible Asset Locked: ${res.result}`)
+        spinner.info(`Fungible Asset Locked, ContractId: ${res.result}, preimage: ${res.preimage}`)
       } catch(error) {
-          print.error(`Could not Lock Fungible Asset in ${options['network2']}`)
-          res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+          print.error(`Could not Lock Fungible Asset in ${options['target-network']}`)
           spinner.fail(`Error`)
           return
       }
@@ -262,42 +272,60 @@ const command: GluegunCommand = {
     }
 
     else if (options['step']=='4') {
-      res = await waitTillLock(network2.contract,
-                  ASSETTYPE_FUNGIBLEASSET,
-                  fungibleAssetType,
-                  fungibleAssetAmt,
-                  user1CertN2,
-                  user2CertN2,
-                  spinner,
-                  true,
-                  'Waiting for Fungible Asset to be locked...');
-      if (!res) {
-        print.error(`Fungible Asset is not Locked in ${options['network2']}`)
+      if (!options['contract-id']) {
+        print.error(
+          `Please provide the contract id`
+        )
         spinner.fail(`Error`)
-        res = AssetManager.reclaimAssetInHTLC(network1.contract, assetType, assetId, user2CertN1, user1CertN1);
         return
+      }
+      const contractId = options['contract-id']
+      try {
+        spinner.info(`Testing if fungible asset is locked: ${contractId}`)
+        res = await AssetManager.isFungibleAssetLockedInHTLC(networkR.contract,
+                        contractId)
+        spinner.info(`Is Fungible Asset Locked Return: ${res}`)
+      } catch(error) {
+          print.error(`Could not call isFungibleAssetLockedInHTLC in ${options['target-network']}`)
+          spinner.fail(`Error`)
+          return
       }
       spinner.succeed('Asset Exchange: Step 4 Complete.')
     }
 
     else if (options['step']=='5') {
+      if (!options['secret']) {
+        print.error(
+          `Please provide the preimage in --secret`
+        )
+        spinner.fail(`Error`)
+        return
+      }
+      if (!options['contract-id']) {
+        print.error(
+          `Please provide the contract id`
+        )
+        spinner.fail(`Error`)
+        return
+      }
+      const contractId = options['contract-id']
       try {
         spinner.info(`Trying Fungible Asset Claim: ${contractId}`)
-        res = await AssetManager.claimFungibleAssetInHTLC(network2U1.contract,
+        res = await AssetManager.claimFungibleAssetInHTLC(networkR.contract,
                         contractId,
                         secret)
         if (!res) {
           throw new Error()
         }
-        const currentQuery1 = {
-              channel: net2Config.channelName,
-              contractName: net2Config.chaincode,
+        const currentQuery = {
+              channel: netConfig.channelName,
+              contractName: netConfig.chaincode,
               ccFunc: 'TransferTokenAssets',
               args: []
             }
-        currentQuery1.args = [...currentQuery1.args, fungibleAssetType, fungibleAssetAmt, user2CertN2, user1CertN2]
+        currentQuery.args = [...currentQuery.args, param1, param2, lockerCert, recipientCert]
         try {
-            const read = await network2U1.contract.submitTransaction(currentQuery1.ccFunc, ...currentQuery1.args)
+            const read = await networkL.contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
             const state = Buffer.from(read).toString()
             if (state) {
               logger.debug(`Response From Network: ${state}`)
@@ -306,16 +334,14 @@ const command: GluegunCommand = {
             }
 
             // Disconnect from the gateway.
-            await network2U1.gateway.disconnect()
+            await networkL.gateway.disconnect()
         } catch (error) {
             console.error(`Failed to submit transaction: ${error}`)
             throw new Error(error)
         }
         spinner.info(`Fungible Asset Claimed: ${res}`)
       } catch(error) {
-          print.error(`Could not claim fungible asset in ${options['network2']}`)
-          res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
-          res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+          print.error(`Could not claim fungible asset in ${options['target-network']}`)
           spinner.fail(`Error`)
           return
       }
@@ -323,25 +349,32 @@ const command: GluegunCommand = {
     }
 
     else if (options['step']=='6') {
+      if (!options['secret']) {
+        print.error(
+          `Please provide the preimage in --secret`
+        )
+        spinner.fail(`Error`)
+        return
+      }
       try {
         spinner.info(`Trying Asset Claim: ${assetType} ${assetId}`)
-        res = await AssetManager.claimAssetInHTLC(network1U2.contract,
-                        assetType,
-                        assetId,
-                        user1CertN1,
+        res = await AssetManager.claimAssetInHTLC(networkR.contract,
+                        param1,
+                        param2,
+                        lockerCert,
                         secret)
         if (!res) {
           throw new Error()
         }
-        const currentQuery2 = {
-              channel: net1Config.channelName,
-              contractName: net1Config.chaincode,
+        const currentQuery = {
+              channel: netConfig.channelName,
+              contractName: netConfig.chaincode,
               ccFunc: 'UpdateOwner',
               args: []
             }
-        currentQuery2.args = [...currentQuery2.args, assetId, user2CertN1]
+        currentQuery.args = [...currentQuery.args, param2, recipientCert]
         try {
-            const read = await network1U2.contract.submitTransaction(currentQuery2.ccFunc, ...currentQuery2.args)
+            const read = await networkL.contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
             const state = Buffer.from(read).toString()
             if (state) {
               logger.debug(`Response From Network: ${state}`)
@@ -350,20 +383,65 @@ const command: GluegunCommand = {
             }
 
             // Disconnect from the gateway.
-            await network1U2.gateway.disconnect()
+            await networkR.gateway.disconnect()
         } catch (error) {
             console.error(`Failed to submit transaction: ${error}`)
             throw new Error(error)
         }
         spinner.info(`Asset Claimed: ${res}`)
       } catch(error) {
-          print.error(`Could not claim asset in ${options['network1']}`)
-          res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
-          res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
+          print.error(`Could not claim asset in ${options['target-network']}`)
           spinner.fail(`Error`)
           return
       }
       spinner.succeed('Asset Exchange: All Steps Complete.')
+    }
+    else if (options['step']=='7') {
+      if (!options['param']) {
+        print.error(
+          `Please provide a asset type and id in --param`
+        )
+        spinner.fail(`Error`)
+        return
+      }
+      try {
+        spinner.info(`Trying Asset Unlock: ${param1} ${param2}`)
+        res = await AssetManager.reclaimAssetInHTLC(networkL.contract,
+                                    param1,
+                                    param2,
+                                    recipientCert);
+        if (!res) {
+          throw new Error()
+        }
+        spinner.succeed(`Asset Reclaimed: ${res}`)
+      } catch(error) {
+          print.error(`Could not claim asset in ${options['target-network']}`)
+          spinner.fail(`Error`)
+          return
+      }
+    }
+    else if (options['step']=='8') {
+      if (!options['contract-id']) {
+        print.error(
+          `Please provide the contract id`
+        )
+        spinner.fail(`Error`)
+        return
+      }
+      const contractId = options['contract-id']
+      try {
+        spinner.info(`Trying Fungible Asset Unlock, contractId: ${contractId}`)
+        res = await res = await AssetManager.reclaimFungibleAssetInHTLC(networkL.contract,
+                                      contractId);
+        if (!res) {
+          throw new Error()
+        }
+        spinner.succeed(`Fungible Asset Reclaimed: ${res}`)
+      } catch(error) {
+          print.error(`Could not claim asset in ${options['target-network']}`)
+          spinner.fail(`Error`)
+          return
+      }
     }
     else {
       spinner.fail('Asset Exchange: Invalid Step number. Exiting.')
@@ -372,29 +450,5 @@ const command: GluegunCommand = {
   }
 }
 
-const waitTillLock = async (contract, assetType, param1, param2, recipient, locker, spinner, requiredResponse, waitMessage) => {
-  var flag = false
-  var tries = 0
-  const MAX_TRIES = 10
-  var res
-  while (!flag && tries <= MAX_TRIES) {
-    if (assetType == ASSETTYPE_ASSET) {
-      res = await AssetManager.isAssetLockedInHTLC(contract, param1, param2, recipient, locker)
-    }
-    else if (assetType == ASSETTYPE_FUNGIBLEASSET) {
-      res = await AssetManager.isFungibleAssetLockedInHTLC(contract, param1, param2, recipient, locker)
-    }
-    spinner.info(Promise.resolve(res))
-    flag = res == requiredResponse
-    tries += 1
-    if (!flag) {
-      setTimeout(function timer() {
-        spinner.info(`${waitMessage}`);
-      }, 5000);
-    }
-  }
-
-  return flag
-}
 
 module.exports = command

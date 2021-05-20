@@ -11,8 +11,6 @@ import { commandHelp, getNetworkConfig, handlePromise } from '../../helpers/help
 import { AssetManager } from '@res-dlt-interop/fabric-interop-sdk'
 
 var crypto = require('crypto');
-const ASSETTYPE_ASSET = 0
-const ASSETTYPE_FUNGIBLEASSET = 1
 
 const command: GluegunCommand = {
   name: 'exchange-all',
@@ -315,29 +313,5 @@ const command: GluegunCommand = {
   }
 }
 
-/*const waitTillLock = async (contract, assetType, param1, param2, recipient, locker, spinner, requiredResponse, waitMessage) => {
-  var flag = false
-  var tries = 0
-  const MAX_TRIES = 10
-  var res
-  while (!flag && tries <= MAX_TRIES) {
-    if (assetType == ASSETTYPE_ASSET) {
-      res = await AssetManager.isAssetLockedInHTLC(contract, param1, param2, recipient, locker)
-    }
-    else if (assetType == ASSETTYPE_FUNGIBLEASSET) {
-      res = await AssetManager.isFungibleAssetLockedInHTLC(contract, param1)
-    }
-    spinner.info(Promise.resolve(res))
-    flag = res == requiredResponse
-    tries += 1
-    if (!flag) {
-      setTimeout(function timer() {
-        spinner.info(`${waitMessage}`);
-      }, 5000);
-    }
-  }
-
-  return flag
-}*/
 
 module.exports = command
