@@ -2,6 +2,7 @@
 
 - [Where does the project name come from?](#where-does-the-project-name-come-from)
 - [Re-building the code after I change it slow. What to do?](#re-building-the-code-after-i-change-it-slow-what-to-do)
+- [The watch script fails with `Internal watch failed: watch ENOSPC`](#the-watch-script-fails-with-internal-watch-failed-watch-enospc)
 - [How can I not re-build the whole project every time I make a small change?](#how-can-i-not-re-build-the-whole-project-every-time-i-make-a-small-change)
 - [Why do you need all these packages/monorepo? It looks complicated!](#why-do-you-need-all-these-packagesmonorepo-it-looks-complicated)
 - [Prototyping something and the linter blocking my builds is slowing me down needlessly](#prototyping-something-and-the-linter-blocking-my-builds-is-slowing-me-down-needlessly)
@@ -32,6 +33,22 @@ Note: You need to make a change to trigger the re-build via the watch script,
 so if you started the script after having made a change then quickly make
 another change such as adding a new line or something like it in order to trigger
 the file save which will in turn trigger the re-build.
+
+## The watch script fails with `Internal watch failed: watch ENOSPC`
+
+This happens because by default your operating system is configured to limit
+the number of files watchable to a number lower than the number of source files
+are there in the project that needs to be watched for changes.
+
+How the raising of this limit can be done will depend heavily on the operating
+system and its version that you use, but for Ubuntu 20.04 and likely its sibling
+versions the solution presented should work:
+
+```sh
+echo fs.inotify.max_user_watches=582222 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+```
+[Stackoverflow.com - Node.JS: Getting error : [nodemon] Internal watch failed: watch ENOSPC](https://stackoverflow.com/a/34664097/698470)
+
 
 ## How can I not re-build the whole project every time I make a small change?
 
@@ -68,7 +85,7 @@ with something like this for example:
 
 ## What are the minimum and recommended hardware specs? Do you have a cool story about this?
 
-> If and when people read this in the future, always inflate the numbers 
+> If and when people read this in the future, always inflate the numbers
 > a bit as we continue to add more and more tests every day (test automation is
 > very important to us)
 
@@ -78,7 +95,7 @@ with something like this for example:
 - **A recommended** setup would be for a dev machine in my opinion is **16 GB RAM 4 CPU**
 **cores (8 threads)** and of course SSD for persistent storage.
 
-- Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only 
+- Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only
 tests that failed were the Corda ones because those are hungrier than the others.
 
 
