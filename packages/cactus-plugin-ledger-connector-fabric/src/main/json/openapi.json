@@ -247,7 +247,8 @@
                 "type": "string",
                 "enum": [
                     "FabricContractInvocationType.SEND",
-                    "FabricContractInvocationType.CALL"
+                    "FabricContractInvocationType.CALL",
+                    "FabricContractInvocationType.SENDPRIVATE"
                 ]
             },
             "SSHExecCommandResponse": {
@@ -288,6 +289,10 @@
                     "params"
                 ],
                 "properties": {
+                    "transientData": {
+                        "type": "object",
+                        "nullable": true
+                    },
                     "signingCredential": {
                         "$ref": "#/components/schemas/FabricSigningCredential",
                         "nullable": false
@@ -316,6 +321,16 @@
                         "nullable": false
                     },
                     "params": {
+                        "type": "array",
+                        "nullable": false,
+                        "default": [],
+                        "items": {
+                            "type": "string",
+                            "nullable": true
+                        }
+                    },
+
+                    "endorsingParties": {
                         "type": "array",
                         "nullable": false,
                         "default": [],
