@@ -1,19 +1,14 @@
 import path from "path";
-import { gte } from "semver";
-import { AddressInfo } from "net";
+import type { AddressInfo } from "net";
 import tls from "tls";
 import { Server, createServer } from "http";
-import { Server as SecureServer } from "https";
+import type { Server as SecureServer } from "https";
 import { createServer as createSecureServer } from "https";
+import { gte } from "semver";
 import npm from "npm";
 import expressHttpProxy from "express-http-proxy";
-import express, {
-  Express,
-  Request,
-  Response,
-  RequestHandler,
-  Application,
-} from "express";
+import type { Application, Request, Response, RequestHandler } from "express";
+import express from "express";
 import { OpenApiValidator } from "express-openapi-validator";
 import compression from "compression";
 import bodyParser from "body-parser";
@@ -377,7 +372,7 @@ export class ApiServer {
       },
     });
 
-    const app: Express = express();
+    const app: Application = express();
     app.use("/api/v*", apiProxyMiddleware);
     app.use(compression());
     app.use(corsMiddleware);
