@@ -1,45 +1,22 @@
-# `@hyperledger/cactus-plugin-ledger-connector-corda`
+# `@hyperledger/cactus-plugin-ledger-connector-corda` <!-- omit in toc -->
 
-> TODO: description
+## Table of Contents <!-- omit in toc -->
 
-### Usage Prometheus
-The prometheus exporter object is initialized in the `PluginLedgerConnectorCorda` class constructor itself, so instantiating the object of the `PluginLedgerConnectorCorda` class, gives access to the exporter object.
-You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginLedgerConnectorCordaOptions` interface for `PluginLedgerConnectoCorda` constructor.
-
-`getPrometheusExporterMetricsEndpointV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime the `transact()` method of the `PluginLedgerConnectorCorda` class is called.
-
-### Prometheus Integration
-To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
-Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
-
-```(yaml)
-- job_name: 'corda_ledger_connector_exporter'
-  metrics_path: api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
-  scrape_interval: 5s
-  static_configs:
-    - targets: ['{host}:{port}']
-```
-
-Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
-`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics`
-
-Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
-On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus_corda_total_tx_count** and click **execute**
-
-### Helper code
-
-###### response.type.ts
-This file contains the various responses of the metrics.
-
-###### data-fetcher.ts
-This file contains functions encasing the logic to process the data points
-
-###### metrics.ts
-This file lists all the prometheus metrics and what they are used for.
+- [Usage](#usage)
+  - [Custom Configuration via Env Variables](#custom-configuration-via-env-variables)
+- [Building Docker Image Locally](#building-docker-image-locally)
+- [Example NodeDiagnosticInfo JSON Response](#example-nodediagnosticinfo-json-response)
+- [Monitoring](#monitoring)
+  - [Usage Prometheus](#usage-prometheus)
+  - [Prometheus Integration](#prometheus-integration)
+  - [Helper code](#helper-code)
+        - [response.type.ts](#responsetypets)
+        - [data-fetcher.ts](#data-fetcherts)
+        - [metrics.ts](#metricsts)
 
 ## Usage
 
-Take a look at how the API client can be used to run transactions on a corda ledger:
+Take a look at how the API client can be used to run transactions on a Corda ledger:
 `packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server.test.ts`
 
 
@@ -282,3 +259,40 @@ DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/s
   ]
 }
 ```
+
+## Monitoring
+
+### Usage Prometheus
+The prometheus exporter object is initialized in the `PluginLedgerConnectorCorda` class constructor itself, so instantiating the object of the `PluginLedgerConnectorCorda` class, gives access to the exporter object.
+You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginLedgerConnectorCordaOptions` interface for `PluginLedgerConnectoCorda` constructor.
+
+`getPrometheusExporterMetricsEndpointV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime the `transact()` method of the `PluginLedgerConnectorCorda` class is called.
+
+### Prometheus Integration
+To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
+Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
+
+```(yaml)
+- job_name: 'corda_ledger_connector_exporter'
+  metrics_path: api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
+  scrape_interval: 5s
+  static_configs:
+    - targets: ['{host}:{port}']
+```
+
+Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
+`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics`
+
+Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
+On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus_corda_total_tx_count** and click **execute**
+
+### Helper code
+
+###### response.type.ts
+This file contains the various responses of the metrics.
+
+###### data-fetcher.ts
+This file contains functions encasing the logic to process the data points
+
+###### metrics.ts
+This file lists all the prometheus metrics and what they are used for.
