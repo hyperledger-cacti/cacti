@@ -511,7 +511,8 @@ export interface DeploymentTargetOrganization {
  */
 export enum FabricContractInvocationType {
     SEND = 'FabricContractInvocationType.SEND',
-    CALL = 'FabricContractInvocationType.CALL'
+    CALL = 'FabricContractInvocationType.CALL',
+    SENDPRIVATE = 'FabricContractInvocationType.SENDPRIVATE'
 }
 
 /**
@@ -617,6 +618,12 @@ export interface InlineResponse501 {
 export interface RunTransactionRequest {
     /**
      * 
+     * @type {object}
+     * @memberof RunTransactionRequest
+     */
+    transientData?: object | null;
+    /**
+     * 
      * @type {FabricSigningCredential}
      * @memberof RunTransactionRequest
      */
@@ -651,6 +658,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     params: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RunTransactionRequest
+     */
+    endorsingParties?: Array<string>;
 }
 /**
  * 

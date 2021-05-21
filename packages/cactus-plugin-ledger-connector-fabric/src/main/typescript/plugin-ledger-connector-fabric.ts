@@ -20,6 +20,7 @@ import {
   Identity,
   InMemoryWallet,
   X509WalletMixin,
+  TransientMap,
 } from "fabric-network";
 
 import { Optional } from "typescript-optional";
@@ -232,8 +233,9 @@ export class PluginLedgerConnectorFabric
 
     const ssh = new NodeSSH();
     await ssh.connect(opts.sshConfig);
-    log.debug(`SSH connection OK`);
-
+    if (req.collectionsConfigFile) {
+      log.debug(`Has private data collection definition`);
+    }
     try {
       const {
         sourceFiles,
@@ -809,6 +811,8 @@ export class PluginLedgerConnectorFabric
       invocationType,
       methodName: fnName,
       params,
+      transientData,
+      endorsingParties,
     } = req;
 
     const gateway = new Gateway();
@@ -870,6 +874,41 @@ export class PluginLedgerConnectorFabric
         }
         case FabricContractInvocationType.SEND: {
           out = await contract.submitTransaction(fnName, ...params);
+          success = true;
+          break;
+        }
+        case FabricContractInvocationType.SENDPRIVATE: {
+          if (!transientData) {
+            const message =
+              "Set transaction to send Transient Data but it was not provided";
+            throw new Error(`${fnTag} ${message}`);
+          }
+
+          const transientMap: TransientMap = transientData as TransientMap;
+
+          try {
+            //Obtains and parses each component of transient data
+            for (const key in transientMap) {
+              transientMap[key] = Buffer.from(
+                JSON.stringify(transientMap[key]),
+              );
+            }
+          } catch (ex) {
+            this.log.error(`Building transient map crashed: `, ex);
+            throw new Error(
+              `${fnTag} Unable to build the transient map: ${ex.message}`,
+            );
+          }
+
+          const transactionProposal = await contract.createTransaction(fnName);
+
+          if (endorsingParties) {
+            endorsingParties.forEach((org) => {
+              transactionProposal.setEndorsingOrganizations(org);
+            });
+          }
+
+          out = await transactionProposal.setTransient(transientMap).submit();
           success = true;
           break;
         }
