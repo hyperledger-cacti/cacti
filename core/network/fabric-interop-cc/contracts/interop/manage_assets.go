@@ -501,7 +501,7 @@ func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface
 }
 
 // UnLockAsset cc is used to record unlocking of an asset on the ledger (this uses the contractId)
-func (s *SmartContract) UnLockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
+func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
 
 	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {

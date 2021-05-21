@@ -67,12 +67,13 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
     }
 
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
-    retVal, err := amc.assetManagement.LockAsset(ctx.GetStub(), assetAgreement, lockInfo)
+    contractId, err := amc.assetManagement.LockAsset(ctx.GetStub(), assetAgreement, lockInfo)
     if err == nil {
         lockInfoHTLC := &common.AssetLockHTLC{}
         err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
         if err == nil {
             contractInfo := &common.AssetContractHTLC{
+                ContractId: contractId,
                 Agreement: assetAgreement,
                 Lock: lockInfoHTLC,
             }
@@ -86,7 +87,7 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
             log.Warn(err.Error())
         }
     }
-    return retVal, err
+    return contractId, err
 }
 
 func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
@@ -125,13 +126,13 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
     }
 
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
-    retVal, err := amc.assetManagement.LockFungibleAsset(ctx.GetStub(), assetAgreement, lockInfo)
+    contractId, err := amc.assetManagement.LockFungibleAsset(ctx.GetStub(), assetAgreement, lockInfo)
     if err == nil {
         lockInfoHTLC := &common.AssetLockHTLC{}
         err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
         if err == nil {
             contractInfo := &common.FungibleAssetContractHTLC{
-                ContractId: retVal,
+                ContractId: contractId,
                 Agreement: assetAgreement,
                 Lock: lockInfoHTLC,
             }
@@ -145,7 +146,7 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
             log.Warn(err.Error())
         }
     }
-    return retVal, err
+    return contractId, err
 }
 
 func (amc *AssetManagementContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
@@ -172,10 +173,16 @@ func (amc *AssetManagementContract) IsAssetLocked(ctx contractapi.TransactionCon
 
 func (amc *AssetManagementContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
     if len(contractId) == 0 {
-        log.Error("empty contract id")
-        return false, fmt.Errorf("empty contract id")
+        return false, logThenErrorf("empty contract id")
     }
     return amc.assetManagement.IsFungibleAssetLocked(ctx.GetStub(), contractId)
+}
+
+func (amc *AssetManagementContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+    if len(contractId) == 0 {
+        return false, logThenErrorf("empty contract id")
+    }
+    return amc.assetManagement.IsAssetLockedQueryUsingContractId(ctx.GetStub(), contractId)
 }
 
 func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
@@ -283,6 +290,49 @@ func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.Transacti
     return retVal, err
 }
 
+func (amc *AssetManagementContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+
+    // Decoding from base64
+    claimInfoSerializedProto, err := base64.StdEncoding.DecodeString(claimInfoSerializedProto64)
+    if err != nil {
+      return false, logThenErrorf(err.Error())
+    }
+
+    if len(contractId) == 0 {
+        return false, logThenErrorf("empty contract id")
+    }
+    claimInfo := &common.AssetClaim{}
+    if len(claimInfoSerializedProto) == 0 {
+        return false, logThenErrorf("empty claim info")
+    }
+    err = proto.Unmarshal([]byte(claimInfoSerializedProto), claimInfo)
+    if err != nil {
+        return false, logThenErrorf(err.Error())
+    }
+
+    // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
+    retVal, err := amc.assetManagement.ClaimAssetUsingContractId(ctx.GetStub(), contractId, claimInfo)
+    if retVal && err == nil {
+        claimInfoHTLC := &common.AssetClaimHTLC{}
+        err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
+        if err == nil {
+            contractInfo := &common.AssetContractHTLC{
+                ContractId: contractId,
+                Claim: claimInfoHTLC,
+            }
+            contractInfoBytes, err := proto.Marshal(contractInfo)
+            if err == nil {
+                err = ctx.GetStub().SetEvent("ClaimAssetUsingContractId", contractInfoBytes)
+            }
+        }
+        if err != nil {
+            log.Warn("Unable to set 'ClaimAssetUsingContractId' event")
+            log.Warn(err.Error())
+        }
+    }
+    return retVal, err
+}
+
 func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
 
     // Decoding from base64
@@ -330,7 +380,7 @@ func (amc *AssetManagementContract) UnlockFungibleAsset(ctx contractapi.Transact
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.UnlockFungibleAsset(ctx.GetStub(), contractId)
     if retVal && err == nil {
-        contractInfo := &common.AssetContractHTLC{
+        contractInfo := &common.FungibleAssetContractHTLC{
             ContractId: contractId,
         }
         contractInfoBytes, err := proto.Marshal(contractInfo)
@@ -339,6 +389,29 @@ func (amc *AssetManagementContract) UnlockFungibleAsset(ctx contractapi.Transact
         }
         if err != nil {
             log.Warn("Unable to set 'UnlockFungibleAsset' event")
+            log.Warn(err.Error())
+        }
+    }
+    return retVal, err
+}
+
+func (amc *AssetManagementContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+    if len(contractId) == 0 {
+        return false, logThenErrorf("empty contract id")
+    }
+
+    // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
+    retVal, err := amc.assetManagement.UnlockAssetUsingContractId(ctx.GetStub(), contractId)
+    if retVal && err == nil {
+        contractInfo := &common.AssetContractHTLC{
+            ContractId: contractId,
+        }
+        contractInfoBytes, err := proto.Marshal(contractInfo)
+        if err == nil {
+            err = ctx.GetStub().SetEvent("UnlockAssetUsingContractId", contractInfoBytes)
+        }
+        if err != nil {
+            log.Warn("Unable to set 'UnlockAssetUsingContractId' event")
             log.Warn(err.Error())
         }
     }
