@@ -481,13 +481,13 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	assetType := "bond"
 	assetId := "A001"
 	locker := "Alice"
-	recipient := getTxCreatorECertBase64()
+	recipient := "Bob"
 	preimage := "abcd"
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
+	chaincodeStub.GetCreatorReturns([]byte(recipient), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
