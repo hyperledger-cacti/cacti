@@ -54,30 +54,6 @@ func (am *AssetManagement) validateInteropccAssetTypeAssetId(assetAgreement *com
     return true, nil
 }
 
-func (am *AssetManagement) validateInteropccAssetTypeAssetIdRecipient(assetAgreement *common.AssetExchangeAgreement) (bool, error) {
-    _, err := am.validateInteropccAssetTypeAssetId(assetAgreement)
-    if err != nil {
-	return false, err
-    }
-    if len(assetAgreement.Recipient) == 0 {
-        return false, logThenErrorf("empty lock recipient")
-    }
-
-    return true, nil
-}
-
-func (am *AssetManagement) validateInteropccAssetTypeAssetIdLocker(assetAgreement *common.AssetExchangeAgreement) (bool, error) {
-    _, err := am.validateInteropccAssetTypeAssetId(assetAgreement)
-    if err != nil {
-	return false, err
-    }
-    if len(assetAgreement.Locker) == 0 {
-        return false, logThenErrorf("empty locker")
-    }
-
-    return true, nil
-}
-
 func (am *AssetManagement) validateInteropccContractId(contractId string) (bool, error) {
     if len(am.interopChaincodeId) == 0 {
         return false, logThenErrorf("interoperation chaincode ID not set. Run the 'Configure(...)' function first.")
@@ -132,23 +108,27 @@ func (am *AssetManagement) validateAndExtractClaimInfoHTLC(claimInfo *common.Ass
 
 // Ledger transaction (invocation) functions
 
-func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement, lockInfo *common.AssetLock) (bool, error) {
-    _, err := am.validateInteropccAssetTypeAssetIdRecipient(assetAgreement)
+func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement, lockInfo *common.AssetLock) (string, error) {
+    _, err := am.validateInteropccAssetTypeAssetId(assetAgreement)
     if err != nil {
-	return false, err
+	return "", err
     }
+    if len(assetAgreement.Recipient) == 0 {
+        return "", logThenErrorf("empty lock recipient")
+    }
+
     assetAgreementBytes, err := proto.Marshal(assetAgreement)
     if err != nil {
-        return false, logThenErrorf(err.Error())
+        return "", logThenErrorf(err.Error())
     }
 
     lockInfoHTLC, err := am.validateAndExtractLockInfoHTLC(lockInfo)
     if err != nil {
-	return false, err
+	return "", err
     }
     lockInfoBytes, err := proto.Marshal(lockInfoHTLC)
     if err != nil {
-        return false, logThenErrorf(err.Error())
+        return "", logThenErrorf(err.Error())
     }
     assetAgreementBytes64 := base64.StdEncoding.EncodeToString(assetAgreementBytes)
     lockInfoBytes64 := base64.StdEncoding.EncodeToString(lockInfoBytes)
@@ -156,10 +136,11 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgre
     iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("LockAsset"), []byte(assetAgreementBytes64), []byte(lockInfoBytes64)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
-        return false, errors.New(string(iccResp.GetPayload()))
+        return "", logThenErrorf(string(iccResp.GetPayload()))
     }
-    fmt.Printf("Asset %s of type %s locked for %s until %+v\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Recipient, time.Unix(int64(lockInfoHTLC.ExpiryTimeSecs), 0))
-    return true, nil
+    contractId := string(iccResp.GetPayload())
+    fmt.Printf("Asset %s of type %s locked for %s until %+v using contractId %s\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Recipient, time.Unix(int64(lockInfoHTLC.ExpiryTimeSecs), 0), contractId)
+    return contractId, nil
 }
 
 func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.FungibleAssetExchangeAgreement, lockInfo *common.AssetLock) (string, error) {
@@ -286,9 +267,12 @@ func (am *AssetManagement) IsAssetLockedQueryUsingContractId(stub shim.Chaincode
 }
 
 func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement, claimInfo *common.AssetClaim) (bool, error) {
-    _, err := am.validateInteropccAssetTypeAssetIdLocker(assetAgreement)
+    _, err := am.validateInteropccAssetTypeAssetId(assetAgreement)
     if err != nil {
 	return false, err
+    }
+    if len(assetAgreement.Locker) == 0 {
+        return false, logThenErrorf("empty locker")
     }
 
     assetAgreementBytes, err := proto.Marshal(assetAgreement)
@@ -367,9 +351,12 @@ func (am *AssetManagement) ClaimAssetUsingContractId(stub shim.ChaincodeStubInte
 }
 
 func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement) (bool, error) {
-    _, err := am.validateInteropccAssetTypeAssetIdRecipient(assetAgreement)
+    _, err := am.validateInteropccAssetTypeAssetId(assetAgreement)
     if err != nil {
 	return false, err
+    }
+    if len(assetAgreement.Recipient) == 0 {
+        return false, logThenErrorf("empty lock recipient")
     }
 
     assetAgreementBytes, err := proto.Marshal(assetAgreement)
@@ -401,13 +388,13 @@ func (am *AssetManagement) UnlockFungibleAsset(stub shim.ChaincodeStubInterface,
     return true, nil
 }
 
-func (am *AssetManagement) UnLockAssetUsingContractId(stub shim.ChaincodeStubInterface, contractId string) (bool, error) {
+func (am *AssetManagement) UnlockAssetUsingContractId(stub shim.ChaincodeStubInterface, contractId string) (bool, error) {
     _, err := am.validateInteropccContractId(contractId)
     if err != nil {
 	return false, err
     }
 
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnLockAssetUsingContractId"), []byte(contractId)}, "")
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("UnlockAssetUsingContractId"), []byte(contractId)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return false, logThenErrorf(string(iccResp.GetPayload()))

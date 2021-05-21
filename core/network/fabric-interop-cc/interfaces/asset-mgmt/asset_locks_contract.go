@@ -31,44 +31,44 @@ func (amc *AssetManagementContract) Configure(interopChaincodeId string) {
 
 // Ledger transaction (invocation) functions
 
-func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (bool, error) {
+func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
 
     // Decoding from base64
     assetAgreementSerializedProto, err64 := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
     if err64 != nil {
       log.Error(err64.Error())
-      return false, err64
+      return "", err64
     }
     lockInfoSerializedProto, err64 := base64.StdEncoding.DecodeString(lockInfoSerializedProto64)
     if err64 != nil {
       log.Error(err64.Error())
-      return false, err64
+      return "", err64
     }
 
     assetAgreement := &common.AssetExchangeAgreement{}
     if len(assetAgreementSerializedProto) == 0 {
         log.Error("empty asset agreement")
-        return false, fmt.Errorf("empty asset agreement")
+        return "", fmt.Errorf("empty asset agreement")
     }
     err := proto.Unmarshal([]byte(assetAgreementSerializedProto), assetAgreement)
     if err != nil {
         log.Error(err.Error())
-        return false, err
+        return "", err
     }
     lockInfo := &common.AssetLock{}
     if len(lockInfoSerializedProto) == 0 {
         log.Error("empty lock info")
-        return false, fmt.Errorf("empty lock info")
+        return "", fmt.Errorf("empty lock info")
     }
     err = proto.Unmarshal([]byte(lockInfoSerializedProto), lockInfo)
     if err != nil {
         log.Error(err.Error())
-        return false, err
+        return "", err
     }
 
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.LockAsset(ctx.GetStub(), assetAgreement, lockInfo)
-    if retVal && err == nil {
+    if err == nil {
         lockInfoHTLC := &common.AssetLockHTLC{}
         err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
         if err == nil {
