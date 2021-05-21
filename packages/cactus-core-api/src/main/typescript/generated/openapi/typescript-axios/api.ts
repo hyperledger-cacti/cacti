@@ -250,6 +250,15 @@ export interface ConsortiumMember {
 /**
  * 
  * @export
+ * @enum {string}
+ */
+export enum Constants {
+    SocketIoConnectionPathV1 = '/api/v1/async/socket-io/connect'
+}
+
+/**
+ * 
+ * @export
  * @interface GetKeychainEntryRequest
  */
 export interface GetKeychainEntryRequest {
