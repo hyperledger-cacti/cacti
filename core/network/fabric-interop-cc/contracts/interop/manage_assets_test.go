@@ -24,7 +24,7 @@ const(
 	defaultTimeLockSecs = 5 * 60		// 5 minutes
 )
 
-// function that supplies value that is to be returned by ctx.GetStub().GetCreator() 
+// function that supplies value that is to be returned by ctx.GetStub().GetCreator()
 func getCreator() string {
 	serializedIdentity := &mspProtobuf.SerializedIdentity{}
 	eCertBytes, _ := base64.StdEncoding.DecodeString(getTxCreatorECertBase64())
@@ -481,13 +481,13 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	assetType := "bond"
 	assetId := "A001"
 	locker := "Alice"
-	recipient := "Bob"
+	recipient := getTxCreatorECertBase64()
 	preimage := "abcd"
 
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
 	currentTimeSecs := uint64(time.Now().Unix())
-	chaincodeStub.GetCreatorReturns([]byte(recipient), nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
