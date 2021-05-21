@@ -6,6 +6,7 @@ on:
     branches: [main, dev]
 
   pull_request:
+    types: [opened, synchronize, edited, reopened]
     branches: [main, dev]
 
 jobs:
