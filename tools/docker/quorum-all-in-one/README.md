@@ -5,6 +5,18 @@
 
 An all in one quorum docker image with Tessera included for private transaction support.
 
+## Usage
+
+### Build and Run Image Locally
+
+```sh
+DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -t qaio
+docker run --rm qaio
+```
+
+
+### Visual Studio Code Tasks
+
 Example `.vscode/tasks.json` file for building/running the image:
 
 ```json
