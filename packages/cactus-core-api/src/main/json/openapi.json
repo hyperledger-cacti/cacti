@@ -31,6 +31,15 @@
     ],
     "components": {
         "schemas": {
+            "Constants": {
+                "type": "string",
+                "enum": [
+                    "/api/v1/async/socket-io/connect"
+                ],
+                "x-enum-varnames": [
+                    "SocketIoConnectionPathV1"
+                ]
+            },
             "PluginImport": {
                 "type": "object",
                 "required": [
