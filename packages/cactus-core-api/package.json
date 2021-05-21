@@ -83,7 +83,8 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "devDependencies": {
-    "@types/express": "4.17.8"
+    "@types/express": "4.17.8",
+    "socket.io": "4.0.1"
   },
   "dependencies": {
     "@hyperledger/cactus-common": "0.5.0",

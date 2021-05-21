@@ -4,10 +4,16 @@ import { Optional } from "typescript-optional";
 import { Application } from "express";
 import { IWebServiceEndpoint } from "./i-web-service-endpoint";
 import { ICactusPlugin } from "../i-cactus-plugin";
+import type { Server as SocketIoServer } from "socket.io";
 
 export interface IPluginWebService extends ICactusPlugin {
   getOrCreateWebServices(): Promise<IWebServiceEndpoint[]>;
-  registerWebServices(expressApp: Application): Promise<IWebServiceEndpoint[]>;
+
+  registerWebServices(
+    expressApp: Application,
+    wsApi: SocketIoServer,
+  ): Promise<IWebServiceEndpoint[]>;
+
   getHttpServer(): Optional<Server | SecureServer>;
   shutdown(): Promise<void>;
 }

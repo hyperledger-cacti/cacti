@@ -495,7 +495,7 @@ export class ApiServer {
       .map(async (plugin: ICactusPlugin) => {
         const p = plugin as IPluginWebService;
         await p.getOrCreateWebServices();
-        const webSvcs = await p.registerWebServices(app);
+        const webSvcs = await p.registerWebServices(app, null as any);
         return webSvcs;
       });
 
