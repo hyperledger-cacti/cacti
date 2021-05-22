@@ -86,7 +86,7 @@ This script performs the following transactional operations:
 3. Create an asset called coolcoin
 4. Create an asset called hotcoin
 5. Add 1000 units of cool coin
-6,. Add 1000 units of hot coin
+6. Add 1000 units of hot coin
 7. Transfer 500 units of cool coin to alice
 8. Transfer 500 units of hot coin to alice
 9. Transfer 500 units of cool coin to bob
