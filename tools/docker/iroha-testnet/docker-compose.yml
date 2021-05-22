@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  node:
+    image: ${IROHA_PRJ}/${IROHA_IMG}
+    ports:
+      - "50051:50051"
+    environment:
+      - IROHA_HOME=/opt/iroha
+      - IROHA_CONF=config.docker
+      - IROHA_NODEKEY=node1
+      - CCACHE_DIR=/tmp/ccache
+    volumes:
+      - ${PWD}/example:/opt/iroha/config
+      - ccache-data:/tmp/ccache
+    working_dir: /opt/iroha/config
+    entrypoint: /opt/iroha/config/entrypoint.sh
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:13.2-alpine
+    environment:
+      - POSTGRES_USER=iroha
+      - POSTGRES_PASSWORD=HelloW0rld
+
+volumes:
+  ccache-data:
