@@ -12,7 +12,7 @@ import (
 // SmartContract provides functions for managing an BondAsset and TokenAsset
 type SmartContract struct {
 	contractapi.Contract
-  am.AssetManagementContract
+	am.AssetManagementContract
 }
 
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface, ccType string, interopChaincodeId string) error {

@@ -248,8 +248,8 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	return contractId, nil
 }
 
-// UnLockAsset cc is used to record unlocking of an asset on the ledger
-func (s *SmartContract) UnLockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) error {
+// UnlockAsset cc is used to record unlocking of an asset on the ledger
+func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) error {
 
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
@@ -500,7 +500,7 @@ func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface
 	return assetLockKey, assetLockVal, nil
 }
 
-// UnLockAsset cc is used to record unlocking of an asset on the ledger (this uses the contractId)
+// UnlockAssetUsingContractId cc is used to record unlocking of an asset on the ledger (this uses the contractId)
 func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
 
 	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
@@ -777,8 +777,8 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 	return nil
 }
 
-// UnLockFungibleAsset cc is used to record unlocking of a fungible asset on the ledger
-func (s *SmartContract) UnLockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) error {
+// UnlockFungibleAsset cc is used to record unlocking of a fungible asset on the ledger
+func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) error {
 
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
