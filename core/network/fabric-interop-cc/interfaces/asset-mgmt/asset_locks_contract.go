@@ -284,7 +284,7 @@ func (amc *AssetManagementContract) ClaimAssetUsingContractId(ctx contractapi.Tr
             }
         }
         if err != nil {
-	    logWarnings("Unable to set 'ClaimAssetUsingContractId' event", err.Error())
+	    logWarnings("Unable to set 'ClaimAsset' event", err.Error())
         }
     }
     return retVal, err
@@ -351,7 +351,7 @@ func (amc *AssetManagementContract) UnlockAssetUsingContractId(ctx contractapi.T
             err = ctx.GetStub().SetEvent("UnlockAssetUsingContractId", contractInfoBytes)
         }
         if err != nil {
-	    logWarnings("Unable to set 'UnlockAssetUsingContractId' event", err.Error())
+	    logWarnings("Unable to set 'UnlockAsset' event", err.Error())
         }
     }
     return retVal, err
