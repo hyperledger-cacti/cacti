@@ -113,7 +113,7 @@ func TestIssueTokenAssets(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	walletMap := make(map[string]int)
+	walletMap := make(map[string]uint64)
 	expectedAsset := &TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
@@ -138,7 +138,7 @@ func TestIssueTokenAssets(t *testing.T) {
 	// Check if given token asset type doesn't exist
 	chaincodeStub.GetStateReturns(nil, nil)
 	err = simpleToken.IssueTokenAssets(transactionContext, "token1", 0, "")
-	require.EqualError(t, err, "cannot issue: the token asset type token1 does not exist.")
+	require.EqualError(t, err, "cannot issue: the token asset type token1 does not exist")
 }
 
 func TestDeleteTokenAssets(t *testing.T) {
@@ -146,7 +146,7 @@ func TestDeleteTokenAssets(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	walletMap := make(map[string]int)
+	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
 	expectedAsset := &TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
@@ -186,7 +186,7 @@ func TestTransferTokenAssets(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	walletMap := make(map[string]int)
+	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
 	expectedAsset := &TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
@@ -211,7 +211,7 @@ func TestGetBalance(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	walletMap := make(map[string]int)
+	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
 	expectedAsset := &TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
@@ -224,7 +224,7 @@ func TestGetBalance(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(1, bytes, nil)
 	bal, err := simpleToken.GetBalance(transactionContext, "token1", "")
 	require.NoError(t, err)
-	require.Equal(t, bal, 5)
+	require.Equal(t, bal, uint64(5))
 
 	// GetState Fails
 	chaincodeStub.GetStateReturnsOnCall(2, nil, fmt.Errorf("Failed to read state"))
@@ -242,7 +242,7 @@ func TestGetMyWallet(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	walletMap := make(map[string]int)
+	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
 	expectedRes := createKeyValuePairs(walletMap)
 	expectedAsset := &TokenWallet{WalletMap: walletMap}
@@ -265,7 +265,7 @@ func TestGetMyWallet(t *testing.T) {
 	// Owner doesn't have a wallet
 	chaincodeStub.GetStateReturnsOnCall(2, nil, nil)
 	bal, err = simpleToken.GetMyWallet(transactionContext)
-	require.EqualError(t, err, "owner does not have a wallet.")
+	require.EqualError(t, err, "owner does not have a wallet")
 }
 
 func TestTokenAssetsExist(t *testing.T) {
@@ -273,7 +273,7 @@ func TestTokenAssetsExist(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 
-	walletMap := make(map[string]int)
+	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
 	expectedAsset := &TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
