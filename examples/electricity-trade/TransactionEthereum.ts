@@ -5,6 +5,10 @@
  * TransactionEthereum.ts
  */
 
+import { LPInfoHolder } from '../../packages/routing-interface/util/LPInfoHolder';
+import { VerifierBase } from '../../packages/ledger-plugin/VerifierBase';
+import { TransactionSigner } from '../../packages/ledger-plugin/util/TransactionSigner';
+
 const ethJsCommon = require('ethereumjs-common').default;
 const ethJsTx = require('ethereumjs-tx').Transaction;
 const libWeb3 = require('web3');
@@ -18,75 +22,103 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 const mapFromAddressNonce: Map<string, number> = new Map();
+let xConnectInfo: LPInfoHolder = null;      // connection information
+let xVerifierEthereum: VerifierBase = null;
 
 export function makeRawTransaction(txParam: { fromAddress: string, fromAddressPkey: string, toAddress: string, amount: number, gas: number }): Promise<{ data: {}, txId: string }> {
     return new Promise(async (resolve, reject) => {
         try {
-            logger.debug("txParam : " + JSON.stringify(txParam));
-            // Initial setting
-            logger.debug('gethUrl: ' + config.electricityTradeInfo.ethereum.gethURL);
-            const provider = new libWeb3.providers.HttpProvider(config.electricityTradeInfo.ethereum.gethURL);
-            const web3 = new libWeb3(provider);
+            logger.debug(`makeRawTransaction: txParam: ${JSON.stringify(txParam)}`);
+            
+            getNewNonce(txParam.fromAddress)
+            .then(result => {
+                logger.debug(`##makeRawTransaction(A): result: ${JSON.stringify(result)}`);
+                
+                const txnCountHex: string = result.txnCountHex;
+                
+                const rawTx: { nonce: string, to: string, value: number, gas: number } = {
+                    "nonce": txnCountHex,
+                    "to": txParam.toAddress,
+                    "value": txParam.amount,
+                    "gas": txParam.gas,
+                }
+                logger.debug(`##makeRawTransaction(B), rawTx: ${JSON.stringify(rawTx)}`);
 
-            // ethereumjs-tx2.1.2_support
-            const customCommon = ethJsCommon.forCustomChain(
-                config.electricityTradeInfo.ethereum.network,
-                {
-                    name: config.electricityTradeInfo.ethereum.chainName,
-                    networkId: config.electricityTradeInfo.ethereum.networkID,
-                    chainId: config.electricityTradeInfo.ethereum.chainID,
-                },
-                config.electricityTradeInfo.ethereum.hardfork
-            );
+                const signedTx = TransactionSigner.signTxEthereum(rawTx, txParam.fromAddressPkey);
+                const resp: { data: {}, txId: string } = {
+                    data: { serializedTx: signedTx["serializedTx"] },
+                    txId: signedTx["txId"]
+                }
 
-            // web3_v1.2.9_support
-            web3.eth.getTransactionCount(txParam.fromAddress)
-                .then(_nonce => {
-                    let txnCount: number = _nonce;
-                    // NOTE: No need to count up.
+                return resolve(resp);
+            })
+        } catch (err) {
+            logger.error(err);
+            return reject(err);
+        };
+    });
+}
 
-                    // NOTE: gasPrice is not used
-                    // const gasPrice: string = web3.eth.getGasPrice();
 
-                    const latestNonce = getLatestNonce(txParam.fromAddress);
-                    logger.debug(`#####(A) _nonce: ${_nonce}, latestNonce: ${latestNonce}`);
-                    logger.debug(`####makeRawTransaction(): fromAddress: ${txParam.fromAddress}, txnCount: ${web3.utils.toHex(txnCount)}, latestNonce: ${web3.utils.toHex(latestNonce)}`);
-                    if (txnCount <= latestNonce) {
-                        txnCount = latestNonce + 1;
-                        logger.debug(`####makeRawTransaction(): Adjust txnCount, fromAddress: ${txParam.fromAddress}, txnCount: ${web3.utils.toHex(txnCount)}, latestNonce: ${web3.utils.toHex(latestNonce)}`);
-                    }
-                    logger.debug(`#####(B) _nonce: ${_nonce}, latestNonce: ${latestNonce}, txnCount: ${txnCount}`);
-                    setLatestNonce(txParam.fromAddress, txnCount);
+function getNewNonce(fromAddress: string): Promise<{txnCountHex: string}> {
+    return new Promise(async (resolve, reject) => {
+        try {
+            logger.debug(`getNewNonce start: fromAddress: ${fromAddress}`);
+            
+            if (xConnectInfo === null) {
+                xConnectInfo = new LPInfoHolder();
+            }
+            
+            if (xVerifierEthereum === null) {
+                logger.debug("create verifierEthereum");
+                const ledgerPluginInfo: string = xConnectInfo.getLegerPluginInfo("84jUisrs");
+                xVerifierEthereum = new VerifierBase(ledgerPluginInfo);
+            }
+            
+            
+            // Get the number of transactions in account
+            const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
+            let method = {type: "function", command: "getNonce"};
+            const template = "default";
+            let args = {"args": {"args": [fromAddress]}};
 
-                    const privKey: Buffer = Buffer.from(txParam.fromAddressPkey, 'hex');
-                    logger.debug('##privKey=' + txParam.fromAddressPkey);
-                    const rawTx: { nonce: number, to: string, value: number, gas: number } = {
-                        "nonce": web3.utils.toHex(txnCount),
-                        "to": txParam.toAddress,
-                        "value": txParam.amount,
-                        "gas": txParam.gas,
-                    }
-                    logger.debug('txnCount=' + web3.utils.toHex(txnCount));
-                    logger.debug('##rawTx=' + JSON.stringify(rawTx));
-                    const tx = new ethJsTx(rawTx, { common: customCommon });
-                    tx.sign(privKey);
-
-                    // Get Transaction ID
-                    const hash: Buffer = tx.hash(true);
-                    const txId: string = '0x' + hash.toString('hex')
-                    logger.debug('##txId=' + txId);
-
-                    const serializedTx: Buffer = tx.serialize();
-                    const serializedTxHex: string = '0x' + serializedTx.toString('hex');
-                    logger.debug('##serializedTxHex=' + serializedTxHex);
-
-                    const result: { data: {}, txId: string } = {
-                        data: { serializedTx: serializedTxHex },
-                        txId: txId
-                    }
-
-                    return resolve(result);
-                })
+            logger.debug(`##getNewNonce(A): call validator#getNonce()`);
+            xVerifierEthereum.execSyncFunction(contract, method, template, args)
+            .then(result => {
+                // logger.debug(`##getNewNonce(A): result: ${JSON.stringify(result)}`);
+                
+                let txnCount: number = result.data.nonce;
+                let txnCountHex: string = result.data.nonceHex;
+                
+                const latestNonce = getLatestNonce(fromAddress);
+                // logger.debug(`##getNewNonce(B): fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`);
+                if (txnCount <= latestNonce) {
+                    // nonce correction
+                    txnCount = latestNonce + 1;
+                    logger.debug(`##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`);
+                    
+                    const method = {type: "function", command: "toHex"};
+                    const args = {"args": {"args": [txnCount]}};
+                    
+                    logger.debug(`##getNewNonce(D): call validator#toHex()`);
+                    xVerifierEthereum.execSyncFunction(contract, method, template, args)
+                    .then(result => {
+                        txnCountHex = result.data.hexStr;
+                        logger.debug(`##getNewNonce(E): txnCountHex: ${txnCountHex}`);
+                        
+                        // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
+                        setLatestNonce(fromAddress, txnCount);
+                        
+                        return resolve({txnCountHex: txnCountHex});
+                    })
+                } else {
+                    // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
+                    setLatestNonce(fromAddress, txnCount);
+                    
+                    logger.debug(`##getNewNonce(G): txnCountHex: ${txnCountHex}`);
+                    return resolve({txnCountHex: txnCountHex});
+                }
+            })
         } catch (err) {
             logger.error(err);
             return reject(err);
@@ -102,6 +134,7 @@ function getLatestNonce(fromAddress: string): number {
     //return 0;
     return -1;
 }
+
 
 function setLatestNonce(fromAddress: string, nonce: number): void {
     mapFromAddressNonce.set(fromAddress, nonce);

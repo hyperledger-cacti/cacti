@@ -76,7 +76,7 @@ You can run the test script while Iroha is running. In this case, run the setup-
 
 ```
 $ cd example/iroha-wallet
-$ bash seetup-iroha-wallet.sh
+$ bash setup-iroha-wallet.sh
 ```
 
 This script performs the following transactional operations:

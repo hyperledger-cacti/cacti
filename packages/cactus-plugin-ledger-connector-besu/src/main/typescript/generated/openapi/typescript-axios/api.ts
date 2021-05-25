@@ -24,6 +24,25 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
+ * @interface BesuPrivateTransactionConfig
+ */
+export interface BesuPrivateTransactionConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof BesuPrivateTransactionConfig
+     */
+    privateFrom: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof BesuPrivateTransactionConfig
+     */
+    privateFor: Array<any>;
+}
+/**
+ * 
+ * @export
  * @interface BesuTransactionConfig
  */
 export interface BesuTransactionConfig {
@@ -163,6 +182,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     timeoutMs?: number;
+    /**
+     * 
+     * @type {BesuPrivateTransactionConfig}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    privateTransactionConfig?: BesuPrivateTransactionConfig;
 }
 /**
  * 
@@ -331,6 +356,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     consistencyStrategy: ConsistencyStrategy;
+    /**
+     * 
+     * @type {BesuPrivateTransactionConfig}
+     * @memberof RunTransactionRequest
+     */
+    privateTransactionConfig?: BesuPrivateTransactionConfig;
 }
 /**
  * 
