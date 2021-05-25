@@ -1,6 +1,7 @@
+import type { Server } from "http";
+import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
 import { Express } from "express";
-
 import {
   Logger,
   Checks,
@@ -126,11 +127,13 @@ export class SupplyChainCactusPlugin
     const insertShipment = new InsertShipmentEndpoint({
       logLevel: this.options.logLevel,
       fabricApi: this.options.fabricApiClient,
+      keychainId: this.options.contracts.bookshelfRepository.keychainId,
     });
 
     const listShipment = new ListShipmentEndpoint({
       logLevel: this.options.logLevel,
       fabricApi: this.options.fabricApiClient,
+      keychainId: this.options.contracts.bookshelfRepository.keychainId,
     });
 
     this.endpoints = [
@@ -144,7 +147,7 @@ export class SupplyChainCactusPlugin
     return this.endpoints;
   }
 
-  public getHttpServer(): Optional<any> {
+  public getHttpServer(): Optional<Server | SecureServer> {
     return Optional.empty();
   }
 
