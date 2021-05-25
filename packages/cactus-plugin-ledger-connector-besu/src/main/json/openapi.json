@@ -31,6 +31,102 @@
     ],
     "components": {
         "schemas": {
+            "WatchBlocksV1": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Next",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Error",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "Web3BlockHeader": {
+                "type": "object",
+                "required": [
+                    "number",
+                    "hash",
+                    "parentHash",
+                    "nonce",
+                    "sha3Uncles",
+                    "logsBloom",
+                    "transactionRoot",
+                    "stateRoot",
+                    "receiptRoot",
+                    "miner",
+                    "extraData",
+                    "gasLimit",
+                    "gasUsed",
+                    "timestamp"
+                ],
+                "properties": {
+                    "number": {
+                        "type": "number"
+                    },
+                    "hash": {
+                        "type": "string"
+                    },
+                    "parentHash": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "sha3Uncles": {
+                        "type": "string"
+                    },
+                    "logsBloom": {
+                        "type": "string"
+                    },
+                    "transactionRoot": {
+                        "type": "string"
+                    },
+                    "stateRoot": {
+                        "type": "string"
+                    },
+                    "receiptRoot": {
+                        "type": "string"
+                    },
+                    "miner": {
+                        "type": "string"
+                    },
+                    "extraData": {
+                        "type": "string"
+                    },
+                    "gasLimit": {
+                        "type": "integer"
+                    },
+                    "gasUsed": {
+                        "type": "integer"
+                    },
+                    "timestamp": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    }
+                }
+            },
+            "WatchBlocksV1Progress": {
+                "type": "object",
+                "required": ["blockHeader"],
+                "properties": {
+                    "blockHeader": {
+                        "$ref": "#/components/schemas/Web3BlockHeader"
+                    } 
+                }
+            },
             "ReceiptType": {
                 "description": "Enumerates the possible types of receipts that can be waited for by someone or something that has requested the execution of a transaction on a ledger.",
                 "type": "string",

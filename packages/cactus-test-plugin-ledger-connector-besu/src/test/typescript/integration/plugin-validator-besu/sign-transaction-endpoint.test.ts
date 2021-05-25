@@ -26,8 +26,8 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 
 import {
-  Configuration,
-  DefaultApi,
+  BesuApiClientOptions,
+  BesuApiClient,
   IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
   SignTransactionRequest,
@@ -84,6 +84,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(tearDown);
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
+  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
 
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyHex,
@@ -98,6 +99,7 @@ test(testCase, async (t: Test) => {
   const options: IPluginLedgerConnectorBesuOptions = {
     instanceId: uuidv4(),
     rpcApiHttpHost,
+    rpcApiWsHost,
     pluginRegistry,
     logLevel,
   };
@@ -164,8 +166,8 @@ test(testCase, async (t: Test) => {
     transactionHash: transactionHash,
   };
 
-  const configuration = new Configuration({ basePath: node1Host });
-  const api = new DefaultApi(configuration);
+  const configuration = new BesuApiClientOptions({ basePath: node1Host });
+  const api = new BesuApiClient(configuration);
 
   // Test for 200 valid response test case
   const res = await api.signTransactionV1(request);
