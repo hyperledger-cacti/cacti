@@ -449,6 +449,123 @@ export interface SolidityContractJsonArtifact {
     gasEstimates?: object;
 }
 /**
+ * 
+ * @export
+ * @enum {string}
+ */
+export enum WatchBlocksV1 {
+    Subscribe = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Subscribe',
+    Next = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Next',
+    Unsubscribe = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Unsubscribe',
+    Error = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Error',
+    Complete = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Complete'
+}
+
+/**
+ * 
+ * @export
+ * @interface WatchBlocksV1Progress
+ */
+export interface WatchBlocksV1Progress {
+    /**
+     * 
+     * @type {Web3BlockHeader}
+     * @memberof WatchBlocksV1Progress
+     */
+    blockHeader: Web3BlockHeader;
+}
+/**
+ * 
+ * @export
+ * @interface Web3BlockHeader
+ */
+export interface Web3BlockHeader {
+    /**
+     * 
+     * @type {number}
+     * @memberof Web3BlockHeader
+     */
+    number: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    hash: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    parentHash: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    nonce: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    sha3Uncles: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    logsBloom: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    transactionRoot: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    stateRoot: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    receiptRoot: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    miner: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3BlockHeader
+     */
+    extraData: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Web3BlockHeader
+     */
+    gasLimit: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Web3BlockHeader
+     */
+    gasUsed: number;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof Web3BlockHeader
+     */
+    timestamp: string | number;
+}
+/**
  * @type Web3SigningCredential
  * @export
  */

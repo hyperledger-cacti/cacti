@@ -200,12 +200,14 @@ export class SupplyChainAppDummyInfrastructure {
       {
         this._besuAccount = await this.besu.createEthTestAccount(2000000);
         const rpcApiHttpHost = await this.besu.getRpcApiHttpHost();
+        const rpcApiWsHost = await this.besu.getRpcApiWsHost();
 
         const pluginRegistry = new PluginRegistry();
         pluginRegistry.add(keychainPlugin);
         const connector = new PluginLedgerConnectorBesu({
           instanceId: "PluginLedgerConnectorBesu_Contract_Deployment",
           rpcApiHttpHost,
+          rpcApiWsHost,
           logLevel: this.options.logLevel,
           pluginRegistry,
         });
