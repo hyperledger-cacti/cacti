@@ -22,3 +22,7 @@ docker rm gethtestnet_init-chain-geth1_run_2
 
 sudo rm -R ../../tools/docker/geth-testnet/data-geth1/geth
 sudo rm ../../tools/docker/geth-testnet/data-geth1/geth.ipc*
+
+sudo rm -R node_modules
+sudo rm -R ../../packages/ledger-plugin/go-ethereum/validator/src/node_modules
+sudo rm -R ../../packages/ledger-plugin/sawtooth/validator/src/node_modules
