@@ -2,7 +2,15 @@
 
 ## Table of Contents <!-- omit in toc -->
 
+- [Summary](#summary)
+- [Concepts](#concepts)
+  - [Contract Invocation JSON DSL](#contract-invocation-json-dsl)
+  - [Expressing Primitive vs Reference Types with the DLS](#expressing-primitive-vs-reference-types-with-the-dls)
+  - [Flow Invocation Types](#flow-invocation-types)
 - [Usage](#usage)
+  - [Invoke Contract (flow) with no parameters](#invoke-contract-flow-with-no-parameters)
+  - [Invoke Contract (flow) with a single integer parameter](#invoke-contract-flow-with-a-single-integer-parameter)
+  - [Invoke Contract (flow) with a custom class parameter](#invoke-contract-flow-with-a-custom-class-parameter)
   - [Custom Configuration via Env Variables](#custom-configuration-via-env-variables)
 - [Building Docker Image Locally](#building-docker-image-locally)
 - [Example NodeDiagnosticInfo JSON Response](#example-nodediagnosticinfo-json-response)
@@ -14,11 +22,276 @@
         - [data-fetcher.ts](#data-fetcherts)
         - [metrics.ts](#metricsts)
 
+## Summary
+
+The Corda connector is written in Kotlin and ships as a Spring Boot JVM application
+that accepts API requests and translates those into Corda RPC calls.
+
+Deploying the Corda connector therefore involves also deploying the mentioned JVM
+application **in addition** to deploying the Cactus API server with the desired
+plugins configured.
+
+## Concepts
+
+### Contract Invocation JSON DSL
+
+One of our core design principles for Hyperledger Cactus is to have low impact
+deployments meaning that changes to the ledgers themselves should be kept to a
+minimum or preferably have no need for any at all. With this in mind, we had to
+solve the challenge of providing users with the ability to invoke Corda flows
+as dynamically as possible within the confines of the strongly typed JVM contrasted
+with the weakly typed Javascript language runtime of NodeJS.
+
+Corda might release some convenience features to ease this in the future, but
+in the meantime we have the *Contract Invocation JSON DSL* which allows developers
+to specify truly arbitrary JVM types as part of their contract invocation arguments
+even if otherwise these types would not be possible to serialize or deserialize
+with traditional tooling such as the excellent
+[Jackson JSON Java library](https://github.com/FasterXML/jackson) or similar ones.
+
+### Expressing Primitive vs Reference Types with the DLS
+
+The features of the DSL include expressing whether a contract invocation parameter
+is a reference or a primitive JVM data types.
+This is a language feature that Javascript has as well to some extent, but for
+those in need of a refresher, here's a writeup from a well known Q/A website that
+I found on the internet: [What's the difference between primitive and reference types?
+](https://stackoverflow.com/a/32049775/698470)
+
+To keep it simple, the following types are primitive data types in the
+Java Virtual Machine (JVM) and everything else not included in the list below
+can be safely considered a reference type:
+- boolean
+- byte
+- short
+- char
+- int
+- long
+- float
+- double
+
+If you'd like to further clarify how this works and feel like an exciting adventure
+then we recommend that you dive into the source code of the
+[deserializer implementation of the JSON DSL](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/impl/JsonJvmObjectDeserializer.kt) and take a look at the following points of interest
+in the code located there:
+- `val exoticTypes: Map<String, Class<*>>`
+- `fun instantiate(jvmObject: JvmObject)`
+
+### Flow Invocation Types
+
+Can be **dynamic** or **tracked dynamic** and the corresponding enum values
+are defined as:
+
+```typescript
+/**
+ * Determines which flow starting method will be used on the back-end when invoking the flow. Based on the value here the plugin back-end might invoke the rpc.startFlowDynamic() method or the rpc.startTrackedFlowDynamic() method. Streamed responses are aggregated and returned in a single response to HTTP callers who are not equipped to handle streams like WebSocket/gRPC/etc. do.
+ * @export
+ * @enum {string}
+ */
+export enum FlowInvocationType {
+    TRACKEDFLOWDYNAMIC = 'TRACKED_FLOW_DYNAMIC',
+    FLOWDYNAMIC = 'FLOW_DYNAMIC'
+}
+```
+
+[Official Corda Java Docs - startFlowDynamic()](https://api.corda.net/api/corda-os/4.7/html/api/kotlin/corda/net.corda.core.messaging/-corda-r-p-c-ops/start-flow-dynamic.html)
+
+[Official Corda Java Docs - startTrackedFlowDynamic()](https://api.corda.net/api/corda-os/4.7/html/api/kotlin/corda/net.corda.core.messaging/-corda-r-p-c-ops/start-tracked-flow-dynamic.html)
+
+
 ## Usage
 
 Take a look at how the API client can be used to run transactions on a Corda ledger:
 `packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server.test.ts`
 
+
+### Invoke Contract (flow) with no parameters
+
+Below, we'll demonstrate invoking a simple contract with no parameters.
+
+**The contract source:**
+
+```java
+package com.example.organization.samples.application.flows;
+
+class SomeCoolFlow {
+  // constructor with no arguments
+  public SomeCoolFlow() {
+    this.doSomething();
+  }
+
+  public doSomething(): void {
+    throw new RuntimeException("Method not implemented.");
+  }
+}
+```
+
+**Steps to build your request:**
+
+1. Find out the fully qualified class name of your contract (flow) and set this as the value for the request parameter `flowFullClassName`
+2. Decide on your flow invocation type which largely comes down to answering the question of: Does your invocation follow a request/response pattern or more like a channel subscription where multiple updates at different times are streamed to the client in response to the invocation request? In our example we assume the simpler request/response communication pattern and therefore will set the `flowInvocationType` to `FlowInvocationType.FLOWDYNAMIC`
+3. Invoke the flow via the API client with the `params` argument being specified as an empty array `[]`
+    ```typescript
+    import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+    import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+
+    const apiUrl = "your-cactus-host.example.com"; // don't forget to specify the port if applicable
+    const apiClient = new CordaApi({ basePath: apiUrl });
+
+    const res = await apiClient.invokeContractV1({
+      flowFullClassName: "com.example.organization.samples.application.flows.SomeCoolFlow",
+      flowInvocationType: FlowInvocationType.FLOWDYNAMIC,
+      params: [],
+      timeoutMs: 60000,
+    });
+    ```
+
+### Invoke Contract (flow) with a single integer parameter
+
+Below, we'll demonstrate invoking a simple contract with a single numeric parameter.
+
+**The contract source:**
+
+```java
+package com.example.organization.samples.application.flows;
+
+class SomeCoolFlow {
+  // constructor with a primitive type long argument
+  public SomeCoolFlow(long myParameterThatIsLong) {
+    // do something with the parameter here
+  }
+}
+```
+
+**Steps to build your request:**
+
+1. Find out the fully qualified class name of your contract (flow) and set this as the value for the request parameter `flowFullClassName`
+2. Decide on your flow invocation type. More details at [Invoke Contract (flow) with no parameters](#invoke-contract-flow-with-no-parameters)
+3. Find out what is the fully qualified class name of the parameter you wish to pass in. You can do this be inspecting the sources of the contract itself. If you do not have access to those sources, then the documentation of the contract should have answers or the person who authored said contract. In our case here the fully qualified class name for the number parameter is simply `long` because it is a primitive data type and as such these can be referred to in their short form, but the fully qualified version also works such as: `java.lang.Long`.
+When in doubt about these, you can always consult the [official java.lang.Long Java Docs](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html)
+After having determined the above, you can construct your first `JvmObject` JSON object as follows in order to pass in the number `42` as the first and only parameter for our flow invocation:
+    ```json
+    params: [
+      {
+        jvmTypeKind: JvmTypeKind.PRIMITIVE,
+        jvmType: {
+          fqClassName: "long",
+        },
+        primitiveValue: 42,
+      }
+    ]
+    ```
+1. Invoke the flow via the API client with the `params` populated as explained above:
+    ```typescript
+    import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+    import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+
+    // don't forget to specify the port if applicable
+    const apiUrl = "your-cactus-host.example.com";
+    const apiClient = new CordaApi({ basePath: apiUrl });
+
+    const res = await apiClient.invokeContractV1({
+      flowFullClassName: "com.example.organization.samples.application.flows.SomeCoolFlow",
+      flowInvocationType: FlowInvocationType.FLOWDYNAMIC,
+      params: [
+        {
+          jvmTypeKind: JvmTypeKind.PRIMITIVE,
+          jvmType: {
+            fqClassName: "long",
+          },
+          primitiveValue: 42,
+        }
+      ],
+      timeoutMs: 60000,
+    });
+    ```
+
+### Invoke Contract (flow) with a custom class parameter
+
+Below, we'll demonstrate invoking a contract with a single class instance parameter.
+
+**The contract sources:**
+
+```java
+package com.example.organization.samples.application.flows;
+
+// contract with a class instance parameter
+class BuildSpaceshipFlow {
+  public BuildSpaceshipFlow(SpaceshipInfo buildSpecs) {
+    // build spaceship as per the specs
+  }
+}
+```
+
+```java
+package com.example.organization.samples.application.flows;
+
+// The type that the contract accepts as an input parameter
+class SpaceshipInfo {
+  public SpaceshipInfo(String name, Integer seatsForHumans) {
+  }
+}
+```
+
+**Assembling and Sending your request:**
+
+Invoke the flow via the API client with the `params` populated as shown below.
+
+Key thing notice here is that we now have a class instance as a parameter for our contract (flow) invocation so we have to describe how this class instance itself will be instantiated by providing a nested array of parameters via the `jvmCtorArgs` which stands for Java Virtual Machine Constructor Arguments meaning that elements of this array will be passed in dynamically (via Reflection) to the class constructor.
+
+**Java Equivalent**
+
+```java
+cordaRpcClient.startFlowDynamic(
+  BuildSpaceshipFlow.class,
+  new SpaceshipInfo(
+    "The last spaceship you'll ever need.",
+    10000000
+  )
+);
+```
+
+**Cactus Invocation JSON DLS Equivalent to the Above Java Snippet**
+
+```typescript
+import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+
+// don't forget to specify the port if applicable
+const apiUrl = "your-cactus-host.example.com";
+const apiClient = new CordaApi({ basePath: apiUrl });
+
+const res = await apiClient.invokeContractV1({
+  flowFullClassName: "com.example.organization.samples.application.flows.BuildSpaceshipFlow",
+  flowInvocationType: FlowInvocationType.FLOWDYNAMIC,
+  params: [
+    {
+      jvmTypeKind: JvmTypeKind.REFERENCE,
+        jvmType: {
+        fqClassName: "com.example.organization.samples.application.flows.SpaceshipInfo",
+      },
+
+      jvmCtorArgs: [
+        {
+          jvmTypeKind: JvmTypeKind.PRIMITIVE,
+          jvmType: {
+            fqClassName: "java.lang.String",
+          },
+          primitiveValue: "The last spaceship you'll ever need.",
+        },
+        {
+          jvmTypeKind: JvmTypeKind.PRIMITIVE,
+          jvmType: {
+            fqClassName: "java.lang.Long",
+          },
+          primitiveValue: 10000000000,
+        },
+      ],
+    }
+  ],
+  timeoutMs: 60000,
+});
+```
 
 ### Custom Configuration via Env Variables
 
