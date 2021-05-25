@@ -17,10 +17,8 @@ import {
   IPluginLedgerConnector,
   IWebServiceEndpoint,
   IPluginWebService,
-  PluginAspect,
   ICactusPlugin,
   ICactusPluginOptions,
-  IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -197,10 +195,6 @@ export class PluginLedgerConnectorQuorum
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-ledger-connector-quorum`;
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.LEDGER_CONNECTOR;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<
@@ -446,9 +440,7 @@ export class PluginLedgerConnectorQuorum
 
     // locate the keychain plugin that has access to the keychain backend
     // denoted by the keychainID from the request.
-    const keychainPlugin = this.pluginRegistry
-      .findManyByAspect<IPluginKeychain>(PluginAspect.KEYCHAIN)
-      .find((k) => k.getKeychainId() === keychainId);
+    const keychainPlugin = this.pluginRegistry.findOneByKeychainId(keychainId);
 
     Checks.truthy(keychainPlugin, `${fnTag} keychain for ID:"${keychainId}"`);
 

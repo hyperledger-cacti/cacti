@@ -30,12 +30,10 @@ namespace Physical_Deplyoment_Elements {
     * getInstanceId(): string
     --
     * getPackageName(): string
-    * getPluginAspect(): string
   }
 
   entity "PluginInstance" <<object>> implements ICactusPlugin {
     + instanceId: string
-    + pluginAspect: string
     + packageName: string
   }
 }

@@ -17,7 +17,6 @@ import {
   ICactusPluginOptions,
   IPluginWebService,
   IWebServiceEndpoint,
-  PluginAspect,
 } from "@hyperledger/cactus-core-api";
 
 // TODO: Writing the getExpressRequestHandler() method for
@@ -76,7 +75,7 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
   private endpoints: IWebServiceEndpoint[] | undefined;
   public prometheusExporter: PrometheusExporter;
 
-  public get className() {
+  public get className(): string {
     return PluginKeychainVault.CLASS_NAME;
   }
 
@@ -195,10 +194,6 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
     return `@hyperledger/cactus-plugin-keychain-vault`;
   }
 
-  public getAspect(): PluginAspect {
-    return PluginAspect.KEYCHAIN;
-  }
-
   async rotateEncryptionKeys(): Promise<void> {
     throw new Error("Method not implemented.");
   }
@@ -247,7 +242,7 @@ export class PluginKeychainVault implements ICactusPlugin, IPluginWebService {
       return res;
     } catch (ex) {
       // We have to make sure that the exception is either an expected
-      // or an unexpected one where the expeted exception is what we
+      // or an unexpected one where the expected exception is what we
       // get when the key is not present in the keychain and anything
       // else being an unexpected exception that we do not want to
       // handle nor suppress under any circumstances since doing so
