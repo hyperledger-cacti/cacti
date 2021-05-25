@@ -16,7 +16,6 @@ import {
   ICactusPlugin,
   IPluginWebService,
   IWebServiceEndpoint,
-  PluginAspect,
 } from "@hyperledger/cactus-core-api";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -141,10 +140,6 @@ export class CarbonAccountingPlugin
 
   public getPackageName(): string {
     return "@hyperledger/cactus-example-carbon-accounting-backend";
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.BUSINESS_LOGIC;
   }
 
   public async enrollAdminV1(

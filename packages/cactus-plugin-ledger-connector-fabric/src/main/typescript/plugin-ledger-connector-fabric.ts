@@ -27,7 +27,6 @@ import { Optional } from "typescript-optional";
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
-  PluginAspect,
   IPluginWebService,
   IWebServiceEndpoint,
   ICactusPlugin,
@@ -192,10 +191,6 @@ export class PluginLedgerConnectorFabric
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-ledger-connector-fabric`;
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.LEDGER_CONNECTOR;
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {

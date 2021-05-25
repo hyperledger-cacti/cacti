@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
   ConsortiumDatabase,
   IPluginWebService,
-  PluginAspect,
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
@@ -222,10 +221,6 @@ export class PluginConsortiumManual
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-consortium-manual`;
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.CONSORTIUM;
   }
 
   public async getNodeJws(): Promise<JWSGeneral> {

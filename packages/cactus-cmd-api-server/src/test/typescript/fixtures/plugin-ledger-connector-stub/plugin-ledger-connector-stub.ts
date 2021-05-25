@@ -9,7 +9,6 @@ import {
   IPluginLedgerConnector,
   IWebServiceEndpoint,
   IPluginWebService,
-  PluginAspect,
   ICactusPlugin,
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
@@ -120,10 +119,6 @@ export class PluginLedgerConnectorStub
     // Note: this package does not exist on npm since this plugin only
     // exists for testing purposes
     return `@hyperledger/cactus-plugin-ledger-connector-stub`;
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.LEDGER_CONNECTOR;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<

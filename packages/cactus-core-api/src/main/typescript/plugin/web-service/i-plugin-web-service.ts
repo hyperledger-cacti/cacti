@@ -18,19 +18,14 @@ export interface IPluginWebService extends ICactusPlugin {
   shutdown(): Promise<void>;
 }
 
-export function isIPluginWebService(
-  pluginInstance: unknown,
-): pluginInstance is IPluginWebService {
+export function isIPluginWebService(x: unknown): x is IPluginWebService {
   return (
-    !!pluginInstance &&
-    typeof (pluginInstance as IPluginWebService).registerWebServices ===
-      "function" &&
-    typeof (pluginInstance as IPluginWebService).getOrCreateWebServices ===
-      "function" &&
-    typeof (pluginInstance as IPluginWebService).getHttpServer === "function" &&
-    typeof (pluginInstance as IPluginWebService).getPackageName ===
-      "function" &&
-    typeof (pluginInstance as IPluginWebService).getAspect === "function" &&
-    typeof (pluginInstance as IPluginWebService).shutdown === "function"
+    !!x &&
+    typeof (x as IPluginWebService).registerWebServices === "function" &&
+    typeof (x as IPluginWebService).getOrCreateWebServices === "function" &&
+    typeof (x as IPluginWebService).getHttpServer === "function" &&
+    typeof (x as IPluginWebService).getPackageName === "function" &&
+    typeof (x as IPluginWebService).getInstanceId === "function" &&
+    typeof (x as IPluginWebService).shutdown === "function"
   );
 }

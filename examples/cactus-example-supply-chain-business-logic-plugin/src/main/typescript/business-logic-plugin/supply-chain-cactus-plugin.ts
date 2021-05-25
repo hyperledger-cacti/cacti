@@ -11,7 +11,6 @@ import {
   ICactusPlugin,
   IPluginWebService,
   IWebServiceEndpoint,
-  PluginAspect,
 } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi as QuorumApi,
@@ -159,9 +158,5 @@ export class SupplyChainCactusPlugin
 
   public getPackageName(): string {
     return "@hyperledger/cactus-example-supply-chain-backend";
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.BUSINESS_LOGIC;
   }
 }

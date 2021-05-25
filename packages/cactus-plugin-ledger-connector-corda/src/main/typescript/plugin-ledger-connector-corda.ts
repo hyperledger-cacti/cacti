@@ -9,7 +9,6 @@ import {
   IPluginLedgerConnector,
   IWebServiceEndpoint,
   IPluginWebService,
-  PluginAspect,
   ICactusPluginOptions,
   ConsensusAlgorithmFamily,
 } from "@hyperledger/cactus-core-api";
@@ -99,10 +98,6 @@ export class PluginLedgerConnectorCorda
     const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.LEDGER_CONNECTOR;
   }
 
   public getInstanceId(): string {
