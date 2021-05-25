@@ -48,21 +48,21 @@ func TestCreateAsset(t *testing.T) {
 	transactionContext.GetStubReturns(chaincodeStub)
 
 	simpleAsset := SmartContract{}
-	err := simpleAsset.CreateAsset(transactionContext, "", "", "", 0, "02 Jan 26 15:04 MST")
+	err := simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 26 15:04 MST")
 	require.NoError(t, err)
 
-	err = simpleAsset.CreateAsset(transactionContext, "", "", "", 0, "02 Jan 06 15:04 MST")
+	err = simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 06 15:04 MST")
 	require.EqualError(t, err, "maturity date can not be in past.")
 
-	err = simpleAsset.CreateAsset(transactionContext, "", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "")
 	require.EqualError(t, err, "maturity date provided is not in correct format, please use this format: 02 Jan 06 15:04 MST")
 
 	chaincodeStub.GetStateReturns([]byte{}, nil)
-	err = simpleAsset.CreateAsset(transactionContext, "asset1", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, "", "asset1", "", "", 0, "")
 	require.EqualError(t, err, "the asset asset1 already exists")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = simpleAsset.CreateAsset(transactionContext, "asset1", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, "", "asset1", "", "", 0, "")
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 }
 
@@ -77,16 +77,16 @@ func TestReadAsset(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(bytes, nil)
 	simpleAsset := SmartContract{}
-	asset, err := simpleAsset.ReadAsset(transactionContext, "")
+	asset, err := simpleAsset.ReadAsset(transactionContext, "", "")
 	require.NoError(t, err)
 	require.Equal(t, expectedAsset, asset)
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	_, err = simpleAsset.ReadAsset(transactionContext, "")
+	_, err = simpleAsset.ReadAsset(transactionContext, "", "")
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 
 	chaincodeStub.GetStateReturns(nil, nil)
-	asset, err = simpleAsset.ReadAsset(transactionContext, "asset1")
+	asset, err = simpleAsset.ReadAsset(transactionContext, "", "asset1")
 	require.EqualError(t, err, "the asset asset1 does not exist")
 	require.Nil(t, asset)
 }
@@ -102,15 +102,15 @@ func TestUpdateFaceValue(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(bytes, nil)
 	simpleAsset := SmartContract{}
-	err = simpleAsset.UpdateFaceValue(transactionContext, "", 0)
+	err = simpleAsset.UpdateFaceValue(transactionContext, "", "", 0)
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(nil, nil)
-	err = simpleAsset.UpdateFaceValue(transactionContext, "asset1", 0)
+	err = simpleAsset.UpdateFaceValue(transactionContext, "", "asset1", 0)
 	require.EqualError(t, err, "the asset asset1 does not exist")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = simpleAsset.UpdateFaceValue(transactionContext, "asset1", 0)
+	err = simpleAsset.UpdateFaceValue(transactionContext, "", "asset1", 0)
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 }
 
@@ -125,15 +125,15 @@ func TestUpdateMaturityDate(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(bytes, nil)
 	simpleAsset := SmartContract{}
-	err = simpleAsset.UpdateMaturityDate(transactionContext, "", time.Now())
+	err = simpleAsset.UpdateMaturityDate(transactionContext, "", "", time.Now())
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(nil, nil)
-	err = simpleAsset.UpdateMaturityDate(transactionContext, "asset1", time.Now())
+	err = simpleAsset.UpdateMaturityDate(transactionContext, "", "asset1", time.Now())
 	require.EqualError(t, err, "the asset asset1 does not exist")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = simpleAsset.UpdateMaturityDate(transactionContext, "asset1", time.Now())
+	err = simpleAsset.UpdateMaturityDate(transactionContext, "", "asset1", time.Now())
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 }
 
@@ -149,15 +149,15 @@ func TestDeleteAsset(t *testing.T) {
 	chaincodeStub.GetStateReturns(bytes, nil)
 	chaincodeStub.DelStateReturns(nil)
 	simpleAsset := SmartContract{}
-	err = simpleAsset.DeleteAsset(transactionContext, "")
+	err = simpleAsset.DeleteAsset(transactionContext, "", "")
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(nil, nil)
-	err = simpleAsset.DeleteAsset(transactionContext, "asset1")
-	require.EqualError(t, err, "the asset asset1 does not exist")
+	err = simpleAsset.DeleteAsset(transactionContext, "", "asset1")
+	require.EqualError(t, err, "the bond asset of type " + "" + " and id " + "asset1" + " does not exist")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = simpleAsset.DeleteAsset(transactionContext, "")
+	err = simpleAsset.DeleteAsset(transactionContext, "", "")
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 }
 
@@ -172,11 +172,11 @@ func TestUpdateOwner(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(bytes, nil)
 	simpleAsset := SmartContract{}
-	err = simpleAsset.UpdateOwner(transactionContext, "", "")
+	err = simpleAsset.UpdateOwner(transactionContext, "", "", "")
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = simpleAsset.UpdateOwner(transactionContext, "", "")
+	err = simpleAsset.UpdateOwner(transactionContext, "", "", "")
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 }
 

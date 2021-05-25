@@ -33,7 +33,7 @@ func logWarnings(warnMsgs ...string) {
     }
 }
 
-func (amc *AssetManagementContract) validateAndExtractAssetAgreement(assetAgreementSerializedProto64 string) (*common.AssetExchangeAgreement, error) {
+func (amc *AssetManagementContract) ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64 string) (*common.AssetExchangeAgreement, error) {
     assetAgreement := &common.AssetExchangeAgreement{}
     // Decoding from base64
     assetAgreementSerializedProto, err := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
@@ -51,7 +51,7 @@ func (amc *AssetManagementContract) validateAndExtractAssetAgreement(assetAgreem
     return assetAgreement, nil
 }
 
-func validateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64 string) (*common.FungibleAssetExchangeAgreement, error) {
+func (amc *AssetManagementContract) ValidateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64 string) (*common.FungibleAssetExchangeAgreement, error) {
     assetAgreement := &common.FungibleAssetExchangeAgreement{}
     // Decoding from base64
     fungibleAssetExchangeAgreementSerializedProto, err := base64.StdEncoding.DecodeString(fungibleAssetExchangeAgreementSerializedProto64)
@@ -69,7 +69,7 @@ func validateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSeri
     return assetAgreement, nil
 }
 
-func (amc *AssetManagementContract) validateAndExtractLockInfo(lockInfoSerializedProto64 string) (*common.AssetLock, error) {
+func (amc *AssetManagementContract) ValidateAndExtractLockInfo(lockInfoSerializedProto64 string) (*common.AssetLock, error) {
     lockInfo := &common.AssetLock{}
     // Decoding from base64
     lockInfoSerializedProto, err := base64.StdEncoding.DecodeString(lockInfoSerializedProto64)
@@ -87,7 +87,7 @@ func (amc *AssetManagementContract) validateAndExtractLockInfo(lockInfoSerialize
     return lockInfo, nil
 }
 
-func (amc *AssetManagementContract) validateAndExtractClaimInfo(claimInfoSerializedProto64 string) (*common.AssetClaim, error) {
+func (amc *AssetManagementContract) ValidateAndExtractClaimInfo(claimInfoSerializedProto64 string) (*common.AssetClaim, error) {
     claimInfo := &common.AssetClaim{}
     // Decode from base64
     claimInfoSerializedProto, err := base64.StdEncoding.DecodeString(claimInfoSerializedProto64)
@@ -108,11 +108,11 @@ func (amc *AssetManagementContract) validateAndExtractClaimInfo(claimInfoSeriali
 // Ledger transaction (invocation) functions
 
 func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return "", err
     }
-    lockInfo, err := amc.validateAndExtractLockInfo(lockInfoSerializedProto64)
+    lockInfo, err := amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)
     if err != nil {
         return "", err
     }
@@ -141,11 +141,11 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
 }
 
 func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-    assetAgreement, err := validateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
     if err != nil {
         return "", err
     }
-    lockInfo, err := amc.validateAndExtractLockInfo(lockInfoSerializedProto64)
+    lockInfo, err := amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)
     if err != nil {
         return "", err
     }
@@ -174,7 +174,7 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
 }
 
 func (amc *AssetManagementContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -197,11 +197,11 @@ func (amc *AssetManagementContract) IsAssetLockedQueryUsingContractId(ctx contra
 }
 
 func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return false, err
     }
-    claimInfo, err := amc.validateAndExtractClaimInfo(claimInfoSerializedProto64)
+    claimInfo, err := amc.ValidateAndExtractClaimInfo(claimInfoSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -232,7 +232,7 @@ func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.Transacti
     if len(contractId) == 0 {
         return false, logThenErrorf("empty contract id")
     }
-    claimInfo, err := amc.validateAndExtractClaimInfo(claimInfoSerializedProto64)
+    claimInfo, err := amc.ValidateAndExtractClaimInfo(claimInfoSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -263,7 +263,7 @@ func (amc *AssetManagementContract) ClaimAssetUsingContractId(ctx contractapi.Tr
     if len(contractId) == 0 {
         return false, logThenErrorf("empty contract id")
     }
-    claimInfo, err := amc.validateAndExtractClaimInfo(claimInfoSerializedProto64)
+    claimInfo, err := amc.ValidateAndExtractClaimInfo(claimInfoSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -291,7 +291,7 @@ func (amc *AssetManagementContract) ClaimAssetUsingContractId(ctx contractapi.Tr
 }
 
 func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -377,7 +377,7 @@ func (amc *AssetManagementContract) GetAllFungibleLockedAssets(ctx contractapi.T
 }
 
 func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (uint64, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return 0, err
     }
@@ -386,7 +386,7 @@ func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.Transa
 }
 
 func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string) (uint64, error) {
-    assetAgreement, err := validateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
     if err != nil {
         return 0, err
     }
