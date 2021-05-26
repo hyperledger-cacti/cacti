@@ -223,17 +223,6 @@ func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInter
 	return balance >= numUnits, nil
 }
 
-// Add token assets into the wallet of a given owner
-func (s *SmartContract) AddTokenAssetsIntoWallet(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, owner string) (bool, error) {
-	id := getWalletId(owner)
-	err := addTokenAssetsHelper(ctx, tokenAssetType, numUnits, id)
-	if err != nil {
-		return false, logThenErrorf("failed to add tokens into wallet for owner %s", owner)
-	}
-
-	return true, nil
-}
-
 // Helper Functions for token asset
 func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, id string) error {
 	walletJSON, err := ctx.GetStub().GetState(id)
@@ -261,17 +250,6 @@ func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, tokenAsse
 		return err
 	}
 	return ctx.GetStub().PutState(id, walletNewJSON)
-}
-
-// Subtract token assets from the wallet of a given owner
-func (s *SmartContract) SubtractTokenAssetsFromWallet(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, owner string) (bool, error) {
-	id := getWalletId(owner)
-	err := subTokenAssetsHelper(ctx, tokenAssetType, numUnits, id)
-	if err != nil {
-		return false, logThenErrorf("failed to subtract tokens from wallet for owner %s", owner)
-	}
-
-	return true, nil
 }
 
 func subTokenAssetsHelper(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, id string) error {

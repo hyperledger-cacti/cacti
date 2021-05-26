@@ -168,7 +168,8 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	tokensWalletBytes, _ = json.Marshal(tokensWallet)
 	chaincodeStub.GetStateReturnsOnCall(6, tokensWalletBytes, nil)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte(tokensContractId)))
-	chaincodeStub.GetStateReturnsOnCall(7, tokensWalletBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(7, tokenAssetTypeBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(8, tokensWalletBytes, nil)
 	tokensContractId, err = sc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(tokensAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.NoError(t, err)
 	require.NotEmpty(t, tokensContractId)
@@ -188,13 +189,19 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
 	chaincodeStub.GetCreatorReturnsOnCall(2, []byte(getCreatorInContext("locker")), nil)
+	tokenAssetType = TokenAssetType {
+		Issuer: tokenIssuer,
+		Value: tokenValue,
+	}
+        tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
 	contractedTokenAsset := ContractedTokenAsset{
 		Type: tokenType,
 		NumUnits: numTokens,
 	}
 	contractedTokenAssetBytes, _ := json.Marshal(contractedTokenAsset)
-	chaincodeStub.GetStateReturnsOnCall(8, contractedTokenAssetBytes, nil)
-	chaincodeStub.GetStateReturnsOnCall(9, nil, nil)
+	chaincodeStub.GetStateReturnsOnCall(9, tokenAssetTypeBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(10, contractedTokenAssetBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(11, nil, nil)
 	_, err = sc.ClaimFungibleAsset(ctx, base64.StdEncoding.EncodeToString(tokensAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
         require.NoError(t, err)
 
@@ -203,8 +210,8 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	fmt.Println("*** Claim bond asset in network1 by Bob ***")
 	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
 	chaincodeStub.GetCreatorReturnsOnCall(3, []byte(getCreatorInContext("recipient")), nil)
-	chaincodeStub.GetStateReturnsOnCall(10, bondAssetBytes, nil)
-	chaincodeStub.GetStateReturnsOnCall(11, []byte(bondContractId), nil)
+	chaincodeStub.GetStateReturnsOnCall(12, bondAssetBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(13, []byte(bondContractId), nil)
 	_, err = sc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
         require.NoError(t, err)
 

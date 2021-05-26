@@ -221,7 +221,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
         return "", logThenErrorf(err.Error())
     }
 
-    _, err = s.SubtractTokenAssetsFromWallet(ctx, assetAgreement.Type, assetAgreement.NumUnits, locker)
+    err = s.DeleteTokenAssets(ctx, assetAgreement.Type, assetAgreement.NumUnits, locker)
     if err != nil {
 	// not performing the operation UnlockFungibleAsset and let the TxCreator take care of it
         return contractId, logThenErrorf(err.Error())
@@ -359,7 +359,7 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 		return false, logThenErrorf("unmarshal error: %+v", err)
         }
 
-        _, err = s.AddTokenAssetsIntoWallet(ctx, contractedTokenAsset.Type, contractedTokenAsset.NumUnits, recipientECertBase64)
+        err = s.IssueTokenAssets(ctx, contractedTokenAsset.Type, contractedTokenAsset.NumUnits, recipientECertBase64)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
@@ -452,7 +452,7 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
 		return false, logThenErrorf("unmarshal error: %+v", err)
         }
 
-        _, err = s.AddTokenAssetsIntoWallet(ctx, contractedTokenAsset.Type, contractedTokenAsset.NumUnits, lockerECertBase64)
+        err = s.IssueTokenAssets(ctx, contractedTokenAsset.Type, contractedTokenAsset.NumUnits, lockerECertBase64)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
