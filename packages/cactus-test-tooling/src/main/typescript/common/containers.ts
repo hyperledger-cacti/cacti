@@ -6,6 +6,7 @@ import Dockerode from "dockerode";
 import tar from "tar-stream";
 import fs from "fs-extra";
 import pRetry from "p-retry";
+import { RuntimeError } from "run-time-error";
 import { Streams } from "../common/streams";
 import {
   Checks,
@@ -50,7 +51,76 @@ export interface IPushFileFromFsOptions {
   dstFileDir: string;
 }
 
+export interface IGetDiagnosticsRequest {
+  logLevel: LogLevelDesc;
+  dockerodeOptions?: Dockerode.DockerOptions;
+}
+
+export interface IGetDiagnosticsResponse {
+  readonly images: Dockerode.ImageInfo[];
+  readonly containers: Dockerode.ContainerInfo[];
+  readonly volumes: {
+    Volumes: Dockerode.VolumeInspectInfo[];
+    Warnings: string[];
+  };
+  readonly networks: unknown[];
+  readonly info: unknown;
+  readonly version: Dockerode.DockerVersion;
+}
+
 export class Containers {
+  /**
+   * Obtains container diagnostic information that is mainly meant to be useful
+   * in the event of a hard-to-debug test failure.
+   */
+  static async getDiagnostics(
+    req: IGetDiagnosticsRequest,
+  ): Promise<IGetDiagnosticsResponse> {
+    const log = LoggerProvider.getOrCreate({
+      label: "containers#get-diagnostics",
+      level: req.logLevel,
+    });
+
+    try {
+      const dockerode = new Dockerode(req.dockerodeOptions);
+      const images = await dockerode.listImages();
+      const containers = await dockerode.listContainers();
+      const volumes = await dockerode.listVolumes();
+      const networks = await dockerode.listNetworks();
+      const info = await dockerode.info();
+      const version = await dockerode.version();
+
+      const response: IGetDiagnosticsResponse = {
+        images,
+        containers,
+        volumes,
+        networks,
+        info,
+        version,
+      };
+      return response;
+    } catch (ex) {
+      log.error("Failed to get diagnostics of Docker daemon", ex);
+      throw new RuntimeError("Failed to get diagnostics of Docker daemon", ex);
+    }
+  }
+  /**
+   * Obtains container diagnostic information that is mainly meant to be useful
+   * in the event of a hard-to-debug test failure.
+   */
+  static async logDiagnostics(
+    req: IGetDiagnosticsRequest,
+  ): Promise<IGetDiagnosticsResponse> {
+    const log = LoggerProvider.getOrCreate({
+      label: "containers#log-diagnostics",
+      level: req.logLevel,
+    });
+
+    const response = await Containers.getDiagnostics(req);
+    log.info("ContainerDiagnostics=%o", JSON.stringify(response, null, 4));
+    return response;
+  }
+
   /**
    * Uploads a file from the local (host) file system to a container's file-system.
    *
