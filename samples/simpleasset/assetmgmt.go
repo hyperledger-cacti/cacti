@@ -147,16 +147,6 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
     if uint64(bond.MaturityDate.Unix()) < lockInfoHTLC.ExpiryTimeSecs {
         return "", logThenErrorf("cannot lock bond asset as it will mature before locking period")
     }
-    // Check if asset is already locked
-    locked, err := s.IsAssetLocked(ctx, assetExchangeAgreementSerializedProto64)
-    if err != nil {
-        return "", logThenErrorf(err.Error())
-    }
-    // If asset is locked, simply return success (effectively a noop)
-    if locked {
-        log.Info("asset already in locked state")
-        return "", nil
-    }
     contractId, err := s.amc.LockAsset(ctx, assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
     if err != nil {
         return "", logThenErrorf(err.Error())

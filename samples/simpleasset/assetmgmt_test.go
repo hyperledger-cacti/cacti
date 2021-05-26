@@ -138,7 +138,6 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	}
 	bondAssetBytes, err := json.Marshal(bondAsset)
 	chaincodeStub.GetStateReturnsOnCall(4, bondAssetBytes, nil)
-	chaincodeStub.GetCreatorReturnsOnCall(0, []byte(getCreatorInContext("locker")), nil)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte(bondContractId)))
 	bondContractId, err = sc.LockAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
         require.NoError(t, err)
@@ -155,7 +154,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 		Recipient: tokensRecipient,
 	}
 	tokensAgreementBytes, _ := proto.Marshal(tokensAgreement)
-	chaincodeStub.GetCreatorReturnsOnCall(1, []byte(getCreatorInContext("recipient")), nil)
+	chaincodeStub.GetCreatorReturnsOnCall(0, []byte(getCreatorInContext("recipient")), nil)
 	tokenAssetType = TokenAssetType {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
@@ -188,7 +187,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
-	chaincodeStub.GetCreatorReturnsOnCall(2, []byte(getCreatorInContext("locker")), nil)
+	chaincodeStub.GetCreatorReturnsOnCall(1, []byte(getCreatorInContext("locker")), nil)
 	tokenAssetType = TokenAssetType {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
@@ -209,7 +208,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	// Claim bond asset in network1 by Bob
 	fmt.Println("*** Claim bond asset in network1 by Bob ***")
 	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
-	chaincodeStub.GetCreatorReturnsOnCall(3, []byte(getCreatorInContext("recipient")), nil)
+	chaincodeStub.GetCreatorReturnsOnCall(2, []byte(getCreatorInContext("recipient")), nil)
 	chaincodeStub.GetStateReturnsOnCall(12, bondAssetBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(13, []byte(bondContractId), nil)
 	_, err = sc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
