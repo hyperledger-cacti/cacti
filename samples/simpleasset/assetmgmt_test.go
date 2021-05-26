@@ -11,9 +11,6 @@ import (
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
-	//"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	//"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	//"github.com/hyperledger-labs/weaver/samples/simpleasset/mocks"
 	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/protos-go/common"
 )
@@ -57,6 +54,7 @@ func generateSHA256HashInBase64Form(preimage string) string {
 	return shaHashBase64
 }
 
+// test case for "asset exchange" happy path
 func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	ctx, chaincodeStub, sc := prepMockStub()
 

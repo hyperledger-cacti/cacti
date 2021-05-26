@@ -7,14 +7,14 @@
 package assetmgmt
 
 import (
-"os"
-"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/mocks"
+	"os"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/mocks"
 )
 
 const (
-myOrg1Msp               = "Org1Testmsp"
-myOrg1Clientid          = "myOrg1Userid"
-interopChaincodeId      = "interopcc"
+	myOrg1Msp               = "Org1Testmsp"
+	myOrg1Clientid          = "myOrg1Userid"
+	interopChaincodeId      = "interopcc"
 )
 
 func prepMockStub() (*mocks.TransactionContext, *mocks.ChaincodeStub, AssetManagementContract) {

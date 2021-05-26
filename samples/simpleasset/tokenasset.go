@@ -238,7 +238,7 @@ func (s *SmartContract) AddTokenAssetsIntoWallet(ctx contractapi.TransactionCont
 func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, id string) error {
 	walletJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
-		return err
+		return logThenErrorf("failed to retrieve entry from ledger: %+v", err)
 	}
 	var wallet TokenWallet
 	if walletJSON != nil {

@@ -9,7 +9,6 @@ package main
 import (
     "fmt"
     "errors"
-    "time"
     "encoding/json"
 
     "github.com/golang/protobuf/proto"
@@ -141,9 +140,11 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
     if err != nil {
 	    return "", logThenErrorf("failed reading the bond asset: %+v", err)
     }
+    log.Infof("bond: %+v", *bond)
+    log.Infof("lockInfoHTLC: %+v", *lockInfoHTLC)
 
     // Check if asset doesn't mature before locking period
-    if uint64(bond.MaturityDate.Unix()) < (uint64(time.Now().Unix()) + lockInfoHTLC.ExpiryTimeSecs) {
+    if uint64(bond.MaturityDate.Unix()) < lockInfoHTLC.ExpiryTimeSecs {
         return "", logThenErrorf("cannot lock bond asset as it will mature before locking period")
     }
     // Check if asset is already locked
