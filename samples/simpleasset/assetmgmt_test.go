@@ -54,6 +54,11 @@ func generateSHA256HashInBase64Form(preimage string) string {
 	return shaHashBase64
 }
 
+type ContractedFungibleAsset struct {
+	Type		string	`json:"type"`
+	NumUnits	uint64	`json:"id"`
+}
+
 // test case for "asset exchange" happy path
 func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	ctx, chaincodeStub, sc := prepMockStub()
@@ -193,10 +198,11 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 		Value: tokenValue,
 	}
         tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
-	contractedTokenAsset := ContractedTokenAsset{
+	contractedTokenAsset := ContractedFungibleAsset{
 		Type: tokenType,
 		NumUnits: numTokens,
 	}
+
 	contractedTokenAssetBytes, _ := json.Marshal(contractedTokenAsset)
 	chaincodeStub.GetStateReturnsOnCall(9, tokenAssetTypeBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(10, contractedTokenAssetBytes, nil)

@@ -9,25 +9,12 @@ package main
 import (
     "fmt"
     "errors"
-    "encoding/json"
 
     "github.com/golang/protobuf/proto"
     log "github.com/sirupsen/logrus"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
     "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/protos-go/common"
 )
-
-// Object used in the map, contractId --> contracted-bond-asset
-type ContractedBondAsset struct {
-        Type		string  `json:"type"`
-        Id		string  `json:"id"`
-}
-
-// Object used in the map, contractId --> contracted-bond-asset
-type ContractedTokenAsset struct {
-        Type            string  `json:"type"`
-        NumUnits        uint64  `json:"id"`
-}
 
 // helper functions
 
@@ -77,48 +64,6 @@ func getLockInfoProtoBytesHTLC(hashBase64 []byte, expiryTimeSecs uint64) ([]byte
     return lockInfoProtoBytes, nil
 }
 
-func getAssetLockMapKey(ctx contractapi.TransactionContextInterface, Type, Id string) (string, error) {
-    assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{Type, Id})
-    if err != nil {
-        return "", logThenErrorf("error while creating composite key: %+v", err)
-    }
-
-    return assetLockKey, nil
-}
-
-func getBondAssetContractIdMapKey(contractId string) string {
-    return "BondContract_" + contractId
-}
-
-func getTokenAssetContractIdMapKey(contractId string) string {
-    return "TokenContract_" + contractId
-}
-
-func deleteBondAssetLookupMaps(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
-    // delete the lookup details
-    assetLockKey, err := getAssetLockMapKey(ctx, assetAgreement.Type, assetAgreement.Id)
-    if err != nil {
-        return logThenErrorf(err.Error())
-    }
-    contractIdBytes, err := ctx.GetStub().GetState(assetLockKey)
-    if err != nil {
-        return logThenErrorf("unable to fetch from bond asset network ledger: %+v", err.Error())
-    }
-    if contractIdBytes == nil {
-        return logThenErrorf("contractId not found on bond asset network ledger")
-    }
-    err = ctx.GetStub().DelState(getBondAssetContractIdMapKey(string(contractIdBytes)))
-    if err != nil {
-        return logThenErrorf("failed to delete entry contractId %s from bond asset network ledger: %+v", string(contractIdBytes), err)
-    }
-    err = ctx.GetStub().DelState(assetLockKey)
-    if err != nil {
-        return logThenErrorf("failed to delete entry associated with contractId %s from bond asset ledger: %+v", string(contractIdBytes), err)
-    }
-
-    return nil
-}
-
 // Ledger transaction (invocation) functions
 
 func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
@@ -153,25 +98,9 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
     }
 
     // write to the ledger the details needed at the time of unlock/claim
-    contractedBondAsset := &ContractedBondAsset {
-	Type: assetAgreement.Type,
-	Id: assetAgreement.Id,
-    }
-    contractedBondAssetBytes, err := json.Marshal(contractedBondAsset)
+    err = s.amc.ContractIdAssetsLookupMap(ctx, assetAgreement.Type, assetAgreement.Id, contractId)
     if err != nil {
-        return "", logThenErrorf("marshal error: %+v", err)
-    }
-    assetLockKey, err := getAssetLockMapKey(ctx, assetAgreement.Type, assetAgreement.Id)
-    if err != nil {
-	return "", logThenErrorf(err.Error())
-    }
-    err = ctx.GetStub().PutState(assetLockKey, []byte(contractId))
-    if err != nil {
-	return "", logThenErrorf("failed to write to the bond asset network ledger: %+v", err)
-    }
-    err = ctx.GetStub().PutState(getBondAssetContractIdMapKey(contractId), contractedBondAssetBytes)
-    if err != nil {
-	return "", logThenErrorf("failed to write to the bond asset network ledger: %+v", err)
+        return "", logThenErrorf(err.Error())
     }
 
     return contractId, nil
@@ -217,17 +146,9 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
         return contractId, logThenErrorf(err.Error())
     }
 
-    contractedTokenAsset := &ContractedTokenAsset {
-	Type: assetAgreement.Type,
-	NumUnits: assetAgreement.NumUnits,
-    }
-    contractedTokenAssetBytes, err := json.Marshal(contractedTokenAsset)
+    err = s.amc.ContractIdFungibleAssetsLookupMap(ctx, assetAgreement.Type, assetAgreement.NumUnits, contractId)
     if err != nil {
-        return "", logThenErrorf("marshal error: %+v", err)
-    }
-    err = ctx.GetStub().PutState(getTokenAssetContractIdMapKey(contractId), contractedTokenAssetBytes)
-    if err != nil {
-	return "", logThenErrorf("failed to write to the token asset network ledger: %+v", err)
+        return "", logThenErrorf(err.Error())
     }
 
     return contractId, nil
@@ -268,7 +189,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
             return false, logThenErrorf(err.Error())
         }
 
-	err = deleteBondAssetLookupMaps(ctx, assetAgreement)
+	err = s.amc.DeleteAssetLookupMaps(ctx, assetAgreement.Type, assetAgreement.Id)
 	if err != nil {
 		return false, logThenErrorf("failed to delete bond asset lookup maps: %+v", err)
 	}
@@ -292,33 +213,17 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
         }
 
 	// Fetch the contracted bond asset type and id from the ledger
-	contractedBondAssetBytes, err := ctx.GetStub().GetState(getBondAssetContractIdMapKey(contractId))
+	assetType, assetId, err := s.amc.FetchFromContractIdAssetLookupMap(ctx, contractId)
 	if err != nil {
-	    return false, logThenErrorf("failed to read from bond asset network ledger: %+v", err)
-        }
-	contractedBondAsset := ContractedBondAsset{}
-	err = json.Unmarshal(contractedBondAssetBytes, &contractedBondAsset)
-        if err != nil {
-		return false, logThenErrorf("unmarshal error: %+v", err)
+	    return false, logThenErrorf(err.Error())
         }
 
-        err = s.UpdateOwner(ctx, contractedBondAsset.Type, contractedBondAsset.Id, recipientECertBase64)
+        err = s.UpdateOwner(ctx, assetType, assetId, recipientECertBase64)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
 	// delete the lookup maps
-	assetLockKey, err := getAssetLockMapKey(ctx, contractedBondAsset.Type, contractedBondAsset.Id)
-	if err != nil {
-            return false, logThenErrorf(err.Error())
-	}
-	err = ctx.GetStub().DelState(assetLockKey)
-	if err != nil {
-            return false, logThenErrorf("failed to delete entry associated with contractId %s from bond asset ledger: %+v", contractId, err)
-	}
-	err = ctx.GetStub().DelState(contractId)
-	if err != nil {
-            return false, logThenErrorf("failed to delete contractId %s from bond asset network ledger: %+v", contractId, err)
-	}
+	err = s.amc.DeleteAssetLookupMapsUsingContractId(ctx, assetType, assetId, contractId)
 
         return true, nil
     } else {
@@ -339,23 +244,18 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
         }
 
 	// Fetch the contracted token asset type and numUnits from the ledger
-	contractedTokenAssetBytes, err := ctx.GetStub().GetState(getTokenAssetContractIdMapKey(contractId))
+	assetType, numUnits, err := s.amc.FetchFromContractIdFungibleAssetLookupMap(ctx, contractId)
 	if err != nil {
-	    return false, logThenErrorf("failed to read from token asset network ledger: %+v", err)
-        }
-	contractedTokenAsset := ContractedTokenAsset{}
-	err = json.Unmarshal(contractedTokenAssetBytes, &contractedTokenAsset)
-        if err != nil {
-		return false, logThenErrorf("unmarshal error: %+v", err)
+	    return false, logThenErrorf(err.Error())
         }
 
-        err = s.IssueTokenAssets(ctx, contractedTokenAsset.Type, contractedTokenAsset.NumUnits, recipientECertBase64)
+        err = s.IssueTokenAssets(ctx, assetType, numUnits, recipientECertBase64)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
-	err = ctx.GetStub().DelState(contractId)
+	err = s.amc.DeleteFungibleAssetLookupMap(ctx, contractId)
 	if err != nil {
-            return false, logThenErrorf("failed to delete contractId %s from token asset network ledger: %+v", contractId, err)
+            return false, logThenErrorf(err.Error())
 	}
         return true, nil
     } else {
@@ -374,7 +274,7 @@ func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface,
         return false, logThenErrorf(err.Error())
     }
     if unlocked {
-	err = deleteBondAssetLookupMaps(ctx, assetAgreement)
+	err = s.amc.DeleteAssetLookupMaps(ctx, assetAgreement.Type, assetAgreement.Id)
 	if err != nil {
             return false, logThenErrorf("failed to delete bond asset lookup maps: %+v", err)
         }
@@ -392,26 +292,9 @@ func (s *SmartContract) UnlockBondAssetUsingContractId(ctx contractapi.Transacti
     }
     if unlocked {
         // delete the lookup maps
-        contractedBondAssetBytes, err := ctx.GetStub().GetState(getBondAssetContractIdMapKey(contractId))
-        if err != nil {
-            return false, logThenErrorf("failed to read from bond asset network ledger: %+v", err)
-        }
-        contractedBondAsset := ContractedBondAsset{}
-        err = json.Unmarshal(contractedBondAssetBytes, &contractedBondAsset)
-        if err != nil {
-            return false, logThenErrorf("unmarshal error: %+v", err)
-        }
-        assetLockKey, err := getAssetLockMapKey(ctx, contractedBondAsset.Type, contractedBondAsset.Id)
+        err := s.amc.DeleteAssetLookupMapsOnlyUsingContractId(ctx, contractId)
         if err != nil {
             return false, logThenErrorf(err.Error())
-        }
-        err = ctx.GetStub().DelState(assetLockKey)
-        if err != nil {
-            return false, logThenErrorf("failed to delete entry associated with contractId %s from bond asset ledger: %+v", contractId, err)
-        }
-        err = ctx.GetStub().DelState(contractId)
-        if err != nil {
-            return false, logThenErrorf("failed to delete contractId %s from bond asset network ledger: %+v", contractId, err)
         }
         return true, nil
     } else {
@@ -432,23 +315,18 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
         }
 
 	// Fetch the contracted token asset type and numUnits from the ledger
-	contractedTokenAssetBytes, err := ctx.GetStub().GetState(getTokenAssetContractIdMapKey(contractId))
+	assetType, numUnits, err := s.amc.FetchFromContractIdFungibleAssetLookupMap(ctx, contractId)
 	if err != nil {
-	    return false, logThenErrorf("failed to read from token asset network ledger: %+v", err)
-        }
-	contractedTokenAsset := ContractedTokenAsset{}
-	err = json.Unmarshal(contractedTokenAssetBytes, &contractedTokenAsset)
-        if err != nil {
-		return false, logThenErrorf("unmarshal error: %+v", err)
+	    return false, logThenErrorf(err.Error())
         }
 
-        err = s.IssueTokenAssets(ctx, contractedTokenAsset.Type, contractedTokenAsset.NumUnits, lockerECertBase64)
+        err = s.IssueTokenAssets(ctx, assetType, numUnits, lockerECertBase64)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
-	err = ctx.GetStub().DelState(contractId)
+	err = s.amc.DeleteFungibleAssetLookupMap(ctx, contractId)
 	if err != nil {
-            return false, logThenErrorf("failed to delete contractId %s from token asset network ledger: %+v", contractId, err)
+            return false, logThenErrorf(err.Error())
         }
         return true, nil
     } else {
