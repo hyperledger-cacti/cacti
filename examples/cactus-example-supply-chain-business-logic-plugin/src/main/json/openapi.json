@@ -2,7 +2,7 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Hyperledger Cactus Example - Supply Chain App",
-        "description": "Demonstrates how a business use case can be satisifedwith Cactus when multiple distinct ledgers are involved.",
+        "description": "Demonstrates how a business use case can be satisfied with Cactus when multiple distinct ledgers are involved.",
         "version": "0.2.0",
         "license": {
             "name": "Apache 2.0",

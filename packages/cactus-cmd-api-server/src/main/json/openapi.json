@@ -31,6 +31,23 @@
     ],
     "components": {
         "schemas": {
+            "WatchHealthcheckV1": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Next",
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Error",
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
             "MemoryUsage": {
                 "type": "object",
                 "properties": {

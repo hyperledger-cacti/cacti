@@ -46,7 +46,7 @@ const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
@@ -166,7 +166,7 @@ test(testCase, async (t: Test) => {
       invocationType: FabricContractInvocationType.SEND,
       contractName: "fabcar",
       methodName: "createCar",
-      params: [carId, "Trabant", "601", "Blue", carOwner],
+      params: [carId, "Ford", "601", "Blue", carOwner],
     };
 
     const res = await apiClient.runTransactionV1(req);
@@ -219,6 +219,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

@@ -145,7 +145,7 @@ async function fireArtilleryCommand(t: Test) {
     const artilleryCommand = `artillery run ${artilleryScriptLocation} --output report.json`;
     await shell_exec(artilleryCommand);
   } catch (err) {
-    log.error(`Failed to run artilerry execution.`, err);
+    log.error(`Failed to run artillery execution.`, err);
     t.fail(`Test failed. Err: ${err}`);
   }
 }

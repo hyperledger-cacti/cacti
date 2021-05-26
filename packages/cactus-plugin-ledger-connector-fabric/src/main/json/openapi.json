@@ -247,7 +247,8 @@
                 "type": "string",
                 "enum": [
                     "FabricContractInvocationType.SEND",
-                    "FabricContractInvocationType.CALL"
+                    "FabricContractInvocationType.CALL",
+                    "FabricContractInvocationType.SENDPRIVATE"
                 ]
             },
             "SSHExecCommandResponse": {
@@ -288,6 +289,10 @@
                     "params"
                 ],
                 "properties": {
+                    "transientData": {
+                        "type": "object",
+                        "nullable": true
+                    },
                     "signingCredential": {
                         "$ref": "#/components/schemas/FabricSigningCredential",
                         "nullable": false
@@ -316,6 +321,16 @@
                         "nullable": false
                     },
                     "params": {
+                        "type": "array",
+                        "nullable": false,
+                        "default": [],
+                        "items": {
+                            "type": "string",
+                            "nullable": true
+                        }
+                    },
+
+                    "endorsingParties": {
                         "type": "array",
                         "nullable": false,
                         "default": [],
@@ -500,7 +515,7 @@
                     },
                     "targetPeerAddresses": {
                         "type": "array",
-                        "description": "An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the offical Fabric samples repository and therefore it is assumed to be correct usage.",
+                        "description": "An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the official Fabric samples repository and therefore it is assumed to be correct usage.",
                         "example": [
                             "peer0.org1.example.com:7051"
                         ],

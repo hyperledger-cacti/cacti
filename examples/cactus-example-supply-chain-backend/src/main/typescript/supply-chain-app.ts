@@ -147,6 +147,7 @@ export class SupplyChainApp {
 
     this.log.info(`Configuring Cactus Node for Ledger A...`);
     const rpcApiHostA = await this.ledgers.besu.getRpcApiHttpHost();
+    const rpcApiWsHostA = await this.ledgers.besu.getRpcApiWsHost();
     const rpcApiHostB = await this.ledgers.quorum.getRpcApiHttpHost();
 
     const connectionProfile = await this.ledgers.fabric.getConnectionProfileOrg1();
@@ -187,6 +188,7 @@ export class SupplyChainApp {
     const connectorBesu = new PluginLedgerConnectorBesu({
       instanceId: "PluginLedgerConnectorBesu_A",
       rpcApiHttpHost: rpcApiHostA,
+      rpcApiWsHost: rpcApiWsHostA,
       pluginRegistry: registryA,
       logLevel: this.options.logLevel,
     });
@@ -256,7 +258,7 @@ export class SupplyChainApp {
           besuApiClient,
           quorumApiClient,
           fabricApiClient,
-          fabricEnviroment: org1Env,
+          fabricEnvironment: org1Env,
         }),
         new PluginKeychainMemory({
           instanceId: uuidv4(),

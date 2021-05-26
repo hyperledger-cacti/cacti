@@ -115,7 +115,7 @@ export class QuorumTestLedger implements ITestLedger {
    * @param minBalance The minimum balance to try and find a genesis account with.
    *
    * @throws {Error} If the balance is too high and there aren't any genesis
-   * accounts allocated with such a high balance then an exceptin is thrown.
+   * accounts allocated with such a high balance then an exception is thrown.
    */
   public async getGenesisAccount(minBalance = 10e7): Promise<string> {
     const { alloc } = await this.getGenesisJsObject();

@@ -16,7 +16,7 @@ export interface IWebServiceEndpoint {
   /**
    * Hooks up this endpoint instance into an ExpressJS web application object.
    * Internally this method uses the other methods of the `IWebServiceEndpoint`
-   * instnce to obtain the verb, path and handler which are the necessary
+   * instance to obtain the verb, path and handler which are the necessary
    * input for being able to create any HTTP request handler in ExpressJS.
    */
   registerExpress(expressApp: Express): Promise<IWebServiceEndpoint>;

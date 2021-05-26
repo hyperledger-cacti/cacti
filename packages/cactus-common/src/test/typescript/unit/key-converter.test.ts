@@ -81,14 +81,14 @@ test.skip("Test Public Hex key conversion", async (assert: Test) => {
     "Public Hex => Raw conversion successful",
   );
 
-  const convertHexublic = keyConverter.publicKeyAs(
+  const convertHexPublic = keyConverter.publicKeyAs(
     hexPublic,
     KeyFormat.Hex,
     KeyFormat.Hex,
   );
   assert.deepEquals(
     hexPublic,
-    convertHexublic,
+    convertHexPublic,
     "Public Hex => Hex conversion successful",
   );
 
@@ -294,7 +294,7 @@ test.skip("Test Private PEM key conversion", async (assert: Test) => {
   assert.end();
 });
 
-test.skip("Test invalide from key format", async (t: Test) => {
+test.skip("Test invalid from key format", async (t: Test) => {
   const keyConverter = new KeyConverter();
   const keyPair = Secp256k1Keys.generateKeyPairsBuffer();
 

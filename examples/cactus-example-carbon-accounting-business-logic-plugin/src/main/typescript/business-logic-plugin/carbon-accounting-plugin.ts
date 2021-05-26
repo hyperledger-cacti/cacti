@@ -63,7 +63,7 @@ export interface ICarbonAccountingPluginOptions {
   fabricApiClient: FabricApi;
   fabricPlugin: PluginLedgerConnectorFabric;
   web3SigningCredential?: Web3SigningCredential;
-  fabricEnviroment?: NodeJS.ProcessEnv;
+  fabricEnvironment?: NodeJS.ProcessEnv;
   fabricContracts: ICarbonAccountingFabricContractDeploymentInfo;
   xdaiContracts: ICarbonAccountingXdaiContractDeploymentInfo;
 }

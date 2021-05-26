@@ -410,7 +410,7 @@ export class CarbonAccountingAppDummyInfrastructure {
       this.log.info(`Deploying ${contractName}...`);
 
       const timelockAccount = await this.xdai.createEthTestAccount(2000000);
-      const dclm8Accunt = await this.xdai.createEthTestAccount(2000000);
+      const dclm8Account = await this.xdai.createEthTestAccount(2000000);
       const guardianAccount = await this.xdai.createEthTestAccount(2000000);
       const res = await besuPlugin.deployContract({
         contractName,
@@ -420,7 +420,7 @@ export class CarbonAccountingAppDummyInfrastructure {
         // address timelock_, address dclm8_, address guardian_
         constructorArgs: [
           timelockAccount.address,
-          dclm8Accunt.address,
+          dclm8Account.address,
           guardianAccount.address,
         ],
         gas: 8000000,

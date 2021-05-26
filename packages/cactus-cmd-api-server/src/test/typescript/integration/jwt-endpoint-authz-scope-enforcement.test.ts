@@ -32,13 +32,13 @@ test(testCase, async (t: Test) => {
   try {
     const jwtKeyPair = await JWK.generate("RSA", 4096);
     const jwtPublicKey = jwtKeyPair.toPEM(false);
-    const middlewareOptions: expressJwt.Options = {
+    const expressJwtOptions: expressJwt.Options = {
       algorithms: ["RS256"],
       secret: jwtPublicKey,
       audience: uuidv4(),
       issuer: uuidv4(),
     };
-    t.ok(middlewareOptions, "Express JWT config truthy OK");
+    t.ok(expressJwtOptions, "Express JWT config truthy OK");
 
     const unprotectedActionEp = new UnprotectedActionEndpoint({
       connector: {} as PluginLedgerConnectorStub,
@@ -47,7 +47,8 @@ test(testCase, async (t: Test) => {
 
     const authorizationConfig: IAuthorizationConfig = {
       unprotectedEndpointExemptions: [unprotectedActionEp.getPath()],
-      middlewareOptions,
+      expressJwtOptions,
+      socketIoJwtOptions: { secret: jwtPublicKey },
     };
 
     const pluginRegistry = new PluginRegistry();
@@ -90,13 +91,13 @@ test(testCase, async (t: Test) => {
 
     const jwtPayload = {
       name: "Peter",
-      location: "Albertirsa",
+      location: "London",
       scope: [...RunTransactionEndpoint.OAUTH2_SCOPES],
     };
     const jwtSignOptions: JWT.SignOptions = {
       algorithm: "RS256",
-      issuer: middlewareOptions.issuer,
-      audience: middlewareOptions.audience,
+      issuer: expressJwtOptions.issuer,
+      audience: expressJwtOptions.audience,
     };
     const token = JWT.sign(jwtPayload, jwtKeyPair, jwtSignOptions);
 

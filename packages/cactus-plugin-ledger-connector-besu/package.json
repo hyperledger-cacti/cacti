@@ -12,7 +12,7 @@
     "dist/*"
   ],
   "scripts": {
-    "generate-sdk": "openapi-generator generate --input-spec src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk": "docker run --rm -v \"${PWD}:/local\" openapitools/openapi-generator-cli:v5.0.0-beta2 generate -i ./local/src/main/json/openapi.json -g typescript-axios -o ./local/src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
@@ -91,6 +91,8 @@
     "joi": "14.3.1",
     "openapi-types": "7.0.1",
     "prom-client": "13.1.0",
+    "rxjs": "6.6.7",
+    "socket.io-client": "4.0.1",
     "typescript-optional": "2.0.1",
     "web3": "1.2.7",
     "web3-utils": "1.2.7"
@@ -98,6 +100,8 @@
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "0.5.0",
     "@hyperledger/cactus-test-tooling": "0.5.0",
-    "@types/express": "4.17.8"
+    "@types/express": "4.17.8",
+    "socket.io": "4.0.1",
+    "web3-eth": "1.2.7"
   }
 }

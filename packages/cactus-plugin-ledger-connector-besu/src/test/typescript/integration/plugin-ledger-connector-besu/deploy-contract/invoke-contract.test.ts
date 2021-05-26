@@ -27,6 +27,7 @@ test("deploys contract via .json file", async (t: Test) => {
   });
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
+  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
 
   /**
    * Constant defining the standard 'dev' Besu genesis.json contents.
@@ -63,6 +64,7 @@ test("deploys contract via .json file", async (t: Test) => {
   });
   const connector: PluginLedgerConnectorBesu = await factory.create({
     rpcApiHttpHost,
+    rpcApiWsHost,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });

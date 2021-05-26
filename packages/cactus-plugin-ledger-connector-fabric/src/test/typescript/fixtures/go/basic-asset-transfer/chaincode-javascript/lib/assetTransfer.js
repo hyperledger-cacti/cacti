@@ -15,7 +15,7 @@ class AssetTransfer extends Contract {
         ID: "asset1",
         Color: "blue",
         Size: 5,
-        Owner: "Tomoko",
+        Owner: "Tom",
         AppraisedValue: 300,
       },
       {

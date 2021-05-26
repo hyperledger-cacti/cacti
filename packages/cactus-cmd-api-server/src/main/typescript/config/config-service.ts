@@ -12,6 +12,7 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   ConsortiumDatabase,
+  Constants,
   PluginImport,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
@@ -510,12 +511,19 @@ export class ConfigService {
       },
     ];
 
+    const jwtSecret = uuidV4();
+
     return {
       authorizationProtocol: AuthorizationProtocol.JSON_WEB_TOKEN,
       authorizationConfigJson: {
+        socketIoPath: Constants.SocketIoConnectionPathV1,
         unprotectedEndpointExemptions: [],
-        middlewareOptions: {
-          secret: uuidV4(),
+        socketIoJwtOptions: {
+          secret: jwtSecret,
+        },
+        expressJwtOptions: {
+          secret: jwtSecret,
+          algorithms: ["RS256"],
           audience: "org.hyperledger.cactus.jwt.audience",
           issuer: "org.hyperledger.cactus.jwt.issuer",
         },

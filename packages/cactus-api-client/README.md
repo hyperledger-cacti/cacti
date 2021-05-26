@@ -133,7 +133,7 @@ Builds the default Consortium provider that can be used by this object to retrie
 
 The DefaultConsortiumProvider class leverages the simplest consortium plugin that we have at the time of this writing: @hyperledger/cactus-plugin-consortium-manual which holds the consortium metadata as pre-configured by the consortium operators.
 
-The pattern we use in the ApiClient class is that you can inject your own `IAsyncProvider<Consortium>` implementation which then will be used for routing information and in theory you can implement completely arbitrary consortium management in your own consortium plugins which then Cactus can use and leverage for the routing. This allows us to support any exotic consortium management algorithms that people may come up with such as storing the consortium definiton in a multi-sig smart contract or have the list of consortium nodes be powered by some sort of automatic service discovery or anything else that people might think of.
+The pattern we use in the ApiClient class is that you can inject your own `IAsyncProvider<Consortium>` implementation which then will be used for routing information and in theory you can implement completely arbitrary consortium management in your own consortium plugins which then Cactus can use and leverage for the routing. This allows us to support any exotic consortium management algorithms that people may come up with such as storing the consortium definition in a multi-sig smart contract or have the list of consortium nodes be powered by some sort of automatic service discovery or anything else that people might think of.
 
 ### `ApiClient`
 

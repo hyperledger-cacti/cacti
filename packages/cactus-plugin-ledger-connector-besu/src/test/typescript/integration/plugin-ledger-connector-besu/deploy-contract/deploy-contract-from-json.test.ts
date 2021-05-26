@@ -1,5 +1,6 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
+import { Server as SocketIoServer } from "socket.io";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   EthContractInvocationType,
@@ -8,7 +9,9 @@ import {
   PluginFactoryLedgerConnector,
   Web3SigningCredentialCactusKeychainRef,
   ReceiptType,
-  DefaultApi as BesuApi,
+  BesuApiClient,
+  WatchBlocksV1Progress,
+  Web3BlockHeader,
 } from "../../../../../main/typescript/public-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -22,19 +25,20 @@ import {
 } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { K_CACTUS_BESU_TOTAL_TX_COUNT } from "../../../../../main/typescript/prometheus-exporter/metrics";
+import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/besu-api-client";
 
 const testCase = "deploys contract via .json file";
 const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
@@ -48,6 +52,7 @@ test(testCase, async (t: Test) => {
   });
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
+  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
 
   /**
    * Constant defining the standard 'dev' Besu genesis.json contents.
@@ -83,6 +88,7 @@ test(testCase, async (t: Test) => {
   });
   const connector: PluginLedgerConnectorBesu = await factory.create({
     rpcApiHttpHost,
+    rpcApiWsHost,
     logLevel,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
@@ -91,8 +97,13 @@ test(testCase, async (t: Test) => {
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
+
+  const wsApi = new SocketIoServer(server, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+
   const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
+    hostname: "localhost",
     port: 0,
     server,
   };
@@ -103,10 +114,14 @@ test(testCase, async (t: Test) => {
   t.comment(
     `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
   );
-  const apiClient = new BesuApi({ basePath: apiHost });
+
+  const wsBasePath = apiHost + Constants.SocketIoConnectionPathV1;
+  t.comment("WS base path: " + wsBasePath);
+  const besuApiClientOptions = new BesuApiClientOptions({ basePath: apiHost });
+  const apiClient = new BesuApiClient(besuApiClientOptions);
 
   await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp);
+  await connector.registerWebServices(expressApp, wsApi);
 
   await connector.transact({
     web3SigningCredential: {
@@ -126,6 +141,24 @@ test(testCase, async (t: Test) => {
       timeoutMs: 60000,
     },
   });
+
+  const blocks = await apiClient.watchBlocksV1();
+
+  const aBlockHeader = await new Promise<Web3BlockHeader>((resolve, reject) => {
+    let done = false;
+    const timerId = setTimeout(() => {
+      if (!done) {
+        reject("Waiting for block header notification to arrive timed out");
+      }
+    }, 10000);
+    const subscription = blocks.subscribe((res: WatchBlocksV1Progress) => {
+      subscription.unsubscribe();
+      done = true;
+      clearTimeout(timerId);
+      resolve(res.blockHeader);
+    });
+  });
+  t.ok(aBlockHeader, "Web3BlockHeader truthy OK");
 
   const balance = await web3.eth.getBalance(testEthAccount.address);
   t.ok(balance, "Retrieved balance of test account OK");
@@ -443,12 +476,12 @@ test(testCase, async (t: Test) => {
       '{type="' +
       K_CACTUS_BESU_TOTAL_TX_COUNT +
       '"} 9';
-    t2.ok(res);
+    t2.ok(res, "Response truthy OK");
     t2.ok(res.data);
     t2.equal(res.status, 200);
     t2.true(
       res.data.includes(promMetricsOutput),
-      "Total Transaction Count of 9 recorded as expected. RESULT OK.",
+      "Total Transaction Count equals 9 OK.",
     );
     t2.end();
   });
@@ -458,6 +491,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
