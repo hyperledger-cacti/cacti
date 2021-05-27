@@ -7,7 +7,12 @@ export {
   BESU_TEST_LEDGER_DEFAULT_OPTIONS,
   BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
 } from "./besu/besu-test-ledger";
-
+export {
+  BurrowTestLedger,
+  IBurrowTestLedgerConstructorOptions,
+  BURROW_TEST_LEDGER_DEFAULT_OPTIONS,
+  BURROW_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
+} from "./burrow/burrow-test-ledger";
 export {
   QuorumTestLedger,
   IQuorumTestLedgerConstructorOptions,
