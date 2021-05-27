@@ -10,6 +10,7 @@ import (
 
 
 type BondAsset struct {
+	Type          string      `json:"type"`
 	ID            string      `json:"id"`
 	Owner         string      `json:"owner"`
 	Issuer        string      `json:"issuer"`
@@ -17,13 +18,16 @@ type BondAsset struct {
 	MaturityDate  time.Time   `json:"maturitydate"`
 }
 
+func getBondAssetKey(assetType string, assetId string) string {
+        return assetType + assetId
+}
 
 // InitLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextInterface) error {
 	assets := []BondAsset{
-		{ID: "a01", Issuer: "Treasury" , Owner: "", FaceValue: 300,
+		{Type: "t1", ID: "a01", Issuer: "Treasury" , Owner: "", FaceValue: 300,
 			 MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
-		{ID: "a02", Issuer: "Treasury" , Owner: "", FaceValue: 400,
+			 {Type: "t1", ID: "a02", Issuer: "Treasury" , Owner: "", FaceValue: 400,
 			 MaturityDate: time.Date(2022, time.July, 1, 12, 0, 0, 0, time.UTC)},
 	}
 
@@ -33,7 +37,7 @@ func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextIn
 			return err
 		}
 
-		err = ctx.GetStub().PutState(asset.ID, assetJSON)
+		err = ctx.GetStub().PutState(getBondAssetKey(asset.Type, asset.ID), assetJSON)
 		if err != nil {
 			return fmt.Errorf("failed to put to world state. %v", err)
 		}
@@ -43,8 +47,8 @@ func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextIn
 }
 
 // CreateAsset issues a new asset to the world state with given details.
-func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id string, owner string, issuer string, faceValue int, maturityDate string) error {
-	exists, err := s.AssetExists(ctx, id)
+func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, assetType, id, owner, issuer string, faceValue int, maturityDate string) error {
+	exists, err := s.AssetExists(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -62,6 +66,7 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	asset := BondAsset{
+		Type: assetType,
 		ID: id,
 		Owner: owner,
 		Issuer: issuer,
@@ -73,12 +78,12 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 
-	return ctx.GetStub().PutState(id, assetJSON)
+	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
 // ReadAsset returns the asset stored in the world state with given id.
-func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, id string) (*BondAsset, error) {
-	assetJSON, err := ctx.GetStub().GetState(id)
+func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, assetType, id string) (*BondAsset, error) {
+	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from world state: %v", err)
 	}
@@ -96,21 +101,21 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, i
 }
 
 // DeleteAsset deletes an given asset from the world state.
-func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, id string) error {
-	exists, err := s.AssetExists(ctx, id)
+func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, assetType, id string) error {
+	exists, err := s.AssetExists(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
 	if !exists {
-		return fmt.Errorf("the asset %s does not exist", id)
+		return fmt.Errorf("the bond asset of type %s and id %s does not exist", assetType, id)
 	}
 
-	return ctx.GetStub().DelState(id)
+	return ctx.GetStub().DelState(getBondAssetKey(assetType, id))
 }
 
 // AssetExists returns true when asset with given ID exists in world state
-func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
-	assetJSON, err := ctx.GetStub().GetState(id)
+func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface, assetType, id string) (bool, error) {
+	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
 	if err != nil {
 		return false, fmt.Errorf("failed to read from world state: %v", err)
 	}
@@ -118,8 +123,8 @@ func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface,
 	return assetJSON != nil, nil
 }
 // AssetExists returns true when asset with given ID exists in world state
-func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterface, id string) (bool, error) {
-	asset, err := s.ReadAsset(ctx, id)
+func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterface, assetType, id string) (bool, error) {
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return false, err
 	}
@@ -132,8 +137,8 @@ func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterf
 }
 
 // TransferAsset updates the owner field of asset with given id in world state.
-func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface, id string, newOwner string) error {
-	asset, err := s.ReadAsset(ctx, id)
+func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface, assetType, id string, newOwner string) error {
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -144,11 +149,11 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 
-	return ctx.GetStub().PutState(id, assetJSON)
+	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 // UpdateAsset updates an existing asset in the world state with provided parameters.
-func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInterface, id string, newMaturityDate time.Time) error {
-	asset, err := s.ReadAsset(ctx, id)
+func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInterface, assetType, id string, newMaturityDate time.Time) error {
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -159,11 +164,11 @@ func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInt
 		return err
 	}
 
-	return ctx.GetStub().PutState(id, assetJSON)
+	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 // UpdateAsset updates an existing asset in the world state with provided parameters.
-func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterface, id string, newFaceValue int) error {
-	asset, err := s.ReadAsset(ctx, id)
+func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterface, assetType, id string, newFaceValue int) error {
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -174,7 +179,7 @@ func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterf
 		return err
 	}
 
-	return ctx.GetStub().PutState(id, assetJSON)
+	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
 func (s *SmartContract) GetMyAssets(ctx contractapi.TransactionContextInterface) ([]*BondAsset, error) {
