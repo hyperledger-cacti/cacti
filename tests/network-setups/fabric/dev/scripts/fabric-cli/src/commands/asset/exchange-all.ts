@@ -236,28 +236,6 @@ const command: GluegunCommand = {
       if (!res) {
         throw new Error()
       }
-      const currentQuery1 = {
-            channel: net2Config.channelName,
-            contractName: net2Config.chaincode,
-            ccFunc: 'TransferTokenAssets',
-            args: []
-          }
-      currentQuery1.args = [...currentQuery1.args, fungibleAssetType, fungibleAssetAmt, user2CertN2, user1CertN2]
-      try {
-          const read = await network2U1.contract.submitTransaction(currentQuery1.ccFunc, ...currentQuery1.args)
-          const state = Buffer.from(read).toString()
-          if (state) {
-            logger.debug(`Response From Network: ${state}`)
-          } else {
-            logger.debug('No Response from network')
-          }
-
-          // Disconnect from the gateway.
-          await network2U1.gateway.disconnect()
-      } catch (error) {
-          console.error(`Failed to submit transaction: ${error}`)
-          throw new Error(error)
-      }
       spinner.info(`Fungible Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim fungible asset in ${options['network2']}`)
@@ -277,28 +255,6 @@ const command: GluegunCommand = {
                       secret)
       if (!res) {
         throw new Error()
-      }
-      const currentQuery2 = {
-            channel: net1Config.channelName,
-            contractName: net1Config.chaincode,
-            ccFunc: 'UpdateOwner',
-            args: []
-          }
-      currentQuery2.args = [...currentQuery2.args, assetId, user2CertN1]
-      try {
-          const read = await network1U2.contract.submitTransaction(currentQuery2.ccFunc, ...currentQuery2.args)
-          const state = Buffer.from(read).toString()
-          if (state) {
-            logger.debug(`Response From Network: ${state}`)
-          } else {
-            logger.debug('No Response from network')
-          }
-
-          // Disconnect from the gateway.
-          await network1U2.gateway.disconnect()
-      } catch (error) {
-          console.error(`Failed to submit transaction: ${error}`)
-          throw new Error(error)
       }
       spinner.info(`Asset Claimed: ${res}`)
     } catch(error) {

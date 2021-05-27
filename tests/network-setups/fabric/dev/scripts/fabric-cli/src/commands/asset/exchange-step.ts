@@ -306,28 +306,6 @@ const command: GluegunCommand = {
         if (!res) {
           throw new Error()
         }
-        const currentQuery = {
-              channel: netConfig.channelName,
-              contractName: netConfig.chaincode,
-              ccFunc: 'TransferTokenAssets',
-              args: []
-            }
-        currentQuery.args = [...currentQuery.args, param1, param2, lockerCert, recipientCert]
-        try {
-            const read = await networkL.contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
-            const state = Buffer.from(read).toString()
-            if (state) {
-              logger.debug(`Response From Network: ${state}`)
-            } else {
-              logger.debug('No Response from network')
-            }
-
-            // Disconnect from the gateway.
-            await networkL.gateway.disconnect()
-        } catch (error) {
-            console.error(`Failed to submit transaction: ${error}`)
-            throw new Error(error)
-        }
         spinner.info(`Fungible Asset Claimed: ${res}`)
       } catch(error) {
           print.error(`Could not claim fungible asset in ${options['target-network']}`)
@@ -354,28 +332,6 @@ const command: GluegunCommand = {
                         secret)
         if (!res) {
           throw new Error()
-        }
-        const currentQuery = {
-              channel: netConfig.channelName,
-              contractName: netConfig.chaincode,
-              ccFunc: 'UpdateOwner',
-              args: []
-            }
-        currentQuery.args = [...currentQuery.args, param2, recipientCert]
-        try {
-            const read = await networkL.contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
-            const state = Buffer.from(read).toString()
-            if (state) {
-              logger.debug(`Response From Network: ${state}`)
-            } else {
-              logger.debug('No Response from network')
-            }
-
-            // Disconnect from the gateway.
-            await networkR.gateway.disconnect()
-        } catch (error) {
-            console.error(`Failed to submit transaction: ${error}`)
-            throw new Error(error)
         }
         spinner.info(`Asset Claimed: ${res}`)
       } catch(error) {
