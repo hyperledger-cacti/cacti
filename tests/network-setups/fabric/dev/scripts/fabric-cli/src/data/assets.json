@@ -1,5 +1,6 @@
 {
   "a03": {
+    "assetType": "bond01",
     "id": "a03",
     "owner": "alice",
     "issuer": "treasury",
@@ -7,6 +8,7 @@
     "maturitydate": "01 Jan 22 00:00 MST"
   },
   "a04": {
+    "assetType": "bond01",
     "id": "a04",
     "owner": "bob",
     "issuer": "treasury",
