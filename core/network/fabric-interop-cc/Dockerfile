@@ -1,9 +1,9 @@
 FROM golang:1.16 AS build
 
 RUN apt-get update && apt-get install unzip
-RUN curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.12.1/protoc-3.12.1-linux-x86_64.zip
+RUN curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
 RUN mkdir /opt/protoc
-RUN unzip protoc-3.12.1-linux-x86_64.zip -d /opt/protoc
+RUN unzip protoc-3.15.6-linux-x86_64.zip -d /opt/protoc
 ENV PATH="/opt/protoc/bin:${PATH}"
 ENV PATH="${PATH}:${HOME}/go/bin"
 
