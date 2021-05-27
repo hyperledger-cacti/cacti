@@ -8,6 +8,7 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import {
+  Containers,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -48,6 +49,9 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 test(testCase, async (t: Test) => {
+  test.onFailure(async () => {
+    await Containers.logDiagnostics({ logLevel });
+  });
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
