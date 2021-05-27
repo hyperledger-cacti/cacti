@@ -64,6 +64,30 @@ func getLockInfoProtoBytesHTLC(hashBase64 []byte, expiryTimeSecs uint64) ([]byte
     return lockInfoProtoBytes, nil
 }
 
+// asset specific checks (ideally an asset in a different application might implment checks specific to that asset)
+func (s *SmartContract) BondAssetSpecificChecks(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement, lockInfo *common.AssetLock) error {
+
+    lockInfoHTLC := &common.AssetLockHTLC{}
+    err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+    if err != nil {
+        return logThenErrorf("unmarshal error: %+v", err)
+    }
+    // ReadAsset should check both the existence and ownership of the asset for the locker
+    bond, err := s.ReadAsset(ctx, assetAgreement.Type, assetAgreement.Id)
+    if err != nil {
+        return logThenErrorf("failed reading the bond asset: %+v", err)
+    }
+    log.Infof("bond: %+v", *bond)
+    log.Infof("lockInfoHTLC: %+v", *lockInfoHTLC)
+
+    // Check if asset doesn't mature before locking period
+    if uint64(bond.MaturityDate.Unix()) < lockInfoHTLC.ExpiryTimeSecs {
+        return logThenErrorf("cannot lock bond asset as it will mature before locking period")
+    }
+
+    return nil
+}
+
 // Ledger transaction (invocation) functions
 
 func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
@@ -76,22 +100,12 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
     if err != nil {
         return "", err
     }
-    lockInfoHTLC := &common.AssetLockHTLC{}
-    err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-    if err != nil {
-	    return "", logThenErrorf("unmarshal error: %+v", err)
-    }
-    bond, err := s.ReadAsset(ctx, assetAgreement.Type, assetAgreement.Id)
-    if err != nil {
-	    return "", logThenErrorf("failed reading the bond asset: %+v", err)
-    }
-    log.Infof("bond: %+v", *bond)
-    log.Infof("lockInfoHTLC: %+v", *lockInfoHTLC)
 
-    // Check if asset doesn't mature before locking period
-    if uint64(bond.MaturityDate.Unix()) < lockInfoHTLC.ExpiryTimeSecs {
-        return "", logThenErrorf("cannot lock bond asset as it will mature before locking period")
+    err = s.BondAssetSpecificChecks(ctx, assetAgreement, lockInfo)
+    if err != nil {
+	    return "", logThenErrorf(err.Error())
     }
+
     contractId, err := s.amc.LockAsset(ctx, assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
     if err != nil {
         return "", logThenErrorf(err.Error())
