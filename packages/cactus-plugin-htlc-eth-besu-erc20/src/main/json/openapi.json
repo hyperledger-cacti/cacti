@@ -1,0 +1,521 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cactus Plugin - HTLC ETH BESU ERC20",
+    "description": "Allows Cactus nodes to interact with HTLC contracts with ERC-20 Tokens",
+    "version": "0.0.1",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://www.cactus.stream/{basePath}",
+      "description": "Public test instance",
+      "variables": {
+        "basePath": {
+          "default": ""
+        }
+      }
+    },
+    {
+      "url": "http://localhost:4000/{basePath}",
+      "description": "Local test instance",
+      "variables": {
+        "basePath": {
+          "default": ""
+        }
+      }
+    }
+  ],
+  "components": {
+    "schemas": {
+      "NewContractRequest": {
+        "type": "object",
+        "required": [
+          "contractAddress",
+          "inputAmount",
+          "outputAmount",
+          "expiration",
+          "hashLock",
+          "tokenAddress",
+          "receiver",
+          "outputNetwork",
+          "outputAddress",
+          "web3SigningCredential",
+          "connectorId",
+          "keychainId"
+        ],
+        "properties": {
+          "contractAddress": {
+            "description": "Contract address",
+            "type": "string",
+            "nullable": false
+          },
+          "inputAmount": {
+            "description": "Input amount to lock",
+            "type": "number",
+            "nullable": false
+          },
+          "outputAmount": {
+            "description": "Output amount to lock",
+            "type": "number",
+            "nullable": false
+          },
+          "expiration": {
+            "description": "Timestamp to expire the contract",
+            "type": "number",
+            "nullable": false
+          },
+          "hashLock": {
+            "description": "Hashlock needed to refund the amount",
+            "type": "string",
+            "nullable": false
+          },
+          "tokenAddress": {
+            "description": "The token address",
+            "type": "string",
+            "nullable": false
+          },
+          "receiver": {
+            "description": "The receiver address",
+            "type": "string",
+            "nullable": false
+          },
+          "outputNetwork": {
+            "description": "The output network id",
+            "type": "string",
+            "nullable": false
+          },
+          "outputAddress": {
+            "description": "The output address to receive the tokens",
+            "type": "string",
+            "nullable": false
+          },
+          "web3SigningCredential": {
+            "description": "Web3SigningCredentialType",
+            "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "nullable": false
+          },
+          "connectorId": {
+            "description": "connectorId for the connector besu plugin",
+            "type": "string",
+            "nullable": false
+          },
+          "keychainId": {
+            "description": "keychainId for the keychian plugin",
+            "type": "string",
+            "nullable": false
+          },
+          "gas": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        }
+      },
+      "RefundRequest": {
+        "type": "object",
+        "required": [
+          "id",
+          "web3SigningCredential",
+          "connectorId",
+          "keychainId"
+        ],
+        "properties": {
+          "id": {
+            "description": "Contract htlc id for refund",
+            "type": "string",
+            "nullable": false
+          },
+          "web3SigningCredential": {
+            "description": "Web3SigningCredentialType",
+            "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "nullable": false
+          },
+          "connectorId": {
+            "description": "connectorId for the connector besu plugin",
+            "type": "string",
+            "nullable": false
+          },
+          "keychainId": {
+            "description": "keychainId for the keychain plugin",
+            "type": "string",
+            "nullable": false
+          },
+          "gas": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        }
+      },
+      "WithdrawRequest": {
+        "type": "object",
+        "required": [
+          "id",
+          "secret",
+          "web3SigningCredential",
+          "connectorId",
+          "keychainId"
+        ],
+        "properties": {
+          "id": {
+            "description": "Contract locked id",
+            "type": "string",
+            "nullable": false
+          },
+          "secret": {
+            "description": "Secret need to unlock the contract",
+            "type": "string",
+            "nullable": false
+          },
+          "web3SigningCredential": {
+            "description": "Web3SigningCredentialType",
+            "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "nullable": false
+          },
+          "connectorId": {
+            "description": "connectorId for the connector besu plugin",
+            "type": "string",
+            "nullable": false
+          },
+          "keychainId": {
+            "description": "keychainId for the keychain plugin",
+            "type": "string",
+            "nullable": false
+          },
+          "gas": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        }
+      },
+      "InitializeRequest": {
+        "type": "object",
+        "required": [
+          "connectorId",
+          "keychainId",
+          "constructorArgs",
+          "web3SigningCredential"
+        ],
+        "properties": {
+          "connectorId": {
+            "description": "connectorId for the connector besu plugin",
+            "type": "string",
+            "nullable": false
+          },
+          "keychainId": {
+            "description": "keychainId for the keychain plugin",
+            "type": "string",
+            "nullable": false
+          },
+          "constructorArgs": {
+            "type": "array",
+            "items": {},
+            "default": []
+        },
+          "web3SigningCredential": {
+            "description": "Web3SigningCredential",
+            "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "nullable": false
+          },
+          "gas": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "responses": {
+      "GetStatusResponse": {
+        "description": "Array of status",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "uint256"
+              }
+            }
+          }
+        }
+      },
+      "GetSingleStatusResponse": {
+        "description": "Status",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "integer",
+              "format": "uint256"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize"
+          }
+        },
+        "operationId": "initialize",
+        "summary": "Initialize contract",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitializeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/RunTransactionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw"
+          }
+        },
+        "operationId": "withdraw",
+        "summary": "Withdraw a hashtimelock contract",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status": {
+      "get": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status"
+          }
+        },
+        "operationId": "getStatus",
+        "summary": "Get array of status of a hashtimelock contract, the status are ( 0 - Invalid, 1 - Active, 2 - Refunded, 3 - Withdrawn, 4 - Expired)",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "bytes32"
+              }
+            }
+          },
+          {
+            "name": "web3SigningCredential",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
+            }
+          },
+          {
+            "name": "connectorId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keychainId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/GetStatusResponse"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status": {
+      "get": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status"
+          }
+        },
+        "operationId": "getSingleStatus",
+        "summary": "Get a status of a hashtimelock contract, the status are ( 0 - Invalid, 1 - Active, 2 - Refunded, 3 - Withdrawn, 4 - Expired)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "bytes32"
+            }
+          },
+          {
+            "name": "web3SigningCredential",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
+            }
+          },
+          {
+            "name": "connectorId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "keychainId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/GetSingleStatusResponse"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund"
+          }
+        },
+        "operationId": "refund",
+        "summary": "Refund a hashtimelock contract",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract"
+          }
+        },
+        "operationId": "newContract",
+        "summary": "Create a new hashtimelock contract",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewContractRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../../../../../packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
