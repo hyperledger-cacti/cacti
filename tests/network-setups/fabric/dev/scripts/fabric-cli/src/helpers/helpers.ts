@@ -86,7 +86,7 @@ const addAssets = ({
 
     if (ccType == 'bond') {
       currentQuery.ccFunc = 'CreateAsset'
-      currentQuery.args = [...currentQuery.args, item[1]['id'], userCert, item[1]['issuer'], item[1]['facevalue'], item[1]['maturitydate']]
+      currentQuery.args = [...currentQuery.args, item[1]['assetType'], item[1]['id'], userCert, item[1]['issuer'], item[1]['facevalue'], item[1]['maturitydate']]
     } else if (ccType == 'token') {
       currentQuery.ccFunc = 'IssueTokenAssets'
       currentQuery.args = [...currentQuery.args, item[1]['tokenassettype'], item[1]['numunits'], userCert]

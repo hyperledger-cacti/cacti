@@ -9,7 +9,6 @@ package main
 import (
     "fmt"
     "errors"
-    "time"
 
     "github.com/golang/protobuf/proto"
     log "github.com/sirupsen/logrus"
@@ -65,172 +64,189 @@ func getLockInfoProtoBytesHTLC(hashBase64 []byte, expiryTimeSecs uint64) ([]byte
     return lockInfoProtoBytes, nil
 }
 
-// Ledger transaction (invocation) functions
+// asset specific checks (ideally an asset in a different application might implment checks specific to that asset)
+func (s *SmartContract) BondAssetSpecificChecks(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement, lockInfo *common.AssetLock) error {
 
-func (s *SmartContract) LockBondAsset(ctx contractapi.TransactionContextInterface, bond *BondAsset, bondType, recipient string, hashBase64 []byte, expiryTimeSecs uint64) (string, error) {
+    lockInfoHTLC := &common.AssetLockHTLC{}
+    err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+    if err != nil {
+        return logThenErrorf("unmarshal error: %+v", err)
+    }
+    // ReadAsset should check both the existence and ownership of the asset for the locker
+    bond, err := s.ReadAsset(ctx, assetAgreement.Type, assetAgreement.Id)
+    if err != nil {
+        return logThenErrorf("failed reading the bond asset: %+v", err)
+    }
+    log.Infof("bond: %+v", *bond)
+    log.Infof("lockInfoHTLC: %+v", *lockInfoHTLC)
+
     // Check if asset doesn't mature before locking period
-    if uint64(bond.MaturityDate.Unix()) < (uint64(time.Now().Unix()) + expiryTimeSecs) {
-        return "", logThenErrorf("cannot lock bond asset as it will mature before locking period")
+    if uint64(bond.MaturityDate.Unix()) < lockInfoHTLC.ExpiryTimeSecs {
+        return logThenErrorf("cannot lock bond asset as it will mature before locking period")
     }
-    // Check if asset is already locked
-    locked, err := s.IsBondAssetLocked(ctx, bond, bondType)
-    if err != nil {
-        return "", logThenErrorf(err.Error())
-    }
-    // If asset is locked, simply return success (effectively a noop)
-    if locked {
-        log.Info("asset already in locked state")
-        return "", nil
-    }
-    assetAgreement := &common.AssetExchangeAgreement {
-        Type: bondType,
-        Id: bond.ID,
-        Recipient: recipient,
-    }
-    assetAgreementBytes, err := proto.Marshal(assetAgreement)
-    if err != nil {
-        return "", logThenErrorf(err.Error())
-    }
-    lockInfoProtoBytes, err := getLockInfoProtoBytesHTLC(hashBase64, expiryTimeSecs)
-    if err != nil {
-        return "", logThenErrorf(err.Error())
-    }
-    return s.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoProtoBytes))
+
+    return nil
 }
 
-func (s *SmartContract) LockTokenAsset(ctx contractapi.TransactionContextInterface, tokenType string, numUnits uint64, recipient string, hashBase64 []byte, expiryTimeSecs uint64) (string, error) {
+// Ledger transaction (invocation) functions
+
+func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+
+    assetAgreement, err := s.amc.ValidateAndExtractAssetAgreement(assetExchangeAgreementSerializedProto64)
+    if err != nil {
+        return "", err
+    }
+    lockInfo, err := s.amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)
+    if err != nil {
+        return "", err
+    }
+
+    err = s.BondAssetSpecificChecks(ctx, assetAgreement, lockInfo)
+    if err != nil {
+	    return "", logThenErrorf(err.Error())
+    }
+
+    contractId, err := s.amc.LockAsset(ctx, assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+    if err != nil {
+        return "", logThenErrorf(err.Error())
+    }
+
+    // write to the ledger the details needed at the time of unlock/claim
+    err = s.amc.ContractIdAssetsLookupMap(ctx, assetAgreement.Type, assetAgreement.Id, contractId)
+    if err != nil {
+        return "", logThenErrorf(err.Error())
+    }
+
+    return contractId, nil
+}
+
+func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+
+    assetAgreement, err := s.amc.ValidateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
+    if err != nil {
+        return "", err
+    }
+    lockInfo, err := s.amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)
+    if err != nil {
+        return "", err
+    }
+    lockInfoHTLC := &common.AssetLockHTLC{}
+    err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+    if err != nil {
+	    return "", logThenErrorf("unmarshal error: %+v", err)
+    }
 
     // Check if locker/transaction-creator has enough quantity of token assets to lock
     locker, err := getECertOfTxCreatorBase64(ctx)
     if err != nil {
         return "", logThenErrorf(err.Error())
     }
-    lockerHasEnoughTokens, err := s.TokenAssetsExist(ctx, tokenType, numUnits, locker)
+    lockerHasEnoughTokens, err := s.TokenAssetsExist(ctx, assetAgreement.Type, assetAgreement.NumUnits, locker)
     if err != nil {
         return "", logThenErrorf(err.Error())
     }
     if lockerHasEnoughTokens == false {
-        return "", logThenErrorf("cannot lock token asset of type %s as there are not enough tokens", tokenType)
+        return "", logThenErrorf("cannot lock token asset of type %s as there are not enough tokens", assetAgreement.Type)
     }
 
-    assetAgreement := &common.FungibleAssetExchangeAgreement {
-        Type: tokenType,
-        NumUnits: numUnits,
-        Recipient: recipient,
-    }
-    assetAgreementBytes, err := proto.Marshal(assetAgreement)
-    if err != nil {
-        return "", logThenErrorf(err.Error())
-    }
-    lockInfoProtoBytes, err := getLockInfoProtoBytesHTLC(hashBase64, expiryTimeSecs)
+    contractId, err := s.amc.LockFungibleAsset(ctx, fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
     if err != nil {
         return "", logThenErrorf(err.Error())
     }
 
-    contractId, err := s.LockFungibleAsset(ctx, string(assetAgreementBytes), string(lockInfoProtoBytes))
-    if err != nil {
-        return "", logThenErrorf(err.Error())
-    }
-
-    _, err = s.SubtractTokenAssetsFromWallet(ctx, tokenType, numUnits, locker)
+    err = s.DeleteTokenAssets(ctx, assetAgreement.Type, assetAgreement.NumUnits, locker)
     if err != nil {
 	// not performing the operation UnlockFungibleAsset and let the TxCreator take care of it
         return contractId, logThenErrorf(err.Error())
+    }
+
+    err = s.amc.ContractIdFungibleAssetsLookupMap(ctx, assetAgreement.Type, assetAgreement.NumUnits, contractId)
+    if err != nil {
+        return "", logThenErrorf(err.Error())
     }
 
     return contractId, nil
 }
 
 // Check whether this asset has been locked by anyone (not just by caller)
-func (s *SmartContract) IsBondAssetLocked(ctx contractapi.TransactionContextInterface, bond *BondAsset, bondType string) (bool, error) {
-    assetAgreement := &common.AssetExchangeAgreement {
-        Type: bondType,
-        Id: bond.ID,
-        Recipient: "*",
-        Locker: "*",
-    }
-    assetAgreementBytes, err := proto.Marshal(assetAgreement)
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    return s.IsAssetLocked(ctx, string(assetAgreementBytes))
+func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
+    return s.amc.IsAssetLocked(ctx, assetAgreementSerializedProto64)
 }
 
 // Check whether a bond asset has been locked using contractId by anyone (not just by caller)
-func (s *SmartContract) IsBondAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-    return s.IsAssetLockedQueryUsingContractId(ctx, contractId)
+func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+    return s.amc.IsAssetLockedQueryUsingContractId(ctx, contractId)
 }
 
 // Check whether a token asset has been locked using contractId by anyone (not just by caller)
-func (s *SmartContract) IsTokenAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-    return s.IsFungibleAssetLocked(ctx, contractId)
+func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+    return s.amc.IsFungibleAssetLocked(ctx, contractId)
 }
 
-func (s *SmartContract) ClaimBondAsset(ctx contractapi.TransactionContextInterface, bond *BondAsset, bondType, locker string, hashPreimage []byte) (bool, error) {
-    assetAgreement := &common.AssetExchangeAgreement {
-        Type: bondType,
-        Id: bond.ID,
-        Locker: locker,
-    }
-    assetAgreementBytes, err := proto.Marshal(assetAgreement)
+func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
+    assetAgreement, err := s.amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
-        return false, logThenErrorf(err.Error())
+        return false, err
     }
-    claimInfoProtoBytes, err := getClaimInfoProtoBytesHTLC(hashPreimage)
-    if err != nil {
-	return false, err
-    }
-    claimed, err := s.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoProtoBytes))
+    claimed, err := s.amc.ClaimAsset(ctx, assetAgreementSerializedProto64, claimInfoSerializedProto64)
     if err != nil {
         return false, logThenErrorf(err.Error())
     }
     if claimed {
         // Change asset ownership to claimant
-        txCreatorECertBase64, err := getECertOfTxCreatorBase64(ctx)
+        recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
-        err = s.UpdateOwner(ctx, bond.ID, string(txCreatorECertBase64))
+        err = s.UpdateOwner(ctx, assetAgreement.Type, assetAgreement.Id, string(recipientECertBase64))
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
+
+	err = s.amc.DeleteAssetLookupMaps(ctx, assetAgreement.Type, assetAgreement.Id)
+	if err != nil {
+		return false, logThenErrorf("failed to delete bond asset lookup maps: %+v", err)
+	}
+
         return true, nil
     } else {
-        return false, logThenErrorf("claim on bond asset type %s, id %s, failed", bondType, bond.ID)
+        return false, logThenErrorf("claim on bond asset type %s with asset id %s failed", assetAgreement.Type, assetAgreement.Id)
     }
 }
 
-func (s *SmartContract) ClaimBondAssetUsingContractId(ctx contractapi.TransactionContextInterface, bondType, bondId, contractId string, hashPreimage []byte) (bool, error) {
-    claimInfoProtoBytes, err := getClaimInfoProtoBytesHTLC(hashPreimage)
-    if err != nil {
-	return false, err
-    }
-    claimed, err := s.ClaimAsset(ctx, contractId, string(claimInfoProtoBytes))
+func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+    claimed, err := s.amc.ClaimAsset(ctx, contractId, claimInfoSerializedProto64)
     if err != nil {
         return false, logThenErrorf(err.Error())
     }
     if claimed {
         // Change asset ownership to claimant
-        txCreatorECertBase64, err := getECertOfTxCreatorBase64(ctx)
+        recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
-        err = s.UpdateOwner(ctx, bondId, txCreatorECertBase64)
+
+	// Fetch the contracted bond asset type and id from the ledger
+	assetType, assetId, err := s.amc.FetchFromContractIdAssetLookupMap(ctx, contractId)
+	if err != nil {
+	    return false, logThenErrorf(err.Error())
+        }
+
+        err = s.UpdateOwner(ctx, assetType, assetId, recipientECertBase64)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
+	// delete the lookup maps
+	err = s.amc.DeleteAssetLookupMapsUsingContractId(ctx, assetType, assetId, contractId)
+
         return true, nil
     } else {
-        return false, logThenErrorf("claim on bond asset type %s with id %s using contractId %s failed", bondType, bondId, contractId)
+        return false, logThenErrorf("claim on bond asset using contractId %s failed", contractId)
     }
 }
 
-func (s *SmartContract) ClaimTokenAsset(ctx contractapi.TransactionContextInterface, tokenType string, numUnits uint64, contractId string, hashPreimage []byte) (bool, error) {
-    claimInfoProtoBytes, err := getClaimInfoProtoBytesHTLC(hashPreimage)
-    if err != nil {
-	return false, err
-    }
-    claimed, err := s.ClaimFungibleAsset(ctx, contractId, string(claimInfoProtoBytes))
+func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+    claimed, err := s.amc.ClaimFungibleAsset(ctx, contractId, claimInfoSerializedProto64)
     if err != nil {
         return false, logThenErrorf(err.Error())
     }
@@ -240,40 +256,68 @@ func (s *SmartContract) ClaimTokenAsset(ctx contractapi.TransactionContextInterf
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
-        _, err = s.AddTokenAssetsIntoWallet(ctx, tokenType, numUnits, recipientECertBase64)
+
+	// Fetch the contracted token asset type and numUnits from the ledger
+	assetType, numUnits, err := s.amc.FetchFromContractIdFungibleAssetLookupMap(ctx, contractId)
+	if err != nil {
+	    return false, logThenErrorf(err.Error())
+        }
+
+        err = s.IssueTokenAssets(ctx, assetType, numUnits, recipientECertBase64)
+        if err != nil {
+            return false, logThenErrorf(err.Error())
+        }
+	err = s.amc.DeleteFungibleAssetLookupMap(ctx, contractId)
+	if err != nil {
+            return false, logThenErrorf(err.Error())
+	}
+        return true, nil
+    } else {
+        return false, logThenErrorf("claim on token asset using contractId %s failed", contractId)
+    }
+}
+
+func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
+    assetAgreement, err := s.amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    if err != nil {
+        return false, err
+    }
+
+    unlocked, err := s.amc.UnlockAsset(ctx, assetAgreementSerializedProto64)
+    if err != nil {
+        return false, logThenErrorf(err.Error())
+    }
+    if unlocked {
+	err = s.amc.DeleteAssetLookupMaps(ctx, assetAgreement.Type, assetAgreement.Id)
+	if err != nil {
+            return false, logThenErrorf("failed to delete bond asset lookup maps: %+v", err)
+        }
+    } else {
+        return false, logThenErrorf("unlock on bond asset type %s with asset id %s failed", assetAgreement.Type, assetAgreement.Id)
+    }
+
+    return true, nil
+}
+
+func (s *SmartContract) UnlockBondAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+    unlocked, err := s.amc.UnlockAssetUsingContractId(ctx, contractId)
+    if err != nil {
+        return false, logThenErrorf(err.Error())
+    }
+    if unlocked {
+        // delete the lookup maps
+        err := s.amc.DeleteAssetLookupMapsOnlyUsingContractId(ctx, contractId)
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
         return true, nil
     } else {
-        return false, logThenErrorf("claim on token asset type %s using contractId %s failed", tokenType, contractId)
+        return false, logThenErrorf("unlock on bond asset using contractId %s failed", contractId)
     }
 }
 
-func (s *SmartContract) UnlockBondAsset(ctx contractapi.TransactionContextInterface, bond *BondAsset, bondType, recipient string) (bool, error) {
-    txCreator, err := ctx.GetStub().GetCreator()
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    assetAgreement := &common.AssetExchangeAgreement {
-        Type: bondType,
-        Id: bond.ID,
-        Recipient: recipient,
-        Locker: string(txCreator),
-    }
-    assetAgreementBytes, err := proto.Marshal(assetAgreement)
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    return s.UnlockAsset(ctx, string(assetAgreementBytes))
-}
-
-func (s *SmartContract) UnlockBondAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-    return s.UnlockAssetUsingContractId(ctx, contractId)
-}
-
-func (s *SmartContract) UnlockTokenAsset(ctx contractapi.TransactionContextInterface, tokenType string, numUnits uint64, contractId string) (bool, error) {
-    unlocked, err := s.UnlockFungibleAsset(ctx, contractId)
+func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+    unlocked, err := s.amc.UnlockFungibleAsset(ctx, contractId)
     if err != nil {
         return false, logThenErrorf(err.Error())
     }
@@ -283,12 +327,23 @@ func (s *SmartContract) UnlockTokenAsset(ctx contractapi.TransactionContextInter
         if err != nil {
             return false, logThenErrorf(err.Error())
         }
-        _, err = s.AddTokenAssetsIntoWallet(ctx, tokenType, numUnits, lockerECertBase64)
+
+	// Fetch the contracted token asset type and numUnits from the ledger
+	assetType, numUnits, err := s.amc.FetchFromContractIdFungibleAssetLookupMap(ctx, contractId)
+	if err != nil {
+	    return false, logThenErrorf(err.Error())
+        }
+
+        err = s.IssueTokenAssets(ctx, assetType, numUnits, lockerECertBase64)
         if err != nil {
+            return false, logThenErrorf(err.Error())
+        }
+	err = s.amc.DeleteFungibleAssetLookupMap(ctx, contractId)
+	if err != nil {
             return false, logThenErrorf(err.Error())
         }
         return true, nil
     } else {
-        return false, logThenErrorf("unlock on token asset type %s using contractId %s failed", tokenType, contractId)
+        return false, logThenErrorf("unlock on token asset using contractId %s failed", contractId)
     }
 }

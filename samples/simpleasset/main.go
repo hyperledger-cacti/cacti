@@ -12,11 +12,11 @@ import (
 // SmartContract provides functions for managing an BondAsset and TokenAsset
 type SmartContract struct {
 	contractapi.Contract
-	am.AssetManagementContract
+	amc am.AssetManagementContract
 }
 
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface, ccType string, interopChaincodeId string) error {
-  s.Configure(interopChaincodeId)
+  s.amc.Configure(interopChaincodeId)
   if ccType == "Bond" {
     return s.InitBondAssetLedger(ctx)
   } else if ccType == "Token" {

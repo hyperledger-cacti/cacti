@@ -8,6 +8,7 @@ package assetmgmt
 
 import (
     "encoding/base64"
+    "encoding/json"
 
     "github.com/golang/protobuf/proto"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
@@ -33,7 +34,188 @@ func logWarnings(warnMsgs ...string) {
     }
 }
 
-func (amc *AssetManagementContract) validateAndExtractAssetAgreement(assetAgreementSerializedProto64 string) (*common.AssetExchangeAgreement, error) {
+// Object used in the map, contractId --> contracted-asset
+type ContractedAsset struct {
+    Type	string	`json:"type"`
+    Id		string	`json:"id"`
+}
+
+// Object used in the map, contractId --> contracted-fungible-asset
+type ContractedFungibleAsset struct {
+    Type	string	`json:"type"`
+    NumUnits	uint64	`json:"id"`
+}
+
+func getAssetLockLookupMapKey(ctx contractapi.TransactionContextInterface, Type, Id string) (string, error) {
+    assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{Type, Id})
+    if err != nil {
+        return "", logThenErrorf("error while creating composite key: %+v", err)
+    }
+
+    return assetLockKey, nil
+}
+
+func getAssetContractIdMapKey(contractId string) string {
+    return "AssetContract_" + contractId
+}
+
+func getFungibleAssetContractIdMapKey(contractId string) string {
+    return "FungibleAssetContract_" + contractId
+}
+
+// write to the ledger the details needed at the time of unlock/claim
+func (amc *AssetManagementContract) ContractIdFungibleAssetsLookupMap(ctx contractapi.TransactionContextInterface, assetType string, numUnits uint64, contractId string) error {
+    contractedFungibleAsset := &ContractedFungibleAsset {
+        Type: assetType,
+        NumUnits: numUnits,
+    }
+    contractedFungibleAssetBytes, err := json.Marshal(contractedFungibleAsset)
+    if err != nil {
+        return logThenErrorf("marshal error: %+v", err)
+    }
+    err = ctx.GetStub().PutState(getFungibleAssetContractIdMapKey(contractId), contractedFungibleAssetBytes)
+    if err != nil {
+        return logThenErrorf("failed to write to the fungible asset ledger: %+v", err)
+    }
+
+    return nil
+}
+// write to the ledger the details needed at the time of unlock/claim
+func (amc *AssetManagementContract) ContractIdAssetsLookupMap(ctx contractapi.TransactionContextInterface, assetType, assetId, contractId string) error {
+    contractedAsset := &ContractedAsset {
+        Type: assetType,
+        Id: assetId,
+    }
+    contractedAssetBytes, err := json.Marshal(contractedAsset)
+    if err != nil {
+        return logThenErrorf("marshal error: %+v", err)
+    }
+    assetLockKey, err := getAssetLockLookupMapKey(ctx, assetType, assetId)
+    if err != nil {
+        return logThenErrorf(err.Error())
+    }
+    err = ctx.GetStub().PutState(assetLockKey, []byte(contractId))
+    if err != nil {
+        return logThenErrorf("failed to write to the asset ledger: %+v", err)
+    }
+    err = ctx.GetStub().PutState(getAssetContractIdMapKey(contractId), contractedAssetBytes)
+    if err != nil {
+        return logThenErrorf("failed to write to the asset ledger: %+v", err)
+    }
+
+    return nil
+}
+
+func (amc *AssetManagementContract) DeleteAssetLookupMapsUsingContractId(ctx contractapi.TransactionContextInterface, assetType, assetId, contractId string) error {
+    // delete the lookup maps
+    assetLockKey, err := getAssetLockLookupMapKey(ctx, assetType, assetId)
+    if err != nil {
+        return logThenErrorf(err.Error())
+    }
+    err = ctx.GetStub().DelState(assetLockKey)
+    if err != nil {
+        return logThenErrorf("failed to delete entry associated with contractId %s from bond asset ledger: %+v", contractId, err)
+    }
+    err = ctx.GetStub().DelState(getAssetContractIdMapKey(contractId))
+    if err != nil {
+        return logThenErrorf("failed to delete contractId %s from bond asset network ledger: %+v", contractId, err)
+    }
+
+    return nil
+}
+
+func (amc *AssetManagementContract) DeleteAssetLookupMapsOnlyUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
+    // delete the lookup maps
+    contractedAssetBytes, err := ctx.GetStub().GetState(getAssetContractIdMapKey(contractId))
+    if err != nil {
+        return logThenErrorf("failed to read from asset ledger: %+v", err)
+    }
+    contractedAsset := ContractedAsset{}
+    err = json.Unmarshal(contractedAssetBytes, &contractedAsset)
+    if err != nil {
+        return logThenErrorf("unmarshal error: %+v", err)
+    }
+    assetLockKey, err := getAssetLockLookupMapKey(ctx, contractedAsset.Type, contractedAsset.Id)
+    if err != nil {
+        return logThenErrorf(err.Error())
+    }
+    err = ctx.GetStub().DelState(assetLockKey)
+    if err != nil {
+        return logThenErrorf("failed to delete entry associated with contractId %s from asset ledger: %+v", contractId, err)
+    }
+    err = ctx.GetStub().DelState(getAssetContractIdMapKey(contractId))
+    if err != nil {
+        return logThenErrorf("failed to delete contractId %s from asset ledger: %+v", contractId, err)
+    }
+
+    return nil
+}
+
+func (amc *AssetManagementContract) DeleteFungibleAssetLookupMap(ctx contractapi.TransactionContextInterface, contractId string) error {
+    err := ctx.GetStub().DelState(getFungibleAssetContractIdMapKey(contractId))
+    if err != nil {
+        return logThenErrorf("failed to delete contractId %s from fungible asset ledger: %+v", contractId, err)
+    }
+
+    return nil
+}
+
+func (amc *AssetManagementContract) DeleteAssetLookupMaps(ctx contractapi.TransactionContextInterface, assetType, assetId string) error {
+    // delete the lookup details
+    assetLockKey, err := getAssetLockLookupMapKey(ctx, assetType, assetId)
+    if err != nil {
+        return logThenErrorf(err.Error())
+    }
+    contractIdBytes, err := ctx.GetStub().GetState(assetLockKey)
+    if err != nil {
+        return logThenErrorf("unable to fetch from bond asset network ledger: %+v", err.Error())
+    }
+    if contractIdBytes == nil {
+        return logThenErrorf("contractId not found on bond asset network ledger")
+    }
+    err = ctx.GetStub().DelState(getAssetContractIdMapKey(string(contractIdBytes)))
+    if err != nil {
+        return logThenErrorf("failed to delete entry contractId %s from bond asset network ledger: %+v", string(contractIdBytes), err)
+    }
+    err = ctx.GetStub().DelState(assetLockKey)
+    if err != nil {
+        return logThenErrorf("failed to delete entry associated with contractId %s from bond asset ledger: %+v", string(contractIdBytes), err)
+    }
+
+    return nil
+}
+
+// Fetch the contracted fungible asset type and numUnits from the ledger
+func (amc *AssetManagementContract) FetchFromContractIdFungibleAssetLookupMap(ctx contractapi.TransactionContextInterface, contractId string) (string, uint64, error) {
+    contractedFungibleAssetBytes, err := ctx.GetStub().GetState(getFungibleAssetContractIdMapKey(contractId))
+    if err != nil {
+        return "", 0, logThenErrorf("failed to read from fungible asset network ledger: %+v", err)
+    }
+    contractedFungibleAsset := ContractedFungibleAsset{}
+    err = json.Unmarshal(contractedFungibleAssetBytes, &contractedFungibleAsset)
+    if err != nil {
+            return "", 0, logThenErrorf("unmarshal error: %+v", err)
+    }
+
+    return contractedFungibleAsset.Type, contractedFungibleAsset.NumUnits, nil
+}
+
+// Fetch the contracted bond asset type and id from the ledger
+func (amc *AssetManagementContract) FetchFromContractIdAssetLookupMap(ctx contractapi.TransactionContextInterface, contractId string) (string, string, error) {
+    contractedAssetBytes, err := ctx.GetStub().GetState(getAssetContractIdMapKey(contractId))
+    if err != nil {
+        return "", "", logThenErrorf("failed to read from asset network ledger: %+v", err)
+    }
+    contractedAsset := ContractedAsset{}
+    err = json.Unmarshal(contractedAssetBytes, &contractedAsset)
+    if err != nil {
+        return "", "", logThenErrorf("unmarshal error: %+v", err)
+    }
+
+    return contractedAsset.Type, contractedAsset.Id, nil
+}
+
+func (amc *AssetManagementContract) ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64 string) (*common.AssetExchangeAgreement, error) {
     assetAgreement := &common.AssetExchangeAgreement{}
     // Decoding from base64
     assetAgreementSerializedProto, err := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
@@ -51,7 +233,7 @@ func (amc *AssetManagementContract) validateAndExtractAssetAgreement(assetAgreem
     return assetAgreement, nil
 }
 
-func validateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64 string) (*common.FungibleAssetExchangeAgreement, error) {
+func (amc *AssetManagementContract) ValidateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64 string) (*common.FungibleAssetExchangeAgreement, error) {
     assetAgreement := &common.FungibleAssetExchangeAgreement{}
     // Decoding from base64
     fungibleAssetExchangeAgreementSerializedProto, err := base64.StdEncoding.DecodeString(fungibleAssetExchangeAgreementSerializedProto64)
@@ -69,7 +251,7 @@ func validateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSeri
     return assetAgreement, nil
 }
 
-func (amc *AssetManagementContract) validateAndExtractLockInfo(lockInfoSerializedProto64 string) (*common.AssetLock, error) {
+func (amc *AssetManagementContract) ValidateAndExtractLockInfo(lockInfoSerializedProto64 string) (*common.AssetLock, error) {
     lockInfo := &common.AssetLock{}
     // Decoding from base64
     lockInfoSerializedProto, err := base64.StdEncoding.DecodeString(lockInfoSerializedProto64)
@@ -87,7 +269,7 @@ func (amc *AssetManagementContract) validateAndExtractLockInfo(lockInfoSerialize
     return lockInfo, nil
 }
 
-func (amc *AssetManagementContract) validateAndExtractClaimInfo(claimInfoSerializedProto64 string) (*common.AssetClaim, error) {
+func (amc *AssetManagementContract) ValidateAndExtractClaimInfo(claimInfoSerializedProto64 string) (*common.AssetClaim, error) {
     claimInfo := &common.AssetClaim{}
     // Decode from base64
     claimInfoSerializedProto, err := base64.StdEncoding.DecodeString(claimInfoSerializedProto64)
@@ -108,11 +290,11 @@ func (amc *AssetManagementContract) validateAndExtractClaimInfo(claimInfoSeriali
 // Ledger transaction (invocation) functions
 
 func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return "", err
     }
-    lockInfo, err := amc.validateAndExtractLockInfo(lockInfoSerializedProto64)
+    lockInfo, err := amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)
     if err != nil {
         return "", err
     }
@@ -141,11 +323,11 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
 }
 
 func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-    assetAgreement, err := validateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
     if err != nil {
         return "", err
     }
-    lockInfo, err := amc.validateAndExtractLockInfo(lockInfoSerializedProto64)
+    lockInfo, err := amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)
     if err != nil {
         return "", err
     }
@@ -174,7 +356,7 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
 }
 
 func (amc *AssetManagementContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -197,11 +379,11 @@ func (amc *AssetManagementContract) IsAssetLockedQueryUsingContractId(ctx contra
 }
 
 func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return false, err
     }
-    claimInfo, err := amc.validateAndExtractClaimInfo(claimInfoSerializedProto64)
+    claimInfo, err := amc.ValidateAndExtractClaimInfo(claimInfoSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -232,7 +414,7 @@ func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.Transacti
     if len(contractId) == 0 {
         return false, logThenErrorf("empty contract id")
     }
-    claimInfo, err := amc.validateAndExtractClaimInfo(claimInfoSerializedProto64)
+    claimInfo, err := amc.ValidateAndExtractClaimInfo(claimInfoSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -263,7 +445,7 @@ func (amc *AssetManagementContract) ClaimAssetUsingContractId(ctx contractapi.Tr
     if len(contractId) == 0 {
         return false, logThenErrorf("empty contract id")
     }
-    claimInfo, err := amc.validateAndExtractClaimInfo(claimInfoSerializedProto64)
+    claimInfo, err := amc.ValidateAndExtractClaimInfo(claimInfoSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -291,7 +473,7 @@ func (amc *AssetManagementContract) ClaimAssetUsingContractId(ctx contractapi.Tr
 }
 
 func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return false, err
     }
@@ -377,7 +559,7 @@ func (amc *AssetManagementContract) GetAllFungibleLockedAssets(ctx contractapi.T
 }
 
 func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (uint64, error) {
-    assetAgreement, err := amc.validateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
         return 0, err
     }
@@ -386,7 +568,7 @@ func (amc *AssetManagementContract) GetAssetTimeToRelease(ctx contractapi.Transa
 }
 
 func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string) (uint64, error) {
-    assetAgreement, err := validateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
+    assetAgreement, err := amc.ValidateAndExtractFungibleAssetAgreement(fungibleAssetExchangeAgreementSerializedProto64)
     if err != nil {
         return 0, err
     }
