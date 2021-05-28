@@ -2,6 +2,7 @@ import test, { Test } from "tape-promise/tape";
 import { v4 as internalIpV4 } from "internal-ip";
 
 import {
+  Containers,
   CordaTestLedger,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -22,6 +23,10 @@ import {
 
 const testCase = "Tests are passing on the JVM side";
 const logLevel: LogLevelDesc = "TRACE";
+
+test.onFailure(async () => {
+  await Containers.logDiagnostics({ logLevel });
+});
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });

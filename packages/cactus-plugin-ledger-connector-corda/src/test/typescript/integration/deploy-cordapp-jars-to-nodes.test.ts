@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import { AddressInfo } from "net";
 
-import { CordaTestLedger } from "@hyperledger/cactus-test-tooling";
+import { Containers, CordaTestLedger } from "@hyperledger/cactus-test-tooling";
 import {
   LogLevelDesc,
   IListenOptions,
@@ -35,6 +35,10 @@ import { K_CACTUS_CORDA_TOTAL_TX_COUNT } from "../../../main/typescript/promethe
 const logLevel: LogLevelDesc = "TRACE";
 
 test("Tests are passing on the JVM side", async (t: Test) => {
+  test.onFailure(async () => {
+    await Containers.logDiagnostics({ logLevel });
+  });
+
   const ledger = new CordaTestLedger({
     imageName: "hyperledger/cactus-corda-4-6-all-in-one-obligation",
     imageVersion: "2021-03-19-feat-686",

@@ -276,7 +276,10 @@ export class SupplyChainAppDummyInfrastructure {
           },
           moduleName: "shipment",
           targetOrganizations: [org1Env],
-          pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+          pinnedDeps: [
+            "github.com/hyperledger/fabric@v1.4.8",
+            "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+          ],
         });
         this.log.debug(res);
 
