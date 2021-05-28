@@ -26,7 +26,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
   apiServerOptions.plugins = [
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
-      type: PluginImportType.LOCAL,
+      type: PluginImportType.Local,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),

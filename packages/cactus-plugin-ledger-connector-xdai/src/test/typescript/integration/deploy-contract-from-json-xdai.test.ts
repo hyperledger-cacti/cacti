@@ -25,7 +25,7 @@ import {
 } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
@@ -79,7 +79,7 @@ test(testCase, async (t: Test) => {
     HelloWorldContractJson,
   );
   const factory = new PluginFactoryLedgerConnector({
-    pluginImportType: PluginImportType.LOCAL,
+    pluginImportType: PluginImportType.Local,
   });
   const connector: PluginLedgerConnectorXdai = await factory.create({
     rpcApiHttpHost,
@@ -100,7 +100,8 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => await Servers.shutdown(server));
   const { address, port } = addressInfo;
   const apiHost = `http://${address}:${port}`;
-  const apiClient = new XdaiApi({ basePath: apiHost });
+  const config = new Configuration({ basePath: apiHost });
+  const apiClient = new XdaiApi(config);
 
   await connector.getOrCreateWebServices();
   await connector.registerWebServices(expressApp);
@@ -109,7 +110,7 @@ test(testCase, async (t: Test) => {
     web3SigningCredential: {
       ethAccount: whalePubKey,
       secret: whalePrivKey,
-      type: Web3SigningCredentialType.PRIVATEKEYHEX,
+      type: Web3SigningCredentialType.PrivateKeyHex,
     },
     transactionConfig: {
       from: whalePubKey,
@@ -119,7 +120,7 @@ test(testCase, async (t: Test) => {
     },
     consistencyStrategy: {
       blockConfirmations: 0,
-      receiptType: ReceiptType.NODETXPOOLACK,
+      receiptType: ReceiptType.NodeTxPoolAck,
       timeoutMs: 60000,
     },
   });
@@ -139,7 +140,7 @@ test(testCase, async (t: Test) => {
       web3SigningCredential: {
         ethAccount: whalePubKey,
         secret: whalePrivKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       bytecode: HelloWorldContractJson.bytecode,
       gas: 1000000,
@@ -163,13 +164,13 @@ test(testCase, async (t: Test) => {
     const { callOutput: helloMsg } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.CALL,
+      invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
       signingCredential: {
         ethAccount: whalePubKey,
         secret: whalePrivKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     t2.ok(helloMsg, "sayHello() output is truthy");
@@ -179,7 +180,7 @@ test(testCase, async (t: Test) => {
     );
   });
 
-  test("invoke Web3SigningCredentialType.NONE", async (t2: Test) => {
+  test("invoke Web3SigningCredentialType.None", async (t2: Test) => {
     const testEthAccount2 = web3.eth.accounts.create(uuidv4());
 
     const { rawTransaction } = await web3.eth.accounts.signTransaction(
@@ -194,14 +195,14 @@ test(testCase, async (t: Test) => {
 
     await connector.transact({
       web3SigningCredential: {
-        type: Web3SigningCredentialType.NONE,
+        type: Web3SigningCredentialType.None,
       },
       transactionConfig: {
         rawTransaction,
       },
       consistencyStrategy: {
         blockConfirmations: 0,
-        receiptType: ReceiptType.NODETXPOOLACK,
+        receiptType: ReceiptType.NodeTxPoolAck,
         timeoutMs: 60000,
       },
     });
@@ -212,18 +213,18 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  test("invoke Web3SigningCredentialType.PRIVATEKEYHEX", async (t2: Test) => {
+  test("invoke Web3SigningCredentialType.PrivateKeyHex", async (t2: Test) => {
     const newName = `DrCactus${uuidv4()}`;
     const setNameOut = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.SEND,
+      invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
       signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       nonce: 1,
     });
@@ -233,14 +234,14 @@ test(testCase, async (t: Test) => {
       const setNameOutInvalid = await connector.invokeContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
-        invocationType: EthContractInvocationType.SEND,
+        invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
         gas: 1000000,
         signingCredential: {
           ethAccount: testEthAccount.address,
           secret: testEthAccount.privateKey,
-          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+          type: Web3SigningCredentialType.PrivateKeyHex,
         },
         nonce: 1,
       });
@@ -255,14 +256,14 @@ test(testCase, async (t: Test) => {
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.CALL,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
       gas: 1000000,
       signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
@@ -270,14 +271,14 @@ test(testCase, async (t: Test) => {
     const getNameOut2 = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.SEND,
+      invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
       gas: 1000000,
       signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
@@ -285,14 +286,14 @@ test(testCase, async (t: Test) => {
     const response = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.SEND,
+      invocationType: EthContractInvocationType.Send,
       methodName: "deposit",
       params: [],
       gas: 1000000,
       signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       value: 10,
     });
@@ -301,14 +302,14 @@ test(testCase, async (t: Test) => {
     const { callOutput } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.CALL,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getNameByIndex",
       params: [0],
       gas: 1000000,
       signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     t2.equal(
@@ -327,13 +328,13 @@ test(testCase, async (t: Test) => {
       ethAccount: testEthAccount.address,
       keychainEntryKey,
       keychainId: keychainPlugin.getKeychainId(),
-      type: Web3SigningCredentialType.CACTUSKEYCHAINREF,
+      type: Web3SigningCredentialType.CactusKeychainRef,
     };
 
     const setNameOut = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.SEND,
+      invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
       gas: 1000000,
@@ -346,7 +347,7 @@ test(testCase, async (t: Test) => {
       const setNameOutInvalid = await connector.invokeContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
-        invocationType: EthContractInvocationType.SEND,
+        invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
         gas: 1000000,
@@ -365,7 +366,7 @@ test(testCase, async (t: Test) => {
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.CALL,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
       gas: 1000000,
@@ -376,7 +377,7 @@ test(testCase, async (t: Test) => {
     const getNameOut2 = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.SEND,
+      invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
       gas: 1000000,
@@ -387,7 +388,7 @@ test(testCase, async (t: Test) => {
     const response = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.SEND,
+      invocationType: EthContractInvocationType.Send,
       methodName: "deposit",
       params: [],
       gas: 1000000,
@@ -399,7 +400,7 @@ test(testCase, async (t: Test) => {
     const { callOutput } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.CALL,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getNameByIndex",
       params: [1],
       gas: 1000000,

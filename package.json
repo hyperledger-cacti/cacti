@@ -36,7 +36,7 @@
     "build:dev:example-supply-chain-backend": "lerna exec --stream --scope '*/*example-supply-chain-b*' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --display-modules --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:sdk": "lerna exec --stream --scope '*/*sdk' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:plugin-ledger-connector-corda": "lerna exec --stream --scope '*/*connector-corda' -- 'del-cli dist/** && npm run tsc && webpack --env=dev --target=node --config ../../webpack.config.js'",
-    "test:plugin-ledger-connector-corda": "tap --jobs=1 --timeout=60 \"packages/cactus-*-corda/src/test/typescript/{unit,integration}/\"",
+    "test:plugin-ledger-connector-corda": "tap --jobs=1 --timeout=600 \"packages/cactus-*-corda/src/test/typescript/{unit,integration}/\"",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "lerna run webpack:dev",
     "webpack:dev:web": "lerna run webpack:dev:web",
@@ -59,7 +59,7 @@
   "devDependencies": {
     "@commitlint/cli": "11.0.0",
     "@commitlint/config-conventional": "8.0.0",
-    "@openapitools/openapi-generator-cli": "1.0.18-5.0.0-beta2",
+    "@openapitools/openapi-generator-cli": "2.3.3",
     "@types/node-fetch": "2.5.4",
     "@types/tape": "4.13.0",
     "@types/tape-promise": "4.0.1",

@@ -17,6 +17,7 @@ import {
 import {
   ApiServer,
   ConfigService,
+  Configuration,
   ICactusApiServerOptions,
 } from "@hyperledger/cactus-cmd-api-server";
 
@@ -126,8 +127,10 @@ export class CarbonAccountingApp {
     const addressInfo = httpApi.address() as AddressInfo;
     const nodeApiHost = `http://localhost:${addressInfo.port}`;
 
-    const xdaiApiClient = new XdaiApi({ basePath: nodeApiHost });
-    const fabricApiClient = new FabricApi({ basePath: nodeApiHost });
+    const config = new Configuration({ basePath: nodeApiHost });
+
+    const xdaiApiClient = new XdaiApi(config);
+    const fabricApiClient = new FabricApi(config);
 
     this.log.info(`Configuring Cactus Node for Ledger A...`);
     const rpcApiHostA = await this.ledgers.xdai.getRpcApiHttpHost();
@@ -151,7 +154,7 @@ export class CarbonAccountingApp {
         asLocalhost: true,
       },
       eventHandlerOptions: {
-        strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
     });
@@ -186,7 +189,7 @@ export class CarbonAccountingApp {
       web3SigningCredential: {
         keychainEntryKey: xdaiAccount.address,
         keychainId: this.keychainId,
-        type: Web3SigningCredentialType.CACTUSKEYCHAINREF,
+        type: Web3SigningCredentialType.CactusKeychainRef,
       },
     });
 

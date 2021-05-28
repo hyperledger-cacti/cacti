@@ -41,10 +41,10 @@ t --> t: network
 t -> t: network.getContract(contractName)
 t --> t: contract
 
-group #LightBlue if invocationType == FabricContractInvocationType.CALL
+group #LightBlue if invocationType == FabricContractInvocationType.Call
     t -> t: wait for contract.evaluateTransaction(fnName, ...params)
     t --> t: out, success: true
-else #LightYellow if invocationType == FabricContractInvocationType.SEND
+else #LightYellow if invocationType == FabricContractInvocationType.Send
     t -> t: wait for contract.submitTransaction(fnName, ...params)
     t --> t: out, success: true
 else #LightCoral default

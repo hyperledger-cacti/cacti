@@ -17,6 +17,8 @@ import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+// @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
@@ -139,8 +141,8 @@ export enum ConsensusAlgorithmFamiliesWithOutTxFinality {
  * @enum {string}
  */
 export enum ConsensusAlgorithmFamiliesWithTxFinality {
-    AUTHORITY = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
-    STAKE = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE'
+    Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
+    Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE'
 }
 
 /**
@@ -149,9 +151,9 @@ export enum ConsensusAlgorithmFamiliesWithTxFinality {
  * @enum {string}
  */
 export enum ConsensusAlgorithmFamily {
-    AUTHORITY = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
-    STAKE = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE',
-    WORK = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK'
+    Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
+    Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE',
+    Work = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK'
 }
 
 /**
@@ -363,14 +365,14 @@ export interface Ledger {
  * @enum {string}
  */
 export enum LedgerType {
-    BESU1X = 'BESU_1X',
-    BESU2X = 'BESU_2X',
-    BURROW0X = 'BURROW_0X',
-    CORDA4X = 'CORDA_4X',
-    FABRIC14X = 'FABRIC_14X',
-    FABRIC2 = 'FABRIC_2',
-    QUORUM2X = 'QUORUM_2X',
-    SAWTOOTH1X = 'SAWTOOTH_1X'
+    Besu1X = 'BESU_1X',
+    Besu2X = 'BESU_2X',
+    Burrow0X = 'BURROW_0X',
+    Corda4X = 'CORDA_4X',
+    Fabric14X = 'FABRIC_14X',
+    Fabric2 = 'FABRIC_2',
+    Quorum2X = 'QUORUM_2X',
+    Sawtooth1X = 'SAWTOOTH_1X'
 }
 
 /**
@@ -404,8 +406,8 @@ export interface PluginImport {
  * @enum {string}
  */
 export enum PluginImportType {
-    LOCAL = 'org.hyperledger.cactus.plugin_import_type.LOCAL',
-    REMOTE = 'org.hyperledger.cactus.plugin_import_type.REMOTE'
+    Local = 'org.hyperledger.cactus.plugin_import_type.LOCAL',
+    Remote = 'org.hyperledger.cactus.plugin_import_type.REMOTE'
 }
 
 /**
