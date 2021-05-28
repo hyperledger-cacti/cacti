@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 import express from "express";
 
 import {
+  Containers,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -54,8 +55,12 @@ test("BEFORE " + testCase, async (t: Test) => {
 test(testCase, async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
 
+  test.onFailure(async () => {
+    await Containers.logDiagnostics({ logLevel });
+  });
+
   const ledger = new FabricTestLedgerV1({
-    emitContainerLogs: false,
+    emitContainerLogs: true,
     publishAllPorts: true,
     logLevel,
     imageName: "hyperledger/cactus-fabric2-all-in-one",
@@ -65,8 +70,7 @@ test(testCase, async (t: Test) => {
       ["CA_VERSION", "1.4.9"],
     ]),
   });
-
-  await ledger.start();
+  t.ok(ledger, "ledger (FabricTestLedgerV1) truthy OK");
 
   const tearDownLedger = async () => {
     await ledger.stop();
@@ -74,6 +78,8 @@ test(testCase, async (t: Test) => {
   };
 
   test.onFinish(tearDownLedger);
+
+  await ledger.start();
 
   const enrollAdminOut = await ledger.enrollAdmin();
   const adminWallet = enrollAdminOut[1];

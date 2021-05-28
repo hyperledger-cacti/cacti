@@ -12,6 +12,7 @@ import {
 } from "../../../main/typescript/public-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
+  Containers,
   K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
   K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
   OpenEthereumTestLedger,
@@ -42,13 +43,17 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 test(testCase, async (t: Test) => {
-  const ledger = new OpenEthereumTestLedger({});
-  await ledger.start();
+  test.onFailure(async () => {
+    await Containers.logDiagnostics({ logLevel });
+  });
+
+  const ledger = new OpenEthereumTestLedger({ logLevel });
 
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
   });
+  await ledger.start();
 
   const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
 

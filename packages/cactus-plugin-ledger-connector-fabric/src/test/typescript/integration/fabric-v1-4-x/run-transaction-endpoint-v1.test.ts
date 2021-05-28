@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 import express from "express";
 
 import {
+  Containers,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -44,6 +45,10 @@ import { K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "../../../../main/typescript/prom
 const testCase = "runs tx on a Fabric v1.4.8 ledger";
 const logLevel: LogLevelDesc = "TRACE";
 
+test.onFailure(async () => {
+  await Containers.logDiagnostics({ logLevel });
+});
+
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
@@ -53,7 +58,7 @@ test("BEFORE " + testCase, async (t: Test) => {
 test(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     publishAllPorts: true,
-    emitContainerLogs: false,
+    emitContainerLogs: true,
     logLevel,
     imageName: "hyperledger/cactus-fabric-all-in-one",
     imageVersion: "2020-12-16-3ddfd8f-v1.4.8",
@@ -63,13 +68,13 @@ test(testCase, async (t: Test) => {
     ]),
   });
 
-  await ledger.start();
-
   const tearDownLedger = async () => {
     await ledger.stop();
     await ledger.destroy();
   };
   test.onFinish(tearDownLedger);
+
+  await ledger.start();
 
   const enrollAdminOut = await ledger.enrollAdmin();
   const adminWallet = enrollAdminOut[1];
@@ -187,7 +192,7 @@ test(testCase, async (t: Test) => {
     t.ok(res.data);
     t.equal(res.status, 200);
     const cars = JSON.parse(res.data.functionOutput);
-    const car277 = cars.find((c: any) => c.Key === carId);
+    const car277 = cars.find((c: { Key: string }) => c.Key === carId);
     t.ok(car277, "Located Car record by its ID OK");
     t.ok(car277.Record, `Car object has "Record" property OK`);
     t.ok(car277.Record.owner, `Car object has "Record"."owner" property OK`);

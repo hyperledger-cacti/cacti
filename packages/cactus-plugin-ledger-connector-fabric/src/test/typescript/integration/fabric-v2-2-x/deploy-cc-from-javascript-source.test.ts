@@ -10,6 +10,7 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import {
+  Containers,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -50,6 +51,10 @@ test(testCase, async (t: Test) => {
   const channelId = "mychannel";
   const channelName = channelId;
 
+  test.onFailure(async () => {
+    await Containers.logDiagnostics({ logLevel });
+  });
+
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
@@ -59,14 +64,13 @@ test(testCase, async (t: Test) => {
     imageVersion: "2021-04-20-nodejs",
     envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
   });
-  await ledger.start();
-
   const tearDown = async () => {
     await ledger.stop();
     await ledger.destroy();
   };
 
   test.onFinish(tearDown);
+  await ledger.start();
 
   const connectionProfile = await ledger.getConnectionProfileOrg1();
   t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
