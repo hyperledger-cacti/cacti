@@ -55,8 +55,10 @@ test(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
+    // imageName: "faio14x",
+    // imageVersion: "latest",
     imageName: "hyperledger/cactus-fabric-all-in-one",
-    imageVersion: "2021-03-02-ssh-hotfix",
+    imageVersion: "2021-04-21-2016750",
   });
 
   const tearDown = async () => {
@@ -174,7 +176,10 @@ test(testCase, async (t: Test) => {
     },
     moduleName: "hello-world",
     targetOrganizations: [org1Env, org2Env],
-    pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+    pinnedDeps: [
+      "github.com/hyperledger/fabric@v1.4.8",
+      "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+    ],
   });
 
   const {
