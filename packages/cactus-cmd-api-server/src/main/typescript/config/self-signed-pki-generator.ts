@@ -140,10 +140,6 @@ export class SelfSignedPkiGenerator {
         name: "subjectAltName",
         altNames: [
           {
-            type: 6, // URI
-            value: "localhost",
-          },
-          {
             type: 7, // IP
             ip: "127.0.0.1",
           },
