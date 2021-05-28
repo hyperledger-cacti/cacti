@@ -97,12 +97,12 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
 
       const { data } = await this.opts.apiClient.apiV1QuorumInvokeContract({
         contractName: this.opts.contractName,
-        invocationType: EthContractInvocationType.CALL,
+        invocationType: EthContractInvocationType.Call,
         methodName: "getAllRecords",
         gas: 1000000,
         params: [],
         signingCredential: {
-          type: Web3SigningCredentialType.NONE,
+          type: Web3SigningCredentialType.None,
         },
         keychainId: this.opts.keychainId,
       });

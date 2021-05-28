@@ -16,7 +16,7 @@ test("Type guards for OpenAPI spec model type definitions", (t1: Test) => {
     const valid: Web3SigningCredentialGethKeychainPassword = {
       secret: "yes",
       ethAccount: "fake-account",
-      type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+      type: Web3SigningCredentialType.GethKeychainPassword,
     };
 
     t2.true(
@@ -34,7 +34,7 @@ test("Type guards for OpenAPI spec model type definitions", (t1: Test) => {
     const valid: Web3SigningCredentialPrivateKeyHex = {
       secret: "yes",
       ethAccount: "fake-account",
-      type: Web3SigningCredentialType.PRIVATEKEYHEX,
+      type: Web3SigningCredentialType.PrivateKeyHex,
     };
 
     t2.true(
@@ -50,7 +50,7 @@ test("Type guards for OpenAPI spec model type definitions", (t1: Test) => {
 
   test("isWeb3SigningCredentialNone()", (t2: Test) => {
     const valid: Web3SigningCredentialNone = {
-      type: Web3SigningCredentialType.NONE,
+      type: Web3SigningCredentialType.None,
     };
 
     t2.true(

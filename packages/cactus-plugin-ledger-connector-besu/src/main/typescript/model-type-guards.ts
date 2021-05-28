@@ -7,11 +7,11 @@ import {
 export function isWeb3SigningCredentialPrivateKeyHex(
   x: any,
 ): x is Web3SigningCredentialPrivateKeyHex {
-  return x?.type && x?.type === Web3SigningCredentialType.PRIVATEKEYHEX;
+  return x?.type && x?.type === Web3SigningCredentialType.PrivateKeyHex;
 }
 
 export function isWeb3SigningCredentialNone(
   x: any,
 ): x is Web3SigningCredentialNone {
-  return x?.type && x?.type === Web3SigningCredentialType.NONE;
+  return x?.type && x?.type === Web3SigningCredentialType.None;
 }

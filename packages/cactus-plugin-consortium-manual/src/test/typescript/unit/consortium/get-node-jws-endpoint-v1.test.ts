@@ -7,7 +7,11 @@ import { AddressInfo } from "net";
 
 import { IListenOptions, Servers } from "@hyperledger/cactus-common";
 
-import { ConsortiumDatabase, CactusNode } from "@hyperledger/cactus-core-api";
+import {
+  ConsortiumDatabase,
+  CactusNode,
+  Configuration,
+} from "@hyperledger/cactus-core-api";
 
 import { ConsortiumRepository } from "@hyperledger/cactus-core";
 
@@ -71,7 +75,9 @@ test("Can provide JWS", async (t: Test) => {
   t.comment(
     `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics`,
   );
-  const apiClient = new ConsortiumManualApi({ basePath: apiHost });
+
+  const config = new Configuration({ basePath: apiHost });
+  const apiClient = new ConsortiumManualApi(config);
 
   await pluginConsortiumManual.getOrCreateWebServices();
   await pluginConsortiumManual.registerWebServices(expressApp);

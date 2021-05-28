@@ -10,9 +10,10 @@ import {
   HealthCheckResponse,
 } from "../generated/openapi/typescript-axios";
 import { Configuration } from "../generated/openapi/typescript-axios/configuration";
+import { ConfigurationParameters } from "../generated/openapi/typescript-axios/configuration";
 import { Optional } from "typescript-optional";
 
-export interface IApiServerApiClientOptions extends Configuration {
+export interface IApiServerApiClientOptions extends ConfigurationParameters {
   readonly logLevel?: LogLevelDesc;
   readonly wsApiHost?: string;
   readonly wsApiPath?: string;
@@ -80,7 +81,7 @@ export class ApiServerApiClient extends DefaultApi {
     const socketOptions: SocketOptions = {
       auth: { token: this.configuration?.baseOptions.headers.Authorization },
       path: this.wsApiPath,
-    } as any; // TODO
+    } as SocketOptions; // TODO
 
     const socket: Socket = io(this.wsApiHost, socketOptions);
     const subject = new ReplaySubject<HealthCheckResponse>(1);

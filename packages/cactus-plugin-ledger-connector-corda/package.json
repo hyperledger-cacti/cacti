@@ -12,8 +12,8 @@
     "dist/*"
   ],
   "scripts": {
-    "generate-sdk": "docker run --rm -v \"${PWD}:/local\" openapitools/openapi-generator-cli:v5.0.0-beta2 generate -i ./local/src/main/json/openapi.json -g typescript-axios -o ./local/src/main/typescript/generated/openapi/typescript-axios/",
-    "generate-server": "docker run --rm -v \"${PWD}:/local\" openapitools/openapi-generator-cli:v5.0.0-beta2 generate -i ./local/src/main/json/openapi.json -g kotlin-spring -o ./local/src/main-server/kotlin/gen/kotlin-spring/ -c ./local/src/main-server/openapi-generator-config.yaml",
+    "generate-sdk": "docker run --rm -v \"${PWD}:/local\" openapitools/openapi-generator-cli:v5.1.1 generate -i ./local/src/main/json/openapi.json -g typescript-axios -o ./local/src/main/typescript/generated/openapi/typescript-axios/",
+    "generate-server": "docker run --rm -v \"${PWD}:/local\" openapitools/openapi-generator-cli:v5.1.1 generate -i ./local/src/main/json/openapi.json -g kotlin-spring -o ./local/src/main-server/kotlin/gen/kotlin-spring/ -c ./local/src/main-server/openapi-generator-config.yaml",
     "pretsc": "npm-run-all generate-sdk generate-server",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",

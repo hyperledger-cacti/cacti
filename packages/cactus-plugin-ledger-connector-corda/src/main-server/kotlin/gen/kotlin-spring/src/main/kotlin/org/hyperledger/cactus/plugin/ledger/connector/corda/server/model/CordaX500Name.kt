@@ -10,6 +10,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -23,17 +24,14 @@ import javax.validation.constraints.Size
  */
 data class CordaX500Name(
 
-    @get:NotNull 
-    @field:JsonProperty("organisation") val organisation: kotlin.String,
+    @field:JsonProperty("organisation", required = true) val organisation: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("locality") val locality: kotlin.String,
+    @field:JsonProperty("locality", required = true) val locality: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("country") val country: kotlin.String,
+    @field:JsonProperty("country", required = true) val country: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("x500Principal") val x500Principal: X500Principal,
+    @field:Valid
+    @field:JsonProperty("x500Principal", required = true) val x500Principal: X500Principal,
 
     @field:JsonProperty("commonName") val commonName: kotlin.String? = null,
 

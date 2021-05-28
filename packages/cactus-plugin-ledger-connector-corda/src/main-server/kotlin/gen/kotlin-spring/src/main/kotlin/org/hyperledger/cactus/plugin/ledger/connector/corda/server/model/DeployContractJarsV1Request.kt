@@ -11,6 +11,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -19,11 +20,11 @@ import javax.validation.constraints.Size
  */
 data class DeployContractJarsV1Request(
 
-    @get:NotNull @get:Size(min=0,max=1024) 
-    @field:JsonProperty("cordappDeploymentConfigs") val cordappDeploymentConfigs: kotlin.collections.List<CordappDeploymentConfig>,
+    @field:Valid
+    @field:JsonProperty("cordappDeploymentConfigs", required = true) val cordappDeploymentConfigs: kotlin.collections.List<CordappDeploymentConfig>,
 
-    @get:NotNull 
-    @field:JsonProperty("jarFiles") val jarFiles: kotlin.collections.List<JarFile>
+    @field:Valid
+    @field:JsonProperty("jarFiles", required = true) val jarFiles: kotlin.collections.List<JarFile>
 ) {
 
 }

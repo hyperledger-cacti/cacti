@@ -113,7 +113,7 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
         data: { success, callOutput, transactionReceipt },
       } = await this.opts.apiClient.apiV1QuorumInvokeContract({
         contractName: this.opts.contractName,
-        invocationType: EthContractInvocationType.SEND,
+        invocationType: EthContractInvocationType.Send,
         methodName: "insertRecord",
         gas: 1000000,
         params: [bambooHarvest],

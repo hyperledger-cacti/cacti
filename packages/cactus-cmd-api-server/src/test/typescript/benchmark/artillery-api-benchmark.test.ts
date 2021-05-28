@@ -13,6 +13,7 @@ import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
+  Configuration,
 } from "../../../main/typescript/public-api";
 
 import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api";
@@ -58,7 +59,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
   apiServerOptions.plugins = [
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
-      type: PluginImportType.LOCAL,
+      type: PluginImportType.Local,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),
@@ -67,7 +68,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
     },
     {
       packageName: "@hyperledger/cactus-plugin-consortium-manual",
-      type: PluginImportType.LOCAL,
+      type: PluginImportType.Local,
       options: {
         instanceId: uuidv4(),
         keyPairPem: keyPairPem,
@@ -102,7 +103,9 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
   const { address, port } = addressInfoApi;
   const apiHost = `${protocol}://${address}:${port}`;
 
-  const apiClient = new ApiServerApi({ basePath: apiHost });
+  const clientConfig = new Configuration({ basePath: apiHost });
+
+  const apiClient = new ApiServerApi(clientConfig);
 
   const res = await apiClient.getPrometheusExporterMetricsV1();
 

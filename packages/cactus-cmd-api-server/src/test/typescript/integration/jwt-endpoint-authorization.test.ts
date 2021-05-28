@@ -11,6 +11,7 @@ import {
 import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import {
+  Configuration,
   ConsortiumDatabase,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
@@ -75,7 +76,7 @@ test(testCase, async (t: Test) => {
     apiSrvOpts.plugins = [
       {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
-        type: PluginImportType.LOCAL,
+        type: PluginImportType.Local,
         options: {
           instanceId: uuidv4(),
           keychainId: uuidv4(),
@@ -84,7 +85,7 @@ test(testCase, async (t: Test) => {
       },
       {
         packageName: "@hyperledger/cactus-plugin-consortium-manual",
-        type: PluginImportType.LOCAL,
+        type: PluginImportType.Local,
         options: {
           instanceId: uuidv4(),
           keyPairPem: keyPairPem,
@@ -112,7 +113,8 @@ test(testCase, async (t: Test) => {
     const apiHost = `${protocol}://${address}:${port}`;
 
     const baseOptions = { headers: { Authorization: `Bearer ${tokenGood}` } };
-    const apiClient = new ApiServerApi({ basePath: apiHost, baseOptions });
+    const conf = new Configuration({ basePath: apiHost, baseOptions });
+    const apiClient = new ApiServerApi(conf);
     const resHc = await apiClient.getHealthCheck();
     t.ok(resHc, "healthcheck response truthy OK");
     t.equal(resHc.status, 200, "healthcheck response status === 200 OK");

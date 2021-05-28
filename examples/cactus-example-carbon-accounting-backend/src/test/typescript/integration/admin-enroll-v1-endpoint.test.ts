@@ -9,6 +9,7 @@ import { StatusCodes } from "http-status-codes";
 import {
   AuthorizationProtocol,
   ConfigService,
+  Configuration,
   IAuthorizationConfig,
 } from "@hyperledger/cactus-cmd-api-server";
 
@@ -118,7 +119,7 @@ test(testCase, async (t: Test) => {
   const verification = JWT.verify(tokenWithScope, jwtKeyPair, jwtSignOptions);
   t.ok(verification, "JWT with scope verification truthy OK");
 
-  const apiClient = new CarbonAccountingApi({
+  const configTokenWithScope = new Configuration({
     basePath: apiBaseUrl,
     baseOptions: {
       headers: {
@@ -126,6 +127,8 @@ test(testCase, async (t: Test) => {
       },
     },
   });
+
+  const apiClient = new CarbonAccountingApi(configTokenWithScope);
 
   const res = await apiClient.enrollAdminV1({
     orgName: "Org1MSP",
@@ -136,7 +139,7 @@ test(testCase, async (t: Test) => {
 
   const tokenNoScope = JWT.sign({ scope: [] }, jwtKeyPair, jwtSignOptions);
 
-  const apiClientBad = new CarbonAccountingApi({
+  const configTokenWithoutScope = new Configuration({
     basePath: apiBaseUrl,
     baseOptions: {
       headers: {
@@ -144,6 +147,8 @@ test(testCase, async (t: Test) => {
       },
     },
   });
+
+  const apiClientBad = new CarbonAccountingApi(configTokenWithoutScope);
 
   try {
     await apiClientBad.enrollAdminV1({ orgName: "does-not-matter" });

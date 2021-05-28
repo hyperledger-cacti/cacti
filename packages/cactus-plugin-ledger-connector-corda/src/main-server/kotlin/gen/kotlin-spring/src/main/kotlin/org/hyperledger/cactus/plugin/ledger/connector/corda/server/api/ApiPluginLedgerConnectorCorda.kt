@@ -42,7 +42,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
         produces = ["application/json"],
         consumes = ["application/json"]
     )
-    fun deployContractJarsV1( @Valid @RequestBody deployContractJarsV1Request: DeployContractJarsV1Request?
+    fun deployContractJarsV1( @Valid @RequestBody(required = false) deployContractJarsV1Request: DeployContractJarsV1Request?
 ): ResponseEntity<DeployContractJarsSuccessV1Response> {
         return ResponseEntity(service.deployContractJarsV1(deployContractJarsV1Request), HttpStatus.valueOf(200))
     }
@@ -53,7 +53,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
         produces = ["application/json"],
         consumes = ["application/json"]
     )
-    fun diagnoseNodeV1( @Valid @RequestBody diagnoseNodeV1Request: DiagnoseNodeV1Request?
+    fun diagnoseNodeV1( @Valid @RequestBody(required = false) diagnoseNodeV1Request: DiagnoseNodeV1Request?
 ): ResponseEntity<DiagnoseNodeV1Response> {
         return ResponseEntity(service.diagnoseNodeV1(diagnoseNodeV1Request), HttpStatus.valueOf(200))
     }
@@ -73,7 +73,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
         produces = ["application/json"],
         consumes = ["application/json"]
     )
-    fun invokeContractV1( @Valid @RequestBody invokeContractV1Request: InvokeContractV1Request?
+    fun invokeContractV1( @Valid @RequestBody(required = false) invokeContractV1Request: InvokeContractV1Request?
 ): ResponseEntity<InvokeContractV1Response> {
         return ResponseEntity(service.invokeContractV1(invokeContractV1Request), HttpStatus.valueOf(200))
     }
@@ -84,7 +84,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
         produces = ["application/json"],
         consumes = ["application/json"]
     )
-    fun listFlowsV1( @Valid @RequestBody listFlowsV1Request: ListFlowsV1Request?
+    fun listFlowsV1( @Valid @RequestBody(required = false) listFlowsV1Request: ListFlowsV1Request?
 ): ResponseEntity<ListFlowsV1Response> {
         return ResponseEntity(service.listFlowsV1(listFlowsV1Request), HttpStatus.valueOf(200))
     }
@@ -95,7 +95,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
         produces = ["application/json"],
         consumes = ["application/json"]
     )
-    fun networkMapV1( @Valid @RequestBody body: kotlin.Any?
+    fun networkMapV1( @Valid @RequestBody(required = false) body: kotlin.Any?
 ): ResponseEntity<List<NodeInfo>> {
         return ResponseEntity(service.networkMapV1(body), HttpStatus.valueOf(200))
     }
