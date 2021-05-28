@@ -45,7 +45,7 @@ The above diagram shows the sequence diagraom of transact() method of the Plugin
 
 ## Usage
 
-To use this import public-api and create new **PluginLedgerConnectorFabric** and **ChainCodeCompiler**. 
+To use this import public-api and create new **PluginLedgerConnectorFabric** and **ChainCodeCompiler**.
 ```typescript
   const connector: PluginLedgerConnectorFabric = new PluginLedgerConnectorFabric(pluginOptions);
   const compiler = new ChainCodeCompiler({ logLevel });
@@ -55,7 +55,10 @@ For compile the chaincodes:
   const opts: ICompilationOptions = {
     fileName: "hello-world-contract.go",
     moduleName: "hello-world-contract",
-    pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+    pinnedDeps: [
+      "github.com/hyperledger/fabric@v1.4.8",
+      "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+    ],
     modTidyOnly: true, // we just need the go.mod file so tidy only is enough
     sourceCode: HELLO_WORLD_CONTRACT_GO_SOURCE,
   };
@@ -108,7 +111,7 @@ docker run \
   "discoveryOptions": {
     "enabled": true,
     "asLocalhost: true"
-  }  
+  }
   }}}]' \
   cplcb
 ```
@@ -134,7 +137,7 @@ docker run \
   "discoveryOptions": {
     "enabled": true,
     "asLocalhost: true"
-  }  
+  }
   }}}]'
 ```
 
@@ -154,7 +157,7 @@ echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "ty
   "discoveryOptions": {
     "enabled": true,
     "asLocalhost: true"
-  }  
+  }
   }}}]' > cactus.json
 
 docker run \
@@ -196,7 +199,7 @@ docker run \
   "discoveryOptions": {
     "enabled": true,
     "asLocalhost: true"
-  }  
+  }
   }}}]' \
   cplcb
 ```
@@ -288,4 +291,4 @@ Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
 
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
 
-## Acknowledgments 
+## Acknowledgments

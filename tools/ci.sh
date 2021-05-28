@@ -23,6 +23,16 @@ function checkWorkTreeStatus()
   fi
 }
 
+function dumpDiskUsageInfo()
+{
+
+  if ! [ -x "$(command -v df)" ]; then
+    echo 'df is not installed, skipping...'
+  else
+    df || true
+  fi
+}
+
 function mainTask()
 {
   set -euxo pipefail
@@ -44,6 +54,24 @@ function mainTask()
   else
     smem --abbreviate --totals --system || true
   fi
+
+  dumpDiskUsageInfo
+
+  # If we are running in a GitHub Actions runner, then free up 30 GB space by
+  # removing things we do not need such as the Android SDK and .NET.
+  #
+  # Huge thanks to Maxim Lobanov for the advice:
+  # https://github.com/actions/virtual-environments/issues/2606#issuecomment-772683150
+  #
+  # Why do this? Because we've been getting warnings about the runners being
+  # left with less than a hundred megabytes of disk space during the tests.
+  if [ "${GITHUB_ACTIONS:-false}" = "true" ]; then
+    echo 'Detected GitHub Action Runner deleting Android and .NET ...'
+    sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
+    sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
+  fi
+
+  dumpDiskUsageInfo
 
   docker --version
   docker-compose --version

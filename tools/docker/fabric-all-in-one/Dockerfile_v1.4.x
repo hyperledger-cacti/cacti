@@ -41,8 +41,8 @@ RUN apk add --no-cache curl
 RUN apk add --no-cache file
 
 # Download and setup path variables for Go
-RUN wget https://golang.org/dl/go1.15.5.linux-amd64.tar.gz
-RUN tar -xvf go1.15.5.linux-amd64.tar.gz
+RUN wget https://golang.org/dl/go1.16.3.linux-amd64.tar.gz
+RUN tar -xvf go1.16.3.linux-amd64.tar.gz
 RUN mv go /usr/local
 ENV GOROOT=/usr/local/go
 ENV GOPATH=/usr/local/go

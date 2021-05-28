@@ -55,14 +55,11 @@ test(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
+    // imageName: "faio14x",
+    // imageVersion: "latest",
     imageName: "hyperledger/cactus-fabric-all-in-one",
-    imageVersion: "2021-03-02-ssh-hotfix",
+    imageVersion: "2021-04-21-2016750",
   });
-  await ledger.start();
-  t.doesNotThrow(() => ledger.getContainer(), "Container is set OK");
-  const ledgerContainer = ledger.getContainer();
-  t.ok(ledgerContainer, "ledgerContainer truthy OK");
-  t.ok(ledgerContainer.id, "ledgerContainer.id truthy OK");
 
   const tearDown = async () => {
     await ledger.stop();
@@ -70,6 +67,12 @@ test(testCase, async (t: Test) => {
   };
 
   test.onFinish(tearDown);
+
+  await ledger.start();
+  t.doesNotThrow(() => ledger.getContainer(), "Container is set OK");
+  const ledgerContainer = ledger.getContainer();
+  t.ok(ledgerContainer, "ledgerContainer truthy OK");
+  t.ok(ledgerContainer.id, "ledgerContainer.id truthy OK");
 
   const connectionProfile = await ledger.getConnectionProfileOrg1();
   t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
@@ -173,7 +176,10 @@ test(testCase, async (t: Test) => {
     },
     moduleName: "hello-world",
     targetOrganizations: [org1Env, org2Env],
-    pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+    pinnedDeps: [
+      "github.com/hyperledger/fabric@v1.4.8",
+      "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+    ],
   });
 
   const {
