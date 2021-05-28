@@ -65,15 +65,19 @@ func getLockInfoProtoBytesHTLC(hashBase64 []byte, expiryTimeSecs uint64) ([]byte
 }
 
 // asset specific checks (ideally an asset in a different application might implment checks specific to that asset)
-func (s *SmartContract) BondAssetSpecificChecks(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement, lockInfo *common.AssetLock) error {
+func (s *SmartContract) BondAssetSpecificChecks(ctx contractapi.TransactionContextInterface, assetType, id string, lockInfoSerializedProto64 string) error {
 
+    lockInfo, err := s.amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)
+    if err != nil {
+        return err
+    }
     lockInfoHTLC := &common.AssetLockHTLC{}
-    err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+    err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
     if err != nil {
         return logThenErrorf("unmarshal error: %+v", err)
     }
     // ReadAsset should check both the existence and ownership of the asset for the locker
-    bond, err := s.ReadAsset(ctx, assetAgreement.Type, assetAgreement.Id)
+    bond, err := s.ReadAsset(ctx, assetType, id, false)
     if err != nil {
         return logThenErrorf("failed reading the bond asset: %+v", err)
     }
@@ -96,12 +100,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
     if err != nil {
         return "", err
     }
-    lockInfo, err := s.amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)
-    if err != nil {
-        return "", err
-    }
-
-    err = s.BondAssetSpecificChecks(ctx, assetAgreement, lockInfo)
+    err = s.BondAssetSpecificChecks(ctx, assetAgreement.Type, assetAgreement.Id, lockInfoSerializedProto64)
     if err != nil {
 	    return "", logThenErrorf(err.Error())
     }
@@ -137,11 +136,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
     }
 
     // Check if locker/transaction-creator has enough quantity of token assets to lock
-    locker, err := getECertOfTxCreatorBase64(ctx)
-    if err != nil {
-        return "", logThenErrorf(err.Error())
-    }
-    lockerHasEnoughTokens, err := s.TokenAssetsExist(ctx, assetAgreement.Type, assetAgreement.NumUnits, locker)
+    lockerHasEnoughTokens, err := s.TokenAssetsExist(ctx, assetAgreement.Type, assetAgreement.NumUnits)
     if err != nil {
         return "", logThenErrorf(err.Error())
     }
@@ -154,7 +149,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
         return "", logThenErrorf(err.Error())
     }
 
-    err = s.DeleteTokenAssets(ctx, assetAgreement.Type, assetAgreement.NumUnits, locker)
+    err = s.DeleteTokenAssets(ctx, assetAgreement.Type, assetAgreement.NumUnits)
     if err != nil {
 	// not performing the operation UnlockFungibleAsset and let the TxCreator take care of it
         return contractId, logThenErrorf(err.Error())

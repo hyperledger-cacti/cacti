@@ -142,6 +142,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 		MaturityDate: bondMaturityDate,
 	}
 	bondAssetBytes, err := json.Marshal(bondAsset)
+	chaincodeStub.GetCreatorReturnsOnCall(0, []byte(getCreatorInContext("locker")), nil)
 	chaincodeStub.GetStateReturnsOnCall(4, bondAssetBytes, nil)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte(bondContractId)))
 	bondContractId, err = sc.LockAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
@@ -159,7 +160,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 		Recipient: tokensRecipient,
 	}
 	tokensAgreementBytes, _ := proto.Marshal(tokensAgreement)
-	chaincodeStub.GetCreatorReturnsOnCall(0, []byte(getCreatorInContext("recipient")), nil)
+	chaincodeStub.GetCreatorReturnsOnCall(1, []byte(getCreatorInContext("recipient")), nil)
 	tokenAssetType = TokenAssetType {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
@@ -172,6 +173,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	tokensWalletBytes, _ = json.Marshal(tokensWallet)
 	chaincodeStub.GetStateReturnsOnCall(6, tokensWalletBytes, nil)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte(tokensContractId)))
+	chaincodeStub.GetCreatorReturnsOnCall(2, []byte(getCreatorInContext("recipient")), nil)
 	chaincodeStub.GetStateReturnsOnCall(7, tokenAssetTypeBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(8, tokensWalletBytes, nil)
 	tokensContractId, err = sc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(tokensAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
@@ -192,7 +194,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
-	chaincodeStub.GetCreatorReturnsOnCall(1, []byte(getCreatorInContext("locker")), nil)
+	chaincodeStub.GetCreatorReturnsOnCall(3, []byte(getCreatorInContext("locker")), nil)
 	tokenAssetType = TokenAssetType {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
@@ -214,7 +216,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	// Claim bond asset in network1 by Bob
 	fmt.Println("*** Claim bond asset in network1 by Bob ***")
 	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
-	chaincodeStub.GetCreatorReturnsOnCall(2, []byte(getCreatorInContext("recipient")), nil)
+	chaincodeStub.GetCreatorReturnsOnCall(4, []byte(getCreatorInContext("recipient")), nil)
 	chaincodeStub.GetStateReturnsOnCall(12, bondAssetBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(13, []byte(bondContractId), nil)
 	_, err = sc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
