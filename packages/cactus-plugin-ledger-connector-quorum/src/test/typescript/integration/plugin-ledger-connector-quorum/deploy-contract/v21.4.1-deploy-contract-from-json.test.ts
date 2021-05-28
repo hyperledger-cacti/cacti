@@ -50,12 +50,12 @@ test(testCase, async (t: Test) => {
   const containerImageVersion = "2021-05-03-quorum-v21.4.1";
   const ledgerOptions = { containerImageName, containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
-  await ledger.start();
 
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
   });
+  await ledger.start();
 
   const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
   const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
