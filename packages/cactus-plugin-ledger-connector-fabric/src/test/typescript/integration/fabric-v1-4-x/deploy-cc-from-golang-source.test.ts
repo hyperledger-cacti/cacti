@@ -58,11 +58,6 @@ test(testCase, async (t: Test) => {
     imageName: "hyperledger/cactus-fabric-all-in-one",
     imageVersion: "2021-03-02-ssh-hotfix",
   });
-  await ledger.start();
-  t.doesNotThrow(() => ledger.getContainer(), "Container is set OK");
-  const ledgerContainer = ledger.getContainer();
-  t.ok(ledgerContainer, "ledgerContainer truthy OK");
-  t.ok(ledgerContainer.id, "ledgerContainer.id truthy OK");
 
   const tearDown = async () => {
     await ledger.stop();
@@ -70,6 +65,12 @@ test(testCase, async (t: Test) => {
   };
 
   test.onFinish(tearDown);
+
+  await ledger.start();
+  t.doesNotThrow(() => ledger.getContainer(), "Container is set OK");
+  const ledgerContainer = ledger.getContainer();
+  t.ok(ledgerContainer, "ledgerContainer truthy OK");
+  t.ok(ledgerContainer.id, "ledgerContainer.id truthy OK");
 
   const connectionProfile = await ledger.getConnectionProfileOrg1();
   t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");

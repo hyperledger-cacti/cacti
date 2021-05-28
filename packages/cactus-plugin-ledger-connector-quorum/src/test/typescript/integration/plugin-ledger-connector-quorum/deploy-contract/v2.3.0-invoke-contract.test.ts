@@ -30,12 +30,11 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
   const containerImageName = "hyperledger/cactus-quorum-all-in-one";
   const ledgerOptions = { containerImageName, containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
-  await ledger.start();
-
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
   });
+  await ledger.start();
 
   const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
   const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
