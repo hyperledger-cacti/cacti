@@ -64,7 +64,7 @@ func getLockInfoProtoBytesHTLC(hashBase64 []byte, expiryTimeSecs uint64) ([]byte
     return lockInfoProtoBytes, nil
 }
 
-// asset specific checks (ideally an asset in a different application might implment checks specific to that asset)
+// asset specific checks (ideally an asset in a different application might implement checks specific to that asset)
 func (s *SmartContract) BondAssetSpecificChecks(ctx contractapi.TransactionContextInterface, assetType, id string, lockInfoSerializedProto64 string) error {
 
     lockInfo, err := s.amc.ValidateAndExtractLockInfo(lockInfoSerializedProto64)

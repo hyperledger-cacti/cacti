@@ -97,7 +97,7 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, a
 	if err != nil {
 		return nil, err
 	}
-	// In the update onwer context, the TxCreator will be the newOwner. Hence don't check if the TxCreator is the current owner.
+	// In the update owner context, the TxCreator will be the newOwner. Hence don't check if the TxCreator is the current owner.
 	if isUpdateOwnerContext == false {
 		owner, err := getECertOfTxCreatorBase64(ctx)
 		if err != nil {
