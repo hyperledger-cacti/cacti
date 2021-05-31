@@ -10,4 +10,9 @@ formats:
 sphinx:
   builder: html
   configuration: docs/source/conf.py
-  fail_on_warning: true
+
+# Explicitly set the version of Python and its requirements
+python:
+  version: 3.7
+  install:
+    - requirements: docs/pip-requirements.txt
