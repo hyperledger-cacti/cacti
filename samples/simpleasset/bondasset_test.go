@@ -60,16 +60,16 @@ func TestReadAsset(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(bytes, nil)
 	simpleAsset := SmartContract{}
-	asset, err := simpleAsset.ReadAsset(transactionContext, "", "")
+	asset, err := simpleAsset.ReadAsset(transactionContext, "", "", false)
 	require.NoError(t, err)
 	require.Equal(t, expectedAsset, asset)
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	_, err = simpleAsset.ReadAsset(transactionContext, "", "")
+	_, err = simpleAsset.ReadAsset(transactionContext, "", "", false)
 	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
 
 	chaincodeStub.GetStateReturns(nil, nil)
-	asset, err = simpleAsset.ReadAsset(transactionContext, "", "asset1")
+	asset, err = simpleAsset.ReadAsset(transactionContext, "", "asset1", false)
 	require.EqualError(t, err, "the asset asset1 does not exist")
 	require.Nil(t, asset)
 }

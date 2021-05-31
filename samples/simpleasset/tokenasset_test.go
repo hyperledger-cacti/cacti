@@ -156,28 +156,28 @@ func TestDeleteTokenAssets(t *testing.T) {
 
 	// Successful delete case
 	chaincodeStub.GetStateReturns(bytes, nil)
-	err = simpleToken.DeleteTokenAssets(transactionContext, "token1", 2, "")
+	err = simpleToken.DeleteTokenAssets(transactionContext, "token1", 2)
 	require.NoError(t, err)
 
 	// Trying to delete more than owner hass
 	chaincodeStub.GetStateReturns(bytes, nil)
-	err = simpleToken.DeleteTokenAssets(transactionContext, "token1", 10, "")
+	err = simpleToken.DeleteTokenAssets(transactionContext, "token1", 10)
 	require.EqualError(t, err, "the owner does not possess enough units of the token asset type token1")
 
 	// Trying to delete token that owner doesn't possess
 	chaincodeStub.GetStateReturns(bytes, nil)
-	err = simpleToken.DeleteTokenAssets(transactionContext, "token2", 2, "")
+	err = simpleToken.DeleteTokenAssets(transactionContext, "token2", 2)
 	require.EqualError(t, err, "the owner does not possess any units of the token asset type token2")
 
 	// Error Check
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("Failed to read state"))
-	err = simpleToken.DeleteTokenAssets(transactionContext, "", 0, "")
+	err = simpleToken.DeleteTokenAssets(transactionContext, "", 0)
 	require.EqualError(t, err, "failed to read from world state: Failed to read state")
 
 	// check if it tries to delete wallet entry when wallet list is empty
 	chaincodeStub.GetStateReturns(bytes, nil)
 	chaincodeStub.DelStateReturns(fmt.Errorf("Failed to delete state"))
-	err = simpleToken.DeleteTokenAssets(transactionContext, "token1", 5, "")
+	err = simpleToken.DeleteTokenAssets(transactionContext, "token1", 5)
 	require.EqualError(t, err, "Failed to delete state")
 
 }
@@ -203,7 +203,7 @@ func TestTransferTokenAssets(t *testing.T) {
 	require.EqualError(t, err, "the owner does not possess enough units of the token asset type token1")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("Failed to read state"))
-	err = simpleToken.DeleteTokenAssets(transactionContext, "", 0, "")
+	err = simpleToken.DeleteTokenAssets(transactionContext, "", 0)
 	require.EqualError(t, err, "failed to read from world state: Failed to read state")
 }
 func TestGetBalance(t *testing.T) {
@@ -283,18 +283,18 @@ func TestTokenAssetsExist(t *testing.T) {
 
 	// Token Assets exist case
 	chaincodeStub.GetStateReturns(bytes, nil)
-	res, err := simpleToken.TokenAssetsExist(transactionContext, "token1", 4, "")
+	res, err := simpleToken.TokenAssetsExist(transactionContext, "token1", 4)
 	require.NoError(t, err)
 	require.Equal(t, res, true)
 
 	// Token Assets doesn't exist case
 	chaincodeStub.GetStateReturns(bytes, nil)
-	res, err = simpleToken.TokenAssetsExist(transactionContext, "token1", 6, "")
+	res, err = simpleToken.TokenAssetsExist(transactionContext, "token1", 6)
 	require.NoError(t, err)
 	require.Equal(t, res, false)
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("Failed to read state"))
-	res, err = simpleToken.TokenAssetsExist(transactionContext, "", 0, "")
+	res, err = simpleToken.TokenAssetsExist(transactionContext, "", 0)
 	require.EqualError(t, err, "failed to read from world state: Failed to read state")
 	require.Equal(t, res, false)
 }

@@ -121,7 +121,11 @@ func (s *SmartContract) IssueTokenAssets(ctx contractapi.TransactionContextInter
 }
 
 // DeleteTokenAssets burns the token assets from an owner.
-func (s *SmartContract) DeleteTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, owner string) error {
+func (s *SmartContract) DeleteTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64) error {
+	owner, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return err
+	}
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return err
@@ -190,7 +194,7 @@ func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface, 
 	return balance, nil
 }
 
-// GetBalance returns the amount of given token asset type owned by an owner.
+// GetMyWallet returns the available amount for each token asset type owned by an owner.
 func (s *SmartContract) GetMyWallet(ctx contractapi.TransactionContextInterface) (string, error) {
 	owner, err := getECertOfTxCreatorBase64(ctx)
 	if err != nil {
@@ -215,7 +219,11 @@ func (s *SmartContract) GetMyWallet(ctx contractapi.TransactionContextInterface)
 }
 
 // Checks if owner has some given amount of token asset
-func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, owner string) (bool, error) {
+func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64) (bool, error) {
+	owner, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return false, err
+	}
 	balance, err := s.GetBalance(ctx, tokenAssetType, owner)
 	if err != nil {
 		return false, err
