@@ -9,6 +9,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * An instance of a java.security.PublicKey (which is an interface) implementation such as org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl
@@ -18,14 +19,11 @@ import javax.validation.constraints.Size
  */
 data class PublicKey(
 
-    @get:NotNull 
-    @field:JsonProperty("algorithm") val algorithm: kotlin.String,
+    @field:JsonProperty("algorithm", required = true) val algorithm: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("format") val format: kotlin.String,
+    @field:JsonProperty("format", required = true) val format: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("encoded") val encoded: kotlin.String
+    @field:JsonProperty("encoded", required = true) val encoded: kotlin.String
 ) {
 
 }

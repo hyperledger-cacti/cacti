@@ -17,6 +17,8 @@ import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+// @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
@@ -179,10 +181,10 @@ export interface ConnectionProfileClient {
  * @enum {string}
  */
 export enum DefaultEventHandlerStrategy {
-    MSPIDSCOPEALLFORTX = 'MSPID_SCOPE_ALLFORTX',
-    MSPIDSCOPEANYFORTX = 'MSPID_SCOPE_ANYFORTX',
-    NETWORKSCOPEALLFORTX = 'NETWORK_SCOPE_ALLFORTX',
-    NETWORKSCOPEANYFORTX = 'NETWORK_SCOPE_ANYFORTX'
+    MspidScopeAllfortx = 'MSPID_SCOPE_ALLFORTX',
+    MspidScopeAnyfortx = 'MSPID_SCOPE_ANYFORTX',
+    NetworkScopeAllfortx = 'NETWORK_SCOPE_ALLFORTX',
+    NetworkScopeAnyfortx = 'NETWORK_SCOPE_ANYFORTX'
 }
 
 /**
@@ -510,9 +512,9 @@ export interface DeploymentTargetOrganization {
  * @enum {string}
  */
 export enum FabricContractInvocationType {
-    SEND = 'FabricContractInvocationType.SEND',
-    CALL = 'FabricContractInvocationType.CALL',
-    SENDPRIVATE = 'FabricContractInvocationType.SENDPRIVATE'
+    Send = 'FabricContractInvocationType.SEND',
+    Call = 'FabricContractInvocationType.CALL',
+    Sendprivate = 'FabricContractInvocationType.SENDPRIVATE'
 }
 
 /**
@@ -732,11 +734,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deployContractGoSourceV1: async (deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -745,21 +748,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof deployContractGoSourceV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(deployContractGoSourceV1Request !== undefined ? deployContractGoSourceV1Request : {}) : (deployContractGoSourceV1Request || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractGoSourceV1Request, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -773,11 +768,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deployContractV1: async (deployContractV1Request?: DeployContractV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -786,21 +782,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof deployContractV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(deployContractV1Request !== undefined ? deployContractV1Request : {}) : (deployContractV1Request || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractV1Request, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -813,30 +801,24 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPrometheusExporterMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
 
     
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -849,16 +831,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          */
         runTransactionV1: async (runTransactionRequest: RunTransactionRequest, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'runTransactionRequest' is not null or undefined
-            if (runTransactionRequest === null || runTransactionRequest === undefined) {
-                throw new RequiredError('runTransactionRequest','Required parameter runTransactionRequest was null or undefined when calling runTransactionV1.');
-            }
+            assertParamExists('runTransactionV1', 'runTransactionRequest', runTransactionRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -867,21 +848,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof runTransactionRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(runTransactionRequest !== undefined ? runTransactionRequest : {}) : (runTransactionRequest || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequest, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -893,6 +866,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
  * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
          * 
@@ -902,11 +876,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractGoSourceV1Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractGoSourceV1(deployContractGoSourceV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -916,11 +887,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractV1Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).deployContractV1(deployContractV1Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractV1(deployContractV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -929,11 +897,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async getPrometheusExporterMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getPrometheusExporterMetricsV1(options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusExporterMetricsV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -943,11 +908,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).runTransactionV1(runTransactionRequest, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
@@ -957,6 +919,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
  * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DefaultApiFp(configuration)
     return {
         /**
          * 
@@ -966,7 +929,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any): AxiosPromise<DeployContractGoSourceV1Response> {
-            return DefaultApiFp(configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(axios, basePath));
+            return localVarFp.deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -976,7 +939,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any): AxiosPromise<DeployContractV1Response> {
-            return DefaultApiFp(configuration).deployContractV1(deployContractV1Request, options).then((request) => request(axios, basePath));
+            return localVarFp.deployContractV1(deployContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -985,7 +948,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         getPrometheusExporterMetricsV1(options?: any): AxiosPromise<string> {
-            return DefaultApiFp(configuration).getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
+            return localVarFp.getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -995,7 +958,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
-            return DefaultApiFp(configuration).runTransactionV1(runTransactionRequest, options).then((request) => request(axios, basePath));
+            return localVarFp.runTransactionV1(runTransactionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };

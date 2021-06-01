@@ -13,6 +13,7 @@ import {
 } from "@hyperledger/cactus-cmd-api-server";
 import {
   CactusNode,
+  Configuration,
   Consortium,
   ConsortiumDatabase,
   ConsortiumMember,
@@ -48,12 +49,12 @@ test("BEFORE " + testCase, async (t: Test) => {
 test(testCase, async (t: Test) => {
   const ledger1: Ledger = {
     id: "my_cool_ledger_that_i_want_to_transact_on",
-    ledgerType: LedgerType.QUORUM2X,
+    ledgerType: LedgerType.Quorum2X,
   };
 
   const ledger2: Ledger = {
     id: "other_ledger_that_is_just_taking_up_space",
-    ledgerType: LedgerType.QUORUM2X,
+    ledgerType: LedgerType.Quorum2X,
   };
 
   const httpServer1 = await Servers.startOnPreferredPort(4050);
@@ -129,7 +130,8 @@ test(testCase, async (t: Test) => {
 
   const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
 
-  const mainApiClient = new ApiClient({ basePath: consortium.mainApiHost });
+  const config = new Configuration({ basePath: consortium.mainApiHost });
+  const mainApiClient = new ApiClient(config);
 
   test("Set Up Test ledgers, Consortium, Cactus Nodes", async (t2: Test) => {
     const quorumTestLedger1 = new QuorumTestLedger();
@@ -259,7 +261,7 @@ test(testCase, async (t: Test) => {
       web3SigningCredential: {
         ethAccount: initialFundsAccount1,
         secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+        type: Web3SigningCredentialType.GethKeychainPassword,
       },
     });
 
@@ -283,7 +285,7 @@ test(testCase, async (t: Test) => {
       web3SigningCredential: {
         ethAccount: initialFundsAccount2,
         secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+        type: Web3SigningCredentialType.GethKeychainPassword,
       },
     });
 

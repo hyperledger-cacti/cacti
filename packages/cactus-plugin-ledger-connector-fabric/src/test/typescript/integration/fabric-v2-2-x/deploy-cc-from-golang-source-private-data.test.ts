@@ -25,6 +25,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
   ChainCodeProgrammingLanguage,
+  Configuration,
   DefaultEventHandlerStrategy,
   FabricContractInvocationType,
   PluginLedgerConnectorFabric,
@@ -149,7 +150,7 @@ test(testCase, async (t: Test) => {
     connectionProfile,
     discoveryOptions,
     eventHandlerOptions: {
-      strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+      strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
       commitTimeout: 300,
     },
   };
@@ -172,7 +173,8 @@ test(testCase, async (t: Test) => {
 
   const apiUrl = `http://localhost:${port}`;
 
-  const apiClient = new FabricApi({ basePath: apiUrl });
+  const configuration = new Configuration({ basePath: apiUrl });
+  const apiClient = new FabricApi(configuration);
 
   const contractName = "asset-transfer-private-data";
 
@@ -317,7 +319,7 @@ test(testCase, async (t: Test) => {
     //objectType, assetID, color, size, appraisedvalue
     params: [],
     methodName: "CreateAsset",
-    invocationType: FabricContractInvocationType.SENDPRIVATE,
+    invocationType: FabricContractInvocationType.Sendprivate,
     signingCredential: {
       keychainId,
       keychainRef: keychainEntryKey,
@@ -333,7 +335,7 @@ test(testCase, async (t: Test) => {
     channelName,
     params: [assetId],
     methodName: "ReadAsset",
-    invocationType: FabricContractInvocationType.SEND,
+    invocationType: FabricContractInvocationType.Send,
     signingCredential: {
       keychainId,
       keychainRef: keychainEntryKey,
@@ -371,7 +373,7 @@ test(testCase, async (t: Test) => {
     channelName,
     params: [assetId, assetId + "1"],
     methodName: "GetAssetByRange",
-    invocationType: FabricContractInvocationType.CALL,
+    invocationType: FabricContractInvocationType.Call,
     signingCredential: {
       keychainId,
       keychainRef: keychainEntryKey,

@@ -461,7 +461,7 @@
                         "nullable": false
                     },
                     "timeoutMs": {
-                        "type": "number",
+                        "type": "integer",
                         "description": "The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing.",
                         "minimum": 0,
                         "default": 60000,
