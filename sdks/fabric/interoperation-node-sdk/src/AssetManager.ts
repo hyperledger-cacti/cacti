@@ -281,6 +281,45 @@ const claimAssetInHTLC = async (
 
 /**
  * Latter step of a Hashed Time Lock Contract
+ * - Claim a unique asset instance using a hash preimage and contractId
+ **/
+const claimAssetInHTLCusingContractId = async (
+    contract: Contract,
+    contractId: string,
+    hashPreimage: string,
+): Promise<any> => {
+
+    if (!contract)
+    {
+        logger.error("Contract handle not supplied");
+        return false;
+    }
+    if (!contractId)
+    {
+        logger.error("contract ID not supplied");
+        return false;
+    }
+    if (!hashPreimage)
+    {
+        logger.error("Hash Preimage not supplied");
+        return false;
+    }
+
+    const claimInfoStr = createAssetClaimInfoSerialized(hashPreimage);
+
+    // Normal invoke function
+    const [result, submitError] = await helpers.handlePromise(
+        contract.submitTransaction("ClaimAssetUsingContractId", contractId, claimInfoStr),
+    );
+    if (submitError) {
+        throw new Error(`ClaimAssetUsingContractId submitTransaction Error: ${submitError}`);
+    }
+    return result;
+};
+
+
+/**
+ * Latter step of a Hashed Time Lock Contract
  * - Claim a set of fungible assets using a hash preimage
  **/
 const claimFungibleAssetInHTLC = async (
@@ -363,6 +402,37 @@ const reclaimAssetInHTLC = async (
 
 /**
  * Rollback step of a Hashed Time Lock Contract
+ * - Reclaim a unique asset instance using contractId
+ **/
+const reclaimAssetInHTLCusingContractId = async (
+    contract: Contract,
+    contractId: string,
+    recipientECert: string,
+): Promise<any> => {
+
+    if (!contract)
+    {
+        logger.error("Contract handle not supplied");
+        return false;
+    }
+    if (!contractId)
+    {
+        logger.error("contract ID not supplied");
+        return false;
+    }
+
+    // Normal invoke function
+    const [result, submitError] = await helpers.handlePromise(
+        contract.submitTransaction("UnlockAssetUsingContractId", contractId),
+    );
+    if (submitError) {
+        throw new Error(`UnlockAssetUsingContractId submitTransaction Error: ${submitError}`);
+    }
+    return result;
+};
+
+/**
+ * Rollback step of a Hashed Time Lock Contract
  * - Reclaim a set of fungible assets
  **/
 const reclaimFungibleAssetInHTLC = async (
@@ -437,6 +507,36 @@ const isAssetLockedInHTLC = async (
     );
     if (evaluateError) {
         throw new Error(`IsAssetLocked evaluateTransaction Error: ${evaluateError}`);
+    }
+    return result;
+};
+
+/**
+ * Query the state of a Hashed Time Lock Contract using contractId
+ * - Determine if a unique asset instance is locked by a given party for another given party
+ **/
+const isAssetLockedInHTLCqueryUsingContractId = async (
+    contract: Contract,
+    contractId: string,
+): Promise<any> => {
+
+    if (!contract)
+    {
+        logger.error("Contract handle not supplied");
+        return false;
+    }
+    if (!contractId)
+    {
+        logger.error("contract ID not supplied");
+        return false;
+    }
+
+    // Normal invoke function
+    const [result, evaluateError] = await helpers.handlePromise(
+        contract.evaluateTransaction("IsAssetLockedQueryUsingContractId", contractId),
+    );
+    if (evaluateError) {
+        throw new Error(`IsAssetLockedQueryUsingContractId evaluateTransaction Error: ${evaluateError}`);
     }
     return result;
 };
@@ -748,10 +848,13 @@ export {
     createHTLC,
     createFungibleHTLC,
     claimAssetInHTLC,
+    claimAssetInHTLCusingContractId,
     claimFungibleAssetInHTLC,
     reclaimAssetInHTLC,
+    reclaimAssetInHTLCusingContractId,
     reclaimFungibleAssetInHTLC,
     isAssetLockedInHTLC,
+    isAssetLockedInHTLCqueryUsingContractId,
     isFungibleAssetLockedInHTLC,
     StartHTLCAssetLockListener,
     StartHTLCAssetClaimListener,
