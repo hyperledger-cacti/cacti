@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 import express from "express";
 
 import {
+  Containers,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -34,6 +35,7 @@ import { K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "../../../../main/typescript/prom
 
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { DiscoveryOptions } from "fabric-network";
+import { Configuration } from "@hyperledger/cactus-core-api";
 
 /**
  * Use this to debug issues with the fabric node SDK
@@ -47,15 +49,19 @@ const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
 test(testCase, async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
 
+  test.onFailure(async () => {
+    await Containers.logDiagnostics({ logLevel });
+  });
+
   const ledger = new FabricTestLedgerV1({
-    emitContainerLogs: false,
+    emitContainerLogs: true,
     publishAllPorts: true,
     logLevel,
     imageName: "hyperledger/cactus-fabric2-all-in-one",
@@ -65,8 +71,7 @@ test(testCase, async (t: Test) => {
       ["CA_VERSION", "1.4.9"],
     ]),
   });
-
-  await ledger.start();
+  t.ok(ledger, "ledger (FabricTestLedgerV1) truthy OK");
 
   const tearDownLedger = async () => {
     await ledger.stop();
@@ -74,6 +79,8 @@ test(testCase, async (t: Test) => {
   };
 
   test.onFinish(tearDownLedger);
+
+  await ledger.start();
 
   const enrollAdminOut = await ledger.enrollAdmin();
   const adminWallet = enrollAdminOut[1];
@@ -110,11 +117,12 @@ test(testCase, async (t: Test) => {
     pluginRegistry,
     sshConfig,
     cliContainerEnv: {},
+    peerBinary: "/fabric-samples/bin/peer",
     logLevel,
     connectionProfile,
     discoveryOptions,
     eventHandlerOptions: {
-      strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+      strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
       commitTimeout: 300,
     },
   };
@@ -135,7 +143,9 @@ test(testCase, async (t: Test) => {
   t.comment(
     `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`,
   );
-  const apiClient = new FabricApi({ basePath: apiHost });
+
+  const apiConfig = new Configuration({ basePath: apiHost });
+  const apiClient = new FabricApi(apiConfig);
 
   await plugin.getOrCreateWebServices();
   await plugin.registerWebServices(expressApp);
@@ -154,7 +164,7 @@ test(testCase, async (t: Test) => {
       signingCredential,
       channelName,
       contractName,
-      invocationType: FabricContractInvocationType.CALL,
+      invocationType: FabricContractInvocationType.Call,
       methodName: "GetAllAssets",
       params: [],
     } as RunTransactionRequest);
@@ -167,7 +177,7 @@ test(testCase, async (t: Test) => {
     const req: RunTransactionRequest = {
       signingCredential,
       channelName,
-      invocationType: FabricContractInvocationType.SEND,
+      invocationType: FabricContractInvocationType.Send,
       contractName,
       methodName: "CreateAsset",
       params: [assetId, "yellow", "11", assetOwner, "199"],
@@ -184,7 +194,7 @@ test(testCase, async (t: Test) => {
       signingCredential,
       channelName,
       contractName,
-      invocationType: FabricContractInvocationType.CALL,
+      invocationType: FabricContractInvocationType.Call,
       methodName: "GetAllAssets",
       params: [],
     } as RunTransactionRequest);
@@ -224,6 +234,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

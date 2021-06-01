@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 import Docker, { Container, ContainerInfo } from "dockerode";
-import axios from "axios";
 import Joi from "joi";
 import tar from "tar-stream";
 import { EventEmitter } from "events";
@@ -14,11 +13,13 @@ import {
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
+import { Containers } from "../common/containers";
 
 export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;
   containerImageName?: string;
   rpcApiHttpPort?: number;
+  rpcApiWsPort?: number;
   envVars?: string[];
   logLevel?: LogLevelDesc;
 }
@@ -27,6 +28,7 @@ export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "2021-01-08-7a055c3",
   containerImageName: "hyperledger/cactus-besu-all-in-one",
   rpcApiHttpPort: 8545,
+  rpcApiWsPort: 8546,
   envVars: ["BESU_NETWORK=dev"],
 });
 
@@ -48,6 +50,7 @@ export class BesuTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
   public readonly rpcApiHttpPort: number;
+  public readonly rpcApiWsPort: number;
   public readonly envVars: string[];
 
   private readonly log: Logger;
@@ -66,6 +69,8 @@ export class BesuTestLedger implements ITestLedger {
       BESU_TEST_LEDGER_DEFAULT_OPTIONS.containerImageName;
     this.rpcApiHttpPort =
       options.rpcApiHttpPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
+    this.rpcApiWsPort =
+      options.rpcApiWsPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort;
     this.envVars = options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
 
     this.validateConstructorOptions();
@@ -91,6 +96,14 @@ export class BesuTestLedger implements ITestLedger {
     const ipAddress = "127.0.0.1";
     const hostPort: number = await this.getRpcApiPublicPort();
     return `http://${ipAddress}:${hostPort}`;
+  }
+
+  public async getRpcApiWsHost(): Promise<string> {
+    const { rpcApiWsPort } = this;
+    const ipAddress = "127.0.0.1";
+    const containerInfo = await this.getContainerInfo();
+    const port = await Containers.getPublicPort(rpcApiWsPort, containerInfo);
+    return `ws://${ipAddress}:${port}`;
   }
 
   public async getFileContents(filePath: string): Promise<string> {
@@ -206,11 +219,23 @@ export class BesuTestLedger implements ITestLedger {
         {
           ExposedPorts: {
             [`${this.rpcApiHttpPort}/tcp`]: {}, // besu RPC - HTTP
-            "8546/tcp": {}, // besu RPC - WebSocket
+            [`${this.rpcApiWsPort}/tcp`]: {}, // besu RPC - WebSocket
             "8888/tcp": {}, // orion Client Port - HTTP
             "8080/tcp": {}, // orion Node Port - HTTP
             "9001/tcp": {}, // supervisord - HTTP
             "9545/tcp": {}, // besu metrics
+          },
+          // TODO: this can be removed once the new docker image is published and
+          // specified as the default one to be used by the tests.
+          Healthcheck: {
+            Test: [
+              "CMD-SHELL",
+              `curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' localhost:8545`,
+            ],
+            Interval: 1000000000, // 1 second
+            Timeout: 3000000000, // 3 seconds
+            Retries: 299,
+            StartPeriod: 3000000000, // 1 second
           },
           // This is a workaround needed for macOS which has issues with routing
           // to docker container's IP addresses directly...
@@ -219,7 +244,7 @@ export class BesuTestLedger implements ITestLedger {
           Env: this.envVars,
         },
         {},
-        (err: any) => {
+        (err: unknown) => {
           if (err) {
             reject(err);
           }
@@ -241,23 +266,23 @@ export class BesuTestLedger implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 120000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 180000): Promise<void> {
     const fnTag = "BesuTestLedger#waitForHealthCheck()";
-    const httpUrl = await this.getRpcApiHttpHost();
+    // const httpUrl = await this.getRpcApiHttpHost();
     const startedAt = Date.now();
-    let reachable = false;
+    let isHealthy = false;
     do {
-      try {
-        const res = await axios.get(httpUrl);
-        reachable = res.status > 199 && res.status < 300;
-      } catch (ex) {
-        reachable = false;
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
-        }
+      if (Date.now() >= startedAt + timeoutMs) {
+        throw new Error(`${fnTag} timed out (${timeoutMs}ms)`);
       }
-      await new Promise((resolve2) => setTimeout(resolve2, 100));
-    } while (!reachable);
+      const containerInfo = await this.getContainerInfo();
+      this.log.debug(`ContainerInfo.Status=%o`, containerInfo.Status);
+      this.log.debug(`ContainerInfo.State=%o`, containerInfo.State);
+      isHealthy = containerInfo.Status.endsWith("(healthy)");
+      if (!isHealthy) {
+        await new Promise((resolve2) => setTimeout(resolve2, 1000));
+      }
+    } while (!isHealthy);
   }
 
   public stop(): Promise<any> {

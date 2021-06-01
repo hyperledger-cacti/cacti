@@ -17,6 +17,8 @@ import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+// @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
@@ -87,8 +89,8 @@ export interface DeployContractSolidityBytecodeV1Response {
  * @enum {string}
  */
 export enum EthContractInvocationType {
-    SEND = 'SEND',
-    CALL = 'CALL'
+    Send = 'SEND',
+    Call = 'CALL'
 }
 
 /**
@@ -99,22 +101,16 @@ export enum EthContractInvocationType {
 export interface InvokeContractV1Request {
     /**
      * 
-     * @type {Web3SigningCredential}
-     * @memberof InvokeContractV1Request
-     */
-    web3SigningCredential: Web3SigningCredential;
-    /**
-     * The application binary interface of the solidity contract
-     * @type {Array<any>}
-     * @memberof InvokeContractV1Request
-     */
-    contractAbi: Array<any>;
-    /**
-     * 
      * @type {string}
      * @memberof InvokeContractV1Request
      */
-    contractAddress: string;
+    contractName: string;
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof InvokeContractV1Request
+     */
+    signingCredential: Web3SigningCredential;
     /**
      * 
      * @type {EthContractInvocationType}
@@ -134,6 +130,24 @@ export interface InvokeContractV1Request {
      */
     params: Array<any>;
     /**
+     * The application binary interface of the solidity contract, optional parameter
+     * @type {Array<any>}
+     * @memberof InvokeContractV1Request
+     */
+    contractAbi?: Array<any>;
+    /**
+     * Address of the solidity contract, optional parameter
+     * @type {string}
+     * @memberof InvokeContractV1Request
+     */
+    contractAddress?: string;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof InvokeContractV1Request
+     */
+    value?: string | number;
+    /**
      * 
      * @type {string | number}
      * @memberof InvokeContractV1Request
@@ -147,12 +161,6 @@ export interface InvokeContractV1Request {
     gasPrice?: string | number;
     /**
      * 
-     * @type {string | number}
-     * @memberof InvokeContractV1Request
-     */
-    value?: string | number;
-    /**
-     * 
      * @type {number}
      * @memberof InvokeContractV1Request
      */
@@ -163,6 +171,12 @@ export interface InvokeContractV1Request {
      * @memberof InvokeContractV1Request
      */
     timeoutMs?: number;
+    /**
+     * The keychainId for retrieve the contracts json.
+     * @type {string}
+     * @memberof InvokeContractV1Request
+     */
+    keychainId?: string;
 }
 /**
  * 
@@ -182,102 +196,10 @@ export interface InvokeContractV1Response {
      * @memberof InvokeContractV1Response
      */
     callOutput?: any | null;
-}
-/**
- * 
- * @export
- * @interface InvokeContractV2Request
- */
-export interface InvokeContractV2Request {
-    /**
-     * 
-     * @type {string}
-     * @memberof InvokeContractV2Request
-     */
-    contractName: string;
-    /**
-     * 
-     * @type {Web3SigningCredential}
-     * @memberof InvokeContractV2Request
-     */
-    signingCredential: Web3SigningCredential;
-    /**
-     * 
-     * @type {EthContractInvocationType}
-     * @memberof InvokeContractV2Request
-     */
-    invocationType: EthContractInvocationType;
-    /**
-     * The name of the contract method to invoke.
-     * @type {string}
-     * @memberof InvokeContractV2Request
-     */
-    methodName: string;
-    /**
-     * The list of arguments to pass in to the contract method being invoked.
-     * @type {Array<any>}
-     * @memberof InvokeContractV2Request
-     */
-    params: Array<any>;
-    /**
-     * 
-     * @type {string | number}
-     * @memberof InvokeContractV2Request
-     */
-    value?: string | number;
-    /**
-     * 
-     * @type {string | number}
-     * @memberof InvokeContractV2Request
-     */
-    gas?: string | number;
-    /**
-     * 
-     * @type {string | number}
-     * @memberof InvokeContractV2Request
-     */
-    gasPrice?: string | number;
-    /**
-     * 
-     * @type {number}
-     * @memberof InvokeContractV2Request
-     */
-    nonce?: number;
-    /**
-     * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND
-     * @type {number}
-     * @memberof InvokeContractV2Request
-     */
-    timeoutMs?: number;
-    /**
-     * The keychainId for retrieve the contracts json.
-     * @type {string}
-     * @memberof InvokeContractV2Request
-     */
-    keychainId?: string;
-}
-/**
- * 
- * @export
- * @interface InvokeContractV2Response
- */
-export interface InvokeContractV2Response {
-    /**
-     * 
-     * @type {Web3TransactionReceipt}
-     * @memberof InvokeContractV2Response
-     */
-    transactionReceipt?: Web3TransactionReceipt;
-    /**
-     * 
-     * @type {any}
-     * @memberof InvokeContractV2Response
-     */
-    callOutput?: any | null;
     /**
      * 
      * @type {boolean}
-     * @memberof InvokeContractV2Response
+     * @memberof InvokeContractV1Response
      */
     success: boolean;
 }
@@ -549,10 +471,10 @@ export interface Web3SigningCredentialPrivateKeyHex {
  * @enum {string}
  */
 export enum Web3SigningCredentialType {
-    CACTUSKEYCHAINREF = 'CACTUS_KEYCHAIN_REF',
-    GETHKEYCHAINPASSWORD = 'GETH_KEYCHAIN_PASSWORD',
-    PRIVATEKEYHEX = 'PRIVATE_KEY_HEX',
-    NONE = 'NONE'
+    CactusKeychainRef = 'CACTUS_KEYCHAIN_REF',
+    GethKeychainPassword = 'GETH_KEYCHAIN_PASSWORD',
+    PrivateKeyHex = 'PRIVATE_KEY_HEX',
+    None = 'NONE'
 }
 
 /**
@@ -635,11 +557,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         apiV1QuorumDeployContractSolidityBytecode: async (deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -648,27 +571,19 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof deployContractSolidityBytecodeV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(deployContractSolidityBytecodeV1Request !== undefined ? deployContractSolidityBytecodeV1Request : {}) : (deployContractSolidityBytecodeV1Request || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractSolidityBytecodeV1Request, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
         /**
          * 
-         * @summary Invokeds a contract on a quorum ledger
+         * @summary Invokes a contract on a besu ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -676,11 +591,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         apiV1QuorumInvokeContract: async (invokeContractV1Request?: InvokeContractV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -689,21 +605,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof invokeContractV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(invokeContractV1Request !== undefined ? invokeContractV1Request : {}) : (invokeContractV1Request || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(invokeContractV1Request, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -717,11 +625,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         apiV1QuorumRunTransaction: async (runTransactionRequest?: RunTransactionRequest, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -730,62 +639,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof runTransactionRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(runTransactionRequest !== undefined ? runTransactionRequest : {}) : (runTransactionRequest || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequest, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Invokeds a contract on a besu ledger
-         * @param {InvokeContractV2Request} [invokeContractV2Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV2QuorumInvokeContract: async (invokeContractV2Request?: InvokeContractV2Request, options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v2/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof invokeContractV2Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(invokeContractV2Request !== undefined ? invokeContractV2Request : {}) : (invokeContractV2Request || "");
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -798,30 +658,24 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPrometheusExporterMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
 
     
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -833,6 +687,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
  * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
          * 
@@ -842,25 +697,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async apiV1QuorumDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractSolidityBytecodeV1Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1QuorumDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1QuorumDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @summary Invokeds a contract on a quorum ledger
+         * @summary Invokes a contract on a besu ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         async apiV1QuorumInvokeContract(invokeContractV1Request?: InvokeContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1QuorumInvokeContract(invokeContractV1Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1QuorumInvokeContract(invokeContractV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -870,25 +719,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async apiV1QuorumRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1QuorumRunTransaction(runTransactionRequest, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * 
-         * @summary Invokeds a contract on a besu ledger
-         * @param {InvokeContractV2Request} [invokeContractV2Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiV2QuorumInvokeContract(invokeContractV2Request?: InvokeContractV2Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV2Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV2QuorumInvokeContract(invokeContractV2Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1QuorumRunTransaction(runTransactionRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -897,11 +729,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async getPrometheusExporterMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getPrometheusExporterMetricsV1(options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusExporterMetricsV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
@@ -911,6 +740,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
  * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DefaultApiFp(configuration)
     return {
         /**
          * 
@@ -920,17 +750,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1QuorumDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): AxiosPromise<DeployContractSolidityBytecodeV1Response> {
-            return DefaultApiFp(configuration).apiV1QuorumDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options).then((request) => request(axios, basePath));
+            return localVarFp.apiV1QuorumDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @summary Invokeds a contract on a quorum ledger
+         * @summary Invokes a contract on a besu ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         apiV1QuorumInvokeContract(invokeContractV1Request?: InvokeContractV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
-            return DefaultApiFp(configuration).apiV1QuorumInvokeContract(invokeContractV1Request, options).then((request) => request(axios, basePath));
+            return localVarFp.apiV1QuorumInvokeContract(invokeContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -940,17 +770,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1QuorumRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
-            return DefaultApiFp(configuration).apiV1QuorumRunTransaction(runTransactionRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Invokeds a contract on a besu ledger
-         * @param {InvokeContractV2Request} [invokeContractV2Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiV2QuorumInvokeContract(invokeContractV2Request?: InvokeContractV2Request, options?: any): AxiosPromise<InvokeContractV2Response> {
-            return DefaultApiFp(configuration).apiV2QuorumInvokeContract(invokeContractV2Request, options).then((request) => request(axios, basePath));
+            return localVarFp.apiV1QuorumRunTransaction(runTransactionRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -959,7 +779,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         getPrometheusExporterMetricsV1(options?: any): AxiosPromise<string> {
-            return DefaultApiFp(configuration).getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
+            return localVarFp.getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -985,7 +805,7 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
-     * @summary Invokeds a contract on a quorum ledger
+     * @summary Invokes a contract on a besu ledger
      * @param {InvokeContractV1Request} [invokeContractV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1005,18 +825,6 @@ export class DefaultApi extends BaseAPI {
      */
     public apiV1QuorumRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any) {
         return DefaultApiFp(this.configuration).apiV1QuorumRunTransaction(runTransactionRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Invokeds a contract on a besu ledger
-     * @param {InvokeContractV2Request} [invokeContractV2Request] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public apiV2QuorumInvokeContract(invokeContractV2Request?: InvokeContractV2Request, options?: any) {
-        return DefaultApiFp(this.configuration).apiV2QuorumInvokeContract(invokeContractV2Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

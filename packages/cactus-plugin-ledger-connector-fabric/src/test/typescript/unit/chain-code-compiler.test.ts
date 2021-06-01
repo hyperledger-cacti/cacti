@@ -17,7 +17,10 @@ test.skip("compiles chaincode straight from go source code", async (t: Test) => 
   const opts: ICompilationOptions = {
     fileName: "hello-world-contract.go",
     moduleName: "hello-world-contract",
-    pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+    pinnedDeps: [
+      "github.com/hyperledger/fabric@v1.4.8",
+      "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+    ],
     sourceCode: HELLO_WORLD_CONTRACT_GO_SOURCE,
   };
 

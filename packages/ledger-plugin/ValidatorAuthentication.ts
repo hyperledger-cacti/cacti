@@ -24,6 +24,7 @@ export class ValidatorAuthentication {
             expiresIn: '1000'
         }
 
+        // logger.debug(`payload = ${JSON.stringify(payload)}`);
         const signature: string = jwt.sign(payload, privateKey, option);
         logger.debug(`signature = ${signature}`);
         return signature;

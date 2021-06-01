@@ -238,35 +238,33 @@ The ledger transfer has a high degree of interference between the blockchains si
 
 Legend:
 
-<img src="https://render.githubusercontent.com/render/math?math=O_1 =\text{ Object 1}">
+![](https://render.githubusercontent.com/render/math?math=O_1=) Object 1
 
-<img src="https://render.githubusercontent.com/render/math?math=O_1^{begin}= \text{ State of object } \quad\!\!\!\! O_1 \quad \!\! \! \! \text{ at the beginning of transaction}">
+![](https://render.githubusercontent.com/render/math?math=O_1^{begin}=) State of object *O<sub>1</sub>* at the beginning of transaction
 
-<img src="https://render.githubusercontent.com/render/math?math=O_2^{begin} = \text{ State of object } \quad\!\!\!\! O_2 \quad\!\!\!\! \text{ at the beginning of transaction}">
+![](https://render.githubusercontent.com/render/math?math=O_2^{begin}=) State of object *O<sub>2</sub>* at the beginning of transaction
 
-<img src="https://render.githubusercontent.com/render/math?math=O_1^{end} = \text{ State of object } \quad\!\!\!\! O_1 \quad\!\!\!\! \text{ at the end of transaction}">
+![](https://render.githubusercontent.com/render/math?math=O_1^{end}=) State of object *O<sub>1</sub>* at the end of transaction
 
-<img src="https://render.githubusercontent.com/render/math?math=O_2^{end} = \text{ State of object } \quad\!\!\!\! O_2 \quad\!\!\!\! \text{ at the end of transaction}">
+![](https://render.githubusercontent.com/render/math?math=O_2^{end}=) State of object *O<sub>2</sub>* at the end of transaction
 
-<img src="https://render.githubusercontent.com/render/math?math=\overline{O}_1^{end} = \text{ Representation of object } \quad\!\!\!\! O_1\quad\!\!\!\! \text{ at the end of transaction in another blockchain}">
+*<span style="text-decoration:overline">O</span><sub>1</sub><sup>end</sup>* = Representation of object *O<sub>1</sub>* at the end of transaction in another blockchain
 
-<img src="https://render.githubusercontent.com/render/math?math=\overline{O}_2^{end} = \text{ Representation of object } \quad\!\!\!\! O_2 \quad\!\!\!\! \text{ at the end of transaction in another blockchain}">
+*<span style="text-decoration:overline">O</span><sub>2</sub><sup>end</sup>* = Representation of object } *O<sub>2</sub>* at the end of transaction in another blockchain
 
-<img src="https://render.githubusercontent.com/render/math?math=T_1 =\text{ Transaction 1}">
+![](https://render.githubusercontent.com/render/math?math=T_1=) Transaction 1
 
-<img src="https://render.githubusercontent.com/render/math?math=T_2 =\text{ Transaction 2}">
+![](https://render.githubusercontent.com/render/math?math=T_2=) Transaction 2
 
-<img src="https://render.githubusercontent.com/render/math?math=\overline{T}_1 = \text{ Representation of transaction 1 } \quad\!\!\!\! (T_1) \quad\!\!\!\! \text{ in another blockchain}">
+*<span style="text-decoration:overline">T</span><sub>1</sub>* = Representation of transaction 1 (T<sub>1</sub>) in another blockchain
 
-<img src="https://render.githubusercontent.com/render/math?math=\overline{T}_2 = \text{ Representation of transaction 2 } \quad\!\!\!\! (T_2) \quad\!\!\!\! \text{ in another blockchain}">
+*<span style="text-decoration:overline">T</span><sub>1</sub>* = Representation of transaction 2 (T<sub>2</sub>) in another blockchain
 
-<img src="https://render.githubusercontent.com/render/math?math=E_1 =\text{ Event 1}">
+![](https://render.githubusercontent.com/render/math?math=E_1=) Event 1
 
-<img src="https://render.githubusercontent.com/render/math?math=E_2(O_1||T_1||E_1) = \text{ Event 2 depends on }\quad\!\!\!\! O_1 \quad\!\!\!\!\text{ or }\quad\!\!\!\!T_1\quad\!\!\!\! \text{ or }\quad\!\!\!\!E_1">
+![](https://render.githubusercontent.com/render/math?math=E_2(O_1||T_1||E_1)=) Event 2 depends on *O<sub>1</sub>*  or *T<sub>1</sub>* or *E<sub>1</sub>*
 
-<img src="https://render.githubusercontent.com/render/math?math=T_2(O_1||T_1||E_1) = \text{ Transaction 2 depends on }\quad\!\!\!\!O_1\quad\!\!\!\! \text{ or } \quad\!\!\!\!T_1\quad\!\!\!\! \text{ or }\quad\!\!\!\!E_1">
-
-
+![](https://render.githubusercontent.com/render/math?math=T_2(O_1||T_1||E_1)=) Transaction 2 depends on *O<sub>1</sub>* or *T<sub>1</sub>* or *E<sub>1</sub>*
 
 
 
@@ -1699,7 +1697,7 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 
 **Cactus Node**: A set of identically configured API servers behind a single network host where the set size is customizable from 1 to infinity with the practical maximum being much lower of course. This logical distinction between node and API server is important because it allows consortium members to abstract away their private infrastructure details from the public consortium definition.
 
-For example if a consortium member wants to have a highly available, high throughput service, they will be forced to run a cluster of API servers behind a load balancer and/or reverse proxy to achieve these system properties and their API servers may also be in an auto-scaling group of a cloud provider or (in the future) even run as Lambda functions. To avoid having to update the consortium definiton (which requires a potentially costly consesus from other members) every time let's say an auto-scaling group adds a new API server to a node, the consortium member can define their presence in the consortium by declaring a single `Cactus Node` and then customize the underlying deployment as they see fit so long as they ensure that the previously agreed upon keys are used by the node and it is indeed accessible through the network host as declared by the `Cactus Node`.
+For example if a consortium member wants to have a highly available, high throughput service, they will be forced to run a cluster of API servers behind a load balancer and/or reverse proxy to achieve these system properties and their API servers may also be in an auto-scaling group of a cloud provider or (in the future) even run as Lambda functions. To avoid having to update the consortium definition (which requires a potentially costly consesus from other members) every time let's say an auto-scaling group adds a new API server to a node, the consortium member can define their presence in the consortium by declaring a single `Cactus Node` and then customize the underlying deployment as they see fit so long as they ensure that the previously agreed upon keys are used by the node and it is indeed accessible through the network host as declared by the `Cactus Node`.
 To get a better understanding of the various, near-infinite deplyoment scenarios, head over to the [Deployment Scenarios](#57-deployment-scenarios) sub-section of the [Architecture](#5-architecture) top level section.
 
 **Validator**: A module of Hyperledger Cactus which verifies validity of transaction to be sent out to the blockchain application.
@@ -1738,6 +1736,7 @@ A recent survey classifies blockchain interoperability studies in three categori
 Each category serves particular use cases.
 
 ![rw](./related-work-categories.png)
+
 
 Cryptocurrency-directed interoperability approaches identify and define different strategies for chain interoperability across public blockchains, most of them implementing cryptocurrencies.
 

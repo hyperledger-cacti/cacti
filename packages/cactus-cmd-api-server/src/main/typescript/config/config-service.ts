@@ -4,23 +4,30 @@ import convict, { Schema, Config, SchemaObj } from "convict";
 import { ipaddress } from "convict-format-with-validator";
 import { v4 as uuidV4 } from "uuid";
 import { JWK, JWS } from "jose";
+import type { Options as ExpressJwtOptions } from "express-jwt";
 import {
   LoggerProvider,
   Logger,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
-import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
 import {
   ConsortiumDatabase,
+  Constants,
   PluginImport,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
+
+import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
+import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
+import { AuthorizationProtocol } from "./authorization-protocol";
+import { IAuthorizationConfig } from "../authzn/i-authorization-config";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
 
 export interface ICactusApiServerOptions {
+  authorizationProtocol: AuthorizationProtocol;
+  authorizationConfigJson: IAuthorizationConfig;
   configFile: string;
   cactusNodeId: string;
   consortiumId: string;
@@ -63,8 +70,8 @@ export class ConfigService {
     const schema: any = ConfigService.getConfigSchema();
 
     const argsHelpText = Object.keys(schema)
-      .map((optionName: string) => {
-        return (
+      .map(
+        (optionName: string) =>
           `  ${optionName}:` +
           `\n\t\tDescription: ${schema[optionName].doc}` +
           `\n\t\tDefault: ${
@@ -72,9 +79,8 @@ export class ConfigService {
             "Mandatory parameter without a default value."
           }` +
           `\n\t\tEnv: ${schema[optionName].env}` +
-          `\n\t\tCLI: --${schema[optionName].arg}`
-        );
-      })
+          `\n\t\tCLI: --${schema[optionName].arg}`,
+      )
       .join("\n");
 
     return this.HELP_TEXT_HEADER.concat(argsHelpText).concat("\n\n");
@@ -82,6 +88,30 @@ export class ConfigService {
 
   private static getConfigSchema(): Schema<ICactusApiServerOptions> {
     return {
+      authorizationProtocol: {
+        doc:
+          "The name of the authorization protocol to use. Accepted values" +
+          `are: ${Object.values(AuthorizationProtocol).join(",")}`,
+        format: (value: AuthorizationProtocol) => {
+          ConfigService.formatNonBlankString(value);
+          const accepted = Object.values(AuthorizationProtocol);
+          const acceptedCsv = accepted.join(",");
+          if (!accepted.includes(value)) {
+            const m = `Accepted authz protocols: ${acceptedCsv} Got: ${value}`;
+            throw new Error(m);
+          }
+        },
+        default: (null as unknown) as AuthorizationProtocol,
+        env: "AUTHORIZATION_PROTOCOL",
+        arg: "authorization-protocol",
+      },
+      authorizationConfigJson: {
+        doc: "The JSON string to deserialize when configuring authorization.",
+        default: null as IAuthorizationConfig | null,
+        format: Object,
+        env: "AUTHORIZATION_CONFIG_JSON",
+        arg: "authorization-config-json",
+      },
       plugins: {
         doc: "A collection of plugins to load at runtime.",
         format: "plugin-array",
@@ -95,7 +125,7 @@ export class ConfigService {
             default: {},
           },
         },
-      } as any,
+      } as SchemaObj<PluginImport[]>,
       configFile: {
         doc:
           "The path to a config file that holds the configuration itself which will be parsed and validated.",
@@ -109,7 +139,7 @@ export class ConfigService {
           "Identifier of the consortium your node is part of. " +
           " Can be any string of characters such as a UUID",
         format: ConfigService.formatNonBlankString,
-        default: null as any,
+        default: null as string | null,
         env: "CONSORTIUM_ID",
         arg: "consortium-id",
       },
@@ -118,7 +148,7 @@ export class ConfigService {
           "Identifier of this particular Cactus node. Must be unique among the total set of Cactus nodes running in any " +
           "given Cactus deployment. Can be any string of characters such as a UUID or an Int64",
         format: ConfigService.formatNonBlankString,
-        default: null as any,
+        default: null as string | null,
         env: "CACTUS_NODE_ID",
         arg: "cactus-node-id",
       },
@@ -226,7 +256,7 @@ export class ConfigService {
         format: ConfigService.filePathOrFileContents,
         env: "COCKPIT_TLS_CERT_PEM",
         arg: "cockpit-tls-cert-pem",
-        default: null as any,
+        default: null as string | null,
       },
       cockpitTlsKeyPem: {
         sensitive: true,
@@ -236,7 +266,7 @@ export class ConfigService {
         format: ConfigService.filePathOrFileContents,
         env: "COCKPIT_TLS_KEY_PEM",
         arg: "cockpit-tls-key-pem",
-        default: null as any,
+        default: null as string | null,
       },
       cockpitTlsClientCaPem: {
         doc:
@@ -245,7 +275,7 @@ export class ConfigService {
         format: ConfigService.filePathOrFileContents,
         env: "COCKPIT_TLS_CLIENT_CA_PEM",
         arg: "cockpit-tls-client-ca-pem",
-        default: null as any,
+        default: null as string | null,
       },
       apiHost: {
         doc:
@@ -297,7 +327,7 @@ export class ConfigService {
         format: ConfigService.filePathOrFileContents,
         env: "API_TLS_CERT_PEM",
         arg: "api-tls-cert-pem",
-        default: null as any,
+        default: null as string | null,
       },
       apiTlsClientCaPem: {
         doc:
@@ -306,7 +336,7 @@ export class ConfigService {
         format: ConfigService.filePathOrFileContents,
         env: "API_TLS_CLIENT_CA_PEM",
         arg: "api-tls-client-ca-pem",
-        default: null as any,
+        default: null as string | null,
       },
       apiTlsKeyPem: {
         sensitive: true,
@@ -316,7 +346,7 @@ export class ConfigService {
         format: ConfigService.filePathOrFileContents,
         env: "API_TLS_KEY_PEM",
         arg: "api-tls-key-pem",
-        default: null as any,
+        default: null as string | null,
       },
       keyPairPem: {
         sensitive: true,
@@ -326,7 +356,7 @@ export class ConfigService {
         env: "KEY_PAIR_PEM",
         arg: "key-pair-pem",
         format: ConfigService.formatNonBlankString,
-        default: null as any,
+        default: null as string | null,
       },
       keychainSuffixKeyPairPem: {
         doc:
@@ -452,7 +482,7 @@ export class ConfigService {
     const plugins: PluginImport[] = [
       {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
-        type: PluginImportType.LOCAL,
+        type: PluginImportType.Local,
         options: {
           instanceId: uuidV4(),
           keychainId: uuidV4(),
@@ -460,7 +490,7 @@ export class ConfigService {
       },
       {
         packageName: "@hyperledger/cactus-plugin-consortium-manual",
-        type: PluginImportType.LOCAL,
+        type: PluginImportType.Local,
         options: {
           instanceId: uuidV4(),
           keyPairPem,
@@ -469,7 +499,27 @@ export class ConfigService {
       },
     ];
 
+    const jwtSecret = uuidV4();
+
+    const expressJwtOptions: ExpressJwtOptions = {
+      secret: jwtSecret,
+      algorithms: ["RS256"],
+      audience: "org.hyperledger.cactus.jwt.audience",
+      issuer: "org.hyperledger.cactus.jwt.issuer",
+    };
+
+    const authorizationConfigJson: IAuthorizationConfig = {
+      socketIoPath: Constants.SocketIoConnectionPathV1,
+      unprotectedEndpointExemptions: [],
+      socketIoJwtOptions: {
+        secret: jwtSecret,
+      },
+      expressJwtOptions,
+    };
+
     return {
+      authorizationProtocol: AuthorizationProtocol.JSON_WEB_TOKEN,
+      authorizationConfigJson,
       configFile: ".config.json",
       cactusNodeId: uuidV4(),
       consortiumId: uuidV4(),
@@ -502,7 +552,7 @@ export class ConfigService {
   }
 
   getOrCreate(options?: {
-    env?: any;
+    env?: NodeJS.ProcessEnv;
     args?: string[];
   }): Config<ICactusApiServerOptions> {
     if (!ConfigService.config) {

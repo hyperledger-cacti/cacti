@@ -2,7 +2,7 @@ import test, { Test } from "tape";
 import { v4 as uuidv4 } from "uuid";
 import { LoggerProvider } from "../../../../main/typescript/public-api";
 
-// FIXME(2020-11-12) this does not work becauase for some reason the stdout
+// FIXME(2020-11-12) this does not work because for some reason the stdout
 // stream does not emit 'data' events with anything even though it should.
 // Suspecting that the test runner library does some internal magic with
 // piping the stream somewhere else or similar foul play at hand.

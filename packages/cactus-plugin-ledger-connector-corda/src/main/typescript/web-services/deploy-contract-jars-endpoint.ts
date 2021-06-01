@@ -11,11 +11,19 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import {
+  AuthorizationOptionsProvider,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
+
+import {
   Checks,
+  IAsyncProvider,
   Logger,
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
+
+import { IEndpointAuthzOptions } from "@hyperledger/cactus-core-api";
 
 import {
   DeployContractJarsSuccessV1Response,
@@ -30,14 +38,21 @@ export interface IDeployContractEndpointOptions {
   corDappsDir: string;
   cordaStartCmd?: string;
   cordaStopCmd?: string;
+  authorizationOptionsProvider?: AuthorizationOptionsProvider;
 }
+
+const K_DEFAULT_AUTHORIZATION_OPTIONS: IEndpointAuthzOptions = {
+  isProtected: true,
+  requiredRoles: [],
+};
 
 export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "DeployContractJarsEndpoint";
 
   private readonly log: Logger;
+  private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
 
-  public get className() {
+  public get className(): string {
     return DeployContractJarsEndpoint.CLASS_NAME;
   }
 
@@ -50,6 +65,16 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
     const level = options.logLevel || "INFO";
     const label = "deploy-contract-jars-endpoint";
     this.log = LoggerProvider.getOrCreate({ level, label });
+
+    this.authorizationOptionsProvider =
+      options.authorizationOptionsProvider ||
+      AuthorizationOptionsProvider.of(K_DEFAULT_AUTHORIZATION_OPTIONS, level);
+
+    this.log.debug(`Instantiated ${this.className} OK`);
+  }
+
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    return this.authorizationOptionsProvider;
   }
 
   public get oasOperation() {
@@ -59,7 +84,7 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
   }
 
   /**
-   * Returns the `operationId` that connects this endpoint to it's definiton in
+   * Returns the `operationId` that connects this endpoint to it's definition in
    * the openapi-spec.ts file.
    */
   public get operationId(): string {
@@ -82,12 +107,10 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public registerExpress(expressApp: Express): IWebServiceEndpoint {
-    const httpVerb = this.getVerbLowerCase();
-    const httpPath = this.getPath();
-    const handler = this.getExpressRequestHandler();
-
-    (expressApp as any)[httpVerb](httpPath, handler);
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 

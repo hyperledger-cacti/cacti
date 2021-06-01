@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core-api",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-core-api.node.umd.min.js",
@@ -12,7 +12,7 @@
     "dist/*"
   ],
   "scripts": {
-    "generate-sdk": "openapi-generator generate --input-spec src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk": "docker run --rm -v \"${PWD}:/local\" openapitools/openapi-generator-cli:v5.1.1 generate -i ./local/src/main/json/openapi.json -g typescript-axios -o ./local/src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
@@ -83,11 +83,12 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "devDependencies": {
-    "@types/express": "4.17.8"
+    "@types/express": "4.17.8",
+    "socket.io": "4.0.1",
+    "typescript-optional": "2.0.1"
   },
   "dependencies": {
-    "axios": "0.21.1",
-    "express": "4.17.1",
-    "typescript-optional": "2.0.1"
+    "@hyperledger/cactus-common": "0.5.0",
+    "axios": "0.21.1"
   }
 }

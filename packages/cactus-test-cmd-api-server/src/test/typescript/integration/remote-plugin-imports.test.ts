@@ -1,7 +1,11 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
@@ -18,6 +22,7 @@ import {
   PluginFactoryKeychain,
 } from "@hyperledger/cactus-plugin-keychain-vault";
 import {
+  Configuration,
   IPluginKeychain,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
@@ -56,11 +61,14 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   const hostPort = await pluginContainer.getHostPortHttp();
   t.comment(`CactusKeychainVaultServer (Port=${hostPort}) started OK`);
 
-  const configuration = { basePath: `http://localhost:${hostPort}` };
+  const configuration = new Configuration({
+    basePath: `http://localhost:${hostPort}`,
+  });
   const apiClient = new DefaultApi(configuration);
 
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
+  apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;
@@ -70,7 +78,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   const config = configService.newExampleConfigConvict(apiServerOptions);
 
   const factory = new PluginFactoryKeychain({
-    pluginImportType: PluginImportType.REMOTE,
+    pluginImportType: PluginImportType.Remote,
   });
 
   const plugin: IPluginKeychain = await factory.create({

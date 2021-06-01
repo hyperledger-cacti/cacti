@@ -5,11 +5,13 @@ import {
   LoggerProvider,
   LogLevelDesc,
   Checks,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
+  IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
@@ -38,6 +40,16 @@ export class RunTransactionEndpointV1 implements IWebServiceEndpoint {
     });
   }
 
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    // TODO: make this an injectable dependency in the constructor
+    return {
+      get: async () => ({
+        isProtected: true,
+        requiredRoles: [],
+      }),
+    };
+  }
+
   public getExpressRequestHandler(): IExpressRequestHandler {
     return this.handleRequest.bind(this);
   }
@@ -62,8 +74,10 @@ export class RunTransactionEndpointV1 implements IWebServiceEndpoint {
     return this.getOasPath().post.operationId;
   }
 
-  public registerExpress(app: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(app, this);
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 

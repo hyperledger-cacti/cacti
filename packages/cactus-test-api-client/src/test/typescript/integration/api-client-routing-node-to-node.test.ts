@@ -6,16 +6,21 @@ import { JWK } from "jose";
 import Web3 from "web3";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 import {
   CactusNode,
+  Configuration,
   Consortium,
   ConsortiumDatabase,
   ConsortiumMember,
   Ledger,
   LedgerType,
 } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
 import {
   DefaultApi as QuorumApi,
   PluginLedgerConnectorQuorum,
@@ -37,19 +42,19 @@ const testCase = "Routes to correct node based on ledger ID";
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
 test(testCase, async (t: Test) => {
   const ledger1: Ledger = {
     id: "my_cool_ledger_that_i_want_to_transact_on",
-    ledgerType: LedgerType.QUORUM2X,
+    ledgerType: LedgerType.Quorum2X,
   };
 
   const ledger2: Ledger = {
     id: "other_ledger_that_is_just_taking_up_space",
-    ledgerType: LedgerType.QUORUM2X,
+    ledgerType: LedgerType.Quorum2X,
   };
 
   const httpServer1 = await Servers.startOnPreferredPort(4050);
@@ -123,7 +128,10 @@ test(testCase, async (t: Test) => {
     pluginInstance: [],
   };
 
-  const mainApiClient = new ApiClient({ basePath: consortium.mainApiHost });
+  const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
+
+  const config = new Configuration({ basePath: consortium.mainApiHost });
+  const mainApiClient = new ApiClient(config);
 
   test("Set Up Test ledgers, Consortium, Cactus Nodes", async (t2: Test) => {
     const quorumTestLedger1 = new QuorumTestLedger();
@@ -167,11 +175,13 @@ test(testCase, async (t: Test) => {
         keyPairPem: keyPair1.toPEM(true),
         consortiumDatabase,
         logLevel,
+        consortiumRepo,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
 
       const configService = new ConfigService();
       const apiServerOptions = configService.newExampleConfig();
+      apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
       apiServerOptions.configFile = "";
       apiServerOptions.apiCorsDomainCsv = "*";
       apiServerOptions.apiPort = addressInfo1.port;
@@ -208,11 +218,13 @@ test(testCase, async (t: Test) => {
         keyPairPem: keyPair2.toPEM(true),
         consortiumDatabase,
         logLevel,
+        consortiumRepo,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
 
       const configService = new ConfigService();
       const apiServerOptions = configService.newExampleConfig();
+      apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
       apiServerOptions.configFile = "";
       apiServerOptions.apiCorsDomainCsv = "*";
       apiServerOptions.apiPort = addressInfo2.port;
@@ -249,7 +261,7 @@ test(testCase, async (t: Test) => {
       web3SigningCredential: {
         ethAccount: initialFundsAccount1,
         secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+        type: Web3SigningCredentialType.GethKeychainPassword,
       },
     });
 
@@ -273,7 +285,7 @@ test(testCase, async (t: Test) => {
       web3SigningCredential: {
         ethAccount: initialFundsAccount2,
         secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+        type: Web3SigningCredentialType.GethKeychainPassword,
       },
     });
 
@@ -289,6 +301,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

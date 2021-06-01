@@ -1,5 +1,6 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
+import { Server as SocketIoServer } from "socket.io";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   EthContractInvocationType,
@@ -8,7 +9,9 @@ import {
   PluginFactoryLedgerConnector,
   Web3SigningCredentialCactusKeychainRef,
   ReceiptType,
-  DefaultApi as BesuApi,
+  BesuApiClient,
+  WatchBlocksV1Progress,
+  Web3BlockHeader,
 } from "../../../../../main/typescript/public-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -22,19 +25,20 @@ import {
 } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { K_CACTUS_BESU_TOTAL_TX_COUNT } from "../../../../../main/typescript/prometheus-exporter/metrics";
+import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/besu-api-client";
 
 const testCase = "deploys contract via .json file";
 const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
@@ -48,6 +52,7 @@ test(testCase, async (t: Test) => {
   });
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
+  const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
 
   /**
    * Constant defining the standard 'dev' Besu genesis.json contents.
@@ -79,10 +84,12 @@ test(testCase, async (t: Test) => {
     HelloWorldContractJson,
   );
   const factory = new PluginFactoryLedgerConnector({
-    pluginImportType: PluginImportType.LOCAL,
+    pluginImportType: PluginImportType.Local,
   });
+
   const connector: PluginLedgerConnectorBesu = await factory.create({
     rpcApiHttpHost,
+    rpcApiWsHost,
     logLevel,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
@@ -91,8 +98,13 @@ test(testCase, async (t: Test) => {
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
+
+  const wsApi = new SocketIoServer(server, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+
   const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
+    hostname: "localhost",
     port: 0,
     server,
   };
@@ -103,16 +115,20 @@ test(testCase, async (t: Test) => {
   t.comment(
     `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
   );
-  const apiClient = new BesuApi({ basePath: apiHost });
+
+  const wsBasePath = apiHost + Constants.SocketIoConnectionPathV1;
+  t.comment("WS base path: " + wsBasePath);
+  const besuApiClientOptions = new BesuApiClientOptions({ basePath: apiHost });
+  const apiClient = new BesuApiClient(besuApiClientOptions);
 
   await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp);
+  await connector.registerWebServices(expressApp, wsApi);
 
   await connector.transact({
     web3SigningCredential: {
       ethAccount: firstHighNetWorthAccount,
       secret: besuKeyPair.privateKey,
-      type: Web3SigningCredentialType.PRIVATEKEYHEX,
+      type: Web3SigningCredentialType.PrivateKeyHex,
     },
     transactionConfig: {
       from: firstHighNetWorthAccount,
@@ -122,10 +138,28 @@ test(testCase, async (t: Test) => {
     },
     consistencyStrategy: {
       blockConfirmations: 0,
-      receiptType: ReceiptType.NODETXPOOLACK,
+      receiptType: ReceiptType.NodeTxPoolAck,
       timeoutMs: 60000,
     },
   });
+
+  const blocks = await apiClient.watchBlocksV1();
+
+  const aBlockHeader = await new Promise<Web3BlockHeader>((resolve, reject) => {
+    let done = false;
+    const timerId = setTimeout(() => {
+      if (!done) {
+        reject("Waiting for block header notification to arrive timed out");
+      }
+    }, 10000);
+    const subscription = blocks.subscribe((res: WatchBlocksV1Progress) => {
+      subscription.unsubscribe();
+      done = true;
+      clearTimeout(timerId);
+      resolve(res.blockHeader);
+    });
+  });
+  t.ok(aBlockHeader, "Web3BlockHeader truthy OK");
 
   const balance = await web3.eth.getBalance(testEthAccount.address);
   t.ok(balance, "Retrieved balance of test account OK");
@@ -137,10 +171,12 @@ test(testCase, async (t: Test) => {
     const deployOut = await connector.deployContract({
       keychainId: keychainPlugin.getKeychainId(),
       contractName: HelloWorldContractJson.contractName,
+      contractAbi: HelloWorldContractJson.abi,
+      constructorArgs: [],
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: besuKeyPair.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       bytecode: HelloWorldContractJson.bytecode,
       gas: 1000000,
@@ -162,15 +198,16 @@ test(testCase, async (t: Test) => {
     );
 
     const { callOutput: helloMsg } = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.CALL,
+      contractAddress,
+      invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: besuKeyPair.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     t2.ok(helloMsg, "sayHello() output is truthy");
@@ -195,14 +232,14 @@ test(testCase, async (t: Test) => {
 
     await connector.transact({
       web3SigningCredential: {
-        type: Web3SigningCredentialType.NONE,
+        type: Web3SigningCredentialType.None,
       },
       transactionConfig: {
         rawTransaction,
       },
       consistencyStrategy: {
         blockConfirmations: 0,
-        receiptType: ReceiptType.NODETXPOOLACK,
+        receiptType: ReceiptType.NodeTxPoolAck,
         timeoutMs: 60000,
       },
     });
@@ -213,18 +250,19 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  test("invoke Web3SigningCredentialType.PRIVATEKEYHEX", async (t2: Test) => {
+  test("invoke Web3SigningCredentialType.PrivateKeyHex", async (t2: Test) => {
     const newName = `DrCactus${uuidv4()}`;
     const setNameOut = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
+      contractAddress,
+      invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       nonce: 1,
     });
@@ -232,16 +270,17 @@ test(testCase, async (t: Test) => {
 
     try {
       const setNameOutInvalid = await connector.invokeContract({
-        contractAddress,
+        contractName: HelloWorldContractJson.contractName,
         contractAbi: HelloWorldContractJson.abi,
-        invocationType: EthContractInvocationType.SEND,
+        contractAddress,
+        invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        web3SigningCredential: {
+        signingCredential: {
           ethAccount: testEthAccount.address,
           secret: testEthAccount.privateKey,
-          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+          type: Web3SigningCredentialType.PrivateKeyHex,
         },
         nonce: 1,
       });
@@ -254,62 +293,66 @@ test(testCase, async (t: Test) => {
       );
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.CALL,
+      contractAddress,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
       gas: 1000000,
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
 
     const getNameOut2 = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
+      contractAddress,
+      invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
       gas: 1000000,
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
 
     const response = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
+      contractAddress,
+      invocationType: EthContractInvocationType.Send,
       methodName: "deposit",
       params: [],
       gas: 1000000,
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       value: 10,
     });
     t2.ok(response, "deposit() payable invocation output is truthy OK");
 
     const { callOutput } = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.CALL,
+      contractAddress,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getNameByIndex",
       params: [0],
       gas: 1000000,
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     t2.equal(
@@ -321,37 +364,39 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  test("invoke Web3SigningCredentialType.CACTUSKEYCHAINREF", async (t2: Test) => {
+  test("invoke Web3SigningCredentialType.CactusKeychainRef", async (t2: Test) => {
     const newName = `DrCactus${uuidv4()}`;
 
-    const web3SigningCredential: Web3SigningCredentialCactusKeychainRef = {
+    const signingCredential: Web3SigningCredentialCactusKeychainRef = {
       ethAccount: testEthAccount.address,
       keychainEntryKey,
       keychainId: keychainPlugin.getKeychainId(),
-      type: Web3SigningCredentialType.CACTUSKEYCHAINREF,
+      type: Web3SigningCredentialType.CactusKeychainRef,
     };
 
     const setNameOut = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
+      contractAddress,
+      invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
       gas: 1000000,
-      web3SigningCredential,
+      signingCredential,
       nonce: 4,
     });
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
 
     try {
       const setNameOutInvalid = await connector.invokeContract({
-        contractAddress,
+        contractName: HelloWorldContractJson.contractName,
         contractAbi: HelloWorldContractJson.abi,
-        invocationType: EthContractInvocationType.SEND,
+        contractAddress,
+        invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        web3SigningCredential,
+        signingCredential,
         nonce: 4,
       });
       t2.ifError(setNameOutInvalid);
@@ -364,47 +409,51 @@ test(testCase, async (t: Test) => {
     }
 
     const { callOutput: getNameOut } = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.CALL,
+      contractAddress,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
       gas: 1000000,
-      web3SigningCredential,
+      signingCredential,
     });
     t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
 
     const getNameOut2 = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
+      contractAddress,
+      invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
       gas: 1000000,
-      web3SigningCredential,
+      signingCredential,
     });
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
 
     const response = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
+      contractAddress,
+      invocationType: EthContractInvocationType.Send,
       methodName: "deposit",
       params: [],
       gas: 1000000,
-      web3SigningCredential,
+      signingCredential,
       value: 10,
     });
     t2.ok(response, "deposit() payable invocation output is truthy OK");
 
     const { callOutput } = await connector.invokeContract({
-      contractAddress,
+      contractName: HelloWorldContractJson.contractName,
       contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.CALL,
+      contractAddress,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getNameByIndex",
       params: [1],
       gas: 1000000,
-      web3SigningCredential,
+      signingCredential,
     });
     t2.equal(
       callOutput,
@@ -428,12 +477,12 @@ test(testCase, async (t: Test) => {
       '{type="' +
       K_CACTUS_BESU_TOTAL_TX_COUNT +
       '"} 9';
-    t2.ok(res);
+    t2.ok(res, "Response truthy OK");
     t2.ok(res.data);
     t2.equal(res.status, 200);
     t2.true(
       res.data.includes(promMetricsOutput),
-      "Total Transaction Count of 9 recorded as expected. RESULT OK.",
+      "Total Transaction Count equals 9 OK.",
     );
     t2.end();
   });
@@ -443,6 +492,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

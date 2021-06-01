@@ -16,7 +16,7 @@ import { Configuration, BaseAPI } from "@hyperledger/cactus-core-api";
  * all can ship with their own `DefaultApi` class that is generated directly
  * from the respective OpenAPI spec of the package/plugin.
  *
- * The functionality provided by this class is meant to be common traints that
+ * The functionality provided by this class is meant to be common traits that
  * can be useful for all of those different `DefaultApi` implementations.
  *
  * One such common trait is the client side component of the routing that
@@ -66,7 +66,7 @@ export class ApiClient extends BaseAPI {
    * consortium management in your own consortium plugins which then Cactus
    * can use and leverage for the routing.
    * This allows us to support any exotic consortium management algorithms
-   * that people may come up with such as storing the consortium definiton in
+   * that people may come up with such as storing the consortium definition in
    * a multi-sig smart contract or have the list of consortium nodes be powered
    * by some sort of automatic service discovery or anything else that people
    * might think of.

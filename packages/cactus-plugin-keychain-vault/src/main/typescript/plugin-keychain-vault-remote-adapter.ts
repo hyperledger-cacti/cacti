@@ -15,7 +15,6 @@ import {
   ICactusPluginOptions,
   IPluginWebService,
   IWebServiceEndpoint,
-  PluginAspect,
 } from "@hyperledger/cactus-core-api";
 
 import { DefaultApi } from "./generated/openapi/typescript-axios";
@@ -28,7 +27,7 @@ export interface IPluginKeychainVaultRemoteAdapterOptions
 }
 
 /**
- * Class responsible for ecapsulating an API client object and then acting as
+ * Class responsible for encapsulating an API client object and then acting as
  * an adapter (ta-da) between said API client object and the calling code to
  * which it is (should be) transparent whether it is talking to an in-process
  * plugin instance of the keychain plugin or an adapter backed by an API client
@@ -123,14 +122,17 @@ export class PluginKeychainVaultRemoteAdapter
   public async get<T>(key: string): Promise<T> {
     const { data } = await this.backend.getKeychainEntry({ key });
     // FIXME what to do here? Does it make any sense to have the get() method
-    // of the keychain be generically parameterizable when we know we can only
+    // of the keychain be generically parameterized when we know we can only
     // return a string anyway?
-    return data.value as any;
+    return (data.value as unknown) as T;
   }
 
   public async set<T>(key: string, value: T): Promise<void> {
     // FIXME Does it make any sense to have the set() method be generic?
-    await this.backend.setKeychainEntry({ key, value: value as any });
+    await this.backend.setKeychainEntry({
+      key,
+      value: (value as unknown) as string,
+    });
   }
 
   public async delete(key: string): Promise<void> {
@@ -146,9 +148,5 @@ export class PluginKeychainVaultRemoteAdapter
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-keychain-vault`;
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.KEYCHAIN;
   }
 }

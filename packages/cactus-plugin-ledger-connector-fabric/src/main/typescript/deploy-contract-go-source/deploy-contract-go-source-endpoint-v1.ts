@@ -6,11 +6,13 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
+  IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
@@ -47,7 +49,7 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath() {
+  public get oasPath(): any {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
     ];
@@ -61,8 +63,20 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
-  public registerExpress(app: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(app, this);
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    // TODO: make this an injectable dependency in the constructor
+    return {
+      get: async () => ({
+        isProtected: true,
+        requiredRoles: [],
+      }),
+    };
+  }
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 
@@ -74,7 +88,7 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     try {
       const { connector } = this.opts;
       const reqBody = req.body as DeployContractGoSourceV1Request;
-      const resBody = await connector.deployContract(reqBody);
+      const resBody = await connector.deployContractGoSourceV1(reqBody);
       res.status(HttpStatus.OK);
       res.json(resBody);
     } catch (ex) {

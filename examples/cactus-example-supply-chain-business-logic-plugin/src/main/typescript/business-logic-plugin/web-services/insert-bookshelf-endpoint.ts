@@ -5,8 +5,10 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 import {
+  IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
@@ -22,10 +24,12 @@ import { InsertBookshelfRequest } from "../../generated/openapi/typescript-axios
 
 export interface IInsertBookshelfEndpointOptions {
   logLevel?: LogLevelDesc;
-  contractAddress: string;
-  contractAbi: any;
+  //  contractAddress: string;
+  //  contractAbi: any;
+  contractName: string;
   besuApi: BesuApi;
   web3SigningCredential: Web3SigningCredential;
+  keychainId: string;
 }
 
 export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
@@ -47,10 +51,10 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.besuApi, `${fnTag} options.besuApi`);
-    Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
-    Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
+    // Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
+    // Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
-      opts.contractAddress,
+      opts.contractName,
       `${fnTag} options.contractAddress`,
     );
 
@@ -59,8 +63,20 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public registerExpress(expressApp: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(expressApp, this);
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    // TODO: make this an injectable dependency in the constructor
+    return {
+      get: async () => ({
+        isProtected: true,
+        requiredRoles: [],
+      }),
+    };
+  }
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 
@@ -85,13 +101,13 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
       const {
         data: { callOutput, transactionReceipt },
       } = await this.opts.besuApi.apiV1BesuInvokeContract({
-        contractAbi: this.opts.contractAbi,
-        contractAddress: this.opts.contractAddress,
-        invocationType: EthContractInvocationType.SEND,
+        contractName: this.opts.contractName,
+        invocationType: EthContractInvocationType.Send,
         methodName: "insertRecord",
         gas: 1000000,
         params: [bookshelf],
-        web3SigningCredential: this.opts.web3SigningCredential,
+        signingCredential: this.opts.web3SigningCredential,
+        keychainId: this.opts.keychainId,
       });
 
       const body = { callOutput, transactionReceipt };

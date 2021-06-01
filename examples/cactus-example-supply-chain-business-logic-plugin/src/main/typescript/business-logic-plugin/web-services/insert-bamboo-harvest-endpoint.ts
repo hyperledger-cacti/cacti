@@ -5,12 +5,19 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 import {
+  IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+
+import {
+  AuthorizationOptionsProvider,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
+
 import {
   DefaultApi as QuorumApi,
   EthContractInvocationType,
@@ -22,11 +29,18 @@ import { InsertBambooHarvestRequest } from "../../generated/openapi/typescript-a
 
 export interface IInsertBambooHarvestEndpointOptions {
   logLevel?: LogLevelDesc;
-  contractAddress: string;
-  contractAbi: any;
+  contractName: string;
+  //  contractAbi: any;
   apiClient: QuorumApi;
   web3SigningCredential: Web3SigningCredential;
+  keychainId: string;
+  authorizationOptionsProvider?: AuthorizationOptionsProvider;
 }
+
+const K_DEFAULT_AUTHORIZATION_OPTIONS: IEndpointAuthzOptions = {
+  isProtected: true,
+  requiredRoles: [],
+};
 
 export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
   public static readonly HTTP_PATH = Constants.HTTP_PATH;
@@ -38,6 +52,7 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "InsertBambooHarvestEndpoint";
 
   private readonly log: Logger;
+  private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
 
   public get className(): string {
     return InsertBambooHarvestEndpoint.CLASS_NAME;
@@ -47,20 +62,32 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.apiClient, `${fnTag} options.apiClient`);
-    Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
-    Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
+    // Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
+    // Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
-      opts.contractAddress,
+      opts.contractName,
       `${fnTag} options.contractAddress`,
     );
 
     const level = this.opts.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
+
+    this.authorizationOptionsProvider =
+      opts.authorizationOptionsProvider ||
+      AuthorizationOptionsProvider.of(K_DEFAULT_AUTHORIZATION_OPTIONS, level);
+
+    this.log.debug(`Instantiated ${this.className} OK`);
   }
 
-  public registerExpress(expressApp: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(expressApp, this);
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    return this.authorizationOptionsProvider;
+  }
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 
@@ -83,18 +110,18 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
       this.log.debug(`${tag} %o`, bambooHarvest);
 
       const {
-        data: { callOutput, transactionReceipt },
+        data: { success, callOutput, transactionReceipt },
       } = await this.opts.apiClient.apiV1QuorumInvokeContract({
-        contractAbi: this.opts.contractAbi,
-        contractAddress: this.opts.contractAddress,
-        invocationType: EthContractInvocationType.SEND,
+        contractName: this.opts.contractName,
+        invocationType: EthContractInvocationType.Send,
         methodName: "insertRecord",
         gas: 1000000,
         params: [bambooHarvest],
-        web3SigningCredential: this.opts.web3SigningCredential,
+        signingCredential: this.opts.web3SigningCredential,
+        keychainId: this.opts.keychainId,
       });
 
-      const body = { callOutput, transactionReceipt };
+      const body = { success, callOutput, transactionReceipt };
       res.status(200);
       res.json(body);
     } catch (ex) {

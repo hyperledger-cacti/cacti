@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Hyperledger Core API
- * Contains/describes the core API types for Cactus. Does not describe actual endpoints on its own as this is left to the implementing plugins who can import and re-use commonLy needed type definitions from this specification. One example of said commonly used type definitons would be the types related to consortium management, cactus nodes, ledgers, etc..
+ * Contains/describes the core API types for Cactus. Does not describe actual endpoints on its own as this is left to the implementing plugins who can import and re-use commonly needed type definitions from this specification. One example of said commonly used type definitions would be the types related to consortium management, cactus nodes, ledgers, etc..
  *
  * The version of the OpenAPI document: 0.2.0
  * 
@@ -17,10 +17,12 @@ import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+// @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
- * A Cactus node can be a single server, or a set of servers behind a loand balancer acting as one.
+ * A Cactus node can be a single server, or a set of servers behind a load balancer acting as one.
  * @export
  * @interface CactusNode
  */
@@ -125,14 +127,33 @@ export interface CactusNodeMeta {
     publicKeyPem: string;
 }
 /**
- * Enumerates a list of consensus algorithm families in existence. Does not intend to be an exhaustive list, just a practical one, meaning that we only include items here that are relevant to Hyperledger Cactus in fulfilling its own duties. This can be extended later as more sophisticated features of Cactus get implemented. This enum is meant to be first and foremest a useful abstraction for achieving practical tasks, not an encyclopedia and therefore we ask of everyone that this to be extended only in ways that serve a practical purpose for the runtime behavior of Cactus or Cactus plugins in general. The bottom line is that we can accept this enum being not 100% accurate as long as it 100% satisfies what it was designed to do.
+ * Enumerates a list of consensus algorithm families that do not provide immediate finality
+ * @export
+ * @enum {string}
+ */
+export enum ConsensusAlgorithmFamiliesWithOutTxFinality {
+    WORK = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK'
+}
+
+/**
+ * Enumerates a list of consensus algorithm families that provide immediate finality
+ * @export
+ * @enum {string}
+ */
+export enum ConsensusAlgorithmFamiliesWithTxFinality {
+    Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
+    Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE'
+}
+
+/**
+ * Enumerates a list of consensus algorithm families in existence. Does not intend to be an exhaustive list, just a practical one, meaning that we only include items here that are relevant to Hyperledger Cactus in fulfilling its own duties. This can be extended later as more sophisticated features of Cactus get implemented. This enum is meant to be first and foremost a useful abstraction for achieving practical tasks, not an encyclopedia and therefore we ask of everyone that this to be extended only in ways that serve a practical purpose for the runtime behavior of Cactus or Cactus plugins in general. The bottom line is that we can accept this enum being not 100% accurate as long as it 100% satisfies what it was designed to do.
  * @export
  * @enum {string}
  */
 export enum ConsensusAlgorithmFamily {
-    AUTHORITY = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
-    STAKE = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE',
-    WORK = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK'
+    Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
+    Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE',
+    Work = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK'
 }
 
 /**
@@ -179,7 +200,7 @@ export interface ConsortiumDatabase {
      */
     consortium: Array<Consortium>;
     /**
-     * The complete collection of all ledger entities inexistence within the consortium.
+     * The complete collection of all ledger entities in existence within the consortium.
      * @type {Array<Ledger>}
      * @memberof ConsortiumDatabase
      */
@@ -228,6 +249,15 @@ export interface ConsortiumMember {
      */
     nodeIds: Array<string>;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+export enum Constants {
+    SocketIoConnectionPathV1 = '/api/v1/async/socket-io/connect'
+}
+
 /**
  * 
  * @export
@@ -335,14 +365,14 @@ export interface Ledger {
  * @enum {string}
  */
 export enum LedgerType {
-    BESU1X = 'BESU_1X',
-    BESU2X = 'BESU_2X',
-    BURROW0X = 'BURROW_0X',
-    CORDA4X = 'CORDA_4X',
-    FABRIC14X = 'FABRIC_14X',
-    FABRIC2 = 'FABRIC_2',
-    QUORUM2X = 'QUORUM_2X',
-    SAWTOOTH1X = 'SAWTOOTH_1X'
+    Besu1X = 'BESU_1X',
+    Besu2X = 'BESU_2X',
+    Burrow0X = 'BURROW_0X',
+    Corda4X = 'CORDA_4X',
+    Fabric14X = 'FABRIC_14X',
+    Fabric2 = 'FABRIC_2',
+    Quorum2X = 'QUORUM_2X',
+    Sawtooth1X = 'SAWTOOTH_1X'
 }
 
 /**
@@ -376,8 +406,8 @@ export interface PluginImport {
  * @enum {string}
  */
 export enum PluginImportType {
-    LOCAL = 'org.hyperledger.cactus.plugin_import_type.LOCAL',
-    REMOTE = 'org.hyperledger.cactus.plugin_import_type.REMOTE'
+    Local = 'org.hyperledger.cactus.plugin_import_type.LOCAL',
+    Remote = 'org.hyperledger.cactus.plugin_import_type.REMOTE'
 }
 
 /**

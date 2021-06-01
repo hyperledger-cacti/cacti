@@ -11,7 +11,6 @@ import {
   ICactusPlugin,
   IPluginWebService,
   IWebServiceEndpoint,
-  PluginAspect,
 } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi as QuorumApi,
@@ -43,7 +42,7 @@ export interface ISupplyChainCactusPluginOptions {
   besuApiClient: BesuApi;
   fabricApiClient: FabricApi;
   web3SigningCredential?: Web3SigningCredential;
-  fabricEnviroment?: NodeJS.ProcessEnv;
+  fabricEnvironment?: NodeJS.ProcessEnv;
   contracts: ISupplyChainContractDeploymentInfo;
 }
 
@@ -80,7 +79,7 @@ export class SupplyChainCactusPlugin
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
-    webServices.forEach((ws) => ws.registerExpress(app));
+    await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
     return webServices;
   }
 
@@ -89,35 +88,39 @@ export class SupplyChainCactusPlugin
       return this.endpoints;
     }
     const insertBambooHarvest = new InsertBambooHarvestEndpoint({
-      contractAddress: this.options.contracts.bambooHarvestRepository.address,
-      contractAbi: this.options.contracts.bambooHarvestRepository.abi,
+      // contractAddress: this.options.contracts.bambooHarvestRepository.address,
+      // contractAbi: this.options.contracts.bambooHarvestRepository.abi,
+      contractName: this.options.contracts.bambooHarvestRepository.contractName,
       apiClient: this.options.quorumApiClient,
       web3SigningCredential: this.options
         .web3SigningCredential as Web3SigningCredential,
       logLevel: this.options.logLevel,
+      keychainId: this.options.contracts.bambooHarvestRepository.keychainId,
     });
 
     const listBambooHarvest = new ListBambooHarvestEndpoint({
-      contractAddress: this.options.contracts.bambooHarvestRepository.address,
-      contractAbi: this.options.contracts.bambooHarvestRepository.abi,
+      // contractAddress: this.options.contracts.bambooHarvestRepository.address,
+      // contractAbi: this.options.contracts.bambooHarvestRepository.abi,
+      contractName: this.options.contracts.bambooHarvestRepository.contractName,
       apiClient: this.options.quorumApiClient,
       logLevel: this.options.logLevel,
+      keychainId: this.options.contracts.bambooHarvestRepository.keychainId,
     });
 
     const insertBookshelf = new InsertBookshelfEndpoint({
-      contractAddress: this.options.contracts.bookshelfRepository.address,
-      contractAbi: this.options.contracts.bookshelfRepository.abi,
+      contractName: this.options.contracts.bookshelfRepository.contractName,
       besuApi: this.options.besuApiClient,
       web3SigningCredential: this.options
         .web3SigningCredential as Web3SigningCredential,
       logLevel: this.options.logLevel,
+      keychainId: this.options.contracts.bookshelfRepository.keychainId,
     });
 
     const listBookshelf = new ListBookshelfEndpoint({
-      contractAddress: this.options.contracts.bookshelfRepository.address,
-      contractAbi: this.options.contracts.bookshelfRepository.abi,
+      contractName: this.options.contracts.bookshelfRepository.contractName,
       besuApi: this.options.besuApiClient,
       logLevel: this.options.logLevel,
+      keychainId: this.options.contracts.bookshelfRepository.keychainId,
     });
 
     const insertShipment = new InsertShipmentEndpoint({
@@ -155,9 +158,5 @@ export class SupplyChainCactusPlugin
 
   public getPackageName(): string {
     return "@hyperledger/cactus-example-supply-chain-backend";
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.WEB_SERVICE;
   }
 }

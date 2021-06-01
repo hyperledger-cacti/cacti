@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Fujitsu Laboratories Ltd.
+ * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  * 
  * validatorDriver_getNumericBalance.js
@@ -46,8 +46,17 @@ const requestData = {
     contract: {}, // NOTE: Since contract does not need to be specified, specify an empty object.
     method: {type: "web3Eth", command: "getBalance"},
     args: {"args": [referedAddress]},
+    // args: {"args": {"args": [referedAddress]}},
     reqID: reqID
 };
+
+const requestData_A = {
+    contract: {}, // NOTE: Since contract does not need to be specified, specify an empty object.
+    func: "getNumericBalance",
+    args: {"args": {"args": [referedAddress]}},
+    reqID: reqID
+};
+
 
 
 const json2str = (jsonObj) => {
@@ -108,8 +117,8 @@ const sendRequest = () => {
     // 
     console.log('exec sendRequest()');
     console.log('#[send]requestData: ' + json2str(requestData));
-    // socket.emit('request', requestData);
-    socket.emit('request2', requestData);
+    socket.emit('request', requestData_A);
+    // socket.emit('request2', requestData);
 }
 
 setTimeout(requestStartMonitor, 2000);

@@ -1,7 +1,5 @@
-import { PluginAspect } from "./plugin-aspect";
-
 /**
- * The common interface definiton that plugin classes can use to inherit from
+ * The common interface definition that plugin classes can use to inherit from
  * when defining their own options interface for their constructors.
  *
  * Not all plugins need to have a unique plugin ID, so if the plugin you are
@@ -57,7 +55,7 @@ export interface ICactusPlugin {
    * Returns the NodeJS/npm package name of the plugin which is used to identify
    * plugin instances at runtime and differentiate them from other types of plugins.
    *
-   * Important: This is not just uniqely identifying the plugin aspect, but the
+   * Important: This is not just uniquely identifying the plugin aspect, but the
    * implementation as well.
    * For example a plugin aspect would we `ledger-connector` or `storage` and
    * implementations are the ones within those
@@ -70,17 +68,12 @@ export interface ICactusPlugin {
    * Hyperledger Besu deployment)
    */
   getPackageName(): string;
-
-  /**
-   * Returns the aspect of which this plugin implementation belongs to such as the aspect of `ledger-connector` or
-   * `storage` for example.
-   * There can be any number of plugin implementations for each aspect.
-   */
-  getAspect(): PluginAspect;
 }
 
-export function isICactusPlugin(
-  pluginInstance: any,
-): pluginInstance is ICactusPlugin {
-  return typeof pluginInstance?.getPackageName === "function";
+export function isICactusPlugin(x: unknown): x is ICactusPlugin {
+  return (
+    !!x &&
+    typeof (x as ICactusPlugin).getPackageName === "function" &&
+    typeof (x as ICactusPlugin).getInstanceId === "function"
+  );
 }

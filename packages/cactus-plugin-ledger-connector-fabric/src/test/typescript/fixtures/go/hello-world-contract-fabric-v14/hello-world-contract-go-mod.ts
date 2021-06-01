@@ -1,3 +1,4 @@
+/* cSpell:disable */
 export const HELLO_WORLD_CONTRACT_GO_MOD = `module hello-world-contract
 
 go 1.14
@@ -25,6 +26,7 @@ require (
 	google.golang.org/grpc v1.31.1 // indirect
 )
 `;
+/* cSpell:enable */
 
 const exportSourceToFs = async () => {
   const path = await import("path");

@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-memory",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-keychain-memory.node.umd.min.js",
@@ -12,7 +12,7 @@
     "dist/*"
   ],
   "scripts": {
-    "generate-sdk": "openapi-generator generate --input-spec src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk": "docker run --rm -v \"${PWD}:/local\" openapitools/openapi-generator-cli:v5.1.1 generate -i ./local/src/main/json/openapi.json -g typescript-axios -o ./local/src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
@@ -83,9 +83,9 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.4.0",
-    "@hyperledger/cactus-core": "0.4.1",
-    "@hyperledger/cactus-core-api": "0.4.1",
+    "@hyperledger/cactus-common": "0.5.0",
+    "@hyperledger/cactus-core": "0.5.0",
+    "@hyperledger/cactus-core-api": "0.5.0",
     "axios": "0.21.1",
     "express": "4.17.1",
     "prom-client": "13.1.0",

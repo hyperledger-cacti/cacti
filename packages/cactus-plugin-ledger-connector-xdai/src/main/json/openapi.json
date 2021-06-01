@@ -1,0 +1,711 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Connector Xdai",
+        "description": "Can perform basic tasks on a Xdai ledger",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://www.cactus.stream/{basePath}",
+            "description": "Public test instance",
+            "variables": {
+                "basePath": {
+                    "default": ""
+                }
+            }
+        },
+        {
+            "url": "http://localhost:4000/{basePath}",
+            "description": "Local test instance",
+            "variables": {
+                "basePath": {
+                    "default": ""
+                }
+            }
+        }
+    ],
+    "components": {
+        "schemas": {
+            "ReceiptType": {
+                "description": "Enumerates the possible types of receipts that can be waited for by someone or something that has requested the execution of a transaction on a ledger.",
+                "type": "string",
+                "enum": [
+                    "NODE_TX_POOL_ACK",
+                    "LEDGER_BLOCK_ACK"
+                ]
+            },
+            "ConsistencyStrategy": {
+                "type": "object",
+                "required": ["receiptType", "blockConfirmations"],
+                "properties": {
+                    "receiptType": {
+                        "$ref": "#/components/schemas/ReceiptType"
+                    },
+                    "timeoutMs": {
+                        "type": "integer",
+                        "description": "The amount of milliseconds to wait for the receipt to arrive to the connector. Defaults to 0 which means to wait for an unlimited amount of time. Note that this wait may be interrupted still by other parts of the infrastructure such as load balancers cutting of HTTP requests after some time even if they are the type that is supposed to be kept alive. The question of re-entrance is a broader topic not in scope to discuss here, but it is important to mention it.",
+                        "minimum": 0
+                    },
+                    "blockConfirmations": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "description": "The number of blocks to wait to be confirmed in addition to the block containing the transaction in question. Note that if the receipt type is set to only wait for node transaction pool ACK and this parameter is set to anything, but zero then the API will not accept the request due to conflicting parameters."
+                    }
+                }
+            },
+            "Web3SigningCredential": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "discriminator": {
+                    "propertyName": "type"
+                },
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialNone"
+                    }
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    }
+                }
+            },
+            "Web3SigningCredentialCactusKeychainRef": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "ethAccount",
+                    "keychainId",
+                    "keychainEntryKey"
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "ethAccount": {
+                        "type": "string",
+                        "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "nullable": false
+                    },
+                    "keychainEntryKey": {
+                        "type": "string",
+                        "description": "The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.",
+                        "minLength": 0,
+                        "maxLength": 1024
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.",
+                        "minLength": 0,
+                        "maxLength": 1024
+                    }
+                }
+            },
+            "Web3SigningCredentialPrivateKeyHex": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "ethAccount",
+                    "secret"
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "ethAccount": {
+                        "type": "string",
+                        "description": "The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "nullable": false
+                    },
+                    "secret": {
+                        "type": "string",
+                        "description": "The HEX encoded private key of an eth account.",
+                        "minLength": 0,
+                        "maxLength": 65535
+                    }
+                }
+            },
+            "Web3SigningCredentialNone": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "description": "Using this denotes that there is no signing required because the transaction is pre-signed.",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    }
+                }
+            },
+            "Web3SigningCredentialType": {
+                "type": "string",
+                "enum": [
+                    "CACTUS_KEYCHAIN_REF",
+                    "GETH_KEYCHAIN_PASSWORD",
+                    "PRIVATE_KEY_HEX",
+                    "NONE"
+                ]
+            },
+            "EthContractInvocationType": {
+                "type": "string",
+                "enum": [
+                    "SEND",
+                    "CALL"
+                ]
+            },
+            "SolidityContractJsonArtifact": {
+                "type": "object",
+                "required": [
+                    "contractName"
+                ],
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "metadata": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "deployedBytecode": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "sourceMap": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "deployedSourceMap": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "sourcePath": {
+                        "type": "string"
+                    },
+                    "compiler": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "version": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "functionHashes": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "gasEstimates": {
+                        "properties": {
+                            "creation": {
+                                "type": "object",
+                                "properties": {
+                                    "codeDepositCost": {
+                                        "type": "string"
+                                    },
+                                    "executionCost": {
+                                        "type": "string"
+                                    },
+                                    "totalCost": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "external": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            },
+            "XdaiTransactionConfig": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                    "rawTransaction": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "from": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "to": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gas": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gasPrice": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "nonce": {
+                        "type": "number"
+                    },
+                    "data": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    }
+                }
+            },
+            "Web3TransactionReceipt": {
+                "type": "object",
+                "required": [
+                    "blockHash",
+                    "blockNumber",
+                    "transactionHash",
+                    "transactionIndex",
+                    "status",
+                    "from",
+                    "to",
+                    "gasUsed"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                    "status": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "transactionHash": {
+                        "type": "string",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                    },
+                    "transactionIndex": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "blockHash": {
+                        "type": "string",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                    },
+                    "blockNumber": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasUsed": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "from": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "to": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "RunTransactionV1Request": {
+                "type": "object",
+                "required": [
+                    "web3SigningCredential",
+                    "transactionConfig",
+                    "consistencyStrategy"
+                ],
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "transactionConfig": {
+                        "$ref": "#/components/schemas/XdaiTransactionConfig",
+                        "nullable": false
+                    },
+                    "consistencyStrategy": {
+                        "$ref": "#/components/schemas/ConsistencyStrategy"
+                    }
+                }
+            },
+            "RunTransactionV1Response": {
+                "type": "object",
+                "required": [
+                    "transactionReceipt"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
+            "DeployContractV1Request": {
+                "type": "object",
+                "required": [
+                    "contractName",
+                    "contractAbi",
+                    "bytecode",
+                    "web3SigningCredential",
+                    "keychainId",
+                    "constructorArgs"
+                ],
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "description": "The contract name for retrieve the contracts json on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "contractAbi": {
+                        "description": "The application binary interface of the solidity contract",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "constructorArgs": {
+                        "type": "array",
+                        "items": {},
+                        "default": []
+                    },
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 24576,
+                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychainId for retrieve the contracts json.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "gas": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasPrice": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeployContractV1Response": {
+                "type": "object",
+                "required": [
+                    "transactionReceipt"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
+            "InvokeContractV1Request": {
+                "type": "object",
+                "required": [
+                    "contractName",
+                    "signingCredential",
+                    "invocationType",
+                    "methodName",
+                    "params"
+                ],
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "signingCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "invocationType": {
+                        "$ref": "#/components/schemas/EthContractInvocationType",
+                        "nullable": false,
+                        "description": "Indicates wether it is a CALL or a SEND type of  invocation where only SEND ends up creating an actual transaction on the ledger."
+                    },
+                    "methodName": {
+                        "description": "The name of the contract method to invoke.",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 2048
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass in to the contract method being invoked.",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gas": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gasPrice": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "nonce": {
+                        "type": "number"
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychainId for retrieve the contracts json.",
+                        "minLength": 1,
+                        "maxLength": 100
+                    }
+                }
+            },
+            "InvokeContractV1Response": {
+                "type": "object",
+                "required": [
+                    "success"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    },
+                    "callOutput": {},
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    }
+                }
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode"
+                    }
+                },
+                "operationId": "deployContractV1",
+                "summary": "Deploys the bytecode of a Solidity contract.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/run-transaction": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/run-transaction"
+                    }
+                },
+                "operationId": "runTransactionV1",
+                "summary": "Executes a transaction on a xdai ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract"
+                    }
+                },
+                "operationId": "invokeContractV1",
+                "summary": "Invokes a contract on a xdai ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeContractV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusExporterMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

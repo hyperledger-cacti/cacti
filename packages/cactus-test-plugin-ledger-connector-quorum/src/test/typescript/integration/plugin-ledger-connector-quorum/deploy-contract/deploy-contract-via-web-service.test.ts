@@ -24,6 +24,7 @@ import {
 
 import {
   ApiServer,
+  AuthorizationProtocol,
   ConfigService,
   ICactusApiServerOptions,
 } from "@hyperledger/cactus-cmd-api-server";
@@ -41,9 +42,11 @@ const log: Logger = LoggerProvider.getOrCreate({
   level: logLevel,
 });
 
+const contractName = "HelloWorld";
+
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
@@ -64,6 +67,7 @@ test(testCase, async (t: Test) => {
 
   const configService = new ConfigService();
   const cactusApiServerOptions: ICactusApiServerOptions = configService.newExampleConfig();
+  cactusApiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   cactusApiServerOptions.configFile = "";
   cactusApiServerOptions.apiCorsDomainCsv = "*";
   cactusApiServerOptions.apiTlsEnabled = false;
@@ -132,7 +136,7 @@ test(testCase, async (t: Test) => {
     web3SigningCredential: {
       ethAccount: firstHighNetWorthAccount,
       secret: "",
-      type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+      type: Web3SigningCredentialType.GethKeychainPassword,
     },
     keychainId: kvStoragePlugin.getKeychainId(),
     gas: 1000000,
@@ -140,7 +144,6 @@ test(testCase, async (t: Test) => {
 
   // 8. Deploy smart contract by issuing REST API call
   const res = await client.apiV1QuorumDeployContractSolidityBytecode(req);
-  const contractAddress = res.data.transactionReceipt.contractAddress as string;
 
   t.ok(res, "Response for contract deployment is truthy");
   t.ok(res.status > 199, "Response status code for contract deployment > 199");
@@ -154,7 +157,7 @@ test(testCase, async (t: Test) => {
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+        type: Web3SigningCredentialType.GethKeychainPassword,
       },
       transactionConfig: {
         from: firstHighNetWorthAccount,
@@ -171,14 +174,14 @@ test(testCase, async (t: Test) => {
     t2.equals(parseInt(balance, 10), 10e9, "Balance of test account OK");
 
     const sayHelloRes = await client.apiV1QuorumInvokeContract({
-      contractAddress,
-      contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.CALL,
+      contractName,
+      invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
-      web3SigningCredential: {
-        type: Web3SigningCredentialType.NONE,
+      signingCredential: {
+        type: Web3SigningCredentialType.None,
       },
+      keychainId: kvStoragePlugin.getKeychainId(),
     });
     t2.ok(sayHelloRes, "sayHello() response is truthy");
     t2.ok(sayHelloRes.status > 199, "Status for sayHello() res > 199");
@@ -196,17 +199,17 @@ test(testCase, async (t: Test) => {
 
     const newName = `DrCactus${uuidV4()}`;
     const setName1Res = await client.apiV1QuorumInvokeContract({
-      contractAddress,
-      contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
+      contractName,
+      invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
       gas: 1000000,
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
+      keychainId: kvStoragePlugin.getKeychainId(),
     });
     t2.ok(setName1Res, "setName1Res truthy OK");
     t2.ok(setName1Res, "setName1Res truthy OK");
@@ -215,17 +218,17 @@ test(testCase, async (t: Test) => {
     t2.ok(setName1Res.data, "setName1Res.data is truthy OK");
 
     const getName1Res = await client.apiV1QuorumInvokeContract({
-      contractAddress,
-      contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.CALL,
+      contractName,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
       gas: 1000000,
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
+      keychainId: kvStoragePlugin.getKeychainId(),
     });
     t2.ok(getName1Res, `getName1Res truthy OK`);
     t2.true(getName1Res.status > 199, `getName1Res.status > 199 OK`);
@@ -240,17 +243,17 @@ test(testCase, async (t: Test) => {
     t2.equal(getName1Res.data.callOutput, newName, `getName1Res truthy OK`);
 
     const getName2Res = await client.apiV1QuorumInvokeContract({
-      contractAddress,
-      contractAbi: HelloWorldContractJson.abi,
-      invocationType: EthContractInvocationType.SEND,
+      contractName,
+      invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
       gas: 1000000,
-      web3SigningCredential: {
+      signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
+      keychainId: kvStoragePlugin.getKeychainId(),
     });
 
     t2.ok(getName2Res, `getName2Res truthy OK`);
@@ -268,6 +271,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

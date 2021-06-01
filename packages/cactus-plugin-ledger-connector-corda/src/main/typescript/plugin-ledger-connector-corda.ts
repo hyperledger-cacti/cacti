@@ -9,11 +9,10 @@ import {
   IPluginLedgerConnector,
   IWebServiceEndpoint,
   IPluginWebService,
-  PluginAspect,
   ICactusPluginOptions,
   ConsensusAlgorithmFamily,
 } from "@hyperledger/cactus-core-api";
-
+import { consensusHasTransactionFinality } from "@hyperledger/cactus-core";
 import {
   Checks,
   Logger,
@@ -23,11 +22,23 @@ import {
 
 import { DeployContractJarsEndpoint } from "./web-services/deploy-contract-jars-endpoint";
 
+import {
+  IGetPrometheusExporterMetricsEndpointV1Options,
+  GetPrometheusExporterMetricsEndpointV1,
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import {
+  IInvokeContractEndpointV1Options,
+  InvokeContractEndpointV1,
+} from "./web-services/invoke-contract-endpoint-v1";
+
 export interface IPluginLedgerConnectorCordaOptions
   extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   sshConfigAdminShell: SshConfig;
   corDappsDir: string;
+  prometheusExporter?: PrometheusExporter;
   cordaStartCmd?: string;
   cordaStopCmd?: string;
 }
@@ -38,6 +49,7 @@ export class PluginLedgerConnectorCorda
 
   private readonly instanceId: string;
   private readonly log: Logger;
+  public prometheusExporter: PrometheusExporter;
 
   private endpoints: IWebServiceEndpoint[] | undefined;
 
@@ -58,16 +70,34 @@ export class PluginLedgerConnectorCorda
     const label = "plugin-ledger-connector-corda";
     this.log = LoggerProvider.getOrCreate({ level, label });
     this.instanceId = this.options.instanceId;
+    this.prometheusExporter =
+      options.prometheusExporter ||
+      new PrometheusExporter({ pollingIntervalInMin: 1 });
+    Checks.truthy(
+      this.prometheusExporter,
+      `${fnTag} options.prometheusExporter`,
+    );
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+    return res;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<
     ConsensusAlgorithmFamily
   > {
-    return ConsensusAlgorithmFamily.AUTHORITY;
+    return ConsensusAlgorithmFamily.Authority;
   }
+  public async hasTransactionFinality(): Promise<boolean> {
+    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
 
-  public getAspect(): PluginAspect {
-    return PluginAspect.LEDGER_CONNECTOR;
+    return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
 
   public getInstanceId(): string {
@@ -83,12 +113,14 @@ export class PluginLedgerConnectorCorda
   }
 
   public async transact(): Promise<any> {
-    throw new Error("Method not implemented.");
+    this.prometheusExporter.addCurrentTransaction();
+    return null as any;
   }
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
-    webServices.forEach((ws) => ws.registerExpress(app));
+    await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
+    // await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
     return webServices;
   }
 
@@ -108,6 +140,24 @@ export class PluginLedgerConnectorCorda
         cordaStopCmd: this.options.cordaStopCmd,
       });
 
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IInvokeContractEndpointV1Options = {
+        connector: this,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new InvokeContractEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+        connector: this,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
       endpoints.push(endpoint);
     }
     this.log.info(`Instantiated endpoints of ${pkgName}`);

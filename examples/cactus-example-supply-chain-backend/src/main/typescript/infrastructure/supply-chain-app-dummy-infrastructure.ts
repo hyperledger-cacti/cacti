@@ -180,7 +180,7 @@ export class SupplyChainAppDummyInfrastructure {
           web3SigningCredential: {
             ethAccount: this.quorumAccount.address,
             secret: this.quorumAccount.privateKey,
-            type: Web3SigningCredentialType.PRIVATEKEYHEX,
+            type: Web3SigningCredentialType.PrivateKeyHex,
           },
           keychainId: keychainPlugin.getKeychainId(),
         });
@@ -192,18 +192,22 @@ export class SupplyChainAppDummyInfrastructure {
           abi: BambooHarvestRepositoryJSON.abi,
           address: contractAddress as string,
           bytecode: BambooHarvestRepositoryJSON.bytecode,
+          contractName: BambooHarvestRepositoryJSON.contractName,
+          keychainId: keychainPlugin.getKeychainId(),
         };
       }
 
       {
         this._besuAccount = await this.besu.createEthTestAccount(2000000);
         const rpcApiHttpHost = await this.besu.getRpcApiHttpHost();
+        const rpcApiWsHost = await this.besu.getRpcApiWsHost();
 
         const pluginRegistry = new PluginRegistry();
         pluginRegistry.add(keychainPlugin);
         const connector = new PluginLedgerConnectorBesu({
           instanceId: "PluginLedgerConnectorBesu_Contract_Deployment",
           rpcApiHttpHost,
+          rpcApiWsHost,
           logLevel: this.options.logLevel,
           pluginRegistry,
         });
@@ -211,11 +215,13 @@ export class SupplyChainAppDummyInfrastructure {
         const res = await connector.deployContract({
           contractName: BookshelfRepositoryJSON.contractName,
           bytecode: BookshelfRepositoryJSON.bytecode,
+          contractAbi: BookshelfRepositoryJSON.abi,
+          constructorArgs: [],
           gas: 1000000,
           web3SigningCredential: {
             ethAccount: this.besuAccount.address,
             secret: this.besuAccount.privateKey,
-            type: Web3SigningCredentialType.PRIVATEKEYHEX,
+            type: Web3SigningCredentialType.PrivateKeyHex,
           },
           keychainId: keychainPlugin.getKeychainId(),
         });
@@ -227,6 +233,8 @@ export class SupplyChainAppDummyInfrastructure {
           abi: BookshelfRepositoryJSON.abi,
           address: contractAddress as string,
           bytecode: BookshelfRepositoryJSON.bytecode,
+          contractName: BookshelfRepositoryJSON.contractName,
+          keychainId: keychainPlugin.getKeychainId(),
         };
       }
 
@@ -244,17 +252,18 @@ export class SupplyChainAppDummyInfrastructure {
           instanceId: "PluginLedgerConnectorFabric_Contract_Deployment",
           dockerBinary: "/usr/local/bin/docker",
           pluginRegistry,
+          peerBinary: "peer",
           sshConfig: sshConfig,
           logLevel: this.options.logLevel || "INFO",
           connectionProfile: connectionProfile,
           cliContainerEnv: org1Env,
           discoveryOptions: discoveryOptions,
           eventHandlerOptions: {
-            strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+            strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
           },
         });
 
-        const res = await connector.deployContract({
+        const res = await connector.deployContractGoSourceV1({
           tlsRootCertFiles: org1Env.CORE_PEER_TLS_ROOTCERT_FILE as string,
           targetPeerAddresses: [org1Env.CORE_PEER_ADDRESS as string],
           policyDslSource: "OR('Org1MSP.member','Org2MSP.member')",
@@ -267,7 +276,10 @@ export class SupplyChainAppDummyInfrastructure {
           },
           moduleName: "shipment",
           targetOrganizations: [org1Env],
-          pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+          pinnedDeps: [
+            "github.com/hyperledger/fabric@v1.4.8",
+            "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+          ],
         });
         this.log.debug(res);
 

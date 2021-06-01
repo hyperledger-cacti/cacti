@@ -7,6 +7,7 @@ import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
 
 import {
   CactusNode,
+  Configuration,
   Consortium,
   ConsortiumDatabase,
   ConsortiumMember,
@@ -14,7 +15,7 @@ import {
   LedgerType,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
 
 import {
   LogLevelDesc,
@@ -121,9 +122,13 @@ export class SupplyChainApp {
     const addressInfoC = httpApiC.address() as AddressInfo;
     const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
 
-    const besuApiClient = new BesuApi({ basePath: nodeApiHostA });
-    const quorumApiClient = new QuorumApi({ basePath: nodeApiHostB });
-    const fabricApiClient = new FabricApi({ basePath: nodeApiHostC });
+    const besuConfig = new Configuration({ basePath: nodeApiHostA });
+    const quorumConfig = new Configuration({ basePath: nodeApiHostB });
+    const fabricConfig = new Configuration({ basePath: nodeApiHostC });
+
+    const besuApiClient = new BesuApi(besuConfig);
+    const quorumApiClient = new QuorumApi(quorumConfig);
+    const fabricApiClient = new FabricApi(fabricConfig);
 
     const keyPairA = await JWK.generate("EC", "secp256k1");
     const keyPairPemA = keyPairA.toPEM(true);
@@ -147,10 +152,13 @@ export class SupplyChainApp {
 
     this.log.info(`Configuring Cactus Node for Ledger A...`);
     const rpcApiHostA = await this.ledgers.besu.getRpcApiHttpHost();
+    const rpcApiWsHostA = await this.ledgers.besu.getRpcApiWsHost();
     const rpcApiHostB = await this.ledgers.quorum.getRpcApiHttpHost();
 
     const connectionProfile = await this.ledgers.fabric.getConnectionProfileOrg1();
     const sshConfig = await this.ledgers.fabric.getSshConfig();
+
+    const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
 
     const registryA = new PluginRegistry({
       plugins: [
@@ -159,6 +167,7 @@ export class SupplyChainApp {
           consortiumDatabase,
           keyPairPem: keyPairPemA,
           logLevel: this.options.logLevel,
+          consortiumRepo,
         }),
         new SupplyChainCactusPlugin({
           logLevel: this.options.logLevel,
@@ -170,7 +179,7 @@ export class SupplyChainApp {
           web3SigningCredential: {
             keychainEntryKey: besuAccount.address,
             keychainId: keychainIdA,
-            type: Web3SigningCredentialType.CACTUSKEYCHAINREF,
+            type: Web3SigningCredentialType.CactusKeychainRef,
           },
         }),
         new PluginKeychainMemory({
@@ -184,6 +193,7 @@ export class SupplyChainApp {
     const connectorBesu = new PluginLedgerConnectorBesu({
       instanceId: "PluginLedgerConnectorBesu_A",
       rpcApiHttpHost: rpcApiHostA,
+      rpcApiWsHost: rpcApiWsHostA,
       pluginRegistry: registryA,
       logLevel: this.options.logLevel,
     });
@@ -201,6 +211,7 @@ export class SupplyChainApp {
           consortiumDatabase,
           keyPairPem: keyPairPemB,
           logLevel: this.options.logLevel,
+          consortiumRepo,
         }),
         new SupplyChainCactusPlugin({
           logLevel: this.options.logLevel,
@@ -212,7 +223,7 @@ export class SupplyChainApp {
           web3SigningCredential: {
             keychainEntryKey: quorumAccount.address,
             keychainId: keychainIdB,
-            type: Web3SigningCredentialType.CACTUSKEYCHAINREF,
+            type: Web3SigningCredentialType.CactusKeychainRef,
           },
         }),
         new PluginKeychainMemory({
@@ -243,6 +254,7 @@ export class SupplyChainApp {
           consortiumDatabase,
           keyPairPem: keyPairPemC,
           logLevel: "INFO",
+          consortiumRepo,
         }),
         new SupplyChainCactusPlugin({
           logLevel: "INFO",
@@ -251,7 +263,7 @@ export class SupplyChainApp {
           besuApiClient,
           quorumApiClient,
           fabricApiClient,
-          fabricEnviroment: org1Env,
+          fabricEnvironment: org1Env,
         }),
         new PluginKeychainMemory({
           instanceId: uuidv4(),
@@ -269,6 +281,7 @@ export class SupplyChainApp {
     const fabricConnector = new PluginLedgerConnectorFabric({
       instanceId: "PluginLedgerConnectorFabric_C",
       dockerBinary: "/usr/local/bin/docker",
+      peerBinary: "peer",
       cliContainerEnv: org1Env,
       connectionProfile: connectionProfile,
       sshConfig: sshConfig,
@@ -276,7 +289,7 @@ export class SupplyChainApp {
       pluginRegistry: registryC,
       discoveryOptions,
       eventHandlerOptions: {
-        strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
     });
@@ -330,7 +343,7 @@ export class SupplyChainApp {
 
     const ledger1 = {
       id: "BesuDemoLedger",
-      ledgerType: LedgerType.BESU1X,
+      ledgerType: LedgerType.Besu1X,
     };
     cactusNodeA.ledgerIds.push(ledger1.id);
 
@@ -357,7 +370,7 @@ export class SupplyChainApp {
 
     const ledger2: Ledger = {
       id: "QuorumDemoLedger",
-      ledgerType: LedgerType.QUORUM2X,
+      ledgerType: LedgerType.Quorum2X,
     };
 
     cactusNodeB.ledgerIds.push(ledger2.id);
@@ -385,7 +398,7 @@ export class SupplyChainApp {
 
     const ledger3: Ledger = {
       id: "FabricDemoLedger",
-      ledgerType: LedgerType.FABRIC14X,
+      ledgerType: LedgerType.Fabric14X,
     };
 
     cactusNodeC.ledgerIds.push(ledger3.id);

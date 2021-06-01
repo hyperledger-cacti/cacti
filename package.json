@@ -10,8 +10,9 @@
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
     "start:cockpit": "lerna run --scope '*/cactus-cockpit' --stream serve:proxy",
     "start:example-supply-chain": "cd ./examples/supply-chain-app/ && npm i --no-package-lock && npm run start",
+    "start:example-carbon-accounting": "CONFIG_FILE=examples/cactus-example-carbon-accounting-backend/example-config.json node examples/cactus-example-carbon-accounting-backend/dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "clean": "del-cli \"./packages/cactus-*/{dist,.nyc_output,src/main/typescript/generated/openapi/typescript-axios/*}\"",
-    "lint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix",
+    "lint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
     "tsc": "lerna run tsc",
     "watch": "lerna run --parallel watch",
     "build": "npm-run-all build:dev build:prod",
@@ -28,6 +29,8 @@
     "build:dev:test-tooling": "lerna exec --stream --scope '*/*test-tooling' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:plugin-ledger-connector-besu": "lerna exec --stream --scope '*/*connector-besu' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "test:plugin-ledger-connector-besu": "tap --jobs=1 --timeout=60 \"packages/cactus-*-besu/src/test/typescript/{unit,integration}/\"",
+    "build:dev:plugin-htlc-eth-besu-erc20": "lerna exec --stream --scope 'packages/*htlc-eth-besu-erc20' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
+    "test:plugin-htlc-besu-erc20": "tap --jobs=1 --timeout=600 \"packages/*htlc-eth-besu-erc20/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-quorum": "lerna exec --stream --scope '*/*connector-quorum' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "test:plugin-ledger-connector-quorum": "tap --jobs=1 --timeout=60 \"packages/cactus-*-quorum/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-fabric": "lerna exec --stream --scope '*/*connector-fabric' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
@@ -35,7 +38,7 @@
     "build:dev:example-supply-chain-backend": "lerna exec --stream --scope '*/*example-supply-chain-b*' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --display-modules --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:sdk": "lerna exec --stream --scope '*/*sdk' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:plugin-ledger-connector-corda": "lerna exec --stream --scope '*/*connector-corda' -- 'del-cli dist/** && npm run tsc && webpack --env=dev --target=node --config ../../webpack.config.js'",
-    "test:plugin-ledger-connector-corda": "tap --jobs=1 --timeout=60 \"packages/cactus-*-corda/src/test/typescript/{unit,integration}/\"",
+    "test:plugin-ledger-connector-corda": "tap --jobs=1 --timeout=600 \"packages/cactus-*-corda/src/test/typescript/{unit,integration}/\"",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "lerna run webpack:dev",
     "webpack:dev:web": "lerna run webpack:dev:web",
@@ -43,21 +46,22 @@
     "webpack:prod": "lerna run webpack:prod",
     "webpack:prod:web": "lerna run webpack:prod:web",
     "webpack:prod:node": "lerna run webpack:prod:node",
-    "test:all": "tap --node-arg=--max-old-space-size=4096 --timeout=3600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
+    "test:all": "tap --node-arg=--max-old-space-size=4096 --timeout=3600 \"packages/cactus-*/src/test/typescript/{unit,integration,benchmark}/\"",
     "test:unit": "tap --node-arg=--max-old-space-size=4096 --timeout=600 \"packages/cactus-*/src/test/typescript/unit/\"",
+    "test:benchmark": "tap --jobs=1 --no-timeout  \"packages/cactus-*/src/test/typescript/benchmark/\"",
     "test:browser": "karma start karma.conf.js",
     "test:integration": "tap --node-arg=--max-old-space-size=4096 --jobs=1 --timeout=3600 \"packages/cactus-*/src/test/typescript/integration/\"",
     "changelog": "conventional-changelog --infile CHANGELOG.md --outfile CHANGELOG.md && git add CHANGELOG.md",
     "commit": "git-cz --signoff",
     "prettier": "prettier --write --config .prettierrc.json \"./**/*.{ts,js}\"",
     "version": "npm ci && lerna clean --yes && lerna bootstrap && npm run build:dev && npm run build:prod && npm run test:unit",
-    "lerna-publish-canary": "lerna publish --canary --sign-git-commit --sign-git-tag",
+    "lerna-publish-canary": "npm run run-ci && lerna publish --canary --force-publish --dist-tag $(git branch --show-current) --preid $(git branch --show-current).$(git rev-parse --short HEAD)",
     "lerna-publish": "lerna publish --conventional-commits --sign-git-commit --sign-git-tag"
   },
   "devDependencies": {
     "@commitlint/cli": "11.0.0",
     "@commitlint/config-conventional": "8.0.0",
-    "@openapitools/openapi-generator-cli": "1.0.18-5.0.0-beta2",
+    "@openapitools/openapi-generator-cli": "2.3.3",
     "@types/node-fetch": "2.5.4",
     "@types/tape": "4.13.0",
     "@types/tape-promise": "4.0.1",
@@ -66,7 +70,6 @@
     "@typescript-eslint/parser": "4.14.1",
     "buffer": "6.0.1",
     "cache-loader": "4.1.0",
-    "commitizen": "4.2.2",
     "cross-env": "5.2.0",
     "crypto-browserify": "3.12.0",
     "del-cli": "3.0.1",
@@ -79,7 +82,7 @@
     "eslint-plugin-prettier": "3.3.1",
     "eslint-plugin-promise": "4.1.1",
     "eslint-plugin-standard": "4.0.0",
-    "git-cz": "4.7.1",
+    "git-cz": "4.7.6",
     "husky": "4.2.5",
     "inquirer": "7.1.0",
     "karma": "5.1.0",
@@ -87,7 +90,7 @@
     "karma-electron": "6.3.1",
     "karma-tap": "4.2.0",
     "karma-webpack": "4.0.2",
-    "lerna": "3.22.1",
+    "lerna": "4.0.0",
     "lint-staged": "10.2.2",
     "node-polyfill-webpack-plugin": "1.0.2",
     "npm-run-all": "4.1.5",
@@ -102,15 +105,10 @@
     "tape-promise": "4.0.0",
     "ts-loader": "6.2.1",
     "ts-node": "8.9.1",
-    "typescript": "4.0.3",
-    "webpack": "git+https://github.com/petermetz/webpack.git#cactus-webpack-ignore-require-calls-feature",
+    "typescript": "4.2.4",
+    "webpack": "5.36.2",
     "webpack-bundle-analyzer": "3.6.0",
     "webpack-cli": "3.3.11"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/git-cz"
-    }
   },
   "husky": {
     "hooks": {
@@ -119,9 +117,14 @@
     }
   },
   "lint-staged": {
-    "*/*/src/**/*.{js,ts}": "eslint --fix"
+    "*/*/src/**/*.{js,ts}": [
+      "eslint --fix",
+      "cspell"
+    ]
   },
   "dependencies": {
-    "@types/ssh2": "0.5.46"
+    "@types/ssh2": "0.5.46",
+    "artillery": "1.7.2",
+    "cspell": "5.4.0"
   }
 }

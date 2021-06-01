@@ -5,8 +5,10 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 import {
+  IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
@@ -22,9 +24,10 @@ import { BambooHarvestConverter } from "../../model/converter/bamboo-harvest-con
 
 export interface IListBambooHarvestEndpointOptions {
   logLevel?: LogLevelDesc;
-  contractAddress: string;
-  contractAbi: any;
+  contractName: string;
+  //  contractAbi: any;
   apiClient: QuorumApi;
+  keychainId: string;
 }
 
 export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
@@ -46,10 +49,10 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.apiClient, `${fnTag} options.apiClient`);
-    Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
-    Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
+    //  Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
+    //  Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
-      opts.contractAddress,
+      opts.contractName,
       `${fnTag} options.contractAddress`,
     );
 
@@ -58,8 +61,20 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public registerExpress(expressApp: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(expressApp, this);
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    // TODO: make this an injectable dependency in the constructor
+    return {
+      get: async () => ({
+        isProtected: true,
+        requiredRoles: [],
+      }),
+    };
+  }
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 
@@ -81,15 +96,15 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
       this.log.debug(`${tag}`);
 
       const { data } = await this.opts.apiClient.apiV1QuorumInvokeContract({
-        contractAbi: this.opts.contractAbi,
-        contractAddress: this.opts.contractAddress,
-        invocationType: EthContractInvocationType.CALL,
+        contractName: this.opts.contractName,
+        invocationType: EthContractInvocationType.Call,
         methodName: "getAllRecords",
         gas: 1000000,
         params: [],
-        web3SigningCredential: {
-          type: Web3SigningCredentialType.NONE,
+        signingCredential: {
+          type: Web3SigningCredentialType.None,
         },
+        keychainId: this.opts.keychainId,
       });
       const { callOutput } = data;
 

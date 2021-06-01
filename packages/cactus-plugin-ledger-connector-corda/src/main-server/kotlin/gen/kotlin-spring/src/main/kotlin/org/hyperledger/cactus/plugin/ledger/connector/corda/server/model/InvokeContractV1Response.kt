@@ -9,6 +9,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -18,12 +19,12 @@ import javax.validation.constraints.Size
  */
 data class InvokeContractV1Response(
 
-    @get:NotNull @get:Size(min=1,max=1024) 
-    @field:JsonProperty("id") val id: kotlin.String,
+    @get:Size(min=1,max=1024)
+    @field:JsonProperty("id", required = true) val id: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("progress") val progress: kotlin.collections.List<kotlin.String>,
+    @field:JsonProperty("progress", required = true) val progress: kotlin.collections.List<kotlin.String>,
 
+    @field:Valid
     @field:JsonProperty("returnValue") val returnValue: kotlin.Any? = null
 ) {
 

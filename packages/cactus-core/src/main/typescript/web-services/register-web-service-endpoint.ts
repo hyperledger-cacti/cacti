@@ -1,3 +1,4 @@
+import expressJwtAuthz from "express-jwt-authz";
 import { Express } from "express";
 
 import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
@@ -8,18 +9,26 @@ import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
  * @param webApp The ExpressJS application object that `endpoint` will be registered with.
  * @param endpoint The `IWebServiceEndpoint` instance that will be registered.
  */
-export function registerWebServiceEndpoint(
+export async function registerWebServiceEndpoint(
   webApp: Express,
   endpoint: IWebServiceEndpoint,
-): void {
+): Promise<void> {
   const fnTag = "registerWebServiceEndpoint";
   const httpVerb = endpoint.getVerbLowerCase();
   const httpPath = endpoint.getPath();
   const requestHandler = endpoint.getExpressRequestHandler();
 
+  const provider = endpoint.getAuthorizationOptionsProvider();
+  const { isProtected, requiredRoles } = await provider.get();
+
   const registrationMethod = (webApp as any)[httpVerb].bind(webApp);
   try {
-    registrationMethod(httpPath, requestHandler);
+    if (isProtected) {
+      const scopeCheckMiddleware = expressJwtAuthz(requiredRoles);
+      registrationMethod(httpPath, scopeCheckMiddleware, requestHandler);
+    } else {
+      registrationMethod(httpPath, requestHandler);
+    }
   } catch (ex) {
     throw new Error(
       `${fnTag} Express verb method ${httpVerb} threw ` +

@@ -1,4 +1,4 @@
-# Hyperledger Cactus SDK Build Instructions
+# Hyperledger Cactus Build Instructions
 
 This is the place to start if you want to give Cactus a spin on your local
 machine or if you are planning on contributing.
@@ -10,17 +10,73 @@ machine or if you are planning on contributing.
 
 The project uses Typescript for both back-end and front-end components.
 
+## Developers guide
+
+This is a video guide to setup Hyperledger Cactus on your local machine.
+
+### Installing git
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RJhifrmSiNA/0.jpg)](https://www.youtube.com/watch?v=RJhifrmSiNA)
+
+### Installing and configuring docker
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/V8YBQoxdyiE/0.jpg)](https://www.youtube.com/watch?v=V8YBQoxdyiE)
+
+### Installing npm and node
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/94xoV9Vfu14/0.jpg)](https://www.youtube.com/watch?v=94xoV9Vfu14)
+
+### Installing VSCode and plugins
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RHQLhZRlAR0/0.jpg)](https://www.youtube.com/watch?v=RHQLhZRlAR0)
+
+### Clone the repository
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/n_HiEwgzPsM/0.jpg)](https://www.youtube.com/watch?v=n_HiEwgzPsM)
+
+### Compiling all packages
+ 
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/5v82MAHPQmM/0.jpg)](https://www.youtube.com/watch?v=5v82MAHPQmM)
+
+### Testing all packages
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/mVuk8txh-JE/0.jpg)](https://www.youtube.com/watch?v=mVuk8txh-JE)
+
+### Compiling a specific packages
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/e7vkd9i-I4c/0.jpg)](https://www.youtube.com/watch?v=e7vkd9i-I4c)
+
+### Testing a specific package
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Jzw9JQZu6c8/0.jpg)](https://www.youtube.com/watch?v=Jzw9JQZu6c8)
+
+### Package structure - OpenAPI
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/5uuRTc3X4MM/0.jpg)](https://www.youtube.com/watch?v=5uuRTc3X4MM)
+
+### Package structure - Web Services
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/DAML56rx5yQ/0.jpg)](https://www.youtube.com/watch?v=DAML56rx5yQ)
+
+### Package structure - Main and Factory Plugin class
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/w0bmkpge2Dw/0.jpg)](https://www.youtube.com/watch?v=w0bmkpge2Dw)
+
+### Package structure - Test class
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/3XpBYhN-8qs/0.jpg)](https://www.youtube.com/watch?v=3XpBYhN-8qs)
+
 ## Fast Developer Flow / Code Iterations
 
 We put a lot of thought and effort into making sure that fast developer iterations can be
-achieved (please file a bug if you feel otherwise) while working **on** the framework. 
+achieved (please file a bug if you feel otherwise) while working **on** the framework.
 
-If you find yourself waiting too much for builds to finish, most of the time 
-that can be helped by using the `npm run watch` script which can automatically 
-recompile packages as you modify them (and only the packages that you have 
+If you find yourself waiting too much for builds to finish, most of the time
+that can be helped by using the `npm run watch` script which can automatically
+recompile packages as you modify them (and only the packages that you have
 modified, not everything).
 
-It also supports re-running the OpenAPI generator when you update any 
+It also supports re-running the OpenAPI generator when you update any
 `openapi.json` spec files that we use to describe our endpoints.
 
 The `npm run watch` script in action:
@@ -34,7 +90,6 @@ The `npm run watch` script in action:
     * WSL1 or WSL2 or any virtual machine running Ubuntu LTS
   * Git
   * NodeJS 12 or newer LTS (we recommend using nvm if available for your OS)
-  * OpenJDK 11
   * Docker Engine
   * Docker Compose
 
@@ -58,15 +113,13 @@ git config --system core.longpaths true
 cd cactus
 ```
 
-* Run the CI script (takes a long time, 10+ minutes on an average laptop)
+* Run the initial configuration script (can take a long time, 10+ minutes on a low-spec laptop)
 
 ```sh
-./tools/ci.sh
+npm run configure
 ```
 
-At this point you should have all packages built and verified with the full
-test suite including unit and integration tests that leverage docker containers
-to run ledgers, contract deployments, etc.
+At this point you should have all packages built for development.
 
 You can start making your changes (use your own fork and a feature branch)
 or just run existing tests and debug them to see how things fit together.
@@ -128,3 +181,25 @@ At this point, with the running API server, you can
 
 We recommend you use WSL or WSL2 or any Linux VM. We test most frequently on
 Ubuntu LTS which at the time of this writing means 18.04 and/or 20.04.
+
+## Build Script Decision Tree
+
+The `npm run watch` script should cover 99% of the cases when it comes to working
+on Cactus code and having it recompile, but for that last 1% you'll need to
+get your hands dirty with the rest of the build scripts. Usually this is only
+needed when you are adding new dependencies (npm packages) as part of something
+that you are implementing.
+
+There are a lot of different build scripts in Cactus in order to provide contributors
+fine(r) grained control over what parts of the framework they wish build.
+
+> Q: Why the complexity of so many build scripts?
+>
+> A: We could just keep it simple with a single build script that builds everything
+always, but that would be a nightmare to wait for after having changed a single
+line of code for example.
+
+To figure out which script could work for rebuilding Cactus, please follow
+the following decision tree (and keep in mind that we have `npm run watch` too)
+
+![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)

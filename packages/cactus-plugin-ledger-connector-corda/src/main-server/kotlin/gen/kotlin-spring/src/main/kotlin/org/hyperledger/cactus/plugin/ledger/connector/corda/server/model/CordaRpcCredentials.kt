@@ -9,6 +9,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -19,17 +20,18 @@ import javax.validation.constraints.Size
  */
 data class CordaRpcCredentials(
 
-    @get:NotNull @get:Size(min=1,max=65535) 
-    @field:JsonProperty("hostname") val hostname: kotlin.String,
+    @get:Size(min=1,max=65535)
+    @field:JsonProperty("hostname", required = true) val hostname: kotlin.String,
 
-    @get:NotNull @get:Min(1) @get:Max(65535) 
-    @field:JsonProperty("port") val port: kotlin.Int,
+    @get:Min(1)
+    @get:Max(65535)
+    @field:JsonProperty("port", required = true) val port: kotlin.Int,
 
-    @get:NotNull @get:Size(min=1,max=1024) 
-    @field:JsonProperty("username") val username: kotlin.String,
+    @get:Size(min=1,max=1024)
+    @field:JsonProperty("username", required = true) val username: kotlin.String,
 
-    @get:NotNull @get:Size(min=1,max=65535) 
-    @field:JsonProperty("password") val password: kotlin.String
+    @get:Size(min=1,max=65535)
+    @field:JsonProperty("password", required = true) val password: kotlin.String
 ) {
 
 }

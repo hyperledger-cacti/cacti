@@ -1,7 +1,12 @@
 name: Cactus CI Github Workflow
 
 # Triggers the workflow on push or pull request events
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, dev]
+
+  pull_request:
+    branches: [main, dev]
 
 jobs:
   build:
@@ -41,13 +46,6 @@ jobs:
 
     # - name: Set up Docker Buildx (ARM64 docker images once we are ready)
     #   uses: docker/setup-buildx-action@v1.0.3
-
-    - name: Set up JDK 8 (OpenAPI generator needs it)
-      uses: actions/setup-java@v1.4.3
-      with:
-        java-version: '8.0.275' # The JDK version to make available on the path.
-        java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
-        architecture: x64 # (x64 or x86) - defaults to x64
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2.1.2
