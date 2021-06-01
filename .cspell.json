@@ -73,7 +73,10 @@
         "Sprintf",
         "thream",
         "socketio",
-        "Albertirsa"
+        "Albertirsa",
+        "HTLC",
+        "Htlc",
+        "htlc"
     ],
     "dictionaries": [
         "typescript,node,npm,go"

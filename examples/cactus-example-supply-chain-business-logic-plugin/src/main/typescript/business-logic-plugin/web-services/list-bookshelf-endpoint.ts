@@ -95,12 +95,12 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
 
       const { data } = await this.opts.besuApi.apiV1BesuInvokeContract({
         contractName: this.opts.contractName,
-        invocationType: EthContractInvocationType.CALL,
+        invocationType: EthContractInvocationType.Call,
         methodName: "getAllRecords",
         gas: 1000000,
         params: [],
         signingCredential: {
-          type: Web3SigningCredentialType.NONE,
+          type: Web3SigningCredentialType.None,
         },
         keychainId: this.opts.keychainId,
       });

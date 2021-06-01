@@ -17,6 +17,8 @@ import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+// @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
@@ -25,6 +27,9 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  * @enum {string}
  */
 export enum AuthzJwtClaim {
+    /**
+    * The &quot;iss&quot; (issuer) claim identifies the principal that issued the JWT.  The processing of this claim is generally application specific. The &quot;iss&quot; value is a case-sensitive string containing a StringOrURI value.  Use of this claim is OPTIONAL.
+    */
     iss = 'Hyperledger Labs - Carbon Accounting Tool'
 }
 
@@ -34,7 +39,13 @@ export enum AuthzJwtClaim {
  * @enum {string}
  */
 export enum AuthzScope {
+    /**
+    * Identities with the group:admin scope are administrators of the system.
+    */
     GroupAdmin = 'group:admin',
+    /**
+    * Identities with the group:user scope are end users of the system who only have authorization to perform a limited set of actions.
+    */
     GroupUser = 'group:user'
 }
 
@@ -185,11 +196,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         daoTokenGetAllowance: async (daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -198,21 +210,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof daoTokenGetAllowanceRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(daoTokenGetAllowanceRequest !== undefined ? daoTokenGetAllowanceRequest : {}) : (daoTokenGetAllowanceRequest || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(daoTokenGetAllowanceRequest, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -226,11 +230,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         enrollAdminV1: async (enrollAdminV1Request?: EnrollAdminV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/utilityemissionchannel/registerEnroll/admin`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -239,21 +244,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof enrollAdminV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(enrollAdminV1Request !== undefined ? enrollAdminV1Request : {}) : (enrollAdminV1Request || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(enrollAdminV1Request, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -265,6 +262,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
  * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
          * 
@@ -274,11 +272,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async daoTokenGetAllowance(daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DaoTokenGetAllowanceResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).daoTokenGetAllowance(daoTokenGetAllowanceRequest, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.daoTokenGetAllowance(daoTokenGetAllowanceRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -288,11 +283,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async enrollAdminV1(enrollAdminV1Request?: EnrollAdminV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EnrollAdminV1Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).enrollAdminV1(enrollAdminV1Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.enrollAdminV1(enrollAdminV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
@@ -302,6 +294,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
  * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DefaultApiFp(configuration)
     return {
         /**
          * 
@@ -311,7 +304,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         daoTokenGetAllowance(daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options?: any): AxiosPromise<DaoTokenGetAllowanceResponse> {
-            return DefaultApiFp(configuration).daoTokenGetAllowance(daoTokenGetAllowanceRequest, options).then((request) => request(axios, basePath));
+            return localVarFp.daoTokenGetAllowance(daoTokenGetAllowanceRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -321,7 +314,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         enrollAdminV1(enrollAdminV1Request?: EnrollAdminV1Request, options?: any): AxiosPromise<EnrollAdminV1Response> {
-            return DefaultApiFp(configuration).enrollAdminV1(enrollAdminV1Request, options).then((request) => request(axios, basePath));
+            return localVarFp.enrollAdminV1(enrollAdminV1Request, options).then((request) => request(axios, basePath));
         },
     };
 };

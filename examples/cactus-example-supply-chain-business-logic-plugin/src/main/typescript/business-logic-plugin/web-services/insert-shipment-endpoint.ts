@@ -97,7 +97,7 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
         },
         channelName: "mychannel",
         contractName: "shipment",
-        invocationType: FabricContractInvocationType.SEND,
+        invocationType: FabricContractInvocationType.Send,
         methodName: "insertShipment",
         params: [shipment.id, shipment.bookshelfId],
       };

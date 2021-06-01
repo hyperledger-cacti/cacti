@@ -113,16 +113,13 @@ export class PluginLedgerConnectorBesu
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.rpcApiHttpHost, `${fnTag} options.rpcApiHttpHost`);
     Checks.truthy(options.rpcApiWsHost, `${fnTag} options.rpcApiWsHost`);
-    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
     Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
+    Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
 
-    // const web3Provider = new Web3.providers.HttpProvider(
-    //   this.options.rpcApiHttpHost,
-    // );
     const web3WsProvider = new Web3.providers.WebsocketProvider(
       this.options.rpcApiWsHost,
     );
@@ -238,7 +235,7 @@ export class PluginLedgerConnectorBesu
   public async getConsensusAlgorithmFamily(): Promise<
     ConsensusAlgorithmFamily
   > {
-    return ConsensusAlgorithmFamily.AUTHORITY;
+    return ConsensusAlgorithmFamily.Authority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
     const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
@@ -288,7 +285,7 @@ export class PluginLedgerConnectorBesu
           },
           consistencyStrategy: {
             blockConfirmations: 0,
-            receiptType: ReceiptType.NODETXPOOLACK,
+            receiptType: ReceiptType.NodeTxPoolAck,
             timeoutMs: req.timeoutMs || 60000,
           },
           web3SigningCredential,
@@ -333,11 +330,11 @@ export class PluginLedgerConnectorBesu
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
     const method: ContractSendMethod = methodRef(...req.params);
 
-    if (req.invocationType === EthContractInvocationType.CALL) {
+    if (req.invocationType === EthContractInvocationType.Call) {
       const callOutput = await (method as any).call();
       const success = true;
       return { success, callOutput };
-    } else if (req.invocationType === EthContractInvocationType.SEND) {
+    } else if (req.invocationType === EthContractInvocationType.Send) {
       if (isWeb3SigningCredentialNone(req.signingCredential)) {
         throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
       }
@@ -360,7 +357,7 @@ export class PluginLedgerConnectorBesu
         web3SigningCredential,
         consistencyStrategy: {
           blockConfirmations: 0,
-          receiptType: ReceiptType.NODETXPOOLACK,
+          receiptType: ReceiptType.NodeTxPoolAck,
           timeoutMs: req.timeoutMs || 60000,
         },
       };
@@ -385,13 +382,13 @@ export class PluginLedgerConnectorBesu
       // Web3SigningCredentialType.GETHKEYCHAINPASSWORD is removed as Hyperledger Besu doesn't support the PERSONAL api
       // for --rpc-http-api as per the discussion mentioned here
       // https://chat.hyperledger.org/channel/besu-contributors?msg=GqQXfW3k79ygRtx5Q
-      case Web3SigningCredentialType.CACTUSKEYCHAINREF: {
+      case Web3SigningCredentialType.CactusKeychainRef: {
         return this.transactCactusKeychainRef(req);
       }
-      case Web3SigningCredentialType.PRIVATEKEYHEX: {
+      case Web3SigningCredentialType.PrivateKeyHex: {
         return this.transactPrivateKey(req);
       }
-      case Web3SigningCredentialType.NONE: {
+      case Web3SigningCredentialType.None: {
         if (req.transactionConfig.rawTransaction) {
           return this.transactSigned(req);
         } else {
@@ -434,7 +431,7 @@ export class PluginLedgerConnectorBesu
     this.prometheusExporter.addCurrentTransaction();
 
     if (
-      req.consistencyStrategy.receiptType === ReceiptType.NODETXPOOLACK &&
+      req.consistencyStrategy.receiptType === ReceiptType.NodeTxPoolAck &&
       req.consistencyStrategy.blockConfirmations > 0
     ) {
       throw new Error(
@@ -445,9 +442,9 @@ export class PluginLedgerConnectorBesu
     }
 
     switch (req.consistencyStrategy.receiptType) {
-      case ReceiptType.NODETXPOOLACK:
+      case ReceiptType.NodeTxPoolAck:
         return { transactionReceipt: txPoolReceipt };
-      case ReceiptType.LEDGERBLOCKACK:
+      case ReceiptType.LedgerBlockAck:
         this.log.debug("Starting poll for ledger TX receipt ...");
         const txHash = txPoolReceipt.transactionHash;
         const { consistencyStrategy } = req;
@@ -517,12 +514,12 @@ export class PluginLedgerConnectorBesu
       transactionConfig,
       web3SigningCredential: {
         ethAccount,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
         secret: privateKeyHex,
       },
       consistencyStrategy: {
         blockConfirmations: 0,
-        receiptType: ReceiptType.NODETXPOOLACK,
+        receiptType: ReceiptType.NodeTxPoolAck,
         timeoutMs: 60000,
       },
     });
@@ -604,7 +601,7 @@ export class PluginLedgerConnectorBesu
         },
         consistencyStrategy: {
           blockConfirmations: 0,
-          receiptType: ReceiptType.NODETXPOOLACK,
+          receiptType: ReceiptType.NodeTxPoolAck,
           timeoutMs: req.timeoutMs || 60000,
         },
         web3SigningCredential,

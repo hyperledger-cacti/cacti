@@ -9,6 +9,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * SHA-256 is part of the SHA-2 hash function family. Generated hash is fixed size, 256-bits (32-bytes).
@@ -18,14 +19,11 @@ import javax.validation.constraints.Size
  */
 data class SHA256(
 
-    @get:NotNull 
-    @field:JsonProperty("bytes") val bytes: kotlin.String,
+    @field:JsonProperty("bytes", required = true) val bytes: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("offset") val offset: kotlin.Int,
+    @field:JsonProperty("offset", required = true) val offset: kotlin.Int,
 
-    @get:NotNull 
-    @field:JsonProperty("size") val size: kotlin.Int
+    @field:JsonProperty("size", required = true) val size: kotlin.Int
 ) {
 
 }

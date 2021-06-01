@@ -8,6 +8,7 @@ import {
   PluginImportType,
   ConsortiumDatabase,
   ICactusPlugin,
+  Configuration,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -45,7 +46,7 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
   apiServerOptions.plugins = [
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
-      type: PluginImportType.LOCAL,
+      type: PluginImportType.Local,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),
@@ -54,7 +55,7 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
     },
     {
       packageName: "@hyperledger/cactus-plugin-consortium-manual",
-      type: PluginImportType.LOCAL,
+      type: PluginImportType.Local,
       options: {
         instanceId: uuidv4(),
         keyPairPem: keyPairPem,
@@ -83,7 +84,8 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
     `Metrics URL: ${apiHost}/api/v1/api-server/get-prometheus-exporter-metrics`,
   );
 
-  const apiClient = new ApiServerApi({ basePath: apiHost });
+  const apiConfig = new Configuration({ basePath: apiHost });
+  const apiClient = new ApiServerApi(apiConfig);
 
   {
     const res = await apiClient.getPrometheusExporterMetricsV1();

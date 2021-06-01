@@ -5,6 +5,7 @@ import test, { Test } from "tape";
 import { DefaultApi as ConsortiumManualApi } from "@hyperledger/cactus-plugin-consortium-manual";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
 import { DefaultConsortiumProvider } from "../../../main/typescript";
+import { Configuration } from "@hyperledger/cactus-core-api";
 
 test("Reports failures with meaningful information", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -15,14 +16,16 @@ test("Reports failures with meaningful information", async (t: Test) => {
     const addressInfo1 = httpServer1.address() as AddressInfo;
     const apiHost = `http://${addressInfo1.address}:${addressInfo1.port}`;
 
+    const config = new Configuration({
+      basePath: apiHost,
+      baseOptions: {
+        timeout: 2000,
+      },
+    });
+
     const provider = new DefaultConsortiumProvider({
       logLevel,
-      apiClient: new ConsortiumManualApi({
-        basePath: apiHost,
-        baseOptions: {
-          timeout: 2000,
-        },
-      }),
+      apiClient: new ConsortiumManualApi(config),
     });
 
     try {
@@ -42,11 +45,12 @@ test("Reports failures with meaningful information", async (t: Test) => {
   });
 
   test("Handles 4xx transparently", async (t2: Test) => {
+    const config = new Configuration({
+      basePath: "https://httpbin.org/status/400",
+    });
     const provider = new DefaultConsortiumProvider({
       logLevel,
-      apiClient: new ConsortiumManualApi({
-        basePath: "https://httpbin.org/status/400",
-      }),
+      apiClient: new ConsortiumManualApi(config),
     });
 
     try {
