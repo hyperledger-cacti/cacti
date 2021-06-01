@@ -10,6 +10,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * A NodeDiagnosticInfo holds information about the current node version.
@@ -21,20 +22,17 @@ import javax.validation.constraints.Size
  */
 data class NodeDiagnosticInfo(
 
-    @get:NotNull @get:Size(min=0,max=4096) 
-    @field:JsonProperty("cordapps") val cordapps: kotlin.collections.List<CordappInfo>,
+    @field:Valid
+    @get:Size(min=0,max=4096) 
+    @field:JsonProperty("cordapps", required = true) val cordapps: kotlin.collections.List<CordappInfo>,
 
-    @get:NotNull 
-    @field:JsonProperty("platformVersion") val platformVersion: kotlin.Int,
+    @field:JsonProperty("platformVersion", required = true) val platformVersion: kotlin.Int,
 
-    @get:NotNull 
-    @field:JsonProperty("revision") val revision: kotlin.String,
+    @field:JsonProperty("revision", required = true) val revision: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("vendor") val vendor: kotlin.String,
+    @field:JsonProperty("vendor", required = true) val vendor: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("version") val version: kotlin.String
+    @field:JsonProperty("version", required = true) val version: kotlin.String
 ) {
 
 }

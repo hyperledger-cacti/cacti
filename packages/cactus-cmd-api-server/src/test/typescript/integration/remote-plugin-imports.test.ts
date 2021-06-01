@@ -16,7 +16,7 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 
 import { DefaultApi } from "@hyperledger/cactus-plugin-keychain-vault";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
 
 test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   const vaultTestContainer = new VaultTestServer({});
@@ -52,7 +52,9 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   const hostPort = await pluginContainer.getHostPortHttp();
   t.comment(`CactusKeychainVaultServer (Port=${hostPort}) started OK`);
 
-  const configuration = { basePath: `http://localhost:${hostPort}` };
+  const configuration = new Configuration({
+    basePath: `http://localhost:${hostPort}`,
+  });
   const apiClient = new DefaultApi(configuration);
 
   const configService = new ConfigService();
@@ -66,7 +68,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   apiServerOptions.plugins = [
     {
       packageName: "@hyperledger/cactus-plugin-keychain-vault",
-      type: PluginImportType.REMOTE,
+      type: PluginImportType.Remote,
       options: {
         keychainId: "_keychainId_",
         instanceId: "_instanceId_",

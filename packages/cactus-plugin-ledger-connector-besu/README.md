@@ -82,7 +82,7 @@ const deployOut = await connector.deployContract({
   web3SigningCredential: {
     ethAccount: firstHighNetWorthAccount,
     secret: besuKeyPair.privateKey,
-    type: Web3SigningCredentialType.PRIVATEKEYHEX,
+    type: Web3SigningCredentialType.PrivateKeyHex,
   },
   bytecode: SmartContractJson.bytecode,
   gas: 1000000,

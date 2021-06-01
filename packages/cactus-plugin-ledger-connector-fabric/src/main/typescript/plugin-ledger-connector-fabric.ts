@@ -201,7 +201,7 @@ export class PluginLedgerConnectorFabric
   public async getConsensusAlgorithmFamily(): Promise<
     ConsensusAlgorithmFamily
   > {
-    return ConsensusAlgorithmFamily.AUTHORITY;
+    return ConsensusAlgorithmFamily.Authority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
     const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
@@ -867,17 +867,17 @@ export class PluginLedgerConnectorFabric
       let out: Buffer;
       let success: boolean;
       switch (invocationType) {
-        case FabricContractInvocationType.CALL: {
+        case FabricContractInvocationType.Call: {
           out = await contract.evaluateTransaction(fnName, ...params);
           success = true;
           break;
         }
-        case FabricContractInvocationType.SEND: {
+        case FabricContractInvocationType.Send: {
           out = await contract.submitTransaction(fnName, ...params);
           success = true;
           break;
         }
-        case FabricContractInvocationType.SENDPRIVATE: {
+        case FabricContractInvocationType.Sendprivate: {
           if (!transientData) {
             const message =
               "Set transaction to send Transient Data but it was not provided";

@@ -9,6 +9,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -18,15 +19,14 @@ import javax.validation.constraints.Size
  */
 data class JarFile(
 
-    @get:NotNull @get:Size(min=1,max=255) 
-    @field:JsonProperty("filename") val filename: kotlin.String,
+    @get:Size(min=1,max=255)
+    @field:JsonProperty("filename", required = true) val filename: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("hasDbMigrations") val hasDbMigrations: kotlin.Boolean,
+    @field:JsonProperty("hasDbMigrations", required = true) val hasDbMigrations: kotlin.Boolean,
 
-    @get:NotNull @get:Size(min=1,max=1073741824) 
-    @field:JsonProperty("contentBase64") val contentBase64: kotlin.String
-) : kotlin.collections.HashMap<String, kotlin.Any>{
+    @get:Size(min=1,max=1073741824)
+    @field:JsonProperty("contentBase64", required = true) val contentBase64: kotlin.String
+) : kotlin.collections.HashMap<String, kotlin.Any>(){
 
 }
 

@@ -96,7 +96,7 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
         },
         channelName: "mychannel",
         contractName: "shipment",
-        invocationType: FabricContractInvocationType.CALL,
+        invocationType: FabricContractInvocationType.Call,
         methodName: "getListShipment",
         params: [],
       };

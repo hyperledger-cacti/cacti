@@ -11,6 +11,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -22,20 +23,18 @@ import javax.validation.constraints.Size
  */
 data class NodeInfo(
 
-    @get:NotNull 
-    @field:JsonProperty("addresses") val addresses: kotlin.collections.List<NetworkHostAndPort>,
+    @field:Valid
+    @field:JsonProperty("addresses", required = true) val addresses: kotlin.collections.List<NetworkHostAndPort>,
 
-    @get:NotNull 
-    @field:JsonProperty("platformVersion") val platformVersion: kotlin.Int,
+    @field:JsonProperty("platformVersion", required = true) val platformVersion: kotlin.Int,
 
-    @get:NotNull 
-    @field:JsonProperty("serial") val serial: java.math.BigDecimal,
+    @field:JsonProperty("serial", required = true) val serial: java.math.BigDecimal,
 
-    @get:NotNull 
-    @field:JsonProperty("legalIdentities") val legalIdentities: kotlin.collections.List<Party>,
+    @field:Valid
+    @field:JsonProperty("legalIdentities", required = true) val legalIdentities: kotlin.collections.List<Party>,
 
-    @get:NotNull 
-    @field:JsonProperty("legalIdentitiesAndCerts") val legalIdentitiesAndCerts: kotlin.collections.List<kotlin.Any>
+    @field:Valid
+    @field:JsonProperty("legalIdentitiesAndCerts", required = true) val legalIdentitiesAndCerts: kotlin.collections.List<kotlin.Any>
 ) {
 
 }

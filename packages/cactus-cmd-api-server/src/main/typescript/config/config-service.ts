@@ -482,7 +482,7 @@ export class ConfigService {
     const plugins: PluginImport[] = [
       {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
-        type: PluginImportType.LOCAL,
+        type: PluginImportType.Local,
         options: {
           instanceId: uuidV4(),
           keychainId: uuidV4(),
@@ -490,7 +490,7 @@ export class ConfigService {
       },
       {
         packageName: "@hyperledger/cactus-plugin-consortium-manual",
-        type: PluginImportType.LOCAL,
+        type: PluginImportType.Local,
         options: {
           instanceId: uuidV4(),
           keyPairPem,
