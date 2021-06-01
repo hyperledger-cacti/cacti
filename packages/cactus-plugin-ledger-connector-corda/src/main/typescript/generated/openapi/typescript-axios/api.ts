@@ -362,22 +362,28 @@ export interface InvokeContractV1Request {
 export interface InvokeContractV1Response {
     /**
      * 
+     * @type {boolean}
+     * @memberof InvokeContractV1Response
+     */
+    success: boolean;
+    /**
+     * 
      * @type {object}
      * @memberof InvokeContractV1Response
      */
-    returnValue?: object;
+    callOutput: object;
     /**
      * The net.corda.core.flows.StateMachineRunId value returned by the flow execution.
      * @type {string}
      * @memberof InvokeContractV1Response
      */
-    id: string;
+    transactionId: string;
     /**
      * An array of strings representing the aggregated stream of progress updates provided by a *tracked* flow invocation. If the flow invocation was not tracked, this array is still returned, but as empty.
      * @type {Array<string>}
      * @memberof InvokeContractV1Response
      */
-    progress: Array<string>;
+    progress?: Array<string>;
 }
 /**
  * 

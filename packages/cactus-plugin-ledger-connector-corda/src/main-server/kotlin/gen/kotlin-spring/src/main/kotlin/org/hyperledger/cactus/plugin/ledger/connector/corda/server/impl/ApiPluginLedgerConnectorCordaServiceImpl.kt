@@ -97,7 +97,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         // org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Response["returnValue"]->
         // net.corda.client.jackson.internal.StxJson["wire"]->net.corda.client.jackson.internal.WireTransactionJson["outputs"])]
         // with root cause
-        return InvokeContractV1Response(id.toString(), progress, (returnValue as SignedTransaction).id)
+        return InvokeContractV1Response(true, id.toString(), (returnValue as SignedTransaction).id, progress)
     }
 
     // FIXME - make it clear in the documentation that this deployment endpoint is not recommended for production
