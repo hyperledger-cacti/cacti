@@ -472,14 +472,19 @@
             "InvokeContractV1Response": {
                 "type": "object",
                 "required": [
-                    "id",
-                    "progress"
+                    "success",
+                    "transactionId",
+                    "callOutput"
                 ],
                 "properties": {
-                    "returnValue": {
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "callOutput": {
                         "type": "object"
                     },
-                    "id": {
+                    "transactionId": {
                         "type": "string",
                         "description": "The net.corda.core.flows.StateMachineRunId value returned by the flow execution.",
                         "minLength": 1,
