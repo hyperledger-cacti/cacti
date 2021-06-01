@@ -9,6 +9,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -17,11 +18,9 @@ import javax.validation.constraints.Size
  */
 data class NetworkHostAndPort(
 
-    @get:NotNull 
-    @field:JsonProperty("host") val host: kotlin.String,
+    @field:JsonProperty("host", required = true) val host: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("port") val port: java.math.BigDecimal
+    @field:JsonProperty("port", required = true) val port: java.math.BigDecimal
 ) {
 
 }

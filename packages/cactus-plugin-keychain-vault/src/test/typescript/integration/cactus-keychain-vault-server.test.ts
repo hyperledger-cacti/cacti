@@ -9,7 +9,7 @@ import {
   VaultTestServer,
 } from "@hyperledger/cactus-test-tooling";
 
-import { DefaultApi } from "../../../main/typescript/public-api";
+import { Configuration, DefaultApi } from "../../../main/typescript/public-api";
 
 test("NodeJS API client + Rust plugin works together", async (tMain: Test) => {
   const vaultTestContainer = new VaultTestServer({});
@@ -45,7 +45,9 @@ test("NodeJS API client + Rust plugin works together", async (tMain: Test) => {
   const hostPort = await pluginContainer.getHostPortHttp();
   tMain.comment(`CactusKeychainVaultServer (Port=${hostPort}) started OK`);
 
-  const configuration = { basePath: `http://localhost:${hostPort}` };
+  const configuration = new Configuration({
+    basePath: `http://localhost:${hostPort}`,
+  });
   const apiClient = new DefaultApi(configuration);
 
   const key = uuidv4();

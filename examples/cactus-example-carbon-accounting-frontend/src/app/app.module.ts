@@ -9,6 +9,7 @@ import { StatusBar } from "@ionic-native/status-bar/ngx";
 import { AppComponent } from "./app.component";
 import { AppRoutingModule } from "./app-routing.module";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Configuration } from "@hyperledger/cactus-core-api";
 import {
   BESU_DEMO_LEDGER_ID,
   CACTUS_API_URL,
@@ -23,7 +24,8 @@ const log: Logger = LoggerProvider.getOrCreate({ label: "app-module" });
 log.info("Running AppModule...");
 const cactusApiUrl = location.origin;
 log.info("Instantiating ApiClient with CACTUS_API_URL=%o", cactusApiUrl);
-const apiClient = new ApiClient({ basePath: cactusApiUrl });
+const configuration = new Configuration({ basePath: cactusApiUrl });
+const apiClient = new ApiClient(configuration);
 
 @NgModule({
   declarations: [AppComponent],

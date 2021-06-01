@@ -22,6 +22,7 @@ import {
 } from "@hyperledger/cactus-common";
 
 import {
+  Configuration,
   IPluginKeychainVaultOptions,
   PluginKeychainVault,
 } from "../../../main/typescript/public-api";
@@ -75,7 +76,9 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
   t.comment(
     `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics`,
   );
-  const apiClient = new KeychainVaultApi({ basePath: apiHost });
+
+  const apiConfig = new Configuration({ basePath: apiHost });
+  const apiClient = new KeychainVaultApi(apiConfig);
 
   await plugin.getOrCreateWebServices();
   await plugin.registerWebServices(expressApp);

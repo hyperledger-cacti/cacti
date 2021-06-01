@@ -25,6 +25,7 @@ import {
   InvokeContractV1Request,
   JvmTypeKind,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
+import { Configuration } from "@hyperledger/cactus-core-api";
 
 import {
   IPluginLedgerConnectorCordaOptions,
@@ -125,7 +126,9 @@ test("Tests are passing on the JVM side", async (t: Test) => {
 
   await connector.logDebugPorts();
   const apiUrl = await connector.getApiLocalhostUrl();
-  const apiClient = new CordaApi({ basePath: apiUrl });
+
+  const config = new Configuration({ basePath: apiUrl });
+  const apiClient = new CordaApi(config);
 
   const flowsRes1 = await apiClient.listFlowsV1();
   t.ok(flowsRes1.status === 200, "flowsRes1.status === 200 OK");
@@ -233,43 +236,43 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   const req: InvokeContractV1Request = ({
     timeoutMs: 60000,
     flowFullClassName: "net.corda.samples.example.flows.ExampleFlow$Initiator",
-    flowInvocationType: FlowInvocationType.FLOWDYNAMIC,
+    flowInvocationType: FlowInvocationType.FlowDynamic,
     params: [
       {
-        jvmTypeKind: JvmTypeKind.PRIMITIVE,
+        jvmTypeKind: JvmTypeKind.Primitive,
         jvmType: {
           fqClassName: "java.lang.Integer",
         },
         primitiveValue: 42,
       },
       {
-        jvmTypeKind: JvmTypeKind.REFERENCE,
+        jvmTypeKind: JvmTypeKind.Reference,
         jvmType: {
           fqClassName: "net.corda.core.identity.Party",
         },
         jvmCtorArgs: [
           {
-            jvmTypeKind: JvmTypeKind.REFERENCE,
+            jvmTypeKind: JvmTypeKind.Reference,
             jvmType: {
               fqClassName: "net.corda.core.identity.CordaX500Name",
             },
             jvmCtorArgs: [
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "java.lang.String",
                 },
                 primitiveValue: "ParticipantB",
               },
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "java.lang.String",
                 },
                 primitiveValue: "New York",
               },
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "java.lang.String",
                 },
@@ -278,28 +281,28 @@ test("Tests are passing on the JVM side", async (t: Test) => {
             ],
           },
           {
-            jvmTypeKind: JvmTypeKind.REFERENCE,
+            jvmTypeKind: JvmTypeKind.Reference,
             jvmType: {
               fqClassName:
                 "org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl",
             },
             jvmCtorArgs: [
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "java.lang.String",
                 },
                 primitiveValue: partyBPublicKey?.algorithm,
               },
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "java.lang.String",
                 },
                 primitiveValue: partyBPublicKey?.format,
               },
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "java.lang.String",
                 },
@@ -339,7 +342,9 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   t.comment(
     `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics`,
   );
-  const apiClient1 = new CordaApi({ basePath: apiHost });
+
+  const apiConfig = new Configuration({ basePath: apiHost });
+  const apiClient1 = new CordaApi(apiConfig);
 
   await plugin.getOrCreateWebServices();
   await plugin.registerWebServices(expressApp);

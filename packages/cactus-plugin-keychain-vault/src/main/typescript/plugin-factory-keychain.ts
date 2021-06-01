@@ -29,10 +29,10 @@ export class PluginFactoryKeychain extends PluginFactory<
     Checks.truthy(options, `${fnTag}:options`);
 
     switch (pluginImportType) {
-      case PluginImportType.LOCAL: {
+      case PluginImportType.Local: {
         return new PluginKeychainVault(options);
       }
-      case PluginImportType.REMOTE: {
+      case PluginImportType.Remote: {
         const { remoteConfig } = options;
         Checks.truthy(remoteConfig, `${fnTag}:options.remoteConfig`);
         Checks.truthy(remoteConfig.basePath, `${fnTag}:remoteConfig.basePath`);

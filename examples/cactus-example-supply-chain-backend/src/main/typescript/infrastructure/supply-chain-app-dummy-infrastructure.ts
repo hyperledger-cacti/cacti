@@ -180,7 +180,7 @@ export class SupplyChainAppDummyInfrastructure {
           web3SigningCredential: {
             ethAccount: this.quorumAccount.address,
             secret: this.quorumAccount.privateKey,
-            type: Web3SigningCredentialType.PRIVATEKEYHEX,
+            type: Web3SigningCredentialType.PrivateKeyHex,
           },
           keychainId: keychainPlugin.getKeychainId(),
         });
@@ -221,7 +221,7 @@ export class SupplyChainAppDummyInfrastructure {
           web3SigningCredential: {
             ethAccount: this.besuAccount.address,
             secret: this.besuAccount.privateKey,
-            type: Web3SigningCredentialType.PRIVATEKEYHEX,
+            type: Web3SigningCredentialType.PrivateKeyHex,
           },
           keychainId: keychainPlugin.getKeychainId(),
         });
@@ -259,7 +259,7 @@ export class SupplyChainAppDummyInfrastructure {
           cliContainerEnv: org1Env,
           discoveryOptions: discoveryOptions,
           eventHandlerOptions: {
-            strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+            strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
           },
         });
 
@@ -276,7 +276,10 @@ export class SupplyChainAppDummyInfrastructure {
           },
           moduleName: "shipment",
           targetOrganizations: [org1Env],
-          pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+          pinnedDeps: [
+            "github.com/hyperledger/fabric@v1.4.8",
+            "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+          ],
         });
         this.log.debug(res);
 

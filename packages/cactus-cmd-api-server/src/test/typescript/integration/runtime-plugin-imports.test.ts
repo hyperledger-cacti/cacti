@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
 
 import {
   ApiServer,
@@ -29,7 +29,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
   apiServerOptions.plugins = [
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
-      type: PluginImportType.LOCAL,
+      type: PluginImportType.Local,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),
@@ -55,7 +55,8 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
     `Metrics URL: ${apiHost}/api/v1/api-server/get-prometheus-exporter-metrics`,
   );
 
-  const apiClient = new ApiServerApi({ basePath: apiHost });
+  const apiConfig = new Configuration({ basePath: apiHost });
+  const apiClient = new ApiServerApi(apiConfig);
 
   {
     const res = await apiClient.getPrometheusExporterMetricsV1();

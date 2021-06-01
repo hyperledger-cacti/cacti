@@ -17,6 +17,8 @@ import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+// @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
@@ -181,8 +183,8 @@ export interface DeployContractSolidityBytecodeV1Response {
  * @enum {string}
  */
 export enum EthContractInvocationType {
-    SEND = 'SEND',
-    CALL = 'CALL'
+    Send = 'SEND',
+    Call = 'CALL'
 }
 
 /**
@@ -301,8 +303,8 @@ export interface InvokeContractV1Response {
  * @enum {string}
  */
 export enum ReceiptType {
-    NODETXPOOLACK = 'NODE_TX_POOL_ACK',
-    LEDGERBLOCKACK = 'LEDGER_BLOCK_ACK'
+    NodeTxPoolAck = 'NODE_TX_POOL_ACK',
+    LedgerBlockAck = 'LEDGER_BLOCK_ACK'
 }
 
 /**
@@ -646,10 +648,10 @@ export interface Web3SigningCredentialPrivateKeyHex {
  * @enum {string}
  */
 export enum Web3SigningCredentialType {
-    CACTUSKEYCHAINREF = 'CACTUS_KEYCHAIN_REF',
-    GETHKEYCHAINPASSWORD = 'GETH_KEYCHAIN_PASSWORD',
-    PRIVATEKEYHEX = 'PRIVATE_KEY_HEX',
-    NONE = 'NONE'
+    CactusKeychainRef = 'CACTUS_KEYCHAIN_REF',
+    GethKeychainPassword = 'GETH_KEYCHAIN_PASSWORD',
+    PrivateKeyHex = 'PRIVATE_KEY_HEX',
+    None = 'NONE'
 }
 
 /**
@@ -732,11 +734,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         apiV1BesuDeployContractSolidityBytecode: async (deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -745,21 +748,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof deployContractSolidityBytecodeV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(deployContractSolidityBytecodeV1Request !== undefined ? deployContractSolidityBytecodeV1Request : {}) : (deployContractSolidityBytecodeV1Request || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractSolidityBytecodeV1Request, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -773,11 +768,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         apiV1BesuInvokeContract: async (invokeContractV1Request?: InvokeContractV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -786,21 +782,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof invokeContractV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(invokeContractV1Request !== undefined ? invokeContractV1Request : {}) : (invokeContractV1Request || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(invokeContractV1Request, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -814,11 +802,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         apiV1BesuRunTransaction: async (runTransactionRequest?: RunTransactionRequest, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -827,21 +816,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof runTransactionRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(runTransactionRequest !== undefined ? runTransactionRequest : {}) : (runTransactionRequest || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequest, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -854,30 +835,24 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPrometheusExporterMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
 
     
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -890,16 +865,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          */
         signTransactionV1: async (signTransactionRequest: SignTransactionRequest, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'signTransactionRequest' is not null or undefined
-            if (signTransactionRequest === null || signTransactionRequest === undefined) {
-                throw new RequiredError('signTransactionRequest','Required parameter signTransactionRequest was null or undefined when calling signTransactionV1.');
-            }
+            assertParamExists('signTransactionV1', 'signTransactionRequest', signTransactionRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -908,21 +882,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof signTransactionRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(signTransactionRequest !== undefined ? signTransactionRequest : {}) : (signTransactionRequest || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(signTransactionRequest, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -934,6 +900,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
  * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
          * 
@@ -943,11 +910,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractSolidityBytecodeV1Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -957,11 +921,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async apiV1BesuInvokeContract(invokeContractV1Request?: InvokeContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1BesuInvokeContract(invokeContractV1Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1BesuInvokeContract(invokeContractV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -971,11 +932,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiV1BesuRunTransaction(runTransactionRequest, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1BesuRunTransaction(runTransactionRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -984,11 +942,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async getPrometheusExporterMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getPrometheusExporterMetricsV1(options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusExporterMetricsV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * Obtain signatures of ledger from the corresponding transaction hash.
@@ -998,11 +953,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async signTransactionV1(signTransactionRequest: SignTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignTransactionResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).signTransactionV1(signTransactionRequest, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.signTransactionV1(signTransactionRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
@@ -1012,6 +964,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
  * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DefaultApiFp(configuration)
     return {
         /**
          * 
@@ -1021,7 +974,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): AxiosPromise<DeployContractSolidityBytecodeV1Response> {
-            return DefaultApiFp(configuration).apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options).then((request) => request(axios, basePath));
+            return localVarFp.apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1031,7 +984,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1BesuInvokeContract(invokeContractV1Request?: InvokeContractV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
-            return DefaultApiFp(configuration).apiV1BesuInvokeContract(invokeContractV1Request, options).then((request) => request(axios, basePath));
+            return localVarFp.apiV1BesuInvokeContract(invokeContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1041,7 +994,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
-            return DefaultApiFp(configuration).apiV1BesuRunTransaction(runTransactionRequest, options).then((request) => request(axios, basePath));
+            return localVarFp.apiV1BesuRunTransaction(runTransactionRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1050,7 +1003,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         getPrometheusExporterMetricsV1(options?: any): AxiosPromise<string> {
-            return DefaultApiFp(configuration).getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
+            return localVarFp.getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
         },
         /**
          * Obtain signatures of ledger from the corresponding transaction hash.
@@ -1060,7 +1013,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         signTransactionV1(signTransactionRequest: SignTransactionRequest, options?: any): AxiosPromise<SignTransactionResponse> {
-            return DefaultApiFp(configuration).signTransactionV1(signTransactionRequest, options).then((request) => request(axios, basePath));
+            return localVarFp.signTransactionV1(signTransactionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };

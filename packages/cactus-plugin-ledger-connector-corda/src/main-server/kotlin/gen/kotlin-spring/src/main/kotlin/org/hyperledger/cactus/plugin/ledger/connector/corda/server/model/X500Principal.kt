@@ -9,6 +9,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -17,11 +18,9 @@ import javax.validation.constraints.Size
  */
 data class X500Principal(
 
-    @get:NotNull 
-    @field:JsonProperty("name") val name: kotlin.String,
+    @field:JsonProperty("name", required = true) val name: kotlin.String,
 
-    @get:NotNull 
-    @field:JsonProperty("encoded") val encoded: kotlin.String
+    @field:JsonProperty("encoded", required = true) val encoded: kotlin.String
 ) {
 
 }

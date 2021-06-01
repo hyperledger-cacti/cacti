@@ -102,7 +102,7 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
         data: { callOutput, transactionReceipt },
       } = await this.opts.besuApi.apiV1BesuInvokeContract({
         contractName: this.opts.contractName,
-        invocationType: EthContractInvocationType.SEND,
+        invocationType: EthContractInvocationType.Send,
         methodName: "insertRecord",
         gas: 1000000,
         params: [bookshelf],

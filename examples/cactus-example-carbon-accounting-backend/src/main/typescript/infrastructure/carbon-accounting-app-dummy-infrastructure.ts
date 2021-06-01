@@ -388,7 +388,7 @@ export class CarbonAccountingAppDummyInfrastructure {
         web3SigningCredential: {
           ethAccount: this.xdaiAccount.get().address,
           secret: this.xdaiAccount.get().privateKey,
-          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+          type: Web3SigningCredentialType.PrivateKeyHex,
         },
       });
       const {
@@ -427,7 +427,7 @@ export class CarbonAccountingAppDummyInfrastructure {
         web3SigningCredential: {
           ethAccount: this.xdaiAccount.get().address,
           secret: this.xdaiAccount.get().privateKey,
-          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+          type: Web3SigningCredentialType.PrivateKeyHex,
         },
       });
       const {
@@ -460,7 +460,7 @@ export class CarbonAccountingAppDummyInfrastructure {
         web3SigningCredential: {
           ethAccount: this.xdaiAccount.get().address,
           secret: this.xdaiAccount.get().privateKey,
-          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+          type: Web3SigningCredentialType.PrivateKeyHex,
         },
       });
       const {
@@ -496,7 +496,7 @@ export class CarbonAccountingAppDummyInfrastructure {
         web3SigningCredential: {
           ethAccount: this.xdaiAccount.get().address,
           secret: this.xdaiAccount.get().privateKey,
-          type: Web3SigningCredentialType.PRIVATEKEYHEX,
+          type: Web3SigningCredentialType.PrivateKeyHex,
         },
       });
       const {
