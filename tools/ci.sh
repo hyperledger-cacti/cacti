@@ -79,6 +79,10 @@ function mainTask()
   npm --version
   java -version
 
+  # install npm 7 globally - needed because Node v12, v14 default to npm v6
+  npm install -g npm@7.14.0
+  npm --version
+
   ### COMMON
   cd $PROJECT_ROOT_DIR
 
