@@ -392,6 +392,10 @@ const command: GluegunCommand = {
       spinner.fail('Asset Exchange: Invalid Step number. Exiting.')
     }
 
+    await networkL.gateway.disconnect()
+    await networkR.gateway.disconnect()
+
+    console.log('Gateways disconnected.')
   }
 }
 
