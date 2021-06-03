@@ -81,8 +81,9 @@ export class BesuMpTestLedger {
     this._containerId = Optional.empty();
 
     this._imageName =
-      options.imageName || "petermetz/cactus-besu-multi-party-all-in-one";
-    this._imageTag = options.imageTag || "0.1.2";
+      options.imageName ||
+      "ghcr.io/hyperledger/cactus-besu-all-in-one-multi-party";
+    this._imageTag = options.imageTag || "2021-08-13--private-tx";
     this._imageFqn = `${this._imageName}:${this._imageTag}`;
 
     this._envVars = options.envVars || new Map();
