@@ -407,7 +407,6 @@ const reclaimAssetInHTLC = async (
 const reclaimAssetInHTLCusingContractId = async (
     contract: Contract,
     contractId: string,
-    recipientECert: string,
 ): Promise<any> => {
 
     if (!contract)
