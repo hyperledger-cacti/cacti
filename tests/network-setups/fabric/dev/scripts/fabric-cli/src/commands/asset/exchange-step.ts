@@ -31,7 +31,7 @@ const command: GluegunCommand = {
           {
             name: '--step',
             description:
-              'Step number of asset exchange protocol: \n1: LockAsset \n2: IsAssetLocked \n3: LockFungibleAsset \n4: IsFungibleAssetLocked \n5: ClaimFungibleAsset \n6: ClaimAsset\n7: UnlockAsset\n8: UnlockFungibleAsset'
+              'Step number of asset exchange protocol: \t\t\t\t\t\n1: LockAsset \t\t\t\t\t\n2: IsAssetLocked \n3: LockFungibleAsset \n4: IsFungibleAssetLocked \n5: ClaimFungibleAsset \n6: ClaimAsset\n7: UnlockAsset\n8: UnlockFungibleAsset'
           },
           {
             name: '--target-network',
