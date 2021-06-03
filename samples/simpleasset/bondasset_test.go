@@ -1,4 +1,4 @@
-package main
+package main_test
 
 import (
 	"encoding/json"
@@ -7,16 +7,13 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	"github.com/hyperledger-labs/weaver/samples/simpleasset/mocks"
+	sa "github.com/hyperledger-labs/weaver/samples/simpleasset"
 	"github.com/stretchr/testify/require"
 )
 
 func TestInitBondAssetLedger(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
 
-	simpleAsset := SmartContract{}
 	err := simpleAsset.InitBondAssetLedger(transactionContext)
 	require.NoError(t, err)
 
@@ -26,11 +23,8 @@ func TestInitBondAssetLedger(t *testing.T) {
 }
 
 func TestCreateAsset(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
 
-	simpleAsset := SmartContract{}
 	err := simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 26 15:04 MST")
 	require.NoError(t, err)
 
@@ -50,16 +44,13 @@ func TestCreateAsset(t *testing.T) {
 }
 
 func TestReadAsset(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
 
-	expectedAsset := &BondAsset{ID: "asset1"}
+	expectedAsset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	simpleAsset := SmartContract{}
 	asset, err := simpleAsset.ReadAsset(transactionContext, "", "", false)
 	require.NoError(t, err)
 	require.Equal(t, expectedAsset, asset)
@@ -75,16 +66,13 @@ func TestReadAsset(t *testing.T) {
 }
 
 func TestUpdateFaceValue(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
 
-	expectedAsset := &BondAsset{ID: "asset1"}
+	expectedAsset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	simpleAsset := SmartContract{}
 	err = simpleAsset.UpdateFaceValue(transactionContext, "", "", 0)
 	require.NoError(t, err)
 
@@ -98,16 +86,13 @@ func TestUpdateFaceValue(t *testing.T) {
 }
 
 func TestUpdateMaturityDate(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
 
-	expectedAsset := &BondAsset{ID: "asset1"}
+	expectedAsset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	simpleAsset := SmartContract{}
 	err = simpleAsset.UpdateMaturityDate(transactionContext, "", "", time.Now())
 	require.NoError(t, err)
 
@@ -121,17 +106,14 @@ func TestUpdateMaturityDate(t *testing.T) {
 }
 
 func TestDeleteAsset(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
 
-	asset := &BondAsset{ID: "asset1"}
+	asset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
 	chaincodeStub.DelStateReturns(nil)
-	simpleAsset := SmartContract{}
 	err = simpleAsset.DeleteAsset(transactionContext, "", "")
 	require.NoError(t, err)
 
@@ -145,16 +127,13 @@ func TestDeleteAsset(t *testing.T) {
 }
 
 func TestUpdateOwner(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
 
-	asset := &BondAsset{ID: "asset1"}
+	asset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	simpleAsset := SmartContract{}
 	err = simpleAsset.UpdateOwner(transactionContext, "", "", "")
 	require.NoError(t, err)
 
@@ -164,25 +143,22 @@ func TestUpdateOwner(t *testing.T) {
 }
 
 func TestGetMyAssets(t *testing.T) {
-	asset := &BondAsset{ID: "asset1", Owner: getTestTxCreatorECertBase64()}
+	transactionContext, chaincodeStub, iterator, simpleAsset := prepMockStubwithIterator()
+
+	asset := &sa.BondAsset{ID: "asset1", Owner: getTestTxCreatorECertBase64()}
 	bytes, err := json.Marshal(asset)
 	require.NoError(t, err)
 
-	iterator := &mocks.StateQueryIterator{}
 	iterator.HasNextReturnsOnCall(0, true)
 	iterator.HasNextReturnsOnCall(1, false)
 	iterator.NextReturns(&queryresult.KV{Value: bytes}, nil)
 
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	chaincodeStub.GetStateByRangeReturns(iterator, nil)
-	simpleAsset := &SmartContract{}
 	assets, err := simpleAsset.GetAllAssets(transactionContext)
 	require.NoError(t, err)
-	require.Equal(t, []*BondAsset{asset}, assets)
+	require.Equal(t, []*sa.BondAsset{asset}, assets)
 
 	iterator.HasNextReturns(true)
 	iterator.NextReturns(nil, fmt.Errorf("failed retrieving next item"))
@@ -197,24 +173,20 @@ func TestGetMyAssets(t *testing.T) {
 }
 
 func TestGetAllAssets(t *testing.T) {
-	asset := &BondAsset{ID: "asset1"}
+	transactionContext, chaincodeStub, iterator, simpleAsset := prepMockStubwithIterator()
+
+	asset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
 	require.NoError(t, err)
 
-	iterator := &mocks.StateQueryIterator{}
 	iterator.HasNextReturnsOnCall(0, true)
 	iterator.HasNextReturnsOnCall(1, false)
 	iterator.NextReturns(&queryresult.KV{Value: bytes}, nil)
 
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
-
 	chaincodeStub.GetStateByRangeReturns(iterator, nil)
-	simpleAsset := &SmartContract{}
 	assets, err := simpleAsset.GetAllAssets(transactionContext)
 	require.NoError(t, err)
-	require.Equal(t, []*BondAsset{asset}, assets)
+	require.Equal(t, []*sa.BondAsset{asset}, assets)
 
 	iterator.HasNextReturns(true)
 	iterator.NextReturns(nil, fmt.Errorf("failed retrieving next item"))

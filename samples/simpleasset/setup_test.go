@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package main
+package main_test
 
 import (
 	"os"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/mocks"
+	"github.com/hyperledger-labs/weaver/samples/simpleasset/mocks"
+	sa "github.com/hyperledger-labs/weaver/samples/simpleasset"
 )
 
 const (
@@ -17,10 +18,10 @@ const (
 	interopChaincodeId      = "interopcc"
 )
 
-func prepMockStub() (*mocks.TransactionContext, *mocks.ChaincodeStub, SmartContract) {
+func prepMockStub() (*mocks.TransactionContext, *mocks.ChaincodeStub, sa.SmartContract) {
 	transactionContext, chaincodeStub := prepMocks(myOrg1Msp, myOrg1Clientid)
-	sc := SmartContract{}
-	sc.amc.Configure(interopChaincodeId)
+	sc := sa.SmartContract{}
+	sc.ConfigureInterop(interopChaincodeId)
 	return transactionContext, chaincodeStub, sc
 }
 
@@ -36,4 +37,12 @@ func prepMocks(orgMSP, clientID string) (*mocks.TransactionContext, *mocks.Chain
 	os.Setenv("CORE_PEER_LOCALMSPID", orgMSP)
 	transactionContext.GetClientIdentityReturns(clientIdentity)
 	return transactionContext, chaincodeStub
+}
+
+func prepMockStubwithIterator() (*mocks.TransactionContext, *mocks.ChaincodeStub, *mocks.StateQueryIterator, sa.SmartContract) {
+	transactionContext, chaincodeStub := prepMocks(myOrg1Msp, myOrg1Clientid)
+	iterator := &mocks.StateQueryIterator{}
+	sc := sa.SmartContract{}
+	sc.ConfigureInterop(interopChaincodeId)
+	return transactionContext, chaincodeStub, iterator, sc
 }

@@ -1,4 +1,4 @@
-package main
+package main_test
 
 import (
 	"encoding/json"
@@ -12,6 +12,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/stretchr/testify/require"
+	sa "github.com/hyperledger-labs/weaver/samples/simpleasset"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/protos-go/common"
 )
 
@@ -95,14 +96,14 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 
 
 	// Issue token assets for Bob
-	tokenAssetType := TokenAssetType {
+	tokenAssetType := sa.TokenAssetType {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
 	}
         tokenAssetTypeBytes, _ := json.Marshal(tokenAssetType)
 	chaincodeStub.GetStateReturnsOnCall(2, tokenAssetTypeBytes, nil)
 	walletMap := make(map[string]uint64)
-	tokensWallet := &TokenWallet{WalletMap: walletMap}
+	tokensWallet := &sa.TokenWallet{WalletMap: walletMap}
 	tokensWalletBytes, _ := json.Marshal(tokensWallet)
 	chaincodeStub.GetStateReturnsOnCall(3, tokensWalletBytes, nil)
 	err = sc.IssueTokenAssets(ctx, tokenType, numTokens, getRecipientECertBase64())
@@ -133,7 +134,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 		Recipient: bondRecipient,
 	}
 	bondAgreementBytes, _ := proto.Marshal(bondAgreement)
-	bondAsset := BondAsset {
+	bondAsset := sa.BondAsset {
 		Type: bondType,
 		ID: bondId,
 		Owner: bondLocker,
@@ -161,7 +162,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	}
 	tokensAgreementBytes, _ := proto.Marshal(tokensAgreement)
 	chaincodeStub.GetCreatorReturnsOnCall(1, []byte(getCreatorInContext("recipient")), nil)
-	tokenAssetType = TokenAssetType {
+	tokenAssetType = sa.TokenAssetType {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
 	}
@@ -169,7 +170,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(5, tokenAssetTypeBytes, nil)
 	walletMap = make(map[string]uint64)
 	walletMap[tokenType] = numTokens
-	tokensWallet = &TokenWallet{WalletMap: walletMap}
+	tokensWallet = &sa.TokenWallet{WalletMap: walletMap}
 	tokensWalletBytes, _ = json.Marshal(tokensWallet)
 	chaincodeStub.GetStateReturnsOnCall(6, tokensWalletBytes, nil)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte(tokensContractId)))
@@ -195,7 +196,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
 	chaincodeStub.GetCreatorReturnsOnCall(3, []byte(getCreatorInContext("locker")), nil)
-	tokenAssetType = TokenAssetType {
+	tokenAssetType = sa.TokenAssetType {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
 	}
