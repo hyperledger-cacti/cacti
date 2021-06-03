@@ -82,7 +82,8 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 }
 
 // ReadAsset returns the asset stored in the world state with given id.
-func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, assetType, id string) (*BondAsset, error) {
+// This function is called with the parameter inUpdateOwnerContext value as false, except in the update-owner context
+func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, assetType, id string, isUpdateOwnerContext bool) (*BondAsset, error) {
 	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from world state: %v", err)
@@ -95,6 +96,16 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, a
 	err = json.Unmarshal(assetJSON, &asset)
 	if err != nil {
 		return nil, err
+	}
+	// In the update owner context, the TxCreator will be the newOwner. Hence don't check if the TxCreator is the current owner.
+	if isUpdateOwnerContext == false {
+		owner, err := getECertOfTxCreatorBase64(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if asset.Owner != owner {
+			return nil, fmt.Errorf("access not allowed to asset of type %s with id %s", assetType, id)
+		}
 	}
 
 	return &asset, nil
@@ -122,9 +133,9 @@ func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface,
 
 	return assetJSON != nil, nil
 }
-// AssetExists returns true when asset with given ID exists in world state
+// IsAssetReleased returns true if asset maturity date elapses
 func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterface, assetType, id string) (bool, error) {
-	asset, err := s.ReadAsset(ctx, assetType, id)
+	asset, err := s.ReadAsset(ctx, assetType, id, false)
 	if err != nil {
 		return false, err
 	}
@@ -136,9 +147,9 @@ func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterf
 	return false, nil
 }
 
-// TransferAsset updates the owner field of asset with given id in world state.
+// UpdateOwner sets the owner of an asset to a new owner.
 func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface, assetType, id string, newOwner string) error {
-	asset, err := s.ReadAsset(ctx, assetType, id)
+	asset, err := s.ReadAsset(ctx, assetType, id, true)
 	if err != nil {
 		return err
 	}
@@ -151,9 +162,9 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
-// UpdateAsset updates an existing asset in the world state with provided parameters.
+// UpdateMaturityDate sets the maturity date of the asset to an updated date as passed in the parameters.
 func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInterface, assetType, id string, newMaturityDate time.Time) error {
-	asset, err := s.ReadAsset(ctx, assetType, id)
+	asset, err := s.ReadAsset(ctx, assetType, id, false)
 	if err != nil {
 		return err
 	}
@@ -166,9 +177,9 @@ func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInt
 
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
-// UpdateAsset updates an existing asset in the world state with provided parameters.
+// UpdateFaceValue sets the face value of an asset to the new value passed.
 func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterface, assetType, id string, newFaceValue int) error {
-	asset, err := s.ReadAsset(ctx, assetType, id)
+	asset, err := s.ReadAsset(ctx, assetType, id, false)
 	if err != nil {
 		return err
 	}
@@ -182,6 +193,7 @@ func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterf
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
+// GetMyAssets returns the assets owner by the caller
 func (s *SmartContract) GetMyAssets(ctx contractapi.TransactionContextInterface) ([]*BondAsset, error) {
 	owner, err := getECertOfTxCreatorBase64(ctx)
 	if err != nil {
