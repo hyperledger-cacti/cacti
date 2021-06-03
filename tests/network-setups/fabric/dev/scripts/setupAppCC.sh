@@ -12,4 +12,8 @@ if [ -d "${CHAINCODE_PATH}/${CC_NAME}" ]; then
 fi
 cp -r ${APP_CC_PATH} ${CHAINCODE_PATH}/
 
+if [ "${CC_NAME}" = "simpleasset" ]; then
+  cp -r ${CHAINCODE_PATH}/fabric-interop-cc/interfaces/asset-mgmt ${CHAINCODE_PATH}/${CC_NAME}/
+fi
+
 echo "Done."
