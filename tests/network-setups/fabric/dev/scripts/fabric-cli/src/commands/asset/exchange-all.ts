@@ -266,6 +266,12 @@ const command: GluegunCommand = {
     }
     spinner.succeed('Asset Exchange Complete.')
 
+    await network1U1.gateway.disconnect()
+    await network1U2.gateway.disconnect()
+    await network2U1.gateway.disconnect()
+    await network2U2.gateway.disconnect()
+
+    console.log('Gateways disconnected.')
   }
 }
 
