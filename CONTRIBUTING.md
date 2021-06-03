@@ -1,4 +1,3 @@
-
 - [Git Know How / Reading List](#git-know-how--reading-list)
 - [PR Checklist - Contributor/Developer](#pr-checklist---contributordeveloper)
 - [PR Checklist - Maintainer/Reviewer](#pr-checklist---maintainerreviewer)
@@ -20,6 +19,7 @@
   - [Building the SDK](#building-the-sdk)
   - [Adding a new public npm dependency to one of the packages:](#adding-a-new-public-npm-dependency-to-one-of-the-packages)
   - [Adding a sibling package npm dependency to one of the packages:](#adding-a-sibling-package-npm-dependency-to-one-of-the-packages)
+  - [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
   - [On Reproducible Builds](#on-reproducible-builds)
 
 Thank you for your interest to contribute to Hyperledger Cactus! :tada:
@@ -100,6 +100,7 @@ Further reading:
 8. Ensure your branch is rebased onto the `upstream` main branch where `upstream` is fancy git talk for the main Cactus repo on Github (the one you created your fork from).
    1. If you are having trouble, there are many great resources out there (so we will not write another here).
       1. If you are having trouble locating a suitable guide specifically on the mechanics of rebasing, we can recommend [this one](https://thoughtbot.com/blog/git-interactive-rebase-squash-amend-rewriting-history). Thanks to Rafael for the link!
+      2. If you went through that tutorial and still not quite sure what's up, give this one a shot as well: https://about.gitlab.com/blog/2020/11/23/keep-git-history-clean-with-interactive-rebase/
    2. If merge conflicts arise, you must fix these at rebase time since omitting this step does not magically make the conflicts go away, just pushes it over the fence to the maintainer who will attempt to merge your pull request at a later point in time.
    3. If the above happens, at that point said maintainer will most likely ask you (if not already) to perform the rebase anyway since as the author of a change you are best positioned to resolve any conflicts on the code level. Occassionally maintainers may do the merge/conflict resolution themselves, but do not count on this nor try to make a habit out of relying on the potential kindness.
    4. After successful rebasing, take another look at your commit(s). Ideally there should be just one in each pull request, but also on the other hand each commit should be as small, simple and self contained as possible, so there can be cases where it makes sense to submit a PR with multiple commits if for example you also had to change something in the test tooling while implementing a feature (in which case there could be a commit for the feature itself and another for the necessary changes to the test tooling package). What we respectfully ask though is that you try to avoid these situations and submit most of your PRs with a single, self contained commit that does not touch multiple things. This significantly reduces the cognitive load required to review the changes which in turn makes everyone happier: the maintainers will have an easier job reviewing, which means they'll be doing it faster which will (probably) cause you joy in turn.
@@ -512,6 +513,8 @@ npx lerna add web3@latest --scope '*/*plugin-ledger-connector-besu' --exact # [-
 
 If you are adding a development dependency you can use the `--dev` option and `--peer` for a peer dependency.
 
+After running any `lerna add` command you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
+
 ### Adding a sibling package npm dependency to one of the packages:
 
 For example the `cactus-test-tooling` can be added as a dev dependency to the besu ledger connector plugin's package this way:
@@ -525,6 +528,20 @@ Or add the common library to allow you the usage of the logger for example:
 ```sh
 npx lerna add @hyperledger/cactus-common --scope '*/*plugin-ledger-connector-quorum' --exact --dev
 ```
+
+After running any `lerna add` command you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
+
+### Reload VSCode Window After Adding Dependencies
+
+If you added a new dependency and VSCode is showing an error when you try to
+import it, then sometimes the issue is just a matter of nudging VSCode to reload
+the Typescript definitions from scratch so that it "notices" the new dependency
+you just added.
+
+The recommended way of doing this is by hitting the `F1` key (or whatever you
+have bound the command menu to) and then searching and selecting `Developer: Reload Window`
+As a simpler alternative you can also just quit and relaunch the VSCode application
+of course.
 
 ### On Reproducible Builds
 

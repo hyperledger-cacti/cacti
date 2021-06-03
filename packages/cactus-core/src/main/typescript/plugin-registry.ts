@@ -8,7 +8,7 @@ import {
   ICactusPlugin,
   IPluginKeychain,
   isICactusPlugin,
-  PluginAspect,
+  isIPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
 /**
@@ -71,12 +71,6 @@ export class PluginRegistry {
     ) as T;
   }
 
-  public getOneByAspect<T extends ICactusPlugin>(aspect: PluginAspect): T {
-    return this.findOneByAspect(aspect).orElseThrow(
-      () => new Error(`No plugin with aspect: ${aspect}`),
-    ) as T;
-  }
-
   public findOneByPackageName<T extends ICactusPlugin>(
     packageName: string,
   ): Optional<T> {
@@ -94,34 +88,19 @@ export class PluginRegistry {
     ) as T[];
   }
 
-  public findOneByAspect<T extends ICactusPlugin>(
-    aspect: PluginAspect,
-  ): Optional<T> {
-    const plugin = this.getPlugins().find((p) => p.getAspect() === aspect);
-    return Optional.ofNullable(plugin as T);
-  }
-
   public findOneByKeychainId<T extends IPluginKeychain>(keychainId: string): T {
     const fnTag = "PluginRegistry#findOneByKeychainId()";
     if (typeof keychainId !== "string" || keychainId.trim().length < 1) {
       throw new Error(`${fnTag} need keychainId arg as non-blank string.`);
     }
 
-    const plugin = this.findManyByAspect<IPluginKeychain>(
-      PluginAspect.KEYCHAIN,
-    ).find((keychainPlugin) => keychainPlugin.getKeychainId() === keychainId);
+    const plugin = this.plugins
+      .filter((p) => isIPluginKeychain(p))
+      .find((p) => (p as IPluginKeychain).getKeychainId() === keychainId);
 
     return Optional.ofNullable(plugin as T).orElseThrow(
       () => new Error(`${fnTag} No keychain found for ID ${keychainId}`),
     );
-  }
-
-  public findManyByAspect<T extends ICactusPlugin>(aspect: PluginAspect): T[] {
-    return this.getPlugins().filter((p) => p.getAspect() === aspect) as T[];
-  }
-
-  public hasByAspect(aspect: PluginAspect): boolean {
-    return this.findOneByAspect(aspect).isPresent();
   }
 
   public hasByPackageName(packageName: string): boolean {

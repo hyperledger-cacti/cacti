@@ -16,7 +16,7 @@ export interface IConsortiumRepositoryOptions {
  * Class responsible for making it convenient for developers to query the
  * `ConsortiumDatabase` model type which is a flat data structure storing
  * all the different types of entities for Consortium representation such as
- * `CactusNode`, `ConsortumMember`, `Ledger` etc..
+ * `CactusNode`, `ConsortiumMember`, `Ledger` etc..
  */
 export class ConsortiumRepository {
   public static readonly CLASS_NAME = "ConsortiumRepository";

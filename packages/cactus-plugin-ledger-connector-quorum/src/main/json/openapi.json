@@ -502,6 +502,17 @@
                         "default": [],
                         "items": {}
                     },
+                    "contractAbi": {
+                        "description": "The application binary interface of the solidity contract, optional parameter",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "description": "Address of the solidity contract, optional parameter",
+                        "type": "string",
+                        "nullable": false
+                    },
                     "value": {
                         "oneOf": [
                             {
@@ -650,7 +661,7 @@
                     }
                 },
                 "operationId": "apiV1QuorumInvokeContract",
-                "summary": "Invokeds a contract on a besu ledger",
+                "summary": "Invokes a contract on a besu ledger",
                 "parameters": [],
                 "requestBody": {
                     "content": {

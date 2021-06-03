@@ -8,7 +8,12 @@ export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector"
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
-export * from "./generated/openapi/typescript-axios/index";
+export {
+  BesuApiClient,
+  BesuApiClientOptions,
+} from "./api-client/besu-api-client";
+
+export * from "./generated/openapi/typescript-axios/api";
 
 export async function createPluginFactory(
   pluginFactoryOptions: IPluginFactoryOptions,

@@ -2,7 +2,7 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Hyperledger Cactus Plugin - Consortium Web Service",
-        "description": "Manage a Cactus consortium through the APIs. Needs administrative priviliges.",
+        "description": "Manage a Cactus consortium through the APIs. Needs administrative privileges.",
         "version": "0.0.1",
         "license": {
             "name": "Apache 2.0",
@@ -61,15 +61,25 @@
             "PrometheusExporterMetricsResponse": {
                 "type": "string",
                 "nullable": false
+            },
+            "GetNodeJwsRequest": {
+                "type": "object",
+                "properties": {
+                }
+            },
+            "GetConsortiumJwsRequest": {
+                "type": "object",
+                "properties": {
+                }
             }
         }
     },
     "paths": {
         "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws": {
-            "get": {
+            "post": {
                 "x-hyperledger-cactus": {
                     "http": {
-                        "verbLowerCase": "get",
+                        "verbLowerCase": "post",
                         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
                     }
                 },
@@ -77,6 +87,15 @@
                 "summary": "Retrieves a consortium JWS",
                 "description": "The JWS asserting the consortium metadata (pub keys and hosts of nodes)",
                 "parameters": [],
+                "requestBody": {
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/GetConsortiumJwsRequest"
+                        }
+                      }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -92,16 +111,25 @@
             }
         },
         "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws": {
-            "get": {
+            "post": {
                 "x-hyperledger-cactus": {
                     "http": {
-                        "verbLowerCase": "get",
+                        "verbLowerCase": "post",
                         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"
                     }
                 },
                 "operationId": "getNodeJws",
                 "summary": "Retrieves the JWT of a Cactus Node",
                 "parameters": [],
+                "requestBody": {
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/GetNodeJwsRequest"
+                        }
+                      }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "OK",

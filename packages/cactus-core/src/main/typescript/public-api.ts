@@ -4,3 +4,10 @@ export {
   ConsortiumRepository,
   IConsortiumRepositoryOptions,
 } from "./consortium-repository";
+
+export {
+  AuthorizationOptionsProvider,
+  IEndpointAuthzOptionsProviderOptions,
+} from "./web-services/authorization-options-provider";
+
+export { consensusHasTransactionFinality } from "./consensus-has-transaction-finality";

@@ -2,6 +2,7 @@ import test, { Test } from "tape-promise/tape";
 import { v4 as internalIpV4 } from "internal-ip";
 
 import {
+  Containers,
   CordaTestLedger,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -19,13 +20,18 @@ import {
   InvokeContractV1Request,
   JvmTypeKind,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
+import { Configuration } from "@hyperledger/cactus-core-api";
 
 const testCase = "Tests are passing on the JVM side";
 const logLevel: LogLevelDesc = "TRACE";
 
+test.onFailure(async () => {
+  await Containers.logDiagnostics({ logLevel });
+});
+
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
@@ -99,7 +105,8 @@ test(testCase, async (t: Test) => {
 
   await connector.logDebugPorts();
   const apiUrl = await connector.getApiLocalhostUrl();
-  const apiClient = new CordaApi({ basePath: apiUrl });
+  const config = new Configuration({ basePath: apiUrl });
+  const apiClient = new CordaApi(config);
 
   const flowsRes = await apiClient.listFlowsV1();
   t.ok(flowsRes.status === 200, "flowsRes.status === 200 OK");
@@ -151,31 +158,31 @@ test(testCase, async (t: Test) => {
 
   const req: InvokeContractV1Request = ({
     flowFullClassName: "net.corda.samples.obligation.flows.IOUIssueFlow",
-    flowInvocationType: FlowInvocationType.TRACKEDFLOWDYNAMIC,
+    flowInvocationType: FlowInvocationType.TrackedFlowDynamic,
     params: [
       {
-        jvmTypeKind: JvmTypeKind.REFERENCE,
+        jvmTypeKind: JvmTypeKind.Reference,
         jvmType: {
           fqClassName: "net.corda.samples.obligation.states.IOUState",
         },
 
         jvmCtorArgs: [
           {
-            jvmTypeKind: JvmTypeKind.REFERENCE,
+            jvmTypeKind: JvmTypeKind.Reference,
             jvmType: {
               fqClassName: "net.corda.core.contracts.Amount",
             },
 
             jvmCtorArgs: [
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "long",
                 },
                 primitiveValue: 42,
               },
               {
-                jvmTypeKind: JvmTypeKind.REFERENCE,
+                jvmTypeKind: JvmTypeKind.Reference,
                 jvmType: {
                   fqClassName: "java.util.Currency",
                   constructorName: "getInstance",
@@ -183,7 +190,7 @@ test(testCase, async (t: Test) => {
 
                 jvmCtorArgs: [
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
@@ -194,35 +201,35 @@ test(testCase, async (t: Test) => {
             ],
           },
           {
-            jvmTypeKind: JvmTypeKind.REFERENCE,
+            jvmTypeKind: JvmTypeKind.Reference,
             jvmType: {
               fqClassName: "net.corda.core.identity.Party",
             },
 
             jvmCtorArgs: [
               {
-                jvmTypeKind: JvmTypeKind.REFERENCE,
+                jvmTypeKind: JvmTypeKind.Reference,
                 jvmType: {
                   fqClassName: "net.corda.core.identity.CordaX500Name",
                 },
 
                 jvmCtorArgs: [
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
                     primitiveValue: "ParticipantA",
                   },
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
                     primitiveValue: "London",
                   },
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
@@ -231,7 +238,7 @@ test(testCase, async (t: Test) => {
                 ],
               },
               {
-                jvmTypeKind: JvmTypeKind.REFERENCE,
+                jvmTypeKind: JvmTypeKind.Reference,
                 jvmType: {
                   fqClassName:
                     "org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl",
@@ -239,21 +246,21 @@ test(testCase, async (t: Test) => {
 
                 jvmCtorArgs: [
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
                     primitiveValue: partyAPublicKey?.algorithm,
                   },
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
                     primitiveValue: partyAPublicKey?.format,
                   },
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
@@ -264,35 +271,35 @@ test(testCase, async (t: Test) => {
             ],
           },
           {
-            jvmTypeKind: JvmTypeKind.REFERENCE,
+            jvmTypeKind: JvmTypeKind.Reference,
             jvmType: {
               fqClassName: "net.corda.core.identity.Party",
             },
 
             jvmCtorArgs: [
               {
-                jvmTypeKind: JvmTypeKind.REFERENCE,
+                jvmTypeKind: JvmTypeKind.Reference,
                 jvmType: {
                   fqClassName: "net.corda.core.identity.CordaX500Name",
                 },
 
                 jvmCtorArgs: [
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
                     primitiveValue: "ParticipantB",
                   },
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
                     primitiveValue: "New York",
                   },
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
@@ -301,7 +308,7 @@ test(testCase, async (t: Test) => {
                 ],
               },
               {
-                jvmTypeKind: JvmTypeKind.REFERENCE,
+                jvmTypeKind: JvmTypeKind.Reference,
                 jvmType: {
                   fqClassName:
                     "org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl",
@@ -309,21 +316,21 @@ test(testCase, async (t: Test) => {
 
                 jvmCtorArgs: [
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
                     primitiveValue: partyBPublicKey?.algorithm,
                   },
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
                     primitiveValue: partyBPublicKey?.format,
                   },
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
@@ -334,21 +341,21 @@ test(testCase, async (t: Test) => {
             ],
           },
           {
-            jvmTypeKind: JvmTypeKind.REFERENCE,
+            jvmTypeKind: JvmTypeKind.Reference,
             jvmType: {
               fqClassName: "net.corda.core.contracts.Amount",
             },
 
             jvmCtorArgs: [
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "long",
                 },
                 primitiveValue: 1,
               },
               {
-                jvmTypeKind: JvmTypeKind.REFERENCE,
+                jvmTypeKind: JvmTypeKind.Reference,
                 jvmType: {
                   fqClassName: "java.util.Currency",
                   constructorName: "getInstance",
@@ -356,7 +363,7 @@ test(testCase, async (t: Test) => {
 
                 jvmCtorArgs: [
                   {
-                    jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                    jvmTypeKind: JvmTypeKind.Primitive,
                     jvmType: {
                       fqClassName: "java.lang.String",
                     },
@@ -367,14 +374,14 @@ test(testCase, async (t: Test) => {
             ],
           },
           {
-            jvmTypeKind: JvmTypeKind.REFERENCE,
+            jvmTypeKind: JvmTypeKind.Reference,
             jvmType: {
               fqClassName: "net.corda.core.contracts.UniqueIdentifier",
             },
 
             jvmCtorArgs: [
               {
-                jvmTypeKind: JvmTypeKind.PRIMITIVE,
+                jvmTypeKind: JvmTypeKind.Primitive,
                 jvmType: {
                   fqClassName: "java.lang.String",
                 },
@@ -397,6 +404,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

@@ -22,7 +22,7 @@ export interface IPluginFactoryOptions {
    * to have language independent plugin implementations since by specifying
    * `REMOTE` when importing a plugin, you can provide a network host where a
    * plugin is deployed that was implemented in your preferred programming
-   * langugage rather than Typescript/Javascript for example.)
+   * language rather than Typescript/Javascript for example.)
    *
    * Important note:
    * When specifying `REMOTE` as the plugin import type, you still need to also

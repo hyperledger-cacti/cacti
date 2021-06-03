@@ -1,6 +1,7 @@
+import type { Server } from "http";
+import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
 import { Express } from "express";
-
 import {
   Logger,
   Checks,
@@ -11,7 +12,6 @@ import {
   ICactusPlugin,
   IPluginWebService,
   IWebServiceEndpoint,
-  PluginAspect,
 } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi as QuorumApi,
@@ -43,7 +43,7 @@ export interface ISupplyChainCactusPluginOptions {
   besuApiClient: BesuApi;
   fabricApiClient: FabricApi;
   web3SigningCredential?: Web3SigningCredential;
-  fabricEnviroment?: NodeJS.ProcessEnv;
+  fabricEnvironment?: NodeJS.ProcessEnv;
   contracts: ISupplyChainContractDeploymentInfo;
 }
 
@@ -80,7 +80,7 @@ export class SupplyChainCactusPlugin
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
-    webServices.forEach((ws) => ws.registerExpress(app));
+    await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
     return webServices;
   }
 
@@ -127,11 +127,13 @@ export class SupplyChainCactusPlugin
     const insertShipment = new InsertShipmentEndpoint({
       logLevel: this.options.logLevel,
       fabricApi: this.options.fabricApiClient,
+      keychainId: this.options.contracts.bookshelfRepository.keychainId,
     });
 
     const listShipment = new ListShipmentEndpoint({
       logLevel: this.options.logLevel,
       fabricApi: this.options.fabricApiClient,
+      keychainId: this.options.contracts.bookshelfRepository.keychainId,
     });
 
     this.endpoints = [
@@ -145,7 +147,7 @@ export class SupplyChainCactusPlugin
     return this.endpoints;
   }
 
-  public getHttpServer(): Optional<any> {
+  public getHttpServer(): Optional<Server | SecureServer> {
     return Optional.empty();
   }
 
@@ -159,9 +161,5 @@ export class SupplyChainCactusPlugin
 
   public getPackageName(): string {
     return "@hyperledger/cactus-example-supply-chain-backend";
-  }
-
-  public getAspect(): PluginAspect {
-    return PluginAspect.WEB_SERVICE;
   }
 }

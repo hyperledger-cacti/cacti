@@ -78,6 +78,17 @@ export {
 } from "./keycloak/keycloak-container";
 
 export {
+  IOpenEthereumTestLedgerOptions,
+  K_DEFAULT_OPEN_ETHEREUM_HTTP_PORT,
+  K_DEFAULT_OPEN_ETHEREUM_IMAGE_NAME,
+  K_DEFAULT_OPEN_ETHEREUM_IMAGE_VERSION,
+  K_DEFAULT_OPEN_ETHEREUM_CHAIN,
+  K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
+  K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
+  OpenEthereumTestLedger,
+} from "./openethereum/openethereum-test-ledger";
+
+export {
   SAMPLE_CORDAPP_ROOT_DIRS,
   SampleCordappEnum,
 } from "./corda/sample-cordapp-enum";

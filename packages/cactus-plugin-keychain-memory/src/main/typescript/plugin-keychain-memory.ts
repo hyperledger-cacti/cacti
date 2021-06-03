@@ -6,7 +6,6 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   ICactusPluginOptions,
-  PluginAspect,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
@@ -20,7 +19,7 @@ import {
 
 export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
-  backend?: Map<string, any>;
+  backend?: Map<string, unknown>;
   keychainId: string;
   prometheusExporter?: PrometheusExporter;
 }
@@ -28,7 +27,7 @@ export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
 export class PluginKeychainMemory {
   public static readonly CLASS_NAME = "PluginKeychainMemory";
 
-  private readonly backend: Map<string, any>;
+  private readonly backend: Map<string, unknown>;
   private readonly log: Logger;
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
@@ -113,12 +112,8 @@ export class PluginKeychainMemory {
     return `@hyperledger/cactus-plugin-keychain-memory`;
   }
 
-  public getAspect(): PluginAspect {
-    return PluginAspect.KEYCHAIN;
-  }
-
   async get<T>(key: string): Promise<T> {
-    return this.backend.get(key);
+    return this.backend.get(key) as T;
   }
 
   async has(key: string): Promise<boolean> {

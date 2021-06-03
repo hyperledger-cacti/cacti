@@ -4,14 +4,18 @@ import { Server } from "http";
 import { v4 as uuidV4 } from "uuid";
 import { JWK } from "jose";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
 import {
   CactusNode,
   ConsortiumMember,
   Consortium,
   ConsortiumDatabase,
 } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -79,6 +83,8 @@ tap.test(
       consortium: [consortium],
     };
 
+    const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
+
     // 3. Instantiate the web service consortium plugin which will host itself on a new TCP port for isolation/security
     // Note that if we omitted the `webAppOptions` object that the web service plugin would default to installing itself
     // on the default port of the API server. This allows for flexibility in deployments.
@@ -92,12 +98,14 @@ tap.test(
         hostname: "127.0.0.1",
         port: 0,
       },
+      consortiumRepo,
     };
     const pluginConsortiumManual = new PluginConsortiumManual(options);
 
     // 4. Create the API Server object that we embed in this test
     const configService = new ConfigService();
     const apiServerOptions = configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
     apiServerOptions.apiCorsDomainCsv = "*";
     apiServerOptions.apiPort = 0;

@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/petermetz/cactus/compare/v0.4.1...v0.5.0) (2021-05-19)
+
+
+### Bug Fixes
+
+* **ci:** dependent issues bot workflow has no job id [#848](https://github.com/petermetz/cactus/issues/848) ([af61202](https://github.com/petermetz/cactus/commit/af61202f73b72efe6df31e5697eedd94f84d417c))
+* **cmd-api-server:** no CLI args causes crash [#794](https://github.com/petermetz/cactus/issues/794) ([a285b96](https://github.com/petermetz/cactus/commit/a285b96785792cd29f450bfc1cc066067c82f558))
+* **connector-besu:** network update only if present in keychain ([8ac2444](https://github.com/petermetz/cactus/commit/8ac2444f86f9a1310f045ff0f7e4e78b91635be0))
+* **connector-fabric:** export IPluginLedgerConnectorFabricOptions ([ada532e](https://github.com/petermetz/cactus/commit/ada532ef09603727379b6193b175e2834fa803d3))
+* **connector-quorum:** web3 Contract type usage ([80c8253](https://github.com/petermetz/cactus/commit/80c82536f6446896a07aab9276f93598266ea5c3))
+* **connector-xdai:** add missing hasTransactionFinality ([cc4f3e1](https://github.com/petermetz/cactus/commit/cc4f3e141da9292b8db5b0261a3347b3ba9c0689))
+* **deps:** elliptic upgrade to >6.5.3 for CVE-2020-28498 ([d75b9af](https://github.com/petermetz/cactus/commit/d75b9af764241ab2e10914769412201fb040b1ed))
+* **examples:** supply chain backend bundle build RAM [#766](https://github.com/petermetz/cactus/issues/766) ([f5c5d82](https://github.com/petermetz/cactus/commit/f5c5d82ef3ae327f057da94ea12a224f9b4d78c6))
+* **test:** eliminate CVE-2020-8203 in besu connector test pkg ([6411933](https://github.com/petermetz/cactus/commit/6411933a167711152165d86a260d5f49d272746d))
+* **tools:** ci.sh retry mechanism no longer ignores last failure ([b5e751e](https://github.com/petermetz/cactus/commit/b5e751e405d0c612f71c50fa964600134d25e0c2))
+* **tools:** use latest fabric bootstrap.sh script for AIO image ([b298b76](https://github.com/petermetz/cactus/commit/b298b76a03382fa2729b89a6066b693e3c072582))
+* **whitepaper:** build fails on Ubuntu 18 due to glibc 2.29 [#703](https://github.com/petermetz/cactus/issues/703) ([ec22a0f](https://github.com/petermetz/cactus/commit/ec22a0fc94929ae0fe8b44f93ce20f44847ec176))
+* **whitepaper:** fix rendering ([d64f3cd](https://github.com/petermetz/cactus/commit/d64f3cd9cc6fd2c3998d139f1872f2c3eaeffc60))
+* keychain to registry, uuid dep, add back missing gas req parameter ([4635d81](https://github.com/petermetz/cactus/commit/4635d817a719bcdaa2a3bf1b4aa3b5d8cc1f6961))
+
+
+### Features
+
+* **api-server:** ability to install plugins at runtime [#764](https://github.com/petermetz/cactus/issues/764) ([8dda0f6](https://github.com/petermetz/cactus/commit/8dda0f61937c6e1a85afee0345af44b1bfa09c0a))
+* **besu:** add sequence diagram of run transaction endpoint ([754a11a](https://github.com/petermetz/cactus/commit/754a11a449d9a67dd8d6ebecbeb1b65cefa71b7f)), closes [#755](https://github.com/petermetz/cactus/issues/755)
+* **cmd-api-server:** container image definition ([eb69fff](https://github.com/petermetz/cactus/commit/eb69fff36fca805c6b96c6db7caadfbed85e8485))
+* **cmd-api-server:** user defined type guard isHealthcheckResponse ([16077d4](https://github.com/petermetz/cactus/commit/16077d42ec7edce4999d77cfbca5c02177d15fa6))
+* **connector-besu:** contract deployment with constructor arguments ([48d67a7](https://github.com/petermetz/cactus/commit/48d67a7a7af223337777917a01002426a79f8463)), closes [#810](https://github.com/petermetz/cactus/issues/810)
+* **connector-besu:** contractAbi optional parameter ([26cf7c2](https://github.com/petermetz/cactus/commit/26cf7c23919436ca82107b532309b5197ad2e39d))
+* **connector-besu:** dockerfile ([7174004](https://github.com/petermetz/cactus/commit/71740048eb97e2855febc96a91a5f64215591187))
+* **connector-besu:** replace invokeContractV2 ([ecd62ea](https://github.com/petermetz/cactus/commit/ecd62eac5721514dbcfc401d5f28dfdc58ef8873))
+* **connector-besu, connector-quorum:** filesystem replaced by keychain ([14d1790](https://github.com/petermetz/cactus/commit/14d17904442723450790644653ff18dda79dfa5e))
+* **connector-besu,connector-quorum:** updated ([985f12f](https://github.com/petermetz/cactus/commit/985f12f69c52a139a72aecc9b050e71545a90df8))
+* **connector-fabric:** containerize-fabric ([b53b3a4](https://github.com/petermetz/cactus/commit/b53b3a4c1cb36e7a0f14d405cdecb3c8341f956d))
+* **connector-fabric:** contract deployment Fabric 2.x ([139a8ed](https://github.com/petermetz/cactus/commit/139a8ed96d5d547a514839a461abcb7d0e937cb0))
+* **connector-fabric:** enrollAdmin() and createCaClient() ([da1cb1b](https://github.com/petermetz/cactus/commit/da1cb1bc3c3751b5d10f98a457ae0ec62b6bdebf))
+* **connector-quorum:** contractAbi optional parameter ([c79d763](https://github.com/petermetz/cactus/commit/c79d763e0cb093647209417cfed7a2645283f302))
+* **connector-xdai:** add ledger connector plugin for xdai [#852](https://github.com/petermetz/cactus/issues/852) ([99399a3](https://github.com/petermetz/cactus/commit/99399a3bd5020c66d2899aca500a880777b6523d))
+* **corda:** prometheus exporter metrics integration ([9f37755](https://github.com/petermetz/cactus/commit/9f3775580381cbdf314c6a75188114315d1844c6)), closes [#535](https://github.com/petermetz/cactus/issues/535)
+* **core:** add plugin registry log level constructor arg ([1652b33](https://github.com/petermetz/cactus/commit/1652b33255c211e87e33ceb3e421cb9fb4182502))
+* **core-api:** decouple web service install & registration [#771](https://github.com/petermetz/cactus/issues/771) ([b50e148](https://github.com/petermetz/cactus/commit/b50e148f43c0b27138471c972aab391486e761e6))
+* **core-api:** hasTransactionFinality() on connector API [#354](https://github.com/petermetz/cactus/issues/354) ([a2d0582](https://github.com/petermetz/cactus/commit/a2d058218780e5e4c81e5f847cc875879a946e3f))
+* **test-tooling:** add OpenEthereumTestLedger [#851](https://github.com/petermetz/cactus/issues/851) ([9ca1f68](https://github.com/petermetz/cactus/commit/9ca1f6839749450b4d8887c5af14a888225d645f))
+* adding additional info into err logs ([888f85a](https://github.com/petermetz/cactus/commit/888f85a680a330cfc6be98bab3e8aed5d9e9dde2)), closes [#295](https://github.com/petermetz/cactus/issues/295)
+* incorporating load testing into our CI pipeline ([7125d10](https://github.com/petermetz/cactus/commit/7125d1043091e0443edaa7b63021cd0b96404c4b)), closes [#295](https://github.com/petermetz/cactus/issues/295)
+* **core-api:** jwt authorization [#770](https://github.com/petermetz/cactus/issues/770) ([2016750](https://github.com/petermetz/cactus/commit/2016750849b4333bb4dd78897468771f0642a4f5))
+* **fabric:** add sequence diagram of run transaction endpoint ([155cbab](https://github.com/petermetz/cactus/commit/155cbab3c0358f6c259df8c0f92b788cbdfc6a71)), closes [#756](https://github.com/petermetz/cactus/issues/756)
+* **test-tooling:** add besu test ledger log level constructor arg ([60ee32f](https://github.com/petermetz/cactus/commit/60ee32fb0e65e8325194a8798dd8cde093a141d3)), closes [#780](https://github.com/petermetz/cactus/issues/780)
+* **test-tooling:** add keycloak container ([f1abb3e](https://github.com/petermetz/cactus/commit/f1abb3e8d2e05aa18008da176753b240528e95e6))
+* **tools:** add test-npm-registry contaimer image ([19afe85](https://github.com/petermetz/cactus/commit/19afe851dc9efbc37ab012146e9c41bfc296304a))
+* **tools:** fabric all-in-one 2.x add nodejs to image ([dc09540](https://github.com/petermetz/cactus/commit/dc09540ba96e346e256363cd4cbeecc6d7aacf73))
+
+
+### Performance Improvements
+
+* **tools:** fabric 1.x AIO image pre-fetching [#649](https://github.com/petermetz/cactus/issues/649) ([a4722fa](https://github.com/petermetz/cactus/commit/a4722fa1a8a1141bb274d10bc6192f4174c60302))
+
+
+### BREAKING CHANGES
+
+* 🧨 Behaviour in a cloud environment is currently untested and could impact
+CI pipeline time.
+
+
+
+
+
 ## [0.4.1](https://github.com/petermetz/cactus/compare/v0.4.0...v0.4.1) (2021-04-02)
 
 

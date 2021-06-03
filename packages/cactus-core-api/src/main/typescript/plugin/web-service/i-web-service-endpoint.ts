@@ -1,4 +1,6 @@
 import { Express } from "express";
+import { IAsyncProvider } from "@hyperledger/cactus-common";
+import { IEndpointAuthzOptions } from "./i-endpoint-authz-options";
 import { IExpressRequestHandler } from "./i-express-request-handler";
 
 /**
@@ -14,10 +16,10 @@ export interface IWebServiceEndpoint {
   /**
    * Hooks up this endpoint instance into an ExpressJS web application object.
    * Internally this method uses the other methods of the `IWebServiceEndpoint`
-   * instnce to obtain the verb, path and handler which are the necessary
+   * instance to obtain the verb, path and handler which are the necessary
    * input for being able to create any HTTP request handler in ExpressJS.
    */
-  registerExpress(expressApp: Express): IWebServiceEndpoint;
+  registerExpress(expressApp: Express): Promise<IWebServiceEndpoint>;
   /**
    * Returns the lower case HTTP verb name that this endpoint is designed to
    * operate on.
@@ -35,4 +37,8 @@ export interface IWebServiceEndpoint {
    * > Handler registration methods are usually: `.get()`, `.post()`, `.all()`, `.use()`, etc.
    */
   getExpressRequestHandler(): IExpressRequestHandler;
+  /**
+   * Returns an
+   */
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions>;
 }

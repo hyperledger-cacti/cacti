@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Hyperledger Core API
- * Contains/describes the core API types for Cactus. Does not describe actual endpoints on its own as this is left to the implementing plugins who can import and re-use commonLy needed type definitions from this specification. One example of said commonly used type definitons would be the types related to consortium management, cactus nodes, ledgers, etc..
+ * Contains/describes the core API types for Cactus. Does not describe actual endpoints on its own as this is left to the implementing plugins who can import and re-use commonly needed type definitions from this specification. One example of said commonly used type definitions would be the types related to consortium management, cactus nodes, ledgers, etc..
  *
  * The version of the OpenAPI document: 0.2.0
  * 

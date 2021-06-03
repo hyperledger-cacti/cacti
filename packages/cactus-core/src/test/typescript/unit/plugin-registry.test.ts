@@ -3,32 +3,42 @@ import { v4 as uuidv4 } from "uuid";
 
 import { PluginRegistry } from "../../../main/typescript/public-api";
 
-import {
-  ICactusPlugin,
-  IPluginKeychain,
-  PluginAspect,
-} from "@hyperledger/cactus-core-api";
+import { ICactusPlugin, IPluginKeychain } from "@hyperledger/cactus-core-api";
 
 test("PluginRegistry", (tMain: Test) => {
   test("findOneByKeychainId() finds plugin by keychain ID", (t: Test) => {
     const keychainId = uuidv4();
+    const instanceId = uuidv4();
 
-    const mockKeychainPlugin = {
+    const mockKeychainPlugin: IPluginKeychain = {
+      getInstanceId: () => instanceId,
       getKeychainId: () => keychainId,
-      getAspect: () => PluginAspect.KEYCHAIN,
-    } as IPluginKeychain;
+      delete: async () => {
+        throw new Error("This is a mock. Not implemented.");
+      },
+      has: async () => {
+        throw new Error("This is a mock. Not implemented.");
+      },
+      get: async () => {
+        throw new Error("This is a mock. Not implemented.");
+      },
+      set: async () => {
+        throw new Error("This is a mock. Not implemented.");
+      },
+      getPackageName: () => "@hyperledger/cactus-plugin-keychain-mock",
+    };
 
     const pluginRegistry = new PluginRegistry({
       plugins: [
         mockKeychainPlugin,
         {
-          getAspect: () => PluginAspect.CONSORTIUM,
+          getInstanceId: () => "some-mock-plugin-instance-id-1",
         } as ICactusPlugin,
         {
-          getAspect: () => PluginAspect.KV_STORAGE,
+          getInstanceId: () => "some-mock-plugin-instance-id-2",
         } as ICactusPlugin,
         {
-          getAspect: () => PluginAspect.LEDGER_CONNECTOR,
+          getInstanceId: () => "some-mock-plugin-instance-id-3",
         } as ICactusPlugin,
       ],
     });

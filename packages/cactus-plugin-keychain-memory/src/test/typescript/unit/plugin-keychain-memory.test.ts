@@ -16,6 +16,7 @@ import {
 import { K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
 
 import { DefaultApi as KeychainMemoryApi } from "../../../main/typescript/public-api";
+import { Configuration } from "@hyperledger/cactus-core-api";
 
 test("PluginKeychainMemory", (t1: Test) => {
   t1.doesNotThrow(
@@ -80,7 +81,9 @@ test("PluginKeychainMemory", (t1: Test) => {
     t.comment(
       `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics`,
     );
-    const apiClient = new KeychainMemoryApi({ basePath: apiHost });
+
+    const config = new Configuration({ basePath: apiHost });
+    const apiClient = new KeychainMemoryApi(config);
 
     await plugin.getOrCreateWebServices(expressApp);
 

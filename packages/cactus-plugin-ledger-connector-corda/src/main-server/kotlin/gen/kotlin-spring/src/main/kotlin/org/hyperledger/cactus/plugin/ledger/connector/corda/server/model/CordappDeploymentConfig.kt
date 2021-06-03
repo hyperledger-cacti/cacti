@@ -11,6 +11,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -23,23 +24,23 @@ import javax.validation.constraints.Size
  */
 data class CordappDeploymentConfig(
 
-    @get:NotNull 
-    @field:JsonProperty("sshCredentials") val sshCredentials: CordaNodeSshCredentials,
+    @field:Valid
+    @field:JsonProperty("sshCredentials", required = true) val sshCredentials: CordaNodeSshCredentials,
 
-    @get:NotNull 
-    @field:JsonProperty("rpcCredentials") val rpcCredentials: CordaRpcCredentials,
+    @field:Valid
+    @field:JsonProperty("rpcCredentials", required = true) val rpcCredentials: CordaRpcCredentials,
 
-    @get:NotNull @get:Size(min=1,max=65535) 
-    @field:JsonProperty("cordaNodeStartCmd") val cordaNodeStartCmd: kotlin.String,
+    @get:Size(min=1,max=65535)
+    @field:JsonProperty("cordaNodeStartCmd", required = true) val cordaNodeStartCmd: kotlin.String,
 
-    @get:NotNull @get:Size(min=1,max=2048) 
-    @field:JsonProperty("cordappDir") val cordappDir: kotlin.String,
+    @get:Size(min=1,max=2048)
+    @field:JsonProperty("cordappDir", required = true) val cordappDir: kotlin.String,
 
-    @get:NotNull @get:Size(min=1,max=2048) 
-    @field:JsonProperty("cordaJarPath") val cordaJarPath: kotlin.String,
+    @get:Size(min=1,max=2048)
+    @field:JsonProperty("cordaJarPath", required = true) val cordaJarPath: kotlin.String,
 
-    @get:NotNull @get:Size(min=1,max=2048) 
-    @field:JsonProperty("nodeBaseDirPath") val nodeBaseDirPath: kotlin.String
+    @get:Size(min=1,max=2048)
+    @field:JsonProperty("nodeBaseDirPath", required = true) val nodeBaseDirPath: kotlin.String
 ) {
 
 }

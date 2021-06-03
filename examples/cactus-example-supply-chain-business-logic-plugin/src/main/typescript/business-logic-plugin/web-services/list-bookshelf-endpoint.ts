@@ -5,8 +5,10 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 import {
+  IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
@@ -57,8 +59,20 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public registerExpress(expressApp: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(expressApp, this);
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    // TODO: make this an injectable dependency in the constructor
+    return {
+      get: async () => ({
+        isProtected: true,
+        requiredRoles: [],
+      }),
+    };
+  }
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 
@@ -81,12 +95,12 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
 
       const { data } = await this.opts.besuApi.apiV1BesuInvokeContract({
         contractName: this.opts.contractName,
-        invocationType: EthContractInvocationType.CALL,
+        invocationType: EthContractInvocationType.Call,
         methodName: "getAllRecords",
         gas: 1000000,
         params: [],
         signingCredential: {
-          type: Web3SigningCredentialType.NONE,
+          type: Web3SigningCredentialType.None,
         },
         keychainId: this.opts.keychainId,
       });

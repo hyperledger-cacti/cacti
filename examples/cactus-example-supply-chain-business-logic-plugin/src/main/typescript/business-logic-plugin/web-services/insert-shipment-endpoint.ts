@@ -5,8 +5,10 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 import {
+  IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
@@ -23,11 +25,13 @@ import OAS from "../../../json/openapi.json";
 export interface IInsertShipmentEndpointOptions {
   logLevel?: LogLevelDesc;
   fabricApi: FabricApi;
+  keychainId: string;
 }
 
 export class InsertShipmentEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "InsertShipmentEndpoint";
   private readonly log: Logger;
+  private readonly keychainId: string;
 
   public get className(): string {
     return InsertShipmentEndpoint.CLASS_NAME;
@@ -37,13 +41,28 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.fabricApi, `${fnTag} options.fabricApi`);
+    Checks.truthy(opts.keychainId, `${fnTag} options.keychain`);
     const level = this.opts.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
+
+    this.keychainId = opts.keychainId;
   }
 
-  public registerExpress(expressApp: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(expressApp, this);
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    // TODO: make this an injectable dependency in the constructor
+    return {
+      get: async () => ({
+        isProtected: true,
+        requiredRoles: [],
+      }),
+    };
+  }
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 
@@ -78,12 +97,12 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
       this.log.debug(`${tag} %o`, shipment);
       const request: RunTransactionRequest = {
         signingCredential: {
-          keychainId: "PluginKeychainMemory_C",
+          keychainId: this.keychainId,
           keychainRef: "user2",
         },
         channelName: "mychannel",
         contractName: "shipment",
-        invocationType: FabricContractInvocationType.SEND,
+        invocationType: FabricContractInvocationType.Send,
         methodName: "insertShipment",
         params: [shipment.id, shipment.bookshelfId],
       };

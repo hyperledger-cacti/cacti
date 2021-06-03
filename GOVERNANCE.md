@@ -1,3 +1,5 @@
+# Governance
+
 Hyperledger Cactus is managed under an open governance model as described in the Hyperledger charter. Cactus is led by a set of maintainers, who can be found in the MAINTAINERS.md file.
 
 **Maintainers**

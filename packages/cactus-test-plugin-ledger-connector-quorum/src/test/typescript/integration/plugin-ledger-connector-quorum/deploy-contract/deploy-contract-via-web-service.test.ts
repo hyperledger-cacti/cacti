@@ -24,6 +24,7 @@ import {
 
 import {
   ApiServer,
+  AuthorizationProtocol,
   ConfigService,
   ICactusApiServerOptions,
 } from "@hyperledger/cactus-cmd-api-server";
@@ -45,7 +46,7 @@ const contractName = "HelloWorld";
 
 test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
@@ -66,6 +67,7 @@ test(testCase, async (t: Test) => {
 
   const configService = new ConfigService();
   const cactusApiServerOptions: ICactusApiServerOptions = configService.newExampleConfig();
+  cactusApiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   cactusApiServerOptions.configFile = "";
   cactusApiServerOptions.apiCorsDomainCsv = "*";
   cactusApiServerOptions.apiTlsEnabled = false;
@@ -134,7 +136,7 @@ test(testCase, async (t: Test) => {
     web3SigningCredential: {
       ethAccount: firstHighNetWorthAccount,
       secret: "",
-      type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+      type: Web3SigningCredentialType.GethKeychainPassword,
     },
     keychainId: kvStoragePlugin.getKeychainId(),
     gas: 1000000,
@@ -155,7 +157,7 @@ test(testCase, async (t: Test) => {
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
-        type: Web3SigningCredentialType.GETHKEYCHAINPASSWORD,
+        type: Web3SigningCredentialType.GethKeychainPassword,
       },
       transactionConfig: {
         from: firstHighNetWorthAccount,
@@ -173,11 +175,11 @@ test(testCase, async (t: Test) => {
 
     const sayHelloRes = await client.apiV1QuorumInvokeContract({
       contractName,
-      invocationType: EthContractInvocationType.CALL,
+      invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
       signingCredential: {
-        type: Web3SigningCredentialType.NONE,
+        type: Web3SigningCredentialType.None,
       },
       keychainId: kvStoragePlugin.getKeychainId(),
     });
@@ -198,14 +200,14 @@ test(testCase, async (t: Test) => {
     const newName = `DrCactus${uuidV4()}`;
     const setName1Res = await client.apiV1QuorumInvokeContract({
       contractName,
-      invocationType: EthContractInvocationType.SEND,
+      invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
       gas: 1000000,
       signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       keychainId: kvStoragePlugin.getKeychainId(),
     });
@@ -217,14 +219,14 @@ test(testCase, async (t: Test) => {
 
     const getName1Res = await client.apiV1QuorumInvokeContract({
       contractName,
-      invocationType: EthContractInvocationType.CALL,
+      invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
       gas: 1000000,
       signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       keychainId: kvStoragePlugin.getKeychainId(),
     });
@@ -242,14 +244,14 @@ test(testCase, async (t: Test) => {
 
     const getName2Res = await client.apiV1QuorumInvokeContract({
       contractName,
-      invocationType: EthContractInvocationType.SEND,
+      invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
       gas: 1000000,
       signingCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PRIVATEKEYHEX,
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       keychainId: kvStoragePlugin.getKeychainId(),
     });
@@ -269,6 +271,6 @@ test(testCase, async (t: Test) => {
 
 test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didnt throw OK");
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

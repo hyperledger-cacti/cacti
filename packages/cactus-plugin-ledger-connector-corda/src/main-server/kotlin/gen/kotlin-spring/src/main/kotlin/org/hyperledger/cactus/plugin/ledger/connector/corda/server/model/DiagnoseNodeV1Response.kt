@@ -10,6 +10,7 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
+import javax.validation.Valid
 
 /**
  * 
@@ -17,8 +18,8 @@ import javax.validation.constraints.Size
  */
 data class DiagnoseNodeV1Response(
 
-    @get:NotNull 
-    @field:JsonProperty("nodeDiagnosticInfo") val nodeDiagnosticInfo: NodeDiagnosticInfo
+    @field:Valid
+    @field:JsonProperty("nodeDiagnosticInfo", required = true) val nodeDiagnosticInfo: NodeDiagnosticInfo
 ) {
 
 }

@@ -461,7 +461,7 @@
                         "nullable": false
                     },
                     "timeoutMs": {
-                        "type": "number",
+                        "type": "integer",
                         "description": "The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing.",
                         "minimum": 0,
                         "default": 60000,
@@ -472,14 +472,19 @@
             "InvokeContractV1Response": {
                 "type": "object",
                 "required": [
-                    "id",
-                    "progress"
+                    "success",
+                    "transactionId",
+                    "callOutput"
                 ],
                 "properties": {
-                    "returnValue": {
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "callOutput": {
                         "type": "object"
                     },
-                    "id": {
+                    "transactionId": {
                         "type": "string",
                         "description": "The net.corda.core.flows.StateMachineRunId value returned by the flow execution.",
                         "minLength": 1,
@@ -721,6 +726,10 @@
                         "$ref": "#/components/schemas/NodeDiagnosticInfo"
                     }
                 }
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
             }
         }
     },
@@ -898,6 +907,31 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/DiagnoseNodeV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusExporterMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
                                 }
                             }
                         }

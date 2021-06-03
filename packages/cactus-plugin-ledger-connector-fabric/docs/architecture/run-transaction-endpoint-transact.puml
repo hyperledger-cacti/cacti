@@ -1,0 +1,59 @@
+@startuml
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransact() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 300
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "PluginLedgerConnectorFabric" as t << (C,#ADD1B2) class >>
+
+autoactivate on
+
+activate caller
+caller -> t: transact(req: RunTransactionRequest)
+
+t -> t: req
+t --> t: {signingCredential, channelName, contractName, invocationType, fnName as methodName, params}
+
+t -> t: InMemoryWallet(new X509WalletMixin())
+t --> t: wallet
+
+t -> t: opts.pluginRegistry.findOneByKeychainID(signingCredential.keychainId)
+t --> t: keychain
+
+t -> t: keychain.get<string>(signingCredential.keychainRef)
+t --> t: fabricX509IdentityJson
+
+t -> t: JSON.parse(fabricX509IdentityJson)
+t --> t: identity
+
+t -> t: wait for wallter.import(signingCredential.keychainRef, identity)
+deactivate t
+
+t -> t: wait for gateway.connect(connectionProfile, gatewayOptions)
+deactivate t
+
+t -> t: wait gateway.getNetwork(channelName)
+t --> t: network
+
+t -> t: network.getContract(contractName)
+t --> t: contract
+
+group #LightBlue if invocationType == FabricContractInvocationType.Call
+    t -> t: wait for contract.evaluateTransaction(fnName, ...params)
+    t --> t: out, success: true
+else #LightYellow if invocationType == FabricContractInvocationType.Send
+    t -> t: wait for contract.submitTransaction(fnName, ...params)
+    t --> t: out, success: true
+else #LightCoral default
+    t --> caller: throw Error('unknown FabricContractInvocationType')
+end
+
+t -> t: out.toString("utf-8")
+t --> t: outUtf8
+
+t --> caller: return { functionOutput, success } as res
+
+@enduml 

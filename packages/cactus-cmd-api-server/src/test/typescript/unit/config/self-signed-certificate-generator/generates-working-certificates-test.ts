@@ -65,7 +65,7 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
       // IMPORTANT:
       // Without this self signed certs are rejected because they are not part of a chain with a trusted root CA
       // By declaring our certificate here we tell the HTTPS client to assume that our certificate is a trusted one.
-      // This is fine for a test case because we don't want thid party dependencies on test execution.
+      // This is fine for a test case because we don't want this party dependencies on test execution.
       ca: serverCertData.certificatePem,
     };
 

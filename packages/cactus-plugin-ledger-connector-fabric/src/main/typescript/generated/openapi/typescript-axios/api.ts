@@ -17,7 +17,81 @@ import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+// @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+
+/**
+ * Enumerates the supported programming language runtimes of Hyperledger Fabric
+ * @export
+ * @enum {string}
+ */
+export enum ChainCodeLanguageRuntime {
+    Golang = 'golang',
+    Node = 'node',
+    Java = 'java'
+}
+
+/**
+ * 
+ * @export
+ * @interface ChainCodeLifeCycleCommandResponses
+ */
+export interface ChainCodeLifeCycleCommandResponses {
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    packaging?: SSHExecCommandResponse;
+    /**
+     * 
+     * @type {Array<SSHExecCommandResponse>}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    installList: Array<SSHExecCommandResponse>;
+    /**
+     * 
+     * @type {Array<SSHExecCommandResponse>}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    queryInstalledList: Array<SSHExecCommandResponse>;
+    /**
+     * 
+     * @type {Array<SSHExecCommandResponse>}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    approveForMyOrgList: Array<SSHExecCommandResponse>;
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    commit?: SSHExecCommandResponse;
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    queryCommitted?: SSHExecCommandResponse;
+    /**
+     * 
+     * @type {SSHExecCommandResponse}
+     * @memberof ChainCodeLifeCycleCommandResponses
+     */
+    init?: SSHExecCommandResponse;
+}
+/**
+ * Enumerates the supported source code programming languages of Hyperledger Fabric
+ * @export
+ * @enum {string}
+ */
+export enum ChainCodeProgrammingLanguage {
+    Golang = 'golang',
+    Javascript = 'javascript',
+    Typescript = 'typescript',
+    Java = 'java'
+}
 
 /**
  * 
@@ -107,10 +181,10 @@ export interface ConnectionProfileClient {
  * @enum {string}
  */
 export enum DefaultEventHandlerStrategy {
-    MSPIDSCOPEALLFORTX = 'MSPID_SCOPE_ALLFORTX',
-    MSPIDSCOPEANYFORTX = 'MSPID_SCOPE_ANYFORTX',
-    NETWORKSCOPEALLFORTX = 'NETWORK_SCOPE_ALLFORTX',
-    NETWORKSCOPEANYFORTX = 'NETWORK_SCOPE_ANYFORTX'
+    MspidScopeAllfortx = 'MSPID_SCOPE_ALLFORTX',
+    MspidScopeAnyfortx = 'MSPID_SCOPE_ANYFORTX',
+    NetworkScopeAllfortx = 'NETWORK_SCOPE_ALLFORTX',
+    NetworkScopeAnyfortx = 'NETWORK_SCOPE_ANYFORTX'
 }
 
 /**
@@ -144,7 +218,7 @@ export interface DeployContractGoSourceV1Request {
      */
     targetOrganizations: Array<DeploymentTargetOrganization>;
     /**
-     * An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the offical Fabric samples repository and therefore it is assumed to be correct usage.
+     * An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the official Fabric samples repository and therefore it is assumed to be correct usage.
      * @type {Array<string>}
      * @memberof DeployContractGoSourceV1Request
      */
@@ -233,6 +307,171 @@ export interface DeployContractGoSourceV1Response {
 /**
  * 
  * @export
+ * @interface DeployContractV1Request
+ */
+export interface DeployContractV1Request {
+    /**
+     * 
+     * @type {ChainCodeProgrammingLanguage}
+     * @memberof DeployContractV1Request
+     */
+    ccLang: ChainCodeProgrammingLanguage;
+    /**
+     * File-system path pointing at the CA file.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    caFile: string;
+    /**
+     * Ordering service endpoint specified as <hostname or IP address>:<port>
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    orderer: string;
+    /**
+     * The hostname override to use when validating the TLS connection to the orderer
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    ordererTLSHostnameOverride: string;
+    /**
+     * Timeout for client to connect (default 3s)
+     * @type {number}
+     * @memberof DeployContractV1Request
+     */
+    connTimeout?: number;
+    /**
+     * Passed in to the peer via the --signature-policy argument on the command line. See also: https://hyperledger-fabric.readthedocs.io/en/release-2.2/endorsement-policies.html#setting-chaincode-level-endorsement-policies
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    signaturePolicy?: string;
+    /**
+     * Name of the collections config file as present in the sourceFiles array of the request.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    collectionsConfigFile?: string;
+    /**
+     * The name of the Fabric channel where the contract will get instantiated.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    channelId: string;
+    /**
+     * 
+     * @type {Array<DeploymentTargetOrganization>}
+     * @memberof DeployContractV1Request
+     */
+    targetOrganizations: Array<DeploymentTargetOrganization>;
+    /**
+     * 
+     * @type {DeployContractGoSourceV1RequestConstructorArgs}
+     * @memberof DeployContractV1Request
+     */
+    constructorArgs?: DeployContractGoSourceV1RequestConstructorArgs;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractV1Request
+     */
+    ccSequence: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    ccVersion: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    ccName: string;
+    /**
+     * Human readable label to uniquely identify the contract. Recommended to include in this at least the contract name and the exact version in order to make it easily distinguishable from other deployments of the same contract.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    ccLabel: string;
+    /**
+     * The your-smart-contract.go file where the functionality of your contract is implemented.
+     * @type {Array<FileBase64>}
+     * @memberof DeployContractV1Request
+     */
+    sourceFiles: Array<FileBase64>;
+}
+/**
+ * 
+ * @export
+ * @interface DeployContractV1Response
+ */
+export interface DeployContractV1Response {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DeployContractV1Response
+     */
+    success: boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof DeployContractV1Response
+     */
+    packageIds: Array<string>;
+    /**
+     * 
+     * @type {ChainCodeLifeCycleCommandResponses}
+     * @memberof DeployContractV1Response
+     */
+    lifecycle: ChainCodeLifeCycleCommandResponses;
+}
+/**
+ * 
+ * @export
+ * @interface DeploymentTargetOrgFabric2x
+ */
+export interface DeploymentTargetOrgFabric2x {
+    /**
+     * Transient map of arguments in JSON encoding
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    _transient?: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    CORE_PEER_LOCALMSPID: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    CORE_PEER_ADDRESS: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    CORE_PEER_MSPCONFIGPATH: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    CORE_PEER_TLS_ROOTCERT_FILE: string;
+    /**
+     * Mapped to environment variables of the Fabric CLI container.
+     * @type {string}
+     * @memberof DeploymentTargetOrgFabric2x
+     */
+    ORDERER_TLS_ROOTCERT_FILE: string;
+}
+/**
+ * 
+ * @export
  * @interface DeploymentTargetOrganization
  */
 export interface DeploymentTargetOrganization {
@@ -273,8 +512,9 @@ export interface DeploymentTargetOrganization {
  * @enum {string}
  */
 export enum FabricContractInvocationType {
-    SEND = 'FabricContractInvocationType.SEND',
-    CALL = 'FabricContractInvocationType.CALL'
+    Send = 'FabricContractInvocationType.SEND',
+    Call = 'FabricContractInvocationType.CALL',
+    Sendprivate = 'FabricContractInvocationType.SENDPRIVATE'
 }
 
 /**
@@ -314,6 +554,12 @@ export interface FileBase64 {
      * @memberof FileBase64
      */
     filename: string;
+    /**
+     * The relative path of the file, if it should be placed in a sub-directory
+     * @type {string}
+     * @memberof FileBase64
+     */
+    filepath?: string;
 }
 /**
  * 
@@ -374,6 +620,12 @@ export interface InlineResponse501 {
 export interface RunTransactionRequest {
     /**
      * 
+     * @type {object}
+     * @memberof RunTransactionRequest
+     */
+    transientData?: object | null;
+    /**
+     * 
      * @type {FabricSigningCredential}
      * @memberof RunTransactionRequest
      */
@@ -408,6 +660,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     params: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RunTransactionRequest
+     */
+    endorsingParties?: Array<string>;
 }
 /**
  * 
@@ -476,11 +734,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deployContractGoSourceV1: async (deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -489,21 +748,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof deployContractGoSourceV1Request !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(deployContractGoSourceV1Request !== undefined ? deployContractGoSourceV1Request : {}) : (deployContractGoSourceV1Request || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractGoSourceV1Request, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployContractV1: async (deployContractV1Request?: DeployContractV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -516,30 +801,24 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPrometheusExporterMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
 
     
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -552,16 +831,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          */
         runTransactionV1: async (runTransactionRequest: RunTransactionRequest, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'runTransactionRequest' is not null or undefined
-            if (runTransactionRequest === null || runTransactionRequest === undefined) {
-                throw new RequiredError('runTransactionRequest','Required parameter runTransactionRequest was null or undefined when calling runTransactionV1.');
-            }
+            assertParamExists('runTransactionV1', 'runTransactionRequest', runTransactionRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
+
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
@@ -570,21 +848,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                query.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof runTransactionRequest !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(runTransactionRequest !== undefined ? runTransactionRequest : {}) : (runTransactionRequest || "");
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequest, localVarRequestOptions, configuration)
 
             return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
@@ -596,6 +866,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
  * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
          * 
@@ -605,11 +876,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractGoSourceV1Response>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractGoSourceV1(deployContractGoSourceV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractV1(deployContractV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -618,11 +897,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async getPrometheusExporterMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).getPrometheusExporterMetricsV1(options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusExporterMetricsV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -632,11 +908,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         async runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).runTransactionV1(runTransactionRequest, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
@@ -646,6 +919,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
  * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DefaultApiFp(configuration)
     return {
         /**
          * 
@@ -655,7 +929,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any): AxiosPromise<DeployContractGoSourceV1Response> {
-            return DefaultApiFp(configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(axios, basePath));
+            return localVarFp.deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any): AxiosPromise<DeployContractV1Response> {
+            return localVarFp.deployContractV1(deployContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -664,7 +948,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         getPrometheusExporterMetricsV1(options?: any): AxiosPromise<string> {
-            return DefaultApiFp(configuration).getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
+            return localVarFp.getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -674,7 +958,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
-            return DefaultApiFp(configuration).runTransactionV1(runTransactionRequest, options).then((request) => request(axios, basePath));
+            return localVarFp.runTransactionV1(runTransactionRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -696,6 +980,18 @@ export class DefaultApi extends BaseAPI {
      */
     public deployContractGoSourceV1(deployContractGoSourceV1Request?: DeployContractGoSourceV1Request, options?: any) {
         return DefaultApiFp(this.configuration).deployContractGoSourceV1(deployContractGoSourceV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The \'v1\' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+     * @param {DeployContractV1Request} [deployContractV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).deployContractV1(deployContractV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

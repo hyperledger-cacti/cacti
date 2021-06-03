@@ -1,0 +1,120 @@
+version: '3'
+
+services:
+
+  node1:
+    image: ${IROHA_PRJ}/${IROHA_IMG}
+    container_name: iroha_node_1
+    restart: always
+    ports:
+      - "50051:50051"
+    environment:
+      - IROHA_HOME=/opt/iroha
+      - IROHA_CONF=iroha1.conf
+      - IROHA_NODEKEY=node1
+      - CCACHE_DIR=/tmp/ccache
+    volumes:
+      - ${PWD}:/opt/iroha/config
+      - ${PWD}/iroha1/tmp/block_store:/tmp/block_store
+      - ccache-data:/tmp/ccache
+    working_dir: /opt/iroha/config
+    entrypoint: /opt/iroha/config/entrypoint.sh
+    depends_on:
+      - postgres1
+
+  node2:
+    image: ${IROHA_PRJ}/${IROHA_IMG}
+    container_name: iroha_node_2
+    restart: always
+    environment:
+      - IROHA_HOME=/opt/iroha
+      - IROHA_CONF=iroha2.conf
+      - IROHA_NODEKEY=node2
+      - CCACHE_DIR=/tmp/ccache
+    volumes:
+      - ${PWD}:/opt/iroha/config
+      - ${PWD}/iroha2/tmp/block_store:/tmp/block_store
+      - ccache-data:/tmp/ccache
+    working_dir: /opt/iroha/config
+    entrypoint: /opt/iroha/config/entrypoint.sh
+    depends_on:
+      - postgres2
+
+  node3:
+    image: ${IROHA_PRJ}/${IROHA_IMG}
+    container_name: iroha_node_3
+    restart: always
+    environment:
+      - IROHA_HOME=/opt/iroha
+      - IROHA_CONF=iroha3.conf
+      - IROHA_NODEKEY=node3
+      - CCACHE_DIR=/tmp/ccache
+    volumes:
+      - ${PWD}:/opt/iroha/config
+      - ${PWD}/iroha3/tmp/block_store:/tmp/block_store
+      - ccache-data:/tmp/ccache
+    working_dir: /opt/iroha/config
+    entrypoint: /opt/iroha/config/entrypoint.sh
+    depends_on:
+      - postgres3
+
+  node4:
+    image: ${IROHA_PRJ}/${IROHA_IMG}
+    container_name: iroha_node_4
+    restart: always
+    environment:
+      - IROHA_HOME=/opt/iroha
+      - IROHA_CONF=iroha4.conf
+      - IROHA_NODEKEY=node4
+      - CCACHE_DIR=/tmp/ccache
+    volumes:
+      - ${PWD}:/opt/iroha/config
+      - ${PWD}/iroha4/tmp/block_store:/tmp/block_store
+      - ccache-data:/tmp/ccache
+    working_dir: /opt/iroha/config
+    entrypoint: /opt/iroha/config/entrypoint.sh
+    depends_on:
+      - postgres4
+
+  postgres1:
+    image: postgres:13.2-alpine
+    container_name: iroha_postgres_1
+    restart: always
+    environment:
+      - POSTGRES_USER=iroha
+      - POSTGRES_PASSWORD=HelloW0rld
+    volumes:
+      - ${PWD}/iroha1/var/lib/postgresql/data:/var/lib/postgresql/data
+
+  postgres2:
+    image: postgres:13.2-alpine
+    container_name: iroha_postgres_2
+    restart: always
+    environment:
+      - POSTGRES_USER=iroha
+      - POSTGRES_PASSWORD=HelloW0rld
+    volumes:
+      - ${PWD}/iroha2/var/lib/postgresql/data:/var/lib/postgresql/data
+
+  postgres3:
+    image: postgres:13.2-alpine
+    container_name: iroha_postgres_3
+    restart: always
+    environment:
+      - POSTGRES_USER=iroha
+      - POSTGRES_PASSWORD=HelloW0rld
+    volumes:
+      - ${PWD}/iroha3/var/lib/postgresql/data:/var/lib/postgresql/data
+
+  postgres4:
+    image: postgres:13.2-alpine
+    container_name: iroha_postgres_4
+    restart: always
+    environment:
+      - POSTGRES_USER=iroha
+      - POSTGRES_PASSWORD=HelloW0rld
+    volumes:
+      - ${PWD}/iroha4/var/lib/postgresql/data:/var/lib/postgresql/data
+
+volumes:
+  ccache-data:

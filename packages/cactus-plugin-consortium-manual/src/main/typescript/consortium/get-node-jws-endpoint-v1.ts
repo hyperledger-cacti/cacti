@@ -1,12 +1,9 @@
-import { v4 as uuidv4 } from "uuid";
 import { Express, Request, Response } from "express";
-import { JWS, JWK } from "jose";
-import jsonStableStringify from "json-stable-stringify";
 
 import {
-  JWSGeneral,
   IWebServiceEndpoint,
   IExpressRequestHandler,
+  IEndpointAuthzOptions,
 } from "@hyperledger/cactus-core-api";
 
 import { GetNodeJwsResponse } from "../generated/openapi/typescript-axios";
@@ -16,6 +13,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Checks,
+  IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -58,6 +56,16 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
+  getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
+    // TODO: make this an injectable dependency in the constructor
+    return {
+      get: async () => ({
+        isProtected: true,
+        requiredRoles: [],
+      }),
+    };
+  }
+
   public getExpressRequestHandler(): IExpressRequestHandler {
     return this.handleRequest.bind(this);
   }
@@ -69,58 +77,39 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return this.getOasPath().get.operationId;
+    return this.getOasPath().post.operationId;
   }
 
   public getPath(): string {
     const oasPath = this.getOasPath();
-    return oasPath.get["x-hyperledger-cactus"].http.path;
+    return oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const oasPath = this.getOasPath();
-    return oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
-  registerExpress(app: Express): IWebServiceEndpoint {
-    registerWebServiceEndpoint(app, this);
+
+  public async registerExpress(
+    expressApp: Express,
+  ): Promise<IWebServiceEndpoint> {
+    await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
+    const fnTag = "GetNodeJwsEndpoint#createJws()";
+    this.log.debug(`GET ${this.getPath()}`);
     try {
-      this.log.debug(`GET ${this.getPath()}`);
-
-      const jws = await this.createJws();
+      const jws = await this.options.plugin.getNodeJws();
       const body: GetNodeJwsResponse = { jws };
       res.status(200);
       res.json(body);
     } catch (ex) {
+      this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(500);
+      res.statusMessage = ex.message;
       res.json({ error: ex.stack });
-    }
-  }
-
-  public async createJws(): Promise<JWSGeneral> {
-    const fnTag = "GetNodeJwsEndpoint#createJws()";
-    const { keyPairPem, consortiumRepo: repo } = this.options;
-    try {
-      // TODO: move this logic here entirely to the plugin itself. We already
-      // have an issue open for it on GH most likely, someone may already be
-      // working on this very thing actually so please do double check prior
-      // to diving in and working on it to avoid redundant effort.
-      this.plugin.updateMetricNodeCount();
-      const keyPair = JWK.asKey(keyPairPem);
-      const payloadObject = { consortiumDatabase: repo.consortiumDatabase };
-      const payloadJson = jsonStableStringify(payloadObject);
-      const _protected = {
-        iat: Date.now(),
-        jti: uuidv4(),
-        iss: "Hyperledger Cactus",
-      };
-      // TODO: double check if this casting is safe (it is supposed to be)
-      return JWS.sign.general(payloadJson, keyPair, _protected) as JWSGeneral;
-    } catch (ex) {
-      throw new Error(`${fnTag} ${ex.stack}`);
     }
   }
 }

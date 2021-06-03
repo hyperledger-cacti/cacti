@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-consortium-manual",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "A web service plugin that provides management capabilities on a Cactus consortium as a whole for administrative purposes.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-consortium-manual.node.umd.min.js",
@@ -12,7 +12,7 @@
     "dist/*"
   ],
   "scripts": {
-    "generate-sdk": "openapi-generator generate --input-spec src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk": "docker run --rm -v \"${PWD}/../../:/local\" openapitools/openapi-generator-cli:v5.1.1 generate -i ./local/packages/cactus-plugin-consortium-manual/src/main/json/openapi.json -g typescript-axios -o ./local/packages/cactus-plugin-consortium-manual/src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "tsc": "tsc --project ./tsconfig.json",
     "pretsc": "npm run generate-sdk",
     "watch": "npm-watch",
@@ -83,13 +83,13 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.4.0",
-    "@hyperledger/cactus-core": "0.4.1",
-    "@hyperledger/cactus-core-api": "0.4.1",
+    "@hyperledger/cactus-common": "0.5.0",
+    "@hyperledger/cactus-core": "0.5.0",
+    "@hyperledger/cactus-core-api": "0.5.0",
     "axios": "0.21.1",
     "body-parser": "1.19.0",
     "express": "4.17.1",
-    "jose": "1.27.2",
+    "jose": "1.28.1",
     "json-stable-stringify": "1.0.1",
     "prom-client": "13.0.0",
     "typescript-optional": "2.0.1",

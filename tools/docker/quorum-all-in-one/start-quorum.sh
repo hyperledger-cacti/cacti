@@ -39,6 +39,7 @@ geth \
   --rpcport 8545 \
   --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-raft} \
   --port 21000 \
+  --allow-insecure-unlock \
   --unlock 0 \
   --password /passwords.txt \
   ${QUORUM_GETH_ARGS:-} ${GETH_ARGS_raft}

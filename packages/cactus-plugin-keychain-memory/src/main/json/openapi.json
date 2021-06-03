@@ -114,7 +114,7 @@
         },
         "requestBodies": {
             "keychain_get_entry_request_body": {
-                "description": "Requst body to obtain a keychain entry via its key",
+                "description": "Request body to obtain a keychain entry via its key",
                 "required": true,
                 "content": {
                     "application/json": {
@@ -125,7 +125,7 @@
                 }
             },
             "keychain_set_entry_request_body": {
-                "description": "Requst body to write/update a keychain entry via its key",
+                "description": "Request body to write/update a keychain entry via its key",
                 "required": true,
                 "content": {
                     "application/json": {

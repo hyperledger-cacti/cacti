@@ -33,6 +33,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DiscoveryOptions } from "fabric-network";
 import { SHIPMENT_CONTRACT_GO_SOURCE } from "../../go/shipment";
+import { IPluginKeychain } from "@hyperledger/cactus-core-api";
 
 export const org1Env = {
   CORE_PEER_LOCALMSPID: "Org1MSP",
@@ -47,6 +48,7 @@ export const org1Env = {
 
 export interface ISupplyChainAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
+  keychain?: IPluginKeychain;
 }
 
 /**
@@ -66,9 +68,10 @@ export class SupplyChainAppDummyInfrastructure {
   public readonly besu: BesuTestLedger;
   public readonly quorum: QuorumTestLedger;
   public readonly fabric: FabricTestLedgerV1;
+  public readonly keychain: IPluginKeychain;
   private readonly log: Logger;
-  private _quorumAccount: Account | undefined;
-  private _besuAccount: Account | undefined;
+  private _quorumAccount?: Account;
+  private _besuAccount?: Account;
 
   public get quorumAccount(): Account {
     if (!this._quorumAccount) {
@@ -107,6 +110,19 @@ export class SupplyChainAppDummyInfrastructure {
       imageName: "hyperledger/cactus-fabric-all-in-one",
       imageVersion: "2021-03-02-ssh-hotfix",
     });
+
+    if (this.options.keychain) {
+      this.keychain = this.options.keychain;
+      this.log.info("Reusing the provided keychain plugin...");
+    } else {
+      this.log.info("Instantiating new keychain plugin...");
+      this.keychain = new PluginKeychainMemory({
+        instanceId: uuidv4(),
+        keychainId: uuidv4(),
+        logLevel: this.options.logLevel || "INFO",
+      });
+    }
+    this.log.info("KeychainID=%o", this.keychain.getKeychainId());
   }
 
   public async stop(): Promise<void> {
@@ -147,16 +163,11 @@ export class SupplyChainAppDummyInfrastructure {
       let bookshelfRepository: IEthContractDeployment;
       let shipmentRepository: IFabricContractDeployment;
 
-      const keychainPlugin = new PluginKeychainMemory({
-        instanceId: uuidv4(),
-        keychainId: uuidv4(),
-        logLevel: this.options.logLevel || "INFO",
-      });
-      keychainPlugin.set(
+      await this.keychain.set(
         BookshelfRepositoryJSON.contractName,
         BookshelfRepositoryJSON,
       );
-      keychainPlugin.set(
+      await this.keychain.set(
         BambooHarvestRepositoryJSON.contractName,
         BambooHarvestRepositoryJSON,
       );
@@ -165,7 +176,7 @@ export class SupplyChainAppDummyInfrastructure {
         const rpcApiHttpHost = await this.quorum.getRpcApiHttpHost();
 
         const pluginRegistry = new PluginRegistry();
-        pluginRegistry.add(keychainPlugin);
+        pluginRegistry.add(this.keychain);
         const connector = new PluginLedgerConnectorQuorum({
           instanceId: "PluginLedgerConnectorQuorum_Contract_Deployment",
           rpcApiHttpHost,
@@ -180,9 +191,9 @@ export class SupplyChainAppDummyInfrastructure {
           web3SigningCredential: {
             ethAccount: this.quorumAccount.address,
             secret: this.quorumAccount.privateKey,
-            type: Web3SigningCredentialType.PRIVATEKEYHEX,
+            type: Web3SigningCredentialType.PrivateKeyHex,
           },
-          keychainId: keychainPlugin.getKeychainId(),
+          keychainId: this.keychain.getKeychainId(),
         });
         const {
           transactionReceipt: { contractAddress },
@@ -193,19 +204,21 @@ export class SupplyChainAppDummyInfrastructure {
           address: contractAddress as string,
           bytecode: BambooHarvestRepositoryJSON.bytecode,
           contractName: BambooHarvestRepositoryJSON.contractName,
-          keychainId: keychainPlugin.getKeychainId(),
+          keychainId: this.keychain.getKeychainId(),
         };
       }
 
       {
         this._besuAccount = await this.besu.createEthTestAccount(2000000);
         const rpcApiHttpHost = await this.besu.getRpcApiHttpHost();
+        const rpcApiWsHost = await this.besu.getRpcApiWsHost();
 
         const pluginRegistry = new PluginRegistry();
-        pluginRegistry.add(keychainPlugin);
+        pluginRegistry.add(this.keychain);
         const connector = new PluginLedgerConnectorBesu({
           instanceId: "PluginLedgerConnectorBesu_Contract_Deployment",
           rpcApiHttpHost,
+          rpcApiWsHost,
           logLevel: this.options.logLevel,
           pluginRegistry,
         });
@@ -213,13 +226,15 @@ export class SupplyChainAppDummyInfrastructure {
         const res = await connector.deployContract({
           contractName: BookshelfRepositoryJSON.contractName,
           bytecode: BookshelfRepositoryJSON.bytecode,
+          contractAbi: BookshelfRepositoryJSON.abi,
+          constructorArgs: [],
           gas: 1000000,
           web3SigningCredential: {
             ethAccount: this.besuAccount.address,
             secret: this.besuAccount.privateKey,
-            type: Web3SigningCredentialType.PRIVATEKEYHEX,
+            type: Web3SigningCredentialType.PrivateKeyHex,
           },
-          keychainId: keychainPlugin.getKeychainId(),
+          keychainId: this.keychain.getKeychainId(),
         });
         const {
           transactionReceipt: { contractAddress },
@@ -230,7 +245,7 @@ export class SupplyChainAppDummyInfrastructure {
           address: contractAddress as string,
           bytecode: BookshelfRepositoryJSON.bytecode,
           contractName: BookshelfRepositoryJSON.contractName,
-          keychainId: keychainPlugin.getKeychainId(),
+          keychainId: this.keychain.getKeychainId(),
         };
       }
 
@@ -243,22 +258,23 @@ export class SupplyChainAppDummyInfrastructure {
         };
 
         const pluginRegistry = new PluginRegistry();
-        pluginRegistry.add(keychainPlugin);
+        pluginRegistry.add(this.keychain);
         const connector = new PluginLedgerConnectorFabric({
           instanceId: "PluginLedgerConnectorFabric_Contract_Deployment",
           dockerBinary: "/usr/local/bin/docker",
           pluginRegistry,
+          peerBinary: "peer",
           sshConfig: sshConfig,
           logLevel: this.options.logLevel || "INFO",
           connectionProfile: connectionProfile,
           cliContainerEnv: org1Env,
           discoveryOptions: discoveryOptions,
           eventHandlerOptions: {
-            strategy: DefaultEventHandlerStrategy.NETWORKSCOPEALLFORTX,
+            strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
           },
         });
 
-        const res = await connector.deployContract({
+        const res = await connector.deployContractGoSourceV1({
           tlsRootCertFiles: org1Env.CORE_PEER_TLS_ROOTCERT_FILE as string,
           targetPeerAddresses: [org1Env.CORE_PEER_ADDRESS as string],
           policyDslSource: "OR('Org1MSP.member','Org2MSP.member')",
@@ -271,7 +287,10 @@ export class SupplyChainAppDummyInfrastructure {
           },
           moduleName: "shipment",
           targetOrganizations: [org1Env],
-          pinnedDeps: ["github.com/hyperledger/fabric@v1.4.8"],
+          pinnedDeps: [
+            "github.com/hyperledger/fabric@v1.4.8",
+            "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+          ],
         });
         this.log.debug(res);
 
