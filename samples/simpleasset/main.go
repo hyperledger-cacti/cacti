@@ -15,8 +15,12 @@ type SmartContract struct {
 	amc am.AssetManagementContract
 }
 
-func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface, ccType string, interopChaincodeId string) error {
+func (s *SmartContract) ConfigureInterop(interopChaincodeId string) {
   s.amc.Configure(interopChaincodeId)
+}
+
+func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface, ccType string, interopChaincodeId string) error {
+  s.ConfigureInterop(interopChaincodeId)
   if ccType == "Bond" {
     return s.InitBondAssetLedger(ctx)
   } else if ccType == "Token" {

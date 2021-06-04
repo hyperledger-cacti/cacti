@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package assetmgmt
+package assetmgmt_test
 
 import (
     "fmt"
@@ -22,6 +22,7 @@ import (
     pb "github.com/hyperledger/fabric-protos-go/peer"
     "github.com/golang/protobuf/proto"
     "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/protos-go/common"
+    am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
 )
 
 
@@ -255,19 +256,19 @@ func setCreator(stub *shimtest.MockStub, creator string) {
     stub.Creator = []byte(creator)
 }
 
-func createAssetMgmtCCInstance() (*AssetManagement, *shimtest.MockStub) {
-    amcc := new(AssetManagement)
+func createAssetMgmtCCInstance() (*am.AssetManagement, *shimtest.MockStub) {
+    amcc := new(am.AssetManagement)
     mockStub := shimtest.NewMockStub("Asset Management chaincode", amcc)
     setCreator(mockStub, clientId)
     return amcc, mockStub
 }
 
-func associateInteropCCInstance(amcc *AssetManagement, stub *shimtest.MockStub) (*InteropCC, *shimtest.MockStub) {
+func associateInteropCCInstance(amcc *am.AssetManagement, stub *shimtest.MockStub) (*InteropCC, *shimtest.MockStub) {
     icc := new(InteropCC)
     mockStub := shimtest.NewMockStub(interopCCId, icc)
     setCreator(mockStub, clientId)
     mockStub.MockInit("1", [][]byte{})
-    amcc.interopChaincodeId = interopCCId
+    amcc.Configure(interopCCId)
     stub.MockPeerChaincode(interopCCId, mockStub, mockStub.GetChannelID())
     return icc, mockStub
 }

@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package assetmgmt
+package assetmgmt_test
 
 import (
 	"os"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/mocks"
+	am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
 )
 
 const (
@@ -17,9 +18,9 @@ const (
 	interopChaincodeId      = "interopcc"
 )
 
-func prepMockStub() (*mocks.TransactionContext, *mocks.ChaincodeStub, AssetManagementContract) {
+func prepMockStub() (*mocks.TransactionContext, *mocks.ChaincodeStub, am.AssetManagementContract) {
 	transactionContext, chaincodeStub := prepMocks(myOrg1Msp, myOrg1Clientid)
-	amc := AssetManagementContract{}
+	amc := am.AssetManagementContract{}
 	amc.Configure(interopChaincodeId)
 	return transactionContext, chaincodeStub, amc
 }
