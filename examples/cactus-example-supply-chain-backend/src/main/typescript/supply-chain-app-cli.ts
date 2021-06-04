@@ -4,9 +4,12 @@ import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import { ISupplyChainAppOptions, SupplyChainApp } from "./supply-chain-app";
 
-export async function launchApp(): Promise<void> {
+export async function launchApp(
+  env?: NodeJS.ProcessEnv,
+  args?: string[],
+): Promise<void> {
   const configService = new ConfigService();
-  const config = configService.getOrCreate();
+  const config = configService.getOrCreate({ args, env });
   const serverOptions = config.getProperties();
   LoggerProvider.setLogLevel(serverOptions.logLevel);
 
@@ -24,5 +27,5 @@ export async function launchApp(): Promise<void> {
 }
 
 if (require.main === module) {
-  launchApp();
+  launchApp(process.env, process.argv);
 }

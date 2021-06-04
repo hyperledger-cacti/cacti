@@ -1,5 +1,5 @@
 # Note: You can use any Debian/Ubuntu based image you want. 
-FROM mcr.microsoft.com/vscode/devcontainers/base:0-buster
+FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-20.04
 
 # [Option] Install zsh
 ARG INSTALL_ZSH="true"
@@ -31,15 +31,6 @@ RUN apt-get update \
 RUN apt-get update \
     && apt-get install python3-pip -y
 
-# Install Node.js
-RUN apt-get update \
-    && curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
-    && apt-get install -y nodejs
-
-# Install modclean and clean redundant node folders
-RUN npm install modclean -g
-    
-
 VOLUME [ "/var/lib/docker" ]
 
 # Setting the ENTRYPOINT to docker-init.sh will start up the Docker Engine 
@@ -51,3 +42,13 @@ CMD [ "sleep", "infinity" ]
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
+
+COPY post-create-commands.sh /home/vscode/bin/
+
+# Installing Node Version Manager (nvm) and Node v14 (current LTS)
+USER vscode
+SHELL ["/bin/bash", "--login", "-i", "-c"]
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+RUN source /home/vscode/.bashrc && nvm install 14.17.0
+SHELL ["/bin/bash", "--login", "-c"]
+USER root
