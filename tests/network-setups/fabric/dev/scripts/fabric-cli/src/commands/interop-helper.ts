@@ -66,6 +66,10 @@ const command: GluegunCommand = {
               'Additional key to be sent to chaincode (used to store result if usign Write)'
           },
           {
+            name: '--username',
+            description: 'User for interop.'
+          },
+          {
             name: '--debug',
             description:
               'Shows debug logs when running. Disabled by default. To enable --debug=true'
@@ -110,7 +114,7 @@ const command: GluegunCommand = {
       mspId: options.mspId,
       logger
     })
-    const username = `User1@org1.${networkName}.com`
+    const username = options.username || `User1@org1.${networkName}.com`
     const [keyCert, keyCertError] = await handlePromise(
       getKeyAndCertForRemoteRequestbyUserName(wallet, username)
     )
