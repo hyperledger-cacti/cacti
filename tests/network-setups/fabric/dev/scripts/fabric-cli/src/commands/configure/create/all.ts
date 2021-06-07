@@ -38,7 +38,7 @@ const command: GluegunCommand = {
             description: 'Local network for command. <network1|network2>'
           },
           {
-            name: '--username',
+            name: '--user',
             description: 'User for interop.'
           },
           {
@@ -64,6 +64,22 @@ const command: GluegunCommand = {
       )
       return
     }
+
+    // Membership
+    logger.info(`Generating membership for ${options['local-network']}`)
+    await generateMembership(
+      process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
+      process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
+      networkEnv.connProfilePath,
+      options['local-network']
+    )
+    logger.info(
+      `Generated ${
+        options['local-network']
+      } secuirty group at ${getCurrentNetworkCredentialPath(
+        options['local-network']
+      )} `
+    )
 
     // Access Control
     logger.info(
@@ -95,29 +111,13 @@ const command: GluegunCommand = {
       )} `
     )
 
-    // Membership
-    logger.info(`Generating membership for ${options['local-network']}`)
-    await generateMembership(
-      process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
-      process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
-      networkEnv.connProfilePath,
-      options['local-network']
-    )
-    logger.info(
-      `Generated ${
-        options['local-network']
-      } secuirty group at ${getCurrentNetworkCredentialPath(
-        options['local-network']
-      )} `
-    )
-
     // Verification Policy
     logger.info(
       `Generating ${options['local-network']} network with verification policy`
     )
     templatePath = path.resolve(
           __dirname,
-          '../../../data/interop/verifiCationPolicyTemplate.json'
+          '../../../data/interop/verificationPolicyTemplate.json'
         )
     logger.info(`Template path: ${templatePath}`)
     await generateVerificationPolicy(

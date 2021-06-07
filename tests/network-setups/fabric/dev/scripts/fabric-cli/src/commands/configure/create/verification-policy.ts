@@ -69,7 +69,7 @@ const command: GluegunCommand = {
       ? path.resolve(options.template)
       : path.resolve(
           __dirname,
-          '../../../data/interop/verifiCationPolicyTemplate.json'
+          '../../../data/interop/verificationPolicyTemplate.json'
         )
     logger.info(`Template path: ${templatePath}`)
     await generateVerificationPolicy(
