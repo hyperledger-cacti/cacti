@@ -26,7 +26,7 @@ const command: GluegunCommand = {
         print,
         toolbox,
         `fabric-cli asset exchange-step --step=1 --target-network=network1 --secret=secrettext --timeout-duration=100 --locker=bob --recipient=alice --param=Type1:a04`,
-        'fabric-cli asset exchange-step --step=<1-8> --target-network=<network1|network2> --secret=<secret> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> --locker=<locker-userid> --recipient=<recipient-userid> --secret=<preimage> --contract-id=<contract-id> --param=<param>',
+        'fabric-cli asset exchange-step --step=<1-8> --target-network=<network1|network2> --secret=<secret> --hash=<hashvalue> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> --locker=<locker-userid> --recipient=<recipient-userid> --secret=<preimage> --contract-id=<contract-id> --param=<param>',
         [
           {
             name: '--step',
@@ -41,7 +41,12 @@ const command: GluegunCommand = {
           {
             name: '--secret',
             description:
-              'secret text to be used Asset owner to hash lock. (Required for step 5, 6)'
+              'secret text to be used by Asset owner to hash lock. (Required for step 5, 6)'
+          },
+          {
+            name: '--hash',
+            description:
+              'hash value in base64 to be used for HTLC. (use only one of secret or hash, do not use both options)'
           },
           {
             name: '--timeout-epoch',
@@ -114,6 +119,10 @@ const command: GluegunCommand = {
     {
       secret = options['secret']
       hash_secret = crypto.createHash('sha256').update(secret).digest('base64');
+    }
+    else if (options['hash'])
+    {
+      hash_secret = options['hash']
     }
 
     // Timeout
