@@ -145,14 +145,11 @@ const command: GluegunCommand = {
       param2 = params[1]
     }
 
-    const spinner = print.spin(`Asset Exchange:\n`)
-
     const netConfig = getNetworkConfig(options['target-network'])
     if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
       print.error(
         `Please use a valid --target-network. No valid environment found for ${options['target-network']} `
       )
-      spinner.fail(`Error`)
       return
     }
 
@@ -180,6 +177,8 @@ const command: GluegunCommand = {
     const recipientId = await networkR.wallet.get(recipient)
     const recipientCert = Buffer.from((recipientId).credentials.certificate).toString('base64')
 
+    const spinner = print.spin(`Asset Exchange:\n`)
+
     var res
 
     if (options['step']===true) {
@@ -191,28 +190,28 @@ const command: GluegunCommand = {
           `Please provide a asset type and id in --param`
         )
         spinner.fail(`Error`)
-        return
       }
-      try {
-        spinner.info(`Trying Asset Lock: ${param1}, ${param2} by ${locker} for ${recipient}`)
-        res = await AssetManager.createHTLC(networkL.contract,
-                        param1,
-                        param2,
-                        recipientCert,
-                        secret,
-                        hash_secret,
-                        timeout2,
-                        null)
-        if (!res.result) {
-          throw new Error()
+      else {
+        try {
+          spinner.info(`Trying Asset Lock: ${param1}, ${param2} by ${locker} for ${recipient}`)
+          res = await AssetManager.createHTLC(networkL.contract,
+                          param1,
+                          param2,
+                          recipientCert,
+                          secret,
+                          hash_secret,
+                          timeout2,
+                          null)
+          if (!res.result) {
+            throw new Error()
+          }
+          spinner.info(`Asset Locked: ${res.result}, preimage: ${res.preimage}, hashvalue: ${hash_secret}`)
+          spinner.succeed('Asset Exchange: Step 1 Complete.')
+        } catch(error) {
+            print.error(`Could not Lock Asset in ${options['target-network']}`)
+            spinner.fail(`Error`)
         }
-        spinner.info(`Asset Locked: ${res.result}, preimage: ${res.preimage}, hashvalue: ${hash_secret}`)
-      } catch(error) {
-          print.error(`Could not Lock Asset in ${options['target-network']}`)
-          spinner.fail(`Error`)
-          return
       }
-      spinner.succeed('Asset Exchange: Step 1 Complete.')
     }
 
     else if (options['step']=='2') {
@@ -221,22 +220,22 @@ const command: GluegunCommand = {
           `Please provide a asset type and id in --param`
         )
         spinner.fail(`Error`)
-        return
       }
-      try {
-        spinner.info(`Testing if asset is locked: ${param1}, ${param2} by ${locker} for ${recipient}`)
-        res = await AssetManager.isAssetLockedInHTLC(networkR.contract,
-                        param1,
-                        param2,
-                        recipientCert,
-                        lockerCert)
-        spinner.info(`Is Asset Locked Return: ${res}`)
-      } catch(error) {
-          print.error(`Could not call isAssetLockedInHTLC in ${options['target-network']}`)
-          spinner.fail(`Error`)
-          return
+      else {
+        try {
+          spinner.info(`Testing if asset is locked: ${param1}, ${param2} by ${locker} for ${recipient}`)
+          res = await AssetManager.isAssetLockedInHTLC(networkR.contract,
+                          param1,
+                          param2,
+                          recipientCert,
+                          lockerCert)
+          spinner.info(`Is Asset Locked Return: ${res}`)
+          spinner.succeed('Asset Exchange: Step 2 Complete.')
+        } catch(error) {
+            print.error(`Could not call isAssetLockedInHTLC in ${options['target-network']}`)
+            spinner.fail(`Error`)
+        }
       }
-      spinner.succeed('Asset Exchange: Step 2 Complete.')
     }
 
     else if (options['step']=='3') {
@@ -245,35 +244,34 @@ const command: GluegunCommand = {
           `Please provide a fungible asset type and num of units in --param`
         )
         spinner.fail(`Error`)
-        return
       }
-      if (options['secret'] || !options['hash']) {
+      else if (options['secret'] || !options['hash']) {
         print.error(
           `Please provide hash value, do not specify preimage for this step.`
         )
         spinner.fail(`Error`)
-        return
       }
-      try {
-        spinner.info(`Trying Fungible Asset Lock: ${param1}, ${param2} by ${locker} for ${recipient}`)
-        res = await AssetManager.createFungibleHTLC(networkL.contract,
-                        param1,
-                        param2,
-                        recipientCert,
-                        '',
-                        hash_secret,
-                        timeout,
-                        null)
-        if (!res.result) {
-          throw new Error()
+      else {
+        try {
+          spinner.info(`Trying Fungible Asset Lock: ${param1}, ${param2} by ${locker} for ${recipient}`)
+          res = await AssetManager.createFungibleHTLC(networkL.contract,
+                          param1,
+                          param2,
+                          recipientCert,
+                          '',
+                          hash_secret,
+                          timeout,
+                          null)
+          if (!res.result) {
+            throw new Error()
+          }
+          spinner.info(`Fungible Asset Locked, ContractId: ${res.result}, preimage: ${res.preimage}`)
+          spinner.succeed('Asset Exchange: Step 3 Complete.')
+        } catch(error) {
+            print.error(`Could not Lock Fungible Asset in ${options['target-network']}`)
+            spinner.fail(`Error`)
         }
-        spinner.info(`Fungible Asset Locked, ContractId: ${res.result}, preimage: ${res.preimage}`)
-      } catch(error) {
-          print.error(`Could not Lock Fungible Asset in ${options['target-network']}`)
-          spinner.fail(`Error`)
-          return
       }
-      spinner.succeed('Asset Exchange: Step 3 Complete.')
     }
 
     else if (options['step']=='4') {
@@ -282,20 +280,20 @@ const command: GluegunCommand = {
           `Please provide the contract id`
         )
         spinner.fail(`Error`)
-        return
       }
-      const contractId = options['contract-id']
-      try {
-        spinner.info(`Testing if fungible asset is locked: ${contractId}`)
-        res = await AssetManager.isFungibleAssetLockedInHTLC(networkR.contract,
-                        contractId)
-        spinner.info(`Is Fungible Asset Locked Return: ${res}`)
-      } catch(error) {
-          print.error(`Could not call isFungibleAssetLockedInHTLC in ${options['target-network']}`)
-          spinner.fail(`Error`)
-          return
+      else {
+        const contractId = options['contract-id']
+        try {
+          spinner.info(`Testing if fungible asset is locked: ${contractId}`)
+          res = await AssetManager.isFungibleAssetLockedInHTLC(networkR.contract,
+                          contractId)
+          spinner.info(`Is Fungible Asset Locked Return: ${res}`)
+          spinner.succeed('Asset Exchange: Step 4 Complete.')
+        } catch(error) {
+            print.error(`Could not call isFungibleAssetLockedInHTLC in ${options['target-network']}`)
+            spinner.fail(`Error`)
+        }
       }
-      spinner.succeed('Asset Exchange: Step 4 Complete.')
     }
 
     else if (options['step']=='5') {
@@ -304,31 +302,30 @@ const command: GluegunCommand = {
           `Please provide the preimage in --secret`
         )
         spinner.fail(`Error`)
-        return
       }
-      if (!options['contract-id']) {
+      else if (!options['contract-id']) {
         print.error(
           `Please provide the contract id`
         )
         spinner.fail(`Error`)
-        return
       }
-      const contractId = options['contract-id']
-      try {
-        spinner.info(`Trying Fungible Asset Claim: ${contractId}`)
-        res = await AssetManager.claimFungibleAssetInHTLC(networkR.contract,
-                        contractId,
-                        secret)
-        if (!res) {
-          throw new Error()
+      else {
+        const contractId = options['contract-id']
+        try {
+          spinner.info(`Trying Fungible Asset Claim: ${contractId}`)
+          res = await AssetManager.claimFungibleAssetInHTLC(networkR.contract,
+                          contractId,
+                          secret)
+          if (!res) {
+            throw new Error()
+          }
+          spinner.info(`Fungible Asset Claimed: ${res}`)
+          spinner.succeed('Asset Exchange: Step 5 Complete.')
+        } catch(error) {
+            print.error(`Could not claim fungible asset in ${options['target-network']}`)
+            spinner.fail(`Error`)
         }
-        spinner.info(`Fungible Asset Claimed: ${res}`)
-      } catch(error) {
-          print.error(`Could not claim fungible asset in ${options['target-network']}`)
-          spinner.fail(`Error`)
-          return
       }
-      spinner.succeed('Asset Exchange: Step 5 Complete.')
     }
 
     else if (options['step']=='6') {
@@ -337,25 +334,25 @@ const command: GluegunCommand = {
           `Please provide the preimage in --secret`
         )
         spinner.fail(`Error`)
-        return
       }
-      try {
-        spinner.info(`Trying Asset Claim: ${param1} ${param2}`)
-        res = await AssetManager.claimAssetInHTLC(networkR.contract,
-                        param1,
-                        param2,
-                        lockerCert,
-                        secret)
-        if (!res) {
-          throw new Error()
+      else {
+        try {
+          spinner.info(`Trying Asset Claim: ${param1} ${param2}`)
+          res = await AssetManager.claimAssetInHTLC(networkR.contract,
+                          param1,
+                          param2,
+                          lockerCert,
+                          secret)
+          if (!res) {
+            throw new Error()
+          }
+          spinner.info(`Asset Claimed: ${res}`)
+          spinner.succeed('Asset Exchange: All Steps Complete.')
+        } catch(error) {
+            print.error(`Could not claim asset in ${options['target-network']}`)
+            spinner.fail(`Error`)
         }
-        spinner.info(`Asset Claimed: ${res}`)
-      } catch(error) {
-          print.error(`Could not claim asset in ${options['target-network']}`)
-          spinner.fail(`Error`)
-          return
       }
-      spinner.succeed('Asset Exchange: All Steps Complete.')
     }
     else if (options['step']=='7') {
       if (!options['param']) {
@@ -363,22 +360,22 @@ const command: GluegunCommand = {
           `Please provide a asset type and id in --param`
         )
         spinner.fail(`Error`)
-        return
       }
-      try {
-        spinner.info(`Trying Asset Unlock: ${param1} ${param2}`)
-        res = await AssetManager.reclaimAssetInHTLC(networkL.contract,
-                                    param1,
-                                    param2,
-                                    recipientCert);
-        if (!res) {
-          throw new Error()
+      else {
+        try {
+          spinner.info(`Trying Asset Unlock: ${param1} ${param2}`)
+          res = await AssetManager.reclaimAssetInHTLC(networkL.contract,
+                                      param1,
+                                      param2,
+                                      recipientCert);
+          if (!res) {
+            throw new Error()
+          }
+          spinner.succeed(`Asset Reclaimed: ${res}`)
+        } catch(error) {
+            print.error(`Could not claim asset in ${options['target-network']}`)
+            spinner.fail(`Error`)
         }
-        spinner.succeed(`Asset Reclaimed: ${res}`)
-      } catch(error) {
-          print.error(`Could not claim asset in ${options['target-network']}`)
-          spinner.fail(`Error`)
-          return
       }
     }
     else if (options['step']=='8') {
@@ -387,21 +384,21 @@ const command: GluegunCommand = {
           `Please provide the contract id`
         )
         spinner.fail(`Error`)
-        return
       }
-      const contractId = options['contract-id']
-      try {
-        spinner.info(`Trying Fungible Asset Unlock, contractId: ${contractId}`)
-        res = await AssetManager.reclaimFungibleAssetInHTLC(networkL.contract,
-                                      contractId);
-        if (!res) {
-          throw new Error()
+      else {
+        const contractId = options['contract-id']
+        try {
+          spinner.info(`Trying Fungible Asset Unlock, contractId: ${contractId}`)
+          res = await AssetManager.reclaimFungibleAssetInHTLC(networkL.contract,
+                                        contractId);
+          if (!res) {
+            throw new Error()
+          }
+          spinner.succeed(`Fungible Asset Reclaimed: ${res}`)
+        } catch(error) {
+            print.error(`Could not claim asset in ${options['target-network']}`)
+            spinner.fail(`Error`)
         }
-        spinner.succeed(`Fungible Asset Reclaimed: ${res}`)
-      } catch(error) {
-          print.error(`Could not claim asset in ${options['target-network']}`)
-          spinner.fail(`Error`)
-          return
       }
     }
     else {
