@@ -206,7 +206,7 @@ const command: GluegunCommand = {
         if (!res.result) {
           throw new Error()
         }
-        spinner.info(`Asset Locked: ${res.result}, preimage: ${res.preimage}`)
+        spinner.info(`Asset Locked: ${res.result}, preimage: ${res.preimage}, hashvalue: ${hash_secret}`)
       } catch(error) {
           print.error(`Could not Lock Asset in ${options['target-network']}`)
           spinner.fail(`Error`)
