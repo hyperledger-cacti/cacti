@@ -66,7 +66,7 @@ const command: GluegunCommand = {
               'Additional key to be sent to chaincode (used to store result if usign Write)'
           },
           {
-            name: '--username',
+            name: '--user',
             description: 'User for interop.'
           },
           {
