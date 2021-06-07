@@ -1,4 +1,4 @@
-package assetmgmt
+package assetmgmt_test
 
 import (
 	"fmt"

@@ -1,23 +1,21 @@
-package main
+package main_test
 
 import (
 	"encoding/json"
 	"fmt"
 	"testing"
 	"encoding/base64"
+	"bytes"
 
 	"github.com/golang/protobuf/proto"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
-	"github.com/hyperledger-labs/weaver/samples/simpleasset/mocks"
+	sa "github.com/hyperledger-labs/weaver/samples/simpleasset"
 	"github.com/stretchr/testify/require"
 )
 
 func TestInitTokenAssetLedger(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
-	simpleToken := SmartContract{}
 	err := simpleToken.InitTokenAssetLedger(transactionContext)
 	require.NoError(t, err)
 
@@ -27,11 +25,7 @@ func TestInitTokenAssetLedger(t *testing.T) {
 }
 
 func TestCreateTokenAssetType(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
-
-	simpleToken := SmartContract{}
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
 	// Successful Case
 	res, err := simpleToken.CreateTokenAssetType(transactionContext, "", "", 0)
@@ -59,17 +53,14 @@ func TestCreateTokenAssetType(t *testing.T) {
 }
 
 func TestReadTokenAssetType(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
-	expectedAsset := &TokenAssetType{Issuer: "CentralBank", Value: 10}
+	expectedAsset := &sa.TokenAssetType{Issuer: "CentralBank", Value: 10}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
 	// Successful Read
 	chaincodeStub.GetStateReturns(bytes, nil)
-	simpleToken := SmartContract{}
 	asset, err := simpleToken.ReadTokenAssetType(transactionContext, "")
 	require.NoError(t, err)
 	require.Equal(t, expectedAsset, asset)
@@ -87,12 +78,9 @@ func TestReadTokenAssetType(t *testing.T) {
 }
 
 func TestDeleteTokenAssetType(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
 	chaincodeStub.DelStateReturns(nil)
-	simpleToken := SmartContract{}
 	err := simpleToken.DeleteTokenAssetType(transactionContext, "")
 	require.EqualError(t, err, "the token asset type  does not exist.")
 
@@ -109,17 +97,14 @@ func TestDeleteTokenAssetType(t *testing.T) {
 }
 
 func TestIssueTokenAssets(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
 	walletMap := make(map[string]uint64)
-	expectedAsset := &TokenWallet{WalletMap: walletMap}
+	expectedAsset := &sa.TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
 	// Checking succesful case
-	simpleToken := SmartContract{}
 	chaincodeStub.GetStateReturns(bytes, nil)
 	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "")
 	require.NoError(t, err)
@@ -142,17 +127,13 @@ func TestIssueTokenAssets(t *testing.T) {
 }
 
 func TestDeleteTokenAssets(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
-	expectedAsset := &TokenWallet{WalletMap: walletMap}
+	expectedAsset := &sa.TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
-
-	simpleToken := SmartContract{}
 
 	// Successful delete case
 	chaincodeStub.GetStateReturns(bytes, nil)
@@ -182,17 +163,13 @@ func TestDeleteTokenAssets(t *testing.T) {
 
 }
 func TestTransferTokenAssets(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
-	expectedAsset := &TokenWallet{WalletMap: walletMap}
+	expectedAsset := &sa.TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
-
-	simpleToken := SmartContract{}
 
 	chaincodeStub.GetStateReturns(bytes, nil)
 	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 2, "", "")
@@ -207,17 +184,13 @@ func TestTransferTokenAssets(t *testing.T) {
 	require.EqualError(t, err, "failed to read from world state: Failed to read state")
 }
 func TestGetBalance(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
-	expectedAsset := &TokenWallet{WalletMap: walletMap}
+	expectedAsset := &sa.TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
-
-	simpleToken := SmartContract{}
 
 	// Successful GetBalance case
 	chaincodeStub.GetStateReturnsOnCall(0, bytes, nil)
@@ -238,20 +211,17 @@ func TestGetBalance(t *testing.T) {
 }
 
 func TestGetMyWallet(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
 	expectedRes := createKeyValuePairs(walletMap)
-	expectedAsset := &TokenWallet{WalletMap: walletMap}
+	expectedAsset := &sa.TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
-	simpleToken := SmartContract{}
 	// Successful GetBalance case
 	chaincodeStub.GetStateReturnsOnCall(0, bytes, nil)
 	bal, err := simpleToken.GetMyWallet(transactionContext)
@@ -269,17 +239,13 @@ func TestGetMyWallet(t *testing.T) {
 }
 
 func TestTokenAssetsExist(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext, chaincodeStub, simpleToken := prepMockStub()
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
-	expectedAsset := &TokenWallet{WalletMap: walletMap}
+	expectedAsset := &sa.TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
-
-	simpleToken := SmartContract{}
 
 	// Token Assets exist case
 	chaincodeStub.GetStateReturns(bytes, nil)
@@ -315,4 +281,11 @@ func getTestTxCreatorECertBase64() string {
 	eCertBase64 := "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNVVENDQWZpZ0F3SUJBZ0lSQU5qaWdnVHRhSERGRmtIaUI3VnhPN013Q2dZSUtvWkl6ajBFQXdJd2N6RUxNQWtHQTFVRUJoTUNWVk14RXpBUkJnTlZCQWdUQ2tOaGJHbG1iM0p1YVdFeEZqQVVCZ05WQkFjVERWTmhiaUJHY21GdVkybHpZMjh4R1RBWEJnTlZCQW9URUc5eVp6RXVaWGhoYlhCc1pTNWpiMjB4SERBYUJnTlZCQU1URTJOaExtOXlaekV1WlhoaGJYQnNaUzVqYjIwd0hoY05NVGt3TkRBeE1EZzBOVEF3V2hjTk1qa3dNekk1TURnME5UQXdXakJ6TVFzd0NRWURWUVFHRXdKVlV6RVRNQkVHQTFVRUNCTUtRMkZzYVdadmNtNXBZVEVXTUJRR0ExVUVCeE1OVTJGdUlFWnlZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTVM1bGVHRnRjR3hsTG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1YjNKbk1TNWxlR0Z0Y0d4bExtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCT2VlYTRCNlM5ZTlyLzZUWGZFZUFmZ3FrNVdpcHZZaEdveGg1ZEZuK1g0bTN2UXZTQlhuVFdLVzczZVNnS0lzUHc5dExDVytwZW9yVnMxMWdieXdiY0dqYlRCck1BNEdBMVVkRHdFQi93UUVBd0lCcGpBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFnWUlLd1lCQlFVSEF3RXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXBCZ05WSFE0RUlnUWcxYzJHZmJTa3hUWkxIM2VzUFd3c2llVkU1QWhZNHNPQjVGOGEvaHM5WjhVd0NnWUlLb1pJemowRUF3SURSd0F3UkFJZ1JkZ1krNW9iMDNqVjJLSzFWdjZiZE5xM2NLWHc0cHhNVXY5MFZOc0tHdTBDSUE4Q0lMa3ZEZWg3NEFCRDB6QUNkbitBTkMyVVQ2Sk5UNnd6VHNLN3BYdUwKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ=="
 
 	return eCertBase64
+}
+func createKeyValuePairs(m map[string]uint64) string {
+    b := new(bytes.Buffer)
+    for key, value := range m {
+        fmt.Fprintf(b, "%s=\"%d\"\n", key, value)
+    }
+    return b.String()
 }

@@ -13,3 +13,6 @@ build:
 	npm install
 	npm run protos
 	npm run build
+
+clean:
+	rm -rf build node_modules package-lock.json
