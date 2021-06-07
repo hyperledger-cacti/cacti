@@ -22,8 +22,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli add user --target-network=network1--id=user --secret=userpw`,
-        `fabric-cli add user --target-network=<network-name> --id=<id> --secret=<secret>`,
+        `fabric-cli user add --target-network=network1 --id=user --secret=userpw`,
+        `fabric-cli user add --target-network=<network-name> --id=<id> --secret=<secret>`,
         [],
         command,
         ['user', 'add']
