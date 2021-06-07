@@ -247,13 +247,20 @@ const command: GluegunCommand = {
         spinner.fail(`Error`)
         return
       }
+      if (options['secret'] || !options['hash']) {
+        print.error(
+          `Please provide hash value, do not specify preimage for this step.`
+        )
+        spinner.fail(`Error`)
+        return
+      }
       try {
         spinner.info(`Trying Fungible Asset Lock: ${param1}, ${param2} by ${locker} for ${recipient}`)
         res = await AssetManager.createFungibleHTLC(networkL.contract,
                         param1,
                         param2,
                         recipientCert,
-                        secret,
+                        '',
                         hash_secret,
                         timeout,
                         null)
@@ -405,6 +412,8 @@ const command: GluegunCommand = {
     await networkR.gateway.disconnect()
 
     console.log('Gateways disconnected.')
+
+    process.exit()
   }
 }
 

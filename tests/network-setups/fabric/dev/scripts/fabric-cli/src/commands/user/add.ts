@@ -55,6 +55,7 @@ const command: GluegunCommand = {
                     userPwd,
                     true
                   )
+    process.exit()
   }
 }
 

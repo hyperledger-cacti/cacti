@@ -272,6 +272,7 @@ const command: GluegunCommand = {
     await network2U2.gateway.disconnect()
 
     console.log('Gateways disconnected.')
+    process.exit()
   }
 }
 
