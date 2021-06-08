@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 import Docker, { Container, ContainerInfo } from "dockerode";
-import axios from "axios";
 import Joi from "joi";
 import tar from "tar-stream";
 import { EventEmitter } from "events";
@@ -226,6 +225,18 @@ export class BesuTestLedger implements ITestLedger {
             "9001/tcp": {}, // supervisord - HTTP
             "9545/tcp": {}, // besu metrics
           },
+          // TODO: this can be removed once the new docker image is published and
+          // specified as the default one to be used by the tests.
+          Healthcheck: {
+            Test: [
+              "CMD-SHELL",
+              `curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' localhost:8545`,
+            ],
+            Interval: 1000000000, // 1 second
+            Timeout: 3000000000, // 3 seconds
+            Retries: 299,
+            StartPeriod: 3000000000, // 1 second
+          },
           // This is a workaround needed for macOS which has issues with routing
           // to docker container's IP addresses directly...
           // https://stackoverflow.com/a/39217691
@@ -233,7 +244,7 @@ export class BesuTestLedger implements ITestLedger {
           Env: this.envVars,
         },
         {},
-        (err: any) => {
+        (err: unknown) => {
           if (err) {
             reject(err);
           }
@@ -255,23 +266,23 @@ export class BesuTestLedger implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 120000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 180000): Promise<void> {
     const fnTag = "BesuTestLedger#waitForHealthCheck()";
-    const httpUrl = await this.getRpcApiHttpHost();
+    // const httpUrl = await this.getRpcApiHttpHost();
     const startedAt = Date.now();
-    let reachable = false;
+    let isHealthy = false;
     do {
-      try {
-        const res = await axios.get(httpUrl);
-        reachable = res.status > 199 && res.status < 300;
-      } catch (ex) {
-        reachable = false;
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
-        }
+      if (Date.now() >= startedAt + timeoutMs) {
+        throw new Error(`${fnTag} timed out (${timeoutMs}ms)`);
       }
-      await new Promise((resolve2) => setTimeout(resolve2, 100));
-    } while (!reachable);
+      const containerInfo = await this.getContainerInfo();
+      this.log.debug(`ContainerInfo.Status=%o`, containerInfo.Status);
+      this.log.debug(`ContainerInfo.State=%o`, containerInfo.State);
+      isHealthy = containerInfo.Status.endsWith("(healthy)");
+      if (!isHealthy) {
+        await new Promise((resolve2) => setTimeout(resolve2, 1000));
+      }
+    } while (!isHealthy);
   }
 
   public stop(): Promise<any> {

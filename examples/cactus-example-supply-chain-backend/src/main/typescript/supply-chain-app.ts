@@ -7,10 +7,10 @@ import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
 
 import {
   CactusNode,
-  Configuration,
   Consortium,
   ConsortiumDatabase,
   ConsortiumMember,
+  IPluginKeychain,
   Ledger,
   LedgerType,
 } from "@hyperledger/cactus-core-api";
@@ -50,11 +50,17 @@ import {
   SupplyChainAppDummyInfrastructure,
   org1Env,
 } from "./infrastructure/supply-chain-app-dummy-infrastructure";
+import {
+  Configuration,
+  DefaultApi as SupplyChainApi,
+} from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { SupplyChainCactusPlugin } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { DiscoveryOptions } from "fabric-network";
 
 export interface ISupplyChainAppOptions {
+  disableSignalHandlers?: true;
   logLevel?: LogLevelDesc;
+  keychain?: IPluginKeychain;
 }
 
 export type ShutdownHook = () => Promise<void>;
@@ -63,6 +69,34 @@ export class SupplyChainApp {
   private readonly log: Logger;
   private readonly shutdownHooks: ShutdownHook[];
   private readonly ledgers: SupplyChainAppDummyInfrastructure;
+  public readonly keychain: IPluginKeychain;
+  private _besuApiClient?: BesuApi;
+  private _quorumApiClient?: QuorumApi;
+  private _fabricApiClient?: FabricApi;
+
+  public get besuApiClientOrThrow(): BesuApi {
+    if (this._besuApiClient) {
+      return this._besuApiClient;
+    } else {
+      throw new Error("Invalid state: ledgers were not started yet.");
+    }
+  }
+
+  public get quorumApiClientOrThrow(): QuorumApi {
+    if (this._quorumApiClient) {
+      return this._quorumApiClient;
+    } else {
+      throw new Error("Invalid state: ledgers were not started yet.");
+    }
+  }
+
+  public get fabricApiClientOrThrow(): FabricApi {
+    if (this._fabricApiClient) {
+      return this._fabricApiClient;
+    } else {
+      throw new Error("Invalid state: ledgers were not started yet.");
+    }
+  }
 
   public constructor(public readonly options: ISupplyChainAppOptions) {
     const fnTag = "SupplyChainApp#constructor()";
@@ -72,20 +106,39 @@ export class SupplyChainApp {
     }
     const { logLevel } = options;
 
-    this.ledgers = new SupplyChainAppDummyInfrastructure({ logLevel });
-    this.shutdownHooks = [];
-
     const level = logLevel || "INFO";
     const label = "supply-chain-app";
     this.log = LoggerProvider.getOrCreate({ level, label });
+
+    if (this.options.keychain) {
+      this.keychain = this.options.keychain;
+      this.log.info("Reusing the provided keychain plugin...");
+    } else {
+      this.log.info("Instantiating new keychain plugin...");
+      this.keychain = new PluginKeychainMemory({
+        instanceId: uuidv4(),
+        keychainId: uuidv4(),
+        logLevel: this.options.logLevel || "INFO",
+      });
+    }
+    this.log.info("KeychainID=%o", this.keychain.getKeychainId());
+
+    this.ledgers = new SupplyChainAppDummyInfrastructure({
+      logLevel,
+      keychain: this.keychain,
+    });
+    this.shutdownHooks = [];
   }
 
-  public async start(): Promise<void> {
+  public async start(): Promise<IStartInfo> {
     this.log.debug(`Starting SupplyChainApp...`);
 
-    exitHook((callback: IAsyncExitHookDoneCallback) => {
-      this.stop().then(callback);
-    });
+    if (!this.options.disableSignalHandlers) {
+      exitHook((callback: IAsyncExitHookDoneCallback) => {
+        this.stop().then(callback);
+      });
+      this.log.debug(`Registered signal handlers for graceful auto-shutdown`);
+    }
 
     await this.ledgers.start();
     this.onShutdown(() => this.ledgers.stop());
@@ -93,17 +146,16 @@ export class SupplyChainApp {
     const contractsInfo = await this.ledgers.deployContracts();
 
     const besuAccount = await this.ledgers.besu.createEthTestAccount();
+    await this.keychain.set(besuAccount.address, besuAccount.privateKey);
     const quorumAccount = await this.ledgers.quorum.createEthTestAccount();
+    await this.keychain.set(quorumAccount.address, quorumAccount.privateKey);
 
     const enrollAdminOut = await this.ledgers.fabric.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await this.ledgers.fabric.enrollUser(adminWallet);
-    const keychainEntryKey = "user2";
-    const keychainEntryValue = JSON.stringify(userIdentity);
-
-    const keychainIdA = "PluginKeychainMemory_A";
-    const keychainIdB = "PluginKeychainMemory_B";
-    const keychainIdC = "PluginKeychainMemory_C";
+    const fabricUserKeychainKey = "user2";
+    const fabricUserKeychainValue = JSON.stringify(userIdentity);
+    await this.keychain.set(fabricUserKeychainKey, fabricUserKeychainValue);
 
     // Reserve the ports where the Cactus nodes will run API servers, GUI
     const httpApiA = await Servers.startOnPort(4000, "0.0.0.0");
@@ -178,15 +230,11 @@ export class SupplyChainApp {
           fabricApiClient,
           web3SigningCredential: {
             keychainEntryKey: besuAccount.address,
-            keychainId: keychainIdA,
+            keychainId: this.keychain.getKeychainId(),
             type: Web3SigningCredentialType.CactusKeychainRef,
           },
         }),
-        new PluginKeychainMemory({
-          instanceId: uuidv4(),
-          keychainId: keychainIdA,
-          backend: new Map([[besuAccount.address, besuAccount.privateKey]]),
-        }),
+        this.keychain,
       ],
     });
 
@@ -200,7 +248,7 @@ export class SupplyChainApp {
 
     registryA.add(connectorBesu);
 
-    await this.startNode(httpApiA, httpGuiA, registryA);
+    const apiServerA = await this.startNode(httpApiA, httpGuiA, registryA);
 
     this.log.info(`Configuring Cactus Node for Ledger B...`);
 
@@ -222,15 +270,11 @@ export class SupplyChainApp {
           fabricApiClient,
           web3SigningCredential: {
             keychainEntryKey: quorumAccount.address,
-            keychainId: keychainIdB,
+            keychainId: this.keychain.getKeychainId(),
             type: Web3SigningCredentialType.CactusKeychainRef,
           },
         }),
-        new PluginKeychainMemory({
-          instanceId: uuidv4(),
-          keychainId: keychainIdB,
-          backend: new Map([[quorumAccount.address, quorumAccount.privateKey]]),
-        }),
+        this.keychain,
       ],
     });
 
@@ -243,7 +287,7 @@ export class SupplyChainApp {
 
     registryB.add(quorumConnector);
 
-    await this.startNode(httpApiB, httpGuiB, registryB);
+    const apiServerB = await this.startNode(httpApiB, httpGuiB, registryB);
 
     this.log.info(`Configuring Cactus Node for Ledger C...`);
 
@@ -265,11 +309,7 @@ export class SupplyChainApp {
           fabricApiClient,
           fabricEnvironment: org1Env,
         }),
-        new PluginKeychainMemory({
-          instanceId: uuidv4(),
-          keychainId: keychainIdC,
-          backend: new Map([[keychainEntryKey, keychainEntryValue]]),
-        }),
+        this.keychain,
       ],
     });
 
@@ -296,7 +336,25 @@ export class SupplyChainApp {
 
     registryC.add(fabricConnector);
 
-    await this.startNode(httpApiC, httpGuiC, registryC);
+    const apiServerC = await this.startNode(httpApiC, httpGuiC, registryC);
+
+    return {
+      apiServerA,
+      apiServerB,
+      apiServerC,
+      besuApiClient,
+      fabricApiClient,
+      quorumApiClient,
+      supplyChainApiClientA: new SupplyChainApi(
+        new Configuration({ basePath: nodeApiHostA }),
+      ),
+      supplyChainApiClientB: new SupplyChainApi(
+        new Configuration({ basePath: nodeApiHostA }),
+      ),
+      supplyChainApiClientC: new SupplyChainApi(
+        new Configuration({ basePath: nodeApiHostA }),
+      ),
+    };
   }
 
   public async stop(): Promise<void> {
@@ -454,4 +512,16 @@ export class SupplyChainApp {
 
     return apiServer;
   }
+}
+
+export interface IStartInfo {
+  readonly apiServerA: ApiServer;
+  readonly apiServerB: ApiServer;
+  readonly apiServerC: ApiServer;
+  readonly besuApiClient: BesuApi;
+  readonly quorumApiClient: QuorumApi;
+  readonly fabricApiClient: FabricApi;
+  readonly supplyChainApiClientA: SupplyChainApi;
+  readonly supplyChainApiClientB: SupplyChainApi;
+  readonly supplyChainApiClientC: SupplyChainApi;
 }
