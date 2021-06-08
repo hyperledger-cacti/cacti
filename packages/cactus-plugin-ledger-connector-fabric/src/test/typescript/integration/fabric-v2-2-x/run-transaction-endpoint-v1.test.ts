@@ -65,7 +65,7 @@ test(testCase, async (t: Test) => {
     publishAllPorts: true,
     logLevel,
     imageName: "hyperledger/cactus-fabric2-all-in-one",
-    imageVersion: "2021-03-08-hotfix-test-network",
+    imageVersion: "2021-04-20-nodejs",
     envVars: new Map([
       ["FABRIC_VERSION", "2.2.0"],
       ["CA_VERSION", "1.4.9"],

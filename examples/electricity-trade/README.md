@@ -43,11 +43,11 @@ Before you begin, you need to check that you have all the prerequisites installe
 		8f50d8fbe985        hyperledger/sawtooth-validator:nightly             "bash -c 'sawadm key…"   4 hours ago         Up 4 hours          0.0.0.0:4004->4004/tcp                                   sawtooth-validator-default
 		b519eb5ed1cd        ethereum/client-go:v1.8.27                         "geth --rpc --networ…"   4 hours ago         Up 4 hours          8546/tcp, 0.0.0.0:8545->8545/tcp, 30303/tcp, 30303/udp   geth1
 		```
-1. Build validators, packages, and the cartrade app:
+1. Build validators, packages, and the electricity trade app:
 	```
 	./script-build-all.sh
 	```
-1. Start validators and the cartrade app
+1. Start validators and the electricity trade app
 	- Please open three consoles and execute the following:.
 	- Start the validator for Sawtooth on the first console using the port 5140:
 		```
@@ -57,7 +57,7 @@ Before you begin, you need to check that you have all the prerequisites installe
 		```
 		./script-start-validator-ethereum.sh
 		```
-	- Start the cartrade app on the third console using the port 5034:
+	- Start the electricity trade app on the third console using the port 5034:
 		```
 		./script-start-electricity-trade.sh
 		```
@@ -131,10 +131,9 @@ Before you begin, you need to check that you have all the prerequisites installe
 		- The result: `{"status":200,"amount":24}`
 	- (The result shows that the asset was transferred between Ethereum addresses depending on the value of the change in Sawtooth intkey.)
 
-## How to stop the application and Docker containers
+## How to stop the application and cleanup Docker containers
 
-1. Stop the above validators (`./script-start-validator-ethereum.sh` and `./script-start-validator-sawtooth.sh`) and the cartrade app (`./script-start-electricity-trade.sh`).
+1. Stop the above validators (`./script-start-validator-ethereum.sh` and `./script-start-validator-sawtooth.sh`) and the electricity trade app (`./script-start-electricity-trade.sh`).
 	- Press Ctrl+C on the above three consoles.
-1. Stop the docker containers of Ethereum and Fabric
-	- Press the command `docker stop <CONTAINER ID>` to stop the container corresponding to the above containers which were launched by `./script-start-ledgers.sh` on the boot method. If you want to destroy the docker containers, press the command `docker rm <CONTAINER ID>` after the above.
-	- If any other docker containers are not running on your machine, you can destroy the Docker containers only with `docker ps -aq | xargs docker stop` and `docker ps -aq | xargs docker rm`.
+1. Cleanup the docker containers of Ethereum and Fabric
+	- Run `./cleanup.sh`
