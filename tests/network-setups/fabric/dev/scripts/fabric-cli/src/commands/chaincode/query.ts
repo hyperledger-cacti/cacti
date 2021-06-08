@@ -21,7 +21,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli chaincode  invoke --local-network=network1 mychannel interop Read '["56612afd-6730-4206-b25e-6d5d592789d3"]'`,
+        `fabric-cli chaincode query --local-network=network1 mychannel interop Read '["56612afd-6730-4206-b25e-6d5d592789d3"]'`,
         'fabric-cli chaincode --local-network=<network1|network2> --user=<user-id> query <channel-name> <contract-name> <function-name> <args array>',
         [
           {

@@ -12,13 +12,15 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
 import {
+  generateAccessControl,
+  getCurrentNetworkCredentialPath,
   generateVerificationPolicy,
-  getCurrentNetworkCredentialPath
+  generateMembership
 } from '../../../helpers/fabric-functions'
 
 const command: GluegunCommand = {
-  name: 'verification-policy',
-  description: 'Generates the verification policy for the local network',
+  name: 'all',
+  description: 'Generates the access-control, membership, and verification-policy for the local network',
   run: async toolbox => {
     const {
       print,
@@ -28,16 +30,16 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli configure  --local-network=network1 verification-policy',
-        'fabric-cli configure  --local-network=<network1|network2> verification-policy',
+        'fabric-cli configure create all --local-network=network1',
+        'fabric-cli configure create all --local-network=<network1|network2>',
         [
           {
             name: '--local-network',
             description: 'Local network for command. <network1|network2>'
           },
           {
-            name: '--template',
-            description: 'Path to file to use as a template'
+            name: '--user',
+            description: 'User for interop.'
           },
           {
             name: '--debug',
@@ -62,12 +64,58 @@ const command: GluegunCommand = {
       )
       return
     }
+
+    // Membership
+    logger.info(`Generating membership for ${options['local-network']}`)
+    await generateMembership(
+      process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
+      process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
+      networkEnv.connProfilePath,
+      options['local-network']
+    )
+    logger.info(
+      `Generated ${
+        options['local-network']
+      } secuirty group at ${getCurrentNetworkCredentialPath(
+        options['local-network']
+      )} `
+    )
+
+    // Access Control
+    logger.info(
+      `Generating ${options['local-network']} network with access control`
+    )
+    const username =
+      options.username || `User1@org1.${options['local-network']}.com`
+
+    let templatePath = path.resolve(
+          __dirname,
+          '../../../data/interop/accessControlTemplate.json'
+        )
+    logger.info(`Template path: ${templatePath}`)
+    await generateAccessControl(
+      process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
+      process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
+      networkEnv.connProfilePath,
+      options['local-network'],
+      templatePath,
+      username,
+      global.__DEFAULT_MSPID__,
+      logger
+    )
+    logger.info(
+      `Generated ${
+        options['local-network']
+      } access control at  ${getCurrentNetworkCredentialPath(
+        options['local-network']
+      )} `
+    )
+
+    // Verification Policy
     logger.info(
       `Generating ${options['local-network']} network with verification policy`
     )
-    const templatePath = options.template
-      ? path.resolve(options.template)
-      : path.resolve(
+    templatePath = path.resolve(
           __dirname,
           '../../../data/interop/verificationPolicyTemplate.json'
         )
