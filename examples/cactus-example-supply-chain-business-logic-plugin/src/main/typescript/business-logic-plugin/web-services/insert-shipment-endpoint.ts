@@ -25,11 +25,13 @@ import OAS from "../../../json/openapi.json";
 export interface IInsertShipmentEndpointOptions {
   logLevel?: LogLevelDesc;
   fabricApi: FabricApi;
+  keychainId: string;
 }
 
 export class InsertShipmentEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "InsertShipmentEndpoint";
   private readonly log: Logger;
+  private readonly keychainId: string;
 
   public get className(): string {
     return InsertShipmentEndpoint.CLASS_NAME;
@@ -39,9 +41,12 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.fabricApi, `${fnTag} options.fabricApi`);
+    Checks.truthy(opts.keychainId, `${fnTag} options.keychain`);
     const level = this.opts.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
+
+    this.keychainId = opts.keychainId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -92,7 +97,7 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
       this.log.debug(`${tag} %o`, shipment);
       const request: RunTransactionRequest = {
         signingCredential: {
-          keychainId: "PluginKeychainMemory_C",
+          keychainId: this.keychainId,
           keychainRef: "user2",
         },
         channelName: "mychannel",

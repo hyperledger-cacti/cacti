@@ -1,4 +1,4 @@
-const tap = require("tap");
+import test, { Test } from "tape-promise/tape";
 import { AddressInfo } from "net";
 import { TLSSocket } from "tls";
 import {
@@ -19,27 +19,27 @@ const log: Logger = LoggerProvider.getOrCreate({
   level: "TRACE",
 });
 
-tap.test("works with HTTPS NodeJS module", async (assert: any) => {
-  assert.ok(SelfSignedPkiGenerator, "class present on API surface");
+test("works with HTTPS NodeJS module", async (t: Test) => {
+  t.ok(SelfSignedPkiGenerator, "class present on API surface");
 
   const generator = new SelfSignedPkiGenerator();
-  assert.ok(generator, "Instantiated SelfSignedCertificateGenerator OK.");
+  t.ok(generator, "Instantiated SelfSignedCertificateGenerator OK.");
 
   const serverCert: IPki = generator.create("localhost");
-  assert.ok(serverCert, "serverCert truthy");
-  assert.ok(serverCert.certificatePem, "serverCert.certificatePem truthy");
-  assert.ok(serverCert.privateKeyPem, "serverCert.privateKeyPem truthy");
-  assert.ok(serverCert.certificate, "serverCert.certificate truthy");
-  assert.ok(serverCert.keyPair, "serverCert.keyPair truthy");
+  t.ok(serverCert, "serverCert truthy");
+  t.ok(serverCert.certificatePem, "serverCert.certificatePem truthy");
+  t.ok(serverCert.privateKeyPem, "serverCert.privateKeyPem truthy");
+  t.ok(serverCert.certificate, "serverCert.certificate truthy");
+  t.ok(serverCert.keyPair, "serverCert.keyPair truthy");
 
   // make sure the client cert has a different common name otherwise they collide and everything breaks in this test
   const clientCert: IPki = generator.create("client.localhost", serverCert);
-  assert.ok(clientCert, "clientCert truthy");
-  assert.ok(clientCert.certificatePem, "clientCert.certificatePem truthy");
-  assert.ok(clientCert.privateKeyPem, "clientCert.privateKeyPem truthy");
-  assert.ok(clientCert.certificate, "clientCert.certificate truthy");
-  assert.ok(clientCert.keyPair, "clientCert.keyPair truthy");
-  assert.ok(
+  t.ok(clientCert, "clientCert truthy");
+  t.ok(clientCert.certificatePem, "clientCert.certificatePem truthy");
+  t.ok(clientCert.privateKeyPem, "clientCert.privateKeyPem truthy");
+  t.ok(clientCert.certificate, "clientCert.certificate truthy");
+  t.ok(clientCert.keyPair, "clientCert.keyPair truthy");
+  t.ok(
     serverCert.certificate.verify(clientCert.certificate),
     "Server cert verified client cert OK",
   );
@@ -82,15 +82,15 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
     aServer.once("tlsClientError", (err: Error) => reject(err));
     aServer.once("listening", () => resolve(aServer));
     aServer.listen(0, "localhost");
-    assert.tearDown(() => aServer.close());
+    test.onFinish(() => aServer.close());
   });
 
-  assert.ok(server, "HTTPS Server object truthy");
-  assert.ok(server.listening, "HTTPS Server is indeed listening");
+  t.ok(server, "HTTPS Server object truthy");
+  t.ok(server.listening, "HTTPS Server is indeed listening");
 
   const addressInfo = server.address() as AddressInfo;
-  assert.ok(addressInfo, "HTTPS Server provided truthy AddressInfo");
-  assert.ok(addressInfo.port, "HTTPS Server provided truthy AddressInfo.port");
+  t.ok(addressInfo, "HTTPS Server provided truthy AddressInfo");
+  t.ok(addressInfo.port, "HTTPS Server provided truthy AddressInfo.port");
   log.debug("AddressInfo for test HTTPS server: %j", addressInfo);
 
   const response = await new Promise((resolve, reject) => {
@@ -130,6 +130,7 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
         }
       });
     });
+    t.ok("req", "req truthy OK");
 
     req.on("error", (error) => {
       log.error("Failed to send request: ", error);
@@ -138,8 +139,8 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
     req.end();
   });
 
-  assert.ok(response, "Server response truthy");
-  assert.equal(response, MESSAGE, `Server responded with "${MESSAGE}"`);
+  t.ok(response, "Server response truthy");
+  t.equal(response, MESSAGE, `Server responded with "${MESSAGE}"`);
 
-  assert.end();
+  t.end();
 });
