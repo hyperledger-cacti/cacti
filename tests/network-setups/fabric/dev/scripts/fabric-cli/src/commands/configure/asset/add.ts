@@ -97,6 +97,7 @@ const command: GluegunCommand = {
       ccType: options['type'],
       logger: logger
     })
+    process.exit()
   }
 }
 

@@ -48,6 +48,7 @@ const command: GluegunCommand = {
       logger.debug('Debugging is enabled')
     }
     await configureNetwork(options['local-network'], logger)
+    process.exit()
   }
 }
 

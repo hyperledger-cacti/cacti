@@ -114,22 +114,18 @@ const command: GluegunCommand = {
     // console.log(user1, assetType, assetId)
     // console.log(user2, fungibleAssetType, fungibleAssetAmt)
 
-    const spinner = print.spin(`Asset Exchange:\n`)
-
     const net1Config = getNetworkConfig(options['network1'])
     const net2Config = getNetworkConfig(options['network2'])
     if (!net1Config.connProfilePath || !net1Config.channelName || !net1Config.chaincode) {
       print.error(
         `Please use a valid --network1. No valid environment found for ${options['network1']} `
       )
-      spinner.fail(`Error`)
       return
     }
     if (!net2Config.connProfilePath || !net2Config.channelName || !net2Config.chaincode) {
       print.error(
         `Please use a valid --network2. No valid environment found for ${options['network2']} `
       )
-      spinner.fail(`Error`)
       return
     }
 
@@ -183,6 +179,8 @@ const command: GluegunCommand = {
     // console.log(user1CertN2)
     // console.log(user2CertN1)
 
+    const spinner = print.spin(`Asset Exchange:\n`)
+
     var res
     var contractId
 
@@ -203,7 +201,7 @@ const command: GluegunCommand = {
     } catch(error) {
         print.error(`Could not Lock Asset in ${options['network1']}`)
         spinner.fail(`Error`)
-        return
+        process.exit()
     }
 
     try {
@@ -225,7 +223,7 @@ const command: GluegunCommand = {
         print.error(`Could not Lock Fungible Asset in ${options['network2']}`)
         res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
-        return
+        process.exit()
     }
 
     try {
@@ -242,7 +240,7 @@ const command: GluegunCommand = {
         res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
         res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
-        return
+        process.exit()
     }
 
 
@@ -262,7 +260,7 @@ const command: GluegunCommand = {
         res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
         res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
-        return
+        process.exit()
     }
     spinner.succeed('Asset Exchange Complete.')
 
@@ -272,6 +270,7 @@ const command: GluegunCommand = {
     await network2U2.gateway.disconnect()
 
     console.log('Gateways disconnected.')
+    process.exit()
   }
 }
 

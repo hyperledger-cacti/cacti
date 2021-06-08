@@ -3,34 +3,34 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# fabric-cli 
+# fabric-cli
 
 A CLI for interacting with the fabric test-net and relays. Made using [gluegun.js](https://infinitered.github.io/gluegun/#/)
 
-fabric-cli options: 
+fabric-cli options:
 
 ![cli options](./cli-options.png)
 
---help can be called on every command and provides examples and usage. 
+--help can be called on every command and provides examples and usage.
 
 More documentation can be found [here](docs/commands.md)
 
-# Folder Structure 
+# Folder Structure
     .
-    ├── build                      # Compiled files 
-    ├── docs                       # Documentation files 
+    ├── build                      # Compiled files
+    ├── docs                       # Documentation files
     ├── src                        # Source files
     │   ├── commands               # Commands for the cli. Subcommands are in named folders
     │   ├── data                   # Data used across the commands, includes credentials for other networks and basic data to initialise the network with
     │    ├── helpers                # Helper functions that are used across the commands
-    │   └── wallet-${networkname}  # Wallets used by the CLI to connect with the fabric networks. 
+    │   └── wallet-${networkname}  # Wallets used by the CLI to connect with the fabric networks.
     └── ...
 
-Another naming convention made is inside the commands folder files suffixed with "`-helper`" are used to for the `--help` options for each command. 
+Another naming convention made is inside the commands folder files suffixed with "`-helper`" are used to for the `--help` options for each command.
 
 # Installation
 
-The tool can be installed via npm or manually. If no development is required it is recommended to install via npm. 
+The tool can be installed via npm or manually. If no development is required it is recommended to install via npm.
 
 ## Installing with npm
 
@@ -40,7 +40,7 @@ Add contents of the `.npmrc` to the `.npmrc` located at `~/.npmrc`, be careful n
 
 then run `npm install -g @res-dlt-interop/fabric-cli`
 
-NOTE: If installing this way it is required to set up the env and config through the cli using either `fabric-cli env set <key> <value>` or `fabric-cli env set-file <file-path>`. Refer to the `.env.template` and `config.json `to determine what values are needed. 
+NOTE: If installing this way it is required to set up the env and config through the cli using either `fabric-cli env set <key> <value>` or `fabric-cli env set-file <file-path>`. Refer to the `.env.template` and `config.json `to determine what values are needed.
 
 ## Installing manually
 
@@ -61,7 +61,7 @@ Set up `.npmrc` by copying across the `.npmrc.template` and updating the values.
 
 Have `yarn` installed and have Node >= 11.14.0 <= 16.0.0
 
-Run `yarn` to install dependencies. 
+Run `yarn` to install dependencies.
 
 ### Development
 
@@ -71,7 +71,7 @@ and
 
 `yarn link`
 
-Then run 
+Then run
 
 `$ fabric-cli`
 
@@ -90,7 +90,7 @@ Setting env is not required inside docker, as env variables are already declared
 * `fabric-cli configure all network1 network2`.
 
 
-## Example Invoke 
+## Example Invoke
 
 To record a key `test` with the value `teststate` via the `simplestate` contract deployed on the `mychannel` channel in `network1`, run:
 ```
@@ -103,7 +103,7 @@ $ fabric-cli chaincode query mychannel simplestate read '["test"]' --local-netwo
 
 NOTE: Use the `--help` flag with any command to view examples and usage.
 
-## Publishing CLI 
+## Publishing CLI
 
 Run `npm publish` will error if same version is already published. Will need the artifactory token, will error if same version is already published. Will need the artifactory token.
 
@@ -112,14 +112,14 @@ Run `npm publish` will error if same version is already published. Will need the
 1) Go to IBM artifactory (https://na.artifactory.swg-devops.com/artifactory/)
 2) Click on your email id on top right
 3) Generate/Copy the API key from profile, let's say it is - "ThisIsMyAPIKey"
-4) Run this command on your system - 
+4) Run this command on your system -
 	 curl --header 'X-JFrog-Art-Api: ThisIsMyAPIKey' https://na.artifactory.swg-devops.com/artifactory/api/npm/auth
 5) The above command will return you auth token along with auth settings and your email id from artifactory.
 6) Create a .npmrc file in the backend folder (from where you want to run npm install)
 7) Add this line to your .npmrc file,
 	 @res-dlt-interop:registry=https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/
 8) Add the output of curl to that file.
-9) Final .npmrc should look like this - 
+9) Final .npmrc should look like this -
    "@res-dlt-interop:registry=https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/
     _auth = <Auth-token>
     always-auth = true
@@ -127,14 +127,14 @@ Run `npm publish` will error if same version is already published. Will need the
 10) Run npm install to check if artifactory connection is working before testing/deployment.
 
 ## Environment Variables
-- `DEFAULT_CHANNEL` (OPTIONAL) The default channel used by the CLI when invoking chaincode on a network. 
-- `DEFAULT_CHAINCODE`(OPTIONAL) The default chaincode id used by the CLI when invoking chaincode on a network. 
-- `MEMBER_CREDENTIAL_FOLDER`(OPTIONAL) The folder where network configurations will be stored and pulled from when generating network config and loading the chaincode. 
-- `CONFIG_PATH`(OPTIONAL) Path to the configuration file used by the CLI when creating network credentials and communicating with the relays. 
+- `DEFAULT_CHANNEL` (OPTIONAL) The default channel used by the CLI when invoking chaincode on a network.
+- `DEFAULT_CHAINCODE`(OPTIONAL) The default chaincode id used by the CLI when invoking chaincode on a network.
+- `MEMBER_CREDENTIAL_FOLDER`(OPTIONAL) The folder where network configurations will be stored and pulled from when generating network config and loading the chaincode.
+- `CONFIG_PATH`(OPTIONAL) Path to the configuration file used by the CLI when creating network credentials and communicating with the relays.
 
 ## Configuration file (required)
 
-The configuration file is used by the CLI when generating credentials to communicate with the network as well as the endpoint used to communicate with the relay. Each network can specify a unique relay and connection profile. 
+The configuration file is used by the CLI when generating credentials to communicate with the network as well as the endpoint used to communicate with the relay. Each network can specify a unique relay and connection profile.
 
 Example config:
 ```
@@ -150,6 +150,20 @@ Example config:
 }
 ```
 
+## Asset Exchange
+
+  Sample `fabric-cli asset exchange-step` commands:
+  ```
+  ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --secret=<hash-pre-image> --target-network=network1 --param=bond01:a03
+ ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
+ ./bin/fabric-cli asset exchange-step --step=3 --timeout-duration=1800 --locker=bob --recipient=alice --hash=<hash-value> --target-network=network2 --param=token1:100
+ ./bin/fabric-cli asset exchange-step --step=4 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
+ ./bin/fabric-cli asset exchange-step --step=5 --recipient=alice --locker=bob --target-network=network2 --contract-id=<contract-id> --secret=<hash-pre-image>
+ ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
+ ./bin/fabric-cli asset exchange-step --step=7 --locker=bob --recipient=alice --target-network=network1 --param=bond01:a03
+ ./bin/fabric-cli asset exchange-step --step=8 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
+ ```
+
 ## NOTE
 
 Due to how fabric works and the CA works once a wallet has been created with identities in the CA you can not create new wallet without fist revoking the original credentials. This can have some issues if you have deleted a wallet and are trying to recreate one.
@@ -158,4 +172,3 @@ Due to how fabric works and the CA works once a wallet has been created with ide
 # License
 
 MIT - see LICENSE
-
