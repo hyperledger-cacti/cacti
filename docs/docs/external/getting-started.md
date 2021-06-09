@@ -57,9 +57,9 @@ Before starting, make sure you have the following software installed on your hos
     sudo apt-get remove protobuf-compiler
     curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
     sudo apt-get install unzip
-    unzip protoc-3.15.6-linux-x86_64.zip <some-folder-path>
+    unzip protoc-3.15.6-linux-x86_64.zip -d <some-folder-path>
     export PATH="$PATH:<some-folder-path>/bin"
-    go install google.golang.org/protobuf/cmd/protoc-gen-go
+    go get -u google.golang.org/protobuf/cmd/protoc-gen-go
     ```
     _Note_: The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps.
 
@@ -204,7 +204,7 @@ Run a relay for `network2` as follows (_do this only if you wish to test interop
 - Navigate to the `core/relay` folder.
 - Run the following:
   ```bash
-  RELAY_CONFIG=config/Fabric_Relay2 cargo run --bin server
+  RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server
   ```
 
 For more information, see the [relay README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/relay).
