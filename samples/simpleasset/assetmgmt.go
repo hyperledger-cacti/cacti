@@ -7,8 +7,6 @@
 package main
 
 import (
-    "fmt"
-    "errors"
 
     "github.com/golang/protobuf/proto"
     log "github.com/sirupsen/logrus"
@@ -17,14 +15,6 @@ import (
 )
 
 // helper functions
-
-// functions to log and return errors
-func logThenErrorf(format string, args ...interface{}) error {
-    errorMsg := fmt.Sprintf(format, args...)
-    log.Error(errorMsg)
-    return errors.New(errorMsg)
-}
-
 // function to return the asset claim information using HTLC
 func getClaimInfoProtoBytesHTLC(hashPreimage []byte) ([]byte, error) {
     claimInfoHTLC := &common.AssetClaimHTLC {

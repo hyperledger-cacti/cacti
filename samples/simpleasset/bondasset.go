@@ -22,7 +22,7 @@ func getBondAssetKey(assetType string, assetId string) string {
         return assetType + assetId
 }
 
-// InitLedger adds a base set of assets to the ledger
+// InitBondAssetLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextInterface) error {
 	assets := []BondAsset{
 		{Type: "t1", ID: "a01", Issuer: "Treasury" , Owner: "", FaceValue: 300,
