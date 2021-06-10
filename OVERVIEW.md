@@ -25,7 +25,6 @@ Toward the right of the figure, you can see functions in the semantic layer call
 - Data transfers
 - Asset transfers
 - Asset exchanges
-- Verification of proofs in the response by the requesting network
 
 You can find details on these use cases (or _modes_ of interoperation) in [Interoperability Modes](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
 
@@ -44,6 +43,7 @@ For a data transfer use case, the following are the functions that are performed
 - Proof of response data authenticity generated in the form of peers' digital signatures
 - Optionally, encryption of repsonse data and signatures to avoid confidentiality and integrity attacks mounted by relays
 - Verification of proofs in the response by the requesting network
+
 The basis for this protocol is a priori knowledge of counterparty networks' membership providers' certificate chains.
 
 For more details, see the [RFCs](./rfcs).
