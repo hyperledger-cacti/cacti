@@ -80,7 +80,7 @@ func TestLockAsset(t *testing.T) {
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure by trying to lock an asset that is already locked
-	_, err = interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err = interopcc.LockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -94,7 +94,7 @@ func TestLockAsset(t *testing.T) {
 	}
 	lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
 	// Test failure with lock information not specified properly
-	_, err = interopcc.LockAsset(ctx, string(assetAgreementBytes), string(lockInfoBytes))
+	_, err = interopcc.LockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 }
@@ -162,7 +162,7 @@ func TestUnlockAsset(t *testing.T) {
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure of unlock asset with expiry time not yet elapsed
-	err = interopcc.UnlockAsset(ctx, string(assetAgreementBytes))
+	err = interopcc.UnlockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 }
@@ -189,7 +189,7 @@ func TestIsAssetLocked(t *testing.T) {
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with asset agreement not specified properly
-	isAssetLocked, err := interopcc.IsAssetLocked(ctx, string(assetAgreementBytes))
+	isAssetLocked, err := interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
@@ -342,7 +342,7 @@ func TestClaimAsset(t *testing.T) {
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with expiry time elapsed to claim the asset
-	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
+	err = interopcc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -357,7 +357,7 @@ func TestClaimAsset(t *testing.T) {
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with claim information (i.e., preimage) not specified properly
-	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(wrongClaimInfoBytes))
+	err = interopcc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(wrongClaimInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -365,7 +365,7 @@ func TestClaimAsset(t *testing.T) {
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 
 	// Test failure with asset agreement specified not properly
-	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
+	err = interopcc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -375,7 +375,7 @@ func TestClaimAsset(t *testing.T) {
 	chaincodeStub.GetStateReturns(nil, nil)
 
 	// Test failure with asset agreement (i.e., asset id) specified not properly
-	err = interopcc.ClaimAsset(ctx, string(assetAgreementBytes), string(claimInfoBytes))
+	err = interopcc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.Error(t, err)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 }
