@@ -82,9 +82,9 @@ const command: GluegunCommand = {
         connProfilePath,
         options['local-network'],
         mspId,
+        logger,
         userid,
-        true,
-        logger
+        true
       )
       spinner.succeed(`Response from network: ${JSON.stringify(result)} `)
     } catch (err) {
