@@ -440,9 +440,9 @@ async function query(
   connProfilePath: string,
   networkName: string,
   mspId = global.__DEFAULT_MSPID__,
+  logger: any = console,
   userString = '',
-  registerUser = true,
-  logger: any = console
+  registerUser = true
 ): Promise<string> {
   logger.debug('Running invoke on fabric network')
   try {
@@ -481,9 +481,9 @@ async function invoke(
   connProfilePath: string,
   networkName: string,
   mspId = global.__DEFAULT_MSPID__,
+  logger: any = console,
   userString = '',
-  registerUser = true,
-  logger: any = console
+  registerUser = true
 ): Promise<string> {
   logger.debug('Running invoke on fabric network')
   try {
