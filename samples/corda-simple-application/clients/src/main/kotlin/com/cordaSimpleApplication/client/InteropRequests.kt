@@ -194,7 +194,7 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
     val externalStateLinearId: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
-      println("Get states with key $key")
+      println("Get states with key $externalStateLinearId")
       val rpc = NodeRPCConnection(
               host = config["CORDA_HOST"]!!,
               username = "clientUser1",
@@ -204,7 +204,9 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
           val proxy = rpc.proxy
           val states = proxy.startFlow(::GetExternalStateByLinearId, externalStateLinearId)
                   .returnValue.get()
-          println(states)
+
+          val s = states.toString(Charsets.UTF_8)
+          println("${states} \n${s}")
       } catch (e: Exception) {
           println(e.toString())
       } finally {
