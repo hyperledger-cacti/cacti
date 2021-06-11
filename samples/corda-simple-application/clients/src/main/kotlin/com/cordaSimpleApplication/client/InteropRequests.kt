@@ -174,6 +174,11 @@ fun writeExternalStateToVault(
         }.fold({
             it.map { linearId ->
                 println("Verification was successful and state was stored with linearId $linearId.\n")
+                val payload = proxy.startFlow(::GetExternalStateByLinearId, linearId.toString())
+                        .returnValue.get()
+                val payloadString = payload.toStringUtf8()
+                println("Read 1: $payload")
+                println("Read 2: $payloadString")
                 linearId.toString()
             }
         }, {
