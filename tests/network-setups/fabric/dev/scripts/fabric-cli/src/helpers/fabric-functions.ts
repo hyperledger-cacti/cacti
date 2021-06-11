@@ -72,6 +72,7 @@ const walletSetup = async (
   const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type)
   const adminUser = await provider.getUserContext(adminIdentity, 'admin')
   const identity = await wallet.get(userName)
+  logger.info(`user ${userName}`)
   if (!identity) {
     // Register the user, enroll the user, and import the new identity into the wallet.
     if (!register) {
@@ -105,7 +106,7 @@ const walletSetup = async (
       logger.info(`Wallet Setup: Sucessful ${secret}`)
     } catch(error) {
       if (!userPwd) {
-        throw new Error('WalletSetup: User Secret not provided, cannot enroll already registered user without secret')
+        throw new Error(`WalletSetup: User Secret not provided, cannot enroll already registered user ${userName} without secret`)
       }
       secret = userPwd
       logger.info(`User already registered: ${error}`)
