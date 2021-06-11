@@ -78,9 +78,9 @@ const command: GluegunCommand = {
         connProfilePath,
         options['local-network'],
         mspId,
+        logger,
         userid,
-        true,
-        logger
+        true
       )
       logger.info(`Result from network query: ${result}`)
     } catch (err) {

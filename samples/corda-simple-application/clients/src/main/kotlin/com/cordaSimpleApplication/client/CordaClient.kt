@@ -66,5 +66,6 @@ fun main(args: Array<String>) = App()
                 UpdateMembershipCommand(),
                 DeleteMembershipCommand(),
                 GetMembershipCommand(),
-                GetMembershipsCommand())
+                GetMembershipsCommand(),
+                GetExternalStateCommand())
         .main(args)
