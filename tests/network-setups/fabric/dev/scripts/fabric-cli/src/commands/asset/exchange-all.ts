@@ -114,22 +114,18 @@ const command: GluegunCommand = {
     // console.log(user1, assetType, assetId)
     // console.log(user2, fungibleAssetType, fungibleAssetAmt)
 
-    const spinner = print.spin(`Asset Exchange:\n`)
-
     const net1Config = getNetworkConfig(options['network1'])
     const net2Config = getNetworkConfig(options['network2'])
     if (!net1Config.connProfilePath || !net1Config.channelName || !net1Config.chaincode) {
       print.error(
         `Please use a valid --network1. No valid environment found for ${options['network1']} `
       )
-      spinner.fail(`Error`)
       return
     }
     if (!net2Config.connProfilePath || !net2Config.channelName || !net2Config.chaincode) {
       print.error(
         `Please use a valid --network2. No valid environment found for ${options['network2']} `
       )
-      spinner.fail(`Error`)
       return
     }
 
@@ -183,6 +179,8 @@ const command: GluegunCommand = {
     // console.log(user1CertN2)
     // console.log(user2CertN1)
 
+    const spinner = print.spin(`Asset Exchange:\n`)
+
     var res
     var contractId
 
@@ -203,7 +201,7 @@ const command: GluegunCommand = {
     } catch(error) {
         print.error(`Could not Lock Asset in ${options['network1']}`)
         spinner.fail(`Error`)
-        return
+        process.exit()
     }
 
     try {
@@ -225,7 +223,7 @@ const command: GluegunCommand = {
         print.error(`Could not Lock Fungible Asset in ${options['network2']}`)
         res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
-        return
+        process.exit()
     }
 
     try {
@@ -236,35 +234,13 @@ const command: GluegunCommand = {
       if (!res) {
         throw new Error()
       }
-      const currentQuery1 = {
-            channel: net2Config.channelName,
-            contractName: net2Config.chaincode,
-            ccFunc: 'TransferTokenAssets',
-            args: []
-          }
-      currentQuery1.args = [...currentQuery1.args, fungibleAssetType, fungibleAssetAmt, user2CertN2, user1CertN2]
-      try {
-          const read = await network2U1.contract.submitTransaction(currentQuery1.ccFunc, ...currentQuery1.args)
-          const state = Buffer.from(read).toString()
-          if (state) {
-            logger.debug(`Response From Network: ${state}`)
-          } else {
-            logger.debug('No Response from network')
-          }
-
-          // Disconnect from the gateway.
-          await network2U1.gateway.disconnect()
-      } catch (error) {
-          console.error(`Failed to submit transaction: ${error}`)
-          throw new Error(error)
-      }
       spinner.info(`Fungible Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim fungible asset in ${options['network2']}`)
         res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
         res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
-        return
+        process.exit()
     }
 
 
@@ -278,38 +254,23 @@ const command: GluegunCommand = {
       if (!res) {
         throw new Error()
       }
-      const currentQuery2 = {
-            channel: net1Config.channelName,
-            contractName: net1Config.chaincode,
-            ccFunc: 'UpdateOwner',
-            args: []
-          }
-      currentQuery2.args = [...currentQuery2.args, assetId, user2CertN1]
-      try {
-          const read = await network1U2.contract.submitTransaction(currentQuery2.ccFunc, ...currentQuery2.args)
-          const state = Buffer.from(read).toString()
-          if (state) {
-            logger.debug(`Response From Network: ${state}`)
-          } else {
-            logger.debug('No Response from network')
-          }
-
-          // Disconnect from the gateway.
-          await network1U2.gateway.disconnect()
-      } catch (error) {
-          console.error(`Failed to submit transaction: ${error}`)
-          throw new Error(error)
-      }
       spinner.info(`Asset Claimed: ${res}`)
     } catch(error) {
         print.error(`Could not claim asset in ${options['network1']}`)
         res = await AssetManager.reclaimFungibleAssetInHTLC(network2U2.contract, contractId);
         res = await AssetManager.reclaimAssetInHTLC(network1U1.contract, assetType, assetId, user2CertN1);
         spinner.fail(`Error`)
-        return
+        process.exit()
     }
     spinner.succeed('Asset Exchange Complete.')
 
+    await network1U1.gateway.disconnect()
+    await network1U2.gateway.disconnect()
+    await network2U1.gateway.disconnect()
+    await network2U2.gateway.disconnect()
+
+    console.log('Gateways disconnected.')
+    process.exit()
   }
 }
 

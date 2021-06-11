@@ -19,7 +19,14 @@ import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.transactions.TransactionBuilder
+import org.hyperledger.fabric.protos.peer.ProposalResponsePackage
 import java.util.Base64
+
+import net.corda.core.node.services.queryBy
+import net.corda.core.node.services.vault.QueryCriteria
+import fabric.view_data.ViewData
+import common.interop_payload.InteropPayloadOuterClass
+
 
 /**
  * The WriteExternalStateInitiator flow is used to process a response from a foreign network for state.
@@ -78,4 +85,91 @@ class WriteExternalStateInitiator(
     } catch (e: Exception) {
         Left(Error("Failed to store state in ledger: ${e.message}"))
     }
+}
+
+
+/**
+ * The GetExternalBoLByLinearId flow is used to read an External State and parse
+ * the View Data.
+ *
+ * @property externalStateLinearId the linearId for the ExternalState.
+ */
+@StartableByRPC
+class GetExternalStateByLinearId(
+        val externalStateLinearId: UniqueIdentifier
+        ) : FlowLogic<Either<Error, ByteArray>>() {
+
+    @Suspendable
+    override fun call(): Either<Error, ByteArray> = try {
+        println("Getting External State for linearId $externalStateLinearId stored in vault\n.")
+        // val linearId = UniqueIdentifier.fromString(externalStateLinearId)
+        val linearId = externalStateLinearId
+        val states = serviceHub.vaultService.queryBy<ExternalState>(
+                QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+        ).states
+
+        if (states.isEmpty()) {
+            println("Error: Could not find external state with linearId $linearId")
+            Left(Error("Error: Could not find external state with linearId $linearId"))
+        } else {
+            val viewMetaByteArray = states.first().state.data.meta
+            val viewDataByteArray = states.first().state.data.state
+            // val utf8MetaString = Base64.getDecoder().decode(viewMetaString).toString(Charsets.UTF_8)
+            // println("GetExternalStateByLinearId: $utf8MetaString")
+            val meta = State.Meta.parseFrom(viewMetaByteArray)
+
+            when (meta.protocol) {
+                State.Meta.Protocol.CORDA -> {
+                    println("GetExternalStateByLinearId Error: Read Corda View not implemented.\n")
+                    Left(Error("GetExternalStateByLinearId Error: Read Corda View not implemented."))
+                }
+                State.Meta.Protocol.FABRIC -> {
+                    // val utf8String = Base64.getDecoder().decode(viewDataString).toString(Charsets.UTF_8)
+                    // println("GetExternalStateByLinearId: $utf8String")
+                    val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
+                    println("fabricViewData: $fabricViewData")
+                    // val proposalResponses = fabricViewData.peerResponses.map { it.proposalResponse }
+                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
+                    // Construct the external state proof
+                    // val externalStateProof = ExternalStateProof(
+                    //         proposals = fabricViewData.peerResponses.map { it.proposal },
+                    //         proposalResponses = proposalResponses,
+                    //         nwId = fabricViewData.networkId,
+                    //         chId = fabricViewData.channelId,
+                    //         ccId = fabricViewData.chaincodeId,
+                    //         ccFunc = fabricViewData.chaincodeFn)
+
+                    // println("External state proof: $externalStateProof\n")
+                    // val proposalResponseString = Base64.getDecoder().decode(proposalResponses.first())
+                    // println("Proposal response string: $proposalResponseString\n")
+                    //
+                    // val proposalResponse = ProposalResponsePackage.ProposalResponse.parseFrom(proposalResponseString)
+                    // println("Proposal Response : $proposalResponse\n")
+                    // println(proposalResponse.response.payload.javaClass.name)
+                    // val payloadString = proposalResponse.response.payload.toStringUtf8()
+                    println("response from remote: $interopPayload.payload.toStringUtf8()")
+                    println("query address: $interopPayload.address")
+                    Right(interopPayload.payload.toByteArray())
+                }
+                State.Meta.Protocol.BITCOIN -> {
+                    println("GetExternalStateByLinearId Error: Interoperation with Bitcoin protocol not implemented.\n")
+                    Left(Error("GetExternalStateByLinearId Error: Interoperation with Bitcoin protocol not implemented"))
+                }
+                State.Meta.Protocol.ETHEREUM -> {
+                    println("GetExternalStateByLinearId Error: Interoperation with Ethereum protocol not implemented.\n")
+                    Left(Error("GetExternalStateByLinearId Error: Interoperation with Ethereum protocol not implemented"))
+                }
+                else -> {
+                    println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
+                    Left(Error("GetExternalStateByLinearId Error: Unrecognized protocol"))
+                }
+            }
+
+
+        }
+    } catch (e: Exception) {
+        println("Error: Could not resolve external state: ${e.message}\n")
+        Left(Error("Error: Could not resolve external state: ${e.message}"))
+    }
+
 }

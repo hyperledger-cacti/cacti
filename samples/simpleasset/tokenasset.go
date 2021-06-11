@@ -17,7 +17,7 @@ type TokenAssetType struct {
 	Value             int               `json:"value"`
 }
 type TokenWallet struct {
-	WalletMap            map[string]int    `json:"walletlist"`
+	WalletMap            map[string]uint64    `json:"walletlist"`
 }
 
 
@@ -107,90 +107,94 @@ func (s *SmartContract) TokenAssetTypeExists(ctx contractapi.TransactionContextI
 }
 
 // IssueTokenAssets issues new token assets to an owner.
-func (s *SmartContract) IssueTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits int, owner string) error {
+func (s *SmartContract) IssueTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, owner string) error {
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return err
 	}
 	if !exists {
-		return fmt.Errorf("cannot issue: the token asset type %s does not exist.", tokenAssetType)
+		return fmt.Errorf("cannot issue: the token asset type %s does not exist", tokenAssetType)
 	}
 
 	id := getWalletId(owner)
-	return addTokenAssetsHelper(ctx, id, tokenAssetType, numUnits)
+	return addTokenAssetsHelper(ctx, tokenAssetType, numUnits, id)
 }
 
 // DeleteTokenAssets burns the token assets from an owner.
-func (s *SmartContract) DeleteTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits int, owner string) error {
+func (s *SmartContract) DeleteTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64) error {
+	owner, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return err
+	}
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return err
 	}
 	if !exists {
-		return fmt.Errorf("the token asset type %s does not exist.", tokenAssetType)
+		return fmt.Errorf("the token asset type %s does not exist", tokenAssetType)
 	}
 
 	id := getWalletId(owner)
-	return subTokenAssetsHelper(ctx, id, tokenAssetType, numUnits)
+	return subTokenAssetsHelper(ctx, tokenAssetType, numUnits, id)
 }
 
 // TransferTokenAssets transfers the token assets from an owner to newOwner
-func (s *SmartContract) TransferTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits int, owner string, newOwner string) error {
+func (s *SmartContract) TransferTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, owner string, newOwner string) error {
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return err
 	}
 	if !exists {
-		return fmt.Errorf("the token asset type %s does not exist.", tokenAssetType)
+		return fmt.Errorf("the token asset type %s does not exist", tokenAssetType)
 	}
 
 
 	ownerId := getWalletId(owner)
 	newOwnerId := getWalletId(newOwner)
 
-	err = subTokenAssetsHelper(ctx, ownerId, tokenAssetType, numUnits)
+	err = subTokenAssetsHelper(ctx, tokenAssetType, numUnits, ownerId)
 	if err != nil {
 		return err
 	}
-	err = addTokenAssetsHelper(ctx, newOwnerId, tokenAssetType, numUnits)
+	err = addTokenAssetsHelper(ctx, tokenAssetType, numUnits, newOwnerId)
 	if err != nil {
 		// Revert subtraction from the original owner
 		// Assuming following will succeed (not sure what to do if it does not)
-		_ = addTokenAssetsHelper(ctx, ownerId, tokenAssetType, numUnits)
+		_ = addTokenAssetsHelper(ctx, tokenAssetType, numUnits, ownerId)
 		return err
 	}
 	return nil
 }
 
 // GetBalance returns the amount of given token asset type owned by an owner.
-func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface, tokenAssetType string, owner string) (int, error) {
+func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface, tokenAssetType string, owner string) (uint64, error) {
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 	if !exists {
-		return -1, fmt.Errorf("the token asset type %s does not exist.", tokenAssetType)
+		return 0, fmt.Errorf("the token asset type %s does not exist", tokenAssetType)
 	}
 
 	id := getWalletId(owner)
 	walletJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
-		return -1, fmt.Errorf("failed to read owner's wallet from world state: %v", err)
+		return 0, fmt.Errorf("failed to read owner's wallet from world state: %v", err)
 	}
 	if walletJSON == nil {
-		return -1, fmt.Errorf("owner does not have a wallet.")
+		return 0, fmt.Errorf("owner does not have a wallet")
 	}
 
 	var wallet TokenWallet
 	err = json.Unmarshal(walletJSON, &wallet)
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 	balance := wallet.WalletMap[tokenAssetType]
 	return balance, nil
 }
 
-// GetBalance returns the amount of given token asset type owned by an owner.
+// GetMyWallet returns the available amount for each token asset type owned by an owner.
 func (s *SmartContract) GetMyWallet(ctx contractapi.TransactionContextInterface) (string, error) {
 	owner, err := getECertOfTxCreatorBase64(ctx)
 	if err != nil {
@@ -203,7 +207,7 @@ func (s *SmartContract) GetMyWallet(ctx contractapi.TransactionContextInterface)
 		return "", fmt.Errorf("failed to read owner's wallet from world state: %v", err)
 	}
 	if walletJSON == nil {
-		return "", fmt.Errorf("owner does not have a wallet.")
+		return "", fmt.Errorf("owner does not have a wallet")
 	}
 
 	var wallet TokenWallet
@@ -215,7 +219,11 @@ func (s *SmartContract) GetMyWallet(ctx contractapi.TransactionContextInterface)
 }
 
 // Checks if owner has some given amount of token asset
-func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits int, owner string) (bool, error) {
+func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64) (bool, error) {
+	owner, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return false, err
+	}
 	balance, err := s.GetBalance(ctx, tokenAssetType, owner)
 	if err != nil {
 		return false, err
@@ -224,10 +232,10 @@ func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInter
 }
 
 // Helper Functions for token asset
-func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, id string, tokenAssetType string, numUnits int) error {
+func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, id string) error {
 	walletJSON, err := ctx.GetStub().GetState(id)
 	if err != nil {
-		return err
+		return logThenErrorf("failed to retrieve entry from ledger: %+v", err)
 	}
 	var wallet TokenWallet
 	if walletJSON != nil {
@@ -238,7 +246,7 @@ func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, id string
 		balance := wallet.WalletMap[tokenAssetType]
 		wallet.WalletMap[tokenAssetType] = balance + numUnits
 	} else {
-		walletMap := make(map[string]int)
+		walletMap := make(map[string]uint64)
 		walletMap[tokenAssetType] = numUnits
 		wallet = TokenWallet{
 			WalletMap: walletMap,
@@ -252,14 +260,14 @@ func addTokenAssetsHelper(ctx contractapi.TransactionContextInterface, id string
 	return ctx.GetStub().PutState(id, walletNewJSON)
 }
 
-func subTokenAssetsHelper(ctx contractapi.TransactionContextInterface, id string, tokenAssetType string, numUnits int) error {
+func subTokenAssetsHelper(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, id string) error {
 	walletJSON, err := ctx.GetStub().GetState(id)
 	var wallet TokenWallet
 	if err != nil {
 		return err
 	}
 	if walletJSON == nil {
-		return fmt.Errorf("owner does not have a wallet.")
+		return fmt.Errorf("owner does not have a wallet")
 	}
 
 	err = json.Unmarshal(walletJSON, &wallet)
@@ -303,7 +311,7 @@ func getTokenAssetTypeId(tokenAssetType string) string {
 func getWalletId(owner string) string {
 	return "W_" + owner
 }
-func createKeyValuePairs(m map[string]int) string {
+func createKeyValuePairs(m map[string]uint64) string {
     b := new(bytes.Buffer)
     for key, value := range m {
         fmt.Fprintf(b, "%s=\"%d\"\n", key, value)
