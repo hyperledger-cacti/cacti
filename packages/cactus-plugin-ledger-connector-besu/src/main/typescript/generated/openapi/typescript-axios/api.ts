@@ -296,6 +296,12 @@ export interface InvokeContractV1Request {
      * @memberof InvokeContractV1Request
      */
     keychainId?: string;
+    /**
+     * 
+     * @type {BesuPrivateTransactionConfig}
+     * @memberof InvokeContractV1Request
+     */
+    privateTransactionConfig?: BesuPrivateTransactionConfig;
 }
 /**
  * 

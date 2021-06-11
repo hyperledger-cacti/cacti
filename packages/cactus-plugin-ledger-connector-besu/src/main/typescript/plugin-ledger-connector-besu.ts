@@ -306,6 +306,7 @@ export class PluginLedgerConnectorBesu
             timeoutMs: req.timeoutMs || 60000,
           },
           web3SigningCredential,
+          privateTransactionConfig: req.privateTransactionConfig,
         });
 
         const address = {
@@ -377,6 +378,7 @@ export class PluginLedgerConnectorBesu
           receiptType: ReceiptType.NodeTxPoolAck,
           timeoutMs: req.timeoutMs || 60000,
         },
+        privateTransactionConfig: req.privateTransactionConfig,
       };
       const out = await this.transact(txReq);
       //const transactionReceipt = out.transactionReceipt;

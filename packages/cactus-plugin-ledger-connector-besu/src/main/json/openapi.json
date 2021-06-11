@@ -687,6 +687,9 @@
                         "description": "The keychainId for retrieve the contracts json.",
                         "minLength": 1,
                         "maxLength": 100
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/BesuPrivateTransactionConfig"
                     }
                 }
             },
