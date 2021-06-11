@@ -415,12 +415,12 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
   fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
   ```
 
-To test the scenario where `network2` requests the value of the state (key) `Arcturus` from `network1`, do the following:
+To test the scenario where `network2` requests the value of the state (key) `a` from `network1`, do the following:
 - Navigate to the `tests/network-setups/fabric/dev/scripts/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - Run the following (if `fabric-cli` is not in your system path, specify the full path to the `fabric-cli` executable):
   ```bash
-  fabric-cli interop --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:Arcturus
+  fabric-cli interop --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
   ```
 
 # Tear Down the Setup
