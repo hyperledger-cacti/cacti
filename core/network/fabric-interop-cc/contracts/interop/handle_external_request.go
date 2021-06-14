@@ -36,6 +36,11 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 	}
 	var query common.Query
 	err = protoV2.Unmarshal(queryBytes, &query)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Unable to unmarshal query: %s", err.Error())
+		log.Error(errorMessage)
+		return "", errors.New(errorMessage)
+	}
 	x509Cert, err := parseCert(query.Certificate)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to parse certificate: %s", err)

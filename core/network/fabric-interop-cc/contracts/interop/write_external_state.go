@@ -26,6 +26,20 @@ type interop interface {
 	WriteExternalState(state string) error
 }
 
+func (s *SmartContract) ExtractDataFromFabricView(viewData []byte) ([]byte, error) {
+	var fabricViewData fabric.FabricView
+	err := protoV2.Unmarshal(viewData, &fabricViewData)
+	if err != nil {
+		return nil, fmt.Errorf("FabricView Unmarshal error: %s", err)
+	}
+	var interopPayload common.InteropPayload
+	err = protoV2.Unmarshal(fabricViewData.Response.Payload, &interopPayload)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+	}
+	return interopPayload.Payload, nil
+}
+
 // WriteExternalState flow is used to process a response from a foreign network for state.
 // 1. Verify Proofs that are returned
 // 2. Call application chaincode
@@ -45,10 +59,20 @@ func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInt
 		return fmt.Errorf("VerifyView error: %s", err)
 	}
 
-	// 2. Call application chaincode with created state as the argument
+	// 2. Extract response data for consumption by application chaincode
+	viewData := view.Data
+	if view.Meta.Protocol == common.Meta_FABRIC {
+		viewData, err = s.ExtractDataFromFabricView(viewData)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Fabric view data: %s\n", string(viewData))
+	}
+
+	// 3. Call application chaincode with created state as the argument
 	arr := append([]string{applicationFunction}, applicationArgs...)
 	byteArgs := strArrToBytesArr(arr)
-	byteArgs = append(byteArgs, view.Data)
+	byteArgs = append(byteArgs, viewData)
 	log.Info(fmt.Sprintf("Calling invoke chaincode. AppId: %s, appChannel: %s", applicationID, applicationChannel))
 	pbResp := ctx.GetStub().InvokeChaincode(applicationID, byteArgs, applicationChannel)
 	if pbResp.Status != shim.OK {

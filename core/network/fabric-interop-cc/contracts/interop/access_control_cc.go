@@ -135,8 +135,9 @@ func verifyAccessToCC(s *SmartContract, ctx contractapi.TransactionContextInterf
 	for _, rule := range acp.Rules {
 		if rule.Resource == viewAddressString || (validPatternString(rule.Resource) && isPatternAndAddressMatch(rule.Resource, viewAddressString)) {
 			// TODO: Check if these will be the same format (Or convert to matching formats at some point)
-			// TODO: Need to use principalType and perform different validation for type "certificate" and "ca". Atm code assumes its a certificate
-			if query.Certificate == rule.Principal {
+			// TODO: Need to use principalType and perform different validation for type "certificate" and "ca".
+			// Code below assumes that "ca" type requires no further check as requestor's membership has already been authenticated earlier
+			if (rule.PrincipalType == "certificate" && query.Certificate == rule.Principal) || rule.PrincipalType == "ca" {
 				// Break loop as cert is valid.
 				return nil
 			}

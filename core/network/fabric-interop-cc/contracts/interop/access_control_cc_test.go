@@ -150,14 +150,40 @@ func TestVerifyAccessToCC(t *testing.T) {
 	err = verifyAccessToCC(&interopcc, ctx, &validAddressStruct, viewAddressString, &query)
 	require.NoError(t, err)
 
-	// Test: Invalid Cert
-	invalidPrincipalRule := common.Rule{
-		Principal:     "asdfasdf",
+	newRule = common.Rule{
 		PrincipalType: "ca",
 		Resource:      "mychannel:interop:Read:*",
 		Read:          true,
 	}
+	accessControlAsset.Rules = []*common.Rule{&newRule}
+	accessControlBytes, err = json.Marshal(&accessControlAsset)
+	require.NoError(t, err)
+	chaincodeStub.GetStateReturns(accessControlBytes, nil)
+	err = verifyAccessToCC(&interopcc, ctx, &validAddressStruct, viewAddressString, &query)
+	require.NoError(t, err)
+
+	// Test: Invalid Cert
+	invalidPrincipalRule := common.Rule{
+		Principal:     "asdfasdf",
+		PrincipalType: "certificate",
+		Resource:      "mychannel:interop:Read:*",
+		Read:          true,
+	}
 	accessControlAsset.Rules = []*common.Rule{&invalidPrincipalRule}
+	accessControlBytes, err = json.Marshal(&accessControlAsset)
+	require.NoError(t, err)
+	chaincodeStub.GetStateReturns(accessControlBytes, nil)
+	err = verifyAccessToCC(&interopcc, ctx, &validAddressStruct, viewAddressString, &query)
+	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the following request: %s", viewAddressString))
+
+	// Test: No rule for requested resource
+	differentResourceRule := common.Rule{
+		Principal:     "asdfasdf",
+		PrincipalType: "ca",
+		Resource:      "mychannel:interop:ReadMe:*",
+		Read:          true,
+	}
+	accessControlAsset.Rules = []*common.Rule{&differentResourceRule}
 	accessControlBytes, err = json.Marshal(&accessControlAsset)
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturns(accessControlBytes, nil)
