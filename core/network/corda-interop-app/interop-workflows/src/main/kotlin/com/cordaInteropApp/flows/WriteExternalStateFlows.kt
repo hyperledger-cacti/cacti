@@ -149,7 +149,7 @@ class GetExternalStateByLinearId(
                     // val payloadString = proposalResponse.response.payload.toStringUtf8()
                     println("response from remote: ${interopPayload.payload.toStringUtf8()}.\n")
                     println("query address: ${interopPayload.address}.\n")
-                    return interopPayload.payload.toString().toByteArray()
+                    return interopPayload.payload.toStringUtf8().toByteArray()
                 }
                 else -> {
                     println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
