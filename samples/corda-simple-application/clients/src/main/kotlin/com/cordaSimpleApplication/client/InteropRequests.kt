@@ -206,8 +206,8 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
                   .returnValue.get()
           val s = data.toString(Charsets.UTF_8)
           val p = proof.toString(Charsets.UTF_8)
-          println("${data} \n${s}")
-          println("${proof} \n${p}")
+          println("Response: ${s}")
+          println("Proof: ${p}")
       } catch (e: Exception) {
           println(e.toString())
       } finally {
