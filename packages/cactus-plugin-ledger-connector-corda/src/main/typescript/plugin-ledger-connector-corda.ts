@@ -108,7 +108,7 @@ export class PluginLedgerConnectorCorda
     return "@hyperledger/cactus-plugin-ledger-connector-corda";
   }
 
-  public deployContract(): Promise<any> {
+  public deployContract(): Promise<unknown> {
     throw new Error("Method not implemented.");
   }
 
