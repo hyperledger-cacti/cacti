@@ -14,3 +14,5 @@ protos-js/*
 temp/
 config.json
 package-lock.json
+src/wallet-network1/admin.id
+src/wallet-network2/admin.id
