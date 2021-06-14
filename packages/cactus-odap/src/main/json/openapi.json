@@ -1,0 +1,349 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Connector Besu",
+        "description": "Can perform basic tasks on a Besu ledger",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:4000",
+            "description": "    ",
+            "variables": {
+                "basePath": {
+                    "default": ""
+                }
+            }
+        }
+    ],
+    "components": {
+        "schemas": {
+            "PayloadProfile":{
+                "type":"object"
+            },
+            "ApplicationProfile":{
+                "type":"object"
+            },
+            "Payload":{
+                "type":"object"
+            },
+            "AssetProfile":{
+                "type":"object",
+                "properties": {
+                    "Issuer":{
+                        "type":"string"
+                    },
+                    "AssetCode":{
+                        "type":"string"
+                    },
+                    "AssetCodeType":{
+                        "type":"string"
+                    },
+                    "IssuanceDate":{
+                        "type":"string"
+                    },
+                    "ExpirationDate":{
+                        "type":"string"
+                    },
+                    "VerificationEndPoint":{
+                        "type":"string"
+                    },
+                    "DigitalSignature":{
+                        "type":"string"
+                    },
+                    "ProspectusLink":{
+                        "type":"string"
+                    },
+                    "KeyInformationLink":{
+                        "type": "array",
+                        "items": {}
+                    },
+                    "KeyWord":{
+                        "type": "array",
+                        "items": {}
+                    },
+                    "TransferRestriction":{
+                        "type": "array",
+                        "items": {}
+                    },
+                    "LedgerRequirements":{
+                        "type": "array",
+                        "items": {}
+                    }
+                }
+            },
+            "LoggingProfile":{
+                "type":"object"
+            },
+            "AccessControlProfile":{
+                "type":"object"
+            },
+            "Permissions":{
+                "type":"object"
+            },
+            "Transaction":{
+                "type":"object"
+            },
+            "ActionCategory":{
+                "type":"object"
+            },
+            "History":{
+                "type":"object",
+                "properties": {
+                    "Transactions":{
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/Transaction"
+                        }
+                    },
+                    "Actions":{
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/ActionCategory"
+                        }
+                    },
+                    "Origin":{
+                        "type":"string"
+                    },
+                    "Destination":{
+                        "type":"string"
+                    },
+                    "Balance":{
+                        "type":"string"
+                    },
+                    "CurrentStatus":{
+                        "type":"object"
+                    },
+                    "ApplicationSpecificParameters":{
+                        "type":"object"
+                    }
+                }
+            },
+            "InitializationRequestMessage":{
+                "type":"object",
+                "properties":{
+                    "Version":{
+                        "type":"string"
+                    },
+                    "DeveloperURN":{
+                        "type":"string"
+                    },
+                    "PayloadProfile":{
+                        "$ref":"#/components/schemas/PayloadProfile"
+                    },
+                    "ApplicationProfile":{
+                        "$ref":"#/components/schemas/AssetProfile"
+                    },
+                    "LoggingProfile":{
+                        "$ref":"#/components/schemas/LoggingProfile",
+                        "nullable":false
+                    },
+                    "AccessControlProfile":{
+                        "$ref":"#/components/schemas/AssetProfile",
+                        "nullable":false
+                    },
+                    "InitializationRequestMessageSignature":{
+                        "type":"string",
+                        "nullable":false
+                    },
+                    "SourceGatewayPubkey":{
+                        "type":"string",
+                        "nullable":false
+                    },
+                    "SourceGateWayDltSystem":{
+                        "type":"string",
+                        "nullable":false
+                    },
+                    "RecipentGateWayPubkey":{
+                        "type":"string",
+                        "nullable":false
+                    },
+                    "RecipentGateWayDltSystem":{
+                        "type":"string",
+                        "nullable":false
+                    },
+                    "EscrowType":{
+                        "type":"string",
+                        "enum":[
+                            "FAUCET",
+                            "TIMELOCK",
+                            "HASHLOCK",
+                            "HASHTIMELOCK",
+                            "MULTICLAIMPC",
+                            "DESTROY",
+                            "BURN"
+                        ]
+                    },
+                    "ExpiryTime":{
+                        "type":"string"
+                    },
+                    "MultipleClaimsAllowed":{
+                        "type":"boolean"
+                    },
+                    "MultipleCancelsAllowed":{
+                        "type":"boolean"
+                    },
+                    "Permissions":{
+                        "$ref":"#/components/schemas/Permissions"
+                    },
+                    "Origin":{
+                        "type":"string"
+                    },
+                    "Destination":{
+                        "type":"string"
+                    },
+                    "SubsequentCalls":{
+                        "type":"object"
+                    },
+                    "Histories":{
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/History"
+                        }
+                    }
+                }
+            },
+            "InitialMessageAck":{
+                "type":"object",
+                "properties": {
+                    "SessionID":{
+                        "type":"string"
+                    },
+                    "SequenceNumber":{
+                        "type":"number"
+                    },
+                    "OdapPhase":{
+                        "type":"string",
+                        "enum":[
+                            "TransferInitialization",
+                            "LockEvidenceVerification",
+                            "CommitmentEstablishment"
+                        ]
+                    },
+                    "InitialRequestMessageHash":{
+                        "type":"string",
+                        "nullable":false
+                    },
+                    "Destination":{
+                        "type":"string"
+                    },
+                    "TimeStamp":{
+                        "type":"string",
+                        "nullable": false
+                    },
+                    "ProcessedTimeStamp":{
+                        "type":"string",
+                        "nullable": false
+                    }
+                }
+            },
+            "OdapMessage":{
+                "type":"object",
+                "properties": {
+                    "SequenceNumber":{
+                        "type":"number"
+                    },
+                    "Phase":{
+                        "type":"string",
+                        "enum":[
+                            "TransferInitialization",
+                            "LockEvidenceVerification",
+                            "CommitmentEstablishment"
+                        ]
+                    },
+                    "ResourceURL":{
+                        "type":"string"
+                    },
+                    "DeveloperURN":{
+                        "type":"string"
+                    },
+                    "ActionResponse":{
+                        "type":"object",
+                        "properties": {
+                            "ResponseCode":{
+                                "type":"string",
+                                "enum":[
+                                    "200",
+                                    "404"
+                                ],
+                                "x-enum-varnames":[
+                                    "OK",
+                                    "RESOURCE_NOT_FOUND"
+                                ]
+                            },
+                            "Arguments":{
+                                "type":"array",
+                                "items":{}
+                            }
+                        }
+                    },
+                    "CredentialProfile":{
+                        "type":"string",
+                        "enum":[
+                            "SAML",
+                            "OAuth",
+                            "X509"
+                        ]
+                    },
+                    "CredentialBlock":{
+                        "type":"array",
+                        "items":{}
+                    },
+                    "CredentialsProfile":{
+                        "$ref":"#/components/schemas/PayloadProfile"
+                    },
+                    "ApplicationProfile":{
+                        "$ref":"#/components/schemas/ApplicationProfile"
+                    },
+                    "Payload":{
+                        "$ref":"#/components/schemas/Payload"
+                    },
+                    "PayloadHash":{
+                        "type":"string"
+                    },
+                    "MessageSinature":{
+                        "type":"string"
+                    }
+                }
+            }    
+        }
+    },
+    "paths": {
+        "/api/v1/transferinitiation":{
+            "get":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/transferinitiation"
+                    }
+                },
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InitializationRequestMessage"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InitialMessageAck"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }   
+}
