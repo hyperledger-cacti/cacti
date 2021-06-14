@@ -5,6 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
+import * as fs from 'fs'
 import { query } from '../../helpers/fabric-functions'
 import { commandHelp, getNetworkConfig } from '../../helpers/helpers'
 import logger from '../../helpers/logger'
@@ -86,6 +87,7 @@ const command: GluegunCommand = {
     } catch (err) {
       logger.error(`Error during fabric query: ${JSON.stringify(err)}`)
     }
+    process.exit()
   }
 }
 

@@ -5,6 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
+import * as fs from 'fs'
 import { invoke } from '../../helpers/fabric-functions'
 import logger from '../../helpers/logger'
 import { commandHelp, getNetworkConfig } from '../../helpers/helpers'
@@ -91,6 +92,7 @@ const command: GluegunCommand = {
       spinner.fail(`Error invoking chaincode`)
       logger.error(`Error invoking chaincode: ${err}`)
     }
+    process.exit()
   }
 }
 
