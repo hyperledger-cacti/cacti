@@ -202,11 +202,12 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
               rpcPort = config["CORDA_PORT"]!!.toInt())
       try {
           val proxy = rpc.proxy
-          val states = proxy.startFlow(::GetExternalStateByLinearId, externalStateLinearId)
+          val (data, proof) = proxy.startFlow(::GetExternalStateByLinearId, externalStateLinearId)
                   .returnValue.get()
-
-          val s = states.toString(Charsets.UTF_8)
-          println("${states} \n${s}")
+          val s = data.toString(Charsets.UTF_8)
+          val p = proof.toString(Charsets.UTF_8)
+          println("${data} \n${s}")
+          println("${proof} \n${p}")
       } catch (e: Exception) {
           println(e.toString())
       } finally {

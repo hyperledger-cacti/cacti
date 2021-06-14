@@ -26,6 +26,7 @@ import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import fabric.view_data.ViewData
 import common.interop_payload.InteropPayloadOuterClass
+import org.hyperledger.fabric.protos.msp.Identities
 
 
 /**
@@ -97,10 +98,10 @@ class WriteExternalStateInitiator(
 @StartableByRPC
 class GetExternalStateByLinearId(
         val externalStateLinearId: String
-) : FlowLogic<ByteArray>() {
+) : FlowLogic<Pair<ByteArray, ByteArray>>() {
 
     @Suspendable
-    override fun call(): ByteArray {
+    override fun call(): Pair<ByteArray, ByteArray> {
         println("Getting External State for linearId $externalStateLinearId stored in vault\n.")
         val linearId = UniqueIdentifier.fromString(externalStateLinearId)
         //val linearId = externalStateLinearId
@@ -110,50 +111,44 @@ class GetExternalStateByLinearId(
 
         if (states.isEmpty()) {
             println("Error: Could not find external state with linearId $linearId")
-            return "error".toByteArray()
+            throw IllegalArgumentException("Error: Could not find external state with linearId $linearId")
         } else {
             val viewMetaByteArray = states.first().state.data.meta
             val viewDataByteArray = states.first().state.data.state
-            // val utf8MetaString = Base64.getDecoder().decode(viewMetaString).toString(Charsets.UTF_8)
-            // println("GetExternalStateByLinearId: $utf8MetaString")
             val meta = State.Meta.parseFrom(viewMetaByteArray)
 
             when (meta.protocol) {
                 State.Meta.Protocol.CORDA -> {
                     println("GetExternalStateByLinearId Error: Read Corda View not implemented.\n")
-                    return "error".toByteArray()
+                    throw UnsupportedOperationException()
                 }
                 State.Meta.Protocol.FABRIC -> {
-                    // val utf8String = Base64.getDecoder().decode(viewDataString).toString(Charsets.UTF_8)
-                    // println("GetExternalStateByLinearId: $utf8String")
                     val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
                     println("fabricViewData: $fabricViewData")
-                    // val proposalResponses = fabricViewData.peerResponses.map { it.proposalResponse }
                     val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
-                    // Construct the external state proof
-                    // val externalStateProof = ExternalStateProof(
-                    //         proposals = fabricViewData.peerResponses.map { it.proposal },
-                    //         proposalResponses = proposalResponses,
-                    //         nwId = fabricViewData.networkId,
-                    //         chId = fabricViewData.channelId,
-                    //         ccId = fabricViewData.chaincodeId,
-                    //         ccFunc = fabricViewData.chaincodeFn)
-
-                    // println("External state proof: $externalStateProof\n")
-                    // val proposalResponseString = Base64.getDecoder().decode(proposalResponses.first())
-                    // println("Proposal response string: $proposalResponseString\n")
-                    //
-                    // val proposalResponse = ProposalResponsePackage.ProposalResponse.parseFrom(proposalResponseString)
-                    // println("Proposal Response : $proposalResponse\n")
-                    // println(proposalResponse.response.payload.javaClass.name)
-                    // val payloadString = proposalResponse.response.payload.toStringUtf8()
-                    println("response from remote: ${interopPayload.payload.toStringUtf8()}.\n")
+                    val response = interopPayload.payload.toStringUtf8()
+                    println("response from remote: ${response}.\n")
                     println("query address: ${interopPayload.address}.\n")
-                    return interopPayload.payload.toStringUtf8().toByteArray()
+
+                    var securityDomain = interopPayload.address.split("/")[1]
+                    val proofStringPrefix = "Verified Proof: Endorsed by members: ["
+                    val proofStringSuffix = "] of security domain: " + securityDomain
+                    var orgList = ""
+                    fabricViewData.endorsementsList.map { endorsement ->
+                        val org = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
+                        if (orgList.length > 0) {
+                            orgList = orgList + ", "
+                        }
+                        orgList = orgList + org
+                    }
+                    var proof = proofStringPrefix + orgList + proofStringSuffix
+                    println("Proof: ${orgList}.\n")
+
+                    return Pair(response.toByteArray(), proof.toByteArray())
                 }
                 else -> {
                     println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
-                    return "error".toByteArray()
+                    throw IllegalArgumentException("Error: Unrecognized protocol.")
                 }
             }
 
@@ -162,3 +157,4 @@ class GetExternalStateByLinearId(
     }
 
 }
+
