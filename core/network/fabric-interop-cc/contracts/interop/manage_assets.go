@@ -241,7 +241,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", logThenErrorf("marshal error: %+v", err)
 	}
 
-	err = ctx.GetStub().PutState(generateContractIdMapKey(string(contractId)), assetLockKeyBytes)
+	err = ctx.GetStub().PutState(generateContractIdMapKey(contractId), assetLockKeyBytes)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
@@ -269,7 +269,7 @@ func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface,
 		return logThenErrorf("error in validation of asset agreement parties: %+v", err)
 	}
 
-	assetLockKey, _, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
+	assetLockKey, contractId, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 	if err != nil {
 		return logThenErrorf(err.Error())
 	}
@@ -302,6 +302,10 @@ func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface,
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
 		return logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+	}
+	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
+	if err != nil {
+		return logThenErrorf("failed to delete the contractId %s as part of asset unlock: %v", contractId, err)
 	}
 
 	return nil
@@ -420,7 +424,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	// display the claim information
 	log.Infof("claimInfo: %+v\n", claimInfo)
 
-	assetLockKey, _, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
+	assetLockKey, contractId, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 	if err != nil {
 		return logThenErrorf(err.Error())
 	}
@@ -463,6 +467,10 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
 		return logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+	}
+	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
+	if err != nil {
+		return logThenErrorf("failed to delete the contractId %s as part of asset claim: %v", contractId, err)
 	}
 
 	return nil

@@ -3,13 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"encoding/base64"
-	"bytes"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	"github.com/golang/protobuf/proto"
-	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
-	// log "github.com/sirupsen/logrus"
 )
 
 type TokenAssetType struct {
@@ -21,7 +16,7 @@ type TokenWallet struct {
 }
 
 
-// InitLedger adds a base set of assets to the ledger
+// InitTokenAssetLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitTokenAssetLedger(ctx contractapi.TransactionContextInterface) error {
 	_, err := s.CreateTokenAssetType(ctx, "token1", "CentralBank", 1)
 	if err != nil {
@@ -310,28 +305,4 @@ func getTokenAssetTypeId(tokenAssetType string) string {
 }
 func getWalletId(owner string) string {
 	return "W_" + owner
-}
-func createKeyValuePairs(m map[string]uint64) string {
-    b := new(bytes.Buffer)
-    for key, value := range m {
-        fmt.Fprintf(b, "%s=\"%d\"\n", key, value)
-    }
-    return b.String()
-}
-func getECertOfTxCreatorBase64(ctx contractapi.TransactionContextInterface) (string, error) {
-
-	txCreatorBytes, err := ctx.GetStub().GetCreator()
-	if err != nil {
-		return "", fmt.Errorf("unable to get the transaction creator information: %+v", err)
-	}
-
-	serializedIdentity := &mspProtobuf.SerializedIdentity{}
-	err = proto.Unmarshal(txCreatorBytes, serializedIdentity)
-	if err != nil {
-		return "", fmt.Errorf("getECertOfTxCreatorBase64: unmarshal error: %+v", err)
-	}
-
-	eCertBytesBase64 := base64.StdEncoding.EncodeToString(serializedIdentity.IdBytes)
-
-	return eCertBytesBase64, nil
 }
