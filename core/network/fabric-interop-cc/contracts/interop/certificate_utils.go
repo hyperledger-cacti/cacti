@@ -131,7 +131,7 @@ func validateCertificateUsingCA(cert *x509.Certificate, signerCACert *x509.Certi
 	}
 	err = isCertificateWithinExpiry(cert)
 	if err != nil {
-		errMsg := fmt.Sprintf("Certificate is outside of expiry dats. No longer valid. Cert: %s", cert.Subject.String())
+		errMsg := fmt.Sprintf("Certificate is outside of expiry date. No longer valid. Cert: %s", cert.Subject.String())
 		return errors.New(errMsg)
 	}
 	certIssuer := cert.Issuer.String()

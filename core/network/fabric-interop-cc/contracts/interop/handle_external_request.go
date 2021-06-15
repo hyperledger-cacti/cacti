@@ -61,14 +61,11 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 		return "", errors.New(errorMessage)
 	}
 	// 2. Checks that the certificate of the requester is valid according to the network's Membership
-	var requestingOrg string
-	if query.RequestingOrg != "" {
-		requestingOrg = query.RequestingOrg
-	} else {
-		requestingOrg = x509Cert.Issuer.Organization[0]
+	if query.RequestingOrg == "" {
+		query.RequestingOrg = x509Cert.Issuer.Organization[0]
 	}
 
-	err = verifyMemberInSecurityDomain(s, ctx, x509Cert, query.RequestingNetwork, requestingOrg)
+	err = verifyMemberInSecurityDomain(s, ctx, x509Cert, query.RequestingNetwork, query.RequestingOrg)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Membership Verification failed: %s", err)
 		log.Error(errorMessage)
