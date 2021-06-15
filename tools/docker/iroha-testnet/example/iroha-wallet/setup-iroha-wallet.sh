@@ -32,6 +32,10 @@ EOF
       echo
       cat /tmp/st | grep "error" | sed 's/^>.*: //'
       break
+    elif cat /tmp/st | grep -q "rejected"; then
+      echo
+      cat /tmp/st | grep "rejected" | sed 's/^>.*: //'
+      break
     fi
     sleep 1
     echo -n "."
