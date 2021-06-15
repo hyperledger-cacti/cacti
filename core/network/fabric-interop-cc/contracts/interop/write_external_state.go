@@ -26,6 +26,7 @@ type interop interface {
 	WriteExternalState(state string) error
 }
 
+// Extract data (i.e., query response) from view
 func (s *SmartContract) ExtractDataFromFabricView(viewData []byte) ([]byte, error) {
 	var fabricViewData fabric.FabricView
 	err := protoV2.Unmarshal(viewData, &fabricViewData)
@@ -40,23 +41,22 @@ func (s *SmartContract) ExtractDataFromFabricView(viewData []byte) ([]byte, erro
 	return interopPayload.Payload, nil
 }
 
-// WriteExternalState flow is used to process a response from a foreign network for state.
-// 1. Verify Proofs that are returned
-// 2. Call application chaincode
-func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInterface, applicationID string, applicationChannel string, applicationFunction string, applicationArgs []string, address string, b64ViewProto string) error {
+// Validate view against address, and extract data (i.e., query response) from view
+func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextInterface, address string, b64ViewProto string) ([]byte, error) {
 	viewB64Bytes, err := base64.StdEncoding.DecodeString(b64ViewProto)
 	if err != nil {
-		return fmt.Errorf("Unable to base64 decode data: %s", err.Error())
+		return nil, fmt.Errorf("Unable to base64 decode data: %s", err.Error())
 	}
 	var view common.View
 	err = protoV2.Unmarshal(viewB64Bytes, &view)
 	if err != nil {
-		return fmt.Errorf("View Unmarshal error: %s", err)
+		return nil, fmt.Errorf("View Unmarshal error: %s", err)
 	}
-	// 1. Verify proofs that are returned
+
+	// 1. Verify proof
 	err = s.VerifyView(ctx, b64ViewProto, address)
 	if err != nil {
-		return fmt.Errorf("VerifyView error: %s", err)
+		return nil, fmt.Errorf("VerifyView error: %s", err)
 	}
 
 	// 2. Extract response data for consumption by application chaincode
@@ -64,15 +64,44 @@ func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInt
 	if view.Meta.Protocol == common.Meta_FABRIC {
 		viewData, err = s.ExtractDataFromFabricView(viewData)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		fmt.Printf("Fabric view data: %s\n", string(viewData))
 	}
 
-	// 3. Call application chaincode with created state as the argument
+	return viewData, nil
+}
+
+// WriteExternalState flow is used to process a response from a foreign network for state.
+// 1. Verify Proofs that are returned
+// 2. Call application chaincode
+func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInterface, applicationID string, applicationChannel string, applicationFunction string, applicationArgs []string, argIndicesForSubstitution []int, addresses []string, b64ViewProtos []string) error {
+	if len(argIndicesForSubstitution) != len(addresses) {
+		return fmt.Errorf("Number of argument indices for substitution (%d) does not match number of addresses (%d)", len(argIndicesForSubstitution), len(addresses))
+	}
+	if len(addresses) != len(b64ViewProtos) {
+		return fmt.Errorf("Number of addresses (%d) does not match number of views (%d)", len(addresses), len(b64ViewProtos))
+	}
+
 	arr := append([]string{applicationFunction}, applicationArgs...)
+
+	// 1. Verify proofs that are returned
+	for i, argIndex := range argIndicesForSubstitution {
+		// Validate argument index
+		if argIndex >= len(applicationArgs) {
+			return fmt.Errorf("Index %d out of bounds of array (length %d)", argIndex, len(applicationArgs))
+	    }
+		// Validate proof and extract view data
+        viewData, err := s.ParseAndValidateView(ctx, addresses[i], b64ViewProtos[i])
+		if err != nil {
+			return err
+		}
+		// Substitute argument in list with view data
+		arr[argIndex + 1] = string(viewData)
+	}
+
+	// 3. Call application chaincode with created state as the argument
 	byteArgs := strArrToBytesArr(arr)
-	byteArgs = append(byteArgs, viewData)
 	log.Info(fmt.Sprintf("Calling invoke chaincode. AppId: %s, appChannel: %s", applicationID, applicationChannel))
 	pbResp := ctx.GetStub().InvokeChaincode(applicationID, byteArgs, applicationChannel)
 	if pbResp.Status != shim.OK {
