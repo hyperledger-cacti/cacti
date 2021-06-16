@@ -271,8 +271,6 @@ class GetStateByLinearId(val linearId: String) : FlowLogic<String>() {
      */
     override fun call(): String {
         val states = serviceHub.vaultService.queryBy<SimpleState>().states
-                //.filter { it.state.data.linearId.externalId == linearId }
-                //.filter { it.state.data.linearId.id == linearId }
                 .filter { it.state.data.linearId == UniqueIdentifier.Companion.fromString(linearId) }
                 .map { it.state.data }
         println("Retrieved states with linearId $linearId: $states\n")

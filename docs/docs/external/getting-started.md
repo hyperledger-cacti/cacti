@@ -402,7 +402,7 @@ To test the scenario where `network1` requests the value of the state (key) `H` 
   ```
 - Query the value of the requested state (key) `H` in `network1` using the following (replace the Args with the Args value obtained in the previous command):
   ```bash
-  fabric-cli interop --local-network=network1 chaincode invoke mychannel simplestate Read '["Args"]'
+  fabric-cli interop --local-network=network1 chaincode invoke mychannel simplestate read '["Args"]'
   ```
 
 To test the scenario where `network2` requests the value of the state (key) `H` from `Corda_Network`, do the following:
@@ -421,6 +421,10 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
 - Run the following (if `fabric-cli` is not in your system path, specify the full path to the `fabric-cli` executable):
   ```bash
   fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+  ```
+- Query the value of the requested state (key) `Arcturus` in `network1` using the following (replace the Args with the Args value obtained in the previous command):
+  ```bash
+  fabric-cli interop --local-network=network1 chaincode invoke mychannel simplestate read '["Args"]'
   ```
 
 To test the scenario where `network2` requests the value of the state (key) `a` from `network1`, do the following:
