@@ -19,6 +19,6 @@ stop:
 	./scripts/stop-nodes.sh
 
 .PHONY: clean
-clean:	stop
+clean-local:	stop
 	./gradlew clean
 	rm artifacts/*.jar
