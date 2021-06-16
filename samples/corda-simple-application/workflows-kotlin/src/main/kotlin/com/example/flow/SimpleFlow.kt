@@ -11,6 +11,7 @@ import com.cordaSimpleApplication.contract.SimpleContract
 import com.cordaSimpleApplication.state.SimpleState
 import javassist.NotFoundException
 import net.corda.core.contracts.Command
+import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.node.services.queryBy
 import net.corda.core.transactions.SignedTransaction
@@ -237,7 +238,7 @@ class DeleteState(val key: String) : FlowLogic<SignedTransaction>() {
  * @property key the key for the [SimpleState] to be retrieved.
  */
 @StartableByRPC
-class GetStateByKey(val key: String) : FlowLogic<ByteArray>() {
+class GetStateByKey(val key: String) : FlowLogic<List<SimpleState>>() {
     @Suspendable
 
     /**
@@ -245,12 +246,37 @@ class GetStateByKey(val key: String) : FlowLogic<ByteArray>() {
      *
      * @return returns the [SimpleState].
      */
-    override fun call(): ByteArray {
+    override fun call(): List<SimpleState> {
         val states = serviceHub.vaultService.queryBy<SimpleState>().states
                 .filter { it.state.data.key == key }
                 .map { it.state.data }
         println("Retrieved states with key $key: $states\n")
-        return states.toString().toByteArray()
+        return states
+    }
+}
+
+/**
+ * The GetStateByLinearId flow is used to retrieve a [SimpleState] from the vault based on its linearId.
+ *
+ * @property linearId the linearId for the [SimpleState] to be retrieved.
+ */
+@StartableByRPC
+class GetStateByLinearId(val linearId: String) : FlowLogic<String>() {
+    @Suspendable
+
+    /**
+     * The call() method captures the logic to find a [SimpleState] in the vault based on its linearId.
+     *
+     * @return returns the [SimpleState].
+     */
+    override fun call(): String {
+        val states = serviceHub.vaultService.queryBy<SimpleState>().states
+                //.filter { it.state.data.linearId.externalId == linearId }
+                //.filter { it.state.data.linearId.id == linearId }
+                .filter { it.state.data.linearId == UniqueIdentifier.Companion.fromString(linearId) }
+                .map { it.state.data }
+        println("Retrieved states with linearId $linearId: $states\n")
+        return states.toString()
     }
 }
 
