@@ -5,6 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
+import * as fs from 'fs'
 import { invoke } from '../../helpers/fabric-functions'
 import logger from '../../helpers/logger'
 import { commandHelp, getNetworkConfig } from '../../helpers/helpers'
@@ -82,15 +83,16 @@ const command: GluegunCommand = {
         connProfilePath,
         options['local-network'],
         mspId,
+        logger,
         userid,
-        true,
-        logger
+        true
       )
       spinner.succeed(`Response from network: ${JSON.stringify(result)} `)
     } catch (err) {
       spinner.fail(`Error invoking chaincode`)
       logger.error(`Error invoking chaincode: ${err}`)
     }
+    process.exit()
   }
 }
 

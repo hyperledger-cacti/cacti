@@ -48,7 +48,7 @@ const command: GluegunCommand = {
     const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'))
     console.log(net)
 
-    let wallet = walletSetup(options['target-network'],
+    let wallet = await walletSetup(options['target-network'],
                     ccp,
                     net.mspId,
                     userName,

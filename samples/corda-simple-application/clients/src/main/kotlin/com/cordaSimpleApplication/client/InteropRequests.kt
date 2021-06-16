@@ -11,6 +11,7 @@ import arrow.core.Left
 import arrow.core.Right
 import com.cordaInteropApp.flows.CreateExternalRequest
 import com.cordaInteropApp.flows.WriteExternalStateInitiator
+import com.cordaInteropApp.flows.GetExternalStateByLinearId
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
@@ -185,5 +186,32 @@ fun writeExternalStateToVault(
         Left(Error("Error writing state to Corda network: ${e.message}"))
     } finally {
         rpc.close()
+    }
+}
+
+class GetExternalStateCommand : CliktCommand(help = "Get external state from vault. " +
+        "Requires linearId") {
+    val externalStateLinearId: String by argument()
+    val config by requireObject<Map<String, String>>()
+    override fun run() {
+      println("Get states with key $externalStateLinearId")
+      val rpc = NodeRPCConnection(
+              host = config["CORDA_HOST"]!!,
+              username = "clientUser1",
+              password = "test",
+              rpcPort = config["CORDA_PORT"]!!.toInt())
+      try {
+          val proxy = rpc.proxy
+          val (data, proof) = proxy.startFlow(::GetExternalStateByLinearId, externalStateLinearId)
+                  .returnValue.get()
+          val s = data.toString(Charsets.UTF_8)
+          val p = proof.toString(Charsets.UTF_8)
+          println("Response: ${s}")
+          println("Proof: ${p}")
+      } catch (e: Exception) {
+          println(e.toString())
+      } finally {
+          rpc.close()
+      }
     }
 }
