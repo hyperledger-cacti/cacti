@@ -34,7 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "@fidm/x509": "^1.2.1",
-    "@res-dlt-interop/fabric-interop-sdk": "file:../../../../../../sdks/fabric/interoperation-node-sdk",
+    "@res-dlt-interop/fabric-interop-sdk": "file:../../../sdks/fabric/interoperation-node-sdk",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "elliptic": "^6.5.4",
