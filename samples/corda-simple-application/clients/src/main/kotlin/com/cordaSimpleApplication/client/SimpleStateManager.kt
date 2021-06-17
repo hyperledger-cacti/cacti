@@ -121,7 +121,7 @@ class GetStateCommand : CliktCommand(help = "Gets state by key. Requires a key")
             val proxy = rpc.proxy
             val states = proxy.startFlow(::GetStateByKey, key)
                     .returnValue.get()
-            println(states)
+            println(states.toString(Charsets.UTF_8))
         } catch (e: Exception) {
             println(e.toString())
         } finally {
@@ -139,7 +139,7 @@ class GetStateUsingLinearIdCommand : CliktCommand(help = "Gets state by linearId
     val linearId: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
-        println("Get states with linearId $linearId")
+        println("Get state with linearId $linearId")
         val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
                 username = "clientUser1",

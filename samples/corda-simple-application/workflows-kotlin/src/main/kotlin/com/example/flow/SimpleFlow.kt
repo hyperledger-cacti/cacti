@@ -238,7 +238,7 @@ class DeleteState(val key: String) : FlowLogic<SignedTransaction>() {
  * @property key the key for the [SimpleState] to be retrieved.
  */
 @StartableByRPC
-class GetStateByKey(val key: String) : FlowLogic<List<SimpleState>>() {
+class GetStateByKey(val key: String) : FlowLogic<ByteArray>() {
     @Suspendable
 
     /**
@@ -246,12 +246,12 @@ class GetStateByKey(val key: String) : FlowLogic<List<SimpleState>>() {
      *
      * @return returns the [SimpleState].
      */
-    override fun call(): List<SimpleState> {
+    override fun call(): ByteArray {
         val states = serviceHub.vaultService.queryBy<SimpleState>().states
                 .filter { it.state.data.key == key }
                 .map { it.state.data }
         println("Retrieved states with key $key: $states\n")
-        return states
+        return states.toString().toByteArray()
     }
 }
 
@@ -273,8 +273,9 @@ class GetStateByLinearId(val linearId: String) : FlowLogic<String>() {
         val states = serviceHub.vaultService.queryBy<SimpleState>().states
                 .filter { it.state.data.linearId == UniqueIdentifier.Companion.fromString(linearId) }
                 .map { it.state.data }
-        println("Retrieved states with linearId $linearId: $states\n")
-        return states.toString()
+        val state = states.first()
+        println("Retrieved state with linearId $linearId: $state\n")
+        return state.toString()
     }
 }
 
