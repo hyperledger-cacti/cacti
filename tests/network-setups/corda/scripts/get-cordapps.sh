@@ -5,11 +5,11 @@ simpleAppVersion="0.4"
 interopAppVersion="0.6"
 
 if [[ $1 == "local" ]]; then
-  cp $directory/../../../../../samples/corda-simple-application/contracts-kotlin/build/libs/contracts-kotlin-$simpleAppVersion.jar $directory/../artifacts
-  cp $directory/../../../../../samples/corda-simple-application/workflows-kotlin/build/libs/workflows-kotlin-$simpleAppVersion.jar $directory/../artifacts
+  cp $directory/../../../../samples/corda/corda-simple-application/contracts-kotlin/build/libs/contracts-kotlin-$simpleAppVersion.jar $directory/../artifacts
+  cp $directory/../../../../samples/corda/corda-simple-application/workflows-kotlin/build/libs/workflows-kotlin-$simpleAppVersion.jar $directory/../artifacts
 
-  cp $directory/../../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$interopAppVersion.jar $directory/../artifacts
-  cp $directory/../../../../../core/network/corda-interop-app/interop-workflows/build/libs/interop-workflows-$interopAppVersion.jar $directory/../artifacts
+  cp $directory/../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$interopAppVersion.jar $directory/../artifacts
+  cp $directory/../../../../core/network/corda-interop-app/interop-workflows/build/libs/interop-workflows-$interopAppVersion.jar $directory/../artifacts
 else
   file="$directory/../../artifactory.properties"
   if [ -f $file ]; then
