@@ -146,7 +146,7 @@ Prepare `fabric-cli` for configuration as follows:
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - Create a `config.json` file by copying the `config.template.json` and setting (or adding or removing) suitable values:
   * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
-    - Replace `<PATH-TO-NETWORK-SETUPS>` with the absolute path location of the `tests/network-setups` folder.
+    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
     - Otherwise, leave the default values unchanged.
 - Create a `.env` file by copying `.env.template` and setting suitable parameter values:
   * The `MEMBER_CREDENTIAL_FOLDER` should refer to the folder containing the credentials (security group and policy info) of all the foreign networks.
@@ -216,14 +216,14 @@ The code for this lies in the `core/drivers/fabric-driver` folder.
 
 #### Configuring
 
-In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the fabric network (e.g. `<PATH-TO-NETWORK-SETUPS>/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
+In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
 
 Configure `fabric-driver` for `network1` as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
 - Create a `.env` file by copying `.env.template` and setting suitable parameter values:
   * The `CONNECTION_PROFILE` should point to the absolute path of the connection profile for `network1`.
-    - For this exercise, specify the path `<PATH-TO-NETWORK-SETUPS>/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json` (_you must specify the full absolute path here_).
-    - `<PATH-TO-NETWORK-SETUPS>` here is the absolute path of the `tests/network-setups` folder.
+    - For this exercise, specify the path `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json` (_you must specify the full absolute path here_).
+    - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
   * Leave the default values unchanged for the other parameters. The relay and driver endpoints as well as the network name are already specified.
 
 #### Building
@@ -251,7 +251,7 @@ Run a Fabric driver for `network2` as follows (_do this only if you wish to test
 - Navigate to the `core/drivers/fabric-driver` folder.
 - Run the following:
   ```bash
-  CONNECTION_PROFILE=<PATH-TO-NETWORK-SETUPS>/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev
+  CONNECTION_PROFILE=<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev
   ```
 _Note_: the variables we specified earlier in the `.env` are now passed in the command line. Alternatively, you can make a copy of the `fabric-driver` folder with a different  name and create a separate `.env` file within it that contains links to the connection profile, relay, and driver for `network2`.
 
