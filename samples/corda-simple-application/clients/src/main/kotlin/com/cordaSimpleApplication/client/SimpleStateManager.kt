@@ -147,9 +147,9 @@ class GetStateUsingLinearIdCommand : CliktCommand(help = "Gets state by linearId
                 rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
             val proxy = rpc.proxy
-            val states = proxy.startFlow(::GetStateByLinearId, linearId)
+            val state = proxy.startFlow(::GetStateByLinearId, linearId)
                     .returnValue.get()
-            println(states)
+            println(state)
         } catch (e: Exception) {
             println(e.toString())
         } finally {
