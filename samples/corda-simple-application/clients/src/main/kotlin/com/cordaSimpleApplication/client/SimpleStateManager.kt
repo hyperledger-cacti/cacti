@@ -121,7 +121,35 @@ class GetStateCommand : CliktCommand(help = "Gets state by key. Requires a key")
             val proxy = rpc.proxy
             val states = proxy.startFlow(::GetStateByKey, key)
                     .returnValue.get()
-            println(states)
+            println(states.toString(Charsets.UTF_8))
+        } catch (e: Exception) {
+            println(e.toString())
+        } finally {
+            rpc.close()
+        }
+    }
+}
+
+/**
+ * The CLI command used to trigger a GetStateByLinearId flow.
+ *
+ * @property linearId The linearId for the [SimpleState] to be retrieved.
+ */
+class GetStateUsingLinearIdCommand : CliktCommand(help = "Gets state by linearId. Requires a linearId") {
+    val linearId: String by argument()
+    val config by requireObject<Map<String, String>>()
+    override fun run() {
+        println("Get state with linearId $linearId")
+        val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val proxy = rpc.proxy
+            val state = proxy.startFlow(::GetStateByLinearId, linearId)
+                    .returnValue.get()
+            println(state)
         } catch (e: Exception) {
             println(e.toString())
         } finally {

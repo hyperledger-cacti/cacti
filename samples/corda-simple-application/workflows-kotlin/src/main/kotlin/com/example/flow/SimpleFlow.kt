@@ -11,6 +11,7 @@ import com.cordaSimpleApplication.contract.SimpleContract
 import com.cordaSimpleApplication.state.SimpleState
 import javassist.NotFoundException
 import net.corda.core.contracts.Command
+import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.node.services.queryBy
 import net.corda.core.transactions.SignedTransaction
@@ -251,6 +252,30 @@ class GetStateByKey(val key: String) : FlowLogic<ByteArray>() {
                 .map { it.state.data }
         println("Retrieved states with key $key: $states\n")
         return states.toString().toByteArray()
+    }
+}
+
+/**
+ * The GetStateByLinearId flow is used to retrieve a [SimpleState] from the vault based on its linearId.
+ *
+ * @property linearId the linearId for the [SimpleState] to be retrieved.
+ */
+@StartableByRPC
+class GetStateByLinearId(val linearId: String) : FlowLogic<String>() {
+    @Suspendable
+
+    /**
+     * The call() method captures the logic to find a [SimpleState] in the vault based on its linearId.
+     *
+     * @return returns the [SimpleState].
+     */
+    override fun call(): String {
+        val states = serviceHub.vaultService.queryBy<SimpleState>().states
+                .filter { it.state.data.linearId == UniqueIdentifier.Companion.fromString(linearId) }
+                .map { it.state.data }
+        val state = states.first()
+        println("Retrieved state with linearId $linearId: $state\n")
+        return state.toString()
     }
 }
 

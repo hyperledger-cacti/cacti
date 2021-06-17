@@ -216,7 +216,7 @@ The code for this lies in the `core/drivers/fabric-driver` folder.
 
 #### Configuring
 
-In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the fabric network (e.g. `<PATH_TO_NETWORK_SETUPS_REPO>/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
+In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the fabric network (e.g. `<PATH-TO-NETWORK-SETUPS>/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
 
 Configure `fabric-driver` for `network1` as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
@@ -373,11 +373,15 @@ Once you have the networks, the relays, and the drivers, running, and the ledger
 
 ## Corda to Fabric
 
-To test the scenario where `Corda_Network` requests the value of the state (key) `Arcturus` from `network1`, do the following:
+To test the scenario where `Corda_Network` requests the value of the state (key) `a` from `network1`, do the following:
 - Navigate to the `samples/corda-simple-application` folder.
 - Run the following:
   ```bash
-  ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:Arcturus
+  ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
+  ```
+- Query the value of the requested state (key) `a` in `Corda_Network` using the following (replace LinearId with the CorDapp simplestate linearId value obtained in the previous command):
+  ```bash
+  ./clients/build/install/clients/bin/clients get-state-using-linear-id LinearId
   ```
 
 To test the scenario where `Corda_Network` requests the value of the state (key) `Arcturus` from `network2`, do the following:
@@ -395,6 +399,10 @@ To test the scenario where `network1` requests the value of the state (key) `H` 
 - Run the following (if `fabric-cli` is not in your system path, specify the full path to the `fabric-cli` executable):
   ```bash
   fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+  ```
+- Query the value of the requested state (key) `H` in `network1` using the following (replace the Args with the Args value obtained in the previous command):
+  ```bash
+  fabric-cli interop --local-network=network1 chaincode invoke mychannel simplestate read '["Args"]'
   ```
 
 To test the scenario where `network2` requests the value of the state (key) `H` from `Corda_Network`, do the following:
@@ -414,6 +422,10 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
   ```bash
   fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
   ```
+- Query the value of the requested state (key) `Arcturus` in `network1` using the following (replace the Args with the Args value obtained in the previous command):
+  ```bash
+  fabric-cli interop --local-network=network1 chaincode invoke mychannel simplestate read '["Args"]'
+  ```
 
 To test the scenario where `network2` requests the value of the state (key) `a` from `network1`, do the following:
 - Navigate to the `tests/network-setups/fabric/dev/scripts/fabric-cli` folder.
@@ -431,7 +443,7 @@ Bring down the various components as follows:
   * Navigate to the `tests/network-setups/shared/corda` folder.
   * Run the following:
   ```bash
-  make clean-local
+  make clean
   ```
 - To bring down one or both of the Fabric networks:
   * Navigate to the `tests/network-setups/fabric/dev` folder.

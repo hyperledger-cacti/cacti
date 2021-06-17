@@ -9,6 +9,8 @@ package com.cordaSimpleApplication.client
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import com.cordaSimpleApplication.flow.CreateState
+import com.cordaSimpleApplication.state.SimpleState
 import com.cordaInteropApp.flows.CreateExternalRequest
 import com.cordaInteropApp.flows.WriteExternalStateInitiator
 import com.cordaInteropApp.flows.GetExternalStateByLinearId
@@ -174,7 +176,16 @@ fun writeExternalStateToVault(
                     .returnValue.get()
         }.fold({
             it.map { linearId ->
-                println("Verification was successful and state was stored with linearId $linearId.\n")
+                println("Verification was successful and external-state was stored with linearId $linearId.\n")
+
+		val (valueByteArray, externalStateProof) = proxy.startFlow(::GetExternalStateByLinearId, linearId.toString()).returnValue.get()
+		val value = valueByteArray.toString(Charsets.UTF_8)
+		val key = address.split(":").last()
+		val createdState = proxy.startFlow(::CreateState, key, value)
+                    .returnValue.get().tx.outputStates.first() as SimpleState
+		println("Created simplestate: ${createdState}")
+		println("LinearId ${createdState.linearId} can be used to fetch the requested state from the CorDapp simplestate vault")
+
                 linearId.toString()
             }
         }, {

@@ -50,6 +50,7 @@ fun main(args: Array<String>) = App()
                 UpdateStateCommand(),
                 DeleteStateCommand(),
                 GetStateCommand(),
+                GetStateUsingLinearIdCommand(),
                 GetStatesCommand(),
                 RequestStateCommand(),
                 CreateVerificationPolicyCommand(),

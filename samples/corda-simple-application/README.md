@@ -54,10 +54,16 @@ Use the command line client to manage state in the network:
 ./clients/build/install/clients/bin/clients create-state H 1
 ```
 
-- Query a `SimpleStates` by key
+- Query a `SimpleState` by key
 
 ```
 ./clients/build/install/clients/bin/clients get-state H
+```
+
+- Query a `SimpleState` by linearId
+
+```
+./clients/build/install/clients/bin/clients get-state-using-linear-id LinearId
 ```
 
 - Query all `SimpleStates`
