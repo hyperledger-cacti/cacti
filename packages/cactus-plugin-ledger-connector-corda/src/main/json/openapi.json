@@ -9,26 +9,6 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "servers": [
-        {
-            "url": "https://www.cactus.stream/{basePath}",
-            "description": "Public test instance",
-            "variables": {
-                "basePath": {
-                    "default": ""
-                }
-            }
-        },
-        {
-            "url": "http://localhost:4000/{basePath}",
-            "description": "Local test instance",
-            "variables": {
-                "basePath": {
-                    "default": ""
-                }
-            }
-        }
-    ],
     "components": {
         "schemas": {
             "SHA256": {
@@ -374,6 +354,7 @@
                     "jarFiles",
                     "cordappDeploymentConfigs"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "cordappDeploymentConfigs": {
                         "type": "array",
@@ -438,6 +419,7 @@
                     "params",
                     "signingCredential"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "flowFullClassName": {
                         "description": "The fully qualified name of the Corda flow to invoke",
@@ -505,6 +487,7 @@
             },
             "ListFlowsV1Request": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                     "filter": {
                         "type": "string"
@@ -689,7 +672,8 @@
                 }
             },
             "NetworkMapV1Request": {
-                "type": "object"
+                "type": "object",
+                "additionalProperties": false
             },
             "NetworkMapV1Response": {
                 "type": "array",
@@ -702,6 +686,7 @@
             },
             "DiagnoseNodeV1Request": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                     "nodeIds": {
                         "type": "array",

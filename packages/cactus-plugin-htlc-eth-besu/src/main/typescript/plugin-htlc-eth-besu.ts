@@ -1,8 +1,12 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 
-import { Express } from "express";
+import type { Express, NextFunction, Request, Response } from "express";
 import { Optional } from "typescript-optional";
+
+import OAS from "../json/openapi.json";
+import * as OpenApiValidator from "express-openapi-validator";
+import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 import {
   IPluginWebService,
@@ -23,7 +27,6 @@ import {
   InvokeContractV1Response,
   PluginLedgerConnectorBesu,
   RunTransactionResponse,
-  Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 import HashTimeLockJSON from "../solidity/contracts/HashTimeLock.json";
@@ -33,6 +36,8 @@ import {
   WithdrawReq,
   NewContractObj,
   InitializeRequest,
+  GetStatusRequest,
+  GetSingleStatusRequest,
 } from "./generated/openapi/typescript-axios";
 export interface IPluginHtlcEthBesuOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -75,6 +80,10 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     return;
   }
 
+  getOpenApiSpecs(): OpenAPIV3.Document {
+    return (OAS as unknown) as OpenAPIV3.Document;
+  }
+
   public getInstanceId(): string {
     return this.instanceId;
   }
@@ -89,6 +98,40 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
+    const apiSpec = this.getOpenApiSpecs();
+    const openApiMiddleware = OpenApiValidator.middleware({
+      apiSpec,
+      validateApiSpec: false,
+      $refParser: {
+        mode: "dereference",
+      },
+    });
+    app.use(openApiMiddleware);
+    app.use(
+      (
+        err: {
+          status?: number;
+          errors: [
+            {
+              path: string;
+              message: string;
+              errorCode: string;
+            },
+          ];
+        },
+        req: Request,
+        res: Response,
+        next: NextFunction,
+      ) => {
+        if (err) {
+          res.status(err.status || 500);
+          res.send(err.errors);
+        } else {
+          next();
+        }
+      },
+    );
+
     webServices.forEach((ws) => ws.registerExpress(app));
     return webServices;
   }
@@ -194,43 +237,37 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
   }
 
   public async getSingleStatus(
-    id: string,
-    connectorId: string,
-    keychainId: string,
-    web3SigningCredential: Web3SigningCredential,
+    req: GetSingleStatusRequest,
   ): Promise<InvokeContractV1Response> {
     const connector = this.pluginRegistry.plugins.find(
-      (plugin) => plugin.getInstanceId() == connectorId,
+      (plugin) => plugin.getInstanceId() == req.connectorId,
     ) as PluginLedgerConnectorBesu;
 
     const result = await connector.invokeContract({
       contractName: HashTimeLockJSON.contractName,
-      signingCredential: web3SigningCredential,
+      signingCredential: req.web3SigningCredential,
       invocationType: EthContractInvocationType.Call,
       methodName: "getSingleStatus",
-      params: [id],
-      keychainId,
+      params: [req.id],
+      keychainId: req.keychainId,
     });
     return result;
   }
 
   public async getStatus(
-    ids: string[],
-    connectorId: string,
-    keychainId: string,
-    web3SigningCredential: Web3SigningCredential,
+    req: GetStatusRequest,
   ): Promise<InvokeContractV1Response> {
     const connector = this.pluginRegistry.plugins.find(
-      (plugin) => plugin.getInstanceId() == connectorId,
+      (plugin) => plugin.getInstanceId() == req.connectorId,
     ) as PluginLedgerConnectorBesu;
 
     const result = await connector.invokeContract({
       contractName: HashTimeLockJSON.contractName,
-      signingCredential: web3SigningCredential,
+      signingCredential: req.web3SigningCredential,
       invocationType: EthContractInvocationType.Call,
       methodName: "getStatus",
-      params: [ids],
-      keychainId,
+      params: [req.ids],
+      keychainId: req.keychainId,
     });
     return result;
   }
