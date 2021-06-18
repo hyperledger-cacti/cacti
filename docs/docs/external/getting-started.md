@@ -232,9 +232,7 @@ Build the Fabric driver module as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
 - Run the following:
   ```bash
-  npm install
   make build-local
-  npm run postinstall
   ```
 _Note_: `postinstall` applies a customization patch to the `fabric-network` NPM library.
 
