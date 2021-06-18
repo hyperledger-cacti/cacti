@@ -27,8 +27,8 @@ repositories {
     mavenCentral()
     mavenLocal()
     flatDir {
-        dirs '../../../core/network/corda-interop-app/interop-contracts/build/libs'
-        dirs '../../../core/network/corda-interop-app/interop-workflows/build/libs'
+        dirs '../../../../core/network/corda-interop-app/interop-contracts/build/libs'
+        dirs '../../../../core/network/corda-interop-app/interop-workflows/build/libs'
     }
 }
 

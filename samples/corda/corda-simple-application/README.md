@@ -12,7 +12,7 @@ contains a key/value pair of strings. Flows are defined to create, update and
 delete a `SimpleState`. A CLI client is also included that allows the user to
 interact with the Corda nodes and trigger the flows in the simple CorDapp and
 the interoperation CorDapp. The Corda network itself is defined in the
-[network-setups](../../tests/network-setups)
+[network-setups](../../../tests/network-setups)
 repository.
 
 ## Initial setup
@@ -43,7 +43,7 @@ make build
 To use the CLI client and interact with the CorDapp running on the nodes, you
 will need to have the Corda network running. Instructions for doing so can be
 found in the
-[network-setups](../../tests/network-setups)
+[network-setups](../../../tests/network-setups)
 repo.
 
 Use the command line client to manage state in the network:
@@ -175,7 +175,7 @@ published to Artifactory, first change the version number in the
 `gradle.properties` file. Then in each of the
 `clients/build.gradle`, `workflows-kotlin/build.gradle` and
 `contracts-kotlin/build.gradle` files, change the version number in the
-`publishing` gradle task. 
+`publishing` gradle task.
 
 ### Updating the version of the interop CorDapps downloaded from Artifactory
 
@@ -186,9 +186,9 @@ Artifactory.
 ## Notes on the proto dependencies
 
 This repo relies on data structures defined in
-[interop-protos](../../common/interop-protos). It
+[interop-protos](../../../common/interop-protos). It
 also has a dependency on the [interop
-CorDapp](../../core/network/corda-interop-app), which
+CorDapp](../../../core/network/corda-interop-app), which
 itself has a dependency on the same proto files. Generating the java and kotlin
 files from the proto files locally in this repository therefore creates some
 problems. Firstly, because the generated java and kotlin files are created under
@@ -209,7 +209,7 @@ single repo, instead of across multiple.
 
 - Remove the `deployNodes` gradle task as the Corda network config is now done
   in
-  [network-setups](../../tests/network-setups).
+  [network-setups](../../../tests/network-setups).
 - Write tests for the CorDapp and CLI client.
 - Fix bug where if Corda flow throws an exception the rpc connection doesn't get
   closed.

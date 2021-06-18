@@ -44,8 +44,8 @@ For local versions, the `get-cordapps` script assumes that _a)_ the repositories
 for these are at the same directory level as the `networks-setup` repository,
 and _b)_ that the cordapp executables have been built in those repos. The
 required CorDapps are in
-[corda-simple-application](../../../../samples/corda-simple-application) and
-[corda-interop-app](../../../../core/network/corda-interop-app)
+[corda-simple-application](../../../samples/corda/corda-simple-application) and
+[corda-interop-app](../../../core/network/corda-interop-app)
 and the instructions for building these projects can be found in their
 respective repos.
 
@@ -72,7 +72,7 @@ targets.
 
 ## Interacting with the nodes
 
-The [corda-simple-application](../../../../samples/corda-simple-application)
+The [corda-simple-application](../../../samples/corda/corda-simple-application)
 repository includes a client application for interacting with the CorDapps
 running on the Corda nodes. Please see this repository for further information
 on how to use it.

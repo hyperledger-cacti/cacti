@@ -18,8 +18,8 @@ services:
       - DEFAULT_APPLICATION_CHAINCODE=simplestate
     command: sh -c "sleep 6000"
     volumes:
-      - ../../../shared/network1/peerOrganizations/org1.network1.com/connection-org1.docker.json:/fabric-cli/ccp-nw1.json
-      - ../../../shared/network2/peerOrganizations/org1.network2.com/connection-org1.docker.json:/fabric-cli/ccp-nw2.json
+      - ../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.docker.json:/fabric-cli/ccp-nw1.json
+      - ../../../tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.docker.json:/fabric-cli/ccp-nw2.json
       - ./config.docker.json:/fabric-cli/config.json
       - ./src/data/credentials_docker:/fabric-cli/credentials
       - ./src/wallet-network1:/fabric-cli/src/wallet-network1
