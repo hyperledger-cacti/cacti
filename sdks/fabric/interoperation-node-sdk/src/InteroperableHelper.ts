@@ -21,6 +21,11 @@ import eciesCrypto from "./eciesCrypto.js";
 import * as helpers from "./helpers";
 import { deserializeRemoteProposalResponseBase64, serializeRemoteProposalResponse } from "./decoders";
 import statePb from "../protos-js/common/state_pb";
+import fabricViewPb from "../protos-js/fabric/view_data_pb";
+import cordaViewPb from "../protos-js/corda/view_data_pb";
+import interopPayloadPb from "../protos-js/common/interop_payload_pb";
+import proposalResponsePb from "../protos-js/peer/proposal_response_pb";
+import identitiesPb from "../protos-js/msp/identities_pb";
 import { Relay } from "./Relay";
 import { Contract } from "fabric-network";
 import { v4 as uuidv4 } from "uuid";
@@ -152,6 +157,66 @@ const verifyRemoteProposalResponse = async (proposalResponseBase64, isEncrypted,
 };
 
 /**
+ * Extracts actual remote query response embedded in view structure.
+ * Argument is a View protobuf ('statePb.View')
+ **/
+const getResponseDataFromView = (view) => {
+    if (view.getMeta().getProtocol() == statePb.Meta.Protocol.FABRIC) {
+        const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
+        const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricView.getResponse().getPayload())));
+        return Buffer.from(interopPayload.getPayload()).toString();
+    } else if (view.getMeta().getProtocol() == statePb.Meta.Protocol.CORDA) {
+        const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
+        const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(cordaView.getPayload())));
+        return Buffer.from(interopPayload.getPayload()).toString();
+    } else {
+        const protocolType = view.getMeta().getProtocol();
+        throw new Error(`Unsupported DLT type: ${protocolType}`);
+    }
+}
+
+/**
+ * Extracts endorsements and the signing authorities backing those endorsements from a Fabric view.
+ * Argument is a View protobuf ('statePb.View')
+ **/
+const getEndorsementsAndSignatoriesFromFabricView = (view) => {
+    if (view.getMeta().getProtocol() != statePb.Meta.Protocol.FABRIC) {
+        throw new Error(`Not a Fabric view`);
+    }
+    const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
+    const endorsements = fabricView.getEndorsementsList();
+    let serializedEndorsementsWithSignatories = [];
+    for (let i = 0; i < endorsements.length; i++) {
+        const endorsement = Buffer.from(endorsements[i].serializeBinary()).toString('base64');
+        const sid = identitiesPb.SerializedIdentity.deserializeBinary(Uint8Array.from(Buffer.from(endorsements[i].getEndorser())));
+        serializedEndorsementsWithSignatories.push([sid.getMspid(), endorsement]);
+    }
+    return serializedEndorsementsWithSignatories;
+}
+
+/**
+ * Extracts response payload from a Fabric view.
+ * Argument is a View protobuf ('statePb.View')
+ **/
+const getResponsePayloadFromFabricView = (view) => {
+    if (view.getMeta().getProtocol() != statePb.Meta.Protocol.FABRIC) {
+        throw new Error(`Not a Fabric view`);
+    }
+    const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData())
+    return Buffer.from(fabricView.getResponse().serializeBinary()).toString('base64')
+}
+
+/**
+ * Extracts signing authority (i.e., organization MSP) a Fabric endorsement.
+ * Argument is an 'Endorsement' in base64 format.
+ **/
+const getSignatoryOrgMSPFromFabricEndorsementBase64 = (endorsementBase64) => {
+    const endorsement = proposalResponsePb.Endorsement.deserializeBinary(Buffer.from(endorsementBase64, 'base64'));
+    const sid = identitiesPb.SerializedIdentity.deserializeBinary(Uint8Array.from(Buffer.from(endorsement.getEndorser())));
+    return sid.getMspid();
+}
+
+/**
  * Accepts a base 64 encoded string of the protobuf view binary and returns a javascript object.
  **/
 const decodeView = (viewBase64) => {
@@ -269,7 +334,7 @@ const verifyView = async (contract: Contract, base64ViewProto: string, address: 
  **/
 const createAddress = (query: Query, networkID, remoteURL) => {
     const { channel, contractName, ccFunc, ccArgs } = query;
-    const addressString = `${remoteURL}/${networkID}/${channel}/${contractName}/${ccFunc}/${ccArgs.join(":")}`;
+    const addressString = `${remoteURL}/${networkID}/${channel}:${contractName}:${ccFunc}:${ccArgs.join(":")}`;
     return addressString;
 };
 
@@ -280,7 +345,7 @@ const createAddress = (query: Query, networkID, remoteURL) => {
  * 2. Get policy from chaincode for supplied address.
  * 3. Call the relay Process request which will send a request to the remote network via local relay and poll for an update in the request status.
  * 4. Call the local chaincode to verify the view before trying to write to chaincode.
- * 5. Prepare aruements and call WriteExternalState.
+ * 5. Prepare arguments and call WriteExternalState.
  **/
 const interopFlow = async (
     interopContract: Contract,
@@ -290,6 +355,7 @@ const interopFlow = async (
     localRelayEndpoint: string,
     interopJSON: InteropJSON,
     keyCert: { key: ICryptoKey; cert: any },
+    returnWithoutLocalInvocation: boolean = false,
 ): Promise<{ view: any; result: any }> => {
     const {
         address,
@@ -326,7 +392,7 @@ const interopFlow = async (
             policyCriteria,
             networkID,
             keyCert.cert,
-            Sign ? signMessage(address + uuidValue, keyCert.key.toBytes()).toString("base64") : "",
+            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()).toString("base64") : "",
             uuidValue,
             // Org is empty as the name is in the certs for
             org,
@@ -359,9 +425,12 @@ const interopFlow = async (
         localChannel,
         localCCFunc,
         JSON.stringify(localCCArgs),
-        address,
+        computedAddress,
         Buffer.from(relayResponse.getView().serializeBinary()).toString("base64"),
     ];
+    if (returnWithoutLocalInvocation) {
+        return { view: relayResponse.getView(), result: ccArgs };
+    }
     const [result, submitError] = await helpers.handlePromise(
         interopContract.submitTransaction("WriteExternalState", ...ccArgs),
     );
@@ -433,6 +502,10 @@ export {
     decryptRemoteProposalResponse,
     verifyRemoteProposalResponse,
     verifyDecryptedRemoteProposalResponse,
+    getResponseDataFromView,
+    getEndorsementsAndSignatoriesFromFabricView,
+    getResponsePayloadFromFabricView,
+    getSignatoryOrgMSPFromFabricEndorsementBase64,
     decodeView,
     signMessage,
     invokeHandler,
