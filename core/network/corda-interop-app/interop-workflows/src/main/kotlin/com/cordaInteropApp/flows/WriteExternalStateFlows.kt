@@ -19,7 +19,15 @@ import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.transactions.TransactionBuilder
+import org.hyperledger.fabric.protos.peer.ProposalResponsePackage
 import java.util.Base64
+
+import net.corda.core.node.services.queryBy
+import net.corda.core.node.services.vault.QueryCriteria
+import fabric.view_data.ViewData
+import common.interop_payload.InteropPayloadOuterClass
+import org.hyperledger.fabric.protos.msp.Identities
+
 
 /**
  * The WriteExternalStateInitiator flow is used to process a response from a foreign network for state.
@@ -79,3 +87,74 @@ class WriteExternalStateInitiator(
         Left(Error("Failed to store state in ledger: ${e.message}"))
     }
 }
+
+
+/**
+ * The GetExternalBoLByLinearId flow is used to read an External State and parse
+ * the View Data.
+ *
+ * @property externalStateLinearId the linearId for the ExternalState.
+ */
+@StartableByRPC
+class GetExternalStateByLinearId(
+        val externalStateLinearId: String
+) : FlowLogic<Pair<ByteArray, ByteArray>>() {
+
+    @Suspendable
+    override fun call(): Pair<ByteArray, ByteArray> {
+        println("Getting External State for linearId $externalStateLinearId stored in vault\n.")
+        val linearId = UniqueIdentifier.fromString(externalStateLinearId)
+        //val linearId = externalStateLinearId
+        val states = serviceHub.vaultService.queryBy<ExternalState>(
+                QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+        ).states
+
+        if (states.isEmpty()) {
+            println("Error: Could not find external state with linearId $linearId")
+            throw IllegalArgumentException("Error: Could not find external state with linearId $linearId")
+        } else {
+            val viewMetaByteArray = states.first().state.data.meta
+            val viewDataByteArray = states.first().state.data.state
+            val meta = State.Meta.parseFrom(viewMetaByteArray)
+
+            when (meta.protocol) {
+                State.Meta.Protocol.CORDA -> {
+                    println("GetExternalStateByLinearId Error: Read Corda View not implemented.\n")
+                    throw UnsupportedOperationException()
+                }
+                State.Meta.Protocol.FABRIC -> {
+                    val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
+                    println("fabricViewData: $fabricViewData")
+                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
+                    val response = interopPayload.payload.toStringUtf8()
+                    println("response from remote: ${response}.\n")
+                    println("query address: ${interopPayload.address}.\n")
+
+                    var securityDomain = interopPayload.address.split("/")[1]
+                    val proofStringPrefix = "Verified Proof: Endorsed by members: ["
+                    val proofStringSuffix = "] of security domain: " + securityDomain
+                    var orgList = ""
+                    fabricViewData.endorsementsList.map { endorsement ->
+                        val org = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
+                        if (orgList.length > 0) {
+                            orgList = orgList + ", "
+                        }
+                        orgList = orgList + org
+                    }
+                    var proof = proofStringPrefix + orgList + proofStringSuffix
+                    println("Proof: ${orgList}.\n")
+
+                    return Pair(response.toByteArray(), proof.toByteArray())
+                }
+                else -> {
+                    println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
+                    throw IllegalArgumentException("Error: Unrecognized protocol.")
+                }
+            }
+
+
+        }
+    }
+
+}
+

@@ -1,0 +1,38 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+services:
+  fabric-cli:
+    image: fabric-cli:latest
+    container_name: fabric-cli
+    environment:
+      - MEMBER_CREDENTIAL_FOLDER=/fabric-cli/credentials
+      - CONFIG_PATH=/fabric-cli/config.json
+      - DEFAULT_CHANNEL=mychannel
+      - DEFAULT_CHAINCODE=interop
+      - LOCAL=false
+      - DEFAULT_APPLICATION_CHAINCODE=simplestate
+    command: sh -c "sleep 6000"
+    volumes:
+      - ../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.docker.json:/fabric-cli/ccp-nw1.json
+      - ../../../tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.docker.json:/fabric-cli/ccp-nw2.json
+      - ./config.docker.json:/fabric-cli/config.json
+      - ./src/data/credentials_docker:/fabric-cli/credentials
+      - ./src/wallet-network1:/fabric-cli/src/wallet-network1
+      - ./src/wallet-network2:/fabric-cli/src/wallet-network2
+    networks:
+      - relay
+      - network1_net
+      - network2_net
+
+networks:
+ network1_net:
+    external: true
+ network2_net:
+    external: true
+ relay:
+    external: true
