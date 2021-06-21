@@ -2,6 +2,6 @@ import { Container } from "dockerode";
 
 export interface ITestLedger {
   start(): Promise<Container>;
-  stop(): Promise<any>;
-  destroy(): Promise<any>;
+  stop(): Promise<unknown>;
+  destroy(): Promise<unknown>;
 }
