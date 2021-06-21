@@ -209,6 +209,8 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		if err != nil {
 			return "", logThenErrorf(err.Error())
 		}
+	} else {
+		return "", logThenErrorf("lock mechanism is not supported")
 	}
 	//display the passed lock information
 	log.Infof("lockInfo: %+v\n", lockInfoHTLC)
@@ -434,6 +436,8 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		if err != nil {
 			return logThenErrorf(err.Error())
 		}
+	} else {
+		return "", logThenErrorf("lock mechanism is not supported")
 	}
 
 	// display the claim information
@@ -594,6 +598,8 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 		if err != nil {
 			return logThenErrorf(err.Error())
 		}
+	} else {
+		return "", logThenErrorf("lock mechanism is not supported")
 	}
 
 	// display the claim information
@@ -683,6 +689,8 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 		if err != nil {
 			return "", logThenErrorf(err.Error())
 		}
+	} else {
+		return "", logThenErrorf("lock mechanism is not supported")
 	}
 	//display the passed lock information
 	log.Infof("lockInfo: %+v\n", lockInfoHTLC)
@@ -792,7 +800,10 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 		if err != nil {
 			return logThenErrorf("unmarshal error: %s", err)
 		}
+	} else {
+		return logThenErrorf("lock mechanism is not supported")
 	}
+
 	// display the claim information
 	log.Infof("claimInfoHTLC: %+v\n", claimInfoHTLC)
 
