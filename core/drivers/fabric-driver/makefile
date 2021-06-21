@@ -3,7 +3,9 @@ export
 build-local:
 	echo "Calling update-protos-local script..."
 	./scripts/update-protos-local.sh
+	npm install
 	npm run build
+	npm run postinstall
 
 
 build-image-local:
@@ -15,7 +17,9 @@ build-image-local:
 build:
 	echo "Calling update-protos script..."
 	./scripts/update-protos.sh
+	npm install
 	npm run build
+	npm run postinstall
 
 
 build-image:
@@ -25,9 +29,9 @@ build-image:
 	docker build -t fabric-driver:latest -f fabricDriver.dockerfile .
 
 deploy:
-	docker-compose -f docker-compose.yml up -d --remove-orphans 
+	docker-compose -f docker-compose.yml up -d --remove-orphans
 
-stop: 
+stop:
 	docker stop fabric-driver 2> /dev/null || true
 	docker rm fabric-driver 2> /dev/null || true
 
