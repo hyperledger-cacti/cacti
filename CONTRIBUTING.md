@@ -71,6 +71,7 @@ Further reading:
 
 
 ## PR Checklist - Contributor/Developer
+### To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.
 
 1. Fork [hyperledger/cactus](https://github.com/hyperledger/cactus) via Github UI
    - If you are using the Git client on the Windows operating system, you will need to enable long paths for git
