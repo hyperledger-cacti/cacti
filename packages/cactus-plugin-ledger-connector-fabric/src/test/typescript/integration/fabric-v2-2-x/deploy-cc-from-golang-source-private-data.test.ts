@@ -61,6 +61,7 @@ test(testCase, async (t: Test) => {
     imageName: "hyperledger/cactus-fabric2-all-in-one",
     imageVersion: "2021-04-20-nodejs",
     envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+    logLevel,
   });
   const tearDown = async () => {
     await ledger.stop();
