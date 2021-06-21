@@ -109,6 +109,7 @@ export class SupplyChainAppDummyInfrastructure {
       publishAllPorts: true,
       imageName: "hyperledger/cactus-fabric-all-in-one",
       imageVersion: "2021-03-02-ssh-hotfix",
+      logLevel: level,
     });
 
     if (this.options.keychain) {
