@@ -23,7 +23,10 @@ export type InteropJSON = {
 
 export type RemoteJSON = {
     LocalRelayEndpoint: string;
-    interopJSON: {
-        [key: string]: InteropJSON;
+    viewRequests: {
+        [key: string]: {
+            invokeArgIndices: Array<number>;
+            interopJSONs: Array<InteropJSON>;
+        };
     };
 };

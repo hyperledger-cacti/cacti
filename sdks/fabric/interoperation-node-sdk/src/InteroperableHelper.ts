@@ -341,11 +341,8 @@ const createAddress = (query: Query, networkID, remoteURL) => {
 /**
  * Flow of communicating with the local relay and requesting information from a remote network.
  * It will then invoke the local network with the response.
- * 1. Will get address from input, if address not there it will create the address from interopJSON
- * 2. Get policy from chaincode for supplied address.
- * 3. Call the relay Process request which will send a request to the remote network via local relay and poll for an update in the request status.
- * 4. Call the local chaincode to verify the view before trying to write to chaincode.
- * 5. Prepare arguments and call WriteExternalState.
+ * 1. For each view address, send a relay request and get a (verified) view in response
+ * 2. Prepare arguments and call WriteExternalState.
  **/
 const interopFlow = async (
     interopContract: Contract,
@@ -353,10 +350,78 @@ const interopFlow = async (
     invokeObject: Query,
     org: string,
     localRelayEndpoint: string,
-    interopJSON: InteropJSON,
+    interopArgIndices: Array<number>,
+    interopJSONs: Array<InteropJSON>,
     keyCert: { key: ICryptoKey; cert: any },
     returnWithoutLocalInvocation: boolean = false,
-): Promise<{ view: any; result: any }> => {
+): Promise<{ views: Array<any>; result: any }> => {
+    if (interopArgIndices.length !== interopJSONs.length) {
+        throw new Error(`Number of argument indices ${interopArgIndices.length} does not match number of view addresses ${interopJSONs.length}`);
+    }
+    // Step 1: Iterate through the view addresses, and send remote requests and get views in response for each
+    let views = [], viewsSerializedBase64 = [], computedAddresses = [];
+    interopJSONs.forEach(async (interopJSON) => {
+        const [requestResponse, requestResponseError] = await helpers.handlePromise(
+            getRemoteView(
+                interopContract,
+                networkID,
+                org,
+                localRelayEndpoint,
+                interopJSON,
+                keyCert
+            ),
+        );
+        if (requestResponseError) {
+            throw new Error(`InteropFlow remote view request error: ${requestResponseError}`);
+        }
+        views.push(requestResponse.view);
+        viewsSerializedBase64.push(Buffer.from(requestResponse.view.serializeBinary()).toString("base64"));
+        computedAddresses.push(requestResponse.address);
+    });
+    // Step 2
+    const {
+        ccArgs: localCCArgs,
+        channel: localChannel,
+        ccFunc: localCCFunc,
+        contractName: localChaincode,
+    } = invokeObject;
+    const ccArgs = [
+        localChaincode,
+        localChannel,
+        localCCFunc,
+        JSON.stringify(localCCArgs),
+        JSON.stringify(interopArgIndices),
+        JSON.stringify(computedAddresses),
+        JSON.stringify(viewsSerializedBase64),
+    ];
+    // Return here if caller just wants the views and doesn't want to invoke a local chaincode
+    if (returnWithoutLocalInvocation) {
+        return { views, result: ccArgs };
+    }
+    const [result, submitError] = await helpers.handlePromise(
+        interopContract.submitTransaction("WriteExternalState", ...ccArgs),
+    );
+    if (submitError) {
+        throw new Error(`submitTransaction Error: ${submitError}`);
+    }
+    return { views, result };
+};
+
+/**
+ * Send a relay request with a view address and get a view in response
+ * 1. Will get address from input, if address not there it will create the address from interopJSON
+ * 2. Get policy from chaincode for supplied address.
+ * 3. Call the relay Process request which will send a request to the remote network via local relay and poll for an update in the request status.
+ * 4. Call the local chaincode to verify the view before trying to submit to chaincode.
+ **/
+const getRemoteView = async (
+    interopContract: Contract,
+    networkID: string,
+    org: string,
+    localRelayEndpoint: string,
+    interopJSON: InteropJSON,
+    keyCert: { key: ICryptoKey; cert: any },
+): Promise<{ view: any; address: any }> => {
     const {
         address,
         ChaincodeFunc,
@@ -413,32 +478,9 @@ const interopFlow = async (
     if (verifyError) {
         throw new Error(`View verification failed ${verifyError}`);
     }
-    // Step 5
-    const {
-        ccArgs: localCCArgs,
-        channel: localChannel,
-        ccFunc: localCCFunc,
-        contractName: localChaincode,
-    } = invokeObject;
-    const ccArgs = [
-        localChaincode,
-        localChannel,
-        localCCFunc,
-        JSON.stringify(localCCArgs),
-        computedAddress,
-        Buffer.from(relayResponse.getView().serializeBinary()).toString("base64"),
-    ];
-    if (returnWithoutLocalInvocation) {
-        return { view: relayResponse.getView(), result: ccArgs };
-    }
-    const [result, submitError] = await helpers.handlePromise(
-        interopContract.submitTransaction("WriteExternalState", ...ccArgs),
-    );
-    if (submitError) {
-        throw new Error(`submitTransaction Error: ${submitError}`);
-    }
-    return { view: relayResponse.getView(), result };
+    return { view: relayResponse.getView(), address: computedAddress };
 };
+
 /**
  * Handles invoke for user and determines when the invoke should be an interop call
  * or a local invoke depending on the remoteJSON configuration provided. Will add the view response as the final arguement to the chaincode.
@@ -453,14 +495,15 @@ const invokeHandler = async (
 ): Promise<any> => {
     // If the function exists in the remoteJSON it will start the interop flow
     // Otherwise it will treat it as a nomral invoke function
-    if (remoteJSON?.interopJSON?.[query.ccFunc]) {
+    if (remoteJSON?.viewRequests?.[query.ccFunc]) {
         return interopFlow(
             contract,
             networkID,
             query,
             org,
             remoteJSON.LocalRelayEndpoint,
-            remoteJSON.interopJSON[query.ccFunc],
+            remoteJSON.viewRequests[query.ccFunc].invokeArgIndices,
+            remoteJSON.viewRequests[query.ccFunc].interopJSONs,
             keyCert,
         );
     }
@@ -510,4 +553,5 @@ export {
     signMessage,
     invokeHandler,
     interopFlow,
+    getRemoteView,
 };

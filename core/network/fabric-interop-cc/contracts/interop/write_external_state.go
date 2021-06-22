@@ -100,7 +100,7 @@ func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInt
 		arr[argIndex + 1] = string(viewData)
 	}
 
-	// 3. Call application chaincode with created state as the argument
+	// 2. Call application chaincode with created state as the argument
 	byteArgs := strArrToBytesArr(arr)
 	log.Info(fmt.Sprintf("Calling invoke chaincode. AppId: %s, appChannel: %s", applicationID, applicationChannel))
 	pbResp := ctx.GetStub().InvokeChaincode(applicationID, byteArgs, applicationChannel)
