@@ -48,7 +48,7 @@ const keysStatic = {
   },
 };
 
-test(testCase, async (t: Test) => {
+test.skip(testCase, async (t: Test) => {
   // At development time one can specify this environment variable if there is
   // a multi-party network already running, which is doable with something like
   // this on the terminal:

@@ -7,6 +7,12 @@ import type { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
 
+import EEAClient, {
+  IPrivateTransactionReceipt,
+  ISendRawTransactionOptions,
+  IWeb3InstanceExtended,
+} from "web3-eea";
+
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";
 
@@ -57,6 +63,7 @@ import {
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
+  Web3TransactionReceipt,
 } from "./generated/openapi/typescript-axios/";
 
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
@@ -71,9 +78,6 @@ import {
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
-
-const EEAClient = require("web3-eea");
-// const PrivateTransaction = require("web3-eea/src/privateTransaction");
 
 export interface IPluginLedgerConnectorBesuOptions
   extends ICactusPluginOptions {
@@ -98,7 +102,8 @@ export class PluginLedgerConnectorBesu
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly web3: Web3;
-  private web3EEA: any;
+  // Undefined temp fix until async init code is merged.
+  private web3EEA: IWeb3InstanceExtended | undefined;
   private readonly pluginRegistry: PluginRegistry;
   private contracts: {
     [name: string]: Contract;
@@ -151,7 +156,7 @@ export class PluginLedgerConnectorBesu
 
   public async initializeEEAClient() {
     const chainId = await this.web3.eth.getChainId();
-    this.web3EEA = new EEAClient(this.web3, chainId);
+    this.web3EEA = EEAClient(this.web3, chainId);
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -495,13 +500,19 @@ export class PluginLedgerConnectorBesu
     }
   }
 
-  public async transactPrivate(options: any): Promise<RunTransactionResponse> {
+  public async transactPrivate(
+    options: ISendRawTransactionOptions,
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactPrivate()`;
     if (!this.web3EEA) {
       await this.initializeEEAClient();
     }
 
     const txHash = await this.web3EEA?.eea.sendRawTransaction(options);
 
+    if (!txHash) {
+      throw new Error(`${fnTag} Transaction Hash undefined`);
+    }
     return this.getPrivateTxReceipt(options.privateFrom, txHash);
   }
 
@@ -509,12 +520,27 @@ export class PluginLedgerConnectorBesu
     privateFrom: string,
     txHash: string,
   ): Promise<RunTransactionResponse> {
-    const txPoolReceipt = await this.web3EEA?.priv.getTransactionReceipt(
+    const fnTag = `${this.className}#getPrivateTxReceipt()`;
+
+    const txPoolReceipt:
+      | IPrivateTransactionReceipt
+      | null
+      | undefined = await this.web3EEA?.priv.getTransactionReceipt(
       txHash,
       privateFrom,
     );
 
-    return { transactionReceipt: txPoolReceipt };
+    if (txPoolReceipt) {
+      const r: Web3TransactionReceipt = {
+        ...txPoolReceipt,
+        status: txPoolReceipt.status === "0x0" ? false : true,
+        gasUsed: 0,
+      };
+
+      return { transactionReceipt: r };
+    }
+
+    throw new Error(`${fnTag} Transaction Hash undefined`);
   }
 
   public async transactPrivateKey(
@@ -529,16 +555,12 @@ export class PluginLedgerConnectorBesu
     // Run transaction to EEA client here if private transaction
 
     if (req.privateTransactionConfig) {
-      const options = {
+      const options: ISendRawTransactionOptions = {
         nonce: transactionConfig.nonce,
-        gasPrice: transactionConfig.gasPrice,
-        gasLimit: transactionConfig.gas,
         to: transactionConfig.to,
-        value: transactionConfig.value,
-        data: transactionConfig.data,
+        data: transactionConfig.data || "",
         privateKey: secret,
-        privateFrom: req.privateTransactionConfig.privateFrom,
-        privateFor: req.privateTransactionConfig.privateFor,
+        ...req.privateTransactionConfig,
         restriction: "restricted",
       };
 

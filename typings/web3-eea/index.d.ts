@@ -402,9 +402,9 @@ declare module "web3-eea" {
     export interface IPrivateTransactionConfig {
         readonly privateKey: string;
         readonly privateFrom: string;
-        readonly privacyGroupId: string;
+        readonly privacyGroupId?: string;
         readonly privateFor: string[];
-        readonly nonce: string;
+        readonly nonce?: string;
         /**
          * Default value: 0
          */
@@ -413,8 +413,9 @@ declare module "web3-eea" {
          * Default value 3000000
          */
         readonly gasLimit?: number;
-        readonly to: string;
-        readonly data: string;
+        readonly to?: string;
+        readonly data?: string;
+        readonly restriction: string;
     }
 
     export interface IPrivacyGroup {
