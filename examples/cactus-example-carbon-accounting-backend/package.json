@@ -14,6 +14,7 @@
   "bin": "./dist/lib/main/typescript/carbon-accounting-app-cli.js",
   "scripts": {
     "tsc": "tsc --project ./tsconfig.json",
+    "start" : "CONFIG_FILE=./example-config.json node dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "solidity": "hardhat compile",
     "pretsc": "npm run solidity",
     "watch": "npm-watch",
