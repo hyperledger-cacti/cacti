@@ -437,7 +437,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 			return logThenErrorf(err.Error())
 		}
 	} else {
-		return "", logThenErrorf("lock mechanism is not supported")
+		return logThenErrorf("lock mechanism is not supported")
 	}
 
 	// display the claim information
@@ -599,7 +599,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 			return logThenErrorf(err.Error())
 		}
 	} else {
-		return "", logThenErrorf("lock mechanism is not supported")
+		return logThenErrorf("lock mechanism is not supported")
 	}
 
 	// display the claim information
