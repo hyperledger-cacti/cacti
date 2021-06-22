@@ -60,7 +60,12 @@ func TestLockAsset(t *testing.T) {
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
-	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+	lockInfoHTLCBytes, _ := proto.Marshal(lockInfoHTLC)
+	lockInfo := &common.AssetLock {
+		LockMechanism: common.LockMechanism_HTLC,
+		LockInfo: lockInfoHTLCBytes,
+	}
+	lockInfoBytes, _ := proto.Marshal(lockInfo)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -92,7 +97,12 @@ func TestLockAsset(t *testing.T) {
 		// TimeSpec of AssetLockHTLC_DURATION is not currently supported
 		TimeSpec: common.AssetLockHTLC_DURATION,
 	}
-	lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
+	lockInfoHTLCBytes, _ = proto.Marshal(lockInfoHTLC)
+	lockInfo = &common.AssetLock {
+		LockMechanism: common.LockMechanism_HTLC,
+		LockInfo: lockInfoHTLCBytes,
+	}
+	lockInfoBytes, _ = proto.Marshal(lockInfo)
 	// Test failure with lock information not specified properly
 	_, err = interopcc.LockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
@@ -117,7 +127,12 @@ func TestUnlockAsset(t *testing.T) {
 		ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs,
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
-	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+	lockInfoHTLCBytes, _ := proto.Marshal(lockInfoHTLC)
+	lockInfo := &common.AssetLock {
+		LockMechanism: common.LockMechanism_HTLC,
+		LockInfo: lockInfoHTLCBytes,
+	}
+	lockInfoBytes, _ := proto.Marshal(lockInfo)
 
 	assetAgreement := &common.AssetExchangeAgreement {
 		Type: assetType,
@@ -132,7 +147,7 @@ func TestUnlockAsset(t *testing.T) {
 	// Lock asset as per the agreement specified
 	_, err := interopcc.LockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.NoError(t, err)
-	log.Info(fmt.Println("Completed locking as asset. Proceed to test unlock asset."))
+	log.Info(fmt.Println("Completed locking an asset. Proceed to test unlock asset."))
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
@@ -324,8 +339,13 @@ func TestClaimAsset(t *testing.T) {
 	}
 	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
 
-	claimInfo := &common.AssetClaimHTLC {
+	claimInfoHTLC := &common.AssetClaimHTLC {
 		HashPreimageBase64: []byte(preimageBase64),
+	}
+	claimInfoHTLCBytes, _ := proto.Marshal(claimInfoHTLC)
+	claimInfo := &common.AssetClaim {
+		LockMechanism: common.LockMechanism_HTLC,
+		ClaimInfo: claimInfoHTLCBytes,
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
@@ -348,8 +368,13 @@ func TestClaimAsset(t *testing.T) {
 
 	wrongPreimage := "abc"
 	wrongPreimageBase64 := base64.StdEncoding.EncodeToString([]byte(wrongPreimage))
-	wrongClaimInfo := &common.AssetClaimHTLC {
+	wrongClaimInfoHTLC := &common.AssetClaimHTLC {
 		HashPreimageBase64: []byte(wrongPreimageBase64),
+	}
+	wrongClaimInfoHTLCBytes, _ := proto.Marshal(wrongClaimInfoHTLC)
+	wrongClaimInfo := &common.AssetClaim {
+		LockMechanism: common.LockMechanism_HTLC,
+		ClaimInfo: wrongClaimInfoHTLCBytes,
 	}
 	wrongClaimInfoBytes, _ := proto.Marshal(wrongClaimInfo)
 
@@ -497,8 +522,13 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	}
 	assetLockKey, contractId, _ := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 
-	claimInfo := &common.AssetClaimHTLC {
+	claimInfoHTLC := &common.AssetClaimHTLC {
 		HashPreimageBase64: []byte(preimageBase64),
+	}
+	claimInfoHTLCBytes, _ := proto.Marshal(claimInfoHTLC)
+	claimInfo := &common.AssetClaim {
+		LockMechanism: common.LockMechanism_HTLC,
+		ClaimInfo: claimInfoHTLCBytes,
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
@@ -547,10 +577,16 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(8, assetLockKeyBytes, nil)
 	wrongPreimage := "abc"
 	wrongPreimageBase64 := base64.StdEncoding.EncodeToString([]byte(wrongPreimage))
-	wrongClaimInfo := &common.AssetClaimHTLC {
+	wrongClaimInfoHTLC := &common.AssetClaimHTLC {
 		HashPreimageBase64: []byte(wrongPreimageBase64),
 	}
+	wrongClaimInfoHTLCBytes, _ := proto.Marshal(wrongClaimInfoHTLC)
+	wrongClaimInfo := &common.AssetClaim {
+		LockMechanism: common.LockMechanism_HTLC,
+		ClaimInfo: wrongClaimInfoHTLCBytes,
+	}
 	wrongClaimInfoBytes, _ := proto.Marshal(wrongClaimInfo)
+
 	assetLockVal = AssetLockValue{Locker: locker, Recipient: recipient, HashBase64: hashBase64, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
 	assetLockValBytes, _ = json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturnsOnCall(9, assetLockValBytes, nil)
@@ -698,7 +734,12 @@ func TestLockFungibleAsset(t *testing.T) {
 		// TimeSpec of AssetLockHTLC_DURATION is not currently supported
 		TimeSpec: common.AssetLockHTLC_DURATION,
 	}
-	lockInfoBytes, _ := proto.Marshal(lockInfoHTLC)
+	lockInfoHTLCBytes, _ := proto.Marshal(lockInfoHTLC)
+	lockInfo := &common.AssetLock {
+		LockMechanism: common.LockMechanism_HTLC,
+		LockInfo: lockInfoHTLCBytes,
+	}
+	lockInfoBytes, _ := proto.Marshal(lockInfo)
 	_, err := interopcc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "only EPOCH time is supported at present")
@@ -713,7 +754,12 @@ func TestLockFungibleAsset(t *testing.T) {
 		// TimeSpec of AssetLockHTLC_EPOCH is only supported currently
 		TimeSpec: common.AssetLockHTLC_EPOCH,
 	}
-	lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
+	lockInfoHTLCBytes, _ = proto.Marshal(lockInfoHTLC)
+	lockInfo = &common.AssetLock {
+		LockMechanism: common.LockMechanism_HTLC,
+		LockInfo: lockInfoHTLCBytes,
+	}
+	lockInfoBytes, _ = proto.Marshal(lockInfo)
 	_, err = interopcc.LockFungibleAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "failed to retrieve from the world state: unable to retrieve contractId " + contractId)
@@ -824,8 +870,13 @@ func TestClaimFungibleAsset(t *testing.T) {
 	}
 	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
-	claimInfo := &common.AssetClaimHTLC {
+	claimInfoHTLC := &common.AssetClaimHTLC {
 		HashPreimageBase64: []byte(preimageBase64),
+	}
+	claimInfoHTLCBytes, _ := proto.Marshal(claimInfoHTLC)
+	claimInfo := &common.AssetClaim {
+		LockMechanism: common.LockMechanism_HTLC,
+		ClaimInfo: claimInfoHTLCBytes,
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 
