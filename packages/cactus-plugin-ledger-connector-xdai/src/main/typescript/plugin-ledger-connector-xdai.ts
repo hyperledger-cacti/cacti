@@ -478,6 +478,9 @@ export class PluginLedgerConnectorXdai
     consistencyStrategy: ConsistencyStrategy,
   ): Promise<TransactionReceipt> {
     const fnTag = `${this.className}#pollForTxReceipt()`;
+    if (consistencyStrategy.receiptType === ReceiptType.NodeTxPoolAck) {
+      consistencyStrategy.blockConfirmations = 0;
+    }
     let txReceipt;
     let timedOut = false;
     let tries = 0;
@@ -492,6 +495,10 @@ export class PluginLedgerConnectorXdai
         break;
       }
 
+      await new Promise((resolve) =>
+        setTimeout(resolve, consistencyStrategy.pollIntervalMs),
+      );
+
       txReceipt = await this.web3.eth.getTransactionReceipt(txHash);
       if (!txReceipt) {
         continue;
@@ -499,7 +506,7 @@ export class PluginLedgerConnectorXdai
 
       const latestBlockNo = await this.web3.eth.getBlockNumber();
       confirmationCount = latestBlockNo - txReceipt.blockNumber;
-    } while (confirmationCount >= consistencyStrategy.blockConfirmations);
+    } while (confirmationCount < consistencyStrategy.blockConfirmations);
 
     if (!txReceipt) {
       throw new Error(`${fnTag} Timed out ${timeoutMs}ms, polls=${tries}`);
