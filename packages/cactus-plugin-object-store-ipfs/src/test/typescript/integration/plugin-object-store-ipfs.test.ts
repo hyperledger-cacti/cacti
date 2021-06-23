@@ -17,6 +17,7 @@ import { Containers } from "@hyperledger/cactus-test-tooling";
 import { PluginObjectStoreIpfs } from "../../../main/typescript";
 
 import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testCase = "can work with go-ipfs container get/set/has operations";
@@ -53,6 +54,8 @@ test(testCase, async (t: Test) => {
   const apiClient = new ObjectStoreIpfsApi(config);
   t.ok(apiClient, "ObjectStoreIpfsApi truthy OK");
 
+  const pluginRegistry = new PluginRegistry();
+
   const ipfsApiUrl = await ipfsContainer.getApiUrl();
   const ipfsGatewayUrl = await ipfsContainer.getWebGatewayUrl();
   t.comment(`Go IPFS Test Container API URL: ${ipfsApiUrl}`);
@@ -67,6 +70,7 @@ test(testCase, async (t: Test) => {
     logLevel,
     instanceId,
     ipfsClientOrOptions,
+    pluginRegistry,
   });
 
   await plugin.getOrCreateWebServices();

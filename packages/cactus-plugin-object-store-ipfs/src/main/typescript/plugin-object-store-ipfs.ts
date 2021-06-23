@@ -25,6 +25,9 @@ import { SetObjectEndpointV1 } from "./web-services/set-object-endpoint-v1";
 import { HasObjectEndpointV1 } from "./web-services/has-object-endpoint-v1";
 import type { IIpfsHttpClient } from "./i-ipfs-http-client";
 import { isIpfsHttpClientOptions } from "./i-ipfs-http-client";
+import { PluginRegistry } from "../../../../cactus-core/dist/types/main/typescript/plugin-registry";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { v4 as uuidv4 } from "uuid";
 
 export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
   "HTTPError: file does not exist";
@@ -33,6 +36,9 @@ export interface IPluginObjectStoreIpfsOptions extends ICactusPluginOptions {
   readonly logLevel?: LogLevelDesc;
   readonly parentDir: string;
   readonly ipfsClientOrOptions: Options | IIpfsHttpClient;
+  readonly pluginRegistry: PluginRegistry;
+  readonly keychainId?: string;
+  readonly keychain?: PluginKeychainMemory;
 }
 
 export class PluginObjectStoreIpfs implements IPluginObjectStore {
@@ -42,6 +48,8 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
   private readonly log: Logger;
   private readonly instanceId: string;
   private readonly parentDir: string;
+  private readonly keychainId: string;
+  private readonly keychain: PluginKeychainMemory;
 
   public get className(): string {
     return PluginObjectStoreIpfs.CLASS_NAME;
@@ -74,6 +82,13 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     this.instanceId = this.opts.instanceId;
 
     this.log.info(`Created ${this.className}. InstanceID=${opts.instanceId}`);
+
+    this.keychainId = uuidv4();
+
+    this.keychain = new PluginKeychainMemory({
+      keychainId: this.keychainId,
+      instanceId: uuidv4(),
+    });
   }
 
   public async registerWebServices(
@@ -161,6 +176,8 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
 
   public async set(req: SetObjectRequestV1): Promise<SetObjectResponseV1> {
     const keyPath = this.getKeyPath(req);
+    //const keychainEntryKey = uuidv4();
+    //const keychainEntryValue = Buffer.from(uuidv4()).toString("base64");
     try {
       this.log.debug(`Seting object ${keyPath} in IPFS...`);
       const buffer = Buffer.from(req.value, "base64");
