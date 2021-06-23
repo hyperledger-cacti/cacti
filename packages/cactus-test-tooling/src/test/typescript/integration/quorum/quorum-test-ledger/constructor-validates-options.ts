@@ -24,8 +24,11 @@ tap.test(
 
 tap.test("starts/stops/destroys a docker container", async (assert: any) => {
   const ledger = new QuorumTestLedger();
-  assert.tearDown(() => ledger.stop());
-  assert.tearDown(() => ledger.destroy());
+  assert.tearDown(async () => {
+    await ledger.stop();
+    await ledger.destroy();
+  });
+
   const container: Container = await ledger.start();
   assert.ok(container);
   const ipAddress: string = await ledger.getContainerIpAddress();

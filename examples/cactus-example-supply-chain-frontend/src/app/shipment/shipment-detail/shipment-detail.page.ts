@@ -46,7 +46,7 @@ export class ShipmentDetailPage implements OnInit {
     }
   }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.log.debug("component initialized.", this.shipment);
 
     this._supplyChainApi = await this.baseClient.ofLedger(
