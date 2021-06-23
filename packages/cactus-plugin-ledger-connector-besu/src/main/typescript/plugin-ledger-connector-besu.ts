@@ -11,6 +11,10 @@ import { AbiItem } from "web3-utils";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
+import {
+  GetBalanceV1Request,
+  GetBalanceV1Response,
+} from "./generated/openapi/typescript-axios/index";
 
 import {
   ConsensusAlgorithmFamily,
@@ -692,5 +696,15 @@ export class PluginLedgerConnectorBesu
     }
 
     return Optional.empty();
+  }
+
+  public async getBalance(
+    request: GetBalanceV1Request,
+  ): Promise<GetBalanceV1Response> {
+    const balance = await this.web3.eth.getBalance(
+      request.address,
+      request.defaultBlock,
+    );
+    return { balance };
   }
 }
