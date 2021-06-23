@@ -1,4 +1,4 @@
-import test, { Test } from "tape";
+import test, { Test } from "tape-promise/tape";
 import { Logger, LoggerProvider } from "../../../main/typescript/public-api";
 
 test("Library can be loaded", (assert: Test) => {
