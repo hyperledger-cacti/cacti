@@ -11,3 +11,7 @@ fabric/shared/chaincode/*
 shared/artifactory.properties
 shared/charts/apikey
 shared/charts/username
+*.real.*
+*.tar.gz
+*.env
+fabric/dev/log.txt

@@ -68,5 +68,9 @@ fun main(args: Array<String>) = App()
                 DeleteMembershipCommand(),
                 GetMembershipCommand(),
                 GetMembershipsCommand(),
+                ConfigureDataCommand(),
+                ConfigureNetworkCommand(),
+                ConfigureAllCommand(),
+                ConfigureCreateAllCommand(),
                 GetExternalStateCommand())
         .main(args)

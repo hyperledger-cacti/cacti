@@ -30,34 +30,33 @@ class CreateVerificationPolicyCommand : CliktCommand(help = "Creates a Verificat
     val config by requireObject<Map<String, String>>()
     val network by argument()
     override fun run() = runBlocking {
-        val result = when (network) {
-            "Corda_Network" -> {
-                Right(File("clients/src/main/resources/config/CordaNetworkVerificationPolicy.json")
-                        .readText(Charsets.UTF_8))
-            }
-            "Fabric_Network" -> {
-                Right(File("clients/src/main/resources/config/FabricNetworkVerificationPolicy.json")
-                        .readText(Charsets.UTF_8))
-            }
-            "Dummy_Network" -> {
-                Right(File("clients/src/main/resources/config/DummyNetworkVerificationPolicy.json")
-                        .readText(Charsets.UTF_8))
-            }
-            else -> Left(Error("Only Fabric and Corda network verification policies are defined"))
-        }.flatMap {
-            val verificationPolicy = Gson().fromJson(it, VerificationPolicyState::class.java)
-            println("Verification policy from file: $verificationPolicy")
-            writeVerificationPolicyToVault(
-                    verificationPolicy,
-                    config["CORDA_HOST"]!!,
-                    config["CORDA_PORT"]!!.toInt()
-            )
-        }
+        val result = createVerificationPolicyFromFile(network, config)
+        println(result)
     }
 }
 
 /**
- * Helper function used by CreateVerificationPolicyCommand to interact with the Corda network
+ * Helper function to create a verification policy for an external network
+ */
+fun createVerificationPolicyFromFile(network: String, config: Map<String, String>): Either<Error, String> {
+    val filepath = "clients/src/main/resources/config/${network}/verification-policy.json"
+    return try {
+        val file = File(filepath).readText(Charsets.UTF_8)
+        val verificationPolicy = Gson().fromJson(file, VerificationPolicyState::class.java)
+        println("Verification policy from file: $verificationPolicy")
+        writeVerificationPolicyToVault(
+                verificationPolicy,
+                config["CORDA_HOST"]!!,
+                config["CORDA_PORT"]!!.toInt()
+        )
+    } catch (e: Exception) {
+      println("Error: Credentials directory ${filepath} not found.")
+      Left(Error("Error: Credentials directory ${filepath} not found."))
+    }
+}
+
+/**
+ * Helper function used by createVerificationPolicyFromFile to interact with the Corda network
  */
 fun writeVerificationPolicyToVault(
         verificationPolicy: VerificationPolicyState,
