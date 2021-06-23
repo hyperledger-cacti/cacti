@@ -16,6 +16,9 @@ import type { IPluginObjectStoreIpfsOptions } from "../../../main/typescript";
 
 import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api";
 import { IpfsHttpClientMock } from "../fixtures/mock/ipfs/ipfs-http-client-mock";
+import { PluginRegistry } from "../../../../../cactus-core/dist/types/main/typescript";
+
+const pluginRegistry = new PluginRegistry();
 
 test("PluginObjectStoreIpfs", (t1: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -26,6 +29,7 @@ test("PluginObjectStoreIpfs", (t1: Test) => {
         instanceId: "a",
         ipfsClientOrOptions,
         parentDir: "/" + uuidv4(),
+        pluginRegistry,
       }),
   );
 
@@ -37,6 +41,7 @@ test("PluginObjectStoreIpfs", (t1: Test) => {
           instanceId: null as any,
           ipfsClientOrOptions,
           parentDir: "/" + uuidv4(),
+          pluginRegistry,
         }),
     );
     t.throws(
@@ -45,6 +50,7 @@ test("PluginObjectStoreIpfs", (t1: Test) => {
           instanceId: "",
           ipfsClientOrOptions,
           parentDir: "/" + uuidv4(),
+          pluginRegistry,
         }),
     );
     t.end();
@@ -56,6 +62,7 @@ test("PluginObjectStoreIpfs", (t1: Test) => {
       instanceId: uuidv4(),
       parentDir: "/" + uuidv4(),
       logLevel,
+      pluginRegistry,
     };
     const plugin = new PluginObjectStoreIpfs(options);
 

@@ -86,6 +86,7 @@
     "@hyperledger/cactus-common": "0.5.0",
     "@hyperledger/cactus-core": "0.5.0",
     "@hyperledger/cactus-core-api": "0.5.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "0.5.0",
     "axios": "0.21.1",
     "ipfs-http-client": "50.1.0",
     "run-time-error": "1.4.0",
