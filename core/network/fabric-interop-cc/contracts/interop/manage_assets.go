@@ -9,9 +9,13 @@
 package main
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
 	"strconv"
 	"crypto/sha256"
 	"encoding/base64"
@@ -24,22 +28,33 @@ import (
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
 )
 
+// Object used to capture the HashLock details used in Asset Locking
+type HashLock struct {
+	HashBase64	string	`json:"hashBase64"`
+}
+
+// Object used to capture the DLPLock details used in Asset Locking
+type ECDLPLock struct {
+	PointPHexaBase64	string	`json:"pointPHexaBase64"`
+	PointQHexaBase64	string	`json:"pointQHexaBase64"`
+}
+
 // Object used in the map, <asset-type, asset-id> --> <contractId, locker, recipient, ...> (for non-fungible assets)
 type AssetLockValue struct {
-	Locker		string	`json:"locker"`
-	Recipient	string	`json:"recipient"`
-	HashBase64	string	`json:"hashBase64"`
-	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
+	Locker		string		`json:"locker"`
+	Recipient	string		`json:"recipient"`
+	LockInfo	interface{}	`json:"lockInfo"`
+	ExpiryTimeSecs	uint64		`json:"expiryTimeSecs"`
 }
 
 // Object used in the map, contractId --> <asset-type, num-units, locker, ...> (for fungible assets)
 type FungibleAssetLockValue struct {
-	Type		string	`json:"type"`
-	NumUnits	uint64	`json:"numUnits"`
-	Locker		string	`json:"locker"`
-	Recipient	string	`json:"recipient"`
-	HashBase64	string	`json:"hashBase64"`
-	ExpiryTimeSecs	uint64	`json:"expiryTimeSecs"`
+	Type		string		`json:"type"`
+	NumUnits	uint64		`json:"numUnits"`
+	Locker		string		`json:"locker"`
+	Recipient	string		`json:"recipient"`
+	LockInfo	interface{}	`json:"lockInfo"`
+	ExpiryTimeSecs	uint64		`json:"expiryTimeSecs"`
 }
 
 const(
@@ -172,6 +187,55 @@ func validateAndSetRecipientOfAssetAgreement(ctx contractapi.TransactionContextI
 	return nil
 }
 
+func getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64 string) (interface{}, uint64, error) {
+	var lockInfoVal interface{}
+	var expiryTimeSecs uint64
+
+	lockInfoBytes, err := base64.StdEncoding.DecodeString(lockInfoBytesBase64)
+	if err != nil {
+		return lockInfoVal, 0, fmt.Errorf("error in base64 decode of lock information: %+v", err)
+	}
+	lockInfo := &common.AssetLock{}
+	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfo)
+	if err != nil {
+		return lockInfoVal, 0, logThenErrorf(err.Error())
+	}
+
+	// process lock details here (lockInfo.LockInfo contains value based on the lock mechanism used)
+        if lockInfo.LockMechanism == common.LockMechanism_HTLC {
+		lockInfoHTLC := &common.AssetLockHTLC{}
+		err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+		if err != nil {
+			return lockInfoVal, 0, logThenErrorf("unmarshal error: %s", err)
+		}
+		//display the passed hash lock information
+		log.Infof("lockInfoHTLC: %+v\n", lockInfoHTLC)
+		lockInfoVal = HashLock{HashBase64: string(lockInfoHTLC.HashBase64)}
+		// process time lock details here
+		if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+			return lockInfoVal, 0, logThenErrorf("only EPOCH time is supported at present")
+		}
+		expiryTimeSecs = lockInfoHTLC.ExpiryTimeSecs
+	} else if lockInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+		lockInfoECDLPTLC := &common.AssetLockECDLPTLC{}
+		err := proto.Unmarshal(lockInfo.LockInfo, lockInfoECDLPTLC)
+		if err != nil {
+			return lockInfoVal, 0, logThenErrorf("unmarshal error: %s", err)
+		}
+		//display the passed ECDLP lock information
+		log.Infof("lockInfoECDLPTLC: %+v\n", lockInfoECDLPTLC)
+		lockInfoVal = ECDLPLock{PointPHexaBase64: string(lockInfoECDLPTLC.PointPHexaBase64), PointQHexaBase64: string(lockInfoECDLPTLC.PointQHexaBase64)}
+		// process time lock details here
+		if lockInfoECDLPTLC.TimeSpec != common.AssetLockECDLPTLC_EPOCH {
+			return lockInfoVal, 0, logThenErrorf("only EPOCH time is supported at present")
+		}
+		expiryTimeSecs = lockInfoECDLPTLC.ExpiryTimeSecs
+	} else {
+		return lockInfoVal, 0, logThenErrorf("lock mechanism is not supported")
+	}
+	return lockInfoVal, expiryTimeSecs, nil
+}
+
 // LockAsset cc is used to record locking of an asset on the ledger
 func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
 
@@ -193,30 +257,9 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", logThenErrorf("error in locker validation: %+v", err)
 	}
 
-	lockInfoBytes, err := base64.StdEncoding.DecodeString(lockInfoBytesBase64)
-	if err != nil {
-		return "", fmt.Errorf("error in base64 decode of lock information: %+v", err)
-	}
-
-	lockInfo := &common.AssetLock{}
-	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfo)
+	lockInfo, expiryTimeSecs, err := getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
-	}
-	lockInfoHTLC := &common.AssetLockHTLC{}
-        if lockInfo.LockMechanism == common.LockMechanism_HTLC {
-		err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-		if err != nil {
-			return "", logThenErrorf(err.Error())
-		}
-	} else {
-		return "", logThenErrorf("lock mechanism is not supported")
-	}
-	//display the passed lock information
-	log.Infof("lockInfo: %+v\n", lockInfoHTLC)
-
-	if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-		return "", logThenErrorf("only EPOCH time is supported at present")
 	}
 
 	assetLockKey, contractId, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
@@ -224,7 +267,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", logThenErrorf(err.Error())
 	}
 
-	assetLockVal := AssetLockValue{Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, HashBase64: string(lockInfoHTLC.HashBase64), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+	assetLockVal := AssetLockValue{Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, LockInfo: lockInfo, ExpiryTimeSecs: expiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -378,6 +421,60 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 }
 
 /*
+ * Function to check if Q = kP where k is the secret used to claim the asset.
+ * All the values k, P and Q are passed in hexadecimal base64 form.
+ */
+func checkIfQequalsToKP(kHexaBase64 string, PHexaBase64 string, QHexaBase64 string) (bool, error) {
+	funName := "checkIfQequalsToKP"
+	kHexa, err := base64.StdEncoding.DecodeString(kHexaBase64)
+	if err != nil {
+		return false, logThenErrorf("base64 decode kHexa error: %s", err)
+	}
+	PHexa, err := base64.StdEncoding.DecodeString(PHexaBase64)
+	if err != nil {
+		return false, logThenErrorf("base64 decode PHexa error: %s", err)
+	}
+	QHexa, err := base64.StdEncoding.DecodeString(QHexaBase64)
+	if err != nil {
+		return false, logThenErrorf("base64 decode QHexa error: %s", err)
+	}
+
+	kPrivKey := new(ecdsa.PrivateKey)
+	var boolError bool
+	kPrivKey.D, boolError = new(big.Int).SetString(string(kHexa), 16)
+	if !boolError {
+		return false, logThenErrorf("cannot convert 'hex' string kHexa(%s) to big.Int", kHexa)
+	}
+
+	Pbytes, err := hex.DecodeString(string(PHexa))
+	if err != nil {
+		return false, logThenErrorf("cannot decode 'hex' string PHexa(%s) to bytes error: %s", PHexa, err)
+	}
+	// fetch the point (X, Y) on the elliptic curve corresponding to P
+	PX, PY := elliptic.Unmarshal(elliptic.P256(), Pbytes)
+	log.Infof("%s: (X, Y) coordinates of P in 'hex' format %s are (%s, %s).", funName, PHexa, PX, PY)
+
+	kPprivKey := new(ecdsa.PrivateKey)
+	kPprivKey.PublicKey.Curve = elliptic.P256()
+	kPprivKey.PublicKey.X, kPprivKey.PublicKey.Y = kPprivKey.PublicKey.Curve.ScalarMult(PX, PY, kPrivKey.D.Bytes())
+	kPpubBytes := elliptic.Marshal(elliptic.P256(), kPprivKey.PublicKey.X, kPprivKey.PublicKey.Y)
+
+	Qbytes, err := hex.DecodeString(string(QHexa))
+	if err != nil {
+		return false, logThenErrorf("cannot decode 'hex' string QHexa(%s) to bytes error: %s", QHexa, err)
+	}
+
+	if string(kPpubBytes) == string(Qbytes) {
+		log.Infof("%s: secret k(%s) is passed correctly (i.e., kP = Q).", funName, kHexa)
+	} else {
+		log.Infof("%s: secret k(%s) is not passed correctly (i.e., kP = Q).", funName, kHexa)
+		return false, nil
+	}
+
+	return true, nil
+}
+
+/*
  * Function to check if hashBase64 is the hash for the preimage preimageBase64.
  * Both the preimage and hash are passed in base64 form.
  */
@@ -430,18 +527,26 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		return logThenErrorf("unmarshal error: %s", err)
 	}
 
+	// process lock details here
 	claimInfoHTLC := &common.AssetClaimHTLC{}
+	claimInfoECDLPTLC := &common.AssetClaimECDLPTLC{}
 	if claimInfo.LockMechanism == common.LockMechanism_HTLC {
 		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
 		if err != nil {
-			return logThenErrorf(err.Error())
+			return logThenErrorf("unmarshal claimInfo.ClaimInfo error: %s", err)
 		}
+		//display the claim information
+		log.Infof("claimInfoHTLC: %+v\n", claimInfoHTLC)
+	} else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoECDLPTLC)
+		if err != nil {
+			return logThenErrorf("unmarshal claimInfo.ClaimInfo error: %s", err)
+		}
+		//display the claim information
+		log.Infof("claimInfoECDLPTLC: %+v\n", claimInfoECDLPTLC)
 	} else {
 		return logThenErrorf("lock mechanism is not supported")
 	}
-
-	// display the claim information
-	log.Infof("claimInfo: %+v\n", claimInfoHTLC)
 
 	assetLockKey, contractId, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 	if err != nil {
@@ -473,14 +578,46 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		return logThenErrorf("cannot claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
 	}
 
-	// compute the hash from the preimage
-	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfoHTLC.HashPreimageBase64), string(assetLockVal.HashBase64))
-	if err != nil {
-		return logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
-	}
+	if claimInfo.LockMechanism == common.LockMechanism_HTLC {
+		lockInfoVal := HashLock{}
+                lockInfoBytes, err := json.Marshal(assetLockVal.LockInfo)
+		if err != nil {
+			return logThenErrorf("marshal assetLockVal.LockInfo error: %s", err)
+		}
+                err = json.Unmarshal(lockInfoBytes, &lockInfoVal)
+		if err != nil {
+			return logThenErrorf("unmarshal lockInfoBytes error: %s", err)
+		}
+                log.Infof("HashLock: %+v\n", lockInfoVal)
 
-	if isCorrectPreimage == false {
-		return logThenErrorf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
+		// match the hash passed during claim with the hash stored during asset locking
+		isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfoHTLC.HashPreimageBase64), lockInfoVal.HashBase64)
+		if err != nil {
+			return logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
+		}
+		if isCorrectPreimage == false {
+			return logThenErrorf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
+		}
+	} else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+		lockInfoVal := ECDLPLock{}
+                lockInfoBytes, err := json.Marshal(assetLockVal.LockInfo)
+		if err != nil {
+			return logThenErrorf("marshal assetLockVal.LockInfo error: %s", err)
+		}
+                err = json.Unmarshal(lockInfoBytes, &lockInfoVal)
+		if err != nil {
+			return logThenErrorf("unmarshal lockInfoBytes error: %s", err)
+		}
+                log.Infof("ECDLPLock: %+v\n", lockInfoVal)
+
+		// check if kP = Q, where k is passed during claim and (P, Q) are stored during asset locking
+		isCorrectECDLP, err := checkIfQequalsToKP(string(claimInfoECDLPTLC.KHexaBase64), lockInfoVal.PointPHexaBase64, lockInfoVal.PointQHexaBase64)
+		if err != nil {
+			return logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
+		}
+		if isCorrectECDLP == false {
+			return logThenErrorf("cannot claim asset of type %s and ID %s as the ECDLP instance is not valid", assetAgreement.Type, assetAgreement.Id)
+		}
 	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
@@ -592,18 +729,26 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 		return logThenErrorf("unmarshal error: %s", err)
 	}
 
+	// process lock details here
 	claimInfoHTLC := &common.AssetClaimHTLC{}
+	claimInfoECDLPTLC := &common.AssetClaimECDLPTLC{}
 	if claimInfo.LockMechanism == common.LockMechanism_HTLC {
 		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
 		if err != nil {
-			return logThenErrorf(err.Error())
+			return logThenErrorf("unmarshal claimInfo.ClaimInfo error: %s", err)
 		}
+		//display the claim information
+		log.Infof("claimInfoHTLC: %+v\n", claimInfoHTLC)
+	} else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoECDLPTLC)
+		if err != nil {
+			return logThenErrorf("unmarshal claimInfo.ClaimInfo error: %s", err)
+		}
+		//display the claim information
+		log.Infof("claimInfoECDLPTLC: %+v\n", claimInfoECDLPTLC)
 	} else {
 		return logThenErrorf("lock mechanism is not supported")
 	}
-
-	// display the claim information
-	log.Infof("claimInfo: %+v\n", claimInfoHTLC)
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
@@ -611,14 +756,46 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 		return logThenErrorf("cannot claim asset associated with contractId %s as the expiry time is already elapsed", contractId)
 	}
 
-	// compute the hash from the preimage
-	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfoHTLC.HashPreimageBase64), string(assetLockVal.HashBase64))
-	if err != nil {
-		return logThenErrorf("claim asset associated with contractId %s failed with error: %v", contractId, err)
-	}
+	if claimInfo.LockMechanism == common.LockMechanism_HTLC {
+		lockInfoVal := HashLock{}
+                lockInfoBytes, err := json.Marshal(assetLockVal.LockInfo)
+		if err != nil {
+			return logThenErrorf("marshal assetLockVal.LockInfo error: %s", err)
+		}
+                err = json.Unmarshal(lockInfoBytes, &lockInfoVal)
+		if err != nil {
+			return logThenErrorf("unmarshal lockInfoBytes error: %s", err)
+		}
+                log.Infof("HashLock: %+v\n", lockInfoVal)
 
-	if isCorrectPreimage == false {
-		return logThenErrorf("cannot claim asset associated with contractId %s as the hash preimage is not matching", contractId)
+		// match the hash passed during claim with the hash stored during asset locking
+		isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfoHTLC.HashPreimageBase64), lockInfoVal.HashBase64)
+		if err != nil {
+			return logThenErrorf("claim asset associated with contractId %s failed with error: %v", contractId, err)
+		}
+		if isCorrectPreimage == false {
+			return logThenErrorf("cannot claim asset associated with contractId %s as the hash preimage is not matching", contractId)
+		}
+	} else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+		lockInfoVal := ECDLPLock{}
+                lockInfoBytes, err := json.Marshal(assetLockVal.LockInfo)
+		if err != nil {
+			return logThenErrorf("marshal assetLockVal.LockInfo error: %s", err)
+		}
+                err = json.Unmarshal(lockInfoBytes, &lockInfoVal)
+		if err != nil {
+			return logThenErrorf("unmarshal lockInfoBytes error: %s", err)
+		}
+                log.Infof("ECDLPLock: %+v\n", lockInfoVal)
+
+		// check if kP = Q, where k is passed during claim and (P, Q) are stored during asset locking
+		isCorrectECDLP, err := checkIfQequalsToKP(string(claimInfoECDLPTLC.KHexaBase64), lockInfoVal.PointPHexaBase64, lockInfoVal.PointQHexaBase64)
+		if err != nil {
+			return logThenErrorf("claim asset associated with contractId %s failed with error: %v", contractId, err)
+		}
+		if isCorrectECDLP == false {
+			return logThenErrorf("cannot claim asset associated with contractId %s as the ECDLP instance is not valid", contractId)
+		}
 	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
@@ -673,37 +850,16 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 		return "", logThenErrorf("error in locker validation: %+v", err)
 	}
 
-	lockInfoBytes, err := base64.StdEncoding.DecodeString(lockInfoBytesBase64)
-	if err != nil {
-		return "", logThenErrorf("error in base64 decode of lock information: %+v", err)
-	}
-
-	lockInfo := &common.AssetLock{}
-	err = proto.Unmarshal([]byte(lockInfoBytes), lockInfo)
+	lockInfo, expiryTimeSecs, err := getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
-	}
-	lockInfoHTLC := &common.AssetLockHTLC{}
-        if lockInfo.LockMechanism == common.LockMechanism_HTLC {
-		err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-		if err != nil {
-			return "", logThenErrorf(err.Error())
-		}
-	} else {
-		return "", logThenErrorf("lock mechanism is not supported")
-	}
-	//display the passed lock information
-	log.Infof("lockInfo: %+v\n", lockInfoHTLC)
-
-	if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-		return "", logThenErrorf("only EPOCH time is supported at present")
 	}
 
 	// generate the contractId for the fungible asset lock agreement
 	contractId := generateFungibleAssetLockContractId(ctx, assetAgreement)
 
 	assetLockVal := FungibleAssetLockValue{Type: assetAgreement.Type, NumUnits: assetAgreement.NumUnits, Locker: assetAgreement.Locker,
-		Recipient: assetAgreement.Recipient, HashBase64: string(lockInfoHTLC.HashBase64), ExpiryTimeSecs: lockInfoHTLC.ExpiryTimeSecs}
+		Recipient: assetAgreement.Recipient, LockInfo: lockInfo, ExpiryTimeSecs: expiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(contractId)
 	if err != nil {
@@ -794,18 +950,27 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 	if err != nil {
 		return logThenErrorf("unmarshal error: %s", err)
 	}
+
+	// process lock details here
 	claimInfoHTLC := &common.AssetClaimHTLC{}
+	claimInfoECDLPTLC := &common.AssetClaimECDLPTLC{}
 	if claimInfo.LockMechanism == common.LockMechanism_HTLC {
 		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
 		if err != nil {
-			return logThenErrorf("unmarshal error: %s", err)
+			return logThenErrorf("unmarshal claimInfo.ClaimInfo error: %s", err)
 		}
+		//display the claim information
+		log.Infof("claimInfoHTLC: %+v\n", claimInfoHTLC)
+	} else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoECDLPTLC)
+		if err != nil {
+			return logThenErrorf("unmarshal claimInfo.ClaimInfo error: %s", err)
+		}
+		//display the claim information
+		log.Infof("claimInfoECDLPTLC: %+v\n", claimInfoECDLPTLC)
 	} else {
 		return logThenErrorf("lock mechanism is not supported")
 	}
-
-	// display the claim information
-	log.Infof("claimInfoHTLC: %+v\n", claimInfoHTLC)
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
@@ -813,14 +978,46 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 		return logThenErrorf("cannot claim fungible asset associated with contractId %s as the expiry time is already elapsed", contractId)
 	}
 
-	// compute the hash from the preimage
-	isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfoHTLC.HashPreimageBase64), string(assetLockVal.HashBase64))
-	if err != nil {
-		return logThenErrorf("claim fungible asset associated with contractId %s failed with error: %v", contractId, err)
-	}
+	if claimInfo.LockMechanism == common.LockMechanism_HTLC {
+		lockInfoVal := HashLock{}
+                lockInfoBytes, err := json.Marshal(assetLockVal.LockInfo)
+		if err != nil {
+			return logThenErrorf("marshal assetLockVal.LockInfo error: %s", err)
+		}
+                err = json.Unmarshal(lockInfoBytes, &lockInfoVal)
+		if err != nil {
+			return logThenErrorf("unmarshal lockInfoBytes error: %s", err)
+		}
+                log.Infof("HashLock: %+v\n", lockInfoVal)
 
-	if isCorrectPreimage == false {
-		return logThenErrorf("cannot claim fungible asset associated with contractId %s as the hash preimage is not matching", contractId)
+		// match the hash passed during claim with the hash stored during asset locking
+		isCorrectPreimage, err := checkIfCorrectPreimage(string(claimInfoHTLC.HashPreimageBase64), lockInfoVal.HashBase64)
+		if err != nil {
+			return logThenErrorf("claim fungible asset associated with contractId %s failed with error: %v", contractId, err)
+		}
+		if isCorrectPreimage == false {
+			return logThenErrorf("cannot claim fungible asset associated with contractId %s as the hash preimage is not matching", contractId)
+		}
+	} else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+		lockInfoVal := ECDLPLock{}
+                lockInfoBytes, err := json.Marshal(assetLockVal.LockInfo)
+		if err != nil {
+			return logThenErrorf("marshal assetLockVal.LockInfo error: %s", err)
+		}
+                err = json.Unmarshal(lockInfoBytes, &lockInfoVal)
+		if err != nil {
+			return logThenErrorf("unmarshal lockInfoBytes error: %s", err)
+		}
+                log.Infof("ECDLPLock: %+v\n", lockInfoVal)
+
+		// check if kP = Q, where k is passed during claim and (P, Q) are stored during asset locking
+		isCorrectECDLP, err := checkIfQequalsToKP(string(claimInfoECDLPTLC.KHexaBase64), lockInfoVal.PointPHexaBase64, lockInfoVal.PointQHexaBase64)
+		if err != nil {
+			return logThenErrorf("claim fungible asset associated with contractId %s failed with error: %v", contractId, err)
+		}
+		if isCorrectECDLP == false {
+			return logThenErrorf("cannot claim fungible asset associated with contractId %s as the ECDLP instance is not valid", contractId)
+		}
 	}
 
 	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
