@@ -9,6 +9,11 @@ export {
 } from "./besu/besu-test-ledger";
 
 export {
+  BesuMpTestLedger,
+  IBesuMpTestLedgerOptions,
+} from "./besu/besu-mp-test-ledger";
+
+export {
   QuorumTestLedger,
   IQuorumTestLedgerConstructorOptions,
   QUORUM_TEST_LEDGER_DEFAULT_OPTIONS,
