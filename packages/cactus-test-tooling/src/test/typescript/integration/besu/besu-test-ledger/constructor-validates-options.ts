@@ -24,8 +24,10 @@ tap.test(
 
 tap.test("starts/stops/destroys a docker container", async (assert: any) => {
   const besuTestLedger = new BesuTestLedger();
-  assert.tearDown(() => besuTestLedger.stop());
-  assert.tearDown(() => besuTestLedger.destroy());
+  assert.tearDown(async () => {
+    await besuTestLedger.stop();
+    await besuTestLedger.destroy();
+  });
 
   const container: Container = await besuTestLedger.start();
   assert.ok(container);

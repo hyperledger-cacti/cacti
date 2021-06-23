@@ -190,6 +190,38 @@ export enum EthContractInvocationType {
 /**
  * 
  * @export
+ * @interface GetBalanceV1Request
+ */
+export interface GetBalanceV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetBalanceV1Request
+     */
+    address: string;
+    /**
+     * 
+     * @type {any}
+     * @memberof GetBalanceV1Request
+     */
+    defaultBlock?: any | null;
+}
+/**
+ * 
+ * @export
+ * @interface GetBalanceV1Response
+ */
+export interface GetBalanceV1Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetBalanceV1Response
+     */
+    balance: string;
+}
+/**
+ * 
+ * @export
  * @interface InvokeContractV1Request
  */
 export interface InvokeContractV1Request {
