@@ -1,5 +1,6 @@
 {
     "configFile": ".config.json",
+    "authorizationConfigJson" : {},
     "cactusNodeId": "972b1aec-a027-4dfb-bf0f-3811ad8d15e4",
     "consortiumId": "fb3edae7-46db-4e84-837e-c66f6f2bc78e",
     "logLevel": "debug",
