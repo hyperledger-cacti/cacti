@@ -74,3 +74,17 @@ message FungibleAssetContractHTLC {
   AssetLockHTLC lock = 3;
   AssetClaimHTLC claim = 4;
 }
+
+message AssetContractECDLPTLC {
+  string contractId = 1;
+  AssetExchangeAgreement agreement = 2;
+  AssetLockECDLPTLC lock = 3;
+  AssetClaimECDLPTLC claim = 4;
+}
+
+message FungibleAssetContractECDLPTLC {
+  string contractId = 1;
+  FungibleAssetExchangeAgreement agreement = 2;
+  AssetLockECDLPTLC lock = 3;
+  AssetClaimECDLPTLC claim = 4;
+}

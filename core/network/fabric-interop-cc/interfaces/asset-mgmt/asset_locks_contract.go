@@ -302,23 +302,39 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     contractId, err := amc.assetManagement.LockAsset(ctx.GetStub(), assetAgreement, lockInfo)
     if err == nil {
-        lockInfoHTLC := &common.AssetLockHTLC{}
-        err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-        if err == nil {
-            contractInfo := &common.AssetContractHTLC{
-                ContractId: contractId,
-                Agreement: assetAgreement,
-                Lock: lockInfoHTLC,
-            }
-            contractInfoBytes, err := proto.Marshal(contractInfo)
+	var contractInfoBytes []byte
+        if lockInfo.LockMechanism == common.LockMechanism_HTLC {
+            lockInfoVal := &common.AssetLockHTLC{}
+            err = proto.Unmarshal(lockInfo.LockInfo, lockInfoVal)
             if err == nil {
-                err = ctx.GetStub().SetEvent("LockAsset", contractInfoBytes)
+                contractInfo := &common.AssetContractHTLC {
+                    ContractId: contractId,
+                    Agreement: assetAgreement,
+                    Lock: lockInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
             }
+        } else if lockInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+            lockInfoVal := &common.AssetLockECDLPTLC{}
+            err = proto.Unmarshal(lockInfo.LockInfo, lockInfoVal)
+            if err == nil {
+                contractInfo := &common.AssetContractECDLPTLC {
+                    ContractId: contractId,
+                    Agreement: assetAgreement,
+                    Lock: lockInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
+            }
+        } else {
+            logWarnings("lock mechanism is not supported")
         }
-        if err != nil {
-	    logWarnings("Unable to set 'LockAsset' event", err.Error())
-        }
+        if err == nil {
+            err = ctx.GetStub().SetEvent("LockAsset", contractInfoBytes)
+        } else {
+            logWarnings("Unable to set 'LockAsset' event", err.Error())
+	}
     }
+
     return contractId, err
 }
 
@@ -335,23 +351,39 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     contractId, err := amc.assetManagement.LockFungibleAsset(ctx.GetStub(), assetAgreement, lockInfo)
     if err == nil {
-        lockInfoHTLC := &common.AssetLockHTLC{}
-        err = proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-        if err == nil {
-            contractInfo := &common.FungibleAssetContractHTLC{
-                ContractId: contractId,
-                Agreement: assetAgreement,
-                Lock: lockInfoHTLC,
-            }
-            contractInfoBytes, err := proto.Marshal(contractInfo)
+	var contractInfoBytes []byte
+        if lockInfo.LockMechanism == common.LockMechanism_HTLC {
+            lockInfoVal := &common.AssetLockHTLC{}
+            err = proto.Unmarshal(lockInfo.LockInfo, lockInfoVal)
             if err == nil {
-                err = ctx.GetStub().SetEvent("LockFungibleAsset", contractInfoBytes)
+                contractInfo := &common.FungibleAssetContractHTLC {
+                    ContractId: contractId,
+                    Agreement: assetAgreement,
+                    Lock: lockInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
             }
+        } else if lockInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+            lockInfoVal := &common.AssetLockECDLPTLC{}
+            err = proto.Unmarshal(lockInfo.LockInfo, lockInfoVal)
+            if err == nil {
+                contractInfo := &common.FungibleAssetContractECDLPTLC {
+                    ContractId: contractId,
+                    Agreement: assetAgreement,
+                    Lock: lockInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
+            }
+        } else {
+            logWarnings("lock mechanism is not supported")
         }
-        if err != nil {
-	    logWarnings("Unable to set 'LockFungibleAsset' event", err.Error())
+	if err == nil {
+            err = ctx.GetStub().SetEvent("LockFungibleAsset", contractInfoBytes)
+        } else {
+            logWarnings("Unable to set 'LockFungibleAsset' event", err.Error())
         }
     }
+
     return contractId, err
 }
 
@@ -391,19 +423,33 @@ func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContex
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.ClaimAsset(ctx.GetStub(), assetAgreement, claimInfo)
     if retVal && err == nil {
-        claimInfoHTLC := &common.AssetClaimHTLC{}
-        err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
-        if err == nil {
-            contractInfo := &common.AssetContractHTLC{
-                Agreement: assetAgreement,
-                Claim: claimInfoHTLC,
-            }
-            contractInfoBytes, err := proto.Marshal(contractInfo)
+	var contractInfoBytes []byte
+        if claimInfo.LockMechanism == common.LockMechanism_HTLC {
+            claimInfoVal := &common.AssetClaimHTLC{}
+            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
             if err == nil {
-                err = ctx.GetStub().SetEvent("ClaimAsset", contractInfoBytes)
+                contractInfo := &common.AssetContractHTLC {
+                    Agreement: assetAgreement,
+                    Claim: claimInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
             }
+        } else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+            claimInfoVal := &common.AssetClaimECDLPTLC{}
+            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
+            if err == nil {
+                contractInfo := &common.AssetContractECDLPTLC {
+                    Agreement: assetAgreement,
+                    Claim: claimInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
+            }
+        } else {
+            logWarnings("lock mechanism is not supported")
         }
-        if err != nil {
+        if err == nil {
+           err = ctx.GetStub().SetEvent("ClaimAsset", contractInfoBytes)
+        } else {
 	    logWarnings("Unable to set 'ClaimAsset' event", err.Error())
         }
     }
@@ -422,19 +468,33 @@ func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.Transacti
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.ClaimFungibleAsset(ctx.GetStub(), contractId, claimInfo)
     if retVal && err == nil {
-        claimInfoHTLC := &common.AssetClaimHTLC{}
-        err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
-        if err == nil {
-            contractInfo := &common.FungibleAssetContractHTLC{
-                ContractId: contractId,
-                Claim: claimInfoHTLC,
-            }
-            contractInfoBytes, err := proto.Marshal(contractInfo)
+	var contractInfoBytes []byte
+        if claimInfo.LockMechanism == common.LockMechanism_HTLC {
+            claimInfoVal := &common.AssetClaimHTLC{}
+            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
             if err == nil {
-                err = ctx.GetStub().SetEvent("ClaimFungibleAsset", contractInfoBytes)
+                contractInfo := &common.FungibleAssetContractHTLC {
+                    ContractId: contractId,
+                    Claim: claimInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
             }
+        } else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+            claimInfoVal := &common.AssetClaimECDLPTLC{}
+            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
+            if err == nil {
+                contractInfo := &common.FungibleAssetContractECDLPTLC {
+                    ContractId: contractId,
+                    Claim: claimInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
+            }
+        } else {
+            logWarnings("lock mechanism is not supported")
         }
-        if err != nil {
+        if err == nil {
+            err = ctx.GetStub().SetEvent("ClaimFungibleAsset", contractInfoBytes)
+        } else {
 	    logWarnings("Unable to set 'ClaimFungibleAsset' event", err.Error())
         }
     }
@@ -453,22 +513,37 @@ func (amc *AssetManagementContract) ClaimAssetUsingContractId(ctx contractapi.Tr
     // The below 'SetEvent' should be the last in a given transaction (if this function is being called by another), otherwise it will be overridden
     retVal, err := amc.assetManagement.ClaimAssetUsingContractId(ctx.GetStub(), contractId, claimInfo)
     if retVal && err == nil {
-        claimInfoHTLC := &common.AssetClaimHTLC{}
-        err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
-        if err == nil {
-            contractInfo := &common.AssetContractHTLC{
-                ContractId: contractId,
-                Claim: claimInfoHTLC,
-            }
-            contractInfoBytes, err := proto.Marshal(contractInfo)
+	var contractInfoBytes []byte
+        if claimInfo.LockMechanism == common.LockMechanism_HTLC {
+            claimInfoVal := &common.AssetClaimHTLC{}
+            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
             if err == nil {
-                err = ctx.GetStub().SetEvent("ClaimAssetUsingContractId", contractInfoBytes)
+                contractInfo := &common.AssetContractHTLC {
+                    ContractId: contractId,
+                    Claim: claimInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
             }
+        } else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
+            claimInfoVal := &common.AssetClaimECDLPTLC{}
+            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
+            if err == nil {
+                contractInfo := &common.AssetContractECDLPTLC {
+                    ContractId: contractId,
+                    Claim: claimInfoVal,
+                }
+                contractInfoBytes, err = proto.Marshal(contractInfo)
+            }
+        } else {
+            logWarnings("lock mechanism is not supported")
         }
-        if err != nil {
+        if err == nil {
+            err = ctx.GetStub().SetEvent("ClaimAsset", contractInfoBytes)
+        } else {
 	    logWarnings("Unable to set 'ClaimAsset' event", err.Error())
-        }
+	}
     }
+
     return retVal, err
 }
 
@@ -489,7 +564,7 @@ func (amc *AssetManagementContract) UnlockAsset(ctx contractapi.TransactionConte
             err = ctx.GetStub().SetEvent("UnlockAsset", contractInfoBytes)
         }
         if err != nil {
-	    logWarnings("Unable to set 'UnlockAsset' event", err.Error())
+            logWarnings("Unable to set 'UnlockAsset' event", err.Error())
         }
     }
     return retVal, err
@@ -511,7 +586,7 @@ func (amc *AssetManagementContract) UnlockFungibleAsset(ctx contractapi.Transact
             err = ctx.GetStub().SetEvent("UnlockFungibleAsset", contractInfoBytes)
         }
         if err != nil {
-	    logWarnings("Unable to set 'UnlockFungibleAsset' event", err.Error())
+            logWarnings("Unable to set 'UnlockFungibleAsset' event", err.Error())
         }
     }
     return retVal, err
@@ -530,7 +605,7 @@ func (amc *AssetManagementContract) UnlockAssetUsingContractId(ctx contractapi.T
         }
         contractInfoBytes, err := proto.Marshal(contractInfo)
         if err == nil {
-            err = ctx.GetStub().SetEvent("UnlockAssetUsingContractId", contractInfoBytes)
+            err = ctx.GetStub().SetEvent("UnlockAsset", contractInfoBytes)
         }
         if err != nil {
 	    logWarnings("Unable to set 'UnlockAsset' event", err.Error())
