@@ -147,13 +147,13 @@ class GetExternalStateByLinearId(
                         mspIdList = mspIdList + mspId
                     }
                     var proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
-                    println("Proof Message: ${mspIdList}.\n")
+                    println("Proof Message: ${proofMessage}.\n")
 
-                    val signatureList = listOf()
+                    var signatureList: List<ProofSignature> = listOf()
 
                     fabricViewData.endorsementsList.map { endorsement ->
                         val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
-                        val mspId = serializedIdentity.mspId
+                        val mspId = serializedIdentity.mspid
                         val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
                         val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
                         val proofSignature = ProofSignature(mspId, certString, signature)
