@@ -360,14 +360,14 @@ const interopFlow = async (
     }
     // Step 1: Iterate through the view addresses, and send remote requests and get views in response for each
     let views = [], viewsSerializedBase64 = [], computedAddresses = [];
-    interopJSONs.forEach(async (interopJSON) => {
+    for(let i = 0 ; i < interopJSONs.length ; i++) {
         const [requestResponse, requestResponseError] = await helpers.handlePromise(
             getRemoteView(
                 interopContract,
                 networkID,
                 org,
                 localRelayEndpoint,
-                interopJSON,
+                interopJSONs[i],
                 keyCert
             ),
         );
@@ -377,7 +377,7 @@ const interopFlow = async (
         views.push(requestResponse.view);
         viewsSerializedBase64.push(Buffer.from(requestResponse.view.serializeBinary()).toString("base64"));
         computedAddresses.push(requestResponse.address);
-    });
+    }
     // Step 2
     const {
         ccArgs: localCCArgs,
