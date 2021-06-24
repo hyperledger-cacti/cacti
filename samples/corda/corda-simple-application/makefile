@@ -13,7 +13,7 @@ build-refresh-dependencies-local:
 	./gradlew clean build --refresh-dependencies
 
 .PHONY: build-cordapp-local
-build-cordapp:-local 
+build-cordapp:-local
 	cp clients/build.gradle.local clients/build.gradle
 	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
 	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
@@ -48,7 +48,7 @@ build-refresh-dependencies:
 	./gradlew clean build --refresh-dependencies
 
 .PHONY: build-cordapp
-build-cordapp: 
+build-cordapp:
 	cp clients/build.gradle.remote clients/build.gradle
 	cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
 	cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
@@ -70,11 +70,11 @@ test:
 
 .PHONY: initialise-vault
 initialise-vault:
-	./scripts/initialise-vault.sh
+	./clients/build/install/clients/bin/clients configure-all network1,network2
 
 .PHONY: initialise-vault-docker
 initialise-vault-docker:
-	./scripts/initialise-vault-docker.sh
+	./clients/build/install/clients/bin/clients configure-all network1-docker
 
 .PHONY: get-access-control-policies
 get-access-control-policies:

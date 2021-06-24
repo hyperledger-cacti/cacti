@@ -18,6 +18,9 @@ network="Corda"
 [relays.Fabric_Relay]
 hostname="localhost"
 port="9080"
+[relays.Fabric_Relay2]
+hostname="localhost"
+port="9083"
 [relays.wtln_relay]
 hostname="tradelens.sl.cloud9.ibm.com"
 port="9089"

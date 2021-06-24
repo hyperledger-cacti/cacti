@@ -25,22 +25,29 @@ class CreateStateCommand : CliktCommand(help = "Invokes the CreateState flow. Re
     val value: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
-        val rpc = NodeRPCConnection(
-                host = config["CORDA_HOST"]!!,
-                username = "clientUser1",
-                password = "test",
-                rpcPort = config["CORDA_PORT"]!!.toInt())
-        try {
-            println("CreateState flow with arguments $key, $value")
-            val proxy = rpc.proxy
-            val createdState = proxy.startFlow(::CreateState, key, value)
-                    .returnValue.get().tx.outputStates.first() as SimpleState
-            println(createdState)
-        } catch (e: Exception) {
-            println(e.toString())
-        } finally {
-            rpc.close()
-        }
+        createStateHelper(key, value, config)
+    }
+}
+
+/**
+ * Helper function used by CreateStateCommand
+ */
+fun createStateHelper(key: String, value: String, config: Map<String, String>) {
+    val rpc = NodeRPCConnection(
+            host = config["CORDA_HOST"]!!,
+            username = "clientUser1",
+            password = "test",
+            rpcPort = config["CORDA_PORT"]!!.toInt())
+    try {
+        println("CreateState flow with arguments $key, $value")
+        val proxy = rpc.proxy
+        val createdState = proxy.startFlow(::CreateState, key, value)
+                .returnValue.get().tx.outputStates.first() as SimpleState
+        println(createdState)
+    } catch (e: Exception) {
+        println(e.toString())
+    } finally {
+        rpc.close()
     }
 }
 
