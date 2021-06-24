@@ -98,10 +98,15 @@ class WriteExternalStateInitiator(
 @StartableByRPC
 class GetExternalStateByLinearId(
         val externalStateLinearId: String
-) : FlowLogic<Pair<ByteArray, ByteArray>>() {
-
+) : FlowLogic<ByteArray>() {
+    /**
+     * The call() method captures the logic to read external state written into the vault,
+     * and parse the payload and proof based on the protocol.
+     *
+     * @return Returns JSON string in ByteArray containing: payload, signatures, and proof message.
+     */
     @Suspendable
-    override fun call(): Pair<ByteArray, ByteArray> {
+    override fun call(): ByteArray {
         println("Getting External State for linearId $externalStateLinearId stored in vault\n.")
         val linearId = UniqueIdentifier.fromString(externalStateLinearId)
         //val linearId = externalStateLinearId
@@ -126,25 +131,41 @@ class GetExternalStateByLinearId(
                     val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
                     println("fabricViewData: $fabricViewData")
                     val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
-                    val response = interopPayload.payload.toStringUtf8()
-                    println("response from remote: ${response}.\n")
+                    val payloadString = interopPayload.payload.toStringUtf8()
+                    println("response from remote: ${payloadString}.\n")
                     println("query address: ${interopPayload.address}.\n")
 
                     var securityDomain = interopPayload.address.split("/")[1]
                     val proofStringPrefix = "Verified Proof: Endorsed by members: ["
                     val proofStringSuffix = "] of security domain: " + securityDomain
-                    var orgList = ""
+                    var mspIdList = ""
                     fabricViewData.endorsementsList.map { endorsement ->
-                        val org = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
-                        if (orgList.length > 0) {
-                            orgList = orgList + ", "
+                        val mspId = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
+                        if (mspIdList.length > 0) {
+                            mspIdList = mspIdList + ", "
                         }
-                        orgList = orgList + org
+                        mspIdList = mspIdList + mspId
                     }
-                    var proof = proofStringPrefix + orgList + proofStringSuffix
-                    println("Proof: ${orgList}.\n")
+                    var proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
+                    println("Proof Message: ${mspIdList}.\n")
 
-                    return Pair(response.toByteArray(), proof.toByteArray())
+                    val signatureList = listOf()
+
+                    fabricViewData.endorsementsList.map { endorsement ->
+                        val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
+                        val mspId = serializedIdentity.mspId
+                        val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
+                        val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
+                        val proofSignature = ProofSignature(mspId, certString, signature)
+                        signatureList += proofSignature
+                    }
+
+                    val response = ExternalStateResponse(payloadString, signatureList, proofMessage)
+                    val responseJSONString = Gson().toJson(response)
+
+                    println("Return Proof: ${responseJSONString}.\n")
+
+                    return responseJSONString.toByteArray()
                 }
                 else -> {
                     println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
@@ -157,4 +178,3 @@ class GetExternalStateByLinearId(
     }
 
 }
-
