@@ -24,6 +24,7 @@ import kotlinx.coroutines.*
 import net.corda.core.messaging.startFlow
 import networks.networks.Networks
 import java.util.*
+import org.json.JSONObject
 
 /**
  * The CLI command used to trigger a request for state from an external network.
@@ -178,8 +179,10 @@ fun writeExternalStateToVault(
             it.map { linearId ->
                 println("Verification was successful and external-state was stored with linearId $linearId.\n")
 
-		val (valueByteArray, externalStateProof) = proxy.startFlow(::GetExternalStateByLinearId, linearId.toString()).returnValue.get()
-		val value = valueByteArray.toString(Charsets.UTF_8)
+		val response = proxy.startFlow(::GetExternalStateByLinearId, linearId.toString()).returnValue.get()
+		val responseString = response.toString(Charsets.UTF_8)
+        var responseJSON = JSONObject(responseString)
+        val value = responseJSON.getString("payload")
 		val key = address.split(":").last()
 		val createdState = proxy.startFlow(::CreateState, key, value)
                     .returnValue.get().tx.outputStates.first() as SimpleState
@@ -213,12 +216,26 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
               rpcPort = config["CORDA_PORT"]!!.toInt())
       try {
           val proxy = rpc.proxy
-          val (data, proof) = proxy.startFlow(::GetExternalStateByLinearId, externalStateLinearId)
+          val response = proxy.startFlow(::GetExternalStateByLinearId, externalStateLinearId)
                   .returnValue.get()
-          val s = data.toString(Charsets.UTF_8)
-          val p = proof.toString(Charsets.UTF_8)
-          println("Response: ${s}")
-          println("Proof: ${p}")
+          val responseString = response.toString(Charsets.UTF_8)
+          var responseJSON = JSONObject(responseString)
+
+          val payload = responseJSON.getString("payload")
+          println("Response Payload: ${payload}.\n")
+
+          val proofMessage = responseJSON.getString("proofmessage")
+          println("Proof Message: ${proofMessage}.\n")
+
+          println("Signatures:")
+          val signatures = responseJSON.getJSONArray("signatures")
+          for (i in 0 until signatures.length()) {
+              val proofSignature = signatures.getJSONObject(i)
+              val id = proofSignature.getString("id")
+              val certificate = proofSignature.getString("certificate")
+              val signature = proofSignature.getString("signature")
+              println("${i}\tID: ${id}\n\tCert: ${certificate}\n\tSignature: ${signature}.\n")
+          }
       } catch (e: Exception) {
           println(e.toString())
       } finally {
