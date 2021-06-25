@@ -8,9 +8,6 @@ package main
 
 import (
 	"encoding/json"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"math/big"
 	"fmt"
 	"testing"
 	"encoding/base64"
@@ -44,21 +41,6 @@ func getTxCreatorECertBase64() string {
 	eCertBase64 := "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNVVENDQWZpZ0F3SUJBZ0lSQU5qaWdnVHRhSERGRmtIaUI3VnhPN013Q2dZSUtvWkl6ajBFQXdJd2N6RUxNQWtHQTFVRUJoTUNWVk14RXpBUkJnTlZCQWdUQ2tOaGJHbG1iM0p1YVdFeEZqQVVCZ05WQkFjVERWTmhiaUJHY21GdVkybHpZMjh4R1RBWEJnTlZCQW9URUc5eVp6RXVaWGhoYlhCc1pTNWpiMjB4SERBYUJnTlZCQU1URTJOaExtOXlaekV1WlhoaGJYQnNaUzVqYjIwd0hoY05NVGt3TkRBeE1EZzBOVEF3V2hjTk1qa3dNekk1TURnME5UQXdXakJ6TVFzd0NRWURWUVFHRXdKVlV6RVRNQkVHQTFVRUNCTUtRMkZzYVdadmNtNXBZVEVXTUJRR0ExVUVCeE1OVTJGdUlFWnlZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTVM1bGVHRnRjR3hsTG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1YjNKbk1TNWxlR0Z0Y0d4bExtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCT2VlYTRCNlM5ZTlyLzZUWGZFZUFmZ3FrNVdpcHZZaEdveGg1ZEZuK1g0bTN2UXZTQlhuVFdLVzczZVNnS0lzUHc5dExDVytwZW9yVnMxMWdieXdiY0dqYlRCck1BNEdBMVVkRHdFQi93UUVBd0lCcGpBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFnWUlLd1lCQlFVSEF3RXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXBCZ05WSFE0RUlnUWcxYzJHZmJTa3hUWkxIM2VzUFd3c2llVkU1QWhZNHNPQjVGOGEvaHM5WjhVd0NnWUlLb1pJemowRUF3SURSd0F3UkFJZ1JkZ1krNW9iMDNqVjJLSzFWdjZiZE5xM2NLWHc0cHhNVXY5MFZOc0tHdTBDSUE4Q0lMa3ZEZWg3NEFCRDB6QUNkbitBTkMyVVQ2Sk5UNnd6VHNLN3BYdUwKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ=="
 
 	return eCertBase64
-}
-
-func getEllipticPointsPandQ(kHexa string) (string, string) {
-        pk := new(ecdsa.PrivateKey)
-        pk.D, _ = new(big.Int).SetString(kHexa, 16)
-
-        PX, PY := elliptic.P256().ScalarBaseMult(pk.D.Bytes())
-        PointPBytes := elliptic.Marshal(elliptic.P256(), PX, PY)
-        PointPHexa := fmt.Sprintf("%x", PointPBytes)
-
-        QX, QY := elliptic.P256().ScalarMult(PX, PY, pk.D.Bytes())
-        PointQBytes := elliptic.Marshal(elliptic.P256(), QX, QY)
-        PointQHexa := fmt.Sprintf("%x", PointQBytes)
-
-        return PointPHexa, PointQHexa
 }
 
 func TestLockAsset(t *testing.T) {
@@ -99,7 +81,7 @@ func TestLockAsset(t *testing.T) {
 	// Test success with asset agreement specified properly
 	_, err := interopcc.LockAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
 	require.NoError(t, err)
-	fmt.Println("Test success as expected since the agreement and lock information aare speccified properly")
+	fmt.Println("Test success as expected since the agreement and lock information are speccified properly")
 
 	assetLockVal := AssetLockValue{Locker: locker, Recipient: recipient}
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
