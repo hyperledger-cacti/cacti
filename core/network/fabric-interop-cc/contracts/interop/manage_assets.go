@@ -9,13 +9,9 @@
 package main
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/big"
 	"strconv"
 	"crypto/sha256"
 	"encoding/base64"
@@ -395,60 +391,6 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 		return false, logThenErrorf("asset of type %s and ID %s is not locked by %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker)
 	} else if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
 		return false, logThenErrorf("asset of type %s and ID %s is not locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker, assetAgreement.Recipient)
-	}
-
-	return true, nil
-}
-
-/*
- * Function to check if Q = kP where k is the secret used to claim the asset.
- * All the values k, P and Q are passed in hexadecimal base64 form.
- */
-func checkIfQequalsToKP(kHexaBase64 string, PHexaBase64 string, QHexaBase64 string) (bool, error) {
-	funName := "checkIfQequalsToKP"
-	kHexa, err := base64.StdEncoding.DecodeString(kHexaBase64)
-	if err != nil {
-		return false, logThenErrorf("base64 decode kHexa error: %s", err)
-	}
-	PHexa, err := base64.StdEncoding.DecodeString(PHexaBase64)
-	if err != nil {
-		return false, logThenErrorf("base64 decode PHexa error: %s", err)
-	}
-	QHexa, err := base64.StdEncoding.DecodeString(QHexaBase64)
-	if err != nil {
-		return false, logThenErrorf("base64 decode QHexa error: %s", err)
-	}
-
-	kPrivKey := new(ecdsa.PrivateKey)
-	var boolError bool
-	kPrivKey.D, boolError = new(big.Int).SetString(string(kHexa), 16)
-	if !boolError {
-		return false, logThenErrorf("cannot convert 'hex' string kHexa(%s) to big.Int", kHexa)
-	}
-
-	Pbytes, err := hex.DecodeString(string(PHexa))
-	if err != nil {
-		return false, logThenErrorf("cannot decode 'hex' string PHexa(%s) to bytes error: %s", PHexa, err)
-	}
-	// fetch the point (X, Y) on the elliptic curve corresponding to P
-	PX, PY := elliptic.Unmarshal(elliptic.P256(), Pbytes)
-	log.Infof("%s: (X, Y) coordinates of P in 'hex' format %s are (%s, %s).", funName, PHexa, PX, PY)
-
-	kPprivKey := new(ecdsa.PrivateKey)
-	kPprivKey.PublicKey.Curve = elliptic.P256()
-	kPprivKey.PublicKey.X, kPprivKey.PublicKey.Y = kPprivKey.PublicKey.Curve.ScalarMult(PX, PY, kPrivKey.D.Bytes())
-	kPpubBytes := elliptic.Marshal(elliptic.P256(), kPprivKey.PublicKey.X, kPprivKey.PublicKey.Y)
-
-	Qbytes, err := hex.DecodeString(string(QHexa))
-	if err != nil {
-		return false, logThenErrorf("cannot decode 'hex' string QHexa(%s) to bytes error: %s", QHexa, err)
-	}
-
-	if string(kPpubBytes) == string(Qbytes) {
-		log.Infof("%s: secret k(%s) is passed correctly (i.e., kP = Q).", funName, kHexa)
-	} else {
-		log.Infof("%s: secret k(%s) is not passed correctly (i.e., kP = Q).", funName, kHexa)
-		return false, nil
 	}
 
 	return true, nil
