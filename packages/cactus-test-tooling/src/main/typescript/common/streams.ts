@@ -24,7 +24,7 @@ export class Streams {
         data.push(item);
       });
 
-      stream.on("error", (err: any) => {
+      stream.on("error", (err: unknown) => {
         if (err instanceof Error) {
           reject(err);
         } else if (typeof err === "string") {
@@ -59,7 +59,7 @@ export class Streams {
         data.push(buffer);
       });
 
-      stream.on("error", (err: any) => {
+      stream.on("error", (err: unknown) => {
         if (err instanceof Error) {
           reject(err);
         } else if (typeof err === "string") {

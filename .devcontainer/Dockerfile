@@ -45,10 +45,10 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 COPY post-create-commands.sh /home/vscode/bin/
 
-# Installing Node Version Manager (nvm) and Node v14 (current LTS)
+# Installing Node Version Manager (nvm) and Node v16
 USER vscode
 SHELL ["/bin/bash", "--login", "-i", "-c"]
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-RUN source /home/vscode/.bashrc && nvm install 14.17.0
+RUN source /home/vscode/.bashrc && nvm install 16.3.0
 SHELL ["/bin/bash", "--login", "-c"]
 USER root
