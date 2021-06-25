@@ -285,11 +285,11 @@ export class BesuTestLedger implements ITestLedger {
     } while (!isHealthy);
   }
 
-  public stop(): Promise<any> {
+  public stop(): Promise<unknown> {
     const fnTag = "BesuTestLedger#stop()";
     return new Promise((resolve, reject) => {
       if (this.container) {
-        this.container.stop({}, (err: any, result: any) => {
+        this.container.stop({}, (err: unknown, result: unknown) => {
           if (err) {
             reject(err);
           } else {
@@ -302,7 +302,7 @@ export class BesuTestLedger implements ITestLedger {
     });
   }
 
-  public destroy(): Promise<any> {
+  public destroy(): Promise<unknown> {
     const fnTag = "BesuTestLedger#destroy()";
     if (this.container) {
       return this.container.remove();
@@ -371,16 +371,16 @@ export class BesuTestLedger implements ITestLedger {
     }
   }
 
-  private pullContainerImage(containerNameAndTag: string): Promise<any[]> {
+  private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: any, stream: any) => {
+      docker.pull(containerNameAndTag, (pullError: unknown, stream: any) => {
         if (pullError) {
           reject(pullError);
         } else {
           docker.modem.followProgress(
             stream,
-            (progressError: any, output: any[]) => {
+            (progressError: unknown, output: unknown[]) => {
               if (progressError) {
                 reject(progressError);
               } else {
