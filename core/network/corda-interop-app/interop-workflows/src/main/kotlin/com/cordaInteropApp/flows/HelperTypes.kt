@@ -75,16 +75,20 @@ data class RequestForExternalState(
         val requestingOrg: String) {
 }
 
-@CordaSerializable
+/**
+ * TODO: Documentation
+ */
 data class ProofSignature(
         val id: String,
         val certificate: String,
-        val signature: String) {
-}
+        val signature: String
+)
 
-@CordaSerializable
+/**
+ * TODO: Documentation
+ */
 data class ExternalStateResponse(
         val payload: String,
         val signatures: List<ProofSignature>,
-        val proofmessage: String) {
-}
+        val proofmessage: String
+)
