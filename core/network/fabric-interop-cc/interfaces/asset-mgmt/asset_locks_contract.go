@@ -314,17 +314,6 @@ func (amc *AssetManagementContract) LockAsset(ctx contractapi.TransactionContext
                 }
                 contractInfoBytes, err = proto.Marshal(contractInfo)
             }
-        } else if lockInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
-            lockInfoVal := &common.AssetLockECDLPTLC{}
-            err = proto.Unmarshal(lockInfo.LockInfo, lockInfoVal)
-            if err == nil {
-                contractInfo := &common.AssetContractECDLPTLC {
-                    ContractId: contractId,
-                    Agreement: assetAgreement,
-                    Lock: lockInfoVal,
-                }
-                contractInfoBytes, err = proto.Marshal(contractInfo)
-            }
         } else {
             logWarnings("lock mechanism is not supported")
         }
@@ -357,17 +346,6 @@ func (amc *AssetManagementContract) LockFungibleAsset(ctx contractapi.Transactio
             err = proto.Unmarshal(lockInfo.LockInfo, lockInfoVal)
             if err == nil {
                 contractInfo := &common.FungibleAssetContractHTLC {
-                    ContractId: contractId,
-                    Agreement: assetAgreement,
-                    Lock: lockInfoVal,
-                }
-                contractInfoBytes, err = proto.Marshal(contractInfo)
-            }
-        } else if lockInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
-            lockInfoVal := &common.AssetLockECDLPTLC{}
-            err = proto.Unmarshal(lockInfo.LockInfo, lockInfoVal)
-            if err == nil {
-                contractInfo := &common.FungibleAssetContractECDLPTLC {
                     ContractId: contractId,
                     Agreement: assetAgreement,
                     Lock: lockInfoVal,
@@ -434,16 +412,6 @@ func (amc *AssetManagementContract) ClaimAsset(ctx contractapi.TransactionContex
                 }
                 contractInfoBytes, err = proto.Marshal(contractInfo)
             }
-        } else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
-            claimInfoVal := &common.AssetClaimECDLPTLC{}
-            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
-            if err == nil {
-                contractInfo := &common.AssetContractECDLPTLC {
-                    Agreement: assetAgreement,
-                    Claim: claimInfoVal,
-                }
-                contractInfoBytes, err = proto.Marshal(contractInfo)
-            }
         } else {
             logWarnings("lock mechanism is not supported")
         }
@@ -479,16 +447,6 @@ func (amc *AssetManagementContract) ClaimFungibleAsset(ctx contractapi.Transacti
                 }
                 contractInfoBytes, err = proto.Marshal(contractInfo)
             }
-        } else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
-            claimInfoVal := &common.AssetClaimECDLPTLC{}
-            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
-            if err == nil {
-                contractInfo := &common.FungibleAssetContractECDLPTLC {
-                    ContractId: contractId,
-                    Claim: claimInfoVal,
-                }
-                contractInfoBytes, err = proto.Marshal(contractInfo)
-            }
         } else {
             logWarnings("lock mechanism is not supported")
         }
@@ -519,16 +477,6 @@ func (amc *AssetManagementContract) ClaimAssetUsingContractId(ctx contractapi.Tr
             err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
             if err == nil {
                 contractInfo := &common.AssetContractHTLC {
-                    ContractId: contractId,
-                    Claim: claimInfoVal,
-                }
-                contractInfoBytes, err = proto.Marshal(contractInfo)
-            }
-        } else if claimInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
-            claimInfoVal := &common.AssetClaimECDLPTLC{}
-            err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoVal)
-            if err == nil {
-                contractInfo := &common.AssetContractECDLPTLC {
                     ContractId: contractId,
                     Claim: claimInfoVal,
                 }

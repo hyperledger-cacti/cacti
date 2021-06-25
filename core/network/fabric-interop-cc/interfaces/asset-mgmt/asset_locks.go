@@ -81,21 +81,6 @@ func (am *AssetManagement) validateLockInfo(lockInfo *common.AssetLock) error {
         if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
             return logThenErrorf("only EPOCH time is supported at present")
         }
-    } else if lockInfo.LockMechanism == common.LockMechanism_ECDLPTLC {
-        lockInfoECDLPTLC := &common.AssetLockECDLPTLC{}
-        err := proto.Unmarshal(lockInfo.LockInfo, lockInfoECDLPTLC)
-        if err != nil {
-            return logThenErrorf(err.Error())
-        }
-        if len(lockInfoECDLPTLC.PointPHexaBase64) == 0 {
-            return logThenErrorf("empty lock EC point P")
-        }
-        if len(lockInfoECDLPTLC.PointQHexaBase64) == 0 {
-            return logThenErrorf("empty lock EC point Q")
-        }
-        if lockInfoECDLPTLC.TimeSpec != common.AssetLockECDLPTLC_EPOCH {
-            return logThenErrorf("only EPOCH time is supported at present")
-        }
     } else {
         return logThenErrorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
     }
@@ -115,15 +100,6 @@ func (am *AssetManagement) validateClaimInfo(claimInfo *common.AssetClaim) error
         }
         if len(claimInfoHTLC.HashPreimageBase64) == 0 {
             return logThenErrorf("empty lock hash preimage")
-        }
-    } else if (claimInfo.LockMechanism == common.LockMechanism_HTLC) {
-        claimInfoECDLPTLC := &common.AssetClaimECDLPTLC{}
-        err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoECDLPTLC)
-        if err != nil {
-            return logThenErrorf(err.Error())
-        }
-        if len(claimInfoECDLPTLC.KHexaBase64) == 0 {
-            return logThenErrorf("empty ECDLP lock secret")
         }
     } else {
         return logThenErrorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
