@@ -42,7 +42,7 @@ export class CactusKeychainVaultServer {
     return CactusKeychainVaultServer.CLASS_NAME;
   }
 
-  public get imageFqn() {
+  public get imageFqn(): string {
     return `${this.imageName}:${this.imageVersion}`;
   }
 
@@ -89,7 +89,7 @@ export class CactusKeychainVaultServer {
           // },
         },
         {},
-        (err: any) => {
+        (err: unknown) => {
           if (err) {
             reject(err);
           }
@@ -113,7 +113,7 @@ export class CactusKeychainVaultServer {
     await Containers.stop(this.container as any);
   }
 
-  public destroy(): Promise<any> {
+  public destroy(): Promise<unknown> {
     const fnTag = `${this.className}#destroy()`;
     if (this.container) {
       return this.container.remove();
