@@ -157,6 +157,10 @@ export class PluginLedgerConnectorBesu
     return this.instanceId;
   }
 
+  public async onPluginInit(): Promise<unknown> {
+    return;
+  }
+
   public getHttpServer(): Optional<Server | SecureServer> {
     return Optional.ofNullable(this.httpServer);
   }
