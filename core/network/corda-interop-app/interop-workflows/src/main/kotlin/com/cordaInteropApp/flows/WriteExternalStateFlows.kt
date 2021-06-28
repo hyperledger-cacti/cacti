@@ -13,14 +13,12 @@ import arrow.core.flatMap
 import co.paralleluniverse.fibers.Suspendable
 import com.cordaInteropApp.contracts.ExternalStateContract
 import com.cordaInteropApp.states.ExternalState
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+// import com.google.gson.Gson
 import common.state.State
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.transactions.TransactionBuilder
-import org.hyperledger.fabric.protos.peer.ProposalResponsePackage
 import java.util.Base64
 
 import net.corda.core.node.services.queryBy
@@ -28,6 +26,8 @@ import net.corda.core.node.services.vault.QueryCriteria
 import fabric.view_data.ViewData
 import common.interop_payload.InteropPayloadOuterClass
 import org.hyperledger.fabric.protos.msp.Identities
+
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 
 /**
@@ -136,18 +136,18 @@ class GetExternalStateByLinearId(
                     println("response from remote: ${payloadString}.\n")
                     println("query address: ${interopPayload.address}.\n")
 
-                    var securityDomain = interopPayload.address.split("/")[1]
+                    val securityDomain = interopPayload.address.split("/")[1]
                     val proofStringPrefix = "Verified Proof: Endorsed by members: ["
-                    val proofStringSuffix = "] of security domain: " + securityDomain
+                    val proofStringSuffix = "] of security domain: $securityDomain"
                     var mspIdList = ""
                     fabricViewData.endorsementsList.map { endorsement ->
                         val mspId = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
-                        if (mspIdList.length > 0) {
-                            mspIdList = mspIdList + ", "
+                        if (mspIdList.isNotEmpty()) {
+                            mspIdList += ", "
                         }
-                        mspIdList = mspIdList + mspId
+                        mspIdList += mspId
                     }
-                    var proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
+                    val proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
                     println("Proof Message: ${proofMessage}.\n")
 
                     var signatureList: List<ProofSignature> = listOf()
@@ -158,12 +158,15 @@ class GetExternalStateByLinearId(
                         val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
                         val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
                         val proofSignature = ProofSignature(mspId, certString, signature)
-                        signatureList += proofSignature
+                        signatureList = signatureList + proofSignature
                     }
 
                     val response = ExternalStateResponse(payloadString, signatureList, proofMessage)
-                    val gson = GsonBuilder().create();
-                    val responseJSONString = gson.toJson(response, ExternalStateResponse::class.java)
+                    // val gson = Gson()
+                    // val responseJSONString = gson.toJson(response, ExternalStateResponse::class.java)
+
+                    val mapper = jacksonObjectMapper()
+                    val responseJSONString = mapper.writeValueAsString(response)
 
                     println("Return Proof: ${responseJSONString}.\n")
 
