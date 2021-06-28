@@ -18,7 +18,6 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import { PluginObjectStoreIpfs } from "../../../main/typescript";
 
 import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testCase = "can work with go-ipfs container get/set/has operations";
@@ -60,8 +59,6 @@ test(testCase, async (t: Test) => {
   t.comment(`Go IPFS Test Container API URL: ${ipfsApiUrl}`);
   t.comment(`Go IPFS Test Container Gateway URL: ${ipfsGatewayUrl}`);
 
-  const pluginRegistry = new PluginRegistry();
-
   const ipfsClientOrOptions = create({
     url: ipfsApiUrl,
   });
@@ -71,28 +68,14 @@ test(testCase, async (t: Test) => {
     logLevel,
     instanceId,
     ipfsClientOrOptions,
-    pluginRegistry,
   });
-
-  const keychainEntryKey = uuidv4();
-  const key2 = uuidv4();
-  const keychainEntryValue = Buffer.from(uuidv4()).toString("base64");
-  const value2 = Buffer.from(uuidv4()).toString("base64");
 
   const keychainPlugin = new PluginKeychainMemory({
     instanceId: uuidv4(),
     keychainId: uuidv4(),
-    backend: new Map([[keychainEntryKey, keychainEntryValue]]),
+    backend: new Map(),
     logLevel,
   });
-
-  pluginRegistry.add(keychainPlugin);
-
-  await keychainPlugin.set(key2, value2);
-
-  console.log("VALUE 2 ===== " + value2);
-  const tested = await keychainPlugin.get(key2);
-  console.log("Keychain.get(key2) ===== " + tested);
 
   await plugin.getOrCreateWebServices();
   await plugin.registerWebServices(expressApp);
@@ -104,21 +87,45 @@ test(testCase, async (t: Test) => {
   t.ok(theInstanceId, "theInstanceId truthy OK");
   t.equal(theInstanceId, instanceId, "instanceId === theInstanceId OK");
 
-  const res1 = await apiClient.setObjectV1({ key: key2, value: value2 });
-  console.log("2 " + res1.status);
-  console.log("3 " + JSON.stringify(res1.data));
-  console.log("4 " + res1.data.key);
-  console.log("=======================");
+  const fileId = uuidv4();
+  const fileContents = Buffer.from(uuidv4()).toString("base64");
 
-  const res2 = await apiClient.getObjectV1({ key: key2 });
-  console.log("2 " + res2.status);
-  console.log("3 " + JSON.stringify(res2.data));
-  console.log("4 " + res2.data.key);
-  console.log("=======================");
+  console.log(fileContents);
 
-  const res3 = await apiClient.hasObjectV1({ key: key2 });
-  console.log("2 " + res3.status);
-  console.log("3 " + JSON.stringify(res3.data));
-  console.log("4 " + res3.data.key);
+  // 172.18.0.8:"port""docker inspect containerId"/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object
+
+  const res1 = await apiClient.setObjectV1({
+    key: fileId,
+    value: fileContents,
+  });
+
+  //setting the qm hash into the keychain
+  await keychainPlugin.set(fileId, (res1.data as any).cidHash);
+  console.log(
+    "File: " +
+      fileId +
+      "set into the keychain with the corresponding value: " +
+      (res1.data as any).cidHash,
+  );
+
+  //getting the qm hash from the keychain
+  const keychainGet = await keychainPlugin.get(fileId);
+  console.log(keychainGet);
+
+  const res2 = await apiClient.getObjectV1({
+    key: fileId,
+    //extraArgs: { hashIncluded: true },
+  });
+  console.log(res2.data.value);
+
+  const res3 = await apiClient.hasObjectV1({ key: fileId });
+  console.log(res3);
+  console.log(res3.data.key);
+  console.log(res3.data.checkedAt);
+  console.log(res3.data.isPresent);
+
+  //const res3 = await apiClient.hasObjectV1({ key: key2 });
   //when you set into the ipfs you create a key with the qm hash as the value - when retrieving you simply give the key and it will return the object stored back to you
+  //test azure keychain plugin with this - ask Enrique if they have an Azure Secretmanager/keyvault.
+  t.end();
 });

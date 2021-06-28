@@ -8,7 +8,7 @@ import { Optional } from "typescript-optional";
 import { RuntimeError } from "run-time-error";
 import { Logger, Checks, LoggerProvider } from "@hyperledger/cactus-common";
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
-import type {
+import {
   IPluginObjectStore,
   ICactusPluginOptions,
   IWebServiceEndpoint,
@@ -18,6 +18,7 @@ import type {
   HasObjectResponseV1,
   SetObjectRequestV1,
   SetObjectResponseV1,
+  // IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
 import { GetObjectEndpointV1 } from "./web-services/get-object-endpoint-v1";
@@ -25,7 +26,7 @@ import { SetObjectEndpointV1 } from "./web-services/set-object-endpoint-v1";
 import { HasObjectEndpointV1 } from "./web-services/has-object-endpoint-v1";
 import type { IIpfsHttpClient } from "./i-ipfs-http-client";
 import { isIpfsHttpClientOptions } from "./i-ipfs-http-client";
-import { PluginRegistry } from "../../../../cactus-core/dist/types/main/typescript/plugin-registry";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { v4 as uuidv4 } from "uuid";
 
@@ -36,11 +37,12 @@ export interface IPluginObjectStoreIpfsOptions extends ICactusPluginOptions {
   readonly logLevel?: LogLevelDesc;
   readonly parentDir: string;
   readonly ipfsClientOrOptions: Options | IIpfsHttpClient;
-  readonly pluginRegistry: PluginRegistry;
+  readonly pluginRegistry?: PluginRegistry;
   readonly keychainId?: string;
   readonly keychain?: PluginKeychainMemory;
 }
 
+//,IPluginKeychain
 export class PluginObjectStoreIpfs implements IPluginObjectStore {
   public static readonly CLASS_NAME = "PluginObjectStoreIpfs";
 
@@ -48,8 +50,8 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
   private readonly log: Logger;
   private readonly instanceId: string;
   private readonly parentDir: string;
-  private readonly keychainId: string;
-  private readonly keychain: PluginKeychainMemory;
+  // private readonly keychainId: string;
+  // private readonly keychain: PluginKeychainMemory;
 
   public get className(): string {
     return PluginObjectStoreIpfs.CLASS_NAME;
@@ -59,6 +61,7 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.nonBlankString(opts.instanceId, `${fnTag} options.instanceId`);
+    // Checks.truthy(opts.keychainId, `${fnTag} arg options.keychainId`);
     Checks.nonBlankString(opts.parentDir, `${fnTag} options.parentDir`);
     Checks.truthy(opts.ipfsClientOrOptions, `${fnTag} ipfsClientOrOptions`);
 
@@ -80,15 +83,20 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
 
     this.parentDir = this.opts.parentDir;
     this.instanceId = this.opts.instanceId;
+    // this.keychainId = this.opts.keychainId;
 
     this.log.info(`Created ${this.className}. InstanceID=${opts.instanceId}`);
+    // this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
 
-    this.keychainId = uuidv4();
-
-    this.keychain = new PluginKeychainMemory({
-      keychainId: this.keychainId,
+    const keychain = new PluginKeychainMemory({
       instanceId: uuidv4(),
+      keychainId: uuidv4(),
+      backend: new Map(),
     });
+
+    const pluginRegistry = new PluginRegistry();
+
+    pluginRegistry.add(keychain);
   }
 
   public async registerWebServices(
@@ -137,6 +145,12 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     return path.join(this.parentDir, req.key);
   }
 
+  // if (req.extraArgs && (req.extraArgs as any).hashIncluded == true) {
+  //   const keyP = req.key;
+  //   const value = this.ipfs.get(keyP);
+
+  //   return { key: keyP, value: (value as unknown) as string };
+
   public async get(req: GetObjectRequestV1): Promise<GetObjectResponseV1> {
     const keyPath = this.getKeyPath(req);
     const chunksIterable = this.ipfs.files.read(keyPath);
@@ -162,6 +176,7 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     try {
       const statResult = await this.ipfs.files.stat(keyPath);
       this.log.debug(`StatResult for ${req.key}: %o`, statResult);
+      this.log.debug(`log for statresult.cid: %o`, statResult.cid.toString());
       return { key: req.key, checkedAt, isPresent: true };
     } catch (ex) {
       if (ex?.stack?.includes(K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST)) {
@@ -176,10 +191,8 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
 
   public async set(req: SetObjectRequestV1): Promise<SetObjectResponseV1> {
     const keyPath = this.getKeyPath(req);
-    //const keychainEntryKey = uuidv4();
-    //const keychainEntryValue = Buffer.from(uuidv4()).toString("base64");
     try {
-      this.log.debug(`Seting object ${keyPath} in IPFS...`);
+      this.log.debug(`Setting object ${keyPath} in IPFS...`);
       const buffer = Buffer.from(req.value, "base64");
       await this.ipfs.files.write(keyPath, buffer, {
         create: true,
@@ -188,9 +201,13 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     } catch (ex) {
       throw new RuntimeError(`Can't set object ${keyPath}. Write failed:`, ex);
     }
+
+    const statResult = await this.ipfs.files.stat(keyPath);
+
     return {
       key: req.key,
-    };
+      cidHash: statResult.cid.toString(),
+    } as SetObjectResponseV1;
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {
@@ -201,3 +218,9 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     this.log.info(`Shutting down ${this.className}...`);
   }
 }
+/*A few things I'd change to make the keychain an optional dependency not a hard one (otherwise it's not really a plugin).
+	
+1) Don't depend on the keychain memory plugin in package.json,
+2) use the keychain interface from the core api package instead of the in-memory implementation
+3) Don't have a keychain instance as a constructor arg's property, use an optional keychainId request parameter to look up keychain instances in the plugin registry
+*/
