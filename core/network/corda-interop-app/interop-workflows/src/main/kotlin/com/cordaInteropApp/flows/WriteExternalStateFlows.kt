@@ -13,7 +13,6 @@ import arrow.core.flatMap
 import co.paralleluniverse.fibers.Suspendable
 import com.cordaInteropApp.contracts.ExternalStateContract
 import com.cordaInteropApp.states.ExternalState
-// import com.google.gson.Gson
 import common.state.State
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
@@ -162,8 +161,6 @@ class GetExternalStateByLinearId(
                     }
 
                     val response = ExternalStateResponse(payloadString, signatureList, proofMessage)
-                    // val gson = Gson()
-                    // val responseJSONString = gson.toJson(response, ExternalStateResponse::class.java)
 
                     val mapper = jacksonObjectMapper()
                     val responseJSONString = mapper.writeValueAsString(response)
