@@ -33,6 +33,12 @@ export interface GetObjectRequestV1 {
      * @memberof GetObjectRequestV1
      */
     key: string;
+    /**
+     * Generic implementation specific parameters to be included here. Check the documentation of the specific plugin you\'re using to see what options are avaliable within this object.
+     * @type {any}
+     * @memberof GetObjectRequestV1
+     */
+    extraArgs?: any | null;
 }
 /**
  * 
@@ -90,6 +96,38 @@ export interface HasObjectResponseV1 {
      * @memberof HasObjectResponseV1
      */
     isPresent: boolean;
+}
+/**
+ * 
+ * @export
+ * @interface RemoveObjectRequestV1
+ */
+export interface RemoveObjectRequestV1 {
+    /**
+     * The key to the file that is to be removed from the ipfs node
+     * @type {string}
+     * @memberof RemoveObjectRequestV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface RemoveObjectResponseV1
+ */
+export interface RemoveObjectResponseV1 {
+    /**
+     * The key that was used to remove the file from the ipfs node
+     * @type {string}
+     * @memberof RemoveObjectResponseV1
+     */
+    key: string;
+    /**
+     * checks if the file was successfully removed from the ipfs node
+     * @type {boolean}
+     * @memberof RemoveObjectResponseV1
+     */
+    isRemoved: boolean;
 }
 /**
  * 
@@ -204,6 +242,42 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Removes an object from the object store.
+         * @param {RemoveObjectRequestV1} removeObjectRequestV1 Request body to check presence of an object under a key.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeObjectV1: async (removeObjectRequestV1: RemoveObjectRequestV1, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'removeObjectRequestV1' is not null or undefined
+            assertParamExists('removeObjectV1', 'removeObjectRequestV1', removeObjectRequestV1)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/remove-object`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(removeObjectRequestV1, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Sets an object in the object store under the specified key.
          * @param {SetObjectRequestV1} setObjectRequestV1 Request body to set an object under a key.
          * @param {*} [options] Override http request option.
@@ -272,6 +346,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Removes an object from the object store.
+         * @param {RemoveObjectRequestV1} removeObjectRequestV1 Request body to check presence of an object under a key.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeObjectV1(removeObjectRequestV1: RemoveObjectRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RemoveObjectResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.removeObjectV1(removeObjectRequestV1, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Sets an object in the object store under the specified key.
          * @param {SetObjectRequestV1} setObjectRequestV1 Request body to set an object under a key.
          * @param {*} [options] Override http request option.
@@ -310,6 +395,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         hasObjectV1(hasObjectRequestV1: HasObjectRequestV1, options?: any): AxiosPromise<HasObjectResponseV1> {
             return localVarFp.hasObjectV1(hasObjectRequestV1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Removes an object from the object store.
+         * @param {RemoveObjectRequestV1} removeObjectRequestV1 Request body to check presence of an object under a key.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeObjectV1(removeObjectRequestV1: RemoveObjectRequestV1, options?: any): AxiosPromise<RemoveObjectResponseV1> {
+            return localVarFp.removeObjectV1(removeObjectRequestV1, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -353,6 +448,18 @@ export class DefaultApi extends BaseAPI {
      */
     public hasObjectV1(hasObjectRequestV1: HasObjectRequestV1, options?: any) {
         return DefaultApiFp(this.configuration).hasObjectV1(hasObjectRequestV1, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Removes an object from the object store.
+     * @param {RemoveObjectRequestV1} removeObjectRequestV1 Request body to check presence of an object under a key.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public removeObjectV1(removeObjectRequestV1: RemoveObjectRequestV1, options?: any) {
+        return DefaultApiFp(this.configuration).removeObjectV1(removeObjectRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

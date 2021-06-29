@@ -92,12 +92,17 @@ test(testCase, async (t: Test) => {
 
   console.log(fileContents);
 
-  // 172.18.0.8:"port""docker inspect containerId"/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object
-
   const res1 = await apiClient.setObjectV1({
     key: fileId,
     value: fileContents,
   });
+  t.ok(res1, "res1 truthy OK");
+  t.ok(res1.status, "res1.status truthy OK");
+  t.true(res1.status > 199, "res1.status > 199 true OK");
+  t.true(res1.status < 300, "res1.status < 300 true OK");
+  t.ok(res1.data, "res1.data truthy OK");
+  t.ok(res1.data.key, "res1.data.key truthy OK");
+  t.equal(res1.data.key, fileId, "equal res1.data.key, fileId OK");
 
   //setting the qm hash into the keychain
   await keychainPlugin.set(fileId, (res1.data as any).cidHash);
@@ -111,21 +116,55 @@ test(testCase, async (t: Test) => {
   //getting the qm hash from the keychain
   const keychainGet = await keychainPlugin.get(fileId);
   console.log(keychainGet);
+  t.equal(keychainGet, (res1.data as any).cidHash);
 
   const res2 = await apiClient.getObjectV1({
     key: fileId,
     //extraArgs: { hashIncluded: true },
   });
-  console.log(res2.data.value);
+  t.ok(res2, "res2 truthy OK");
+  t.ok(res2.status, "res2.status truthy OK");
+  t.true(res2.status > 199, "res2.status > 199 true OK");
+  t.true(res2.status < 300, "res2.status < 300 true OK");
+  t.ok(res2.data, "res2.data truthy OK");
+  t.ok(res2.data.key, "res2.data.key truthy OK");
+  t.equal(res2.data.key, fileId, "equal res2.data.key, fileId OK");
+  // eslint-disable-next-line prettier/prettier
+  t.equal(res2.data.value, fileContents, "equal res2.data.value, fileContents OK");
 
   const res3 = await apiClient.hasObjectV1({ key: fileId });
-  console.log(res3);
-  console.log(res3.data.key);
-  console.log(res3.data.checkedAt);
-  console.log(res3.data.isPresent);
+  t.ok(res3, "res3 truthy OK");
+  t.ok(res3.status, "res3.status truthy OK");
+  t.true(res3.status > 199, "res3.status > 199 true OK");
+  t.true(res3.status < 300, "res3.status < 300 true OK");
+  t.ok(res3.data, "res3.data truthy OK");
+  t.ok(res3.data.key, "res3.data.key truthy OK");
+  t.equal(res3.data.key, fileId, "equal res3.data.key, fileId OK");
+  t.equal(res3.data.isPresent, true, "equal res3.data.isPresent, true OK");
 
-  //const res3 = await apiClient.hasObjectV1({ key: key2 });
-  //when you set into the ipfs you create a key with the qm hash as the value - when retrieving you simply give the key and it will return the object stored back to you
-  //test azure keychain plugin with this - ask Enrique if they have an Azure Secretmanager/keyvault.
+  const res4 = await apiClient.removeObjectV1({ key: fileId });
+  console.log(res4);
+  console.log(res4.data);
+  console.log(res4.data.isRemoved);
+  console.log(res4.data.key);
+  t.ok(res4, "res4 truthy OK");
+  t.ok(res4.status, "res4.status truthy OK");
+  t.true(res4.status > 199, "res4.status > 199 true OK");
+  t.true(res4.status < 300, "res4.status < 300 true OK");
+  t.ok(res4.data, "res4.data truthy OK");
+  t.ok(res4.data.key, "res4.data.key truthy OK");
+  t.equal(res4.data.key, fileId, "equal res4.data.key, fileId OK");
+  t.equal(res4.data.isRemoved, true, "equal res4.data.isPresent, true OK");
+
+  const res5 = await apiClient.hasObjectV1({ key: fileId });
+  t.ok(res5, "res5 truthy OK");
+  t.ok(res5.status, "res5.status truthy OK");
+  t.true(res5.status > 199, "res5.status > 199 true OK");
+  t.true(res5.status < 300, "res5.status < 300 true OK");
+  t.ok(res5.data, "res5.data truthy OK");
+  t.ok(res5.data.key, "res5.data.key truthy OK");
+  t.equal(res5.data.key, fileId, "equal res5.data.key, fileId OK");
+  t.equal(res5.data.isPresent, false, "equal res5.data.isPresent, false OK");
+
   t.end();
 });

@@ -18,17 +18,20 @@ import {
   HasObjectResponseV1,
   SetObjectRequestV1,
   SetObjectResponseV1,
+  RemoveObjectRequestV1,
+  RemoveObjectResponseV1,
   // IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
 import { GetObjectEndpointV1 } from "./web-services/get-object-endpoint-v1";
 import { SetObjectEndpointV1 } from "./web-services/set-object-endpoint-v1";
 import { HasObjectEndpointV1 } from "./web-services/has-object-endpoint-v1";
+import { RemoveObjectEndpointV1 } from "./web-services/remove-object-endpoint-v1";
 import type { IIpfsHttpClient } from "./i-ipfs-http-client";
 import { isIpfsHttpClientOptions } from "./i-ipfs-http-client";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 
 export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
   "HTTPError: file does not exist";
@@ -42,7 +45,6 @@ export interface IPluginObjectStoreIpfsOptions extends ICactusPluginOptions {
   readonly keychain?: PluginKeychainMemory;
 }
 
-//,IPluginKeychain
 export class PluginObjectStoreIpfs implements IPluginObjectStore {
   public static readonly CLASS_NAME = "PluginObjectStoreIpfs";
 
@@ -50,8 +52,6 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
   private readonly log: Logger;
   private readonly instanceId: string;
   private readonly parentDir: string;
-  // private readonly keychainId: string;
-  // private readonly keychain: PluginKeychainMemory;
 
   public get className(): string {
     return PluginObjectStoreIpfs.CLASS_NAME;
@@ -61,7 +61,6 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.nonBlankString(opts.instanceId, `${fnTag} options.instanceId`);
-    // Checks.truthy(opts.keychainId, `${fnTag} arg options.keychainId`);
     Checks.nonBlankString(opts.parentDir, `${fnTag} options.parentDir`);
     Checks.truthy(opts.ipfsClientOrOptions, `${fnTag} ipfsClientOrOptions`);
 
@@ -83,20 +82,12 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
 
     this.parentDir = this.opts.parentDir;
     this.instanceId = this.opts.instanceId;
-    // this.keychainId = this.opts.keychainId;
 
     this.log.info(`Created ${this.className}. InstanceID=${opts.instanceId}`);
-    // this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
+  }
 
-    const keychain = new PluginKeychainMemory({
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
-      backend: new Map(),
-    });
-
-    const pluginRegistry = new PluginRegistry();
-
-    pluginRegistry.add(keychain);
+  public async onPluginInit(): Promise<unknown> {
+    return;
   }
 
   public async registerWebServices(
@@ -126,6 +117,10 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
         logLevel,
         plugin: this,
       }),
+      new RemoveObjectEndpointV1({
+        logLevel,
+        plugin: this,
+      }),
     ];
     const pkg = this.getPackageName();
     log.info(`Installed web services for plugin ${pkg} OK`, { endpoints });
@@ -144,12 +139,6 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
   public getKeyPath(req: { key: string }): string {
     return path.join(this.parentDir, req.key);
   }
-
-  // if (req.extraArgs && (req.extraArgs as any).hashIncluded == true) {
-  //   const keyP = req.key;
-  //   const value = this.ipfs.get(keyP);
-
-  //   return { key: keyP, value: (value as unknown) as string };
 
   public async get(req: GetObjectRequestV1): Promise<GetObjectResponseV1> {
     const keyPath = this.getKeyPath(req);
@@ -208,6 +197,17 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
       key: req.key,
       cidHash: statResult.cid.toString(),
     } as SetObjectResponseV1;
+  }
+
+  // eslint-disable-next-line prettier/prettier
+  public async remove( req: RemoveObjectRequestV1 ): Promise<RemoveObjectResponseV1> {
+    const keyPath = this.getKeyPath(req);
+    try {
+      const removeResult = await this.ipfs.files.rm(keyPath);
+      this.log.debug(`RemoveResult for ${req.key}: %o`, removeResult);
+      return { key: req.key, isRemoved: true };
+    } catch (ex) {}
+    return { key: req.key, isRemoved: false };
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {

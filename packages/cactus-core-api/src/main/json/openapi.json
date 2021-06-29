@@ -462,7 +462,7 @@
                     }
                 }
             },
-            "removeObjectRequestV1": {
+            "RemoveObjectRequestV1": {
                 "type": "object",
                 "required": [
                     "key"
@@ -477,7 +477,7 @@
                     }
                 }
             },
-            "removeObjectResponseV1": {
+            "RemoveObjectResponseV1": {
                 "type": "object",
                 "required": [
                     "key",
@@ -691,6 +691,17 @@
                     }
                 }
             },
+            "object_store_remove_object_v1_request_body": {
+                "description": "Request body to check presence of an object under a key.",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/RemoveObjectRequestV1"
+                        }
+                    }
+                }
+            },
             "keychain_get_entry_request_body": {
                 "description": "Request body to obtain a keychain entry via its key",
                 "required": true,
@@ -741,6 +752,16 @@
                     "application/json": {
                         "schema": {
                             "$ref": "#/components/schemas/HasObjectResponseV1"
+                        }
+                    }
+                }
+            },
+            "object_store_remove_object_v1_response_body": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/RemoveObjectResponseV1"
                         }
                     }
                 }

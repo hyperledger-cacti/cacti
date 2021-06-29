@@ -59,6 +59,27 @@
                 }
             }
         },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/remove-object": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/remove-object"
+                    }
+                },
+                "operationId": "removeObjectV1",
+                "summary": "Removes an object from the object store.",
+                "parameters": [],
+                "requestBody": {
+                    "$ref": "../../../../cactus-core-api/src/main/json/openapi.json#/components/requestBodies/object_store_remove_object_v1_request_body"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "../../../../cactus-core-api/src/main/json/openapi.json#/components/responses/object_store_remove_object_v1_response_body"
+                    }
+                }
+            }
+        },
         "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object": {
             "post": {
                 "x-hyperledger-cactus": {

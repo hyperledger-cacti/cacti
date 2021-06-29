@@ -302,6 +302,12 @@ export interface GetObjectRequestV1 {
      * @memberof GetObjectRequestV1
      */
     key: string;
+    /**
+     * Generic implementation specific parameters to be included here. Check the documentation of the specific plugin you\'re using to see what options are avaliable within this object.
+     * @type {any}
+     * @memberof GetObjectRequestV1
+     */
+    extraArgs?: any | null;
 }
 /**
  * 
@@ -498,6 +504,38 @@ export interface PluginInstance {
      * @memberof PluginInstance
      */
     packageName: string;
+}
+/**
+ * 
+ * @export
+ * @interface RemoveObjectRequestV1
+ */
+export interface RemoveObjectRequestV1 {
+    /**
+     * The key to the file that is to be removed from the ipfs node
+     * @type {string}
+     * @memberof RemoveObjectRequestV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface RemoveObjectResponseV1
+ */
+export interface RemoveObjectResponseV1 {
+    /**
+     * The key that was used to remove the file from the ipfs node
+     * @type {string}
+     * @memberof RemoveObjectResponseV1
+     */
+    key: string;
+    /**
+     * checks if the file was successfully removed from the ipfs node
+     * @type {boolean}
+     * @memberof RemoveObjectResponseV1
+     */
+    isRemoved: boolean;
 }
 /**
  * 
