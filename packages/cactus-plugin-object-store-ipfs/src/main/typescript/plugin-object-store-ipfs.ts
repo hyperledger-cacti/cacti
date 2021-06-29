@@ -29,8 +29,6 @@ import { HasObjectEndpointV1 } from "./web-services/has-object-endpoint-v1";
 import { RemoveObjectEndpointV1 } from "./web-services/remove-object-endpoint-v1";
 import type { IIpfsHttpClient } from "./i-ipfs-http-client";
 import { isIpfsHttpClientOptions } from "./i-ipfs-http-client";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 // import { v4 as uuidv4 } from "uuid";
 
 export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
@@ -40,9 +38,7 @@ export interface IPluginObjectStoreIpfsOptions extends ICactusPluginOptions {
   readonly logLevel?: LogLevelDesc;
   readonly parentDir: string;
   readonly ipfsClientOrOptions: Options | IIpfsHttpClient;
-  readonly pluginRegistry?: PluginRegistry;
   readonly keychainId?: string;
-  readonly keychain?: PluginKeychainMemory;
 }
 
 export class PluginObjectStoreIpfs implements IPluginObjectStore {
@@ -218,9 +214,3 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     this.log.info(`Shutting down ${this.className}...`);
   }
 }
-/*A few things I'd change to make the keychain an optional dependency not a hard one (otherwise it's not really a plugin).
-	
-1) Don't depend on the keychain memory plugin in package.json,
-2) use the keychain interface from the core api package instead of the in-memory implementation
-3) Don't have a keychain instance as a constructor arg's property, use an optional keychainId request parameter to look up keychain instances in the plugin registry
-*/
