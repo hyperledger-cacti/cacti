@@ -77,11 +77,11 @@ export class CarbonAccountingApp {
       new PluginKeychainMemory({
         keychainId: this.keychainId,
         instanceId: uuidv4(),
-        logLevel,
+        logLevel: logLevel || "INFO",
       });
 
     this.ledgers = new CarbonAccountingAppDummyInfrastructure({
-      logLevel,
+      logLevel: logLevel || "INFO",
       keychain: this.keychain,
     });
   }
@@ -148,7 +148,7 @@ export class CarbonAccountingApp {
       cliContainerEnv: this.ledgers.org1Env,
       sshConfig,
       connectionProfile,
-      logLevel: this.options.logLevel,
+      logLevel: this.options.logLevel || "INFO",
       discoveryOptions: {
         enabled: true,
         asLocalhost: true,
@@ -177,7 +177,7 @@ export class CarbonAccountingApp {
     );
 
     const businessLogicPlugin = new CarbonAccountingPlugin({
-      logLevel: this.options.logLevel,
+      logLevel: this.options.logLevel || "INFO",
       xdaiContracts,
       fabricContracts,
       fabricPlugin,
