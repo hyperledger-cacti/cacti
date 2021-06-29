@@ -78,7 +78,6 @@ dependencies {
 
     // CorDapp dependencies.
     cordapp project(":interop-contracts")
-    compile "com.google.code.gson:gson:$gson_version"
     cordaCompile "$corda_release_group:corda-jackson:$corda_release_version"
 
 }
