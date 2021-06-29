@@ -14,7 +14,6 @@ buildscript {
         slf4j_version = constants.getProperty("slf4jVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         arrow_version = constants.getProperty("arrowVersion")
-        gson_version = constants.getProperty("gsonVersion")
     }
 
     repositories {
