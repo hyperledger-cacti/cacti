@@ -76,7 +76,11 @@ data class RequestForExternalState(
 }
 
 /**
- * TODO: Documentation
+ * ProofSignature stores the signature of a proof from a single member/endorser.
+ *
+ * @property id This is the ID of the member.
+ * @property certificate This is the certificate of the member using which signature can be verified.
+ * @property signature This is the signature of the proof.
  */
 data class ProofSignature(
         val id: String,
@@ -85,7 +89,14 @@ data class ProofSignature(
 )
 
 /**
- * TODO: Documentation
+ * ExternalStateResponse stores response along with proof that is returned in
+ * JSON String when client calls GetExternalStateByLinearId flow.
+ *
+ * @property payload This is the response returned from remote network.
+ * @property signatures This is list of ProofSignature objects, combined 
+ *  together to form actual proof.
+ * @property proofmessage This is the string message of proof displaying member IDs 
+ *  providing the signature and the security domain of the members.
  */
 data class ExternalStateResponse(
         val payload: String,
