@@ -1,8 +1,5 @@
-import test, { Test } from "tape-promise/tape";
+import * as apiSurface from "../../../main/typescript/public-api";
 
-import { PluginFactoryLedgerConnector } from "../../../main/typescript/public-api";
-
-test("Library can be loaded", (t: Test) => {
-  t.ok(PluginFactoryLedgerConnector, "PluginFactoryLedgerConnector truthy OK");
-  t.end();
+test("Library can be loaded", async () => {
+  expect(apiSurface).toBeTruthy();
 });

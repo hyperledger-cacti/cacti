@@ -8,7 +8,7 @@
     ]
   },
   "files": [
-    "src/test.ts",
+    "src/test-environment-setup.ts",
     "src/zone-flags.ts",
     "src/polyfills.ts"
   ],

@@ -64,8 +64,6 @@ export class DefaultConsortiumProvider
       const res = await this.options.apiClient.getConsortiumJws();
       return this.parseConsortiumJws(res.data);
     } catch (ex) {
-      const innerException = (ex.toJSON && ex.toJSON()) || ex;
-      this.log.error(`Request for Consortium JWS failed: `, innerException);
       throw ex;
     }
   }
