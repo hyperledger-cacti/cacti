@@ -160,6 +160,12 @@ export interface SetObjectResponseV1 {
      * @memberof SetObjectResponseV1
      */
     key: string;
+    /**
+     * Contains all additional implementation specific output.
+     * @type {any}
+     * @memberof SetObjectResponseV1
+     */
+    extraOutput?: any | null;
 }
 
 /**

@@ -577,6 +577,9 @@
                         "minLength": 1,
                         "maxLength": 1024,
                         "nullable": false
+                    },
+                    "extraOutput": {
+                        "description": "Contains all additional implementation specific output."
                     }
                 }
             },

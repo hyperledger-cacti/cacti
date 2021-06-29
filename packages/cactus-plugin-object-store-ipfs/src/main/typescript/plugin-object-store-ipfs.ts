@@ -34,6 +34,7 @@ import { isIpfsHttpClientOptions } from "./i-ipfs-http-client";
 export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
   "HTTPError: file does not exist";
 
+export const K_IPFS_JS_HTTP_ERROR_404 = "K_IPFS_JS_HTTP_ERROR_404";
 export interface IPluginObjectStoreIpfsOptions extends ICactusPluginOptions {
   readonly logLevel?: LogLevelDesc;
   readonly parentDir: string;
@@ -191,19 +192,30 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
 
     return {
       key: req.key,
-      cidHash: statResult.cid.toString(),
+      extraOutput: { cidHash: statResult.cid.toString() },
     } as SetObjectResponseV1;
   }
 
-  // eslint-disable-next-line prettier/prettier
-  public async remove( req: RemoveObjectRequestV1 ): Promise<RemoveObjectResponseV1> {
+  public async remove(
+    req: RemoveObjectRequestV1,
+  ): Promise<RemoveObjectResponseV1> {
     const keyPath = this.getKeyPath(req);
     try {
       const removeResult = await this.ipfs.files.rm(keyPath);
       this.log.debug(`RemoveResult for ${req.key}: %o`, removeResult);
       return { key: req.key, isRemoved: true };
-    } catch (ex) {}
-    return { key: req.key, isRemoved: false };
+    } catch (ex) {
+      if (ex?.stack?.includes(K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST)) {
+        const msg = `Remove ${req.key} failed with error message containing phrase "${K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST}" Throwing new RuntimeError ...`;
+        this.log.debug(msg);
+        throw new RuntimeError(
+          K_IPFS_JS_HTTP_ERROR_404,
+          K_IPFS_JS_HTTP_ERROR_404,
+        );
+      } else {
+        throw new RuntimeError(`Removing ${req.key} crashed:`, ex);
+      }
+    }
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {

@@ -16,9 +16,12 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
+import { K_IPFS_JS_HTTP_ERROR_404 } from "../plugin-object-store-ipfs";
+
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
+import { RuntimeError } from "run-time-error";
 
 export interface IRemoveObjectEndpointV1Options {
   readonly logLevel?: LogLevelDesc;
@@ -92,6 +95,17 @@ export class RemoveObjectEndpointV1 implements IWebServiceEndpoint {
       res.status(200);
       res.json(resBody);
     } catch (ex) {
+      if (ex instanceof RuntimeError) {
+        if (ex.cause == K_IPFS_JS_HTTP_ERROR_404) {
+          this.log.debug(
+            "404 Error thrown as file does not exist on object store",
+            ex,
+          );
+          res.status(404);
+          res.send("Error thrown as file does not exist on object store");
+          return;
+        }
+      }
       this.log.error(`${tag} Failed to serve request:`, ex);
       res.status(500);
       res.json({ error: ex.stack });
