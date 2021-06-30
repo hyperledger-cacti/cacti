@@ -118,6 +118,7 @@ function mainTask()
     dumpDiskUsageInfo
     echo "$(date +%FT%T%z) [CI] First (#1) try of tests failed starting second try now..."
     npm run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Second (#2) try of tests succeeded OK."
+    
   } ||
   {
     dumpDiskUsageInfo
