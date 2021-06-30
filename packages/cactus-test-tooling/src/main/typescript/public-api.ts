@@ -94,9 +94,22 @@ export {
 } from "./openethereum/openethereum-test-ledger";
 
 export {
+  GoIpfsTestContainer,
+  IGoIpfsTestContainerOptions,
+} from "./go-ipfs/go-ipfs-test-container";
+
+export {
   SAMPLE_CORDAPP_ROOT_DIRS,
   SampleCordappEnum,
 } from "./corda/sample-cordapp-enum";
+
+export {
+  IRustcContainerOptions,
+  K_DEFAULT_RUSTC_CONTAINER_CMD,
+  RustcContainer,
+} from "./rustc-container/rustc-container";
+
+export { RustcBuildCmd } from "./rustc-container/rustc-build-cmd";
 
 export { Streams } from "./common/streams";
 
