@@ -54,7 +54,7 @@ test("can get block from blockchain", async (t: Test) => {
   });
 
   const request: GetBlockV1Request = { blockHashOrBlockNumber: 0 };
-  const currentBlock = await connector.getBlock(request.blockHashOrBlockNumber);
+  const currentBlock = await connector.getBlock(request);
   t.comment(JSON.stringify(currentBlock));
   //makes the information in to string
   t.ok(currentBlock, " Block response is OK :-)");
