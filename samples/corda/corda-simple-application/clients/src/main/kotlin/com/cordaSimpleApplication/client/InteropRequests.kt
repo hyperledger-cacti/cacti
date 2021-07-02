@@ -219,7 +219,7 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
           val response = proxy.startFlow(::GetExternalStateByLinearId, externalStateLinearId)
                   .returnValue.get()
           val responseString = response.toString(Charsets.UTF_8)
-          var responseJSON = JSONObject(responseString)
+          val responseJSON = JSONObject(responseString)
 
           val payload = responseJSON.getString("payload")
           println("Response Payload: ${payload}.\n")

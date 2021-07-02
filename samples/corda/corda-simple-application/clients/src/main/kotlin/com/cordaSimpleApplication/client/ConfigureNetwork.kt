@@ -100,13 +100,16 @@ fun configNetworkHelper(network: String, config: Map<String, String>) {
  */
 fun configureCreateAllHelper() {
     // Some variables specific to network
-    val baseNodesPath = "../../../tests/network-setups/corda/build/nodes/"
-    val networkName = "Corda_Network"
-    val destPath = "clients/src/main/resources/config/${networkName}/"
-    val nodes = arrayOf("PartyA")
-    val locFlow = "localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*"
-    val remoteFlow = "mychannel:simplestate:Read:*"
-    val verificationPolicyCriteria = listOf("PartyA")
+    val baseNodesPath = System.getenv("BASE_NODE_PATH") ?: "../../../tests/network-setups/corda/build/nodes/"
+    val networkName = System.getenv("NETWORK_NAME") ?: "Corda_Network"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val nodesList = System.getenv("NODES_LIST") ?: "PartyA"
+    val remoteFlow = System.getenv("REMOTE_FLOW") ?: "mychannel:simplestate:Read:*"
+    val locFlow = System.getenv("LOCAL_FLOW") ?: "localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*"
+
+    val destPath = "${credentialPath}/${networkName}/"
+    val nodes = nodesList.split(",").toTypedArray()
+    val verificationPolicyCriteria = nodes.toList()
 
     val linearId = UniqueIdentifier()
     val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
