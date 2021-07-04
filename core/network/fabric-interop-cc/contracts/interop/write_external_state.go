@@ -27,16 +27,30 @@ type interop interface {
 }
 
 // Extract data (i.e., query response) from view
-func (s *SmartContract) ExtractDataFromFabricView(viewData []byte) ([]byte, error) {
-	var fabricViewData fabric.FabricView
-	err := protoV2.Unmarshal(viewData, &fabricViewData)
-	if err != nil {
-		return nil, fmt.Errorf("FabricView Unmarshal error: %s", err)
-	}
+func ExtractDataFromView(view *common.View) ([]byte, error) {
 	var interopPayload common.InteropPayload
-	err = protoV2.Unmarshal(fabricViewData.Response.Payload, &interopPayload)
-	if err != nil {
-		return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+	if view.Meta.Protocol == common.Meta_FABRIC {
+		var fabricViewData fabric.FabricView
+		err := protoV2.Unmarshal(view.Data, &fabricViewData)
+		if err != nil {
+			return nil, fmt.Errorf("FabricView Unmarshal error: %s", err)
+		}
+		err = protoV2.Unmarshal(fabricViewData.Response.Payload, &interopPayload)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+		}
+	} else if view.Meta.Protocol == common.Meta_CORDA {
+		var cordaViewData corda.ViewData
+		err := protoV2.Unmarshal(view.Data, &cordaViewData)
+		if err != nil {
+			return nil, fmt.Errorf("CordaView Unmarshal error: %s", err)
+		}
+		err = protoV2.Unmarshal(cordaViewData.Payload, &interopPayload)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+		}
+	} else {
+		return nil, fmt.Errorf("Cannot extract data from view; unsupported DLT type: %+v", view.Meta.Protocol)
 	}
 	return interopPayload.Payload, nil
 }
@@ -60,14 +74,11 @@ func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextI
 	}
 
 	// 2. Extract response data for consumption by application chaincode
-	viewData := view.Data
-	if view.Meta.Protocol == common.Meta_FABRIC {
-		viewData, err = s.ExtractDataFromFabricView(viewData)
-		if err != nil {
-			return nil, err
-		}
-		fmt.Printf("Fabric view data: %s\n", string(viewData))
+	viewData, err := ExtractDataFromView(&view)
+	if err != nil {
+		return nil, err
 	}
+	fmt.Printf("View data: %s\n", string(viewData))
 
 	return viewData, nil
 }
@@ -90,14 +101,14 @@ func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInt
 		// Validate argument index
 		if argIndex >= len(applicationArgs) {
 			return fmt.Errorf("Index %d out of bounds of array (length %d)", argIndex, len(applicationArgs))
-	    }
+		}
 		// Validate proof and extract view data
-        viewData, err := s.ParseAndValidateView(ctx, addresses[i], b64ViewProtos[i])
+		viewData, err := s.ParseAndValidateView(ctx, addresses[i], b64ViewProtos[i])
 		if err != nil {
 			return err
 		}
 		// Substitute argument in list with view data
-		arr[argIndex + 1] = string(viewData)
+		arr[argIndex + 1] = string(viewData)        // First argument is the CC function name
 	}
 
 	// 2. Call application chaincode with created state as the argument

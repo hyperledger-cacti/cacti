@@ -195,6 +195,28 @@ const getEndorsementsAndSignatoriesFromFabricView = (view) => {
 }
 
 /**
+ * Extracts endorsements and the signing authorities backing those endorsements from a Corda view.
+ * Argument is a View protobuf ('statePb.View')
+ **/
+const getEndorsementsAndSignatoriesFromCordaView = (view) => {
+    if (view.getMeta().getProtocol() != statePb.Meta.Protocol.CORDA) {
+        throw new Error(`Not a Corda view`);
+    }
+    const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
+    const notarizations = cordaView.getNotarizationsList();
+    const signatures = [];
+    const certs = [];
+    const ids = [];
+    for (let i = 0 ; i < notarizations.length ; i++) {
+        signatures.push(notarizations[i].getSignature());
+        const cert = notarizations[i].getCertificate();
+        certs.push(Buffer.from(cert).toString('base64'));
+        ids.push(notarizations[i].getId());
+    }
+    return { signatures, certs, ids };
+}
+
+/**
  * Extracts response payload from a Fabric view.
  * Argument is a View protobuf ('statePb.View')
  **/
@@ -378,7 +400,36 @@ const interopFlow = async (
         viewsSerializedBase64.push(Buffer.from(requestResponse.view.serializeBinary()).toString("base64"));
         computedAddresses.push(requestResponse.address);
     }
+    // Return here if caller just wants the views and doesn't want to invoke a local chaincode
+    if (returnWithoutLocalInvocation) {
+        const ccArgs = getCCArgsForProofVerification(
+            invokeObject,
+            interopArgIndices,
+            computedAddresses,
+            viewsSerializedBase64,
+        );
+        return { views, result: ccArgs };
+    }
     // Step 2
+    const result = await submitTransactionWithRemoteViews(
+        interopContract,
+        invokeObject,
+        interopArgIndices,
+        computedAddresses,
+        viewsSerializedBase64,
+    );
+    return { views, result };
+};
+
+/**
+ * Prepare arguments for WriteExternalState chaincode transaction to verify a view and write data to ledger.
+ **/
+const getCCArgsForProofVerification = (
+    invokeObject: Query,
+    interopArgIndices: Array<number>,
+    viewAddresses: Array<string>,
+    viewsSerializedBase64: Array<string>,
+): Array<any> => {
     const {
         ccArgs: localCCArgs,
         channel: localChannel,
@@ -391,20 +442,36 @@ const interopFlow = async (
         localCCFunc,
         JSON.stringify(localCCArgs),
         JSON.stringify(interopArgIndices),
-        JSON.stringify(computedAddresses),
+        JSON.stringify(viewAddresses),
         JSON.stringify(viewsSerializedBase64),
     ];
-    // Return here if caller just wants the views and doesn't want to invoke a local chaincode
-    if (returnWithoutLocalInvocation) {
-        return { views, result: ccArgs };
-    }
+    return ccArgs;
+};
+
+/**
+ * Submit local chaincode transaction to verify a view and write data to ledger.
+ * - Prepare arguments and call WriteExternalState.
+ **/
+const submitTransactionWithRemoteViews = async (
+    interopContract: Contract,
+    invokeObject: Query,
+    interopArgIndices: Array<number>,
+    viewAddresses: Array<string>,
+    viewsSerializedBase64: Array<string>,
+): Promise<any> => {
+    const ccArgs = getCCArgsForProofVerification(
+        invokeObject,
+        interopArgIndices,
+        viewAddresses,
+        viewsSerializedBase64,
+    );
     const [result, submitError] = await helpers.handlePromise(
         interopContract.submitTransaction("WriteExternalState", ...ccArgs),
     );
     if (submitError) {
         throw new Error(`submitTransaction Error: ${submitError}`);
     }
-    return { views, result };
+    return result;
 };
 
 /**
@@ -547,11 +614,14 @@ export {
     verifyDecryptedRemoteProposalResponse,
     getResponseDataFromView,
     getEndorsementsAndSignatoriesFromFabricView,
+    getEndorsementsAndSignatoriesFromCordaView,
     getResponsePayloadFromFabricView,
     getSignatoryOrgMSPFromFabricEndorsementBase64,
     decodeView,
     signMessage,
     invokeHandler,
     interopFlow,
+    getCCArgsForProofVerification,
+    submitTransactionWithRemoteViews,
     getRemoteView,
 };
