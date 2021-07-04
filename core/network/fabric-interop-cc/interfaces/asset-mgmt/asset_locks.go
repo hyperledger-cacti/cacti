@@ -65,45 +65,47 @@ func (am *AssetManagement) validateInteropccContractId(contractId string) (bool,
     return true, nil
 }
 
-func (am *AssetManagement) validateAndExtractLockInfoHTLC(lockInfo *common.AssetLock) (*common.AssetLockHTLC, error) {
-    lockInfoHTLC := &common.AssetLockHTLC{}
-    if (lockInfo.LockMechanism != common.LockMechanism_HTLC) {
-        return lockInfoHTLC, logThenErrorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-    }
+func (am *AssetManagement) validateLockInfo(lockInfo *common.AssetLock) error {
     if len(lockInfo.LockInfo) == 0 {
-        return lockInfoHTLC, logThenErrorf("empty lock info")
+        return logThenErrorf("empty lock info")
     }
-    err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-    if err != nil {
-        return lockInfoHTLC, logThenErrorf(err.Error())
-    }
-    if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-        return lockInfoHTLC, logThenErrorf("only EPOCH time is supported at present")
-    }
-    if len(lockInfoHTLC.HashBase64) == 0 {
-        return lockInfoHTLC, logThenErrorf("empty lock hash value")
+    if (lockInfo.LockMechanism == common.LockMechanism_HTLC) {
+        lockInfoHTLC := &common.AssetLockHTLC{}
+        err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+        if err != nil {
+            return logThenErrorf(err.Error())
+        }
+        if len(lockInfoHTLC.HashBase64) == 0 {
+            return logThenErrorf("empty lock hash value")
+        }
+        if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+            return logThenErrorf("only EPOCH time is supported at present")
+        }
+    } else {
+        return logThenErrorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
     }
 
-    return lockInfoHTLC, nil
+    return nil
 }
 
-func (am *AssetManagement) validateAndExtractClaimInfoHTLC(claimInfo *common.AssetClaim) (*common.AssetClaimHTLC, error) {
-    claimInfoHTLC := &common.AssetClaimHTLC{}
-    if (claimInfo.LockMechanism != common.LockMechanism_HTLC) {
-        return claimInfoHTLC, logThenErrorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
-    }
+func (am *AssetManagement) validateClaimInfo(claimInfo *common.AssetClaim) error {
     if len(claimInfo.ClaimInfo) == 0 {
-        return claimInfoHTLC, logThenErrorf("empty claim info")
+        return logThenErrorf("empty claim info")
     }
-    err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
-    if err != nil {
-        return claimInfoHTLC, logThenErrorf(err.Error())
-    }
-    if len(claimInfoHTLC.HashPreimageBase64) == 0 {
-        return claimInfoHTLC, logThenErrorf("empty lock hash preimage")
+    if (claimInfo.LockMechanism == common.LockMechanism_HTLC) {
+        claimInfoHTLC := &common.AssetClaimHTLC{}
+        err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
+        if err != nil {
+            return logThenErrorf(err.Error())
+        }
+        if len(claimInfoHTLC.HashPreimageBase64) == 0 {
+            return logThenErrorf("empty lock hash preimage")
+        }
+    } else {
+        return logThenErrorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
     }
 
-    return claimInfoHTLC, nil
+    return nil
 }
 
 // Ledger transaction (invocation) functions
@@ -122,11 +124,11 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgre
         return "", logThenErrorf(err.Error())
     }
 
-    lockInfoHTLC, err := am.validateAndExtractLockInfoHTLC(lockInfo)
+    err = am.validateLockInfo(lockInfo)
     if err != nil {
 	return "", err
     }
-    lockInfoBytes, err := proto.Marshal(lockInfoHTLC)
+    lockInfoBytes, err := proto.Marshal(lockInfo)
     if err != nil {
         return "", logThenErrorf(err.Error())
     }
@@ -139,7 +141,7 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgre
         return "", logThenErrorf(string(iccResp.GetMessage()))
     }
     contractId := string(iccResp.GetPayload())
-    fmt.Printf("Asset %s of type %s locked for %s until %+v using contractId %s\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Recipient, time.Unix(int64(lockInfoHTLC.ExpiryTimeSecs), 0), contractId)
+    fmt.Printf("Asset %s of type %s locked for %s using contractId %s\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Recipient, contractId)
     return contractId, nil
 }
 
@@ -162,11 +164,11 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
     if err != nil {
         return "", logThenErrorf(err.Error())
     }
-    lockInfoHTLC, err := am.validateAndExtractLockInfoHTLC(lockInfo)
+    err = am.validateLockInfo(lockInfo)
     if err != nil {
         return "", err
     }
-    lockInfoBytes, err := proto.Marshal(lockInfoHTLC)
+    lockInfoBytes, err := proto.Marshal(lockInfo)
     if err != nil {
         return "", logThenErrorf(err.Error())
     }
@@ -179,7 +181,7 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
         return "", errors.New(string(iccResp.GetMessage()))
     }
     contractId := string(iccResp.GetPayload())
-    fmt.Printf("%d units of asset type %s locked for %s until %+v using contractId %s\n", assetAgreement.NumUnits, assetAgreement.Type, assetAgreement.Recipient, time.Unix(int64(lockInfoHTLC.ExpiryTimeSecs), 0), contractId)
+    fmt.Printf("%d units of asset type %s locked for %s using contractId %s\n", assetAgreement.NumUnits, assetAgreement.Type, assetAgreement.Recipient, contractId)
     return contractId, nil
 }
 
@@ -280,12 +282,12 @@ func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgr
         return false, logThenErrorf(err.Error())
     }
 
-    claimInfoHTLC, err := am.validateAndExtractClaimInfoHTLC(claimInfo)
+    err = am.validateClaimInfo(claimInfo)
     if err != nil {
 	return false, err
     }
 
-    claimInfoBytes, err := proto.Marshal(claimInfoHTLC)
+    claimInfoBytes, err := proto.Marshal(claimInfo)
     if err != nil {
         return false, logThenErrorf(err.Error())
     }
@@ -306,12 +308,12 @@ func (am *AssetManagement) ClaimFungibleAsset(stub shim.ChaincodeStubInterface, 
 	return false, err
     }
 
-    claimInfoHTLC, err := am.validateAndExtractClaimInfoHTLC(claimInfo)
+    err = am.validateClaimInfo(claimInfo)
     if err != nil {
 	return false, err
     }
 
-    claimInfoBytes, err := proto.Marshal(claimInfoHTLC)
+    claimInfoBytes, err := proto.Marshal(claimInfo)
     if err != nil {
         return false, logThenErrorf(err.Error())
     }
@@ -331,12 +333,12 @@ func (am *AssetManagement) ClaimAssetUsingContractId(stub shim.ChaincodeStubInte
 	return false, err
     }
 
-    claimInfoHTLC, err := am.validateAndExtractClaimInfoHTLC(claimInfo)
+    err = am.validateClaimInfo(claimInfo)
     if err != nil {
 	return false, err
     }
 
-    claimInfoBytes, err := proto.Marshal(claimInfoHTLC)
+    claimInfoBytes, err := proto.Marshal(claimInfo)
     if err != nil {
         return false, logThenErrorf(err.Error())
     }

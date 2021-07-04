@@ -28,30 +28,33 @@ class CreateMembershipCommand : CliktCommand(help = "Creates a Membership for an
     val config by requireObject<Map<String, String>>()
     val network by argument()
     override fun run() = runBlocking {
-        val result = when (network) {
-            "Corda_Network" -> {
-                Right(File("clients/src/main/resources/config/CordaNetworkMembership.json")
-                        .readText(Charsets.UTF_8))
-            }
-            "Fabric_Network" -> {
-                Right(File("clients/src/main/resources/config/FabricNetworkMembership.json")
-                        .readText(Charsets.UTF_8))
-            }
-            else -> Left(Error("Only Fabric and Corda network memberships are defined"))
-        }.flatMap {
-            val membership = Gson().fromJson(it, MembershipState::class.java)
-            println("Membership from file: $membership")
-            writeMembershipToVault(
-                    membership,
-                    config["CORDA_HOST"]!!,
-                    config["CORDA_PORT"]!!.toInt()
-            )
-        }
+        val result = createMembershipFromFile(network, config)
+        println(result)
     }
 }
 
 /**
- * Helper function used by CreateMembershipCommand to interact with the Corda network
+ * Helper function to create Membership for an external network
+ */
+fun createMembershipFromFile(network: String, config: Map<String, String>): Either<Error, String> {
+    val filepath = "clients/src/main/resources/config/${network}/membership.json"
+    return try {
+        val file = File(filepath).readText(Charsets.UTF_8)
+        val membership = Gson().fromJson(file, MembershipState::class.java)
+        println("Membership from file: $membership")
+        writeMembershipToVault(
+                membership,
+                config["CORDA_HOST"]!!,
+                config["CORDA_PORT"]!!.toInt()
+        )
+    } catch (e: Exception) {
+      println("Error: Credentials directory ${filepath} not found.")
+      Left(Error("Error: Credentials directory ${filepath} not found."))
+    }
+}
+
+/**
+ * Helper function used by createMembershipFromFile to interact with the Corda network
  */
 fun writeMembershipToVault(
         membership: MembershipState,
