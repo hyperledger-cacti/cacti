@@ -2,7 +2,7 @@
 
 directory=$(dirname $0)
 simpleAppVersion="0.4"
-interopAppVersion="0.6"
+interopAppVersion="1.2.0"
 
 cp $directory/../artifacts/contracts-kotlin-$simpleAppVersion.jar build/nodes/Notary/cordapps
 cp $directory/../artifacts/contracts-kotlin-$simpleAppVersion.jar build/nodes/PartyA/cordapps
