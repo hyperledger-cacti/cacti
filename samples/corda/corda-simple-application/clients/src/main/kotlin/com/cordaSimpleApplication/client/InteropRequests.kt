@@ -182,9 +182,8 @@ fun writeExternalStateToVault(
                 println("Verification was successful and external-state was stored with linearId $linearId.\n")
 
 		val response = proxy.startFlow(::GetExternalStateByLinearId, linearId.toString()).returnValue.get()
-		val responseString = response.toString(Charsets.UTF_8)
-        var responseJSON = JSONObject(responseString)
-        val value = responseJSON.getString("payload")
+        val responseView = ViewDataOuterClass.ViewData.parseFrom(response)
+        val value = responseView.payload.toStringUtf8()
 		val key = address.split(":").last()
 		val createdState = proxy.startFlow(::CreateState, key, value)
                     .returnValue.get().tx.outputStates.first() as SimpleState
