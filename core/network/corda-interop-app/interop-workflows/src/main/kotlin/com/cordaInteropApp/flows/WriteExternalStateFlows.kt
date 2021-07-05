@@ -23,6 +23,8 @@ import java.util.Base64
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import fabric.view_data.ViewData
+import corda.ViewDataOuterClass
+import com.google.protobuf.ByteString
 import common.interop_payload.InteropPayloadOuterClass
 import org.hyperledger.fabric.protos.msp.Identities
 
@@ -124,8 +126,18 @@ class GetExternalStateByLinearId(
 
             when (meta.protocol) {
                 State.Meta.Protocol.CORDA -> {
-                    println("GetExternalStateByLinearId Error: Read Corda View not implemented.\n")
-                    throw UnsupportedOperationException()
+                    val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewDataByteArray)
+                    println("cordaViewData: $cordaViewData")
+                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.payload)
+                    val payloadString = interopPayload.payload.toStringUtf8()
+                    println("response from remote: ${payloadString}.\n")
+                    println("query address: ${interopPayload.address}.\n")
+                    val viewData = ViewDataOuterClass.ViewData.newBuilder()
+                            .addAllNotarizations(cordaViewData.notarizationsList)
+                            .setPayload(interopPayload.payload)
+                            .build()
+                            
+                    return viewData.toByteArray()
                 }
                 State.Meta.Protocol.FABRIC -> {
                     val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
@@ -149,25 +161,36 @@ class GetExternalStateByLinearId(
                     val proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
                     println("Proof Message: ${proofMessage}.\n")
 
-                    var signatureList: List<ProofSignature> = listOf()
+                    var notarizationList: List<ViewDataOuterClass.ViewData.Notarization> = listOf()
 
                     fabricViewData.endorsementsList.map { endorsement ->
                         val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
                         val mspId = serializedIdentity.mspid
                         val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
                         val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
-                        val proofSignature = ProofSignature(mspId, certString, signature)
-                        signatureList = signatureList + proofSignature
+                        
+                        val notarization = ViewDataOuterClass.ViewData.Notarization.newBuilder()
+                                .setCertificate(certString)
+                                .setSignature(signature)
+                                .setId(mspId)
+                                .build()
+                        notarizationList = notarizationList + notarization
                     }
 
-                    val response = ExternalStateResponse(payloadString, signatureList, proofMessage)
+                    // val response = ExternalStateResponse(payloadString, signatureList, proofMessage)
 
-                    val mapper = jacksonObjectMapper()
-                    val responseJSONString = mapper.writeValueAsString(response)
-
-                    println("Return Proof: ${responseJSONString}.\n")
-
-                    return responseJSONString.toByteArray()
+                    val viewData = ViewDataOuterClass.ViewData.newBuilder()
+                            .addAllNotarizations(notarizationList)
+                            .setPayload(interopPayload.payload)
+                            .build()
+                            
+                    return viewData.toByteArray()
+                    // val mapper = jacksonObjectMapper()
+                    // val responseJSONString = mapper.writeValueAsString(response)
+                    // 
+                    // println("Return Proof: ${responseJSONString}.\n")
+                    // 
+                    // return responseJSONString.toByteArray()
                 }
                 else -> {
                     println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")

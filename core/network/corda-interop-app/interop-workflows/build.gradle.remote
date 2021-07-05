@@ -118,7 +118,7 @@ publishing {
         workflows(MavenPublication) {
             groupId = 'com.cordaInteropApp'
             artifactId = 'interop-workflows'
-            version = '0.6'
+            version = '1.2.0'
             from components.java
         }
     }
