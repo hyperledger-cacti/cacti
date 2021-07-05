@@ -26,6 +26,8 @@ import networks.networks.Networks
 import java.util.*
 import org.json.JSONObject
 
+import corda.ViewDataOuterClass
+
 /**
  * The CLI command used to trigger a request for state from an external network.
  *
@@ -218,24 +220,40 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
           val proxy = rpc.proxy
           val response = proxy.startFlow(::GetExternalStateByLinearId, externalStateLinearId)
                   .returnValue.get()
-          val responseString = response.toString(Charsets.UTF_8)
-          val responseJSON = JSONObject(responseString)
-
-          val payload = responseJSON.getString("payload")
+          val responseView = ViewDataOuterClass.ViewData.parseFrom(response)
+          
+          val payload = responseView.payload.toStringUtf8()
+          
           println("Response Payload: ${payload}.\n")
-
-          val proofMessage = responseJSON.getString("proofmessage")
-          println("Proof Message: ${proofMessage}.\n")
-
+          
           println("Signatures:")
-          val signatures = responseJSON.getJSONArray("signatures")
-          for (i in 0 until signatures.length()) {
-              val proofSignature = signatures.getJSONObject(i)
-              val id = proofSignature.getString("id")
-              val certificate = proofSignature.getString("certificate")
-              val signature = proofSignature.getString("signature")
+          var i = 1
+          for (notarization in responseView.notarizationsList) {
+              val id = notarization.id
+              val certificate = notarization.certificate
+              val signature = notarization.signature
               println("${i}\tID: ${id}\n\tCert: ${certificate}\n\tSignature: ${signature}.\n")
-          }
+              i += 1
+          }          
+          
+          // val responseString = response.toString(Charsets.UTF_8)
+          // val responseJSON = JSONObject(responseString)
+          // 
+          // val payload = responseJSON.getString("payload")
+          // println("Response Payload: ${payload}.\n")
+          // 
+          // val proofMessage = responseJSON.getString("proofmessage")
+          // println("Proof Message: ${proofMessage}.\n")
+          // 
+          // println("Signatures:")
+          // val signatures = responseJSON.getJSONArray("signatures")
+          // for (i in 0 until signatures.length()) {
+          //     val proofSignature = signatures.getJSONObject(i)
+          //     val id = proofSignature.getString("id")
+          //     val certificate = proofSignature.getString("certificate")
+          //     val signature = proofSignature.getString("signature")
+          //     println("${i}\tID: ${id}\n\tCert: ${certificate}\n\tSignature: ${signature}.\n")
+          // }
       } catch (e: Exception) {
           println(e.toString())
       } finally {
