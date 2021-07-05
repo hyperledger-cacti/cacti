@@ -28,8 +28,6 @@ import com.google.protobuf.ByteString
 import common.interop_payload.InteropPayloadOuterClass
 import org.hyperledger.fabric.protos.msp.Identities
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-
 
 /**
  * The WriteExternalStateInitiator flow is used to process a response from a foreign network for state.
@@ -177,20 +175,12 @@ class GetExternalStateByLinearId(
                         notarizationList = notarizationList + notarization
                     }
 
-                    // val response = ExternalStateResponse(payloadString, signatureList, proofMessage)
-
                     val viewData = ViewDataOuterClass.ViewData.newBuilder()
                             .addAllNotarizations(notarizationList)
                             .setPayload(interopPayload.payload)
                             .build()
                             
                     return viewData.toByteArray()
-                    // val mapper = jacksonObjectMapper()
-                    // val responseJSONString = mapper.writeValueAsString(response)
-                    // 
-                    // println("Return Proof: ${responseJSONString}.\n")
-                    // 
-                    // return responseJSONString.toByteArray()
                 }
                 else -> {
                     println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")

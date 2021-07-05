@@ -86,7 +86,6 @@ dependencies {
 
     // CorDapp dependencies.
     cordapp project(":interop-contracts")
-    cordaCompile "$corda_release_group:corda-jackson:$corda_release_version"
 }
 
 task integrationTest(type: Test, dependsOn: []) {

@@ -24,7 +24,6 @@ import kotlinx.coroutines.*
 import net.corda.core.messaging.startFlow
 import networks.networks.Networks
 import java.util.*
-import org.json.JSONObject
 
 import corda.ViewDataOuterClass
 
@@ -234,25 +233,7 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
               println("${i}\tID: ${id}\n\tCert: ${certificate}\n\tSignature: ${signature}.\n")
               i += 1
           }          
-          
-          // val responseString = response.toString(Charsets.UTF_8)
-          // val responseJSON = JSONObject(responseString)
-          // 
-          // val payload = responseJSON.getString("payload")
-          // println("Response Payload: ${payload}.\n")
-          // 
-          // val proofMessage = responseJSON.getString("proofmessage")
-          // println("Proof Message: ${proofMessage}.\n")
-          // 
-          // println("Signatures:")
-          // val signatures = responseJSON.getJSONArray("signatures")
-          // for (i in 0 until signatures.length()) {
-          //     val proofSignature = signatures.getJSONObject(i)
-          //     val id = proofSignature.getString("id")
-          //     val certificate = proofSignature.getString("certificate")
-          //     val signature = proofSignature.getString("signature")
-          //     println("${i}\tID: ${id}\n\tCert: ${certificate}\n\tSignature: ${signature}.\n")
-          // }
+
       } catch (e: Exception) {
           println(e.toString())
       } finally {
