@@ -177,6 +177,7 @@ const generateAccessControl = async (
   }
   const updatedRules = templateJSON.rules.map(rule => {
     rule.principal = keyCert.cert
+    rule.principalType = 'certificate'
     return rule
   })
   const accessControlJSON = {

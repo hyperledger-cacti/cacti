@@ -85,6 +85,16 @@ To build the library, do the following:
   make build-local
   ```
 
+### Sample Fabric Application Contract (Chaincode)
+
+To prepare this contract (chaincode) for deployment (see next section):
+- Navigate to the `samples/fabric/simplestate` folder.
+- Run the following command:
+  ```bash
+  make mocks
+  go mod tidy
+  ```
+
 ### Fabric Network
 
 The code for this lies in the `tests/network-setups` folder.
