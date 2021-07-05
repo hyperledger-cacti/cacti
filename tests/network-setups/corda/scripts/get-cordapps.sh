@@ -2,7 +2,7 @@
 
 directory=$(dirname $0)
 simpleAppVersion="0.4"
-interopAppVersion="0.6"
+interopAppVersion="1.2.0"
 
 if [[ $1 == "local" ]]; then
   cp $directory/../../../../samples/corda/corda-simple-application/contracts-kotlin/build/libs/contracts-kotlin-$simpleAppVersion.jar $directory/../artifacts
