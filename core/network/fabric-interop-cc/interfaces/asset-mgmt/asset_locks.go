@@ -66,41 +66,43 @@ func (am *AssetManagement) validateInteropccContractId(contractId string) (bool,
 }
 
 func (am *AssetManagement) validateLockInfo(lockInfo *common.AssetLock) error {
-    lockInfoHTLC := &common.AssetLockHTLC{}
-    if (lockInfo.LockMechanism != common.LockMechanism_HTLC) {
-        return logThenErrorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
-    }
     if len(lockInfo.LockInfo) == 0 {
         return logThenErrorf("empty lock info")
     }
-    err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
-    if err != nil {
-        return logThenErrorf(err.Error())
-    }
-    if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
-        return logThenErrorf("only EPOCH time is supported at present")
-    }
-    if len(lockInfoHTLC.HashBase64) == 0 {
-        return logThenErrorf("empty lock hash value")
+    if (lockInfo.LockMechanism == common.LockMechanism_HTLC) {
+        lockInfoHTLC := &common.AssetLockHTLC{}
+        err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
+        if err != nil {
+            return logThenErrorf(err.Error())
+        }
+        if len(lockInfoHTLC.HashBase64) == 0 {
+            return logThenErrorf("empty lock hash value")
+        }
+        if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+            return logThenErrorf("only EPOCH time is supported at present")
+        }
+    } else {
+        return logThenErrorf("unsupported lock mechanism: %+v", lockInfo.LockMechanism)
     }
 
     return nil
 }
 
 func (am *AssetManagement) validateClaimInfo(claimInfo *common.AssetClaim) error {
-    claimInfoHTLC := &common.AssetClaimHTLC{}
-    if (claimInfo.LockMechanism != common.LockMechanism_HTLC) {
-        return logThenErrorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
-    }
     if len(claimInfo.ClaimInfo) == 0 {
         return logThenErrorf("empty claim info")
     }
-    err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
-    if err != nil {
-        return logThenErrorf(err.Error())
-    }
-    if len(claimInfoHTLC.HashPreimageBase64) == 0 {
-        return logThenErrorf("empty lock hash preimage")
+    if (claimInfo.LockMechanism == common.LockMechanism_HTLC) {
+        claimInfoHTLC := &common.AssetClaimHTLC{}
+        err := proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
+        if err != nil {
+            return logThenErrorf(err.Error())
+        }
+        if len(claimInfoHTLC.HashPreimageBase64) == 0 {
+            return logThenErrorf("empty lock hash preimage")
+        }
+    } else {
+        return logThenErrorf("unsupported lock mechanism: %+v", claimInfo.LockMechanism)
     }
 
     return nil

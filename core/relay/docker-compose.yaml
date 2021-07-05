@@ -63,16 +63,16 @@ services:
     # if we are using the default configuration template, which is
     # referencing these variables.
     #
-    - DRIVER_NAME=${DRIVER_NAME}
-    - DRIVER_PORT=${DRIVER_PORT}
-    - DRIVER_HOST=${DRIVER_HOST}
+    # - DRIVER_NAME=${DRIVER_NAME}
+    # - DRIVER_PORT=${DRIVER_PORT}
+    # - DRIVER_HOST=${DRIVER_HOST}
     # Network configuration: this section provides the information
     # associated to the network. This value is only relevant if we
     # use the default configuration template which references this
     # variable.
     #
-    - NETWORK_NAME=${NETWORK_NAME}
-    - NETWORK_TYPE=${NETWORK_TYPE}
+    # - NETWORK_NAME=${NETWORK_NAME}
+    # - NETWORK_TYPE=${NETWORK_TYPE}
     # Uncomment these variables to specify the setup of the relay.
     # The values that are assigned to the variables represent the
     # default values that are used in the absence of their
@@ -81,7 +81,7 @@ services:
     - RELAY_CONFIG=/opt/relay/config/server.toml
     # - RELAY_CONFIG=${RELAY_CONFIG}
     # - RELAY_CONFIG_TEMPLATE=/opt/relay/config/server.template.toml
-    - RELAY_DNS_CONFIG=/opt/relay/config/relays
+    # - RELAY_DNS_CONFIG=/opt/relay/config/relays
     # You don't need any volumes, these can be uncommented in case
     # you are doing debugging of the scripts that initialise the
     # the container and you want to check that the everything is
@@ -101,8 +101,8 @@ services:
     # any of the default configurations.
     #
     # - ./config/Network1.toml:/opt/relay/config/Network1.toml
-    # - <path/to/configuration>:/opt/relay/config/server.toml
-    - ${PATH_TO_REMOTE_RELAYS_DEFINITIONS}:/opt/relay/config/relays
+    - ${PATH_TO_CONFIG}:/opt/relay/config/server.toml
+    # - ${PATH_TO_REMOTE_RELAYS_DEFINITIONS}:/opt/relay/config/relays
     # - <path/to/custom-configuration-template>:/opt/relay/config/server.template.toml
     # Uncomment this to expose ports internally and externally from the container
     ports:
