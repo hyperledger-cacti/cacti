@@ -4,3 +4,4 @@ proto-rs/*
 /protos
 !proto-rs/.gitkeep
 /db
+.env

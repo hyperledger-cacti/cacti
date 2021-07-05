@@ -17,7 +17,7 @@ NOTE: Minimum requirement of npm v5.0 for patch-package to apply the patch for t
 ### Setup
 
 The .env (check .env.template, more information [here](#Environment-variables)) and config.json files need to be checked and updated to match the network and relay that it will be connecting to.
-The .env contains information related to the network and relay. The config.json contains information about the admin, user and ca that is used when connecting to the network.
+The .env contains information related to the network and relay. The config.json contains information about the ca admin, user and its org, that is used when connecting to the network.
 
 ### Running
 
@@ -66,6 +66,8 @@ Port for the driver to be run on: `DRIVER_ENDPOINT` (ex: DRIVER_ENDPOINT=localho
 Can pass in a variable 'local' for working with fabric and docker: `local` (ex: local=false)
 
 Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DRIVER_CONFIG=../custom_config.json)
+
+`INTEROP_CHAINCODE` stores the name of the interop chaincode installed.
 
 NOTE: When specifying ensure that they match the config that the relay is using.
 
