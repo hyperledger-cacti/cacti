@@ -13,18 +13,18 @@ import arrow.core.flatMap
 import co.paralleluniverse.fibers.Suspendable
 import com.cordaInteropApp.contracts.ExternalStateContract
 import com.cordaInteropApp.states.ExternalState
-import com.google.gson.Gson
 import common.state.State
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.transactions.TransactionBuilder
-import org.hyperledger.fabric.protos.peer.ProposalResponsePackage
 import java.util.Base64
 
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import fabric.view_data.ViewData
+import corda.ViewDataOuterClass
+import com.google.protobuf.ByteString
 import common.interop_payload.InteropPayloadOuterClass
 import org.hyperledger.fabric.protos.msp.Identities
 
@@ -98,10 +98,15 @@ class WriteExternalStateInitiator(
 @StartableByRPC
 class GetExternalStateByLinearId(
         val externalStateLinearId: String
-) : FlowLogic<Pair<ByteArray, ByteArray>>() {
-
+) : FlowLogic<ByteArray>() {
+    /**
+     * The call() method captures the logic to read external state written into the vault,
+     * and parse the payload and proof based on the protocol.
+     *
+     * @return Returns JSON string in ByteArray containing: payload, signatures, and proof message.
+     */
     @Suspendable
-    override fun call(): Pair<ByteArray, ByteArray> {
+    override fun call(): ByteArray {
         println("Getting External State for linearId $externalStateLinearId stored in vault\n.")
         val linearId = UniqueIdentifier.fromString(externalStateLinearId)
         //val linearId = externalStateLinearId
@@ -119,32 +124,63 @@ class GetExternalStateByLinearId(
 
             when (meta.protocol) {
                 State.Meta.Protocol.CORDA -> {
-                    println("GetExternalStateByLinearId Error: Read Corda View not implemented.\n")
-                    throw UnsupportedOperationException()
+                    val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewDataByteArray)
+                    println("cordaViewData: $cordaViewData")
+                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.payload)
+                    val payloadString = interopPayload.payload.toStringUtf8()
+                    println("response from remote: ${payloadString}.\n")
+                    println("query address: ${interopPayload.address}.\n")
+                    val viewData = ViewDataOuterClass.ViewData.newBuilder()
+                            .addAllNotarizations(cordaViewData.notarizationsList)
+                            .setPayload(interopPayload.payload)
+                            .build()
+                            
+                    return viewData.toByteArray()
                 }
                 State.Meta.Protocol.FABRIC -> {
                     val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
                     println("fabricViewData: $fabricViewData")
                     val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
-                    val response = interopPayload.payload.toStringUtf8()
-                    println("response from remote: ${response}.\n")
+                    val payloadString = interopPayload.payload.toStringUtf8()
+                    println("response from remote: ${payloadString}.\n")
                     println("query address: ${interopPayload.address}.\n")
 
-                    var securityDomain = interopPayload.address.split("/")[1]
+                    val securityDomain = interopPayload.address.split("/")[1]
                     val proofStringPrefix = "Verified Proof: Endorsed by members: ["
-                    val proofStringSuffix = "] of security domain: " + securityDomain
-                    var orgList = ""
+                    val proofStringSuffix = "] of security domain: $securityDomain"
+                    var mspIdList = ""
                     fabricViewData.endorsementsList.map { endorsement ->
-                        val org = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
-                        if (orgList.length > 0) {
-                            orgList = orgList + ", "
+                        val mspId = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
+                        if (mspIdList.isNotEmpty()) {
+                            mspIdList += ", "
                         }
-                        orgList = orgList + org
+                        mspIdList += mspId
                     }
-                    var proof = proofStringPrefix + orgList + proofStringSuffix
-                    println("Proof: ${orgList}.\n")
+                    val proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
+                    println("Proof Message: ${proofMessage}.\n")
 
-                    return Pair(response.toByteArray(), proof.toByteArray())
+                    var notarizationList: List<ViewDataOuterClass.ViewData.Notarization> = listOf()
+
+                    fabricViewData.endorsementsList.map { endorsement ->
+                        val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
+                        val mspId = serializedIdentity.mspid
+                        val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
+                        val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
+                        
+                        val notarization = ViewDataOuterClass.ViewData.Notarization.newBuilder()
+                                .setCertificate(certString)
+                                .setSignature(signature)
+                                .setId(mspId)
+                                .build()
+                        notarizationList = notarizationList + notarization
+                    }
+
+                    val viewData = ViewDataOuterClass.ViewData.newBuilder()
+                            .addAllNotarizations(notarizationList)
+                            .setPayload(interopPayload.payload)
+                            .build()
+                            
+                    return viewData.toByteArray()
                 }
                 else -> {
                     println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
@@ -157,4 +193,3 @@ class GetExternalStateByLinearId(
     }
 
 }
-

@@ -112,7 +112,7 @@ publishing {
         contracts(MavenPublication) {
             groupId = 'com.cordaInteropApp'
             artifactId = 'interop-contracts'
-            version = '0.6'
+            version = '1.2.0'
             from components.java
         }
     }
