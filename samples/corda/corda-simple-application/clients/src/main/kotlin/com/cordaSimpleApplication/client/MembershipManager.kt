@@ -37,7 +37,8 @@ class CreateMembershipCommand : CliktCommand(help = "Creates a Membership for an
  * Helper function to create Membership for an external network
  */
 fun createMembershipFromFile(network: String, config: Map<String, String>): Either<Error, String> {
-    val filepath = "clients/src/main/resources/config/${network}/membership.json"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val filepath = "${credentialPath}/${network}/membership.json"
     return try {
         val file = File(filepath).readText(Charsets.UTF_8)
         val membership = Gson().fromJson(file, MembershipState::class.java)

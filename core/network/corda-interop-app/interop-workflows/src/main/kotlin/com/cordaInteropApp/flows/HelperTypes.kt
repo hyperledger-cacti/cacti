@@ -74,4 +74,3 @@ data class RequestForExternalState(
         val nonce: String,
         val requestingOrg: String) {
 }
-
