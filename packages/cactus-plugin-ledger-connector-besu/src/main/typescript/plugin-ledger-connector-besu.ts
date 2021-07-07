@@ -17,6 +17,10 @@ import {
 } from "./generated/openapi/typescript-axios/index";
 
 import {
+  GetPastLogsV1Request,
+  GetPastLogsV1Response,
+} from "./generated/openapi/typescript-axios/index";
+import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
   IWebServiceEndpoint,
@@ -75,6 +79,7 @@ import {
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
 import { GetBalanceEndpoint } from "./web-services/get-balance-endpoint";
+import { GetTransactionEndpoint } from "./web-services/get-transaction-endpoint";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
@@ -208,6 +213,13 @@ export class PluginLedgerConnectorBesu
     }
     {
       const endpoint = new GetBalanceEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new GetTransactionEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -729,5 +741,12 @@ export class PluginLedgerConnectorBesu
       request.transactionHash,
     );
     return { transaction };
+  }
+
+  public async getPastLogs(
+    request: GetPastLogsV1Request,
+  ): Promise<GetPastLogsV1Response> {
+    const logs = await this.web3.eth.getPastLogs(request);
+    return { logs };
   }
 }
