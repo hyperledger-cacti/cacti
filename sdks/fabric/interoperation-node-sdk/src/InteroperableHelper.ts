@@ -30,7 +30,7 @@ import { Relay } from "./Relay";
 import { Contract } from "fabric-network";
 import { v4 as uuidv4 } from "uuid";
 import { ICryptoKey } from "fabric-common";
-import { InteropJSON, Query, RemoteJSON } from "./types";
+import { InteropJSON, Query, Flow, RemoteJSON } from "./types";
 const logger = log4js.getLogger("InteroperableHelper");
 
 // TODO: Lookup different key and cert pairs for different networks and chaincode functions
@@ -361,6 +361,15 @@ const createAddress = (query: Query, networkID, remoteURL) => {
 };
 
 /**
+ * Creates an address string based on a flow object, networkid and remote url.
+ **/
+const createFlowAddress = (flow: Flow, networkID, remoteURL) => {
+    const { cordappAddress, cordappId, flowId, flowArgs } = flow;
+    const addressString = `${remoteURL}/${networkID}/${cordappAddress}#${cordappId}.${flowId}:${flowArgs.join(":")}`;
+    return addressString;
+};
+
+/**
  * Flow of communicating with the local relay and requesting information from a remote network.
  * It will then invoke the local network with the response.
  * 1. For each view address, send a relay request and get a (verified) view in response
@@ -624,4 +633,5 @@ export {
     getCCArgsForProofVerification,
     submitTransactionWithRemoteViews,
     getRemoteView,
+    createFlowAddress,
 };

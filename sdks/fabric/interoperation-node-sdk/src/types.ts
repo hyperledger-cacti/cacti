@@ -10,6 +10,14 @@ export type Query = {
     ccFunc: string;
     contractName: string;
 };
+
+export type Flow = {
+    flowArgs: string[];
+    cordappAddress: string;
+    flowId: string;
+    cordappId: string;
+};
+
 export type InteropJSON = {
     address?: string;
     ChaincodeFunc?: string;
