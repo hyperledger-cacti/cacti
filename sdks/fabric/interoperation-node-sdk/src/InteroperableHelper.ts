@@ -21,11 +21,16 @@ import eciesCrypto from "./eciesCrypto.js";
 import * as helpers from "./helpers";
 import { deserializeRemoteProposalResponseBase64, serializeRemoteProposalResponse } from "./decoders";
 import statePb from "../protos-js/common/state_pb";
+import fabricViewPb from "../protos-js/fabric/view_data_pb";
+import cordaViewPb from "../protos-js/corda/view_data_pb";
+import interopPayloadPb from "../protos-js/common/interop_payload_pb";
+import proposalResponsePb from "../protos-js/peer/proposal_response_pb";
+import identitiesPb from "../protos-js/msp/identities_pb";
 import { Relay } from "./Relay";
 import { Contract } from "fabric-network";
 import { v4 as uuidv4 } from "uuid";
 import { ICryptoKey } from "fabric-common";
-import { InteropJSON, Query, RemoteJSON } from "./types";
+import { InteropJSON, Query, Flow, RemoteJSON } from "./types";
 const logger = log4js.getLogger("InteroperableHelper");
 
 // TODO: Lookup different key and cert pairs for different networks and chaincode functions
@@ -152,6 +157,88 @@ const verifyRemoteProposalResponse = async (proposalResponseBase64, isEncrypted,
 };
 
 /**
+ * Extracts actual remote query response embedded in view structure.
+ * Argument is a View protobuf ('statePb.View')
+ **/
+const getResponseDataFromView = (view) => {
+    if (view.getMeta().getProtocol() == statePb.Meta.Protocol.FABRIC) {
+        const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
+        const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricView.getResponse().getPayload())));
+        return Buffer.from(interopPayload.getPayload()).toString();
+    } else if (view.getMeta().getProtocol() == statePb.Meta.Protocol.CORDA) {
+        const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
+        const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(cordaView.getPayload())));
+        return Buffer.from(interopPayload.getPayload()).toString();
+    } else {
+        const protocolType = view.getMeta().getProtocol();
+        throw new Error(`Unsupported DLT type: ${protocolType}`);
+    }
+}
+
+/**
+ * Extracts endorsements and the signing authorities backing those endorsements from a Fabric view.
+ * Argument is a View protobuf ('statePb.View')
+ **/
+const getEndorsementsAndSignatoriesFromFabricView = (view) => {
+    if (view.getMeta().getProtocol() != statePb.Meta.Protocol.FABRIC) {
+        throw new Error(`Not a Fabric view`);
+    }
+    const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
+    const endorsements = fabricView.getEndorsementsList();
+    let serializedEndorsementsWithSignatories = [];
+    for (let i = 0; i < endorsements.length; i++) {
+        const endorsement = Buffer.from(endorsements[i].serializeBinary()).toString('base64');
+        const sid = identitiesPb.SerializedIdentity.deserializeBinary(Uint8Array.from(Buffer.from(endorsements[i].getEndorser())));
+        serializedEndorsementsWithSignatories.push([sid.getMspid(), endorsement]);
+    }
+    return serializedEndorsementsWithSignatories;
+}
+
+/**
+ * Extracts endorsements and the signing authorities backing those endorsements from a Corda view.
+ * Argument is a View protobuf ('statePb.View')
+ **/
+const getEndorsementsAndSignatoriesFromCordaView = (view) => {
+    if (view.getMeta().getProtocol() != statePb.Meta.Protocol.CORDA) {
+        throw new Error(`Not a Corda view`);
+    }
+    const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
+    const notarizations = cordaView.getNotarizationsList();
+    const signatures = [];
+    const certs = [];
+    const ids = [];
+    for (let i = 0 ; i < notarizations.length ; i++) {
+        signatures.push(notarizations[i].getSignature());
+        const cert = notarizations[i].getCertificate();
+        certs.push(Buffer.from(cert).toString('base64'));
+        ids.push(notarizations[i].getId());
+    }
+    return { signatures, certs, ids };
+}
+
+/**
+ * Extracts response payload from a Fabric view.
+ * Argument is a View protobuf ('statePb.View')
+ **/
+const getResponsePayloadFromFabricView = (view) => {
+    if (view.getMeta().getProtocol() != statePb.Meta.Protocol.FABRIC) {
+        throw new Error(`Not a Fabric view`);
+    }
+    const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData())
+    return Buffer.from(fabricView.getResponse().serializeBinary()).toString('base64')
+}
+
+/**
+ * Extracts signing authority (i.e., organization MSP) a Fabric endorsement.
+ * Argument is an 'Endorsement' in base64 format.
+ **/
+const getSignatoryOrgMSPFromFabricEndorsementBase64 = (endorsementBase64) => {
+    const endorsement = proposalResponsePb.Endorsement.deserializeBinary(Buffer.from(endorsementBase64, 'base64'));
+    const sid = identitiesPb.SerializedIdentity.deserializeBinary(Uint8Array.from(Buffer.from(endorsement.getEndorser())));
+    return sid.getMspid();
+}
+
+/**
  * Accepts a base 64 encoded string of the protobuf view binary and returns a javascript object.
  **/
 const decodeView = (viewBase64) => {
@@ -269,18 +356,24 @@ const verifyView = async (contract: Contract, base64ViewProto: string, address: 
  **/
 const createAddress = (query: Query, networkID, remoteURL) => {
     const { channel, contractName, ccFunc, ccArgs } = query;
-    const addressString = `${remoteURL}/${networkID}/${channel}/${contractName}/${ccFunc}/${ccArgs.join(":")}`;
+    const addressString = `${remoteURL}/${networkID}/${channel}:${contractName}:${ccFunc}:${ccArgs.join(":")}`;
+    return addressString;
+};
+
+/**
+ * Creates an address string based on a flow object, networkid and remote url.
+ **/
+const createFlowAddress = (flow: Flow, networkID, remoteURL) => {
+    const { cordappAddress, cordappId, flowId, flowArgs } = flow;
+    const addressString = `${remoteURL}/${networkID}/${cordappAddress}#${cordappId}.${flowId}:${flowArgs.join(":")}`;
     return addressString;
 };
 
 /**
  * Flow of communicating with the local relay and requesting information from a remote network.
  * It will then invoke the local network with the response.
- * 1. Will get address from input, if address not there it will create the address from interopJSON
- * 2. Get policy from chaincode for supplied address.
- * 3. Call the relay Process request which will send a request to the remote network via local relay and poll for an update in the request status.
- * 4. Call the local chaincode to verify the view before trying to write to chaincode.
- * 5. Prepare aruements and call WriteExternalState.
+ * 1. For each view address, send a relay request and get a (verified) view in response
+ * 2. Prepare arguments and call WriteExternalState.
  **/
 const interopFlow = async (
     interopContract: Contract,
@@ -288,9 +381,123 @@ const interopFlow = async (
     invokeObject: Query,
     org: string,
     localRelayEndpoint: string,
+    interopArgIndices: Array<number>,
+    interopJSONs: Array<InteropJSON>,
+    keyCert: { key: ICryptoKey; cert: any },
+    returnWithoutLocalInvocation: boolean = false,
+): Promise<{ views: Array<any>; result: any }> => {
+    if (interopArgIndices.length !== interopJSONs.length) {
+        throw new Error(`Number of argument indices ${interopArgIndices.length} does not match number of view addresses ${interopJSONs.length}`);
+    }
+    // Step 1: Iterate through the view addresses, and send remote requests and get views in response for each
+    let views = [], viewsSerializedBase64 = [], computedAddresses = [];
+    for(let i = 0 ; i < interopJSONs.length ; i++) {
+        const [requestResponse, requestResponseError] = await helpers.handlePromise(
+            getRemoteView(
+                interopContract,
+                networkID,
+                org,
+                localRelayEndpoint,
+                interopJSONs[i],
+                keyCert
+            ),
+        );
+        if (requestResponseError) {
+            throw new Error(`InteropFlow remote view request error: ${requestResponseError}`);
+        }
+        views.push(requestResponse.view);
+        viewsSerializedBase64.push(Buffer.from(requestResponse.view.serializeBinary()).toString("base64"));
+        computedAddresses.push(requestResponse.address);
+    }
+    // Return here if caller just wants the views and doesn't want to invoke a local chaincode
+    if (returnWithoutLocalInvocation) {
+        const ccArgs = getCCArgsForProofVerification(
+            invokeObject,
+            interopArgIndices,
+            computedAddresses,
+            viewsSerializedBase64,
+        );
+        return { views, result: ccArgs };
+    }
+    // Step 2
+    const result = await submitTransactionWithRemoteViews(
+        interopContract,
+        invokeObject,
+        interopArgIndices,
+        computedAddresses,
+        viewsSerializedBase64,
+    );
+    return { views, result };
+};
+
+/**
+ * Prepare arguments for WriteExternalState chaincode transaction to verify a view and write data to ledger.
+ **/
+const getCCArgsForProofVerification = (
+    invokeObject: Query,
+    interopArgIndices: Array<number>,
+    viewAddresses: Array<string>,
+    viewsSerializedBase64: Array<string>,
+): Array<any> => {
+    const {
+        ccArgs: localCCArgs,
+        channel: localChannel,
+        ccFunc: localCCFunc,
+        contractName: localChaincode,
+    } = invokeObject;
+    const ccArgs = [
+        localChaincode,
+        localChannel,
+        localCCFunc,
+        JSON.stringify(localCCArgs),
+        JSON.stringify(interopArgIndices),
+        JSON.stringify(viewAddresses),
+        JSON.stringify(viewsSerializedBase64),
+    ];
+    return ccArgs;
+};
+
+/**
+ * Submit local chaincode transaction to verify a view and write data to ledger.
+ * - Prepare arguments and call WriteExternalState.
+ **/
+const submitTransactionWithRemoteViews = async (
+    interopContract: Contract,
+    invokeObject: Query,
+    interopArgIndices: Array<number>,
+    viewAddresses: Array<string>,
+    viewsSerializedBase64: Array<string>,
+): Promise<any> => {
+    const ccArgs = getCCArgsForProofVerification(
+        invokeObject,
+        interopArgIndices,
+        viewAddresses,
+        viewsSerializedBase64,
+    );
+    const [result, submitError] = await helpers.handlePromise(
+        interopContract.submitTransaction("WriteExternalState", ...ccArgs),
+    );
+    if (submitError) {
+        throw new Error(`submitTransaction Error: ${submitError}`);
+    }
+    return result;
+};
+
+/**
+ * Send a relay request with a view address and get a view in response
+ * 1. Will get address from input, if address not there it will create the address from interopJSON
+ * 2. Get policy from chaincode for supplied address.
+ * 3. Call the relay Process request which will send a request to the remote network via local relay and poll for an update in the request status.
+ * 4. Call the local chaincode to verify the view before trying to submit to chaincode.
+ **/
+const getRemoteView = async (
+    interopContract: Contract,
+    networkID: string,
+    org: string,
+    localRelayEndpoint: string,
     interopJSON: InteropJSON,
     keyCert: { key: ICryptoKey; cert: any },
-): Promise<{ view: any; result: any }> => {
+): Promise<{ view: any; address: any }> => {
     const {
         address,
         ChaincodeFunc,
@@ -326,7 +533,7 @@ const interopFlow = async (
             policyCriteria,
             networkID,
             keyCert.cert,
-            Sign ? signMessage(address + uuidValue, keyCert.key.toBytes()).toString("base64") : "",
+            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()).toString("base64") : "",
             uuidValue,
             // Org is empty as the name is in the certs for
             org,
@@ -347,29 +554,9 @@ const interopFlow = async (
     if (verifyError) {
         throw new Error(`View verification failed ${verifyError}`);
     }
-    // Step 5
-    const {
-        ccArgs: localCCArgs,
-        channel: localChannel,
-        ccFunc: localCCFunc,
-        contractName: localChaincode,
-    } = invokeObject;
-    const ccArgs = [
-        localChaincode,
-        localChannel,
-        localCCFunc,
-        JSON.stringify(localCCArgs),
-        address,
-        Buffer.from(relayResponse.getView().serializeBinary()).toString("base64"),
-    ];
-    const [result, submitError] = await helpers.handlePromise(
-        interopContract.submitTransaction("WriteExternalState", ...ccArgs),
-    );
-    if (submitError) {
-        throw new Error(`submitTransaction Error: ${submitError}`);
-    }
-    return { view: relayResponse.getView(), result };
+    return { view: relayResponse.getView(), address: computedAddress };
 };
+
 /**
  * Handles invoke for user and determines when the invoke should be an interop call
  * or a local invoke depending on the remoteJSON configuration provided. Will add the view response as the final arguement to the chaincode.
@@ -384,14 +571,15 @@ const invokeHandler = async (
 ): Promise<any> => {
     // If the function exists in the remoteJSON it will start the interop flow
     // Otherwise it will treat it as a nomral invoke function
-    if (remoteJSON?.interopJSON?.[query.ccFunc]) {
+    if (remoteJSON?.viewRequests?.[query.ccFunc]) {
         return interopFlow(
             contract,
             networkID,
             query,
             org,
             remoteJSON.LocalRelayEndpoint,
-            remoteJSON.interopJSON[query.ccFunc],
+            remoteJSON.viewRequests[query.ccFunc].invokeArgIndices,
+            remoteJSON.viewRequests[query.ccFunc].interopJSONs,
             keyCert,
         );
     }
@@ -433,8 +621,17 @@ export {
     decryptRemoteProposalResponse,
     verifyRemoteProposalResponse,
     verifyDecryptedRemoteProposalResponse,
+    getResponseDataFromView,
+    getEndorsementsAndSignatoriesFromFabricView,
+    getEndorsementsAndSignatoriesFromCordaView,
+    getResponsePayloadFromFabricView,
+    getSignatoryOrgMSPFromFabricEndorsementBase64,
     decodeView,
     signMessage,
     invokeHandler,
     interopFlow,
+    getCCArgsForProofVerification,
+    submitTransactionWithRemoteViews,
+    getRemoteView,
+    createFlowAddress,
 };

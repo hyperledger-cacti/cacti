@@ -10,6 +10,14 @@ export type Query = {
     ccFunc: string;
     contractName: string;
 };
+
+export type Flow = {
+    flowArgs: string[];
+    cordappAddress: string;
+    flowId: string;
+    cordappId: string;
+};
+
 export type InteropJSON = {
     address?: string;
     ChaincodeFunc?: string;
@@ -23,7 +31,10 @@ export type InteropJSON = {
 
 export type RemoteJSON = {
     LocalRelayEndpoint: string;
-    interopJSON: {
-        [key: string]: InteropJSON;
+    viewRequests: {
+        [key: string]: {
+            invokeArgIndices: Array<number>;
+            interopJSONs: Array<InteropJSON>;
+        };
     };
 };

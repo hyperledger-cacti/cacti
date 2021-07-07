@@ -81,7 +81,7 @@ func TestHandleExternalRequest(t *testing.T) {
 		SecurityDomain: "2345",
 		Rules: []*common.Rule{{
 			Principal:     validCertificate,
-			PrincipalType: "ca",
+			PrincipalType: "certificate",
 			Read:          true,
 			Resource:      "mychannel:interop:Read:a",
 		}},

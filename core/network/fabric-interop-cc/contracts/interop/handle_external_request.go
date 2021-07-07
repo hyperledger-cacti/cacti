@@ -36,6 +36,11 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 	}
 	var query common.Query
 	err = protoV2.Unmarshal(queryBytes, &query)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Unable to unmarshal query: %s", err.Error())
+		log.Error(errorMessage)
+		return "", errors.New(errorMessage)
+	}
 	x509Cert, err := parseCert(query.Certificate)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to parse certificate: %s", err)
@@ -56,14 +61,11 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 		return "", errors.New(errorMessage)
 	}
 	// 2. Checks that the certificate of the requester is valid according to the network's Membership
-	var requestingOrg string
-	if query.RequestingOrg != "" {
-		requestingOrg = query.RequestingOrg
-	} else {
-		requestingOrg = x509Cert.Issuer.Organization[0]
+	if query.RequestingOrg == "" {
+		query.RequestingOrg = x509Cert.Issuer.Organization[0]
 	}
 
-	err = verifyMemberInSecurityDomain(s, ctx, x509Cert, query.RequestingNetwork, requestingOrg)
+	err = verifyMemberInSecurityDomain(s, ctx, x509Cert, query.RequestingNetwork, query.RequestingOrg)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Membership Verification failed: %s", err)
 		log.Error(errorMessage)

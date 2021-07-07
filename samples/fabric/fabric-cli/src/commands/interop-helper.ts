@@ -129,7 +129,7 @@ const command: GluegunCommand = {
       const invokeObject = {
         channel,
         ccFunc: applicationFunction,
-        ccArgs: [key],
+        ccArgs: [key, ''],
         contractName: 'simplestate'
       }
       const interopFlowResponse = await InteroperableHelper.interopFlow(
@@ -139,15 +139,16 @@ const command: GluegunCommand = {
         invokeObject,
         options['requesting-org'] || '',
         relayEnv.relayEndpoint,
-        {
+        [1],
+        [{
           address: array[0],
           Sign: true
-        },
+        }],
         keyCert
       )
       logger.info(
         `View from remote network: ${JSON.stringify(
-          interopFlowResponse.view.toObject()
+          interopFlowResponse.views[0].toObject()
         )}. Interop Flow result: ${interopFlowResponse.result || 'successful'}`
       )
       spinner.succeed(
