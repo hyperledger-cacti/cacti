@@ -34,11 +34,11 @@ The tool can be installed via npm or manually. If no development is required it 
 
 ## Installing with npm
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
 
 Add contents of the `.npmrc` to the `.npmrc` located at `~/.npmrc`, be careful not to replace anything
 
-then run `npm install -g @res-dlt-interop/fabric-cli`
+then run `npm install -g @hyperledger-labs/weaver-fabric-cli`
 
 NOTE: If installing this way it is required to set up the env and config through the cli using either `fabric-cli env set <key> <value>` or `fabric-cli env set-file <file-path>`. Refer to the `.env.template` and `config.json `to determine what values are needed.
 
@@ -57,7 +57,7 @@ Set up `config.json` by adding the connection profile and relay port for each ne
 
 (Editing of the env and config can be done via the CLI with the `fabric-cli env set` and `fabric-cli config set` commands)
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
 
 Have `yarn` installed and have Node >= 11.14.0 <= 16.0.0
 
@@ -77,7 +77,7 @@ Then run
 
 ## Docker
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
 
 Run `make build-image` to build fabric-cli docker image.
 
@@ -105,26 +105,14 @@ NOTE: Use the `--help` flag with any command to view examples and usage.
 
 ## Publishing CLI
 
-Run `npm publish` will error if same version is already published. Will need the artifactory token, will error if same version is already published. Will need the artifactory token.
+Run `npm publish`. Will need the github personal access token with write access, will error if same version is already published.
 
-## Setup Artifactory token for fabric-interop-sdk
+## Setup access token for weaver-fabric-interop-sdk
 
-1) Go to IBM artifactory (https://na.artifactory.swg-devops.com/artifactory/)
-2) Click on your email id on top right
-3) Generate/Copy the API key from profile, let's say it is - "ThisIsMyAPIKey"
-4) Run this command on your system -
-	 curl --header 'X-JFrog-Art-Api: ThisIsMyAPIKey' https://na.artifactory.swg-devops.com/artifactory/api/npm/auth
-5) The above command will return you auth token along with auth settings and your email id from artifactory.
-6) Create a .npmrc file in the backend folder (from where you want to run npm install)
-7) Add this line to your .npmrc file,
-	 @res-dlt-interop:registry=https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/
-8) Add the output of curl to that file.
-9) Final .npmrc should look like this -
-   "@res-dlt-interop:registry=https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/
-    _auth = <Auth-token>
-    always-auth = true
-    email = user@email.com"
-10) Run npm install to check if artifactory connection is working before testing/deployment.
+1) Create a Personal Access Token from Github with read access to packages. \
+2) Create a copy of `.npmrc.template` as `.npmrc`. \
+3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token. \
+4) Run npm install to check if it is working before testing/deployment.
 
 ## Environment Variables
 - `DEFAULT_CHANNEL` (OPTIONAL) The default channel used by the CLI when invoking chaincode on a network.
@@ -141,11 +129,17 @@ Example config:
 {
   "network1": {
     "connProfilePath": "",
-    "relayEndpoint": ""
+    "relayEndpoint": "",
+    "mspId": "",
+    "channelName": "",
+    "chaincode": ""
   },
   "network2": {
     "connProfilePath": "",
-    "relayEndpoint": ""
+    "relayEndpoint": "",
+    "mspId": "",
+    "channelName": "",
+    "chaincode": ""
   }
 }
 ```
