@@ -5,7 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { RelayHelper } from '@res-dlt-interop/fabric-interop-sdk'
+import { RelayHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import { commandHelp, getNetworkConfig } from '../../helpers/helpers'
 import logger from '../../helpers/logger'
 

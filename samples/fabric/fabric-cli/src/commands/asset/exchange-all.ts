@@ -8,7 +8,7 @@ import { GluegunCommand } from 'gluegun'
 import { fabricHelper, invoke } from '../../helpers/fabric-functions'
 import logger from '../../helpers/logger'
 import { commandHelp, getNetworkConfig, handlePromise } from '../../helpers/helpers'
-import { AssetManager } from '@res-dlt-interop/fabric-interop-sdk'
+import { AssetManager } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 
 var crypto = require('crypto');
 

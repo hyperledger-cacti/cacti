@@ -16,7 +16,7 @@ import {
   fabricHelper,
   getKeyAndCertForRemoteRequestbyUserName
 } from '../../helpers/fabric-functions'
-import { RelayHelper } from '@res-dlt-interop/fabric-interop-sdk'
+import { RelayHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
