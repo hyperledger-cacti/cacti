@@ -4,5 +4,5 @@ description = "Account 2 in genesis file of IBFTNetwork-FreeGas"
 
 [signing]
 type = "file-based-signer"
-key-file = "/home/dvinaya1/workspace/test/keys2/keyFile_m3"
-password-file = "/home/dvinaya1/workspace/test/keys2/passwordFile"
+key-file = "keyFile_m3"
+password-file = "passwordFile"
