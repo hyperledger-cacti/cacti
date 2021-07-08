@@ -9,10 +9,10 @@
  **/
 /** End file docs */
 import * as grpcJs from "@grpc/grpc-js";
-import networksGrpcPb from "../protos-js/networks/networks_grpc_pb";
-import networksPb from "../protos-js/networks/networks_pb";
-import common_ack_pb from "../protos-js/common/ack_pb";
-import statePb from "../protos-js/common/state_pb";
+import networksGrpcPb from "@hyperledger-labs/weaver-protos-js/networks/networks_grpc_pb";
+import networksPb from "@hyperledger-labs/weaver-protos-js/networks/networks_pb";
+import common_ack_pb from "@hyperledger-labs/weaver-protos-js/common/ack_pb";
+import statePb from "@hyperledger-labs/weaver-protos-js/common/state_pb";
 import * as helpers from "./helpers";
 /**
  * The Relay class represents a relay in the target blockchain network.

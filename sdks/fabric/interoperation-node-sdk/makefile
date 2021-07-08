@@ -8,11 +8,13 @@ build-local:
 
 .PHONY: build
 build:
-	echo "Calling update-protos script..."
-	./scripts/update-protos.sh
 	npm install
-	npm run protos
 	npm run build
+	
+.PHONE: publish
+publish: .npmrc
+	npm publish
+	
 
 clean:
-	rm -rf build node_modules package-lock.json
+	rm -rf build node_modules package-lock.json .nyc_output coverage
