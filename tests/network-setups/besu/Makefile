@@ -1,4 +1,4 @@
-besu:
+start:
 	bash scripts/setupNetwork.sh
 
 clean:
