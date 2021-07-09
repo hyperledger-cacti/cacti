@@ -40,7 +40,7 @@ Run `npm run docs` to generate docs. View docs via the generated html file.
 1) Create a Personal Access Token from Github with write/read/delete access to packages.
 2) Create a copy of `.npmrc.template` as `.npmrc`.
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
-4) Run npm publish to publish package to artifactory.
+4) Run `npm publish` to publish package to github packages.
 
 NOTE:- Github Packages won't allow you to update the package if same version exists,
 you have to delete the package version (requires admin access) before publishing an update on the same package version.
