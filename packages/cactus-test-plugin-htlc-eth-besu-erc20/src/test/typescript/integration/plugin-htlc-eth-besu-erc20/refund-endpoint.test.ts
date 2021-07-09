@@ -1,5 +1,5 @@
 import http from "http";
-import type { AddressInfo } from "net";
+import { AddressInfo } from "net";
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import express from "express";
