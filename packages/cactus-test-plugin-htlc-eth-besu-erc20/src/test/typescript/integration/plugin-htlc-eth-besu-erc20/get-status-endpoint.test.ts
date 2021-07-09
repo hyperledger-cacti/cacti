@@ -68,6 +68,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   });
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
@@ -450,11 +451,5 @@ test("Test get invalid id status", async (t: Test) => {
   );
   t.equal(res.status, 200, "response status is 200 OK");
   t.equal(res.data[0], "0", "the contract status is 0 - INVALID");
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });

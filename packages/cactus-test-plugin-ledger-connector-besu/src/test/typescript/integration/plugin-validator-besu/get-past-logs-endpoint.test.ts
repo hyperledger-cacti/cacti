@@ -13,8 +13,6 @@ import {
   ConfigService,
 } from "@hyperledger/cactus-cmd-api-server";
 import {
-  JsObjectSigner,
-  IJsObjectSignerOptions,
   Secp256k1Keys,
   KeyFormat,
   LogLevelDesc,
@@ -30,14 +28,14 @@ import {
   BesuApiClient,
   IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
-  SignTransactionRequest,
+  GetPastLogsV1Request,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
-const testCase = "Test sign transaction endpoint";
+const testCase = "API client can call getPastLogs via network";
 const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
@@ -79,19 +77,12 @@ test(testCase, async (t: Test) => {
   const tearDown = async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
   };
 
   test.onFinish(tearDown);
-
+  const testAccount = await besuTestLedger.createEthTestAccount();
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
   const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
-
-  const jsObjectSignerOptions: IJsObjectSignerOptions = {
-    privateKey: keyHex,
-    logLevel,
-  };
-  const jsObjectSigner = new JsObjectSigner(jsObjectSignerOptions);
 
   // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
   const pluginRegistry = new PluginRegistry({ plugins: [keychain] });
@@ -157,39 +148,24 @@ test(testCase, async (t: Test) => {
 
   const transactionHash = await web3Eea.eea.sendRawTransaction(contractOptions);
 
-  const transaction = await web3.eth.getTransaction(transactionHash);
-  const singData = jsObjectSigner.sign(transaction.input);
-  const signDataHex = Buffer.from(singData).toString("hex");
+  await web3.eth.getTransaction(transactionHash);
 
-  const request: SignTransactionRequest = {
-    keychainId,
-    keychainRef,
-    transactionHash: transactionHash,
+  const request: GetPastLogsV1Request = {
+    address: testAccount.address,
   };
 
   const configuration = new BesuApiClientOptions({ basePath: node1Host });
   const api = new BesuApiClient(configuration);
 
-  // Test for 200 valid response test case
-  const res = await api.signTransactionV1(request);
+  const res = await api.getPastLogsV1(request);
+  // const { } = res;
   t.ok(res, "API response object is truthy");
-  t.deepEquals(signDataHex, res.data.signature, "Signature data are equal");
+  t.ok(res.data.logs, "Response.logs is truthy ok");
+  t.true(Array.isArray(res.data.logs), "Response.logs is Array ok");
+});
 
-  // Test for 404 Transaction not found test case
-  try {
-    const notFoundRequest: SignTransactionRequest = {
-      keychainId: "fake",
-      keychainRef: "fake",
-      transactionHash:
-        "0x46eac4d1d1ff81837698cbab38862a428ddf042f92855a72010de2771a7b704d",
-    };
-    await api.signTransactionV1(notFoundRequest);
-  } catch (error) {
-    t.equal(error.response.status, 404, "HTTP response status are equal");
-    t.equal(
-      error.response.statusText,
-      "Transaction not found",
-      "Response text are equal",
-    );
-  }
+test("AFTER " + testCase, async (t: Test) => {
+  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  await t.doesNotReject(pruning, "Pruning didn't throw OK");
+  t.end();
 });

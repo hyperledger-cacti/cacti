@@ -76,6 +76,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   });
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
@@ -501,11 +502,5 @@ test("Test invalid withdraw with invalid id", async (t: Test) => {
     params: [receiver],
   });
   t.equal(responseFinalBalance.callOutput, "0", "balance of account is 0 OK");
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });
