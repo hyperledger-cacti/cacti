@@ -159,7 +159,7 @@ First **login** to github container registry:
     * EXTERNAL_NETWORK: Docker bridge network name.
     * DOCKER_REGISTRY: Keep it same as in template.
     * DOCKER_IMAGE_NAME: Keep it same as in template.
-    * DOCKER_IMAGE_VERSION: Version of the image in github registry. Check here: [weaver-relay-server](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server)
+    * DOCKER_TAG: Tag of the image in github registry. Check here: [weaver-relay-server](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server)
 * Tip: If running all relays on same host, make sure to change service name before each relay deployment, to avoid conflict in names.
 * Create docker network named `relay`: `docker network create relay`.
 * To deploy relay, run: `docker-compose up relay-server -d` (Given relay-server is the service name in docker-compose).
@@ -180,7 +180,7 @@ First **login** to github container registry:
     * EXTERNAL_NETWORK: Docker bridge network name.
     * DOCKER_REGISTRY: Keep it same as in template.
     * DOCKER_IMAGE_NAME: Keep it same as in template.
-    * DOCKER_IMAGE_VERSION: Version of the image in github registry. Check here: [weaver-relay-server](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server)
+    * DOCKER_TAG: Tag of the image in github registry. Check here: [weaver-relay-server](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server)
 * Modify `docker/remote-relay-dns-config/relays.toml` to add remote relays' dns information.
 * Uncomment line `66`, `67`, `68`, `74`, `75`, `84` and `105` and comment line `104`.
 * Tip: If running all relays on same host, make sure to change service name before each relay deployment, to avoid conflict in names.
