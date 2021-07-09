@@ -1,0 +1,5 @@
+fabric-protos/
+.gradle/
+build/
+src/
+artifactory.properties
