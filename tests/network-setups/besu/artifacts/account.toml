@@ -1,0 +1,8 @@
+[metadata]
+createdAt = 2019-11-05T08:15:30-05:00
+description
+
+[signing]
+type = "file-based-signer"
+key-file
+password-file 

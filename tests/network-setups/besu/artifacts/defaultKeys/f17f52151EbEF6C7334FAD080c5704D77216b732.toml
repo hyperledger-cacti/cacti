@@ -1,0 +1,8 @@
+[metadata]
+createdAt = 2021-05-12
+description = "Account 3 in genesis file of IBFTNetwork-FreeGas"
+
+[signing]
+type = "file-based-signer"
+key-file = "keyFile_m4"
+password-file = "passwordFile"
