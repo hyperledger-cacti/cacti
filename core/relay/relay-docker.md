@@ -192,8 +192,7 @@ First **login** to github container registry:
 
 * Create a Personal Access Token with write, read, and delete packages access in github.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
-* Run `make build-server-local` to build the image.
-* Run `make push-server` to push the image to github registry.
+* Run `make push-server` to build and push the image to github registry.
 
 
 
