@@ -11,12 +11,9 @@
   "files": [
     "dist/*"
   ],
-  "bin": "./dist/lib/main/typescript/carbon-accounting-app-cli.js",
   "scripts": {
-    "tsc": "tsc --project ./tsconfig.json",
     "start": "CONFIG_FILE=./example-config.json node dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "solidity": "hardhat compile",
-    "pretsc": "npm run solidity",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -27,23 +24,11 @@
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
   "watch": {
-    "tsc": {
+    "solidity": {
       "patterns": [
-        "src/",
-        "src/*/json/**/openapi*",
-        "src/*/solidity/**/*"
+        "./src/main/solidity/"
       ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "sol",
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
+      "extensions": "sol"
     }
   },
   "engines": {

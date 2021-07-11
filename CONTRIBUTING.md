@@ -17,8 +17,7 @@
   - [All-In-One Docker Images for Ledger Connector Plugins](#all-in-one-docker-images-for-ledger-connector-plugins)
     - [Test Automation of Ledger Plugins](#test-automation-of-ledger-plugins)
   - [Building the SDK](#building-the-sdk)
-  - [Adding a new public npm dependency to one of the packages:](#adding-a-new-public-npm-dependency-to-one-of-the-packages)
-  - [Adding a sibling package npm dependency to one of the packages:](#adding-a-sibling-package-npm-dependency-to-one-of-the-packages)
+  - [Adding new dependencies:](#adding-new-dependencies)
   - [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
   - [On Reproducible Builds](#on-reproducible-builds)
 
@@ -493,7 +492,7 @@ npx tap --ts --jobs=1 --timeout=600 \"./\"
 ### Building the SDK
 
 You do not need to do anything special to have the SDK sources generated and
-compiled. It is all part of the `npm run build` task which you can run yourself
+compiled. It is all part of the `npm run build:dev:backend` task which you can run yourself
 or as part of the CI script (`./tools/ci.sh`).
 
 The SDK is itself just another package named `sdk` and can be dependend on by
@@ -504,33 +503,24 @@ browser and also NodeJS environments. This is very important as we do not wish
 to maintain two (or more) separate SDK codebases and we also want as much of it
 being generated automatically as possible (currently this is close to 100%).
 
-### Adding a new public npm dependency to one of the packages:
+### Adding new dependencies:
 
-For example web3 can be added as a dependency to the besu ledger connector plugin's package this way:
-
-```sh
-npx lerna add web3@latest --scope '*/*plugin-ledger-connector-besu' --exact # [--dev] [--peer]
-```
-
-If you are adding a development dependency you can use the `--dev` option and `--peer` for a peer dependency.
-
-After running any `lerna add` command you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
-
-### Adding a sibling package npm dependency to one of the packages:
-
-For example the `cactus-test-tooling` can be added as a dev dependency to the besu ledger connector plugin's package this way:
+Example:
 
 ```sh
-npx lerna add @hyperledger/cactus-test-tooling --scope '*/*plugin-ledger-connector-besu' --exact --dev
+# Adds "got" as a dependency to the cactus common package
+# (which resides under the path of ./packages/cactus-common)
+npm install got --save-exact --workspace ./packages/cactus-common
 ```
 
-Or add the common library to allow you the usage of the logger for example:
+You need to know which package of the monorepo will be using the package and then
+run the `npm install` command with an additional parameter specifying the directory
+of that package. See [adding-dependencies-to-a-workspace](https://docs.npmjs.com/cli/v7/using-npm/workspaces#adding-dependencies-to-a-workspace) from the official npm documentation
+for further details and examples.
 
-```sh
-npx lerna add @hyperledger/cactus-common --scope '*/*plugin-ledger-connector-quorum' --exact --dev
-```
+After adding new dependencies, you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
 
-After running any `lerna add` command you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
+> **Always specify the `--save-exact` when installing new dependencies to ensure [reproducible builds](https://reproducible-builds.org/)**
 
 ### Reload VSCode Window After Adding Dependencies
 

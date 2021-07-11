@@ -12,35 +12,24 @@
 		"dist/*"
 	],
 	"scripts": {
-		"generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
-		"pretsc": "npm run generate-sdk",
-		"tsc": "tsc --project ./tsconfig.json",
-		"watch": "npm-watch",
-		"webpack": "npm-run-all webpack:dev webpack:prod",
-		"webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-		"webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-		"webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-		"webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
-		"webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
-		"webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
+	  "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+	  "codegen:openapi": "npm run generate-sdk",
+	  "codegen": "run-p codegen:*",
+	  "watch": "npm-watch",
+	  "webpack": "npm-run-all webpack:dev webpack:prod",
+	  "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+	  "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
+	  "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+	  "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
+	  "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
+	  "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
 	},
 	"watch": {
-		"tsc": {
-			"patterns": [
-				"src/",
-				"src/*/json/**/openapi*"
-			],
-			"ignore": [
-				"src/**/generated/*"
-			],
-			"extensions": [
-				"ts",
-				"json"
-			],
-			"quiet": true,
-			"verbose": false,
-			"runOnChangeOnly": true
-		}
+    "codegen:openapi": {
+      "patterns": [
+        "./src/main/json/openapi.json"
+      ]
+    }
 	},
 	"publishConfig": {
 		"access": "public"
@@ -103,8 +92,8 @@
 		"web3-eea": "0.10.0"
 	},
 	"devDependencies": {
-		"@hyperledger/cactus-plugin-keychain-memory": "0.5.0",
-		"@hyperledger/cactus-test-tooling": "0.5.0",
+		"@hyperledger/cactus-plugin-keychain-memory": "0.6.0",
+		"@hyperledger/cactus-test-tooling": "0.6.0",
 		"@types/express": "4.17.8",
 		"@types/joi": "14.3.4"
 	}
