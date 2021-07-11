@@ -13,8 +13,8 @@
   ],
   "scripts": {
     "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
-    "tsc": "tsc --project ./tsconfig.json",
-    "pretsc": "npm run generate-sdk",
+    "codegen:openapi": "npm run generate-sdk",
+    "codegen": "run-p codegen:*",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -25,21 +25,10 @@
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
   "watch": {
-    "tsc": {
+    "codegen:openapi": {
       "patterns": [
-        "src/",
-        "src/*/json/**/openapi*"
-      ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
+        "./src/main/json/openapi.json"
+      ]
     }
   },
   "publishConfig": {
