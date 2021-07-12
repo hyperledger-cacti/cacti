@@ -3,7 +3,7 @@ DOCKER_TAG ?= 1.2.0
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/fabric-driver
 
-build-local:
+build-local: .npmrc
 	# echo "Calling update-protos-local script..."
 	# ./scripts/update-protos-local.sh
 	npm install
@@ -11,18 +11,18 @@ build-local:
 	npm run build
 	npm run postinstall
 
-build-image-local:
+build-image-local: .npmrc
 	# cp ${CONNECTION_PROFILE} connection_profile.json
 	# echo "Calling update-protos-local script..."
 	# ./scripts/update-protos-local.sh
 	docker build --build-arg GIT_URL=$(GIT_URL) -t fabric-driver:latest -f fabricDriver.dockerfile .
 	
-build:
+build: .npmrc
 	npm install
 	npm run build
 	npm run postinstall
 
-build-image:
+build-image: .npmrc
 	docker build --build-arg GIT_URL=$(GIT_URL) -t fabric-driver:latest -f fabricDriver.dockerfile .
 	
 push-image: build-image
