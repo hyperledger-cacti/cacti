@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	sh update-protos-local.sh
+	sh ../get-fabric-protos.sh ../..
 	npm install
 	npm run build
 
@@ -16,5 +16,4 @@ clean-build:
 clean: clean-build
 	rm -rf node_modules
 	rm package-lock.json
-	rm -rf fabric-protos
-	rm -rf protos
+	rm -rf ../fabric-protos

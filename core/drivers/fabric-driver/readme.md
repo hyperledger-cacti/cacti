@@ -7,7 +7,7 @@
 
 This driver is for communication with a Fabric Network.
 
-This driver implements the Driver Service specified in the [driver.proto file](../../../common/interop-protos/driver/driver.proto).
+This driver implements the Driver Service specified in the [driver.proto file](../../../common/protos/driver/driver.proto).
 
 
 ## Development

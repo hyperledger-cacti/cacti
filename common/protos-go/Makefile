@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	sh update-protos-local.sh
+	sh ../get-fabric-protos.sh ../..
 	sh build-protos.sh
 	
 .PHONY: clean-build
@@ -9,4 +9,4 @@ clean-build:
 	
 .PHONY: clean
 clean:
-	rm -rf tmp
+	rm -rf ../fabric-protos
