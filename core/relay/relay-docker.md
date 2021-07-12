@@ -151,11 +151,11 @@ First **login** to github container registry:
 
 **Some sample steps to deploy relay using docker-compose when Config File is available:**
 
-* Copy `.env.template` file to `.env` (depending upon whether relay is for fabric or corda), and make sure the values are accurate, update the paths accordingly.
+* Copy `.env.template` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
+    * PATH_TO_CONFIG: Path to the relay's config file. e.g. `./config/Fabric_Relay.toml`.
     * RELAY_NAME: Keep it same as in relay config file.
     * RELAY_PORT: Port for grpc relay server.
-    * PATH_TO_CONFIG: Path to the relay's config file. e.g. `./config/Fabric_Relay.toml`.
     * EXTERNAL_NETWORK: Docker bridge network name.
     * DOCKER_REGISTRY: Keep it same as in template.
     * DOCKER_IMAGE_NAME: Keep it same as in template.
@@ -163,11 +163,11 @@ First **login** to github container registry:
 * Tip: If running all relays on same host, make sure to change service name before each relay deployment, to avoid conflict in names.
 * Create docker network named `relay`: `docker network create relay`.
 * To deploy relay, run: `docker-compose up relay-server -d` (Given relay-server is the service name in docker-compose).
-* Also `make start` does the above 2 steps, if service name is not changed.
+* Also `make start-server` does the above 2 steps, if service name is not changed.
 
 **Some sample steps to deploy relay using docker-compose when Config is not available:**
 
-* Copy `.env.template.2` file to `.env`, and make sure the values are accurate, update the paths accordingly.
+* Copy `.env.template.2` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
     * RELAY_NAME: Name for the relay.
     * RELAY_PORT: Port for grpc relay server.
@@ -186,7 +186,7 @@ First **login** to github container registry:
 * Tip: If running all relays on same host, make sure to change service name before each relay deployment, to avoid conflict in names.
 * Create docker network named `relay`: `docker network create relay`.
 * To deploy relay, run: `docker-compose up relay-server -d` (Given relay-server is the service name in docker-compose).
-* Also `make start` does the above 2 steps, if service name is not changed.
+* Also `make start-server` does the above 2 steps, if service name is not changed.
 
 ## Push Relay image to Github container registry
 
