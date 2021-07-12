@@ -76,7 +76,7 @@ NOTE: When specifying ensure that they match the config that the relay is using.
 **For docker-compose:***
 
 * `DOCKER_IMAGE_NAME`, `DOCKER_TAG`, and `DOCKER_REGISTRY` needs to specified based on [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver) image.
-* `DOCKER_PORT` is the driver port to be exposed, and `EXTERNAL_NETWORK` is the docker network in which fabric-network is running. 
+* `DRIVER_PORT` is the driver server port, and `EXTERNAL_NETWORK` is the docker network in which fabric-network is running.
 
 ## Push Fabric Driver image to Github container registry
 
