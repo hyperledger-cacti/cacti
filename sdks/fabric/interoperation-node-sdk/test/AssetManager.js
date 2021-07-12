@@ -20,7 +20,7 @@ const { Wallets } = require("fabric-network");
 const { ContractImpl } = require("fabric-network/lib/contract");
 const { NetworkImpl } = require("fabric-network/lib/network");
 const assetManager = require("../src/AssetManager");
-import assetLocksPb from "../protos-js/common/asset_locks_pb";
+import assetLocksPb from "@hyperledger-labs/weaver-protos-js/common/asset_locks_pb";
 
 describe("AssetManager", () => {
     const mspId = "mspId";

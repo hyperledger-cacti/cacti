@@ -6,7 +6,7 @@
     "scripts": {
         "protos": "grpc_tools_node_protoc --proto_path=protos --proto_path=fabric-protos  --js_out=import_style=commonjs,binary:protos-js/ --grpc_out=grpc_js:protos-js/ --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` protos/relay/datatransfer.proto protos/networks/networks.proto protos/driver/driver.proto protos/common/ack.proto protos/common/query.proto  protos/common/interop_payload.proto protos/fabric/view_data.proto protos/common/state.proto protos/common/proofs.proto fabric-protos/peer/proposal_response.proto fabric-protos/peer/proposal.proto fabric-protos/peer/chaincode.proto fabric-protos/common/policies.proto fabric-protos/msp/msp_principal.proto && protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts --ts_out=./protos-js -I ./protos -I ./fabric-protos protos/relay/datatransfer.proto protos/networks/networks.proto protos/driver/driver.proto protos/common/ack.proto protos/common/query.proto protos/fabric/view_data.proto protos/common/state.proto protos/common/proofs.proto protos/common/verification_policy.proto fabric-protos/peer/proposal_response.proto fabric-protos/peer/proposal.proto fabric-protos/peer/chaincode.proto fabric-protos/common/policies.proto fabric-protos/msp/msp_principal.proto protos/common/interop_payload.proto",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "npm run protos && npm run tsc",
+        "build": "npm run tsc",
         "postinstall": "patch-package",
         "tsc": "tsc",
         "start": "node out/server.js",
@@ -16,11 +16,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git@github.ibm.com:dlt-interoperability/fabric-driver.git"
+        "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability.git"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@hyperledger-labs/weaver-protos-js": "^1.2.0",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",
         "@grpc/proto-loader": "^0.5.4",

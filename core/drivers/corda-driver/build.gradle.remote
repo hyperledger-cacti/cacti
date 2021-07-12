@@ -9,6 +9,7 @@ buildscript {
     ext.corda_version = "4.4"
     ext.corda_core_version = "4.4"
     ext.arrow_version = "0.10.4"
+    ext.interop_app_version = "1.2.0"
 
     repositories {
         mavenCentral()
@@ -68,8 +69,8 @@ dependencies {
     implementation "net.corda:corda:4.4"
     implementation "net.corda:corda-rpc:4.4"
 
-    implementation(group: 'com.cordaInteropApp', name: 'interop-contracts', version: "0.6")
-    implementation(group: 'com.cordaInteropApp', name: 'interop-workflows', version: "0.6")
+    implementation(group: 'com.cordaInteropApp', name: 'interop-contracts', version: "$interop_app_version")
+    implementation(group: 'com.cordaInteropApp', name: 'interop-workflows', version: "$interop_app_version")
 
     // gRPC and protobuf dependencies
     implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"

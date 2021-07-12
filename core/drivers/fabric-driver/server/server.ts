@@ -5,12 +5,12 @@
  */
 
 import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
-import ack_pb from '../protos-js/common/ack_pb';
-import fabricView from '../protos-js/fabric/view_data_pb';
-import query_pb from '../protos-js/common/query_pb';
-import driver_pb_grpc from '../protos-js/driver/driver_grpc_pb';
-import datatransfer_grpc_pb from '../protos-js/relay/datatransfer_grpc_pb';
-import state_pb from '../protos-js/common/state_pb';
+import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
+import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
+import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
+import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grpc_pb';
+import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
+import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import invoke from './fabric-code';
 import 'dotenv/config';
 import { walletSetup } from './walletSetup';

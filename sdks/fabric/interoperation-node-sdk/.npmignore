@@ -1,7 +1,15 @@
 .npmrc
+.npmrc.template
 node_modules/
 .nyc_output/
 coverage/
+scripts/
+test/
+protos-js/
+src/
+types/
 package-lock.json
-old/
-protos/
+.gitignore
+.npmignore
+.eslintignore
+makefile

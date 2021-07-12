@@ -7,7 +7,7 @@
 
 This driver is for communication with a Fabric Network.
 
-This driver implements the Driver Service specified in the [driver.proto file](../../../common/interop-protos/driver/driver.proto).
+This driver implements the Driver Service specified in the [driver.proto file](../../../common/protos/driver/driver.proto).
 
 
 ## Development
@@ -41,7 +41,9 @@ To deploy, run `make deploy`
 
 **Sample steps to use docker deployment:**
 
-* After building image using `make build-image`, copy `.env.docker.template` to `.env` and make changes appropriately (like correcting the base path of repo, changing network name if required etc).
+* Create a Personal Access Token with read packages access in github.
+* Run `docker login ghcr.io` and use your github username and personal access token as password.
+* Copy `.env.docker.template` to `.env` and make changes appropriately (like correcting the base path of repo, changing network name if required etc, check image details here: [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver)).
 * Make sure connection profile used for docker, containers correct hostnames instead of localhost in urls.
 * If deploying more than one driver on same host, make sure to change service name in docker-compose to avoid conflicts.
 * Finally run `docker-compose up -d` to deploy the fabric driver.
@@ -70,6 +72,19 @@ Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DR
 `INTEROP_CHAINCODE` stores the name of the interop chaincode installed.
 
 NOTE: When specifying ensure that they match the config that the relay is using.
+
+**For docker-compose:***
+
+* `DOCKER_IMAGE_NAME`, `DOCKER_TAG`, and `DOCKER_REGISTRY` needs to specified based on [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver) image.
+* `DRIVER_PORT` is the driver server port, and `EXTERNAL_NETWORK` is the docker network in which fabric-network is running.
+
+## Push Fabric Driver image to Github container registry
+
+* Create a Personal Access Token with write, read, and delete packages access in github.
+* Run `docker login ghcr.io` and use your github username and personal access token as password.
+* Create a copy of `.npmrc.template` as `.npmrc`.
+* Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
+* Run `make push-image` to build and push the image to github registry.
 
 
 ## Known Issues

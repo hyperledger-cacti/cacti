@@ -9,10 +9,10 @@ import { Endorser } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fabproto6 from 'fabric-protos';
-import query_pb from '../protos-js/common/query_pb';
-import view_data from '../protos-js/fabric/view_data_pb';
-import proposalResponse from '../protos-js/peer/proposal_response_pb';
-import interopPayload from '../protos-js/common/interop_payload_pb';
+import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
+import view_data from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
+import proposalResponse from '@hyperledger-labs/weaver-protos-js/peer/proposal_response_pb';
+import interopPayload from '@hyperledger-labs/weaver-protos-js/common/interop_payload_pb';
 import { Certificate } from '@fidm/x509';
 import { getConfig } from './walletSetup';
 

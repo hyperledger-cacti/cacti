@@ -9,7 +9,7 @@ Various data structures, patterns, templates, and message types, need to be defi
 
 This folder contains various closed and interdependent sets of such patterns that are used in one or more scenario (i.e., protocol).
 
-Presently, we have defined various patterns for proof-based data-sharing, including messages and addresses passed through relays, as protobufs [here](./interop-protos). These are parsed and used in code written in Go, Node.js, and Java, in our platform modules and sample applications.
+Presently, we have defined various patterns for proof-based data-sharing, including messages and addresses passed through relays, as protobufs [here](./protos). These are parsed and used in code written in Go, Node.js, and Java, in our platform modules and sample applications.
 
 A DSL for expressing proof verification policies is defined [here](./policy-dsl). This is work-in-progress and not used by other components at present.
 

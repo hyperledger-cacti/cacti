@@ -15,7 +15,7 @@ import {
   getNetworkConfig,
   handlePromise
 } from '../helpers/helpers'
-import { InteroperableHelper } from '@res-dlt-interop/fabric-interop-sdk'
+import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import { v4 as uuidv4 } from 'uuid'
 
 import logger from '../helpers/logger'

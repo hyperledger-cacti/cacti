@@ -144,22 +144,30 @@ This repository also contains a `docker-compose.yaml` file that is designed to s
 
 To run with Docker Compose please refer to the comments in the [docker-compose.yaml](docker-compose.yaml) file or the documentation above.
 
+First **login** to github container registry:
+
+* Create a Personal Access Token with read packages access in github.
+* Run `docker login ghcr.io` and use your github username and personal access token as password.
+
 **Some sample steps to deploy relay using docker-compose when Config File is available:**
 
-* Copy `.env.template` file to `.env` (depending upon whether relay is for fabric or corda), and make sure the values are accurate, update the paths accordingly.
+* Copy `.env.template` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
+    * PATH_TO_CONFIG: Path to the relay's config file. e.g. `./config/Fabric_Relay.toml`.
     * RELAY_NAME: Keep it same as in relay config file.
     * RELAY_PORT: Port for grpc relay server.
-    * PATH_TO_CONFIG: Path to the relay's config file. e.g. `./config/Fabric_Relay.toml`.
     * EXTERNAL_NETWORK: Docker bridge network name.
+    * DOCKER_REGISTRY: Keep it same as in template.
+    * DOCKER_IMAGE_NAME: Keep it same as in template.
+    * DOCKER_TAG: Tag of the image in github registry. Check here: [weaver-relay-server](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server)
 * Tip: If running all relays on same host, make sure to change service name before each relay deployment, to avoid conflict in names.
 * Create docker network named `relay`: `docker network create relay`.
 * To deploy relay, run: `docker-compose up relay-server -d` (Given relay-server is the service name in docker-compose).
-* Also `make start` does the above 2 steps, if service name is not changed.
+* Also `make start-server` does the above 2 steps, if service name is not changed.
 
 **Some sample steps to deploy relay using docker-compose when Config is not available:**
 
-* Copy `.env.template.2` file to `.env`, and make sure the values are accurate, update the paths accordingly.
+* Copy `.env.template.2` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
     * RELAY_NAME: Name for the relay.
     * RELAY_PORT: Port for grpc relay server.
@@ -170,13 +178,21 @@ To run with Docker Compose please refer to the comments in the [docker-compose.y
     * NETWORK_TYPE: Type of network. e.g. `Fabric` or `Corda`.
     * PATH_TO_REMOTE_RELAYS_DEFINITIONS: Keep it `./docker/remote-relay-dns-config`.
     * EXTERNAL_NETWORK: Docker bridge network name.
+    * DOCKER_REGISTRY: Keep it same as in template.
+    * DOCKER_IMAGE_NAME: Keep it same as in template.
+    * DOCKER_TAG: Tag of the image in github registry. Check here: [weaver-relay-server](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server)
 * Modify `docker/remote-relay-dns-config/relays.toml` to add remote relays' dns information.
 * Uncomment line `66`, `67`, `68`, `74`, `75`, `84` and `105` and comment line `104`.
 * Tip: If running all relays on same host, make sure to change service name before each relay deployment, to avoid conflict in names.
 * Create docker network named `relay`: `docker network create relay`.
 * To deploy relay, run: `docker-compose up relay-server -d` (Given relay-server is the service name in docker-compose).
-* Also `make start` does the above 2 steps, if service name is not changed.
+* Also `make start-server` does the above 2 steps, if service name is not changed.
 
+## Push Relay image to Github container registry
+
+* Create a Personal Access Token with write, read, and delete packages access in github.
+* Run `docker login ghcr.io` and use your github username and personal access token as password.
+* Run `make push-server` to build and push the image to github registry.
 
 
 
