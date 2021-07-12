@@ -70,8 +70,8 @@ sourceSets {
   main {
     proto {
       // In addition to the default "src/main/proto"
-	  srcDir "./fabric-protos"
-	  srcDir "../../common/interop-protos"
+	  srcDir "../fabric-protos"
+	  srcDir "../protos"
     }
   }
 }

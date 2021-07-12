@@ -186,7 +186,7 @@ Artifactory.
 ## Notes on the proto dependencies
 
 This repo relies on data structures defined in
-[interop-protos](../../../common/interop-protos). It
+[protos](../../../common/protos). It
 also has a dependency on the [interop
 CorDapp](../../../core/network/corda-interop-app), which
 itself has a dependency on the same proto files. Generating the java and kotlin

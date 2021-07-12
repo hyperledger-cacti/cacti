@@ -2,10 +2,6 @@
 .npmrc.template
 node_modules/
 package-lock.json
-protos/
-fabric-protos/
 Makefile
-index.js
 .gitignore
-update-protos-local.sh
 .npmignore

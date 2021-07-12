@@ -14,7 +14,7 @@ then
     echo "Deleting local copy of protos directory to copy latest from main folder"
     rm -rf proto
 fi
-cp -r $WEAVER_ROOT/common/interop-protos proto
+cp -r $WEAVER_ROOT/common/protos proto
 
 
 # check if local fabric-protos dir exists
