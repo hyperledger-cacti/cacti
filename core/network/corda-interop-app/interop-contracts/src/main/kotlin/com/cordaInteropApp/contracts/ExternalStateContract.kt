@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.contracts
+package com.weaver.cordaInteropApp.contracts
 
-import com.cordaInteropApp.states.ExternalState
+import com.weaver.cordaInteropApp.states.ExternalState
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.Requirements.using
@@ -25,7 +25,7 @@ import net.corda.core.transactions.LedgerTransaction
 class ExternalStateContract : Contract {
     companion object {
         // Used to identify our contract when building a transaction.
-        const val ID = "com.cordaInteropApp.contracts.ExternalStateContract"
+        const val ID = "com.weaver.cordaInteropApp.contracts.ExternalStateContract"
     }
     /**
      * The verify() function determines a transaction is valid if it does not throw and exception.

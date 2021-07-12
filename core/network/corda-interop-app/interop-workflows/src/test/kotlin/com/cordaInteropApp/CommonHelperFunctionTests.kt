@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp
+package com.weaver.cordaInteropApp
 
-import com.cordaInteropApp.flows.*
+import com.weaver.cordaInteropApp.flows.*
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

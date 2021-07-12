@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.flows
+package com.weaver.cordaInteropApp.flows
 
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
 import co.paralleluniverse.fibers.Suspendable
-import com.cordaInteropApp.contracts.MembershipStateContract
-import com.cordaInteropApp.states.Member
-import com.cordaInteropApp.states.MembershipState
+import com.weaver.cordaInteropApp.contracts.MembershipStateContract
+import com.weaver.cordaInteropApp.states.Member
+import com.weaver.cordaInteropApp.states.MembershipState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier

@@ -2,8 +2,6 @@ buildscript {
     Properties constants = new Properties()
     file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
 
-    file("$projectDir/./artifactory.properties").withInputStream { constants.load(it) }
-
     ext {
         corda_release_group = constants.getProperty("cordaReleaseGroup")
         corda_core_release_group =  constants.getProperty("cordaCoreReleaseGroup")
@@ -17,8 +15,8 @@ buildscript {
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         arrow_version = constants.getProperty("arrowVersion")
         weaver_protos_version = "1.2.0"
-        artifactory_username = constants.getProperty("username")
-        artifactory_password = constants.getProperty("password")
+        artifactory_username = ""
+        artifactory_password = ""
     }
 
     repositories {
@@ -44,7 +42,6 @@ plugins {
     id "maven-publish"
 }
 
-
 allprojects {
     apply from: "${rootProject.projectDir}/repositories.gradle"
     apply plugin: 'kotlin'
@@ -56,12 +53,8 @@ allprojects {
         maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
         maven { url 'https://software.r3.com/artifactory/corda' }
         maven { url 'https://jitpack.io' }
-        maven {
-            url 'https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability'
-            credentials {
-                username artifactory_username
-                password artifactory_password
-            }
+        flatDir {
+            dirs '../../../common/protos-java-kt/build/libs'
         }
     }
 
@@ -104,7 +97,7 @@ dependencies {
     
     // weaver-protos
     implementation "com.weaver:protos-java-kt:$weaver_protos_version"
-    
+
     // CorDapp dependencies.
     cordapp project(":interop-workflows")
     cordapp project(":interop-contracts")

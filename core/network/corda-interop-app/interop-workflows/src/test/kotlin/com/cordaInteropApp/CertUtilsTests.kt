@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp
+package com.weaver.cordaInteropApp
 
-import com.cordaInteropApp.flows.getCertificateFromString
-import com.cordaInteropApp.flows.verifyCertificateChain
-import com.cordaInteropApp.flows.verifyNodeSignature
+import com.weaver.cordaInteropApp.flows.getCertificateFromString
+import com.weaver.cordaInteropApp.flows.verifyCertificateChain
+import com.weaver.cordaInteropApp.flows.verifyNodeSignature
 import arrow.core.flatMap
 import arrow.core.Right
-import com.cordaInteropApp.flows.verifyCaCertificate
+import com.weaver.cordaInteropApp.flows.verifyCaCertificate
 import org.junit.Test
 import kotlin.test.assertTrue
 

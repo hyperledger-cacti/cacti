@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.flows.customSerializers
+package com.weaver.cordaInteropApp.flows.customSerializers
 
 import common.state.State.Meta
 import common.state.State.Meta.Protocol

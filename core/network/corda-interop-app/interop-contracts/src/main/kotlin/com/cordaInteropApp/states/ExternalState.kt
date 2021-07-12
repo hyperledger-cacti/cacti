@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.states
+package com.weaver.cordaInteropApp.states
 
-import com.cordaInteropApp.contracts.ExternalStateContract
+import com.weaver.cordaInteropApp.contracts.ExternalStateContract
 import com.google.protobuf.ByteString
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.LinearState

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.flows.customSerializers
+package com.weaver.cordaInteropApp.flows.customSerializers
 
 import common.query.QueryOuterClass.Query
 import net.corda.core.serialization.SerializationCustomSerializer

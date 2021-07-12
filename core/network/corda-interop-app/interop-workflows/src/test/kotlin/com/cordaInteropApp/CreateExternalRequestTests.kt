@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp
+package com.weaver.cordaInteropApp
 
-import com.cordaInteropApp.flows.CreateAccessControlPolicy
-import com.cordaInteropApp.flows.CreateExternalRequest
-import com.cordaInteropApp.flows.CreateVerificationPolicyState
-import com.cordaInteropApp.flows.verifyNodeSignature
-import com.cordaInteropApp.states.Policy
-import com.cordaInteropApp.states.VerificationPolicyState
-import com.cordaInteropApp.states.Identifier
+import com.weaver.cordaInteropApp.flows.CreateAccessControlPolicy
+import com.weaver.cordaInteropApp.flows.CreateExternalRequest
+import com.weaver.cordaInteropApp.flows.CreateVerificationPolicyState
+import com.weaver.cordaInteropApp.flows.verifyNodeSignature
+import com.weaver.cordaInteropApp.states.Policy
+import com.weaver.cordaInteropApp.states.VerificationPolicyState
+import com.weaver.cordaInteropApp.states.Identifier
 import net.corda.core.utilities.getOrThrow
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetworkParameters
@@ -33,8 +33,8 @@ class CreateExternalRequestTests {
         @JvmStatic
         fun setup() {
             network = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(
-                    TestCordapp.findCordapp("com.cordaInteropApp.contracts"),
-                    TestCordapp.findCordapp("com.cordaInteropApp.flows")
+                    TestCordapp.findCordapp("com.weaver.cordaInteropApp.contracts"),
+                    TestCordapp.findCordapp("com.weaver.cordaInteropApp.flows")
             )))
             partyA = network.createPartyNode()
             network.runNetwork()

@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp
+package com.weaver.cordaInteropApp
 
 import arrow.core.Either
-import com.cordaInteropApp.flows.CreateVerificationPolicyState
-import com.cordaInteropApp.flows.DeleteVerificationPolicyState
-import com.cordaInteropApp.flows.UpdateVerificationPolicyState
-import com.cordaInteropApp.states.Policy
-import com.cordaInteropApp.states.VerificationPolicyState
-import com.cordaInteropApp.states.Identifier
+import com.weaver.cordaInteropApp.flows.CreateVerificationPolicyState
+import com.weaver.cordaInteropApp.flows.DeleteVerificationPolicyState
+import com.weaver.cordaInteropApp.flows.UpdateVerificationPolicyState
+import com.weaver.cordaInteropApp.states.Policy
+import com.weaver.cordaInteropApp.states.VerificationPolicyState
+import com.weaver.cordaInteropApp.states.Identifier
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.node.services.queryBy
 import net.corda.core.utilities.getOrThrow
@@ -33,8 +33,8 @@ class VerificationPolicyTests {
         @BeforeClass @JvmStatic
         fun setup() {
             network = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(
-                    TestCordapp.findCordapp("com.cordaInteropApp.contracts"),
-                    TestCordapp.findCordapp("com.cordaInteropApp.flows")
+                    TestCordapp.findCordapp("com.weaver.cordaInteropApp.contracts"),
+                    TestCordapp.findCordapp("com.weaver.cordaInteropApp.flows")
             )))
             partyA = network.createPartyNode()
             network.runNetwork()

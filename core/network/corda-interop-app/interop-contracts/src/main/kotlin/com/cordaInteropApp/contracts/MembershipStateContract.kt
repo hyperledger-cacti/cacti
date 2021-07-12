@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.contracts
+package com.weaver.cordaInteropApp.contracts
 
-import com.cordaInteropApp.states.MembershipState
+import com.weaver.cordaInteropApp.states.MembershipState
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand
@@ -24,7 +24,7 @@ import net.corda.core.transactions.LedgerTransaction
 class MembershipStateContract : Contract {
     companion object {
         // Used to identify our contract when building a transaction.
-        const val ID = "com.cordaInteropApp.contracts.MembershipStateContract"
+        const val ID = "com.weaver.cordaInteropApp.contracts.MembershipStateContract"
     }
 
     /**

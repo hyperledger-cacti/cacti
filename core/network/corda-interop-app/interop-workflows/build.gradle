@@ -11,15 +11,6 @@ plugins {
     id "maven-publish"
 }
 
-Properties constants = new Properties()
-
-repositories {
-    google()
-    jcenter()
-    mavenCentral()
-    mavenLocal()
-}
-
 apply plugin: 'net.corda.plugins.cordapp'
 apply plugin: 'net.corda.plugins.quasar-utils'
 
@@ -69,6 +60,9 @@ dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-fx:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    
+    // weaver-protos
+    implementation "com.weaver:protos-java-kt:$weaver_protos_version"
 
     // Corda dependencies.
     cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
@@ -78,8 +72,6 @@ dependencies {
 
     // CorDapp dependencies.
     cordapp project(":interop-contracts")
-    cordaCompile "$corda_release_group:corda-jackson:$corda_release_version"
-
 }
 
 task integrationTest(type: Test, dependsOn: []) {
@@ -87,14 +79,22 @@ task integrationTest(type: Test, dependsOn: []) {
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
-
 publishing {
     publications {
         workflows(MavenPublication) {
-            groupId = 'com.cordaInteropApp'
+            groupId = project.properties['group']
             artifactId = 'interop-workflows'
-            version = '0.7'
+            version = project.properties['version']
             from components.java
+        }
+    }
+    repositories {
+        maven {
+            url 'https://maven.pkg.github.com/sanvenDev/weaver-dlt-interoperability'
+            credentials {
+                username artifactory_username
+                password artifactory_password
+            }
         }
     }
 }

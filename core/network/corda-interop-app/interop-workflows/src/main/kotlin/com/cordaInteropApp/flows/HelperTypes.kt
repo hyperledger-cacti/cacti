@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.flows
+package com.weaver.cordaInteropApp.flows
 
 import net.corda.core.serialization.CordaSerializable
 

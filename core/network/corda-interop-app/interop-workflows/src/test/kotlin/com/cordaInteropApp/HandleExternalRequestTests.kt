@@ -4,17 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp
+package com.weaver.cordaInteropApp
 
 import arrow.core.Left
 import arrow.core.identity
-import com.cordaInteropApp.flows.CreateAccessControlPolicy
-import com.cordaInteropApp.flows.CreateMembershipState
-import com.cordaInteropApp.flows.HandleExternalRequest
-import com.cordaInteropApp.states.AccessControlPolicyState
-import com.cordaInteropApp.states.Member
-import com.cordaInteropApp.states.MembershipState
-import com.cordaInteropApp.states.Rule
+import com.weaver.cordaInteropApp.flows.CreateAccessControlPolicy
+import com.weaver.cordaInteropApp.flows.CreateMembershipState
+import com.weaver.cordaInteropApp.flows.HandleExternalRequest
+import com.weaver.cordaInteropApp.states.AccessControlPolicyState
+import com.weaver.cordaInteropApp.states.Member
+import com.weaver.cordaInteropApp.states.MembershipState
+import com.weaver.cordaInteropApp.states.Rule
 import common.query.QueryOuterClass
 import net.corda.core.utilities.getOrThrow
 import net.corda.testing.node.MockNetwork
@@ -36,8 +36,8 @@ class HandleExternalRequestTests {
         @JvmStatic
         fun setup() {
             network = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(
-                    TestCordapp.findCordapp("com.cordaInteropApp.contracts"),
-                    TestCordapp.findCordapp("com.cordaInteropApp.flows")
+                    TestCordapp.findCordapp("com.weaver.cordaInteropApp.contracts"),
+                    TestCordapp.findCordapp("com.weaver.cordaInteropApp.flows")
             )))
             partyA = network.createPartyNode()
             network.runNetwork()
@@ -55,7 +55,7 @@ class HandleExternalRequestTests {
 
     val query = QueryOuterClass.Query.newBuilder()
             .addAllPolicy(listOf())
-            .setAddress("localhost:9080/Corda_Network/localhost:10006#com.cordaInteropApp.flows.QueryState")
+            .setAddress("localhost:9080/Corda_Network/localhost:10006#com.weaver.cordaInteropApp.flows.QueryState")
             .setRequestingRelay("")
             .setRequestingNetwork("Corda_Network")
             .setCertificate(cert)
@@ -84,7 +84,7 @@ class HandleExternalRequestTests {
                     Rule(
                             principal = cert,
                             principalType = "certificate",
-                            resource = "localhost:10006#com.cordaInteropApp.flows.QueryState",
+                            resource = "localhost:10006#com.weaver.cordaInteropApp.flows.QueryState",
                             read = true
                     ))
     )
@@ -174,7 +174,7 @@ class HandleExternalRequestTests {
         network.runNetwork()
         val noACPError = noAccessControlPolicyFuture.getOrThrow()
         assertTrue(noACPError.isLeft())
-        assertEquals("Error verifying access for PartyA for the address: localhost:9080/Corda_Network/localhost:10006#com.cordaInteropApp.flows.QueryState with error: List is empty.", noACPError.fold({ it.message }, { "" }))
+        assertEquals("Error verifying access for PartyA for the address: localhost:9080/Corda_Network/localhost:10006#com.weaver.cordaInteropApp.flows.QueryState with error: List is empty.", noACPError.fold({ it.message }, { "" }))
     }
 
     @Test

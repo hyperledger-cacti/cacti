@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.contracts
+package com.weaver.cordaInteropApp.contracts
 
 import net.corda.testing.node.MockServices
 import org.junit.Test

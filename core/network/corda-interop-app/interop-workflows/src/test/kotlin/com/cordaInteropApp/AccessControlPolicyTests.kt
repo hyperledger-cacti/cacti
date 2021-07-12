@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp
+package com.weaver.cordaInteropApp
 
 import arrow.core.Either
-import com.cordaInteropApp.flows.*
-import com.cordaInteropApp.states.AccessControlPolicyState
-import com.cordaInteropApp.states.Rule
+import com.weaver.cordaInteropApp.flows.*
+import com.weaver.cordaInteropApp.states.AccessControlPolicyState
+import com.weaver.cordaInteropApp.states.Rule
 import common.query.QueryOuterClass
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.node.services.queryBy
@@ -30,8 +30,8 @@ class AccessControlPolicyTests {
         @JvmStatic
         fun setup() {
             network = MockNetwork(MockNetworkParameters(cordappsForAllNodes = listOf(
-                    TestCordapp.findCordapp("com.cordaInteropApp.contracts"),
-                    TestCordapp.findCordapp("com.cordaInteropApp.flows")
+                    TestCordapp.findCordapp("com.weaver.cordaInteropApp.contracts"),
+                    TestCordapp.findCordapp("com.weaver.cordaInteropApp.flows")
             )))
             partyA = network.createPartyNode()
             network.runNetwork()

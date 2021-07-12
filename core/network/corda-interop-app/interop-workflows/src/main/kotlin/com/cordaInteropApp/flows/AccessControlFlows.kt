@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.flows
+package com.weaver.cordaInteropApp.flows
 
 import arrow.core.*
 import co.paralleluniverse.fibers.Suspendable
-import com.cordaInteropApp.contracts.AccessControlPolicyStateContract
-import com.cordaInteropApp.states.AccessControlPolicyState
-import com.cordaInteropApp.states.Rule
+import com.weaver.cordaInteropApp.contracts.AccessControlPolicyStateContract
+import com.weaver.cordaInteropApp.states.AccessControlPolicyState
+import com.weaver.cordaInteropApp.states.Rule
 import common.access_control.AccessControl
 import common.query.QueryOuterClass
 import net.corda.core.contracts.Command

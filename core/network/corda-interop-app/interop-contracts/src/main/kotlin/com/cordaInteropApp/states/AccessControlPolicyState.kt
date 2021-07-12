@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp.states
+package com.weaver.cordaInteropApp.states
 
-import com.cordaInteropApp.contracts.AccessControlPolicyStateContract
+import com.weaver.cordaInteropApp.contracts.AccessControlPolicyStateContract
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
