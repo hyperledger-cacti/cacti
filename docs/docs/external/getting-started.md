@@ -66,6 +66,8 @@ Before starting, make sure you have the following software installed on your hos
 ### Credentials
 Make sure you have an SSH or GPG key registered in https://github.com to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the `https://` prefix but this may change to `git@` in the future).
 
+**Note:** Create a personal access token with `read:packages` accesss in github in order to use modules published in github packages.
+
 ## Getting the Code and Documentation
 
 Clone the [weaver-dlt-interoperability](https://github.com/hyperledger-labs/weaver-dlt-interoperability) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
@@ -78,8 +80,9 @@ Using the sequence of instructions below, you can start two separate Fabric netw
 
 A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the `sdks/fabric/interoperation-node-sdk` folder. This contains functions for Fabric Gateway-based applications to exercise interoperation capabilities via relays and also a number of utility/helper functions. The Fabric-CLI tool, which we will use later, depends on this library.
 
-To build the library, do the following:
+(OPTIONAL) To build the library, do the following:
 - Navigate to the `sdks/fabric/interoperation-node-sdk` folder.
+- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following command:
   ```bash
   make build-local
@@ -124,6 +127,7 @@ _Note_: The setup and running instructions below were tested with all Node.js ve
 
 You can install `fabric-cli` as follows:
 - Navigate to the `samples/fabric/fabric-cli` folder.
+- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following to install dependencies:
   ```bash
   npm install
@@ -230,6 +234,7 @@ Configure `fabric-driver` for `network1` as follows:
 
 Build the Fabric driver module as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
+- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following:
   ```bash
   make build-local
