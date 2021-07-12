@@ -182,7 +182,11 @@ fabric-cli configure all network1 network2
 The relay is a module acting on behalf of a network, enabling interoperation flows with other networks by communicating with their relays.
 The code for this lies in the `core/relay` folder.
 
-#### Building
+We support both to run relay in host as well as in docker. To run in host refer [Running Relay in Host](#running-relay-in-host) and to run using docker refer [Running Relay in Docker](#running-relay-in-docker)
+
+#### Running Relay in Host
+
+##### Building
 
 _Prerequisite_: make sure Rust is already installed and that the `cargo` executable is in your system path (after installation of Rust, this should be available in `$HOME/.cargo/bin`); you can also ensure this by running `source "$HOME/.cargo/env"`.
 
@@ -192,8 +196,8 @@ Build the generic (i.e., common to all DLTs) relay module as follows:
   ```bash
   make
   ```
-
-#### Running
+  
+##### Deployment
 
 An instance or a relay can be run using a suitable configuration file. Samples are available in the `core/relay/config` folder.
 
@@ -213,12 +217,54 @@ Run a relay for `network2` as follows (_do this only if you wish to test interop
 
 For more information, see the [relay README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/relay).
 
+#### Running Relay in Docker
+
+Navigate to the `core/relay` folder and Run a relay as follows:
+
+**Method 1**:
+* Copy `.env.template` file to `.env`.
+* Update following Environment Variables in `.env` (Examples are given wrt our testnet) :
+    * `PATH_TO_CONFIG`: Path to the relay's config file. e.g. `./config/Fabric_Relay.toml` for fabric network1 in our testnet, `./config/Fabric_Relay2.toml` for fabric network2, and `./config/Corda_Relay.toml` for corda network. (Modify the config files to reflect correct host address of remote relay and fabric driver, if they are deployed using docker)
+    * `RELAY_NAME`: Keep it same as in relay config file.
+    * `RELAY_PORT`: Port for grpc relay server as per relay config file. e.g. `9080` for fabric network1 in our testnet, `9083` for fabric network2, and `9081` for corda network.
+    * `EXTERNAL_NETWORK`: Docker bridge network name. e.g. `network1_net` for fabric network1 in our testnet, `network2_net` for fabric network2, and `corda_default` for corda network.
+    * `DOCKER_REGISTRY`: Keep it same as in template.
+    * `DOCKER_IMAGE_NAME`: Keep it same as in template.
+    * `DOCKER_TAG`: Tag of the image in github registry. Check here: [weaver-relay-server](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server)
+* To deploy the relay, run `make start-server`.
+* Note: For some docker-compose versions, it may throw error about conflict in service name, if running all relays on same host, change service name before each relay deployment, to resolve that issue.
+
+**Method 2** (_When you don't want to manually configure config files_):
+* Copy `.env.template` file to `.env`.
+* Update following Environment Variables in `.env` (Examples are given wrt our testnet deployed completely in docker) :
+    * `RELAY_NAME`: Name for the relay. e.g. `relay-network1` for fabric network1, `relay-network2` for fabric network2, and `relay-corda` for corda network.
+    * `RELAY_PORT`: Port for grpc relay server. e.g. `9080` for fabric network1, `9083` for fabric network2 and `9081` for corda network.
+    * `DRIVER_NAME`: Driver name. e.g. `fabric-driver-network1` for fabric network1, `fabric-driver-network2` for fabric network2, and `corda-driver` for corda network. 
+    * `DRIVER_PORT`: Port for driver. e.g. `9090` for fabric network1, `9095` for fabric network2, and `9099` for corda network. 
+    * `DRIVER_HOST`: Hostname/IP for driver. e.g. `fabric-driver-network1` for fabric network1, `fabric-driver-network2` for fabric network2, and `localhost` for corda network. 
+    * `NETWORK_NAME`: Name of network. e.g. `network1` for fabric network1, `network2` for fabric network2, and `Corda_Network` for corda network.
+    * `NETWORK_TYPE`: Type of network. e.g. `Fabric` or `Corda`.
+    * `PATH_TO_REMOTE_RELAYS_DEFINITIONS`: Keep it `./docker/remote-relay-dns-config`.
+    * `EXTERNAL_NETWORK`: Docker bridge network name. e.g. `network1_net` for fabric network1 in our testnet, `network2_net` for fabric network2, and `corda_default` for corda network.
+    * `DOCKER_REGISTRY`: Keep it same as in template.
+    * `DOCKER_IMAGE_NAME`: Keep it same as in template.
+    * `DOCKER_TAG`: Tag of the image in github registry. Check here: [weaver-relay-server](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server)
+* Uncomment line `66`, `67`, `68`, `74`, `75`, `84` and `105` and comment line `104` in `docker-compose.yaml`.
+* To deploy the relay, run `make start-server`.
+* Note: For some docker-compose versions, it may throw error about conflict in service name, if running all relays on same host, change service name before each relay deployment, to resolve that issue.
+
+For more information, see the [relay-docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/relay/relay-docker.md).
+
 ### Fabric Driver
 
 A driver is a DLT-specific plugin invoked by the relay while channelling external data queries to the local peer network and collecting a response with proofs. The Fabric driver is built as a Fabric client application on the `fabric-network` NPM package.
 The code for this lies in the `core/drivers/fabric-driver` folder.
 
-#### Configuring
+We support both to run relay in host as well as in docker. To run in host refer [Running Fabric Driver in Host](#running-fabric-driver-in-host) and to run using docker refer [Running Fabric Driver in Docker](#running-fabric-driver-in-docker)
+
+#### Running Fabric Driver In Host
+
+##### Configuring
 
 In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
 
@@ -230,7 +276,7 @@ Configure `fabric-driver` for `network1` as follows:
     - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
   * Leave the default values unchanged for the other parameters. The relay and driver endpoints as well as the network name are already specified.
 
-#### Building
+##### Building
 
 Build the Fabric driver module as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
@@ -241,7 +287,7 @@ Build the Fabric driver module as follows:
   ```
 _Note_: `postinstall` applies a customization patch to the `fabric-network` NPM library.
 
-#### Running
+##### Running
 
 Run a Fabric driver for `network1` as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
@@ -257,6 +303,28 @@ Run a Fabric driver for `network2` as follows (_do this only if you wish to test
   CONNECTION_PROFILE=<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev
   ```
 _Note_: the variables we specified earlier in the `.env` are now passed in the command line. Alternatively, you can make a copy of the `fabric-driver` folder with a different  name and create a separate `.env` file within it that contains links to the connection profile, relay, and driver for `network2`.
+
+#### Running Fabric Driver In Docker
+
+Configure `fabric-driver` as follows:
+- Navigate to the `core/drivers/fabric-driver` folder.
+- Create a `.env` file by copying `.env.docker.template` and setting suitable parameter values:
+  * The `CONNECTION_PROFILE` should point to the absolute path of the connection profile.
+    - For this exercise, specify the path `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json` for network1 and `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json` for network2 (_you must specify the full absolute path here_).
+    - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
+  * `RELAY_ENDPOINT`: change it to point to correct relay. e.g. `relay-network1:9080` for network1, and `relay-network2:9083` for network2 if deployed in docker.
+  * `NETWORK_NAME`: Network name. e.g. network1 or network2
+  * `DRIVER_PORT`: Server port for the driver. e.g. `9090` for network and `9095` for network2.
+  * `INTEROP_CHAINCODE`: Name of interop chaincode deployed in network. e.g. `interop` in our testnet.
+  * `EXTERNAL_NETWORK`: Docker bridge network name. e.g. `network1_net` for `network1` in our testnet, `network2_net` for `network2`, and `corda_default` for corda network.
+  * `DOCKER_IMAGE_NAME`: Keep it default.
+  * `DOCKER_TAG`: Tag of the image in github registry. Check here: [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver)
+  * `DOCKER_REGISTRY`: Keep it default.
+  
+For deployment:
+- Run `make deploy` to start the fabric driver container.
+- Run `make stop` to stop the fabric driver.
+
 
 For more information see the [fabric-driver README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/drivers/fabric-driver).
 
@@ -310,7 +378,7 @@ If the Corda node and notary start up successfully, you should something like th
 
 The relay was built earlier, so you just need to use a different configuration file to start a relay for the Corda network.
 
-Run a relay as follows:
+Run a relay in host as follows:
 - Navigate to the `core/relay` folder.
 - (Make sure you've already built the relay by running `make`.)
 - Run the following:
@@ -324,6 +392,8 @@ If the relay starts up successfully, the following will be logged on your termin
 Relay Name: "Corda_Relay"
 RelayServer listening on [::1]:9081
 ```
+
+To run **corda relay in docker**, please refer [Running in Docker](#running-relay-in-docker). Steps are provided there.
 
 ### Corda Driver
 
