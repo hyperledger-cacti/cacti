@@ -230,5 +230,38 @@ test(testCase, async (t: Test) => {
       "Total Transaction Count of 3 recorded as expected. RESULT OK",
     );
   }
+
+  {
+    const res = await apiClient.runTransactionV1({
+      gatewayOptions: {
+        connectionProfile,
+        discovery: discoveryOptions,
+        eventHandlerOptions: {
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+          commitTimeout: 300,
+          endorseTimeout: 300,
+        },
+        identity: keychainEntryKey,
+        wallet: {
+          json: keychainEntryValue,
+        },
+      },
+      signingCredential,
+      channelName,
+      contractName,
+      invocationType: FabricContractInvocationType.Call,
+      methodName: "GetAllAssets",
+      params: [],
+    } as RunTransactionRequest);
+    t.ok(res);
+    t.ok(res.data);
+    t.equal(res.status, 200);
+    const assets = JSON.parse(res.data.functionOutput);
+    const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
+    t.ok(asset277, "Located Asset record by its ID OK");
+    t.ok(asset277.owner, `Asset object has "owner" property OK`);
+    t.equal(asset277.owner, assetOwner, `Asset has expected owner OK`);
+  }
+
   t.end();
 });
