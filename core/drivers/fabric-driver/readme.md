@@ -82,6 +82,8 @@ NOTE: When specifying ensure that they match the config that the relay is using.
 
 * Create a Personal Access Token with write, read, and delete packages access in github.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
+* Create a copy of `.npmrc.template` as `.npmrc`.
+* Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 * Run `make push-image` to build and push the image to github registry.
 
 
