@@ -10,22 +10,14 @@
 
 **NOTE:** Always publish to your fork first, and only after testing it well, then 
 before creating PR, publish it to `hyperledger-labs/weaver-dlt-interoperability`.
-To publish to your fork, modify in `build.gradle`:
+To publish to your fork, replace `<your-git-name>` with your github username in `artifactory.properties`:
 ```
 ...
-publishing {
-    publications {
-        ... (Don't change this block)
-    }
-	repositories {
-		maven {
-			url 'https://maven.pkg.github.com/<your-git-name>/weaver-dlt-interoperability'
-			...
-		}
-	}
-}
+url=https://maven.pkg.github.com/<your-git-name>/weaver-dlt-interoperability
 ```
 and then follow above 4 steps.
+
+**NOTE:** To change version, just modify it in `gradle.properties`.
 
 ## Steps to Use with Gradle:
 
