@@ -1,5 +1,7 @@
 .PHONY: build-local
 build-local:
+	echo "Building local protos..."
+	cd ../../../common/protos-java-kt && make build
 	cp clients/build.gradle.local clients/build.gradle
 	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
 	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
@@ -7,6 +9,8 @@ build-local:
 
 .PHONY: build-refresh-dependencies-local
 build-refresh-dependencies-local:
+	echo "Building local protos..."
+	cd ../../../common/protos-java-kt && make build
 	cp clients/build.gradle.local clients/build.gradle
 	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
 	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
@@ -14,6 +18,8 @@ build-refresh-dependencies-local:
 
 .PHONY: build-cordapp-local
 build-cordapp:-local
+	echo "Building local protos..."
+	cd ../../../common/protos-java-kt && make build
 	cp clients/build.gradle.local clients/build.gradle
 	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
 	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
@@ -21,6 +27,8 @@ build-cordapp:-local
 
 .PHONY: build-cli-local
 build-cli-local:
+	echo "Building local protos..."
+	cd ../../../common/protos-java-kt && make build
 	cp clients/build.gradle.local clients/build.gradle
 	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
 	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
@@ -28,6 +36,8 @@ build-cli-local:
 
 .PHONY: test-local
 test-local:
+	echo "Building local protos..."
+	cd ../../../common/protos-java-kt && make build
 	cp clients/build.gradle.local clients/build.gradle
 	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
 	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle

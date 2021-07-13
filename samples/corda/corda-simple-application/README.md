@@ -32,7 +32,12 @@ repository.
 make build-local
 ```
 
-## Building the CLI client and CorDapp using Dependencies in Artifactory
+## Building the CLI client and CorDapp using Dependencies in Github Packages
+
+1) Create a Personal Access Token from Github with read access to packages.
+2) Create a copy of `artifactory.properties.template` as `artifactory.properties`.
+3) Replace <GITHUB Email> with your email id for github.
+4) Replace <GITHUB Personal Access Token> with your personal access token.
 
 ```
 make build

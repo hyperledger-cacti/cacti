@@ -4,16 +4,6 @@ apply plugin: 'net.corda.plugins.quasar-utils'
 Properties constants = new Properties()
 file("$projectDir/../artifactory.properties").withInputStream { constants.load(it) }
 
-repositories {
-    maven {
-        url 'https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/'
-        credentials {
-            username constants.username
-            password constants.password
-        }
-    }
-}
-
 cordapp {
     targetPlatformVersion corda_platform_version
     minimumPlatformVersion corda_platform_version
@@ -72,23 +62,6 @@ task integrationTest(type: Test, dependsOn: []) {
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
-artifactory {
-    contextUrl = 'https://na.artifactory.swg-devops.com:443/artifactory/'
-
-    publish {
-        contextUrl = 'https://na.artifactory.swg-devops.com:443/artifactory/'
-        repository {
-            repoKey = 'res-dlt-interop-maven-local'
-            username = constants.username
-            password = constants.password
-            maven = true
-        }
-        defaults {
-            publications ('mavenJava')
-        }
-    }
-}
-
 publishing {
     publications {
         workflows(MavenPublication) {
@@ -100,7 +73,7 @@ publishing {
     }
     repositories {
         maven {
-            url 'https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/'
+            url constants.url
             credentials {
                 username constants.username
                 password constants.password

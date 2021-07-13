@@ -10,8 +10,8 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
-import com.cordaInteropApp.states.MembershipState
-import com.cordaInteropApp.flows.*
+import com.weaver.corda.app.interop.states.MembershipState
+import com.weaver.corda.app.interop.flows.*
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
