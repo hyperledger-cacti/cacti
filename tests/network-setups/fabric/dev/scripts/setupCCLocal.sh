@@ -17,7 +17,7 @@ fi
 cp -r ${INTEROP_CC_PATH} .
 
 cd fabric-interop-cc
-WEAVER_ROOT=$PWD/../../../../../.. make protos-local
+# WEAVER_ROOT=$PWD/../../../../../.. make protos-local
 cp -R contracts/interop ../interop
 
 echo "Done."
