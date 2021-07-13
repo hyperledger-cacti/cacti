@@ -362,7 +362,7 @@ for both them separately anyway:
   - A unit test:
 
       ```sh
-      npx tap --ts --timeout=600 packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.ts
+      npx tap --ts --timeout=600 packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts
       ```
 
 #### Running all test cases (unit+integration)
@@ -417,7 +417,7 @@ These produce the `hyperledger/cactus-besu-all-in-one` and
 `hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are
 used in the test cases that are written for the specific ledger connector
 plugins at:
-* `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
+* `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
 * `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.ts`
 
 The specific classes that utilize the `all-in-one` images can be found in the
@@ -444,7 +444,7 @@ container from scratch, execute the test scenario and then tear down and delete
 the container completely.
 
 An example for a ledger connector plugin and it's test automation implemented the way it is explained above:
-`packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
+`packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
 
 > This test case is also an example of how to run an ApiServer independently with a single ledger plugin which is
 > how the test case is set up to begin with.
@@ -462,7 +462,7 @@ chmod +x ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-ap
 You can run this test case the same way you would run any other test case (which is also a requirement in itself for each test case):
 
 ```sh
-npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts
+npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts
 ```
 
 You can specify an arbitrary set of test cases to run in a single execution via glob patterns. Examples of these glob
