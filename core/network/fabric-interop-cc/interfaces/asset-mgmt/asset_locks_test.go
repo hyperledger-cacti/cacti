@@ -21,7 +21,7 @@ import (
     "github.com/hyperledger/fabric-chaincode-go/shimtest"
     pb "github.com/hyperledger/fabric-protos-go/peer"
     "github.com/golang/protobuf/proto"
-    "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/protos-go/common"
+    "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
     am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
 )
 
