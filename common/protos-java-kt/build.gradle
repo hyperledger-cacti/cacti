@@ -3,7 +3,6 @@ buildscript {
     ext.protobuf_version = "3.11.1"
     ext.grpc_version = "1.29.0" // CURRENT_GRPC_VERSION
     ext.grpc_kotlin_version = "0.1.4" // CURRENT_GRPC_KOTLIN_VERSION
-	ext.release_version = "1.2.0"
 }
 
 plugins {
@@ -22,13 +21,6 @@ repositories {
 	maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
 	maven { url 'https://software.r3.com/artifactory/corda' }
 	maven { url 'https://jitpack.io' }
-	maven {
-		url 'https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability'
-		credentials {
-			username constants.username
-			password constants.password
-		}
-	}
 }
 
 dependencies {
@@ -84,18 +76,15 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 publishing {
     publications {
         protos(MavenPublication) {
-			groupId = 'com.weaver'
+			groupId = project.properties['group']
 			artifactId = 'protos-java-kt'
-            version = "${release_version}"
-            from components.java
-            artifact (sourcesJar) {
-                classifier = "sources"
-            }
+			version = project.properties['version']
+			from components.java
         }
     }
 	repositories {
 		maven {
-			url 'https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability'
+			url constants.url
 			credentials {
 				username constants.username
 				password constants.password

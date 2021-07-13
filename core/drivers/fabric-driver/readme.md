@@ -76,12 +76,14 @@ NOTE: When specifying ensure that they match the config that the relay is using.
 **For docker-compose:***
 
 * `DOCKER_IMAGE_NAME`, `DOCKER_TAG`, and `DOCKER_REGISTRY` needs to specified based on [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver) image.
-* `DOCKER_PORT` is the driver port to be exposed, and `EXTERNAL_NETWORK` is the docker network in which fabric-network is running. 
+* `DRIVER_PORT` is the driver server port, and `EXTERNAL_NETWORK` is the docker network in which fabric-network is running.
 
 ## Push Fabric Driver image to Github container registry
 
 * Create a Personal Access Token with write, read, and delete packages access in github.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
+* Create a copy of `.npmrc.template` as `.npmrc`.
+* Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 * Run `make push-image` to build and push the image to github registry.
 
 

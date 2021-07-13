@@ -1,4 +1,4 @@
-module github.com/hyperledger-labs/weaver-dlt-interoperability/protobuf/protos-go
+module github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
 
 go 1.16
 

@@ -8,6 +8,17 @@
 3) Replace <GITHUB Personal Access Token> with your personal access token.
 4) Run `make publish` to publish package to github packages.
 
+**NOTE:** Always publish to your fork first, and only after testing it well, then 
+before creating PR, publish it to `hyperledger-labs/weaver-dlt-interoperability`.
+To publish to your fork, replace `<your-git-name>` with your github username in `artifactory.properties`:
+```
+...
+url=https://maven.pkg.github.com/<your-git-name>/weaver-dlt-interoperability
+```
+and then follow above 4 steps.
+
+**NOTE:** To change version, just modify it in `gradle.properties`.
+
 ## Steps to Use with Gradle:
 
 1) Create a Personal Access Token from Github with read access to packages.
