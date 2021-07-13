@@ -17,6 +17,7 @@ buildscript {
         weaver_protos_version = "1.2.0"
         artifactory_username = ""
         artifactory_password = ""
+        artifactory_url = ""
     }
 
     repositories {

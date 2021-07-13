@@ -35,6 +35,10 @@ publish-workflows:
 	# cp interop-workflows/build.gradle.remote interop-workflows/build.gradle
 	echo "Publishing interop workflows to Artifactory..."
 	./gradlew publishWorkflowsPublicationToMavenRepository
+	
+.PHONY: test
+test:
+	./gradlew test
 
 .PHONY: clean-local
 clean-local:

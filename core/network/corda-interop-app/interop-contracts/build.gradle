@@ -56,7 +56,7 @@ publishing {
     }
     repositories {
         maven {
-            url 'https://maven.pkg.github.com/sanvenDev/weaver-dlt-interoperability'
+            url artifactory_url
             credentials {
                 username artifactory_username
                 password artifactory_password

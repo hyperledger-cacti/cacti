@@ -19,6 +19,7 @@ buildscript {
         weaver_protos_version = "1.2.0"
         artifactory_username = constants.getProperty("username")
         artifactory_password = constants.getProperty("password")
+        artifactory_url = constants.getProperty("url")
     }
 
     repositories {
