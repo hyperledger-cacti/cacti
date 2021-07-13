@@ -17,7 +17,7 @@ build-refresh-dependencies-local:
 	./gradlew clean build --refresh-dependencies
 
 .PHONY: build-cordapp-local
-build-cordapp:-local
+build-cordapp-local:
 	echo "Building local protos..."
 	cd ../../../common/protos-java-kt && make build
 	cp clients/build.gradle.local clients/build.gradle

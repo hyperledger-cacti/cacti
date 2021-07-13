@@ -72,8 +72,8 @@ and then follow above 4 steps.
 1) Create a Personal Access Token from Github with read access to packages.
 2) Create a copy of `artifactory.properties.template` as `artifactory.properties`.
 3) Replace <GITHUB Email> with your email id for github.
-3) Replace <GITHUB Personal Access Token> with your personal access token.
-4) Add this to your build.gradle (change the version accordingly):
+4) Replace <GITHUB Personal Access Token> with your personal access token.
+5) Add this to your build.gradle (change the version accordingly):
 ```
 dependencies {
 	compile(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "1.2.0")
