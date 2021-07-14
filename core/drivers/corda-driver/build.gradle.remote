@@ -9,7 +9,7 @@ buildscript {
     ext.corda_version = "4.4"
     ext.corda_core_version = "4.4"
     ext.arrow_version = "0.10.4"
-    ext.interop_app_version = "1.2.0"
+    ext.weaver_version = "1.2.+"
 
     repositories {
         mavenCentral()
@@ -37,7 +37,7 @@ repositories {
     mavenLocal()
     maven { url 'https://software.r3.com/artifactory/corda' }
     maven {
-        url 'https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/'
+        url 'https://maven.pkg.github.com/sanvenDev/weaver-dlt-interoperability'
         credentials {
             username constants.username
             password constants.password
@@ -69,9 +69,10 @@ dependencies {
     implementation "net.corda:corda:4.4"
     implementation "net.corda:corda-rpc:4.4"
 
-    implementation(group: 'com.cordaInteropApp', name: 'interop-contracts', version: "$interop_app_version")
-    implementation(group: 'com.cordaInteropApp', name: 'interop-workflows', version: "$interop_app_version")
-
+    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_version")
+    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_version")
+    implementation(group: 'com.weaver', name: 'protos-java-kt', version: "$weaver_version")
+    
     // gRPC and protobuf dependencies
     implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"
     implementation "com.google.protobuf:protobuf-java:$protobuf_version"
@@ -97,31 +98,31 @@ dokka {
     outputDirectory = "$buildDir/dokka"
 }
 
-protobuf {
-    protoc { artifact = "com.google.protobuf:protoc:$protobuf_version" }
-    plugins {
-        // Specify protoc to generate using kotlin protobuf plugin
-        grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version"
-        }
-        // Specify protoc to generate using our grpc kotlin plugin
-        grpckt {
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpc_kotlin_version"
-        }
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.plugins {
-                // Generate Java gRPC classes
-                grpc { }
-                // Generate Kotlin gRPC using the custom plugin from library
-                grpckt { }
-            }
-        }
-    }
-}
+// protobuf {
+//     protoc { artifact = "com.google.protobuf:protoc:$protobuf_version" }
+//     plugins {
+//         // Specify protoc to generate using kotlin protobuf plugin
+//         grpc {
+//             artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version"
+//         }
+//         // Specify protoc to generate using our grpc kotlin plugin
+//         grpckt {
+//             artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpc_kotlin_version"
+//         }
+//     }
+//     generateProtoTasks {
+//         all().each { task ->
+//             task.plugins {
+//                 // Generate Java gRPC classes
+//                 grpc { }
+//                 // Generate Kotlin gRPC using the custom plugin from library
+//                 grpckt { }
+//             }
+//         }
+//     }
+// }
 
-mainClassName = "com.cordaDriver.CordaDriverKt"
+mainClassName = "com.weaver.corda.driver.CordaDriverKt"
 
 tasks.test {
     useJUnitPlatform()

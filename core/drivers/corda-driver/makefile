@@ -1,5 +1,10 @@
 .PHONY: build-local
 build-local:
+	echo "Building Protos..."
+	cd ../../../common/protos-java-kt && make build
+	echo "Building corda-interop-app..."
+	cd ../../network/corda-interop-app && make build-local
+	echo "Building Driver..."
 	cp build.gradle.local build.gradle
 	./gradlew clean installDist
 
@@ -21,3 +26,7 @@ build-refresh-dependencies:
 .PHONY: run
 run:
 	./build/install/corda-driver/bin/corda-driver
+	
+.PHONY: clean
+clean:
+	./gradlew clean

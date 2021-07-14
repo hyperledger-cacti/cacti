@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaDriver
+package com.weaver.corda.driver
 
 import arrow.core.*
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.list.traverse.traverse
-import com.cordaInteropApp.flows.HandleExternalRequest
+import com.weaver.corda.app.interop.flows.HandleExternalRequest
 import com.google.gson.Gson
 import net.corda.core.messaging.startFlow
 import common.query.QueryOuterClass
