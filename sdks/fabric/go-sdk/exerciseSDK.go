@@ -53,6 +53,21 @@ func connectSimpleAssetWithSDK(assetId string) {
 	if err != nil {
 		log.Fatalf("failed Query with error: %+v", err)
 	}
+
+	err = helpers.Invoke(contractU1, "CreateTokenAssetType", "token1", "Central Bank", "1")
+	if err != nil {
+		log.Fatalf("failed Invoke with error: %+v", err)
+	}
+
+	err = helpers.Invoke(contractU1, "IssueTokenAssets", "token1", "5", "User1")
+	if err != nil {
+		log.Fatalf("failed Invoke with error: %+v", err)
+	}
+
+	err = helpers.Query(contractU1, "GetBalance", "token1", "User1")
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
 }
 
 func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
@@ -148,21 +163,21 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 		log.Fatalf("failed Query with error: %+v", err)
 	}
 
-	log.Println("Going to query if asset is locked using locker ..")
+	log.Println("Locker going to query if asset is locked ..")
 	result, err = am.IsAssetLockedInHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
 		// It's possible that the time elapses hence the query fails. So don't use log.Fatalf so that we can proceed to unlock
 		log.Printf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
-	log.Println("Going to query if asset is locked using recipient ..")
+	log.Println("Recipient going to query if asset is locked ..")
 	result, err = am.IsAssetLockedInHTLC(contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
 		log.Printf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 
-	log.Println("Going to unlock/reclaim a locked asset using recipient ..")
+	log.Println("Locker going to unlock/reclaim a locked asset ..")
 	result, err = am.ReclaimAssetInHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
 	if err != nil {
 		log.Fatalf("failed ReclaimAssetInHTLC with error: %+v", err)
@@ -175,9 +190,170 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 
 }
 
+func testLockAssetAndClaimAssetOfTokenAsset() {
+
+	assetType := "token1"
+	numUnits := uint64(5)
+	contractU1, idU1, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com")
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+	contractU2, idU2, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com")
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+
+	fmt.Println("Going to create token assets: ", numUnits)
+	err = helpers.Invoke(contractU2, "IssueTokenAssets", assetType, "6", base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Invoke with error: %+v", err)
+	}
+	log.Println("Query the token balance for locker after issueance ..")
+	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+	preimage := "abcd"
+	hashBase64 := am.GenerateSHA256HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+	expiryTimeSecs := currentTimeSecs + 600
+
+	log.Println("Going to lock asset by locker ..")
+	result, err := am.CreateFungibleHTLC(contractU2, assetType, numUnits, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	if err != nil {
+		log.Fatalf("failed CreateFungibleHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	contractId := result
+	log.Println("Query the token balance for locker before claim ..")
+	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+	log.Println("Query the token balance for recipient before claim ..")
+	err = helpers.Query(contractU1, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+	log.Println("Locker going to query if asset is locked ..")
+	result, err = am.IsFungibleAssetLockedInHTLC(contractU2, contractId)
+	if err != nil {
+		log.Fatalf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	log.Println("Recipient going to query if asset is locked ..")
+	result, err = am.IsFungibleAssetLockedInHTLC(contractU1, contractId)
+	if err != nil {
+		log.Fatalf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
+	}
+	log.Println(result)
+
+	log.Println("Going to claim a locked asset by recipient ..")
+	result, err = am.ClaimFungibleAssetInHTLC(contractU1, contractId, base64.StdEncoding.EncodeToString([]byte(preimage)))
+	if err != nil {
+		log.Fatalf("failed ClaimAssetInHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	log.Println("Query the token balance for locker after claim..")
+	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+	log.Println("Query the token balance for recipient after claim..")
+	err = helpers.Query(contractU1, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+}
+
+func testLockAssetAndUnlockAssetOfTokenAsset() {
+
+	assetType := "token1"
+	numUnits := uint64(5)
+	contractU1, idU1, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com")
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+	contractU2, idU2, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com")
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+
+	fmt.Println("Going to create token assets: ", numUnits)
+	err = helpers.Invoke(contractU2, "IssueTokenAssets", assetType, "6", base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Invoke with error: %+v", err)
+	}
+	log.Println("Query the token balance for locker after issueance ..")
+	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+	preimage := "abcd"
+	hashBase64 := am.GenerateSHA256HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+	expiryTimeSecs := currentTimeSecs + 1
+
+	log.Println("Going to lock asset by locker ..")
+	result, err := am.CreateFungibleHTLC(contractU2, assetType, numUnits, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	if err != nil {
+		log.Fatalf("failed CreateFungibleHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	contractId := result
+	log.Println("Query the token balance for locker before claim ..")
+	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+	log.Println("Query the token balance for recipient before claim ..")
+	err = helpers.Query(contractU1, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+	log.Println("Locker going to query if asset is locked ..")
+	result, err = am.IsFungibleAssetLockedInHTLC(contractU2, contractId)
+	if err != nil {
+		log.Printf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	log.Println("Recipient going to query if asset is locked ..")
+	result, err = am.IsFungibleAssetLockedInHTLC(contractU1, contractId)
+	if err != nil {
+		log.Printf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
+	}
+	log.Println(result)
+
+	log.Println("Locker going to unlock/reclaim a locked asset ..")
+	result, err = am.ReclaimFungibleAssetInHTLC(contractU2, contractId)
+	if err != nil {
+		log.Fatalf("failed ReclaimFungibleAssetInHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	log.Println("Query the token balance for locker after claim..")
+	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+	log.Println("Query the token balance for recipient after claim..")
+	err = helpers.Query(contractU1, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+}
+
 func main() {
 	connectSimpleStateWithSDK()
 	connectSimpleAssetWithSDK("a001")
 	testLockAssetAndClaimAssetOfBondAsset("a040")
 	testLockAssetAndUnlockAssetOfBondAsset("a041")
+
+	testLockAssetAndClaimAssetOfTokenAsset()
+	testLockAssetAndUnlockAssetOfTokenAsset()
 }
