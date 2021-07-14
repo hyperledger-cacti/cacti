@@ -312,6 +312,7 @@ Configure `fabric-driver` as follows:
   * The `CONNECTION_PROFILE` should point to the absolute path of the connection profile.
     - For this exercise, specify the path `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json` for network1 and `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json` for network2 (_you must specify the full absolute path here_).
     - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
+  * `DRIVER_CONFIG`: Path to driver config file. Keep it unchanged for testnet demo.
   * `RELAY_ENDPOINT`: change it to point to correct relay. e.g. `relay-network1:9080` for network1, and `relay-network2:9083` for network2 if deployed in docker.
   * `NETWORK_NAME`: Network name. e.g. network1 or network2
   * `DRIVER_PORT`: Server port for the driver. e.g. `9090` for network and `9095` for network2.
