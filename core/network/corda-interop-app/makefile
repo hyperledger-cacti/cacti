@@ -1,6 +1,7 @@
 .PHONY: build-local
 build-local:
-	# echo "Calling update-protos-local script..."
+	echo "Building protos locally..."
+	cd ../../../common/protos-java-kt && make build
 	# ./scripts/update-protos-local.sh
 	# echo "Successfully updated protos, compiling Kotlin from protos and compiling the client..."
 	cp build.gradle.local build.gradle
