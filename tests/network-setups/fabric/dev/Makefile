@@ -2,6 +2,7 @@ FABRIC_VERSION=2.1.0
 FABRIC_CA_VERSION=1.4.7
 FABRIC_COUCH_VERSION=0.4.20
 CHAINCODE_NAME?=simplestate
+NW?=network1
 
 .PHONY:	all
 all: start
@@ -47,6 +48,11 @@ setup-interop-cc:
 .PHONY: setup-cc
 setup-cc:
 	./scripts/setupAppCC.sh $(CHAINCODE_NAME)
+
+.PHONY: deploy-cc
+deploy-cc:
+	./scripts/setupAppCC.sh $(CHAINCODE_NAME)
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw $(NW)
 
 
 .fabric-setup:
