@@ -57,17 +57,17 @@ The driver could be improved to have a way to revoke the prexisting identity in 
 
 ## Environment variables
 
-The connection profile is required to set up the required material to communicate with the network. This should be supplied with the `CONNECTION_PROFILE` environeent variable (ex: CONNECTION_PROFILE=path/to/con_profile.json)
+The connection profile is required to set up the required material to communicate with the network. This should be supplied with the `CONNECTION_PROFILE` environment variable (ex: CONNECTION_PROFILE=path/to/con_profile.json)
 
-Port for connecting relay: `RELAY_ENDPOINT` (ex: RELAY_ENDPOINT=localhost:9081 )
+`<Hostname>:<Port>` for connecting relay: `RELAY_ENDPOINT` (ex: RELAY_ENDPOINT=localhost:9081 )
 
 Boolean for when to use mocked fabric communication: `MOCK` (ex: MOCK=true)
 
-Port for the driver to be run on: `DRIVER_ENDPOINT` (ex: DRIVER_ENDPOINT=localhost:9093)
+`<Hostname>:<Port>` for the driver to be run on: `DRIVER_ENDPOINT` (ex: DRIVER_ENDPOINT=localhost:9093) (Not required for docker)
 
 Can pass in a variable 'local' for working with fabric and docker: `local` (ex: local=false)
 
-Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DRIVER_CONFIG=../custom_config.json)
+Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DRIVER_CONFIG=./config.json)
 
 `INTEROP_CHAINCODE` stores the name of the interop chaincode installed.
 
@@ -76,7 +76,8 @@ NOTE: When specifying ensure that they match the config that the relay is using.
 **For docker-compose:***
 
 * `DOCKER_IMAGE_NAME`, `DOCKER_TAG`, and `DOCKER_REGISTRY` needs to specified based on [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver) image.
-* `DRIVER_PORT` is the driver server port, and `EXTERNAL_NETWORK` is the docker network in which fabric-network is running.
+* `DRIVER_PORT` is the driver server port.
+* `EXTERNAL_NETWORK` is the docker network in which fabric-network is running.
 
 ## Push Fabric Driver image to Github container registry
 
