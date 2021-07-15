@@ -77,8 +77,6 @@ repositories {
         }
     }
     flatDir {
-        dirs '../../../core/network/corda-interop-app/interop-contracts/build/libs'
-        dirs '../../../core/network/corda-interop-app/interop-workflows/build/libs'
         dirs '../../../samples/corda/corda-simple-application/contracts-kotlin/build/libs'
         dirs '../../../samples/corda/corda-simple-application/workflows-kotlin/build/libs'
     }
