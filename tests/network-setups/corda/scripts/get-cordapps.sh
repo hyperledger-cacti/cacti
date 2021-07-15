@@ -32,6 +32,9 @@ cp $directory/../../../../samples/corda/corda-simple-application/workflows-kotli
 
 if [[ $1 == "local" ]]; then
   echo "Copying Corda Interop App..."
+  cd $directory/../../../../core/network/corda-interop-app
+  make build-local
+  cd -
   cp $directory/../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$interopAppVersion.jar $directory/../artifacts
   cp $directory/../../../../core/network/corda-interop-app/interop-workflows/build/libs/interop-workflows-$interopAppVersion.jar $directory/../artifacts
 else
