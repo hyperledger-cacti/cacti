@@ -1,81 +1,78 @@
-.PHONY: build-local
-build-local:
+.PHONY: build-local-weaver-dependencies
+build-local-weaver-dependencies:
 	echo "Building local protos..."
 	cd ../../../common/protos-java-kt && make build
+	echo "Building corda interop app..."
+	cd ../../../core/network/corda-interop-app && make build-local
+	
+.PHONY: build-local	
+build-local: build-local-weaver-dependencies
 	cp clients/build.gradle.local clients/build.gradle
-	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies-local
-build-refresh-dependencies-local:
-	echo "Building local protos..."
-	cd ../../../common/protos-java-kt && make build
+build-refresh-dependencies-local: build-local-weaver-dependencies
 	cp clients/build.gradle.local clients/build.gradle
-	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
 	./gradlew clean build --refresh-dependencies
 
 .PHONY: build-cordapp-local
-build-cordapp-local:
-	echo "Building local protos..."
-	cd ../../../common/protos-java-kt && make build
+build-cordapp-local: build-local-weaver-dependencies
 	cp clients/build.gradle.local clients/build.gradle
-	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
 	./gradlew jar
 
 .PHONY: build-cli-local
-build-cli-local:
-	echo "Building local protos..."
-	cd ../../../common/protos-java-kt && make build
+build-cli-local: build-local-weaver-dependencies
 	cp clients/build.gradle.local clients/build.gradle
-	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
 	./gradlew installDist
 
 .PHONY: test-local
-test-local:
-	echo "Building local protos..."
-	cd ../../../common/protos-java-kt && make build
+test-local: build-local-weaver-dependencies
 	cp clients/build.gradle.local clients/build.gradle
-	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
 	./gradlew test
 
 .PHONY: build
 build:
 	cp clients/build.gradle.remote clients/build.gradle
-	cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies
 build-refresh-dependencies:
 	cp clients/build.gradle.remote clients/build.gradle
-	cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
 	./gradlew clean build --refresh-dependencies
 
 .PHONY: build-cordapp
 build-cordapp:
 	cp clients/build.gradle.remote clients/build.gradle
-	cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
 	./gradlew jar
 
 .PHONY: build-cli
 build-cli:
 	cp clients/build.gradle.remote clients/build.gradle
-	cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
 	./gradlew installDist
 
 .PHONY: test
 test:
 	cp clients/build.gradle.remote clients/build.gradle
-	cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
 	./gradlew test
 
 .PHONY: initialise-vault
@@ -107,13 +104,13 @@ publish-cordapps:
 .PHONY: clean-local
 clean-local:
 	cp clients/build.gradle.local clients/build.gradle
-	cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
 	./gradlew clean
 
 .PHONY: clean
 clean:
 	cp clients/build.gradle.remote clients/build.gradle
-	cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
-	cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
+	# cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
+	# cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
 	./gradlew clean
