@@ -68,7 +68,8 @@ Before starting, make sure you have the following software installed on your hos
 ### Credentials
 Make sure you have an SSH or GPG key registered in https://github.com to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the `https://` prefix but this may change to `git@` in the future).
 
-**Note:** Create a personal access token with `read:packages` accesss in github in order to use modules published in github packages.
+#### Package Access Token:
+Create a personal access token with `read:packages` accesss in github in order to use modules published in github packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 
 ## Getting the Code and Documentation
 
@@ -80,11 +81,11 @@ Using the sequence of instructions below, you can start two separate Fabric netw
 
 ### Fabric Interoperation Node SDK
 
-A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the `sdks/fabric/interoperation-node-sdk` folder. This contains functions for Fabric Gateway-based applications to exercise interoperation capabilities via relays and also a number of utility/helper functions. The Fabric-CLI tool, which we will use later, depends on this library.
+A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the `sdks/fabric/interoperation-node-sdk` folder. This contains functions for Fabric Gateway-based applications to exercise interoperation capabilities via relays and also a number of utility/helper functions. The Fabric-CLI tool, which we will use later, depends on this library. This library is published as github packages here: [hyperledger-labs packages](https://github.com/orgs/hyperledger-labs/packages), thus it is **not required** to build this library for the testnet demo.
 
 (OPTIONAL) To build the library, do the following:
 - Navigate to the `sdks/fabric/interoperation-node-sdk` folder.
-- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
+- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token).
 - Run the following command:
   ```bash
   make build-local
@@ -129,7 +130,7 @@ _Note_: The setup and running instructions below were tested with all Node.js ve
 
 You can install `fabric-cli` as follows:
 - Navigate to the `samples/fabric/fabric-cli` folder.
-- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
+- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
 - Run the following to install dependencies:
   ```bash
   npm install
@@ -246,7 +247,7 @@ Navigate to the `core/relay` folder and Run a relay as follows:
     * `DRIVER_HOST`: Hostname/IP for driver. e.g. `fabric-driver-network1` for fabric network1, `fabric-driver-network2` for fabric network2, and `localhost` for corda network. 
     * `NETWORK_NAME`: Name of network. e.g. `network1` for fabric network1, `network2` for fabric network2, and `Corda_Network` for corda network.
     * `NETWORK_TYPE`: Type of network. e.g. `Fabric` or `Corda`.
-    * `PATH_TO_REMOTE_RELAYS_DEFINITIONS`: Keep it `./docker/remote-relay-dns-config`.
+    * `PATH_TO_REMOTE_RELAYS_DEFINITIONS`: Stores path to directory with file named `relays.toml`, which stores DNS information of remote relays. Keep it `./docker/remote-relay-dns-config`.
     * `EXTERNAL_NETWORK`: Docker bridge network name. e.g. `network1_net` for fabric network1 in our testnet, `network2_net` for fabric network2, and `corda_default` for corda network.
     * `DOCKER_REGISTRY`: Keep it same as in template.
     * `DOCKER_IMAGE_NAME`: Keep it same as in template.
@@ -314,7 +315,7 @@ Configure `fabric-driver` as follows:
   * The `CONNECTION_PROFILE` should point to the absolute path of the connection profile.
     - For this exercise, specify the path `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json` for network1 and `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json` for network2 (_you must specify the full absolute path here_).
     - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
-  * `DRIVER_CONFIG`: Path to driver config file. Keep it unchanged for testnet demo.
+  * `DRIVER_CONFIG`: Path to driver config file. e.g. `./config.json` for our testnet.
   * `RELAY_ENDPOINT`: change it to point to correct relay. e.g. `relay-network1:9080` for network1, and `relay-network2:9083` for network2 if deployed in docker.
   * `NETWORK_NAME`: Network name. e.g. network1 or network2
   * `DRIVER_PORT`: Server port for the driver. e.g. `9090` for network and `9095` for network2.
@@ -339,7 +340,7 @@ Using the sequence of instructions below, you can start a Corda network and run 
 
 The interoperation Cordapp is deployed to run as part of any Corda application flow that involves cross-network interoperation.
 
-Build the interoperation Cordapp as follows:
+(OPTIONAL) Build the interoperation Cordapp as follows:
 - Navigate to the `core/network/corda-interop-app` folder.
 - Run the following to create the JAR files on which other Corda network components will depend on:
   ```bash
@@ -351,7 +352,7 @@ Build the interoperation Cordapp as follows:
 This is a simple Cordapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 The code for this lies in the `samples/corda/corda-simple-application` folder.
 
-#### Building
+#### (OPTIONAL) Building
 
 Build the `corda-simple-application` Cordapp as follows:
 - Navigate to the `samples/corda/corda-simple-application` folder.
@@ -364,7 +365,7 @@ Build the `corda-simple-application` Cordapp as follows:
 
 The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary.
 
-#### Running
+#### Running with Local Interoperation Cordapp
 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
@@ -372,6 +373,17 @@ Follow the instructions below to build and launch the network:
   ```bash
   make start-local
   ```
+  
+#### Running with Interoperation Cordapp from Github Packages.
+
+Follow the instructions below to build and launch the network:
+- Navigate to the `tests/network-setups/corda` folder.
+- Create copy of `artifactory.properties.template` as `artifactory.properties`.
+- Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
+- To spin up the Corda network with the interoperation Cordapp, run:
+    ```bash
+    make start
+    ```
 
 If the Corda node and notary start up successfully, you should something like the following:
 

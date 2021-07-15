@@ -154,7 +154,7 @@ First **login** to github container registry:
 * Copy `.env.template` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
     * PATH_TO_CONFIG: Path to the relay's config file. e.g. `./config/Fabric_Relay.toml`.
-    * RELAY_NAME: Keep it same as in relay config file.
+    * RELAY_NAME: Keep it same as in relay config file. Same is used for container name.
     * RELAY_PORT: Port for grpc relay server.
     * EXTERNAL_NETWORK: Docker bridge network name.
     * DOCKER_REGISTRY: Keep it same as in template.
@@ -169,14 +169,14 @@ First **login** to github container registry:
 
 * Copy `.env.template.2` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
-    * RELAY_NAME: Name for the relay.
+    * RELAY_NAME: Name for the relay. Same is used for container name.
     * RELAY_PORT: Port for grpc relay server.
     * DRIVER_NAME: Driver host name.
     * DRIVER_PORT: Port for driver.
     * DRIVER_HOST: Hostname/IP for driver.
     * NETWORK_NAME: Name of network it will be attached to (should be same as used in relay requests arguments.)
     * NETWORK_TYPE: Type of network. e.g. `Fabric` or `Corda`.
-    * PATH_TO_REMOTE_RELAYS_DEFINITIONS: Keep it `./docker/remote-relay-dns-config`.
+    * PATH_TO_REMOTE_RELAYS_DEFINITIONS: Should be path to a directory which stores `relays.toml`, which contains DNS information regarding remote relays. Refer [./docker/remote-relay-dns-config](./docker/remote-relay-dns-config) for example.
     * EXTERNAL_NETWORK: Docker bridge network name.
     * DOCKER_REGISTRY: Keep it same as in template.
     * DOCKER_IMAGE_NAME: Keep it same as in template.
