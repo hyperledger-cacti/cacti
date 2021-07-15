@@ -36,4 +36,4 @@ stop:
 .PHONY: clean
 clean:	stop
 	./gradlew clean
-	rm artifacts/*.jar
+	rm artifacts/*.jar || true

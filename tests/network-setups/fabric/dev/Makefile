@@ -83,7 +83,8 @@ remove-network2:
 
 .PHONY: clean
 clean:	stop
-	+rm -rf bin
-	+rm -rf config
-	+rm .fabric-setup
+	+rm -rf bin || true
+	+rm -rf config || true
+	+rm .fabric-setup || true
+	+chmod -R 755 ../shared/chaincode/interop
 	+rm -rf ../shared/chaincode/*
