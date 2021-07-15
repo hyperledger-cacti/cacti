@@ -1,4 +1,4 @@
-module github.com/sanvenDev/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
+module github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
 
 go 1.16
 

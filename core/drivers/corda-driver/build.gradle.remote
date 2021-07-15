@@ -37,7 +37,7 @@ repositories {
     mavenLocal()
     maven { url 'https://software.r3.com/artifactory/corda' }
     maven {
-        url 'https://maven.pkg.github.com/sanvenDev/weaver-dlt-interoperability'
+        url 'https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability'
         credentials {
             username constants.username
             password constants.password

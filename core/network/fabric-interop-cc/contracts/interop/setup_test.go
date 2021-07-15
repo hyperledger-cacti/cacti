@@ -17,7 +17,7 @@ import (
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
-	"github.com/sanvenDev/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/mocks"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/mocks"
 )
 
 const (
