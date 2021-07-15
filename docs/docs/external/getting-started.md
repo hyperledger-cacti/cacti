@@ -47,10 +47,11 @@ Before starting, make sure you have the following software installed on your hos
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Rust: [sample instructions](https://www.rust-lang.org/tools/install)
 - Protoc (Protobuf compiler): _Golang should already be installed and configured._
-  * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugin.
+  * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugins.
     ```
     apt-get install protobuf-compiler
     go get -u google.golang.org/protobuf/cmd/protoc-gen-go
+    go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
     ```
   * If the above method installs an older version of `protoc` (check using `protoc --version`), say below 3.12.x, you should download pre-compiled binaries instead. (With an older version, you may see errors while attempting to launch and setup the Fabric networks).
     ```
@@ -60,6 +61,7 @@ Before starting, make sure you have the following software installed on your hos
     unzip protoc-3.15.6-linux-x86_64.zip -d <some-folder-path>
     export PATH="$PATH:<some-folder-path>/bin"
     go get -u google.golang.org/protobuf/cmd/protoc-gen-go
+    go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
     ```
     _Note_: The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps.
 
