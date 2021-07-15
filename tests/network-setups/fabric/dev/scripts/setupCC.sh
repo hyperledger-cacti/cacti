@@ -1,7 +1,7 @@
 directory=$(dirname $0)
 
-TMP_PATH=$directory/../../../fabric/shared/tmp
-CHAINCODE_PATH=$directory/../../../fabric/shared/chaincode
+TMP_PATH=$PWD/../shared/tmp
+CHAINCODE_PATH=$PWD/../shared/chaincode
 
 # interop cc module
 INTEROPCC_MOD=github.com/sanvenDev/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
