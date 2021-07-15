@@ -1,8 +1,5 @@
 .PHONY: start
 start:
-	echo "Building Simple App..."
-	cp
-	cd ../../../samples/corda/corda-simple-application/ && make build
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh
 	./scripts/start-nodes.sh
