@@ -16,7 +16,7 @@ buildscript {
         slf4j_version = constants.getProperty("slf4jVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         arrow_version = constants.getProperty("arrowVersion")
-        weaver_version = "1.2.+"
+        weaver_version = constants.getProperty("weaverVersion")
         artifactory_username = constants.getProperty("username")
         artifactory_password = constants.getProperty("password")
         artifactory_url = constants.getProperty("url")
