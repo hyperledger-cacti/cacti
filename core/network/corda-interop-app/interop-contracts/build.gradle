@@ -42,7 +42,7 @@ dependencies {
     implementation "com.google.protobuf:protobuf-java-util:$protobuf_version"
     
     // weaver-protos
-    compile "com.weaver:protos-java-kt:$weaver_protos_version"
+    compile "com.weaver:protos-java-kt:$weaver_version"
 }
 
 publishing {
