@@ -41,7 +41,8 @@ setup-interop-network2: setup-interop-cc
 
 .PHONY: setup-interop-cc
 setup-interop-cc:
-	./scripts/setupCCLocal.sh
+	# ./scripts/setupCCLocal.sh
+	./scripts/setupCC.sh
 
 .PHONY: setup-cc
 setup-cc:
