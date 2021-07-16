@@ -1,7 +1,7 @@
 DOCKER_IMAGE_NAME ?= weaver-corda-driver
-DOCKER_TAG ?= 1.2.1
+DOCKER_TAG ?= 1.2.0
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
-GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/fabric-driver
+GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/corda-driver
 
 .PHONY: build-local
 build-local:

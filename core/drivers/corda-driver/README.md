@@ -81,6 +81,7 @@ To push image to github container registry:
 * Create a Personal Access Token with read packages access in github.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Run: `make deploy`.
+* To stop, run: `docker-compose down`
 
 ## Documentation
 
