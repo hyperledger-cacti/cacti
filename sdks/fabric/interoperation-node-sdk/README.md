@@ -42,6 +42,16 @@ Run `npm run docs` to generate docs. View docs via the generated html file.
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 4) Run `npm publish` to publish package to github packages.
 
+**NOTE:** Always publish to your fork first, and only after testing it well, then 
+after PR approval, publish it to `hyperledger-labs/weaver-dlt-interoperability`.
+To publish to your fork, modify in `package.json`:
+```
+...
+"publishConfig": {
+  "registry": "https://npm.pkg.github.com/<your-git-name>"
+}
+```
+
 NOTE:- Github Packages won't allow you to update the package if same version exists,
 you have to delete the package version (requires admin access) before publishing an update on the same package version.
 

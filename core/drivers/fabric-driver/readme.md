@@ -87,6 +87,7 @@ NOTE: When specifying ensure that they match the config that the relay is using.
 * Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 * Run `make push-image` to build and push the image to github registry.
 
+**NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
 
 ## Known Issues
 

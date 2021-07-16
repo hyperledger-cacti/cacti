@@ -51,6 +51,24 @@ The driver gRPC server will be listening on port `9099`.
 By default, the driver gRPC server listens on port `9099`. To change the port, set 
 the `DRIVER_PORT` as an environment variable. 
 
+## Docker
+
+To build image, run:
+```
+make image
+```
+
+To push image to github container registry:
+
+* Create a Personal Access Token with write, read, and delete packages access in github.
+* Run `docker login ghcr.io` and use your github username and personal access token as password.
+* Create a copy of `artifactory.properties.template` as `artifactory.properties`.
+* Replace <GITHUB Email> with your email id for github.
+* Replace <GITHUB Personal Access Token> with your personal access token.
+* Run `make push-image` to build and push the image to github registry.
+
+**NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
+
 ## Documentation
 
 This repo uses `Dokka` to auto-generate the Kotlin code documentation. To
