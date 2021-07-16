@@ -12,7 +12,7 @@
     "dist/*"
   ],
   "scripts": {
-    "start" : "CONFIG_FILE=./example-config.json node dist/lib/main/typescript/carbon-accounting-app-cli.js",
+    "start": "CONFIG_FILE=./example-config.json node dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "solidity": "hardhat compile",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",

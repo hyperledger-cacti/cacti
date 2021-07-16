@@ -21,8 +21,7 @@
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
-  "watch": {
-  },
+  "watch": {},
   "publishConfig": {
     "access": "public"
   },
