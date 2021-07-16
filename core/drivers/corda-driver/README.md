@@ -69,6 +69,19 @@ To push image to github container registry:
 
 **NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
 
+### Docker-compose Deployment
+
+* Copy `.env.docker.template` to `.env`
+    - `NETWORK_NAME`: Used as suffix to corda-driver container name, i.e. `corda-driver-<network-name>` will be the name of container.
+    - `DRIVER_PORT`: Driver server port.
+    - `EXTERNAL_NETWORK`: is the docker network in which corda-network is running.
+    - `DOCKER_IMAGE_NAME`: Keep it same.
+    - `DOCKER_TAG`: Refer here for the image tags available: [weaver-corda-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-corda-driver)
+    - `DOCKER_REGISTRY`: Keep it same. (replace `hyperledger-labs` with your git username if testing from your fork)
+* Create a Personal Access Token with read packages access in github.
+* Run `docker login ghcr.io` and use your github username and personal access token as password.
+* Run: `make deploy`.
+
 ## Documentation
 
 This repo uses `Dokka` to auto-generate the Kotlin code documentation. To

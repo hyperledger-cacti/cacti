@@ -37,7 +37,7 @@ repositories {
     mavenLocal()
     maven { url 'https://software.r3.com/artifactory/corda' }
     maven {
-        url 'https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability'
+        url constants.url
         credentials {
             username constants.username
             password constants.password
@@ -98,29 +98,6 @@ dokka {
     outputDirectory = "$buildDir/dokka"
 }
 
-// protobuf {
-//     protoc { artifact = "com.google.protobuf:protoc:$protobuf_version" }
-//     plugins {
-//         // Specify protoc to generate using kotlin protobuf plugin
-//         grpc {
-//             artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version"
-//         }
-//         // Specify protoc to generate using our grpc kotlin plugin
-//         grpckt {
-//             artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpc_kotlin_version"
-//         }
-//     }
-//     generateProtoTasks {
-//         all().each { task ->
-//             task.plugins {
-//                 // Generate Java gRPC classes
-//                 grpc { }
-//                 // Generate Kotlin gRPC using the custom plugin from library
-//                 grpckt { }
-//             }
-//         }
-//     }
-// }
 
 mainClassName = "com.weaver.corda.driver.CordaDriverKt"
 

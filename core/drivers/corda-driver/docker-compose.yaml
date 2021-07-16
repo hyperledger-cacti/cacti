@@ -7,13 +7,15 @@
 version: '2'
 services:
   corda-driver:
-    image: corda-driver
-    container_name: corda-driver
+    image: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+    container_name: corda-driver-${NETWORK_NAME}
+    environment:
+      - DRIVER_PORT=${DRIVER_PORT}
     ports:
-      - "9099:9099"
+      - "${DRIVER_PORT}:${DRIVER_PORT}"
     command: sh -c "./bin/corda-driver"
 
 networks:
   default:
     external:
-      name: corda_default
+      name: ${EXTERNAL_NETWORK}

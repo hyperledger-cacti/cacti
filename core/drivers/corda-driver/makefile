@@ -1,3 +1,8 @@
+DOCKER_IMAGE_NAME ?= weaver-corda-driver
+DOCKER_TAG ?= 1.2.1
+DOCKER_REGISTRY ?= ghcr.io/sanvenDev
+GIT_URL = https://github.com/sanvenDev/weaver-dlt-interoperability/core/drivers/fabric-driver
+
 .PHONY: build-local
 build-local:
 	echo "Building Protos..."
@@ -22,10 +27,24 @@ build:
 build-refresh-dependencies: 
 	cp build.gradle.remote build.gradle
 	./gradlew build --refresh-dependencies
+	
+.PHONY: image
+image:
+	cp build.gradle.remote build.gradle
+	docker build --build-arg GIT_URL=$(GIT_URL) -t corda-driver:latest .
+
+.PHONY: push-image	
+push-image: image
+	docker tag corda-driver:latest $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
+	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 .PHONY: run
 run:
 	./build/install/corda-driver/bin/corda-driver
+	
+.PHONY: deploy
+deploy:
+	docker-compose up -d
 	
 .PHONY: clean
 clean:
