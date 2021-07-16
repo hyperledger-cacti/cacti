@@ -19,7 +19,7 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
-import { InsertBookshelfEndpoint as Constants } from "./insert-bookshelf-endpoint-constants";
+import OAS from "../../../json/openapi.json";
 import { InsertBookshelfRequest } from "../../generated/openapi/typescript-axios/index";
 
 export interface IInsertBookshelfEndpointOptions {
@@ -33,12 +33,6 @@ export interface IInsertBookshelfEndpointOptions {
 }
 
 export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
-  public static readonly HTTP_PATH = Constants.HTTP_PATH;
-
-  public static readonly HTTP_VERB_LOWER_CASE = Constants.HTTP_VERB_LOWER_CASE;
-
-  public static readonly OPENAPI_OPERATION_ID = Constants.OPENAPI_OPERATION_ID;
-
   public static readonly CLASS_NAME = "InsertBookshelfEndpoint";
 
   private readonly log: Logger;
@@ -46,7 +40,6 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
   public get className(): string {
     return InsertBookshelfEndpoint.CLASS_NAME;
   }
-
   constructor(public readonly opts: IInsertBookshelfEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
@@ -61,6 +54,12 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
     const level = this.opts.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
+  }
+
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"
+    ];
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -81,11 +80,13 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
   }
 
   public getVerbLowerCase(): string {
-    return InsertBookshelfEndpoint.HTTP_VERB_LOWER_CASE;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return InsertBookshelfEndpoint.HTTP_PATH;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {

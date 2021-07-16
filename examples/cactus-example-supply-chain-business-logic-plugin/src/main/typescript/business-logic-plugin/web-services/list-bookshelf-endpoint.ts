@@ -19,7 +19,7 @@ import {
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
-import { ListBookshelfEndpoint as Constants } from "./list-bookshelf-endpoint-constants";
+import OAS from "../../../json/openapi.json";
 import { BookshelfConverter } from "../../model/converter/bookshelf-converter";
 
 export interface IListBookshelfEndpointOptions {
@@ -32,12 +32,6 @@ export interface IListBookshelfEndpointOptions {
 }
 
 export class ListBookshelfEndpoint implements IWebServiceEndpoint {
-  public static readonly HTTP_PATH = Constants.HTTP_PATH;
-
-  public static readonly HTTP_VERB_LOWER_CASE = Constants.HTTP_VERB_LOWER_CASE;
-
-  public static readonly OPENAPI_OPERATION_ID = Constants.OPENAPI_OPERATION_ID;
-
   public static readonly CLASS_NAME = "ListBookshelfEndpoint";
 
   private readonly log: Logger;
@@ -59,6 +53,12 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"
+    ];
+  }
+
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
     // TODO: make this an injectable dependency in the constructor
     return {
@@ -77,11 +77,13 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
   }
 
   public getVerbLowerCase(): string {
-    return ListBookshelfEndpoint.HTTP_VERB_LOWER_CASE;
+    const apiPath = this.getOasPath();
+    return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return ListBookshelfEndpoint.HTTP_PATH;
+    const apiPath = this.getOasPath();
+    return apiPath.get["x-hyperledger-cactus"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {
