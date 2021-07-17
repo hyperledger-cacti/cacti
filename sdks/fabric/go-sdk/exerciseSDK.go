@@ -93,7 +93,7 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 	expiryTimeSecs := currentTimeSecs + 600
 
 	log.Println("Going to lock asset by locker ..")
-	result, err := am.CreateHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	result, err := am.CreateHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
 	if err != nil {
 		log.Fatalf("failed CreateHTLC with error: %+v", err)
 	}
@@ -104,20 +104,20 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 	}
 
 	log.Println("Going to query if asset is locked using locker ..")
-	result, err = am.IsAssetLockedInHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	result, err = am.IsAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
 		log.Fatalf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 	log.Println("Going to query if asset is locked using recipient ..")
-	result, err = am.IsAssetLockedInHTLC(contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	result, err = am.IsAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
 		log.Fatalf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 
 	log.Println("Going to claim a locked asset by recipient ..")
-	result, err = am.ClaimAssetInHTLC(contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(preimage)))
+	result, err = am.ClaimAssetInHTLC(am.NewGatewayContractInterface(), contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(preimage)))
 	if err != nil {
 		log.Fatalf("failed ClaimAssetInHTLC with error: %+v", err)
 	}
@@ -153,7 +153,7 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 	expiryTimeSecs := currentTimeSecs + 1
 
 	log.Println("Going to lock asset by locker ..")
-	result, err := am.CreateHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	result, err := am.CreateHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
 	if err != nil {
 		log.Fatalf("failed CreateHTLC with error: %+v", err)
 	}
@@ -164,21 +164,21 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 	}
 
 	log.Println("Locker going to query if asset is locked ..")
-	result, err = am.IsAssetLockedInHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	result, err = am.IsAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
 		// It's possible that the time elapses hence the query fails. So don't use log.Fatalf so that we can proceed to unlock
 		log.Printf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 	log.Println("Recipient going to query if asset is locked ..")
-	result, err = am.IsAssetLockedInHTLC(contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	result, err = am.IsAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
 		log.Printf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 
 	log.Println("Locker going to unlock/reclaim a locked asset ..")
-	result, err = am.ReclaimAssetInHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
+	result, err = am.ReclaimAssetInHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
 	if err != nil {
 		log.Fatalf("failed ReclaimAssetInHTLC with error: %+v", err)
 	}
@@ -220,7 +220,7 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	expiryTimeSecs := currentTimeSecs + 600
 
 	log.Println("Going to lock asset by locker ..")
-	result, err := am.CreateFungibleHTLC(contractU2, assetType, numUnits, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	result, err := am.CreateFungibleHTLC(am.NewGatewayContractInterface(), contractU2, assetType, numUnits, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
 	if err != nil {
 		log.Fatalf("failed CreateFungibleHTLC with error: %+v", err)
 	}
@@ -238,20 +238,20 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	}
 
 	log.Println("Locker going to query if asset is locked ..")
-	result, err = am.IsFungibleAssetLockedInHTLC(contractU2, contractId)
+	result, err = am.IsFungibleAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU2, contractId)
 	if err != nil {
 		log.Fatalf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 	log.Println("Recipient going to query if asset is locked ..")
-	result, err = am.IsFungibleAssetLockedInHTLC(contractU1, contractId)
+	result, err = am.IsFungibleAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU1, contractId)
 	if err != nil {
 		log.Fatalf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 
 	log.Println("Going to claim a locked asset by recipient ..")
-	result, err = am.ClaimFungibleAssetInHTLC(contractU1, contractId, base64.StdEncoding.EncodeToString([]byte(preimage)))
+	result, err = am.ClaimFungibleAssetInHTLC(am.NewGatewayContractInterface(), contractU1, contractId, base64.StdEncoding.EncodeToString([]byte(preimage)))
 	if err != nil {
 		log.Fatalf("failed ClaimAssetInHTLC with error: %+v", err)
 	}
@@ -299,7 +299,7 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 	expiryTimeSecs := currentTimeSecs + 1
 
 	log.Println("Going to lock asset by locker ..")
-	result, err := am.CreateFungibleHTLC(contractU2, assetType, numUnits, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	result, err := am.CreateFungibleHTLC(am.NewGatewayContractInterface(), contractU2, assetType, numUnits, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
 	if err != nil {
 		log.Fatalf("failed CreateFungibleHTLC with error: %+v", err)
 	}
@@ -317,20 +317,20 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 	}
 
 	log.Println("Locker going to query if asset is locked ..")
-	result, err = am.IsFungibleAssetLockedInHTLC(contractU2, contractId)
+	result, err = am.IsFungibleAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU2, contractId)
 	if err != nil {
 		log.Printf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 	log.Println("Recipient going to query if asset is locked ..")
-	result, err = am.IsFungibleAssetLockedInHTLC(contractU1, contractId)
+	result, err = am.IsFungibleAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU1, contractId)
 	if err != nil {
 		log.Printf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 
 	log.Println("Locker going to unlock/reclaim a locked asset ..")
-	result, err = am.ReclaimFungibleAssetInHTLC(contractU2, contractId)
+	result, err = am.ReclaimFungibleAssetInHTLC(am.NewGatewayContractInterface(), contractU2, contractId)
 	if err != nil {
 		log.Fatalf("failed ReclaimFungibleAssetInHTLC with error: %+v", err)
 	}
@@ -351,8 +351,8 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 func main() {
 	connectSimpleStateWithSDK()
 	connectSimpleAssetWithSDK("a001")
-	testLockAssetAndClaimAssetOfBondAsset("a040")
-	testLockAssetAndUnlockAssetOfBondAsset("a041")
+	testLockAssetAndClaimAssetOfBondAsset("a042")
+	testLockAssetAndUnlockAssetOfBondAsset("a043")
 
 	testLockAssetAndClaimAssetOfTokenAsset()
 	testLockAssetAndUnlockAssetOfTokenAsset()
