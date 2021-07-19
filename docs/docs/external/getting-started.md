@@ -43,9 +43,10 @@ Before starting, make sure you have the following software installed on your hos
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Latest version)
 - Golang: [sample instructions](https://golang.org/dl/) (Version 1.15 or above)
 - Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
-- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 16 Supported)
+- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Rust: [sample instructions](https://www.rust-lang.org/tools/install)
+  * Ensure that the installed version of Rust is 1.52.0 or below by running rustc --version. If the version is 1.53.0 or above, run rustup default 1.52.0 to set the appropriate version.
 - Protoc (Protobuf compiler): _Golang should already be installed and configured._
   * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugins.
     ```
@@ -124,7 +125,7 @@ The `fabric-cli` source code is located in the `samples/fabric/fabric-cli` folde
 
 If you are using a Linux system, make sure that lib64 is installed.
 
-_Note_: The setup and running instructions below were tested with all Node.js versions from v11.14.0 to v16.0.0.
+_Note_: The setup and running instructions below were tested with all Node.js versions from v11.14.0 to v14.17.3.
 
 #### Installation
 
