@@ -153,7 +153,7 @@ const command: GluegunCommand = {
       )
       const remoteValue = InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
       spinner.succeed(
-        `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs}, and Value: ${remoteValue}`
+        `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue}`
       )
     } catch (e) {
       spinner.fail(`Error verifying and storing state`)
