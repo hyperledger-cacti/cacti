@@ -343,6 +343,31 @@ func ClaimFungibleAssetInHTLC(gci GatewayContractInterface, contract *gateway.Co
 	return string(result), nil
 }
 
+func ClaimAssetInHTLCusingContractId(gci GatewayContractInterface, contract *gateway.Contract, contractId string, hashPreimageBase64 string) (string, error) {
+	if contract == nil {
+		return "", logThenErrorf("contract handle not supplied")
+	}
+	if contractId == "" {
+		return "", logThenErrorf("contractId not supplied")
+	}
+	if hashPreimageBase64 == "" {
+		return "", logThenErrorf("hashPreimageBase64 is not supplied")
+	}
+
+	claimInfoStr, err := createAssetClaimInfoSerializedBase64(hashPreimageBase64)
+	if err != nil {
+		return "", logThenErrorf(err.Error())
+	}
+
+	// Normal invoke function
+	result, err := gci.SubmitTransaction(contract, "ClaimAssetUsingContractId", contractId, claimInfoStr)
+	if err != nil {
+		return "", logThenErrorf("error in contract.SubmitTransaction ClaimAssetUsingContractId: %+v", err.Error())
+	}
+
+	return string(result), nil
+}
+
 func ReclaimAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract, assetType string, assetId string, recipientECertBase64 string) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")

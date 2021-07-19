@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	log "github.com/sirupsen/logrus"
 
 	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
@@ -18,7 +19,7 @@ import (
 )
 
 func connectSimpleStateWithSDK() {
-	contractU1, _, _ := helpers.FabricHelper("mychannel", "simplestate", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com")
+	contractU1, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
 
 	err := helpers.Query(contractU1, "Read", "a")
 	if err != nil {
@@ -37,7 +38,7 @@ func connectSimpleStateWithSDK() {
 }
 
 func connectSimpleAssetWithSDK(assetId string) {
-	contractU1, _, _ := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com")
+	contractU1, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
 
 	err := helpers.Query(contractU1, "GetAllAssets")
 	if err != nil {
@@ -72,11 +73,11 @@ func connectSimpleAssetWithSDK(assetId string) {
 
 func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 
-	contractU1, idU1, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com")
+	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
-	contractU2, idU2, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com")
+	contractU2, idU2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com", "connection-org1.yaml")
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
@@ -131,11 +132,11 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 
 func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 
-	contractU1, idU1, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com")
+	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
-	contractU2, idU2, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com")
+	contractU2, idU2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com", "connection-org1.yaml")
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
@@ -194,13 +195,22 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 
 	assetType := "token1"
 	numUnits := uint64(5)
-	contractU1, idU1, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com")
+	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
-	contractU2, idU2, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com")
+	contractU2, idU2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com", "connection-org1.yaml")
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+
+	// register for chaincode event
+	reg, notifier, errEventRegistration := contractU2.RegisterEvent("LockFungibleAsset")
+	if errEventRegistration != nil {
+		log.Printf("Failed to register contract event: %s", errEventRegistration)
+	}
+	if errEventRegistration == nil {
+		defer contractU2.Unregister(reg)
 	}
 
 	fmt.Println("Going to create token assets: ", numUnits)
@@ -226,6 +236,17 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	}
 	log.Println(result)
 	contractId := result
+
+	if errEventRegistration == nil {
+		var ccEvent *fab.CCEvent
+		select {
+		case ccEvent = <-notifier:
+			log.Printf("Received CC event: %#v\n", ccEvent)
+		case <-time.After(time.Second * 20):
+			log.Printf("Did NOT receive CC event for eventId(%s)\n", "LockFungibleAsset")
+		}
+	}
+
 	log.Println("Query the token balance for locker before claim ..")
 	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
@@ -273,11 +294,11 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 
 	assetType := "token1"
 	numUnits := uint64(5)
-	contractU1, idU1, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com")
+	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
-	contractU2, idU2, err := helpers.FabricHelper("mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com")
+	contractU2, idU2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com", "connection-org1.yaml")
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
@@ -349,11 +370,11 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 }
 
 func main() {
-	connectSimpleStateWithSDK()
-	connectSimpleAssetWithSDK("a001")
-	testLockAssetAndClaimAssetOfBondAsset("a042")
-	testLockAssetAndUnlockAssetOfBondAsset("a043")
+	connectSimpleStateWithSDK()                    // needs the chaincode simplestate on the channel
+	connectSimpleAssetWithSDK("a001")              // needs the chaincode simpleasset on the channel
+	testLockAssetAndClaimAssetOfBondAsset("a042")  // needs the chaincodes simpleasset and interop on the channel
+	testLockAssetAndUnlockAssetOfBondAsset("a043") // needs the chaincodes simpleasset and interop on the channel
 
-	testLockAssetAndClaimAssetOfTokenAsset()
-	testLockAssetAndUnlockAssetOfTokenAsset()
+	testLockAssetAndClaimAssetOfTokenAsset()  // needs the chaincodes simpleasset and interop on the channel
+	testLockAssetAndUnlockAssetOfTokenAsset() // needs the chaincodes simpleasset and interop on the channel
 }

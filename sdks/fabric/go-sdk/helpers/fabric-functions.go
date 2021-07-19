@@ -19,6 +19,20 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 )
 
+type GatewayNetworkInterface interface {
+	GetNetwork(*gateway.Gateway, string) (*gateway.Network, error)
+}
+
+type fabricGatewayNetwork struct{}
+
+func (f fabricGatewayNetwork) GetNetwork(gw *gateway.Gateway, channel string) (*gateway.Network, error) {
+	return gw.GetNetwork(channel)
+}
+
+func NewGatewayNetworkInterface() GatewayNetworkInterface {
+	return fabricGatewayNetwork{}
+}
+
 // helper functions to log and return errors
 func logThenErrorf(format string, args ...interface{}) error {
 	errorMsg := fmt.Sprintf(format, args...)
@@ -26,7 +40,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 	return errors.New(errorMsg)
 }
 
-func FabricHelper(channel string, contractName string, connProfilePath string, networkName string, mspId string, userString string) (*gateway.Contract, *gateway.X509Identity, error) {
+func FabricHelper(gni GatewayNetworkInterface, channel string, contractName string, connProfilePath string, networkName string, mspId string, userString string, fileName string) (*gateway.Contract, *gateway.X509Identity, error) {
 	var identity *gateway.X509Identity
 	log.Infof("fabricHelper(): parameters passed are.. channel: %s, contractName: %s, connProfilePath: %s, networkName: %s, mspId: %s, "+
 		"userString: %s", channel, contractName, connProfilePath, networkName, mspId, userString)
@@ -57,7 +71,7 @@ func FabricHelper(channel string, contractName string, connProfilePath string, n
 		}
 	}
 
-	ccpPath := filepath.Join(connProfilePath, networkName, "peerOrganizations", "org1."+networkName+".com", "connection-org1.yaml")
+	ccpPath := filepath.Join(connProfilePath, networkName, "peerOrganizations", "org1."+networkName+".com", fileName)
 
 	gw, err := gateway.Connect(
 		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
@@ -68,9 +82,9 @@ func FabricHelper(channel string, contractName string, connProfilePath string, n
 	}
 	defer gw.Close()
 
-	network, err := gw.GetNetwork(channel)
+	network, err := gni.GetNetwork(gw, channel)
 	if err != nil {
-		log.Fatalf("Failed to get network: %v", err)
+		return nil, nil, logThenErrorf("failed to get network: %+v", err)
 	}
 
 	contract := network.GetContract(contractName)
