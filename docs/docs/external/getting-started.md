@@ -46,7 +46,7 @@ Before starting, make sure you have the following software installed on your hos
 - Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Rust: [sample instructions](https://www.rust-lang.org/tools/install)
-  * Ensure that the installed version of Rust is 1.52.0 or below by running rustc --version. If the version is 1.53.0 or above, run rustup default 1.52.0 to set the appropriate version.
+  * Ensure that the installed version of Rust is 1.52.0 or below by running `rustc --version`. If the version is 1.53.0 or above, run `rustup default 1.52.0` to set the appropriate version.
 - Protoc (Protobuf compiler): _Golang should already be installed and configured._
   * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugins.
     ```
@@ -417,21 +417,25 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
 To test the scenario where `network1` requests the value of the state (key) `H` from `Corda_Network`, do the following:
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Run the following (if `fabric-cli` is not in your system path, specify the full path to the `fabric-cli` executable):
+- Run the following:
   ```bash
-  fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+  ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
   ```
 - Query the value of the requested state (key) `H` in `network1` using the following (replace the Args with the Args value obtained in the previous command):
   ```bash
-  fabric-cli interop --local-network=network1 chaincode invoke mychannel simplestate read '["Args"]'
+  ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1
   ```
 
 To test the scenario where `network2` requests the value of the state (key) `H` from `Corda_Network`, do the following:
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Run the following (if `fabric-cli` is not in your system path, specify the full path to the `fabric-cli` executable):
+- Run the following:
   ```bash
-  fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+  ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+  ```
+- Query the value of the requested state (key) `H` in `network2` using the following:
+  ```bash
+  ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network2
   ```
 
 ## Fabric to Fabric
@@ -439,21 +443,25 @@ To test the scenario where `network2` requests the value of the state (key) `H` 
 To test the scenario where `network1` requests the value of the state (key) `Arcturus` from `network2`, do the following:
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Run the following (if `fabric-cli` is not in your system path, specify the full path to the `fabric-cli` executable):
+- Run the following:
   ```bash
-  fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+  ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
   ```
-- Query the value of the requested state (key) `Arcturus` in `network1` using the following (replace the Args with the Args value obtained in the previous command):
+- Query the value of the requested state (key) `Arcturus` in `network1` using the following:
   ```bash
-  fabric-cli interop --local-network=network1 chaincode invoke mychannel simplestate read '["Args"]'
+  ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
   ```
 
 To test the scenario where `network2` requests the value of the state (key) `a` from `network1`, do the following:
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Run the following (if `fabric-cli` is not in your system path, specify the full path to the `fabric-cli` executable):
+- Run the following:
   ```bash
-  fabric-cli interop --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
+  ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
+  ```
+- Query the value of the requested state (key) `a` in `network2` using the following:
+  ```bash
+  ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
   ```
 
 # Tear Down the Setup
@@ -516,7 +524,7 @@ To change the ports the Corda nodes are listening on, do the following:
   ```
 - When you attempt a Fabric to Corda interoperation flow, use the new host name and port values as in the following example (`network1` requesting `Corda_Network`):
   ```bash
-  fabric-cli interop --local-network=network1 --requesting-org=org1.network1.com localhost:9081/Corda_Network/<CORDA_HOST>:<CORDA_PORT>#com.cordaSimpleApplication.flow.GetStateByKey:H`
+  ./bin/fabric-cli interop --local-network=network1 --requesting-org=org1.network1.com localhost:9081/Corda_Network/<CORDA_HOST>:<CORDA_PORT>#com.cordaSimpleApplication.flow.GetStateByKey:H`
   ```
 
 ### Client Application
