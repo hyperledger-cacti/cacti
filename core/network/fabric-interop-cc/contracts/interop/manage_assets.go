@@ -9,55 +9,55 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
-	"crypto/sha256"
-	"encoding/base64"
 	"time"
 
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	log "github.com/sirupsen/logrus"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 )
 
 // Object used to capture the HashLock details used in Asset Locking
 type HashLock struct {
-	HashBase64	string	`json:"hashBase64"`
+	HashBase64 string `json:"hashBase64"`
 }
 
 // Object used in the map, <asset-type, asset-id> --> <contractId, locker, recipient, ...> (for non-fungible assets)
 type AssetLockValue struct {
-	Locker		string		`json:"locker"`
-	Recipient	string		`json:"recipient"`
-	LockInfo	interface{}	`json:"lockInfo"`
-	ExpiryTimeSecs	uint64		`json:"expiryTimeSecs"`
+	Locker         string      `json:"locker"`
+	Recipient      string      `json:"recipient"`
+	LockInfo       interface{} `json:"lockInfo"`
+	ExpiryTimeSecs uint64      `json:"expiryTimeSecs"`
 }
 
 // Object used in the map, contractId --> <asset-type, num-units, locker, ...> (for fungible assets)
 type FungibleAssetLockValue struct {
-	Type		string		`json:"type"`
-	NumUnits	uint64		`json:"numUnits"`
-	Locker		string		`json:"locker"`
-	Recipient	string		`json:"recipient"`
-	LockInfo	interface{}	`json:"lockInfo"`
-	ExpiryTimeSecs	uint64		`json:"expiryTimeSecs"`
+	Type           string      `json:"type"`
+	NumUnits       uint64      `json:"numUnits"`
+	Locker         string      `json:"locker"`
+	Recipient      string      `json:"recipient"`
+	LockInfo       interface{} `json:"lockInfo"`
+	ExpiryTimeSecs uint64      `json:"expiryTimeSecs"`
 }
 
-const(
-	assetKeyPrefix		= "AssetKey_"	// prefix for the map, asset-key --> asset-object
-	assetKeyDelimiter	= "_"		// delimiter for the asset-key
-	contractIdPrefix	= "ContractId_"	// prefix for the map, contractId --> asset-key
+const (
+	assetKeyPrefix    = "AssetKey_"   // prefix for the map, asset-key --> asset-object
+	assetKeyDelimiter = "_"           // delimiter for the asset-key
+	contractIdPrefix  = "ContractId_" // prefix for the map, contractId --> asset-key
 )
 
 // helper functions to log and return errors
 func logThenErrorf(format string, args ...interface{}) error {
-    errorMsg := fmt.Sprintf(format, args...)
-    log.Error(errorMsg)
-    return errors.New(errorMsg)
+	errorMsg := fmt.Sprintf(format, args...)
+	log.Error(errorMsg)
+	return errors.New(errorMsg)
 }
 
 // function to generate a "SHA256" hash in base64 format for a given preimage
@@ -94,7 +94,7 @@ func generateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterfa
  */
 func generateFungibleAssetLockContractId(ctx contractapi.TransactionContextInterface, assetAgreement *common.FungibleAssetExchangeAgreement) string {
 	preimage := assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
-			assetAgreement.Locker + assetAgreement.Recipient + ctx.GetStub().GetTxID()
+		assetAgreement.Locker + assetAgreement.Recipient + ctx.GetStub().GetTxID()
 	contractId := generateSHA256HashInBase64Form(preimage)
 	return contractId
 }
@@ -106,14 +106,14 @@ func getECertOfTxCreatorBase64(ctx contractapi.TransactionContextInterface) (str
 	if err != nil {
 		return "", logThenErrorf("unable to get the transaction creator information: %+v", err)
 	}
-	log.Infof("getECertOfTxCreatorBase64: TxCreator: %s\n", string(txCreatorBytes))
+	log.Infof("getECertOfTxCreatorBase64: TxCreator: %s", string(txCreatorBytes))
 
 	serializedIdentity := &mspProtobuf.SerializedIdentity{}
 	err = proto.Unmarshal(txCreatorBytes, serializedIdentity)
 	if err != nil {
 		return "", logThenErrorf("getECertOfTxCreatorBase64: unmarshal error: %+v", err)
 	}
-	log.Infof("getECertOfTxCreatorBase64: TxCreator ECert: %s\n", string(serializedIdentity.IdBytes))
+	log.Infof("getECertOfTxCreatorBase64: TxCreator ECert: %s", string(serializedIdentity.IdBytes))
 
 	eCertBytesBase64 := base64.StdEncoding.EncodeToString(serializedIdentity.IdBytes)
 
@@ -192,14 +192,14 @@ func getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64 string) (interface{}, uint
 	}
 
 	// process lock details here (lockInfo.LockInfo contains value based on the lock mechanism used)
-        if lockInfo.LockMechanism == common.LockMechanism_HTLC {
+	if lockInfo.LockMechanism == common.LockMechanism_HTLC {
 		lockInfoHTLC := &common.AssetLockHTLC{}
 		err := proto.Unmarshal(lockInfo.LockInfo, lockInfoHTLC)
 		if err != nil {
 			return lockInfoVal, 0, logThenErrorf("unmarshal error: %s", err)
 		}
 		//display the passed hash lock information
-		log.Infof("lockInfoHTLC: %+v\n", lockInfoHTLC)
+		log.Infof("lockInfoHTLC: %+v", lockInfoHTLC)
 		lockInfoVal = HashLock{HashBase64: string(lockInfoHTLC.HashBase64)}
 		// process time lock details here
 		if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
@@ -226,7 +226,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", logThenErrorf(err.Error())
 	}
 	//display the requested asset agreement
-	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
+	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
 	err = validateAndSetLockerOfAssetAgreement(ctx, assetAgreement)
 	if err != nil {
@@ -290,7 +290,7 @@ func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface,
 		return logThenErrorf(err.Error())
 	}
 	//display the requested asset agreement
-	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
+	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
 	err = validateAndSetLockerOfAssetAgreement(ctx, assetAgreement)
 	if err != nil {
@@ -353,7 +353,7 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 		return false, logThenErrorf(err.Error())
 	}
 	//display the requested asset agreement
-	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
+	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
 	assetLockKey, _, err := generateAssetLockKeyAndContractId(ctx, assetAgreement)
 	if err != nil {
@@ -374,7 +374,7 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 	if err != nil {
 		return false, logThenErrorf("unmarshal error: %s", err)
 	}
-	log.Infof("assetLockVal: %+v\n", assetLockVal)
+	log.Infof("assetLockVal: %+v", assetLockVal)
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
@@ -409,9 +409,9 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, err
 
 	shaHashBase64 := generateSHA256HashInBase64Form(string(preimage))
 	if shaHashBase64 == hashBase64 {
-		log.Infof("%s: preimage %s is passed correctly.\n", funName, preimage)
+		log.Infof("%s: preimage %s is passed correctly", funName, preimage)
 	} else {
-		log.Infof("%s: preimage %s is not passed correctly.\n", funName, preimage)
+		log.Infof("%s: preimage %s is not passed correctly", funName, preimage)
 		return false, nil
 	}
 	return true, nil
@@ -454,7 +454,7 @@ func getClaimInfo(claimInfoBytesBase64 string) (*common.AssetClaim, error) {
 		return claimInfo, logThenErrorf("unmarshal error: %s", err)
 	}
 	// check if a valid lock mechanism is provided
-	if (claimInfo.LockMechanism != common.LockMechanism_HTLC) {
+	if claimInfo.LockMechanism != common.LockMechanism_HTLC {
 		return claimInfo, logThenErrorf("lock mechanism is not supported")
 	}
 
@@ -522,7 +522,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		if err != nil {
 			return logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
 		}
-		if isCorrectPreimage == false {
+		if !isCorrectPreimage {
 			return logThenErrorf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
 		}
 	}
@@ -552,8 +552,11 @@ func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface
 		return assetLockKey, assetLockVal, logThenErrorf("no contractId %s exists on the ledger", contractId)
 	}
 
-	assetLockKey = string(assetLockKeyBytes)
-	log.Infof("contractId: %s and assetLockKey: %s\n", contractId, assetLockKey)
+	err = json.Unmarshal(assetLockKeyBytes, &assetLockKey)
+	if err != nil {
+		return assetLockKey, assetLockVal, logThenErrorf("assetLockKey unmarshal error: %s", err)
+	}
+	log.Infof("contractId: %s and assetLockKey: %s", contractId, assetLockKey)
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
@@ -566,7 +569,7 @@ func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface
 
 	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
 	if err != nil {
-		return assetLockKey, assetLockVal, logThenErrorf("unmarshal error: %s", err)
+		return assetLockKey, assetLockVal, logThenErrorf("assetLockVal unmarshal error: %s", err)
 	}
 	return assetLockKey, assetLockVal, nil
 }
@@ -641,7 +644,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 		if err != nil {
 			return logThenErrorf("claim asset associated with contractId %s failed with error: %v", contractId, err)
 		}
-		if isCorrectPreimage == false {
+		if !isCorrectPreimage {
 			return logThenErrorf("cannot claim asset associated with contractId %s as the hash preimage is not matching", contractId)
 		}
 	}
@@ -691,7 +694,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 	}
 
 	//display the requested fungible asset agreement
-	log.Infof("fungibleAssetExchangeAgreement: %+v\n", assetAgreement)
+	log.Infof("fungibleAssetExchangeAgreement: %+v", assetAgreement)
 
 	err = validateAndSetLockerOfFungibleAssetAgreement(ctx, assetAgreement)
 	if err != nil {
@@ -748,7 +751,7 @@ func fetchFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contr
 	if err != nil {
 		return assetLockVal, logThenErrorf("unmarshal error: %s", err)
 	}
-	log.Infof("contractId: %s and fungibleAssetLockVal: %+v\n", contractId, assetLockVal)
+	log.Infof("contractId: %s and fungibleAssetLockVal: %+v", contractId, assetLockVal)
 
 	return assetLockVal, nil
 }
@@ -804,7 +807,7 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 		if err != nil {
 			return logThenErrorf("claim fungible asset associated with contractId %s failed with error: %v", contractId, err)
 		}
-		if isCorrectPreimage == false {
+		if !isCorrectPreimage {
 			return logThenErrorf("cannot claim fungible asset associated with contractId %s as the hash preimage is not matching", contractId)
 		}
 	}
