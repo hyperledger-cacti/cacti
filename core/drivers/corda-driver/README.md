@@ -7,30 +7,28 @@
 
 The Corda driver is used by the relays to interface with the Corda nodes. It
 triggers flows from the interoperation CorDapp to retrieve state given the query
-from the external network. The interoperation CorDapp is retrieved as a
-dependency from Artifactory. To access the interoperation CorDapp, Artifactory
-credentials are required and you will need to have permission to access the
-[res-dlt-interop-maven-local](https://na.artifactory.swg-devops.com/artifactory/webapp/#/artifacts/browse/tree/General/res-dlt-interop-maven-local)
-repository. Copy the `artifactory.properties.template` file to
-`artifactory.properties` with your IBM email and Artifactory API key to be able
-to download this dependency.
+from the external network.
 
 ## Setup
 
-To build the driver executable locally, run the following:
+To build the driver executable locally (delete `artifactory.properties` if present, else it will try to fetch dependencies from Github Packages), run the following:
 
 ```
 make build-local
 ```
 
-To build the driver executable using dependencies in Artifactory, run the following:
+To build the driver executable using dependencies from Github Packages, follow the steps:
+* Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
+* Create a copy of `artifactory.properties.template` as `artifactory.properties`.
+* Replace <GITHUB Email> with your email id for github.
+* Replace <GITHUB Personal Access Token> with your personal access token.
 
 ```
 make build
 ```
 
 If you see compile errors about classes not being found, it may be that gradle
-hasn't downloaded the required dependencies. To install the dependencies (with or without Artifactory support), run:
+hasn't downloaded the required dependencies. To install the dependencies (with or without Github Packages support), run:
 
 ```
 make build-refresh-dependencies[-local]

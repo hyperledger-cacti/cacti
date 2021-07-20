@@ -28,7 +28,6 @@ plugins {
 }
 
 Properties constants = new Properties()
-file("$projectDir/artifactory.properties").withInputStream { constants.load(it) }
 
 repositories {
     google()
@@ -36,12 +35,23 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'https://software.r3.com/artifactory/corda' }
-    maven {
-        url constants.url
-        credentials {
-            username constants.username
-            password constants.password
+    if (file("$projectDir/./artifactory.properties").exists()) {
+        file("$projectDir/artifactory.properties").withInputStream { constants.load(it) }
+        maven {
+            url constants.url
+            credentials {
+                username constants.username
+                password constants.password
+            }
         }
+    }
+    else {
+        flatDir {
+            dirs '../../network/corda-interop-app/interop-contracts/build/libs'
+            dirs '../../network/corda-interop-app/interop-workflows/build/libs'
+            dirs '../../../common/protos-java-kt/build/libs'
+        }
+    
     }
 }
 
