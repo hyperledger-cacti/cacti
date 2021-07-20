@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/hyperledger/cactus/compare/v0.4.1...v0.6.0) (2021-07-19)
+
+
+### Bug Fixes
+
+* **deps:** elliptic upgrade to >6.5.3 for CVE-2020-28498 ([d75b9af](https://github.com/hyperledger/cactus/commit/d75b9af764241ab2e10914769412201fb040b1ed))
+
+
+### Features
+
+* **atomic-swap-erc20:** implemented plugin and test ([0c9423a](https://github.com/hyperledger/cactus/commit/0c9423a2a2cd4675c3c6dec4288190f148cad938))
+* expose besu test ledger web socket API port ([e198a99](https://github.com/hyperledger/cactus/commit/e198a99f5fe7c2ac5c7bc1a8be0f0d29259871a8))
+* **keychain-vault:** add the missing endpoint classes [#676](https://github.com/hyperledger/cactus/issues/676) ([341cffc](https://github.com/hyperledger/cactus/commit/341cffcef72286169a4ceced69414618d5059d0e))
+* **test-tooling:** add besu multi-party test ledger ([89f173e](https://github.com/hyperledger/cactus/commit/89f173eea9deb15f0c2f6bd94ccefeb453fbeb39))
+* **test-tooling:** add besu test ledger log level constructor arg ([60ee32f](https://github.com/hyperledger/cactus/commit/60ee32fb0e65e8325194a8798dd8cde093a141d3)), closes [#780](https://github.com/hyperledger/cactus/issues/780)
+* **test-tooling:** add keycloak container ([f1abb3e](https://github.com/hyperledger/cactus/commit/f1abb3e8d2e05aa18008da176753b240528e95e6))
+* **test-tooling:** add OpenEthereumTestLedger [#851](https://github.com/hyperledger/cactus/issues/851) ([9ca1f68](https://github.com/hyperledger/cactus/commit/9ca1f6839749450b4d8887c5af14a888225d645f))
+* **test-tooling:** containers#logDiagnostics() utility method ([ed9e125](https://github.com/hyperledger/cactus/commit/ed9e125723508827a096293c808dbfac1fdba41c))
+* **test-tooling:** go-ipfs test container ([e62b1b0](https://github.com/hyperledger/cactus/commit/e62b1b08988463fdccdd88743562081a486285f2))
+* **test-tooling:** quorum test ledger omit pull parameter ([73f84f7](https://github.com/hyperledger/cactus/commit/73f84f7399c30f6cf3e1a0c46e4b9b9ec26dbced))
+* **test-tooling:** rust compiler container for wasm builds ([ad7cdc0](https://github.com/hyperledger/cactus/commit/ad7cdc07e1f40e2b663577312ed47b1b64e9eafc))
+
+
+
+
+
 # [0.5.0](https://github.com/hyperledger/cactus/compare/v0.4.1...v0.5.0) (2021-05-19)
 
 
