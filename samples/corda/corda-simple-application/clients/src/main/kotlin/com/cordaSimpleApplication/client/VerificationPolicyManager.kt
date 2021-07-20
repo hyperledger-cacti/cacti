@@ -10,10 +10,10 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
-import com.cordaInteropApp.flows.*
-import com.cordaInteropApp.states.VerificationPolicyState
-import com.cordaInteropApp.states.Policy
-import com.cordaInteropApp.states.Identifier
+import com.weaver.corda.app.interop.flows.*
+import com.weaver.corda.app.interop.states.VerificationPolicyState
+import com.weaver.corda.app.interop.states.Policy
+import com.weaver.corda.app.interop.states.Identifier
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument

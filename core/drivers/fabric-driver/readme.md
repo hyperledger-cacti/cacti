@@ -41,7 +41,7 @@ To deploy, run `make deploy`
 
 **Sample steps to use docker deployment:**
 
-* Create a Personal Access Token with read packages access in github.
+* Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Copy `.env.docker.template` to `.env` and make changes appropriately (like correcting the base path of repo, changing network name if required etc, check image details here: [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver)).
 * Make sure connection profile used for docker, containers correct hostnames instead of localhost in urls.
@@ -57,17 +57,17 @@ The driver could be improved to have a way to revoke the prexisting identity in 
 
 ## Environment variables
 
-The connection profile is required to set up the required material to communicate with the network. This should be supplied with the `CONNECTION_PROFILE` environeent variable (ex: CONNECTION_PROFILE=path/to/con_profile.json)
+The connection profile is required to set up the required material to communicate with the network. This should be supplied with the `CONNECTION_PROFILE` environment variable (ex: CONNECTION_PROFILE=path/to/con_profile.json)
 
-Port for connecting relay: `RELAY_ENDPOINT` (ex: RELAY_ENDPOINT=localhost:9081 )
+`<Hostname>:<Port>` for connecting relay: `RELAY_ENDPOINT` (ex: RELAY_ENDPOINT=localhost:9081 )
 
 Boolean for when to use mocked fabric communication: `MOCK` (ex: MOCK=true)
 
-Port for the driver to be run on: `DRIVER_ENDPOINT` (ex: DRIVER_ENDPOINT=localhost:9093)
+`<Hostname>:<Port>` for the driver to be run on: `DRIVER_ENDPOINT` (ex: DRIVER_ENDPOINT=localhost:9093) (Not required for docker)
 
 Can pass in a variable 'local' for working with fabric and docker: `local` (ex: local=false)
 
-Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DRIVER_CONFIG=../custom_config.json)
+Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DRIVER_CONFIG=./config.json)
 
 `INTEROP_CHAINCODE` stores the name of the interop chaincode installed.
 
@@ -76,16 +76,18 @@ NOTE: When specifying ensure that they match the config that the relay is using.
 **For docker-compose:***
 
 * `DOCKER_IMAGE_NAME`, `DOCKER_TAG`, and `DOCKER_REGISTRY` needs to specified based on [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver) image.
-* `DRIVER_PORT` is the driver server port, and `EXTERNAL_NETWORK` is the docker network in which fabric-network is running.
+* `DRIVER_PORT` is the driver server port.
+* `EXTERNAL_NETWORK` is the docker network in which fabric-network is running.
 
 ## Push Fabric Driver image to Github container registry
 
-* Create a Personal Access Token with write, read, and delete packages access in github.
+* Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Create a copy of `.npmrc.template` as `.npmrc`.
 * Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 * Run `make push-image` to build and push the image to github registry.
 
+**NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
 
 ## Known Issues
 

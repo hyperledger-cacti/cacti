@@ -146,7 +146,7 @@ To run with Docker Compose please refer to the comments in the [docker-compose.y
 
 First **login** to github container registry:
 
-* Create a Personal Access Token with read packages access in github.
+* Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 
 **Some sample steps to deploy relay using docker-compose when Config File is available:**
@@ -154,7 +154,7 @@ First **login** to github container registry:
 * Copy `.env.template` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
     * PATH_TO_CONFIG: Path to the relay's config file. e.g. `./config/Fabric_Relay.toml`.
-    * RELAY_NAME: Keep it same as in relay config file.
+    * RELAY_NAME: It's the `name` parameter in the config file. Same is used for container name.
     * RELAY_PORT: Port for grpc relay server.
     * EXTERNAL_NETWORK: Docker bridge network name.
     * DOCKER_REGISTRY: Keep it same as in template.
@@ -169,14 +169,14 @@ First **login** to github container registry:
 
 * Copy `.env.template.2` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
-    * RELAY_NAME: Name for the relay.
+    * RELAY_NAME: Name for the relay. Same is used for container name.
     * RELAY_PORT: Port for grpc relay server.
     * DRIVER_NAME: Driver host name.
     * DRIVER_PORT: Port for driver.
     * DRIVER_HOST: Hostname/IP for driver.
     * NETWORK_NAME: Name of network it will be attached to (should be same as used in relay requests arguments.)
     * NETWORK_TYPE: Type of network. e.g. `Fabric` or `Corda`.
-    * PATH_TO_REMOTE_RELAYS_DEFINITIONS: Keep it `./docker/remote-relay-dns-config`.
+    * PATH_TO_REMOTE_RELAYS_DEFINITIONS: Should be path to a directory which stores `relays.toml`, which contains DNS information regarding remote relays. Refer [./docker/remote-relay-dns-config](./docker/remote-relay-dns-config) for example.
     * EXTERNAL_NETWORK: Docker bridge network name.
     * DOCKER_REGISTRY: Keep it same as in template.
     * DOCKER_IMAGE_NAME: Keep it same as in template.
@@ -190,9 +190,11 @@ First **login** to github container registry:
 
 ## Push Relay image to Github container registry
 
-* Create a Personal Access Token with write, read, and delete packages access in github.
+* Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Run `make push-server` to build and push the image to github registry.
+
+**NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
 
 
 

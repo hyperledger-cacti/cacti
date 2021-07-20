@@ -11,9 +11,9 @@ import arrow.core.Left
 import arrow.core.Right
 import com.cordaSimpleApplication.flow.CreateState
 import com.cordaSimpleApplication.state.SimpleState
-import com.cordaInteropApp.flows.CreateExternalRequest
-import com.cordaInteropApp.flows.WriteExternalStateInitiator
-import com.cordaInteropApp.flows.GetExternalStateByLinearId
+import com.weaver.corda.app.interop.flows.CreateExternalRequest
+import com.weaver.corda.app.interop.flows.WriteExternalStateInitiator
+import com.weaver.corda.app.interop.flows.GetExternalStateByLinearId
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument

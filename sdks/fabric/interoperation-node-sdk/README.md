@@ -30,17 +30,27 @@ Run `npm test`
 Run `npm run docs` to generate docs. View docs via the generated html file. 
 
 # Steps to Use
-1) Create a Personal Access Token from Github with read access to packages.
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 2) Create a copy of `.npmrc.template` as `.npmrc`.
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 4) Now put this `.npmrc` file in your application in same level as package.json.
 5) Now you can run `npm install @hyperledger-labs/weaver-fabric-interop-sdk` in your application directory to install the latest version.
 
 # Steps to publish
-1) Create a Personal Access Token from Github with write/read/delete access to packages.
+1) Create a Personal Access Token from Github with write/read/delete access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 2) Create a copy of `.npmrc.template` as `.npmrc`.
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 4) Run `npm publish` to publish package to github packages.
+
+**NOTE:** Always publish to your fork first, and only after testing it well, then 
+after PR approval, publish it to `hyperledger-labs/weaver-dlt-interoperability`.
+To publish to your fork, modify in `package.json`:
+```
+...
+"publishConfig": {
+  "registry": "https://npm.pkg.github.com/<your-git-name>"
+}
+```
 
 NOTE:- Github Packages won't allow you to update the package if same version exists,
 you have to delete the package version (requires admin access) before publishing an update on the same package version.

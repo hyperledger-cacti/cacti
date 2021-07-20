@@ -1,5 +1,4 @@
 buildscript {
-    ext.interop_cordapps_version = "0.6"
     ext.clikt_version = "2.7.1"
     ext.coroutines_version = "1.3.7"
     ext.protobuf_version = "3.11.1"
@@ -24,8 +23,8 @@ sourceSets {
         resources {
             srcDir rootProject.file("config/dev")
         }
-	java.srcDirs += 'src/main/kotlin/'
-	kotlin.srcDirs += 'src/main/kotlin/'
+        java.srcDirs += 'src/main/kotlin/'
+        kotlin.srcDirs += 'src/main/kotlin/'
     }
 }
 
@@ -38,7 +37,7 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url 'https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/'
+        url constants.url
         credentials {
             username constants.username
             password constants.password
@@ -59,8 +58,9 @@ dependencies {
     compile project(":workflows-kotlin")
     compile "com.github.ajalt:clikt:$clikt_version"
 
-    compile(group: 'com.cordaInteropApp', name: 'interop-contracts', version: "$interop_cordapps_version")
-    compile(group: 'com.cordaInteropApp', name: 'interop-workflows', version: "$interop_cordapps_version")
+    compile(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_version")
+    compile(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_version")
+    compile(group: 'com.weaver', name: 'protos-java-kt', version: "$weaver_version")
 
     // gRPC and protobuf dependencies
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
@@ -78,53 +78,12 @@ dependencies {
     compile "org.slf4j:jul-to-slf4j:$slf4j_version"
 }
 
-protobuf {
-    protoc { artifact = "com.google.protobuf:protoc:$protobuf_version" }
-    plugins {
-        // Specify protoc to generate using kotlin protobuf plugin
-        grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version"
-        }
-        // Specify protoc to generate using our grpc kotlin plugin
-        grpckt {
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpc_kotlin_version"
-        }
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.plugins {
-                // Generate Java gRPC classes
-                grpc { }
-                // Generate Kotlin gRPC using the custom plugin from library
-                grpckt { }
-            }
-        }
-    }
-}
-
 mainClassName = "com.cordaSimpleApplication.client.CordaClientKt"
 jar {
     manifest {
         attributes(
                 'Main-Class': 'com.cordaSimpleApplication.client.CordaClientKt'
         )
-    }
-}
-
-artifactory {
-    contextUrl = 'https://na.artifactory.swg-devops.com:443/artifactory/'
-
-    publish {
-        contextUrl = 'https://na.artifactory.swg-devops.com:443/artifactory/'
-        repository {
-            repoKey = 'res-dlt-interop-maven-local'
-            username = constants.username
-            password = constants.password
-            maven = true
-        }
-        defaults {
-            publications ('mavenJava')
-        }
     }
 }
 
@@ -139,7 +98,7 @@ publishing {
     }
     repositories {
         maven {
-            url 'https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/'
+            url constants.url
             credentials {
                 username constants.username
                 password constants.password

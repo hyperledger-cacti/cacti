@@ -13,6 +13,7 @@ buildscript {
         log4j_version = constants.getProperty("log4jVersion")
         slf4j_version = constants.getProperty("slf4jVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
+        weaver_version = constants.getProperty("weaverVersion")
     }
 
     repositories {
@@ -46,7 +47,17 @@ dependencies {
     // Corda dependencies.
     cordaRuntime "$corda_release_group:corda-node-api:$corda_release_version"
     cordaRuntime "$corda_release_group:corda:$corda_release_version"
+    
+    // Cordapps
+    // Corda Interop Apps
+    cordapp "com.weaver.corda.app.interop:interop-contracts:$weaver_version"
+    cordapp "com.weaver.corda.app.interop:interop-workflows:$weaver_version"
+    
+    // Corda Simple Apps        
+    cordapp "com.cordaSimpleApplication:contracts-kotlin:0.4"
+    cordapp "com.cordaSimpleApplication:workflows-kotlin:0.4"
 }
+
 
 repositories {
     mavenLocal()
@@ -54,6 +65,28 @@ repositories {
     mavenCentral()
     maven { url 'https://software.r3.com/artifactory/corda' }
     maven { url 'https://jitpack.io' }
+    if (file("$projectDir/./artifactory.properties").exists()) {
+        Properties constants = new Properties()
+        file("$projectDir/./artifactory.properties").withInputStream { constants.load(it) }
+        maven {
+            url constants.url
+            credentials {
+                username constants.username
+                password constants.password
+            }
+        }
+    }
+    else {
+        flatDir {
+            dirs '../../../core/network/corda-interop-app/interop-contracts/build/libs'
+            dirs '../../../core/network/corda-interop-app/interop-workflows/build/libs'
+        }
+    
+    }
+    flatDir {
+        dirs '../../../samples/corda/corda-simple-application/contracts-kotlin/build/libs'
+        dirs '../../../samples/corda/corda-simple-application/workflows-kotlin/build/libs'
+    }
 }
 
 task ganache {
@@ -78,6 +111,14 @@ task deployNodes(type: net.corda.plugins.Cordform) {
         projectCordapp {
             deploy = false
         }
+        
+        // Corda Interop Apps
+        cordapp "com.weaver.corda.app.interop:interop-contracts:$weaver_version"
+        cordapp "com.weaver.corda.app.interop:interop-workflows:$weaver_version"
+        
+        // Corda Simple Apps        
+        cordapp "com.cordaSimpleApplication:contracts-kotlin:0.4"
+        cordapp "com.cordaSimpleApplication:workflows-kotlin:0.4"
     }
     node {
         name "O=Notary,L=London,C=GB"
@@ -102,6 +143,19 @@ task deployNodes(type: net.corda.plugins.Cordform) {
 }
 
 task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
+    nodeDefaults {
+        projectCordapp {
+            deploy = false
+        }
+        
+        // Corda Interop Apps
+        cordapp "com.weaver.corda.app.interop:interop-contracts:$weaver_version"
+        cordapp "com.weaver.corda.app.interop:interop-workflows:$weaver_version"
+        
+        // Corda Simple Apps        
+        cordapp "com.cordaSimpleApplication:contracts-kotlin:0.4"
+        cordapp "com.cordaSimpleApplication:workflows-kotlin:0.4"
+    }
     node {
         name "O=Notary,L=London,C=GB"
         notary = [validating: false]
@@ -110,10 +164,6 @@ task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) 
             address("localhost:10003")
             adminAddress("localhost:10005")
         }
-        projectCordapp {
-            deploy = false
-        }
-        cordapps.clear()
     }
     node {
         name "O=PartyA,L=London,C=GB"
@@ -121,9 +171,6 @@ task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) 
         rpcSettings {
             address("localhost:10003")
             adminAddress("localhost:10005")
-        }
-        projectCordapp {
-            deploy = false
         }
         rpcUsers = [
                 [ user: "clientUser1", "password": "test", "permissions": ["ALL"]],

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 directory=$(dirname $0)
-version="1.2.0"
+version="1.2.1"
 
 echo Stopping nodes...
 echo

@@ -1,18 +1,22 @@
 directory=$(dirname $0)
 
-ARTIFACTS_PATH=$directory/../../../fabric/shared/artifacts
-CHAINCODE_PATH=$directory/../../../fabric/shared/chaincode
-ARTIFACTORY_BINARY_REGISTRY=https://na.artifactory.swg-devops.com/artifactory/res-dlt-interop-generic-local
+TMP_PATH=$PWD/../shared/tmp
+CHAINCODE_PATH=$PWD/../shared/chaincode
 
-INTEROP_GIT=git@github.ibm.com:dlt-interoperability/fabric-interop-cc.git
-INTEROP_BRANCH=fabric_v2
+# interop cc module
+INTEROPCC_MOD=github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
+INTEROP_VERSION=
 
-if [ ! -d "${CHAINCODE_PATH}/fabric-interop-cc" ]; then
-    echo "INTEROP is not present, cloning from git...."
-    (cd $CHAINCODE_PATH && git clone ${INTEROP_GIT} fabric-interop-cc && cd fabric-interop-cc && make protos && cp -R contracts/interop ../interop)
-else
-    echo "INTEROP is already installed"
-    echo "Updating existing copy"
-    (cd $CHAINCODE_PATH/fabric-interop-cc/ && git checkout -f master && git fetch && git pull && make protos && rm -rf ../interop && cp -R contracts/interop ../interop)
-fi
+# custom gopath for convenient downloading
+mkdir $TMP_PATH
+OLD_GOPATH=$GOPATH
+export GOPATH=$TMP_PATH
 
+# Download interopcc and copy it into correct folder
+go get -d "${INTEROPCC_MOD}${INTEROP_VERSION}"
+cp -r $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop* $CHAINCODE_PATH/interop
+
+# Clean tmp and Undo gopath
+go clean -modcache
+rm -rf $TMP_PATH
+export GOPATH=${OLD_GOPATH}

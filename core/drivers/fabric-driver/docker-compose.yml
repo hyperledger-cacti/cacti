@@ -13,11 +13,13 @@ services:
       - NETWORK_NAME=${NETWORK_NAME}
       - RELAY_ENDPOINT=${RELAY_ENDPOINT}
       - DRIVER_ENDPOINT=0.0.0.0:${DRIVER_PORT}
-      - CONNECTION_PROFILE=/ccp.json
+      - CONNECTION_PROFILE=/fabric-driver/ccp.json
+      - DRIVER_CONFIG=/fabric-driver/config.json
       - INTEROP_CHAINCODE=${INTEROP_CHAINCODE}
       - local=false
     volumes:
-      - ${CONNECTION_PROFILE}:/ccp.json
+      - ${CONNECTION_PROFILE}:/fabric-driver/ccp.json
+      - ${DRIVER_CONFIG}:/fabric-driver/config.json
       - ./wallet-${NETWORK_NAME}:/fabric-driver/wallet-${NETWORK_NAME}
     ports:
       - "${DRIVER_PORT}:${DRIVER_PORT}"

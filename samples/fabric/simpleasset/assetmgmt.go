@@ -11,7 +11,7 @@ import (
     "github.com/golang/protobuf/proto"
     log "github.com/sirupsen/logrus"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
-    "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/protos-go/common"
+    "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 )
 
 // helper functions
