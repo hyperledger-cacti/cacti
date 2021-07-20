@@ -386,7 +386,7 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
   ```bash
   ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
   ```
-- Query the value of the requested state (key) `a` in `Corda_Network` using the following (replace LinearId with the CorDapp simplestate linearId value obtained in the previous command):
+- Query the value of the requested state (key) `a` in `Corda_Network` using the following:
   ```bash
   ./clients/build/install/clients/bin/clients get-state a
   ```
@@ -397,7 +397,7 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
   ```bash
   ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus
   ```
-- Query the value of the requested state (key) `a` in `Corda_Network` using the following (replace LinearId with the CorDapp simplestate linearId value obtained in the previous command):
+- Query the value of the requested state (key) `Arcturus` in `Corda_Network` using the following:
   ```bash
   ./clients/build/install/clients/bin/clients get-state Arcturus
   ```
