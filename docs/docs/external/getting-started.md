@@ -557,7 +557,7 @@ The `config.json` (which can have a different name as long as you add the right 
 - `relayEndpoint`: hostname and port of the particular network's relay (make sure you sync this with any changes made to that relay's configuration)
 
 
-# Building Components  Locally
+## Building Components Locally
 
 ### Fabric Interoperation Node SDK
 
