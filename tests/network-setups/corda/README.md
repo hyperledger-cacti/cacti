@@ -65,7 +65,7 @@ targets.
     gets the CorDapps from Github Packages, then starts the Corda nodes.
 -   `make start-local` is the same as `make start` except it gets the cordapps
     from locally built jars from the `corda-simple-app` and `corda-interop-app`
-    repositories.
+    repositories (delete `artifactory.properties` if present, else it will try to fetch dependencies from Github Packages).
 -   `make restart-with-new-interop-app` can be used to restart an already running
     Corda network with new local versions of the `corda-interop-app` CorDapp.
 -   `make stop` stops the nodes.

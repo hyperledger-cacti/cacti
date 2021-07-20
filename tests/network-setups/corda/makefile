@@ -3,7 +3,6 @@ start: artifactory.properties
 	echo "Building corda simple app..."
 	cp artifactory.properties ../../../samples/corda/corda-simple-application/
 	cd ../../../samples/corda/corda-simple-application && make build
-	cp build.gradle.remote build.gradle
 	./scripts/generate.sh
 	#./scripts/get-cordapps.sh
 	# ./scripts/start-nodes.sh
@@ -17,7 +16,6 @@ start-local:
 	cd ../../../core/network/corda-interop-app && make build-local
 	echo "Building corda simple app..."
 	cd ../../../samples/corda/corda-simple-application && make build-local
-	cp build.gradle.local build.gradle
 	./scripts/generate.sh
 	#./scripts/get-cordapps.sh local
 	# ./scripts/start-nodes.sh

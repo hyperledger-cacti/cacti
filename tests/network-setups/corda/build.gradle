@@ -1,7 +1,6 @@
 buildscript {
     Properties constants = new Properties()
     file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
-    file("$projectDir/./artifactory.properties").withInputStream { constants.load(it) }
 
     ext {
         corda_release_group = constants.getProperty("cordaReleaseGroup")
@@ -15,9 +14,6 @@ buildscript {
         slf4j_version = constants.getProperty("slf4jVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         weaver_version = constants.getProperty("weaverVersion")
-        artifactory_username = constants.getProperty("username")
-        artifactory_password = constants.getProperty("password")
-        artifactory_url = constants.getProperty("url")
     }
 
     repositories {
@@ -69,16 +65,25 @@ repositories {
     mavenCentral()
     maven { url 'https://software.r3.com/artifactory/corda' }
     maven { url 'https://jitpack.io' }
-    maven {
-        url artifactory_url
-        credentials {
-            username artifactory_username
-            password artifactory_password
+    if (file("$projectDir/./artifactory.properties").exists()) {
+        Properties constants = new Properties()
+        file("$projectDir/./artifactory.properties").withInputStream { constants.load(it) }
+        maven {
+            url constants.url
+            credentials {
+                username constants.username
+                password constants.password
+            }
         }
     }
+    else {
+        flatDir {
+            dirs '../../../core/network/corda-interop-app/interop-contracts/build/libs'
+            dirs '../../../core/network/corda-interop-app/interop-workflows/build/libs'
+        }
+    
+    }
     flatDir {
-        dirs '../../../core/network/corda-interop-app/interop-contracts/build/libs'
-        dirs '../../../core/network/corda-interop-app/interop-workflows/build/libs'
         dirs '../../../samples/corda/corda-simple-application/contracts-kotlin/build/libs'
         dirs '../../../samples/corda/corda-simple-application/workflows-kotlin/build/libs'
     }
