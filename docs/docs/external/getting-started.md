@@ -317,8 +317,8 @@ RelayServer listening on [::1]:9081
 
 The code for this lies in the `core/drivers/corda-driver` folder.
 
-To build the driver without building weaver dependencies locally, skip next section and go to [Building Corda Driver Locally](#building-corda-driver-locally),
-else go to [Building Corda Driver with dependencies from Github Packages](#building-corda-driver-with-dependencies-from-github-packages).
+To build the driver without building weaver dependencies locally, skip next section and go to [Building Corda Driver with dependencies from Github Packages](#building-corda-driver-with-dependencies-from-github-packages),
+else go to [Building Corda Driver Locally](#building-corda-driver-locally).
 
 #### Building Corda Driver Locally
 
