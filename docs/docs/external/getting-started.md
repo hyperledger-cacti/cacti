@@ -266,7 +266,7 @@ The Corda network code lies in the `tests/network-setups/corda` folder. You can 
 Following steps will build above cordapp and a corda-client as well in `samples/corda/client`.
 
 To start the network without building weaver dependencies locally, skip next section and go to [Running with Interoperation Cordapp from Github Packages](#running-with-interoperation-cordapp-from-github-packages),
-else go to [Running with Local Interoperation Cordapp](#running-with-local-interoperation-cordapp), and skip the next section.
+else go to [Running with Local Interoperation Cordapp](#running-with-local-interoperation-cordapp).
 
 #### Running with Local Interoperation Cordapp
 
@@ -318,7 +318,7 @@ RelayServer listening on [::1]:9081
 The code for this lies in the `core/drivers/corda-driver` folder.
 
 To build the driver without building weaver dependencies locally, skip next section and go to [Building Corda Driver Locally](#building-corda-driver-locally),
-else go to [Building Corda Driver with dependencies from Github Packages](#building-corda-driver-with-dependencies-from-github-packages), and skip the next section.
+else go to [Building Corda Driver with dependencies from Github Packages](#building-corda-driver-with-dependencies-from-github-packages).
 
 #### Building Corda Driver Locally
 
