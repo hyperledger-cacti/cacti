@@ -19,7 +19,8 @@ As blockchain technology proliferates, blockchain integration will become an inc
 
 ### Supply Chain Example
 
-1. Run the following command to pull up the container that will run the example application and the test ledgers as well:
+1. Ensure a working installation of [Docker](https://docs.docker.com/desktop/) is present on your machine.
+2. Run the following command to pull up the container that will run the example application and the test ledgers as well:
     ```sh
     docker run \
       --rm \
@@ -30,11 +31,11 @@ As blockchain technology proliferates, blockchain integration will become an inc
       -p 4000:4000 \
       -p 4100:4100 \
       -p 4200:4200 \
-      ghcr.io/hyperledger/cactus-example-supply-chain-app:2021-07-01--fix-1063-v2
+      ghcr.io/hyperledger/cactus-example-supply-chain-app:2021-07-20--fix-720
     ```
-2. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3100`
-3. Visit http://localhost:3100 in a web browser with Javascript enabled
-4. Use the graphical user interface to create data on both ledgers and observe that a consistent view of the data from different ledgers is provided.
+3. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3100`
+4. Visit http://localhost:3100 in a web browser with Javascript enabled
+5. Use the graphical user interface to create data on both ledgers and observe that a consistent view of the data from different ledgers is provided.
 
 Once the last command has finished executing, open link printed on the console with a web browser of your choice
 
