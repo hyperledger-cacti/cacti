@@ -76,8 +76,8 @@ and then follow above 4 steps.
 5) Add this to your build.gradle (change the version accordingly):
 ```
 dependencies {
-	compile(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "1.2.0")
-	compile(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "1.2.0")
+	compile(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "1.2.1")
+	compile(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "1.2.1")
 }
 ```
 

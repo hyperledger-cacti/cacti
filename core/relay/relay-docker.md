@@ -154,7 +154,7 @@ First **login** to github container registry:
 * Copy `.env.template` file to `.env`.
 * Keep following Environment Variables in `.env` and delete/ignore rest:
     * PATH_TO_CONFIG: Path to the relay's config file. e.g. `./config/Fabric_Relay.toml`.
-    * RELAY_NAME: Keep it same as in relay config file. Same is used for container name.
+    * RELAY_NAME: It's the `name` parameter in the config file. Same is used for container name.
     * RELAY_PORT: Port for grpc relay server.
     * EXTERNAL_NETWORK: Docker bridge network name.
     * DOCKER_REGISTRY: Keep it same as in template.
