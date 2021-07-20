@@ -41,7 +41,7 @@ To deploy, run `make deploy`
 
 **Sample steps to use docker deployment:**
 
-* Create a Personal Access Token with read packages access in github.
+* Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Copy `.env.docker.template` to `.env` and make changes appropriately (like correcting the base path of repo, changing network name if required etc, check image details here: [weaver-fabric-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver)).
 * Make sure connection profile used for docker, containers correct hostnames instead of localhost in urls.
@@ -81,7 +81,7 @@ NOTE: When specifying ensure that they match the config that the relay is using.
 
 ## Push Fabric Driver image to Github container registry
 
-* Create a Personal Access Token with write, read, and delete packages access in github.
+* Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Create a copy of `.npmrc.template` as `.npmrc`.
 * Replace <personal-access-token> in copied `.npmrc` file with your personal access token.

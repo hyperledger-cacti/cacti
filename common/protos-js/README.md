@@ -2,7 +2,7 @@
 
 ## Steps to publish:
 
-1) Create a Personal Access Token from Github with write/read/delete access to packages.
+1) Create a Personal Access Token from Github with write/read/delete access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 2) Create a copy of `.npmrc.template` as `.npmrc`.
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 4) Run `npm publish` to publish package to github packages.
@@ -19,7 +19,7 @@ To publish to your fork, modify in `package.json`:
 and then follow above 4 steps.
 
 # Steps to Use
-1) Create a Personal Access Token from Github with read access to packages.
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 2) Create a copy of `.npmrc.template` as `.npmrc`.
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 4) Now put this `.npmrc` file in your application in same level as package.json.

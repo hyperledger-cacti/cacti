@@ -60,7 +60,7 @@ make image
 
 To push image to github container registry:
 
-* Create a Personal Access Token with write, read, and delete packages access in github.
+* Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Create a copy of `artifactory.properties.template` as `artifactory.properties`.
 * Replace <GITHUB Email> with your email id for github.
@@ -78,7 +78,7 @@ To push image to github container registry:
     - `DOCKER_IMAGE_NAME`: Keep it same.
     - `DOCKER_TAG`: Refer here for the image tags available: [weaver-corda-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-corda-driver)
     - `DOCKER_REGISTRY`: Keep it same. (replace `hyperledger-labs` with your git username if testing from your fork)
-* Create a Personal Access Token with read packages access in github.
+* Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Run: `make deploy`.
 * To stop, run: `docker-compose down`

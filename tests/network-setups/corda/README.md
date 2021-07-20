@@ -51,7 +51,7 @@ respective repos.
 
 To get the CorDapps from Github Packages you will need to have permission to do so:
 
-1) Create a Personal Access Token from Github with read access to packages.
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 2) Create a copy of `artifactory.properties.template` as `artifactory.properties`.
 3) Replace <GITHUB Email> with your email id for github.
 4) Replace <GITHUB Personal Access Token> with your personal access token.

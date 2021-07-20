@@ -2,7 +2,7 @@
 
 ## Steps to publish:
 
-1) Create a Personal Access Token from Github with write/read/delete access to packages.
+1) Create a Personal Access Token from Github with write/read/delete access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 2) Create a copy of `artifactory.properties.template` as `artifactory.properties`.
 3) Replace <GITHUB Email> with your email id for github.
 4) Replace <GITHUB Personal Access Token> with your personal access token.
@@ -21,7 +21,7 @@ and then follow above 4 steps.
 
 ## Steps to Use with Gradle:
 
-1) Create a Personal Access Token from Github with read access to packages.
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 2) Create a copy of `artifactory.properties.template` as `artifactory.properties`.
 3) Replace <GITHUB Email> with your email id for github.
 4) Replace <GITHUB Personal Access Token> with your personal access token.

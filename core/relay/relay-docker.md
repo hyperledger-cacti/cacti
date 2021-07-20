@@ -146,7 +146,7 @@ To run with Docker Compose please refer to the comments in the [docker-compose.y
 
 First **login** to github container registry:
 
-* Create a Personal Access Token with read packages access in github.
+* Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 
 **Some sample steps to deploy relay using docker-compose when Config File is available:**
@@ -190,7 +190,7 @@ First **login** to github container registry:
 
 ## Push Relay image to Github container registry
 
-* Create a Personal Access Token with write, read, and delete packages access in github.
+* Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Run `make push-server` to build and push the image to github registry.
 
