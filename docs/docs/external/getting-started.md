@@ -265,8 +265,12 @@ Using the sequence of instructions below, you can start a Corda network and run 
 The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary. This network uses `samples/corda/corda-simple-application` which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 Following steps will build above cordapp and a corda-client as well in `samples/corda/client`.
 
+To start the network without building weaver dependencies locally, skip next section and go to [Running with Interoperation Cordapp from Github Packages](#running-with-interoperation-cordapp-from-github-packages),
+else go to [Running with Local Interoperation Cordapp](#running-with-local-interoperation-cordapp), and skip the next section.
+
 #### Running with Local Interoperation Cordapp
 
+This will build the Interoperation Cordapp in `core/network/corda-interop-app` locally.
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
 - To spin up the Corda network with the interoperation Cordapp, run:
@@ -274,8 +278,9 @@ Follow the instructions below to build and launch the network:
   make start-local
   ```
   
-#### Running with Interoperation Cordapp from Github Packages.
+#### Running with Interoperation Cordapp from Github Packages
 
+This will fetch the already built Interoperation Cordapp from Github Packages.
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
 - Create copy of `artifactory.properties.template` as `artifactory.properties`.
@@ -312,14 +317,30 @@ RelayServer listening on [::1]:9081
 
 The code for this lies in the `core/drivers/corda-driver` folder.
 
-#### Building
+To build the driver without building weaver dependencies locally, skip next section and go to [Building Corda Driver Locally](#building-corda-driver-locally),
+else go to [Building Corda Driver with dependencies from Github Packages](#building-corda-driver-with-dependencies-from-github-packages), and skip the next section.
 
+#### Building Corda Driver Locally
+
+This will build all the weaver dependencies locally.
 Build the Corda driver module as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
 - Run the following:
   ```bash
   make build-local
   ```
+  
+#### Building Corda Driver with dependencies from Github Packages
+
+This will fetch already built weaver dependencies from Github Packages.
+Build the Corda driver module as follows:
+- Navigate to the `core/drivers/corda-driver` folder.
+- Create copy of `artifactory.properties.template` as `artifactory.properties`.
+- Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
+- Run the following:
+```bash
+make build
+```
 
 #### Running
 
