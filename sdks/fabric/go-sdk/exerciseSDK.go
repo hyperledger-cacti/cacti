@@ -191,6 +191,128 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 
 }
 
+func testLockAssetAndClaimAssetUsingContractIdOfBondAsset(assetId string) {
+
+	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+	contractU2, idU2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com", "connection-org1.yaml")
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+
+	fmt.Println("Going to create asset ", assetId)
+	err = helpers.Invoke(contractU2, "CreateAsset", "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), "Treasury", "500", "02 Dec 29 15:04 MST")
+	if err != nil {
+		log.Fatalf("failed Invoke with error: %+v", err)
+	}
+
+	preimage := "abcd"
+	hashBase64 := am.GenerateSHA256HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+	expiryTimeSecs := currentTimeSecs + 600
+
+	log.Println("Going to lock asset by locker ..")
+	result, err := am.CreateHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	if err != nil {
+		log.Fatalf("failed CreateHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	contractId := result
+	err = helpers.Query(contractU2, "ReadAsset", "t1", assetId, "false")
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+	log.Println("Going to query if asset is locked using locker (via contarct-id) ..")
+	result, err = am.IsAssetLockedInHTLCqueryUsingContractId(am.NewGatewayContractInterface(), contractU2, contractId)
+	if err != nil {
+		log.Fatalf("failed IsAssetLockedInHTLCqueryUsingContractId with error: %+v", err)
+	}
+	log.Println(result)
+	log.Println("Going to query if asset is locked using recipient (via contract-id) ..")
+	result, err = am.IsAssetLockedInHTLCqueryUsingContractId(am.NewGatewayContractInterface(), contractU1, contractId)
+	if err != nil {
+		log.Fatalf("failed IsAssetLockedInHTLCqueryUsingContractId with error: %+v", err)
+	}
+	log.Println(result)
+
+	log.Println("Going to claim a locked asset by recipient (via contract-id) ..")
+	result, err = am.ClaimAssetInHTLCusingContractId(am.NewGatewayContractInterface(), contractU1, contractId, base64.StdEncoding.EncodeToString([]byte(preimage)))
+	if err != nil {
+		log.Fatalf("failed ClaimAssetInHTLCusingContractId with error: %+v", err)
+	}
+	log.Println(result)
+	err = helpers.Query(contractU1, "ReadAsset", "t1", assetId, "false")
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+}
+
+func testLockAssetAndUnlockAssetUsingContractIdOfBondAsset(assetId string) {
+
+	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+	contractU2, idU2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com", "connection-org1.yaml")
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %+v", err)
+	}
+
+	fmt.Println("Going to create asset ", assetId)
+	err = helpers.Invoke(contractU2, "CreateAsset", "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), "Treasury", "500", "02 Dec 29 15:04 MST")
+	if err != nil {
+		log.Fatalf("failed Invoke with error: %+v", err)
+	}
+
+	preimage := "abcd"
+	hashBase64 := am.GenerateSHA256HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+	// lock for only few seconds so that unlock/reclaim can be exercised
+	expiryTimeSecs := currentTimeSecs + 1
+
+	log.Println("Going to lock asset by locker ..")
+	result, err := am.CreateHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	if err != nil {
+		log.Fatalf("failed CreateHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	contractId := result
+	err = helpers.Query(contractU2, "ReadAsset", "t1", assetId, "false")
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+	log.Println("Locker going to query if asset is locked (via contract-id) ..")
+	result, err = am.IsAssetLockedInHTLCqueryUsingContractId(am.NewGatewayContractInterface(), contractU2, contractId)
+	if err != nil {
+		// It's possible that the time elapses hence the query fails. So don't use log.Fatalf so that we can proceed to unlock
+		log.Printf("failed IsAssetLockedInHTLCqueryUsingContractId with error: %+v", err)
+	}
+	log.Println(result)
+	log.Println("Recipient going to query if asset is locked (via contract-id) ..")
+	result, err = am.IsAssetLockedInHTLCqueryUsingContractId(am.NewGatewayContractInterface(), contractU1, contractId)
+	if err != nil {
+		log.Printf("failed IsAssetLockedInHTLCqueryUsingContractId with error: %+v", err)
+	}
+	log.Println(result)
+
+	log.Println("Locker going to unlock/reclaim a locked asset (via contract-id) ..")
+	result, err = am.ReclaimAssetInHTLCusingContractId(am.NewGatewayContractInterface(), contractU2, contractId)
+	if err != nil {
+		log.Fatalf("failed ReclaimAssetInHTLC with error: %+v", err)
+	}
+	log.Println(result)
+	err = helpers.Query(contractU2, "ReadAsset", "t1", assetId, "false")
+	if err != nil {
+		log.Fatalf("failed Query with error: %+v", err)
+	}
+
+}
+
 func testLockAssetAndClaimAssetOfTokenAsset() {
 
 	assetType := "token1"
@@ -372,8 +494,11 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 func main() {
 	connectSimpleStateWithSDK()                    // needs the chaincode simplestate on the channel
 	connectSimpleAssetWithSDK("a001")              // needs the chaincode simpleasset on the channel
-	testLockAssetAndClaimAssetOfBondAsset("a042")  // needs the chaincodes simpleasset and interop on the channel
-	testLockAssetAndUnlockAssetOfBondAsset("a043") // needs the chaincodes simpleasset and interop on the channel
+	testLockAssetAndClaimAssetOfBondAsset("a020")  // needs the chaincodes simpleasset and interop on the channel
+	testLockAssetAndUnlockAssetOfBondAsset("a021") // needs the chaincodes simpleasset and interop on the channel
+
+	testLockAssetAndClaimAssetUsingContractIdOfBondAsset("a040")  // needs the chaincodes simpleasset and interop on the channel
+	testLockAssetAndUnlockAssetUsingContractIdOfBondAsset("a041") // needs the chaincodes simpleasset and interop on the channel
 
 	testLockAssetAndClaimAssetOfTokenAsset()  // needs the chaincodes simpleasset and interop on the channel
 	testLockAssetAndUnlockAssetOfTokenAsset() // needs the chaincodes simpleasset and interop on the channel
