@@ -279,7 +279,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         return DiagnoseNodeV1Response(nodeDiagnosticInfo = nodeDiagnosticInfoCactus)
     }
 
-    override fun getPrometheusExporterMetricsV1(): String {
+    override fun getPrometheusMetricsV1(): String {
         TODO("Not yet implemented")
     }
 
