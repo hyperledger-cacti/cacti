@@ -80,18 +80,6 @@ Clone the [weaver-dlt-interoperability](https://github.com/hyperledger-labs/weav
 
 Using the sequence of instructions below, you can start two separate Fabric networks, each with a single channel and application contract (chaincode). You can also start an interoperation contract, a relay and a _driver_ acting on behalf of each network. You can build a Fabric CLI tool with which you can initialize both networks' ledgers with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample key-value pairs that can be shared during subsequent interoperation flows.
 
-### Fabric Interoperation Node SDK
-
-A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the `sdks/fabric/interoperation-node-sdk` folder. This contains functions for Fabric Gateway-based applications to exercise interoperation capabilities via relays and also a number of utility/helper functions. The Fabric-CLI tool, which we will use later, depends on this library. This library is published as github packages here: [hyperledger-labs packages](https://github.com/orgs/hyperledger-labs/packages), thus it is **not required** to build this library for the testnet demo.
-
-(OPTIONAL) To build the library, do the following:
-- Navigate to the `sdks/fabric/interoperation-node-sdk` folder.
-- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token).
-- Run the following command:
-  ```bash
-  make build-local
-  ```
-
 ### Fabric Network
 
 The code for this lies in the `tests/network-setups` folder.
@@ -271,34 +259,11 @@ _Note_: the variables we specified earlier in the `.env` are now passed in the c
 
 Using the sequence of instructions below, you can start a Corda network and run an application Cordapp on it. You can also run an interoperation Cordapp, a relay and a _driver_ acting on behalf of the network. You can initialize the network's vault with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample state values that can be shared during subsequent interoperation flows.
 
-### Interoperation Cordapp
-
-The interoperation Cordapp is deployed to run as part of any Corda application flow that involves cross-network interoperation.
-
-(OPTIONAL) Build the interoperation Cordapp as follows:
-- Navigate to the `core/network/corda-interop-app` folder.
-- Run the following to create the JAR files on which other Corda network components will depend on:
-  ```bash
-  make build-local
-  ```
-
-### Corda Client (Application)
-
-This is a simple Cordapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
-The code for this lies in the `samples/corda/corda-simple-application` folder.
-
-#### (OPTIONAL) Building
-
-Build the `corda-simple-application` Cordapp as follows:
-- Navigate to the `samples/corda/corda-simple-application` folder.
-- Run the following:
-  ```bash
-  make build-local
-  ```
 
 ### Corda Network
 
-The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary.
+The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary. This network uses `samples/corda/corda-simple-application` which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
+Following steps will build above cordapp and a corda-client as well in `samples/corda/client`.
 
 #### Running with Local Interoperation Cordapp
 
@@ -402,7 +367,7 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
   ```
 - Query the value of the requested state (key) `a` in `Corda_Network` using the following (replace LinearId with the CorDapp simplestate linearId value obtained in the previous command):
   ```bash
-  ./clients/build/install/clients/bin/clients get-state-using-linear-id LinearId
+  ./clients/build/install/clients/bin/clients get-state a
   ```
 
 To test the scenario where `Corda_Network` requests the value of the state (key) `Arcturus` from `network2`, do the following:
@@ -410,6 +375,10 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
 - Run the following:
   ```bash
   ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+  ```
+- Query the value of the requested state (key) `a` in `Corda_Network` using the following (replace LinearId with the CorDapp simplestate linearId value obtained in the previous command):
+  ```bash
+  ./clients/build/install/clients/bin/clients get-state Arcturus
   ```
 
 ## Fabric to Corda
@@ -586,3 +555,43 @@ The `config.json` (which can have a different name as long as you add the right 
 ```
 - `connProfilePath`: absolute path of the network's connection profile
 - `relayEndpoint`: hostname and port of the particular network's relay (make sure you sync this with any changes made to that relay's configuration)
+
+
+# Building Components  Locally
+
+### Fabric Interoperation Node SDK
+
+A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the `sdks/fabric/interoperation-node-sdk` folder. This contains functions for Fabric Gateway-based applications to exercise interoperation capabilities via relays and also a number of utility/helper functions. The Fabric-CLI tool, which we will use later, depends on this library. This library is published as github packages here: [hyperledger-labs packages](https://github.com/orgs/hyperledger-labs/packages), thus it is **not required** to build this library for the testnet demo.
+
+(OPTIONAL) To build the library, do the following:
+- Navigate to the `sdks/fabric/interoperation-node-sdk` folder.
+- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token).
+- Run the following command:
+  ```bash
+  make build-local
+  ```
+  
+### Interoperation Cordapp
+
+The interoperation Cordapp is deployed to run as part of any Corda application flow that involves cross-network interoperation.
+
+(OPTIONAL) Build the interoperation Cordapp as follows:
+- Navigate to the `core/network/corda-interop-app` folder.
+- Run the following to create the JAR files on which other Corda network components will depend on:
+  ```bash
+  make build-local
+  ```
+
+### Corda Client (Application)
+
+This is a simple Cordapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
+The code for this lies in the `samples/corda/corda-simple-application` folder.
+
+#### (OPTIONAL) Building
+
+Build the `corda-simple-application` Cordapp as follows:
+- Navigate to the `samples/corda/corda-simple-application` folder.
+- Run the following:
+  ```bash
+  make build-local
+  ```
