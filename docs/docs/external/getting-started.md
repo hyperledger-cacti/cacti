@@ -124,7 +124,7 @@ You can install `fabric-cli` as follows:
   ```bash
   npm install
   ```
-- Use the `fabric-cli` executable in the `bin` folder for subsequent actions. Either add that folder to your system path or simply run the command using `./bin/fabric-cli`.
+- Use the `fabric-cli` executable in the `bin` folder for subsequent actions.
 
 #### Configuration
 
@@ -153,11 +153,11 @@ Prepare `fabric-cli` for configuration as follows:
   * Leave the default values unchanged for the other parameters.
 - Run the following commands:
   ```
-  fabric-cli env set-file ./.env
+  ./bin/fabric-cli env set-file ./.env
   ```
 - If you haven't specified CONFIG_PATH environment variable in .env, then run this:
   ```
-  fabric-cli config set-file ./config.json
+  ./bin/fabric-cli config set-file ./config.json
   ```
   **NOTE:** Only one thing is required, either specify CONFIG_PATH in .env file or run the above command, not both.
 
@@ -166,7 +166,7 @@ See the [Fabric CLI](#fabric-cli) section for more information.
 Finally, to prepare both `network1` and `network2` for interoperation, run:
 
 ```bash
-fabric-cli configure all network1 network2
+./bin/fabric-cli configure all network1 network2
 ```
 
 ### Fabric Relay
