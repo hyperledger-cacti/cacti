@@ -109,7 +109,7 @@ Run `npm publish`. Will need the github personal access token with write access,
 
 ## Setup access token for weaver-fabric-interop-sdk
 
-1) Create a Personal Access Token from Github with read access to packages. \
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help. \
 2) Create a copy of `.npmrc.template` as `.npmrc`. \
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token. \
 4) Run npm install to check if it is working before testing/deployment.

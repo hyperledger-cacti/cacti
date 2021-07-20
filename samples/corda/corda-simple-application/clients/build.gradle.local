@@ -1,5 +1,4 @@
 buildscript {
-    ext.interop_cordapps_version = "1.2.0"
     ext.clikt_version = "2.7.1"
     ext.coroutines_version = "1.3.7"
     ext.protobuf_version = "3.11.1"
@@ -39,6 +38,7 @@ repositories {
     flatDir {
         dirs '../../../../core/network/corda-interop-app/interop-contracts/build/libs'
         dirs '../../../../core/network/corda-interop-app/interop-workflows/build/libs'
+        dirs '../../../../common/protos-java-kt/build/libs'
     }
 }
 
@@ -55,8 +55,9 @@ dependencies {
     compile project(":workflows-kotlin")
     compile "com.github.ajalt:clikt:$clikt_version"
 
-    compile(group: 'com.cordaInteropApp', name: 'interop-contracts', version: "$interop_cordapps_version")
-    compile(group: 'com.cordaInteropApp', name: 'interop-workflows', version: "$interop_cordapps_version")
+    compile(group: 'com.com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_version")
+    compile(group: 'com.com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_version")
+    compile(group: 'com.weaver', name: 'protos-java-kt', version: "$weaver_version")
 
     // gRPC and protobuf dependencies
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
@@ -72,30 +73,6 @@ dependencies {
     compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
     compile "org.apache.logging.log4j:log4j-web:${log4j_version}"
     compile "org.slf4j:jul-to-slf4j:$slf4j_version"
-}
-
-protobuf {
-    protoc { artifact = "com.google.protobuf:protoc:$protobuf_version" }
-    plugins {
-        // Specify protoc to generate using kotlin protobuf plugin
-        grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version"
-        }
-        // Specify protoc to generate using our grpc kotlin plugin
-        grpckt {
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:$grpc_kotlin_version"
-        }
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.plugins {
-                // Generate Java gRPC classes
-                grpc { }
-                // Generate Kotlin gRPC using the custom plugin from library
-                grpckt { }
-            }
-        }
-    }
 }
 
 mainClassName = "com.cordaSimpleApplication.client.CordaClientKt"

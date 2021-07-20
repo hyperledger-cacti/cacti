@@ -10,7 +10,6 @@ publish: build
 .PHONY: clean-build
 clean-build:
 	./gradlew clean
-	rm -rf src
 
 .PHONY: clean
 clean: clean-build

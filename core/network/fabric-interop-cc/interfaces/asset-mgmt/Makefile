@@ -1,3 +1,4 @@
+.PHONY: mocks
 mocks:
 	cp -r ../../contracts/interop/mocks .
 test: mocks

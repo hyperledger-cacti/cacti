@@ -1,4 +1,4 @@
 protos-go/
 vendor/
 interop
-mocks
+mocks/

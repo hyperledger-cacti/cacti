@@ -11,8 +11,8 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
 import net.corda.core.contracts.UniqueIdentifier
-import com.cordaInteropApp.states.*
-import com.cordaInteropApp.flows.*
+import com.weaver.corda.app.interop.states.*
+import com.weaver.corda.app.interop.flows.*
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaInteropApp
+package com.weaver.corda.app.interop
 
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.utilities.getOrThrow
