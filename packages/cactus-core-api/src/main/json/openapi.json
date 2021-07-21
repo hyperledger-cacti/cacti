@@ -542,6 +542,54 @@
                     }
                 }
             },
+            "AllHasObjectRequestV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key to check for presence in the object store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "AllHasObjectResponseV1": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "isPresent",
+                    "checkedAt",
+                    "presentOnSwarm"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to check the presence of the value in the object store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "checkedAt": {
+                        "type": "string",
+                        "description": "Date and time encoded as JSON when the presence check was performed by the plugin backend.",
+                        "nullable": false
+                    },
+                    "isPresent": {
+                        "type": "boolean",
+                        "description": "The boolean true or false indicating the presence or absence of an object under 'key'.",
+                        "nullable": false
+                    },
+                    "presentOnSwarm": {
+                        "type": "string",
+                        "description": "The string indicating what swarm(s) the object is present on.",
+                        "nullable": false
+                    }
+                }
+            },
             "SetObjectRequestV1": {
                 "type": "object",
                 "required": [
@@ -694,6 +742,17 @@
                     }
                 }
             },
+            "object_store_all_has_object_v1_request_body": {
+                "description": "Request body to check presence of an object under a key.",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/AllHasObjectRequestV1"
+                        }
+                    }
+                }
+            },
             "object_store_remove_object_v1_request_body": {
                 "description": "Request body to check presence of an object under a key.",
                 "required": true,
@@ -755,6 +814,16 @@
                     "application/json": {
                         "schema": {
                             "$ref": "#/components/schemas/HasObjectResponseV1"
+                        }
+                    }
+                }
+            },
+            "object_store_all_has_object_v1_response_body": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/AllHasObjectResponseV1"
                         }
                     }
                 }

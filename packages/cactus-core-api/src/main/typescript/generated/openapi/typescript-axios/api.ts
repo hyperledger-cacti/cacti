@@ -22,6 +22,50 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
+ * 
+ * @export
+ * @interface AllHasObjectRequestV1
+ */
+export interface AllHasObjectRequestV1 {
+    /**
+     * The key to check for presence in the object store.
+     * @type {string}
+     * @memberof AllHasObjectRequestV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface AllHasObjectResponseV1
+ */
+export interface AllHasObjectResponseV1 {
+    /**
+     * The key that was used to check the presence of the value in the object store.
+     * @type {string}
+     * @memberof AllHasObjectResponseV1
+     */
+    key: string;
+    /**
+     * Date and time encoded as JSON when the presence check was performed by the plugin backend.
+     * @type {string}
+     * @memberof AllHasObjectResponseV1
+     */
+    checkedAt: string;
+    /**
+     * The boolean true or false indicating the presence or absence of an object under \'key\'.
+     * @type {boolean}
+     * @memberof AllHasObjectResponseV1
+     */
+    isPresent: boolean;
+    /**
+     * The string indicating what swarm(s) the object is present on.
+     * @type {string}
+     * @memberof AllHasObjectResponseV1
+     */
+    presentOnSwarm: string;
+}
+/**
  * A Cactus node can be a single server, or a set of servers behind a load balancer acting as one.
  * @export
  * @interface CactusNode

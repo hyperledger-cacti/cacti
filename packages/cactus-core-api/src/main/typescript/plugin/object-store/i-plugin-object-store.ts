@@ -1,9 +1,13 @@
 import type { GetObjectRequestV1 } from "../../generated/openapi/typescript-axios";
 import type { GetObjectResponseV1 } from "../../generated/openapi/typescript-axios";
+import type { RemoveObjectRequestV1 } from "../../generated/openapi/typescript-axios";
+import type { RemoveObjectResponseV1 } from "../../generated/openapi/typescript-axios";
 import type { HasObjectRequestV1 } from "../../generated/openapi/typescript-axios";
+import type { HasObjectResponseV1 } from "../../generated/openapi/typescript-axios";
+import type { AllHasObjectRequestV1 } from "../../generated/openapi/typescript-axios";
+import type { AllHasObjectResponseV1 } from "../../generated/openapi/typescript-axios";
 import type { SetObjectRequestV1 } from "../../generated/openapi/typescript-axios";
 import type { SetObjectResponseV1 } from "../../generated/openapi/typescript-axios";
-import type { HasObjectResponseV1 } from "../../generated/openapi/typescript-axios";
 import type { ICactusPlugin } from "../i-cactus-plugin";
 import type { IPluginWebService } from "../web-service/i-plugin-web-service";
 
@@ -15,4 +19,6 @@ export interface IPluginObjectStore extends ICactusPlugin, IPluginWebService {
   has(req: HasObjectRequestV1): Promise<HasObjectResponseV1>;
   get(req: GetObjectRequestV1): Promise<GetObjectResponseV1>;
   set(req: SetObjectRequestV1): Promise<SetObjectResponseV1>;
+  remove(req: RemoveObjectRequestV1): Promise<RemoveObjectResponseV1>;
+  allHas?(req: AllHasObjectRequestV1): Promise<AllHasObjectResponseV1>;
 }
