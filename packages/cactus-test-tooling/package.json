@@ -12,7 +12,6 @@
     "dist/*"
   ],
   "scripts": {
-    "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -23,22 +22,6 @@
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
   "watch": {
-    "tsc": {
-      "patterns": [
-        "src/",
-        "src/*/json/**/openapi*"
-      ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
-    }
   },
   "publishConfig": {
     "access": "public"
@@ -86,8 +69,8 @@
     "compare-versions": "3.6.0",
     "dockerode": "3.2.0",
     "execa": "5.1.1",
-    "fabric-client": "1.4.14",
-    "fabric-network": "1.4.14",
+    "fabric-network": "2.2.8",
+    "fabric-ca-client": "2.2.8",
     "fs-extra": "9.0.0",
     "internal-ip": "6.2.0",
     "is-port-reachable": "3.0.0",

@@ -11,9 +11,7 @@
   "files": [
     "dist/*"
   ],
-  "bin": "./dist/lib/main/typescript/supply-chain-app-cli.js",
   "scripts": {
-    "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -24,22 +22,6 @@
     "webpack:prod:node": "NODE_OPTIONS=--max_old_space_size=4096 webpack --env=prod --target=node --config ../../webpack.config.js"
   },
   "watch": {
-    "tsc": {
-      "patterns": [
-        "src/",
-        "src/*/json/**/openapi*"
-      ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
-    }
   },
   "publishConfig": {
     "access": "public"
@@ -98,7 +80,7 @@
     "async-exit-hook": "2.0.1",
     "axios": "0.21.1",
     "express": "4.17.1",
-    "fabric-network": "1.4.13",
+    "fabric-network": "2.2.8",
     "jose": "1.28.1",
     "openapi-types": "7.0.1",
     "solc": "0.7.1",

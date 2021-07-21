@@ -577,11 +577,11 @@ export class Containers {
     const imageIds = existingImages.map((it) => it.Id);
     log.debug(`Clearing ${imageIds.length} images.... %o`, imageIds);
 
-    const cleanUpCmds = [
+    const cleanUpCommands = [
       { binary: "docker", args: ["rmi", ...imageIds] },
       { binary: "docker", args: ["volume", "prune", "--force"] },
     ];
-    for (const { binary, args } of cleanUpCmds) {
+    for (const { binary, args } of cleanUpCommands) {
       try {
         const { all, command } = await execa(binary, args, { all: true });
         log.debug(command);
