@@ -15,7 +15,7 @@
     "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
     "watch": "npm-watch",
     "codegen:openapi": "npm run generate-sdk",
-    "codegen": "run-p codegen:*",
+    "codegen": "run-p 'codegen:*'",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",

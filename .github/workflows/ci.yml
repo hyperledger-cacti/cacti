@@ -10,43 +10,18 @@ on:
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       max-parallel: 1024
       matrix:
         os: [ubuntu-20.04]
         node-version: [v12.22.3, v14.15.1, v16.2.0]
         experimental: [false]
-        # include:
-        #
-        # # FIXME macOS does not work due to lack of docker support in GHA.
-        # https://github.community/t/why-is-docker-not-installed-on-macos/17017
-        #   - os: macos-11.0 # macOS Big Sur 11.0
-        #     node-version: v12.22.3
-        #     experimental: true
-        #   - os: macos-10.15 # macOS Catalina 10.15
-        #     node-version: v12.22.3
-        #     experimental: true
-        #
-        # # FIXME
-        # https://github.com/hyperledger/cactus/issues/171
-        #   - os: windows-2019 # Windows Server 2019
-        #     node-version: v12.22.3
-        #     experimental: true
 
     steps:
-    # FIXME: These do not work on mac OS as of 2020-12-09
-    # https://github.community/t/why-is-docker-not-installed-on-macos/17017
-    # - name: Set up QEMU (ARM64 docker images once we are ready)
-    #   uses: docker/setup-qemu-action@v1.0.1
-
-    # - name: Set up Docker Buildx (ARM64 docker images once we are ready)
-    #   uses: docker/setup-buildx-action@v1.0.3
-
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2.1.2
       with:

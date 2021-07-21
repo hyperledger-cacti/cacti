@@ -13,6 +13,7 @@
     - [Running unit tests only](#running-unit-tests-only)
     - [Running integration tests only](#running-integration-tests-only)
     - [What is npx used for?](#what-is-npx-used-for)
+    - [What's the equivalent of npx for Yarn?](#whats-the-equivalent-of-npx-for-yarn)
     - [Debugging a test case](#debugging-a-test-case)
   - [All-In-One Docker Images for Ledger Connector Plugins](#all-in-one-docker-images-for-ledger-connector-plugins)
     - [Test Automation of Ledger Plugins](#test-automation-of-ledger-plugins)
@@ -389,6 +390,10 @@ place every node module (project dependencies) on the OS path or to install them
 
 Read more about npx here: https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner
 
+#### What's the equivalent of npx for Yarn?
+
+Yarn itself. E.g. `npx lerna clean` becomes `yarn lerna clean`.
+
 #### Debugging a test case
 
 Open the `.vscode/template.launch.json` file and either copy it with a name of
@@ -509,14 +514,15 @@ Example:
 
 ```sh
 # Adds "got" as a dependency to the cactus common package
-# (which resides under the path of ./packages/cactus-common)
-npm install got --save-exact --workspace ./packages/cactus-common
+# Note that you must specify the fully qualified package name as present in
+# the package.json file
+yarn workspace @hyperledger/cactus-common add got --save-exact
 ```
 
 You need to know which package of the monorepo will be using the package and then
-run the `npm install` command with an additional parameter specifying the directory
-of that package. See [adding-dependencies-to-a-workspace](https://docs.npmjs.com/cli/v7/using-npm/workspaces#adding-dependencies-to-a-workspace) from the official npm documentation
-for further details and examples.
+run the `yarn workspace` command with an additional parameters specifying the package
+name and the dependency name. 
+See [Yarn Workspaces Documentation](https://classic.yarnpkg.com/en/docs/cli/workspace/) for the official Yarn documentation for further details and examples.
 
 After adding new dependencies, you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
 
