@@ -20,7 +20,7 @@
     "test": "jest",
     "watch": "jest --watch",
     "snapupdate": "jest --updateSnapshot",
-    "coverage": "jest --coverage",
+    "coverage": "jest --coverage"
   },
   "files": [
     "tsconfig.json",
