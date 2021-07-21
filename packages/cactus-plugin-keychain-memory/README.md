@@ -9,7 +9,7 @@ This class creates a prometheus exporter, which scrapes the transactions (total 
 The prometheus exporter object is initialized in the `PluginKeychainMemory` class constructor itself, so instantiating the object of the `PluginKeychainMemory` class, gives access to the exporter object.
 You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginKeychainMemoryOptions` interface for `PluginKeychainMemory` constructor.
 
-`getPrometheusExporterMetricsV1` function returns the prometheus exporter metrics, currently displaying the total key count, which currently updates everytime a new key is added/removed from the list of total keys.
+`getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total key count, which currently updates everytime a new key is added/removed from the list of total keys.
 
 ### Prometheus Integration
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
