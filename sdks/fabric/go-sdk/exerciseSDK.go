@@ -12,11 +12,54 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/proto"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
 )
+
+func registerEvent(contract *gateway.Contract, eventName string) (fab.Registration, <-chan *fab.CCEvent, error) {
+	reg, notifier, errEventRegistration := contract.RegisterEvent(eventName)
+	if errEventRegistration != nil {
+		log.Errorf("failed to register contract event: %s", errEventRegistration)
+	}
+
+	return reg, notifier, errEventRegistration
+}
+
+func receiveEvent(notifier <-chan *fab.CCEvent) {
+
+	var ccEvent *fab.CCEvent
+	select {
+	case ccEvent = <-notifier:
+		{
+			log.Printf("received CC event: %#v", ccEvent)
+			eventName := ccEvent.EventName
+			if eventName == "LockAsset" || eventName == "ClaimAsset" || eventName == "UnlockAsset" {
+				contractInfo := &common.AssetContractHTLC{}
+				err := proto.Unmarshal(ccEvent.Payload, contractInfo)
+				if err != nil {
+					log.Errorf("failed to unmarshal event: %+v", err)
+				}
+				log.Printf("received CC event %s is: %+v\n", eventName, contractInfo)
+			} else if eventName == "LockFungibleAsset" || eventName == "ClaimFungibleAsset" || eventName == "UnlockFungibleAsset" {
+				contractInfo := &common.FungibleAssetContractHTLC{}
+				err := proto.Unmarshal(ccEvent.Payload, contractInfo)
+				if err != nil {
+					log.Errorf("failed to unmarshal event: %+v", err)
+				}
+				log.Printf("received CC event %s is: %+v\n", eventName, contractInfo)
+			}
+
+		}
+	case <-time.After(time.Second * 20):
+		log.Errorf("did NOT receive CC event for eventId(%s)\n", "LockFungibleAsset")
+	}
+
+}
 
 func connectSimpleStateWithSDK() {
 	contractU1, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
@@ -82,6 +125,10 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
 
+	// register for chaincode event
+	reg, notifier, errEventRegistration := registerEvent(contractU2, "LockAsset")
+	defer contractU2.Unregister(reg)
+
 	fmt.Println("Going to create asset ", assetId)
 	err = helpers.Invoke(contractU2, "CreateAsset", "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), "Treasury", "500", "02 Dec 29 15:04 MST")
 	if err != nil {
@@ -99,6 +146,11 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 		log.Fatalf("failed CreateHTLC with error: %+v", err)
 	}
 	log.Println(result)
+
+	if errEventRegistration == nil {
+		receiveEvent(notifier)
+	}
+
 	err = helpers.Query(contractU2, "ReadAsset", "t1", assetId, "false")
 	if err != nil {
 		log.Fatalf("failed Query with error: %+v", err)
@@ -141,6 +193,10 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
 
+	// register for chaincode event
+	reg, notifier, errEventRegistration := registerEvent(contractU2, "LockAsset")
+	defer contractU2.Unregister(reg)
+
 	fmt.Println("Going to create asset ", assetId)
 	err = helpers.Invoke(contractU2, "CreateAsset", "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), "Treasury", "500", "02 Dec 29 15:04 MST")
 	if err != nil {
@@ -171,6 +227,11 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 		log.Printf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
+
+	if errEventRegistration == nil {
+		receiveEvent(notifier)
+	}
+
 	log.Println("Recipient going to query if asset is locked ..")
 	result, err = am.IsAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
@@ -327,13 +388,8 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	}
 
 	// register for chaincode event
-	reg, notifier, errEventRegistration := contractU2.RegisterEvent("LockFungibleAsset")
-	if errEventRegistration != nil {
-		log.Printf("Failed to register contract event: %s", errEventRegistration)
-	}
-	if errEventRegistration == nil {
-		defer contractU2.Unregister(reg)
-	}
+	reg, notifier, errEventRegistration := registerEvent(contractU2, "LockFungibleAsset")
+	defer contractU2.Unregister(reg)
 
 	fmt.Println("Going to create token assets: ", numUnits)
 	err = helpers.Invoke(contractU2, "IssueTokenAssets", assetType, "6", base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
@@ -360,13 +416,7 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	contractId := result
 
 	if errEventRegistration == nil {
-		var ccEvent *fab.CCEvent
-		select {
-		case ccEvent = <-notifier:
-			log.Printf("Received CC event: %#v\n", ccEvent)
-		case <-time.After(time.Second * 20):
-			log.Printf("Did NOT receive CC event for eventId(%s)\n", "LockFungibleAsset")
-		}
+		receiveEvent(notifier)
 	}
 
 	log.Println("Query the token balance for locker before claim ..")
@@ -425,6 +475,10 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
 
+	// register for chaincode event
+	reg, notifier, errEventRegistration := registerEvent(contractU2, "LockFungibleAsset")
+	defer contractU2.Unregister(reg)
+
 	fmt.Println("Going to create token assets: ", numUnits)
 	err = helpers.Invoke(contractU2, "IssueTokenAssets", assetType, "6", base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
@@ -478,6 +532,11 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 		log.Fatalf("failed ReclaimFungibleAssetInHTLC with error: %+v", err)
 	}
 	log.Println(result)
+
+	if errEventRegistration == nil {
+		receiveEvent(notifier)
+	}
+
 	log.Println("Query the token balance for locker after claim..")
 	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
