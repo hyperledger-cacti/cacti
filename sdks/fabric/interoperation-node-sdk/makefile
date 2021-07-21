@@ -1,9 +1,6 @@
 .PHONY: build-local
 build-local: .npmrc
-	# echo "Calling update-protos-local script..."
-	# ./scripts/update-protos-local.sh
 	npm install
-	# npm run protos
 	npm run build
 
 .PHONY: build
