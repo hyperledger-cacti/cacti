@@ -12,7 +12,6 @@
     "dist/*"
   ],
   "scripts": {
-    "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -22,24 +21,7 @@
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
-  "watch": {
-    "tsc": {
-      "patterns": [
-        "src/",
-        "src/*/json/**/openapi*"
-      ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
-    }
-  },
+  "watch": {},
   "publishConfig": {
     "access": "public"
   },
@@ -83,7 +65,7 @@
   "dependencies": {
     "json-stable-stringify": "1.0.1",
     "key-encoder": "2.0.3",
-    "loglevel": "1.6.7",
+    "loglevel": "1.7.1",
     "loglevel-plugin-prefix": "0.8.4",
     "secp256k1": "4.0.2",
     "sha3": "2.1.3"
