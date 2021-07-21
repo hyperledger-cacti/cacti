@@ -1,0 +1,101 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Example Business Logic Plugin - Cartrade",
+        "description": "Demonstrates how to use the Verifier CC plugin for trading cars.",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "WatchBlocksV1": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Next",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Error",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "WatchBlocksV1Progress": {
+                "type": "object",
+                "required": ["blockHeader"],
+                "properties": {
+                    "blockHeader": {
+                    } 
+                }
+            },
+            "GetBalanceV1Response": {
+                "type": "object",
+                "required": [
+                    "balance"                    
+                ],
+                "properties": {
+                    "balance": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GetBalanceV1Request": {
+                "type": "object",
+                "required":[
+                    "address"
+                ],
+                "properties": {
+                    "address": {
+                        "type":"string"
+                    },
+                    "defaultBlock": {
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance": {
+            "post": {
+                "x-hyperledger-cactus": { 
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance"
+                    }
+                },
+                "operationId": "getBalanceV1",
+                "summary": "Return balance of an address of a given block",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetBalanceV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetBalanceV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -16,3 +16,4 @@
 # typings/**
 
 **/src/main/typescript/generated/proto/**
+packages/cactus-verifier/src/main/typescript/

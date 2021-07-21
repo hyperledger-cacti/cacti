@@ -38,6 +38,7 @@
         "grpc",
         "grpcs",
         "grpcwebtext",
+        "guks",
         "hashicorp",
         "Healthcheck",
         "HTLC",
@@ -50,6 +51,7 @@
         "isready",
         "jboss",
         "JORDI",
+        "jsrsa",
         "jsrsasign",
         "Keychain",
         "Keycloak",
@@ -92,8 +94,10 @@
         "sbjpubkey",
         "Secp",
         "shrn",
+        "Smonitor",
         "socketio",
         "SPDX",
+        "Splug",
         "Sprintf",
         "stretchr",
         "supervisorctl",
@@ -104,6 +108,7 @@
         "tlsca",
         "tlscacerts",
         "txqueue",
+        "Uisrs",
         "Unmarshal",
         "uuidv",
         "vscc",
@@ -114,8 +119,9 @@
         "typescript,node,npm,go,rust"
     ],
     "ignorePaths": [
-        "node_modules/**",
+        "**/node_modules/**",
         "**/build/**",
-        "**/src/main/typescript/generated/**"
+        "**/src/main/typescript/generated/**",
+        "packages/cactus-plugin-verifier-cc/**"
     ]
 }
