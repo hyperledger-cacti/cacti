@@ -8,8 +8,8 @@ package assetmgmt_test
 
 import (
 	"os"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/mocks"
-	am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
+	"github.com/sanvenDev/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/mocks"
+	am "github.com/sanvenDev/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
+module github.com/sanvenDev/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
 
 go 1.16
 
