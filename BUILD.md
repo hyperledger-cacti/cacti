@@ -90,6 +90,8 @@ The `npm run watch` script in action:
     * WSL2 or any virtual machine running Ubuntu 20.04 LTS
   * Git
   * NodeJS 16, npm 7 (we recommend using the Node Version Manager (nvm) if available for your OS)
+  * Yarn 
+    * `npm run install-yarn` (from within the project directory)
   * Docker Engine
   * Docker Compose
 
