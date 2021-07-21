@@ -21,7 +21,6 @@
     "watch": "jest --watch",
     "snapupdate": "jest --updateSnapshot",
     "coverage": "jest --coverage",
-    "protos": "grpc_tools_node_protoc --proto_path=protos --js_out=import_style=commonjs,binary:protos-js/ --grpc_out=grpc_js:protos-js/ --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` protos/relay/datatransfer.proto protos/networks/networks.proto protos/driver/driver.proto protos/common/ack.proto protos/common/query.proto protos/common/state.proto protos/common/proofs.proto  "
   },
   "files": [
     "tsconfig.json",
