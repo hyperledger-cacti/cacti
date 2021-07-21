@@ -1,0 +1,32 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-example-verifier-cc-cartrade.tsbuildinfo"
+  },
+  "include": [
+    "./src",
+    "src/**/*.json"
+  ],
+  "references": [
+    {
+      "path": "../../packages/cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-verifier-cc/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-test-tooling/tsconfig.json"
+    }
+  ]
+}
