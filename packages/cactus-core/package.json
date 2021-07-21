@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Contains lower level abstractions/implementation that is to be shared by multiple other, higher level packages of the project.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-core.node.umd.min.js",
@@ -12,7 +12,6 @@
     "dist/*"
   ],
   "scripts": {
-    "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -23,22 +22,6 @@
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
   "watch": {
-    "tsc": {
-      "patterns": [
-        "src/",
-        "src/*/json/**/openapi*"
-      ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
-    }
   },
   "publishConfig": {
     "access": "public"
@@ -81,8 +64,8 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.5.0",
-    "@hyperledger/cactus-core-api": "0.5.0",
+    "@hyperledger/cactus-common": "0.6.0",
+    "@hyperledger/cactus-core-api": "0.6.0",
     "express": "4.17.1",
     "express-jwt-authz": "2.4.1",
     "typescript-optional": "2.0.1"

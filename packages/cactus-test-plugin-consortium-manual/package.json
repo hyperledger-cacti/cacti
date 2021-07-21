@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-plugin-consortium-manual",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Integration tests for the Quorum ledger and the API server.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-plugin-consortium-manual.node.umd.min.js",
@@ -12,7 +12,6 @@
     "dist/*"
   ],
   "scripts": {
-    "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -23,22 +22,6 @@
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
   "watch": {
-    "tsc": {
-      "patterns": [
-        "src/",
-        "src/*/json/**/openapi*"
-      ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
-    }
   },
   "publishConfig": {
     "access": "public"
@@ -81,12 +64,12 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "0.5.0",
-    "@hyperledger/cactus-common": "0.5.0",
-    "@hyperledger/cactus-core": "0.5.0",
-    "@hyperledger/cactus-core-api": "0.5.0",
-    "@hyperledger/cactus-plugin-consortium-manual": "0.5.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "0.5.0",
+    "@hyperledger/cactus-cmd-api-server": "0.6.0",
+    "@hyperledger/cactus-common": "0.6.0",
+    "@hyperledger/cactus-core": "0.6.0",
+    "@hyperledger/cactus-core-api": "0.6.0",
+    "@hyperledger/cactus-plugin-consortium-manual": "0.6.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "0.6.0",
     "axios": "0.21.1",
     "jose": "1.28.1"
   }

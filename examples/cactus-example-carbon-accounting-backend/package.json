@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-carbon-accounting-backend",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "An example application showing how to use Cactus when implementing a Carbon Accounting Application where two or more blockchains are sharing data with each other to achieve a certain business outcome beneficial to multiple parties (business organizations).",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-example-carbon-accounting-backend.node.umd.min.js",
@@ -11,12 +11,9 @@
   "files": [
     "dist/*"
   ],
-  "bin": "./dist/lib/main/typescript/carbon-accounting-app-cli.js",
   "scripts": {
-    "tsc": "tsc --project ./tsconfig.json",
-    "start" : "CONFIG_FILE=./example-config.json node dist/lib/main/typescript/carbon-accounting-app-cli.js",
+    "start": "CONFIG_FILE=./example-config.json node dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "solidity": "hardhat compile",
-    "pretsc": "npm run solidity",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -27,23 +24,11 @@
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
   "watch": {
-    "tsc": {
+    "solidity": {
       "patterns": [
-        "src/",
-        "src/*/json/**/openapi*",
-        "src/*/solidity/**/*"
+        "./src/main/solidity/"
       ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "sol",
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
+      "extensions": "sol"
     }
   },
   "engines": {
@@ -84,20 +69,20 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-api-client": "0.5.0",
-    "@hyperledger/cactus-cmd-api-server": "0.5.0",
-    "@hyperledger/cactus-common": "0.5.0",
-    "@hyperledger/cactus-core": "0.5.0",
-    "@hyperledger/cactus-core-api": "0.5.0",
-    "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin": "0.5.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "0.5.0",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "0.5.0",
-    "@hyperledger/cactus-plugin-ledger-connector-xdai": "0.5.0",
-    "@hyperledger/cactus-test-tooling": "0.5.0",
+    "@hyperledger/cactus-api-client": "0.6.0",
+    "@hyperledger/cactus-cmd-api-server": "0.6.0",
+    "@hyperledger/cactus-common": "0.6.0",
+    "@hyperledger/cactus-core": "0.6.0",
+    "@hyperledger/cactus-core-api": "0.6.0",
+    "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin": "0.6.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "0.6.0",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "0.6.0",
+    "@hyperledger/cactus-plugin-ledger-connector-xdai": "0.6.0",
+    "@hyperledger/cactus-test-tooling": "0.6.0",
     "@openzeppelin/contracts": "3.3.0",
     "@openzeppelin/contracts-upgradeable": "3.4.1",
     "async-exit-hook": "2.0.1",
-    "fabric-network": "1.4.13",
+    "fabric-network": "2.2.8",
     "fs-extra": "9.1.0",
     "openapi-types": "7.0.1",
     "typescript-optional": "2.0.1",

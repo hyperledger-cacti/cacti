@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-memory",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-keychain-memory.node.umd.min.js",
@@ -13,8 +13,8 @@
   ],
   "scripts": {
     "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
-    "pretsc": "npm run generate-sdk",
-    "tsc": "tsc --project ./tsconfig.json",
+    "codegen:openapi": "npm run generate-sdk",
+    "codegen": "run-p codegen:*",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -25,21 +25,10 @@
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
   "watch": {
-    "tsc": {
+    "codegen:openapi": {
       "patterns": [
-        "src/",
-        "src/*/json/**/openapi*"
-      ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
+        "./src/main/json/openapi.json"
+      ]
     }
   },
   "publishConfig": {
@@ -83,9 +72,9 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.5.0",
-    "@hyperledger/cactus-core": "0.5.0",
-    "@hyperledger/cactus-core-api": "0.5.0",
+    "@hyperledger/cactus-common": "0.6.0",
+    "@hyperledger/cactus-core": "0.6.0",
+    "@hyperledger/cactus-core-api": "0.6.0",
     "axios": "0.21.1",
     "express": "4.17.1",
     "prom-client": "13.1.0",
