@@ -35,7 +35,7 @@ This is a video guide to setup Hyperledger Cactus on your local machine.
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/n_HiEwgzPsM/0.jpg)](https://www.youtube.com/watch?v=n_HiEwgzPsM)
 
 ### Compiling all packages
- 
+
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/5v82MAHPQmM/0.jpg)](https://www.youtube.com/watch?v=5v82MAHPQmM)
 
 ### Testing all packages
@@ -87,9 +87,9 @@ The `npm run watch` script in action:
 
 * Install OS level dependencies:
   * Windows Only
-    * WSL1 or WSL2 or any virtual machine running Ubuntu LTS
+    * WSL2 or any virtual machine running Ubuntu 20.04 LTS
   * Git
-  * NodeJS 12 or newer LTS (we recommend using nvm if available for your OS)
+  * NodeJS 16, npm 7 (we recommend using the Node Version Manager (nvm) if available for your OS)
   * Docker Engine
   * Docker Compose
 
@@ -147,11 +147,10 @@ The most interesting part of the `.config.json` file is the plugins array which
 takes a list of plugin package names and their options (which can be anything
 that you can fit into a generic JSON object).
 
-Notice that to include a plugin, all you need is specify it's npm package name
-(and ensure that said package is actually installed). This is important since
-it allows you to have your own plugins in their respective, independent Github
-repositories and npm packages where you do not have to seek explicit approval
-from the Cactus maintainers to create/maintain your plugin at all.
+Notice that to include a plugin, all you need is specify it's npm package name.
+This is important since it allows you to have your own plugins in their respective,
+independent Github repositories and npm packages where you do not have to seek
+explicit approval from the Cactus maintainers to create/maintain your plugin at all.
 
 Once you are satisfied with the `.config.json` file's contents you can just:
 
@@ -173,14 +172,14 @@ from that state.
 
 At this point, with the running API server, you can
 * Test the REST API directly with tools like cURL or Postman
-* Develop your own applications against it with the `Cactus SDK`
+* Develop your own applications against it with the `Cactus API Client(s)`
 * Create and test your own plugins
 
 
 #### Random Windows specific issues not covered here
 
-We recommend you use WSL or WSL2 or any Linux VM. We test most frequently on
-Ubuntu LTS which at the time of this writing means 18.04 and/or 20.04.
+We recommend that you use WSL2 or any Linux VM (or bare metal).
+We test most frequently on Ubuntu 20.04 LTS
 
 ## Build Script Decision Tree
 
