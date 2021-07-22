@@ -5,7 +5,8 @@ go 1.16
 require (
 	github.com/golang/protobuf v1.5.0
 	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v0.0.0-20210712215013-866f5840a1a9
-	github.com/hyperledger/fabric-chaincode-go v0.0.0-20200424173110-d7076418f212
+	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop v1.2.1
+	github.com/hyperledger/fabric-chaincode-go v0.0.0-20200728190242-9b3ae92d8664
 	github.com/hyperledger/fabric-contract-api-go v1.1.1
 	github.com/hyperledger/fabric-protos-go v0.0.0-20210528200356-82833ecdac31
 	github.com/sirupsen/logrus v1.8.1
