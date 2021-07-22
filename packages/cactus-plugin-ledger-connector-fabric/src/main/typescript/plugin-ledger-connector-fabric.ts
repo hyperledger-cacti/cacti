@@ -69,6 +69,8 @@ import {
   RunTransactionResponse,
   ChainCodeProgrammingLanguage,
   ChainCodeLifeCycleCommandResponses,
+  FabricSigningCredential,
+  DefaultEventHandlerStrategy,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -85,6 +87,7 @@ import {
 } from "./deploy-contract/deploy-contract-endpoint-v1";
 import { sourceLangToRuntimeLang } from "./peer/source-lang-to-runtime-lang";
 import FabricCAServices from "fabric-ca-client";
+import { createGateway } from "./common/create-gateway";
 
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
@@ -802,25 +805,35 @@ export class PluginLedgerConnectorFabric
     return endpoints;
   }
 
-  public async transact(
-    req: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transact()`;
+  protected async createGateway(req: RunTransactionRequest): Promise<Gateway> {
+    if (req.gatewayOptions) {
+      return createGateway({
+        logLevel: this.opts.logLevel,
+        pluginRegistry: this.opts.pluginRegistry,
+        defaultConnectionProfile: this.opts.connectionProfile,
+        defaultDiscoveryOptions: this.opts.discoveryOptions || {
+          enabled: true,
+          asLocalhost: true,
+        },
+        defaultEventHandlerOptions: this.opts.eventHandlerOptions || {
+          endorseTimeout: 300,
+          commitTimeout: 300,
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+        },
+        gatewayOptions: req.gatewayOptions,
+      });
+    } else {
+      return this.createGatewayLegacy(req.signingCredential);
+    }
+  }
 
+  protected async createGatewayLegacy(
+    signingCredential: FabricSigningCredential,
+  ): Promise<Gateway> {
     const { connectionProfile, eventHandlerOptions: eho } = this.opts;
-    const {
-      signingCredential,
-      channelName,
-      contractName,
-      invocationType,
-      methodName: fnName,
-      params,
-      transientData,
-      endorsingParties,
-    } = req;
 
-    const gateway = new Gateway();
     const wallet = await Wallets.newInMemoryWallet();
+
     const keychain = this.opts.pluginRegistry.findOneByKeychainId(
       signingCredential.keychainId,
     );
@@ -838,34 +851,57 @@ export class PluginLedgerConnectorFabric
     );
     const identity = JSON.parse(fabricX509IdentityJson);
 
+    await wallet.put(signingCredential.keychainRef, identity);
+    this.log.debug("transact() imported identity to in-memory wallet OK");
+
+    const eventHandlerOptions: DefaultEventHandlerOptions = {
+      commitTimeout: this.opts.eventHandlerOptions?.commitTimeout || 300,
+      endorseTimeout: 300,
+    };
+    if (eho?.strategy) {
+      eventHandlerOptions.strategy =
+        DefaultEventHandlerStrategies[eho.strategy];
+    }
+
+    const gatewayOptions: GatewayOptions = {
+      discovery: this.opts.discoveryOptions,
+      eventHandlerOptions,
+      identity: signingCredential.keychainRef,
+      wallet,
+    };
+
+    this.log.debug(`discovery=%o`, gatewayOptions.discovery);
+    this.log.debug(`eventHandlerOptions=%o`, eventHandlerOptions);
+
+    const gateway = new Gateway();
+
+    await gateway.connect(
+      connectionProfile as ConnectionProfile,
+      gatewayOptions,
+    );
+
+    this.log.debug("transact() gateway connection established OK");
+
+    return gateway;
+  }
+
+  public async transact(
+    req: RunTransactionRequest,
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transact()`;
+
+    const {
+      channelName,
+      contractName,
+      invocationType,
+      methodName: fnName,
+      params,
+      transientData,
+      endorsingParties,
+    } = req;
+
     try {
-      await wallet.put(signingCredential.keychainRef, identity);
-      this.log.debug("transact() imported identity to in-memory wallet OK");
-
-      const eventHandlerOptions: DefaultEventHandlerOptions = {
-        commitTimeout: this.opts.eventHandlerOptions?.commitTimeout || 300,
-        endorseTimeout: 300,
-      };
-      if (eho?.strategy) {
-        eventHandlerOptions.strategy =
-          DefaultEventHandlerStrategies[eho.strategy];
-      }
-
-      const gatewayOptions: GatewayOptions = {
-        discovery: this.opts.discoveryOptions,
-        eventHandlerOptions,
-        identity: signingCredential.keychainRef,
-        wallet,
-      };
-
-      this.log.debug(`discovery=%o`, gatewayOptions.discovery);
-      this.log.debug(`eventHandlerOptions=%o`, eventHandlerOptions);
-      await gateway.connect(
-        connectionProfile as ConnectionProfile,
-        gatewayOptions,
-      );
-      this.log.debug("transact() gateway connection established OK");
-
+      const gateway = await this.createGateway(req);
       const network = await gateway.getNetwork(channelName);
       // const channel = network.getChannel();
       // const endorsers = channel.getEndorsers();
