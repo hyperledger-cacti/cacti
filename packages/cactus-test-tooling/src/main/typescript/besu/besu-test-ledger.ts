@@ -9,6 +9,7 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
+  Bools,
 } from "@hyperledger/cactus-common";
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
@@ -22,6 +23,7 @@ export interface IBesuTestLedgerConstructorOptions {
   rpcApiWsPort?: number;
   envVars?: string[];
   logLevel?: LogLevelDesc;
+  emitContainerLogs?: boolean;
 }
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
@@ -52,6 +54,7 @@ export class BesuTestLedger implements ITestLedger {
   public readonly rpcApiHttpPort: number;
   public readonly rpcApiWsPort: number;
   public readonly envVars: string[];
+  public readonly emitContainerLogs: boolean;
 
   private readonly log: Logger;
   private container: Container | undefined;
@@ -72,6 +75,10 @@ export class BesuTestLedger implements ITestLedger {
     this.rpcApiWsPort =
       options.rpcApiWsPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort;
     this.envVars = options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
+
+    this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
+      ? (options.emitContainerLogs as boolean)
+      : true;
 
     this.validateConstructorOptions();
     const label = "besu-test-ledger";
@@ -255,6 +262,16 @@ export class BesuTestLedger implements ITestLedger {
         this.log.debug(`Started container OK. Waiting for healthcheck...`);
         this.container = container;
         this.containerId = container.id;
+
+        if (this.emitContainerLogs) {
+          const logOptions = { follow: true, stderr: true, stdout: true };
+          const logStream = await container.logs(logOptions);
+          logStream.on("data", (data: Buffer) => {
+            const fnTag = `[${this.getContainerImageName()}]`;
+            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          });
+        }
+
         try {
           await this.waitForHealthCheck();
           this.log.debug(`Healthcheck passing OK.`);

@@ -103,13 +103,19 @@ export class SupplyChainAppDummyInfrastructure {
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
 
-    this.besu = new BesuTestLedger();
-    this.quorum = new QuorumTestLedger();
+    this.besu = new BesuTestLedger({
+      logLevel: level,
+    });
+    this.quorum = new QuorumTestLedger({
+      logLevel: level,
+      emitContainerLogs: true,
+    });
     this.fabric = new FabricTestLedgerV1({
       publishAllPorts: true,
       imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
       imageVersion: "2021-03-02-ssh-hotfix",
       logLevel: level,
+      emitContainerLogs: true,
     });
 
     if (this.options.keychain) {
