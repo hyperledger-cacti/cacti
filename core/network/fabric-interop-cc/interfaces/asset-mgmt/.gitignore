@@ -1,2 +1,4 @@
+protos-go/
 vendor/
 interop
+mocks/
