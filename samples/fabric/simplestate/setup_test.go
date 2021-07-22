@@ -8,8 +8,8 @@ package main_test
 
 import (
 	"os"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/mocks"
-	ss "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simplestate"
+	"github.com/hyperledger-labs/weaver/samples/simplestate/mocks"
+	ss "github.com/hyperledger-labs/weaver/samples/simplestate"
 )
 
 const (
