@@ -139,6 +139,7 @@ test(testCase, async (t: Test) => {
     test.onFinish(async () => {
       await quorumTestLedger1.stop();
       await quorumTestLedger1.destroy();
+      await pruneDockerAllIfGithubAction({ logLevel });
     });
     const rpcApiHttpHost1 = await quorumTestLedger1.getRpcApiHttpHost();
 
@@ -252,7 +253,7 @@ test(testCase, async (t: Test) => {
     const apiClient1 = await mainApiClient.ofLedger(ledger1.id, QuorumApi);
 
     // send money to the test account on ledger 1
-    const res = await apiClient1.apiV1QuorumRunTransaction({
+    const res = await apiClient1.runTransactionV1({
       transactionConfig: {
         from: initialFundsAccount1,
         to: testAccount1.address,
@@ -276,7 +277,7 @@ test(testCase, async (t: Test) => {
     const apiClient2 = await mainApiClient.ofLedger(ledger2.id, QuorumApi);
 
     // send money to the test account on ledger 1
-    const res = await apiClient2.apiV1QuorumRunTransaction({
+    const res = await apiClient2.runTransactionV1({
       transactionConfig: {
         from: initialFundsAccount2,
         to: testAccount2.address,
@@ -296,11 +297,5 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

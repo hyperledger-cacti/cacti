@@ -47,13 +47,13 @@ export class BookshelfListPage implements OnInit {
   }
 
   private async loadData(): Promise<void> {
-    const { data } = await this.supplyChainApi.apiV1ListBookshelf();
+    const { data } = await this.supplyChainApi.listBookshelfV1();
     const { data: bookshelves } = data;
     this.bookshelves = bookshelves;
     this.log.debug(`Fetched Bookshelf data: %o`, bookshelves);
   }
 
-  async clickShowDetail(bookshelf: Bookshelf) {
+  async clickShowDetail(bookshelf: Bookshelf): Promise<void> {
     this.log.debug("clickShowDetail()", bookshelf);
 
     const modal = await this.modalController.create({
@@ -73,7 +73,7 @@ export class BookshelfListPage implements OnInit {
     }
   }
 
-  async clickAddNew() {
+  async clickAddNew(): Promise<void> {
     this.log.debug(`clickAddNew()`);
     const modal = await this.modalController.create({
       component: BookshelfDetailPage,
@@ -83,7 +83,7 @@ export class BookshelfListPage implements OnInit {
     const bookshelf = overlayEventDetail.data as Bookshelf;
     this.log.debug("clickAddNew() detail presented OK", bookshelf);
     if (bookshelf) {
-      const res = await this.supplyChainApi.apiV1InsertBookshelf({
+      const res = await this.supplyChainApi.insertBookshelfV1({
         bookshelf,
       });
       this.log.debug(`New Bookshelf inserted OK`, res);

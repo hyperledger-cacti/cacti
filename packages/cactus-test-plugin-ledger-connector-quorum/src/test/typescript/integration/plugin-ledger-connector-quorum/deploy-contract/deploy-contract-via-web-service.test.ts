@@ -57,6 +57,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   });
 
   // 2. Start the actual ledger
@@ -143,7 +144,7 @@ test(testCase, async (t: Test) => {
   };
 
   // 8. Deploy smart contract by issuing REST API call
-  const res = await client.apiV1QuorumDeployContractSolidityBytecode(req);
+  const res = await client.deployContractSolBytecodeV1(req);
 
   t.ok(res, "Response for contract deployment is truthy");
   t.ok(res.status > 199, "Response status code for contract deployment > 199");
@@ -153,7 +154,7 @@ test(testCase, async (t: Test) => {
     const web3 = new Web3(rpcApiHttpHost);
     const testEthAccount = web3.eth.accounts.create(uuidV4());
 
-    const res1 = await client.apiV1QuorumRunTransaction({
+    const res1 = await client.runTransactionV1({
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
@@ -173,7 +174,7 @@ test(testCase, async (t: Test) => {
     t2.ok(balance, "Retrieved balance of test account OK");
     t2.equals(parseInt(balance, 10), 10e9, "Balance of test account OK");
 
-    const sayHelloRes = await client.apiV1QuorumInvokeContract({
+    const sayHelloRes = await client.invokeContractV1({
       contractName,
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
@@ -198,7 +199,7 @@ test(testCase, async (t: Test) => {
     );
 
     const newName = `DrCactus${uuidV4()}`;
-    const setName1Res = await client.apiV1QuorumInvokeContract({
+    const setName1Res = await client.invokeContractV1({
       contractName,
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
@@ -217,7 +218,7 @@ test(testCase, async (t: Test) => {
     t2.ok(setName1Res.status < 300, "Status for setName1Res < 300 OK");
     t2.ok(setName1Res.data, "setName1Res.data is truthy OK");
 
-    const getName1Res = await client.apiV1QuorumInvokeContract({
+    const getName1Res = await client.invokeContractV1({
       contractName,
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
@@ -242,7 +243,7 @@ test(testCase, async (t: Test) => {
     );
     t2.equal(getName1Res.data.callOutput, newName, `getName1Res truthy OK`);
 
-    const getName2Res = await client.apiV1QuorumInvokeContract({
+    const getName2Res = await client.invokeContractV1({
       contractName,
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
@@ -266,11 +267,5 @@ test(testCase, async (t: Test) => {
     );
   });
 
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

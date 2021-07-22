@@ -41,7 +41,7 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   });
 
   const ledger = new CordaTestLedger({
-    imageName: "hyperledger/cactus-corda-4-6-all-in-one-obligation",
+    imageName: "ghcr.io/hyperledger/cactus-corda-4-6-all-in-one-obligation",
     imageVersion: "2021-03-19-feat-686",
     // imageName: "caio",
     // imageVersion: "latest",
@@ -105,7 +105,7 @@ test("Tests are passing on the JVM side", async (t: Test) => {
 
   const connector = new CordaConnectorContainer({
     logLevel,
-    imageName: "hyperledger/cactus-connector-corda-server",
+    imageName: "ghcr.io/hyperledger/cactus-connector-corda-server",
     imageVersion: "2021-03-25-feat-622",
     // imageName: "cccs",
     // imageVersion: "latest",
@@ -351,7 +351,7 @@ test("Tests are passing on the JVM side", async (t: Test) => {
 
   {
     plugin.transact();
-    const promRes = await apiClient1.getPrometheusExporterMetricsV1();
+    const promRes = await apiClient1.getPrometheusMetricsV1();
     const promMetricsOutput =
       "# HELP " +
       K_CACTUS_CORDA_TOTAL_TX_COUNT +
@@ -374,7 +374,7 @@ test("Tests are passing on the JVM side", async (t: Test) => {
     // Executing transaction to increment the Total transaction count metrics
     plugin.transact();
 
-    const promRes1 = await apiClient1.getPrometheusExporterMetricsV1();
+    const promRes1 = await apiClient1.getPrometheusMetricsV1();
     const promMetricsOutput1 =
       "# HELP " +
       K_CACTUS_CORDA_TOTAL_TX_COUNT +

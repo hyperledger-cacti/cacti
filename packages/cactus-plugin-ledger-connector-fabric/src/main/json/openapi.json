@@ -55,7 +55,9 @@
             "ChainCodeLifeCycleCommandResponses": {
                 "type": "object",
                 "required": [
-                    "queryInstalledList", "approveForMyOrgList", "installList"
+                    "queryInstalledList",
+                    "approveForMyOrgList",
+                    "installList"
                 ],
                 "properties": {
                     "packaging": {
@@ -184,6 +186,42 @@
                     }
                 }
             },
+            "GatewayOptions": {
+                "type": "object",
+                "required": ["identity", "wallet"],
+                "properties": {
+                    "connectionProfile": {
+                        "$ref": "#/components/schemas/ConnectionProfile"
+                    },
+                    "discovery": {
+                        "$ref": "#/components/schemas/GatewayDiscoveryOptions",
+                        "nullable": false
+                    },
+                    "eventHandlerOptions": {
+                        "$ref": "#/components/schemas/GatewayEventHandlerOptions",
+                        "nullable": false
+                    },
+                    "identity": {
+                        "type": "string"
+                    },
+                    "wallet": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 1,
+                        "properties": {
+                            "keychain": {
+                                "$ref": "#/components/schemas/FabricSigningCredential"
+                            },
+                            "json": {
+                                "type": "string",
+                                "nullable": false,
+                                "minLength": 1,
+                                "maxLength": 65535
+                            }
+                        }
+                    }
+                }
+            },
             "DefaultEventHandlerStrategy": {
                 "type": "string",
                 "enum": [
@@ -201,6 +239,10 @@
                 "additionalProperties": false,
                 "properties": {
                     "commitTimeout": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "endorseTimeout": {
                         "type": "number",
                         "nullable": false
                     },
@@ -293,6 +335,10 @@
                         "type": "object",
                         "nullable": true
                     },
+                    "gatewayOptions": {
+                        "$ref": "#/components/schemas/GatewayOptions",
+                        "nullable": false
+                    },
                     "signingCredential": {
                         "$ref": "#/components/schemas/FabricSigningCredential",
                         "nullable": false
@@ -329,7 +375,6 @@
                             "nullable": true
                         }
                     },
-
                     "endorsingParties": {
                         "type": "array",
                         "nullable": false,
@@ -916,7 +961,7 @@
                         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics"
                     }
                 },
-                "operationId": "getPrometheusExporterMetricsV1",
+                "operationId": "getPrometheusMetricsV1",
                 "summary": "Get the Prometheus Metrics",
                 "parameters": [],
                 "responses": {

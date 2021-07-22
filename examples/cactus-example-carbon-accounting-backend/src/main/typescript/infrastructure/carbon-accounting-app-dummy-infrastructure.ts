@@ -122,14 +122,14 @@ export class CarbonAccountingAppDummyInfrastructure {
 
     this.keychain = options.keychain;
     this.xdai = new OpenEthereumTestLedger({
-      logLevel: this.options.logLevel,
+      logLevel: this.options.logLevel || "INFO",
     });
     this.fabric = new FabricTestLedgerV1({
       publishAllPorts: true,
-      imageName: "hyperledger/cactus-fabric2-all-in-one",
+      imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
       imageVersion: "2021-04-20-nodejs",
       envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
-      logLevel: this.options.logLevel,
+      logLevel: this.options.logLevel || "INFO",
     });
   }
 

@@ -9,6 +9,11 @@ export {
 } from "./besu/besu-test-ledger";
 
 export {
+  BesuMpTestLedger,
+  IBesuMpTestLedgerOptions,
+} from "./besu/besu-mp-test-ledger";
+
+export {
   QuorumTestLedger,
   IQuorumTestLedgerConstructorOptions,
   QUORUM_TEST_LEDGER_DEFAULT_OPTIONS,
@@ -89,9 +94,22 @@ export {
 } from "./openethereum/openethereum-test-ledger";
 
 export {
+  GoIpfsTestContainer,
+  IGoIpfsTestContainerOptions,
+} from "./go-ipfs/go-ipfs-test-container";
+
+export {
   SAMPLE_CORDAPP_ROOT_DIRS,
   SampleCordappEnum,
 } from "./corda/sample-cordapp-enum";
+
+export {
+  IRustcContainerOptions,
+  K_DEFAULT_RUSTC_CONTAINER_CMD,
+  RustcContainer,
+} from "./rustc-container/rustc-container";
+
+export { RustcBuildCmd } from "./rustc-container/rustc-build-cmd";
 
 export { Streams } from "./common/streams";
 

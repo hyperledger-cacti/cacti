@@ -294,8 +294,13 @@ export class ApiServer {
             const { message, stack } = err;
             reject(new Error(`${fnTag} npm load fail: ${message}: ${stack}`));
           } else {
+            // do not touch package.json
             npm.config.set("save", false);
+            // do not touch package-lock.json
+            npm.config.set("package-lock", false);
+            // do not waste resources on running an audit
             npm.config.set("audit", false);
+            // do not wast resources on rendering a progress bar
             npm.config.set("progress", false);
             resolve();
           }
@@ -571,7 +576,7 @@ export class ApiServer {
       },
     });
 
-    this.wsApi.use(socketIoAuthorizer);
+    this.wsApi.use(socketIoAuthorizer as never);
 
     return addressInfo;
   }

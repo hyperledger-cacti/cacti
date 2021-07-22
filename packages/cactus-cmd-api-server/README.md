@@ -363,7 +363,7 @@ This class creates a prometheus exporter, which scrapes the total Cactus node co
 The prometheus exporter object is initialized in the `ApiServer` class constructor itself, so instantiating the object of the `ApiServer` class, gives access to the exporter object.
 You can also initialize the prometheus exporter object seperately and then pass it to the `IApiServerConstructorOptions` interface for `ApiServer` constructor.
 
-`getPrometheusExporterMetricsV1` function returns the prometheus exporter metrics, currently displaying the total plugins imported, which currently refreshes to match the plugin count, everytime `setTotalPluginImports` method is called.
+`getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total plugins imported, which currently refreshes to match the plugin count, everytime `setTotalPluginImports` method is called.
 
 ### Prometheus Integration
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).

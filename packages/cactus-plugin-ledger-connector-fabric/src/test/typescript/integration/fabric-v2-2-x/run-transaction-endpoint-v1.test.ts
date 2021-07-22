@@ -64,7 +64,7 @@ test(testCase, async (t: Test) => {
     emitContainerLogs: true,
     publishAllPorts: true,
     logLevel,
-    imageName: "hyperledger/cactus-fabric2-all-in-one",
+    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
     imageVersion: "2021-04-20-nodejs",
     envVars: new Map([
       ["FABRIC_VERSION", "2.2.0"],
@@ -76,6 +76,7 @@ test(testCase, async (t: Test) => {
   const tearDownLedger = async () => {
     await ledger.stop();
     await ledger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   };
 
   test.onFinish(tearDownLedger);
@@ -209,7 +210,7 @@ test(testCase, async (t: Test) => {
   }
 
   {
-    const res = await apiClient.getPrometheusExporterMetricsV1();
+    const res = await apiClient.getPrometheusMetricsV1();
     const promMetricsOutput =
       "# HELP " +
       K_CACTUS_FABRIC_TOTAL_TX_COUNT +
@@ -229,11 +230,38 @@ test(testCase, async (t: Test) => {
       "Total Transaction Count of 3 recorded as expected. RESULT OK",
     );
   }
-  t.end();
-});
 
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
+  {
+    const res = await apiClient.runTransactionV1({
+      gatewayOptions: {
+        connectionProfile,
+        discovery: discoveryOptions,
+        eventHandlerOptions: {
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+          commitTimeout: 300,
+          endorseTimeout: 300,
+        },
+        identity: keychainEntryKey,
+        wallet: {
+          json: keychainEntryValue,
+        },
+      },
+      signingCredential,
+      channelName,
+      contractName,
+      invocationType: FabricContractInvocationType.Call,
+      methodName: "GetAllAssets",
+      params: [],
+    } as RunTransactionRequest);
+    t.ok(res);
+    t.ok(res.data);
+    t.equal(res.status, 200);
+    const assets = JSON.parse(res.data.functionOutput);
+    const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
+    t.ok(asset277, "Located Asset record by its ID OK");
+    t.ok(asset277.owner, `Asset object has "owner" property OK`);
+    t.equal(asset277.owner, assetOwner, `Asset has expected owner OK`);
+  }
+
   t.end();
 });

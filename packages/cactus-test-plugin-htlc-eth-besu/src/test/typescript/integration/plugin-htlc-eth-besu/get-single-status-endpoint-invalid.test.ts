@@ -37,21 +37,6 @@ import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu/src/
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
-const firstHighNetWorthAccount = "627306090abaB3A6e1400e9345bC60c78a8BEf57";
-const privateKey =
-  "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3";
-const web3SigningCredential: Web3SigningCredential = {
-  ethAccount: firstHighNetWorthAccount,
-  secret: privateKey,
-  type: Web3SigningCredentialType.PrivateKeyHex,
-} as Web3SigningCredential;
-
-const fakeWeb3SigningCredential: Web3SigningCredential = {
-  ethAccount: "fakeAccount",
-  secret: privateKey,
-  type: Web3SigningCredentialType.PrivateKeyHex,
-} as Web3SigningCredential;
-
 const testCase = "Test get invalid single status";
 
 test("BEFORE " + testCase, async (t: Test) => {
@@ -64,15 +49,29 @@ test(testCase, async (t: Test) => {
   t.comment("Starting Besu Test Ledger");
   const besuTestLedger = new BesuTestLedger({ logLevel });
 
-  test.onFailure(async () => {
+  test.onFinish(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   });
 
   await besuTestLedger.start();
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
   const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
+  const firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
+  const privateKey = besuTestLedger.getGenesisAccountPrivKey();
+  const web3SigningCredential: Web3SigningCredential = {
+    ethAccount: firstHighNetWorthAccount,
+    secret: privateKey,
+    type: Web3SigningCredentialType.PrivateKeyHex,
+  } as Web3SigningCredential;
+
+  const fakeWeb3SigningCredential: Web3SigningCredential = {
+    ethAccount: "fakeAccount",
+    secret: privateKey,
+    type: Web3SigningCredentialType.PrivateKeyHex,
+  } as Web3SigningCredential;
   const keychainId = uuidv4();
   const keychainPlugin = new PluginKeychainMemory({
     instanceId: uuidv4(),
@@ -192,7 +191,7 @@ test(testCase, async (t: Test) => {
     keychainId,
     gas: DataTest.estimated_gas,
   };
-  const resp = await api.newContract(bodyObj);
+  const resp = await api.newContractV1(bodyObj);
   t.ok(resp, "response newContract is OK");
   t.equal(resp.status, 200, "response status newContract is OK");
 
@@ -206,7 +205,7 @@ test(testCase, async (t: Test) => {
   );
   try {
     const fakeId = "0x66616b654964";
-    const res = await api.getSingleStatus(
+    const res = await api.getSingleStatusV1(
       fakeId,
       fakeWeb3SigningCredential,
       connectorId,
@@ -216,13 +215,5 @@ test(testCase, async (t: Test) => {
   } catch (e) {
     t.equal(e.response.status, 500);
   }
-  await besuTestLedger.stop();
-  await besuTestLedger.destroy();
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });

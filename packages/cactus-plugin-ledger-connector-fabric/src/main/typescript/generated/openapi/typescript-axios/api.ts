@@ -594,10 +594,72 @@ export interface GatewayEventHandlerOptions {
     commitTimeout?: number;
     /**
      * 
+     * @type {number}
+     * @memberof GatewayEventHandlerOptions
+     */
+    endorseTimeout?: number;
+    /**
+     * 
      * @type {DefaultEventHandlerStrategy}
      * @memberof GatewayEventHandlerOptions
      */
     strategy: DefaultEventHandlerStrategy;
+}
+/**
+ * 
+ * @export
+ * @interface GatewayOptions
+ */
+export interface GatewayOptions {
+    /**
+     * 
+     * @type {ConnectionProfile}
+     * @memberof GatewayOptions
+     */
+    connectionProfile?: ConnectionProfile;
+    /**
+     * 
+     * @type {GatewayDiscoveryOptions}
+     * @memberof GatewayOptions
+     */
+    discovery?: GatewayDiscoveryOptions;
+    /**
+     * 
+     * @type {GatewayEventHandlerOptions}
+     * @memberof GatewayOptions
+     */
+    eventHandlerOptions?: GatewayEventHandlerOptions;
+    /**
+     * 
+     * @type {string}
+     * @memberof GatewayOptions
+     */
+    identity: string;
+    /**
+     * 
+     * @type {GatewayOptionsWallet}
+     * @memberof GatewayOptions
+     */
+    wallet: GatewayOptionsWallet;
+}
+/**
+ * 
+ * @export
+ * @interface GatewayOptionsWallet
+ */
+export interface GatewayOptionsWallet {
+    /**
+     * 
+     * @type {FabricSigningCredential}
+     * @memberof GatewayOptionsWallet
+     */
+    keychain?: FabricSigningCredential;
+    /**
+     * 
+     * @type {string}
+     * @memberof GatewayOptionsWallet
+     */
+    json?: string;
 }
 /**
  * 
@@ -624,6 +686,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     transientData?: object | null;
+    /**
+     * 
+     * @type {GatewayOptions}
+     * @memberof RunTransactionRequest
+     */
+    gatewayOptions?: GatewayOptions;
     /**
      * 
      * @type {FabricSigningCredential}
@@ -798,7 +866,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPrometheusExporterMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
+        getPrometheusMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -896,8 +964,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPrometheusExporterMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusExporterMetricsV1(options);
+        async getPrometheusMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusMetricsV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -947,8 +1015,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPrometheusExporterMetricsV1(options?: any): AxiosPromise<string> {
-            return localVarFp.getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
+        getPrometheusMetricsV1(options?: any): AxiosPromise<string> {
+            return localVarFp.getPrometheusMetricsV1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1001,8 +1069,8 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getPrometheusExporterMetricsV1(options?: any) {
-        return DefaultApiFp(this.configuration).getPrometheusExporterMetricsV1(options).then((request) => request(this.axios, this.basePath));
+    public getPrometheusMetricsV1(options?: any) {
+        return DefaultApiFp(this.configuration).getPrometheusMetricsV1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -49,6 +49,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   });
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
@@ -59,10 +60,10 @@ test(testCase, async (t: Test) => {
    *
    * @see https://github.com/hyperledger/besu/blob/1.5.1/config/src/main/resources/dev.json
    */
-  const firstHighNetWorthAccount = "627306090abaB3A6e1400e9345bC60c78a8BEf57";
+
+  const firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
   const besuKeyPair = {
-    privateKey:
-      "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3",
+    privateKey: besuTestLedger.getGenesisAccountPrivKey(),
   };
 
   const web3 = new Web3(rpcApiHttpHost);
@@ -465,7 +466,7 @@ test(testCase, async (t: Test) => {
   });
 
   test("get prometheus exporter metrics", async (t2: Test) => {
-    const res = await apiClient.getPrometheusExporterMetricsV1();
+    const res = await apiClient.getPrometheusMetricsV1();
     const promMetricsOutput =
       "# HELP " +
       K_CACTUS_BESU_TOTAL_TX_COUNT +
@@ -487,11 +488,5 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

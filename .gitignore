@@ -45,3 +45,13 @@ cactus-openapi-spec-*.json
 build/
 .gradle/
 site/
+
+.build-cache/*.tsbuildinfo
+
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*

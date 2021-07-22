@@ -19,6 +19,7 @@ function checkWorkTreeStatus()
   new_changed_files="$(git diff-index --name-only HEAD --)"
   if [ "${CHANGED_FILES}" != "${new_changed_files}" ]; then
     echo >&2 "Changes in the git index have been detected!"
+    git diff
     exit 1
   fi
 }
@@ -30,6 +31,11 @@ function dumpDiskUsageInfo()
     echo 'df is not installed, skipping...'
   else
     df || true
+  fi
+  if ! [ -x "$(command -v docker)" ]; then
+    echo 'docker is not installed, skipping...'
+  else
+    docker system df || true
   fi
 }
 
@@ -80,45 +86,37 @@ function mainTask()
   java -version
 
   # install npm 7 globally - needed because Node v12, v14 default to npm v6
-  npm install -g npm@7.14.0
+  npm install -g npm@7.19.1
   npm --version
+  yarn --version
 
   ### COMMON
   cd $PROJECT_ROOT_DIR
 
-  # https://stackoverflow.com/a/61789467
-  npm config list
-  npm config delete proxy
-  npm config delete http-proxy
-  npm config delete https-proxy
-
-  # https://stackoverflow.com/a/15483897
-  npm cache verify
-  npm cache clean --force
-  npm cache verify
-
-  npm ci
-  ./node_modules/.bin/lerna bootstrap
-
-  # The "quick" build that is enough for the tests to be runnable
-  npm run build:dev:backend
+  yarn run configure
 
   # Tests are still flaky (on weak hardware such as the CI env) despite our best
   # efforts so here comes the mighty hammer of brute force. 3 times the charm...
   {
-    npm run test:all -- --bail && echo "$(date +%FT%T%z) [CI] First (#1) try of tests succeeded OK."
+    dumpDiskUsageInfo
+    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] First (#1) try of tests succeeded OK."
   } ||
   {
+    dumpDiskUsageInfo
     echo "$(date +%FT%T%z) [CI] First (#1) try of tests failed starting second try now..."
-    npm run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Second (#2) try of tests succeeded OK."
+    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Second (#2) try of tests succeeded OK."
+
   } ||
   {
+    dumpDiskUsageInfo
     # If the third try fails then the execution will reach the last echo and the exit 1 statement
     # ensuring that the script crashes if 3 out of 3 test runs have failed.
     echo "$(date +%FT%T%z) [CI] Second (#2) try of tests failed starting third and last try now..."
-    npm run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Third (#3) try of tests succeeded OK." || \
+    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Third (#3) try of tests succeeded OK." || \
       echo "$(date +%FT%T%z) [CI] Third (#3) try of tests failed so giving up at this point" ; exit 1
   }
+
+  dumpDiskUsageInfo
 
   # The webpack production build needs more memory than the default allocation
   export NODE_OPTIONS=--max_old_space_size=4096
@@ -127,7 +125,7 @@ function mainTask()
   # of providing feedback about failing tests as early as possible we run the
   # dev:backend build first and then the tests which is the fastest way to get
   # to a failed test if there was one.
-  npm run build
+  yarn run build
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))

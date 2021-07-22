@@ -54,6 +54,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   });
   await ledger.start();
 
@@ -449,7 +450,7 @@ test(testCase, async (t: Test) => {
   });
 
   test("get prometheus exporter metrics", async (t2: Test) => {
-    const res = await apiClient.getPrometheusExporterMetricsV1();
+    const res = await apiClient.getPrometheusMetricsV1();
     const promMetricsOutput =
       "# HELP " +
       K_CACTUS_QUORUM_TOTAL_TX_COUNT +
@@ -471,11 +472,5 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

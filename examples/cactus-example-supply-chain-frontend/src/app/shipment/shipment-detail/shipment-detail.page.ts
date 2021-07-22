@@ -46,7 +46,7 @@ export class ShipmentDetailPage implements OnInit {
     }
   }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.log.debug("component initialized.", this.shipment);
 
     this._supplyChainApi = await this.baseClient.ofLedger(
@@ -69,7 +69,7 @@ export class ShipmentDetailPage implements OnInit {
   }
 
   private async loadData(): Promise<void> {
-    const { data } = await this.supplyChainApi.apiV1ListBookshelf();
+    const { data } = await this.supplyChainApi.listBookshelfV1();
     const { data: bookshelves } = data;
     this.bookshelves = bookshelves;
     this.log.debug(`Fetched BambooHarvest data: %o`, bookshelves);
@@ -77,13 +77,13 @@ export class ShipmentDetailPage implements OnInit {
     this.log.debug(`BambooHarvest IDs: %o`, this.bookshelfIds);
   }
 
-  onClickFormSubmit(value: any) {
+  onClickFormSubmit(value: any): void {
     this.log.debug("form submitted", value);
     this.shipment = value;
     this.modalController.dismiss(this.shipment);
   }
 
-  onClickBtnCancel() {
+  onClickBtnCancel(): void {
     this.log.debug("form submission cancelled by user");
     this.modalController.dismiss();
   }

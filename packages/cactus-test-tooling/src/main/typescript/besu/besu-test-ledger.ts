@@ -9,6 +9,7 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
+  Bools,
 } from "@hyperledger/cactus-common";
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
@@ -22,11 +23,12 @@ export interface IBesuTestLedgerConstructorOptions {
   rpcApiWsPort?: number;
   envVars?: string[];
   logLevel?: LogLevelDesc;
+  emitContainerLogs?: boolean;
 }
 
 export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "2021-01-08-7a055c3",
-  containerImageName: "hyperledger/cactus-besu-all-in-one",
+  containerImageName: "ghcr.io/hyperledger/cactus-besu-all-in-one",
   rpcApiHttpPort: 8545,
   rpcApiWsPort: 8546,
   envVars: ["BESU_NETWORK=dev"],
@@ -52,6 +54,7 @@ export class BesuTestLedger implements ITestLedger {
   public readonly rpcApiHttpPort: number;
   public readonly rpcApiWsPort: number;
   public readonly envVars: string[];
+  public readonly emitContainerLogs: boolean;
 
   private readonly log: Logger;
   private container: Container | undefined;
@@ -72,6 +75,10 @@ export class BesuTestLedger implements ITestLedger {
     this.rpcApiWsPort =
       options.rpcApiWsPort || BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort;
     this.envVars = options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
+
+    this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
+      ? (options.emitContainerLogs as boolean)
+      : true;
 
     this.validateConstructorOptions();
     const label = "besu-test-ledger";
@@ -255,6 +262,16 @@ export class BesuTestLedger implements ITestLedger {
         this.log.debug(`Started container OK. Waiting for healthcheck...`);
         this.container = container;
         this.containerId = container.id;
+
+        if (this.emitContainerLogs) {
+          const logOptions = { follow: true, stderr: true, stdout: true };
+          const logStream = await container.logs(logOptions);
+          logStream.on("data", (data: Buffer) => {
+            const fnTag = `[${this.getContainerImageName()}]`;
+            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          });
+        }
+
         try {
           await this.waitForHealthCheck();
           this.log.debug(`Healthcheck passing OK.`);
@@ -285,11 +302,11 @@ export class BesuTestLedger implements ITestLedger {
     } while (!isHealthy);
   }
 
-  public stop(): Promise<any> {
+  public stop(): Promise<unknown> {
     const fnTag = "BesuTestLedger#stop()";
     return new Promise((resolve, reject) => {
       if (this.container) {
-        this.container.stop({}, (err: any, result: any) => {
+        this.container.stop({}, (err: unknown, result: unknown) => {
           if (err) {
             reject(err);
           } else {
@@ -302,7 +319,7 @@ export class BesuTestLedger implements ITestLedger {
     });
   }
 
-  public destroy(): Promise<any> {
+  public destroy(): Promise<unknown> {
     const fnTag = "BesuTestLedger#destroy()";
     if (this.container) {
       return this.container.remove();
@@ -371,16 +388,16 @@ export class BesuTestLedger implements ITestLedger {
     }
   }
 
-  private pullContainerImage(containerNameAndTag: string): Promise<any[]> {
+  private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: any, stream: any) => {
+      docker.pull(containerNameAndTag, (pullError: unknown, stream: any) => {
         if (pullError) {
           reject(pullError);
         } else {
           docker.modem.followProgress(
             stream,
-            (progressError: any, output: any[]) => {
+            (progressError: unknown, output: unknown[]) => {
               if (progressError) {
                 reject(progressError);
               } else {

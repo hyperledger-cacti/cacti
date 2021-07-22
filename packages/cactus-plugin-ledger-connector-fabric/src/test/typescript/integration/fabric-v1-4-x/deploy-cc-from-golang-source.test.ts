@@ -55,16 +55,18 @@ test(testCase, async (t: Test) => {
   });
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
+    logLevel,
     publishAllPorts: true,
     // imageName: "faio14x",
     // imageVersion: "latest",
-    imageName: "hyperledger/cactus-fabric-all-in-one",
+    imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
     imageVersion: "2021-04-21-2016750",
   });
 
   const tearDown = async () => {
     await ledger.stop();
     await ledger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   };
 
   test.onFinish(tearDown);
@@ -179,8 +181,26 @@ test(testCase, async (t: Test) => {
     moduleName: "hello-world",
     targetOrganizations: [org1Env, org2Env],
     pinnedDeps: [
+      "github.com/Knetic/govaluate@v3.0.0+incompatible",
+      "github.com/Shopify/sarama@v1.27.0",
+      "github.com/fsouza/go-dockerclient@v1.6.5",
+      "github.com/grpc-ecosystem/go-grpc-middleware@v1.2.1",
+      "github.com/hashicorp/go-version@v1.2.1",
       "github.com/hyperledger/fabric@v1.4.8",
+      "github.com/hyperledger/fabric-amcl@v0.0.0-20200424173818-327c9e2cf77a",
+      "github.com/miekg/pkcs11@v1.0.3",
+      "github.com/mitchellh/mapstructure@v1.3.3",
+      "github.com/onsi/ginkgo@v1.14.1",
+      "github.com/onsi/gomega@v1.10.2",
+      "github.com/op/go-logging@v0.0.0-20160315200505-970db520ece7",
+      "github.com/pkg/errors@v0.9.1",
+      "github.com/spf13/viper@v1.7.1",
+      "github.com/stretchr/testify@v1.6.1",
+      "github.com/sykesm/zap-logfmt@v0.0.3",
+      "go.uber.org/zap@v1.16.0",
+      "golang.org/x/crypto@v0.0.0-20200820211705-5c72a883971a",
       "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
+      "google.golang.org/grpc@v1.31.1",
     ],
   });
 
@@ -239,11 +259,5 @@ test(testCase, async (t: Test) => {
   t.true(getRes.status > 199 && setRes.status < 300, "getRes status 2xx OK");
   t.comment(`HelloWorld.get() ResponseBody: ${JSON.stringify(getRes.data)}`);
   t.equal(getRes.data.functionOutput, testValue, "get returns UUID OK");
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

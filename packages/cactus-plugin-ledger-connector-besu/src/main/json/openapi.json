@@ -31,6 +31,241 @@
     ],
     "components": {
         "schemas": {
+            "GetBalanceV1Response": {
+                "type": "object",
+                "required": [
+                    "balance"                    
+                ],
+                "properties": {
+                    "balance": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GetBalanceV1Request": {
+                "type": "object",
+                "required":[
+                    "address"
+                ],
+                "properties": {
+                    "address": {
+                        "type":"string"
+                    },
+                    "defaultBlock": {
+                    }
+                }
+            },
+            "EvmBlock":{
+                "type":"object",
+                "properties":{
+                    "number":{
+                        "type":"number"
+                    },
+                    "hash":{
+                        "type":"string"
+                    },
+                    "parentHash":{
+                        "type":"string"
+                    },
+                    "nonce":{
+                        "type":"string"
+                    },
+                    "sha3Uncles":{
+                        "type":"string"
+                    },
+                    "logsBloom":{
+                        "type":"string"
+                    },
+                    "transactionsRoot":{
+                        "type":"string"
+                    },
+                    "stateRoot":{
+                        "type":"string"
+                    },
+                    "miner":{
+                        "type":"string"
+                    },
+                    "difficulty":{
+                        "type":"number"
+                    },
+                    "totalDifficulty":{
+                        "type":"number"
+                    },
+                    "extraData":{
+                        "type":"string"
+                    },
+                    "size":{
+                        "type":"number"
+                    },
+                    "gasLimit":{
+                        "type":"number"
+                    },
+                    "gasUsed":{
+                        "type":"number"
+                    },
+                    "timestamp":{
+                    },
+                    "transactions":{
+                        "type":"array",
+                        "items":{}
+                    },
+                    "uncles":{
+                        "type":"array",
+                        "items":{}
+                    }
+                }
+            },
+            "GetBlockV1Response": {
+                "type": "object",
+                "required": [
+                    "block"                    
+                ],
+                "properties": {
+                    "block": {
+                        "$ref":"#/components/schemas/EvmBlock"
+                    }
+
+                }
+            },
+            "EvmTransaction":{
+                "type":"object",
+                "properties":{
+                    "hash":{
+                        "type":"string"
+                    },
+                    "nonce":{
+                        "type":"number"
+                    },
+                    "blockHash":{
+                    },
+                    "blockNumber":{
+                    },
+                    "transactionIndex":{
+                    },
+                    "from":{
+                        "type":"string"
+                    },
+                    "to":{
+                    },
+                    "value":{
+                        "type":"string"
+                    },
+                    "gasPrice":{
+                        "type":"string"
+                    },
+                    "gas":{
+                        "type":"number"
+                    },
+                    "input":{
+                        "type":"string"
+                    }
+                }
+            },
+            "GetTransactionV1Response": {
+                "type": "object",
+                "required": [
+                    "transaction"                    
+                ],
+                "properties": {
+                    "transaction": {
+                        "$ref":"#/components/schemas/EvmTransaction"
+                    }
+                }
+            },
+            "GetTransactionV1Request": {
+                "type": "object",
+                "required": ["transactionHash"],
+                "properties": {
+                    "transactionHash":{
+                        "type": "string"
+                    }
+                }
+            },       
+            "GetPastLogsV1Response": {
+                "type": "object",
+                "required": [
+                    "logs"                    
+                ],
+                "properties": {
+                    "logs": {
+                        "type": "array", 
+                        "items":{
+                            "$ref": "#/components/schemas/EvmLog"
+                        }
+                    }
+                   
+                }
+            },
+            "GetPastLogsV1Request": {
+                "type": "object",
+                "properties": {
+                    "toBlock": {
+                    },
+                    "fromBlock": {
+                    
+                    },
+                    "address": {
+                    },
+                    "topics": {
+                        "type" : "array",
+                        "items":{
+
+                        }
+                    }
+
+                }
+            },
+            "EvmLog":{
+                "type" : "object",
+                "required": [
+                  "address",
+                  "data",
+                  "blockHash",
+                  "transactionHash",
+                  "topics",
+                  "logIndex",
+                  "transactionIndex",
+                  "blockNumber"
+                ],
+                "properties": {
+                  "address":{
+                    "type": "string"
+                  },
+                  "data":{
+                    "type": "string"
+                  },
+                  "blockHash":{
+                    "type": "string"
+                  },
+                  "transactionHash":{
+                    "type": "string"
+                  },
+                  "topics":{
+                    "type": "array",
+                    "items":{
+                      "type" :"string" 
+                      
+                    }
+                  },
+                  "logIndex":{
+                    "type": "number"
+                  },
+                  "transactionIndex":{
+                    "type": "number"
+                  },
+                  "blockNumber":{
+                    "type": "number"
+                  }
+              }
+            },
+            "GetBlockV1Request": {
+                "required": ["blockHashOrBlockNumber"],
+                "type": "object",
+                "properties": {
+                    "blockHashOrBlockNumber": {
+                    }
+                }
+            },
             "WatchBlocksV1": {
                 "type": "string",
                 "enum": [
@@ -727,6 +962,33 @@
             "PrometheusExporterMetricsResponse": {
                 "type": "string",
                 "nullable": false
+            },
+            "GetBesuRecordV1Request":{
+                "type": "object",
+                "properties": {
+                    "invokeCall": {
+                        "$ref": "#/components/schemas/InvokeContractV1Request"
+                    },
+                    "transactionHash": {
+                        "type": "string",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                    }
+                }
+            },
+            "GetBesuRecordV1Response":{
+                "type": "object",
+                "properties": {
+                    "ledgerId":{
+                        "type":"string"
+                    },
+                    "stateContract":{
+                        "type":"string"
+                    },
+                    "transactionInputData":{},
+                    "callOutput":{}
+                }
             }
         }
     },
@@ -739,7 +1001,7 @@
                         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode"
                     }
                 },
-                "operationId": "apiV1BesuDeployContractSolidityBytecode",
+                "operationId": "deployContractSolBytecodeV1",
                 "summary": "Deploys the bytecode of a Solidity contract.",
                 "parameters": [],
                 "requestBody": {
@@ -765,6 +1027,74 @@
                 }
             }
         },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance": {
+            "post": {
+                "x-hyperledger-cactus": { 
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance"
+                    }
+                },
+                "operationId": "getBalanceV1",
+                "summary": "Return balance of an address of a given block",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetBalanceV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetBalanceV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block"
+                    }
+                },
+                "operationId": "getBlockV1",
+                "summary": "Returns a block matching the block",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetBlockV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetBlockV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction": {
             "post": {
                 "x-hyperledger-cactus": {
@@ -773,7 +1103,7 @@
                         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction"
                     }
                 },
-                "operationId": "apiV1BesuRunTransaction",
+                "operationId": "runTransactionV1",
                 "summary": "Executes a transaction on a besu ledger",
                 "parameters": [],
                 "requestBody": {
@@ -799,6 +1129,75 @@
                 }
             }
         },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction"
+                    }
+                },
+                "operationId": "getTransactionV1",
+                "summary": "Executes a transaction on a besu ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetTransactionV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetTransactionV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs"
+                    }
+                },
+                "operationId": "getPastLogsV1",
+                "summary": "Gets past logs, matching the given options.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetPastLogsV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                    "$ref": "#/components/schemas/GetPastLogsV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract": {
             "post": {
                 "x-hyperledger-cactus": {
@@ -807,7 +1206,7 @@
                         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract"
                     }
                 },
-                "operationId": "apiV1BesuInvokeContract",
+                "operationId": "invokeContractV1",
                 "summary": "Invokes a contract on a besu ledger",
                 "parameters": [],
                 "requestBody": {
@@ -880,7 +1279,7 @@
                         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics"
                     }
                 },
-                "operationId": "getPrometheusExporterMetricsV1",
+                "operationId": "getPrometheusMetricsV1",
                 "summary": "Get the Prometheus Metrics",
                 "parameters": [],
                 "responses": {
@@ -890,6 +1289,40 @@
                             "text/plain": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record"
+                    }
+                },
+                "operationId": "getBesuRecordV1",
+                "summary": "Retrieves an arbitrary record (any piece of information) from the ledger. Ledger records can be call outputs, transaction input, etc.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetBesuRecordV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetBesuRecordV1Response"
                                 }
                             }
                         }

@@ -6,6 +6,12 @@ import Joi from "joi";
 import tar from "tar-stream";
 import Web3 from "web3";
 import { Account } from "web3-core";
+import {
+  Bools,
+  Logger,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
@@ -15,11 +21,13 @@ export interface IQuorumTestLedgerConstructorOptions {
   containerImageVersion?: string;
   containerImageName?: string;
   rpcApiHttpPort?: number;
+  logLevel?: LogLevelDesc;
+  emitContainerLogs?: boolean;
 }
 
 export const QUORUM_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "2021-01-08-7a055c3",
-  containerImageName: "hyperledger/cactus-quorum-all-in-one",
+  containerImageName: "ghcr.io/hyperledger/cactus-quorum-all-in-one",
   rpcApiHttpPort: 8545,
 });
 
@@ -40,7 +48,9 @@ export class QuorumTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
   public readonly rpcApiHttpPort: number;
+  public readonly emitContainerLogs: boolean;
 
+  private readonly log: Logger;
   private container: Container | undefined;
   private containerId: string | undefined;
 
@@ -60,7 +70,15 @@ export class QuorumTestLedger implements ITestLedger {
       options.rpcApiHttpPort ||
       QUORUM_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
 
+    this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
+      ? (options.emitContainerLogs as boolean)
+      : true;
+
     this.validateConstructorOptions();
+
+    const label = "quorum-test-ledger";
+    const level = options.logLevel || "INFO";
+    this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
   public getContainer(): Container {
@@ -174,6 +192,7 @@ export class QuorumTestLedger implements ITestLedger {
   public async start(omitPull = false): Promise<Container> {
     const containerNameAndTag = this.getContainerImageName();
 
+    this.log.debug(`Starting Quorum Test Ledger: ${containerNameAndTag}`);
     if (this.container) {
       await this.container.stop();
       await this.container.remove();
@@ -181,6 +200,7 @@ export class QuorumTestLedger implements ITestLedger {
     const docker = new Docker();
 
     if (!omitPull) {
+      this.log.debug(`Pulling image: ${containerNameAndTag}`);
       await this.pullContainerImage(containerNameAndTag);
     }
 
@@ -217,8 +237,21 @@ export class QuorumTestLedger implements ITestLedger {
       eventEmitter.once("start", async (container: Container) => {
         this.container = container;
         this.containerId = container.id;
+
+        this.log.debug("Quorum Test Ledger container started booting OK.");
+
+        if (this.emitContainerLogs) {
+          const logOptions = { follow: true, stderr: true, stdout: true };
+          const logStream = await container.logs(logOptions);
+          logStream.on("data", (data: Buffer) => {
+            const fnTag = `[${this.getContainerImageName()}]`;
+            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          });
+        }
+
         try {
           await this.waitForHealthCheck();
+          this.log.debug("Quorum Test Ledger container passed healthcheck OK");
           resolve(container);
         } catch (ex) {
           reject(ex);

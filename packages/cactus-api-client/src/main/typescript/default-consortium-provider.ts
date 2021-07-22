@@ -23,7 +23,7 @@ export class DefaultConsortiumProvider
 
   private readonly log: Logger;
 
-  public get className() {
+  public get className(): string {
     return DefaultConsortiumProvider.CLASS_NAME;
   }
 
@@ -61,7 +61,7 @@ export class DefaultConsortiumProvider
 
   public async get(): Promise<ConsortiumDatabase> {
     try {
-      const res = await this.options.apiClient.getConsortiumJws();
+      const res = await this.options.apiClient.getConsortiumJwsV1();
       return this.parseConsortiumJws(res.data);
     } catch (ex) {
       const innerException = (ex.toJSON && ex.toJSON()) || ex;

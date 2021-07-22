@@ -39,7 +39,8 @@ import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc2
 
 const logLevel: LogLevelDesc = "INFO";
 const estimatedGas = 6721975;
-const receiver = "0x627306090abaB3A6e1400e9345bC60c78a8BEf57";
+const besuTestLedger = new BesuTestLedger({ logLevel });
+const receiver = "0x" + besuTestLedger.getGenesisAccountPubKey();
 const hashLock =
   "0x3c335ba7f06a8b01d0596589f73c19069e21c81e5013b91f408165d1bf623d32";
 const firstHighNetWorthAccount = "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1";
@@ -75,6 +76,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
+    await pruneDockerAllIfGithubAction({ logLevel });
   });
 
   const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
@@ -265,7 +267,7 @@ test(testCase, async (t: Test) => {
     web3SigningCredential,
     gas: estimatedGas,
   };
-  const res = await api.newContract(request);
+  const res = await api.newContractV1(request);
   t.equal(res.status, 200, "response status is 200 OK");
 
   t.comment("Get account balance");
@@ -306,7 +308,7 @@ test(testCase, async (t: Test) => {
     connectorId,
     keychainId,
   };
-  const resRefund = await api.refund(refundRequest);
+  const resRefund = await api.refundV1(refundRequest);
   t.equal(resRefund.status, 200, "response status is 200 OK");
 
   t.comment("Get account balance");
@@ -324,7 +326,7 @@ test(testCase, async (t: Test) => {
     "balance of account is 100 OK",
   );
   t.comment("Get status of HTLC");
-  const resStatus = await api.getSingleStatus(
+  const resStatus = await api.getSingleStatusV1(
     id,
     web3SigningCredential,
     connectorId,
@@ -536,7 +538,7 @@ test("Test invalid refund with invalid time", async (t: Test) => {
     web3SigningCredential,
     gas: estimatedGas,
   };
-  const res = await api.newContract(request);
+  const res = await api.newContractV1(request);
   t.equal(res.status, 200, "response status is 200 OK");
 
   t.comment("Get HTLC Id from DemoHelper");
@@ -566,7 +568,7 @@ test("Test invalid refund with invalid time", async (t: Test) => {
       connectorId,
       keychainId,
     };
-    const resRefund = await api.refund(refundRequest);
+    const resRefund = await api.refundV1(refundRequest);
     t.equal(resRefund.status, 400, "response status is 400");
   } catch (error) {
     t.equal(error.response.status, 400, "response status is 400");
@@ -582,11 +584,5 @@ test("Test invalid refund with invalid time", async (t: Test) => {
     params: [firstHighNetWorthAccount],
   });
   t.equal(responseFinalBalance.callOutput, "90", "balance of account is 90 OK");
-  t.end();
-});
-
-test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });

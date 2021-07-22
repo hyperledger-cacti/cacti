@@ -226,7 +226,7 @@ This class creates a prometheus exporter, which scrapes the transactions (total 
 The prometheus exporter object is initialized in the `PluginLedgerConnectorBesu` class constructor itself, so instantiating the object of the `PluginLedgerConnectorBesu` class, gives access to the exporter object.
 You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginLedgerConnectorBesuOptions` interface for `PluginLedgerConnectoBesu` constructor.
 
-`getPrometheusExporterMetricsV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime the `transact()` method of the `PluginLedgerConnectorBesu` class is called.
+`getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime the `transact()` method of the `PluginLedgerConnectorBesu` class is called.
 
 ### Prometheus Integration
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).

@@ -47,13 +47,13 @@ export class BambooHarvestListPage implements OnInit {
   }
 
   private async loadData(): Promise<void> {
-    const { data } = await this.supplyChainApi.apiV1ListBambooHarvest();
+    const { data } = await this.supplyChainApi.listBambooHarvestV1();
     const { data: bambooHarvests } = data;
     this.bambooHarvests = bambooHarvests;
     this.log.debug(`Fetched BambooHarvest data: %o`, bambooHarvests);
   }
 
-  async clickShowDetail(bambooHarvest: BambooHarvest) {
+  async clickShowDetail(bambooHarvest: BambooHarvest): Promise<void> {
     this.log.debug("clickShowDetail()", bambooHarvest);
 
     const modal = await this.modalController.create({
@@ -73,7 +73,7 @@ export class BambooHarvestListPage implements OnInit {
     }
   }
 
-  async clickAddNew() {
+  async clickAddNew(): Promise<void> {
     this.log.debug(`clickAddNew()`);
     const modal = await this.modalController.create({
       component: BambooHarvestDetailPage,
@@ -83,7 +83,7 @@ export class BambooHarvestListPage implements OnInit {
     const bambooHarvest = overlayEventDetail.data as BambooHarvest;
     this.log.debug("clickAddNew() detail presented OK", bambooHarvest);
     if (bambooHarvest) {
-      const res = await this.supplyChainApi.apiV1InsertBambooHarvest({
+      const res = await this.supplyChainApi.insertBambooHarvestV1({
         bambooHarvest,
       });
       this.log.debug(`New BambooHarvest inserted OK`, res);

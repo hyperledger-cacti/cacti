@@ -44,19 +44,22 @@ Photo by Pontus Wellgraf on Unsplash
     - [2.1.3 Burning or Locking of Assets](#213-burning-or-locking-of-assets)
   - [2.2 Footnotes (Introduction)](#22-footnotes-introduction)
 - [3. Example Use Cases](#3-example-use-cases)
-  - [3.1 Ethereum to Quorum Asset Transfer](#31-ethereum-to-quorum-asset-transfer)
-  - [3.2 Escrowed Sale of Data for Coins](#32-escrowed-sale-of-data-for-coins)
-  - [3.3 Money Exchanges](#33-money-exchanges)
-  - [3.4 Stable Coin Pegged to Other Currency](#34-stable-coin-pegged-to-other-currency)
-    - [3.4.1 With Permissionless Ledgers (BTC)](#341-with-permissionless-ledgers-btc)
-    - [3.4.2 With Fiat Money (USD)](#342-with-fiat-money-usd)
-  - [3.5 Healthcare Data Sharing with Access Control Lists](#35-healthcare-data-sharing-with-access-control-lists)
-  - [3.6 Integrate Existing Food Traceability Solutions](#36-integrate-existing-food-traceability-solutions)
-  - [3.7 End User Wallet Authentication/Authorization](#37-end-user-wallet-authenticationauthorization)
-  - [3.8 Blockchain Migration](#38-blockchain-migration)
-    - [3.8.1 Blockchain Data Migration](#381-blockchain-data-migration)
-    - [3.8.2 Blockchain Smart Contract Migration](#382-blockchain-smart-contract-migration)
-    - [3.8.3 Semi-Automatic Blockchain Migration](#383-semi-automatic-blockchain-migration)
+  - [3.1 Car Trade](#31-car-trade)
+  - [3.2 Electricity Trade](#32-electricity-trade)
+  - [3.3 Supply chain](#33-supply-chain)
+  - [3.4 Ethereum to Quorum Asset Transfer](#34-ethereum-to-quorum-asset-transfer)
+  - [3.5 Escrowed Sale of Data for Coins](#35-escrowed-sale-of-data-for-coins)
+  - [3.6 Money Exchanges](#36-money-exchanges)
+  - [3.7 Stable Coin Pegged to Other Currency](#37-stable-coin-pegged-to-other-currency)
+    - [3.7.1 With Permissionless Ledgers (BTC)](#371-with-permissionless-ledgers-btc)
+    - [3.7.2 With Fiat Money (USD)](#372-with-fiat-money-usd)
+  - [3.8 Healthcare Data Sharing with Access Control Lists](#38-healthcare-data-sharing-with-access-control-lists)
+  - [3.9 Integrate Existing Food Traceability Solutions](#39-integrate-existing-food-traceability-solutions)
+  - [3.10 End User Wallet Authentication/Authorization](#310-end-user-wallet-authenticationauthorization)
+  - [3.11 Blockchain Migration](#311-blockchain-migration)
+    - [3.11.1 Blockchain Data Migration](#3111-blockchain-data-migration)
+    - [3.11.2 Blockchain Smart Contract Migration](#3112-blockchain-smart-contract-migration)
+    - [3.11.3 Semi-Automatic Blockchain Migration](#3113-semi-automatic-blockchain-migration)
 - [4. Software Design](#4-software-design)
   - [4.1. Principles](#41-principles)
     - [4.1.1. Wide support](#411-wide-support)
@@ -136,6 +139,7 @@ Photo by Pontus Wellgraf on Unsplash
 - [7. Terminology](#7-terminology)
 - [8. Related Work](#8-related-work)
 - [9. References](#9-references)
+- [10. Recommended Reference](#10-recommended-reference)
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
@@ -331,16 +335,16 @@ The following table summarizes the use cases that will be explained in more deta
 <tr><td>One-way</td><td>Two-way</td><td>One-way</td><td>Two-way</td>
   </tr>
 
- <tr> <td> D</td> <td >D</td><td><a href="#35-healthcare-data-sharing-with-access-control-lists">3.5</a><br><a href="#38-blockchain-migration">3.8</a></td><td><a href="#35-healthcare-data-sharing-with-access-control-lists" >3.5</a><br><a href="#36-integrate-existing-food-traceability-solutions">3.6</a></td><td>-</td><td>-</td><td>-</td><td rowspan="12"><a href="#37-end-user-wallet-authenticationauthorization"  >3.7</a></td>
+ <tr> <td> D</td> <td >D</td><td><a href="#38-healthcare-data-sharing-with-access-control-lists">3.8</a><br><a href="#311-blockchain-migration">3.11</a></td><td><a href="#38-healthcare-data-sharing-with-access-control-lists" >3.8</a><br><a href="#39-integrate-existing-food-traceability-solutions">3.9</a></td><td>-</td><td>-</td><td>-</td><td rowspan="12"><a href="#310-end-user-wallet-authenticationauthorization"  >3.10</a></td>
   </tr>
 
- <tr> <td>FA</td><td >FA</td><td><a href="#31-ethereum-to-quorum-asset-transfer">3.1</a></td><td><a href="#34-stable-coin-pegged-to-other-currency">3.4</a></td><td><a href="#33-money-exchanges">3.3</a></td><td><a href="#33-money-exchanges">3.3</a></td><td><a href="#33-money-exchanges">3.3</a></td>
+ <tr> <td>FA</td><td >FA</td><td><a href="#34-ethereum-to-quorum-asset-transfer">3.4</a></td><td><a href="#37-stable-coin-pegged-to-other-currency">3.7</a></td><td><a href="#36-money-exchanges">3.6</a></td><td><a href="#36-money-exchanges">3.6</a></td><td><a href="#36-money-exchanges">3.6</a></td>
   </tr>
 
  <tr> <td>NFA</td><td>NFA</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
   </tr>
 
- <tr> <td>FA</td><td>D</td><td>-</td><td rowspan="3">-</td><td rowspan="3"><a href="#32-escrowed-sale-of-data-for-coins">3.2</a></td><td>-</td><td rowspan="3">-</td>
+ <tr> <td>FA</td><td>D</td><td>-</td><td rowspan="3">-</td><td rowspan="3"><a href="#35-escrowed-sale-of-data-for-coins">3.5</a></td><td>-</td><td rowspan="3">-</td>
 </tr>
 
 <tr>
@@ -369,14 +373,63 @@ The following table summarizes the use cases that will be explained in more deta
 
 </table>
 
+## 3.1 Car Trade
 
+| Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Use Case Title             | Car Trade |
+| Use Case                   | TBD |
+| Interworking patterns      | TBD |
+| Type of Social Interaction | TBD |
+| Narrative                  | TBD |
+| Actors                     | TBD |
+| Goals of Actors            | TBD |
+| Success Scenario           | TBD |
+| Success Criteria           | TBD |
+| Failure Criteria           | TBD |
+| Prerequisites              | TBD |
+| Comments                   |     |
 
-## 3.1 Ethereum to Quorum Asset Transfer
+## 3.2 Electricity Trade
+
+| Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Use Case Title             | Electricity Trade |
+| Use Case                   | TBD |
+| Interworking patterns      | TBD |
+| Type of Social Interaction | TBD |
+| Narrative                  | TBD |
+| Actors                     | TBD |
+| Goals of Actors            | TBD |
+| Success Scenario           | TBD |
+| Success Criteria           | TBD |
+| Failure Criteria           | TBD |
+| Prerequisites              | TBD |
+| Comments                   |     |
+
+## 3.3 Supply chain
+
+| Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Use Case Title             | Supply Chain |
+| Use Case                   | TBD |
+| Interworking patterns      | TBD |
+| Type of Social Interaction | TBD |
+| Narrative                  | TBD |
+| Actors                     | TBD |
+| Goals of Actors            | TBD |
+| Success Scenario           | TBD |
+| Success Criteria           | TBD |
+| Failure Criteria           | TBD |
+| Prerequisites              | TBD |
+| Comments                   |     |
+
+## 3.4 Ethereum to Quorum Asset Transfer
 
 | Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Use Case Title             | Ethereum to Quorum Escrowed Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                |
-| Use Case                   | 1. `User A` owns some assets on a Ethereum ledger<br>2. `User A` asks `Exchanger` to exchange specified amount of assets on Ethereum ledger, and receives exchanged asset at the Quorum ledger.
+| Use Case                   | 1. `User A` owns some assets on an Ethereum ledger<br>2. `User A` asks `Exchanger` to exchange specified amount of assets on Ethereum ledger, and receives exchanged asset at the Quorum ledger.
 | Interworking patterns      | Value transfer                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | Type of Social Interaction | Escrowed Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | Narrative                  | A person (`User A`) has multiple accounts on different ledgers (Ethereum, Quorum) and he wishes to send some assets from Ethereum ledger to a Quorum ledger with considering conversion rate. The sent asset on Ethereum will be received by Exchanger only when he successfully received converted asset on Quorum ledger. |
@@ -393,7 +446,7 @@ The following table summarizes the use cases that will be explained in more deta
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 3.2 Escrowed Sale of Data for Coins
+## 3.5 Escrowed Sale of Data for Coins
 
 
 | W3C Use Case Attribute Name | W3C Use Case Attribute Value |
@@ -414,13 +467,13 @@ The following table summarizes the use cases that will be explained in more deta
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/jPF1Qi9048Rl-nI3nu07FNee6cseq8FKzYR899dOnNKtdTreVVlEnb1ZeI257ZF_jpCVEvkf3yYXEHXOqqT3jY1OQDmn7c08ZxvWTw8IrcW8N0KB30YLOvWxRRrIVgzjZH6UiP2Pis4TpiBgW4ONIWKTvElfN1CRAdV4a1fNx8jtr1QMDf1C2jfPoAG9dHplD_Ol8bW4-NZpnDiPe0ViLz9OoPNAtIUaoqoH5Qqp36QhvQ25Qosr4YI_G8FdrjKFL2bpSlG46UQiY-qbY8VAqJLCoJVzQ7njXqrmegAF64JSIW663t7Y15RiQYUdNncjZup4JA5Xsozr61gOCqcJijzYhNUtS73TNK7MsD8hY5p4ox7GqQgjNpaXkfdTkNwtkRELveFCl8TH-JrUSNCzhL6drIxqNwnkDr1LgXlTYYR92ncAEwpQUq5HYMjDaerD4l5XAaWVjTs1lFEWoL-I-AvWrkAfCBwcE87CEKc--qz-61rgGt5_NPx_bgkfN8ZyaLy0">
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 3.3 Money Exchanges
+## 3.6 Money Exchanges
 
 Enabling the trading of fiat and virtual currencies in any permutation of possible pairs.
 
 > On the technical level, this use case is the same as the one above and therefore the specific details were omitted.
 
-## 3.4 Stable Coin Pegged to Other Currency
+## 3.7 Stable Coin Pegged to Other Currency
 
 
 | W3C Use Case Attribute Name | W3C Use Case Attribute Value |
@@ -439,7 +492,7 @@ Enabling the trading of fiat and virtual currencies in any permutation of possib
 
 > Sequence diagram omitted as use case does not pertain to end users of Hyperledger Cactus itself.
 
-### 3.4.1 With Permissionless Ledgers (BTC)
+### 3.7.1 With Permissionless Ledgers (BTC)
 
 A BTC holder can exchange their BTC for ExampleCoins by sending their BTC to `ExampleCoin Reserve Wallet` and the equivalent amount of coins get minted for them
 onto their ExampleCoin wallet on the other network.
@@ -448,14 +501,14 @@ An ExampleCoin holder can redeem their funds to BTC by receiving a Proof of Burn
 
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/XP9FIyH03CNlyoc2dhmiui6JY5ln7tWG4KJmaft6TkWqgJFfrbNyxgPBLzP5yLQQlFpoNkOiAoRjsmWNRzXsaSubCDnHLL49Ab04zVR7EGqQ2QvN7QL8PKK9YYY-yJLQ_mqhLGar2CDbmfO6ISqp_pCoDu4xj7R8zDeJUvgd9CD37Np3b3CSRRKawRdqajZ8HuTRXHRVMcl6Yd9u9pW-_6NkdNaCFdJ82ZR6B0Gcvrx6LM7lGHH_-h_X9R5AMkq1Pb3o0VPlGrNhLS8LV3W0bjAKyuCViaUCaJIlHUI7RmqHhqMVxdC7EcMn2rpynOiHHEin_4cuZKHPR9XF5ACC4tIZBWvsZmptb2ajAKzpfisxzCVkewcJsMnskcbQrnsB4jZfBTN6pG6vX08iUZDed2N6dc117ljChe2GOO7URbI1MPdAyW9po09Hk79Z15OPrZj1BT4kDieGDFLPxHbPM45NCqU66kdEdTcdFUCl">
 
-### 3.4.2 With Fiat Money (USD)
+### 3.7.2 With Fiat Money (USD)
 
 Very similar idea as with pegging against BTC, but the BTC wallet used for reserves
 gets replaced by a traditional bank account holding USD.
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 3.5 Healthcare Data Sharing with Access Control Lists
+## 3.8 Healthcare Data Sharing with Access Control Lists
 
 | W3C Use Case Attribute Name | W3C Use Case Attribute Value |
 |-----------------------------|------------------------------------------------|
@@ -474,7 +527,7 @@ gets replaced by a traditional bank account holding USD.
 <img width="700" src="https://www.plantuml.com/plantuml/png/0/hLHDRzf04BtxLupefJtaa1mjX69IaQ16AYfgUeaK3Ui1Zx1ttTd1b7_VMK1WL9NcqAFtVSsyNVa-AefkcXhcz7D3tX5yPbm9Dd03JuIrLWx53b4HvXKA-nLiMIiedACOuI5ubL33CqUDMHRNx5jCya8aR2U6pdLN4x1YpIxBbDM-ddOjIKtbYWJ6TN1hLo5xc7eborOE7YPcGjiWwrV_VqP3fq7WUoHvAm0Z80o7hMMHrz6eZuuJkZ2qEeUq4ZekIOoPBS8l64ydyE57nKhp9gmfCnFM7GoAsNImDs_vTFPYcvTezX_ZfptO6LI2sHoy1i_x8kBWmj4KkC18CC65i7ixa9Ayl3s3OugRFdHtjiQD1jkAErI2u2qBRaPfi1o-fKAZ7gexj9LbaB0z9OUPXAPLM5ebVGw0a6x4mwEWLvYHD1mZ9_EJkhpBuP4KYXX9N_r5YsbiQ_1aSuMJ32yMM2xF6LqEBoIyt5rFSSBA3krjyygZ9LA4_MKO1j2TwXYwK0V9LqBaHxQw8qeKggtWddJgkx-BXSfHiGYYIUZBFyRlLsJZFmYbuwlZ7rFAs_VI-wqU9ILy_VAUI_WdFJkoUy_Xy0gigkpUDhP_o6y0">
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 3.6 Integrate Existing Food Traceability Solutions
+## 3.9 Integrate Existing Food Traceability Solutions
 
 | W3C Use Case Attribute Name | W3C Use Case Attribute Value |
 |-----------------------------|------------------------------|
@@ -498,7 +551,7 @@ gets replaced by a traditional bank account holding USD.
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 3.7 End User Wallet Authentication/Authorization
+## 3.10 End User Wallet Authentication/Authorization
 
 | W3C Use Case Attribute Name | W3C Use Case Attribute Value |
 |-----------------------------|------------------------------|
@@ -522,7 +575,7 @@ gets replaced by a traditional bank account holding USD.
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
-## 3.8 Blockchain Migration
+## 3.11 Blockchain Migration
 
 
 | Use Case Attribute Name    | Use Case Attribute Value |
@@ -556,18 +609,18 @@ Currently, when a consortium wants to migrate the entire blockchain or user want
 Data migrations have been performed before on public blockchains [[2](#8-references), [3](#8-references), [4](#8-references)] to render flexibility to blockchain-based solutions.
 Such work proposes data migration capabilities and patterns for public, permissionless blockchains, in which a user can specify requirements and scope for the blockchain infrastructure supporting their service.
 
-### 3.8.1 Blockchain Data Migration
+### 3.11.1 Blockchain Data Migration
 Data migration corresponds to capturing the subset of assets and data on a source blockchain and constructing a representation of those in a target blockchain. Note that the models underlying both blockchains do not need to be the same (e.g., world state model in Hyperledger Fabric vs account-balance model in Ethereum).
 For migration to be effective, it should be possible to capture the necessary assets and data from the source blockchain and to write them on the target blockchain.
 
 
 <img width="700" src="./use-case-sequence-diagram-blockchain-migration.png">
 
-### 3.8.2 Blockchain Smart Contract Migration
+### 3.11.2 Blockchain Smart Contract Migration
 The task of migrating a smart contract comprises the task of migrating the smart contract logic and data embedded in it. In specific, the data should be accessible and writeable on another blockchain. When the target blockchain can execute a smart contract written for the source blockchain, execution behaviour can be preserved by redeploying the same smart contract (e.g., reusing a smart contract written for Ethereum on Hyperldger Besu) and recreating its assets and data. If code reuse is not possible (either at source or binary code level), the target blockchain's virtual machine should support the computational complexity of the source blockchain (e.g., one cannot migrate all Ethereum smart contracts to Bitcoin, but the other way around is feasible).
 Automatic smart contract migration (with or without translation) yields risks for enterprise blockchain systems, and thus the solution is nontrivial [[4](#8-references)].
 
-### 3.8.3 Semi-Automatic Blockchain Migration
+### 3.11.3 Semi-Automatic Blockchain Migration
 
 By expressing a user's preferences in terms of functional and non-functional requirements, `Cactus` can recommend a set of suitable blockchains, as the target for the migration.
 Firstly, a user could know in real-time the characteristics of the target blockchain that would influence the migration decision. For instance, the platform can analyze the cost of writing data to Ethereum, Ether:USD exchange rate, average inter-block time, transaction throughput, and network hash rate [[3](#8-references)].
@@ -1709,3 +1762,15 @@ The blockchain migrator feature paves the way for building a solution that perfo
 4: H.M.N. Dilum Bandara, Xiwei Xu, and Ingo Weber. 2020. [Patterns for blockchain data migration](https://arxiv.org/abs/1906.00239). European Conf. on Pattern Languages of Programs 2020 (EuroPLoP 2020).
 
 5: Belchior,  A.  Vasconcelos,  S.  Guerreiro,  and  M.  Correia,  “A  Surveyon Blockchain Interoperability: Past, Present, and Future Trends,”arXiv,2020. [Online]. Available: http://arxiv.org/abs/2005.14282
+
+<div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
+
+# 10. Recommended Reference
+Please use the following BibTex entry to cite this whitepaper:
+
+@article{hyperledgercactus,
+  title={Hyperledger Cactus Whitepaper v0.1},
+  author={Montgomery, Hart and Borne-Pons, Hugo and Hamilton, Jonathan and Bowman, Mic and Somogyvari, Peter and Fujimoto, Shingo and Takeuchi, Takuma and Kuhrt, Tracy and Belchior, Rafael},
+  journal={URL: https://github. com/hyperledger/cactus/blob/main/whitepaper/whitepaper. md},
+  year={2020}
+}

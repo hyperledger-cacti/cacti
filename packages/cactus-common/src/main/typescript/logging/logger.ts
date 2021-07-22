@@ -46,20 +46,20 @@ export class Logger {
     this.backend.info("Shut down logger OK.");
   }
 
-  public error(...msg: any[]): void {
+  public error(...msg: unknown[]): void {
     this.backend.error(...msg);
   }
 
-  public warn(...msg: any[]): void {
+  public warn(...msg: unknown[]): void {
     this.backend.warn(...msg);
   }
-  public info(...msg: any[]): void {
+  public info(...msg: unknown[]): void {
     this.backend.info(...msg);
   }
-  public debug(...msg: any[]): void {
+  public debug(...msg: unknown[]): void {
     this.backend.debug(...msg);
   }
-  public trace(...msg: any[]): void {
+  public trace(...msg: unknown[]): void {
     this.backend.trace(...msg);
   }
 }

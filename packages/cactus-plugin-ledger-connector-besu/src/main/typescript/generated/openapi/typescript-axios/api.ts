@@ -190,6 +190,427 @@ export enum EthContractInvocationType {
 /**
  * 
  * @export
+ * @interface EvmBlock
+ */
+export interface EvmBlock {
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmBlock
+     */
+    number?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    hash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    parentHash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    nonce?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    sha3Uncles?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    logsBloom?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    transactionsRoot?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    stateRoot?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    miner?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmBlock
+     */
+    difficulty?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmBlock
+     */
+    totalDifficulty?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmBlock
+     */
+    extraData?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmBlock
+     */
+    size?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmBlock
+     */
+    gasLimit?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmBlock
+     */
+    gasUsed?: number;
+    /**
+     * 
+     * @type {any}
+     * @memberof EvmBlock
+     */
+    timestamp?: any | null;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof EvmBlock
+     */
+    transactions?: Array<any>;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof EvmBlock
+     */
+    uncles?: Array<any>;
+}
+/**
+ * 
+ * @export
+ * @interface EvmLog
+ */
+export interface EvmLog {
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmLog
+     */
+    address: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmLog
+     */
+    data: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmLog
+     */
+    blockHash: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmLog
+     */
+    transactionHash: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof EvmLog
+     */
+    topics: Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmLog
+     */
+    logIndex: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmLog
+     */
+    transactionIndex: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmLog
+     */
+    blockNumber: number;
+}
+/**
+ * 
+ * @export
+ * @interface EvmTransaction
+ */
+export interface EvmTransaction {
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmTransaction
+     */
+    hash?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmTransaction
+     */
+    nonce?: number;
+    /**
+     * 
+     * @type {any}
+     * @memberof EvmTransaction
+     */
+    blockHash?: any | null;
+    /**
+     * 
+     * @type {any}
+     * @memberof EvmTransaction
+     */
+    blockNumber?: any | null;
+    /**
+     * 
+     * @type {any}
+     * @memberof EvmTransaction
+     */
+    transactionIndex?: any | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmTransaction
+     */
+    from?: string;
+    /**
+     * 
+     * @type {any}
+     * @memberof EvmTransaction
+     */
+    to?: any | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmTransaction
+     */
+    value?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmTransaction
+     */
+    gasPrice?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof EvmTransaction
+     */
+    gas?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof EvmTransaction
+     */
+    input?: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetBalanceV1Request
+ */
+export interface GetBalanceV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetBalanceV1Request
+     */
+    address: string;
+    /**
+     * 
+     * @type {any}
+     * @memberof GetBalanceV1Request
+     */
+    defaultBlock?: any | null;
+}
+/**
+ * 
+ * @export
+ * @interface GetBalanceV1Response
+ */
+export interface GetBalanceV1Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetBalanceV1Response
+     */
+    balance: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetBesuRecordV1Request
+ */
+export interface GetBesuRecordV1Request {
+    /**
+     * 
+     * @type {InvokeContractV1Request}
+     * @memberof GetBesuRecordV1Request
+     */
+    invokeCall?: InvokeContractV1Request;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetBesuRecordV1Request
+     */
+    transactionHash?: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetBesuRecordV1Response
+ */
+export interface GetBesuRecordV1Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetBesuRecordV1Response
+     */
+    ledgerId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetBesuRecordV1Response
+     */
+    stateContract?: string;
+    /**
+     * 
+     * @type {any}
+     * @memberof GetBesuRecordV1Response
+     */
+    transactionInputData?: any | null;
+    /**
+     * 
+     * @type {any}
+     * @memberof GetBesuRecordV1Response
+     */
+    callOutput?: any | null;
+}
+/**
+ * 
+ * @export
+ * @interface GetBlockV1Request
+ */
+export interface GetBlockV1Request {
+    /**
+     * 
+     * @type {any}
+     * @memberof GetBlockV1Request
+     */
+    blockHashOrBlockNumber: any | null;
+}
+/**
+ * 
+ * @export
+ * @interface GetBlockV1Response
+ */
+export interface GetBlockV1Response {
+    /**
+     * 
+     * @type {EvmBlock}
+     * @memberof GetBlockV1Response
+     */
+    block: EvmBlock;
+}
+/**
+ * 
+ * @export
+ * @interface GetPastLogsV1Request
+ */
+export interface GetPastLogsV1Request {
+    /**
+     * 
+     * @type {any}
+     * @memberof GetPastLogsV1Request
+     */
+    toBlock?: any | null;
+    /**
+     * 
+     * @type {any}
+     * @memberof GetPastLogsV1Request
+     */
+    fromBlock?: any | null;
+    /**
+     * 
+     * @type {any}
+     * @memberof GetPastLogsV1Request
+     */
+    address?: any | null;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof GetPastLogsV1Request
+     */
+    topics?: Array<any>;
+}
+/**
+ * 
+ * @export
+ * @interface GetPastLogsV1Response
+ */
+export interface GetPastLogsV1Response {
+    /**
+     * 
+     * @type {Array<EvmLog>}
+     * @memberof GetPastLogsV1Response
+     */
+    logs: Array<EvmLog>;
+}
+/**
+ * 
+ * @export
+ * @interface GetTransactionV1Request
+ */
+export interface GetTransactionV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetTransactionV1Request
+     */
+    transactionHash: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetTransactionV1Response
+ */
+export interface GetTransactionV1Response {
+    /**
+     * 
+     * @type {EvmTransaction}
+     * @memberof GetTransactionV1Response
+     */
+    transaction: EvmTransaction;
+}
+/**
+ * 
+ * @export
  * @interface InvokeContractV1Request
  */
 export interface InvokeContractV1Request {
@@ -731,7 +1152,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1BesuDeployContractSolidityBytecode: async (deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options: any = {}): Promise<RequestArgs> => {
+        deployContractSolBytecodeV1: async (deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -760,12 +1181,212 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Return balance of an address of a given block
+         * @param {GetBalanceV1Request} [getBalanceV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBalanceV1: async (getBalanceV1Request?: GetBalanceV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getBalanceV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Retrieves an arbitrary record (any piece of information) from the ledger. Ledger records can be call outputs, transaction input, etc.
+         * @param {GetBesuRecordV1Request} [getBesuRecordV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBesuRecordV1: async (getBesuRecordV1Request?: GetBesuRecordV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getBesuRecordV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Returns a block matching the block
+         * @param {GetBlockV1Request} [getBlockV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBlockV1: async (getBlockV1Request?: GetBlockV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getBlockV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Gets past logs, matching the given options.
+         * @param {GetPastLogsV1Request} [getPastLogsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPastLogsV1: async (getPastLogsV1Request?: GetPastLogsV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getPastLogsV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPrometheusMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a besu ledger
+         * @param {GetTransactionV1Request} [getTransactionV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTransactionV1: async (getTransactionV1Request?: GetTransactionV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getTransactionV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Invokes a contract on a besu ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1BesuInvokeContract: async (invokeContractV1Request?: InvokeContractV1Request, options: any = {}): Promise<RequestArgs> => {
+        invokeContractV1: async (invokeContractV1Request?: InvokeContractV1Request, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -799,7 +1420,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1BesuRunTransaction: async (runTransactionRequest?: RunTransactionRequest, options: any = {}): Promise<RequestArgs> => {
+        runTransactionV1: async (runTransactionRequest?: RunTransactionRequest, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -820,36 +1441,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Get the Prometheus Metrics
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getPrometheusExporterMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -909,8 +1500,73 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractSolidityBytecodeV1Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options);
+        async deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractSolidityBytecodeV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Return balance of an address of a given block
+         * @param {GetBalanceV1Request} [getBalanceV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getBalanceV1(getBalanceV1Request?: GetBalanceV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetBalanceV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getBalanceV1(getBalanceV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Retrieves an arbitrary record (any piece of information) from the ledger. Ledger records can be call outputs, transaction input, etc.
+         * @param {GetBesuRecordV1Request} [getBesuRecordV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getBesuRecordV1(getBesuRecordV1Request?: GetBesuRecordV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetBesuRecordV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getBesuRecordV1(getBesuRecordV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Returns a block matching the block
+         * @param {GetBlockV1Request} [getBlockV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getBlockV1(getBlockV1Request?: GetBlockV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetBlockV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getBlockV1(getBlockV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Gets past logs, matching the given options.
+         * @param {GetPastLogsV1Request} [getPastLogsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPastLogsV1(getPastLogsV1Request?: GetPastLogsV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetPastLogsV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPastLogsV1(getPastLogsV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPrometheusMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusMetricsV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a besu ledger
+         * @param {GetTransactionV1Request} [getTransactionV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTransactionV1(getTransactionV1Request?: GetTransactionV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetTransactionV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionV1(getTransactionV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -920,8 +1576,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1BesuInvokeContract(invokeContractV1Request?: InvokeContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1BesuInvokeContract(invokeContractV1Request, options);
+        async invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeContractV1(invokeContractV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -931,18 +1587,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiV1BesuRunTransaction(runTransactionRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Get the Prometheus Metrics
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getPrometheusExporterMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusExporterMetricsV1(options);
+        async runTransactionV1(runTransactionRequest?: RunTransactionRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -973,8 +1619,67 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): AxiosPromise<DeployContractSolidityBytecodeV1Response> {
-            return localVarFp.apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options).then((request) => request(axios, basePath));
+        deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): AxiosPromise<DeployContractSolidityBytecodeV1Response> {
+            return localVarFp.deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Return balance of an address of a given block
+         * @param {GetBalanceV1Request} [getBalanceV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBalanceV1(getBalanceV1Request?: GetBalanceV1Request, options?: any): AxiosPromise<GetBalanceV1Response> {
+            return localVarFp.getBalanceV1(getBalanceV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Retrieves an arbitrary record (any piece of information) from the ledger. Ledger records can be call outputs, transaction input, etc.
+         * @param {GetBesuRecordV1Request} [getBesuRecordV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBesuRecordV1(getBesuRecordV1Request?: GetBesuRecordV1Request, options?: any): AxiosPromise<GetBesuRecordV1Response> {
+            return localVarFp.getBesuRecordV1(getBesuRecordV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Returns a block matching the block
+         * @param {GetBlockV1Request} [getBlockV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBlockV1(getBlockV1Request?: GetBlockV1Request, options?: any): AxiosPromise<GetBlockV1Response> {
+            return localVarFp.getBlockV1(getBlockV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Gets past logs, matching the given options.
+         * @param {GetPastLogsV1Request} [getPastLogsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPastLogsV1(getPastLogsV1Request?: GetPastLogsV1Request, options?: any): AxiosPromise<GetPastLogsV1Response> {
+            return localVarFp.getPastLogsV1(getPastLogsV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPrometheusMetricsV1(options?: any): AxiosPromise<string> {
+            return localVarFp.getPrometheusMetricsV1(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a besu ledger
+         * @param {GetTransactionV1Request} [getTransactionV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTransactionV1(getTransactionV1Request?: GetTransactionV1Request, options?: any): AxiosPromise<GetTransactionV1Response> {
+            return localVarFp.getTransactionV1(getTransactionV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -983,8 +1688,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1BesuInvokeContract(invokeContractV1Request?: InvokeContractV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
-            return localVarFp.apiV1BesuInvokeContract(invokeContractV1Request, options).then((request) => request(axios, basePath));
+        invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
+            return localVarFp.invokeContractV1(invokeContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -993,17 +1698,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
-            return localVarFp.apiV1BesuRunTransaction(runTransactionRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get the Prometheus Metrics
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getPrometheusExporterMetricsV1(options?: any): AxiosPromise<string> {
-            return localVarFp.getPrometheusExporterMetricsV1(options).then((request) => request(axios, basePath));
+        runTransactionV1(runTransactionRequest?: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
+            return localVarFp.runTransactionV1(runTransactionRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Obtain signatures of ledger from the corresponding transaction hash.
@@ -1033,8 +1729,79 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any) {
-        return DefaultApiFp(this.configuration).apiV1BesuDeployContractSolidityBytecode(deployContractSolidityBytecodeV1Request, options).then((request) => request(this.axios, this.basePath));
+    public deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Return balance of an address of a given block
+     * @param {GetBalanceV1Request} [getBalanceV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getBalanceV1(getBalanceV1Request?: GetBalanceV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).getBalanceV1(getBalanceV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Retrieves an arbitrary record (any piece of information) from the ledger. Ledger records can be call outputs, transaction input, etc.
+     * @param {GetBesuRecordV1Request} [getBesuRecordV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getBesuRecordV1(getBesuRecordV1Request?: GetBesuRecordV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).getBesuRecordV1(getBesuRecordV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Returns a block matching the block
+     * @param {GetBlockV1Request} [getBlockV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getBlockV1(getBlockV1Request?: GetBlockV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).getBlockV1(getBlockV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Gets past logs, matching the given options.
+     * @param {GetPastLogsV1Request} [getPastLogsV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getPastLogsV1(getPastLogsV1Request?: GetPastLogsV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).getPastLogsV1(getPastLogsV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get the Prometheus Metrics
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getPrometheusMetricsV1(options?: any) {
+        return DefaultApiFp(this.configuration).getPrometheusMetricsV1(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Executes a transaction on a besu ledger
+     * @param {GetTransactionV1Request} [getTransactionV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getTransactionV1(getTransactionV1Request?: GetTransactionV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).getTransactionV1(getTransactionV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1045,8 +1812,8 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public apiV1BesuInvokeContract(invokeContractV1Request?: InvokeContractV1Request, options?: any) {
-        return DefaultApiFp(this.configuration).apiV1BesuInvokeContract(invokeContractV1Request, options).then((request) => request(this.axios, this.basePath));
+    public invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).invokeContractV1(invokeContractV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1057,19 +1824,8 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public apiV1BesuRunTransaction(runTransactionRequest?: RunTransactionRequest, options?: any) {
-        return DefaultApiFp(this.configuration).apiV1BesuRunTransaction(runTransactionRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Get the Prometheus Metrics
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public getPrometheusExporterMetricsV1(options?: any) {
-        return DefaultApiFp(this.configuration).getPrometheusExporterMetricsV1(options).then((request) => request(this.axios, this.basePath));
+    public runTransactionV1(runTransactionRequest?: RunTransactionRequest, options?: any) {
+        return DefaultApiFp(this.configuration).runTransactionV1(runTransactionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

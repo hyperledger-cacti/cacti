@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-plugin-ledger-connector-besu",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Integration tests for the Besu ledger and the API server.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-plugin-ledger-connector-besu.node.umd.min.js",
@@ -12,7 +12,6 @@
     "dist/*"
   ],
   "scripts": {
-    "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -22,24 +21,7 @@
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
     "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
   },
-  "watch": {
-    "tsc": {
-      "patterns": [
-        "src/",
-        "src/*/json/**/openapi*"
-      ],
-      "ignore": [
-        "src/**/generated/*"
-      ],
-      "extensions": [
-        "ts",
-        "json"
-      ],
-      "quiet": true,
-      "verbose": false,
-      "runOnChangeOnly": true
-    }
-  },
+  "watch": {},
   "publishConfig": {
     "access": "public"
   },
@@ -81,12 +63,12 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "0.5.0",
-    "@hyperledger/cactus-common": "0.5.0",
-    "@hyperledger/cactus-core": "0.5.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "0.5.0",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "0.5.0",
-    "@hyperledger/cactus-test-tooling": "0.5.0",
+    "@hyperledger/cactus-cmd-api-server": "0.6.0",
+    "@hyperledger/cactus-common": "0.6.0",
+    "@hyperledger/cactus-core": "0.6.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "0.6.0",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "0.6.0",
+    "@hyperledger/cactus-test-tooling": "0.6.0",
     "key-encoder": "2.0.3",
     "web3": "1.2.11",
     "web3-eea": "0.10.0"

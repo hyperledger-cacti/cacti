@@ -13,12 +13,12 @@
     - [Running unit tests only](#running-unit-tests-only)
     - [Running integration tests only](#running-integration-tests-only)
     - [What is npx used for?](#what-is-npx-used-for)
+    - [What's the equivalent of npx for Yarn?](#whats-the-equivalent-of-npx-for-yarn)
     - [Debugging a test case](#debugging-a-test-case)
   - [All-In-One Docker Images for Ledger Connector Plugins](#all-in-one-docker-images-for-ledger-connector-plugins)
     - [Test Automation of Ledger Plugins](#test-automation-of-ledger-plugins)
   - [Building the SDK](#building-the-sdk)
-  - [Adding a new public npm dependency to one of the packages:](#adding-a-new-public-npm-dependency-to-one-of-the-packages)
-  - [Adding a sibling package npm dependency to one of the packages:](#adding-a-sibling-package-npm-dependency-to-one-of-the-packages)
+  - [Adding new dependencies:](#adding-new-dependencies)
   - [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
   - [On Reproducible Builds](#on-reproducible-builds)
 
@@ -71,6 +71,7 @@ Further reading:
 
 
 ## PR Checklist - Contributor/Developer
+**To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
 1. Fork [hyperledger/cactus](https://github.com/hyperledger/cactus) via Github UI
    - If you are using the Git client on the Windows operating system, you will need to enable long paths for git
@@ -355,13 +356,13 @@ for both them separately anyway:
   - An integration test:
 
       ```sh
-      npx tap --timeout=600 packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/security-isolation-via-api-server-ports.ts
+      npx tap --ts --timeout=600 packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/security-isolation-via-api-server-ports.ts
       ```
 
   - A unit test:
 
       ```sh
-      npx tap --timeout=600 packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.ts
+      npx tap --ts --timeout=600 packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts
       ```
 
 #### Running all test cases (unit+integration)
@@ -388,6 +389,10 @@ npm run test:integration
 place every node module (project dependencies) on the OS path or to install them globally (`npm install some-pkg -g`)
 
 Read more about npx here: https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner
+
+#### What's the equivalent of npx for Yarn?
+
+Yarn itself. E.g. `npx lerna clean` becomes `yarn lerna clean`.
 
 #### Debugging a test case
 
@@ -416,7 +421,7 @@ These produce the `hyperledger/cactus-besu-all-in-one` and
 `hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are
 used in the test cases that are written for the specific ledger connector
 plugins at:
-* `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
+* `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
 * `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.ts`
 
 The specific classes that utilize the `all-in-one` images can be found in the
@@ -443,7 +448,7 @@ container from scratch, execute the test scenario and then tear down and delete
 the container completely.
 
 An example for a ledger connector plugin and it's test automation implemented the way it is explained above:
-`packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
+`packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
 
 > This test case is also an example of how to run an ApiServer independently with a single ledger plugin which is
 > how the test case is set up to begin with.
@@ -461,7 +466,7 @@ chmod +x ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-ap
 You can run this test case the same way you would run any other test case (which is also a requirement in itself for each test case):
 
 ```sh
-npx tap --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts
+npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts
 ```
 
 You can specify an arbitrary set of test cases to run in a single execution via glob patterns. Examples of these glob
@@ -469,9 +474,9 @@ patterns can be observed in the root directory's `package.json` file which has n
 a single command (the CI script uses these):
 
 ```json
-"test:all": "tap --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
-"test:unit": "tap --timeout=600 \"packages/cactus-*/src/test/typescript/unit/\"",
-"test:integration": "tap --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/integration/\""
+"test:all": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
+"test:unit": "tap --ts --timeout=600 \"packages/cactus-*/src/test/typescript/unit/\"",
+"test:integration": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/integration/\""
 ```
 
 Following a similar pattern if you have a specific folder where your test cases are, you can run everything in that
@@ -483,7 +488,7 @@ For example this can work as well:
 ```sh
 # Starting from the project root
 cd packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum
-npx tap --jobs=1 --timeout=600 \"./\"
+npx tap --ts --jobs=1 --timeout=600 \"./\"
 ```
 
 > Be aware that glob patterns need quoting in some operating system's shell environments and not necessarily on others.
@@ -492,7 +497,7 @@ npx tap --jobs=1 --timeout=600 \"./\"
 ### Building the SDK
 
 You do not need to do anything special to have the SDK sources generated and
-compiled. It is all part of the `npm run build` task which you can run yourself
+compiled. It is all part of the `npm run build:dev:backend` task which you can run yourself
 or as part of the CI script (`./tools/ci.sh`).
 
 The SDK is itself just another package named `sdk` and can be dependend on by
@@ -503,33 +508,25 @@ browser and also NodeJS environments. This is very important as we do not wish
 to maintain two (or more) separate SDK codebases and we also want as much of it
 being generated automatically as possible (currently this is close to 100%).
 
-### Adding a new public npm dependency to one of the packages:
+### Adding new dependencies:
 
-For example web3 can be added as a dependency to the besu ledger connector plugin's package this way:
-
-```sh
-npx lerna add web3@latest --scope '*/*plugin-ledger-connector-besu' --exact # [--dev] [--peer]
-```
-
-If you are adding a development dependency you can use the `--dev` option and `--peer` for a peer dependency.
-
-After running any `lerna add` command you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
-
-### Adding a sibling package npm dependency to one of the packages:
-
-For example the `cactus-test-tooling` can be added as a dev dependency to the besu ledger connector plugin's package this way:
+Example:
 
 ```sh
-npx lerna add @hyperledger/cactus-test-tooling --scope '*/*plugin-ledger-connector-besu' --exact --dev
+# Adds "got" as a dependency to the cactus common package
+# Note that you must specify the fully qualified package name as present in
+# the package.json file
+yarn workspace @hyperledger/cactus-common add got --save-exact
 ```
 
-Or add the common library to allow you the usage of the logger for example:
+You need to know which package of the monorepo will be using the package and then
+run the `yarn workspace` command with an additional parameters specifying the package
+name and the dependency name. 
+See [Yarn Workspaces Documentation](https://classic.yarnpkg.com/en/docs/cli/workspace/) for the official Yarn documentation for further details and examples.
 
-```sh
-npx lerna add @hyperledger/cactus-common --scope '*/*plugin-ledger-connector-quorum' --exact --dev
-```
+After adding new dependencies, you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
 
-After running any `lerna add` command you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
+> **Always specify the `--save-exact` when installing new dependencies to ensure [reproducible builds](https://reproducible-builds.org/)**
 
 ### Reload VSCode Window After Adding Dependencies
 
