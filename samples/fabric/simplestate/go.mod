@@ -1,4 +1,4 @@
-module github.com/hyperledger-labs/weaver/samples/simplestate
+module github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simplestate
 
 go 1.15
 
