@@ -1,6 +1,4 @@
-mocks:
-	cp -r ../../../core/network/fabric-interop-cc/contracts/interop/mocks .
-test: mocks
+test:
 	go test -v .
 clean:
-	rm -rf mocks simplestate
+	rm -rf simplestate
