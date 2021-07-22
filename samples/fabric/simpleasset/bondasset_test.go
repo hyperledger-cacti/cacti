@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset"
+	sa "github.com/hyperledger-labs/weaver/samples/simpleasset"
 	"github.com/stretchr/testify/require"
 )
 

@@ -9,7 +9,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
-	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset"
+	sa "github.com/hyperledger-labs/weaver/samples/simpleasset"
 	"github.com/stretchr/testify/require"
 )
 
