@@ -1,8 +1,3 @@
-.PHONY: build-local
-build-local: .npmrc
-	npm install
-	npm run build
-
 .PHONY: build
 build: .npmrc
 	npm install

@@ -234,7 +234,7 @@ Build the Fabric driver module as follows:
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following:
   ```bash
-  make build-local
+  make build
   ```
 _Note_: `postinstall` applies a customization patch to the `fabric-network` NPM library.
 
@@ -589,7 +589,7 @@ A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the 
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token).
 - Run the following command:
   ```bash
-  make build-local
+  make build
   ```
   
 ### Interoperation Cordapp
