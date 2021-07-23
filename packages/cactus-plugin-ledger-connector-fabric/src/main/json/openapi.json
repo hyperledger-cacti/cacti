@@ -331,6 +331,16 @@
                     "params"
                 ],
                 "properties": {
+                    "endorsingPeers": {
+                        "description": "An array of MSP IDs to set as the list of endorsing peers for the transaction.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 4096,
+                            "nullable": false
+                        }
+                    },
                     "transientData": {
                         "type": "object",
                         "nullable": true
