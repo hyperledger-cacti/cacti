@@ -5,7 +5,7 @@ package networks.networks;
 import "common/ack.proto";
 import "common/state.proto";
 
-option go_package = "/networks";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/networks";
 
 // This service is the interface for how the network communicates with
 // its relay.
