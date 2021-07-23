@@ -5,11 +5,11 @@
     "outDir": "./dist/lib/",
     "declarationDir": "dist/types",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-keychain-vault.tsbuildinfo"
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-keychain-aws-sm.tsbuildinfo"
   },
   "include": [
     "./src",
-    "**/openapi.json",
+    "**/openapi.json"
   ],
   "references": [
     {
