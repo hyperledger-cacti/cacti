@@ -41,7 +41,7 @@
   ],
   "include": [
     "./src",
-    "src/**/*.json",
+    "src/**/*.json"
   ],
   "exclude": [
     "./src/utility-emissions-channel"

@@ -169,13 +169,6 @@
     symbol-observable "4.0.0"
     uuid "8.3.2"
 
-"@angular/common@11.2.1":
-  version "11.2.1"
-  resolved "https://registry.npmjs.org/@angular/common/-/common-11.2.1.tgz"
-  integrity sha512-6FuZvJkYq8ZD4Bi6n7zaok1BMe5ve3EZDXLM7cDl2Hktpc+z0/mIZtVYMR0zvf7VX48E4zUU039779ixy0zDMw==
-  dependencies:
-    tslib "^2.0.0"
-
 "@angular/common@12.1.1":
   version "12.1.1"
   resolved "https://registry.npmjs.org/@angular/common/-/common-12.1.1.tgz"
@@ -215,13 +208,6 @@
   resolved "https://registry.npmjs.org/@angular/compiler/-/compiler-9.0.0.tgz"
   integrity sha512-ctjwuntPfZZT2mNj2NDIVu51t9cvbhl/16epc5xEwyzyDt76pX9UgwvY+MbXrf/C/FWwdtmNtfP698BKI+9leQ==
 
-"@angular/core@11.2.1":
-  version "11.2.1"
-  resolved "https://registry.npmjs.org/@angular/core/-/core-11.2.1.tgz"
-  integrity sha512-FfMMG9yWW1xfZmHp8NtXJlNbLrgZ5Fm7FguRfTAuH007gDoknm+V3INKGyQfYOsIlxuJCSzyEeM3270lmbzYaQ==
-  dependencies:
-    tslib "^2.0.0"
-
 "@angular/core@12.1.1":
   version "12.1.1"
   resolved "https://registry.npmjs.org/@angular/core/-/core-12.1.1.tgz"
@@ -233,13 +219,6 @@
   version "9.0.0"
   resolved "https://registry.npmjs.org/@angular/core/-/core-9.0.0.tgz"
   integrity sha512-6Pxgsrf0qF9iFFqmIcWmjJGkkCaCm6V5QNnxMy2KloO3SDq6QuMVRbN9RtC8Urmo25LP+eZ6ZgYqFYpdD8Hd9w==
-
-"@angular/forms@11.2.1":
-  version "11.2.1"
-  resolved "https://registry.npmjs.org/@angular/forms/-/forms-11.2.1.tgz"
-  integrity sha512-/Xy1DQCZkCs1qWudmxooscPmVDkOEsgy9YJIoAYzsrRNINOpggBxBYRO9dztRmp2yDvRSAFTylmfQyTOrWrK7Q==
-  dependencies:
-    tslib "^2.0.0"
 
 "@angular/forms@12.1.1":
   version "12.1.1"
@@ -253,13 +232,6 @@
   resolved "https://registry.npmjs.org/@angular/language-service/-/language-service-12.1.1.tgz"
   integrity sha512-8jpfEJcK2rO6JFhqrSoHqAXyIiOmWtAnl6cNkvzvQjQgrzlIwFuixEgcohq8QaKN4vWYZtnX6YKxUakNmGo+Ww==
 
-"@angular/platform-browser-dynamic@11.2.1":
-  version "11.2.1"
-  resolved "https://registry.npmjs.org/@angular/platform-browser-dynamic/-/platform-browser-dynamic-11.2.1.tgz"
-  integrity sha512-7DEAwy3w2GqhVDe9e5AZoFFEd6e/cnACkz39R4VWY8YiSz/HFtOQ7lQPmjzkmXMEKuGVnQzFwD4aAQWXd/myQg==
-  dependencies:
-    tslib "^2.0.0"
-
 "@angular/platform-browser-dynamic@12.1.1":
   version "12.1.1"
   resolved "https://registry.npmjs.org/@angular/platform-browser-dynamic/-/platform-browser-dynamic-12.1.1.tgz"
@@ -267,26 +239,12 @@
   dependencies:
     tslib "^2.2.0"
 
-"@angular/platform-browser@11.2.1":
-  version "11.2.1"
-  resolved "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-11.2.1.tgz"
-  integrity sha512-wu1B6AY0Om1Pj3U7woLGNbuAgajKEg+B6IKIaCwXv03lID53hpMagyBiNJLLEL6PIRO33G3rPbRKW9gGEr52vg==
-  dependencies:
-    tslib "^2.0.0"
-
 "@angular/platform-browser@12.1.1":
   version "12.1.1"
   resolved "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-12.1.1.tgz"
   integrity sha512-R78K0DYxplYUvctq/7MvoBjuMDgMNrL1h8Bov0g7lN5hQWBQwBjl//CiJgx8H7uSiba9DQ0Jwu5Xxvkzkr8ggA==
   dependencies:
     tslib "^2.2.0"
-
-"@angular/router@11.2.1":
-  version "11.2.1"
-  resolved "https://registry.npmjs.org/@angular/router/-/router-11.2.1.tgz"
-  integrity sha512-YAq3zO8xdfjqEZ8Ur3go+5JXGIwpSTDj86dzZUMhTIsUuSVluBNdG1A+BQV2X5QNLh7VtdwfW5Npbjkn0Go/Cw==
-  dependencies:
-    tslib "^2.0.0"
 
 "@angular/router@12.1.1":
   version "12.1.1"
@@ -1992,95 +1950,6 @@
   resolved "https://registry.npmjs.org/@hutson/parse-repository-url/-/parse-repository-url-3.0.2.tgz"
   integrity sha512-H9XAx3hc0BQHY6l+IFSWHDySypcXsvsuLhgYLUGywmJ5pswRVQJUHpOsobnLYp2ZUaUlKiKDrgWWhosOwAEM8Q==
 
-"@hyperledger/cactus-api-client@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@hyperledger/cactus-api-client/-/cactus-api-client-0.5.0.tgz#3ef013f76669fc12fa0526c24b72a015878fad08"
-  integrity sha512-ALrDtoGqNHZ6I/KOUWfrHTpZINlxBR/SFl7uG/pZNR/mWZqO1BBPKPseAyTr04r2uT3eYkLzozzzoFB5MMtZig==
-  dependencies:
-    "@hyperledger/cactus-common" "0.5.0"
-    "@hyperledger/cactus-core" "0.5.0"
-    "@hyperledger/cactus-core-api" "0.5.0"
-    "@hyperledger/cactus-plugin-consortium-manual" "0.5.0"
-
-"@hyperledger/cactus-cockpit@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.npmjs.org/@hyperledger/cactus-cockpit/-/cactus-cockpit-0.5.0.tgz"
-  integrity sha512-5XiWesg6+5NRCybNsV2CXnLwMkv42DSQ3DUVC6DFKRZAi+Hf1i28JyavMHW9lBX8cRfar54p/AtBnaPS5tDd9g==
-  dependencies:
-    "@angular/common" "11.2.1"
-    "@angular/core" "11.2.1"
-    "@angular/forms" "11.2.1"
-    "@angular/platform-browser" "11.2.1"
-    "@angular/platform-browser-dynamic" "11.2.1"
-    "@angular/router" "11.2.1"
-    "@hyperledger/cactus-api-client" "0.5.0"
-    "@hyperledger/cactus-common" "0.5.0"
-    "@hyperledger/cactus-plugin-consortium-manual" "0.5.0"
-    "@ionic-native/core" "5.0.0"
-    "@ionic-native/splash-screen" "5.0.0"
-    "@ionic-native/status-bar" "5.0.0"
-    "@ionic/angular" "5.1.1"
-    jwt-decode "2.2.0"
-    rxjs "6.5.5"
-    zone.js "~0.10.2"
-
-"@hyperledger/cactus-common@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@hyperledger/cactus-common/-/cactus-common-0.5.0.tgz#0b0544424db12e06a5c626f235fb832861b652db"
-  integrity sha512-FMWE+9UJUpiaiESbULfbF/Q7GG9CH3jVCl6pqJMU673tsryCL6U/IgYEiRFW4aOFr+g81McG2xiUZ31E52696g==
-  dependencies:
-    json-stable-stringify "1.0.1"
-    key-encoder "2.0.3"
-    loglevel "1.6.7"
-    loglevel-plugin-prefix "0.8.4"
-    secp256k1 "4.0.2"
-    sha3 "2.1.3"
-
-"@hyperledger/cactus-core-api@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@hyperledger/cactus-core-api/-/cactus-core-api-0.5.0.tgz#3a8c47ebb9633b0b07d59c78ad1b01f1900fcc9c"
-  integrity sha512-Ba3vFellXjRoVd25Zw4+CQEZxrKVmjEybfz6jNWcMNHOV/bFTxlgOKtIGUDxH3v3HF5WNuxGzYGK77mPeF0mEg==
-  dependencies:
-    "@hyperledger/cactus-common" "0.5.0"
-    axios "0.21.1"
-    express "4.17.1"
-    typescript-optional "2.0.1"
-
-"@hyperledger/cactus-core@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@hyperledger/cactus-core/-/cactus-core-0.5.0.tgz#4787f9248513a0293245e6acc99919f5f161c3d3"
-  integrity sha512-putWKhR97P4NkddBlZuT/pyP8/1SkoJgXtWBAWxk2m/+DtAoHCqMqHuDaZdc1IOmdPv4ouk5jwrZ36FExYr5ZQ==
-  dependencies:
-    "@hyperledger/cactus-common" "0.5.0"
-    "@hyperledger/cactus-core-api" "0.5.0"
-    express "4.17.1"
-    express-jwt-authz "2.4.1"
-    typescript-optional "2.0.1"
-
-"@hyperledger/cactus-plugin-consortium-manual@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@hyperledger/cactus-plugin-consortium-manual/-/cactus-plugin-consortium-manual-0.5.0.tgz#3ee451fe4ded6b095e3cc237e2d5f28f874e2208"
-  integrity sha512-VajNKMN3Vgvf83fwSAQMQ17e420jJ/Y8mPG9xmdZj8WmTxHuX73H9PH7uQ0nQggFA7/vGFrrhqvBUl5XqLUNdA==
-  dependencies:
-    "@hyperledger/cactus-common" "0.5.0"
-    "@hyperledger/cactus-core" "0.5.0"
-    "@hyperledger/cactus-core-api" "0.5.0"
-    axios "0.21.1"
-    body-parser "1.19.0"
-    express "4.17.1"
-    jose "1.27.2"
-    json-stable-stringify "1.0.1"
-    prom-client "13.0.0"
-    typescript-optional "2.0.1"
-    uuid "8.3.2"
-
-"@ionic-native/core@5.0.0":
-  version "5.0.0"
-  resolved "https://registry.npmjs.org/@ionic-native/core/-/core-5.0.0.tgz"
-  integrity sha512-qtshWPo+CMq9ZoDGcg+1XF1+k2ASm0sLtZsIbXmYo5X82Q9cUhjk95X9BqHnjXHOdIWk4J/D3ot0/vzmMTNdbA==
-  dependencies:
-    "@types/cordova" latest
-
 "@ionic-native/core@5.34.0":
   version "5.34.0"
   resolved "https://registry.npmjs.org/@ionic-native/core/-/core-5.34.0.tgz"
@@ -2088,24 +1957,10 @@
   dependencies:
     "@types/cordova" latest
 
-"@ionic-native/splash-screen@5.0.0":
-  version "5.0.0"
-  resolved "https://registry.npmjs.org/@ionic-native/splash-screen/-/splash-screen-5.0.0.tgz"
-  integrity sha512-+7QfXPkaosGsR3ohEiL/WJn23NHVDZYvnilYNrOMF7oohnj5ngH46fCNYp1Tpybe5GCV1iP++RzDvE5jghWLZg==
-  dependencies:
-    "@types/cordova" latest
-
 "@ionic-native/splash-screen@5.34.0":
   version "5.34.0"
   resolved "https://registry.npmjs.org/@ionic-native/splash-screen/-/splash-screen-5.34.0.tgz"
   integrity sha512-ZSeT7v19fqhcyuvImhiXoTz2st82pUK99XxnZeUIa9U9zDu2zTkKI8ctNkBrSnFdVGjdKr8JA+aoOxWiQCzxOA==
-  dependencies:
-    "@types/cordova" latest
-
-"@ionic-native/status-bar@5.0.0":
-  version "5.0.0"
-  resolved "https://registry.npmjs.org/@ionic-native/status-bar/-/status-bar-5.0.0.tgz"
-  integrity sha512-mJfj+VXTOgf9Og0S7QDlT9I8UVI+Wj4kpZUHdQizovA/R0m1HG2hLKtEMy00iDVbOBjRsXGcD6JXCOeyVjg7LA==
   dependencies:
     "@types/cordova" latest
 
@@ -2128,14 +1983,6 @@
     tslib "^1.9.0"
     ws "^7.0.1"
 
-"@ionic/angular@5.1.1":
-  version "5.1.1"
-  resolved "https://registry.npmjs.org/@ionic/angular/-/angular-5.1.1.tgz"
-  integrity sha512-/39Z3DnmdbTM3pIGJRLWG+rVI7jrDWkDL8Cds2ziZbGLwhbd3jjEXVbSeR62RiEpMCL2FSHtLUKhd6/OIDD1fQ==
-  dependencies:
-    "@ionic/core" "5.1.1"
-    tslib "^1.9.3"
-
 "@ionic/angular@5.6.11":
   version "5.6.11"
   resolved "https://registry.npmjs.org/@ionic/angular/-/angular-5.6.11.tgz"
@@ -2143,14 +1990,6 @@
   dependencies:
     "@ionic/core" "5.6.11"
     tslib "^1.9.3"
-
-"@ionic/core@5.1.1":
-  version "5.1.1"
-  resolved "https://registry.npmjs.org/@ionic/core/-/core-5.1.1.tgz"
-  integrity sha512-mmQL7hzwwReqFCJlRyxo3sNoI7r63GYnZD6QBXbYmCp83POvL89fQYegUfURM1Fcw0JiAZ3BsCoMYxuFXa7+cA==
-  dependencies:
-    ionicons "^5.0.1"
-    tslib "^1.10.0"
 
 "@ionic/core@5.6.11":
   version "5.6.11"
@@ -11252,7 +11091,7 @@ io-ts@1.10.4:
   dependencies:
     fp-ts "^1.0.0"
 
-ionicons@^5.0.1, ionicons@^5.5.1:
+ionicons@^5.5.1:
   version "5.5.2"
   resolved "https://registry.npmjs.org/ionicons/-/ionicons-5.5.2.tgz"
   integrity sha512-SHVBBtzNVQjY4jtcqKEHkqL5nIQwA/o2MIdU9JtMz8kQAB0NRVJFv5AxwmVbXXKDpxz57SiEjeLp8Uzt7jirpw==
@@ -12626,11 +12465,6 @@ jws@^4.0.0:
     jwa "^2.0.0"
     safe-buffer "^5.0.1"
 
-jwt-decode@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.npmjs.org/jwt-decode/-/jwt-decode-2.2.0.tgz"
-  integrity sha1-fYa9VmefWM5qhHBKZX3TkruoGnk=
-
 karma-chrome-launcher@3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/karma-chrome-launcher/-/karma-chrome-launcher-3.1.0.tgz"
@@ -13531,11 +13365,6 @@ loglevel-plugin-prefix@0.8.4:
   version "0.8.4"
   resolved "https://registry.npmjs.org/loglevel-plugin-prefix/-/loglevel-plugin-prefix-0.8.4.tgz"
   integrity sha512-WpG9CcFAOjz/FtNht+QJeGpvVl/cdR6P0z6OcXSkr8wFJOsV2GRj2j10JLfjuA4aYkcKCNIEqRGCyTife9R8/g==
-
-loglevel@1.6.7:
-  version "1.6.7"
-  resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.7.tgz#b3e034233188c68b889f5b862415306f565e2c56"
-  integrity sha512-cY2eLFrQSAfVPhCgH1s7JI73tMbg9YC3v3+ZHVW67sBS7UxWzNEk/ZBbSfLykBWHp33dqqtOv82gjhKEi81T/A==
 
 loglevel@1.7.1, loglevel@^1.6.8:
   version "1.7.1"
@@ -22468,7 +22297,7 @@ zone.js@0.11.4:
   dependencies:
     tslib "^2.0.0"
 
-zone.js@~0.10.2, zone.js@~0.10.3:
+zone.js@~0.10.3:
   version "0.10.3"
   resolved "https://registry.npmjs.org/zone.js/-/zone.js-0.10.3.tgz"
   integrity sha512-LXVLVEq0NNOqK/fLJo3d0kfzd4sxwn2/h67/02pjCjfKDxgx1i9QqpvtHD8CrBnSSwMw5+dy11O7FRX5mkO7Cg==
