@@ -45,8 +45,10 @@ else
     pkgurl=`sed '/^\#/d' $file | grep 'url=' | cut -d "=" -f2-`
     baseUrl="$pkgurl/com/weaver/corda/app/interop"
     echo "Downloading Corda Interop App from $baseUrl ..."
-    (cd $directory/../artifacts && curl -u $username:$password -O $baseUrl/interop-contracts/$interopAppVersion/interop-contracts-$interopAppVersion.jar)
-    (cd $directory/../artifacts && curl -u $username:$password -O $baseUrl/interop-contracts/$interopAppVersion/interop-workflows-$interopAppVersion.jar)
+    set -x
+    (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/interop-contracts/$interopAppVersion/interop-contracts-$interopAppVersion.jar)
+    (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/interop-contracts/$interopAppVersion/interop-workflows-$interopAppVersion.jar)
+    set +x
   else
     echo Please copy the artifactory.properties.template file as artifactory.properties and replace placeholders with Artifactory credentials.
   fi
