@@ -74,7 +74,9 @@ test(testCase, async (t: Test) => {
     // pre-provision keychain with mock backend holding the private key of the
     // test account that we'll reference while sending requests with the
     // signing credential pointing to this keychain entry.
-    backend: new Map([[HashTimeLockJSON.contractName, HashTimeLockJSON]]),
+    backend: new Map([
+      [HashTimeLockJSON.contractName, JSON.stringify(HashTimeLockJSON)],
+    ]),
     logLevel,
   });
 
@@ -169,7 +171,9 @@ test("Test initialize function with invalid params", async (t: Test) => {
     // pre-provision keychain with mock backend holding the private key of the
     // test account that we'll reference while sending requests with the
     // signing credential pointing to this keychain entry.
-    backend: new Map([[HashTimeLockJSON.contractName, HashTimeLockJSON]]),
+    backend: new Map([
+      [HashTimeLockJSON.contractName, JSON.stringify(HashTimeLockJSON)],
+    ]),
     logLevel,
   });
 
