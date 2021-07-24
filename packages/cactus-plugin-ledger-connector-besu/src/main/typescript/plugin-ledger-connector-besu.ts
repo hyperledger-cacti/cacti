@@ -320,7 +320,8 @@ export class PluginLedgerConnectorBesu
           `${fnTag} Cannot create an instance of the contract because the contractName and the contractName of the JSON doesn't match`,
         );
       }
-      const contractJSON = (await keychainPlugin.get(contractName)) as any;
+      const contractStr = (await keychainPlugin.get(contractName)) as any;
+      const contractJSON = JSON.parse(contractStr);
       if (
         contractJSON.networks === undefined ||
         contractJSON.networks[networkId] === undefined ||
@@ -674,7 +675,8 @@ export class PluginLedgerConnectorBesu
         if (status && contractAddress) {
           const networkInfo = { address: contractAddress };
 
-          const contractJSON = await keychainPlugin.get(contractName);
+          const contractStr = (await keychainPlugin.get(contractName)) as any;
+          const contractJSON = JSON.parse(contractStr);
           const contractPojo = JSON.parse(contractJSON);
           this.log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
 
