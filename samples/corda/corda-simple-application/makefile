@@ -107,6 +107,7 @@ clean-local:
 	# cp contracts-kotlin/build.gradle.local contracts-kotlin/build.gradle
 	# cp workflows-kotlin/build.gradle.local workflows-kotlin/build.gradle
 	./gradlew clean
+	rm -rf .gradle
 
 .PHONY: clean
 clean:
@@ -114,3 +115,4 @@ clean:
 	# cp contracts-kotlin/build.gradle.remote contracts-kotlin/build.gradle
 	# cp workflows-kotlin/build.gradle.remote workflows-kotlin/build.gradle
 	./gradlew clean
+	rm -rf .gradle

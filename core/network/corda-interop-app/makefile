@@ -33,8 +33,10 @@ clean-local:
 	cp build.gradle.local build.gradle
 	./gradlew clean
 	rm -rf fabric-protos proto || true
+	rm -rf .gradle
 
 .PHONY: clean
 clean:
 	cp build.gradle.remote build.gradle
 	./gradlew clean
+	rm -rf .gradle
