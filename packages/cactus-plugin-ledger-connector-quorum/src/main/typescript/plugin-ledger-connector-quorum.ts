@@ -450,7 +450,7 @@ export class PluginLedgerConnectorQuorum
 
     // Now use the found keychain plugin to actually perform the lookup of
     // the private key that we need to run the transaction.
-    const privateKeyHex = await keychainPlugin?.get<string>(keychainEntryKey);
+    const privateKeyHex = await keychainPlugin.get(keychainEntryKey);
 
     return this.transactPrivateKey({
       transactionConfig,

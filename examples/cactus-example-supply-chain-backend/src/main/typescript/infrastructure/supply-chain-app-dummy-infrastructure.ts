@@ -166,11 +166,11 @@ export class SupplyChainAppDummyInfrastructure {
 
       await this.keychain.set(
         BookshelfRepositoryJSON.contractName,
-        BookshelfRepositoryJSON,
+        BookshelfRepositoryJSON.contractName,
       );
       await this.keychain.set(
         BambooHarvestRepositoryJSON.contractName,
-        BambooHarvestRepositoryJSON,
+        BambooHarvestRepositoryJSON.contractName,
       );
       {
         this._quorumAccount = await this.quorum.createEthTestAccount(2000000);

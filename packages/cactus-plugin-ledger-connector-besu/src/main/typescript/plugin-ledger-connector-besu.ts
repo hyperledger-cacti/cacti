@@ -7,7 +7,6 @@ import type { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
 import Web3 from "web3";
-import { AbiItem } from "web3-utils";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
@@ -566,7 +565,7 @@ export class PluginLedgerConnectorBesu
 
     // Now use the found keychain plugin to actually perform the lookup of
     // the private key that we need to run the transaction.
-    const privateKeyHex = await keychainPlugin?.get<string>(keychainEntryKey);
+    const privateKeyHex = await keychainPlugin?.get(keychainEntryKey);
 
     return this.transactPrivateKey({
       transactionConfig,
@@ -675,24 +674,20 @@ export class PluginLedgerConnectorBesu
         if (status && contractAddress) {
           const networkInfo = { address: contractAddress };
 
-          type SolcJson = {
-            abi: AbiItem[];
-            networks: unknown;
-          };
-          const contractJSON = await keychainPlugin.get<SolcJson>(contractName);
-
+          const contractJSON = await keychainPlugin.get(contractName);
+          const contractPojo = JSON.parse(contractJSON);
           this.log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
 
           const contract = new this.web3.eth.Contract(
-            contractJSON.abi,
+            contractPojo.abi,
             contractAddress,
           );
           this.contracts[contractName] = contract;
 
           const network = { [networkId]: networkInfo };
-          contractJSON.networks = network;
+          contractPojo.networks = network;
 
-          keychainPlugin.set(contractName, contractJSON);
+          await keychainPlugin.set(contractName, JSON.stringify(contractPojo));
         }
       } else {
         throw new Error(

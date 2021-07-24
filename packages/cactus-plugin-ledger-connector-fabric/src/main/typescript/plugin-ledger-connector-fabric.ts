@@ -842,7 +842,7 @@ export class PluginLedgerConnectorFabric
       signingCredential.keychainId,
     );
 
-    const fabricX509IdentityJson = await keychain.get<string>(
+    const fabricX509IdentityJson = await keychain.get(
       signingCredential.keychainRef,
     );
     this.log.debug(
