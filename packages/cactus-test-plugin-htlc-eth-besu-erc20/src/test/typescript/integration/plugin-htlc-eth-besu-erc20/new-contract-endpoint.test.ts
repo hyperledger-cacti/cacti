@@ -79,11 +79,16 @@ test(testCase, async (t: Test) => {
     // pre-provision keychain with mock backend holding the private key of the
     // test account that we'll reference while sending requests with the
     // signing credential pointing to this keychain entry.
-    backend: new Map([[TestTokenJSON.contractName, TestTokenJSON]]),
+    backend: new Map([
+      [TestTokenJSON.contractName, JSON.stringify(TestTokenJSON)],
+    ]),
     logLevel,
   });
-  keychainPlugin.set(HashTimeLockJSON.contractName, HashTimeLockJSON);
 
+  keychainPlugin.set(
+    HashTimeLockJSON.contractName,
+    JSON.stringify(HashTimeLockJSON),
+  );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
   });
@@ -246,11 +251,15 @@ test("Test new invalid contract with 0 inputAmount token for HTLC", async (t: Te
     // pre-provision keychain with mock backend holding the private key of the
     // test account that we'll reference while sending requests with the
     // signing credential pointing to this keychain entry.
-    backend: new Map([[TestTokenJSON.contractName, TestTokenJSON]]),
+    backend: new Map([
+      [TestTokenJSON.contractName, JSON.stringify(TestTokenJSON)],
+    ]),
     logLevel,
   });
-  keychainPlugin.set(HashTimeLockJSON.contractName, HashTimeLockJSON);
-
+  keychainPlugin.set(
+    HashTimeLockJSON.contractName,
+    JSON.stringify(HashTimeLockJSON),
+  );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
   });
