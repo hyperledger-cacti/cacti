@@ -146,7 +146,26 @@ Example config:
 
 ## Asset Exchange
 
-  Sample `fabric-cli asset exchange-step` commands:
+Below are the steps to exercise asset exchange using `fabric-cli`.
+1. Spin up both `network1` and `network2` with interoperation chaincode installed along with the `simpleasset` application, by running
+```bash
+   make start-interop CHAINCODE_NAME=simpleasset
+```
+2. Go to `fabric-cli` directory and run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adds the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
+```bash
+   sh scripts/initAsset.sh
+```
+3. Check the status of the assets owned by `Alice` and `Bob` in the the networks `network1` and `network2`, by running
+```bash
+   sh scripts/getAssetStatus.sh
+```
+4. Initiate exchange of bond asset `bond01:a04` of `Bob` in `network1` with token assets `token1:100` of `Alice` in `network2`, by running (with the help of `fabric-cli asset exchange-all` CLI command)
+```bash
+   sh scripts/invoke-asset-exchange.sh
+```
+- Note: Observe the change in the ownership of assets at the end of the execution of the above script.
+
+5. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange-step` CLI commands):
   ```
   ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --secret=<hash-pre-image> --target-network=network1 --param=bond01:a03
  ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
