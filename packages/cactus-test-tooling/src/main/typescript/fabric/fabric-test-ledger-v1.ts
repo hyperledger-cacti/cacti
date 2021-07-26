@@ -8,8 +8,10 @@ import Docker, {
   ContainerCreateOptions,
   ContainerInfo,
 } from "dockerode";
-import { Gateway } from "fabric-network";
+
+import { Wallets, Gateway, Wallet, X509Identity } from "fabric-network";
 import FabricCAServices from "fabric-ca-client";
+
 import Joi from "joi";
 import { ITestLedger } from "../i-test-ledger";
 import { Containers } from "../common/containers";
@@ -72,6 +74,8 @@ const DEFAULT_OPTS = Object.freeze({
   imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
   imageVersion: "2021-09-02--fix-876-supervisord-retries",
   envVars: new Map([["FABRIC_VERSION", "1.4.8"]]),
+  stateDatabase: STATE_DATABASE.COUCH_DB,
+  orgList: ["org1", "org2"],
 });
 export const FABRIC_TEST_LEDGER_DEFAULT_OPTIONS = DEFAULT_OPTS;
 
@@ -104,7 +108,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
   public readonly stateDatabase: STATE_DATABASE;
   public orgList: string[];
   public readonly testLedgerId: string;
-  public extraOrgs: organizationDefinitionFabricV2[];
+  public extraOrgs: organizationDefinitionFabricV2[] | undefined;
 
   private readonly log: Logger;
 
@@ -132,7 +136,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     this.envVars = options.envVars || DEFAULT_OPTS.envVars;
     this.stateDatabase = options.stateDatabase || DEFAULT_OPTS.stateDatabase;
     this.orgList = options.orgList || DEFAULT_OPTS.orgList;
-    this.extraOrgs = options.extraOrgs || DEFAULT_OPTS.extraOrgs;
+    this.extraOrgs = options.extraOrgs;
 
     if (compareVersions.compare(this.getFabricVersion(), "1.4", "<"))
       this.log.warn(
@@ -178,7 +182,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return new FabricCAServices(caUrl, tlsOptions, caName);
     } catch (ex) {
       this.log.error(`createCaClient() Failure:`, ex);
-      throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+      throw new Error(`${fnTag} Inner Exception: ${ex}`);
     }
   }
 
@@ -239,7 +243,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return [x509Identity, wallet];
     } catch (ex) {
       this.log.error(`enrollUser() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex?.message}`);
+      throw new Error(`${fnTag} Exception: ${ex}`);
     }
   }
 
@@ -270,7 +274,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return [x509Identity, wallet];
     } catch (ex) {
       this.log.error(`enrollAdmin() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex?.message}`);
+      throw new Error(`${fnTag} Exception: ${ex}`);
     }
   }
 
@@ -507,7 +511,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return ccp;
     } catch (error) {
       this.log.debug(`error on get connection profile`);
-      throw new Error(error);
+      throw new Error(error as string);
     }
   }
 
@@ -572,7 +576,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
           //const dataCouch: IDockerFabricComposeCouchDbTemplate = yaml.load(contents);
           const dataCouch: any = yaml.load(contents);
           log.debug(dataCouch);
-          //xawait fs.promises.writeFile("test", dataCouch);
+          //await fs.promises.writeFile("test", dataCouch);
 
           if (dataCouch === null || dataCouch === undefined) {
             throw new Error(`${fnTag} Could not read yaml`);
@@ -728,7 +732,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
           dataCompose["services"][peer0OrgName]["ports"] = [`${port}:${port}`];
 
-          log.debug("dataCompose after modificaitons: \n");
+          log.debug("dataCompose after modifications: \n");
           log.debug(dataCompose);
           const dumpCompose = yaml.dump(dataCompose, {
             flowLevel: -1,
@@ -788,7 +792,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
           dataCa["services"][caName]["container_name"] = caName;
 
-          log.debug("dataCa after modificaitons: \n");
+          log.debug("dataCa after modifications: \n");
           log.debug(dataCa);
           const dumpCa = yaml.dump(dataCa, {
             flowLevel: -1,
@@ -877,10 +881,10 @@ export class FabricTestLedgerV1 implements ITestLedger {
             "Rule"
           ] = `OR('${mspId}.peer')`;
 
-          log.debug("dataConfigTxGen after modificaitons: \n");
+          log.debug("dataConfigTxGen after modifications: \n");
           log.debug(dataConfigTxGen);
 
-          log.debug("dataConfigTxGen after modificaitons: \n");
+          log.debug("dataConfigTxGen after modifications: \n");
           log.debug(dataConfigTxGen);
 
           const dumpConfigTxGen = yaml.dump(dataConfigTxGen, {
@@ -928,7 +932,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       }
     } catch (error) {
       this.log.error(`populateFile() crashed: `, error);
-      throw new Error(`${fnTag} Unable to run transaction: ${error.message}`);
+      throw new Error(`${fnTag} Unable to run transaction: ${error}`);
     }
   }
 
@@ -979,7 +983,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const { log } = this;
     log.debug(`
     Adding ${orgName} on ${channel}, with state database ${database}. 
-    Certification authorithy: ${certificateAuthority}.
+    Certification authority: ${certificateAuthority}.
     Default port: ${peerPort}
     Path to original source files: ${addOrgXDirectoryPath}`);
 
@@ -1157,7 +1161,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       this.orgList.push(orgName);
     } catch (error) {
       this.log.error(`addOrgX() crashed: `, error);
-      throw new Error(`${fnTag} Unable to run transaction: ${error.message}`);
+      throw new Error(`${fnTag} Unable to run transaction: ${error}`);
     } finally {
       try {
         ssh.dispose();
@@ -1270,21 +1274,21 @@ export class FabricTestLedgerV1 implements ITestLedger {
         },
       },
     };
-
-    this.extraOrgs.forEach((org) => {
-      const caPort = String(Number(org.port) + 3);
-      if (createOptions["ExposedPorts"] && createOptions["HostConfig"]) {
-        createOptions["ExposedPorts"][`${org.port}/tcp`] = {};
-        createOptions["ExposedPorts"][`${caPort}/tcp`] = {};
-        createOptions["HostConfig"]["PortBindings"][org.port] = [
-          { HostPort: org.port },
-        ];
-        createOptions["HostConfig"]["PortBindings"][caPort] = [
-          { HostPort: caPort },
-        ];
-      }
-    });
-
+    if (this.extraOrgs) {
+      this.extraOrgs.forEach((org) => {
+        const caPort = String(Number(org.port) + 3);
+        if (createOptions["ExposedPorts"] && createOptions["HostConfig"]) {
+          createOptions["ExposedPorts"][`${org.port}/tcp`] = {};
+          createOptions["ExposedPorts"][`${caPort}/tcp`] = {};
+          createOptions["HostConfig"]["PortBindings"][org.port] = [
+            { HostPort: org.port },
+          ];
+          createOptions["HostConfig"]["PortBindings"][caPort] = [
+            { HostPort: caPort },
+          ];
+        }
+      });
+    }
     // (createOptions as any).PortBindings = {
     //   "22/tcp": [{ HostPort: "30022" }],
     //   "7050/tcp": [{ HostPort: "7050" }],
@@ -1298,7 +1302,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
-        imageFqn,
+        containerNameAndTag,
         [],
         [],
         createOptions,
@@ -1325,15 +1329,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
         try {
           await this.waitForHealthCheck();
-          for (let i = 0; i < this.extraOrgs.length; i++) {
-            await this.addOrgX(
-              this.extraOrgs[i].path,
-              this.extraOrgs[i].orgName,
-              this.extraOrgs[i].orgChannel,
-              this.extraOrgs[i].certificateAuthority,
-              this.extraOrgs[i].stateDatabase,
-              this.extraOrgs[i].port,
-            );
+          if (this.extraOrgs) {
+            for (let i = 0; i < this.extraOrgs.length; i++) {
+              await this.addOrgX(
+                this.extraOrgs[i].path,
+                this.extraOrgs[i].orgName,
+                this.extraOrgs[i].orgChannel,
+                this.extraOrgs[i].certificateAuthority,
+                this.extraOrgs[i].stateDatabase,
+                this.extraOrgs[i].port,
+              );
+            }
           }
           resolve(container);
         } catch (ex) {
@@ -1354,7 +1360,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       } catch (ex) {
         reachable = false;
         if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
+          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex}`);
         }
       }
       await new Promise((resolve2) => setTimeout(resolve2, 1000));
