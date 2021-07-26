@@ -44,3 +44,4 @@ deploy:
 .PHONY: clean
 clean:
 	./gradlew clean
+	rm -rf .gradle

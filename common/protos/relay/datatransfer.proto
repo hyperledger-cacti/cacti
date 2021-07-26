@@ -6,7 +6,7 @@ import "common/ack.proto";
 import "common/state.proto";
 import "common/query.proto";
 
-option go_package = "/relay";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/relay";
 
 // definitions of all messages used in the datatransfer protocol
 service DataTransfer {

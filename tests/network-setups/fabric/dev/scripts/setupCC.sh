@@ -5,7 +5,7 @@ CHAINCODE_PATH=$PWD/../shared/chaincode
 
 # interop cc module
 INTEROPCC_MOD=github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
-INTEROP_VERSION=
+INTEROP_VERSION=@v1.2.1
 
 # custom gopath for convenient downloading
 mkdir $TMP_PATH
