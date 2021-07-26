@@ -41,6 +41,7 @@
     "test:plugin-ledger-connector-besu": "tap --ts --jobs=1 --timeout=60 \"packages/cactus-*-besu/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-htlc-eth-besu-erc20": "lerna exec --stream --scope 'packages/*htlc-eth-besu-erc20' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "test:plugin-htlc-besu-erc20": "tap --jobs=1 --timeout=600 \"packages/*htlc-eth-besu-erc20/src/test/typescript/{unit,integration}/\"",
+    "test:plugin": "tap --jobs=1 --timeout=600 \"packages/*test-plugin-htlc-eth-besu/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-quorum": "lerna exec --stream --scope '*/*connector-quorum' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "test:plugin-ledger-connector-quorum": "tap --ts --jobs=1 --timeout=60 \"packages/cactus-*-quorum/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-fabric": "lerna exec --stream --scope '*/*connector-fabric' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
@@ -129,17 +130,13 @@
     "typescript": "4.2.4",
     "webpack": "5.36.2",
     "webpack-bundle-analyzer": "4.4.2",
-    "webpack-cli": "4.7.2"
+    "webpack-cli": "4.7.2",
+    "cspell": "5.4.0"
   },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
-  },
-  "dependencies": {
-    "@types/ssh2": "0.5.46",
-    "artillery": "1.7.2",
-    "cspell": "5.4.0"
   }
 }
