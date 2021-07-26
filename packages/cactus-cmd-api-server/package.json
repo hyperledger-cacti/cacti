@@ -97,7 +97,8 @@
     "socket.io": "4.0.1",
     "socket.io-client": "4.0.1",
     "typescript-optional": "2.0.1",
-    "uuid": "7.0.2"
+    "uuid": "7.0.2",
+    "artillery": "1.7.2"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-vault": "0.8.0",
