@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package fabric.view_data;
 
-option go_package = "/fabric";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/fabric";
 
 import "peer/proposal_response.proto";
 

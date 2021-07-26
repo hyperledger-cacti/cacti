@@ -107,7 +107,7 @@ build-allinone-local: protos-local fingerprint.json
 build-images-local: build-allinone-local build-driver-local build-server-local build-client-local
 
 .PHONY: push-server
-push-server: build-server
+push-server: build-server-local
 	@echo -e "\033[1mPUSH\033[0m - Pushing Docker image (relay server)..."
 	docker tag $(DOCKER_IMAGE_SERVER) $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_SERVER)
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_SERVER)

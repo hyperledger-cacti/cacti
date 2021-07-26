@@ -70,7 +70,7 @@ Before starting, make sure you have the following software installed on your hos
 Make sure you have an SSH or GPG key registered in https://github.com to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the `https://` prefix but this may change to `git@` in the future).
 
 #### Package Access Token:
-Create a personal access token with `read:packages` accesss in github in order to use modules published in github packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
+Create a personal access token with `read:packages` access in github in order to use modules published in github packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 
 ## Getting the Code and Documentation
 
@@ -234,7 +234,7 @@ Build the Fabric driver module as follows:
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following:
   ```bash
-  make build-local
+  make build
   ```
 _Note_: `postinstall` applies a customization patch to the `fabric-network` NPM library.
 
@@ -265,22 +265,8 @@ Using the sequence of instructions below, you can start a Corda network and run 
 The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary. This network uses `samples/corda/corda-simple-application` which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 Following steps will build above cordapp and a corda-client as well in `samples/corda/client`.
 
-To start the network without building weaver dependencies locally, skip next section and go to [Running with Interoperation Cordapp from Github Packages](#running-with-interoperation-cordapp-from-github-packages),
-else go to [Running with Local Interoperation Cordapp](#running-with-local-interoperation-cordapp).
-
-#### Running with Local Interoperation Cordapp
-
-This will build the Interoperation Cordapp in `core/network/corda-interop-app` locally.
-Follow the instructions below to build and launch the network:
-- Navigate to the `tests/network-setups/corda` folder.
-- To spin up the Corda network with the interoperation Cordapp, run:
-  ```bash
-  make start-local
-  ```
-  
 #### Running with Interoperation Cordapp from Github Packages
 
-This will fetch the already built Interoperation Cordapp from Github Packages.
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
 - Create copy of `artifactory.properties.template` as `artifactory.properties`.
@@ -317,22 +303,8 @@ RelayServer listening on [::1]:9081
 
 The code for this lies in the `core/drivers/corda-driver` folder.
 
-To build the driver without building weaver dependencies locally, skip next section and go to [Building Corda Driver with dependencies from Github Packages](#building-corda-driver-with-dependencies-from-github-packages),
-else go to [Building Corda Driver Locally](#building-corda-driver-locally).
+#### Building Corda Driver
 
-#### Building Corda Driver Locally
-
-This will build all the weaver dependencies locally.
-Build the Corda driver module as follows:
-- Navigate to the `core/drivers/corda-driver` folder.
-- Run the following:
-  ```bash
-  make build-local
-  ```
-  
-#### Building Corda Driver with dependencies from Github Packages
-
-This will fetch already built weaver dependencies from Github Packages.
 Build the Corda driver module as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
 - Create copy of `artifactory.properties.template` as `artifactory.properties`.
@@ -589,7 +561,7 @@ A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the 
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token).
 - Run the following command:
   ```bash
-  make build-local
+  make build
   ```
   
 ### Interoperation Cordapp

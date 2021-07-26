@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package common.verification_policy;
 
-option go_package = "/common";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
 
 // VerificationPolicy stores the rules around which parties from a foreign
 // network need to provide proof of a view in order for it to be deemed valid by
