@@ -21,6 +21,8 @@ function main()
   tar -cC '/etc/hyperledger/fabric/fabric-ccenv/' . | docker load
   tar -cC '/etc/hyperledger/fabric/fabric-tools/' . | docker load
   tar -cC '/etc/hyperledger/fabric/fabric-ca/' . | docker load
+  tar -cC '/etc/hyperledger/fabric/fabric-couchdb/' . | docker load
+  tar -cC '/etc/couchdb/' . | docker load
 
 
   echo "[FabricAIO] >>> Parsed MAJOR version of Fabric as ${MAJOR}"
