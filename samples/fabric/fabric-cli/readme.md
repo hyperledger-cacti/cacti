@@ -151,7 +151,7 @@ Below are the steps to exercise asset exchange using `fabric-cli`.
 ```bash
    make start-interop CHAINCODE_NAME=simpleasset
 ```
-2. Go to `fabric-cli` directory and run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adds the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
+2. Go to `fabric-cli` directory and run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adding the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
 ```bash
    sh scripts/initAsset.sh
 ```
@@ -163,7 +163,7 @@ Below are the steps to exercise asset exchange using `fabric-cli`.
 ```bash
    sh scripts/invoke-asset-exchange.sh
 ```
-- Note: Observe the change in the ownership of assets at the end of the execution of the above script.
+- Observe the change in the ownership of assets at the end of the execution of the above script.
 
 5. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange-step` CLI commands):
   ```
@@ -173,7 +173,7 @@ Below are the steps to exercise asset exchange using `fabric-cli`.
  ./bin/fabric-cli asset exchange-step --step=4 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
  ./bin/fabric-cli asset exchange-step --step=5 --recipient=alice --locker=bob --target-network=network2 --contract-id=<contract-id> --secret=<hash-pre-image>
  ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
- ./bin/fabric-cli asset exchange-step --step=7 --locker=bob --recipient=alice --target-network=network1 --param=bond01:a03
+ ./bin/fabric-cli asset exchange-step --step=7 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
  ./bin/fabric-cli asset exchange-step --step=8 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
  ```
 

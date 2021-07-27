@@ -19,7 +19,7 @@ cp -r ${INTEROP_CC_PATH} .
 
 cd fabric-interop-cc
 cp -R contracts/interop ../interop
-cp -r $INTEROPCC_CHAINCODE_PATH/fabric-interop-cc/libs/assetexchange ../interop
+cp -r $INTEROP_CC_PATH/libs/assetexchange ../interop
 
 echo "Done."
 
