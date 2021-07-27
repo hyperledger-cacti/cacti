@@ -240,6 +240,12 @@
         "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf": {
             "post": {
                 "operationId": "insertBookshelfV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"
+                    }
+                },
                 "summary": "Inserts the provided Bookshelf entity to the ledger.",
                 "parameters": [],
                 "requestBody": {
@@ -268,6 +274,12 @@
         "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf": {
             "get": {
                 "operationId": "listBookshelfV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"
+                    }
+                },
                 "summary": "Lists all the Bookshelf entities stored on the ledger.",
                 "parameters": [],
                 "responses": {
@@ -346,6 +358,12 @@
         "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest": {
             "post": {
                 "operationId": "insertBambooHarvestV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
+                    }
+                },
                 "summary": "Inserts the provided BambooHarvest entity to the ledger.",
                 "parameters": [],
                 "requestBody": {
@@ -374,6 +392,12 @@
         "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest": {
             "get": {
                 "operationId": "listBambooHarvestV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest"
+                    }
+                },
                 "summary": "Lists all the BambooHarvest entities stored on the ledger.",
                 "parameters": [],
                 "responses": {

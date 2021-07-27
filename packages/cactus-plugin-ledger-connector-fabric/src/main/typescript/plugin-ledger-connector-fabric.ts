@@ -3,6 +3,7 @@ import path from "path";
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 
+import { Certificate } from "@fidm/x509";
 import { Express } from "express";
 import "multer";
 import temp from "temp";
@@ -88,6 +89,7 @@ import {
 import { sourceLangToRuntimeLang } from "./peer/source-lang-to-runtime-lang";
 import FabricCAServices from "fabric-ca-client";
 import { createGateway } from "./common/create-gateway";
+import { Endorser } from "fabric-common";
 
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
@@ -916,7 +918,37 @@ export class PluginLedgerConnectorFabric
           break;
         }
         case FabricContractInvocationType.Send: {
-          out = await contract.submitTransaction(fnName, ...params);
+          const tx = contract.createTransaction(fnName);
+          if (req.endorsingPeers) {
+            const { endorsingPeers } = req;
+            const channel = network.getChannel();
+
+            const allChannelEndorsers = (channel.getEndorsers() as unknown) as Array<
+              Endorser & { options: { pem: string } }
+            >;
+
+            const endorsers = allChannelEndorsers
+              .map((endorser) => {
+                const certificate = Certificate.fromPEM(
+                  (endorser.options.pem as unknown) as Buffer,
+                );
+                return { certificate, endorser };
+              })
+              .filter(
+                ({ endorser, certificate }) =>
+                  endorsingPeers.includes(endorser.mspid) ||
+                  endorsingPeers.includes(certificate.issuer.organizationName),
+              )
+              .map((it) => it.endorser);
+
+            this.log.debug(
+              "%o endorsers: %o",
+              endorsers.length,
+              endorsers.map((it) => `${it.mspid}:${it.name}`),
+            );
+            tx.setEndorsingPeers(endorsers);
+          }
+          out = await tx.submit(...params);
           success = true;
           break;
         }
