@@ -159,11 +159,11 @@ Below are the steps to exercise asset exchange using `fabric-cli`.
 ```bash
    sh scripts/getAssetStatus.sh
 ```
-4. Initiate exchange of bond asset `bond01:a04` of `Bob` in `network1` with token assets `token1:100` of `Alice` in `network2`, by running (with the help of `fabric-cli asset exchange-all` CLI command)
-```bash
-   sh scripts/invoke-asset-exchange.sh
+4. Initiate exchange of bond asset `bond01:a04` of `Bob` in `network1` with token assets `token1:100` of `Alice` in `network2`, by running
 ```
-- Observe the change in the ownership of assets at the end of the execution of the above script.
+./bin/fabric-cli asset exchange-all --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:bond01:a04:alice:token1:100
+```
+- Repeat the step 3 to observe the change in the ownership of assets as a result of the `asset echange` exercise.
 
 5. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange-step` CLI commands):
   ```
