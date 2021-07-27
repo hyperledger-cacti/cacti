@@ -161,7 +161,7 @@ func validateAndSetLockerOfFungibleAssetAgreement(ctx contractapi.TransactionCon
 /*
  * Function to validate the recipient in asset agreement.
  * If recipient is not set, it will be set to the caller.
- * If the recipeint is set already, it ensures that the recipient is same as the creator of the transaction.
+ * If the recipient is set already, it ensures that the recipient is same as the creator of the transaction.
  */
 func validateAndSetRecipientOfAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
 	txCreatorECertBase64, err := getECertOfTxCreatorBase64(ctx)
