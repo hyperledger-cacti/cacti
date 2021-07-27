@@ -19,7 +19,6 @@ cp -r ${INTEROP_CC_PATH} .
 
 cd fabric-interop-cc
 cp -R contracts/interop ../interop
-cp -r $INTEROP_CC_PATH/libs/assetexchange ../interop
 
 echo "Done."
 
