@@ -42,6 +42,9 @@ export interface IAzureInMemoryCredentials {
 }
 
 export interface IPluginKeychainAzureKvOptions extends ICactusPluginOptions {
+  containerId(containerId: any);
+  stop();
+  destroy();
   logLevel?: LogLevelDesc;
   keychainId: string;
   instanceId: string;
@@ -53,6 +56,9 @@ export interface IPluginKeychainAzureKvOptions extends ICactusPluginOptions {
 
 export class PluginKeychainAzureKv
   implements ICactusPlugin, IPluginWebService, IPluginKeychain {
+  deleteKeychainId() {
+    throw new Error("Method not implemented.");
+  }
   public static readonly CLASS_NAME = "PluginKeychainAzureKv";
 
   readonly vaultUrl: string;

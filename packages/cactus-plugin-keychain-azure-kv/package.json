@@ -64,6 +64,11 @@
       "name": "Peter Somogyvari",
       "email": "peter.somogyvari@accenture.com",
       "url": "https://accenture.com"
+    },
+    {
+      "name": "Jeffrey Ushry II",
+      "email": "ushryaspirant@gmail.com",
+      "url": "https://www.linkedin.com/in/jeffrey-ushry-ii-aa7ab8183"
     }
   ],
   "license": "Apache-2.0",
@@ -87,6 +92,9 @@
     "@types/request": "2.48.5",
     "express": "4.17.1",
     "internal-ip": "6.2.0",
-    "openapi-types": "7.2.2"
+    "openapi-types": "7.2.2",
+    "web3": "1.2.7",
+    "web3-utils": "1.2.7",
+    "key-encoder": "1.2.10"
   }
 }
