@@ -8,6 +8,7 @@
     { "path": "./packages/cactus-plugin-consortium-manual/tsconfig.json" },
     { "path": "./packages/cactus-plugin-keychain-aws-sm/tsconfig.json" },
     { "path": "./packages/cactus-plugin-keychain-google-sm/tsconfig.json" },
+    { "path": "./packages/cactus-plugin-keychain-azure-kv/tsconfig.json" },
     { "path": "./packages/cactus-plugin-keychain-memory/tsconfig.json" },
     { "path": "./packages/cactus-plugin-keychain-vault/tsconfig.json" },
     { "path": "./packages/cactus-plugin-ledger-connector-corda/tsconfig.json" },
