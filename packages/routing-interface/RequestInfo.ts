@@ -13,6 +13,7 @@ class TradeInfo {
     fabricAccountTo: string;
     tradingValue: string;
     carID: string;
+    proofJson: object;
 }
 
 // authorization information
