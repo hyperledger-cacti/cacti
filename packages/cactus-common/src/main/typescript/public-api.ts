@@ -19,3 +19,4 @@ export { ISignerKeyPair } from "./signer-key-pair";
 export { Secp256k1Keys } from "./secp256k1-keys";
 export { KeyFormat, KeyConverter } from "./key-converter";
 export { IAsyncProvider } from "./i-async-provider";
+export { Http405NotAllowedError } from "./http/http-status-code-errors";
