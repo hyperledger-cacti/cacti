@@ -14,6 +14,8 @@ start:	start-network1 start-network2
 .PHONY: start-interop
 start-interop: start-interop-network1 start-interop-network2
 
+.PHONY: start-networks
+start-networks: start-network1 start-network2
 
 .PHONY: start-network1
 start-network1:	.fabric-setup setup-cc
