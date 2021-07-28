@@ -70,7 +70,7 @@ class GrpcServer(private val port: Int) {
         override suspend fun requestDriverState(request: QueryOuterClass.Query): AckOuterClass.Ack {
             println("Request received with request: $request")
             val ack = AckOuterClass.Ack.newBuilder()
-                .setStatus(common.ack.AckOuterClass.Ack.STATUS.OK)
+                .setStatus(AckOuterClass.Ack.STATUS.OK)
                 .setRequestId(request.requestId)
                 .setMessage("Received query with request id ${request.requestId}")
                 .build()
