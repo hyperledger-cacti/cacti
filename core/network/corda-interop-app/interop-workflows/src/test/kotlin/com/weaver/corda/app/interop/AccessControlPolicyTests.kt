@@ -10,7 +10,7 @@ import arrow.core.Either
 import com.weaver.corda.app.interop.flows.*
 import com.weaver.corda.app.interop.states.AccessControlPolicyState
 import com.weaver.corda.app.interop.states.Rule
-import common.query.QueryOuterClass
+import com.weaver.protos.common.query.QueryOuterClass
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.node.services.queryBy
 import net.corda.core.utilities.getOrThrow

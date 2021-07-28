@@ -5,6 +5,7 @@ package driver.driver;
 import "common/ack.proto";
 import "common/query.proto";
 
+option java_package = "com.weaver.protos.driver.driver";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/driver";
 
 service DriverCommunication {

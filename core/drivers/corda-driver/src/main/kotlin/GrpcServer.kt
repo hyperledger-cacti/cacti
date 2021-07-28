@@ -6,12 +6,13 @@
 
 package com.weaver.corda.driver
 
-import common.ack.AckOuterClass
-import common.query.QueryOuterClass
-import driver.driver.DriverCommunicationGrpcKt
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import kotlinx.coroutines.*
+
+import com.weaver.protos.common.ack.AckOuterClass
+import com.weaver.protos.common.query.QueryOuterClass
+import com.weaver.protos.driver.driver.DriverCommunicationGrpcKt
 
 /**
  * The GrpcServer is used by the Corda driver to listen for requests for statefrom the relay.

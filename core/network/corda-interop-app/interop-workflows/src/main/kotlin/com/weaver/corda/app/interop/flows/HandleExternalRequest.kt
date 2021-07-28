@@ -6,16 +6,16 @@
 
 package com.weaver.corda.app.interop.flows
 
-import common.query.QueryOuterClass
+import com.weaver.protos.common.query.QueryOuterClass
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
 import co.paralleluniverse.fibers.Suspendable
 import com.google.protobuf.ByteString
-import common.interop_payload.InteropPayloadOuterClass
-import common.state.State
-import corda.ViewDataOuterClass
+import com.weaver.protos.common.interop_payload.InteropPayloadOuterClass
+import com.weaver.protos.common.state.State
+import com.weaver.protos.corda.ViewDataOuterClass
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FlowLogic

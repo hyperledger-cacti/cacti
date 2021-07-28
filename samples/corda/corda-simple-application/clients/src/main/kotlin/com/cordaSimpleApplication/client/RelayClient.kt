@@ -13,8 +13,9 @@ import java.io.Closeable
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import networks.networks.NetworkGrpcKt.NetworkCoroutineStub
-import networks.networks.Networks
+
+import com.weaver.protos.networks.networks.NetworkGrpcKt.NetworkCoroutineStub
+import com.weaver.protos.networks.networks.Networks
 
 /**
  * RelayClient implements a gRPC client that connects to a local relay to request external state.

@@ -11,8 +11,8 @@ import co.paralleluniverse.fibers.Suspendable
 import com.weaver.corda.app.interop.contracts.AccessControlPolicyStateContract
 import com.weaver.corda.app.interop.states.AccessControlPolicyState
 import com.weaver.corda.app.interop.states.Rule
-import common.access_control.AccessControl
-import common.query.QueryOuterClass
+import com.weaver.protos.common.access_control.AccessControl
+import com.weaver.protos.common.query.QueryOuterClass
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*

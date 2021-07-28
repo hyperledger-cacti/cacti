@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 package common.asset_locks;
+
+option java_package = "com.weaver.protos.common.asset_locks";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
 
 enum LockMechanism {

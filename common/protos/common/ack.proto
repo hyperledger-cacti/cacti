@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package common.ack;
 
+option java_package = "com.weaver.protos.common.ack";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
 
 // This message respresents "ACKs" sent between relay-relay,

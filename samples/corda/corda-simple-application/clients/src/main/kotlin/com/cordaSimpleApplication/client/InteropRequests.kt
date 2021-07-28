@@ -9,23 +9,24 @@ package com.cordaSimpleApplication.client
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import com.cordaSimpleApplication.flow.CreateState
-import com.cordaSimpleApplication.state.SimpleState
-import com.weaver.corda.app.interop.flows.CreateExternalRequest
-import com.weaver.corda.app.interop.flows.WriteExternalStateInitiator
-import com.weaver.corda.app.interop.flows.GetExternalStateByLinearId
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
-import common.state.State
 import io.grpc.ManagedChannelBuilder
 import java.lang.Exception
 import kotlinx.coroutines.*
 import net.corda.core.messaging.startFlow
-import networks.networks.Networks
 import java.util.*
 
-import corda.ViewDataOuterClass
+import com.cordaSimpleApplication.flow.CreateState
+import com.cordaSimpleApplication.state.SimpleState
+
+import com.weaver.corda.app.interop.flows.CreateExternalRequest
+import com.weaver.corda.app.interop.flows.WriteExternalStateInitiator
+import com.weaver.corda.app.interop.flows.GetExternalStateByLinearId
+import com.weaver.protos.corda.ViewDataOuterClass
+import com.weaver.protos.common.state.State
+import com.weaver.protos.networks.networks.Networks
 
 /**
  * The CLI command used to trigger a request for state from an external network.
