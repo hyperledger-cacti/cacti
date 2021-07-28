@@ -2,6 +2,8 @@ buildscript {
     Properties constants = new Properties()
     file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
 
+    file("$projectDir/./artifactory.properties").withInputStream { constants.load(it) }
+
     ext {
         corda_release_group = constants.getProperty("cordaReleaseGroup")
         corda_core_release_group =  constants.getProperty("cordaCoreReleaseGroup")
@@ -15,9 +17,9 @@ buildscript {
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         arrow_version = constants.getProperty("arrowVersion")
         weaver_version = constants.getProperty("weaverVersion")
-        artifactory_username = ""
-        artifactory_password = ""
-        artifactory_url = ""
+        artifactory_username = constants.getProperty("username")
+        artifactory_password = constants.getProperty("password")
+        artifactory_url = constants.getProperty("url")
     }
 
     repositories {
@@ -43,6 +45,7 @@ plugins {
     id "maven-publish"
 }
 
+
 allprojects {
     apply from: "${rootProject.projectDir}/repositories.gradle"
     apply plugin: 'kotlin'
@@ -54,9 +57,12 @@ allprojects {
         maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
         maven { url 'https://software.r3.com/artifactory/corda' }
         maven { url 'https://jitpack.io' }
-        flatDir {
-            dirs '../../../common/protos-java-kt/build/libs'
-            dirs '../../../../common/protos-java-kt/build/libs'
+        maven {
+            url artifactory_url
+            credentials {
+                username artifactory_username
+                password artifactory_password
+            }
         }
     }
 
@@ -96,7 +102,7 @@ dependencies {
     cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
     cordaRuntime "$corda_release_group:corda-node-api:$corda_release_version"
     cordaRuntime "$corda_release_group:corda:$corda_release_version"
-
+    
     // CorDapp dependencies.
     cordapp project(":interop-workflows")
     cordapp project(":interop-contracts")

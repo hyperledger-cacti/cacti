@@ -81,5 +81,3 @@ artifactory.properties
 /proto
 /fabric-protos
 
-# Temporary
-build.gradle
