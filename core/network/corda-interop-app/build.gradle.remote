@@ -58,7 +58,7 @@ allprojects {
         maven { url 'https://software.r3.com/artifactory/corda' }
         maven { url 'https://jitpack.io' }
         maven {
-            url 'https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability'
+            url artifactory_url
             credentials {
                 username artifactory_username
                 password artifactory_password
