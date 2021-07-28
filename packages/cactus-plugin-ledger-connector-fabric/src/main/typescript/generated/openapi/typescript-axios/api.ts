@@ -681,6 +681,12 @@ export interface InlineResponse501 {
  */
 export interface RunTransactionRequest {
     /**
+     * An array of MSP IDs to set as the list of endorsing peers for the transaction.
+     * @type {Array<string>}
+     * @memberof RunTransactionRequest
+     */
+    endorsingPeers?: Array<string>;
+    /**
      * 
      * @type {object}
      * @memberof RunTransactionRequest

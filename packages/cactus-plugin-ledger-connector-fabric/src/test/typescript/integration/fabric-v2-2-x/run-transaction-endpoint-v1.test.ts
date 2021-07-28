@@ -232,6 +232,29 @@ test(testCase, async (t: Test) => {
   }
 
   {
+    const req: RunTransactionRequest = {
+      signingCredential,
+      gatewayOptions: {
+        identity: keychainEntryKey,
+        wallet: {
+          json: keychainEntryValue,
+        },
+      },
+      channelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName,
+      methodName: "CreateAsset",
+      params: ["asset388", "green", "111", assetOwner, "299"],
+      endorsingPeers: ["org1.example.com", "Org2MSP"],
+    };
+
+    const res = await apiClient.runTransactionV1(req);
+    t.ok(res, "Create green asset response truthy OK");
+    t.ok(res.data, "Create green asset response.data truthy OK");
+    t.equal(res.status, 200, "Create green asset response.status=200 OK");
+  }
+
+  {
     const res = await apiClient.runTransactionV1({
       gatewayOptions: {
         connectionProfile,
