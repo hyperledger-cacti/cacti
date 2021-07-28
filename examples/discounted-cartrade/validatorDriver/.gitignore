@@ -1,0 +1,7 @@
+node_modules/
+package-lock.json
+wallet
+dist/core/wallet
+dist/core/*.js
+dist/core/bin/*.js
+dist/core/config/*.js

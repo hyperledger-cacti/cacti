@@ -1,0 +1,29 @@
+{
+  "name": "webapi",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "@types/node": "^14.0.18",
+    "body-parser": "~1.17.1",
+    "config": "^1.26.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~4.1.1",
+    "express": "~4.15.2",
+    "log4js": "^3.0.6",
+    "morgan": "~1.8.1",
+    "serve-favicon": "~2.4.2",
+    "socket.io": "^2.0.4",
+    "ethereumjs-common": "^1.5.1",
+    "ethereumjs-tx": "^2.1.2",
+    "web3": "^1.2.9",
+    "fabric-ca-client": "~1.4.0",
+    "fabric-network": "~1.4.0"
+  }
+}
