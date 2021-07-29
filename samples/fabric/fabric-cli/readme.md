@@ -179,7 +179,7 @@ Below are the steps to exercise asset exchange using `fabric-cli`.
  6. The `asset exchange` scenario is demonstrated above using an application chaincode `simpleasset` and the `interop` chaincode, where the application chaincode makes invocations into the `interop` chaincode when it needs to lock, claim, or reclaim/unlock assets. However, the same `asset exchange` scenario can be demonstrated with the help of just the application chaincode `simpleassetandinterop` which also includes the scripts to lock, claim, or reclaim/unlock assets. This requires the steps 1-5 to be exercised with minor modifications as indicated below:
  - Spin up the networks by running the below command (update to step 1)
  ```bash
- make start-networks CHAINCODE_NAME=simpleassetandinterop
+ make start CHAINCODE_NAME=simpleassetandinterop
 ```
 - Replace `simpleasset` with `simpleassetandinterop` in the `config.json` file used to populate the `.env` file that is part of the script `initAsset.sh` (update to step 2)
 - Replace `simpleasset` with `simpleassetandinterop` in the script `getAssetStatus.sh` (update to step 3)
