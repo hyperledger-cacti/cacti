@@ -1,9 +1,3 @@
-#
-# Copyright IBM Corp. All Rights Reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
 
 #############################################################################
 #   This is a configuration file for the fabric-ca-client command.
@@ -117,7 +111,7 @@ csr:
       O: Hyperledger
       OU: Fabric
   hosts:
-    - oc5103747380.ibm.com
+    - sannish1
 
 #############################################################################
 #  Registration section used to register a new identity with fabric-ca server
