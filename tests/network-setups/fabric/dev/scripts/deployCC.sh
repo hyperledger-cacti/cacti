@@ -279,6 +279,10 @@ chaincodeInvokeInit() {
         peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":["Bond", "interop"]}' >&log.txt
   elif [ "$CC_CHAIN_CODE" = "simpleasset" ] && [ "$NW_NAME" = "network2" ]; then
         peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":["Token", "interop"]}' >&log.txt
+  elif [ "$CC_CHAIN_CODE" = "simpleassetandinterop" ] && [ "$NW_NAME" = "network1" ]; then
+        peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":["Bond"]}' >&log.txt
+  elif [ "$CC_CHAIN_CODE" = "simpleassetandinterop" ] && [ "$NW_NAME" = "network2" ]; then
+        peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":["Token"]}' >&log.txt
 	else
         peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":[""]}' >&log.txt
   fi
