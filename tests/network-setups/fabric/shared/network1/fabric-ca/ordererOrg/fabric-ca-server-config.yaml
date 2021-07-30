@@ -1,9 +1,3 @@
-#
-# Copyright IBM Corp. All Rights Reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
 #############################################################################
 #   This is a configuration file for the fabric-ca-server command.
 #
@@ -43,10 +37,16 @@
 #############################################################################
 
 # Version of config file
-version: 1.2.0
+version: 1.4.7
 
 # Server's listening port (default: 7054)
 port: 7054
+
+# Cross-Origin Resource Sharing (CORS)
+cors:
+    enabled: false
+    origins:
+      - "*"
 
 # Enables debug logging (default: false)
 debug: false
@@ -66,7 +66,7 @@ crlsizelimit: 512000
 #############################################################################
 tls:
   # Enable TLS (default: false)
-  enabled: true
+  enabled: false
   # TLS for the server's listening port
   certfile:
   keyfile:
@@ -86,7 +86,7 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name: ca.orderer.network1.com
+  name:
   # Key file (is only used to import a private key into BCCSP)
   keyfile:
   # Certificate file (default: ca-cert.pem)
@@ -307,19 +307,46 @@ signing:
 #     CA certificates though it can still issue end entity certificates.
 ###########################################################################
 csr:
-   cn: ca.orderer.network1.com
+   cn: fabric-ca-server
+   keyrequest:
+     algo: ecdsa
+     size: 256
    names:
       - C: US
-        ST: "New York"
-        L: "New York"
-        O: orderer.network1.com
-        OU:
+        ST: "North Carolina"
+        L:
+        O: Hyperledger
+        OU: Fabric
    hosts:
+     - f586f7bcba54
      - localhost
-     - orderer.network1.com
    ca:
       expiry: 131400h
       pathlength: 1
+
+###########################################################################
+# Each CA can issue both X509 enrollment certificate as well as Idemix
+# Credential. This section specifies configuration for the issuer component
+# that is responsible for issuing Idemix credentials.
+###########################################################################
+idemix:
+  # Specifies pool size for revocation handles. A revocation handle is an unique identifier of an
+  # Idemix credential. The issuer will create a pool revocation handles of this specified size. When
+  # a credential is requested, issuer will get handle from the pool and assign it to the credential.
+  # Issuer will repopulate the pool with new handles when the last handle in the pool is used.
+  # A revocation handle and credential revocation information (CRI) are used to create non revocation proof
+  # by the prover to prove to the verifier that her credential is not revoked.
+  rhpoolsize: 1000
+
+  # The Idemix credential issuance is a two step process. First step is to  get a nonce from the issuer
+  # and second step is send credential request that is constructed using the nonce to the isuser to
+  # request a credential. This configuration property specifies expiration for the nonces. By default is
+  # nonces expire after 15 seconds. The value is expressed in the time.Duration format (see https://golang.org/pkg/time/#ParseDuration).
+  nonceexpiration: 15s
+
+  # Specifies interval at which expired nonces are removed from datastore. Default value is 15 minutes.
+  #  The value is expressed in the time.Duration format (see https://golang.org/pkg/time/#ParseDuration)
+  noncesweepinterval: 15m
 
 #############################################################################
 # BCCSP (BlockChain Crypto Service Provider) section is used to select which
@@ -410,3 +437,68 @@ intermediate:
     client:
       certfile:
       keyfile:
+
+#############################################################################
+# CA configuration section
+#
+# Configure the number of incorrect password attempts are allowed for
+# identities. By default, the value of 'passwordattempts' is 10, which
+# means that 10 incorrect password attempts can be made before an identity get
+# locked out.
+#############################################################################
+cfg:
+  identities:
+    passwordattempts: 10
+
+###############################################################################
+#
+#    Operations section
+#
+###############################################################################
+operations:
+    # host and port for the operations server
+    listenAddress: 127.0.0.1:9443
+
+    # TLS configuration for the operations endpoint
+    tls:
+        # TLS enabled
+        enabled: false
+
+        # path to PEM encoded server certificate for the operations server
+        cert:
+            file:
+
+        # path to PEM encoded server key for the operations server
+        key:
+            file:
+
+        # require client certificate authentication to access all resources
+        clientAuthRequired: false
+
+        # paths to PEM encoded ca certificates to trust for client authentication
+        clientRootCAs:
+            files: []
+
+###############################################################################
+#
+#    Metrics section
+#
+###############################################################################
+metrics:
+    # statsd, prometheus, or disabled
+    provider: disabled
+
+    # statsd configuration
+    statsd:
+        # network type: tcp or udp
+        network: udp
+
+        # statsd server address
+        address: 127.0.0.1:8125
+
+        # the interval at which locally cached counters and gauges are pushsed
+        # to statsd; timings are pushed immediately
+        writeInterval: 10s
+
+        # prefix is prepended to all emitted statsd merics
+        prefix: server
