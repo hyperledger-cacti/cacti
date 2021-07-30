@@ -1,9 +1,9 @@
 # Crypto Materials and Artifacts for Fabric Test Network (testnet)
 
 The `network1` and `network2` stores pre-generated crypto materials and artifacts
-so as to provide consisntent behaviour in testnet.
+so as to provide consistent behaviour in testnet.
 
-If these get expired they can be generated again. Follow steps in next sections.
+If these get expired they can be generated again. First stop all testnet deployed components, and clean everything. Then follow the steps in following sections.
 
 ## Steps to generate
 
