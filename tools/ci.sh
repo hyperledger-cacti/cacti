@@ -96,6 +96,7 @@ function mainTask()
   yarn run configure
 
   yarn run custom-checks
+  node ./tools/validate-bundle-names.js 
 
   # Tests are still flaky (on weak hardware such as the CI env) despite our best
   # efforts so here comes the mighty hammer of brute force. 3 times the charm...
