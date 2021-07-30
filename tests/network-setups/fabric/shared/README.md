@@ -48,9 +48,9 @@ All paths in following steps are relative to this folder (`tests/network-setups/
 5. Now update credentials in other directories:
     - Go to `samples/fabric/fabric-cli` and copy `src/data/credentials/network1` and `src/data/credentials/network2` to `src/data/credentials_docker` directory.
     - Go to `samples/corda/corda-simple-application/clients/src/main/resources/config` and then follow these steps:
-        * With reference from `samples/fabric/fabric-cli/src/data/credentials/network1/access-control.json`, update the `rules.principal` key in `network1/access-control.json`.
-        * With reference from `samples/fabric/fabric-cli/src/data/credentials/network1/membership.json`, update the `members.Org1MSP.value` key in `network1/membership.json`.
-        * Repeat above two steps for `network1-docker` as well with same reference.
-        * Repeat first two steps for `network2` by replacing `network1` with `network2`.
+        1. With reference from `samples/fabric/fabric-cli/src/data/credentials/network1/access-control.json`, update the `rules.principal` key in `network1/access-control.json`.
+        2. With reference from `samples/fabric/fabric-cli/src/data/credentials/network1/membership.json`, update the `members.Org1MSP.value` key in `network1/membership.json`.
+        3. Repeat steps `a` and `b` for `network1-docker` as well with same reference.
+        4. Repeat steps `a` and `b` for `network2` by replacing `network1` with `network2`.
         
 ---
