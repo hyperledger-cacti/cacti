@@ -13,6 +13,7 @@
     - [Running unit tests only](#running-unit-tests-only)
     - [Running integration tests only](#running-integration-tests-only)
     - [What is npx used for?](#what-is-npx-used-for)
+    - [What's the equivalent of npx for Yarn?](#whats-the-equivalent-of-npx-for-yarn)
     - [Debugging a test case](#debugging-a-test-case)
   - [All-In-One Docker Images for Ledger Connector Plugins](#all-in-one-docker-images-for-ledger-connector-plugins)
     - [Test Automation of Ledger Plugins](#test-automation-of-ledger-plugins)
@@ -361,7 +362,7 @@ for both them separately anyway:
   - A unit test:
 
       ```sh
-      npx tap --ts --timeout=600 packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.ts
+      npx tap --ts --timeout=600 packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts
       ```
 
 #### Running all test cases (unit+integration)
@@ -388,6 +389,10 @@ npm run test:integration
 place every node module (project dependencies) on the OS path or to install them globally (`npm install some-pkg -g`)
 
 Read more about npx here: https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner
+
+#### What's the equivalent of npx for Yarn?
+
+Yarn itself. E.g. `npx lerna clean` becomes `yarn lerna clean`.
 
 #### Debugging a test case
 
@@ -416,7 +421,7 @@ These produce the `hyperledger/cactus-besu-all-in-one` and
 `hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are
 used in the test cases that are written for the specific ledger connector
 plugins at:
-* `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
+* `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
 * `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.ts`
 
 The specific classes that utilize the `all-in-one` images can be found in the
@@ -443,7 +448,7 @@ container from scratch, execute the test scenario and then tear down and delete
 the container completely.
 
 An example for a ledger connector plugin and it's test automation implemented the way it is explained above:
-`packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts`
+`packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
 
 > This test case is also an example of how to run an ApiServer independently with a single ledger plugin which is
 > how the test case is set up to begin with.
@@ -461,7 +466,7 @@ chmod +x ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-ap
 You can run this test case the same way you would run any other test case (which is also a requirement in itself for each test case):
 
 ```sh
-npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.ts
+npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts
 ```
 
 You can specify an arbitrary set of test cases to run in a single execution via glob patterns. Examples of these glob
@@ -509,14 +514,15 @@ Example:
 
 ```sh
 # Adds "got" as a dependency to the cactus common package
-# (which resides under the path of ./packages/cactus-common)
-npm install got --save-exact --workspace ./packages/cactus-common
+# Note that you must specify the fully qualified package name as present in
+# the package.json file
+yarn workspace @hyperledger/cactus-common add got --save-exact
 ```
 
 You need to know which package of the monorepo will be using the package and then
-run the `npm install` command with an additional parameter specifying the directory
-of that package. See [adding-dependencies-to-a-workspace](https://docs.npmjs.com/cli/v7/using-npm/workspaces#adding-dependencies-to-a-workspace) from the official npm documentation
-for further details and examples.
+run the `yarn workspace` command with an additional parameters specifying the package
+name and the dependency name. 
+See [Yarn Workspaces Documentation](https://classic.yarnpkg.com/en/docs/cli/workspace/) for the official Yarn documentation for further details and examples.
 
 After adding new dependencies, you might need to [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
 

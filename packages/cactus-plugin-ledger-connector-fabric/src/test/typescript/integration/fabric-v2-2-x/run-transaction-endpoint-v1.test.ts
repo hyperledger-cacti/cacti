@@ -230,5 +230,61 @@ test(testCase, async (t: Test) => {
       "Total Transaction Count of 3 recorded as expected. RESULT OK",
     );
   }
+
+  {
+    const req: RunTransactionRequest = {
+      signingCredential,
+      gatewayOptions: {
+        identity: keychainEntryKey,
+        wallet: {
+          json: keychainEntryValue,
+        },
+      },
+      channelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName,
+      methodName: "CreateAsset",
+      params: ["asset388", "green", "111", assetOwner, "299"],
+      endorsingPeers: ["org1.example.com", "Org2MSP"],
+    };
+
+    const res = await apiClient.runTransactionV1(req);
+    t.ok(res, "Create green asset response truthy OK");
+    t.ok(res.data, "Create green asset response.data truthy OK");
+    t.equal(res.status, 200, "Create green asset response.status=200 OK");
+  }
+
+  {
+    const res = await apiClient.runTransactionV1({
+      gatewayOptions: {
+        connectionProfile,
+        discovery: discoveryOptions,
+        eventHandlerOptions: {
+          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+          commitTimeout: 300,
+          endorseTimeout: 300,
+        },
+        identity: keychainEntryKey,
+        wallet: {
+          json: keychainEntryValue,
+        },
+      },
+      signingCredential,
+      channelName,
+      contractName,
+      invocationType: FabricContractInvocationType.Call,
+      methodName: "GetAllAssets",
+      params: [],
+    } as RunTransactionRequest);
+    t.ok(res);
+    t.ok(res.data);
+    t.equal(res.status, 200);
+    const assets = JSON.parse(res.data.functionOutput);
+    const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
+    t.ok(asset277, "Located Asset record by its ID OK");
+    t.ok(asset277.owner, `Asset object has "owner" property OK`);
+    t.equal(asset277.owner, assetOwner, `Asset has expected owner OK`);
+  }
+
   t.end();
 });

@@ -116,6 +116,15 @@
                 "ledgerAbstract": "Cactus Quorum Ledger via http connection"
             },
             "apiInfo": []
+        },
+        {
+            "validatorID": "3PfTJw8g",
+            "validatorURL": "http://172.16.0.4:8000",
+            "validatorKeyPath": "./validatorKey/3PfTJw8g/3PfTJw8g.crt",
+            "ledgerInfo": {
+                "ledgerAbstract": "Indy Ledger"
+            },
+            "apiInfo": []
         }
     ],
     "signTxInfo": {

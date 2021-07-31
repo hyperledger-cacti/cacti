@@ -3,6 +3,7 @@ from flask_socketio import SocketIO
 import json
 import time
 import asyncio
+import jwt
 
 # from indy import ledger, pool
 from indy import pool
@@ -12,7 +13,7 @@ from .IndyConnector import IndyConnector
 
 class SocketIoValidator:
     def __init__(self):
-        self.moduleName = "SocketIoValidator"
+        self.moduleName = 'SocketIoValidator'
         self.the_cb = None
         self.indy_dic = {}
         
@@ -22,8 +23,13 @@ class SocketIoValidator:
         self.app = Flask(__name__)
         self.app.config['SECRET_KEY'] = 'secret!'
         # socketio = SocketIO(app)
+
+        print(f'socket port: {self.settings.validatorSettings.port}')
+
         self.socketio = SocketIO(self.app, host='0.0.0.0', port=self.settings.validatorSettings.port, logger=True, engineio_logger=True)
         
+        self.privateKeyFile = '3PfTJw8g.priv'
+        self.algorithm = 'ES256'
 
         @self.socketio.on('connect')
         def handle_connect():
@@ -64,24 +70,26 @@ class SocketIoValidator:
             print(f"##requestData:  {requestData}")
             
             result = self.session_dict[request.sid].execSyncFunction(None, None, requestData)
-            
-            resp_obj = self.build_res_obj(200, requestData["reqId"], result)
-            respJson = json.dumps(resp_obj)
-            self.socketio.emit("response", respJson);
+
+            resp_obj = self.build_res_obj(200, requestData["reqID"], result)
+            #respJson = json.dumps(resp_obj)
+            self.socketio.emit("response", resp_obj)
 
         self.session_dict = {}
 
     def build_res_obj(self, status_code, req_id, result):
-        ## signed_results = ValidatorAuthentication.sign(result)
-        signed_results = result
-    
+
+        print(f"##build_res_obj result: {result}")
+
+        signed_results = self.sign(result)
+        responseData = {}
         res_obj = {}
         res_obj["status"] = status_code
         res_obj["data"] = signed_results
+        responseData["resObj"] = res_obj
         if req_id is not None:
-            res_obj["id"] = req_id
-            
-        return res_obj
+            responseData["id"] = req_id
+        return responseData
 
     def run(self):
         """Run Validator"""
@@ -95,6 +103,20 @@ class SocketIoValidator:
     def getValidatorInstance(self):
         print(f'##called getValidatorInstance()')
         return IndyConnector(self.socketio, request.sid, self.indy_dic)
+
+    def sign(self, data):
+        """ sign data """
+        print(f'##called sign()')
+        with open(self.privateKeyFile, 'br') as fh:
+            private_key = fh.read()
+
+        # unique process for reqId in indy data
+        # data["result"]["reqId"] = str(data["result"]["reqId"])
+
+        print(f"raw data:  {data}")
+        encoded_jwt = jwt.encode(data, private_key, algorithm="ES256")
+        print(f"encoded_jwt:  {encoded_jwt}")
+        return encoded_jwt
 
     # for INDY
     def init_indy(self):
@@ -116,4 +138,3 @@ class SocketIoValidator:
         if loop is None:
             loop = asyncio.get_event_loop()
         loop.run_until_complete(coroutine())
-

@@ -55,7 +55,9 @@
             "ChainCodeLifeCycleCommandResponses": {
                 "type": "object",
                 "required": [
-                    "queryInstalledList", "approveForMyOrgList", "installList"
+                    "queryInstalledList",
+                    "approveForMyOrgList",
+                    "installList"
                 ],
                 "properties": {
                     "packaging": {
@@ -184,6 +186,42 @@
                     }
                 }
             },
+            "GatewayOptions": {
+                "type": "object",
+                "required": ["identity", "wallet"],
+                "properties": {
+                    "connectionProfile": {
+                        "$ref": "#/components/schemas/ConnectionProfile"
+                    },
+                    "discovery": {
+                        "$ref": "#/components/schemas/GatewayDiscoveryOptions",
+                        "nullable": false
+                    },
+                    "eventHandlerOptions": {
+                        "$ref": "#/components/schemas/GatewayEventHandlerOptions",
+                        "nullable": false
+                    },
+                    "identity": {
+                        "type": "string"
+                    },
+                    "wallet": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 1,
+                        "properties": {
+                            "keychain": {
+                                "$ref": "#/components/schemas/FabricSigningCredential"
+                            },
+                            "json": {
+                                "type": "string",
+                                "nullable": false,
+                                "minLength": 1,
+                                "maxLength": 65535
+                            }
+                        }
+                    }
+                }
+            },
             "DefaultEventHandlerStrategy": {
                 "type": "string",
                 "enum": [
@@ -201,6 +239,10 @@
                 "additionalProperties": false,
                 "properties": {
                     "commitTimeout": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "endorseTimeout": {
                         "type": "number",
                         "nullable": false
                     },
@@ -289,9 +331,23 @@
                     "params"
                 ],
                 "properties": {
+                    "endorsingPeers": {
+                        "description": "An array of MSP IDs to set as the list of endorsing peers for the transaction.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 4096,
+                            "nullable": false
+                        }
+                    },
                     "transientData": {
                         "type": "object",
                         "nullable": true
+                    },
+                    "gatewayOptions": {
+                        "$ref": "#/components/schemas/GatewayOptions",
+                        "nullable": false
                     },
                     "signingCredential": {
                         "$ref": "#/components/schemas/FabricSigningCredential",
@@ -329,7 +385,6 @@
                             "nullable": true
                         }
                     },
-
                     "endorsingParties": {
                         "type": "array",
                         "nullable": false,

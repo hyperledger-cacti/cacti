@@ -10,7 +10,7 @@
   },
   "include": [
     "./src",
-    "src/**/*.json",
+    "src/**/*.json"
   ],
   "exclude": [
     "./src/test/typescript/fixtures/go/basic-asset-transfer/chaincode-typescript/**/*.ts"

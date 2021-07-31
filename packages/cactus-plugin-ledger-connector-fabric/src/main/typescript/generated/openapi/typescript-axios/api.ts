@@ -594,10 +594,72 @@ export interface GatewayEventHandlerOptions {
     commitTimeout?: number;
     /**
      * 
+     * @type {number}
+     * @memberof GatewayEventHandlerOptions
+     */
+    endorseTimeout?: number;
+    /**
+     * 
      * @type {DefaultEventHandlerStrategy}
      * @memberof GatewayEventHandlerOptions
      */
     strategy: DefaultEventHandlerStrategy;
+}
+/**
+ * 
+ * @export
+ * @interface GatewayOptions
+ */
+export interface GatewayOptions {
+    /**
+     * 
+     * @type {ConnectionProfile}
+     * @memberof GatewayOptions
+     */
+    connectionProfile?: ConnectionProfile;
+    /**
+     * 
+     * @type {GatewayDiscoveryOptions}
+     * @memberof GatewayOptions
+     */
+    discovery?: GatewayDiscoveryOptions;
+    /**
+     * 
+     * @type {GatewayEventHandlerOptions}
+     * @memberof GatewayOptions
+     */
+    eventHandlerOptions?: GatewayEventHandlerOptions;
+    /**
+     * 
+     * @type {string}
+     * @memberof GatewayOptions
+     */
+    identity: string;
+    /**
+     * 
+     * @type {GatewayOptionsWallet}
+     * @memberof GatewayOptions
+     */
+    wallet: GatewayOptionsWallet;
+}
+/**
+ * 
+ * @export
+ * @interface GatewayOptionsWallet
+ */
+export interface GatewayOptionsWallet {
+    /**
+     * 
+     * @type {FabricSigningCredential}
+     * @memberof GatewayOptionsWallet
+     */
+    keychain?: FabricSigningCredential;
+    /**
+     * 
+     * @type {string}
+     * @memberof GatewayOptionsWallet
+     */
+    json?: string;
 }
 /**
  * 
@@ -619,11 +681,23 @@ export interface InlineResponse501 {
  */
 export interface RunTransactionRequest {
     /**
+     * An array of MSP IDs to set as the list of endorsing peers for the transaction.
+     * @type {Array<string>}
+     * @memberof RunTransactionRequest
+     */
+    endorsingPeers?: Array<string>;
+    /**
      * 
      * @type {object}
      * @memberof RunTransactionRequest
      */
     transientData?: object | null;
+    /**
+     * 
+     * @type {GatewayOptions}
+     * @memberof RunTransactionRequest
+     */
+    gatewayOptions?: GatewayOptions;
     /**
      * 
      * @type {FabricSigningCredential}

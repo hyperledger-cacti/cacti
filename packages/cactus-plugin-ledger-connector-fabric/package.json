@@ -14,7 +14,7 @@
   "scripts": {
     "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "codegen:openapi": "npm run generate-sdk",
-    "codegen": "run-p codegen:*",
+    "codegen": "run-p 'codegen:*'",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -72,6 +72,7 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
+    "@fidm/x509": "1.2.1",
     "@hyperledger/cactus-common": "0.6.0",
     "@hyperledger/cactus-core": "0.6.0",
     "@hyperledger/cactus-core-api": "0.6.0",
