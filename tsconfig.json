@@ -122,7 +122,7 @@
       "path": "./packages/cactus-test-verifier-client/tsconfig.json"
     },
     {
-      "path": "./examples/cactus-common-example-server/tsconfig.json"
+      "path": "./packages/cactus-plugin-cc-tx-visualization/tsconfig.json"
     },
     {
       "path": "./examples/cactus-example-carbon-accounting-backend/tsconfig.json"
