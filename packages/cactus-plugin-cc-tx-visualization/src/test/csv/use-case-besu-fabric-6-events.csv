@@ -1,0 +1,7 @@
+caseID;receiptID;timestamp;blockchainID;invocationType;methodName;parameters;identity;cost;carbonFootprint;latency;revenue
+FABRIC_BESU;0xd184f5a49d170e2f7f9fcb7996e8db3d7764c13d798fc5a795e0d9371dd61435;2022-06-24T14:47:43.716Z;BESU_2X;SEND;createAsset;"[""asset1"",5]";0x627306090abab3a6e1400e9345bc60c78a8bef57;5.27;0.00018;10065;0
+FABRIC_BESU;0xc315d4ee310a04d4c0949279f4edba34fa8fb35cf5fe4fb1e4b95488202860fc;2022-06-24T14:47:45.312Z;BESU_2X;SEND;lockAsset;"[""asset1""]";0x627306090abab3a6e1400e9345bc60c78a8bef57;2.18;0.00018;8469;0
+FABRIC_BESU;7fddc8aef1a46f23fa33891b4ab6b951c7224671575b573cd47e7711cd9449b1;2022-06-24T14:47:47.102Z;FABRIC_2;FabricContractInvocationType.SEND;MintAsset;"[""asset1"",""Green"",""19"",""owner1"",""9999""]";user2;0;0.00018;6679;0
+FABRIC_BESU;7c395a691ba45d7fe921fb5f69b40fbff810459f8f9f274307c58fb070b2910a;2022-06-24T14:47:49.361Z;FABRIC_2;FabricContractInvocationType.SEND;TransferAsset;"[""asset1"",""owner2""]";user2;0;0.00018;4420;0
+FABRIC_BESU;a6b747257c6e92b8c85292561999dad7dcf56051f2c6c639a2bbbd987a4afbdf;2022-06-24T14:47:51.573Z;FABRIC_2;FabricContractInvocationType.SEND;TransferAsset;"[""asset1"",""owner1""]";user2;0;0.00018;2208;0
+FABRIC_BESU;fc20c6cd4f1cbd6b06da6cd1fc846a0b2051382096d63cd7e8a67865471526f1;2022-06-24T14:47:53.767Z;FABRIC_2;FabricContractInvocationType.SEND;BurnAsset;"[""asset1""]";user2;0;0.00018;14;0
