@@ -60,6 +60,7 @@
     "@hyperledger/cactus-core": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
     "axios": "1.6.0",
+    "amqp-ts": "1.8.0",
     "bl": "5.0.0",
     "bn.js": "4.12.0",
     "elliptic": "6.5.4",

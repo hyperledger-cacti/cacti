@@ -772,6 +772,18 @@
         ],
         "additionalProperties": false,
         "properties": {
+          "caseID": {
+            "type": "string",
+            "nullable": false
+          },
+          "cost": {
+            "type": "number",
+            "nullable": false
+          },
+          "carbonFootprint": {
+            "type": "string",
+            "nullable": false
+          },
           "contractName": {
             "type": "string",
             "nullable": false

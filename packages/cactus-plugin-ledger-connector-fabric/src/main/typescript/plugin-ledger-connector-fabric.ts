@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
@@ -43,6 +44,7 @@ import {
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
+  LedgerType,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -137,6 +139,7 @@ import {
   getTransactionReceiptByTxID,
   IGetTransactionReceiptByTxIDOptions,
 } from "./common/get-transaction-receipt-by-tx-id";
+
 import { GetBlockEndpointV1 } from "./get-block/get-block-endpoint-v1";
 import { querySystemChainCode } from "./common/query-system-chain-code";
 import { isSshExecOk } from "./common/is-ssh-exec-ok";
@@ -146,6 +149,10 @@ import { deployContractGoSourceImplFabricV256 } from "./deploy-contract-go-sourc
 
 const { loadFromConfig } = require("fabric-network/lib/impl/ccp/networkconfig");
 assertFabricFunctionIsAvailable(loadFromConfig, "loadFromConfig");
+
+//cc-tx-viz
+import * as amqp from "amqp-ts";
+import {FabricV2TxReceipt, IsVisualizable} from "@hyperledger/cactus-plugin-cc-tx-visualization/src/main/typescript/models/transaction-receipt";
 
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
@@ -184,6 +191,12 @@ export interface IPluginLedgerConnectorFabricOptions
   vaultConfig?: IVaultConfig;
   webSocketConfig?: IWebSocketConfig;
   signCallback?: SignPayloadCallback;
+
+  //cc-tx-viz
+  collectTransactionReceipts?: boolean;
+  persistMessages?: boolean;
+  queueId?: string;
+  eventProvider?: string;
 }
 
 export class PluginLedgerConnectorFabric
@@ -194,6 +207,7 @@ export class PluginLedgerConnectorFabric
       RunTransactionRequest,
       RunTransactionResponse
     >,
+    IsVisualizable,
     ICactusPlugin,
     IPluginWebService
 {
@@ -210,6 +224,15 @@ export class PluginLedgerConnectorFabric
   private readonly certStore: CertDatastore;
   private readonly sshDebugOn: boolean;
   private runningWatchBlocksMonitors = new Set<WatchBlocksV1Endpoint>();
+ 
+  //cc-tx-viz
+  private amqpConnection: amqp.Connection | undefined;
+  private amqpQueue: amqp.Queue | undefined;
+  private amqpExchange: amqp.Exchange | undefined;
+  public readonly collectTransactionReceipts: boolean;
+  public readonly persistMessages: boolean | undefined;
+  public readonly queueId: string | undefined;
+  public readonly eventProvider: string | undefined;
 
   public get className(): string {
     return PluginLedgerConnectorFabric.CLASS_NAME;
@@ -223,7 +246,7 @@ export class PluginLedgerConnectorFabric
   constructor(public readonly opts: IPluginLedgerConnectorFabricOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
-    Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
+    //Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
     Checks.truthy(opts.peerBinary, `${fnTag} options.peerBinary`);
     Checks.truthy(opts.pluginRegistry, `${fnTag} options.pluginRegistry`);
     Checks.truthy(opts.connectionProfile, `${fnTag} options.connectionProfile`);
@@ -268,6 +291,27 @@ export class PluginLedgerConnectorFabric
     }
 
     this.signCallback = opts.signCallback;
+
+    //cc-tx-viz
+    // Visualization part
+    this.collectTransactionReceipts = opts.collectTransactionReceipts || false;
+    if (this.collectTransactionReceipts)  {
+      this.eventProvider = opts.eventProvider || "amqp://localhost";
+      this.log.debug("Initializing connection to RabbitMQ");
+      this.amqpConnection = new amqp.Connection(this.eventProvider);
+      this.log.info("Connection to RabbitMQ server initialized");
+      const queue = this.opts.queueId || "cc-tx-viz-queue";
+      this.queueId = queue;
+      this.persistMessages = this.opts.persistMessages || false;
+      this.amqpExchange = this.amqpConnection.declareExchange(`cc-tx-viz-exchange`, "direct", {durable: this.persistMessages});
+      this.amqpQueue = this.amqpConnection.declareQueue(this.queueId, {durable: this.persistMessages});
+      this.amqpQueue.bind(this.amqpExchange);
+    }
+  }
+
+  public closeConnection(): Promise<void>  {
+    this.log.info("Closing Amqp connection");
+    return this.amqpConnection?.close();
   }
 
   public getOpenApiSpec(): unknown {
@@ -287,6 +331,11 @@ export class PluginLedgerConnectorFabric
     const res: string = await this.prometheusExporter.getPrometheusMetrics();
     this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
     return res;
+  }
+  
+  //TODO returns Promise<FabricTransactionReceipt>
+  public async getTransactionReceiptsList(): Promise<void>  {
+    //returns list
   }
 
   public getInstanceId(): string {
@@ -1124,8 +1173,16 @@ export class PluginLedgerConnectorFabric
   public async transact(
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
+    //start transaction time
+    // const startTx = performance.now();
+
+    //start tx
     const fnTag = `${this.className}#transact()`;
     this.log.debug("%s ENTER", fnTag);
+    
+    //cc-tx-viz
+    const startTimeFabricReceipt = new Date();
+
     const {
       channelName,
       contractName,
@@ -1192,9 +1249,33 @@ export class PluginLedgerConnectorFabric
           }
 
           const transientMap = this.toTransientMap(req.transientData);
+          
+          //cc-tx-viz
+          /*
+          const transientMap: TransientMap = transientData as TransientMap;
+
+          try {
+            //Obtains and parses each component of transient data
+            for (const key in transientMap) {
+              transientMap[key] = Buffer.from(
+                JSON.stringify(transientMap[key]),
+              );
+            }
+          } catch (ex) {
+            this.log.error(`Building transient map crashed: `, ex);
+            throw new Error(
+              `${fnTag} Unable to build the transient map: ${ex.message}`,
+            );
+          }
+          */
+
           const transactionProposal = await contract.createTransaction(fnName);
           transactionProposal.setEndorsingPeers(endorsingTargets);
           out = await transactionProposal.setTransient(transientMap).submit();
+          
+          //cc-tx-viz
+          //transactionId = transactionProposal.getTransactionId();
+          //success = true;
           break;
         }
         default: {
@@ -1202,7 +1283,74 @@ export class PluginLedgerConnectorFabric
           throw new Error(`${fnTag} unknown ${message}`);
         }
       }
+      //cc-tx-viz
+      /*
+      const endTimeFabricReceipt = new Date();
+      this.log.debug(`EVAL-${this.className}-ISSUE-TRANSACTION:${endTimeFabricReceipt.getTime()-startTimeFabricReceipt.getTime()}`);
 
+      // if we don't want to collect reads, than add condition  && transactionId !== ""
+      if (this.collectTransactionReceipts)  {
+        const startTimeFabricReceipt = new Date();
+        const txParams = req.params;
+        //getTransactionReceiptByTxID requires 2 params in req.params => channelName and txID
+        req.params = [];
+        req.params[0] = req.channelName;
+        req.params[1] = transactionId;
+        //req.params get are stored in the basicTxReceipt rwsetWriteData
+        if (transactionId)  {
+          const basicTxReceipt = await this.getTransactionReceiptByTxID(req);
+        const extendedReceipt: FabricV2TxReceipt={
+          caseID: req.caseID || "FABRIC_TBD",
+          transactionID: transactionId,
+          blockchainID: LedgerType.Fabric2,
+          invocationType: req.invocationType,
+          methodName: req.methodName,
+          parameters: txParams,
+          timestamp: new Date(),
+          channelName: req.channelName,
+          contractName: req.contractName,
+          signingCredentials: req.signingCredential,
+          endorsingParties: req.endorsingParties,
+          endorsingPeers: req.endorsingPeers,
+          gatewayOptions: req.gatewayOptions,
+          transactionCreator: basicTxReceipt.transactionCreator,
+          transientData: req.transientData,
+          blockMetaData: basicTxReceipt.blockMetaData,
+          chainCodeName: basicTxReceipt.chainCodeName,
+          blockNumber: basicTxReceipt.blockNumber,
+          chainCodeVersion: basicTxReceipt.chainCodeVersion,
+          responseStatus: basicTxReceipt.responseStatus,
+        };
+        const txReceipt = new amqp.Message(extendedReceipt);
+        this.amqpQueue?.send(txReceipt);
+        this.log.debug(`Sent extended transaction receipt to queue ${this.queueId}`);
+        } else  {
+          const extendedReceipt: FabricV2TxReceipt={
+            caseID: req.caseID || "FABRIC_TBD",
+            transactionID: undefined,
+            blockchainID: LedgerType.Fabric2,
+            invocationType: req.invocationType,
+            methodName: req.methodName,
+            parameters: txParams,
+            timestamp: new Date(),
+            channelName: req.channelName,
+            contractName: req.contractName,
+            signingCredentials: req.signingCredential,
+            endorsingParties: req.endorsingParties,
+            endorsingPeers: req.endorsingPeers,
+            gatewayOptions: req.gatewayOptions,
+            };
+          const txReceipt = new amqp.Message(extendedReceipt);
+          this.amqpQueue?.send(txReceipt);
+          this.log.debug(`Sent simple transaction receipt to queue ${this.queueId}`);
+        }
+        const endTimeFabricReceipt = new Date();
+        this.log.debug(`EVAL-${this.className}-GENERATE-AND-CAPTURE-RECEIPT:${endTimeFabricReceipt.getTime()-startTimeFabricReceipt.getTime()}`);
+
+      }
+
+      const outUtf8 = out.toString("utf-8");
+      */
       const res: RunTransactionResponse = {
         functionOutput: this.convertToTransactionResponseType(
           out,
@@ -1212,12 +1360,10 @@ export class PluginLedgerConnectorFabric
       };
       gateway.disconnect();
       this.log.debug(`transact() response: %o`, res);
-      this.prometheusExporter.addCurrentTransaction();
-
       return res;
     } catch (ex) {
       this.log.error(`transact() crashed: `, ex);
-      throw new Error(`${fnTag} Unable to run transaction: ${ex.message}`);
+      throw new Error(`${fnTag} Unable to run transaction: ${ex}`);
     }
   }
 
@@ -1254,7 +1400,7 @@ export class PluginLedgerConnectorFabric
       return new FabricCAServices(caUrl, tlsOptions, caName);
     } catch (ex) {
       this.log.error(`createCaClient() Failure:`, ex);
-      throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+      throw new Error(`${fnTag} Inner Exception: ${ex}`);
     }
   }
 
@@ -1290,7 +1436,7 @@ export class PluginLedgerConnectorFabric
       return [x509Identity, wallet];
     } catch (ex) {
       this.log.error(`enrollAdmin() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex?.message}`);
+      throw new Error(`${fnTag} Exception: ${ex}`);
     }
   }
   /**

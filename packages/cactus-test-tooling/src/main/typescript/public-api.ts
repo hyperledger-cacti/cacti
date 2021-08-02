@@ -202,3 +202,5 @@ export {
   FABRIC_25_LTS_FABRIC_SAMPLES__ORDERER_TLS_ROOTCERT_FILE_ORG_2,
   IFabricOrgEnvInfo,
 } from "./fabric/fabric-samples-env-constants";
+
+export { RabbitMQTestServer } from "./rabbitmq-test-server/rabbit-mq-test-server";
