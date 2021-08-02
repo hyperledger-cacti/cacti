@@ -30,6 +30,7 @@ import {
   ICactusPluginOptions,
   IPluginGrpcService,
   IGrpcSvcDefAndImplPair,
+  LedgerType,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -112,6 +113,13 @@ export interface IRunTransactionV1Exchange {
   timestamp: Date;
 }
 
+//cc-tx-viz
+import * as amqp from "amqp-ts";
+import {
+  BesuV2TxReceipt,
+  IsVisualizable,
+} from "@hyperledger/cactus-plugin-cc-tx-visualization/src/main/typescript/models/transaction-receipt";
+
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
 export interface IPluginLedgerConnectorBesuOptions
@@ -121,6 +129,10 @@ export interface IPluginLedgerConnectorBesuOptions
   pluginRegistry: PluginRegistry;
   prometheusExporter?: PrometheusExporter;
   logLevel?: LogLevelDesc;
+  collectTransactionReceipts?: boolean;
+  persistMessages?: boolean;
+  queueId?: string;
+  eventProvider?: string;
 }
 
 export class PluginLedgerConnectorBesu
@@ -133,7 +145,7 @@ export class PluginLedgerConnectorBesu
     >,
     ICactusPlugin,
     IPluginGrpcService,
-    IPluginWebService
+    IPluginWebService //, IsVisualizable //cc-tx-viz
 {
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
@@ -146,12 +158,19 @@ export class PluginLedgerConnectorBesu
   private contracts: {
     [name: string]: Contract;
   } = {};
-
   private endpoints: IWebServiceEndpoint[] | undefined;
   private txSubject: ReplaySubject<IRunTransactionV1Exchange> =
     new ReplaySubject();
 
-  public static readonly CLASS_NAME = "PluginLedgerConnectorBesu";
+  public transactionReceipts: any[] = [];
+  public collectTransactionReceipts: boolean;
+
+  private amqpConnection: amqp.Connection | undefined;
+  private amqpQueue: amqp.Queue | undefined;
+  private amqpExchange: amqp.Exchange | undefined;
+  public readonly persistMessages: boolean | undefined;
+  public readonly queueId: string | undefined;
+  public readonly eventProvider: string | undefined;
 
   public get className(): string {
     return PluginLedgerConnectorBesu.CLASS_NAME;
@@ -183,8 +202,29 @@ export class PluginLedgerConnectorBesu
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
-
     this.prometheusExporter.startMetricsCollection();
+
+    //Visualization part
+    this.collectTransactionReceipts =
+      options.collectTransactionReceipts || false;
+    if (this.collectTransactionReceipts) {
+      this.eventProvider = options.eventProvider || "amqp://localhost";
+      this.log.debug("Initializing connection to RabbitMQ");
+      this.amqpConnection = new amqp.Connection(this.eventProvider);
+      this.log.info("Connection to RabbitMQ server initialized");
+      const queue = options.queueId || "cc-tx-viz-queue";
+      this.queueId = queue;
+      this.persistMessages = options.persistMessages || false;
+      this.amqpExchange = this.amqpConnection.declareExchange(
+        `cc-tx-viz-exchange`,
+        "direct",
+        { durable: this.persistMessages },
+      );
+      this.amqpQueue = this.amqpConnection.declareQueue(this.queueId, {
+        durable: this.persistMessages,
+      });
+      this.amqpQueue.bind(this.amqpExchange);
+    }
   }
 
   public getOpenApiSpec(): unknown {
@@ -199,6 +239,11 @@ export class PluginLedgerConnectorBesu
     const res: string = await this.prometheusExporter.getPrometheusMetrics();
     this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
     return res;
+  }
+
+  public closeConnection(): Promise<void> {
+    this.log.info("Closing Amqp connection");
+    return this.amqpConnection?.close();
   }
 
   public getInstanceId(): string {
@@ -441,7 +486,6 @@ export class PluginLedgerConnectorBesu
     req: InvokeContractV1Request,
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
-
     const contractName = req.contractName;
     let contractInstance: Contract;
 
@@ -472,7 +516,6 @@ export class PluginLedgerConnectorBesu
         const web3SigningCredential = req.signingCredential as
           | Web3SigningCredentialPrivateKeyHex
           | Web3SigningCredentialCactusKeychainRef;
-
         const receipt = await this.transact({
           transactionConfig: {
             data: `0x${contractJSON.bytecode}`,
@@ -488,7 +531,6 @@ export class PluginLedgerConnectorBesu
           web3SigningCredential,
           privateTransactionConfig: req.privateTransactionConfig,
         });
-
         const address = {
           address: receipt.transactionReceipt.contractAddress,
         };
@@ -511,7 +553,6 @@ export class PluginLedgerConnectorBesu
         `${fnTag} Cannot invoke a contract without contract instance, the keychainId param is needed`,
       );
     }
-
     contractInstance = this.contracts[contractName];
     if (req.contractAbi != undefined) {
       let abi;
