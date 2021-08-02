@@ -211,3 +211,5 @@ export {
   IBuildImageCordaAllInOneV412Response,
   buildImageCordaAllInOneV412,
 } from "./corda/build-image-corda-all-in-one-v4-12";
+
+export { RabbitMQTestServer } from "./rabbitmq-test-server/rabbit-mq-test-server";

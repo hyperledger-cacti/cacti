@@ -1,0 +1,92 @@
+{
+  "name": "@hyperledger/cactus-plugin-cc-tx-visualization",
+  "version": "1.0.0",
+  "description": "A web service plugin that provides management capabilities on cross-chain transactions visualization.",
+  "main": "dist/lib/main/typescript/index.js",
+  "mainMinified": "dist/cactus-plugin-cc-tx-visualization.node.umd.min.js",
+  "browser": "dist/cactus-plugin-cc-tx-visualization.web.umd.js",
+  "browserMinified": "dist/cactus-plugin-cc-tx-visualization.web.umd.min.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/types/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev webpack:prod",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
+    "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
+    "webpack:prod:node": "webpack --env=prod --target=node --config ../../webpack.config.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Iulia Mihaiu"
+    },
+    {
+      "name": "Sabrina Scuri"
+    },
+    {
+      "name": "Rafael Belchior"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "dependencies": {
+    "@hyperledger/cactus-common": "1.0.0",
+    "@hyperledger/cactus-core": "1.0.0",
+    "@hyperledger/cactus-core-api": "1.0.0",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "1.0.0",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "1.0.0",
+    "amqp-ts": "1.8.0",
+    "axios": "0.21.1",
+    "body-parser": "1.19.0",
+    "csv-stringify": "6.0.5",
+    "express": "4.17.1",
+    "fabric-contract-api": "2.2.3",
+    "jose": "1.28.1",
+    "json-stable-stringify": "1.0.1",
+    "prom-client": "13.0.0",
+    "typescript-optional": "2.0.1",
+    "uuid": "8.3.2"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-test-tooling": "1.0.0",
+    "@types/express": "4.17.8",
+    "@types/json-stable-stringify": "1.0.32",
+    "@types/uuid": "8.3.0"
+  }
+}
