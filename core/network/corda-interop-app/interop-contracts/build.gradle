@@ -53,10 +53,10 @@ publishing {
     }
     repositories {
         maven {
-            url artifactory_url
+            url github_url
             credentials {
-                username artifactory_username
-                password artifactory_password
+                username github_username
+                password github_password
             }
         }
     }

@@ -17,9 +17,9 @@ buildscript {
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         arrow_version = constants.getProperty("arrowVersion")
         weaver_version = constants.getProperty("weaverVersion")
-        artifactory_username = constants.getProperty("username")
-        artifactory_password = constants.getProperty("password")
-        artifactory_url = constants.getProperty("url")
+        github_username = constants.getProperty("username")
+        github_password = constants.getProperty("password")
+        github_url = constants.getProperty("url")
     }
 
     repositories {
@@ -58,10 +58,10 @@ allprojects {
         maven { url 'https://software.r3.com/artifactory/corda' }
         maven { url 'https://jitpack.io' }
         maven {
-            url artifactory_url
+            url github_url
             credentials {
-                username artifactory_username
-                password artifactory_password
+                username github_username
+                password github_password
             }
         }
     }
