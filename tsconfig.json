@@ -101,6 +101,9 @@
       "path": "./packages/cactus-test-tooling/tsconfig.json"
     },
     {
+      "path": "./packages/cactus-plugin-cc-tx-visualization/tsconfig.json"
+    },
+    {
       "path": "./examples/cactus-example-carbon-accounting-backend/tsconfig.json"
     },
     {

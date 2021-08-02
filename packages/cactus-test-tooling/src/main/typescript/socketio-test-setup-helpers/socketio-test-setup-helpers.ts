@@ -72,7 +72,7 @@ export function connectTestClient(socket: ClientSocket): Promise<ClientSocket> {
     socket.on("connect_timeout", errorHandlerFactory("connect_timeout"));
 
     socket.on("connect", () => {
-      socket.removeAllListeners();
+      //socket.removeAllListeners();
       resolve(socket);
     });
   });
