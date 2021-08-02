@@ -13,14 +13,14 @@ if [[ $1 == "local" ]]; then
   make build-local
   cd -
 else
-  file="$directory/../artifactory.properties"
+  file="$directory/../github.properties"
   if [ -f $file ]; then
     cp $file $cordaSimpleAppPath/
     cd $cordaSimpleAppPath
     make build
     cd -
   else
-    echo Please copy the artifactory.properties.template file as artifactory.properties and replace placeholders with Artifactory credentials.
+    echo Please copy the github.properties.template file as github.properties and replace placeholders with Github credentials.
   fi
 fi
 
@@ -39,7 +39,7 @@ if [[ $1 == "local" ]]; then
   cp $directory/../../../../core/network/corda-interop-app/interop-workflows/build/libs/interop-workflows-$weaverVersion.jar $directory/../artifacts
   cp $directory/../../../../common/protos-java-kt/build/libs/protos-java-kt-$weaverVersion.jar $directory/../artifacts
 else
-  file="$directory/../artifactory.properties"
+  file="$directory/../github.properties"
   if [ -f $file ]; then
     username=`sed '/^\#/d' $file | grep 'username=' | cut -d "=" -f2-`
     password=`sed '/^\#/d' $file | grep 'password=' | cut -d "=" -f2-`
@@ -52,7 +52,7 @@ else
     (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/protos-java-kt/$weaverVersion/protos-java-kt-$weaverVersion.jar)
     set +x
   else
-    echo Please copy the artifactory.properties.template file as artifactory.properties and replace placeholders with Artifactory credentials.
+    echo Please copy the github.properties.template file as github.properties and replace placeholders with Github credentials.
   fi
 fi
 

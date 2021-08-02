@@ -52,7 +52,7 @@ respective repos.
 To get the CorDapps from Github Packages you will need to have permission to do so:
 
 1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
-2) Create a copy of `artifactory.properties.template` as `artifactory.properties`.
+2) Create a copy of `github.properties.template` as `github.properties`.
 3) Replace <GITHUB Email> with your email id for github.
 4) Replace <GITHUB Personal Access Token> with your personal access token.
 
@@ -65,7 +65,7 @@ targets.
     gets the CorDapps from Github Packages, then starts the Corda nodes.
 -   `make start-local` is the same as `make start` except it gets the cordapps
     from locally built jars from the `corda-simple-app` and `corda-interop-app`
-    repositories (delete `artifactory.properties` if present, else it will try to fetch dependencies from Github Packages).
+    repositories (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages).
 -   `make restart-with-new-interop-app` can be used to restart an already running
     Corda network with new local versions of the `corda-interop-app` CorDapp.
 -   `make stop` stops the nodes.

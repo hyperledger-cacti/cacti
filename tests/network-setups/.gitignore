@@ -8,7 +8,6 @@ fabric/dev/.fabric-setup
 *.lock
 fabric/dev/scripts/config.json
 fabric/shared/chaincode/*
-shared/artifactory.properties
 shared/charts/apikey
 shared/charts/username
 *.real.*

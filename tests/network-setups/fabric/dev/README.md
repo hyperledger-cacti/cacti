@@ -28,7 +28,7 @@ If you are ok with the default configuration you can simply use the default make
 If you want to be able to have more control on the setup and configuration of the network, proceed to read the next section and 
 use the capabilities of the underlying script `network.sh`.
 
-NOTE: For runnining inteorp setup/start scripts you will need to set up artifactory properties in the `shared` directory. 
+NOTE: For runnining inteorp setup/start scripts you will need to set up github properties in the `shared` directory. 
 
 ## Running via network.sh
 

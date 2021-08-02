@@ -2,7 +2,7 @@ buildscript {
     Properties constants = new Properties()
     file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
 
-    file("$projectDir/./artifactory.properties").withInputStream { constants.load(it) }
+    file("$projectDir/./github.properties").withInputStream { constants.load(it) }
 
     ext {
         corda_release_group = constants.getProperty("cordaReleaseGroup")

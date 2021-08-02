@@ -35,8 +35,8 @@ repositories {
     jcenter()
     mavenCentral()
     mavenLocal()
-    if (file("$projectDir/../artifactory.properties").exists()) {
-        file("$projectDir/../artifactory.properties").withInputStream { constants.load(it) }
+    if (file("$projectDir/../github.properties").exists()) {
+        file("$projectDir/../github.properties").withInputStream { constants.load(it) }
         maven {
             url constants.url
             credentials {

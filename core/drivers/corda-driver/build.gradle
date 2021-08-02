@@ -35,8 +35,8 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'https://software.r3.com/artifactory/corda' }
-    if (file("$projectDir/./artifactory.properties").exists()) {
-        file("$projectDir/artifactory.properties").withInputStream { constants.load(it) }
+    if (file("$projectDir/./github.properties").exists()) {
+        file("$projectDir/github.properties").withInputStream { constants.load(it) }
         maven {
             url constants.url
             credentials {

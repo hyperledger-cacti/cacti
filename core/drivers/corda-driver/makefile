@@ -17,15 +17,15 @@ build-refresh-dependencies-local:
 	./gradlew build --refresh-dependencies
 
 .PHONY: build
-build: artifactory.properties
+build: github.properties
 	./gradlew clean installDist
 
 .PHONY: build-refresh-dependencies
-build-refresh-dependencies: artifactory.properties
+build-refresh-dependencies: github.properties
 	./gradlew build --refresh-dependencies
 	
 .PHONY: image
-image: artifactory.properties
+image: github.properties
 	docker build --build-arg GIT_URL=$(GIT_URL) -t corda-driver:latest .
 
 .PHONY: push-image	

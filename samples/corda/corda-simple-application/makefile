@@ -26,23 +26,23 @@ test-local: build-local-weaver-dependencies
 	./gradlew test
 
 .PHONY: build
-build: artifactory.properties
+build: github.properties
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies
-build-refresh-dependencies: artifactory.properties
+build-refresh-dependencies: github.properties
 	./gradlew clean build --refresh-dependencies
 
 .PHONY: build-cordapp
-build-cordapp: artifactory.properties
+build-cordapp: github.properties
 	./gradlew jar
 
 .PHONY: build-cli
-build-cli: artifactory.properties
+build-cli: github.properties
 	./gradlew installDist
 
 .PHONY: test
-test: artifactory.properties
+test: github.properties
 	./gradlew test
 
 .PHONY: initialise-vault
@@ -67,7 +67,7 @@ get-security-groups:
 
 .PHONY: publish-cordapps
 publish-cordapps:
-	echo "Publishing CorDapps to Artifactory..."
+	echo "Publishing CorDapps to Github..."
 	./gradlew publishContractsPublicationToMavenRepository
 	./gradlew publishWorkflowsPublicationToMavenRepository
 

@@ -269,7 +269,7 @@ Following steps will build above cordapp and a corda-client as well in `samples/
 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
-- Create copy of `artifactory.properties.template` as `artifactory.properties`.
+- Create copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - To spin up the Corda network with the interoperation Cordapp, run:
     ```bash
@@ -307,7 +307,7 @@ The code for this lies in the `core/drivers/corda-driver` folder.
 
 Build the Corda driver module as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
-- Create copy of `artifactory.properties.template` as `artifactory.properties`.
+- Create copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - Run the following:
 ```bash
