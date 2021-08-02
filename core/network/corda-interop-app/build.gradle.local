@@ -15,9 +15,9 @@ buildscript {
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         arrow_version = constants.getProperty("arrowVersion")
         weaver_version = constants.getProperty("weaverVersion")
-        artifactory_username = ""
-        artifactory_password = ""
-        artifactory_url = ""
+        github_username = ""
+        github_password = ""
+        github_url = ""
     }
 
     repositories {

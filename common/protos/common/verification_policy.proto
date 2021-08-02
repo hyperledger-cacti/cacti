@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package common.verification_policy;
 
+option java_package = "com.weaver.protos.common.verification_policy";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
 
 // VerificationPolicy stores the rules around which parties from a foreign

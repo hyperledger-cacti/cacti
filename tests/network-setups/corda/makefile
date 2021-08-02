@@ -1,7 +1,7 @@
 .PHONY: start
-start: artifactory.properties
+start: github.properties
 	echo "Building corda simple app..."
-	cp artifactory.properties ../../../samples/corda/corda-simple-application/
+	cp github.properties ../../../samples/corda/corda-simple-application/
 	cd ../../../samples/corda/corda-simple-application && make build
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh

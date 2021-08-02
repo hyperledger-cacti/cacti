@@ -11,7 +11,7 @@ from the external network.
 
 ## Setup
 
-To build the driver executable locally (delete `artifactory.properties` if present, else it will try to fetch dependencies from Github Packages), run the following:
+To build the driver executable locally (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages), run the following:
 
 ```
 make build-local
@@ -19,7 +19,7 @@ make build-local
 
 To build the driver executable using dependencies from Github Packages, follow the steps:
 * Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
-* Create a copy of `artifactory.properties.template` as `artifactory.properties`.
+* Create a copy of `github.properties.template` as `github.properties`.
 * Replace <GITHUB Email> with your email id for github.
 * Replace <GITHUB Personal Access Token> with your personal access token.
 
@@ -60,7 +60,7 @@ To push image to github container registry:
 
 * Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
-* Create a copy of `artifactory.properties.template` as `artifactory.properties`.
+* Create a copy of `github.properties.template` as `github.properties`.
 * Replace <GITHUB Email> with your email id for github.
 * Replace <GITHUB Personal Access Token> with your personal access token.
 * Run `make push-image` to build and push the image to github registry.
@@ -117,7 +117,7 @@ files are updated, they need to be updated in a single repo, instead of across
 multiple.
 
 To update the version number of the interop CorDapps that should be pulled from
-Artifactory, change the version number of the `interop_cordapps_version` at the
+Github Maven Repository, change the version number of the `interop_cordapps_version` at the
 top of the `build.gradle` file. 
 
 ## TODO

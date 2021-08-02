@@ -7,7 +7,7 @@
 package com.weaver.corda.app.interop.flows.customSerializers
 
 import com.google.protobuf.ByteString
-import common.state.State
+import com.weaver.protos.common.state.State
 import net.corda.core.serialization.SerializationCustomSerializer
 
 class ViewSerializer: SerializationCustomSerializer<State.View, ViewSerializer.Proxy> {

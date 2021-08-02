@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package common.query;
+option java_package = "com.weaver.protos.common.query";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
 
 // the payload to define the data that is being requested

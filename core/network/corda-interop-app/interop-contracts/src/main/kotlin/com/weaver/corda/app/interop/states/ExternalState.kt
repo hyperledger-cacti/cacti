@@ -7,7 +7,6 @@
 package com.weaver.corda.app.interop.states
 
 import com.weaver.corda.app.interop.contracts.ExternalStateContract
-import com.google.protobuf.ByteString
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
