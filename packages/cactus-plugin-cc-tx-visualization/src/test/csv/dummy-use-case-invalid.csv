@@ -1,0 +1,7 @@
+caseID;receiptID;timestamp;blockchainID;invocationType;methodName;parameters;identity;cost;carbonFootprint;latency;revenue
+INVALID_FABRIC_BESU_1;f0e58801-e6dd-44d4-91de-4adb2113a68b;2022-08-03T14:05:37.740Z;TEST;send;createAsset;"[""asset1,5""]";A;0;0;7602;
+INVALID_FABRIC_BESU_1;fe6e7084-74da-4d1e-8681-6603111a71fc;2022-08-03T14:05:37.742Z;TEST;send;mintAsset;"[""asset1"",""Green"",""19"",""owner1"",""9999""]";A;0;0;7601;
+INVALID_FABRIC_BESU_1;e7466cb2-4eaf-44f0-acd3-0b0dfae52801;2022-08-03T14:05:37.743Z;TEST;send;lockAsset;"[""asset1""]";A;0;0;7600;
+INVALID_FABRIC_BESU_1;4df9be1c-6e47-40dd-8722-90072b0b04bd;2022-08-03T14:05:37.744Z;TEST;send;transferAsset;"[""asset1"",""owner2""]";A;0;0;7599;
+INVALID_FABRIC_BESU_1;9a130336-c165-4e05-b72c-3b9c3fa583a0;2022-08-03T14:05:37.745Z;TEST;send;transferAsset;"[""asset1"",""owner1""]";A;0;0;7598;
+INVALID_FABRIC_BESU_1;b8fef379-e64f-4aa0-97d8-45f28276576c;2022-08-03T14:05:37.746Z;TEST;send;BurnAsset;"[""asset1""]";A;0;0;7598;

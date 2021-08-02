@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/types",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-cc-tx-visualization.tsbuildinfo"
+  },
+  "include": [
+    "./src",
+    "./src/test/solidity/*.json",
+  ],
+  "references": [
+    {
+      "path": "../cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../cactus-core-api/tsconfig.json"
+    }
+  ]
+}

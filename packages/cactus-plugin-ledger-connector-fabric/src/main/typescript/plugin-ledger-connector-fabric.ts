@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
@@ -44,6 +45,7 @@ import {
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
+  LedgerType,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -191,6 +193,12 @@ export interface IPluginLedgerConnectorFabricOptions
    * This is especially relevant when testing with the fabricAIO image.
    */
   dockerNetworkName?: string;
+
+  //cc-tx-viz
+  collectTransactionReceipts?: boolean;
+  persistMessages?: boolean;
+  queueId?: string;
+  eventProvider?: string;
 }
 
 export class PluginLedgerConnectorFabric
@@ -201,6 +209,7 @@ export class PluginLedgerConnectorFabric
       RunTransactionRequest,
       RunTransactionResponse
     >,
+    IsVisualizable,
     ICactusPlugin,
     IPluginWebService
 {
@@ -229,7 +238,7 @@ export class PluginLedgerConnectorFabric
   constructor(public readonly opts: IPluginLedgerConnectorFabricOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
-    Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
+    //Checks.truthy(opts.instanceId, `${fnTag} options.instanceId`);
     Checks.truthy(opts.pluginRegistry, `${fnTag} options.pluginRegistry`);
     this.prometheusExporter =
       opts.prometheusExporter ||
@@ -273,6 +282,27 @@ export class PluginLedgerConnectorFabric
       this.dockerNetworkName = opts.dockerNetworkName;
     }
     this.signCallback = opts.signCallback;
+
+    //cc-tx-viz
+    // Visualization part
+    this.collectTransactionReceipts = opts.collectTransactionReceipts || false;
+    if (this.collectTransactionReceipts)  {
+      this.eventProvider = opts.eventProvider || "amqp://localhost";
+      this.log.debug("Initializing connection to RabbitMQ");
+      this.amqpConnection = new amqp.Connection(this.eventProvider);
+      this.log.info("Connection to RabbitMQ server initialized");
+      const queue = this.opts.queueId || "cc-tx-viz-queue";
+      this.queueId = queue;
+      this.persistMessages = this.opts.persistMessages || false;
+      this.amqpExchange = this.amqpConnection.declareExchange(`cc-tx-viz-exchange`, "direct", {durable: this.persistMessages});
+      this.amqpQueue = this.amqpConnection.declareQueue(this.queueId, {durable: this.persistMessages});
+      this.amqpQueue.bind(this.amqpExchange);
+    }
+  }
+
+  public closeConnection(): Promise<void>  {
+    this.log.info("Closing Amqp connection");
+    return this.amqpConnection?.close();
   }
 
   public getOpenApiSpec(): unknown {
@@ -292,6 +322,11 @@ export class PluginLedgerConnectorFabric
     const res: string = await this.prometheusExporter.getPrometheusMetrics();
     this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
     return res;
+  }
+  
+  //TODO returns Promise<FabricTransactionReceipt>
+  public async getTransactionReceiptsList(): Promise<void>  {
+    //returns list
   }
 
   public getInstanceId(): string {
@@ -1287,6 +1322,10 @@ export class PluginLedgerConnectorFabric
   public async transact(
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
+    //start transaction time
+    // const startTx = performance.now();
+
+    //start tx
     const fnTag = `${this.className}#transact()`;
     this.log.debug("%s ENTER", fnTag);
 
@@ -1356,6 +1395,26 @@ export class PluginLedgerConnectorFabric
           }
 
           const transientMap = this.toTransientMap(req.transientData);
+          
+          //cc-tx-viz
+          /*
+          const transientMap: TransientMap = transientData as TransientMap;
+
+          try {
+            //Obtains and parses each component of transient data
+            for (const key in transientMap) {
+              transientMap[key] = Buffer.from(
+                JSON.stringify(transientMap[key]),
+              );
+            }
+          } catch (ex) {
+            this.log.error(`Building transient map crashed: `, ex);
+            throw new Error(
+              `${fnTag} Unable to build the transient map: ${ex.message}`,
+            );
+          }
+          */
+
           const transactionProposal = await contract.createTransaction(fnName);
           transactionProposal.setEndorsingPeers(endorsingTargets);
           out = await transactionProposal.setTransient(transientMap).submit();
@@ -1367,6 +1426,10 @@ export class PluginLedgerConnectorFabric
           throw new Error(`${fnTag} unknown ${message}`);
         }
       }
+      //cc-tx-viz
+      /*
+      const endTimeFabricReceipt = new Date();
+      this.log.debug(`EVAL-${this.className}-ISSUE-TRANSACTION:${endTimeFabricReceipt.getTime()-startTimeFabricReceipt.getTime()}`);
 
       // create IRunTxReqWithTxId for transaction monitoring
       const receiptData: IRunTxReqWithTxId = {
@@ -1388,12 +1451,10 @@ export class PluginLedgerConnectorFabric
       };
       gateway.disconnect();
       this.log.debug(`transact() response: %o`, res);
-      this.prometheusExporter.addCurrentTransaction();
-
       return res;
     } catch (ex) {
       this.log.error(`transact() crashed: `, ex);
-      throw new Error(`${fnTag} Unable to run transaction: ${ex.message}`);
+      throw new Error(`${fnTag} Unable to run transaction: ${ex}`);
     }
   }
 
@@ -1430,7 +1491,7 @@ export class PluginLedgerConnectorFabric
       return new FabricCAServices(caUrl, tlsOptions, caName);
     } catch (ex) {
       this.log.error(`createCaClient() Failure:`, ex);
-      throw new Error(`${fnTag} Inner Exception: ${ex?.message}`);
+      throw new Error(`${fnTag} Inner Exception: ${ex}`);
     }
   }
 
@@ -1466,7 +1527,7 @@ export class PluginLedgerConnectorFabric
       return [x509Identity, wallet];
     } catch (ex) {
       this.log.error(`enrollAdmin() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex?.message}`);
+      throw new Error(`${fnTag} Exception: ${ex}`);
     }
   }
   /**
