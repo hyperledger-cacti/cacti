@@ -136,5 +136,11 @@ module.exports = {
     `./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-cli-via-npm-script.test.ts`,
     `./examples/cactus-check-connection-ethereum-validator/src/test/typescript/integration/check-connection-to-ledger.test.ts`,
     `./examples/cactus-check-connection-ethereum-validator/src/test/typescript/integration/check-config-files.test.ts`,
+    `./packages/cactus-plugin-cc-tx-visualization/src/test/typescript/integration/initialize-rabbitmq.test.ts`,
+    `./packages/cactus-plugin-cc-tx-visualization/src/test/typescript/integration/cctxviz-generate-use-case-dummy-baseline-events.test.ts`,
+    `./packages/cactus-plugin-cc-tx-visualization/src/test/typescript/integration/cctxviz-generate-use-case-dummy-invalid.test.ts`,
+    `./packages/cactus-plugin-cc-tx-visualization/src/test/typescript/integration/cctxviz-persist-cross-chain-log.test.ts`,
+    `./packages/cactus-plugin-cc-tx-visualization/src/test/typescript/integration/initialize-cctxviz-usecase-fabric-besu-6-events.test.ts`,
+    `./packages/cactus-plugin-cc-tx-visualization/src/test/typescript/integration/initialize-rabbitmq.test.ts`,
   ],
 };

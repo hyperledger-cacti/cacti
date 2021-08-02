@@ -57,6 +57,7 @@
     "@hyperledger/cactus-core": "1.0.0",
     "@hyperledger/cactus-core-api": "1.0.0",
     "axios": "0.21.4",
+    "amqp-ts": "1.8.0",
     "express": "4.17.1",
     "joi": "17.4.2",
     "openapi-types": "9.1.0",
