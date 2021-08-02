@@ -81,7 +81,8 @@ certificateAuthorities:
     url: https://localhost:7054
     caName: ca-org1
     tlsCACerts:
-      pem: |
+      pem:
+        - |
           -----BEGIN CERTIFICATE-----
           MIICFjCCAb2gAwIBAgIUYyc2soSqUtWVHTOtud7D1FbCHp0wCgYIKoZIzj0EAwIw
           aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
