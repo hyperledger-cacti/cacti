@@ -17,7 +17,7 @@ repository.
 
 ## Initial setup
 
-Copy the `artifactory.properties.template` file to `artifactory.properties` with
+Copy the `github.properties.template` file to `github.properties` with
 your IBM email and Artifactory API key. This is needed because the client CLI
 triggers flows from the interoperation CorDapp to store external state in the
 Corda vault and therefore the interoperation CorDapp needs to be retrieved as a
@@ -32,10 +32,12 @@ repository.
 make build-local
 ```
 
-## Building the CLI client and CorDapp using Dependencies in Github Packages
+**NOTE:** If `github.properties` file is present, then it will always fetch weaver dependencies from Github. Delete this file to build using local modules.
+
+## Building the CLI client and CorDapp using weaver Dependencies in Github Packages
 
 1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
-2) Create a copy of `artifactory.properties.template` as `artifactory.properties`.
+2) Create a copy of `github.properties.template` as `github.properties`.
 3) Replace <GITHUB Email> with your email id for github.
 4) Replace <GITHUB Personal Access Token> with your personal access token.
 

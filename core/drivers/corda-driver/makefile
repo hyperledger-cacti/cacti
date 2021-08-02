@@ -1,5 +1,5 @@
 DOCKER_IMAGE_NAME ?= weaver-corda-driver
-DOCKER_TAG ?= 1.2.1
+DOCKER_TAG ?= 1.2.3
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/corda-driver
 
@@ -17,15 +17,15 @@ build-refresh-dependencies-local:
 	./gradlew build --refresh-dependencies
 
 .PHONY: build
-build: artifactory.properties
+build: github.properties
 	./gradlew clean installDist
 
 .PHONY: build-refresh-dependencies
-build-refresh-dependencies: artifactory.properties
+build-refresh-dependencies: github.properties
 	./gradlew build --refresh-dependencies
 	
 .PHONY: image
-image: artifactory.properties
+image: github.properties
 	docker build --build-arg GIT_URL=$(GIT_URL) -t corda-driver:latest .
 
 .PHONY: push-image	

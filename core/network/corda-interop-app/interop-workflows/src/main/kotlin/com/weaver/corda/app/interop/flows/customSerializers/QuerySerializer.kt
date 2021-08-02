@@ -6,7 +6,7 @@
 
 package com.weaver.corda.app.interop.flows.customSerializers
 
-import common.query.QueryOuterClass.Query
+import com.weaver.protos.common.query.QueryOuterClass.Query
 import net.corda.core.serialization.SerializationCustomSerializer
 
 /**

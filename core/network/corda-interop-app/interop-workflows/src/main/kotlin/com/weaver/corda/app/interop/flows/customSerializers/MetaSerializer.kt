@@ -6,8 +6,8 @@
 
 package com.weaver.corda.app.interop.flows.customSerializers
 
-import common.state.State.Meta
-import common.state.State.Meta.Protocol
+import com.weaver.protos.common.state.State.Meta
+import com.weaver.protos.common.state.State.Meta.Protocol
 import net.corda.core.serialization.SerializationCustomSerializer
 
 /**

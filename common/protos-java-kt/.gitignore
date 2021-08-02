@@ -1,4 +1,4 @@
 .gradle/
 build/
 src/
-artifactory.properties
+github.properties

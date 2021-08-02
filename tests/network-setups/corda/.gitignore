@@ -75,5 +75,5 @@ crashlytics-build.properties
 # docs related
 docs/virtualenv/
 
-# Authentication properties for Artifactory
-artifactory.properties
+# Authentication properties for Github
+github.properties

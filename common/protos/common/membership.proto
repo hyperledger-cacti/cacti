@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package common.membership;
 
+option java_package = "com.weaver.protos.common.membership";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
 
 // Membership captures the members of an external entity such as a thing,

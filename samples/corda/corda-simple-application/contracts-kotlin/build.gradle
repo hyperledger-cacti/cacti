@@ -24,15 +24,15 @@ dependencies {
 }
 
 publishing {
-    // Handling if artifactory.properties is not specified
+    // Handling if github.properties is not specified
     def styler = 'black red green yellow blue magenta cyan white'
             .split().toList().withIndex(30)
             .collectEntries { key, val -> [(key) : { "\033[${val}m${it}\033[0m" }] }
-    if (file("$projectDir/../artifactory.properties").exists()) {
-        file("$projectDir/../artifactory.properties").withInputStream { constants.load(it) }
+    if (file("$projectDir/../github.properties").exists()) {
+        file("$projectDir/../github.properties").withInputStream { constants.load(it) }
     }
     else {
-        println "${styler['red']('Warning')}: Publish won't work. Please use artifactory.properties.template to create artifactory.properties"
+        println "${styler['red']('Warning')}: Publish won't work. Please use github.properties.template to create github.properties"
     }
     
     publications {

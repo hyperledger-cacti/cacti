@@ -74,9 +74,10 @@ crashlytics-build.properties
 # docs related
 docs/virtualenv/
 
-# Artifactory credentials
-artifactory.properties
+# Github credentials
+github.properties
 
 # Proto files
 /proto
 /fabric-protos
+
