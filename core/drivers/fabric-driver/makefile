@@ -2,6 +2,7 @@ DOCKER_IMAGE_NAME ?= weaver-fabric-driver
 DOCKER_TAG ?= 1.2.1
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/fabric-driver
+COMPOSE_ARG ?=
 	
 build: .npmrc
 	npm install
@@ -16,11 +17,10 @@ push-image: build-image
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 deploy:
-	docker-compose up -d
+	docker-compose $(COMPOSE_ARG) up -d
 
 stop:
-	docker stop fabric-driver 2> /dev/null || true
-	docker rm fabric-driver 2> /dev/null || true
+	docker-compose $(COMPOSE_ARG) down
 
 clean: stop build
 
