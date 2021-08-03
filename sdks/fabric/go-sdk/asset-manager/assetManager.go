@@ -15,8 +15,9 @@ import (
 
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/proto"
 
+	//"google.golang.org/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 )
 
