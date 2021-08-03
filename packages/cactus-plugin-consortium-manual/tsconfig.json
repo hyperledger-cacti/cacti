@@ -9,7 +9,7 @@
   },
   "include": [
     "./src",
-    "**/openapi.json",
+    "**/openapi.json"
   ],
   "references": [
     {

@@ -10,7 +10,7 @@
   },
   "include": [
     "./src",
-    "src/**/*.json",
+    "src/**/*.json"
   ],
   "references": [
     {
@@ -26,16 +26,16 @@
       "path": "../cactus-core-api/tsconfig.json"
     },
     {
-      "path": "../cactus-plugin-keychain-memory/tsconfig.json"
-    },
-    {
       "path": "../cactus-plugin-htlc-eth-besu/tsconfig.json"
     },
     {
-      "path": "../cactus-test-tooling/tsconfig.json"
+      "path": "../cactus-plugin-keychain-memory/tsconfig.json"
     },
     {
       "path": "../cactus-plugin-ledger-connector-besu/tsconfig.json"
+    },
+    {
+      "path": "../cactus-test-tooling/tsconfig.json"
     }
   ]
 }
