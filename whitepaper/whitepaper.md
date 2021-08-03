@@ -101,7 +101,7 @@ Photo by Pontus Wellgraf on Unsplash
         - [5.4.1.1.2 Configuration Schema - API Server](#54112-configuration-schema---api-server)
         - [5.4.1.1.3 Plugin Loading/Validation](#54113-plugin-loadingvalidation)
       - [5.4.1.2 core-api](#5412-core-api)
-      - [5.4.1.3 sdk](#5413-sdk)
+      - [5.4.1.3 API Client](#5413-api-client)
       - [5.4.1.4 keychain](#5414-keychain)
       - [5.4.1.5 tracing](#5415-tracing)
       - [5.4.1.6 audit](#5416-audit)
@@ -1112,7 +1112,6 @@ All packages have a prefix of `cactus-*` to avoid potential naming conflicts wit
 
 Naming conventions for packages:
 * cmd-* for packages that ship their own executable
-* sdk-* for packages designed to be used directly by application developers except for the Javacript SDK which is named just `sdk` for simplicity.
 * All other packages should be named preferably as a single English word suggesting the most important feature/responsibility of the package itself.
 
 #### 5.4.1.1 cmd-api-server
@@ -1235,9 +1234,9 @@ Plugin loading happens through NodeJS's built-in module loader and the validatio
 Contains interface definitions for the plugin architecture and other system level components that are to be shared among many other packages.
 `core-api` is intended to be a leaf package meaning that it shouldn't depend on other packages in order to make it safe for any and all packages to depend on `core-api` without having to deal with circular dependency issues.
 
-#### 5.4.1.3 sdk
+#### 5.4.1.3 API Client
 
-Javascript SDK (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
+Javascript API Client (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
 Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
 
 #### 5.4.1.4 keychain
@@ -1512,10 +1511,10 @@ seen below:
         }
 ```
 
-The configuration above will cause the `Consortium JWS` REST API endpoint (callable via the SDK) to respond with a
+The configuration above will cause the `Consortium JWS` REST API endpoint (callable via the API Client) to respond with a
 consortium JWS that looks similar to what is pasted below.
 
-Code examples of how to use the SDK to call this endpoint can be seen at
+Code examples of how to use the API Client to call this endpoint can be seen at
 `./packages/cactus-cockpit/src/app/consortium-inspector/consortium-inspector.page.ts`
 
 ```json

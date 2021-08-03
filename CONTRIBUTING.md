@@ -17,7 +17,7 @@
     - [Debugging a test case](#debugging-a-test-case)
   - [All-In-One Docker Images for Ledger Connector Plugins](#all-in-one-docker-images-for-ledger-connector-plugins)
     - [Test Automation of Ledger Plugins](#test-automation-of-ledger-plugins)
-  - [Building the SDK](#building-the-sdk)
+  - [Building the API Client(S)](#building-the-api-clients)
   - [Adding new dependencies:](#adding-new-dependencies)
   - [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
   - [On Reproducible Builds](#on-reproducible-builds)
@@ -494,19 +494,21 @@ npx tap --ts --jobs=1 --timeout=600 \"./\"
 > Be aware that glob patterns need quoting in some operating system's shell environments and not necessarily on others.
 > In the npm scripts Cactus uses we quote all of them to ensure a wider shell compatibility.
 
-### Building the SDK
+### Building the API Client(S)
 
-You do not need to do anything special to have the SDK sources generated and
+You do not need to do anything special to have the API Client sources generated and
 compiled. It is all part of the `npm run build:dev:backend` task which you can run yourself
 or as part of the CI script (`./tools/ci.sh`).
 
-The SDK is itself just another package named `sdk` and can be dependend on by
-other packages where applicable.
+The API client code is automatically generated from the respective `openapi.json` file of each package that exposes ay web serices (REST/SocketIO/gRPC/etc.) and can be dependend on by
+other packages where applicable. There's a dedicated `@hyperledger/cactus-api-client` package that is meant to contain common functionality among the rest of API clients. The concept here is similar to abstract classes and their sub-class implementations. 
 
-The SDK is designed to be a universal package meaning that it runs just fine in
+Each `openapi.json` produces its own API client via the code generator that also contains relevant model definitions, such as interfaces describing the request/response bodies of all possible operations and validation constraints as well. 
+
+The API clients are designed to be a universal components, meaning that it runs just fine in
 browser and also NodeJS environments. This is very important as we do not wish
-to maintain two (or more) separate SDK codebases and we also want as much of it
-being generated automatically as possible (currently this is close to 100%).
+to maintain two (or more) separate API client codebases for the various platforms and we also want as much of it being generated automatically as possible (currently this is close to 100%).
+
 
 ### Adding new dependencies:
 
