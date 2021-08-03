@@ -45,4 +45,5 @@ A pluggable, enterprise-grade framework to transact on multiple distributed ledg
    Whitepaper <whitepaper-init.rst>
    regulatory-and-industry-initiatives-reading-list
    Components <packages.rst>
+   Ledger Support Matrix <support.rst>
 

@@ -52,7 +52,7 @@ test("can get past logs of an account", async (t: Test) => {
   });
   keychainPlugin.set(
     HelloWorldContractJson.contractName,
-    HelloWorldContractJson,
+    JSON.stringify(HelloWorldContractJson),
   );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
