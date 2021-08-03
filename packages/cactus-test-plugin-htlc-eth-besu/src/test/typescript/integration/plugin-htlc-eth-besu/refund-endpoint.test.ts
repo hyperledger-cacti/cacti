@@ -79,10 +79,15 @@ test(testCase, async (t: Test) => {
     // pre-provision keychain with mock backend holding the private key of the
     // test account that we'll reference while sending requests with the
     // signing credential pointing to this keychain entry.
-    backend: new Map([[DemoHelperJSON.contractName, DemoHelperJSON]]),
+    backend: new Map([
+      [DemoHelperJSON.contractName, JSON.stringify(DemoHelperJSON)],
+    ]),
     logLevel,
   });
-  keychainPlugin.set(HashTimeLockJSON.contractName, HashTimeLockJSON);
+  keychainPlugin.set(
+    HashTimeLockJSON.contractName,
+    JSON.stringify(HashTimeLockJSON),
+  );
 
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,

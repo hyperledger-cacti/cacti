@@ -232,7 +232,8 @@ export class PluginLedgerConnectorQuorum
           `${fnTag} Cannot create an instance of the contract because the contractName and the contractName of the JSON doesn't match`,
         );
       }
-      const contractJSON = (await keychainPlugin.get(contractName)) as any;
+      const contractStr = await keychainPlugin.get(contractName);
+      const contractJSON = JSON.parse(contractStr);
       if (
         contractJSON.networks === undefined ||
         contractJSON.networks[networkId] === undefined ||
@@ -260,7 +261,7 @@ export class PluginLedgerConnectorQuorum
         };
         const network = { [networkId]: address };
         contractJSON.networks = network;
-        keychainPlugin.set(contractName, contractJSON);
+        keychainPlugin.set(contractName, JSON.stringify(contractJSON));
       }
       const contract = new this.web3.eth.Contract(
         contractJSON.abi,
@@ -450,7 +451,7 @@ export class PluginLedgerConnectorQuorum
 
     // Now use the found keychain plugin to actually perform the lookup of
     // the private key that we need to run the transaction.
-    const privateKeyHex = await keychainPlugin?.get<string>(keychainEntryKey);
+    const privateKeyHex = await keychainPlugin.get(keychainEntryKey);
 
     return this.transactPrivateKey({
       transactionConfig,
@@ -527,9 +528,8 @@ export class PluginLedgerConnectorQuorum
         receipt.transactionReceipt.contractAddress != null
       ) {
         const address = { address: receipt.transactionReceipt.contractAddress };
-        const contractJSON = (await keychainPlugin.get(
-          req.contractName,
-        )) as any;
+        const contractStr = await keychainPlugin.get(req.contractName);
+        const contractJSON = JSON.parse(contractStr);
         this.log.info(JSON.stringify(contractJSON));
         const contract = new this.web3.eth.Contract(
           contractJSON.abi,
@@ -540,7 +540,7 @@ export class PluginLedgerConnectorQuorum
         const network = { [networkId]: address };
         contractJSON.networks = network;
 
-        keychainPlugin.set(req.contractName, contractJSON);
+        keychainPlugin.set(req.contractName, JSON.stringify(contractJSON));
       }
 
       return receipt;

@@ -165,7 +165,7 @@ export class CarbonAccountingPlugin
       enrollmentSecret,
     );
 
-    this.keychain.set(identityId, identity);
+    this.keychain.set(identityId, JSON.stringify(identity));
     this.log.debug(`Stored Fabric admin identity on keychain as ${identityId}`);
 
     const res: EnrollAdminV1Response = {

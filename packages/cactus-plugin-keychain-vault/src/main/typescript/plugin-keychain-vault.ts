@@ -219,7 +219,7 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     return `${this.kvSecretsMountPath}${key}`;
   }
 
-  async get<T>(key: string): Promise<T> {
+  async get(key: string): Promise<string> {
     const fnTag = `${this.className}#get(key: string)`;
     const path = this.pathFor(key);
     try {
@@ -233,8 +233,9 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
         );
       }
     } catch (ex) {
+      // FIXME: Throw if not found, detect it in the endpoint code, status=404
       if (ex?.response?.statusCode === HttpStatus.NOT_FOUND) {
-        return (null as unknown) as T;
+        return (null as unknown) as string;
       } else {
         this.log.error(`Retrieval of "${key}" crashed:`, ex);
         throw ex;
@@ -269,7 +270,7 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     }
   }
 
-  async set<T>(key: string, value: T): Promise<void> {
+  async set(key: string, value: string): Promise<void> {
     const path = this.pathFor(key);
     await this.backend.write(path, { data: { value } });
     this.prometheusExporter.setTotalKeyCounter(key, "set");
