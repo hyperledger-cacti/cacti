@@ -2,7 +2,6 @@ directory=$(dirname $0)
 
 CHAINCODE_PATH=$directory/../../../fabric/shared/chaincode
 INTEROP_CC_PATH=$PWD/../../../../core/network/fabric-interop-cc
-INTEROPCC_CHAINCODE_PATH=$PWD/../../../../core/network
 
 echo "Setting up Interop CC..."
 
@@ -18,6 +17,7 @@ fi
 cp -r ${INTEROP_CC_PATH} .
 
 cd fabric-interop-cc
+cp -r $PWD/../../../../../../common/protos-go contracts/interop/
 cp -R contracts/interop ../interop
 
 echo "Done."

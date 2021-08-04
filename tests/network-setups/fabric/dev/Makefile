@@ -13,6 +13,9 @@ start:	start-network1 start-network2
 .PHONY: start-interop
 start-interop: start-interop-network1 start-interop-network2
 
+.PHONY: start-interop-local
+start-interop-local: start-interop-network1-local start-interop-network2-local
+
 .PHONY: start-network1
 start-network1:	.fabric-setup setup-cc
 	./network.sh up createChannel -ca -nw network1
@@ -26,22 +29,38 @@ start-network2: .fabric-setup setup-cc
 .PHONY: start-interop-network1
 start-interop-network1:	setup-interop-cc start-network1 setup-interop-network1
 
+.PHONY: start-interop-network1-local
+start-interop-network1-local: setup-interop-cc-local start-network1 setup-interop-network1-local
+
 .PHONY:	start-interop-network2
 start-interop-network2: setup-interop-cc start-network2 setup-interop-network2
+
+.PHONY:	start-interop-network2-local
+start-interop-network2-local: setup-interop-cc-local start-network2 setup-interop-network2-local
 
 .PHONY: setup-interop-network1
 setup-interop-network1: setup-interop-cc
 	./network.sh deployCC -ch interop -nw network1
 
+.PHONY: setup-interop-network1-local
+setup-interop-network1-local: setup-interop-cc-local
+	./network.sh deployCC -ch interop -nw network1
 
 .PHONY:	setup-interop-network2
 setup-interop-network2: setup-interop-cc
 	./network.sh deployCC -ch interop -nw network2
 
+.PHONY:	setup-interop-network2-local
+setup-interop-network2-local: setup-interop-cc-local
+	./network.sh deployCC -ch interop -nw network2
+
 .PHONY: setup-interop-cc
 setup-interop-cc:
-	# ./scripts/setupCCLocal.sh
 	./scripts/setupCC.sh
+
+.PHONY: setup-interop-cc-local
+setup-interop-cc-local:
+	./scripts/setupCCLocal.sh
 
 .PHONY: setup-cc
 setup-cc:
