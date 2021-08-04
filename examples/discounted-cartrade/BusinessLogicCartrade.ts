@@ -93,7 +93,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             // this.useValidator = JSON.parse(transactionManagement.getValidatorToUse(requestInfo.businessLogicID));
 
             // this.dummyTransaction(requestInfo, tradeInfo);
-            // this.firstTransaction(requestInfo, tradeInfo);
+            this.firstTransaction(requestInfo, tradeInfo);
         })
         .catch(err => {
             logger.error(err);
