@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package common.state;
+option java_package = "com.weaver.protos.common.state";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
 
 // Metadata for a View

@@ -16,7 +16,7 @@ import com.weaver.corda.app.interop.states.AccessControlPolicyState
 import com.weaver.corda.app.interop.states.Member
 import com.weaver.corda.app.interop.states.MembershipState
 import com.weaver.corda.app.interop.states.Rule
-import common.query.QueryOuterClass
+import com.weaver.protos.common.query.QueryOuterClass
 import net.corda.core.utilities.getOrThrow
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetworkParameters

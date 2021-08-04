@@ -11,10 +11,10 @@ import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.list.traverse.traverse
 import co.paralleluniverse.fibers.Suspendable
 import com.google.protobuf.ByteString
-import common.interop_payload.InteropPayloadOuterClass
-import common.state.State
-import corda.ViewDataOuterClass
-import fabric.view_data.ViewData
+import com.weaver.protos.common.interop_payload.InteropPayloadOuterClass
+import com.weaver.protos.common.state.State
+import com.weaver.protos.corda.ViewDataOuterClass
+import com.weaver.protos.fabric.view_data.ViewData
 import net.corda.core.node.ServiceHub
 import org.hyperledger.fabric.protos.msp.Identities
 import org.hyperledger.fabric.protos.peer.ProposalPackage

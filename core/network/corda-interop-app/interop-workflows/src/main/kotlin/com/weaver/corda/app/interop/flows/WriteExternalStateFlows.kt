@@ -13,7 +13,7 @@ import arrow.core.flatMap
 import co.paralleluniverse.fibers.Suspendable
 import com.weaver.corda.app.interop.contracts.ExternalStateContract
 import com.weaver.corda.app.interop.states.ExternalState
-import common.state.State
+import com.weaver.protos.common.state.State
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
@@ -22,10 +22,10 @@ import java.util.Base64
 
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
-import fabric.view_data.ViewData
-import corda.ViewDataOuterClass
+import com.weaver.protos.fabric.view_data.ViewData
+import com.weaver.protos.corda.ViewDataOuterClass
 import com.google.protobuf.ByteString
-import common.interop_payload.InteropPayloadOuterClass
+import com.weaver.protos.common.interop_payload.InteropPayloadOuterClass
 import org.hyperledger.fabric.protos.msp.Identities
 
 

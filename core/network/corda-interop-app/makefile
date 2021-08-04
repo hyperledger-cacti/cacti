@@ -15,13 +15,13 @@ build:
 .PHONY: publish
 publish:
 	cp build.gradle.remote build.gradle
-	echo "Publishing cordapps to Artifactory..."
+	echo "Publishing cordapps to Github..."
 	./gradlew publishAllPublicationsToMavenRepository
 
 .PHONY: publish-workflows
 publish-workflows:
 	cp build.gradle.remote build.gradle
-	echo "Publishing interop workflows to Artifactory..."
+	echo "Publishing interop workflows to Github..."
 	./gradlew publishWorkflowsPublicationToMavenRepository
 	
 .PHONY: test

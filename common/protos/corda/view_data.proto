@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package corda;
 
+option java_package = "com.weaver.protos.corda";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/corda";
 
 message ViewData {

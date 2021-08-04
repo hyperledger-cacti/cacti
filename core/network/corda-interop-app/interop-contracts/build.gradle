@@ -1,5 +1,4 @@
 buildscript {
-    ext.coroutines_version = "1.3.7"
     ext.protobuf_version = "3.11.1"
 }
 
@@ -35,14 +34,12 @@ dependencies {
     cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
 
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
-
-    // gRPC and protobuf dependencies
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
-    compile "com.google.protobuf:protobuf-java:$protobuf_version"
-    implementation "com.google.protobuf:protobuf-java-util:$protobuf_version"
     
     // weaver-protos
-    compile "com.weaver:protos-java-kt:$weaver_version"
+    implementation "com.weaver:protos-java-kt:$weaver_version"
+    
+    compile "com.google.protobuf:protobuf-java:$protobuf_version"
+    compile "com.google.protobuf:protobuf-java-util:$protobuf_version"
 }
 
 publishing {
@@ -56,10 +53,10 @@ publishing {
     }
     repositories {
         maven {
-            url artifactory_url
+            url github_url
             credentials {
-                username artifactory_username
-                password artifactory_password
+                username github_username
+                password github_password
             }
         }
     }

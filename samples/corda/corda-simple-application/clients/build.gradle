@@ -29,18 +29,27 @@ sourceSets {
 }
 
 Properties constants = new Properties()
-file("$projectDir/../artifactory.properties").withInputStream { constants.load(it) }
 
 repositories {
     google()
     jcenter()
     mavenCentral()
     mavenLocal()
-    maven {
-        url 'https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability'
-        credentials {
-            username constants.username
-            password constants.password
+    if (file("$projectDir/../github.properties").exists()) {
+        file("$projectDir/../github.properties").withInputStream { constants.load(it) }
+        maven {
+            url constants.url
+            credentials {
+                username constants.username
+                password constants.password
+            }
+        }
+    }
+    else {
+        flatDir {
+            dirs '../../../../core/network/corda-interop-app/interop-contracts/build/libs'
+            dirs '../../../../core/network/corda-interop-app/interop-workflows/build/libs'
+            dirs '../../../../common/protos-java-kt/build/libs'
         }
     }
 }
@@ -94,15 +103,6 @@ publishing {
             artifactId = 'clients'
             version = '0.4'
             artifact("./clients/build/distributions/clients-0.2.zip")
-        }
-    }
-    repositories {
-        maven {
-            url constants.url
-            credentials {
-                username constants.username
-                password constants.password
-            }
         }
     }
 }
