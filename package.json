@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "run-ci": "./tools/ci.sh",
-    "configure": "yarn install --frozen-lockfile --non-interactive --ignore-engines && yarn run build:dev:backend",
+    "configure": "yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend",
     "install-yarn": "npm install --global yarn@1.19.0",
     "custom-checks": "ts-node ./tools/custom-checks/run-custom-checks.ts",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
