@@ -48,7 +48,7 @@ func TestFarbicHelper(t *testing.T) {
 		return network, nil
 	}
 	logrus.Printf("Test FabricHelper() success scenario")
-	_, _, err := FabricHelper(gnm, "mychannel", "simpleasset", "./testdata/example/peerOrganizations/org1.example.com/connection-tls.yaml", "example", "Org1MSP", "User1@org1.example.com")
+	_, _, _, err := FabricHelper(gnm, "mychannel", "simpleasset", "./testdata/example/peerOrganizations/org1.example.com/connection-tls.yaml", "example", "Org1MSP", "User1@org1.example.com")
 	if err != nil {
 		t.Errorf("failed FabricHelper with error: %+v", err)
 		logrus.Errorf("failed FabricHelper with error: %+v", err)
@@ -61,7 +61,7 @@ func TestFarbicHelper(t *testing.T) {
 		return network, errors.New("cannot execute gateway.GetNetwork()")
 	}
 	expectedError := "failed to get network: cannot execute gateway.GetNetwork()"
-	_, _, err = FabricHelper(gnm, "mychannel", "simpleasset", "./testdata/example/peerOrganizations/org1.example.com/connection-tls.yaml", "example", "Org1MSP", "")
+	_, _, _, err = FabricHelper(gnm, "mychannel", "simpleasset", "./testdata/example/peerOrganizations/org1.example.com/connection-tls.yaml", "example", "Org1MSP", "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -83,8 +83,9 @@ func TestFarbicHelper(t *testing.T) {
 	}
 	require.NoError(t, err)
 
-	expectedError = "Invalid identity format: unexpected end of JSON input"
-	_, _, err = FabricHelper(gnm, "mychannel", "simpleasset", "./testdata/example/peerOrganizations/org1.example.com/connection-tls.json", "example", "Org1MSP", "")
+	//expectedError = "Invalid identity format: unexpected end of JSON input"
+	expectedError = "failed to connect to gateway: unexpected end of JSON input"
+	_, _, _, err = FabricHelper(gnm, "mychannel", "simpleasset", "./testdata/example/peerOrganizations/org1.example.com/connection-tls.json", "example", "Org1MSP", "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}

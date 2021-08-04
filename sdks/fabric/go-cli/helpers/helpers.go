@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type NetworkConfig struct {
@@ -45,4 +47,33 @@ func GetNetworkConfig(networkId string) (NetworkConfig, error) {
 	}
 
 	return networkConfigs[networkId], nil
+}
+
+func AddData(filename string, connProfilePath string, networkName string, query QueryType, mspId string) error {
+	filePath := filepath.Join("data", filename)
+
+	dataBytes, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		logThenErrorf("failed reading file %s with error: %s", filePath, err.Error())
+	}
+	log.Infof("dataBytes: %s", string(dataBytes))
+
+	dataJSON := map[string]interface{}{}
+	err = json.Unmarshal(dataBytes, &dataJSON)
+	if err != nil {
+		logThenErrorf("failed to unmarshal the content of the file %s with error: %s", filePath, err.Error())
+	}
+	log.Infof("dataJSON: %+v", dataJSON)
+
+	for key, val := range dataJSON {
+		args := []string{key, val.(string)}
+		query.Args = args
+		log.Infof("query: %+v", query)
+		_, err := Invoke(query, connProfilePath, networkName, mspId, "")
+		if err != nil {
+			logThenErrorf("%s Invoke error: %s", query.CcFunc, err.Error())
+		}
+	}
+
+	return nil
 }

@@ -9,13 +9,14 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/configure"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers/interopsetup"
 )
 
 func connectSimpleStateWithSDK() {
 	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
-	contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
+	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
 
 	result, err := contract.EvaluateTransaction("Read", "a")
 	if err != nil {
@@ -74,7 +75,7 @@ func connectSimpleAssetWithSDK(assetId string) {
 	}
 	log.Printf("%s helpers.Invoke %v", query.CcFunc, string(result))
 
-	contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
+	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
 	result, err = contract.EvaluateTransaction("ReadAsset", "t1", assetId, "true")
 	if err != nil {
 		log.Fatalf("failed Query with error: %s", err)
@@ -593,12 +594,12 @@ func configureNetwork(networkId string) {
 
 func main() {
 
-	configureNetwork("network1")
+	configure.ConfigureAll("network1")
 	fetchAccessControlPolicy("network1")
 	fetchMembership("network1")
 	fetchVerificationPolicy("network1")
 
-	//connectSimpleStateWithSDK()                    // needs the chaincode simplestate on the channel
+	//connectSimpleStateWithSDK() // needs the chaincode simplestate on the channel
 	//connectSimpleAssetWithSDK("a001") // needs the chaincode simpleasset on the channel
 	//testLockAssetAndClaimAssetOfBondAsset("a020")  // needs the chaincodes simpleasset and interop on the channel
 	//testLockAssetAndUnlockAssetOfBondAsset("a021") // needs the chaincodes simpleasset and interop on the channel
