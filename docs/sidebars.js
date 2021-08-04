@@ -7,14 +7,48 @@
 module.exports = {
     Documentation: [
         "external/introduction",
-        "external/getting-started",        
+        {
+            type: "category",
+            label: "Getting Started",
+            items: [
+                {
+                    type: "category",
+                    label: "Launching a Test Network",
+                    items: [
+                        "external/getting-started/test-network/overview",
+                        "external/getting-started/test-network/setup-local",
+                        "external/getting-started/test-network/setup-local-docker",
+                        "external/getting-started/test-network/setup-packages",
+                        "external/getting-started/test-network/setup-packages-docker",
+                        "external/getting-started/test-network/advanced-configuration",
+                    ],
+                },
+                {
+                    type: "category",
+                    label: "Testing Interoperation Modes",
+                    items: [
+                        "external/getting-started/interop/data-sharing",
+                        "external/getting-started/interop/asset-exchange",
+                    ],
+                },
+                {
+                    type: "category",
+                    label: "Enabling Weaver in your Network",
+                    items: [
+                        "external/getting-started/enabling-weaver-network/fabric",
+                        "external/getting-started/enabling-weaver-network/corda",
+                        "external/getting-started/enabling-weaver-network/besu",
+                    ],
+                },
+            ],
+        },
         {
             type: "category",
             label: "What is Interoperability?",
             items: [
-                "external/what-is-interoperability/understanding-interoperability",                
+                "external/what-is-interoperability/understanding-interoperability",
                 "external/what-is-interoperability/levels-of-interoperability",
-                "external/what-is-interoperability/integration-patterns",                
+                "external/what-is-interoperability/integration-patterns",
             ],
         },
                 "external/interoperability-modes",

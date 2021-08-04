@@ -1,6 +1,6 @@
 ---
-id: getting-started
-title: Getting Started
+id: setup-packages
+title: Setup with Imported Weaver Components
 ---
 
 <!--
@@ -9,25 +9,7 @@ title: Getting Started
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-This document details how to get the system running end-to-end locally.
-
-# Overview
-
-A comprehensive demonstrations of basic interoperation flows for trusted data sharing among networks built on Corda and Hyperledger Fabric require 9 different components:
-
-- [Fabric testnet](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/fabric/dev) - A pair of basic Fabric networks for testing interop flows
-- [Corda testnet](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/corda) - A basic Corda network for testing interop flows
-- [Relay](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/relay) - The daemon and protocol for cross-DLT interoperability. Two instances of this project is needed, one for the Corda network and one for the Fabric network
-- [Fabric driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/drivers/fabric-driver) - Driver used by the Fabric networks relay to communicate with the Fabric testnet
-- [Corda driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/drivers/corda-driver) - Driver used by the Corda networks relay to communicate with the Corda testnet
-- [Corda interop app](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/network/corda-interop-app) CorDapp used to handle interop duties between the relay and the application
-- [Corda client app](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/samples/corda/corda-simple-application) - CorDapp and client used to trigger interop flows initiated from the Corda side and to manage Corda state
-- [Fabric client](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/samples/fabric/fabric-cli) - Fabric client used to trigger interop flows initiated from the Fabric side and to manage Fabric state
-- [Fabric Interop chaincode](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/network/fabric-interop-cc) - The Fabric interoperability contracts handle the dual process of servicing requests for views from external networks, and verifing requested views for integrity
-
-In the **Setup** section below, we detail the steps using which you can bring up networks and share data among them using interoperation flows using the default configuration settings. To customize these settings (e.g., hostnames, ports), refer to the **Configuration** section at the end of this page.
-
-# Setup
+In this document, we detail the steps using which you can bring up networks using the default configuration settings and by fetching pre-built Weaver interoperation modules, SDK libraries, and relay drivers from Github Package repositories. To customize these settings (e.g., hostnames, ports), refer to the [Advanced Configuration page](./advanced-configuration.md).
 
 _Note_: The default configuration is for a development setup, therefore all components are run on `localhost`, many within Docker containers.
 
@@ -69,7 +51,6 @@ Before starting, make sure you have the following software installed on your hos
 ### Credentials
 Make sure you have an SSH or GPG key registered in https://github.com to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the `https://` prefix but this may change to `git@` in the future).
 
-#### Package Access Token:
 Create a personal access token with `read:packages` access in github in order to use modules published in github packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 
 ## Getting the Code and Documentation
@@ -342,249 +323,20 @@ Bootstrap the Corda network and application states as follows:
   make initialise-vault
   ```
 
-# Testing Interoperation Scenarios
+## Tear Down the Setup
 
-Once the whole system is running, these flows can be executed to test the various interoperation flows i.e. Fabric to Corda, Corda to Fabric and Fabric to Fabric.
-Once you have the networks, the relays, and the drivers, running, and the ledgers bootstrapped, you can test three different data-sharing combinations by triggering interoperation flows:
-1. **Corda to Fabric**: The Corda network requests state and proof from either Fabric network
-2. **Fabric to Corda**: Either Fabric network requests state and proof from the Corda network
-3. **Fabric to Fabric**: One Fabric network requests state and proof from another Fabric network
-
-## Corda to Fabric
-
-To test the scenario where `Corda_Network` requests the value of the state (key) `a` from `network1`, do the following:
-- Navigate to the `samples/corda/corda-simple-application` folder.
-- Run the following:
-  ```bash
-  ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
-  ```
-- Query the value of the requested state (key) `a` in `Corda_Network` using the following:
-  ```bash
-  ./clients/build/install/clients/bin/clients get-state a
-  ```
-
-To test the scenario where `Corda_Network` requests the value of the state (key) `Arcturus` from `network2`, do the following:
-- Navigate to the `samples/corda/corda-simple-application` folder.
-- Run the following:
-  ```bash
-  ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus
-  ```
-- Query the value of the requested state (key) `Arcturus` in `Corda_Network` using the following:
-  ```bash
-  ./clients/build/install/clients/bin/clients get-state Arcturus
-  ```
-
-## Fabric to Corda
-
-To test the scenario where `network1` requests the value of the state (key) `H` from `Corda_Network`, do the following:
-- Navigate to the `samples/fabric/fabric-cli` folder.
-- (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Run the following:
-  ```bash
-  ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
-  ```
-- Query the value of the requested state (key) `H` in `network1` using the following (replace the Args with the Args value obtained in the previous command):
-  ```bash
-  ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1
-  ```
-
-To test the scenario where `network2` requests the value of the state (key) `H` from `Corda_Network`, do the following:
-- Navigate to the `samples/fabric/fabric-cli` folder.
-- (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Run the following:
-  ```bash
-  ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
-  ```
-- Query the value of the requested state (key) `H` in `network2` using the following:
-  ```bash
-  ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network2
-  ```
-
-## Fabric to Fabric
-
-To test the scenario where `network1` requests the value of the state (key) `Arcturus` from `network2`, do the following:
-- Navigate to the `samples/fabric/fabric-cli` folder.
-- (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Run the following:
-  ```bash
-  ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
-  ```
-- Query the value of the requested state (key) `Arcturus` in `network1` using the following:
-  ```bash
-  ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
-  ```
-
-To test the scenario where `network2` requests the value of the state (key) `a` from `network1`, do the following:
-- Navigate to the `samples/fabric/fabric-cli` folder.
-- (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Run the following:
-  ```bash
-  ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
-  ```
-- Query the value of the requested state (key) `a` in `network2` using the following:
-  ```bash
-  ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
-  ```
-
-# Tear Down the Setup
-
-Bring down the various components as follows:
+Bring down the test network's components as follows:
 - Simply terminate the various relays and drivers, which are running in the foreground in different terminals
-- To bring down the Corda network:
+- To bring down the running Corda network:
   * Navigate to the `tests/network-setups/corda` folder.
   * Run the following:
   ```bash
   make clean
   ```
-- To bring down one or both of the Fabric networks:
+- To bring down all the running Fabric networks:
   * Navigate to the `tests/network-setups/fabric/dev` folder.
   * Run the following:
   ```bash
   make clean
   ```
 
-# Configuration
-
-If you don't want to run all the system components on your local machine, or if you want to select different host names or ports, you can tweak the configurations appropriately. Here is a list, classified by the DLT type.
-
-## Corda
-
-### Relay
-
-To run the relay on a different port from the default (`9081`), do the following:
-- Navigate to the `core/relay` folder.
-- Update the `port` field in `config/Corda_Relay.toml`.
-- To ensure that the relay of `network1` can communicate with this relay, update the `port` field in the `relays.Corda_Relay` section in `config/Fabric_Relay.toml` with the same value.
-- To ensure that the relay of `network2` can communicate with this relay, update the `port` field in the `relays.Corda_Relay` section in `config/Fabric_Relay2.toml` with the same value.
-- (You can update host names in similar locations, by adjusting the `hostname` field.)
-- When you attempt a Fabric to Corda interoperation flow, use the new host name or port (instead of `localhost:9081`).
-
-### Driver
-
-To run the driver on a different port from the default (`9099`), do the following:
-- Navigate to the `core/drivers/corda-driver` folder.
-- Set the environment variable `DRIVER_PORT` appropriately while running the executable as follows:
-  ```bash
-  DRIVER_PORT=<port> ./build/install/corda-driver/bin/corda-driver
-  ```
-
-To ensure that the relay can connect to this driver:
-- Navigate to the `core/relay` folder.
-- Update the `port` field in the `drivers.Corda` section in `config/Corda_Relay.toml` with the same value.
-
-### Network
-
-_Note_: Currently, all the Corda nodes must be running on the same machine (`localhost` or some other) for seamless communication.
-
-To change the ports the Corda nodes are listening on, do the following:
-- Navigate to the `tests/network-setups/corda` folder.
-- Update the exposed ports in `docker-compose.yml` (defaults are `10003` for the `notary` container and `10006` for the `partya` container).
-- Navigate to the `samples/corda/corda-simple-application` folder.
-- Update the `CORDA_HOST` (default is `localhost`) and `CORDA_PORT` (default is `10006`) environment variables on your host machine to reflect the above update, or run the client bootstrapping script as follows:
-  ```bash
-  CORDA_HOST=<hostname> CORDA_PORT=<port> make initialise-vault
-  ```
-- When you attempt a Fabric to Corda interoperation flow, use the new host name and port values as in the following example (`network1` requesting `Corda_Network`):
-  ```bash
-  ./bin/fabric-cli interop --local-network=network1 --requesting-org=org1.network1.com localhost:9081/Corda_Network/<CORDA_HOST>:<CORDA_PORT>#com.cordaSimpleApplication.flow.GetStateByKey:H`
-  ```
-
-### Client Application
-
-The config files used to initialise the network's verification policies, access control policies, and security group info, contain the address (host name and port) of the Corda node.
-To update the address of the Corda node, do the following:
-- Navigate to the `samples/corda/corda-simple-application` folder.
-- Edit the `rules --> resource` field in line 7 in `clients/src/main/resources/config/FabricNetworkAccessControlPolicy.json` by replacing `localhost:10006` with `<CORDA_HOST>:<CORDA_PORT>` as specified in the previous section.
-
-## Fabric
-
-### Relay
-
-To run the relay on a different port from the default (`9080` for `network1` and `9083` for `network2`), do the following:
-- Navigate to the `core/relay` folder.
-- Update the `port` field in `config/Fabric_Relay.toml` (for `network1`) or `config/Fabric_Relay2.toml` (for `network2`).
-- To ensure Fabric-Fabric relay communication, update the foreign relay port in the `port` field in the `relays.Fabric_Relay` section in either of the above files.
-- To ensure that the Corda network's relay can communicate with this relay, update the `port` field in the `relays.Fabric_Relay` section in `config/Corda_Relay.toml`.
-- (You can update host names in similar locations, by adjusting the `hostname` field.)
-- When you attempt a Fabric to Fabric or Corda to Fabric interoperation flow, use the new host name or port (instead of `localhost:9081` or `localhost:9083`).
-- Navigate to the `core/drivers/fabric-driver` folder.
-- Update the `RELAY_ENDPOINT` variable in `.env` or specify `RELAY_ENDPOINT=<hostname>:<port>` in the command line while running the driver using `npm run dev`.
-- Navigate to the `samples/fabric/fabric-cli` folder.
-- Update the `relayEndpoint` variables appropriately.
-
-### Driver
-
-The `fabric-driver` configuration can be controlled by environment variables either set in `.env` in the `core/drivers/fabric-driver` folder (or a copy if you created one) or passed in the command line when you run `npm run dev` to start the driver. The relevant variables you can control when you make any change to the setup are:
-- `CONNECTION_PROFILE`: this is the path to the connection profile. If you make changes to the network or use a different one, create a new connection profile and point to it using this variable.
-- `RELAY_ENDPOINT`: this is the endpoint of the relay (hostname and port), and you can adjust it as described in the previous section; this is where the relay will be listening for incoming requests and from where the relay will channel foreign requests as well.
-- `DRIVER_ENDPOINT`: this is the hostname and port the driver itself will bind to, and you can change it from the default (`localhost:9090` for `network1` and `localhost:9095` for `network2`) as per your need
-
-### Fabric CLI
-
-You can adjust settings for `fabric-cli` in the `.env` and `config.json` (in the `samples/fabric/fabric-cli` folder) as described earlier.
-
-Important environment variables (in `.env`) are:
-- `DEFAULT_CHANNEL`: this is the name of the channel the CLI will interact with. If you build a new channel or network, update the channel name here.
-- `DEFAULT_CHAINCODE`: this is the name of the interoperaton chaincode the CLI will submit transactions and queries to for policy and security group bootstrapping. If you wish to test with a modified interoperation chaincode with a different name, update this value.
-- `MEMBER_CREDENTIAL_FOLDER`: as described earlier, this is an absolute path that points to policies and security group info associated with foreign networks. You can adjust this info for the existing three networks or add credentials for another network you wish to test interoperation flows with.
-- `LOCAL`: this is a boolean, indicating whether the network to connect to is running on (and as) `localhost`
-- `DEFAULT_APPLICATION_CHAINCODE`: this is the name of the application chaincode which maintains information that can be shared (with proof) with other networks upon request using interoperation. You may write and deploy your own chaincode and use its name here instead of the default `simplestate`.
-- `CONFIG_PATH`: this points to the JSON file containing the configurations of all the Fabric networks that need to be configured using the `fabric-cli`.
-
-The `config.json` (which can have a different name as long as you add the right reference to `.env` and configure `fabric-cli` suitably) has the following structure (it can have any number of networks specified):
-
-```
-{
-  "network1": {
-    "connProfilePath": "",
-    "relayEndpoint": ""
-  },
-  "network2": {
-    "connProfilePath": "",
-    "relayEndpoint": ""
-  }
-}
-
-```
-- `connProfilePath`: absolute path of the network's connection profile
-- `relayEndpoint`: hostname and port of the particular network's relay (make sure you sync this with any changes made to that relay's configuration)
-
-
-## Building Components Locally
-
-### Fabric Interoperation Node SDK
-
-A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the `sdks/fabric/interoperation-node-sdk` folder. This contains functions for Fabric Gateway-based applications to exercise interoperation capabilities via relays and also a number of utility/helper functions. The Fabric-CLI tool, which we will use later, depends on this library. This library is published as github packages here: [hyperledger-labs packages](https://github.com/orgs/hyperledger-labs/packages), thus it is **not required** to build this library for the testnet demo.
-
-(OPTIONAL) To build the library, do the following:
-- Navigate to the `sdks/fabric/interoperation-node-sdk` folder.
-- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token).
-- Run the following command:
-  ```bash
-  make build
-  ```
-  
-### Interoperation Cordapp
-
-The interoperation Cordapp is deployed to run as part of any Corda application flow that involves cross-network interoperation.
-
-(OPTIONAL) Build the interoperation Cordapp as follows:
-- Navigate to the `core/network/corda-interop-app` folder.
-- Run the following to create the JAR files on which other Corda network components will depend on:
-  ```bash
-  make build-local
-  ```
-
-### Corda Client (Application)
-
-This is a simple Cordapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
-The code for this lies in the `samples/corda/corda-simple-application` folder.
-
-#### (OPTIONAL) Building
-
-Build the `corda-simple-application` Cordapp as follows:
-- Navigate to the `samples/corda/corda-simple-application` folder.
-- Run the following:
-  ```bash
-  make build-local
-  ```
