@@ -127,7 +127,7 @@ You can install `fabric-cli` as follows:
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - Run the following to install dependencies:
   ```bash
-  cp package.json package-remote.json && cp package-local.json package.json && npm install && mv package-remote.json package.json
+  make build-local
   ```
 - Use the `fabric-cli` executable in the `bin` folder for subsequent actions.
 
@@ -239,7 +239,7 @@ Build the Fabric driver module as follows:
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following:
   ```bash
-  make build
+  make build-local
   ```
 _Note_: `postinstall` applies a customization patch to the `fabric-network` NPM library.
 
