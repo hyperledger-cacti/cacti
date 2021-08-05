@@ -27,12 +27,13 @@
     "npm": "^7.10.0"
   },
   "dependencies": {
-    "@hyperledger-labs/weaver-protos-js": "file:../../../common/protos-js",
+    "@hyperledger-labs/weaver-protos-js": "file:./protos-js",
     "@grpc/grpc-js": "^1.1.3",
     "elliptic": "^6.2.3",
     "fabric-common": "^2.2.8",
     "fabric-network": "^2.2.8",
     "fabric-protos": "^2.2.8",
+    "google-protobuf": "^3.17.3",
     "js-sha3": "^0.7.0",
     "jsrsasign": "^8.0.19",
     "log4js": "^6.3.0",

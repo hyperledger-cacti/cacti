@@ -8,6 +8,14 @@ build: .npmrc
 	npm run build
 	npm run postinstall
 
+build-local:
+	cp package.json package-remote.json && \
+		cp package-local.json package.json && \
+		npm install && \
+		mv package-remote.json package.json
+	npm run build
+	npm run postinstall
+
 build-image: .npmrc
 	docker build --build-arg GIT_URL=$(GIT_URL) -t fabric-driver:latest -f fabricDriver.dockerfile .
 	
