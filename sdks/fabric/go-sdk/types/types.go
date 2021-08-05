@@ -7,10 +7,10 @@ SPDX-License-Identifier: Apache-2.0
 package types
 
 type Query struct {
-	CcArgs       []string `json:"ccArgs"`
+	ContractName string   `json:"contractName"`
 	Channel      string   `json:"channel"`
 	CcFunc       string   `json:"ccFunc"`
-	ContractName string   `json:"contractName"`
+	CcArgs       []string `json:"ccArgs"`
 }
 
 type Flow struct {
