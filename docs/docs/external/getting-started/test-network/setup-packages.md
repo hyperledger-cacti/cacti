@@ -103,7 +103,7 @@ You can install `fabric-cli` as follows:
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
 - Run the following to install dependencies:
   ```bash
-  npm install
+  make build
   ```
 - Use the `fabric-cli` executable in the `bin` folder for subsequent actions.
 
