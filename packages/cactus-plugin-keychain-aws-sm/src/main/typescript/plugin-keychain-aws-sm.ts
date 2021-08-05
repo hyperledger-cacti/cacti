@@ -80,7 +80,7 @@ export class PluginKeychainAwsSm
   private endpoints: IWebServiceEndpoint[] | undefined;
   private awsCredentialType: AwsCredentialType;
 
-  public get className() {
+  public get className(): string {
     return PluginKeychainAwsSm.CLASS_NAME;
   }
 
@@ -191,18 +191,18 @@ export class PluginKeychainAwsSm
   }
 
   public getEncryptionAlgorithm(): string {
-    return null as any;
+    return (null as unknown) as string;
   }
 
-  async get<T>(key: string): Promise<T> {
+  async get(key: string): Promise<string> {
     const fnTag = `${this.className}#get(key: string)`;
     const awsClient = this.getAwsClient();
     try {
-      const res = (await awsClient
+      const res = await awsClient
         .getSecretValue({
           SecretId: key,
         })
-        .promise()) as any;
+        .promise();
       if (res.SecretString) {
         return res.SecretString;
       } else {
@@ -215,7 +215,8 @@ export class PluginKeychainAwsSm
         SECRETMANAGER_STATUS_KEY_NOT_FOUND,
       );
       if (errorStatus) {
-        return (null as unknown) as T;
+        // FIXME: Throw if the value was not present instead of returning null
+        return (null as unknown) as string;
       } else {
         this.log.error(`Error retriving secret value for the key "${key}"`);
         throw ex;
@@ -227,11 +228,11 @@ export class PluginKeychainAwsSm
     const fnTag = `${this.className}#has(key: string)`;
     const awsClient = this.getAwsClient();
     try {
-      (await awsClient
+      await awsClient
         .describeSecret({
           SecretId: key,
         })
-        .promise()) as any;
+        .promise();
       return true;
     } catch (ex) {
       const errorStatus = (ex as Error).message.includes(
@@ -246,16 +247,16 @@ export class PluginKeychainAwsSm
     }
   }
 
-  async set<T>(key: string, value: T): Promise<void> {
+  async set(key: string, value: string): Promise<void> {
     const fnTag = `${this.className}#set(key: string)`;
     const awsClient = this.getAwsClient();
     try {
-      (await awsClient
+      await awsClient
         .createSecret({
           Name: key,
-          SecretString: value as any,
+          SecretString: value,
         })
-        .promise()) as any;
+        .promise();
     } catch (ex) {
       this.log.error(` ${fnTag}: Error writing secret "${key}"`);
       throw ex;
@@ -266,12 +267,12 @@ export class PluginKeychainAwsSm
     const fnTag = `${this.className}#delete(key: string)`;
     const awsClient = this.getAwsClient();
     try {
-      (await awsClient
+      await awsClient
         .deleteSecret({
           SecretId: key,
           ForceDeleteWithoutRecovery: true,
         })
-        .promise()) as any;
+        .promise();
     } catch (ex) {
       this.log.error(`${fnTag} Error deleting secret "${key}"`);
       throw ex;

@@ -61,7 +61,7 @@ export class PluginKeychainAzureKv
   private endpoints: IWebServiceEndpoint[] | undefined;
   private azureKvClient: SecretClient;
 
-  public get className() {
+  public get className(): string {
     return PluginKeychainAzureKv.CLASS_NAME;
   }
 
@@ -187,20 +187,20 @@ export class PluginKeychainAzureKv
   }
 
   public getEncryptionAlgorithm(): string {
-    return null as any;
+    return (null as unknown) as string;
   }
 
   public getAzureKvClient(): SecretClient {
     return this.azureKvClient;
   }
 
-  async get<T>(key: string): Promise<T> {
+  async get(key: string): Promise<string> {
     const keyVaultSecret: KeyVaultSecret = await this.azureKvClient.getSecret(
       key,
     );
     if (keyVaultSecret) {
       const result = keyVaultSecret.value;
-      return (result as unknown) as T;
+      return result as string;
     } else {
       throw new Error(`${key} secret not found`);
     }

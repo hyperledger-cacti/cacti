@@ -35,7 +35,7 @@ export class PluginKeychainGoogleSm
   private endpoints: IWebServiceEndpoint[] | undefined;
   private googleSmClient: SecretManagerServiceClient;
 
-  public get className() {
+  public get className(): string {
     return PluginKeychainGoogleSm.CLASS_NAME;
   }
 
@@ -118,7 +118,7 @@ export class PluginKeychainGoogleSm
   }
 
   public getEncryptionAlgorithm(): string {
-    return "AES-256" as any;
+    return "AES-256";
   }
 
   public async onPluginInit(): Promise<unknown> {
@@ -129,13 +129,15 @@ export class PluginKeychainGoogleSm
     return this.googleSmClient;
   }
 
-  async get<T>(key: string): Promise<T> {
+  async get(key: string): Promise<string> {
     const accessResponse = await this.googleSmClient.getSecret({
       name: key,
     });
     if (accessResponse[0]) {
       const result = accessResponse[0];
-      return (result as unknown) as T;
+      // FIXME: We need to verify if this actually works because
+      // based on the type definitions of the underlying library it should not.
+      return (result as unknown) as string;
     } else {
       throw new Error(`${key} secret not found.`);
     }

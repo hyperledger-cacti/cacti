@@ -48,7 +48,7 @@ export async function createGateway(
     const keychain = ctx.pluginRegistry.findOneByKeychainId(
       ctx.gatewayOptions.wallet.keychain.keychainId,
     );
-    identity = await keychain.get<string>(
+    identity = await keychain.get(
       ctx.gatewayOptions.wallet.keychain.keychainRef,
     );
   } else {

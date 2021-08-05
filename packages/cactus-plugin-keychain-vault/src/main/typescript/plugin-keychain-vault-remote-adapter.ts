@@ -119,20 +119,17 @@ export class PluginKeychainVaultRemoteAdapter
     }
   }
 
-  public async get<T>(key: string): Promise<T> {
+  public async get(key: string): Promise<string> {
     const { data } = await this.backend.getKeychainEntryV1({ key });
     // FIXME what to do here? Does it make any sense to have the get() method
     // of the keychain be generically parameterized when we know we can only
     // return a string anyway?
-    return (data.value as unknown) as T;
+    return data.value;
   }
 
-  public async set<T>(key: string, value: T): Promise<void> {
+  public async set(key: string, value: string): Promise<void> {
     // FIXME Does it make any sense to have the set() method be generic?
-    await this.backend.setKeychainEntryV1({
-      key,
-      value: (value as unknown) as string,
-    });
+    await this.backend.setKeychainEntryV1({ key, value });
   }
 
   public async delete(key: string): Promise<void> {
