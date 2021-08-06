@@ -19,7 +19,7 @@ build-local:
 		cp package-local.json package.json && \
 		npm install && \
 		mv package-remote.json package.json
-	npm run build
+	npm run build && cp -r protos-js build/
 
 .PHONE: publish
 publish: .npmrc

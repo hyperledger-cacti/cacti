@@ -20,7 +20,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@hyperledger-labs/weaver-protos-js": "file:../../../common/protos-js",
+        "@hyperledger-labs/weaver-protos-js": "file:./protos-js",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",
         "@types/node": "^14.0.14",
