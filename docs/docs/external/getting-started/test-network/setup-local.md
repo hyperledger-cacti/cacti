@@ -28,7 +28,11 @@ Before starting, make sure you have the following software installed on your hos
 - Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Rust: [sample instructions](https://www.rust-lang.org/tools/install)
-  * Ensure that the installed version of Rust is 1.52.0 or below by running `rustc --version`. If the version is 1.53.0 or above, run `rustup default 1.52.0` to set the appropriate version.
+  * To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is depenent) to their latest versions as follows:
+    ```
+    cargo update -p nom
+    cargo update -p lexical-core
+    ```
 - Protoc (Protobuf compiler): _Golang should already be installed and configured._
   * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugins.
     ```
