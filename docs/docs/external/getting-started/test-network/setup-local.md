@@ -291,17 +291,13 @@ Build the `corda-simple-application` Cordapp as follows:
 
 The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary. This network uses `samples/corda/corda-simple-application` which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 
-The following steps will build above cordapp and a corda-client as well in `samples/corda/client`.
-
 #### Running with Interoperation Cordapp from Github Packages
 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
-- Create copy of `github.properties.template` as `github.properties`.
-- Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - To spin up the Corda network with the interoperation Cordapp, run:
     ```bash
-    make start
+    make start-local
     ```
 
 If the Corda node and notary start up successfully, you should something like the following:
@@ -335,11 +331,9 @@ The code for this lies in the `core/drivers/corda-driver` folder.
 
 Build the Corda driver module as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
-- Create copy of `github.properties.template` as `github.properties`.
-- Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - Run the following:
 ```bash
-make build
+make build-local
 ```
 
 #### Running

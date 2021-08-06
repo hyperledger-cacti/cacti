@@ -5,8 +5,12 @@
  -->
 # Corda interoperability application
 
-To build the interoperation CorDapp locally, run the following:
-
+To build the interoperation CorDapp locally, first build the protobufs:
+```
+cd ../../../common/protos-java-kt
+make build
+```
+Then run the following:
 ```
 make build-local
 ```
