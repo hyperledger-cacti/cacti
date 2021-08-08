@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
@@ -28,7 +27,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 	return errors.New(errorMsg)
 }
 
-func interopFlow(interopContract *gateway.Contract, networkId string, invokeObject types.Query, org, localRelayEndpoint string,
+func InteropFlow(interopContract *gateway.Contract, networkId string, invokeObject types.Query, org, localRelayEndpoint string,
 	interopArgIndices []int, interopJSONs []types.InteropJSON, key, cert string, returnWithoutLocalInvocation bool) ([]string, []byte, error) {
 	if len(interopArgIndices) != len(interopJSONs) {
 		logThenErrorf("number of argument indices %d does not match number of view addresses %d", len(interopArgIndices), len(interopJSONs))
@@ -214,7 +213,7 @@ func getResponseDataFromView(view *common.View) ([]byte, error) {
 }
 */
 
-func getResponseDataFromView(contract *gateway.Contract, view *common.View) ([]byte, error) {
+/*func getResponseDataFromView(contract *gateway.Contract, view *common.View) ([]byte, error) {
 
 	viewData, err := contract.EvaluateTransaction("ExtractDataFromView", view)
 	if err != nil {
@@ -222,7 +221,7 @@ func getResponseDataFromView(contract *gateway.Contract, view *common.View) ([]b
 	}
 
 	return viewData, nil
-}
+}*/
 
 func verifyView(contract *gateway.Contract, b64ViewProto string, address string) error {
 	_, err := contract.EvaluateTransaction("VerifyView", b64ViewProto, address)
@@ -325,12 +324,14 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 	// Step 3
 	// TODO fix types here so can return proper view
 
+	log.Infof("computeAddress: %s, policyCriteria: %s, networkId: %s, cert: %s, uuidValue: %s, org: %s",
+		computedAddress, policyCriteria, networkId, cert, uuidValue, org)
 	var relayResponse string
-	// relayResponse, err := relay.ProcessRequest(computedAddress, policyCriteria, networkId, cert, "", uuidValue, org)
-	// if err != nil {
-	// 	return "", "", logThenErrorf("InteropFlow relay response error: %s", err.Error())
-	// }
-
+	/*relayResponse, err = relay.ProcessRequest(computedAddress, policyCriteria, networkId, cert, "", uuidValue, org)
+	if err != nil {
+		return "", "", logThenErrorf("InteropFlow relay response error: %s", err.Error())
+	}
+	*/
 	// Step 4
 	// Verify view to ensure it is valid before starting expensive WriteExternalState flow.
 

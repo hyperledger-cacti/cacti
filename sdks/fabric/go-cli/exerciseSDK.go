@@ -9,9 +9,10 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/configure"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers/interopsetup"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/interoperablehelper"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
 )
 
 func connectSimpleStateWithSDK() {
@@ -25,6 +26,8 @@ func connectSimpleStateWithSDK() {
 	log.Infof("result of query: %s", result)
 
 	result, err = contract.SubmitTransaction("Create", "key01", "value")
+	//valBytes, _ := json.Marshal([]int64{1, 2})
+	//result, err = contract.SubmitTransaction("CreateArr", "key01", string(valBytes))
 	if err != nil {
 		log.Fatalf("failed Invoke with error: %+v", err)
 	}
@@ -546,7 +549,7 @@ func fetchAccessControlPolicy(networkId string) {
 		ContractName: "interop",
 		Channel:      "mychannel",
 		CcFunc:       "GetAccessControlPolicyBySecurityDomain",
-		Args:         []string{"network1"},
+		Args:         []string{networkId},
 	}
 
 	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
@@ -562,7 +565,7 @@ func fetchMembership(networkId string) {
 		ContractName: "interop",
 		Channel:      "mychannel",
 		CcFunc:       "GetMembershipBySecurityDomain",
-		Args:         []string{"network1"},
+		Args:         []string{networkId},
 	}
 
 	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
@@ -578,7 +581,7 @@ func fetchVerificationPolicy(networkId string) {
 		ContractName: "interop",
 		Channel:      "mychannel",
 		CcFunc:       "GetVerificationPolicyBySecurityDomain",
-		Args:         []string{"network1"},
+		Args:         []string{networkId},
 	}
 
 	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
@@ -592,12 +595,63 @@ func configureNetwork(networkId string) {
 	interopsetup.ConfigureNetwork(networkId)
 }
 
+func interop(key string, localNetwork string, requestingOrg string, address string) {
+	relayEnv, err := helpers.GetNetworkConfig(localNetwork)
+	if err != nil {
+		log.Fatalf("failed helpers.GetNetworkConfig with error: %+v", err.Error())
+	}
+	log.Infof("relayEnv: %+v", relayEnv)
+
+	if (relayEnv.RelayEndPoint == "") || (relayEnv.ConnProfilePath == "") {
+		log.Fatalf("please use a valid --local-network. If valid network please check if your environment variables are configured properly")
+	}
+	networkName := localNetwork
+	channel := "mychannel"
+	contractName := "interop"
+	connProfilePath := relayEnv.ConnProfilePath
+	mspId := requestingOrg
+	username := "User1@org1." + localNetwork + ".com"
+
+	_, contract, wallet, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), channel, contractName, connProfilePath,
+		networkName, mspId, username)
+	if err != nil {
+		log.Fatalf("failed helpers.FabricHelper with error: %s", err.Error())
+	}
+	keyUser, certUser, err := helpers.GetKeyAndCertForRemoteRequestbyUserName(wallet, username)
+	if err != nil {
+		log.Fatalf("failed helpers.GetKeyAndCertForRemoteRequestbyUserName with error: %s", err.Error())
+	}
+	log.Infof("key: %s & cert: %s", keyUser, certUser)
+
+	applicationFunction := "Create"
+	args := []string{key, ""}
+	invokeObject := types.Query{
+		ContractName: "simplestate",
+		Channel:      channel,
+		CcFunc:       applicationFunction,
+		CcArgs:       args,
+	}
+	log.Infof("invokeObject: %+v", invokeObject)
+
+	interopJSON := types.InteropJSON{
+		Address: address,
+		Sign:    false,
+	}
+	interopJSONs := []types.InteropJSON{interopJSON}
+
+	interopArgIndices := []int{1}
+	interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, keyUser, certUser, true)
+
+}
+
 func main() {
 
-	configure.ConfigureAll("network1")
-	fetchAccessControlPolicy("network1")
-	fetchMembership("network1")
-	fetchVerificationPolicy("network1")
+	interop("a", "network1", "Org1MSP", "localhost:9080/network1/mychannel:simplestate:Read:a")
+
+	//configure.ConfigureAll("network1")
+	//fetchAccessControlPolicy("network1")
+	//fetchMembership("network1")
+	//fetchVerificationPolicy("network1")
 
 	//connectSimpleStateWithSDK() // needs the chaincode simplestate on the channel
 	//connectSimpleAssetWithSDK("a001") // needs the chaincode simpleasset on the channel
