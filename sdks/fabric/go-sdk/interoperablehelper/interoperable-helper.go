@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
@@ -192,7 +193,6 @@ func isPatternAndAddressMatch(pattern string, address string) bool {
  * Extracts actual remote query response embedded in view structure.
  * Argument is a View protobuf ('statePb.View')
  **/
-
 /*
 func getResponseDataFromView(view *common.View) ([]byte, error) {
 
@@ -213,7 +213,7 @@ func getResponseDataFromView(view *common.View) ([]byte, error) {
 	return interopPayload.Payload, nil
 }
 */
-/*
+
 func getResponseDataFromView(contract *gateway.Contract, view *common.View) ([]byte, error) {
 
 	viewData, err := contract.EvaluateTransaction("ExtractDataFromView", view)
@@ -223,7 +223,6 @@ func getResponseDataFromView(contract *gateway.Contract, view *common.View) ([]b
 
 	return viewData, nil
 }
-*/
 
 func verifyView(contract *gateway.Contract, b64ViewProto string, address string) error {
 	_, err := contract.EvaluateTransaction("VerifyView", b64ViewProto, address)
