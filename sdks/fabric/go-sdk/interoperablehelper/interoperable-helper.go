@@ -7,8 +7,13 @@ SPDX-License-Identifier: Apache-2.0
 package interoperablehelper
 
 import (
+	"crypto/ecdsa"
+	"crypto/rand"
+	"crypto/sha256"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"strings"
@@ -29,7 +34,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 }
 
 func InteropFlow(interopContract *gateway.Contract, networkId string, invokeObject types.Query, org, localRelayEndpoint string,
-	interopArgIndices []int, interopJSONs []types.InteropJSON, key, cert string, returnWithoutLocalInvocation bool) ([]string, []byte, error) {
+	interopArgIndices []int, interopJSONs []types.InteropJSON, keyUser, certUser string, returnWithoutLocalInvocation bool) ([]string, []byte, error) {
 	if len(interopArgIndices) != len(interopJSONs) {
 		logThenErrorf("number of argument indices %d does not match number of view addresses %d", len(interopArgIndices), len(interopJSONs))
 	}
@@ -40,7 +45,7 @@ func InteropFlow(interopContract *gateway.Contract, networkId string, invokeObje
 	var computedAddresses []string
 
 	for i := 0; i < len(interopJSONs); i++ {
-		requestResponseView, requestResponseAddress, err := getRemoteView(interopContract, networkId, org, localRelayEndpoint, interopJSONs[i], key, cert)
+		requestResponseView, requestResponseAddress, err := getRemoteView(interopContract, networkId, org, localRelayEndpoint, interopJSONs[i], keyUser, certUser)
 		if err != nil {
 			return views, nil, logThenErrorf("InteropFlow remote view request error: %s", err.Error())
 		}
@@ -288,6 +293,31 @@ func createFlowAddress(flow types.Flow, networkId string, remoteURL string) stri
 	return addressString
 }
 
+func hashMessage(msg []byte) []byte {
+	hash := sha256.New()
+	hash.Write(msg)
+
+	return hash.Sum(nil)
+}
+
+func convertToPrivKey(signkeyPEM string) (*ecdsa.PrivateKey, error) {
+	//privKey := &ecies.PrivateKey{}
+	privKey := &ecdsa.PrivateKey{}
+	signkeyBytes, pemErr := pem.Decode([]byte(signkeyPEM))
+	if pemErr != nil {
+		return privKey, logThenErrorf("failed pem.Decode with error: %s", pemErr)
+	}
+	signkeyPriv, err := x509.ParsePKCS8PrivateKey(signkeyBytes.Bytes)
+	if err != nil {
+		return privKey, logThenErrorf("failed x509.ParsePKCS8PrivateKey with error: %s", err.Error())
+	}
+	signkeyPrivEC := signkeyPriv.(*ecdsa.PrivateKey)
+	//privKey = ecies.ImportECDSA(signkeyPrivEC)
+	privKey = signkeyPrivEC
+	return privKey, nil
+
+}
+
 /**
  * Send a relay request with a view address and get a view in response
  * 1. Will get address from input, if address not there it will create the address from interopJSON
@@ -296,7 +326,7 @@ func createFlowAddress(flow types.Flow, networkId string, remoteURL string) stri
  * 4. Call the local chaincode to verify the view before trying to submit to chaincode.
  **/
 func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelayEndpoint string, interopJSON types.InteropJSON,
-	key, cert string) (string, string, error) {
+	keyUser, certUser string) (string, string, error) {
 
 	// Step 1
 	query := types.Query{
@@ -320,17 +350,28 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 
 	//relay = new Relay(localRelayEndpoint);
 	uuidValue := uuid.New()
-	log.Infof("policyCriteria: %s and uuidValue: %s", policyCriteria, uuidValue)
+	uuidStr := base64.StdEncoding.EncodeToString([]byte(uuidValue.String()))
 
 	// Step 3
 	// TODO fix types here so can return proper view
 
-	log.Infof("computeAddress: %s, policyCriteria: %s, networkId: %s, cert: %s, uuidValue: %s, org: %s",
-		computedAddress, policyCriteria, networkId, cert, uuidValue, org)
-	//var relayResponse string
-	//var relayResponse *common.RequestState
+	log.Infof("computeAddress: %s, policyCriteria: %s, networkId: %s, keyUser: %s, certUser: %s, uuidStr: %s, org: %s",
+		computedAddress, policyCriteria, networkId, keyUser, certUser, uuidStr, org)
 
-	relayResponse, err := relay.ProcessRequest(computedAddress, policyCriteria, networkId, cert, "", "mynonce", org)
+	message := computedAddress + uuidStr
+	hashedMessage := hashMessage([]byte(message))
+	signingKey, err := convertToPrivKey(keyUser)
+	if err != nil {
+		return "", "", logThenErrorf("failed convertToPrivKey with error: %s", err.Error())
+	}
+	random := rand.Reader
+	signature, err := ecdsa.SignASN1(random, signingKey, hashedMessage)
+	signatureBase64 := base64.StdEncoding.EncodeToString(signature)
+	if err != nil {
+		return "", "", logThenErrorf("failed ecdsa.SignASN1 with error: %s", err.Error())
+	}
+
+	relayResponse, err := relay.ProcessRequest(localRelayEndpoint, computedAddress, policyCriteria, networkId, certUser, string(signatureBase64), uuidStr, org)
 	if err != nil {
 		return "", "", logThenErrorf("InteropFlow relay response error: %s", err.Error())
 	}
@@ -341,9 +382,9 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 	// Verify view to ensure it is valid before starting expensive WriteExternalState flow.
 
 	// replace relayResponse with relayResponse.getView()
-	// err = verifyView(interopContract, base64.StdEncoding.EncodeToString([]byte(relayResponse)), computedAddress)
-	// if err != nil {
-	// 	return "", "", logThenErrorf("view verification failed with error: %s", err.Error())
-	// }
+	err = verifyView(interopContract, base64.StdEncoding.EncodeToString([]byte(relayResponse.GetView().String())), computedAddress)
+	if err != nil {
+		return "", "", logThenErrorf("view verification failed with error: %s", err.Error())
+	}
 	return "", computedAddress, nil
 }
