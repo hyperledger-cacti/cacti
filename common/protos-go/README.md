@@ -40,7 +40,7 @@ make clean-build
 ```
 
 ## Steps to Use
-* Just add `github.com/sanvenDev/weaver-dlt-interoperability/common/protos-go` to your imports, to use it.
+* Just add `github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go` to your imports, to use it.
 * Run `go mod tidy` to populate your `go.mod` with the latest version.
 
 ## Publish

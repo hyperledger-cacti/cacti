@@ -7,7 +7,7 @@
 package networks
 
 import (
-	common "github.com/sanvenDev/weaver-dlt-interoperability/common/protos-go/common"
+	common "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
