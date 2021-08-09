@@ -304,7 +304,7 @@ func convertToPrivKey(signkeyPEM string) (*ecdsa.PrivateKey, error) {
 	//privKey := &ecies.PrivateKey{}
 	privKey := &ecdsa.PrivateKey{}
 	signkeyBytes, pemErr := pem.Decode([]byte(signkeyPEM))
-	if pemErr != nil {
+	if string(pemErr) != "" {
 		return privKey, logThenErrorf("failed pem.Decode with error: %s", pemErr)
 	}
 	signkeyPriv, err := x509.ParsePKCS8PrivateKey(signkeyBytes.Bytes)
