@@ -4,7 +4,7 @@ package driver
 
 import (
 	context "context"
-	common "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	common "github.com/sanvenDev/weaver-dlt-interoperability/common/protos-go/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
