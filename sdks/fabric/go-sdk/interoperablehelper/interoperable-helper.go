@@ -386,5 +386,5 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 	if err != nil {
 		return "", "", logThenErrorf("view verification failed with error: %s", err.Error())
 	}
-	return "", computedAddress, nil
+	return relayResponse.GetView().String(), computedAddress, nil
 }
