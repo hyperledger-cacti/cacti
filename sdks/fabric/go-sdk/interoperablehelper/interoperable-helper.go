@@ -15,6 +15,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/relay"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	log "github.com/sirupsen/logrus"
@@ -326,19 +327,23 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 
 	log.Infof("computeAddress: %s, policyCriteria: %s, networkId: %s, cert: %s, uuidValue: %s, org: %s",
 		computedAddress, policyCriteria, networkId, cert, uuidValue, org)
-	var relayResponse string
-	/*relayResponse, err = relay.ProcessRequest(computedAddress, policyCriteria, networkId, cert, "", uuidValue, org)
+	//var relayResponse string
+	//var relayResponse *common.RequestState
+
+	relayResponse, err := relay.ProcessRequest(computedAddress, policyCriteria, networkId, cert, "", "mynonce", org)
 	if err != nil {
 		return "", "", logThenErrorf("InteropFlow relay response error: %s", err.Error())
 	}
-	*/
+
+	log.Infof("relayResponse: %+v", relayResponse)
+
 	// Step 4
 	// Verify view to ensure it is valid before starting expensive WriteExternalState flow.
 
 	// replace relayResponse with relayResponse.getView()
-	err = verifyView(interopContract, base64.StdEncoding.EncodeToString([]byte(relayResponse)), computedAddress)
-	if err != nil {
-		return "", "", logThenErrorf("view verification failed with error: %s", err.Error())
-	}
-	return relayResponse, computedAddress, nil
+	// err = verifyView(interopContract, base64.StdEncoding.EncodeToString([]byte(relayResponse)), computedAddress)
+	// if err != nil {
+	// 	return "", "", logThenErrorf("view verification failed with error: %s", err.Error())
+	// }
+	return "", computedAddress, nil
 }
