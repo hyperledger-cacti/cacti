@@ -78,6 +78,7 @@
     "@openapitools/openapi-generator-cli": "2.3.3",
     "@types/fs-extra": "9.0.11",
     "@types/jasminewd2": "2.0.10",
+    "@types/node": "15.14.7",
     "@types/node-fetch": "2.5.4",
     "@types/tape": "4.13.0",
     "@types/tape-promise": "4.0.1",
