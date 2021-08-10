@@ -12,8 +12,9 @@ import arrow.core.Right
 import io.grpc.ManagedChannelBuilder
 import java.lang.Exception
 import kotlinx.coroutines.*
-import net.corda.core.messaging.startFlow
 import java.util.*
+import org.slf4j.LoggerFactory
+import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
 
 import com.weaver.corda.app.interop.flows.CreateExternalRequest
@@ -25,6 +26,7 @@ import com.weaver.protos.networks.networks.Networks
 
 class InteroperableHelper {
     companion object {
+        private val logger = LoggerFactory.getLogger(InteroperableHelper::class.java)
         @JvmStatic
         fun interopFlow (
             proxy: CordaRPCOps,
@@ -42,9 +44,9 @@ class InteroperableHelper {
             var result: Either<Error, String> = Left(Error(""))
             runBlocking {
                 val eitherErrorQuery = constructNetworkQuery(proxy, externalStateAddress)
-                println("\nCorda network returned: $eitherErrorQuery \n")
+                logger.info("\nCorda network returned: $eitherErrorQuery \n")
                 eitherErrorQuery.map { networkQuery ->
-                    println("Network query: $networkQuery")
+                    logger.info("Network query: $networkQuery")
                     runBlocking {
                         val ack = async { client.requestState(networkQuery) }.await()
                         pollForState(ack.requestId, client).map {
@@ -141,7 +143,7 @@ class InteroperableHelper {
             proxy: CordaRPCOps,
             address: String
         ): Either<Error, Networks.NetworkQuery> {
-            println("Getting query information for foreign network from Corda network")
+            logger.info("Getting query information for foreign network from Corda network")
             try {
                 val eitherErrorRequest = proxy.startFlow(::CreateExternalRequest, address)
                         .returnValue.get().map {
@@ -179,13 +181,13 @@ class InteroperableHelper {
             } else {
                 delay(1000L)
                 val requestState = async { client.getState(requestId) }.await()
-                println("Response from getState: $requestState")
+                logger.info("Response from getState: $requestState")
                 when (requestState.status.toString()) {
                     "COMPLETED" -> Right(requestState)
                     "PENDING" -> async { pollForState(requestId, client, retryCount + 1) }.await()
                     "PENDING_ACK" -> async { pollForState(requestId, client, retryCount + 1) }.await()
                     "ERROR" -> {
-                        println("Error returned from the remote network: $requestState")
+                        logger.info("Error returned from the remote network: $requestState")
                         Left(Error("Error returned from remote network $requestState"))
                     }
                     else -> Left(Error("Unexpected status returned in RequestState"))
@@ -211,14 +213,14 @@ class InteroperableHelper {
             address: String
         ): Either<Error, String> {
             return try {
-                println("Sending response to Corda for view verification.\n")
+                logger.info("Sending response to Corda for view verification.\n")
                 val stateId = runCatching {
                     val viewBase64String = Base64.getEncoder().encodeToString(requestState.view.toByteArray())
                     proxy.startFlow(::WriteExternalStateInitiator, viewBase64String, address)
                             .returnValue.get()
                 }.fold({
                     it.map { linearId ->
-                        println("Verification was successful and external-state was stored with linearId $linearId.\n")
+                        logger.info("Verification was successful and external-state was stored with linearId $linearId.\n")
                         linearId.toString()
                     }
                 }, {
@@ -226,7 +228,7 @@ class InteroperableHelper {
                 })
                 stateId
             } catch (e: Exception) {
-                println("Error writing state to Corda network: ${e.message}\n")
+                logger.info("Error writing state to Corda network: ${e.message}\n")
                 Left(Error("Error writing state to Corda network: ${e.message}"))
             }
         }

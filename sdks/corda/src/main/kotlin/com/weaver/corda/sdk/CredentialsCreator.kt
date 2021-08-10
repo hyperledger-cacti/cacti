@@ -16,6 +16,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder;
 import org.json.JSONObject
 import java.util.*
+import org.slf4j.LoggerFactory
 
   
 class CredentialsCreator(
@@ -33,7 +34,8 @@ class CredentialsCreator(
     val securityDomain = securityDomain
     val remoteFlow = remoteFlow
     val locFlow = locFlow
-    val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
+    private val logger = LoggerFactory.getLogger(CredentialsCreator::class.java)
     init {
         // Extracting Network certs
         val config = CredentialsExtractor.getConfig(baseNodesPath, nodes)
@@ -46,6 +48,7 @@ class CredentialsCreator(
         // Initialising class variables
         this.nodeid_cert = Base64.getDecoder().decode(node0Json.getJSONArray("nodeid_cert").getString(0)).toString(Charsets.UTF_8)
         this.cert_chain = listOf(root_cert, doorman_cert, nodeca_cert)
+        logger.debug("Cert Chain: ${this.cert_chain}")
     }
     
     fun createAccessControlPolicyState(): AccessControlPolicyState {

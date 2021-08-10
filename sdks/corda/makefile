@@ -5,7 +5,7 @@ build-local:
 	echo "Building corda-interop-app..."
 	cd ../../network/corda-interop-app && make build-local
 	echo "Building Driver..."
-	./gradlew clean installDist
+	./gradlew clean build 
 
 .PHONY: build-refresh-dependencies-local
 build-refresh-dependencies-local:

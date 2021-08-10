@@ -11,10 +11,12 @@ buildscript {
     ext.arrow_version = "0.10.4"
     ext.weaver_version = "1.2.3"
     ext.corda_gradle_plugins_version = "5.0.4"
-
-   dependencies {
-       classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-   }
+    ext.log4j_version = "2.11.2"
+    ext.slf4j_version = "1.7.25"
+    
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
 }
 
 plugins {
@@ -74,6 +76,11 @@ dependencies {
     implementation "io.grpc:grpc-netty-shaded:$grpc_version"
     implementation "io.grpc:grpc-stub:$grpc_version"
     implementation group: 'org.json', name: 'json', version: '20190722'
+    
+    // Logger dependencies
+    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
+    compile "org.apache.logging.log4j:log4j-web:${log4j_version}"
+    compile "org.slf4j:jul-to-slf4j:$slf4j_version"
 
 }
 
