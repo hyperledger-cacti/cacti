@@ -142,7 +142,7 @@ func (r *Relay) getRequest(requestId string) (*common.RequestState, error) {
 	if err != nil {
 		return nil, logThenErrorf("error in grpc GetState(): %s", err.Error())
 	}
-	log.Infof("requestState: %v", requestState)
+	log.Debugf("requestState: %v", requestState)
 
 	return requestState, nil
 }

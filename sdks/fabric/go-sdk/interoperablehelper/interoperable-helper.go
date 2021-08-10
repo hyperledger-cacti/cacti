@@ -20,6 +20,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/corda"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/fabric"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/relay"
@@ -207,7 +208,6 @@ func isPatternAndAddressMatch(pattern string, address string) bool {
  * Argument is a View protobuf ('statePb.View')
  **/
 func GetResponseDataFromView(view *common.View) ([]byte, error) {
-
 	var interopPayload common.InteropPayload
 	if view.Meta.Protocol == common.Meta_FABRIC {
 		var fabricViewData fabric.FabricView
@@ -219,21 +219,21 @@ func GetResponseDataFromView(view *common.View) ([]byte, error) {
 		if err != nil {
 			return nil, logThenErrorf("unable to unmarshal interopPayload: %s", err.Error())
 		}
+	} else if view.Meta.Protocol == common.Meta_CORDA {
+		var cordaViewData corda.ViewData
+		err := protoV2.Unmarshal(view.Data, &cordaViewData)
+		if err != nil {
+			return nil, fmt.Errorf("cordaView unmarshal error: %s", err.Error())
+		}
+		err = protoV2.Unmarshal(cordaViewData.Payload, &interopPayload)
+		if err != nil {
+			return nil, fmt.Errorf("unable to unmarshal interopPayload: %s", err.Error())
+		}
 	} else {
 		return nil, logThenErrorf("cannot extract data from view; unsupported DLT type: %+v", view.Meta.Protocol)
 	}
 	return interopPayload.Payload, nil
 }
-
-/*func getResponseDataFromView(contract *gateway.Contract, view *common.View) ([]byte, error) {
-
-	viewData, err := contract.EvaluateTransaction("ExtractDataFromView", view)
-	if err != nil {
-		logThenErrorf("failed evaluate transaction ExtractDataFromView with error: %s", err.Error())
-	}
-
-	return viewData, nil
-}*/
 
 func verifyView(contract *gateway.Contract, b64ViewProto string, address string) error {
 	_, err := contract.EvaluateTransaction("VerifyView", b64ViewProto, address)
@@ -301,7 +301,6 @@ func createFlowAddress(flow types.Flow, networkId string, remoteURL string) stri
 func hashMessage(msg []byte) []byte {
 	hash := sha256.New()
 	hash.Write(msg)
-
 	return hash.Sum(nil)
 }
 
@@ -315,10 +314,9 @@ func convertToPrivKey(signkeyPEM string) (*ecdsa.PrivateKey, error) {
 	if err != nil {
 		return privKey, logThenErrorf("failed x509.ParsePKCS8PrivateKey with error: %s", err.Error())
 	}
-	signkeyPrivEC := signkeyPriv.(*ecdsa.PrivateKey)
-	privKey = signkeyPrivEC
-	return privKey, nil
+	privKey = signkeyPriv.(*ecdsa.PrivateKey)
 
+	return privKey, nil
 }
 
 func signMessage(computedAddress string, uuidStr string, keyUser string) (string, error) {
