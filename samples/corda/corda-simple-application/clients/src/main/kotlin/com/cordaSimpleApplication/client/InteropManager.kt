@@ -55,7 +55,7 @@ class RequestStateCommand : CliktCommand(help = "Requests state from a foreign n
             ).fold({
                 println("Error in Interop Flow: ${it.message}")
             }, {
-                println("Access Control Policy stored with linearId $it")
+                println("External State stored with linearId $it")
             })
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
