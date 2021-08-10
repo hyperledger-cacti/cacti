@@ -25,23 +25,30 @@ func logThenErrorf(format string, args ...interface{}) error {
 	return errors.New(errorMsg)
 }
 
-const (
-	//address     = "localhost:9080"
-	timeoutTime = 60 // in seconds
-)
+type Relay struct {
+	endPoint    string
+	timeoutSecs uint64
+}
+
+func NewRelay(localEndPoint string, timeout uint64) *Relay {
+	relayObj := &Relay{
+		endPoint:    localEndPoint,
+		timeoutSecs: timeout,
+	}
+	return relayObj
+}
 
 /**
- * SendRequest to send a request to a remote network using gRPC and the relay.
+ * sendRequest to send a request to a remote network using gRPC and the relay.
  * @returns {string} The ID of the request
  */
-func SendRequest(localRelayEndpoint string, address string, policy []string, requestingNetwork string, certificate string, signature string,
+func (r *Relay) sendRequest(address string, policy []string, requestingNetwork string, certificate string, signature string,
 	nonce string, org string) (string, error) {
 
 	// set up a connection to the server
-	conn, err := grpc.Dial(localRelayEndpoint, grpc.WithInsecure())
-	//conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(r.endPoint, grpc.WithInsecure())
 	if err != nil {
-		return "", logThenErrorf("SendRequest(): failed to connect: %v", err)
+		return "", logThenErrorf("grpc Dial() failed to connect in sendRequest: %v", err)
 	}
 	defer conn.Close()
 
@@ -61,7 +68,7 @@ func SendRequest(localRelayEndpoint string, address string, policy []string, req
 	}
 	resp, err := networkClient.RequestState(ctx, networkQuery)
 	if err != nil {
-		return "", logThenErrorf("request state error: %v", err)
+		return "", logThenErrorf("error in grpc RequestState(): %v", err)
 	}
 
 	return resp.RequestId, nil
@@ -72,40 +79,39 @@ func SendRequest(localRelayEndpoint string, address string, policy []string, req
  * Uses the timeout provided by the class.
  * @returns {string} The state returned by the remote request
  */
-func ProcessRequest(localRelayEndpoint string, address string, policy []string, requestingNetwork string, certificate string, signature string,
+func (r *Relay) ProcessRequest(address string, policy []string, requestingNetwork string, certificate string, signature string,
 	nonce string, org string) (*common.RequestState, error) {
 
-	requestId, err := SendRequest(localRelayEndpoint, address, policy, requestingNetwork, certificate, signature, nonce, org)
+	requestId, err := r.sendRequest(address, policy, requestingNetwork, certificate, signature, nonce, org)
 	if err != nil {
-		return nil, logThenErrorf("request state error: %s", err.Error())
+		return nil, logThenErrorf("sendRequest() error: %s", err.Error())
 	}
 	// Adds timout time to current time.
 	currentTimeSecs := uint64(time.Now().Unix())
-	endTime := currentTimeSecs + timeoutTime
-	//TODO: SLOW DOWN
-	finalState, err := recursiveState(localRelayEndpoint, requestId, endTime)
+	endTime := currentTimeSecs + r.timeoutSecs
+	finalState, err := r.recursiveState(requestId, endTime)
 	if err != nil {
-		return nil, logThenErrorf("state error: %s", err.Error())
+		return nil, logThenErrorf("error to get state: %s", err.Error())
 	}
 	if finalState.GetError() != "" {
-		return nil, logThenErrorf("error from view payload: %s", finalState.GetError())
+		return nil, logThenErrorf("cannot get finalState: %s", finalState.GetError())
 	}
 	return finalState, nil
 }
 
-func recursiveState(localRelayEndpoint string, requestID string, endTime uint64) (*common.RequestState, error) {
-	state, err := GetRequest(localRelayEndpoint, requestID)
+func (r *Relay) recursiveState(requestID string, endTime uint64) (*common.RequestState, error) {
+	state, err := r.getRequest(requestID)
 	if err != nil {
-		return nil, logThenErrorf("request state error: %s", err.Error())
+		return nil, logThenErrorf("getRequest() error: %s", err.Error())
 	}
 	if (state.GetStatus() == common.RequestState_PENDING) ||
 		(state.GetStatus() == common.RequestState_PENDING_ACK) {
 		// return error if the waiting time is elapsed
 		currentTimeSecs := uint64(time.Now().Unix())
 		if endTime <= currentTimeSecs {
-			return nil, logThenErrorf("timeout: State is still pending")
+			return nil, logThenErrorf("timeout: state is still pending")
 		} else {
-			return recursiveState(localRelayEndpoint, requestID, endTime)
+			return r.recursiveState(requestID, endTime)
 		}
 	} else {
 		return state, nil
@@ -113,16 +119,15 @@ func recursiveState(localRelayEndpoint string, requestID string, endTime uint64)
 }
 
 /**
- * GetRequest is used to get the request from the local network
+ * getRequest is used to get the request from the local network
  * @returns {object} The request object from the relay
  */
-//func GetRequest(requestId string) (*networks.GetStateMessage, error) {
-func GetRequest(localRelayEndpoint string, requestId string) (*common.RequestState, error) {
+func (r *Relay) getRequest(requestId string) (*common.RequestState, error) {
 
 	// set up a connection to the server
-	conn, err := grpc.Dial(localRelayEndpoint, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(r.endPoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		return nil, logThenErrorf("GetRequest(): failed to connect: %v", err)
+		return nil, logThenErrorf("grpc Dial() failed to connect in getRequest: %v", err)
 	}
 	defer conn.Close()
 
@@ -135,9 +140,9 @@ func GetRequest(localRelayEndpoint string, requestId string) (*common.RequestSta
 	}
 	requestState, err := networkClient.GetState(ctx, getStateMessage)
 	if err != nil {
-		return nil, logThenErrorf("failed to get state: %v", err)
+		return nil, logThenErrorf("error in grpc GetState(): %s", err.Error())
 	}
-	log.Infof("requestState: %+v", requestState)
+	log.Infof("requestState: %v", requestState)
 
 	return requestState, nil
 }

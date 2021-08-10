@@ -23,7 +23,9 @@ import (
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/relay"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
+	"github.com/sanvenDev/weaver-dlt-interoperability/common/protos-go/common"
 	log "github.com/sirupsen/logrus"
+	protoV2 "google.golang.org/protobuf/proto"
 )
 
 // helper functions to log and return errors
@@ -34,13 +36,13 @@ func logThenErrorf(format string, args ...interface{}) error {
 }
 
 func InteropFlow(interopContract *gateway.Contract, networkId string, invokeObject types.Query, org, localRelayEndpoint string,
-	interopArgIndices []int, interopJSONs []types.InteropJSON, keyUser, certUser string, returnWithoutLocalInvocation bool) ([]string, []byte, error) {
+	interopArgIndices []int, interopJSONs []types.InteropJSON, keyUser, certUser string, returnWithoutLocalInvocation bool) ([]*common.View, []byte, error) {
 	if len(interopArgIndices) != len(interopJSONs) {
 		logThenErrorf("number of argument indices %d does not match number of view addresses %d", len(interopArgIndices), len(interopJSONs))
 	}
 
 	// Step 1: Iterate through the view addresses, and send remote requests and get views in response for each
-	var views []string
+	var views []*common.View
 	var viewsSerializedBase64 []string
 	var computedAddresses []string
 
@@ -49,9 +51,15 @@ func InteropFlow(interopContract *gateway.Contract, networkId string, invokeObje
 		if err != nil {
 			return views, nil, logThenErrorf("InteropFlow remote view request error: %s", err.Error())
 		}
+
+		viewBytes, err := protoV2.Marshal(requestResponseView)
+		if err != nil {
+			return views, nil, logThenErrorf("failed to marshal view with error: %s", err.Error())
+		}
+
 		views = append(views, requestResponseView)
 		computedAddresses = append(computedAddresses, requestResponseAddress)
-		viewsSerializedBase64 = append(viewsSerializedBase64, base64.StdEncoding.EncodeToString([]byte(requestResponseView)))
+		viewsSerializedBase64 = append(viewsSerializedBase64, base64.StdEncoding.EncodeToString(viewBytes))
 
 	}
 
@@ -122,7 +130,7 @@ func getPolicyCriteriaForAddress(contract *gateway.Contract, address string) ([]
 	}
 	queryResponse, err := contract.EvaluateTransaction("GetVerificationPolicyBySecurityDomain", parsedAddress.NetworkSegment)
 	if err != nil {
-		logThenErrorf("failed evaluate transaction GetVerificationPolicyBySecurityDomain with error: %s", err.Error())
+		logThenErrorf("failed to evaluate transaction GetVerificationPolicyBySecurityDomain with error: %s", err.Error())
 	}
 
 	if string(queryResponse) == "" {
@@ -279,8 +287,7 @@ func getCCArgsForProofVerification(invokeObject types.Query, interopArgIndices [
  * Creates an address string based on a query object, networkid and remote url.
  **/
 func createAddress(query types.Query, networkId, remoteURL string) string {
-	addressString := remoteURL + "/" + networkId + "/" + query.Channel + ":" + query.ContractName + ":" + query.CcFunc + ":"
-	// + query.CcArgs + ":"
+	addressString := remoteURL + "/" + networkId + "/" + query.Channel + ":" + query.ContractName + ":" + query.CcFunc + ":" + query.CcArgs[0]
 	return addressString
 }
 
@@ -301,18 +308,16 @@ func hashMessage(msg []byte) []byte {
 }
 
 func convertToPrivKey(signkeyPEM string) (*ecdsa.PrivateKey, error) {
-	//privKey := &ecies.PrivateKey{}
 	privKey := &ecdsa.PrivateKey{}
-	signkeyBytes, pemErr := pem.Decode([]byte(signkeyPEM))
-	if string(pemErr) != "" {
-		return privKey, logThenErrorf("failed pem.Decode with error: %s", pemErr)
+	signkeyBytes, _ := pem.Decode([]byte(signkeyPEM))
+	if signkeyBytes == nil {
+		return privKey, logThenErrorf("no PEM data found in signkeyPEM: %s", signkeyPEM)
 	}
 	signkeyPriv, err := x509.ParsePKCS8PrivateKey(signkeyBytes.Bytes)
 	if err != nil {
 		return privKey, logThenErrorf("failed x509.ParsePKCS8PrivateKey with error: %s", err.Error())
 	}
 	signkeyPrivEC := signkeyPriv.(*ecdsa.PrivateKey)
-	//privKey = ecies.ImportECDSA(signkeyPrivEC)
 	privKey = signkeyPrivEC
 	return privKey, nil
 
@@ -325,8 +330,8 @@ func convertToPrivKey(signkeyPEM string) (*ecdsa.PrivateKey, error) {
  * 3. Call the relay Process request which will send a request to the remote network via local relay and poll for an update in the request status.
  * 4. Call the local chaincode to verify the view before trying to submit to chaincode.
  **/
-func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelayEndpoint string, interopJSON types.InteropJSON,
-	keyUser, certUser string) (string, string, error) {
+func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelayEndPoint string, interopJSON types.InteropJSON,
+	keyUser, certUser string) (*common.View, string, error) {
 
 	// Step 1
 	query := types.Query{
@@ -337,7 +342,7 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 	}
 	var computedAddress string
 	if interopJSON.Address == "" {
-		computedAddress = createAddress(query, interopJSON.NetworkId, interopJSON.RemoteEndpoint)
+		computedAddress = createAddress(query, interopJSON.NetworkId, interopJSON.RemoteEndPoint)
 	} else {
 		computedAddress = interopJSON.Address
 	}
@@ -345,7 +350,7 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 	// Step 2
 	policyCriteria, err := getPolicyCriteriaForAddress(interopContract, computedAddress)
 	if err != nil {
-		return "", "", logThenErrorf("InteropFlow failed to get policy criteria for address %s with error: %s", computedAddress, err.Error())
+		return nil, "", logThenErrorf("InteropFlow failed to get policy criteria for address %s with error: %s", computedAddress, err.Error())
 	}
 
 	//relay = new Relay(localRelayEndpoint);
@@ -355,36 +360,38 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 	// Step 3
 	// TODO fix types here so can return proper view
 
-	log.Infof("computeAddress: %s, policyCriteria: %s, networkId: %s, keyUser: %s, certUser: %s, uuidStr: %s, org: %s",
-		computedAddress, policyCriteria, networkId, keyUser, certUser, uuidStr, org)
+	log.Infof("localRelayEndPoint: %s, computedAddress: %s, policyCriteria: %s, networkId: %s, keyUser: %s, certUser: %s, uuidStr: %s, org: %s",
+		localRelayEndPoint, computedAddress, policyCriteria, networkId, keyUser, certUser, uuidStr, org)
 
 	message := computedAddress + uuidStr
 	hashedMessage := hashMessage([]byte(message))
 	signingKey, err := convertToPrivKey(keyUser)
 	if err != nil {
-		return "", "", logThenErrorf("failed convertToPrivKey with error: %s", err.Error())
+		return nil, "", logThenErrorf("failed convertToPrivKey with error: %s", err.Error())
 	}
 	random := rand.Reader
 	signature, err := ecdsa.SignASN1(random, signingKey, hashedMessage)
 	signatureBase64 := base64.StdEncoding.EncodeToString(signature)
 	if err != nil {
-		return "", "", logThenErrorf("failed ecdsa.SignASN1 with error: %s", err.Error())
+		return nil, "", logThenErrorf("failed ecdsa.SignASN1 with error: %s", err.Error())
 	}
 
-	relayResponse, err := relay.ProcessRequest(localRelayEndpoint, computedAddress, policyCriteria, networkId, certUser, string(signatureBase64), uuidStr, org)
+	relayObj := relay.NewRelay(localRelayEndPoint, 600)
+	relayResponse, err := relayObj.ProcessRequest(computedAddress, policyCriteria, networkId, certUser, string(signatureBase64), uuidStr, org)
 	if err != nil {
-		return "", "", logThenErrorf("InteropFlow relay response error: %s", err.Error())
+		return nil, "", logThenErrorf("InteropFlow relay response error: %s", err.Error())
 	}
-
-	log.Infof("relayResponse: %+v", relayResponse)
 
 	// Step 4
 	// Verify view to ensure it is valid before starting expensive WriteExternalState flow.
 
-	// replace relayResponse with relayResponse.getView()
-	err = verifyView(interopContract, base64.StdEncoding.EncodeToString([]byte(relayResponse.GetView().String())), computedAddress)
+	viewBytes, err := protoV2.Marshal(relayResponse.GetView())
 	if err != nil {
-		return "", "", logThenErrorf("view verification failed with error: %s", err.Error())
+		return nil, "", logThenErrorf("failed to marshal view with error: %s", err.Error())
 	}
-	return relayResponse.GetView().String(), computedAddress, nil
+	err = verifyView(interopContract, base64.StdEncoding.EncodeToString(viewBytes), computedAddress)
+	if err != nil {
+		return nil, "", logThenErrorf("view verification failed with error: %s", err.Error())
+	}
+	return relayResponse.GetView(), computedAddress, nil
 }

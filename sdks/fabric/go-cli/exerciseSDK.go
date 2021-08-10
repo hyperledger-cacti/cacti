@@ -600,7 +600,7 @@ func interop(key string, localNetwork string, requestingOrg string, address stri
 	if err != nil {
 		log.Fatalf("failed helpers.GetNetworkConfig with error: %+v", err.Error())
 	}
-	log.Infof("relayEnv: %+v", relayEnv)
+	log.Debugf("relayEnv: %+v", relayEnv)
 
 	if (relayEnv.RelayEndPoint == "") || (relayEnv.ConnProfilePath == "") {
 		log.Fatalf("please use a valid --local-network. If valid network please check if your environment variables are configured properly")
@@ -621,7 +621,7 @@ func interop(key string, localNetwork string, requestingOrg string, address stri
 	if err != nil {
 		log.Fatalf("failed helpers.GetKeyAndCertForRemoteRequestbyUserName with error: %s", err.Error())
 	}
-	log.Infof("key: %s & cert: %s", keyUser, certUser)
+	log.Debugf("keyUser: %s & certUser: %s", keyUser, certUser)
 
 	applicationFunction := "Create"
 	args := []string{key, ""}
@@ -631,16 +631,23 @@ func interop(key string, localNetwork string, requestingOrg string, address stri
 		CcFunc:       applicationFunction,
 		CcArgs:       args,
 	}
-	log.Infof("invokeObject: %+v", invokeObject)
+	log.Debugf("invokeObject: %+v", invokeObject)
 
 	interopJSON := types.InteropJSON{
-		Address: address,
-		Sign:    false,
+		Address:        address,
+		ChaincodeFunc:  "Read",
+		ChaincodeId:    "simplestate",
+		ChannelId:      channel,
+		RemoteEndPoint: "localhost:9080",
+		NetworkId:      "network1",
+		Sign:           true,
+		CcArgs:         []string{"a"},
 	}
+	log.Debugf("interopJSON: %+v", interopJSON)
 	interopJSONs := []types.InteropJSON{interopJSON}
 
 	interopArgIndices := []int{1}
-	interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, keyUser, certUser, true)
+	interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, keyUser, certUser, false)
 
 }
 
@@ -648,7 +655,7 @@ func main() {
 
 	interop("a", "network1", "Org1MSP", "localhost:9080/network1/mychannel:simplestate:Read:a")
 
-	//configure.ConfigureAll("network1")
+	//configureNetwork("network1")
 	//fetchAccessControlPolicy("network1")
 	//fetchMembership("network1")
 	//fetchVerificationPolicy("network1")

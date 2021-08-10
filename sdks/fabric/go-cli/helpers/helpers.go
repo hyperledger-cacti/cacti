@@ -18,7 +18,6 @@ import (
 type NetworkConfig struct {
 	RelayEndPoint   string `json:"relayEndPoint"`
 	ConnProfilePath string `json:"connProfilePath"`
-	Username        string `json:"username"`
 	MspId           string `json:"mspId"`
 	ChannelName     string `json:"channelName"`
 	Chaincode       string `json:"chaincode"`
