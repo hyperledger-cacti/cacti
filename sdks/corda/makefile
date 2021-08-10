@@ -13,7 +13,7 @@ build-refresh-dependencies-local:
 
 .PHONY: build
 build: github.properties
-	./gradlew clean jar
+	./gradlew clean build 
 
 .PHONY: build-refresh-dependencies
 build-refresh-dependencies: github.properties
