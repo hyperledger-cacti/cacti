@@ -49,6 +49,7 @@ repositories {
         flatDir {
             dirs '../../../../core/network/corda-interop-app/interop-contracts/build/libs'
             dirs '../../../../core/network/corda-interop-app/interop-workflows/build/libs'
+            dirs '../../../../sdks/corda/build/libs'
             dirs '../../../../common/protos-java-kt/build/libs'
         }
     }
@@ -69,6 +70,7 @@ dependencies {
 
     compile(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_version")
     compile(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_version")
+    compile(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "$weaver_version")
     compile(group: 'com.weaver', name: 'protos-java-kt', version: "$weaver_version")
 
     // gRPC and protobuf dependencies

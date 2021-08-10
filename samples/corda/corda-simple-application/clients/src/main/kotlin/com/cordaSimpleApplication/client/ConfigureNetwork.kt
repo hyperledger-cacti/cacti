@@ -25,6 +25,8 @@ import net.corda.core.messaging.startFlow
 import org.json.JSONObject
 import java.util.*
 
+import com.weaver.corda.sdk.CredentialsExtractor
+
 /**
  * TODO: Documentation
  */
