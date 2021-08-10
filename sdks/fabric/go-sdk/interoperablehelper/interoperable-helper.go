@@ -19,11 +19,11 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/relay"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
-	"github.com/sanvenDev/weaver-dlt-interoperability/common/protos-go/common"
 	log "github.com/sirupsen/logrus"
 	protoV2 "google.golang.org/protobuf/proto"
 )

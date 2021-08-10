@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sanvenDev/weaver-dlt-interoperability/common/protos-go/common"
-	"github.com/sanvenDev/weaver-dlt-interoperability/common/protos-go/networks"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/networks"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
