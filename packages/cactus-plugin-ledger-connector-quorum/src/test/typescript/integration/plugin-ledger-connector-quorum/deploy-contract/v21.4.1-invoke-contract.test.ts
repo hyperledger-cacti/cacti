@@ -66,7 +66,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
   });
   keychainPlugin.set(
     HelloWorldContractJson.contractName,
-    HelloWorldContractJson,
+    JSON.stringify(HelloWorldContractJson),
   );
   // Instantiate connector with the keychain plugin that already has the
   // private key we want to use for one of our tests

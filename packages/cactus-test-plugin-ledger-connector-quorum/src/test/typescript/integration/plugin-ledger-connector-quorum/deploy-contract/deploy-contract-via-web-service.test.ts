@@ -83,7 +83,7 @@ test(testCase, async (t: Test) => {
   });
   kvStoragePlugin.set(
     HelloWorldContractJson.contractName,
-    HelloWorldContractJson,
+    JSON.stringify(HelloWorldContractJson),
   );
   plugins.push(kvStoragePlugin);
 

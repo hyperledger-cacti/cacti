@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+const fs = require("fs-extra");
 const { getPackageInfoList } = require("./get-package-info-list");
 
 const main = async () => {
@@ -7,10 +7,10 @@ const main = async () => {
 
   const errors = [];
 
-  packageInfoList.forEach((pi) => {
+  const checksDone = packageInfoList.map(async (pi) => {
     const nameNoScope = pi.name.replace("@hyperledger/", "");
 
-    const targetMain = `dist/${nameNoScope}.node.umd.js`;
+    const targetMain = `dist/lib/main/typescript/index.js`;
     const targetMainMinified = `dist/${nameNoScope}.node.umd.min.js`;
     const targetBrowser = `dist/${nameNoScope}.web.umd.js`;
     const targetBrowserMinified = `dist/${nameNoScope}.web.umd.min.js`;
@@ -18,13 +18,19 @@ const main = async () => {
     const { main, mainMinified, browser, browserMinified } = pi.packageObject;
 
     const pkgJsonPath = `${pi.location}/package.json`;
+    const pkgJson = await fs.readJson(pkgJsonPath);
+
+    if (!pkgJson.scripts.webpack) {
+      console.log(`Skipping ${pi.name} due to lack of webpack npm script`);
+      return;
+    }
 
     if (targetMain !== main) {
       errors.push(`${pkgJsonPath}: \n\t${targetMain}\n\t${main}\n`);
     }
     if (targetMainMinified !== mainMinified) {
       errors.push(
-        `${pkgJsonPath}: \n\t${targetMainMinified}\n\t${mainMinified}\n`
+        `${pkgJsonPath}: \n\t${targetMainMinified}\n\t${mainMinified}\n`,
       );
     }
     if (targetBrowser !== browser) {
@@ -36,6 +42,8 @@ const main = async () => {
       errors.push(errorMessage);
     }
   });
+
+  await Promise.all(checksDone);
 
   if (errors.length === 0) {
     console.log(`No errors found. All OK.`);

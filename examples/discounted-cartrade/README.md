@@ -206,7 +206,7 @@ Assume there exist "sample_Userside.log" which is a result file of "sample_Users
 5. Remove a line break on the last line of myproof.json.
 6. Creates a new file "discounted-cartrade_request_body.json"
 7. Please write the following content in "discounted-cartrade_request_body.json"
-   - {"businessLogicID":"guks32pf","tradeParams":["0xec709e1774f0ce4aba47b52a499f9abaaa159f71", "0x9d624f7995e8bd70251f8265f2f9f2b49f169c55", "fuser01", "fuser02", "CAR1", "<<the content of myproof.json>>"],"authParams":["fujitsu"]}
+   - {"businessLogicID":"guks32pf","tradeParams":["0xec709e1774f0ce4aba47b52a499f9abaaa159f71", "0x9d624f7995e8bd70251f8265f2f9f2b49f169c55", "fuser01", "fuser02", "CAR1", "<<the content of myproof.json>>"],"authParams":["<<company name>>"]}
 
 ### How to exec this app (in host)
 1. Go to the directory one level above cactus

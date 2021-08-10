@@ -1,12 +1,12 @@
 {
   "name": "@hyperledger/cactus-cmd-api-server",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "API server that combines and exposes all the functionality of a Cactus deployment through a unified REST API interface.",
   "files": [
     "dist/*"
   ],
   "main": "dist/lib/main/typescript/index.js",
-  "mainMinified": "dist/cactus-cmd-api-server.node.umd.js",
+  "mainMinified": "dist/cactus-cmd-api-server.node.umd.min.js",
   "browser": "dist/cactus-cmd-api-server.web.umd.js",
   "browserMinified": "dist/cactus-cmd-api-server.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
@@ -72,9 +72,9 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.6.0",
-    "@hyperledger/cactus-core": "0.6.0",
-    "@hyperledger/cactus-core-api": "0.6.0",
+    "@hyperledger/cactus-common": "0.7.0",
+    "@hyperledger/cactus-core": "0.7.0",
+    "@hyperledger/cactus-core-api": "0.7.0",
     "@thream/socketio-jwt": "2.1.0",
     "axios": "0.21.1",
     "body-parser": "1.19.0",
@@ -100,8 +100,8 @@
     "uuid": "7.0.2"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-vault": "0.6.0",
-    "@hyperledger/cactus-test-tooling": "0.6.0",
+    "@hyperledger/cactus-plugin-keychain-vault": "0.7.0",
+    "@hyperledger/cactus-test-tooling": "0.7.0",
     "@types/compression": "1.7.0",
     "@types/convict": "5.2.1",
     "@types/cors": "2.8.6",
