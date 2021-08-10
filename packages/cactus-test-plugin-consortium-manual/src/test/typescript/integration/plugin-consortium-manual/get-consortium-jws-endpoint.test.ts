@@ -22,7 +22,7 @@ import {
   ConsortiumDatabase,
   ConsortiumMember,
 } from "@hyperledger/cactus-core-api";
-import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 test("member node public keys and hosts are pre-shared", async (t: Test) => {
   const consortiumId = uuidV4();
@@ -138,7 +138,6 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     pluginInstance: [],
   };
 
-  const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
   t.comment(`Setting up first node...`);
   {
     // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
@@ -151,7 +150,6 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
       keyPairPem: keyPair1.toPEM(true),
       consortiumDatabase,
       logLevel: "trace",
-      consortiumRepo,
     };
     const pluginConsortiumManual = new PluginConsortiumManual(options);
 
@@ -205,8 +203,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
       pluginRegistry,
       keyPairPem: keyPair2.toPEM(true),
       consortiumDatabase,
-      logLevel: "trace",
-      consortiumRepo,
+      logLevel: "TRACE",
     };
     const pluginConsortiumManual = new PluginConsortiumManual(options);
 
@@ -261,8 +258,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
       pluginRegistry,
       keyPairPem: keyPair3.toPEM(true),
       consortiumDatabase,
-      logLevel: "trace",
-      consortiumRepo,
+      logLevel: "TRACE",
     };
     const pluginConsortiumManual = new PluginConsortiumManual(options);
 

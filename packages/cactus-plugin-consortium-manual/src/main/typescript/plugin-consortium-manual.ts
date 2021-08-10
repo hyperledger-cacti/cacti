@@ -48,7 +48,6 @@ export interface IWebAppOptions {
 export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
   keyPairPem: string;
   consortiumDatabase: ConsortiumDatabase;
-  consortiumRepo: ConsortiumRepository;
   prometheusExporter?: PrometheusExporter;
   pluginRegistry?: PluginRegistry;
   logLevel?: LogLevelDesc;
@@ -57,11 +56,17 @@ export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
 
 export class PluginConsortiumManual
   implements ICactusPlugin, IPluginWebService {
+  public static readonly CLASS_NAME = "PluginConsortiumManual";
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly instanceId: string;
+  private readonly repo: ConsortiumRepository;
   private endpoints: IWebServiceEndpoint[] | undefined;
   private httpServer: Server | SecureServer | null = null;
+
+  public get className(): string {
+    return PluginConsortiumManual.CLASS_NAME;
+  }
 
   constructor(public readonly options: IPluginConsortiumManualOptions) {
     const fnTag = `PluginConsortiumManual#constructor()`;
@@ -73,13 +78,18 @@ export class PluginConsortiumManual
       options.consortiumDatabase,
       `${fnTag} options.consortiumDatabase`,
     );
+
     this.log = LoggerProvider.getOrCreate({
       label: "plugin-consortium-manual",
     });
+
     this.instanceId = this.options.instanceId;
+    this.repo = new ConsortiumRepository({ db: options.consortiumDatabase });
+
     this.prometheusExporter =
       options.prometheusExporter ||
       new PrometheusExporter({ pollingIntervalInMin: 1 });
+
     Checks.truthy(
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
@@ -107,12 +117,8 @@ export class PluginConsortiumManual
   }
 
   public getNodeCount(): number {
-    const consortiumDatabase: ConsortiumDatabase = this.options
-      .consortiumDatabase;
-    const consortiumRepo: ConsortiumRepository = new ConsortiumRepository({
-      db: consortiumDatabase,
-    });
-    return consortiumRepo.allNodes.length;
+    Checks.truthy(this.repo, `${this.className}.this.repo`);
+    return this.repo.allNodes.length;
   }
 
   /**
@@ -121,12 +127,8 @@ export class PluginConsortiumManual
    * only affects **the metrics**.
    */
   public updateMetricNodeCount(): void {
-    const consortiumDatabase: ConsortiumDatabase = this.options
-      .consortiumDatabase;
-    const consortiumRepo: ConsortiumRepository = new ConsortiumRepository({
-      db: consortiumDatabase,
-    });
-    this.prometheusExporter.setNodeCount(consortiumRepo.allNodes.length);
+    const nodeCount = this.getNodeCount();
+    this.prometheusExporter.setNodeCount(nodeCount);
   }
 
   public async shutdown(): Promise<void> {
@@ -184,10 +186,8 @@ export class PluginConsortiumManual
     // presence of webAppOptions implies that caller wants the plugin to configure it's own express instance on a custom
     // host/port to listen on
 
-    const { consortiumDatabase, keyPairPem } = this.options;
-    const consortiumRepo = new ConsortiumRepository({
-      db: consortiumDatabase,
-    });
+    const { keyPairPem } = this.options;
+    const consortiumRepo = this.repo;
 
     const endpoints: IWebServiceEndpoint[] = [];
     {
@@ -229,11 +229,12 @@ export class PluginConsortiumManual
   }
 
   public async getNodeJws(): Promise<JWSGeneral> {
-    const { keyPairPem, consortiumRepo: repo } = this.options;
+    Checks.truthy(this.repo, `${this.className}.this.repo`);
+    const { keyPairPem } = this.options;
 
     this.updateMetricNodeCount();
     const keyPair = JWK.asKey(keyPairPem);
-    const payloadObject = { consortiumDatabase: repo.consortiumDatabase };
+    const payloadObject = { consortiumDatabase: this.repo.consortiumDatabase };
     const payloadJson = jsonStableStringify(payloadObject);
     const _protected = {
       iat: Date.now(),
@@ -245,7 +246,7 @@ export class PluginConsortiumManual
   }
 
   public async getConsortiumJws(): Promise<JWSGeneral> {
-    const nodes = this.options.consortiumRepo.allNodes;
+    const nodes = this.repo.allNodes;
 
     const requests = nodes
       .map((cnm) => cnm.nodeApiHost)
