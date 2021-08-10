@@ -82,11 +82,6 @@ dependencies {
     implementation "io.grpc:grpc-protobuf:$grpc_version"
     implementation "io.grpc:grpc-stub:$grpc_version"
     implementation group: 'org.json', name: 'json', version: '20190722'
-
-    // Logging dependencies.
-    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
-    compile "org.apache.logging.log4j:log4j-web:${log4j_version}"
-    compile "org.slf4j:jul-to-slf4j:$slf4j_version"
 }
 
 mainClassName = "com.cordaSimpleApplication.client.CordaClientKt"

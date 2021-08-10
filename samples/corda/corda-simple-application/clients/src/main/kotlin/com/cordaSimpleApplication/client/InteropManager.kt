@@ -55,7 +55,17 @@ class RequestStateCommand : CliktCommand(help = "Requests state from a foreign n
             ).fold({
                 println("Error in Interop Flow: ${it.message}")
             }, {
-                println("External State stored with linearId $it")
+                val linearId = it.toString()
+                println("Interop flow successful and external-state was stored with linearId $linearId.\n")
+                val value = InteroperableHelper.getExternalStatePayloadString(
+                                rpc.proxy, 
+                                linearId
+                            )
+        		val key = externalStateAddress.split(":").last()
+        		val createdState = rpc.proxy.startFlow(::CreateState, key, value)
+                            .returnValue.get().tx.outputStates.first() as SimpleState
+        		println("Created simplestate: ${createdState}")
+        		println("LinearId ${createdState.linearId} can be used to fetch the requested state from the CorDapp simplestate vault")
             })
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
@@ -81,7 +91,7 @@ class GetExternalStateCommand : CliktCommand(help = "Get external state from vau
                             rpc.proxy, 
                             externalStateLinearId
                         )
-            println("Response Payload: ${payload}.\n")
+            println("\nResponse Payload: ${payload}.\n")
 
             println("Signatures:")
             val signatories = InteroperableHelper.getExternalStateSignatories(
