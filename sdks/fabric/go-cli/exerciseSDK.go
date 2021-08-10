@@ -11,11 +11,13 @@ import (
 
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers/interopsetup"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/interoperablehelper"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
 )
 
 func connectSimpleStateWithSDK() {
 	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
-	contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
+	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
 
 	result, err := contract.EvaluateTransaction("Read", "a")
 	if err != nil {
@@ -24,6 +26,8 @@ func connectSimpleStateWithSDK() {
 	log.Infof("result of query: %s", result)
 
 	result, err = contract.SubmitTransaction("Create", "key01", "value")
+	//valBytes, _ := json.Marshal([]int64{1, 2})
+	//result, err = contract.SubmitTransaction("CreateArr", "key01", string(valBytes))
 	if err != nil {
 		log.Fatalf("failed Invoke with error: %+v", err)
 	}
@@ -74,7 +78,7 @@ func connectSimpleAssetWithSDK(assetId string) {
 	}
 	log.Printf("%s helpers.Invoke %v", query.CcFunc, string(result))
 
-	contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
+	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
 	result, err = contract.EvaluateTransaction("ReadAsset", "t1", assetId, "true")
 	if err != nil {
 		log.Fatalf("failed Query with error: %s", err)
@@ -545,7 +549,7 @@ func fetchAccessControlPolicy(networkId string) {
 		ContractName: "interop",
 		Channel:      "mychannel",
 		CcFunc:       "GetAccessControlPolicyBySecurityDomain",
-		Args:         []string{"network1"},
+		Args:         []string{networkId},
 	}
 
 	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
@@ -561,7 +565,7 @@ func fetchMembership(networkId string) {
 		ContractName: "interop",
 		Channel:      "mychannel",
 		CcFunc:       "GetMembershipBySecurityDomain",
-		Args:         []string{"network1"},
+		Args:         []string{networkId},
 	}
 
 	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
@@ -577,7 +581,7 @@ func fetchVerificationPolicy(networkId string) {
 		ContractName: "interop",
 		Channel:      "mychannel",
 		CcFunc:       "GetVerificationPolicyBySecurityDomain",
-		Args:         []string{"network1"},
+		Args:         []string{networkId},
 	}
 
 	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
@@ -591,14 +595,72 @@ func configureNetwork(networkId string) {
 	interopsetup.ConfigureNetwork(networkId)
 }
 
+func interop(key string, localNetwork string, requestingOrg string, address string) {
+	relayEnv, err := helpers.GetNetworkConfig(localNetwork)
+	if err != nil {
+		log.Fatalf("failed helpers.GetNetworkConfig with error: %+v", err.Error())
+	}
+	log.Debugf("relayEnv: %+v", relayEnv)
+
+	if (relayEnv.RelayEndPoint == "") || (relayEnv.ConnProfilePath == "") {
+		log.Fatalf("please use a valid --local-network. If valid network please check if your environment variables are configured properly")
+	}
+	networkName := localNetwork
+	channel := "mychannel"
+	contractName := "interop"
+	connProfilePath := relayEnv.ConnProfilePath
+	mspId := requestingOrg
+	username := "User1@org1." + localNetwork + ".com"
+
+	_, contract, wallet, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), channel, contractName, connProfilePath,
+		networkName, mspId, username)
+	if err != nil {
+		log.Fatalf("failed helpers.FabricHelper with error: %s", err.Error())
+	}
+	keyUser, certUser, err := helpers.GetKeyAndCertForRemoteRequestbyUserName(wallet, username)
+	if err != nil {
+		log.Fatalf("failed helpers.GetKeyAndCertForRemoteRequestbyUserName with error: %s", err.Error())
+	}
+	log.Debugf("keyUser: %s & certUser: %s", keyUser, certUser)
+
+	applicationFunction := "Create"
+	args := []string{key, ""}
+	invokeObject := types.Query{
+		ContractName: "simplestate",
+		Channel:      channel,
+		CcFunc:       applicationFunction,
+		CcArgs:       args,
+	}
+	log.Debugf("invokeObject: %+v", invokeObject)
+
+	interopJSON := types.InteropJSON{
+		Address:        address,
+		ChaincodeFunc:  "Read",
+		ChaincodeId:    "simplestate",
+		ChannelId:      channel,
+		RemoteEndPoint: "localhost:9080",
+		NetworkId:      "network1",
+		Sign:           true,
+		CcArgs:         []string{"a"},
+	}
+	log.Debugf("interopJSON: %+v", interopJSON)
+	interopJSONs := []types.InteropJSON{interopJSON}
+
+	interopArgIndices := []int{1}
+	interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, keyUser, certUser, false)
+
+}
+
 func main() {
 
-	configureNetwork("network1")
-	fetchAccessControlPolicy("network1")
-	fetchMembership("network1")
-	fetchVerificationPolicy("network1")
+	interop("a", "network1", "Org1MSP", "localhost:9080/network1/mychannel:simplestate:Read:a")
 
-	//connectSimpleStateWithSDK()                    // needs the chaincode simplestate on the channel
+	//configureNetwork("network1")
+	//fetchAccessControlPolicy("network1")
+	//fetchMembership("network1")
+	//fetchVerificationPolicy("network1")
+
+	//connectSimpleStateWithSDK() // needs the chaincode simplestate on the channel
 	//connectSimpleAssetWithSDK("a001") // needs the chaincode simpleasset on the channel
 	//testLockAssetAndClaimAssetOfBondAsset("a020")  // needs the chaincodes simpleasset and interop on the channel
 	//testLockAssetAndUnlockAssetOfBondAsset("a021") // needs the chaincodes simpleasset and interop on the channel

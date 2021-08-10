@@ -7,10 +7,10 @@ SPDX-License-Identifier: Apache-2.0
 package types
 
 type Query struct {
-	CcArgs       []string `json:"ccArgs"`
+	ContractName string   `json:"contractName"`
 	Channel      string   `json:"channel"`
 	CcFunc       string   `json:"ccFunc"`
-	ContractName string   `json:"contractName"`
+	CcArgs       []string `json:"ccArgs"`
 }
 
 type Flow struct {
@@ -25,14 +25,14 @@ type InteropJSON struct {
 	ChaincodeFunc  string   `json:"chaincodeFunc"`
 	ChaincodeId    string   `json:"chaincodeId"`
 	ChannelId      string   `json:"channelId"`
-	RemoteEndpoint string   `json:"remoteEndpoint"`
+	RemoteEndPoint string   `json:"remoteEndPoint"`
 	NetworkId      string   `json:"networkId"`
 	Sign           bool     `json:"sign"`
 	CcArgs         []string `json:"ccArgs"`
 }
 
 type RemoteJSON struct {
-	LocalRelayEndpoint string                 `json:"localRelayEndpoint"`
+	LocalRelayEndPoint string                 `json:"localRelayEndPoint"`
 	ViewRequests       map[string]ViewRequest `json:"viewRequests"`
 }
 

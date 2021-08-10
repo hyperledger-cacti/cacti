@@ -52,27 +52,39 @@ func ConfigureNetwork(mainNetwork string) error {
 	}
 
 	credentialFolderPath := helpers.GetCredentialPath()
-	_, err = filepath.Glob(credentialFolderPath)
+	fileExists, err := helpers.CheckIfFileOrDirectoryExists(credentialFolderPath)
 	if err != nil {
 		logThenErrorf("failed to find credentialFolderPath %q: %+s", credentialFolderPath, err.Error())
+	} else if !fileExists {
+		logThenErrorf("credentials folder %s doesn't exist", credentialFolderPath)
 	}
 
 	accessControlPath := filepath.Join(helpers.GetCurrentNetworkCredentialPath(mainNetwork), "access-control.json")
-	_, err = filepath.Glob(accessControlPath)
+	fileExists, err = helpers.CheckIfFileOrDirectoryExists(accessControlPath)
 	if err != nil {
 		logThenErrorf("failed to find accessControlPath %q: %+s", accessControlPath, err.Error())
+	} else if !fileExists {
+		logThenErrorf("file access-control.json doesn't exist")
 	}
 
 	membershipPath := filepath.Join(helpers.GetCurrentNetworkCredentialPath(mainNetwork), "membership.json")
-	_, err = filepath.Glob(membershipPath)
+	fileExists, err = helpers.CheckIfFileOrDirectoryExists(membershipPath)
 	if err != nil {
 		logThenErrorf("failed to find membershipPath %q: %+s", membershipPath, err.Error())
+	} else if !fileExists {
+		logThenErrorf("file membership.json doesn't exist")
 	}
 
 	verificationPolicyPath := filepath.Join(helpers.GetCurrentNetworkCredentialPath(mainNetwork), "verification-policy.json")
 	_, err = filepath.Glob(verificationPolicyPath)
 	if err != nil {
 		logThenErrorf("failed to find verificationPolicyPath %q: %+s", verificationPolicyPath, err.Error())
+	}
+	fileExists, err = helpers.CheckIfFileOrDirectoryExists(verificationPolicyPath)
+	if err != nil {
+		logThenErrorf("failed to find verificationPolicyPath %q: %+s", verificationPolicyPath, err.Error())
+	} else if !fileExists {
+		logThenErrorf("file verification-policy.json doesn't exist")
 	}
 
 	return configureNetworkHelper(networkEnv.ConnProfilePath, mainNetwork, "mychannel", "interop", accessControlPath, membershipPath, verificationPolicyPath)
@@ -86,8 +98,8 @@ func configureNetworkHelper(connProfilePath, networkName, channelName, contractN
 	log.Infof("accessControl: %s", string(accessControlBytes))
 
 	ccArgs := []string{string(accessControlBytes)}
-	//ccFunc := "CreateAccessControlPolicy"
-	ccFunc := "UpdateAccessControlPolicy"
+	ccFunc := "CreateAccessControlPolicy"
+	//ccFunc := "UpdateAccessControlPolicy"
 	result, err := HelperInvoke(ccFunc, ccArgs, contractName, channelName, connProfilePath, networkName)
 	if err != nil {
 		logThenErrorf("%s interopsetup.HelperInvoke error: %+v", ccFunc, err.Error())
@@ -101,8 +113,8 @@ func configureNetworkHelper(connProfilePath, networkName, channelName, contractN
 	log.Infof("membership: %s", string(membershipBytes))
 
 	ccArgs = []string{string(membershipBytes)}
-	//ccFunc = "CreateMembership"
-	ccFunc = "UpdateMembership"
+	ccFunc = "CreateMembership"
+	//ccFunc = "UpdateMembership"
 	result, err = HelperInvoke(ccFunc, ccArgs, contractName, channelName, connProfilePath, networkName)
 	if err != nil {
 		logThenErrorf("%s interopsetup.HelperInvoke error: %s", ccFunc, err.Error())
@@ -116,8 +128,8 @@ func configureNetworkHelper(connProfilePath, networkName, channelName, contractN
 	log.Infof("verificationPolicy: %s", string(verificationPolicyBytes))
 
 	ccArgs = []string{string(verificationPolicyBytes)}
-	//ccFunc = "CreateVerificationPolicy"
-	ccFunc = "UpdateVerificationPolicy"
+	ccFunc = "CreateVerificationPolicy"
+	//ccFunc = "UpdateVerificationPolicy"
 	result, err = HelperInvoke(ccFunc, ccArgs, contractName, channelName, connProfilePath, networkName)
 	if err != nil {
 		logThenErrorf("%s interopsetup.HelperInvoke error: %s", ccFunc, err.Error())
