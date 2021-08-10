@@ -77,6 +77,7 @@ export class PluginLedgerConnectorCorda
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+    this.prometheusExporter.startMetricsCollection();
   }
 
   public getPrometheusExporter(): PrometheusExporter {
