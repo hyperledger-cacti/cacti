@@ -647,8 +647,16 @@ func interop(key string, localNetwork string, requestingOrg string, address stri
 	interopJSONs := []types.InteropJSON{interopJSON}
 
 	interopArgIndices := []int{1}
-	interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, keyUser, certUser, false)
-
+	interopFlowResponse, _, err := interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, keyUser, certUser, false)
+	if err != nil {
+		log.Fatalf("failed interoperablehelper.InteropFlow with error: %s", err.Error())
+	}
+	log.Debugf("interopFlowResponse: %v", interopFlowResponse[0])
+	remoteValue, err := interoperablehelper.GetResponseDataFromView(interopFlowResponse[0])
+	if err != nil {
+		log.Fatalf("failed interoperablehelper.GetResponseDataFromView with error: %s", err.Error())
+	}
+	log.Infof("called function %s with args: %s and %s", applicationFunction, invokeObject.CcArgs[0], remoteValue)
 }
 
 func main() {

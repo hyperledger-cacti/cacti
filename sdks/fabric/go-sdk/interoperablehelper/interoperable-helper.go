@@ -20,6 +20,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/fabric"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/relay"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
@@ -95,7 +96,6 @@ func submitTransactionWithRemoteViews(interopContract *gateway.Contract, invokeO
 	if err != nil {
 		return nil, logThenErrorf("failed calling getCCArgsForProofVerification with error: %s", err.Error())
 	}
-	//result, err := interopContract.submitTransaction("WriteExternalState", ...ccArgs)
 	result, err := interopContract.SubmitTransaction("WriteExternalState", ccArgs...)
 	if err != nil {
 		return result, logThenErrorf("submitTransaction Error: %s", err.Error())
@@ -206,26 +206,24 @@ func isPatternAndAddressMatch(pattern string, address string) bool {
  * Extracts actual remote query response embedded in view structure.
  * Argument is a View protobuf ('statePb.View')
  **/
-/*
-func getResponseDataFromView(view *common.View) ([]byte, error) {
+func GetResponseDataFromView(view *common.View) ([]byte, error) {
 
 	var interopPayload common.InteropPayload
 	if view.Meta.Protocol == common.Meta_FABRIC {
 		var fabricViewData fabric.FabricView
 		err := protoV2.Unmarshal(view.Data, &fabricViewData)
 		if err != nil {
-			return nil, logThenErrorf("fabricView Unmarshal error: %s", err.Error())
+			return nil, logThenErrorf("fabricView unmarshal error: %s", err.Error())
 		}
 		err = protoV2.Unmarshal(fabricViewData.Response.Payload, &interopPayload)
 		if err != nil {
-			return nil, logThenErrorf("unable to Unmarshal interopPayload: %s", err.Error())
+			return nil, logThenErrorf("unable to unmarshal interopPayload: %s", err.Error())
 		}
 	} else {
 		return nil, logThenErrorf("cannot extract data from view; unsupported DLT type: %+v", view.Meta.Protocol)
 	}
 	return interopPayload.Payload, nil
 }
-*/
 
 /*func getResponseDataFromView(contract *gateway.Contract, view *common.View) ([]byte, error) {
 
@@ -323,6 +321,22 @@ func convertToPrivKey(signkeyPEM string) (*ecdsa.PrivateKey, error) {
 
 }
 
+func signMessage(computedAddress string, uuidStr string, keyUser string) (string, error) {
+	message := computedAddress + uuidStr
+	hashedMessage := hashMessage([]byte(message))
+	signingKey, err := convertToPrivKey(keyUser)
+	if err != nil {
+		return "", logThenErrorf("failed convertToPrivKey with error: %s", err.Error())
+	}
+	random := rand.Reader
+	signature, err := ecdsa.SignASN1(random, signingKey, hashedMessage)
+	if err != nil {
+		return "", logThenErrorf("failed ecdsa.SignASN1 with error: %s", err.Error())
+	}
+	signatureBase64 := base64.StdEncoding.EncodeToString(signature)
+	return signatureBase64, nil
+}
+
 /**
  * Send a relay request with a view address and get a view in response
  * 1. Will get address from input, if address not there it will create the address from interopJSON
@@ -363,21 +377,13 @@ func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelay
 	log.Infof("localRelayEndPoint: %s, computedAddress: %s, policyCriteria: %s, networkId: %s, keyUser: %s, certUser: %s, uuidStr: %s, org: %s",
 		localRelayEndPoint, computedAddress, policyCriteria, networkId, keyUser, certUser, uuidStr, org)
 
-	message := computedAddress + uuidStr
-	hashedMessage := hashMessage([]byte(message))
-	signingKey, err := convertToPrivKey(keyUser)
+	signatureBase64, err := signMessage(computedAddress, uuidStr, keyUser)
 	if err != nil {
-		return nil, "", logThenErrorf("failed convertToPrivKey with error: %s", err.Error())
-	}
-	random := rand.Reader
-	signature, err := ecdsa.SignASN1(random, signingKey, hashedMessage)
-	signatureBase64 := base64.StdEncoding.EncodeToString(signature)
-	if err != nil {
-		return nil, "", logThenErrorf("failed ecdsa.SignASN1 with error: %s", err.Error())
+		return nil, "", logThenErrorf("failed signMessage with error: %s", err.Error())
 	}
 
 	relayObj := relay.NewRelay(localRelayEndPoint, 600)
-	relayResponse, err := relayObj.ProcessRequest(computedAddress, policyCriteria, networkId, certUser, string(signatureBase64), uuidStr, org)
+	relayResponse, err := relayObj.ProcessRequest(computedAddress, policyCriteria, networkId, certUser, signatureBase64, uuidStr, org)
 	if err != nil {
 		return nil, "", logThenErrorf("InteropFlow relay response error: %s", err.Error())
 	}
