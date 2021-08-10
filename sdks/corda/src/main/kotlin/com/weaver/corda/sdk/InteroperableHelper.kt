@@ -84,13 +84,11 @@ class InteroperableHelper {
             proxy: CordaRPCOps,
             externalStateLinearId: String
         ): List<String> {
-            var i = 1
             val responseView = getExternalStateView(proxy, externalStateLinearId)
             var result: List<String> = listOf()
             for (notarization in responseView.notarizationsList) {
                 val id = notarization.id
                 result += id
-                i += 1
             }
             return result
         }
@@ -101,14 +99,12 @@ class InteroperableHelper {
             externalStateLinearId: String,
             signerId: String
         ): String {
-            var i = 1
             val responseView = getExternalStateView(proxy, externalStateLinearId)
             for (notarization in responseView.notarizationsList) {
                 val id = notarization.id
                 if (id == signerId) {
                     return notarization.signature
                 }
-                i += 1
             }
             return ""
         }
@@ -119,14 +115,12 @@ class InteroperableHelper {
             externalStateLinearId: String,
             signerId: String
         ): String {
-            var i = 1
             val responseView = getExternalStateView(proxy, externalStateLinearId)
             for (notarization in responseView.notarizationsList) {
                 val id = notarization.id
                 if (id == signerId) {
                     return notarization.certificate
                 }
-                i += 1
             }
             return ""
         }
