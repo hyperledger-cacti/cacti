@@ -105,39 +105,29 @@ Assume the following two directories exist in the same directory:
 
    - please check indy_pool, nginx and valipy are booting
 
-3. Please exec "sample_Userside.py" at every "docker-compose up"
- - 3-1) please copy "sample_Userside.py" to "indy-sdk/samples/python"
+3. Please exec INDY validator
 
-     - $ cd cactus/examples/register-indy-data
-
-       $ cp -frp sample_Userside.py ../../../indy-sdk/samples/python/src
- - 3-2) please exec "sample_Userside.py" in valipy
-   
-   - $ docker ps | grep valipy
-   
-    - please check ID 
-  
-    $ sudo docker exec -it validator bash
-  
-    $ cd /root/indy-sdk/samples/python
-  
-    $ TEST_POOL_IP=172.16.0.2 python -m src.sample_Userside > sample_Userside.log 2>&1
-
-4. Please exec INDY validator (in velipy)
+   $docker exec -it validator bash
 
    $ cd /root/validator
 
    $ TEST_POOL_IP=172.16.0.2 python -m main
 
-5. Please exec test driver (in host server)
+4. Please exec test driver (in host server)
 
-   $ cd cactus/packages-python/cactus_validator_socketio/testcli
+   $ cp -frp cactus/examples/register-indy-data/req_discounted_cartrade.py indy-sdk/samples/python/src
+
+   $ cd indy-sdk/samples/python
+
+   $ TEST_POOL_IP=172.16.0.2 python -m src.req_discounted_cartrade
+
+   - The log exits with an error, but if myproof.json is generated, it is OK.
+
+   $ cd ../../../cactus/packages-python/cactus_validator_socketio/testcli
 
    $ npm install
 
-   $ cp -frp ../../../../indy-sdk/samples/python/sample_Userside.log ./
-
-   $ tail -1 < sample_Userside.log | sed -e 's%INFO:__main__:%%'  > myproof.json
+   $ cp -frp ../../../../indy-sdk/samples/python/myproof.json ./
 
    $ node testsock.js
 
@@ -152,24 +142,34 @@ Assume the following two directories exist in the same directory:
 ## How to use: discounted-cartrade
 
 ### Preparations
-- The above commands is executed.
-- Starting one Validator
- -- <Indy> "validatorUrl": "https://172.16.0.4:8000"
+- Please exec 3 validators (ethereum, fabric, indy).
+
+   - <ethereum> "validatorUrl": "https://localhost:5050"
+   - <fabric> "validatorUrl": "https://localhost:5040"
+   - <indy> "validatorUrl": "https://172.16.0.4:8000"
+
 - The following drivers work properly:
- -- <Indy> testcli/testsock.js
-- "sample_Userside.py" is executed in "How to execute INDY validator".
 
-### Creating BLP container
-1. Please get branch "master"
-2. $ cd cactus/examples/discounted-cartrade/BLP_container
-3. $ docker-compose -f docker-compose.yaml up
+   - <ethereum> unit_test/validatorDriver_getNumericBalance.js
 
- - Executing the above command will not return to the console. When "Attaching to blp_container" is displayed, startup is completed. The following steps should be performed on a separate console.
+   - <fabric> unit_test/queryCar.js
 
-### Booting (in blp_container)
-1. $ docker exec -it blp_container bash
-2. $ cd ~/cactus/packages
+     ​                    unit_test/validatorDriver_signTransactionOffline.js
+
+   - <Indy> testcli/testsock.js
+
+     - Please refer  "How to execute INDY validator: 4. Please exec test driver (in host server)"
+
+- This procedure assumes the following two directories exist in the same directory:
+
+   - cactus ($ git clone https://github.com/hyperledger/cactus.git)
+   - indy-sdk ($ git clone https://github.com/hyperledger/indy-sdk.git)
+
+### How to boot
+1. Please get branch "main"
+2. $ cd cactus/packages
 3. $ npm install
+
 4. If you modify the URL of the server for "cactus/packages/config/default.json", create and modify "cactus/examples/discounted-cartrade/config/usersetting.json".
    - applicationHostInfo.hostName
      - this is URL of the host returned in the Location header
@@ -197,28 +197,105 @@ Assume the following two directories exist in the same directory:
 11. $ npm run start
     - if you do this, discounted-cartrade starts to exec on 5034 port.
 
-### Preparations before executing
-Assume there exist "sample_Userside.log" which is a result file of "sample_Userside.py"
-1. Go to the directory one level above cactus
-2. tail -1 <indy-sdk/samples/python/sample _ Userside.log | sed-e's% INFO in main> myproof.json
-3. Replace all " in myproof.json with \" and save
-4. Replace all \\" in myproof.json with \\\" and save
-5. Remove a line break on the last line of myproof.json.
-6. Creates a new file "discounted-cartrade_request_body.json"
-7. Please write the following content in "discounted-cartrade_request_body.json"
-   - {"businessLogicID":"guks32pf","tradeParams":["0xec709e1774f0ce4aba47b52a499f9abaaa159f71", "0x9d624f7995e8bd70251f8265f2f9f2b49f169c55", "fuser01", "fuser02", "CAR1", "<<the content of myproof.json>>"],"authParams":["<<company name>>"]}
+### How to execute
+- a.) Transaction Execution
+  - Please run Python script instead of curl (script that runs from data registration with indy to HTTP requests to BLP)
 
-### How to exec this app (in host)
-1. Go to the directory one level above cactus
+  - To modify the transaction parameters, please modify the "http_req_params = {...}" part of the script "sample _ Userside.py".
 
-2. $ curl localhost:5034/api/v1/bl/trades/ -XPOST -H "Content-Type: application/json" -d @discounted-cartrade_request_body.json
+     - please run the following command in an environment where discounted-cartrade is running and python can be run. We have confirmed that the following can be executed in the environment where "python3-indy==1.16.0" and "requests==2.26.0" are installed by the pip command.
 
-3. you can see the following logs:
+   - $ cp -frp cactus/examples/register-indy-data/req_discounted_cartrade.py indy-sdk/samples/python/src
 
-   - [2021-07-26T10:15:27.420] [DEBUG] TransactionIndy - ##getDataFromIndy: result: [object Object]
+      $ cd indy-sdk/samples/python
 
-     [2021-07-26T10:15:27.420] [DEBUG] BusinessLogicCartrade - finish get Data from indy
+      $ TEST_POOL_IP=172.16.0.2 python -m src.req_discounted_cartrade
 
-     [2021-07-26T10:15:27.664] [DEBUG] BusinessLogicCartrade - verify proof: ok
+  - A log similar to the following is output to the console:
 
-     [2021-07-26T10:15:27.664] [DEBUG] BusinessLogicCartrade - ##isPreferredCustomer result : true
+    - [2021-07-26T10:15:27.664] [DEBUG] BusinessLogicCartrade - ##isPreferredCustomer result : true
+
+      - If "##isPreferredCustomer result : true" is output, employee certification part is completed.
+
+    - [2020-08-21T19:55:24.207] [INFO] TransactionManagement - tradeID: 20200821195524-001
+
+      [2020-08-21T19:55:24.282] [INFO] BusinessLogicCartrade - firstTransaction txId : 0xafe7c812ab55c02feb691d2133bbba2c38abaf7f221794c3ca833a29708f4653
+
+      [2020-08-21T19:56:20.005] [INFO] BusinessLogicCartrade - ##INFO: underEscrow -> underTransfer, businessLogicID: guks32pf, tradeID: 20200821195524-001
+
+      [2020-08-21T19:56:20.608] [INFO] BusinessLogicCartrade - secondTransaction txId : 17c7577f73560ea5955f3151ed678833aa45d1252b34c6f933a7123757e82969
+
+      [2020-08-21T19:56:23.691] [INFO] BusinessLogicCartrade - ##INFO: underTransfer -> underSettlement, businessLogicID: guks32pf, tradeID: 20200821195524-001
+
+      [2020-08-21T19:56:23.703] [INFO] BusinessLogicCartrade - thirdTransaction txId : 0x61acb066349e24319afdf272b35429d198046e10f8fca3972f17a9e9a4dca75d
+
+      [2020-08-21T19:56:31.518] [INFO] BusinessLogicCartrade - ##INFO: completed cartrade, businessLogicID: guks32pf, tradeID: 20200821195524-001
+
+      - If "##INFO: completed cartrade," is output, cartrade part is completed.
+
+- b.) Transaction Reference
+
+  - $ curl localhost:5034/api/v1/bl/trades/XXXXXXXXXXXXXX-XXX -XGET
+
+- c.) Login
+
+  - $ curl localhost:5034/api/v1/bl/login/ -XPOST -H "Content-Type: application/json" -d '{"userid":"user01","pwd":"hoge"}'
+
+- d.) Balance Confirmation
+
+  - $ curl localhost:5034/api/v1/bl/balance/9d624f7995e8bd70251f8265f2f9f2b49f169c55
+    - At the end of the URL, specify the account
+
+- e.) QueryCar
+
+  - $ curl localhost:5034/api/v1/bl/cars/CAR1 -XGET
+
+- f.) QueryAllCars
+
+  - $ curl localhost:5034/api/v1/bl/cars/ -XGET
+
+- g.) GetAsset ("contractInfo.json" must be replaced)
+
+  - "contractInfo.json" is still a sample file and should be replaced when confirming operation.
+  - $ curl localhost:5034/api/v1/bl/asset/ -XGET
+
+- h.) AddAsset ("contractInfo.json" must be replaced)
+
+  - "contractInfo.json" is still a sample file and should be replaced when confirming operation.
+  - $ curl localhost:5034/api/v1/bl/asset/ -XPOST -H "Content-Type: application/json" -d '{"amount":100}'
+
+- i.) Executing Template Functions (execSyncFunction)
+
+  - $ curl localhost:5034/api/v1/bl/template-trade/execSyncFunction/ -XPOST -H "Content-Type: application/json" -d '{"template": "name", "args": {"tokenID": "token-12345", "contractID": "contract-123456"}}'
+
+    $ curl localhost:5034/api/v1/bl/template-trade/execSyncFunction/ -XPOST -H "Content-Type: application/json" -d '{"template": "symbol", "args": {"tokenID": "token-12345", "contractID": "contract-123456"}}'
+
+    $ curl localhost:5034/api/v1/bl/template-trade/execSyncFunction/ -XPOST -H "Content-Type: application/json" -d '{"template": "decimals", "args": {"tokenID": "token-12345", "contractID": "contract-123456"}}'
+
+    $ curl localhost:5034/api/v1/bl/template-trade/execSyncFunction/ -XPOST -H "Content-Type: application/json" -d '{"template": "totalSupply", "args": {"tokenID": "token-12345", "contractID": "contract-123456"}}'
+
+    $ curl localhost:5034/api/v1/bl/template-trade/execSyncFunction/ -XPOST -H "Content-Type: application/json" -d '{"template": "balanceOf", "args": {"tokenID": "token-12345", "contractID": "contract-123456"}}'
+
+- j.)  Executing Template Functions (sendSignedTransaction)
+
+  - $ curl localhost:5034/api/v1/bl/template-trade/sendSignedTransaction/ -XPOST -H "Content-Type: application/json" -d '{"template": "transfer", "args": {"_from": "account001", "_to": "account002", "value": 1000, "tokenID": "token-12345", "contractID": "contract-123456"}}'
+
+- k.) nop-sample
+
+  - $ curl localhost:5034/api/v1/bl/nop-sample/ -XGET
+
+- l.) how to check
+
+  - How to check account balance
+    - unit_test/validatorDriver_getNumericBalance.js
+    - ex.) $ node validatorDriver_getNumericBalance.js
+      - The balance for the account appears in the Validator console as follows:
+      - [2020-08-18T17:06:15.795] [INFO] connector_main[6710] - Response　:{"status":200,"amount":1900}
+  - How to check the car owner
+    - unit_test/queryCar.js
+    - ex.) $ node queryCar.js CAR1
+      - The Car owner appears in the Validator console as follows:
+      - ##queryCar Params: CAR1
+      - Transaction has been evaluated, result is: {"colour":"red","make":"Ford","model":"Mustang","owner":"fuser02"}
+  - How to change car ownership
+    - unit_test/validatorDriver_signTransactionOffline.js
