@@ -50,6 +50,7 @@
         "Keycloak",
         "Knetic",
         "LEDGERBLOCKACK",
+        "lmify",
         "LOCALMSPID",
         "miekg",
         "mitchellh",
@@ -72,6 +73,7 @@
         "OpenAPI",
         "openethereum",
         "organisation",
+        "parameterizable",
         "protos",
         "RUSTC",
         "Secp",
@@ -91,8 +93,7 @@
         "uuidv",
         "vscc",
         "wasm",
-        "Xdai",
-        "parameterizable"
+        "Xdai"
     ],
     "dictionaries": [
         "typescript,node,npm,go,rust"

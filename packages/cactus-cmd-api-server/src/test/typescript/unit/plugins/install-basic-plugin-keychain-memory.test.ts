@@ -9,18 +9,32 @@ import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api";
 
-import { K_CACTUS_API_SERVER_TOTAL_PLUGIN_IMPORTS } from "../../../main/typescript/prometheus-exporter/metrics";
+import { K_CACTUS_API_SERVER_TOTAL_PLUGIN_IMPORTS } from "../../../../main/typescript/prometheus-exporter/metrics";
 
-import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api";
+import { DefaultApi as ApiServerApi } from "../../../../main/typescript/public-api";
+import path from "path";
 
 const logLevel: LogLevelDesc = "TRACE";
 
 test("can import plugins at runtime (CLI)", async (t: Test) => {
+  // const pluginsPath = path.join(
+  //   "/tmp/org/hyperledger/cactus/cmd-api-server/install-basic-plugin-keychain-memory_test", // the dir path from the root
+  //   uuidv4(), // then a random directory to ensure proper isolation
+  // );
+  const pluginsPath = path.join(
+    __dirname, // start at the current file's path
+    "../../../../../../../", // walk back up to the project root
+    ".tmp/test/cmd-api-server/runtime-plugin-imports_test", // the dir path from the root
+    uuidv4(), // then a random directory to ensure proper isolation
+  );
+  const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
+
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+  apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;
