@@ -44,9 +44,9 @@ class InteroperableHelper {
             var result: Either<Error, String> = Left(Error(""))
             runBlocking {
                 val eitherErrorQuery = constructNetworkQuery(proxy, externalStateAddress)
-                logger.info("\nCorda network returned: $eitherErrorQuery \n")
+                logger.debug("\nCorda network returned: $eitherErrorQuery \n")
                 eitherErrorQuery.map { networkQuery ->
-                    logger.info("Network query: $networkQuery")
+                    logger.debug("Network query: $networkQuery")
                     runBlocking {
                         val ack = async { client.requestState(networkQuery) }.await()
                         pollForState(ack.requestId, client).map {
@@ -143,7 +143,7 @@ class InteroperableHelper {
             proxy: CordaRPCOps,
             address: String
         ): Either<Error, Networks.NetworkQuery> {
-            logger.info("Getting query information for foreign network from Corda network")
+            logger.debug("Getting query information for foreign network from Corda network")
             try {
                 val eitherErrorRequest = proxy.startFlow(::CreateExternalRequest, address)
                         .returnValue.get().map {
@@ -181,13 +181,13 @@ class InteroperableHelper {
             } else {
                 delay(1000L)
                 val requestState = async { client.getState(requestId) }.await()
-                logger.info("Response from getState: $requestState")
+                logger.debug("Response from getState: $requestState")
                 when (requestState.status.toString()) {
                     "COMPLETED" -> Right(requestState)
                     "PENDING" -> async { pollForState(requestId, client, retryCount + 1) }.await()
                     "PENDING_ACK" -> async { pollForState(requestId, client, retryCount + 1) }.await()
                     "ERROR" -> {
-                        logger.info("Error returned from the remote network: $requestState")
+                        logger.error("Error returned from the remote network: $requestState")
                         Left(Error("Error returned from remote network $requestState"))
                     }
                     else -> Left(Error("Unexpected status returned in RequestState"))
@@ -213,14 +213,14 @@ class InteroperableHelper {
             address: String
         ): Either<Error, String> {
             return try {
-                logger.info("Sending response to Corda for view verification.\n")
+                logger.debug("Sending response to Corda for view verification.\n")
                 val stateId = runCatching {
                     val viewBase64String = Base64.getEncoder().encodeToString(requestState.view.toByteArray())
                     proxy.startFlow(::WriteExternalStateInitiator, viewBase64String, address)
                             .returnValue.get()
                 }.fold({
                     it.map { linearId ->
-                        logger.info("Verification was successful and external-state was stored with linearId $linearId.\n")
+                        logger.debug("Verification was successful and external-state was stored with linearId $linearId.\n")
                         linearId.toString()
                     }
                 }, {
@@ -228,7 +228,7 @@ class InteroperableHelper {
                 })
                 stateId
             } catch (e: Exception) {
-                logger.info("Error writing state to Corda network: ${e.message}\n")
+                logger.error("Error writing state to Corda network: ${e.message}\n")
                 Left(Error("Error writing state to Corda network: ${e.message}"))
             }
         }
