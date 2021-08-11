@@ -161,6 +161,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     apiServerOptions.apiCorsDomainCsv = "*";
     apiServerOptions.apiPort = addressInfo1.port;
     apiServerOptions.cockpitPort = 0;
+    apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
     const config = configService.newExampleConfigConvict(apiServerOptions);
 
@@ -215,6 +216,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     apiServerOptions.apiCorsDomainCsv = "*";
     apiServerOptions.apiPort = addressInfo2.port;
     apiServerOptions.cockpitPort = 0;
+    apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
     const config = configService.newExampleConfigConvict(apiServerOptions);
 
@@ -270,6 +272,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     apiServerOptions.apiCorsDomainCsv = "*";
     apiServerOptions.apiPort = addressInfo3.port;
     apiServerOptions.cockpitPort = 0;
+    apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
     const config = configService.newExampleConfigConvict(apiServerOptions);
 

@@ -492,6 +492,7 @@ export class SupplyChainApp {
     properties.apiHost = addressInfoApi.address;
     properties.cockpitHost = addressInfoCockpit.address;
     properties.cockpitPort = addressInfoCockpit.port;
+    properties.grpcPort = 0; // TODO - make this configurable as well
     properties.logLevel = this.options.logLevel || "INFO";
 
     const apiServer = new ApiServer({
