@@ -351,6 +351,19 @@ export interface GetObjectResponseV1 {
 /**
  * 
  * @export
+ * @interface HasKeychainEntryRequest
+ */
+export interface HasKeychainEntryRequest {
+    /**
+     * The key for the entry to check on the keychain.
+     * @type {string}
+     * @memberof HasKeychainEntryRequest
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
  * @interface HasObjectRequestV1
  */
 export interface HasObjectRequestV1 {
