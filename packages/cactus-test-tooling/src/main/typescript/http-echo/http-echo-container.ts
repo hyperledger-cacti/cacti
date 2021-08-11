@@ -230,14 +230,11 @@ export class HttpEchoContainer implements ITestLedger {
   }
 
   private validateConstructorOptions(): void {
-    const validationResult = Joi.validate<IHttpEchoContainerConstructorOptions>(
-      {
-        imageVersion: this.imageVersion,
-        imageName: this.imageName,
-        httpPort: this.httpPort,
-      },
-      OPTS_SCHEMA,
-    );
+    const validationResult = OPTS_SCHEMA.validate({
+      imageVersion: this.imageVersion,
+      imageName: this.imageName,
+      httpPort: this.httpPort,
+    });
 
     if (validationResult.error) {
       throw new Error(

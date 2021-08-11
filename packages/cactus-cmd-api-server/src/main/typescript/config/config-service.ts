@@ -590,6 +590,8 @@ export class ConfigService {
     if (!ConfigService.config) {
       const schema: Schema<ICactusApiServerOptions> = ConfigService.getConfigSchema();
       ConfigService.config = (convict as any)(schema, options);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       if (ConfigService.config.get("configFile")) {
         const configFilePath = ConfigService.config.get("configFile");
         ConfigService.config.loadFile(configFilePath);

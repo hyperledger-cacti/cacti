@@ -1,3 +1,6 @@
+import type { BlockCodec } from "multiformats/codecs/interface";
+import type { MultibaseCodec } from "multiformats/bases/interface";
+import type { MultihashHasher } from "multiformats/hashes/interface";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { API as BitswapAPI } from "ipfs-core-types/src/bitswap";
 import { API as BlockAPI } from "ipfs-core-types/src/block";
@@ -55,6 +58,21 @@ interface RefsAPI extends Refs {
   local: Local;
 }
 
+interface Bases {
+  getBase: (code: string) => Promise<MultibaseCodec<string>>;
+  listBases: () => Array<MultibaseCodec<string>>;
+}
+
+interface Codecs {
+  getCodec: (code: number | string) => Promise<BlockCodec<number, unknown>>;
+  listCodecs: () => Array<BlockCodec<number, unknown>>;
+}
+
+interface Hashers {
+  getHasher: (code: number | string) => Promise<MultihashHasher>;
+  listHashers: () => Array<MultihashHasher>;
+}
+
 export interface IIpfsHttpClientMockOptions {
   logLevel?: LogLevelDesc;
 }
@@ -82,6 +100,9 @@ export class IpfsHttpClientMock implements IIpfsHttpClient {
   public readonly repo: RepoAPI;
   public readonly stats: StatsAPI;
   public readonly swarm: SwarmAPI;
+  public readonly bases: Bases;
+  public readonly codecs: Codecs;
+  public readonly hashers: Hashers;
 
   public get className(): string {
     return IpfsHttpClientMock.CLASS_NAME;
@@ -109,6 +130,9 @@ export class IpfsHttpClientMock implements IIpfsHttpClient {
     this.repo = {} as RepoAPI;
     this.stats = {} as StatsAPI;
     this.swarm = {} as SwarmAPI;
+    this.bases = {} as Bases;
+    this.codecs = {} as Codecs;
+    this.hashers = {} as Hashers;
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;

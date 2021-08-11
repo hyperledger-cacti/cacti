@@ -226,14 +226,11 @@ export class CordaConnectorContainer {
 
   private validateConstructorOptions(): void {
     const fnTag = `${this.className}#validateConstructorOptions()`;
-    const validationResult = Joi.validate<ICordaConnectorContainerOptions>(
-      {
-        imageVersion: this.imageVersion,
-        imageName: this.imageName,
-        apiPort: this.apiPort,
-      },
-      JOI_SCHEMA,
-    );
+    const validationResult = JOI_SCHEMA.validate({
+      imageVersion: this.imageVersion,
+      imageName: this.imageName,
+      apiPort: this.apiPort,
+    });
 
     if (validationResult.error) {
       throw new Error(`${fnTag} ${validationResult.error.annotate()}`);
