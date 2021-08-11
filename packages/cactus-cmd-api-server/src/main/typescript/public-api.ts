@@ -16,6 +16,13 @@ export {
   IPki,
 } from "./config/self-signed-pki-generator";
 
+// gRPC - generated models and client
+export * as default_service from "./generated/proto/protoc-gen-ts/services/default_service";
+export * as health_check_response_pb from "./generated/proto/protoc-gen-ts/models/health_check_response_pb";
+export * as memory_usage_pb from "./generated/proto/protoc-gen-ts/models/memory_usage_pb";
+export * as empty from "./generated/proto/protoc-gen-ts/google/protobuf/empty";
+
+// HTTP - generated models and client
 export * from "./generated/openapi/typescript-axios/index";
 
 export { ApiServerApiClient } from "./api-client/api-server-api-client";
