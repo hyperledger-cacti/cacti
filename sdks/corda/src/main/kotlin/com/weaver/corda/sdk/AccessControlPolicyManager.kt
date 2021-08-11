@@ -38,13 +38,14 @@ class AccessControlPolicyManager {
         ): Either<Error, String> {
             var accessControlPolicyJSON = JSONObject(accessControlPolicy)
             val linearId = UniqueIdentifier()
-            accessControlPolicyJSON.put("linearId", linearId)
+            accessControlPolicyJSON.put("linearId", JSONObject())
             accessControlPolicyJSON.put("participants", JSONArray())
             
             val accessControlPolicyState = Gson().fromJson(
                 accessControlPolicyJSON.toString(), 
                 AccessControlPolicyState::class.java
             )
+            accessControlPolicyState.linearId = linearId
             logger.info("Writing AccessControlPolicyState: ${accessControlPolicyState}")
             return try {
                 runCatching {
@@ -127,16 +128,15 @@ class AccessControlPolicyManager {
             proxy: CordaRPCOps,
             securityDomain: String
         ): Either<Error, AccessControlPolicyState> {
-            logger.info("Getting access control policy for securityDomain $securityDomain")
             return try {
-                logger.info("Getting access control policy for securityDomain $securityDomain")
+                logger.debug("Getting access control policy for securityDomain $securityDomain")
                 val accessControlPolicy = runCatching {
                     proxy.startFlow(::GetAccessControlPolicyBySecurityDomain, securityDomain)
                             .returnValue.get().fold({
-                                logger.info("Error getting access control policy from network: ${it.message}")
+                                logger.error("Error getting access control policy from network: ${it.message}")
                                 Left(Error("Corda Network Error: ${it.message}"))
                             }, {
-                                logger.info("Access Control Policy for securityDomain $securityDomain: ${it.state.data} \n")
+                                logger.debug("Access Control Policy for securityDomain $securityDomain: ${it.state.data} \n")
                                 Right(it.state.data)
                             })
                 }.fold({ it }, {
@@ -156,10 +156,21 @@ class AccessControlPolicyManager {
             proxy: CordaRPCOps
         ): Either<Error, String> {
             return try {
-                logger.info("Getting all access control policies")
+                logger.debug("Getting all access control policies")
                 val accessControlPolicies = proxy.startFlow(::GetAccessControlPolicies)
                         .returnValue.get()
-                logger.info("Access Control Policies: $accessControlPolicies\n")
+                        
+                val accessControlPolicyList: List<AccessControlPolicyState> = listOf()
+                for (acl in accessControlPolicies) {
+                    acl.fold({
+                        logger.error("Error in acl: ${it.message}")
+                        Left(Error("Error in acl: ${it.message}"))
+                    }, {
+                        logger.info("acl: ${it.state.data}\n")
+                        accessControlPolicyList += it.state.data
+                    })
+                }
+                logger.debug("Access Control Policies: $accessControlPolicyList\n")
                 Right(accessControlPolicies.toString())
             } catch (e: Exception) {
                 Left(Error("${e.message}"))
