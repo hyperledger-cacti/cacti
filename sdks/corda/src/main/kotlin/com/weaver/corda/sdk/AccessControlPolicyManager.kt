@@ -38,14 +38,13 @@ class AccessControlPolicyManager {
         ): Either<Error, String> {
             var accessControlPolicyJSON = JSONObject(accessControlPolicy)
             val linearId = UniqueIdentifier()
-            accessControlPolicyJSON.put("linearId", JSONObject())
+            accessControlPolicyJSON.put("linearId", JSONObject().put("id", linearId))
             accessControlPolicyJSON.put("participants", JSONArray())
             
             val accessControlPolicyState = Gson().fromJson(
                 accessControlPolicyJSON.toString(), 
                 AccessControlPolicyState::class.java
             )
-            accessControlPolicyState.linearId = linearId
             logger.info("Writing AccessControlPolicyState: ${accessControlPolicyState}")
             return try {
                 runCatching {
@@ -154,24 +153,18 @@ class AccessControlPolicyManager {
         @JvmStatic
         fun getAccessControlPolicies(
             proxy: CordaRPCOps
-        ): Either<Error, String> {
+        ): Either<Error, List<AccessControlPolicyState>> {
             return try {
                 logger.debug("Getting all access control policies")
                 val accessControlPolicies = proxy.startFlow(::GetAccessControlPolicies)
                         .returnValue.get()
                         
-                val accessControlPolicyList: List<AccessControlPolicyState> = listOf()
+                var accessControlPolicyList: List<AccessControlPolicyState> = listOf()
                 for (acl in accessControlPolicies) {
-                    acl.fold({
-                        logger.error("Error in acl: ${it.message}")
-                        Left(Error("Error in acl: ${it.message}"))
-                    }, {
-                        logger.info("acl: ${it.state.data}\n")
-                        accessControlPolicyList += it.state.data
-                    })
+                    accessControlPolicyList += acl.state.data
                 }
                 logger.debug("Access Control Policies: $accessControlPolicyList\n")
-                Right(accessControlPolicies.toString())
+                Right(accessControlPolicyList)
             } catch (e: Exception) {
                 Left(Error("${e.message}"))
             }
