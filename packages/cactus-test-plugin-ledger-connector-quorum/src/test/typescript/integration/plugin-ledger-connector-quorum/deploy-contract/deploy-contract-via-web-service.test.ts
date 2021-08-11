@@ -123,6 +123,8 @@ test(testCase, async (t: Test) => {
   const httpServer = apiServer.getHttpServerApi();
   const addressInfo = httpServer?.address() as AddressInfo;
   log.debug(`AddressInfo: `, addressInfo);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
   const protocol = config.get("apiTlsEnabled") ? "https:" : "http:";
   const basePath = `${protocol}//${addressInfo.address}:${addressInfo.port}`;
   log.debug(`SDK base path: %s`, basePath);

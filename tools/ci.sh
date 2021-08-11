@@ -88,14 +88,23 @@ function mainTask()
   # install npm 7 globally - needed because Node v12, v14 default to npm v6
   npm install -g npm@7.19.1
   npm --version
-  yarn --version  
+  yarn --version
 
   ### COMMON
   cd $PROJECT_ROOT_DIR
 
   yarn run configure
 
-  yarn run custom-checks
+  # Obtains the major NodeJS version such as "12" from "v12.14.1"
+  # We only run the custom checks above v12 because the globby dependency's
+  # latest version is forcing us to use Ecmascript Modules which do not work
+  # on NodeJS 12 even with the additional flags passed in.
+  nodejs_version=`node --version | awk -v range=1 '{print substr($0,range+1,2)}'`
+  if [ "$nodejs_version" -gt "12" ]; then
+    echo "$(date +%FT%T%z) [CI] NodeJS is newer than v12, running custom checks..."
+    yarn run custom-checks
+  fi
+
   node ./tools/validate-bundle-names.js
 
   dumpDiskUsageInfo

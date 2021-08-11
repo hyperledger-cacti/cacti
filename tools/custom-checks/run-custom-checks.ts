@@ -1,12 +1,21 @@
+import esMain from "es-main";
 import { checkOpenApiJsonSpecs } from "./check-open-api-json-specs";
 
 export async function runCustomChecks(
   argv: string[],
   env: NodeJS.ProcessEnv,
+  version: string,
 ): Promise<void> {
   const TAG = "[tools/custom-checks/check-source-code.ts]";
   let overallSuccess = true;
   let overallErrors: string[] = [];
+
+  const [majorVersion] = version.split(".");
+  const nodeV12OrOlder = parseInt(majorVersion) <= 12;
+  if (nodeV12OrOlder) {
+    console.log(`${TAG} Checks skipped due to old NodeJS (v${version}) OK.`);
+    return;
+  }
 
   {
     const [success, errors] = await checkOpenApiJsonSpecs({ argv, env });
@@ -23,6 +32,6 @@ export async function runCustomChecks(
   process.exit(exitCode);
 }
 
-if (require.main === module) {
-  runCustomChecks(process.argv, process.env);
+if (esMain(import.meta)) {
+  runCustomChecks(process.argv, process.env, process.versions.node);
 }
