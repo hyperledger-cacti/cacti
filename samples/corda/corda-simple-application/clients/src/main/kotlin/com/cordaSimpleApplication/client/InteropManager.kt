@@ -65,7 +65,6 @@ class RequestStateCommand : CliktCommand(help = "Requests state from a foreign n
         		val createdState = rpc.proxy.startFlow(::CreateState, key, value)
                             .returnValue.get().tx.outputStates.first() as SimpleState
         		println("Created simplestate: ${createdState}")
-        		println("LinearId ${createdState.linearId} can be used to fetch the requested state from the CorDapp simplestate vault")
             })
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
