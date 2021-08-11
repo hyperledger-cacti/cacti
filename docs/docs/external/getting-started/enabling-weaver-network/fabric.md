@@ -190,4 +190,195 @@ Only a connection profile will be used by Weaver, as we will see later.
 
 ### Startup and Bootstrap
 
-To launch a network using containerized components, you will typically use a Docker Compose or Kubernetes configuration file. No modifications are needed for the peers', orderers', and CAs' configurations.
+To launch a network using containerized components, you will typically use a Docker Compose or Kubernetes configuration file. No modifications are needed to the peers', orderers', and CAs' configurations. Sample instructions are given below for networks launched using Docker Compose; we leave it to the reader to adapt these to their custom launch processes.
+
+#### Launch Relay
+
+You can start a relay within a Docker container using a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server). You just need to customize the container configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
+- `.env`: This sets suitable environment variables within the relay container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
+  ```
+  PATH_TO_CONFIG=./config.toml
+  RELAY_NAME=<"name" in config.toml>
+  RELAY_PORT=<relay-server-port/"port" in config.toml>
+  EXTERNAL_NETWORK=<docker-bridge-network>
+  DOCKER_REGISTRY=ghcr.io/hyperledger-labs
+  DOCKER_IMAGE_NAME=weaver-relay
+  DOCKER_TAG=1.2.1
+  ```
+  The `PATH_TO_CONFIG` variable should point to the `config.toml` (you can name this whatever you wish) specified below.
+
+  The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
+
+  The `RELAY_PORT` variable specifies the port this relay server will listen on. It should match what's specified in the `config.toml` (more on that below).
+
+  The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
+
+  The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [Github](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server).
+
+  For more details, see the [Relay Docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
+- `config.toml`: This specifies properties of the relay and the driver(s) is associates with. A sample is given below:
+  ```
+  name=<relay-name>
+  port=<relay-port>
+  host="0.0.0.0"
+  db_path="db/<relay-name>/requests"
+  remote_db_path="db/<relay-name>/remote_request"
+
+  # FOR TLS
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=<true/false>
+
+  [networks]
+  [networks.<network-name>]
+  network="<driver-name>"
+
+  [relays]
+  [relays.<foreign-relay-name>]
+  hostname="<foreign-relay-hostname-or-ip-address>"
+  port="<foreign-relay-port>"
+
+  [drivers]
+  [drivers.<driver-name>]
+  hostname="<driver-hostname-or-ip-address>"
+  port="<driver-port>"
+  ```
+  `<relay-name>` should be a unique ID representing this relay; e.g., `my_network_relay`. It should match the `RELAY_NAME` value in `.env`.
+
+  `<relay-port>` is the port number the relay server will listen on. It should match the `RELAY_PORT` value in `.env`.
+
+  `db_path` and `remote_db_path` are used internally by the relay to store data. Replace `<relay-name>` with the same value set for the `name` parameter. (These can point to any filesystem paths in the relay's container.)
+
+  If you set `tls` to `true`, the relay will enforce TLS communication. The `cert_path` and `key_path` should point to a Fabric TLS certificate and key respectively, such as those created using the `cryptogen` tool.
+
+  `<network-name>` is a unique identifier for your local network. You can set it to whatever value you wish.
+
+  `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 234 and 242 must match.) In lines 243 and 244, you should specify the hostname and port for the driver (whose configuration we will handle later). (_Note_: you can specify more than one driver instance in the `drivers` section.)
+
+  The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 238 and 239, you should specify the hostname and port for the foreign relay. (_Note_: you can specify more than one foreign relay instance in the `relays` section.)
+- `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/docker-compose.yaml) verbatim.
+
+To start the relay server, navigate to the folder containing the above files and run the following:
+```
+docker-compose up -d relay-server
+```
+
+#### Launch Driver
+
+You can start a driver within a Docker container using a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver). You just need to customize the container configuration for your Fabric network, which you can do by simply creating a folder (let's call it `driver_config`) and configuring the following files in it:
+- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
+  ```
+  CONNECTION_PROFILE=<path_to_connection_profile>
+  DRIVER_CONFIG=./config.json
+  RELAY_ENDPOINT=<relay-hostname>:<relay-port>
+  NETWORK_NAME=<network-name>
+  DRIVER_PORT=<driver-server-port>
+  INTEROP_CHAINCODE=<interop-chaincode-name>
+  EXTERNAL_NETWORK=<docker-bridge-network>
+  DOCKER_IMAGE_NAME=weaver-fabric-driver
+  DOCKER_TAG=1.2.1
+  DOCKER_REGISTRY=ghcr.io/hyperledger-labs
+  ```
+  `<path_to_connection_profile>` should point to the path of a connection profile you generated in the "Pre-Configuration" section. A Fabric driver obtains client credentials from one of the organizations in your network, so pick an organization and point to the right connection profile.
+
+  The `DRIVER_CONFIG` variable should point to the `config.json` (you can name this whatever you wish) specified below.
+
+  `<relay-hostname>` should be set to the hostname of the relay server machine and `<relay-port>` should match the `port` value in the relay's `config.toml` (see above).
+
+  The `NETWORK_NAME` variable should be a unique ID referring to the Fabric network. It will be used to distinguish container names and wallet paths. (This setting is relevant in situations where a driver is used to query multiple network channels.)
+
+  The `DRIVER_PORT` variable should be set to the port this driver will listen on.
+
+  The `INTEROP_CHAINCODE` variable should be set to the ID of the Fabric Interop Chaincode installed on your Fabric network channel.
+
+  The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
+- `config.json`: This contains settings used to connect to a CA of a Fabric network organization and enroll a client. A sample is given below:
+  ```
+  {
+      "admin":{
+          "name":"admin",
+          "secret":"adminpw"
+      },
+      "relay": {
+          "name":"relay",
+          "affiliation":"<affiliation>",
+          "role": "client",
+          "attrs": [{ "name": "relay", "value": "true", "ecert": true }]
+      },
+      "mspId":"<msp-id>",
+      "caUrl":"<ca-service-endpoint>"
+  }
+  ```
+  As in the `.env` configuration, you should pick an organization for the driver to associate with. The `admin` section specifies the registrar name and password (this should be familiar to any Fabric network administrator) used to enroll clients. Default values of `admin` and `adminpw` are specified above as examples, which you should replace with the right values configured in your network organization's CA.
+
+  `<affiliation>` should be what's specified in your organization's Fabric CA server configuration. The default is `org1.department1`, but you should look up the appropriate value from the CA server's configuration file.
+
+  `<msp-id>` should be set to the (or an) MSP ID of the selected organization.
+
+  `<ca-service-endpoint>` should be set to the CA server's endpoint. If you launched your CA server as a container from a docker-compose file, this should be set to the container's service name.
+- `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/drivers/fabric-driver/docker-compose.yml) verbatim.
+
+To start the driver, navigate to the folder containing the above files and run the following:
+```
+docker-compose up -d
+```
+
+#### Ledger Initialization
+
+To prepare your network for interoperation with a foreign network, you need to record the following to your network channel through the Fabric Interoperation Chaincode:
+- **Access control policies**:
+  Let's take the example of the request made from `trade-finance-network` to `trade-logistics-network` for a B/L earlier in this document. `trade-logistics-network` can have a policy of the following form permitting access to the `GetBillOfLading` function from a client belonging to the `Exporter` organization in `trade-finance-network` as follows:
+  ```
+  {
+      "securityDomain":"trade-finance-network",
+      "rules":
+          [
+              {
+                  "principal":"ExporterMSP",
+                  "principalType":"ca",
+                  "resource":"tradelogisticschannel:shipmentcc:GetBillOfLading:*",
+                  "read":true
+              }
+          ]
+  }
+  ```
+  In this sample, a single rule is specified for requests coming from `trade-finance-network`: it states that a `GetBillOfLading` query made to the `shipmentcc` contract installed on the `tradelogisticschannel` channel is permitted for a requestor possessing credentials certified by an MSP with the `ExporterMSP` identity. The `*` at the end indicates that any arguments passed to the function will pass the access control check.
+
+  You need to record this policy rule on your Fabric network's channel by invoking either the `CreateAccessControlPolicy` function or the `UpdateAccessControlPolicy` function on the Fabric Interoperation Chaincode that is already installed on that channel; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. In either case, the chaincode function will take a single argument, which is the policy in the form of a JSON string (make sure you escape the double quotes before sending the request to avoid parsing errors). You can do this in one of two ways: (1) writing a small piece of code in Layer-2 that invokes the contract using the Fabric SDK Gateway API, or (2) running a `peer chaincode invoke` command from within a Docker container built on the `hyperledger/fabric-tools` image. Either approach should be familiar to a Fabric practitioner.
+- **Verification policies**:
+  Taking the same example as above, an example of a verification policy for a B/L requested by the `trade-finance-network` from the `trade-logistics-network` is as follows:
+  ```
+  {
+      "securityDomain":"trade-logistics-network",
+      "identifiers":
+          [
+              {
+                  "pattern":"tradelogisticschannel:shipmentcc:GetBillOfLading:*",
+                  "policy":
+                      {
+                          "type":"Signature",
+                          "criteria":
+                              [
+                                  "ExporterMSP",
+                                  "CarrierMSP"
+                              ]
+                      }
+              }
+          ]
+  }
+  ```
+  In this sample, a single verification policy rule is specified for data views coming from `trade-logistics-network`: it states that the data returned by the `GetBillOfLading` query made to the `shipmentcc` chaincode on the `tradelogisticschannel` channel requires as proof two signatures, one from a peer in the organization whose MSP ID is `ExporterMSP` and another from a peer in the organization whose MSP ID is `CarrierMSP`.
+
+  You need to record this policy rule on your Fabric network's channel by invoking either the `CreateVerificationPolicy` function or the `UpdateVerificationPolicy` function on the Fabric Interoperation Chaincode that is already installed on that channel; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. In either case, the chaincode function will take a single argument, which is the policy in the form of a JSON string (make sure you escape the double quotes before sending the request to avoid parsing errors). As with the access control policy, you can do this in one of two ways: (1) writing a small piece of code in Layer-2 that invokes the contract using the Fabric SDK Gateway API, or (2) running a `peer chaincode invoke` command from within a Docker container built on the `hyperledger/fabric-tools` image. Either approach should be familiar to a Fabric practitioner.
+- **Foreign network security group (membership) configuration**:
+  Run the following procedure (pseudocode) to record security group configuration for every foreign network you wish your Fabric network to interoperate with (you will need to collect the identity service URLs for all the foreign networks first):
+  ```
+  for each foreign network:
+      send an HTTP GET request to the network's identity service (using 'curl' or 'wget' from a shell script or equivalent programming language APIs)
+      invoke `CreateMembership` or `UpdateMembership` on the Fabric Interoperation Chaincode with the above HTTP response as argument
+  ```
+  As in the above two cases, use `CreateMembership` to record a confiuration for the first time for a given `securityDomain` and `UpdateMembership` to overwrite a configuration.
+
+  _Note_: security group configurations (organization lists and their certificate chains) for any Fabric network channel are subject to change, so you should run the above procedure periodically in a loop.
+
+Your Fabric network is now up and running with the necessary Weaver components, and your network's channel's ledger is bootstrapped with the initial configuration necessary for cross-network interactions!
