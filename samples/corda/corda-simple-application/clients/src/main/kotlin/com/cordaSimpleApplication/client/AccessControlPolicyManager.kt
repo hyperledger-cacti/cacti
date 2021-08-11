@@ -23,6 +23,7 @@ import com.weaver.corda.sdk.AccessControlPolicyManager
 
 /**
  * TODO: Documentation
+ * create-access-control-policy Dummy_Network
  */
 class CreateAccessControlPolicyCommand : CliktCommand(
         help = "Creates an Access Control Policy for an external network. ") {
@@ -52,7 +53,7 @@ fun createAccessControlPolicyFromFile(network: String, config: Map<String, Strin
             rpc.proxy,
             accessControlPolicy
         )
-        println("Access Control Policy created with linearId $res")
+        println("Access Control Policy Create Result: $res")
     } catch (e: Exception) {
       println("Error: Credentials directory ${filepath} not found.")
     } finally {
@@ -88,18 +89,11 @@ fun updateAccessControlPolicyFromFile(network: String, config: Map<String, Strin
         val accessControlPolicy = File(filepath).readText(Charsets.UTF_8)
         println("Access control policy from file: $accessControlPolicy")
         println("Updating access control policy in the vault")
-        runCatching {
-            AccessControlPolicyManager.updateAccessControlPolicyState(
-                rpc.proxy,
-                accessControlPolicy
-            )
-        }.fold({
-            it.flatMap {
-                println("Access Control Policy updated with linearId $it")
-            }
-        }, {
-            println("${it.message}")
-        })
+        val res = AccessControlPolicyManager.updateAccessControlPolicyState(
+            rpc.proxy,
+            accessControlPolicy
+        )
+        println("Access Control Policy Update Result: $res")
     } catch (e: Exception) {
       println("Error: ${e.toString()}")
     } finally {
