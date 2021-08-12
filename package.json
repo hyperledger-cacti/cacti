@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "run-ci": "./tools/ci.sh",
+    "reset": "git clean -f -X && yarn run configure",
     "configure": "yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend",
     "install-yarn": "npm install --global yarn@1.19.0",
     "custom-checks": "ts-node ./tools/custom-checks/run-custom-checks.ts",
