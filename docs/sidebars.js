@@ -11,6 +11,7 @@ module.exports = {
             type: "category",
             label: "Getting Started",
             items: [
+                "external/getting-started/guide",
                 {
                     type: "category",
                     label: "Launching a Test Network",

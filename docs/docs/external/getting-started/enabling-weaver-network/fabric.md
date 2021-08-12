@@ -9,7 +9,7 @@ title: Enabling Weaver in a Fabric Network and Application
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-After testing the Weaver interoperation mechanisms on [toy networks](../test-network/overview.md), you may be interested in finding out how you can equip an existing real network, whether in development or in production, to exercise these mechanisms. In this document, we will demonstrate how to equip a Fabric network and application with Weaver components and capabilities.
+After testing the Weaver interoperation mechanisms on [basic sample networks](../test-network/overview.md), you may be interested in finding out how you can equip an existing real network, whether in development or in production, to exercise these mechanisms. In this document, we will demonstrate how to equip a Fabric network and application with Weaver components and capabilities.
 
 ## Model
 
@@ -175,6 +175,20 @@ A Fabric distributed application's business logic code spans two layers as illus
       Let us understand this code snippet better. The structure in lines 156-161 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtaind via relays. The function `RecordBillOfLading` expects two arguments as specified in line 160: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 150), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay. (_Note_: a local chaincode invocation may require multiple view requests to different networks, which is why `indices` and `interopJSONs` are arrays; they therefore must have the same lengths.)
 
       The rest of the code ought to be self-explanatory. Values are hardcoded for explanation purposes, but you can refactor the above code by reading view addresses corresponding to chaincode invocations from a configuration file.
+
+      You also need to add the following dependency to the `dependencies` section of your application's `package.json` file:
+      ```
+      "@hyperledger-labs/weaver-fabric-interop-sdk": "latest",
+      ```
+      (Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424) and select a different version.)
+
+Create a personal access token with `read:packages` access in github in order to use modules published in github packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
+      Before you run `npm install` to fetch the dependencies, make sure you create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github. Create an `.npmrc` file in the same folder as the `package.json` with the following contents:
+      ```
+      registry=https://npm.pkg.github.com/hyperledger-labs
+      //npm.pkg.github.com/:_authToken=<personal-access-token>
+      ```
+      Replace `<personal-access-token>` in this file with the token you created in Github.
     - _Asset exchange_: _TBD_
 
 ### Pre-Configuration
