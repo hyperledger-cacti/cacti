@@ -120,6 +120,7 @@ export class ApiServer {
         pollingIntervalInMin: 1,
       });
     }
+    this.prometheusExporter.startMetricsCollection();
     this.prometheusExporter.setTotalPluginImports(this.getPluginImportsCount());
 
     this.log = LoggerProvider.getOrCreate({
