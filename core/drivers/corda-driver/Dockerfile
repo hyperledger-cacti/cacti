@@ -5,11 +5,14 @@ RUN apt-get update && apt-get install -y maven
 
 WORKDIR /corda-driver
 ADD . .
-RUN ./gradlew build --refresh-dependencies
-RUN ./gradlew installDist
+# RUN ./gradlew build --refresh-dependencies
+RUN ./gradlew clean installDist
 
 FROM openjdk:8-jre-alpine
 
 COPY --from=builder /corda-driver/build/install/corda-driver /corda-driver/
 
 WORKDIR /corda-driver
+
+ARG GIT_URL
+LABEL org.opencontainers.image.source ${GIT_URL}

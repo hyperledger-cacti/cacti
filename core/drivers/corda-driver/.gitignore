@@ -63,5 +63,6 @@ crashlytics-build.properties
 # docs related
 docs/virtualenv/
 
-# artifactory credentials
-artifactory.properties
+# github credentials
+github.properties
+.env

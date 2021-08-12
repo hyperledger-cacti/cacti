@@ -2,6 +2,7 @@ FABRIC_VERSION=2.1.0
 FABRIC_CA_VERSION=1.4.7
 FABRIC_COUCH_VERSION=0.4.20
 CHAINCODE_NAME?=simplestate
+NW?=network1
 
 .PHONY:	all
 all: start
@@ -9,10 +10,8 @@ all: start
 .PHONY: start
 start:	start-network1 start-network2
 
-
 .PHONY: start-interop
 start-interop: start-interop-network1 start-interop-network2
-
 
 .PHONY: start-network1
 start-network1:	.fabric-setup setup-cc
@@ -41,11 +40,17 @@ setup-interop-network2: setup-interop-cc
 
 .PHONY: setup-interop-cc
 setup-interop-cc:
-	./scripts/setupCCLocal.sh
+	# ./scripts/setupCCLocal.sh
+	./scripts/setupCC.sh
 
 .PHONY: setup-cc
 setup-cc:
 	./scripts/setupAppCC.sh $(CHAINCODE_NAME)
+
+.PHONY: deploy-cc
+deploy-cc:
+	./scripts/setupAppCC.sh $(CHAINCODE_NAME)
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw $(NW)
 
 
 .fabric-setup:
@@ -76,7 +81,8 @@ remove-network2:
 
 .PHONY: clean
 clean:	stop
-	+rm -rf bin
-	+rm -rf config
-	+rm .fabric-setup
+	+rm -rf bin || true
+	+rm -rf config || true
+	+rm .fabric-setup || true
+	+chmod -R 755 ../shared/chaincode/interop
 	+rm -rf ../shared/chaincode/*

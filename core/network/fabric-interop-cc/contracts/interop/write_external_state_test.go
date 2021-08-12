@@ -14,7 +14,7 @@ import (
 
 	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 )
 
 var cordaB64View = `CjQIBBIcVHVlIE5vdiAxNyAwMDoxMzo0NiBHTVQgMjAyMBoMTm90YXJpemF0aW9uIgRKU09OEtYHCoQGClhhMjZHVW9WYythenlIMENUYjN2K2pTdmp3Y255M0hFd3AyMlJrdDkvZC9GcXN4WVVvYXhVWTdUOWNKRk9TVTZiVW42UFIwNmFVckxxdjZLbzZ1NG5CUT09Ep8FLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ3akNDQVYrZ0F3SUJBZ0lJVUprUXZtS20zNVl3RkFZSUtvWkl6ajBFQXdJR0NDcUdTTTQ5QXdFSE1DOHgKQ3pBSkJnTlZCQVlUQWtkQ01ROHdEUVlEVlFRSERBWk1iMjVrYjI0eER6QU5CZ05WQkFvTUJsQmhjblI1UVRBZQpGdzB5TURBM01qUXdNREF3TURCYUZ3MHlOekExTWpBd01EQXdNREJhTUM4eEN6QUpCZ05WQkFZVEFrZENNUTh3CkRRWURWUVFIREFaTWIyNWtiMjR4RHpBTkJnTlZCQW9NQmxCaGNuUjVRVEFxTUFVR0F5dGxjQU1oQU1NS2FSRUsKaGNUZ1NCTU16Szgxb1BVU1BvVm1HL2ZKTUxYcS91alNtc2U5bzRHSk1JR0dNQjBHQTFVZERnUVdCQlJNWHREcwpLRlp6VUxkUTNjMkRDVUV4M1QxQ1VEQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01Bc0dBMVVkRHdRRUF3SUNoREFUCkJnTlZIU1VFRERBS0JnZ3JCZ0VGQlFjREFqQWZCZ05WSFNNRUdEQVdnQlI0aHdMdUxnZklaTUVXekc0bjNBeHcKZmdQYmV6QVJCZ29yQmdFRUFZT0tZZ0VCQkFNQ0FRWXdGQVlJS29aSXpqMEVBd0lHQ0NxR1NNNDlBd0VIQTBjQQpNRVFDSUM3SjQ2U3hERHozTGpETnJFUGpqd1AycHJnTUVNaDdyL2dKcG91UUhCaytBaUErS3pYRDBkNW1pSTg2CkQybVlLNEMzdFJsaTNYM1ZnbkNlOENPcWZZeXVRZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0aBlBhcnR5QRLMAQpsW1NpbXBsZVN0YXRlKGtleT1ILCB2YWx1ZT0xLCBvd25lcj1PPVBhcnR5QSwgTD1Mb25kb24sIEM9R0IsIGxpbmVhcklkPTIzMTRkNmI3LTFlY2EtNDg5Mi04OGY4LTc2ZDg1YjhhODVjZCldElxsb2NhbGhvc3Q6OTA4MC9Db3JkYV9OZXR3b3JrL2xvY2FsaG9zdDoxMDAwNiNjb20uY29yZGFTaW1wbGVBcHBsaWNhdGlvbi5mbG93LkdldFN0YXRlQnlLZXk6SA==`
@@ -81,8 +81,18 @@ func TestWriteExternalState(t *testing.T) {
 		Payload: []byte("I am a result"),
 	})
 
-	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key"}, "localhost:9080/network1/mychannel:simplestate:Read:Arcturus", b64View)
+	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9080/network1/mychannel:simplestate:Read:Arcturus"}, []string{b64View})
 	require.NoError(t, err)
+
+	// Test failures when invalid or insufficient arguments are supplied
+	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{"localhost:9080/network1/mychannel:simplestate:Read:Arcturus"}, []string{b64View})
+	require.EqualError(t, err, "Index 2 out of bounds of array (length 2)")
+
+	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{"localhost:9080/network1/mychannel:simplestate:Read:Arcturus"}, []string{b64View})
+	require.EqualError(t, err, "Number of argument indices for substitution (2) does not match number of addresses (1)")
+
+	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9080/network1/mychannel:simplestate:Read:Arcturus"}, []string{})
+	require.EqualError(t, err, "Number of addresses (1) does not match number of views (0)")
 
 	// Happy case: Corda
 	ctx, chaincodeStub, interopcc = prepMockStub()
@@ -98,7 +108,7 @@ func TestWriteExternalState(t *testing.T) {
 		Message: "",
 		Payload: []byte("I am a result"),
 	})
-	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key"}, "localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H", cordaB64View)
+	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"}, []string{cordaB64View})
 	require.NoError(t, err)
 
 	// Test case: Invalid cert in Membership
@@ -108,7 +118,7 @@ func TestWriteExternalState(t *testing.T) {
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturnsOnCall(0, network1VerificationPolicyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(1, invalidMembershipBytes, nil)
-	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key"}, "localhost:9080/network1/mychannel:simplestate:Read:Arcturus", b64View)
+	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9080/network1/mychannel:simplestate:Read:Arcturus"}, []string{b64View})
 	require.EqualError(t, err, "VerifyView error: Verify membership failed. Certificate not valid: Client cert not in a known PEM format")
 
 	// Test case: Invalid policy in verification policy
@@ -117,6 +127,6 @@ func TestWriteExternalState(t *testing.T) {
 	invalidVerificationPolicyBytes, err := json.Marshal(&network1VerificationPolicy)
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturnsOnCall(0, invalidVerificationPolicyBytes, nil)
-	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key"}, "localhost:9080/network1/mychannel:simplestate:Read:Arcturus", b64View)
+	err = interopcc.WriteExternalState(ctx, "network1", "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9080/network1/mychannel:simplestate:Read:Arcturus"}, []string{b64View})
 	require.EqualError(t, err, "VerifyView error: Unable to resolve verification policy: Verification Policy Error: Failed to find verification policy matching view address: mychannel:simplestate:Read:Arcturus")
 }

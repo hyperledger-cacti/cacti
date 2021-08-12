@@ -4,17 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaDriver
+package com.weaver.corda.driver
 
-import common.state.State
 import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import relay.datatransfer.DataTransferGrpcKt
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
+
+import com.weaver.protos.common.state.State
+import com.weaver.protos.relay.datatransfer.DataTransferGrpcKt
 
 /**
  * Implements a gRPC client that connects to a local relay to send back requested state.

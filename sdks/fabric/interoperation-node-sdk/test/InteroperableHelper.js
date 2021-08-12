@@ -38,7 +38,7 @@ describe("InteroperableHelper", () => {
     const userName = "user_name";
 
     let wallet;
-    let fnimcc;
+    let interopcc;
     // Initialize wallet with a single user identity
     async function initializeWallet() {
         const privKeyFile = `${__dirname}/data/privKey.pem`;
@@ -57,7 +57,7 @@ describe("InteroperableHelper", () => {
     beforeEach(async () => {
         await initializeWallet();
         const network = sinon.createStubInstance(NetworkImpl);
-        fnimcc = new ContractImpl(network, "fnimcc", "InteroperableHelper");
+        interopcc = new ContractImpl(network, "interopcc", "InteroperableHelper");
     });
 
     afterEach(() => {
@@ -154,7 +154,7 @@ describe("InteroperableHelper", () => {
     describe("verify remote proposal response", () => {
         beforeEach(() => {
             const ccResult = fs.readFileSync(`${__dirname}/data/exporter_org_msp_config.json`);
-            sinon.stub(fnimcc, "evaluateTransaction").resolves(ccResult);
+            sinon.stub(interopcc, "evaluateTransaction").resolves(ccResult);
         });
 
         const samplePropJSON = JSON.parse(fs.readFileSync(`${__dirname}/data/prop.json`).toString());
@@ -228,13 +228,13 @@ describe("InteroperableHelper", () => {
                 viewPatterns: [],
             };
             const vpResult = JSON.stringify(vpJSON);
-            const fnimccStub = sinon.stub(fnimcc, "evaluateTransaction").resolves(vpResult);
-            fnimccStub.withArgs("GetVerificationPolicyBySecurityDomain", "network1").resolves(vpResult);
+            const interopccStub = sinon.stub(interopcc, "evaluateTransaction").resolves(vpResult);
+            interopccStub.withArgs("GetVerificationPolicyBySecurityDomain", "network1").resolves(vpResult);
         });
 
         it("validate policy syntax and attributes", async () => {
             const policyJSON = await getPolicyCriteriaForAddress(
-                fnimcc,
+                interopcc,
                 "localhost:9080/network1/mychannel:simplestate:Read:Arcturus",
             );
             expect(policyJSON).to.be.an("array");
@@ -264,9 +264,9 @@ describe("InteroperableHelper", () => {
                 ],
                 viewPatterns: [],
             };
-            const fnimccStub = sinon.stub(fnimcc, "submitTransaction").resolves(false);
-            fnimccStub.withArgs("Write", "w", "value").resolves(true);
-            fnimccStub
+            const interopccStub = sinon.stub(interopcc, "submitTransaction").resolves(false);
+            interopccStub.withArgs("Write", "w", "value").resolves(true);
+            interopccStub
                 .withArgs(
                     "WriteExternalState",
                     "interop",
@@ -276,8 +276,8 @@ describe("InteroperableHelper", () => {
                 )
                 .resolves(true);
             const vpResult = JSON.stringify(vpJSON);
-            const fnimccStub = sinon.stub(fnimcc, "evaluateTransaction").resolves(vpResult);
-            fnimccStub.withArgs("GetVerificationPolicyBySecurityDomain", "network1").resolves(vpResult);
+            const interopccStub = sinon.stub(interopcc, "evaluateTransaction").resolves(vpResult);
+            interopccStub.withArgs("GetVerificationPolicyBySecurityDomain", "network1").resolves(vpResult);
         });
         it("works as a normal invoke", async () => {
             const invokeObject = {
@@ -289,7 +289,7 @@ describe("InteroperableHelper", () => {
             const remoteJSON = {};
             const keyCert = await getKeyAndCertForRemoteRequestbyUserName(wallet, userName);
             const invokeHandlerResponse = await invokeHandler(
-                fnimcc,
+                interopcc,
                 "networkID",
                 "org",
                 invokeObject,

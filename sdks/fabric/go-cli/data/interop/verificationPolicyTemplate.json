@@ -1,0 +1,11 @@
+{
+    "securityDomain": "<network-id>",
+    "identifiers": [
+      {
+        "pattern": "mychannel:simplestate:Read:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      }]
+  }

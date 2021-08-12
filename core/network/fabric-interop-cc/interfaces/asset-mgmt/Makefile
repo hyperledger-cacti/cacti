@@ -1,8 +1,4 @@
-mocks:
-	cp -r ../../contracts/interop/mocks .
-test: mocks
+test:
 	go test asset_locks_contract.go asset_locks_contract_test.go setup_test.go asset_locks.go -v
-test-all: mocks
+test-all:
 	go test -v .
-clean:
-	rm -rf mocks

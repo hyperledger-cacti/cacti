@@ -8,8 +8,8 @@ package main_test
 
 import (
 	"os"
-	"github.com/hyperledger-labs/weaver/samples/simpleasset/mocks"
-	sa "github.com/hyperledger-labs/weaver/samples/simpleasset"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/mocks"
+	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset"
 )
 
 const (

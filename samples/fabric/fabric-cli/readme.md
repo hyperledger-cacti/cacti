@@ -34,11 +34,11 @@ The tool can be installed via npm or manually. If no development is required it 
 
 ## Installing with npm
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
 
 Add contents of the `.npmrc` to the `.npmrc` located at `~/.npmrc`, be careful not to replace anything
 
-then run `npm install -g @res-dlt-interop/fabric-cli`
+then run `npm install -g @hyperledger-labs/weaver-fabric-cli`
 
 NOTE: If installing this way it is required to set up the env and config through the cli using either `fabric-cli env set <key> <value>` or `fabric-cli env set-file <file-path>`. Refer to the `.env.template` and `config.json `to determine what values are needed.
 
@@ -57,7 +57,7 @@ Set up `config.json` by adding the connection profile and relay port for each ne
 
 (Editing of the env and config can be done via the CLI with the `fabric-cli env set` and `fabric-cli config set` commands)
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
 
 Have `yarn` installed and have Node >= 11.14.0 <= 16.0.0
 
@@ -77,7 +77,7 @@ Then run
 
 ## Docker
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
 
 Run `make build-image` to build fabric-cli docker image.
 
@@ -105,26 +105,14 @@ NOTE: Use the `--help` flag with any command to view examples and usage.
 
 ## Publishing CLI
 
-Run `npm publish` will error if same version is already published. Will need the artifactory token, will error if same version is already published. Will need the artifactory token.
+Run `npm publish`. Will need the github personal access token with write access, will error if same version is already published.
 
-## Setup Artifactory token for fabric-interop-sdk
+## Setup access token for weaver-fabric-interop-sdk
 
-1) Go to IBM artifactory (https://na.artifactory.swg-devops.com/artifactory/)
-2) Click on your email id on top right
-3) Generate/Copy the API key from profile, let's say it is - "ThisIsMyAPIKey"
-4) Run this command on your system -
-	 curl --header 'X-JFrog-Art-Api: ThisIsMyAPIKey' https://na.artifactory.swg-devops.com/artifactory/api/npm/auth
-5) The above command will return you auth token along with auth settings and your email id from artifactory.
-6) Create a .npmrc file in the backend folder (from where you want to run npm install)
-7) Add this line to your .npmrc file,
-	 @res-dlt-interop:registry=https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/
-8) Add the output of curl to that file.
-9) Final .npmrc should look like this -
-   "@res-dlt-interop:registry=https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/
-    _auth = <Auth-token>
-    always-auth = true
-    email = user@email.com"
-10) Run npm install to check if artifactory connection is working before testing/deployment.
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help. \
+2) Create a copy of `.npmrc.template` as `.npmrc`. \
+3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token. \
+4) Run npm install to check if it is working before testing/deployment.
 
 ## Environment Variables
 - `DEFAULT_CHANNEL` (OPTIONAL) The default channel used by the CLI when invoking chaincode on a network.
@@ -141,18 +129,43 @@ Example config:
 {
   "network1": {
     "connProfilePath": "",
-    "relayEndpoint": ""
+    "relayEndpoint": "",
+    "mspId": "",
+    "channelName": "",
+    "chaincode": ""
   },
   "network2": {
     "connProfilePath": "",
-    "relayEndpoint": ""
+    "relayEndpoint": "",
+    "mspId": "",
+    "channelName": "",
+    "chaincode": ""
   }
 }
 ```
 
 ## Asset Exchange
 
-  Sample `fabric-cli asset exchange-step` commands:
+Below are the steps to exercise asset exchange using `fabric-cli`.
+1. Spin up both `network1` and `network2` with interoperation chaincode installed along with the `simpleasset` application, by running
+```bash
+   make start-interop CHAINCODE_NAME=simpleasset
+```
+2. Go to `fabric-cli` directory and run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adding the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
+```bash
+   sh scripts/initAsset.sh
+```
+3. Check the status of the assets owned by `Alice` and `Bob` in the the networks `network1` and `network2`, by running
+```bash
+   sh scripts/getAssetStatus.sh
+```
+4. Initiate exchange of bond asset `bond01:a04` of `Bob` in `network1` with token assets `token1:100` of `Alice` in `network2`, by running
+```
+./bin/fabric-cli asset exchange-all --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:bond01:a04:alice:token1:100
+```
+- Repeat the step 3 to observe the change in the ownership of assets as a result of the `asset echange` exercise.
+
+5. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange-step` CLI commands):
   ```
   ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --secret=<hash-pre-image> --target-network=network1 --param=bond01:a03
  ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
@@ -160,9 +173,17 @@ Example config:
  ./bin/fabric-cli asset exchange-step --step=4 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
  ./bin/fabric-cli asset exchange-step --step=5 --recipient=alice --locker=bob --target-network=network2 --contract-id=<contract-id> --secret=<hash-pre-image>
  ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
- ./bin/fabric-cli asset exchange-step --step=7 --locker=bob --recipient=alice --target-network=network1 --param=bond01:a03
+ ./bin/fabric-cli asset exchange-step --step=7 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
  ./bin/fabric-cli asset exchange-step --step=8 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
  ```
+ 6. The `asset exchange` scenario is demonstrated above using an application chaincode `simpleasset` and the `interop` chaincode, where the application chaincode makes invocations into the `interop` chaincode when it needs to lock, claim, or reclaim/unlock assets. However, the same `asset exchange` scenario can be demonstrated with the help of just the application chaincode `simpleassetandinterop` which also includes the scripts to lock, claim, or reclaim/unlock assets. This requires the steps 1-5 to be exercised with minor modifications as indicated below:
+ - Spin up the networks by running the below command (update to step 1)
+ ```bash
+ make start CHAINCODE_NAME=simpleassetandinterop
+```
+- Replace `simpleasset` with `simpleassetandinterop` in the `config.json` file used to populate the `.env` file that is part of the script `initAsset.sh` (update to step 2)
+- Replace `simpleasset` with `simpleassetandinterop` in the script `getAssetStatus.sh` (update to step 3)
+
 
 ## NOTE
 

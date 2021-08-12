@@ -12,4 +12,4 @@ then
     echo "Deleting local copy of protos directory to copy latest from main folder"
     rm -rf protos
 fi
-cp -r $WEAVER_ROOT/common/interop-protos protos
+cp -r $WEAVER_ROOT/common/protos protos

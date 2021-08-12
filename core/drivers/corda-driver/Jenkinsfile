@@ -28,7 +28,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                  sed -e "s/<IBM email>/${DOCKER_CREDENTIALS_USR}/g" -e "s/<Artifactory API Key>/${DOCKER_CREDENTIALS_PSW}/g" artifactory.properties.template > artifactory.properties
+                  sed -e "s/<IBM email>/${DOCKER_CREDENTIALS_USR}/g" -e "s/<Artifactory API Key>/${DOCKER_CREDENTIALS_PSW}/g" github.properties.template > github.properties
                   docker build -t corda-driver:latest -f Dockerfile .;
             		'''
             }

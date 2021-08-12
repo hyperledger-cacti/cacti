@@ -1,6 +1,6 @@
-DOCKER_IMAGE_NAME ?= dlt-interop/relay
-DOCKER_TAG ?= latest
-DOCKER_REGISTRY ?= res-dlt-interop-docker-local.na.artifactory.swg-devops.com
+DOCKER_IMAGE_NAME ?= weaver-relay
+DOCKER_TAG ?= 1.2.1
+DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 PROTOS_TAG ?= v0.7
 
 DOCKER_IMAGE_ALL = $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
@@ -11,6 +11,7 @@ DOCKER_IMAGE_DRIVER = $(DOCKER_IMAGE_NAME)-driver:$(DOCKER_TAG)
 COMMIT = $(shell git log -1 --oneline | cut -d ' ' -f 1)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 TIMESTAMP = $(shell date +%FT%T%z)
+GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability
 
 .PHONY: all
 all: 	build-local
@@ -42,7 +43,7 @@ build:	protos
 .PHONY:	build-server
 build-server: protos fingerprint.json
 	@echo -e "\033[1mBUILD\033[0m - Building Docker image (relay server)..."
-	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) -t $(DOCKER_IMAGE_SERVER) -f Dockerfile.server . 
+	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_SERVER) -f Dockerfile.server . 
 
 .PHONY: build-client
 build-client: protos fingerprint.json
@@ -83,7 +84,7 @@ build-local:	protos-local
 .PHONY:	build-server-local
 build-server-local: protos-local fingerprint.json
 	@echo -e "\033[1mBUILD\033[0m - Building Docker image (relay server)..."
-	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) -t $(DOCKER_IMAGE_SERVER) -f Dockerfile.server .
+	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_SERVER) -f Dockerfile.server .
 
 .PHONY: build-client-local
 build-client-local: protos-local fingerprint.json
@@ -105,9 +106,8 @@ build-allinone-local: protos-local fingerprint.json
 .PHONY: build-images-local
 build-images-local: build-allinone-local build-driver-local build-server-local build-client-local
 
-
 .PHONY: push-server
-push-server: build-server
+push-server: build-server-local
 	@echo -e "\033[1mPUSH\033[0m - Pushing Docker image (relay server)..."
 	docker tag $(DOCKER_IMAGE_SERVER) $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_SERVER)
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_SERVER)

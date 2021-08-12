@@ -24,7 +24,7 @@ import (
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	protoV2 "google.golang.org/protobuf/proto"
 )
 
@@ -81,7 +81,7 @@ func TestHandleExternalRequest(t *testing.T) {
 		SecurityDomain: "2345",
 		Rules: []*common.Rule{{
 			Principal:     validCertificate,
-			PrincipalType: "ca",
+			PrincipalType: "certificate",
 			Read:          true,
 			Resource:      "mychannel:interop:Read:a",
 		}},

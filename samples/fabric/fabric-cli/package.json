@@ -1,5 +1,5 @@
 {
-  "name": "@res-dlt-interop/fabric-cli",
+  "name": "@hyperledger-labs/weaver-fabric-cli",
   "version": "1.2.1",
   "description": "fabric-cli CLI",
   "types": "build/types/types.d.ts",
@@ -20,8 +20,7 @@
     "test": "jest",
     "watch": "jest --watch",
     "snapupdate": "jest --updateSnapshot",
-    "coverage": "jest --coverage",
-    "protos": "grpc_tools_node_protoc --proto_path=protos --js_out=import_style=commonjs,binary:protos-js/ --grpc_out=grpc_js:protos-js/ --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` protos/relay/datatransfer.proto protos/networks/networks.proto protos/driver/driver.proto protos/common/ack.proto protos/common/query.proto protos/common/state.proto protos/common/proofs.proto  "
+    "coverage": "jest --coverage"
   },
   "files": [
     "tsconfig.json",
@@ -33,13 +32,13 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "@hyperledger-labs/weaver-fabric-interop-sdk": "latest",
     "@fidm/x509": "^1.2.1",
-    "@res-dlt-interop/fabric-interop-sdk": "file:../../../sdks/fabric/interoperation-node-sdk",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "elliptic": "^6.5.4",
-    "fabric-ca-client": "^2.2.5",
-    "fabric-network": "^2.2.5",
+    "fabric-ca-client": "^2.2.8",
+    "fabric-network": "^2.2.8",
     "gluegun": "latest",
     "grpc-tools": "1.9.1",
     "ini": "^1.3.6",
@@ -76,6 +75,6 @@
     "singleQuote": true
   },
   "publishConfig": {
-    "registry": "https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/"
+    "registry": "https://npm.pkg.github.com/hyperledger-labs"
   }
 }

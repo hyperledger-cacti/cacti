@@ -1,11 +1,18 @@
 .PHONY: start
-start:
+start: github.properties
+	echo "Building corda simple app..."
+	cp github.properties ../../../samples/corda/corda-simple-application/
+	cd ../../../samples/corda/corda-simple-application && make build
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh
 	./scripts/start-nodes.sh
 
 .PHONY: start-local
 start-local:
+	echo "Building corda interop app..."
+	cd ../../../core/network/corda-interop-app && make build-local
+	echo "Building corda simple app..."
+	cd ../../../samples/corda/corda-simple-application && make build-local
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh local
 	./scripts/start-nodes.sh
@@ -16,9 +23,9 @@ restart-with-new-interop-app:
 
 .PHONY:	stop
 stop: 
-	./scripts/stop-nodes.sh
+	docker-compose down
 
 .PHONY: clean
 clean:	stop
 	./gradlew clean
-	rm artifacts/*.jar
+	rm artifacts/*.jar || true

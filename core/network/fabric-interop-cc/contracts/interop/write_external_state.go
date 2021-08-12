@@ -16,9 +16,9 @@ import (
 	"github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric-protos-go/peer"
 	log "github.com/sirupsen/logrus"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/corda"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/fabric"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/corda"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/fabric"
 	protoV2 "google.golang.org/protobuf/proto"
 )
 
@@ -26,29 +26,93 @@ type interop interface {
 	WriteExternalState(state string) error
 }
 
-// WriteExternalState flow is used to process a response from a foreign network for state.
-// 1. Verify Proofs that are returned
-// 2. Call application chaincode
-func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInterface, applicationID string, applicationChannel string, applicationFunction string, applicationArgs []string, address string, b64ViewProto string) error {
+// Extract data (i.e., query response) from view
+func ExtractDataFromView(view *common.View) ([]byte, error) {
+	var interopPayload common.InteropPayload
+	if view.Meta.Protocol == common.Meta_FABRIC {
+		var fabricViewData fabric.FabricView
+		err := protoV2.Unmarshal(view.Data, &fabricViewData)
+		if err != nil {
+			return nil, fmt.Errorf("FabricView Unmarshal error: %s", err)
+		}
+		err = protoV2.Unmarshal(fabricViewData.Response.Payload, &interopPayload)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+		}
+	} else if view.Meta.Protocol == common.Meta_CORDA {
+		var cordaViewData corda.ViewData
+		err := protoV2.Unmarshal(view.Data, &cordaViewData)
+		if err != nil {
+			return nil, fmt.Errorf("CordaView Unmarshal error: %s", err)
+		}
+		err = protoV2.Unmarshal(cordaViewData.Payload, &interopPayload)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+		}
+	} else {
+		return nil, fmt.Errorf("Cannot extract data from view; unsupported DLT type: %+v", view.Meta.Protocol)
+	}
+	return interopPayload.Payload, nil
+}
+
+// Validate view against address, and extract data (i.e., query response) from view
+func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextInterface, address string, b64ViewProto string) ([]byte, error) {
 	viewB64Bytes, err := base64.StdEncoding.DecodeString(b64ViewProto)
 	if err != nil {
-		return fmt.Errorf("Unable to base64 decode data: %s", err.Error())
+		return nil, fmt.Errorf("Unable to base64 decode data: %s", err.Error())
 	}
 	var view common.View
 	err = protoV2.Unmarshal(viewB64Bytes, &view)
 	if err != nil {
-		return fmt.Errorf("View Unmarshal error: %s", err)
+		return nil, fmt.Errorf("View Unmarshal error: %s", err)
 	}
-	// 1. Verify proofs that are returned
+
+	// 1. Verify proof
 	err = s.VerifyView(ctx, b64ViewProto, address)
 	if err != nil {
-		return fmt.Errorf("VerifyView error: %s", err)
+		return nil, fmt.Errorf("VerifyView error: %s", err)
+	}
+
+	// 2. Extract response data for consumption by application chaincode
+	viewData, err := ExtractDataFromView(&view)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("View data: %s\n", string(viewData))
+
+	return viewData, nil
+}
+
+// WriteExternalState flow is used to process a response from a foreign network for state.
+// 1. Verify Proofs that are returned
+// 2. Call application chaincode
+func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInterface, applicationID string, applicationChannel string, applicationFunction string, applicationArgs []string, argIndicesForSubstitution []int, addresses []string, b64ViewProtos []string) error {
+	if len(argIndicesForSubstitution) != len(addresses) {
+		return fmt.Errorf("Number of argument indices for substitution (%d) does not match number of addresses (%d)", len(argIndicesForSubstitution), len(addresses))
+	}
+	if len(addresses) != len(b64ViewProtos) {
+		return fmt.Errorf("Number of addresses (%d) does not match number of views (%d)", len(addresses), len(b64ViewProtos))
+	}
+
+	arr := append([]string{applicationFunction}, applicationArgs...)
+
+	// 1. Verify proofs that are returned
+	for i, argIndex := range argIndicesForSubstitution {
+		// Validate argument index
+		if argIndex >= len(applicationArgs) {
+			return fmt.Errorf("Index %d out of bounds of array (length %d)", argIndex, len(applicationArgs))
+		}
+		// Validate proof and extract view data
+		viewData, err := s.ParseAndValidateView(ctx, addresses[i], b64ViewProtos[i])
+		if err != nil {
+			return err
+		}
+		// Substitute argument in list with view data
+		arr[argIndex + 1] = string(viewData)        // First argument is the CC function name
 	}
 
 	// 2. Call application chaincode with created state as the argument
-	arr := append([]string{applicationFunction}, applicationArgs...)
 	byteArgs := strArrToBytesArr(arr)
-	byteArgs = append(byteArgs, view.Data)
 	log.Info(fmt.Sprintf("Calling invoke chaincode. AppId: %s, appChannel: %s", applicationID, applicationChannel))
 	pbResp := ctx.GetStub().InvokeChaincode(applicationID, byteArgs, applicationChannel)
 	if pbResp.Status != shim.OK {

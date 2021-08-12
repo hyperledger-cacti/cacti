@@ -58,9 +58,8 @@ message InteropPayload {
 The interop chaincode will wrap the response from the application chaincode up in this `InteropPayload` structure. The reason for this is so that we can leverage the `Endorsement`'s from the peers to verify that the `ProposalResponsePayload` corresponds to the correct query address. By doing this, the `ProposalHash` inside of the `ProposalResponsePayload` doesn't need to be matched with the `Proposal` (and therefore the `Proposal` no longer needs to be included in the `FabricView`).
 
 -   Fabric protobuf reference (from current snapshot of `release-2.1` branch):
-    -   [Proposal](https://github.com/hyperledger/fabric-protos/blob/release-2.1/peer/proposal.proto#L122)
-    -   [TxReadWriteSet](https://github.com/hyperledger/fabric-protos/blob/release-2.1/ledger/rwset/rwset.proto#L15)
-    -   [ChaincodeID](https://github.com/hyperledger/fabric-protos/blob/release-2.1/peer/chaincode.proto#L21)
+    -   [Response](https://github.com/hyperledger/fabric-protos/blob/release-2.1/peer/proposal_response.proto#L45)
+    -   [ProposalResponsePayload](https://github.com/hyperledger/fabric-protos/blob/release-2.1/peer/proposal_response.proto#L61)
     -   [Endorsement](https://github.com/hyperledger/fabric-protos/blob/release-2.1/peer/proposal_response.proto#L86)
 
 ## Example

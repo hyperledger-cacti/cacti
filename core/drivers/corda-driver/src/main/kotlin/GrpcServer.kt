@@ -4,14 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaDriver
+package com.weaver.corda.driver
 
-import common.ack.AckOuterClass
-import common.query.QueryOuterClass
-import driver.driver.DriverCommunicationGrpcKt
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import kotlinx.coroutines.*
+
+import com.weaver.protos.common.ack.AckOuterClass
+import com.weaver.protos.common.query.QueryOuterClass
+import com.weaver.protos.driver.driver.DriverCommunicationGrpcKt
 
 /**
  * The GrpcServer is used by the Corda driver to listen for requests for statefrom the relay.
@@ -69,7 +70,7 @@ class GrpcServer(private val port: Int) {
         override suspend fun requestDriverState(request: QueryOuterClass.Query): AckOuterClass.Ack {
             println("Request received with request: $request")
             val ack = AckOuterClass.Ack.newBuilder()
-                .setStatus(common.ack.AckOuterClass.Ack.STATUS.OK)
+                .setStatus(AckOuterClass.Ack.STATUS.OK)
                 .setRequestId(request.requestId)
                 .setMessage("Received query with request id ${request.requestId}")
                 .build()

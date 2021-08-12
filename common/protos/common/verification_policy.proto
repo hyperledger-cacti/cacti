@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package common.verification_policy;
+
+option java_package = "com.weaver.protos.common.verification_policy";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+// VerificationPolicy stores the rules around which parties from a foreign
+// network need to provide proof of a view in order for it to be deemed valid by
+// the Fabric network
+message VerificationPolicy {
+  string securityDomain = 1;
+  repeated Identifier identifiers = 2;
+}
+
+// The Policy captures the list of parties that are required to provide proofs
+// of a view in order for the Fabric network to accept the view as valid.
+message Policy {
+  string type = 1;
+  repeated string criteria = 2;
+}
+
+// List of identifiers for the VerificationPolicy
+message Identifier {
+  // pattern defines the view/views that this rule applies to
+  // A rule may contain a "*" at the end of the pattern
+  string pattern = 1;
+  Policy policy = 2;
+}

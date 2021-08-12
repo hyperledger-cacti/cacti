@@ -21,7 +21,7 @@ import {
 } from '../../helpers/fabric-functions'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
-import { RelayHelper } from '@res-dlt-interop/fabric-interop-sdk'
+import { RelayHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 const command: GluegunCommand = {
   name: 'send',
   description: 'Sends a query to the local relay.',

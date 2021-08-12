@@ -30,7 +30,7 @@ Necessary information includes:
    issuing CAs up to the network root CA. This is located in
    `credentials/CordaNetworkMap.json`. 5. Scripts for:
 
--   Bringing up the network (default is to use CorDapps from Artifactory - but
+-   Bringing up the network (default is to use CorDapps from Github Packages - but
     there is an option for local copies of CorDapps)
 -   Pulling in latest copies of CorDapps and starting nodes
 -   Populating the network with dummy data
@@ -38,7 +38,7 @@ Necessary information includes:
 ## Requirements
 
 The simple state and interoperation CorDapps can be sourced either from the
-local file system or from Artifactory.
+local file system or from Github Packages.
 
 For local versions, the `get-cordapps` script assumes that _a)_ the repositories
 for these are at the same directory level as the `networks-setup` repository,
@@ -49,11 +49,12 @@ required CorDapps are in
 and the instructions for building these projects can be found in their
 respective repos.
 
-To get the CorDapps from Artifactory you will need to have permission to do so
-. Copy the `artifactory.properties.template`
-file as `artifactory.properties` and replace placeholders with your IBM email
-and Artifactory API key (found on your profile at
-https://na.artifactory.swg-devops.com/artifactory/).
+To get the CorDapps from Github Packages you will need to have permission to do so:
+
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
+2) Create a copy of `github.properties.template` as `github.properties`.
+3) Replace <GITHUB Email> with your email id for github.
+4) Replace <GITHUB Personal Access Token> with your personal access token.
 
 ## Running with Make
 
@@ -61,10 +62,10 @@ If you are happy with the default configuration, you can use the following make
 targets.
 
 -   `make start` builds the required node folder structure for the nodes to run,
-    gets the CorDapps from Artifactory, then starts the Corda nodes.
+    gets the CorDapps from Github Packages, then starts the Corda nodes.
 -   `make start-local` is the same as `make start` except it gets the cordapps
     from locally built jars from the `corda-simple-app` and `corda-interop-app`
-    repositories.
+    repositories (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages).
 -   `make restart-with-new-interop-app` can be used to restart an already running
     Corda network with new local versions of the `corda-interop-app` CorDapp.
 -   `make stop` stops the nodes.

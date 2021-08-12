@@ -1,5 +1,6 @@
 CC_NAME=${1:-"simplestate"}
 
+INTEROPCC_CHAINCODE_PATH=$PWD/../../../../core/network
 CHAINCODE_PATH=$PWD/../shared/chaincode
 APP_CC_PATH=$PWD/../../../../samples/fabric/${CC_NAME}
 
@@ -11,9 +12,5 @@ if [ -d "${CHAINCODE_PATH}/${CC_NAME}" ]; then
     rm -rf ${CHAINCODE_PATH}/${CC_NAME}
 fi
 cp -r ${APP_CC_PATH} ${CHAINCODE_PATH}/
-
-if [ "${CC_NAME}" = "simpleasset" ]; then
-  cp -r ${CHAINCODE_PATH}/fabric-interop-cc/interfaces/asset-mgmt ${CHAINCODE_PATH}/${CC_NAME}/
-fi
 
 echo "Done."

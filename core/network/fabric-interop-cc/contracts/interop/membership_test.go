@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 )
 
 var member = common.Member{

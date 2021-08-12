@@ -3,18 +3,15 @@ module github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabr
 go 1.16
 
 require (
-	github.com/golang/protobuf v1.4.0
-	github.com/google/go-cmp v0.4.0 // indirect
-	github.com/hyperledger/fabric v2.1.1+incompatible // indirect
+	github.com/golang/protobuf v1.5.2
+	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.2.1
+	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.2.2
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20200728190242-9b3ae92d8664
-	github.com/hyperledger/fabric-contract-api-go v1.1.0
-	github.com/hyperledger/fabric-protos-go v0.0.0-20200923192742-3897341ac036
-	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.4.2
-	github.com/stretchr/objx v0.3.0 // indirect
+	github.com/hyperledger/fabric-contract-api-go v1.1.1
+	github.com/hyperledger/fabric-protos-go v0.0.0-20210720123151-f0dc3e2a0871
+	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.6.1
-	golang.org/dl v0.0.0-20200909201834-1fb66e01de4d // indirect
-	golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4
-	google.golang.org/protobuf v1.23.0
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )

@@ -13,7 +13,7 @@ import log4js from "log4js";
 import crypto from "crypto";
 import fabproto6 from "fabric-protos";
 import * as helpers from "./helpers";
-import assetLocksPb from "../protos-js/common/asset_locks_pb";
+import assetLocksPb from "@hyperledger-labs/weaver-protos-js/common/asset_locks_pb";
 import { Contract, ContractListener } from "fabric-network";
 const logger = log4js.getLogger("InteroperableHelper");
 

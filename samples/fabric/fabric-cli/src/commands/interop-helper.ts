@@ -15,7 +15,7 @@ import {
   getNetworkConfig,
   handlePromise
 } from '../helpers/helpers'
-import { InteroperableHelper } from '@res-dlt-interop/fabric-interop-sdk'
+import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import { v4 as uuidv4 } from 'uuid'
 
 import logger from '../helpers/logger'
@@ -129,7 +129,7 @@ const command: GluegunCommand = {
       const invokeObject = {
         channel,
         ccFunc: applicationFunction,
-        ccArgs: [key],
+        ccArgs: [key, ''],
         contractName: 'simplestate'
       }
       const interopFlowResponse = await InteroperableHelper.interopFlow(
@@ -139,19 +139,21 @@ const command: GluegunCommand = {
         invokeObject,
         options['requesting-org'] || '',
         relayEnv.relayEndpoint,
-        {
+        [1],
+        [{
           address: array[0],
           Sign: true
-        },
+        }],
         keyCert
       )
       logger.info(
         `View from remote network: ${JSON.stringify(
-          interopFlowResponse.view.toObject()
+          interopFlowResponse.views[0].toObject()
         )}. Interop Flow result: ${interopFlowResponse.result || 'successful'}`
       )
+      const remoteValue = InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
       spinner.succeed(
-        `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} `
+        `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue}`
       )
     } catch (e) {
       spinner.fail(`Error verifying and storing state`)
