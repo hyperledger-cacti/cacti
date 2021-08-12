@@ -25,10 +25,14 @@ import (
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/relay"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
-	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	log "github.com/sirupsen/logrus"
 	protoV2 "google.golang.org/protobuf/proto"
 )
+
+type GatewayContract interface {
+	EvaluateTransaction(name string, args ...string) ([]byte, error)
+	SubmitTransaction(name string, args ...string) ([]byte, error)
+}
 
 // helper functions to log and return errors
 func logThenErrorf(format string, args ...interface{}) error {
@@ -37,7 +41,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 	return errors.New(errorMsg)
 }
 
-func InteropFlow(interopContract *gateway.Contract, networkId string, invokeObject types.Query, org, localRelayEndpoint string,
+func InteropFlow(interopContract GatewayContract, networkId string, invokeObject types.Query, org, localRelayEndpoint string,
 	interopArgIndices []int, interopJSONs []types.InteropJSON, keyUser, certUser string, returnWithoutLocalInvocation bool) ([]*common.View, []byte, error) {
 	if len(interopArgIndices) != len(interopJSONs) {
 		logThenErrorf("number of argument indices %d does not match number of view addresses %d", len(interopArgIndices), len(interopJSONs))
@@ -91,7 +95,7 @@ func InteropFlow(interopContract *gateway.Contract, networkId string, invokeObje
  * Submit local chaincode transaction to verify a view and write data to ledger.
  * - Prepare arguments and call WriteExternalState.
  **/
-func submitTransactionWithRemoteViews(interopContract *gateway.Contract, invokeObject types.Query,
+func submitTransactionWithRemoteViews(interopContract GatewayContract, invokeObject types.Query,
 	interopArgIndices []int, viewAddresses []string, viewsSerializedBase64 []string) ([]byte, error) {
 	ccArgs, err := getCCArgsForProofVerification(invokeObject, interopArgIndices, viewAddresses, viewsSerializedBase64)
 	if err != nil {
@@ -122,7 +126,7 @@ type VerificationPolicy struct {
 /**
  * Lookup verification policy in the interop chaincode and get the criteria related to query
  **/
-func getPolicyCriteriaForAddress(contract *gateway.Contract, address string) ([]string, error) {
+func getPolicyCriteriaForAddress(contract GatewayContract, address string) ([]string, error) {
 	emptyCriteria := []string{}
 
 	parsedAddress, err := helpers.ParseAddress(address)
@@ -235,7 +239,7 @@ func GetResponseDataFromView(view *common.View) ([]byte, error) {
 	return interopPayload.Payload, nil
 }
 
-func verifyView(contract *gateway.Contract, b64ViewProto string, address string) error {
+func verifyView(contract GatewayContract, b64ViewProto string, address string) error {
 	_, err := contract.EvaluateTransaction("VerifyView", b64ViewProto, address)
 	if err != nil {
 		return logThenErrorf("VerifyView error: %s", err)
@@ -342,7 +346,7 @@ func signMessage(computedAddress string, uuidStr string, keyUser string) (string
  * 3. Call the relay Process request which will send a request to the remote network via local relay and poll for an update in the request status.
  * 4. Call the local chaincode to verify the view before trying to submit to chaincode.
  **/
-func getRemoteView(interopContract *gateway.Contract, networkId, org, localRelayEndPoint string, interopJSON types.InteropJSON,
+func getRemoteView(interopContract GatewayContract, networkId, org, localRelayEndPoint string, interopJSON types.InteropJSON,
 	keyUser, certUser string) (*common.View, string, error) {
 
 	// Step 1
