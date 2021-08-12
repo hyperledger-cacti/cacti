@@ -31,6 +31,8 @@ test("Generates valid example config for the API server", async (t: Test) => {
   ) as unknown) as IAuthorizationConfig;
 
   exampleConfig.configFile = "";
+  exampleConfig.apiPort = 0;
+  exampleConfig.cockpitPort = 0;
 
   const convictConfig = configService.newExampleConfigConvict(exampleConfig);
   t.ok(convictConfig, "configService.newExampleConfigConvict() truthy OK");
