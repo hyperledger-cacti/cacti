@@ -7,13 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 package interoperablehelper
 
 import (
-	"crypto/ecdsa"
-	"crypto/rand"
-	"crypto/sha256"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
-	"encoding/pem"
 	"errors"
 	"fmt"
 	"strings"
@@ -34,6 +29,10 @@ type GatewayContract interface {
 	SubmitTransaction(name string, args ...string) ([]byte, error)
 }
 
+type Signer interface {
+	Sign(msg []byte) ([]byte, error)
+}
+
 // helper functions to log and return errors
 func logThenErrorf(format string, args ...interface{}) error {
 	errorMsg := fmt.Sprintf(format, args...)
@@ -42,7 +41,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 }
 
 func InteropFlow(interopContract GatewayContract, networkId string, invokeObject types.Query, org, localRelayEndpoint string,
-	interopArgIndices []int, interopJSONs []types.InteropJSON, keyUser, certUser string, returnWithoutLocalInvocation bool) ([]*common.View, []byte, error) {
+	interopArgIndices []int, interopJSONs []types.InteropJSON, signer Signer, certUser string, returnWithoutLocalInvocation bool) ([]*common.View, []byte, error) {
 	if len(interopArgIndices) != len(interopJSONs) {
 		logThenErrorf("number of argument indices %d does not match number of view addresses %d", len(interopArgIndices), len(interopJSONs))
 	}
@@ -53,7 +52,7 @@ func InteropFlow(interopContract GatewayContract, networkId string, invokeObject
 	var computedAddresses []string
 
 	for i := 0; i < len(interopJSONs); i++ {
-		requestResponseView, requestResponseAddress, err := getRemoteView(interopContract, networkId, org, localRelayEndpoint, interopJSONs[i], keyUser, certUser)
+		requestResponseView, requestResponseAddress, err := getRemoteView(interopContract, networkId, org, localRelayEndpoint, interopJSONs[i], signer, certUser)
 		if err != nil {
 			return views, nil, logThenErrorf("InteropFlow remote view request error: %s", err.Error())
 		}
@@ -302,38 +301,11 @@ func createFlowAddress(flow types.Flow, networkId string, remoteURL string) stri
 	return addressString
 }
 
-func hashMessage(msg []byte) []byte {
-	hash := sha256.New()
-	hash.Write(msg)
-	return hash.Sum(nil)
-}
-
-func convertToPrivKey(signkeyPEM string) (*ecdsa.PrivateKey, error) {
-	privKey := &ecdsa.PrivateKey{}
-	signkeyBytes, _ := pem.Decode([]byte(signkeyPEM))
-	if signkeyBytes == nil {
-		return privKey, logThenErrorf("no PEM data found in signkeyPEM: %s", signkeyPEM)
-	}
-	signkeyPriv, err := x509.ParsePKCS8PrivateKey(signkeyBytes.Bytes)
-	if err != nil {
-		return privKey, logThenErrorf("failed x509.ParsePKCS8PrivateKey with error: %s", err.Error())
-	}
-	privKey = signkeyPriv.(*ecdsa.PrivateKey)
-
-	return privKey, nil
-}
-
-func signMessage(computedAddress string, uuidStr string, keyUser string) (string, error) {
+func signMessage(computedAddress string, uuidStr string, signer Signer) (string, error) {
 	message := computedAddress + uuidStr
-	hashedMessage := hashMessage([]byte(message))
-	signingKey, err := convertToPrivKey(keyUser)
+	signature, err := signer.Sign([]byte(message))
 	if err != nil {
-		return "", logThenErrorf("failed convertToPrivKey with error: %s", err.Error())
-	}
-	random := rand.Reader
-	signature, err := ecdsa.SignASN1(random, signingKey, hashedMessage)
-	if err != nil {
-		return "", logThenErrorf("failed ecdsa.SignASN1 with error: %s", err.Error())
+		return "", fmt.Errorf("signing failed: %s", err)
 	}
 	signatureBase64 := base64.StdEncoding.EncodeToString(signature)
 	return signatureBase64, nil
@@ -347,7 +319,7 @@ func signMessage(computedAddress string, uuidStr string, keyUser string) (string
  * 4. Call the local chaincode to verify the view before trying to submit to chaincode.
  **/
 func getRemoteView(interopContract GatewayContract, networkId, org, localRelayEndPoint string, interopJSON types.InteropJSON,
-	keyUser, certUser string) (*common.View, string, error) {
+	signer Signer, certUser string) (*common.View, string, error) {
 
 	// Step 1
 	query := types.Query{
@@ -376,10 +348,10 @@ func getRemoteView(interopContract GatewayContract, networkId, org, localRelayEn
 	// Step 3
 	// TODO fix types here so can return proper view
 
-	log.Infof("localRelayEndPoint: %s, computedAddress: %s, policyCriteria: %s, networkId: %s, keyUser: %s, certUser: %s, uuidStr: %s, org: %s",
-		localRelayEndPoint, computedAddress, policyCriteria, networkId, keyUser, certUser, uuidStr, org)
+	log.Infof("localRelayEndPoint: %s, computedAddress: %s, policyCriteria: %s, networkId: %s, certUser: %s, uuidStr: %s, org: %s",
+		localRelayEndPoint, computedAddress, policyCriteria, networkId, certUser, uuidStr, org)
 
-	signatureBase64, err := signMessage(computedAddress, uuidStr, keyUser)
+	signatureBase64, err := signMessage(computedAddress, uuidStr, signer)
 	if err != nil {
 		return nil, "", logThenErrorf("failed signMessage with error: %s", err.Error())
 	}

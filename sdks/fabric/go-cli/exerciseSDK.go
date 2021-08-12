@@ -7,6 +7,13 @@ SPDX-License-Identifier: Apache-2.0
 package main
 
 import (
+	"crypto/ecdsa"
+	"crypto/rand"
+	"crypto/sha256"
+	"crypto/x509"
+	"encoding/pem"
+	"fmt"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers"
@@ -595,6 +602,33 @@ func configureNetwork(networkId string) {
 	interopsetup.ConfigureNetwork(networkId)
 }
 
+type signer struct {
+	signkeyPEM []byte
+}
+
+func hashMessage(msg []byte) []byte {
+	hash := sha256.New()
+	hash.Write(msg)
+	return hash.Sum(nil)
+}
+
+func (s *signer) Sign(msg []byte) ([]byte, error) {
+	signkeyBytes, _ := pem.Decode(s.signkeyPEM)
+	if signkeyBytes == nil {
+		return nil, fmt.Errorf("no PEM data found in signkeyPEM: %s", s.signkeyPEM)
+	}
+	signkeyPriv, err := x509.ParsePKCS8PrivateKey(signkeyBytes.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed x509.ParsePKCS8PrivateKey with error: %s", err.Error())
+	}
+
+	signature, err := ecdsa.SignASN1(rand.Reader, signkeyPriv.(*ecdsa.PrivateKey), hashMessage(msg))
+	if err != nil {
+		return nil, fmt.Errorf("failed ecdsa.SignASN1 with error: %s", err.Error())
+	}
+	return signature, nil
+}
+
 func interop(key string, localNetwork string, requestingOrg string, address string) {
 	relayEnv, err := helpers.GetNetworkConfig(localNetwork)
 	if err != nil {
@@ -647,7 +681,12 @@ func interop(key string, localNetwork string, requestingOrg string, address stri
 	interopJSONs := []types.InteropJSON{interopJSON}
 
 	interopArgIndices := []int{1}
-	interopFlowResponse, _, err := interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, keyUser, certUser, false)
+
+	signer := &signer{
+		signkeyPEM: []byte(keyUser),
+	}
+
+	interopFlowResponse, _, err := interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, signer, certUser, false)
 	if err != nil {
 		log.Fatalf("failed interoperablehelper.InteropFlow with error: %s", err.Error())
 	}
