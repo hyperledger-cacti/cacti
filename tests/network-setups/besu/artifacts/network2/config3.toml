@@ -1,10 +1,12 @@
-#Path
+# Path
 data-path="data"
 
 # Network
+p2p-port=31305
+
 rpc-http-enabled=true
 rpc-http-host="0.0.0.0"
-rpc-http-port=8590
+rpc-http-port=9547
 rpc-http-api=["ETH","NET","IBFT"]
 rpc-http-cors-origins=["all"]
 
