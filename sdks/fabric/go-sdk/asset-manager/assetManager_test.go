@@ -11,31 +11,29 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	"github.com/stretchr/testify/require"
 )
 
 var submitTransactionMock func() ([]byte, error)
 var evaluateTransactionMock func() ([]byte, error)
 
-type fabricGatewayContractMock struct{}
+type gatewayContractMock struct{}
 
-func (fMock fabricGatewayContractMock) SubmitTransaction(contract *gateway.Contract, ccFunc string, args ...string) ([]byte, error) {
+func (gwMock gatewayContractMock) SubmitTransaction(ccFunc string, args ...string) ([]byte, error) {
 	return submitTransactionMock()
 }
 
-func (fMock fabricGatewayContractMock) EvaluateTransaction(contract *gateway.Contract, ccFunc string, args ...string) ([]byte, error) {
+func (gwMock gatewayContractMock) EvaluateTransaction(ccFunc string, args ...string) ([]byte, error) {
 	return evaluateTransactionMock()
 }
 
 func TestCreateHTLC(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	submitTransactionMock = func() ([]byte, error) {
 		return []byte("contract-id"), nil
 	}
 
-	contract := &gateway.Contract{}
 	assetType := "asset-type"
 	assetId := "asset-id"
 	recipientECertBase64 := "recipientECertBase64"
@@ -43,49 +41,49 @@ func TestCreateHTLC(t *testing.T) {
 	expiryTimeSecs := uint64(time.Now().Unix()) - 10
 
 	expectedError := "contract handle not supplied"
-	_, err := CreateHTLC(gci, nil, assetType, assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err := CreateHTLC(nil, assetType, assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset type not supplied"
-	_, err = CreateHTLC(gci, contract, "", assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err = CreateHTLC(contract, "", assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset id not supplied"
-	_, err = CreateHTLC(gci, contract, assetType, "", recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err = CreateHTLC(contract, assetType, "", recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "recipientECertBase64 id not supplied"
-	_, err = CreateHTLC(gci, contract, assetType, assetId, "", hashBase64, expiryTimeSecs)
+	_, err = CreateHTLC(contract, assetType, assetId, "", hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "hashBase64 is not supplied"
-	_, err = CreateHTLC(gci, contract, assetType, assetId, recipientECertBase64, "", expiryTimeSecs)
+	_, err = CreateHTLC(contract, assetType, assetId, recipientECertBase64, "", expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "supplied expirty time in the past"
-	_, err = CreateHTLC(gci, contract, assetType, assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err = CreateHTLC(contract, assetType, assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expiryTimeSecs = uint64(time.Now().Unix()) + 10
-	contractId, err := CreateHTLC(gci, contract, assetType, assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
+	contractId, err := CreateHTLC(contract, assetType, assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -95,7 +93,7 @@ func TestCreateHTLC(t *testing.T) {
 		return []byte(""), errors.New("failed submission")
 	}
 	expectedError = "error in contract.SubmitTransaction LockAsset: failed submission"
-	_, err = CreateHTLC(gci, contract, assetType, assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err = CreateHTLC(contract, assetType, assetId, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -104,12 +102,11 @@ func TestCreateHTLC(t *testing.T) {
 
 func TestCreateFungibleHTLC(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	submitTransactionMock = func() ([]byte, error) {
 		return []byte("contract-id"), nil
 	}
 
-	contract := &gateway.Contract{}
 	assetType := "asset-type"
 	numUnits := uint64(10)
 	recipientECertBase64 := "recipientECertBase64"
@@ -117,49 +114,49 @@ func TestCreateFungibleHTLC(t *testing.T) {
 	expiryTimeSecs := uint64(time.Now().Unix()) - 10
 
 	expectedError := "contract handle not supplied"
-	_, err := CreateFungibleHTLC(gci, nil, assetType, numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err := CreateFungibleHTLC(nil, assetType, numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset type not supplied"
-	_, err = CreateFungibleHTLC(gci, contract, "", numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err = CreateFungibleHTLC(contract, "", numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset count must be a positive number"
-	_, err = CreateFungibleHTLC(gci, contract, assetType, 0, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err = CreateFungibleHTLC(contract, assetType, 0, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "recipientECertBase64 id not supplied"
-	_, err = CreateFungibleHTLC(gci, contract, assetType, numUnits, "", hashBase64, expiryTimeSecs)
+	_, err = CreateFungibleHTLC(contract, assetType, numUnits, "", hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "hashBase64 is not supplied"
-	_, err = CreateFungibleHTLC(gci, contract, assetType, numUnits, recipientECertBase64, "", expiryTimeSecs)
+	_, err = CreateFungibleHTLC(contract, assetType, numUnits, recipientECertBase64, "", expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "supplied expirty time in the past"
-	_, err = CreateFungibleHTLC(gci, contract, assetType, numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err = CreateFungibleHTLC(contract, assetType, numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expiryTimeSecs = uint64(time.Now().Unix()) + 10
-	contractId, err := CreateFungibleHTLC(gci, contract, assetType, numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
+	contractId, err := CreateFungibleHTLC(contract, assetType, numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -169,7 +166,7 @@ func TestCreateFungibleHTLC(t *testing.T) {
 		return []byte(""), errors.New("failed submission")
 	}
 	expectedError = "error in contract.SubmitTransaction LockFungibleAsset: failed submission"
-	_, err = CreateFungibleHTLC(gci, contract, assetType, numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
+	_, err = CreateFungibleHTLC(contract, assetType, numUnits, recipientECertBase64, hashBase64, expiryTimeSecs)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -178,53 +175,52 @@ func TestCreateFungibleHTLC(t *testing.T) {
 
 func TestIsAssetLockedInHTLC(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	evaluateTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	assetType := "asset-type"
 	assetId := "asset-id"
 	recipientECertBase64 := "recipientECertBase64"
 	lockerECertBase64 := "lockerECertBase64"
 
 	expectedError := "contract handle not supplied"
-	_, err := IsAssetLockedInHTLC(gci, nil, assetType, assetId, recipientECertBase64, lockerECertBase64)
+	_, err := IsAssetLockedInHTLC(nil, assetType, assetId, recipientECertBase64, lockerECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset type not supplied"
-	_, err = IsAssetLockedInHTLC(gci, contract, "", assetId, recipientECertBase64, lockerECertBase64)
+	_, err = IsAssetLockedInHTLC(contract, "", assetId, recipientECertBase64, lockerECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset id not supplied"
-	_, err = IsAssetLockedInHTLC(gci, contract, assetType, "", recipientECertBase64, lockerECertBase64)
+	_, err = IsAssetLockedInHTLC(contract, assetType, "", recipientECertBase64, lockerECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "recipientECertBase64 id not supplied"
-	_, err = IsAssetLockedInHTLC(gci, contract, assetType, assetId, "", lockerECertBase64)
+	_, err = IsAssetLockedInHTLC(contract, assetType, assetId, "", lockerECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "lockerECertBase64 id not supplied"
-	_, err = IsAssetLockedInHTLC(gci, contract, assetType, assetId, recipientECertBase64, "")
+	_, err = IsAssetLockedInHTLC(contract, assetType, assetId, recipientECertBase64, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isLocked, err := IsAssetLockedInHTLC(gci, contract, assetType, assetId, recipientECertBase64, lockerECertBase64)
+	isLocked, err := IsAssetLockedInHTLC(contract, assetType, assetId, recipientECertBase64, lockerECertBase64)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -234,7 +230,7 @@ func TestIsAssetLockedInHTLC(t *testing.T) {
 		return []byte(""), errors.New("failed evaluation")
 	}
 	expectedError = "error in contract.EvaluateTransaction IsAssetLocked: failed evaluation"
-	_, err = IsAssetLockedInHTLC(gci, contract, assetType, assetId, recipientECertBase64, lockerECertBase64)
+	_, err = IsAssetLockedInHTLC(contract, assetType, assetId, recipientECertBase64, lockerECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -243,29 +239,28 @@ func TestIsAssetLockedInHTLC(t *testing.T) {
 
 func TestIsFungibleAssetLockedInHTLC(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	evaluateTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	contractId := "contract-id"
 
 	expectedError := "contract handle not supplied"
-	_, err := IsFungibleAssetLockedInHTLC(gci, nil, contractId)
+	_, err := IsFungibleAssetLockedInHTLC(nil, contractId)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "contractId not supplied"
-	_, err = IsFungibleAssetLockedInHTLC(gci, contract, "")
+	_, err = IsFungibleAssetLockedInHTLC(contract, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isLocked, err := IsFungibleAssetLockedInHTLC(gci, contract, contractId)
+	isLocked, err := IsFungibleAssetLockedInHTLC(contract, contractId)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -275,7 +270,7 @@ func TestIsFungibleAssetLockedInHTLC(t *testing.T) {
 		return []byte(""), errors.New("failed evaluation")
 	}
 	expectedError = "error in contract.EvaluateTransaction IsFungibleAssetLocked: failed evaluation"
-	_, err = IsFungibleAssetLockedInHTLC(gci, contract, contractId)
+	_, err = IsFungibleAssetLockedInHTLC(contract, contractId)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -284,29 +279,28 @@ func TestIsFungibleAssetLockedInHTLC(t *testing.T) {
 
 func TestIsAssetLockedInHTLCqueryUsingContractId(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	evaluateTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	contractId := "contract-id"
 
 	expectedError := "contract handle not supplied"
-	_, err := IsAssetLockedInHTLCqueryUsingContractId(gci, nil, contractId)
+	_, err := IsAssetLockedInHTLCqueryUsingContractId(nil, contractId)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "contractId not supplied"
-	_, err = IsAssetLockedInHTLCqueryUsingContractId(gci, contract, "")
+	_, err = IsAssetLockedInHTLCqueryUsingContractId(contract, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isLocked, err := IsAssetLockedInHTLCqueryUsingContractId(gci, contract, contractId)
+	isLocked, err := IsAssetLockedInHTLCqueryUsingContractId(contract, contractId)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -316,7 +310,7 @@ func TestIsAssetLockedInHTLCqueryUsingContractId(t *testing.T) {
 		return []byte(""), errors.New("failed evaluation")
 	}
 	expectedError = "error in contract.EvaluateTransaction IsAssetLockedQueryUsingContractId: failed evaluation"
-	_, err = IsAssetLockedInHTLCqueryUsingContractId(gci, contract, contractId)
+	_, err = IsAssetLockedInHTLCqueryUsingContractId(contract, contractId)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -325,53 +319,52 @@ func TestIsAssetLockedInHTLCqueryUsingContractId(t *testing.T) {
 
 func TestClaimAssetInHTLC(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	submitTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	assetType := "asset-type"
 	assetId := "asset-id"
 	lockerECertBase64 := "lockerECertBase64"
 	hashPreimageBase64 := "hashPreimageBase64"
 
 	expectedError := "contract handle not supplied"
-	_, err := ClaimAssetInHTLC(gci, nil, assetType, assetId, lockerECertBase64, hashPreimageBase64)
+	_, err := ClaimAssetInHTLC(nil, assetType, assetId, lockerECertBase64, hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset type not supplied"
-	_, err = ClaimAssetInHTLC(gci, contract, "", assetId, lockerECertBase64, hashPreimageBase64)
+	_, err = ClaimAssetInHTLC(contract, "", assetId, lockerECertBase64, hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset id not supplied"
-	_, err = ClaimAssetInHTLC(gci, contract, assetType, "", lockerECertBase64, hashPreimageBase64)
+	_, err = ClaimAssetInHTLC(contract, assetType, "", lockerECertBase64, hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "lockerECertBase64 id not supplied"
-	_, err = ClaimAssetInHTLC(gci, contract, assetType, assetId, "", hashPreimageBase64)
+	_, err = ClaimAssetInHTLC(contract, assetType, assetId, "", hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "hashPreimageBase64 is not supplied"
-	_, err = ClaimAssetInHTLC(gci, contract, assetType, assetId, lockerECertBase64, "")
+	_, err = ClaimAssetInHTLC(contract, assetType, assetId, lockerECertBase64, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isClaimed, err := ClaimAssetInHTLC(gci, contract, assetType, assetId, lockerECertBase64, hashPreimageBase64)
+	isClaimed, err := ClaimAssetInHTLC(contract, assetType, assetId, lockerECertBase64, hashPreimageBase64)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -381,7 +374,7 @@ func TestClaimAssetInHTLC(t *testing.T) {
 		return []byte(""), errors.New("failed submission")
 	}
 	expectedError = "error in contract.SubmitTransaction ClaimAsset: failed submission"
-	_, err = ClaimAssetInHTLC(gci, contract, assetType, assetId, lockerECertBase64, hashPreimageBase64)
+	_, err = ClaimAssetInHTLC(contract, assetType, assetId, lockerECertBase64, hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -390,37 +383,36 @@ func TestClaimAssetInHTLC(t *testing.T) {
 
 func TestClaimFungibleAssetInHTLC(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	submitTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	contractId := "contract-id"
 	hashPreimageBase64 := "hashPreimageBase64"
 
 	expectedError := "contract handle not supplied"
-	_, err := ClaimFungibleAssetInHTLC(gci, nil, contractId, hashPreimageBase64)
+	_, err := ClaimFungibleAssetInHTLC(nil, contractId, hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "contractId not supplied"
-	_, err = ClaimFungibleAssetInHTLC(gci, contract, "", hashPreimageBase64)
+	_, err = ClaimFungibleAssetInHTLC(contract, "", hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "hashPreimageBase64 is not supplied"
-	_, err = ClaimFungibleAssetInHTLC(gci, contract, contractId, "")
+	_, err = ClaimFungibleAssetInHTLC(contract, contractId, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isClaimed, err := ClaimFungibleAssetInHTLC(gci, contract, contractId, hashPreimageBase64)
+	isClaimed, err := ClaimFungibleAssetInHTLC(contract, contractId, hashPreimageBase64)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -430,7 +422,7 @@ func TestClaimFungibleAssetInHTLC(t *testing.T) {
 		return []byte(""), errors.New("failed submission")
 	}
 	expectedError = "error in contract.SubmitTransaction ClaimFungibleAsset: failed submission"
-	_, err = ClaimFungibleAssetInHTLC(gci, contract, contractId, hashPreimageBase64)
+	_, err = ClaimFungibleAssetInHTLC(contract, contractId, hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -439,37 +431,36 @@ func TestClaimFungibleAssetInHTLC(t *testing.T) {
 
 func TestClaimAssetInHTLCusingContractId(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	submitTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	contractId := "contract-id"
 	hashPreimageBase64 := "hashPreimageBase64"
 
 	expectedError := "contract handle not supplied"
-	_, err := ClaimAssetInHTLCusingContractId(gci, nil, contractId, hashPreimageBase64)
+	_, err := ClaimAssetInHTLCusingContractId(nil, contractId, hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "contractId not supplied"
-	_, err = ClaimAssetInHTLCusingContractId(gci, contract, "", hashPreimageBase64)
+	_, err = ClaimAssetInHTLCusingContractId(contract, "", hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "hashPreimageBase64 is not supplied"
-	_, err = ClaimAssetInHTLCusingContractId(gci, contract, contractId, "")
+	_, err = ClaimAssetInHTLCusingContractId(contract, contractId, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isClaimed, err := ClaimAssetInHTLCusingContractId(gci, contract, contractId, hashPreimageBase64)
+	isClaimed, err := ClaimAssetInHTLCusingContractId(contract, contractId, hashPreimageBase64)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -479,7 +470,7 @@ func TestClaimAssetInHTLCusingContractId(t *testing.T) {
 		return []byte(""), errors.New("failed submission")
 	}
 	expectedError = "error in contract.SubmitTransaction ClaimAssetUsingContractId: failed submission"
-	_, err = ClaimAssetInHTLCusingContractId(gci, contract, contractId, hashPreimageBase64)
+	_, err = ClaimAssetInHTLCusingContractId(contract, contractId, hashPreimageBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -488,45 +479,44 @@ func TestClaimAssetInHTLCusingContractId(t *testing.T) {
 
 func TestReclaimAssetInHTLC(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	submitTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	assetType := "asset-type"
 	assetId := "asset-id"
 	recipientECertBase64 := "recipientECertBase64"
 
 	expectedError := "contract handle not supplied"
-	_, err := ReclaimAssetInHTLC(gci, nil, assetType, assetId, recipientECertBase64)
+	_, err := ReclaimAssetInHTLC(nil, assetType, assetId, recipientECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset type not supplied"
-	_, err = ReclaimAssetInHTLC(gci, contract, "", assetId, recipientECertBase64)
+	_, err = ReclaimAssetInHTLC(contract, "", assetId, recipientECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "asset id not supplied"
-	_, err = ReclaimAssetInHTLC(gci, contract, assetType, "", recipientECertBase64)
+	_, err = ReclaimAssetInHTLC(contract, assetType, "", recipientECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "recipientECertBase64 id not supplied"
-	_, err = ReclaimAssetInHTLC(gci, contract, assetType, assetId, "")
+	_, err = ReclaimAssetInHTLC(contract, assetType, assetId, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isClaimed, err := ReclaimAssetInHTLC(gci, contract, assetType, assetId, recipientECertBase64)
+	isClaimed, err := ReclaimAssetInHTLC(contract, assetType, assetId, recipientECertBase64)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -536,7 +526,7 @@ func TestReclaimAssetInHTLC(t *testing.T) {
 		return []byte(""), errors.New("failed submission")
 	}
 	expectedError = "error in contract.SubmitTransaction UnlockAsset: failed submission"
-	_, err = ReclaimAssetInHTLC(gci, contract, assetType, assetId, recipientECertBase64)
+	_, err = ReclaimAssetInHTLC(contract, assetType, assetId, recipientECertBase64)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -545,29 +535,28 @@ func TestReclaimAssetInHTLC(t *testing.T) {
 
 func TestReclaimFungibleAssetInHTLC(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	submitTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	contractId := "contract-id"
 
 	expectedError := "contract handle not supplied"
-	_, err := ReclaimFungibleAssetInHTLC(gci, nil, contractId)
+	_, err := ReclaimFungibleAssetInHTLC(nil, contractId)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "contractId not supplied"
-	_, err = ReclaimFungibleAssetInHTLC(gci, contract, "")
+	_, err = ReclaimFungibleAssetInHTLC(contract, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isClaimed, err := ReclaimFungibleAssetInHTLC(gci, contract, contractId)
+	isClaimed, err := ReclaimFungibleAssetInHTLC(contract, contractId)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -577,7 +566,7 @@ func TestReclaimFungibleAssetInHTLC(t *testing.T) {
 		return []byte(""), errors.New("failed submission")
 	}
 	expectedError = "error in contract.SubmitTransaction UnlockFungibleAsset: failed submission"
-	_, err = ReclaimFungibleAssetInHTLC(gci, contract, contractId)
+	_, err = ReclaimFungibleAssetInHTLC(contract, contractId)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
@@ -586,29 +575,28 @@ func TestReclaimFungibleAssetInHTLC(t *testing.T) {
 
 func TestReclaimAssetInHTLCusingContractId(t *testing.T) {
 
-	gci := fabricGatewayContractMock{}
+	contract := gatewayContractMock{}
 	submitTransactionMock = func() ([]byte, error) {
 		return []byte("true"), nil
 	}
 
-	contract := &gateway.Contract{}
 	contractId := "contract-id"
 
 	expectedError := "contract handle not supplied"
-	_, err := ReclaimAssetInHTLCusingContractId(gci, nil, contractId)
+	_, err := ReclaimAssetInHTLCusingContractId(nil, contractId)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
 	expectedError = "contractId not supplied"
-	_, err = ReclaimAssetInHTLCusingContractId(gci, contract, "")
+	_, err = ReclaimAssetInHTLCusingContractId(contract, "")
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
 	require.EqualError(t, err, expectedError)
 
-	isClaimed, err := ReclaimAssetInHTLCusingContractId(gci, contract, contractId)
+	isClaimed, err := ReclaimAssetInHTLCusingContractId(contract, contractId)
 	if err != nil {
 		t.Error("failed with error: ", err.Error())
 	}
@@ -618,7 +606,7 @@ func TestReclaimAssetInHTLCusingContractId(t *testing.T) {
 		return []byte(""), errors.New("failed submission")
 	}
 	expectedError = "error in contract.SubmitTransaction UnlockAssetUsingContractId: failed submission"
-	_, err = ReclaimAssetInHTLCusingContractId(gci, contract, contractId)
+	_, err = ReclaimAssetInHTLCusingContractId(contract, contractId)
 	if err == nil {
 		t.Error("expected to fail with error " + expectedError + " but didn't")
 	}
