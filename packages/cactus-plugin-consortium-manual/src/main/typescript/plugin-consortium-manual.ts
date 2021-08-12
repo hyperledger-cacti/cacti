@@ -84,6 +84,7 @@ export class PluginConsortiumManual
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+    this.prometheusExporter.startMetricsCollection();
     this.prometheusExporter.setNodeCount(this.getNodeCount());
   }
 
