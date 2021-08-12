@@ -63,13 +63,22 @@ Clone the [weaver-dlt-interoperability](https://github.com/hyperledger-labs/weav
 
 The `common/protos` folder contains structure definitions in the protobuf format that are used by all the different components. The various `common/protos-*` folders are meant to contain compiled protobufs (in different languages).
 
-To compile the protobufs, do the following:
+To compile the protobufs for JavaScript, do the following:
 - Navigate to the `common/protos-js` folder.
 - Run the following command:
   ```bash
   make build
   ```
+
+To compile the protobufs for Golang, do the following:
 - Navigate to the `common/protos-go` folder.
+- Run the following command:
+  ```bash
+  make build
+  ```
+
+To compile the protobufs for Java, do the following:
+- Navigate to the `common/protos-java-kt` folder.
 - Run the following command:
   ```bash
   make build
@@ -81,7 +90,7 @@ Using the sequence of instructions below, you can start two separate Fabric netw
 
 ### Fabric Interoperation Node SDK
 
-A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the `sdks/fabric/interoperation-node-sdk` folder. This contains functions for Fabric Gateway-based applications to exercise interoperation capabilities via relays and also a number of utility/helper functions. The Fabric-CLI tool, which we will use later, depends on this library. This library is published as github packages here: [hyperledger-labs packages](https://github.com/orgs/hyperledger-labs/packages), thus it is **not required** to build this library for the testnet demo.
+A library, as companion to the `hyperledger/fabric-sdk-node`, is defined in the `sdks/fabric/interoperation-node-sdk` folder. This contains functions for Fabric Gateway-based applications to exercise interoperation capabilities via relays and also a number of utility/helper functions. The Fabric-CLI tool, which we will use later, depends on this library.
 
 To build the library, do the following:
 - Navigate to the `sdks/fabric/interoperation-node-sdk` folder.
@@ -133,59 +142,14 @@ You can install `fabric-cli` as follows:
   ```bash
   make build-local
   ```
-- Use the `fabric-cli` executable in the `bin` folder for subsequent actions.
-
-#### Configuration
-
-During bootstrap, the ledgers in both `network1` and `network2` must be populated with the following information scoped by the interoperation chaincode:
-- Access control policies governing requests from foreign networks
-- Security group info for foreign networks (i.e., identities of network units and their membership providers' certificate chains)
-- Verification policies for proofs supplied by foreign networks
-Knowledge of foreign networks that must be configured in this stage is as follows:
-- `network1` has policies and security group info for `network2` and `Corda_Network`
-- `network2` has policies and security group info for `network1` and `Corda_Network`
-(_`Corda_Network` will be launched later._)
-The ledgers must also be populated with sample key-value pairs for testing interoperation flows, scoped by the sample application chaincode.
-
-Prepare `fabric-cli` for configuration as follows:
-- Navigate to the `samples/fabric/fabric-cli` folder.
-- Create a `config.json` file by copying the `config.template.json` and setting (or adding or removing) suitable values:
-  * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
-    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
-    - Otherwise, leave the default values unchanged.
-- Create a `.env` file by copying `.env.template` and setting suitable parameter values:
-  * The `MEMBER_CREDENTIAL_FOLDER` should refer to the folder containing the credentials (security group and policy info) of all the foreign networks.
-    - If you specify a non-existent or new folder, `fabric-cli` will automatically generate sample credentials for you in that folder.
-    - For this exercise, simply point to the folder `src/data/credentials` (_you must specify the full absolute path here_).
-  * The `CONFIG_PATH` must point to a JSON file that contains connection info for networks and relays.
-    - For this exercise, set the value to `./config.json`.
-  * Leave the default values unchanged for the other parameters.
-- Run the following commands:
-  ```
-  ./bin/fabric-cli env set-file ./.env
-  ```
-- If you haven't specified CONFIG_PATH environment variable in .env, then run this:
-  ```
-  ./bin/fabric-cli config set-file ./config.json
-  ```
-  **NOTE:** Only one thing is required, either specify CONFIG_PATH in .env file or run the above command, not both.
-
-See the [Fabric CLI](#fabric-cli) section for more information.
-
-Finally, to prepare both `network1` and `network2` for interoperation, run:
-
-```bash
-./bin/fabric-cli configure all network1 network2
-```
+- Use the `fabric-cli` executable in the `bin` folder for [subsequent actions](./ledger-initialization.md).
 
 ### Fabric Relay
 
 The relay is a module acting on behalf of a network, enabling interoperation flows with other networks by communicating with their relays.
 The code for this lies in the `core/relay` folder.
 
-#### Running Relay in Host
-
-##### Building
+#### Building
 
 _Prerequisite_: make sure Rust is already installed and that the `cargo` executable is in your system path (after installation of Rust, this should be available in `$HOME/.cargo/bin`); you can also ensure this by running `source "$HOME/.cargo/env"`.
 
@@ -196,7 +160,7 @@ Build the generic (i.e., common to all DLTs) relay module as follows:
   make
   ```
 
-##### Deployment
+#### Deployment
 
 An instance or a relay can be run using a suitable configuration file. Samples are available in the `core/relay/config` folder.
 
@@ -353,20 +317,6 @@ If the driver starts successfully, it should log the following message on your t
 ```
 Corda driver gRPC server started. Listening on port 9099
 ```
-
-### Corda Client (Application)
-
-Now that the network is launched, the client application (which we built earlier) needs to be exercised to generate network (ledger) state in preparation to test interoperation flows.
-
-#### Bootstrapping Network and Application State
-Just as we did for either Fabric network, the Corda network ledger (or _vault_ on each node) must be initialized with access control policies, verification policies, and security group information for the two Fabric networks. Further, sample key-value pairs need to be recorded so we can later share them with a Fabric network via an interoperation flow.
-
-Bootstrap the Corda network and application states as follows:
-- Navigate to the `samples/corda/corda-simple-application` folder.
-- Run the following:
-  ```bash
-  make initialise-vault
-  ```
 
 ## Tear Down the Setup
 

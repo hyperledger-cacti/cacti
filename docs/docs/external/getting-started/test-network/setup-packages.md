@@ -33,24 +33,6 @@ Before starting, make sure you have the following software installed on your hos
     cargo update -p nom
     cargo update -p lexical-core
     ```
-- Protoc (Protobuf compiler): _Golang should already be installed and configured._
-  * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugins.
-    ```
-    apt-get install protobuf-compiler
-    go get -u google.golang.org/protobuf/cmd/protoc-gen-go
-    go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-    ```
-  * If the above method installs an older version of `protoc` (check using `protoc --version`), say below 3.12.x, you should download pre-compiled binaries instead. (With an older version, you may see errors while attempting to launch and setup the Fabric networks).
-    ```
-    sudo apt-get remove protobuf-compiler
-    curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
-    sudo apt-get install unzip
-    unzip protoc-3.15.6-linux-x86_64.zip -d <some-folder-path>
-    export PATH="$PATH:<some-folder-path>/bin"
-    go get -u google.golang.org/protobuf/cmd/protoc-gen-go
-    go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-    ```
-    _Note_: The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps.
 
 ### Credentials
 Make sure you have an SSH or GPG key registered in https://github.com to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the `https://` prefix but this may change to `git@` in the future).
@@ -86,7 +68,6 @@ For more information, refer to the associated [README](https://github.com/hyperl
 
 **Troubleshooting Tips**:
 - If you see any errors during the launches, re-check the prerequisites (software installations and credentials). Ensure your network connection is working. As a safe bet, you can retry after cleanup: kill and remove all Docker containers and associated volumes.
-- If `protoc` or `protoc-gen-go` throws an error, reinstall `protoc` and `protoc-gen-go` using suggestions made in the Prerequisites section above.
 
 ### Fabric Client (fabric-cli)
 
@@ -109,50 +90,7 @@ You can install `fabric-cli` as follows:
   ```bash
   make build
   ```
-- Use the `fabric-cli` executable in the `bin` folder for subsequent actions.
-
-#### Configuration
-
-During bootstrap, the ledgers in both `network1` and `network2` must be populated with the following information scoped by the interoperation chaincode:
-- Access control policies governing requests from foreign networks
-- Security group info for foreign networks (i.e., identities of network units and their membership providers' certificate chains)
-- Verification policies for proofs supplied by foreign networks
-Knowledge of foreign networks that must be configured in this stage is as follows:
-- `network1` has policies and security group info for `network2` and `Corda_Network`
-- `network2` has policies and security group info for `network1` and `Corda_Network`
-(_`Corda_Network` will be launched later._)
-The ledgers must also be populated with sample key-value pairs for testing interoperation flows, scoped by the sample application chaincode.
-
-Prepare `fabric-cli` for configuration as follows:
-- Navigate to the `samples/fabric/fabric-cli` folder.
-- Create a `config.json` file by copying the `config.template.json` and setting (or adding or removing) suitable values:
-  * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
-    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
-    - Otherwise, leave the default values unchanged.
-- Create a `.env` file by copying `.env.template` and setting suitable parameter values:
-  * The `MEMBER_CREDENTIAL_FOLDER` should refer to the folder containing the credentials (security group and policy info) of all the foreign networks.
-    - If you specify a non-existent or new folder, `fabric-cli` will automatically generate sample credentials for you in that folder.
-    - For this exercise, simply point to the folder `src/data/credentials` (_you must specify the full absolute path here_).
-  * The `CONFIG_PATH` must point to a JSON file that contains connection info for networks and relays.
-    - For this exercise, set the value to `./config.json`.
-  * Leave the default values unchanged for the other parameters.
-- Run the following commands:
-  ```
-  ./bin/fabric-cli env set-file ./.env
-  ```
-- If you haven't specified CONFIG_PATH environment variable in .env, then run this:
-  ```
-  ./bin/fabric-cli config set-file ./config.json
-  ```
-  **NOTE:** Only one thing is required, either specify CONFIG_PATH in .env file or run the above command, not both.
-
-See the [Fabric CLI](#fabric-cli) section for more information.
-
-Finally, to prepare both `network1` and `network2` for interoperation, run:
-
-```bash
-./bin/fabric-cli configure all network1 network2
-```
+- Use the `fabric-cli` executable in the `bin` folder for [subsequent actions](./ledger-initialization.md).
 
 ### Fabric Relay
 
@@ -312,20 +250,6 @@ If the driver starts successfully, it should log the following message on your t
 ```
 Corda driver gRPC server started. Listening on port 9099
 ```
-
-### Corda Client (Application)
-
-Now that the network is launched, the client application (which we built earlier) needs to be exercised to generate network (ledger) state in preparation to test interoperation flows.
-
-#### Bootstrapping Network and Application State
-Just as we did for either Fabric network, the Corda network ledger (or _vault_ on each node) must be initialized with access control policies, verification policies, and security group information for the two Fabric networks. Further, sample key-value pairs need to be recorded so we can later share them with a Fabric network via an interoperation flow.
-
-Bootstrap the Corda network and application states as follows:
-- Navigate to the `samples/corda/corda-simple-application` folder.
-- Run the following:
-  ```bash
-  make initialise-vault
-  ```
 
 ## Tear Down the Setup
 

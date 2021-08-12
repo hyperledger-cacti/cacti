@@ -21,6 +21,7 @@ module.exports = {
                         "external/getting-started/test-network/setup-local-docker",
                         "external/getting-started/test-network/setup-packages",
                         "external/getting-started/test-network/setup-packages-docker",
+                        "external/getting-started/test-network/ledger-initialization",
                         "external/getting-started/test-network/advanced-configuration",
                     ],
                 },
