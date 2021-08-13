@@ -7,7 +7,7 @@
   "browser": "dist/cactus-plugin-keychain-memory.web.umd.js",
   "browserMinified": "dist/cactus-plugin-keychain-memory.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/types/main/typescript/index.d.ts",
+  "types": "dist/lib/main/typescript/index.d.ts",
   "files": [
     "dist/*"
   ],
