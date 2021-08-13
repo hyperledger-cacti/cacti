@@ -9,10 +9,6 @@ start: github.properties
 
 .PHONY: start-local
 start-local:
-	echo "Building corda interop app..."
-	cd ../../../core/network/corda-interop-app && make build-local
-	echo "Building corda simple app..."
-	cd ../../../samples/corda/corda-simple-application && make build-local
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh local
 	./scripts/start-nodes.sh

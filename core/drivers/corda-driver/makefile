@@ -5,10 +5,6 @@ GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/d
 
 .PHONY: build-local
 build-local:
-	echo "Building Protos..."
-	cd ../../../common/protos-java-kt && make build
-	echo "Building corda-interop-app..."
-	cd ../../network/corda-interop-app && make build-local
 	echo "Building Driver..."
 	./gradlew clean installDist
 
