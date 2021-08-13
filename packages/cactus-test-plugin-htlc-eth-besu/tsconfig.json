@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist/lib/",
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/lib",
     "resolveJsonModule": true,
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-test-plugin-htlc-eth-besu.tsbuildinfo"

@@ -10,7 +10,7 @@
   "browser": "dist/cactus-cmd-api-server.web.umd.js",
   "browserMinified": "dist/cactus-cmd-api-server.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/types/main/typescript/index.d.ts",
+  "types": "dist/lib/main/typescript/index.d.ts",
   "scripts": {
     "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "codegen:openapi": "npm run generate-sdk",
