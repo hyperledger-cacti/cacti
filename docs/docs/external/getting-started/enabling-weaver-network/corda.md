@@ -1,6 +1,6 @@
 ---
 id: corda
-title: Enabling Weaver in a Corda Network and Application
+title: Corda
 ---
 
 <!--

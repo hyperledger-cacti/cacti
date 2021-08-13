@@ -35,7 +35,7 @@ module.exports = {
                 },
                 {
                     type: "category",
-                    label: "Enabling Weaver in your Network",
+                    label: "Enabling Weaver in your Network and Application",
                     items: [
                         "external/getting-started/enabling-weaver-network/fabric",
                         "external/getting-started/enabling-weaver-network/corda",

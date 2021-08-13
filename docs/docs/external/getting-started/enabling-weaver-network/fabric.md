@@ -1,6 +1,6 @@
 ---
 id: fabric
-title: Enabling Weaver in a Fabric Network and Application
+title: Hyperledger Fabric
 ---
 
 <!--
@@ -39,7 +39,7 @@ A Fabric distributed application's business logic code spans two layers as illus
   * **Identity Service**: A Fabric network needs to share its security group (or membership) configuration, i.e., its organizations' CA certificate chains, with a foreign network with which it seeks to interoperate. (You will need one service per channel.) Though such sharing can be implemented using several different mechanisms, ranging from manual to automated, the simplest and most modular way is to expose a REST endpoint that agents in foreign networks can reach. Further, this REST endpoint can be implemented as a standalone web application or it can be an extension of one or more of the existing Layer-2 applications. (Multiple apps can expose the same endpoint serving the same information for redundancy.) We will demonstrate an example of this while leaving other implementation modes to the user.
     Let's say a Fabric network consists of two organizations called `myorg1` and `myorg2`, each running a Layer-2 application with a web server whose URL prefixes are `http://myorg1.mynetwork.com:9000` and `http://myorg2.mynetwork.com:9000` respectively. For the configuration associated with the channel `mychannel`, each app exposes a REST endpoint (again, as an example) `http://myorg1.mynetwork.com:9000/mychannel/org_sec_group` and `http://myorg2.mynetwork.com:9000/mychannel/org_sec_group` respectively.
     At each web server's backend, you need to implement logic to retrieve the organization's MSP ID and its associated certificated chains. Sample code is given below for a JavaScript implementation built on `fabric-sdk-node`. You can use this code verbatim if your Layer-2 application is built on JavaScript or TypeScript, or port it to other languages (Java or Golang).
-    ```
+    ```javascript
     var express = require('express');
     var app = express();
     
@@ -95,7 +95,7 @@ A Fabric distributed application's business logic code spans two layers as illus
     });
     ```
     Finally, each app exposes an identity service on the endpoints `http://myorg1.mynetwork.com:9000/sec_group` and `http://myorg2.mynetwork.com:9000/sec_group` respectively. Here is sample code for the app representing `myorg1`.
-    ```
+    ```javascript
     // Boilerplate HTTP GET request-response code
     const performGETTopologyRequest = async function(url) {
         return new Promise((resolve, reject) => {
@@ -135,7 +135,7 @@ A Fabric distributed application's business logic code spans two layers as illus
       (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded on `tradefinancechannel` in `trade-finance-network`. We will see how to do this in the "Startup and Boostrap" section later.)
       
       You will need to insert some code in the Layer-2 application that accepts a B/L and submits a `RecordBillOfLading` transaction in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `interopFlow` function offered by the [weaver-fabric-interop-sdk](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424) library (there's an [equivalent library in Golang](https://github.com/hyperledger-labs/weaver-dlt-interoperability/releases/tag/sdks%2Ffabric%2Fgo-sdk%2Fv1.2.3-alpha.1) too). The following code sample illustrates this (the Golang equivalent is left to the reader):
-      ```
+      ```javascript
       const ihelper = require('@hyperledger-labs/weaver-fabric-interop-sdk').InteroperableHelper;
       const interopcc = <handle-to-fabric-interop-chaincode>;   // Use Fabric SDK functions: (new Gateway()).getNetwork(...).getContract(<fabric-interop-chaincode-id>)
       const keyCert = await ihelper.getKeyAndCertForRemoteRequestbyUserName(<wallet>, <user-id>);      // Read key and certificate for <user-id> from wallet (get handle using Fabric SDK Wallets API)
@@ -172,17 +172,16 @@ A Fabric distributed application's business logic code spans two layers as illus
           throw <error>;
       }
       ```
-      Let us understand this code snippet better. The structure in lines 156-161 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtaind via relays. The function `RecordBillOfLading` expects two arguments as specified in line 160: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 150), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay. (_Note_: a local chaincode invocation may require multiple view requests to different networks, which is why `indices` and `interopJSONs` are arrays; they therefore must have the same lengths.)
+      Let us understand this code snippet better. The structure in lines 156-161 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtained via relays. The function `RecordBillOfLading` expects two arguments as specified in line 160: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 150), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay. (_Note_: a local chaincode invocation may require multiple view requests to different networks, which is why `indices` and `interopJSONs` are arrays; they therefore must have the same lengths.)
 
       The rest of the code ought to be self-explanatory. Values are hardcoded for explanation purposes, but you can refactor the above code by reading view addresses corresponding to chaincode invocations from a configuration file.
 
       You also need to add the following dependency to the `dependencies` section of your application's `package.json` file:
-      ```
+      ```json
       "@hyperledger-labs/weaver-fabric-interop-sdk": "latest",
       ```
       (Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424) and select a different version.)
 
-Create a personal access token with `read:packages` access in github in order to use modules published in github packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
       Before you run `npm install` to fetch the dependencies, make sure you create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github. Create an `.npmrc` file in the same folder as the `package.json` with the following contents:
       ```
       registry=https://npm.pkg.github.com/hyperledger-labs
@@ -196,7 +195,7 @@ Create a personal access token with `read:packages` access in github in order to
 No changes are required in your network's pre-configuration process for Weaver enablement.
 
 Typically, pre-configuration involves generating:
-- _Channel artifacts_: orderer genesis block, channel transaction, and anchor peer configurations from a `configytx.yaml` file (using Fabric's `configtxgen` tool)
+- _Channel artifacts_: orderer genesis block, channel transaction, and anchor peer configurations from a `configtx.yaml` file (using Fabric's `configtxgen` tool)
 - _Crypto artifacts_: keys and certificates for CAs, peers, orderers, and clients from a `crypto-config.yaml` file (using Fabric's `cryptogen` tool)
 - _Connection profiles_: one for every network organization, which will be used by the organization's Layer-2 applications to connect to the network's peers and CAs
 
@@ -273,7 +272,7 @@ You can start a relay within a Docker container using a [pre-built image](https:
 - `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/docker-compose.yaml) verbatim.
 
 To start the relay server, navigate to the folder containing the above files and run the following:
-```
+```bash
 docker-compose up -d relay-server
 ```
 
@@ -307,7 +306,7 @@ You can start a driver within a Docker container using a [pre-built image](https
 
   The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
 - `config.json`: This contains settings used to connect to a CA of a Fabric network organization and enroll a client. A sample is given below:
-  ```
+  ```json
   {
       "admin":{
           "name":"admin",
@@ -329,11 +328,11 @@ You can start a driver within a Docker container using a [pre-built image](https
 
   `<msp-id>` should be set to the (or an) MSP ID of the selected organization.
 
-  `<ca-service-endpoint>` should be set to the CA server's endpoint. If you launched your CA server as a container from a docker-compose file, this should be set to the container's service name.
+  `<ca-service-endpoint>` should be set to the CA server's endpoint. If you launched your CA server as a container from a docker-compose file, this should be set to the container's service name. (_Note_: if your connection profile already contains specifications for a CA server, you can leave this field empty.)
 - `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/drivers/fabric-driver/docker-compose.yml) verbatim.
 
 To start the driver, navigate to the folder containing the above files and run the following:
-```
+```bash
 docker-compose up -d
 ```
 
@@ -342,7 +341,7 @@ docker-compose up -d
 To prepare your network for interoperation with a foreign network, you need to record the following to your network channel through the Fabric Interoperation Chaincode:
 - **Access control policies**:
   Let's take the example of the request made from `trade-finance-network` to `trade-logistics-network` for a B/L earlier in this document. `trade-logistics-network` can have a policy of the following form permitting access to the `GetBillOfLading` function from a client belonging to the `Exporter` organization in `trade-finance-network` as follows:
-  ```
+  ```json
   {
       "securityDomain":"trade-finance-network",
       "rules":
@@ -361,7 +360,7 @@ To prepare your network for interoperation with a foreign network, you need to r
   You need to record this policy rule on your Fabric network's channel by invoking either the `CreateAccessControlPolicy` function or the `UpdateAccessControlPolicy` function on the Fabric Interoperation Chaincode that is already installed on that channel; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. In either case, the chaincode function will take a single argument, which is the policy in the form of a JSON string (make sure you escape the double quotes before sending the request to avoid parsing errors). You can do this in one of two ways: (1) writing a small piece of code in Layer-2 that invokes the contract using the Fabric SDK Gateway API, or (2) running a `peer chaincode invoke` command from within a Docker container built on the `hyperledger/fabric-tools` image. Either approach should be familiar to a Fabric practitioner.
 - **Verification policies**:
   Taking the same example as above, an example of a verification policy for a B/L requested by the `trade-finance-network` from the `trade-logistics-network` is as follows:
-  ```
+  ```json
   {
       "securityDomain":"trade-logistics-network",
       "identifiers":
@@ -384,6 +383,8 @@ To prepare your network for interoperation with a foreign network, you need to r
   In this sample, a single verification policy rule is specified for data views coming from `trade-logistics-network`: it states that the data returned by the `GetBillOfLading` query made to the `shipmentcc` chaincode on the `tradelogisticschannel` channel requires as proof two signatures, one from a peer in the organization whose MSP ID is `ExporterMSP` and another from a peer in the organization whose MSP ID is `CarrierMSP`.
 
   You need to record this policy rule on your Fabric network's channel by invoking either the `CreateVerificationPolicy` function or the `UpdateVerificationPolicy` function on the Fabric Interoperation Chaincode that is already installed on that channel; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. In either case, the chaincode function will take a single argument, which is the policy in the form of a JSON string (make sure you escape the double quotes before sending the request to avoid parsing errors). As with the access control policy, you can do this in one of two ways: (1) writing a small piece of code in Layer-2 that invokes the contract using the Fabric SDK Gateway API, or (2) running a `peer chaincode invoke` command from within a Docker container built on the `hyperledger/fabric-tools` image. Either approach should be familiar to a Fabric practitioner.
+
+  **Note**: For any cross-network data request, make sure an access control policy is recorded in the _source network_ (`trade-logistics-network` in the above example) and a corresponding verification policy is recorded in the _destination network_ (`trade-finance-network` in the above example) before any relay request is triggered.
 - **Foreign network security group (membership) configuration**:
   Run the following procedure (pseudocode) to record security group configuration for every foreign network you wish your Fabric network to interoperate with (you will need to collect the identity service URLs for all the foreign networks first):
   ```

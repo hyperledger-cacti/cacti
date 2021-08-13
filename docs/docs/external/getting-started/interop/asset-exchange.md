@@ -1,6 +1,6 @@
 ---
 id: asset-exchange
-title: Testing Interoperation Scenarios for Asset Exchange
+title: Asset Exchange
 ---
 
 <!--

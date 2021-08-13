@@ -9,9 +9,9 @@ title: Ledger Initialization
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-Once the two Fabric networks and the Corda network are up and running along with their associated relays and drivers, we must initialize states in those networks to prepare them for interoperation. In the Fabric networks, this involves recording state in the channel ledgers, and in the Corda network, in the nodes' vaults.
+Once the two Fabric networks and the Corda network are up and running along with their associated relays and drivers, we must initialize states in those networks to prepare them for interoperation. For the Fabric networks, this involves recording state in the channel ledgers, and for the Corda network, in the nodes' vaults.
 
-## Intializing the Fabric Networks
+## Initializing the Fabric Networks
 
 We use the Fabric CLI (`fabric-cli`) built earlier (in `samples/fabric/fabric-cli`) for this purpose.
 

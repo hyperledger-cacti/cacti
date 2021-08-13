@@ -1,6 +1,6 @@
 ---
 id: besu
-title: Enabling Weaver in a Besu Network and Application
+title: Hyperledger Besu
 ---
 
 <!--

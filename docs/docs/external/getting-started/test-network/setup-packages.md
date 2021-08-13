@@ -13,7 +13,7 @@ In this document, we detail the steps using which you can bring up networks usin
 
 _Note_: The default configuration is for a development setup, therefore all components are run on `localhost`, many within Docker containers.
 
-Follow the instructions below to build and run components followed by interoperation flows. These instructions have been tested on Ubuntu Linux (bash shell) and Mac OS. In general, they should work on any system and shell as long as the various dependenices have been installed and configured.
+Follow the instructions below to build and run components followed by interoperation flows. These instructions have been tested on Ubuntu Linux (bash shell) and Mac OS. In general, they should work on any system and shell as long as the various dependencies have been installed and configured.
 
 ## Prerequisites
 
@@ -25,10 +25,10 @@ Before starting, make sure you have the following software installed on your hos
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Latest version)
 - Golang: [sample instructions](https://golang.org/dl/) (Version 1.15 or above)
 - Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
-- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 Supported)
+- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Rust: [sample instructions](https://www.rust-lang.org/tools/install)
-  * To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is depenent) to their latest versions as follows:
+  * To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions as follows:
     ```
     cargo update -p nom
     cargo update -p lexical-core
@@ -45,7 +45,7 @@ Clone the [weaver-dlt-interoperability](https://github.com/hyperledger-labs/weav
 
 ## Hyperledger Fabric Components
 
-Using the sequence of instructions below, you can start two separate Fabric networks, each with a single channel and application contract (chaincode). You can also start an interoperation contract, a relay and a _driver_ acting on behalf of each network. You can build a Fabric CLI tool with which you can initialize both networks' ledgers with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample key-value pairs that can be shared during subsequent interoperation flows.
+Using the sequence of instructions below, you can start two separate Fabric networks, each with a single channel and application contract (chaincode). You can also start an interoperation contract, a relay, and a _driver_ acting on behalf of each network. You can build a Fabric CLI tool with which you can initialize both networks' ledgers with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample key-value pairs that can be shared during subsequent interoperation flows.
 
 ### Fabric Network
 
@@ -71,7 +71,7 @@ For more information, refer to the associated [README](https://github.com/hyperl
 
 ### Fabric Client (fabric-cli)
 
-The CLI is used to interact with a Fabric network, configure it and run chaincode transactions to record data on the channel ledger or query data. It is also used to interact with remote networks through the relay in order to trigger an interoperation flow for data request and acceptance.
+The CLI is used to interact with a Fabric network, configure it and run chaincode transactions to record data on the channel ledger or query data. It is also used to interact with remote networks through the relay to trigger an interoperation flow for data request and acceptance.
 
 The `fabric-cli` source code is located in the `samples/fabric/fabric-cli` folder.
 
@@ -97,9 +97,7 @@ You can install `fabric-cli` as follows:
 The relay is a module acting on behalf of a network, enabling interoperation flows with other networks by communicating with their relays.
 The code for this lies in the `core/relay` folder.
 
-#### Running Relay in Host
-
-##### Building
+#### Building
 
 _Prerequisite_: make sure Rust is already installed and that the `cargo` executable is in your system path (after installation of Rust, this should be available in `$HOME/.cargo/bin`); you can also ensure this by running `source "$HOME/.cargo/env"`.
 
@@ -110,7 +108,7 @@ Build the generic (i.e., common to all DLTs) relay module as follows:
   make
   ```
   
-##### Deployment
+#### Deployment
 
 An instance or a relay can be run using a suitable configuration file. Samples are available in the `core/relay/config` folder.
 
@@ -133,12 +131,10 @@ For more information, see the [relay README](https://github.com/hyperledger-labs
 
 ### Fabric Driver
 
-A driver is a DLT-specific plugin invoked by the relay while channelling external data queries to the local peer network and collecting a response with proofs. The Fabric driver is built as a Fabric client application on the `fabric-network` NPM package.
+A driver is a DLT-specific plugin invoked by the relay while conveying external data queries to the local peer network and collecting a response with proofs. The Fabric driver is built as a Fabric client application on the `fabric-network` NPM package.
 The code for this lies in the `core/drivers/fabric-driver` folder.
 
-#### Running Fabric Driver
-
-##### Configuring
+#### Configuring
 
 In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
 
@@ -150,7 +146,7 @@ Configure `fabric-driver` for `network1` as follows:
     - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
   * Leave the default values unchanged for the other parameters. The relay and driver endpoints as well as the network name are already specified.
 
-##### Building
+#### Building
 
 Build the Fabric driver module as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
@@ -159,9 +155,8 @@ Build the Fabric driver module as follows:
   ```bash
   make build
   ```
-_Note_: `postinstall` applies a customization patch to the `fabric-network` NPM library.
 
-##### Running
+#### Running
 
 Run a Fabric driver for `network1` as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
@@ -192,7 +187,7 @@ Following steps will build above cordapp and a corda-client as well in `samples/
 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
-- Create copy of `github.properties.template` as `github.properties`.
+- Create a copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - To spin up the Corda network with the interoperation Cordapp, run:
     ```bash
@@ -230,7 +225,7 @@ The code for this lies in the `core/drivers/corda-driver` folder.
 
 Build the Corda driver module as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
-- Create copy of `github.properties.template` as `github.properties`.
+- Create a copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - Run the following:
 ```bash

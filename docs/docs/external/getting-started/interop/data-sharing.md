@@ -1,6 +1,6 @@
 ---
 id: data-sharing
-title: Testing Interoperation Scenarios for Data Sharing
+title: Data Sharing
 ---
 
 <!--
