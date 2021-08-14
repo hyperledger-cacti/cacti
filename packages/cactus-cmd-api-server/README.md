@@ -165,7 +165,7 @@ if (require.main === module) {
 ### Complete Example
 
 For a complete example of how to use the API server, read all the code of the
-supply chain exmaple's backend package:
+supply chain example's backend package:
 
 https://github.com/hyperledger/cactus/tree/main/examples/cactus-example-supply-chain-backend/src/main/typescript
 
@@ -219,7 +219,7 @@ DOCKER_BUILDKIT=1 docker build -f ./packages/cactus-cmd-api-server/Dockerfile . 
 
 Build with a specific version of the npm package:
 ```sh
-DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=fix-quorum-contract-types -f ./packages/cactus-cmd-api-server/Dockerfile . -t cas -t cactus-api-server
+DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=main -f ./packages/cactus-cmd-api-server/Dockerfile . -t cas -t cactus-api-server
 ```
 
 ### Running the container image locally
@@ -239,7 +239,7 @@ Once you've built the container, the following commands should work:
     cas
   ```
 
-- Launch container with plugins of your choice (keychain, consortium connector, etc.) 
+- Launch container with plugins of your choice (keychain, consortium connector, etc.)
 
   ```sh
     docker run \
