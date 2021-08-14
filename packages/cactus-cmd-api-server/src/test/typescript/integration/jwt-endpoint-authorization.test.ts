@@ -1,3 +1,4 @@
+import path from "path";
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import { JWK, JWT } from "jose";
@@ -64,9 +65,18 @@ test(testCase, async (t: Test) => {
       },
     };
 
+    const pluginsPath = path.join(
+      __dirname, // start at the current file's path
+      "../../../../../../", // walk back up to the project root
+      ".tmp/test/cmd-api-server/jwt-endpoint-authorization_test", // the dir path from the root
+      uuidv4(), // then a random directory to ensure proper isolation
+    );
+    const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
+
     const configService = new ConfigService();
     const apiSrvOpts = configService.newExampleConfig();
     apiSrvOpts.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
+    apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
     apiSrvOpts.authorizationConfigJson = authorizationConfig;
     apiSrvOpts.configFile = "";
     apiSrvOpts.apiCorsDomainCsv = "*";

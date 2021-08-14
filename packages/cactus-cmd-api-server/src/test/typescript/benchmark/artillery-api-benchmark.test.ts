@@ -1,3 +1,9 @@
+import { promisify } from "util";
+import { unlinkSync, readFileSync } from "fs";
+
+import { exec } from "child_process";
+import path from "path";
+
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import { JWK } from "jose";
@@ -23,11 +29,6 @@ const log = LoggerProvider.getOrCreate({
   label: "logger-test",
 });
 
-import { promisify } from "util";
-import { unlinkSync, readFileSync } from "fs";
-
-import { exec } from "child_process";
-
 const shell_exec = promisify(exec);
 
 const artilleryScriptLocation =
@@ -47,9 +48,18 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
 
   log.info("Generating Config...");
 
+  const pluginsPath = path.join(
+    __dirname, // start at the current file's path
+    "../../../../../../", // walk back up to the project root
+    ".tmp/test/cmd-api-server/artillery-api-benchmark_test", // the dir path from the root
+    uuidv4(), // then a random directory to ensure proper isolation
+  );
+  const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
+
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+  apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 4000;

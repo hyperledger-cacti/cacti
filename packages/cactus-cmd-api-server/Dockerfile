@@ -50,8 +50,8 @@ EXPOSE 3000 4000
 
 USER $APP_USER
 
-RUN npm i @hyperledger/cactus-cmd-api-server@${NPM_PKG_VERSION} --production
+RUN npm i @elenaizaguirre/cactus-cmd-api-server@${NPM_PKG_VERSION}
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js"]
+CMD ["node", "node_modules/@elenaizaguirre/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js"]
 HEALTHCHECK --interval=5s --timeout=5s --start-period=1s --retries=30 CMD /healthcheck.sh

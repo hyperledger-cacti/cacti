@@ -3,8 +3,9 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist/lib/",
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/lib",
     "rootDir": "./src",
+    "skipLibCheck": true,
     "tsBuildInfoFile": "../../.build-cache/cactus-cmd-api-server.tsbuildinfo"
   },
   "include": [

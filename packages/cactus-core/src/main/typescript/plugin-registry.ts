@@ -1,5 +1,6 @@
 import { Optional } from "typescript-optional";
 import {
+  Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
@@ -58,6 +59,28 @@ export class PluginRegistry {
   }
 
   /**
+   * Same as `findOneById()` but throws instead of returning an `EMPTY` `Optional`
+   * when the plugin does not exist in the registry.
+   *
+   * @param instanceId The `instanceId` of the plugin that you are looking to obtain an instance of from the registry.
+   * @throws If there is no plugin in the registry by the `instanceId` specificed.
+   */
+  public getOneById<T extends ICactusPlugin>(instanceId: string): T {
+    Checks.nonBlankString(instanceId, "instanceId");
+    return this.findOneById(instanceId).orElseThrow(
+      () => new Error(`Plugin ${instanceId} not present in registry`),
+    ) as T;
+  }
+
+  public findOneById<T extends ICactusPlugin>(instanceId: string): Optional<T> {
+    Checks.nonBlankString(instanceId, "instanceId");
+    const plugin = this.getPlugins().find(
+      (p) => p.getInstanceId() === instanceId,
+    );
+    return Optional.ofNullable(plugin as T);
+  }
+
+  /**
    * The main difference between this method and `findOneByPackageName` is that this throws an Error if there was nothing to
    * return. It is recommended to use this method over `findOneByPackageName` if you have a hard dependency on a certain
    * plugin being loaded for your code.
@@ -65,7 +88,7 @@ export class PluginRegistry {
    * @param packageName The package name of the plugin that you are looking to obtain an instance of from the registry.
    * @throws If there is no plugin in the registry by the package name specificed.
    */
-  public getOneById<T extends ICactusPlugin>(packageName: string): T {
+  public getOneByPackageName<T extends ICactusPlugin>(packageName: string): T {
     return this.findOneByPackageName(packageName).orElseThrow(
       () => new Error(`Plugin ${packageName} not present in registry`),
     ) as T;
