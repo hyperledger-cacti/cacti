@@ -26,6 +26,7 @@ convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
 
 export interface ICactusApiServerOptions {
+  pluginManagerOptionsJson: string;
   authorizationProtocol: AuthorizationProtocol;
   authorizationConfigJson: IAuthorizationConfig;
   configFile: string;
@@ -88,6 +89,14 @@ export class ConfigService {
 
   private static getConfigSchema(): Schema<ICactusApiServerOptions> {
     return {
+      pluginManagerOptionsJson: {
+        doc:
+          "Can be used to override npm registry and authentication details for example. See https://www.npmjs.com/package/live-plugin-manager#pluginmanagerconstructoroptions-partialpluginmanageroptions for further details.",
+        format: "*",
+        default: "{}",
+        env: "PLUGIN_MANAGER_OPTIONS_JSON",
+        arg: "plugin-manager-options-json",
+      },
       authorizationProtocol: {
         doc:
           "The name of the authorization protocol to use. Accepted values" +
@@ -518,6 +527,7 @@ export class ConfigService {
     };
 
     return {
+      pluginManagerOptionsJson: "{}",
       authorizationProtocol: AuthorizationProtocol.JSON_WEB_TOKEN,
       authorizationConfigJson,
       configFile: ".config.json",

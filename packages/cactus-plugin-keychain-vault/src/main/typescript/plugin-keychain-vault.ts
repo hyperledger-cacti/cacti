@@ -114,6 +114,7 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+    this.prometheusExporter.startMetricsCollection();
 
     this.log.info(`Created Vault backend OK. Endpoint=${this.endpoint}`);
 

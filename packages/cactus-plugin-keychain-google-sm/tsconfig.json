@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist/lib/",
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/lib",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-keychain-google-sm.tsbuildinfo"
   },

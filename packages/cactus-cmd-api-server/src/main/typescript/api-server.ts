@@ -1,11 +1,13 @@
-import path from "path";
 import type { AddressInfo } from "net";
+import type { Server as SecureServer } from "https";
+import os from "os";
+import path from "path";
 import tls from "tls";
 import { Server, createServer } from "http";
-import type { Server as SecureServer } from "https";
 import { createServer as createSecureServer } from "https";
 import { gte } from "semver";
-import npm from "npm";
+import lmify from "lmify";
+import fs from "fs-extra";
 import expressHttpProxy from "express-http-proxy";
 import type { Application, Request, Response, RequestHandler } from "express";
 import express from "express";
@@ -41,7 +43,9 @@ import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { AuthorizerFactory } from "./authzn/authorizer-factory";
 import { WatchHealthcheckV1 } from "./generated/openapi/typescript-axios";
 import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-endpoint";
+import { RuntimeError } from "run-time-error";
 export interface IApiServerConstructorOptions {
+  pluginManagerOptions?: { pluginsPath: string };
   pluginRegistry?: PluginRegistry;
   httpServerApi?: Server | SecureServer;
   wsServerApi?: SocketIoServer;
@@ -71,6 +75,7 @@ export class ApiServer {
   private readonly wsApi: SocketIoServer;
   private readonly expressApi: Application;
   private readonly expressCockpit: Application;
+  private readonly pluginsPath: string;
   public prometheusExporter: PrometheusExporter;
 
   public get className(): string {
@@ -120,12 +125,30 @@ export class ApiServer {
         pollingIntervalInMin: 1,
       });
     }
+    this.prometheusExporter.startMetricsCollection();
     this.prometheusExporter.setTotalPluginImports(this.getPluginImportsCount());
 
     this.log = LoggerProvider.getOrCreate({
       label: "api-server",
       level: options.config.logLevel,
     });
+
+    const defaultPluginsPath = path.join(
+      os.tmpdir(),
+      "org",
+      "hyperledger",
+      "cactus",
+      "plugins",
+    );
+
+    const { pluginsPath } = {
+      ...{ pluginsPath: defaultPluginsPath },
+      ...JSON.parse(this.options.config.pluginManagerOptionsJson),
+      ...this.options.pluginManagerOptions,
+    } as { pluginsPath: string };
+
+    this.pluginsPath = pluginsPath;
+    this.log.debug("pluginsPath: %o", pluginsPath);
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -255,8 +278,16 @@ export class ApiServer {
 
     await this.installPluginPackage(pluginImport);
 
+    const packagePath = path.join(
+      this.pluginsPath,
+      options.instanceId,
+      "node_modules",
+      packageName,
+    );
+    this.log.debug("Package path: %o", packagePath);
+
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const pluginPackage = require(/* webpackIgnore: true */ packageName);
+    const pluginPackage = require(/* webpackIgnore: true */ packagePath);
     const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
 
     const pluginFactoryOptions: IPluginFactoryOptions = {
@@ -275,54 +306,38 @@ export class ApiServer {
     const fnTag = `ApiServer#installPluginPackage()`;
     const { packageName: pkgName } = pluginImport;
 
-    const npmLogHandler = (message: unknown) => {
-      this.log.debug(`${fnTag} [npm-log]:`, message);
-    };
-
-    const cleanUpNpmLogHandler = () => {
-      npm.off("log", npmLogHandler);
-    };
-
+    const instanceId = pluginImport.options.instanceId;
+    const pluginPackageDir = path.join(this.pluginsPath, instanceId);
     try {
-      this.log.info(`Installing ${pkgName} for plugin import`, pluginImport);
-      npm.on("log", npmLogHandler);
-
-      await new Promise<void>((resolve, reject) => {
-        npm.load((err?: Error) => {
-          if (err) {
-            this.log.error(`${fnTag} npm load fail:`, err);
-            const { message, stack } = err;
-            reject(new Error(`${fnTag} npm load fail: ${message}: ${stack}`));
-          } else {
-            // do not touch package.json
-            npm.config.set("save", false);
-            // do not touch package-lock.json
-            npm.config.set("package-lock", false);
-            // do not waste resources on running an audit
-            npm.config.set("audit", false);
-            // do not wast resources on rendering a progress bar
-            npm.config.set("progress", false);
-            resolve();
-          }
-        });
-      });
-
-      await new Promise<unknown>((resolve, reject) => {
-        const npmInstallHandler = (errInstall?: Error, result?: unknown) => {
-          if (errInstall) {
-            this.log.error(`${fnTag} npm install failed:`, errInstall);
-            const { message: m, stack } = errInstall;
-            reject(new Error(`${fnTag} npm install fail: ${m}: ${stack}`));
-          } else {
-            this.log.info(`Installed ${pkgName} OK`, result);
-            resolve(result);
-          }
-        };
-
-        npm.commands.install([pkgName], npmInstallHandler);
-      });
-    } finally {
-      cleanUpNpmLogHandler();
+      await fs.mkdirp(pluginPackageDir);
+      this.log.debug(`${pkgName} plugin package dir: %o`, pluginPackageDir);
+    } catch (ex) {
+      const errorMessage =
+        "Could not create plugin installation directory, check the file-system permissions.";
+      throw new RuntimeError(errorMessage, ex);
+    }
+    try {
+      lmify.setPackageManager("npm");
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      lmify.setRootDir(pluginPackageDir);
+      this.log.debug(`Installing ${pkgName} for plugin import`, pluginImport);
+      const out = await lmify.install([
+        pkgName,
+        "--production",
+        "--audit=false",
+        "--progress=false",
+        "--fund=false",
+        `--prefix=${pluginPackageDir}`,
+        // "--ignore-workspace-root-check",
+      ]);
+      this.log.debug("%o install result: %o", pkgName, out);
+      if (out.exitCode !== 0) {
+        throw new RuntimeError("Non-zero exit code: ", JSON.stringify(out));
+      }
+      this.log.info(`Installed ${pkgName} OK`);
+    } catch (ex) {
+      throw new RuntimeError(`${fnTag} plugin install fail: ${pkgName}`, ex);
     }
   }
 
