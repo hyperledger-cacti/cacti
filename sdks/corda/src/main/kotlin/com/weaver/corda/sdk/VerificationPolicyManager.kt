@@ -95,7 +95,7 @@ class VerificationPolicyManager {
                 val result = runCatching {
                     proxy.startFlow(::DeleteVerificationPolicyState, securityDomain)
                             .returnValue.get().flatMap {
-                                logger.info("Access Control Policy for securityDomain $securityDomain deleted\n")
+                                logger.info("Verification Policy for securityDomain $securityDomain deleted\n")
                                 Right(it.toString())
                             }
                 }.fold({ it }, { Left(Error(it.message)) })
@@ -121,7 +121,7 @@ class VerificationPolicyManager {
                                 logger.error("Error getting verification policy from network: ${it.message}")
                                 Left(Error("Corda Network Error: ${it.message}"))
                             }, {
-                                logger.debug("Access Control Policy for securityDomain $securityDomain: ${it.state.data} \n")
+                                logger.debug("Verification Policy for securityDomain $securityDomain: ${it.state.data} \n")
                                 Right(stateToProto(it.state.data))
                             })
                 }.fold({ it }, {
@@ -134,10 +134,10 @@ class VerificationPolicyManager {
         }
 
         /**
-         * Helper function used by GetAccessControlPoliciesCommand to interact with the Corda network
+         * Helper function used by GetVerificationPoliciesCommand to interact with the Corda network
          */
         @JvmStatic
-        fun getAccessControlPolicies(
+        fun getVerificationPolicies(
             proxy: CordaRPCOps
         ): Either<Error, List<VerificationPolicyOuterClass.VerificationPolicy>> {
             return try {
@@ -149,7 +149,7 @@ class VerificationPolicyManager {
                 for (vp in verificationPolicies) {
                     verificationPolicyList += stateToProto(vp.state.data)
                 }
-                logger.debug("Access Control Policies: $verificationPolicyList\n")
+                logger.debug("Verification Policies: $verificationPolicyList\n")
                 Right(verificationPolicyList)
             } catch (e: Exception) {
                 Left(Error("${e.message}"))

@@ -94,7 +94,7 @@ class MembershipManager {
                 val result = runCatching {
                     proxy.startFlow(::DeleteMembershipState, securityDomain)
                             .returnValue.get().flatMap {
-                                logger.info("Access Control Policy for securityDomain $securityDomain deleted\n")
+                                logger.info("Membership for securityDomain $securityDomain deleted\n")
                                 Right(it.toString())
                             }
                 }.fold({ it }, { Left(Error(it.message)) })
@@ -133,10 +133,10 @@ class MembershipManager {
         }
 
         /**
-         * Helper function used by GetAccessControlPoliciesCommand to interact with the Corda network
+         * Helper function used by GetMembershipsPoliciesCommand to interact with the Corda network
          */
         @JvmStatic
-        fun getAccessControlPolicies(
+        fun getMemberships(
             proxy: CordaRPCOps
         ): Either<Error, List<MembershipOuterClass.Membership>> {
             return try {

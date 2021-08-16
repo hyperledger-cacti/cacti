@@ -61,7 +61,7 @@ class CredentialsCreator(
         return AccessControlPolicyManager.stateToProto(accessControlPolicyState)
     }
     
-    fun createMembershipState(): MembershipOuterClass.Membership {
+    fun createMembership(): MembershipOuterClass.Membership {
         val memberNode0 = Member("", "certificate", this.cert_chain)
         val memberMap = mapOf(this.nodes[0] to memberNode0)
         val membershipState = MembershipState(
@@ -71,7 +71,7 @@ class CredentialsCreator(
         return MembershipManager.stateToProto(membershipState)
     }
     
-    fun createVerificationPolicyState(): VerificationPolicyOuterClass.VerificationPolicy {
+    fun createVerificationPolicy(): VerificationPolicyOuterClass.VerificationPolicy {
         val verificationPolicyCriteria = this.nodes.toList()
         val policy = Policy("Signature", verificationPolicyCriteria)
         val identifier = Identifier(this.locFlow, policy)
