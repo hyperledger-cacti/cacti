@@ -13,8 +13,6 @@ import arrow.core.flatMap
 import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 import org.slf4j.LoggerFactory
-import com.google.gson.Gson
-import org.json.*
 
 import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
@@ -158,6 +156,7 @@ class VerificationPolicyManager {
             }
         }
         
+        @JvmStatic
         fun protoToState(
             verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy
         ): VerificationPolicyState {
@@ -176,6 +175,7 @@ class VerificationPolicyManager {
             )
         }
         
+        @JvmStatic
         fun stateToProto(
             verificationPolicyState: VerificationPolicyState
         ): VerificationPolicyOuterClass.VerificationPolicy {

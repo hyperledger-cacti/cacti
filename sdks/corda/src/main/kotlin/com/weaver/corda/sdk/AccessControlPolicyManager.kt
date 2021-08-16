@@ -13,8 +13,6 @@ import arrow.core.flatMap
 import kotlinx.coroutines.runBlocking
 import java.lang.Exception
 import org.slf4j.LoggerFactory
-import com.google.gson.Gson
-import org.json.*
 
 import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
@@ -157,6 +155,7 @@ class AccessControlPolicyManager {
             }
         }
         
+        @JvmStatic
         fun protoToState(
             accessControlPolicyProto: AccessControl.AccessControlPolicy
         ): AccessControlPolicyState {
@@ -177,6 +176,7 @@ class AccessControlPolicyManager {
             )
         }
         
+        @JvmStatic
         fun stateToProto(
             accessControlPolicyState: AccessControlPolicyState
         ): AccessControl.AccessControlPolicy {

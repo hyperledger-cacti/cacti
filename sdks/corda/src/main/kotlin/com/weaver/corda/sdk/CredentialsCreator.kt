@@ -12,11 +12,14 @@ package com.weaver.corda.sdk;
 import net.corda.core.contracts.UniqueIdentifier
 import com.weaver.corda.app.interop.states.*
 import com.weaver.corda.app.interop.flows.*
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder;
 import org.json.JSONObject
 import java.util.*
 import org.slf4j.LoggerFactory
+
+import com.weaver.protos.common.access_control.AccessControl
+import com.weaver.protos.common.membership.MembershipOuterClass
+import com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass
+
 
   
 class CredentialsCreator(
@@ -28,13 +31,11 @@ class CredentialsCreator(
 ) {
     val cert_chain: List<String>
     val nodeid_cert: String
-    val linearId = UniqueIdentifier()
     val nodes = nodesList.split(",").toTypedArray()
     val baseNodesPath = baseNodesPath
     val securityDomain = securityDomain
     val remoteFlow = remoteFlow
     val locFlow = locFlow
-    val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
     private val logger = LoggerFactory.getLogger(CredentialsCreator::class.java)
     init {
         // Extracting Network certs
@@ -51,57 +52,33 @@ class CredentialsCreator(
         logger.debug("Cert Chain: ${this.cert_chain}")
     }
     
-    fun createAccessControlPolicyState(): AccessControlPolicyState {
+    fun createAccessControlPolicy(): AccessControl.AccessControlPolicy {
         val rule = Rule(this.nodeid_cert, "certificate", this.remoteFlow, true)
-        return AccessControlPolicyState(this.securityDomain, listOf(rule), this.linearId, listOf())
-    }
-    fun createAccessControlPolicyJSON(corda: Boolean = true): String {
-        val accessControlPolicy = this.createAccessControlPolicyState()
-        val accessControlPolicyJSONString = this.gson.toJson(accessControlPolicy)
-        if (corda) {
-            return accessControlPolicyJSONString
-        } else {
-            val accessControlPolicyJSON = JSONObject(accessControlPolicyJSONString)
-            accessControlPolicyJSON.remove("linearId")
-            accessControlPolicyJSON.remove("participants")
-            return accessControlPolicyJSON.toString()
-        }
+        val accessControlPolicyState = AccessControlPolicyState(
+            this.securityDomain, 
+            listOf(rule)
+        )
+        return AccessControlPolicyManager.stateToProto(accessControlPolicyState)
     }
     
-    fun createMembershipState(): MembershipState {
+    fun createMembershipState(): MembershipOuterClass.Membership {
         val memberNode0 = Member("", "certificate", this.cert_chain)
         val memberMap = mapOf(this.nodes[0] to memberNode0)
-        return MembershipState(this.securityDomain, memberMap, this.linearId, listOf())
-    }
-    fun createMembershipJSON(corda: Boolean = true): String {
-        val membership = this.createMembershipState()
-        val membershipJSONString = this.gson.toJson(membership)
-        if (corda) {
-            return membershipJSONString
-        } else {
-            val membershipJSON = JSONObject(membershipJSONString)
-            membershipJSON.remove("linearId")
-            membershipJSON.remove("participants")
-            return membershipJSON.toString()
-        }
+        val membershipState = MembershipState(
+            this.securityDomain, 
+            memberMap
+        )
+        return MembershipManager.stateToProto(membershipState)
     }
     
-    fun createVerificationPolicyState(): VerificationPolicyState {
+    fun createVerificationPolicyState(): VerificationPolicyOuterClass.VerificationPolicy {
         val verificationPolicyCriteria = this.nodes.toList()
         val policy = Policy("Signature", verificationPolicyCriteria)
         val identifier = Identifier(this.locFlow, policy)
-        return VerificationPolicyState(this.securityDomain, listOf(identifier), this.linearId, listOf())
-    }
-    fun createVerificationPolicyJSON(corda: Boolean = true): String {
-        val verificationPolicy = this.createVerificationPolicyState()
-        val verificationPolicyJSONString = this.gson.toJson(verificationPolicy)
-        if (corda) {
-            return verificationPolicyJSONString
-        } else {
-            val verificationPolicyJSON = JSONObject(verificationPolicyJSONString)
-            verificationPolicyJSON.remove("linearId")
-            verificationPolicyJSON.remove("participants")
-            return verificationPolicyJSON.toString()
-        }
+        val verificationPolicyState = VerificationPolicyState(
+            this.securityDomain, 
+            listOf(identifier)
+        )
+        return VerificationPolicyManager.stateToProto(verificationPolicyState)
     }
 }
