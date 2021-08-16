@@ -21,7 +21,9 @@ import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.contracts.UniqueIdentifier
 
 import com.weaver.corda.app.interop.states.AccessControlPolicyState
+import com.weaver.corda.app.interop.states.Rule
 import com.weaver.corda.app.interop.flows.*
+import com.weaver.protos.common.access_control.AccessControl
 
 
 class AccessControlPolicyManager {
@@ -34,17 +36,9 @@ class AccessControlPolicyManager {
         @JvmStatic
         fun createAccessControlPolicyState(
             proxy: CordaRPCOps,
-            accessControlPolicy: String
+            accessControlPolicyProto: AccessControl.AccessControlPolicy
         ): Either<Error, String> {
-            var accessControlPolicyJSON = JSONObject(accessControlPolicy)
-            val linearId = UniqueIdentifier()
-            accessControlPolicyJSON.put("linearId", JSONObject().put("id", linearId))
-            accessControlPolicyJSON.put("participants", JSONArray())
-            
-            val accessControlPolicyState = Gson().fromJson(
-                accessControlPolicyJSON.toString(), 
-                AccessControlPolicyState::class.java
-            )
+            val accessControlPolicyState = protoToState(accessControlPolicyProto)
             logger.info("Writing AccessControlPolicyState: ${accessControlPolicyState}")
             return try {
                 runCatching {
@@ -68,16 +62,9 @@ class AccessControlPolicyManager {
         @JvmStatic
         fun updateAccessControlPolicyState(
             proxy: CordaRPCOps,
-            accessControlPolicy: String
+            accessControlPolicyProto: AccessControl.AccessControlPolicy
         ): Either<Error, String> {
-            var accessControlPolicyJSON = JSONObject(accessControlPolicy)
-            accessControlPolicyJSON.put("linearId", JSONObject())
-            accessControlPolicyJSON.put("participants", JSONArray())
-            
-            val accessControlPolicyState = Gson().fromJson(
-                accessControlPolicyJSON.toString(), 
-                AccessControlPolicyState::class.java
-            )
+            val accessControlPolicyState = protoToState(accessControlPolicyProto)
             logger.info("Update AccessControlPolicyState: ${accessControlPolicyState}")
             return try {
                 runCatching {
@@ -126,22 +113,22 @@ class AccessControlPolicyManager {
         fun getAccessControlPolicyState(
             proxy: CordaRPCOps,
             securityDomain: String
-        ): Either<Error, AccessControlPolicyState> {
+        ): Either<Error, AccessControl.AccessControlPolicy> {
             return try {
                 logger.debug("Getting access control policy for securityDomain $securityDomain")
-                val accessControlPolicy = runCatching {
+                val accessControlPolicyState = runCatching {
                     proxy.startFlow(::GetAccessControlPolicyBySecurityDomain, securityDomain)
                             .returnValue.get().fold({
                                 logger.error("Error getting access control policy from network: ${it.message}")
                                 Left(Error("Corda Network Error: ${it.message}"))
                             }, {
                                 logger.debug("Access Control Policy for securityDomain $securityDomain: ${it.state.data} \n")
-                                Right(it.state.data)
+                                Right(stateToProto(it.state.data))
                             })
                 }.fold({ it }, {
                     Left(Error("Corda Network Error: ${it.message}"))
                 })
-                accessControlPolicy
+                accessControlPolicyState
             } catch (e: Exception) {
                 Left(Error("Error with network connection: ${e.message}"))
             }
@@ -153,21 +140,61 @@ class AccessControlPolicyManager {
         @JvmStatic
         fun getAccessControlPolicies(
             proxy: CordaRPCOps
-        ): Either<Error, List<AccessControlPolicyState>> {
+        ): Either<Error, List<AccessControl.AccessControlPolicy>> {
             return try {
                 logger.debug("Getting all access control policies")
                 val accessControlPolicies = proxy.startFlow(::GetAccessControlPolicies)
                         .returnValue.get()
                         
-                var accessControlPolicyList: List<AccessControlPolicyState> = listOf()
+                var accessControlPolicyList: List<AccessControl.AccessControlPolicy> = listOf()
                 for (acl in accessControlPolicies) {
-                    accessControlPolicyList += acl.state.data
+                    accessControlPolicyList += stateToProto(acl.state.data)
                 }
                 logger.debug("Access Control Policies: $accessControlPolicyList\n")
                 Right(accessControlPolicyList)
             } catch (e: Exception) {
                 Left(Error("${e.message}"))
             }
+        }
+        
+        fun protoToState(
+            accessControlPolicyProto: AccessControl.AccessControlPolicy
+        ): AccessControlPolicyState {
+            var rules: List<Rule> = listOf()
+            for (ruleProto in accessControlPolicyProto.rulesList) {
+                val rule = Rule(
+                    principal = ruleProto.principal,
+                    principalType = ruleProto.principalType,
+                    resource = ruleProto.resource,
+                    read = ruleProto.read
+                )
+                rules += rule
+            }
+            
+            return AccessControlPolicyState(
+                securityDomain = accessControlPolicyProto.securityDomain,
+                rules = rules
+            )
+        }
+        
+        fun stateToProto(
+            accessControlPolicyState: AccessControlPolicyState
+        ): AccessControl.AccessControlPolicy {
+            var rulesList: List<AccessControl.Rule> = listOf()
+            for (rule in accessControlPolicyState.rules) {
+                val ruleProto = AccessControl.Rule.newBuilder()
+                    .setPrincipal(rule.principal)
+                    .setPrincipalType(rule.principalType)
+                    .setResource(rule.resource)
+                    .setRead(rule.read)
+                    .build()
+                rulesList += ruleProto
+            }
+                    
+            return AccessControl.AccessControlPolicy.newBuilder()
+                    .setSecurityDomain(accessControlPolicyState.securityDomain)
+                    .addAllRules(rulesList)
+                    .build()
         }
     }
 }

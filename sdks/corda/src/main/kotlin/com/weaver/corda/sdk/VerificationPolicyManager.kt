@@ -21,7 +21,10 @@ import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.contracts.UniqueIdentifier
 
 import com.weaver.corda.app.interop.states.VerificationPolicyState
+import com.weaver.corda.app.interop.states.Identifier
+import com.weaver.corda.app.interop.states.Policy
 import com.weaver.corda.app.interop.flows.*
+import com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass
 
 
 class VerificationPolicyManager {
@@ -34,17 +37,9 @@ class VerificationPolicyManager {
         @JvmStatic
         fun createVerificationPolicyState(
             proxy: CordaRPCOps,
-            verificationPolicy: String
+            verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy
         ): Either<Error, String> {
-            var verificationPolicyJSON = JSONObject(verificationPolicy)
-            val linearId = UniqueIdentifier()
-            verificationPolicyJSON.put("linearId", JSONObject().put("id", linearId))
-            verificationPolicyJSON.put("participants", JSONArray())
-            
-            val verificationPolicyState = Gson().fromJson(
-                verificationPolicyJSON.toString(), 
-                VerificationPolicyState::class.java
-            )
+            val verificationPolicyState = protoToState(verificationPolicyProto)
             logger.info("Writing VerificationPolicyState: ${verificationPolicyState}")
             return try {
                 runCatching {
@@ -68,16 +63,9 @@ class VerificationPolicyManager {
         @JvmStatic
         fun updateVerificationPolicyState(
             proxy: CordaRPCOps,
-            verificationPolicy: String
+            verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy
         ): Either<Error, String> {
-            var verificationPolicyJSON = JSONObject(verificationPolicy)
-            verificationPolicyJSON.put("linearId", JSONObject())
-            verificationPolicyJSON.put("participants", JSONArray())
-            
-            val verificationPolicyState = Gson().fromJson(
-                verificationPolicyJSON.toString(), 
-                VerificationPolicyState::class.java
-            )
+            val verificationPolicyState = protoToState(verificationPolicyProto)
             logger.info("Update VerificationPolicyState: ${verificationPolicyState}")
             return try {
                 runCatching {
@@ -126,7 +114,7 @@ class VerificationPolicyManager {
         fun getVerificationPolicyState(
             proxy: CordaRPCOps,
             securityDomain: String
-        ): Either<Error, VerificationPolicyState> {
+        ): Either<Error, VerificationPolicyOuterClass.VerificationPolicy> {
             return try {
                 logger.debug("Getting verification policy for securityDomain $securityDomain")
                 val verificationPolicy = runCatching {
@@ -136,7 +124,7 @@ class VerificationPolicyManager {
                                 Left(Error("Corda Network Error: ${it.message}"))
                             }, {
                                 logger.debug("Access Control Policy for securityDomain $securityDomain: ${it.state.data} \n")
-                                Right(it.state.data)
+                                Right(stateToProto(it.state.data))
                             })
                 }.fold({ it }, {
                     Left(Error("Corda Network Error: ${it.message}"))
@@ -153,21 +141,60 @@ class VerificationPolicyManager {
         @JvmStatic
         fun getAccessControlPolicies(
             proxy: CordaRPCOps
-        ): Either<Error, List<VerificationPolicyState>> {
+        ): Either<Error, List<VerificationPolicyOuterClass.VerificationPolicy>> {
             return try {
                 logger.debug("Getting all verification policies")
                 val verificationPolicies = proxy.startFlow(::GetVerificationPolicies)
                         .returnValue.get()
                         
-                var verificationPolicyList: List<VerificationPolicyState> = listOf()
+                var verificationPolicyList: List<VerificationPolicyOuterClass.VerificationPolicy> = listOf()
                 for (vp in verificationPolicies) {
-                    verificationPolicyList += vp.state.data
+                    verificationPolicyList += stateToProto(vp.state.data)
                 }
                 logger.debug("Access Control Policies: $verificationPolicyList\n")
                 Right(verificationPolicyList)
             } catch (e: Exception) {
                 Left(Error("${e.message}"))
             }
+        }
+        
+        fun protoToState(
+            verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy
+        ): VerificationPolicyState {
+            var identifiers: List<Identifier> = listOf()
+            for (identifierProto in verificationPolicyProto.identifiersList) {
+                val identifier = Identifier(
+                    pattern = identifierProto.pattern,
+                    policy = Policy(identifierProto.policy.type, identifierProto.policy.criteriaList)
+                )
+                identifiers += identifier
+            }
+            
+            return VerificationPolicyState(
+                securityDomain = verificationPolicyProto.securityDomain,
+                identifiers = identifiers
+            )
+        }
+        
+        fun stateToProto(
+            verificationPolicyState: VerificationPolicyState
+        ): VerificationPolicyOuterClass.VerificationPolicy {
+            var identifiersList: List<VerificationPolicyOuterClass.Identifier> = listOf()
+            for (identifier in verificationPolicyState.identifiers) {
+                val policyProto = VerificationPolicyOuterClass.Policy.newBuilder()
+                    .setType(identifier.policy.type)
+                    .addAllCriteria(identifier.policy.criteria)
+                val identifierProto = VerificationPolicyOuterClass.Identifier.newBuilder()
+                    .setPattern(identifier.pattern)
+                    .setPolicy(policyProto)
+                    .build()
+                identifiersList += identifierProto
+            }
+                    
+            return VerificationPolicyOuterClass.VerificationPolicy.newBuilder()
+                    .setSecurityDomain(verificationPolicyState.securityDomain)
+                    .addAllIdentifiers(identifiersList)
+                    .build()
         }
     }
 }

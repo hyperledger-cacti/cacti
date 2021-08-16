@@ -21,7 +21,9 @@ import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.contracts.UniqueIdentifier
 
 import com.weaver.corda.app.interop.states.MembershipState
+import com.weaver.corda.app.interop.states.Member
 import com.weaver.corda.app.interop.flows.*
+import com.weaver.protos.common.membership.MembershipOuterClass
 
 
 class MembershipManager {
@@ -34,17 +36,9 @@ class MembershipManager {
         @JvmStatic
         fun createMembershipState(
             proxy: CordaRPCOps,
-            membership: String
+            membershipProto: MembershipOuterClass.Membership
         ): Either<Error, String> {
-            var membershipJSON = JSONObject(membership)
-            val linearId = UniqueIdentifier()
-            membershipJSON.put("linearId", JSONObject().put("id", linearId))
-            membershipJSON.put("participants", JSONArray())
-            
-            val membershipState = Gson().fromJson(
-                membershipJSON.toString(), 
-                MembershipState::class.java
-            )
+            val membershipState = protoToState(membershipProto)
             logger.info("Writing MembershipState: ${membershipState}")
             return try {
                 runCatching {
@@ -68,16 +62,9 @@ class MembershipManager {
         @JvmStatic
         fun updateMembershipState(
             proxy: CordaRPCOps,
-            membership: String
+            membershipProto: MembershipOuterClass.Membership
         ): Either<Error, String> {
-            var membershipJSON = JSONObject(membership)
-            membershipJSON.put("linearId", JSONObject())
-            membershipJSON.put("participants", JSONArray())
-            
-            val membershipState = Gson().fromJson(
-                membershipJSON.toString(), 
-                MembershipState::class.java
-            )
+            val membershipState = protoToState(membershipProto)
             logger.info("Update MembershipState: ${membershipState}")
             return try {
                 runCatching {
@@ -126,7 +113,7 @@ class MembershipManager {
         fun getMembershipState(
             proxy: CordaRPCOps,
             securityDomain: String
-        ): Either<Error, MembershipState> {
+        ): Either<Error, MembershipOuterClass.Membership> {
             return try {
                 logger.debug("Getting membership for securityDomain $securityDomain")
                 val membership = runCatching {
@@ -136,7 +123,7 @@ class MembershipManager {
                                 Left(Error("Corda Network Error: ${it.message}"))
                             }, {
                                 logger.debug("Access Control Policy for securityDomain $securityDomain: ${it.state.data} \n")
-                                Right(it.state.data)
+                                Right(stateToProto(it.state.data))
                             })
                 }.fold({ it }, {
                     Left(Error("Corda Network Error: ${it.message}"))
@@ -153,21 +140,59 @@ class MembershipManager {
         @JvmStatic
         fun getAccessControlPolicies(
             proxy: CordaRPCOps
-        ): Either<Error, List<MembershipState>> {
+        ): Either<Error, List<MembershipOuterClass.Membership>> {
             return try {
                 logger.debug("Getting all memberships")
                 val memberships = proxy.startFlow(::GetMembershipStates)
                         .returnValue.get()
                         
-                var membershipList: List<MembershipState> = listOf()
+                var membershipList: List<MembershipOuterClass.Membership> = listOf()
                 for (membershipItem in memberships) {
-                    membershipList += membershipItem.state.data
+                    membershipList += stateToProto(membershipItem.state.data)
                 }
                 logger.debug("Access Control Policies: $membershipList\n")
                 Right(membershipList)
             } catch (e: Exception) {
                 Left(Error("${e.message}"))
             }
+        }
+        
+        fun protoToState(
+            membershipProto: MembershipOuterClass.Membership
+        ): MembershipState {
+            var members: Map<String, Member> = mapOf()
+            for ((memberId, memberProto) in membershipProto.membersMap) {
+                val member = Member(
+                    value = memberProto.value,
+                    type = memberProto.type,
+                    chain = memberProto.chainList
+                )
+                members += mapOf(memberId to member)
+            }
+            
+            return MembershipState(
+                securityDomain = membershipProto.securityDomain,
+                members = members
+            )
+        }
+        
+        fun stateToProto(
+            membershipState: MembershipState
+        ): MembershipOuterClass.Membership {
+            var membersMap: Map<String, MembershipOuterClass.Member> = mapOf()
+            for ((memberId,  member) in membershipState.members) {
+                val memberProto = MembershipOuterClass.Member.newBuilder()
+                    .setValue(member.value)
+                    .setType(member.type)
+                    .addAllChain(member.chain)
+                    .build()
+                membersMap += mapOf(memberId to memberProto)
+            }
+                    
+            return MembershipOuterClass.Membership.newBuilder()
+                    .setSecurityDomain(membershipState.securityDomain)
+                    .putAllMembers(membersMap)
+                    .build()
         }
     }
 }
