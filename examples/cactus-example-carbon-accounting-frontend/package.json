@@ -38,6 +38,7 @@
     "zone.js": "0.11.4"
   },
   "devDependencies": {
+    "@angular-builders/custom-webpack": "12.1.0",
     "@angular-devkit/build-angular": "12.1.1",
     "@angular/cli": "12.1.1",
     "@angular/compiler": "12.1.1",
@@ -47,6 +48,7 @@
     "@types/jasminewd2": "2.0.3",
     "@types/node": "12.11.1",
     "codelyzer": "6.0.2",
+    "https-browserify": "1.0.0",
     "jasmine-core": "3.6.0",
     "jasmine-spec-reporter": "5.0.0",
     "karma": "6.3.4",
@@ -54,6 +56,8 @@
     "karma-coverage-istanbul-reporter": "3.0.2",
     "karma-jasmine": "4.0.0",
     "karma-jasmine-html-reporter": "1.5.0",
+    "os-browserify": "0.3.0",
+    "path-browserify": "1.0.1",
     "protractor": "7.0.0",
     "ts-node": "8.3.0",
     "tslint": "6.1.0",
