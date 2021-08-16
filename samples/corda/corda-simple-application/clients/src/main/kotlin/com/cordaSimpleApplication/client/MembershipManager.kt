@@ -9,17 +9,17 @@ package com.cordaSimpleApplication.client
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.flatMap
-import com.weaver.corda.app.interop.states.MembershipState
-import com.weaver.corda.app.interop.flows.*
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.google.gson.Gson
 import java.io.File
 import java.lang.Exception
 import kotlinx.coroutines.runBlocking
 import net.corda.core.messaging.startFlow
+import com.google.protobuf.util.JsonFormat
+
+import com.weaver.corda.sdk.MembershipManager
+import com.weaver.protos.common.membership.MembershipOuterClass
 
 /**
  * TODO: Documentation
@@ -28,54 +28,38 @@ class CreateMembershipCommand : CliktCommand(help = "Creates a Membership for an
     val config by requireObject<Map<String, String>>()
     val network by argument()
     override fun run() = runBlocking {
-        val result = createMembershipFromFile(network, config)
-        println(result)
+        createMembershipFromFile(network, config)
     }
 }
 
 /**
- * Helper function to create Membership for an external network
+ * Helper function for CreateMembershipCommand
  */
-fun createMembershipFromFile(network: String, config: Map<String, String>): Either<Error, String> {
+fun createMembershipFromFile(network: String, config: Map<String, String>) {
     val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
     val filepath = "${credentialPath}/${network}/membership.json"
-    return try {
-        val file = File(filepath).readText(Charsets.UTF_8)
-        val membership = Gson().fromJson(file, MembershipState::class.java)
-        println("Membership from file: $membership")
-        writeMembershipToVault(
-                membership,
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt()
-        )
-    } catch (e: Exception) {
-      println("Error: Credentials directory ${filepath} not found.")
-      Left(Error("Error: Credentials directory ${filepath} not found."))
-    }
-}
-
-/**
- * Helper function used by createMembershipFromFile to interact with the Corda network
- */
-fun writeMembershipToVault(
-        membership: MembershipState,
-        host: String,
-        port: Int): Either<Error, String> {
-    println("Storing membership in the vault")
     val rpc = NodeRPCConnection(
-            host = host,
+            host = config["CORDA_HOST"]!!,
             username = "clientUser1",
             password = "test",
-            rpcPort = port)
-    return try {
+            rpcPort = config["CORDA_PORT"]!!.toInt())
+    try {
+        val membership = File(filepath).readText(Charsets.UTF_8)
+        println("Membership from file: $membership")
+        val membershipBuilder = MembershipOuterClass.Membership.newBuilder()
+        JsonFormat.parser().merge(
+            membership, 
+            membershipBuilder
+        );
         println("Storing membership in the vault")
-        val proxy = rpc.proxy
-        val stateId = proxy.startFlow(::CreateMembershipState, membership)
-                .returnValue.get()
-        println("Membership stored with linearId $stateId")
-        Right(stateId.toString())
+        val res = MembershipManager.createMembershipState(
+            rpc.proxy,
+            membershipBuilder.build()
+        )
+        println("Membership Create Result: $res")
+        
     } catch (e: Exception) {
-        Left(Error("${e.message}"))
+        println("Error: ${e.toString()}")
     } finally {
         rpc.close()
     }
@@ -86,7 +70,42 @@ fun writeMembershipToVault(
  */
 class UpdateMembershipCommand : CliktCommand(help = "Updates a Membership for an external network. ") {
     val config by requireObject<Map<String, String>>()
-    override fun run() = TODO("Not yet implemented")
+    val network: String by argument()
+    override fun run() = runBlocking {
+        updateMembershipFromFile(network, config)
+    }
+}
+
+/**
+ * Helper function for UpdateMembershipCommand
+ */
+fun updateMembershipFromFile(network: String, config: Map<String, String>) {
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val filepath = "${credentialPath}/${network}/membership.json"
+    val rpc = NodeRPCConnection(
+            host = config["CORDA_HOST"]!!,
+            username = "clientUser1",
+            password = "test",
+            rpcPort = config["CORDA_PORT"]!!.toInt())
+    try {
+        val membership = File(filepath).readText(Charsets.UTF_8)
+        println("Membership from file: $membership")
+        val membershipBuilder = MembershipOuterClass.Membership.newBuilder()
+        JsonFormat.parser().merge(
+            membership, 
+            membershipBuilder
+        );
+        println("Updating membership in the vault")
+        val res = MembershipManager.updateMembershipState(
+            rpc.proxy,
+            membershipBuilder.build()
+        )
+        println("Membership Update Result: $res")
+    } catch (e: Exception) {
+        println("Error: ${e.toString()}")
+    } finally {
+        rpc.close()
+    }
 }
 
 /**
@@ -98,42 +117,22 @@ class DeleteMembershipCommand : CliktCommand(help = "Deletes a Membership for an
     //    TODO: make this a flag instead of positional arguments
     val securityDomain by argument()
     override fun run() = runBlocking {
-        val eitherErrorStateId = deleteMembership(
-                securityDomain,
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt())
-        println("Corda network returned: $eitherErrorStateId")
-    }
-}
-
-/**
- * Helper function used by DeleteMembershipCommand to interact with the Corda network
- */
-fun deleteMembership(
-    securityDomain: String,
-    host: String,
-    port: Int
-): Either<Error, String> {
-    val rpc = NodeRPCConnection(
-            host = host,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = port)
-    return try {
-        println("Deleting membership for securityDomain $securityDomain")
-        val proxy = rpc.proxy
-        val result = runCatching {
-            proxy.startFlow(::DeleteMembershipState, securityDomain)
-                    .returnValue.get().flatMap {
-                        println("Membership for securityDomain $securityDomain deleted\n")
-                        Right(it.toString())
-                    }
-        }.fold({ it }, { Left(Error(it.message)) })
-        result
-    } catch (e: Exception) {
-        Left(Error("Corda Network Error: ${e.message}"))
-    } finally {
-        rpc.close()
+        val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val res = MembershipManager.deleteMembershipState(
+                rpc.proxy, 
+                securityDomain
+            )
+            println("Delete Membership State Result: ${res}")
+        } catch (e: Exception) {
+            println("Error: ${e.toString()}")
+        } finally {
+            rpc.close()
+        }
     }
 }
 
@@ -144,47 +143,22 @@ class GetMembershipCommand : CliktCommand(help = "Gets a Membership for an exter
     val config by requireObject<Map<String, String>>()
     val securityDomain by argument()
     override fun run() = runBlocking {
-        val eitherErrorStateId = getMembership(
-                securityDomain,
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt())
-        println("Get Membership result: $eitherErrorStateId")
-    }
-}
-
-/**
- * Helper function used by GetMembershipCommand to interact with the Corda network
- */
-fun getMembership(
-        securityDomain: String,
-        host: String,
-        port: Int): Either<Error, MembershipState> {
-    println("Getting membership for securityDomain $securityDomain")
-    val rpc = NodeRPCConnection(
-            host = host,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = port)
-    return try {
-        println("Getting membership for securityDomain $securityDomain")
-        val proxy = rpc.proxy
-        val membership = runCatching {
-            proxy.startFlow(::GetMembershipStateBySecurityDomain, securityDomain)
-                    .returnValue.get().fold({
-                        println("Error getting membership from network: ${it.message}")
-                        Left(Error("Corda Network Error: ${it.message}"))
-                    }, {
-                        println("Membership for network $securityDomain: ${it.state.data} \n")
-                        Right(it.state.data)
-                    })
-        }.fold({ it }, {
-            Left(Error("Corda Network Error: ${it.message}"))
-        })
-        membership
-    } catch (e: Exception) {
-        Left(Error("Error with network connection: ${e.message}"))
-    } finally {
-        rpc.close()
+        val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val res = MembershipManager.getMembershipState(
+                rpc.proxy, 
+                securityDomain
+            )
+            println("Get Membership Result:\n${res}")
+        } catch (e: Exception) {
+            println("Error: ${e.toString()}")
+        } finally {
+            rpc.close()
+        }
     }
 }
 
@@ -194,35 +168,18 @@ fun getMembership(
 class GetMembershipsCommand : CliktCommand(help = "Gets all Memberships.") {
     val config by requireObject<Map<String, String>>()
     override fun run() = runBlocking {
-        val eitherErrorStateId = getMemberships(
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt())
-        println("Get Memberships result: $eitherErrorStateId")
-    }
-}
-
-/**
- * Helper function used by GetMembershipsCommand to interact with the Corda network
- */
-fun getMemberships(
-    host: String,
-    port: Int
-): Either<Error, String> {
-    val rpc = NodeRPCConnection(
-            host = host,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = port)
-    return try {
-        println("Getting all memberships")
-        val proxy = rpc.proxy
-        val memberships = proxy.startFlow(::GetMembershipStates)
-                .returnValue.get()
-        println("Memberships: $memberships\n")
-        Right(memberships.toString())
-    } catch (e: Exception) {
-        Left(Error("${e.message}"))
-    } finally {
-        rpc.close()
+        val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val res = MembershipManager.getMemberships(rpc.proxy)
+            println("Get All Memberships Result:\n${res}")
+        } catch (e: Exception) {
+            println("Error: ${e.toString()}")
+        } finally {
+            rpc.close()
+        }
     }
 }

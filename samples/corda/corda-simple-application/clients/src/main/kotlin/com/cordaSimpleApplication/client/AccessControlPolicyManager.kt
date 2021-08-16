@@ -9,17 +9,17 @@ package com.cordaSimpleApplication.client
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.flatMap
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.google.gson.Gson
 import java.io.File
 import java.lang.Exception
 import kotlinx.coroutines.runBlocking
 import net.corda.core.messaging.startFlow
+import com.google.protobuf.util.JsonFormat
 
 import com.weaver.corda.sdk.AccessControlPolicyManager
+import com.weaver.protos.common.access_control.AccessControl
 
 /**
  * TODO: Documentation
@@ -48,14 +48,19 @@ fun createAccessControlPolicyFromFile(network: String, config: Map<String, Strin
     try {
         val accessControlPolicy = File(filepath).readText(Charsets.UTF_8)
         println("Access control policy from file: $accessControlPolicy")
+        val accessControlPolicyBuilder = AccessControl.AccessControlPolicy.newBuilder()
+        JsonFormat.parser().merge(
+            accessControlPolicy, 
+            accessControlPolicyBuilder
+        );
         println("Storing access control policy in the vault")
         val res = AccessControlPolicyManager.createAccessControlPolicyState(
             rpc.proxy,
-            accessControlPolicy
+            accessControlPolicyBuilder.build()
         )
         println("Access Control Policy Create Result: $res")
     } catch (e: Exception) {
-      println("Error: Credentials directory ${filepath} not found.")
+      println("Error: ${e.toString()}")
     } finally {
         rpc.close()
     }
@@ -88,10 +93,15 @@ fun updateAccessControlPolicyFromFile(network: String, config: Map<String, Strin
     try {
         val accessControlPolicy = File(filepath).readText(Charsets.UTF_8)
         println("Access control policy from file: $accessControlPolicy")
+        val accessControlPolicyBuilder = AccessControl.AccessControlPolicy.newBuilder()
+        JsonFormat.parser().merge(
+            accessControlPolicy, 
+            accessControlPolicyBuilder
+        );
         println("Updating access control policy in the vault")
         val res = AccessControlPolicyManager.updateAccessControlPolicyState(
             rpc.proxy,
-            accessControlPolicy
+            accessControlPolicyBuilder.build()
         )
         println("Access Control Policy Update Result: $res")
     } catch (e: Exception) {
@@ -114,14 +124,11 @@ class DeleteAccessControlPolicyCommand : CliktCommand(help = "Deletes an Access 
                 password = "test",
                 rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
-            AccessControlPolicyManager.deleteAccessControlPolicyState(
+            val res = AccessControlPolicyManager.deleteAccessControlPolicyState(
                 rpc.proxy, 
                 securityDomain
-            ).fold({
-                println("Error: ${it.message}")
-            }, {
-                println("Delete Access Control Policy State Result: ${it}")
-            })
+            )
+            println("Delete Access Control Policy State Result: ${res}")
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
         } finally {
@@ -132,6 +139,7 @@ class DeleteAccessControlPolicyCommand : CliktCommand(help = "Deletes an Access 
 
 /**
  * TODO: Documentation
+ * get-access-control-policy Dummy_Network
  */
 class GetAccessControlPolicyCommand : CliktCommand(help = "Gets Access Control Policy for the provided securityDomain.") {
     val config by requireObject<Map<String, String>>()
@@ -143,14 +151,11 @@ class GetAccessControlPolicyCommand : CliktCommand(help = "Gets Access Control P
                 password = "test",
                 rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
-            AccessControlPolicyManager.getAccessControlPolicyState(
+            val res = AccessControlPolicyManager.getAccessControlPolicyState(
                 rpc.proxy, 
                 securityDomain
-            ).fold({
-                println("Error: ${it.message}")
-            }, {
-                println("Get Access Control Policy State Result: ${it}")
-            })
+            )
+            println("Get Access Control Policy Result:\n${res}")
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
         } finally {
@@ -171,10 +176,8 @@ class GetAccessControlPoliciesCommand : CliktCommand(help = "Gets all Access Con
                 password = "test",
                 rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
-            AccessControlPolicyManager.getAccessControlPolicies(rpc.proxy).fold(
-                { println("Error: ${it.message}") },
-                { println("All Access Control Policies: ${it}") }
-            )
+            val res = AccessControlPolicyManager.getAccessControlPolicies(rpc.proxy)
+            println("Get All Access Control Policies Result:\n${res}")
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
         } finally {
