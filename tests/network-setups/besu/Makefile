@@ -1,6 +1,4 @@
-start:
-	start-network1
-	start-network2
+start: start-network1 start-network2
 
 start-network1:
 	bash scripts/setupNetwork.sh 1
@@ -12,9 +10,7 @@ test:
 	bash scripts/testSetup.sh 1 8545
 	bash scripts/testSetup.sh 2 9544
 
-clean:
-	clean-network1
-	clean-network2
+clean: clean-network1 clean-network2
 
 clean-network1:
 	tmux kill-session -t Network1_EthSigner_session || true
