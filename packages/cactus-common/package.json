@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-common",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-common.node.umd.min.js",
