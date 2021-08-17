@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-api-client",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-api-client.node.umd.min.js",
@@ -63,17 +63,17 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-api-client": "0.7.0",
-    "@hyperledger/cactus-cmd-api-server": "0.7.0",
-    "@hyperledger/cactus-common": "0.7.0",
-    "@hyperledger/cactus-core": "0.7.0",
-    "@hyperledger/cactus-core-api": "0.7.0",
-    "@hyperledger/cactus-plugin-consortium-manual": "0.7.0",
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "0.7.0",
+    "@hyperledger/cactus-api-client": "0.8.0",
+    "@hyperledger/cactus-cmd-api-server": "0.8.0",
+    "@hyperledger/cactus-common": "0.8.0",
+    "@hyperledger/cactus-core": "0.8.0",
+    "@hyperledger/cactus-core-api": "0.8.0",
+    "@hyperledger/cactus-plugin-consortium-manual": "0.8.0",
+    "@hyperledger/cactus-plugin-ledger-connector-quorum": "0.8.0",
     "jose": "1.28.1",
     "web3": "1.2.7"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "0.7.0"
+    "@hyperledger/cactus-test-tooling": "0.8.0"
   }
 }
