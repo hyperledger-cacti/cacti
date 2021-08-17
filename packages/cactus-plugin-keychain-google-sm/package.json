@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-google-sm",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A keychain implementation storing its entries in Azure key vault.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-keychain-google-sm.node.umd.min.js",
@@ -73,15 +73,15 @@
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "@google-cloud/secret-manager": "3.7.1",
-    "@hyperledger/cactus-common": "0.7.0",
-    "@hyperledger/cactus-core": "0.7.0",
-    "@hyperledger/cactus-core-api": "0.7.0",
+    "@hyperledger/cactus-common": "0.8.0",
+    "@hyperledger/cactus-core": "0.8.0",
+    "@hyperledger/cactus-core-api": "0.8.0",
     "axios": "0.21.1",
     "http-status-codes": "2.1.4",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "0.7.0",
+    "@hyperledger/cactus-test-tooling": "0.8.0",
     "@types/express": "4.17.8",
     "@types/request": "2.48.5",
     "express": "4.17.1",
