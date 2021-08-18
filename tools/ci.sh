@@ -88,7 +88,7 @@ function mainTask()
   # install npm 7 globally - needed because Node v12, v14 default to npm v6
   npm install -g npm@7.19.1
   npm --version
-  yarn --version
+  yarn --version  
 
   ### COMMON
   cd $PROJECT_ROOT_DIR
@@ -96,28 +96,10 @@ function mainTask()
   yarn run configure
 
   yarn run custom-checks
-  node ./tools/validate-bundle-names.js 
+  node ./tools/validate-bundle-names.js
 
-  # Tests are still flaky (on weak hardware such as the CI env) despite our best
-  # efforts so here comes the mighty hammer of brute force. 3 times the charm...
-  {
-    dumpDiskUsageInfo
-    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] First (#1) try of tests succeeded OK."
-  } ||
-  {
-    dumpDiskUsageInfo
-    echo "$(date +%FT%T%z) [CI] First (#1) try of tests failed starting second try now..."
-    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Second (#2) try of tests succeeded OK."
-
-  } ||
-  {
-    dumpDiskUsageInfo
-    # If the third try fails then the execution will reach the last echo and the exit 1 statement
-    # ensuring that the script crashes if 3 out of 3 test runs have failed.
-    echo "$(date +%FT%T%z) [CI] Second (#2) try of tests failed starting third and last try now..."
-    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Third (#3) try of tests succeeded OK." || \
-      echo "$(date +%FT%T%z) [CI] Third (#3) try of tests failed so giving up at this point" ; exit 1
-  }
+  dumpDiskUsageInfo
+  yarn run test:all -- --bail
 
   dumpDiskUsageInfo
 
