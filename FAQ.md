@@ -1,15 +1,45 @@
 # Frequently Asked Questions - Hyperledger Cactus <!-- omit in toc -->
 
-- [npm install fails with `code EMFILE` (syscall connect)](#npm-install-fails-with-code-emfile-syscall-connect)
-- [Where does the project name come from?](#where-does-the-project-name-come-from)
-- [Re-building the code after I change it slow. What to do?](#re-building-the-code-after-i-change-it-slow-what-to-do)
-- [The watch script fails with `Internal watch failed: watch ENOSPC`](#the-watch-script-fails-with-internal-watch-failed-watch-enospc)
-- [How can I not re-build the whole project every time I make a small change?](#how-can-i-not-re-build-the-whole-project-every-time-i-make-a-small-change)
-- [Why do you need all these packages/monorepo? It looks complicated!](#why-do-you-need-all-these-packagesmonorepo-it-looks-complicated)
-- [Prototyping something and the linter blocking my builds is slowing me down needlessly](#prototyping-something-and-the-linter-blocking-my-builds-is-slowing-me-down-needlessly)
-- [What are the minimum and recommended hardware specs? Do you have a cool story about this?](#what-are-the-minimum-and-recommended-hardware-specs-do-you-have-a-cool-story-about-this)
-- [Why do all the tests bind the HTTP/S listeners to a random port?](#why-do-all-the-tests-bind-the-https-listeners-to-a-random-port)
-- [HTTP requests sent with Postman/curl/etc. hang if I'm debugging a test case with VSCode, why?](#http-requests-sent-with-postmancurletc-hang-if-im-debugging-a-test-case-with-vscode-why)
+- Quick-Start Topics:
+  - [What are the minimum and recommended hardware specs? Do you have a cool story about this?](#what-are-the-minimum-and-recommended-hardware-specs-do-you-have-a-cool-story-about-this)
+  - [Cactus API-Server returns `Unauthorized Error` using Postman on local machine](#cactus-api-server-returns-unauthorized-error-using-postman-on-local-machine)
+  - [npm install fails with `code EMFILE` (syscall connect)](#npm-install-fails-with-code-emfile-syscall-connect)
+  - [Where does the project name come from?](#where-does-the-project-name-come-from)
+- Other Topics:
+  - [Re-building the code after I change it slow. What to do?](#re-building-the-code-after-i-change-it-slow-what-to-do)
+  - [The watch script fails with `Internal watch failed: watch ENOSPC`](#the-watch-script-fails-with-internal-watch-failed-watch-enospc)
+  - [How can I not re-build the whole project every time I make a small change?](#how-can-i-not-re-build-the-whole-project-every-time-i-make-a-small-change)
+  - [Why do you need all these packages/monorepo? It looks complicated!](#why-do-you-need-all-these-packagesmonorepo-it-looks-complicated)
+  - [Prototyping something and the linter blocking my builds is slowing me down needlessly](#prototyping-something-and-the-linter-blocking-my-builds-is-slowing-me-down-needlessly)
+  - [Why do all the tests bind the HTTP/S listeners to a random port?](#why-do-all-the-tests-bind-the-https-listeners-to-a-random-port)
+  - [HTTP requests sent with Postman/curl/etc. hang if I'm debugging a test case with VSCode, why?](#http-requests-sent-with-postmancurletc-hang-if-im-debugging-a-test-case-with-vscode-why)
+
+## What are the minimum and recommended hardware specs? Do you have a cool story about this?
+
+> If and when people read this in the future, always inflate the numbers
+> a bit as we continue to add more and more tests every day (test automation is
+> very important to us)
+
+- **The bare minimum** for general development (building the code, running the tests,
+ etc) would be around **2 CPU cores (4 threads) and 6 GB RAM free/available**.
+
+- **A recommended** setup would be for a dev machine in my opinion is **16 GB RAM 4 CPU**
+**cores (8 threads)** and of course SSD for persistent storage.
+
+- Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only
+tests that failed were the Corda ones because those are hungrier than the others.
+
+
+## Cactus API-Server returns `Unauthorized Error` using Postman on local machine
+After installation of latest Cactus version a first API-Test with Postman is showing `Unauthorized Error`:
+   - Reason:  We have decided that the
+software should be `secure by default` above all else and allow for
+customization/degradation of security as an opt-in feature rather than starting from that state.
+  - How to enable manually the CORS patterns in config file: Open `config.json` and adapt the following settings:
+    - "authorizationProtocol": "NONE"
+    - "apiMtlsEnabled": false
+    - "apiTlsEnabled": false
+    - Restart the Cactus API-Server to use the changed settings
 
 ## npm install fails with `code EMFILE` (syscall connect)
 
@@ -98,22 +128,6 @@ by replacing its contents
 with something like this for example:
 
 `"lint": "echo OK",`
-
-## What are the minimum and recommended hardware specs? Do you have a cool story about this?
-
-> If and when people read this in the future, always inflate the numbers
-> a bit as we continue to add more and more tests every day (test automation is
-> very important to us)
-
-- **The bare minimum** for general development (building the code, running the tests,
- etc) would be around **2 CPU cores (4 threads) and 6 GB RAM free/available**.
-
-- **A recommended** setup would be for a dev machine in my opinion is **16 GB RAM 4 CPU**
-**cores (8 threads)** and of course SSD for persistent storage.
-
-- Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only
-tests that failed were the Corda ones because those are hungrier than the others.
-
 
 ## Why do all the tests bind the HTTP/S listeners to a random port?
 
