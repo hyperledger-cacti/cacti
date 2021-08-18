@@ -18,6 +18,12 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
+//import {homedir} from "os";
+//import { PluginRegistry } from "@hyperledger/cactus-core";
+import { SetKeychainEntryEndpoint } from "./web-services/set-keychain-entry-endpoint";
+import { GetKeychainEntryEndpoint } from "./web-services/get-keychain-entry-endpoint";
+import { DeleteKeychainEntryEndpoint } from "./web-services/delete-keychain-entry-endpoint";
+
 import { KeyVaultSecret, SecretClient } from "@azure/keyvault-secrets";
 import {
   UsernamePasswordCredential,
@@ -42,9 +48,9 @@ export interface IAzureInMemoryCredentials {
 }
 
 export interface IPluginKeychainAzureKvOptions extends ICactusPluginOptions {
-  containerId(containerId: any);
-  stop();
-  destroy();
+  // containerId(containerId: any);
+  // stop();
+  // destroy();
   logLevel?: LogLevelDesc;
   keychainId: string;
   instanceId: string;
@@ -56,9 +62,6 @@ export interface IPluginKeychainAzureKvOptions extends ICactusPluginOptions {
 
 export class PluginKeychainAzureKv
   implements ICactusPlugin, IPluginWebService, IPluginKeychain {
-  deleteKeychainId() {
-    throw new Error("Method not implemented.");
-  }
   public static readonly CLASS_NAME = "PluginKeychainAzureKv";
 
   readonly vaultUrl: string;
@@ -140,7 +143,21 @@ export class PluginKeychainAzureKv
     if (Array.isArray(this.endpoints)) {
       return this.endpoints;
     }
-    const endpoints: IWebServiceEndpoint[] = [];
+    //const endpoints: IWebServiceEndpoint[] = [];
+    const endpoints: IWebServiceEndpoint[] = [
+      new SetKeychainEntryEndpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new GetKeychainEntryEndpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new DeleteKeychainEntryEndpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+    ];
 
     // TODO: Writing the getExpressRequestHandler() method for
     // GetKeychainEntryEndpointV1 and SetKeychainEntryEndpointV1
