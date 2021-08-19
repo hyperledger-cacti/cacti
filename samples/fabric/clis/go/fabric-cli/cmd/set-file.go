@@ -27,17 +27,13 @@ import (
 
 // setFileCmd represents the setFile command
 var setFileCmd = &cobra.Command{
-	Use:   "set-file",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "set-file <ENV_PATH>",
+	Short: "Replace env file with contents from another env file",
 	Run: func(cmd *cobra.Command, args []string) {
-		//fmt.Println("setFile called")
-		setFile(args)
+		err := setFile(args)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
 	},
 }
 
@@ -60,9 +56,9 @@ func setFile(args []string) error {
 	if (len(args) < 1) || (len(args) > 1) {
 		return fmt.Errorf("incorrect number of arguments")
 	}
-	log.Infof("args[0]: %s", args[0])
+	log.Debugf("args[0]: %s", args[0])
 
-	log.Info("reading .env file")
+	log.Debug("reading .env file")
 	envFileExists, err := helpers.CheckIfFileOrDirectoryExists(filepath.Join(".env"))
 	if err != nil {
 		return fmt.Errorf("cannot access .env file: %s", err.Error())
@@ -91,7 +87,7 @@ func setFile(args []string) error {
 		return fmt.Errorf("failed ioutil.WriteFile with error: %+v", err)
 	}
 
-	log.Infof("updated .env file")
+	log.Debugf("updated .env file with the contents of the file %s", args[0])
 
 	return nil
 }

@@ -15,6 +15,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Valid keys for .env
+var ValidKeys = []string{
+	"DEFAULT_CHANNEL",
+	"DEFAULT_CHAINCODE",
+	"MEMBER_CREDENTIAL_FOLDER",
+	"LOCAL",
+	"DEFAULT_APPLICATION_CHAINCODE",
+	"CONFIG_PATH",
+}
+
 type NetworkConfig struct {
 	RelayEndPoint   string `json:"relayEndPoint"`
 	ConnProfilePath string `json:"connProfilePath"`
