@@ -3,19 +3,32 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# corda-driver
+# Corda SDK
 
-The Corda driver is used by the relays to interface with the Corda nodes. It
-triggers flows from the interoperation CorDapp to retrieve state given the query
-from the external network.
+The Corda SDK is used by the client application to allow corda app to make
+interop calls.
 
 ## Setup
 
-To build the driver executable locally (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages), run the following:
+### Build Locally:
+
+Build Weaver dependencies:
+```
+cd ../../common/protos-java-kt
+make build
+cd -
+cd ../../core/network/corda-interop-app
+make build-local
+cd -
+```
+
+To build the SDK locally (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages), run the following:
 
 ```
-make build-local
+make build
 ```
+
+### Build with Github Packages
 
 To build the driver executable using dependencies from Github Packages, follow the steps:
 * Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
@@ -27,100 +40,77 @@ To build the driver executable using dependencies from Github Packages, follow t
 make build
 ```
 
-If you see compile errors about classes not being found, it may be that gradle
+**NOTE:** If you see compile errors about classes not being found, it may be that gradle
 hasn't downloaded the required dependencies. To install the dependencies (with or without Github Packages support), run:
+
+**FOR DEVS:** Now you can run `make publish` as well to publish it to Github Packages, but never publish directly to `hyperledger-labs`. Always first test it by publishing to your own fork, then create a PR to merge your changes, and then you can publish. To publish to your own fork, change `url` in `github.properties`, and replace `hyperledger-labs` with your github username.
 
 ```
 make build-refresh-dependencies[-local]
 ```
 
-## Run
+## Usage
 
-To run the driver, use the following:
-
-```
-./build/install/corda-driver/bin/corda-driver
-```
-
-The driver gRPC server will be listening on port `9099`.
-
-## Changing the default port configuration
-
-By default, the driver gRPC server listens on port `9099`. To change the port, set 
-the `DRIVER_PORT` as an environment variable. 
-
-## Docker
-
-To build image, run:
-```
-make image
-```
-
-To push image to github container registry:
-
-* Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
-* Run `docker login ghcr.io` and use your github username and personal access token as password.
-* Create a copy of `github.properties.template` as `github.properties`.
-* Replace <GITHUB Email> with your email id for github.
-* Replace <GITHUB Personal Access Token> with your personal access token.
-* Run `make push-image` to build and push the image to github registry.
-
-**NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
-
-### Docker-compose Deployment
-
-* Copy `.env.docker.template` to `.env`
-    - `NETWORK_NAME`: Used as suffix to corda-driver container name, i.e. `corda-driver-<network-name>` will be the name of container.
-    - `DRIVER_PORT`: Driver server port.
-    - `EXTERNAL_NETWORK`: is the docker network in which corda-network is running.
-    - `DOCKER_IMAGE_NAME`: Keep it same.
-    - `DOCKER_TAG`: Refer here for the image tags available: [weaver-corda-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-corda-driver)
-    - `DOCKER_REGISTRY`: Keep it same. (replace `hyperledger-labs` with your git username if testing from your fork)
-* Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
-* Run `docker login ghcr.io` and use your github username and personal access token as password.
-* Run: `make deploy`.
-* To stop, run: `docker-compose down`
-
-## Documentation
-
-This repo uses `Dokka` to auto-generate the Kotlin code documentation. To
-generate the code docs, run the following:
+To use the SDK, add following in your `build.gradle`:
 
 ```
-./gradlew dokka
+repositories {
+    maven {
+        url https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability
+        credentials {
+            username <github-email>
+            password <github-personal-access-token>
+        }
+    }
+}
+dependencies {
+    implementation(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "1.2.3")
+    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "1.2.3")
+    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "1.2.3")
+    implementation(group: 'com.weaver', name: 'protos-java-kt', version: "1.2.3")
+}
 ```
 
-The docs are then located in `build/dokka/corda-driver`. Opening
-`index.html` in your browser will allow you to navigate through the project
-structure.
+**NOTE:** In above, `<github-personal-access-token>`, the access token must have `read:packages` access.
 
-## Notes on the proto dependencies
+## API
 
-This repo relies on data structures defined in
-[protos](../../../common/protos). It
-also has a dependency on the [interop
-CorDapp](../../../core/network/corda-interop-app), which
-itself has a dependency on the same proto files. Generating the java and Kotlin
-files from the proto files locally in this repository therefore creates some
-problems. Firstly, because the generated java and kotlin files are created under
-the namespace provided in the proto files (e.g. `common.state`), this creates
-two sets of the same source files in the classpath under the same namespace.
-Compiling the project then fails with conflicting dependencies. The other
-problem is that if the proto files do change, they need to be updated in two
-separate repositories.
+All Following functions (except CredentialsCreator), accepts an instance of `net.corda.core.messaging.CordaRPCOps` as first parameter, to make flow calls to corda nodes.
 
-A workaround (or arguably, a cleaner solution) is for the corda-testnet project
-to use the generated java and kotlin source files that comes from the interop
-CorDapp. This means that there is guaranteed to be one consistent version of the
-files and we don't need to worry about conflicting dependencies. When the proto
-files are updated, they need to be updated in a single repo, instead of across
-multiple.
-
-To update the version number of the interop CorDapps that should be pulled from
-Github Maven Repository, change the version number of the `interop_cordapps_version` at the
-top of the `build.gradle` file. 
-
-## TODO
-
-1. Create an Error class
-2. Make a script for pulling the latest interop cordapp (add to make)
+* `InteroperableHelper`: Static Methods:
+    - `interopFlow`: Takes input `remoteRelayEndpoint` and `externalViewAddress`, performs a remote relay(interop) call, and stores externalState, and returns it's linearId.
+    - `createFabricViewAddress`: Takes remote relay endpoint, security domain, channel name, chaincode name, cc function name and arg to create a view address that can be consumed by `interopFlow` for making interop call to a fabric network. 
+    - `createCordaViewAddress`: Takes remote relay endpoint, security domain, list of string of corda host endpoints, flow name, and flow args to create a view address that can be consumed by `interopFlow` for making interop call to a corda network.
+    - `getExternalStateView`: Takes linearId returned by interopFlow, and returns protobuf `ViewDataOuterClass.ViewData` object.
+    - `getExternalStatePayloadString`: Takes linearId returned by interopFlow, and returns interop payload string.
+    - `getExternalStateSignatories`: Takes linearId returned by interopFlow, and returns list of signatories in proof.
+    - `getExternalStateSignature`: Takes linearId returned by interopFlow and signatory Id, and returns it's signature that is part of the proof.
+    - `getExternalStateSignatoryCertificate`: Takes linearId returned by interopFlow and signatory Id, and returns it's certificate that can be used to verify the signature.
+* `AccessControlPolicyManager`: Static Methods:
+    - createAccessControlPolicyState
+    - updateAccessControlPolicyState
+    - deleteAccessControlPolicyState
+    - getAccessControlPolicyState
+    - getAccessControlPolicies
+* `MembershipManager`: Static Methods:
+    - createMembershipState
+    - updateMembershipState
+    - deleteMembershipState
+    - getMembershipState
+    - getMemberships
+* `VerificationPolicyManager`: Static Methods:
+    - createVerificationPolicyState
+    - updateVerificationPolicyState
+    - deleteVerificationPolicyState
+    - getVerificationPolicyState
+    - getVerificationPolicies
+* `CredentialsCreator`: Class Methods:
+    - Constructor Args:
+        * **baseNodesPath**: Path to the `build/nodes` of Corda Network directory.
+        * **securityDomain**: Security Domain Name for this Corda Network.
+        * **odesList**: List of names of Nodes in this Corda Network.
+        * **remoteFlow**: pattern for local flow to be used in access control policy.
+        * **locFlow**: pattern for remote flow to be used in verification policy.
+    - createAccessControlPolicy
+    - createMembership
+    - createVerificationPolicy

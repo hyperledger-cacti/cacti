@@ -1,22 +1,17 @@
-.PHONY: build-local
-build-local:
-	echo "Building Corda SDK..."
-	./gradlew clean build 
-
-.PHONY: build-refresh-dependencies-local
-build-refresh-dependencies-local:
-	./gradlew build --refresh-dependencies
-
 .PHONY: build
-build: github.properties
-	./gradlew clean build 
+build:
+	./gradlew clean jar 
 
 .PHONY: build-refresh-dependencies
 build-refresh-dependencies: github.properties
 	./gradlew build --refresh-dependencies
 	
-
-.PHONY: run
+.PHONY: publish
+publish: github.properties
+	echo "Publishing SDK to Github..."
+	./gradlew publishAllPublicationsToMavenRepository
+	
+.PHONY: test
 test:
 	./gradlew test
 	
