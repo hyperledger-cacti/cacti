@@ -122,7 +122,7 @@ fun configureCreateAllHelper() {
     val doorman_cert = Base64.getDecoder().decode(node0Json.getJSONArray("doorman_certs").getString(0)).toString(Charsets.UTF_8)
     val nodeca_cert = Base64.getDecoder().decode(node0Json.getJSONArray("nodeca_certs").getString(0)).toString(Charsets.UTF_8)
     val nodeid_cert = Base64.getDecoder().decode(node0Json.getJSONArray("nodeid_cert").getString(0)).toString(Charsets.UTF_8)
-    val cert_chain = listOf(nodeca_cert, doorman_cert, root_cert)
+    val cert_chain = listOf(root_cert, doorman_cert, nodeca_cert)
 
     // Generate Membership
     val memberNode0 = Member("", "certificate", cert_chain)

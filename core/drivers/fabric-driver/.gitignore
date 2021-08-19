@@ -6,3 +6,5 @@
 /fabric-protos
 package-lock.json
 .npmrc
+.env.n1
+.env.n2

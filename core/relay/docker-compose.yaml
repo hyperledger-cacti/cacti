@@ -176,6 +176,8 @@ services:
     # Uncomment this to expose ports internally and externally from the container
     # ports:
     # - "9083:9083"
+    networks:
+        - relay
 # This networks section is required for when the peers have networks specified
 networks:
   base-network:
