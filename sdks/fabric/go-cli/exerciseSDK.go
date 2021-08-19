@@ -7,113 +7,112 @@ SPDX-License-Identifier: Apache-2.0
 package main
 
 import (
-	"encoding/base64"
+	"crypto/ecdsa"
+	"crypto/rand"
+	"crypto/sha256"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
-	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/proto"
 
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
-	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/helpers"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers/interopsetup"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/interoperablehelper"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
 )
 
-func registerEvent(contract *gateway.Contract, eventName string) (fab.Registration, <-chan *fab.CCEvent, error) {
-	reg, notifier, errEventRegistration := contract.RegisterEvent(eventName)
-	if errEventRegistration != nil {
-		log.Errorf("failed to register contract event: %s", errEventRegistration)
-	}
-
-	return reg, notifier, errEventRegistration
-}
-
-func receiveEvent(notifier <-chan *fab.CCEvent) {
-
-	var ccEvent *fab.CCEvent
-	select {
-	case ccEvent = <-notifier:
-		{
-			log.Printf("received CC event: %#v", ccEvent)
-			eventName := ccEvent.EventName
-			if eventName == "LockAsset" || eventName == "ClaimAsset" || eventName == "UnlockAsset" {
-				contractInfo := &common.AssetContractHTLC{}
-				err := proto.Unmarshal(ccEvent.Payload, contractInfo)
-				if err != nil {
-					log.Errorf("failed to unmarshal event: %+v", err)
-				}
-				log.Printf("received CC event %s is: %+v\n", eventName, contractInfo)
-			} else if eventName == "LockFungibleAsset" || eventName == "ClaimFungibleAsset" || eventName == "UnlockFungibleAsset" {
-				contractInfo := &common.FungibleAssetContractHTLC{}
-				err := proto.Unmarshal(ccEvent.Payload, contractInfo)
-				if err != nil {
-					log.Errorf("failed to unmarshal event: %+v", err)
-				}
-				log.Printf("received CC event %s is: %+v\n", eventName, contractInfo)
-			}
-
-		}
-	case <-time.After(time.Second * 20):
-		log.Errorf("did NOT receive CC event for eventId(%s)\n", "LockFungibleAsset")
-	}
-
-}
-
 func connectSimpleStateWithSDK() {
-	contractU1, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
 
-	err := helpers.Query(contractU1, "Read", "a")
+	result, err := contract.EvaluateTransaction("Read", "a")
 	if err != nil {
 		log.Fatalf("failed Query with error: %+v", err)
 	}
+	log.Infof("result of query: %s", result)
 
-	err = helpers.Invoke(contractU1, "Create", "key01", "value")
+	result, err = contract.SubmitTransaction("Create", "key01", "value")
+	//valBytes, _ := json.Marshal([]int64{1, 2})
+	//result, err = contract.SubmitTransaction("CreateArr", "key01", string(valBytes))
 	if err != nil {
 		log.Fatalf("failed Invoke with error: %+v", err)
 	}
+	log.Infof("result of invoke: %s", result)
 
-	err = helpers.Query(contractU1, "Read", "key01")
+	result, err = contract.EvaluateTransaction("Read", "key01")
 	if err != nil {
 		log.Fatalf("failed Query with error: %+v", err)
 	}
+	log.Infof("result of query: %s", result)
 }
 
 func connectSimpleAssetWithSDK(assetId string) {
-	contractU1, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
-
-	err := helpers.Query(contractU1, "GetAllAssets")
-	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	query := helpers.QueryType{
+		ContractName: "simpleasset",
+		Channel:      "mychannel",
+		CcFunc:       "GetAllAssets",
+		Args:         []string{},
 	}
+	result, err := helpers.Query(query, connProfilePath, "network1", "Org1MSP", "")
+	if err != nil {
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
+	}
+	log.Printf("%s helpers.Query result: %s", query.CcFunc, string(result))
 
-	err = helpers.Invoke(contractU1, "CreateAsset", "t1", assetId, "User1", "Treasury", "500", "02 Dec 29 15:04 MST")
+	// result, err = contract.SubmitTransaction("CreateAsset", "t1", assetId, "User1", "Treasury", "500", "02 Dec 29 15:04 MST")
+	// if err != nil {
+	// 	log.Fatalf("failed Invoke with error: %+v", err)
+	// }
+	// log.Println(string(result))
+
+	/*query = helpers.QueryType{
+		ContractName: "simpleasset",
+		Channel:      "mychannel",
+		CcFunc:       "CreateAsset",
+		Args:         []string{"t1", assetId + "3", "User1", "Treasury", "455", "02 Dec 29 15:04 MST"},
+	}
+	result, err = helpers.Invoke(query, connProfilePath, "network1", "Org1MSP", "")
+	if err != nil {
+		log.Fatalf("%s helpers.Invoke error: %+v", query.CcFunc, err.Error())
+	}
+	log.Printf("%s helpers.Invoke %v", query.CcFunc, string(result))*/
+
+	result, err = interopsetup.HelperInvoke("CreateAsset", []string{"t1", assetId, "User1", "Treasury", "455", "02 Dec 29 15:04 MST"}, "simpleasset", "mychannel", connProfilePath, "network1")
+	if err != nil {
+		log.Fatalf("%s helpers.Invoke error: %s", query.CcFunc, err.Error())
+	}
+	log.Printf("%s helpers.Invoke %v", query.CcFunc, string(result))
+
+	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
+	result, err = contract.EvaluateTransaction("ReadAsset", "t1", assetId, "true")
+	if err != nil {
+		log.Fatalf("failed Query with error: %s", err)
+	}
+	log.Println(string(result))
+
+	/*result, err = contract.SubmitTransaction("CreateTokenAssetType", "token1", "Central Bank", "1")
 	if err != nil {
 		log.Fatalf("failed Invoke with error: %+v", err)
 	}
+	log.Println(string(result))
 
-	err = helpers.Query(contractU1, "ReadAsset", "t1", assetId, "true")
-	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
-	}
-
-	err = helpers.Invoke(contractU1, "CreateTokenAssetType", "token1", "Central Bank", "1")
+	result, err = contract.SubmitTransaction("IssueTokenAssets", "token1", "5", "User1")
 	if err != nil {
 		log.Fatalf("failed Invoke with error: %+v", err)
 	}
+	log.Println(string(result))
 
-	err = helpers.Invoke(contractU1, "IssueTokenAssets", "token1", "5", "User1")
-	if err != nil {
-		log.Fatalf("failed Invoke with error: %+v", err)
-	}
-
-	err = helpers.Query(contractU1, "GetBalance", "token1", "User1")
+	result, err = contract.EvaluateTransaction("GetBalance", "token1", "User1")
 	if err != nil {
 		log.Fatalf("failed Query with error: %+v", err)
 	}
+	log.Println(string(result))
+	*/
 }
 
+/*
 func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 
 	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
@@ -549,16 +548,173 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 	}
 
 }
+*/
+
+func fetchAccessControlPolicy(networkId string) {
+	connProfilePath := "../../../tests/network-setups/fabric/shared/" + networkId + "/peerOrganizations/org1." + networkId + ".com/connection-org1.yaml"
+	query := helpers.QueryType{
+		ContractName: "interop",
+		Channel:      "mychannel",
+		CcFunc:       "GetAccessControlPolicyBySecurityDomain",
+		Args:         []string{networkId},
+	}
+
+	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
+	if err != nil {
+		log.Fatalf("%s helpers.Query error: %+v", query.CcFunc, err.Error())
+	}
+	log.Printf("%s helpers.Query result: %s", query.CcFunc, string(result))
+}
+
+func fetchMembership(networkId string) {
+	connProfilePath := "../../../tests/network-setups/fabric/shared/" + networkId + "/peerOrganizations/org1." + networkId + ".com/connection-org1.yaml"
+	query := helpers.QueryType{
+		ContractName: "interop",
+		Channel:      "mychannel",
+		CcFunc:       "GetMembershipBySecurityDomain",
+		Args:         []string{networkId},
+	}
+
+	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
+	if err != nil {
+		log.Fatalf("%s helpers.Query error: %+v", query.CcFunc, err.Error())
+	}
+	log.Printf("%s helpers.Query result: %s", query.CcFunc, string(result))
+}
+
+func fetchVerificationPolicy(networkId string) {
+	connProfilePath := "../../../tests/network-setups/fabric/shared/" + networkId + "/peerOrganizations/org1." + networkId + ".com/connection-org1.yaml"
+	query := helpers.QueryType{
+		ContractName: "interop",
+		Channel:      "mychannel",
+		CcFunc:       "GetVerificationPolicyBySecurityDomain",
+		Args:         []string{networkId},
+	}
+
+	result, err := helpers.Query(query, connProfilePath, networkId, "Org1MSP", "")
+	if err != nil {
+		log.Fatalf("%s helpers.Query error: %+v", query.CcFunc, err.Error())
+	}
+	log.Printf("%s helpers.Query result: %s", query.CcFunc, string(result))
+}
+
+func configureNetwork(networkId string) {
+	interopsetup.ConfigureNetwork(networkId)
+}
+
+type signer struct {
+	signkeyPEM []byte
+}
+
+func hashMessage(msg []byte) []byte {
+	hash := sha256.New()
+	hash.Write(msg)
+	return hash.Sum(nil)
+}
+
+func (s *signer) Sign(msg []byte) ([]byte, error) {
+	signkeyBytes, _ := pem.Decode(s.signkeyPEM)
+	if signkeyBytes == nil {
+		return nil, fmt.Errorf("no PEM data found in signkeyPEM: %s", s.signkeyPEM)
+	}
+	signkeyPriv, err := x509.ParsePKCS8PrivateKey(signkeyBytes.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed x509.ParsePKCS8PrivateKey with error: %s", err.Error())
+	}
+
+	signature, err := ecdsa.SignASN1(rand.Reader, signkeyPriv.(*ecdsa.PrivateKey), hashMessage(msg))
+	if err != nil {
+		return nil, fmt.Errorf("failed ecdsa.SignASN1 with error: %s", err.Error())
+	}
+	return signature, nil
+}
+
+func interop(key string, localNetwork string, requestingOrg string, address string) {
+	relayEnv, err := helpers.GetNetworkConfig(localNetwork)
+	if err != nil {
+		log.Fatalf("failed helpers.GetNetworkConfig with error: %+v", err.Error())
+	}
+	log.Debugf("relayEnv: %+v", relayEnv)
+
+	if (relayEnv.RelayEndPoint == "") || (relayEnv.ConnProfilePath == "") {
+		log.Fatalf("please use a valid --local-network. If valid network please check if your environment variables are configured properly")
+	}
+	networkName := localNetwork
+	channel := "mychannel"
+	contractName := "interop"
+	connProfilePath := relayEnv.ConnProfilePath
+	mspId := requestingOrg
+	username := "User1@org1." + localNetwork + ".com"
+
+	_, contract, wallet, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), channel, contractName, connProfilePath,
+		networkName, mspId, username)
+	if err != nil {
+		log.Fatalf("failed helpers.FabricHelper with error: %s", err.Error())
+	}
+	keyUser, certUser, err := helpers.GetKeyAndCertForRemoteRequestbyUserName(wallet, username)
+	if err != nil {
+		log.Fatalf("failed helpers.GetKeyAndCertForRemoteRequestbyUserName with error: %s", err.Error())
+	}
+	log.Debugf("keyUser: %s & certUser: %s", keyUser, certUser)
+
+	applicationFunction := "Create"
+	args := []string{key, ""}
+	invokeObject := types.Query{
+		ContractName: "simplestate",
+		Channel:      channel,
+		CcFunc:       applicationFunction,
+		CcArgs:       args,
+	}
+	log.Debugf("invokeObject: %+v", invokeObject)
+
+	interopJSON := types.InteropJSON{
+		Address:        address,
+		ChaincodeFunc:  "Read",
+		ChaincodeId:    "simplestate",
+		ChannelId:      channel,
+		RemoteEndPoint: "localhost:9080",
+		NetworkId:      "network1",
+		Sign:           true,
+		CcArgs:         []string{"a"},
+	}
+	log.Debugf("interopJSON: %+v", interopJSON)
+	interopJSONs := []types.InteropJSON{interopJSON}
+
+	interopArgIndices := []int{1}
+
+	signer := &signer{
+		signkeyPEM: []byte(keyUser),
+	}
+
+	interopFlowResponse, _, err := interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, signer, certUser, false)
+	if err != nil {
+		log.Fatalf("failed interoperablehelper.InteropFlow with error: %s", err.Error())
+	}
+	log.Debugf("interopFlowResponse: %v", interopFlowResponse[0])
+	remoteValue, err := interoperablehelper.GetResponseDataFromView(interopFlowResponse[0])
+	if err != nil {
+		log.Fatalf("failed interoperablehelper.GetResponseDataFromView with error: %s", err.Error())
+	}
+	log.Infof("called function %s with args: %s and %s", applicationFunction, invokeObject.CcArgs[0], remoteValue)
+}
 
 func main() {
-	connectSimpleStateWithSDK()                    // needs the chaincode simplestate on the channel
-	connectSimpleAssetWithSDK("a001")              // needs the chaincode simpleasset on the channel
-	testLockAssetAndClaimAssetOfBondAsset("a020")  // needs the chaincodes simpleasset and interop on the channel
-	testLockAssetAndUnlockAssetOfBondAsset("a021") // needs the chaincodes simpleasset and interop on the channel
 
-	testLockAssetAndClaimAssetUsingContractIdOfBondAsset("a040")  // needs the chaincodes simpleasset and interop on the channel
-	testLockAssetAndUnlockAssetUsingContractIdOfBondAsset("a041") // needs the chaincodes simpleasset and interop on the channel
+	interop("a", "network1", "Org1MSP", "localhost:9080/network1/mychannel:simplestate:Read:a")
 
-	testLockAssetAndClaimAssetOfTokenAsset()  // needs the chaincodes simpleasset and interop on the channel
-	testLockAssetAndUnlockAssetOfTokenAsset() // needs the chaincodes simpleasset and interop on the channel
+	//configureNetwork("network1")
+	//fetchAccessControlPolicy("network1")
+	//fetchMembership("network1")
+	//fetchVerificationPolicy("network1")
+
+	//connectSimpleStateWithSDK() // needs the chaincode simplestate on the channel
+	//connectSimpleAssetWithSDK("a001") // needs the chaincode simpleasset on the channel
+	//testLockAssetAndClaimAssetOfBondAsset("a020")  // needs the chaincodes simpleasset and interop on the channel
+	//testLockAssetAndUnlockAssetOfBondAsset("a021") // needs the chaincodes simpleasset and interop on the channel
+
+	//testLockAssetAndClaimAssetUsingContractIdOfBondAsset("a040")  // needs the chaincodes simpleasset and interop on the channel
+	//testLockAssetAndUnlockAssetUsingContractIdOfBondAsset("a041") // needs the chaincodes simpleasset and interop on the channel
+
+	//testLockAssetAndClaimAssetOfTokenAsset()  // needs the chaincodes simpleasset and interop on the channel
+	//testLockAssetAndUnlockAssetOfTokenAsset() // needs the chaincodes simpleasset and interop on the channel
 }

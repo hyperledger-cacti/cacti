@@ -1,0 +1,92 @@
+{
+  "name": "@hyperledger-labs/weaver-fabric-interop-sdk",
+  "description": "Supplemental library to 'fabric-client' with functions for relay-based cross-network interactions",
+  "keywords": [
+    "hyperledger",
+    "blockchain",
+    "interoperability"
+  ],
+  "version": "1.2.1",
+  "author": "V. Ramakrishna",
+  "tag": "latest",
+  "main": "build/index.js",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
+    "build": "tsc",
+    "prepublishOnly": "npm test",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "docs": "typedoc --out docs/ src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability.git"
+  },
+  "engines": {
+    "node": ">=10.15.3 <=16.0.0",
+    "npm": "^7.10.0"
+  },
+  "dependencies": {
+    "@hyperledger-labs/weaver-protos-js": "file:./protos-js",
+    "@grpc/grpc-js": "^1.1.3",
+    "elliptic": "^6.2.3",
+    "fabric-common": "^2.2.8",
+    "fabric-network": "^2.2.8",
+    "fabric-protos": "^2.2.8",
+    "google-protobuf": "^3.17.3",
+    "js-sha3": "^0.7.0",
+    "jsrsasign": "^8.0.19",
+    "log4js": "^6.3.0",
+    "pkcs11js": "^1.0.6",
+    "sjcl": "1.0.7",
+    "sshpk": "^1.16.1",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.14",
+    "@typescript-eslint/eslint-plugin": "^3.5.0",
+    "@typescript-eslint/parser": "^3.5.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^7.11.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
+    "prettier": "^2.1.2",
+    "prettier-eslint": "^11.0.0",
+    "rewire": "^4.0.1",
+    "sinon": "^6.1.3",
+    "sinon-chai": "^3.3.0",
+    "ts-node": "^9.0.0",
+    "typedoc": "^0.20.35",
+    "typescript": "^4.2.4"
+  },
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "https://github.com/hyperledger/fabric/blob/master/LICENSE"
+    }
+  ],
+  "nyc": {
+    "exclude": [
+      "index.js",
+      "coverage/**",
+      "lib/impl",
+      "lib/msp",
+      "lib/protos",
+      "test/**"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "all": true
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/hyperledger-labs"
+  }
+}
