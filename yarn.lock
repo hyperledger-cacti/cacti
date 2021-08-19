@@ -11114,7 +11114,7 @@ http-signature@~1.2.0:
 
 http-status-codes@2.1.4:
   version "2.1.4"
-  resolved "https://registry.npmjs.org/http-status-codes/-/http-status-codes-2.1.4.tgz"
+  resolved "https://registry.yarnpkg.com/http-status-codes/-/http-status-codes-2.1.4.tgz#453d99b4bd9424254c4f6a9a3a03715923052798"
   integrity sha512-MZVIsLKGVOVE1KEnldppe6Ij+vmemMuApDfjhVSLzyYP+td0bREEYyAoIw9yFePoBXManCuBqmiNP5FqJS5Xkg==
 
 http2-wrapper@^1.0.0-beta.5.2:
@@ -17867,7 +17867,7 @@ run-queue@^1.0.0, run-queue@^1.0.3:
 
 run-time-error@1.4.0:
   version "1.4.0"
-  resolved "https://registry.npmjs.org/run-time-error/-/run-time-error-1.4.0.tgz"
+  resolved "https://registry.yarnpkg.com/run-time-error/-/run-time-error-1.4.0.tgz#5d6b71b28e36e33ae41a2660941fddaedb987a30"
   integrity sha512-eYJ8Uws3zU7gU7dbKZg5vKIEvl8025pVpTkgU6Up8wSGyOo6MRUCJ0qFi1EY2wgQDyX/DvXaQncK/nlho//Bxw==
 
 rustbn.js@~0.2.0:

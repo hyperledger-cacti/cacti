@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-memory",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-keychain-memory.node.umd.min.js",
@@ -72,9 +72,9 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.7.0",
-    "@hyperledger/cactus-core": "0.7.0",
-    "@hyperledger/cactus-core-api": "0.7.0",
+    "@hyperledger/cactus-common": "0.8.0",
+    "@hyperledger/cactus-core": "0.8.0",
+    "@hyperledger/cactus-core-api": "0.8.0",
     "axios": "0.21.1",
     "express": "4.17.1",
     "prom-client": "13.1.0",
