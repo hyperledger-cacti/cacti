@@ -10,8 +10,6 @@
 package com.weaver.corda.sdk;
 
 import net.corda.core.contracts.UniqueIdentifier
-import com.weaver.corda.app.interop.states.*
-import com.weaver.corda.app.interop.flows.*
 import org.json.JSONObject
 import java.util.*
 import org.slf4j.LoggerFactory
@@ -29,8 +27,8 @@ class CredentialsCreator(
     remoteFlow: String,
     locFlow: String
 ) {
-    val cert_chain: List<String>
-    val nodeid_cert: String
+    var cert_chain: Map<String, List<String>> = mapOf()
+    var nodeid_cert: Map<String, String> = mapOf()
     val nodes = nodesList.split(",").toTypedArray()
     val baseNodesPath = baseNodesPath
     val securityDomain = securityDomain
@@ -41,44 +39,63 @@ class CredentialsCreator(
         // Extracting Network certs
         val config = CredentialsExtractor.getConfig(baseNodesPath, nodes)
         val jsonConfig = JSONObject(config)
-        val node0Json = jsonConfig.getJSONObject(nodes[0])
-        val root_cert = Base64.getDecoder().decode(node0Json.getJSONArray("root_certs").getString(0)).toString(Charsets.UTF_8)
-        val doorman_cert = Base64.getDecoder().decode(node0Json.getJSONArray("doorman_certs").getString(0)).toString(Charsets.UTF_8)
-        val nodeca_cert = Base64.getDecoder().decode(node0Json.getJSONArray("nodeca_certs").getString(0)).toString(Charsets.UTF_8)
-        
-        // Initialising class variables
-        this.nodeid_cert = Base64.getDecoder().decode(node0Json.getJSONArray("nodeid_cert").getString(0)).toString(Charsets.UTF_8)
-        this.cert_chain = listOf(root_cert, doorman_cert, nodeca_cert)
+        for (i in 0..nodes.size-1) {
+            val node0Json = jsonConfig.getJSONObject(nodes[i])
+            val root_cert = Base64.getDecoder().decode(node0Json.getJSONArray("root_certs").getString(i)).toString(Charsets.UTF_8)
+            val doorman_cert = Base64.getDecoder().decode(node0Json.getJSONArray("doorman_certs").getString(i)).toString(Charsets.UTF_8)
+            val nodeca_cert = Base64.getDecoder().decode(node0Json.getJSONArray("nodeca_certs").getString(i)).toString(Charsets.UTF_8)
+            
+            // Initialising class variables
+            this.nodeid_cert += mapOf(nodes[i] to Base64.getDecoder().decode(node0Json.getJSONArray("nodeid_cert").getString(0)).toString(Charsets.UTF_8))
+            this.cert_chain += mapOf(nodes[i] to listOf(root_cert, doorman_cert, nodeca_cert))
+        }
         logger.debug("Cert Chain: ${this.cert_chain}")
     }
     
     fun createAccessControlPolicy(): AccessControl.AccessControlPolicy {
-        val rule = Rule(this.nodeid_cert, "certificate", this.remoteFlow, true)
-        val accessControlPolicyState = AccessControlPolicyState(
-            this.securityDomain, 
-            listOf(rule)
-        )
-        return AccessControlPolicyManager.stateToProto(accessControlPolicyState)
+        var rulesList: List<AccessControl.Rule> = listOf()
+        for (node in nodes) {
+            val ruleProto = AccessControl.Rule.newBuilder()
+                .setPrincipal(this.nodeid_cert.getValue(node))
+                .setPrincipalType("certificate")
+                .setResource(this.remoteFlow)
+                .setRead(true)
+                .build()
+            rulesList += ruleProto            
+        }
+        return AccessControl.AccessControlPolicy.newBuilder()
+                .setSecurityDomain(this.securityDomain)
+                .addAllRules(rulesList)
+                .build()
     }
     
     fun createMembership(): MembershipOuterClass.Membership {
-        val memberNode0 = Member("", "certificate", this.cert_chain)
-        val memberMap = mapOf(this.nodes[0] to memberNode0)
-        val membershipState = MembershipState(
-            this.securityDomain, 
-            memberMap
-        )
-        return MembershipManager.stateToProto(membershipState)
+        var membersMap: Map<String, MembershipOuterClass.Member> = mapOf()
+        for ((memberId,  member_cert_chain) in this.cert_chain) {
+            val memberProto = MembershipOuterClass.Member.newBuilder()
+                .setValue("")
+                .setType("certificate")
+                .addAllChain(member_cert_chain)
+                .build()
+            membersMap += mapOf(memberId to memberProto)
+        }
+        return MembershipOuterClass.Membership.newBuilder()
+                .setSecurityDomain(this.securityDomain)
+                .putAllMembers(membersMap)
+                .build()
     }
     
     fun createVerificationPolicy(): VerificationPolicyOuterClass.VerificationPolicy {
-        val verificationPolicyCriteria = this.nodes.toList()
-        val policy = Policy("Signature", verificationPolicyCriteria)
-        val identifier = Identifier(this.locFlow, policy)
-        val verificationPolicyState = VerificationPolicyState(
-            this.securityDomain, 
-            listOf(identifier)
-        )
-        return VerificationPolicyManager.stateToProto(verificationPolicyState)
+        val policyProto = VerificationPolicyOuterClass.Policy.newBuilder()
+            .setType("Signature")
+            .addAllCriteria(this.nodes.toList())
+        val identifierProto = VerificationPolicyOuterClass.Identifier.newBuilder()
+            .setPattern(this.locFlow)
+            .setPolicy(policyProto)
+            .build()
+        return VerificationPolicyOuterClass.VerificationPolicy.newBuilder()
+                .setSecurityDomain(this.securityDomain)
+                .addAllIdentifiers(listOf(identifierProto))
+                .build()
     }
 }
