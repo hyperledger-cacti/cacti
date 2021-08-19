@@ -1,7 +1,5 @@
 .PHONY: build-local
 build-local:
-	echo "Building protos locally..."
-	cd ../../../common/protos-java-kt && make build
 	cp build.gradle.local build.gradle
 	echo "Set gradle build files to use local dependencies"
 	./gradlew clean jar

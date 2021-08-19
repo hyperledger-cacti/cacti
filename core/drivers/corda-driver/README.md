@@ -13,6 +13,19 @@ from the external network.
 
 To build the driver executable locally (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages), run the following:
 
+_Prerequisites_: Build the following dependencies in sequence:
+**Protobufs**
+```
+cd ../../../common/protos-java-kt
+make build
+```
+**Interoperation CorDapp**
+```
+cd ../../../core/network/corda-interop-app
+make build-local
+```
+
+Now build the driver as follows:
 ```
 make build-local
 ```

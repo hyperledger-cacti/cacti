@@ -66,6 +66,22 @@ targets.
 -   `make start-local` is the same as `make start` except it gets the cordapps
     from locally built jars from the `corda-simple-app` and `corda-interop-app`
     repositories (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages).
+    * _Prerequisites_: Before you run this command, build the following in sequence:
+      **Protobufs**
+      ```
+      cd ../../../common/protos-java-kt
+      make build
+      ```
+      **Interoperation CorDapp**
+      ```
+      cd ../../../core/network/corda-interop-app
+      make build-local
+      ```
+      **CLI Client and CorDapp**
+      ```
+      cd ../../../samples/corda/corda-simple-application
+      make build-local
+      ```
 -   `make restart-with-new-interop-app` can be used to restart an already running
     Corda network with new local versions of the `corda-interop-app` CorDapp.
 -   `make stop` stops the nodes.

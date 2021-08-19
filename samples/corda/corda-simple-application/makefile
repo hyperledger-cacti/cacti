@@ -6,7 +6,7 @@ build-local-weaver-dependencies:
 	cd ../../../core/network/corda-interop-app && make build-local
 	
 .PHONY: build-local	
-build-local: build-local-weaver-dependencies
+build-local:
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies-local
@@ -51,7 +51,7 @@ initialise-vault:
 
 .PHONY: initialise-vault-docker
 initialise-vault-docker:
-	./clients/build/install/clients/bin/clients configure-all network1-docker
+	./clients/build/install/clients/bin/clients configure-all network1-docker,network2-docker
 
 .PHONY: get-access-control-policies
 get-access-control-policies:

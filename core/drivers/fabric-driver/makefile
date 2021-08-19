@@ -2,9 +2,28 @@ DOCKER_IMAGE_NAME ?= weaver-fabric-driver
 DOCKER_TAG ?= 1.2.1
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/fabric-driver
+COMPOSE_ARG ?=
 	
 build: .npmrc
 	npm install
+	npm run build
+	npm run postinstall
+
+build-local:
+	mkdir -p protos-js && \
+		cp -r ../../../common/protos-js/common ./protos-js/ && \
+		cp -r ../../../common/protos-js/corda ./protos-js/ && \
+		cp -r ../../../common/protos-js/driver ./protos-js/ && \
+		cp -r ../../../common/protos-js/fabric ./protos-js/ && \
+		cp -r ../../../common/protos-js/msp ./protos-js/ && \
+		cp -r ../../../common/protos-js/networks ./protos-js/ && \
+		cp -r ../../../common/protos-js/peer ./protos-js/ && \
+		cp -r ../../../common/protos-js/relay ./protos-js/ && \
+		cp -r ../../../common/protos-js/package.json ./protos-js/
+	cp package.json package-remote.json && \
+		cp package-local.json package.json && \
+		npm install && \
+		mv package-remote.json package.json
 	npm run build
 	npm run postinstall
 
@@ -16,11 +35,10 @@ push-image: build-image
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 deploy:
-	docker-compose up -d
+	docker-compose $(COMPOSE_ARG) up -d
 
 stop:
-	docker stop fabric-driver 2> /dev/null || true
-	docker rm fabric-driver 2> /dev/null || true
+	docker-compose $(COMPOSE_ARG) down
 
 clean: stop build
 
