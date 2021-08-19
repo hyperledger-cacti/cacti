@@ -19,7 +19,17 @@ import com.weaver.protos.common.membership.MembershipOuterClass
 import com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass
 
 
-  
+/**
+ * The CredentialsCreator flow is used to create memberships, access control
+ * and verification policies for your local network that can be consumed by
+ * remote network.
+ *
+ * @property baseNodesPath Path to build/nodes directory of this corda network
+ * @property securityDomain Security Domain Name for this Corda Network.
+ * @property nodesList List of names of Nodes in this Corda Network.
+ * @property remoteFlow Flow pattern for local flow to be used in access control policy.
+ * @property locFlow Flow pattern for remote flow to be used in verification policy.
+ */
 class CredentialsCreator(
     baseNodesPath: String,
     securityDomain: String,
@@ -52,8 +62,11 @@ class CredentialsCreator(
         logger.debug("Cert Chain: ${this.cert_chain}")
     }
     
+    /*
+     * @return Returns access control policy proto object.
+     */
     fun createAccessControlPolicy(): AccessControl.AccessControlPolicy {
-        var rulesList: List<AccessControl.Rule> = listOf()
+        var rulesLi@returnst: List<AccessControl.Rule> = listOf()
         for (node in nodes) {
             val ruleProto = AccessControl.Rule.newBuilder()
                 .setPrincipal(this.nodeid_cert.getValue(node))
@@ -69,6 +82,9 @@ class CredentialsCreator(
                 .build()
     }
     
+    /*
+     * @return Returns Membership proto object.
+     */
     fun createMembership(): MembershipOuterClass.Membership {
         var membersMap: Map<String, MembershipOuterClass.Member> = mapOf()
         for ((memberId,  member_cert_chain) in this.cert_chain) {
@@ -85,6 +101,9 @@ class CredentialsCreator(
                 .build()
     }
     
+    /*
+     * @return Returns Verification policy proto object.
+     */
     fun createVerificationPolicy(): VerificationPolicyOuterClass.VerificationPolicy {
         val policyProto = VerificationPolicyOuterClass.Policy.newBuilder()
             .setType("Signature")

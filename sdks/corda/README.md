@@ -109,8 +109,8 @@ All Following functions (except CredentialsCreator), accepts an instance of `net
         * **baseNodesPath**: Path to the `build/nodes` of Corda Network directory.
         * **securityDomain**: Security Domain Name for this Corda Network.
         * **odesList**: List of names of Nodes in this Corda Network.
-        * **remoteFlow**: pattern for local flow to be used in access control policy.
-        * **locFlow**: pattern for remote flow to be used in verification policy.
+        * **remoteFlow**: Flow pattern for local flow to be used in access control policy.
+        * **locFlow**: Flow pattern for remote flow to be used in verification policy.
     - createAccessControlPolicy
     - createMembership
     - createVerificationPolicy

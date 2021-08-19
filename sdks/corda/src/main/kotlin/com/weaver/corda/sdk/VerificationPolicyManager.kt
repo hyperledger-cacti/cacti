@@ -134,7 +134,7 @@ class VerificationPolicyManager {
         }
 
         /**
-         * Helper function used by GetVerificationPoliciesCommand to interact with the Corda network
+         * Function to get all verification policies from Vault
          */
         @JvmStatic
         fun getVerificationPolicies(
@@ -156,6 +156,10 @@ class VerificationPolicyManager {
             }
         }
         
+        /**
+         * Function to convert proto VerificationPolicyOuterClass.VerificationPolicy
+         * to  state VerificationPolicyState
+         */
         @JvmStatic
         fun protoToState(
             verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy
@@ -175,6 +179,10 @@ class VerificationPolicyManager {
             )
         }
         
+        /**
+         * Function to convert state VerificationPolicyState to
+         * proto VerificationPolicyOuterClass.VerificationPolicy
+         */
         @JvmStatic
         fun stateToProto(
             verificationPolicyState: VerificationPolicyState

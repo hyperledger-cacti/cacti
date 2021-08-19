@@ -133,7 +133,7 @@ class AccessControlPolicyManager {
         }
 
         /**
-         * Helper function used by GetAccessControlPoliciesCommand to interact with the Corda network
+         * Function to get all access control policies from Vault
          */
         @JvmStatic
         fun getAccessControlPolicies(
@@ -155,6 +155,9 @@ class AccessControlPolicyManager {
             }
         }
         
+        /**
+         * Function to convert proto AccessControl.AccessControlPolicy to state AccessControlPolicyState
+         */
         @JvmStatic
         fun protoToState(
             accessControlPolicyProto: AccessControl.AccessControlPolicy
@@ -176,6 +179,9 @@ class AccessControlPolicyManager {
             )
         }
         
+        /**
+         * Function to convert state AccessControlPolicyState to proto AccessControl.AccessControlPolicy
+         */
         @JvmStatic
         fun stateToProto(
             accessControlPolicyState: AccessControlPolicyState

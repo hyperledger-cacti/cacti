@@ -28,6 +28,9 @@ class InteroperableHelper {
     companion object {
         private val logger = LoggerFactory.getLogger(InteroperableHelper::class.java)
         
+        /**
+         * Function to create an view address for interop call to a fabric network.
+         */
         @JvmStatic
         fun createFabricViewAddress (
             securityDomain: String,
@@ -44,6 +47,9 @@ class InteroperableHelper {
             return remoteRelayEndpoint + "/" + securityDomain + "/" resource            
         }
         
+        /**
+         * Function to create an view address for interop call to a corda network.
+         */
         @JvmStatic
         fun createCordaViewAddress (
             securityDomain: String,
@@ -58,6 +64,17 @@ class InteroperableHelper {
             return remoteRelayEndpoint + "/" + securityDomain + "/" resource
         }
         
+        /**
+         * Make an interop call through relay, and passes it to WriteExternalState
+         * to verify the proof and write it to vault.
+         * 
+         * @param proxy instance of CordaRPCOps to make flow calls to corda nodes.
+         * @param localRelayEndpoint local relay hostname/IP:port
+         * @param externalStateAddress view address created by above two functions. 
+         *
+         * @return Returns linearId of the written external state, that can be consumed by
+         * list of getExternalState functions below.
+         */
         @JvmStatic
         fun interopFlow (
             proxy: CordaRPCOps,
@@ -92,6 +109,12 @@ class InteroperableHelper {
             return result
         }
         
+        /**
+         * Takes linearId returned by interopFlow
+         *
+         * @return Returns protobuf `ViewDataOuterClass.ViewData`, 
+         * that stores the interop flow result.
+         */
         @JvmStatic
         fun getExternalStateView(
             proxy: CordaRPCOps,
@@ -103,6 +126,9 @@ class InteroperableHelper {
         }
         
         
+        /**
+         * Takes linearId returned by interopFlow, and returns interop payload string.
+         */
         @JvmStatic
         fun getExternalStatePayloadString(
             proxy: CordaRPCOps,
@@ -112,6 +138,9 @@ class InteroperableHelper {
             return responseView.payload.toStringUtf8()
         }
         
+        /**
+         * Takes linearId returned by interopFlow, and returns list of signatories in proof.
+         */
         @JvmStatic
         fun getExternalStateSignatories(
             proxy: CordaRPCOps,
@@ -126,6 +155,10 @@ class InteroperableHelper {
             return result
         }
         
+        /**
+         * Takes linearId returned by interopFlow and signatory Id, 
+         * and returns it's signature that is part of the proof.
+         */
         @JvmStatic
         fun getExternalStateSignature(
             proxy: CordaRPCOps,
@@ -142,6 +175,10 @@ class InteroperableHelper {
             return ""
         }
         
+        /**
+         * Takes linearId returned by interopFlow and signatory Id, 
+         * and returns it's certificate that can be used to verify the signature.
+         */
         @JvmStatic
         fun getExternalStateSignatoryCertificate(
             proxy: CordaRPCOps,

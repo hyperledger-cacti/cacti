@@ -133,7 +133,7 @@ class MembershipManager {
         }
 
         /**
-         * Helper function used by GetMembershipsPoliciesCommand to interact with the Corda network
+         * Function to get all memberships from Vault
          */
         @JvmStatic
         fun getMemberships(
@@ -155,6 +155,9 @@ class MembershipManager {
             }
         }
         
+        /**
+         * Function to convert proto MembershipOuterClass.Membership to state MembershipState
+         */
         @JvmStatic
         fun protoToState(
             membershipProto: MembershipOuterClass.Membership
@@ -175,6 +178,9 @@ class MembershipManager {
             )
         }
         
+        /**
+         * Function to convert state MembershipState to proto MembershipOuterClass.Membership
+         */
         @JvmStatic
         fun stateToProto(
             membershipState: MembershipState
