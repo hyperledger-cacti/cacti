@@ -1,4 +1,4 @@
-# Compiled Protos for JS
+# Compiled Protos for Golang
 
 ## Pre-requisites:
 

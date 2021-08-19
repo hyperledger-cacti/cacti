@@ -28,6 +28,24 @@ repository.
 
 ## Building the CLI client and CorDapp locally
 
+_Prerequisites_: Build local dependencies as follows:
+```
+make build-local-weaver-dependencies
+```
+
+Alternatively, you can explicitly build the following dependencies in sequence:
+**Protobufs**
+```
+cd ../../../common/protos-java-kt
+make build
+```
+**Interoperation CorDapp**
+```
+cd ../../../core/network/corda-interop-app
+make build-local
+```
+
+Now build the CLI client and CorDapp as follows:
 ```
 make build-local
 ```

@@ -176,8 +176,15 @@ const generateAccessControl = async (
     )
   }
   const updatedRules = templateJSON.rules.map(rule => {
-    rule.principal = keyCert.cert
-    rule.principalType = 'certificate'
+    if (rule.principalType == 'ca') {
+        rule.principal = mspId
+    } else if (rule.principalType == 'certificate') {
+        rule.principal = keyCert.cert
+    } else {
+        logger.error(
+          'Error Invalid Principal Type in template file'
+        )
+    }
     return rule
   })
   const accessControlJSON = {

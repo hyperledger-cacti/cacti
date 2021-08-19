@@ -6,7 +6,7 @@ build-local-weaver-dependencies:
 	cd ../../../core/network/corda-interop-app && make build-local
 	
 .PHONY: build-local	
-build-local: build-local-weaver-dependencies
+build-local:
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies-local
