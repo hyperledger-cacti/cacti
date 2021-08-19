@@ -7,10 +7,5 @@
       "resource": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*",
       "read": true
     }
-  ],
-  "linearId": {
-    "id": "54a6b7d8-820b-42d3-8362-0bcd22452e50",
-    "externalId": ""
-  },
-  "participants": []
+  ]
 }

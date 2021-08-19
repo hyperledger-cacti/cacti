@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.cordaSimpleApplication.client
+package com.weaver.corda.sdk;
 
 import io.grpc.ManagedChannel
 import io.grpc.Status
@@ -13,6 +13,7 @@ import java.io.Closeable
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import org.slf4j.LoggerFactory
 
 import com.weaver.protos.networks.networks.NetworkGrpcKt.NetworkCoroutineStub
 import com.weaver.protos.networks.networks.Networks
@@ -25,6 +26,7 @@ import com.weaver.protos.networks.networks.Networks
  */
 class RelayClient(private val channel: ManagedChannel) : Closeable {
     private val stub = NetworkCoroutineStub(channel)
+    private val logger = LoggerFactory.getLogger(RelayClient::class.java)
 
     /**
      * requestState() coordinates making the initial RPC to the local relay to with a request for
@@ -45,7 +47,7 @@ class RelayClient(private val channel: ManagedChannel) : Closeable {
      */
     suspend fun requestState(networkQuery: Networks.NetworkQuery) = coroutineScope {
         val response = async { stub.requestState(networkQuery) }
-        println("Ack received from requestState with requestId: ${response.await()}")
+        logger.debug("Ack received from requestState with requestId: ${response.await()}")
         return@coroutineScope response.await()
     }
 
