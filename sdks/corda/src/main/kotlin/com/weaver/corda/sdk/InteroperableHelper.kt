@@ -27,6 +27,37 @@ import com.weaver.protos.networks.networks.Networks
 class InteroperableHelper {
     companion object {
         private val logger = LoggerFactory.getLogger(InteroperableHelper::class.java)
+        
+        @JvmStatic
+        fun createFabricViewAddress (
+            securityDomain: String,
+            remoteRelayEndpoint: String,
+            channelName: String,
+            chaincodeName: String,
+            ccFunc: String,
+            ccFuncArgs: String            
+        ): String {
+            val resource = channelName
+                            + ":" + chaincodeName
+                            + ":" + ccFunc
+                            + ":" + ccFuncArgs
+            return remoteRelayEndpoint + "/" + securityDomain + "/" resource            
+        }
+        
+        @JvmStatic
+        fun createCordaViewAddress (
+            securityDomain: String,
+            remoteRelayEndpoint: String,
+            remoteCordaHosts: List<String>,
+            remoteFlow: String,
+            remoteFlowArgs: String
+        ): String {
+            val resource = remoteCordaHosts.joinToString(separator=";") { it }
+                            + "#" + remoteFlow
+                            + ":" + remoteFlowArgs
+            return remoteRelayEndpoint + "/" + securityDomain + "/" resource
+        }
+        
         @JvmStatic
         fun interopFlow (
             proxy: CordaRPCOps,

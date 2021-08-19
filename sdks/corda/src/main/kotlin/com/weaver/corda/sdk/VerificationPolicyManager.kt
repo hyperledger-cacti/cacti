@@ -27,7 +27,7 @@ import com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass
 
 class VerificationPolicyManager {
     companion object {
-        private val logger = LoggerFactory.getLogger(InteroperableHelper::class.java)
+        private val logger = LoggerFactory.getLogger(VerificationPolicyManager::class.java)
         
         /**
          * Function to create an verification policy state in Vault
@@ -38,7 +38,7 @@ class VerificationPolicyManager {
             verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy
         ): Either<Error, String> {
             val verificationPolicyState = protoToState(verificationPolicyProto)
-            logger.info("Writing VerificationPolicyState: ${verificationPolicyState}")
+            logger.debug("Writing VerificationPolicyState: ${verificationPolicyState}")
             return try {
                 runCatching {
                     proxy.startFlow(::CreateVerificationPolicyState, verificationPolicyState)
@@ -64,7 +64,7 @@ class VerificationPolicyManager {
             verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy
         ): Either<Error, String> {
             val verificationPolicyState = protoToState(verificationPolicyProto)
-            logger.info("Update VerificationPolicyState: ${verificationPolicyState}")
+            logger.debug("Update VerificationPolicyState: ${verificationPolicyState}")
             return try {
                 runCatching {
                     proxy.startFlow(::UpdateVerificationPolicyState, verificationPolicyState)
@@ -89,13 +89,13 @@ class VerificationPolicyManager {
             proxy: CordaRPCOps,
             securityDomain: String
         ): Either<Error, String> {
-            logger.info("Deleting verification policy for securityDomain $securityDomain")
+            logger.debug("Deleting verification policy for securityDomain $securityDomain")
             return try {
-                logger.info("Deleting verification policy for securityDomain $securityDomain")
+                logger.debug("Deleting verification policy for securityDomain $securityDomain")
                 val result = runCatching {
                     proxy.startFlow(::DeleteVerificationPolicyState, securityDomain)
                             .returnValue.get().flatMap {
-                                logger.info("Verification Policy for securityDomain $securityDomain deleted\n")
+                                logger.debug("Verification Policy for securityDomain $securityDomain deleted\n")
                                 Right(it.toString())
                             }
                 }.fold({ it }, { Left(Error(it.message)) })

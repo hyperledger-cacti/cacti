@@ -26,7 +26,7 @@ import com.weaver.protos.common.membership.MembershipOuterClass
 
 class MembershipManager {
     companion object {
-        private val logger = LoggerFactory.getLogger(InteroperableHelper::class.java)
+        private val logger = LoggerFactory.getLogger(MembershipManager::class.java)
         
         /**
          * Function to create an membership state in Vault
@@ -37,7 +37,7 @@ class MembershipManager {
             membershipProto: MembershipOuterClass.Membership
         ): Either<Error, String> {
             val membershipState = protoToState(membershipProto)
-            logger.info("Writing MembershipState: ${membershipState}")
+            logger.debug("Writing MembershipState: ${membershipState}")
             return try {
                 runCatching {
                     proxy.startFlow(::CreateMembershipState, membershipState)
@@ -63,7 +63,7 @@ class MembershipManager {
             membershipProto: MembershipOuterClass.Membership
         ): Either<Error, String> {
             val membershipState = protoToState(membershipProto)
-            logger.info("Update MembershipState: ${membershipState}")
+            logger.debug("Update MembershipState: ${membershipState}")
             return try {
                 runCatching {
                     proxy.startFlow(::UpdateMembershipState, membershipState)
@@ -88,13 +88,13 @@ class MembershipManager {
             proxy: CordaRPCOps,
             securityDomain: String
         ): Either<Error, String> {
-            logger.info("Deleting membership for securityDomain $securityDomain")
+            logger.debug("Deleting membership for securityDomain $securityDomain")
             return try {
-                logger.info("Deleting membership for securityDomain $securityDomain")
+                logger.debug("Deleting membership for securityDomain $securityDomain")
                 val result = runCatching {
                     proxy.startFlow(::DeleteMembershipState, securityDomain)
                             .returnValue.get().flatMap {
-                                logger.info("Membership for securityDomain $securityDomain deleted\n")
+                                logger.debug("Membership for securityDomain $securityDomain deleted\n")
                                 Right(it.toString())
                             }
                 }.fold({ it }, { Left(Error(it.message)) })

@@ -26,7 +26,7 @@ import com.weaver.protos.common.access_control.AccessControl
 
 class AccessControlPolicyManager {
     companion object {
-        private val logger = LoggerFactory.getLogger(InteroperableHelper::class.java)
+        private val logger = LoggerFactory.getLogger(AccessControlPolicyManager::class.java)
         
         /**
          * Function to create an access control policy state in Vault
@@ -37,7 +37,7 @@ class AccessControlPolicyManager {
             accessControlPolicyProto: AccessControl.AccessControlPolicy
         ): Either<Error, String> {
             val accessControlPolicyState = protoToState(accessControlPolicyProto)
-            logger.info("Writing AccessControlPolicyState: ${accessControlPolicyState}")
+            logger.debug("Writing AccessControlPolicyState: ${accessControlPolicyState}")
             return try {
                 runCatching {
                     proxy.startFlow(::CreateAccessControlPolicy, accessControlPolicyState)
@@ -63,7 +63,7 @@ class AccessControlPolicyManager {
             accessControlPolicyProto: AccessControl.AccessControlPolicy
         ): Either<Error, String> {
             val accessControlPolicyState = protoToState(accessControlPolicyProto)
-            logger.info("Update AccessControlPolicyState: ${accessControlPolicyState}")
+            logger.debug("Update AccessControlPolicyState: ${accessControlPolicyState}")
             return try {
                 runCatching {
                     proxy.startFlow(::UpdateAccessControlPolicyState, accessControlPolicyState)
@@ -88,13 +88,13 @@ class AccessControlPolicyManager {
             proxy: CordaRPCOps,
             securityDomain: String
         ): Either<Error, String> {
-            logger.info("Deleting access control policy for securityDomain $securityDomain")
+            logger.debug("Deleting access control policy for securityDomain $securityDomain")
             return try {
-                logger.info("Deleting access control policy for securityDomain $securityDomain")
+                logger.debug("Deleting access control policy for securityDomain $securityDomain")
                 val result = runCatching {
                     proxy.startFlow(::DeleteAccessControlPolicyState, securityDomain)
                             .returnValue.get().flatMap {
-                                logger.info("Access Control Policy for securityDomain $securityDomain deleted\n")
+                                logger.debug("Access Control Policy for securityDomain $securityDomain deleted\n")
                                 Right(it.toString())
                             }
                 }.fold({ it }, { Left(Error(it.message)) })
