@@ -74,7 +74,7 @@ The code for this lies in the `core/relay` folder.
 Navigate to the `core/relay` folder and run a relay as follows:
 
 * Run: `make convert-compose-method2` to uncomment and comment some lines.
-* For `network1`, create a `.env.n1` file by copying `.env.template` and set values as (_Values are given wrt our testnet deployed completely in docker_):
+* For `network1`, create a `.env.n1` file by copying `.env.template.2` and set values as (_Values are given wrt our testnet deployed completely in docker_):
  ```
  PATH_TO_REMOTE_RELAYS_DEFINITIONS=./docker/remote-relay-dns-config
  NETWORK_NAME=network1
@@ -90,7 +90,7 @@ Navigate to the `core/relay` folder and run a relay as follows:
  COMPOSE_PROJECT_NAME=network1
  COMPOSE_PROJECT_NETWORK=net
  ```
-* For `network2`, create a `.env.n2` file by copying `.env.template` and set values as:
+* For `network2`, create a `.env.n2` file by copying `.env.template.2` and set values as:
  ```
  PATH_TO_REMOTE_RELAYS_DEFINITIONS=./docker/remote-relay-dns-config
  NETWORK_NAME=network2
