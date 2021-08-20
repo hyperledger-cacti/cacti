@@ -7,11 +7,13 @@ SPDX-License-Identifier: Apache-2.0
 package helpers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -43,6 +45,83 @@ func Contains(list []string, value string) bool {
 	return false
 }
 
+func AddAssets(dataFilePath, networkName, connProfilePath string, query QueryType, mspId, channelName, contractName, ccFunc, ccType string) error {
+	dataFileExists, err := CheckIfFileOrDirectoryExists(filepath.Join(dataFilePath))
+	if err != nil {
+		return logThenErrorf("cannot access file: %s", dataFilePath)
+	} else if !dataFileExists {
+		return logThenErrorf("file %s doesn't exist", filepath.Join(dataFilePath))
+	}
+	dataBytes, err := ioutil.ReadFile(filepath.Join(dataFilePath))
+	if err != nil {
+		logThenErrorf("failed reading data file %s with error: %s", filepath.Join(dataFilePath), err.Error())
+	}
+
+	dataJSON := map[string]interface{}{}
+	err = json.Unmarshal(dataBytes, &dataJSON)
+	if err != nil {
+		logThenErrorf("failed to unmarshal the content of the file %s with error: %s", filepath.Join(dataFilePath), err.Error())
+	}
+
+	if channelName == "" {
+		channelName = "simpleasset"
+	}
+
+	for _, val := range dataJSON {
+
+		var currentQuery QueryType
+		if query.Channel != "" {
+			currentQuery = query
+		} else {
+			currentQuery = QueryType{
+				ContractName: contractName,
+				Channel:      channelName,
+				CcFunc:       "",
+				Args:         []string{},
+			}
+		}
+
+		valBytes, err := json.Marshal(val)
+		if err != nil {
+			return logThenErrorf("failed to marshal with error: %s", err.Error())
+		}
+
+		assetJson := map[string]interface{}{}
+		err = json.Unmarshal(valBytes, &assetJson)
+		if err != nil {
+			return logThenErrorf("failed to unmarshal the json content %v with error: %s", val, err.Error())
+		}
+		log.Debugf("assetJson: %v", assetJson)
+
+		_, _, wallet, err := FabricHelper(NewGatewayNetworkInterface(), channelName, contractName, connProfilePath, networkName, mspId, assetJson["owner"].(string))
+		if err != nil {
+			return logThenErrorf("failed helpers.FabricHelper with error: %s", err.Error())
+		}
+
+		identity, err := wallet.Get(assetJson["owner"].(string))
+		if err != nil {
+			return logThenErrorf("fetching username %s from wallet error: %s", assetJson["owner"].(string), err.Error())
+		}
+
+		certificate := identity.(*gateway.X509Identity).Certificate()
+		userCert := base64.StdEncoding.EncodeToString([]byte(certificate))
+		if ccType == "bond" {
+			currentQuery.CcFunc = "CreateAsset"
+			currentQuery.Args = append(currentQuery.Args, assetJson["assetType"].(string), assetJson["id"].(string), userCert, assetJson["issuer"].(string), assetJson["facevalue"].(string), assetJson["maturitydate"].(string))
+		} else if ccType == "token" {
+			currentQuery.CcFunc = "IssueTokenAssets"
+			currentQuery.Args = append(currentQuery.Args, assetJson["tokenassettype"].(string), assetJson["numunits"].(string), userCert)
+		}
+
+		log.Debugf("query: %+v", currentQuery)
+		_, err = Invoke(currentQuery, connProfilePath, networkName, mspId, assetJson["owner"].(string))
+		if err != nil {
+			logThenErrorf("%s Invoke error: %s", query.CcFunc, err.Error())
+		}
+	}
+	return nil
+}
+
 func GetNetworkConfig(networkId string) (NetworkConfig, error) {
 	networkConfig := NetworkConfig{}
 	// this is the path relative to the fabric-go-cli path
@@ -50,19 +129,19 @@ func GetNetworkConfig(networkId string) (NetworkConfig, error) {
 
 	configJSONfile, err := os.Open(configPath)
 	if err != nil {
-		return networkConfig, logThenErrorf("failed opening Config.json file with error: %s", err.Error())
+		return networkConfig, logThenErrorf("failed opening config.json file with error: %s", err.Error())
 	}
 	defer configJSONfile.Close()
 
 	networkConfigsBytes, err := ioutil.ReadAll(configJSONfile)
 	if err != nil {
-		return networkConfig, logThenErrorf("failed reading Config.json file with error: %s", err.Error())
+		return networkConfig, logThenErrorf("failed reading config.json file with error: %s", err.Error())
 	}
 
 	var networkConfigs map[string]NetworkConfig
 	err = json.Unmarshal(networkConfigsBytes, &networkConfigs)
 	if err != nil {
-		return networkConfig, logThenErrorf("failed to unmarshal Config.json file content with error: %s", err.Error())
+		return networkConfig, logThenErrorf("failed to unmarshal config.json file content with error: %s", err.Error())
 	}
 
 	return networkConfigs[networkId], nil
