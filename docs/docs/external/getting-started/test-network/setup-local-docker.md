@@ -189,10 +189,9 @@ _Note_: The setup and running instructions below were tested with all Node.js ve
 
 You can install `fabric-cli` as follows:
 - Navigate to the `samples/fabric/fabric-cli` folder.
-- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
 - Run the following to install dependencies:
 ```bash
-npm install
+make build-local
 ```
 - Use the `fabric-cli` executable in the `bin` folder for subsequent actions.
 

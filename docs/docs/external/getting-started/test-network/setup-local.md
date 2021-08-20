@@ -202,7 +202,6 @@ Configure `fabric-driver` for `network1` as follows:
 
 Build the Fabric driver module as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
-- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following:
   ```bash
   make build-local
