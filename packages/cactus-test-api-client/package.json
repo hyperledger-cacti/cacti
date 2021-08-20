@@ -71,7 +71,7 @@
     "@hyperledger/cactus-plugin-consortium-manual": "0.8.0",
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "0.8.0",
     "jose": "1.28.1",
-    "web3": "1.2.7"
+    "web3": "1.3.5"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "0.8.0"
