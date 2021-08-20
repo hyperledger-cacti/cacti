@@ -239,8 +239,19 @@ Build the interoperation Cordapp as follows:
   ```bash
   make build-local
   ```
+  
+### Corda Interoperation SDK
 
-### Corda Client (Application)
+A client-layer library is defined in the `sdks/corda` folder. This contains functions for Corda based client applications to exercise interoperation capabilities via relays and also several utility/helper functions. The Corda Client tool, which we will use later, depends on this library.
+
+To build the library, do the following:
+- Navigate to the `sdks/corda` folder.
+- Run the following command (_make sure there is no github.properties file present in the directory_):
+```bash
+make build
+```
+
+### Corda Simple Application and Client (Application)
 
 This is a simple Cordapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 The code for this lies in the `samples/corda/corda-simple-application` folder.
@@ -255,8 +266,6 @@ Build the `corda-simple-application` Cordapp as follows:
 ### Corda Network
 
 The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary. This network uses `samples/corda/corda-simple-application` which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
-
-#### Running with Interoperation Cordapp from Github Packages
 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.

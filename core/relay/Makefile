@@ -153,6 +153,14 @@ start-server:
 .PHONY: stop
 stop:
 	docker-compose $(COMPOSE_ARG) down
+	
+.PHONY: convert-compose-method1
+convert-compose-method1:
+	./scripts/convert-compose.sh 1
+	
+.PHONY: convert-compose-method2
+convert-compose-method2:
+	./scripts/convert-compose.sh 2
 
 # Cleans up all the build artifacts.
 #

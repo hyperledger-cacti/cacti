@@ -40,11 +40,11 @@ class InteroperableHelper {
             ccFunc: String,
             ccFuncArgs: String            
         ): String {
-            val resource = channelName
-                            + ":" + chaincodeName
-                            + ":" + ccFunc
-                            + ":" + ccFuncArgs
-            return remoteRelayEndpoint + "/" + securityDomain + "/" resource            
+            val resource = channelName +
+                            ":" + chaincodeName + 
+                            ":" + ccFunc +
+                            ":" + ccFuncArgs
+            return remoteRelayEndpoint + "/" + securityDomain + "/" + resource            
         }
         
         /**
@@ -58,10 +58,10 @@ class InteroperableHelper {
             remoteFlow: String,
             remoteFlowArgs: String
         ): String {
-            val resource = remoteCordaHosts.joinToString(separator=";") { it }
-                            + "#" + remoteFlow
-                            + ":" + remoteFlowArgs
-            return remoteRelayEndpoint + "/" + securityDomain + "/" resource
+            val resource = remoteCordaHosts.joinToString(separator=";") { it } +
+                            "#" + remoteFlow +
+                            ":" + remoteFlowArgs
+            return remoteRelayEndpoint + "/" + securityDomain + "/" + resource
         }
         
         /**

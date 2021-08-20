@@ -23,11 +23,11 @@ build-refresh-dependencies: github.properties
 	
 .PHONY: image
 image: github.properties
-	docker build --build-arg GIT_URL=$(GIT_URL) -t corda-driver:latest .
+	docker build --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
 
 .PHONY: push-image	
 push-image: image
-	docker tag corda-driver:latest $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
+	docker tag $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 .PHONY: run

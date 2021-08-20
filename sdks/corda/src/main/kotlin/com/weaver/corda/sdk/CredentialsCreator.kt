@@ -66,7 +66,7 @@ class CredentialsCreator(
      * @return Returns access control policy proto object.
      */
     fun createAccessControlPolicy(): AccessControl.AccessControlPolicy {
-        var rulesLi@returnst: List<AccessControl.Rule> = listOf()
+        var rulesList: List<AccessControl.Rule> = listOf()
         for (node in nodes) {
             val ruleProto = AccessControl.Rule.newBuilder()
                 .setPrincipal(this.nodeid_cert.getValue(node))

@@ -7,7 +7,7 @@
 version: '2'
 services:
   corda-driver:
-    image: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+    image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
     container_name: corda-driver-${NETWORK_NAME}
     environment:
       - DRIVER_PORT=${DRIVER_PORT}
