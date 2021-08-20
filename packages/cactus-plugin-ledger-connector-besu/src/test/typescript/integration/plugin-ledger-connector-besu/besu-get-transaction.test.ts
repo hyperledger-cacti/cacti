@@ -65,6 +65,8 @@ test("can get past logs of an account", async (t: Test) => {
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
 
+  await connector.onPluginInit();
+
   const privateKey = await besuTestLedger.getGenesisAccountPrivKey();
   const { transactionReceipt } = await connector.transact({
     web3SigningCredential: {

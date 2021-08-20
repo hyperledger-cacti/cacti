@@ -68,6 +68,8 @@ test("deploys contract via .json file", async (t: Test) => {
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
 
+  await connector.onPluginInit();
+
   await connector.transact({
     web3SigningCredential: {
       ethAccount: firstHighNetWorthAccount,

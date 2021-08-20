@@ -145,7 +145,7 @@ export class BesuTestLedger implements ITestLedger {
    * @see https://github.com/hyperledger/besu/blob/1.5.1/config/src/main/resources/dev.json
    */
   public getGenesisAccountPubKey(): string {
-    return "627306090abaB3A6e1400e9345bC60c78a8BEf57";
+    return "0x627306090abaB3A6e1400e9345bC60c78a8BEf57";
   }
 
   /**
