@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -27,12 +26,12 @@ import (
 	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers"
 )
 
-// setCmd represents the set command
-var setCmd = &cobra.Command{
-	Use:   "set <" + strings.Join(helpers.ValidKeys, "|") + "> <value>",
-	Short: "Set env variables for the fabric-cli",
+// getCmd represents the get command
+var getCmd = &cobra.Command{
+	Use:   "get <" + strings.Join(helpers.ValidKeys, "|") + ">",
+	Short: "Get env variables for the fabric-cli",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := set(args)
+		err := get(args)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -40,22 +39,22 @@ var setCmd = &cobra.Command{
 }
 
 func init() {
-	envCmd.AddCommand(setCmd)
+	envCmd.AddCommand(getCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// setCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// getCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// setCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// getCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func set(args []string) error {
+func get(args []string) error {
 
-	if (len(args) < 2) || (len(args) > 2) {
+	if len(args) != 1 {
 		return fmt.Errorf("incorrect number of arguments")
 	}
 
@@ -81,8 +80,6 @@ func set(args []string) error {
 	}
 	log.Debugf("envFileBytes: %s", string(envFileBytes))
 
-	updatedEnvVars := bytes.Buffer{}
-	envVarFound := false
 	var key, value string
 	envVars := strings.Split(string(envFileBytes), "\n")
 	for i := 0; i < len(envVars); i++ {
@@ -92,32 +89,11 @@ func set(args []string) error {
 		keyAndValue := strings.Split(envVars[i], "=")
 		key = keyAndValue[0]
 		value = keyAndValue[1]
-		if i != 0 {
-			// if this is not the line number 1, then write "\n" to go to the next line
-			updatedEnvVars.WriteString("\n")
-		}
 		if key == args[0] {
-			envVarFound = true
-			updatedEnvVars.WriteString(key + "=" + args[1])
-		} else if key != "" {
-			updatedEnvVars.WriteString(key + "=" + value)
+			log.Infof("Key: %s, Value: %s\n", key, value)
+			return nil
 		}
 	}
 
-	if !envVarFound {
-		if len(envVars) > 0 {
-			// if this is not the first env var to be written, then write "\n" to go to the next line
-			updatedEnvVars.WriteString("\n")
-		}
-		updatedEnvVars.WriteString(args[0] + "=" + args[1])
-	}
-
-	err = ioutil.WriteFile(filepath.Join(".env"), updatedEnvVars.Bytes(), 0755)
-	if err != nil {
-		return fmt.Errorf("failed ioutil.WriteFile with error: %+v", err)
-	}
-
-	log.Debugf("updated .env file content is: \n%s\n", updatedEnvVars.String())
-
-	return nil
+	return fmt.Errorf("invalid env key: %s", args[0])
 }

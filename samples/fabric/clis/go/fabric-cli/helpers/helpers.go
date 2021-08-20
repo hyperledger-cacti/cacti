@@ -33,6 +33,16 @@ type NetworkConfig struct {
 	Chaincode       string `json:"chaincode"`
 }
 
+// return true if string array list contains the element value
+func Contains(list []string, value string) bool {
+	for _, item := range list {
+		if item == value {
+			return true
+		}
+	}
+	return false
+}
+
 func GetNetworkConfig(networkId string) (NetworkConfig, error) {
 	networkConfig := NetworkConfig{}
 	// this is the path relative to the fabric-go-cli path
