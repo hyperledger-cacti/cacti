@@ -1,10 +1,10 @@
 #!/bin/sh
 
 comment () {
-    sed -i'' -e "$1"' s/    - /    # - /' "$2"
+    sed -i'.scriptbak' -e "$1"' s/    - /    # - /' "$2"
 }
 uncomment() {
-    sed -i'' -e "$1"' s/    # - /    - /' "$2"
+    sed -i'.scriptbak' -e "$1"' s/    # - /    - /' "$2"
 }
 
 # if [ $1 -eq 1 ]
@@ -36,3 +36,5 @@ else
     comment 105 docker-compose.yaml
     uncomment 104 docker-compose.yaml
 fi
+
+rm -rf docker-compose.yaml.scriptbak
