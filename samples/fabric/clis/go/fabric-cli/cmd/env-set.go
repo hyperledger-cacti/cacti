@@ -30,7 +30,11 @@ import (
 // setCmd represents the set command
 var setCmd = &cobra.Command{
 	Use:   "set <" + strings.Join(helpers.ValidKeys, "|") + "> <value>",
-	Short: "Set env variables for the fabric-cli",
+	Short: "set env variables for the fabric-cli",
+	Long: `Set env variables for the fabric-cli
+
+Example:
+  fabric-cli env set DEFAULT_CHANNEL testchannel`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := set(args)
 		if err != nil {
@@ -41,16 +45,6 @@ var setCmd = &cobra.Command{
 
 func init() {
 	envCmd.AddCommand(setCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// setCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// setCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func set(args []string) error {

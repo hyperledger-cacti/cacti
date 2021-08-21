@@ -29,7 +29,11 @@ import (
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get <" + strings.Join(helpers.ValidKeys, "|") + ">",
-	Short: "Get env variables for the fabric-cli",
+	Short: "get env variables for the fabric-cli",
+	Long: `Get env variables for the fabric-cli
+
+Example:
+  fabric-cli env get DEFAULT_CHANNEL`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := get(args)
 		if err != nil {
@@ -40,16 +44,6 @@ var getCmd = &cobra.Command{
 
 func init() {
 	envCmd.AddCommand(getCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// getCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// getCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func get(args []string) error {

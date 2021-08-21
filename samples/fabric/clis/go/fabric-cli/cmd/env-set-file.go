@@ -28,7 +28,11 @@ import (
 // setFileCmd represents the setFile command
 var setFileCmd = &cobra.Command{
 	Use:   "set-file <ENV_PATH>",
-	Short: "Replace env file with contents from another env file",
+	Short: "replace env file with contents from another env file",
+	Long: `Replace env file with contents from another env file
+
+Example:
+  fabric-cli env set-file ./data/.new_env`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := setFile(args)
 		if err != nil {
@@ -39,16 +43,6 @@ var setFileCmd = &cobra.Command{
 
 func init() {
 	envCmd.AddCommand(setFileCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// setFileCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// setFileCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func setFile(args []string) error {

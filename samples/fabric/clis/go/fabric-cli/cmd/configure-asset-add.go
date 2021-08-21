@@ -25,7 +25,11 @@ import (
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add --target-network=<network-name> --type=<bond|token --data-file=<path-to-data-file>>",
-	Short: "Add assets to asset network",
+	Short: "adds assets to asset network",
+	Long: `Adds assets to asset network
+
+Example:
+  fabric-cli configure asset add --target-network=network1 --type=bond --data-file=src/data/assets.json`,
 	Run: func(cmd *cobra.Command, args []string) {
 		targetNetwork, _ := cmd.Flags().GetString("target-network")
 		if targetNetwork == "" {
@@ -63,12 +67,6 @@ var addCmd = &cobra.Command{
 
 func init() {
 	assetCmd.AddCommand(addCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	addCmd.Flags().String("target-network", "", "target-network network for command. <network1|network2>")
 	addCmd.Flags().String("type", "", "Type of network <bond|token>")

@@ -22,7 +22,11 @@ import (
 // assetCmd represents the asset command
 var assetCmd = &cobra.Command{
 	Use:   "asset",
-	Short: "access the network assets",
+	Short: "configure for asset networks",
+	Long: `Configure for asset networks
+
+Example:
+  fabric-cli configure asset all --target-network=network1 --type=bond	`,
 	//Run: func(cmd *cobra.Command, args []string) {
 	//	fmt.Println("asset called")
 	//},
@@ -30,14 +34,4 @@ var assetCmd = &cobra.Command{
 
 func init() {
 	configureCmd.AddCommand(assetCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// assetCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// assetCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
