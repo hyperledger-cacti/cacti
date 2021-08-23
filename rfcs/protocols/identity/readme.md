@@ -255,7 +255,7 @@ After discovery of the network and fetching the Network DID document, the authen
 
 ## Data Plane Identity Configuration
 
-TODO
+A single participant unit cannot update a foreign network identity information in the network's ledger. This needs agreement among the participanting units. This agreement is ensured through collection of signatures through an application level flow as discussed in detail [here](./data-plane-identity-configuration.md).
 
 ## Updating Network DID with changing Network Structure
 
@@ -284,6 +284,6 @@ The IIN registry authenticates a Network DID updation request based on two condi
 (1) The signatures must  satisfy the `updatePolicy` in the `BlockchainNetworkMultiSig` verification method of the existing Network DID document.
 
 
-## Dataplane credentials update on update of identity in the identity plane
+## Dataplane credentials update with changes in identity plane
 
-TODO
+The idetntiy exchange and validation has to be done whenever there is a change in the identuty of any network. Thus, the identity exchange protocol steps explained in this document have to be triggered for a network for changes in identity of its interoperating network of their participant units. This is further explained [here](./identity-change-updates.md).

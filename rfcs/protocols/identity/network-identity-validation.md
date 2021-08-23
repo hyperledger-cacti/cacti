@@ -1,6 +1,11 @@
 
 ## Network Identity Validation
 
+* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh
+* Status: Draft
+* Since: 10-June-2020
+
+### Summary
 When a network ("local network" from here on) tries to configure the idetntity of another network ("foreign network" from here on) for interoperation, the broad steps involved are (i) Network Discovery (ii) Network Identity Validation. Both these steps are carried out by the IIN agent of the participants of the local network.
 
 Whether each participant needs to carry out the discovery and validation, or a subset of participants will do it depends entirely on the trust basis of the network. This is explained in [*Data Plane Identity Configuration*](./readme.md).

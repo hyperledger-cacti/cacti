@@ -107,7 +107,7 @@ These trust anchors are entities that the participants trust and whose identity 
 
 ## IIN Agents
 
-TODO
+DLT networks interact with the IINs through a components called IIN Agent. Each participant unit in a DLT network has have atleast one IIN Agent using which it exposes its identity as well as discovers and verifies foreign network identities. The IIN Agents are detailed [here](./iin-agent.md).
 
 
 <!-- 
