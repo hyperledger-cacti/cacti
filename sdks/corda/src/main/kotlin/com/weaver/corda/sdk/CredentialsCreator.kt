@@ -33,13 +33,13 @@ import com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass
 class CredentialsCreator(
     baseNodesPath: String,
     securityDomain: String,
-    nodesList: String,
+    nodesList: List<String>,
     remoteFlow: String,
     locFlow: String
 ) {
     var cert_chain: Map<String, List<String>> = mapOf()
     var nodeid_cert: Map<String, String> = mapOf()
-    val nodes = nodesList.split(",").toTypedArray()
+    val nodes = nodesList.toTypedArray()
     val baseNodesPath = baseNodesPath
     val securityDomain = securityDomain
     val remoteFlow = remoteFlow

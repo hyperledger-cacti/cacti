@@ -102,7 +102,7 @@ fun configureCreateAllHelper() {
     val credentialsCreator = CredentialsCreator(
         baseNodesPath, 
         networkName, 
-        nodesList, 
+        nodesList.split(","), 
         remoteFlow, 
         locFlow
     )
