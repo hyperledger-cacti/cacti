@@ -57,10 +57,14 @@ To run the driver, use the following:
 
 The driver gRPC server will be listening on port `9099`.
 
-## Changing the default port configuration
+## Driver configuration
 
 By default, the driver gRPC server listens on port `9099`. To change the port, set 
 the `DRIVER_PORT` as an environment variable. 
+
+Set `DRIVER_RPC_USERNAME` to a rpc user created for driver in the corda network.
+
+Set `DRIVER_RPC_PASSWORD` to the password of above user.
 
 ## Docker
 

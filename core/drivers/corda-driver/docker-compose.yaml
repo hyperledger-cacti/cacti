@@ -11,6 +11,8 @@ services:
     container_name: corda-driver-${NETWORK_NAME}
     environment:
       - DRIVER_PORT=${DRIVER_PORT}
+      - DRIVER_RPC_USERNAME=${DRIVER_RPC_USERNAME}
+      - DRIVER_RPC_PASSWORD=${DRIVER_RPC_PASSWORD}
     ports:
       - "${DRIVER_PORT}:${DRIVER_PORT}"
     command: sh -c "./bin/corda-driver"
