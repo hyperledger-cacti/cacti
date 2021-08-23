@@ -6,7 +6,11 @@ import type { Socket as SocketIoSocket } from "socket.io";
 import type { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
+
 import Web3 from "web3";
+
+import type { WebsocketProvider } from "web3-core";
+import EEAClient, { ICallOptions, IWeb3InstanceExtended } from "web3-eea";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
@@ -80,6 +84,7 @@ import {
   IGetPrometheusExporterMetricsEndpointV1Options,
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
+import { RuntimeError } from "run-time-error";
 import { GetBalanceEndpoint } from "./web-services/get-balance-endpoint";
 import { GetTransactionEndpoint } from "./web-services/get-transaction-endpoint";
 import { GetPastLogsEndpoint } from "./web-services/get-past-logs-endpoint";
@@ -111,7 +116,9 @@ export class PluginLedgerConnectorBesu
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
+  private readonly web3Provider: WebsocketProvider;
   private readonly web3: Web3;
+  private web3EEA: IWeb3InstanceExtended | undefined;
   private readonly pluginRegistry: PluginRegistry;
   private contracts: {
     [name: string]: Contract;
@@ -138,10 +145,10 @@ export class PluginLedgerConnectorBesu
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
 
-    const web3WsProvider = new Web3.providers.WebsocketProvider(
+    this.web3Provider = new Web3.providers.WebsocketProvider(
       this.options.rpcApiWsHost,
     );
-    this.web3 = new Web3(web3WsProvider);
+    this.web3 = new Web3(this.web3Provider);
     this.instanceId = options.instanceId;
     this.pluginRegistry = options.pluginRegistry;
     this.prometheusExporter =
@@ -169,8 +176,9 @@ export class PluginLedgerConnectorBesu
     return this.instanceId;
   }
 
-  public async onPluginInit(): Promise<unknown> {
-    return;
+  public async onPluginInit(): Promise<void> {
+    const chainId = await this.web3.eth.getChainId();
+    this.web3EEA = EEAClient(this.web3, chainId);
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {
@@ -183,6 +191,7 @@ export class PluginLedgerConnectorBesu
       const server = serverMaybe.get();
       await promisify(server.close.bind(server))();
     }
+    this.web3Provider.disconnect(1000, "Shutting down...");
   }
 
   async registerWebServices(
@@ -347,6 +356,7 @@ export class PluginLedgerConnectorBesu
             timeoutMs: req.timeoutMs || 60000,
           },
           web3SigningCredential,
+          privateTransactionConfig: req.privateTransactionConfig,
         });
 
         const address = {
@@ -360,6 +370,7 @@ export class PluginLedgerConnectorBesu
         contractJSON.abi,
         contractJSON.networks[networkId].address,
       );
+
       this.contracts[contractName] = contract;
     } else if (
       req.keychainId == undefined &&
@@ -389,8 +400,55 @@ export class PluginLedgerConnectorBesu
     const method: ContractSendMethod = methodRef(...req.params);
 
     if (req.invocationType === EthContractInvocationType.Call) {
-      const callOutput = await (method as any).call();
-      const success = true;
+      let callOutput;
+      let success = false;
+      if (req.privateTransactionConfig) {
+        const data = method.encodeABI();
+        let privKey: string;
+
+        if (
+          req.signingCredential.type ==
+          Web3SigningCredentialType.CactusKeychainRef
+        ) {
+          const {
+            keychainEntryKey,
+            keychainId,
+          } = req.signingCredential as Web3SigningCredentialCactusKeychainRef;
+
+          const keychainPlugin = this.pluginRegistry.findOneByKeychainId(
+            keychainId,
+          );
+          privKey = await keychainPlugin?.get(keychainEntryKey);
+        } else {
+          privKey = (req.signingCredential as any).secret;
+        }
+
+        const fnParams = {
+          to: contractInstance.options.address,
+          data,
+          privateFrom: req.privateTransactionConfig.privateFrom,
+          privateKey: privKey,
+          privateFor: req.privateTransactionConfig.privateFor,
+        };
+        if (!this.web3EEA) {
+          throw new RuntimeError(`InvalidState: web3EEA not initialized.`);
+        }
+
+        const privacyGroupId = this.web3EEA.priv.generatePrivacyGroup(fnParams);
+        this.log.debug("Generated privacyGroupId: ", privacyGroupId);
+        callOutput = await this.web3EEA.priv.call({
+          privacyGroupId,
+          to: contractInstance.options.address,
+          data,
+          // TODO: Update the "from" property of ICallOptions to be optional
+        } as ICallOptions);
+
+        success = true;
+        this.log.debug(`Web3 EEA Call output: `, callOutput);
+      } else {
+        callOutput = await (method as any).call();
+        success = true;
+      }
       return { success, callOutput };
     } else if (req.invocationType === EthContractInvocationType.Send) {
       if (isWeb3SigningCredentialNone(req.signingCredential)) {
@@ -418,9 +476,9 @@ export class PluginLedgerConnectorBesu
           receiptType: ReceiptType.NodeTxPoolAck,
           timeoutMs: req.timeoutMs || 60000,
         },
+        privateTransactionConfig: req.privateTransactionConfig,
       };
       const out = await this.transact(txReq);
-      //const transactionReceipt = out.transactionReceipt;
       const success = out.transactionReceipt.status;
       const data = { success, out };
       return data;
@@ -478,8 +536,20 @@ export class PluginLedgerConnectorBesu
       `${fnTag}:req.transactionConfig.rawTransaction`,
     );
     const rawTx = req.transactionConfig.rawTransaction as string;
+
     this.log.debug("Starting web3.eth.sendSignedTransaction(rawTransaction) ");
+
     const txPoolReceipt = await this.web3.eth.sendSignedTransaction(rawTx);
+
+    return this.getTxReceipt(req, txPoolReceipt);
+  }
+
+  public async getTxReceipt(
+    request: RunTransactionRequest,
+    txPoolReceipt: any,
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#getTxReceipt()`;
+
     this.log.debug("Received preliminary receipt from Besu node.");
 
     if (txPoolReceipt instanceof Error) {
@@ -489,8 +559,8 @@ export class PluginLedgerConnectorBesu
     this.prometheusExporter.addCurrentTransaction();
 
     if (
-      req.consistencyStrategy.receiptType === ReceiptType.NodeTxPoolAck &&
-      req.consistencyStrategy.blockConfirmations > 0
+      request.consistencyStrategy.receiptType === ReceiptType.NodeTxPoolAck &&
+      request.consistencyStrategy.blockConfirmations > 0
     ) {
       throw new Error(
         `${fnTag} Conflicting parameters for consistency` +
@@ -499,13 +569,13 @@ export class PluginLedgerConnectorBesu
       );
     }
 
-    switch (req.consistencyStrategy.receiptType) {
+    switch (request.consistencyStrategy.receiptType) {
       case ReceiptType.NodeTxPoolAck:
         return { transactionReceipt: txPoolReceipt };
       case ReceiptType.LedgerBlockAck:
         this.log.debug("Starting poll for ledger TX receipt ...");
         const txHash = txPoolReceipt.transactionHash;
-        const { consistencyStrategy } = req;
+        const { consistencyStrategy } = request;
         const ledgerReceipt = await this.pollForTxReceipt(
           txHash,
           consistencyStrategy,
@@ -517,9 +587,45 @@ export class PluginLedgerConnectorBesu
         return { transactionReceipt: ledgerReceipt };
       default:
         throw new Error(
-          `${fnTag} Unrecognized ReceiptType: ${req.consistencyStrategy.receiptType}`,
+          `${fnTag} Unrecognized ReceiptType: ${request.consistencyStrategy.receiptType}`,
         );
     }
+  }
+
+  public async transactPrivate(options: any): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactPrivate()`;
+
+    if (!this.web3EEA) {
+      throw new Error(`${fnTag} Web3 EEA client not initialized.`);
+    }
+
+    const txHash = await this.web3EEA.eea.sendRawTransaction(options);
+
+    if (!txHash) {
+      throw new Error(`${fnTag} eea.sendRawTransaction provided no tx hash.`);
+    }
+    return this.getPrivateTxReceipt(options.privateFrom, txHash);
+  }
+
+  public async getPrivateTxReceipt(
+    privateFrom: string,
+    txHash: string,
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#getPrivateTxReceipt()`;
+
+    if (!this.web3EEA) {
+      throw new Error(`${fnTag} Web3 EEA client not initialized.`);
+    }
+
+    const txPoolReceipt = await this.web3EEA.priv.getTransactionReceipt(
+      txHash,
+      privateFrom,
+    );
+    if (!txPoolReceipt) {
+      throw new RuntimeError(`priv.getTransactionReceipt provided no receipt.`);
+    }
+
+    return { transactionReceipt: txPoolReceipt };
   }
 
   public async transactPrivateKey(
@@ -530,6 +636,25 @@ export class PluginLedgerConnectorBesu
     const {
       secret,
     } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+
+    // Run transaction to EEA client here if private transaction
+
+    if (req.privateTransactionConfig) {
+      const options = {
+        nonce: transactionConfig.nonce,
+        gasPrice: transactionConfig.gasPrice,
+        gasLimit: transactionConfig.gas,
+        to: transactionConfig.to,
+        value: transactionConfig.value,
+        data: transactionConfig.data,
+        privateKey: secret,
+        privateFrom: req.privateTransactionConfig.privateFrom,
+        privateFor: req.privateTransactionConfig.privateFor,
+        restriction: "restricted",
+      };
+
+      return this.transactPrivate(options);
+    }
 
     const signedTx = await this.web3.eth.accounts.signTransaction(
       transactionConfig,
@@ -551,7 +676,11 @@ export class PluginLedgerConnectorBesu
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactCactusKeychainRef()`;
-    const { transactionConfig, web3SigningCredential } = req;
+    const {
+      transactionConfig,
+      web3SigningCredential,
+      privateTransactionConfig,
+    } = req;
     const {
       ethAccount,
       keychainEntryKey,
@@ -569,6 +698,7 @@ export class PluginLedgerConnectorBesu
     const privateKeyHex = await keychainPlugin?.get(keychainEntryKey);
 
     return this.transactPrivateKey({
+      privateTransactionConfig,
       transactionConfig,
       web3SigningCredential: {
         ethAccount,
@@ -634,7 +764,11 @@ export class PluginLedgerConnectorBesu
         keychainPlugin,
         `${fnTag} keychain for ID:"${req.keychainId}"`,
       );
-
+      if (!keychainPlugin.has(req.contractName)) {
+        throw new Error(
+          `${fnTag} Cannot create an instance of the contract because the contractName and the contractName on the keychain does not match`,
+        );
+      }
       const networkId = await this.web3.eth.net.getId();
 
       const tmpContract = new this.web3.eth.Contract(req.contractAbi);
@@ -650,6 +784,7 @@ export class PluginLedgerConnectorBesu
       const web3SigningCredential = req.web3SigningCredential as
         | Web3SigningCredentialPrivateKeyHex
         | Web3SigningCredentialCactusKeychainRef;
+
       const runTxResponse = await this.transact({
         transactionConfig: {
           data,
@@ -663,6 +798,7 @@ export class PluginLedgerConnectorBesu
           timeoutMs: req.timeoutMs || 60000,
         },
         web3SigningCredential,
+        privateTransactionConfig: req.privateTransactionConfig,
       });
 
       const keychainHasContract = await keychainPlugin.has(contractName);

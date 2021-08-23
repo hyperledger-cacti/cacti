@@ -98,7 +98,7 @@ export class IpfsHttpClientMock implements IIpfsHttpClient {
     this.dag = {} as DAGAPI;
     this.dht = {} as DHTAPI;
     this.diag = {} as DiagAPI;
-    this.files = new FilesApiMock({ logLevel: this.options.logLevel });
+    this.files = new FilesApiMock({ logLevel: this.options.logLevel }) as any;
     this.key = {} as KeyAPI;
     this.log = {} as LogAPI;
     this.name = {} as NameAPI;
