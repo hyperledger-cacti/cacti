@@ -242,6 +242,8 @@ Run a Corda driver as follows:
  ```
  NETWORK_NAME=Corda_Network
  DRIVER_PORT=9099
+ DRIVER_RPC_USERNAME=driverUser1
+ DRIVER_RPC_PASSWORD=test
  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-corda-driver
  DOCKER_TAG=1.2.3
  EXTERNAL_NETWORK=corda_default
