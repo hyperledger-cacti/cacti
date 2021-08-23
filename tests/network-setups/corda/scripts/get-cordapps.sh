@@ -20,7 +20,7 @@ else
   if [ -f $file ]; then
     cp $file $cordaSimpleAppPath/
     cd $cordaSimpleAppPath
-    make build
+    make build || exit 1
     cd -
   else
     echo Please copy the github.properties.template file as github.properties and replace placeholders with Github credentials.
@@ -55,9 +55,9 @@ else
     pkgurl=`sed '/^\#/d' $file | grep 'url=' | cut -d "=" -f2-`
     baseUrl="$pkgurl/com/weaver"
     echo "Downloading Corda Interop App from $baseUrl ..."
-    (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/corda/app/interop/interop-contracts/$weaverVersion/interop-contracts-$weaverVersion.jar)
-    (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/corda/app/interop/interop-workflows/$weaverVersion/interop-workflows-$weaverVersion.jar)
-    (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/protos-java-kt/$weaverVersion/protos-java-kt-$weaverVersion.jar)
+    (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/corda/app/interop/interop-contracts/$weaverVersion/interop-contracts-$weaverVersion.jar) || exit 1
+    (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/corda/app/interop/interop-workflows/$weaverVersion/interop-workflows-$weaverVersion.jar) || exit 1
+    (cd $directory/../artifacts && curl --location -u $username:$password -O $baseUrl/protos-java-kt/$weaverVersion/protos-java-kt-$weaverVersion.jar) || exit 1
   else
     echo Please copy the github.properties.template file as github.properties and replace placeholders with Github credentials.
   fi
