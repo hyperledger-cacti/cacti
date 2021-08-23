@@ -12,36 +12,44 @@
 
 # Summary
 
-This document specifies the structure of a DLT network that seeks to interoperate with another using our specified protocols in the data and identity planes. In particular, it describes the components and artifacts that are necessary for the identity plane protocols that establish trust anchors for data plane protocols.
-
+This document specifies a component of a DLT network's participant unit that is responsible for exposing as well as consuming identity information with the help of IINs, and also act as a bridge between the data plane and the identity plane. The IIN Agent specifically interacts with the DID registry of the IINs, the trust anchors, and IIN agents of other networks' participant units to expose, discover and exchange identity information. The IIN agent also communicates with the data plane to read and configure data plane identity certificates and credentials.
 
 # Network Architecture with IIN Agents
 
-In our view, a DLT network seeking to interoperate with another using any of our protocols is composed of units that are consituent members of that network and are assumed to have identities independent of the network. Representing each unit in an IIN is an IIN Agent. We also assume that each nework unit is a root identity provider within its network. In Fabric: an MSP root CA server (typically, but not mandatorially, having a 1-1 relationship with an organization). In Corda: network root CA.
+In our view, a DLT network seeking to interoperate with another using any of our protocols is composed of units that are consituent members of that network, and are assumed to have identities independent of the network in the identity plane. Representing each unit in an IIN is an IIN Agent, managing the participant unit's DID. Furthermore, these IIN agents are used to discover, resolve, and verify other participant units' identities as well as network identities. We also assume that each nework unit is a root identity provider within the data plane of its DLT network. In Fabric: an MSP root CA server (typically, but not mandatorially, having a 1-1 relationship with an organization). In Corda: network root CA.
 
-This view is illustrated in the figure below, which maps quite naturally to Fabric networks where each organization is a unit, but is general enough to encompass other permissioned DLTs like Corda and Besu too.
+This view is illustrated in the figure below (Fig.1), which maps quite naturally to Fabric networks where each organization is a unit, but is general enough to encompass other permissioned DLTs like Corda and Besu too.
 
+
+<div align="center">
 <img src="../../resources/images/iin-augmented-network.jpg" width=60%>
+<br/>
+<figcaption>Fig.1 - IIN Agent.</figcaption>
+</div>
+<br/>
 
 
-# Ledger Artifacts
 
-The following artifacts are relevant to identity plane protocols:
-* _Identity trust store_: this is a set of mappings `<IIN>,<Steward-ID> --> [<<Network-ID>,DID>>,<<Network-ID><DID>>,....]|<Pattern>`. It implies that the network trusts a given steward in a given IIN to certify a set of network units. Each network unit can be described directly by the network ID and a DID or the set can be described using a pattern (like a regular expression; e.g., Kleene closure `*`). The IIN definition can additionally contain peer connectivity information (to access the IIN ledger) and the Steward definition can contain its agent's service endpoint. This data will be looked up in the identity sharing protocol, while fetching membership information for a foreign network. It can also be used in proof verification (or view validation) in data plane protocols.
-* _Foreign network identities and configurations_: these are [security groups](../security.md), containing identities and certificates corresponding to a foreign network's units. (_Each security group is augmented with a DID attribute denoting the identity owned by the IIN Agent associated with this network unit/security group_)
+# Data Plane Identity Artifacts
+
+The following artifacts in the data plane are relevant to identity plane protocols:
+* _Identity trust store_: this is a set of IINs and Trust anchors `<IIN>,<Trust-Anchor-DID>`. It implies that the network trusts a given trust anchor or all trust anchors in a given IIN to certify the identity/membership credentials of foreign network units. 
+<!-- * Each network unit can be described directly by the network ID and a DID or the set can be described using a pattern (like a regular expression; e.g., Kleene closure `*`).  -->
+* The IIN definition can additionally contain peer connectivity information (to access the IIN ledger). This data will be looked up in the identity sharing protocol, while fetching membership information for a foreign network. It can also be used in proof verification (or view validation) in data plane protocols.
+* _Foreign network identities and configurations_: these are [security groups](../security.md), containing identities and certificates corresponding to a foreign network's units. (_Each security group is augmented with a DID attribute denoting the identity owned by the IIN Agent associated with this network unit/security group_). The IIN Agent of the network participants together update these configurations from the identity plane information.
 
 
-# IIN Agent Definition and Bootstrap
+# Indy implementation of IIN Agent
 
 An IIN Agent represents a network unit that is also a self-certified identity provider for some subset of the network, as stated earlier in the summary. It is simultaneously an IIN (Indy) client and a network (Fabric, Corda, etc.) client. Therefore, there are different ways in which it can be implemented, but its core feature is that it lies within the trust boundary of a root identity provider of a network.
 
-Being an IIN client, the IIN Agent, like an [IIN Steward Agent](../iin-steward-agent.md), or some portion of it, must be built according to the canonical specification of an Indy Agent with the capability to create a wallet, interact with other agents (including stewards), and access an Indy ledger. Another portion of the IIN Agent must be built as a regular network client with the ability to exercise smart contracts for looking up and recording ledger data.
+Being an IIN client, the IIN Agent, like an [IIN Steward Agent](../iin-steward-agent.md), or some portion of it, must be built according to the canonical specification of an Indy Agent with the capability to create a wallet, interact with other agents (including stewards), and access an Indy ledger. These form the trust anchros in the IINs. Another portion of the IIN Agent must be built as a regular network client with the ability to exercise smart contracts for looking up and recording ledger data.
 
 The IIN Agent can be built and deployed in the following configurations:
 * As an augmentation of a network root identity provider or CA: in Fabric, this would mean augmenting the Fabric CA Server to perform the functions of an IIN Agent
 * As a separate service with a trusted communication channel (e.g., using gRPC) to a network root identity provider or CA
-* As two separate services, one resembling an IIN Steward Agent and another a network client (e.g., a Fabric Client SDK-based application). These two services will communicate with each other and with the network root identity provider or CA using a trusted communication channel
-(As you can see in the above diagram, there must be exactly one IIN Agent service, however configured, for every network unit)
+* As two separate services, one resembling an IIN Agent and another a network client (e.g., a Fabric Client SDK-based application). These two services will communicate with each other and with the network root identity provider or CA using a trusted communication channel
+(As shown in the above diagram (Fig.1), there must be exactly one IIN Agent service, however configured, for every network unit)
 
 ## Bootstrap/Initialize an IIN Agent
 * Start a [Hyperleder Aries](https://www.hyperledger.org/use/aries) service, which consists of a <_controller_, _agent_> pair, with the agent built using [Aries Cloud Agent - Python](https://github.com/hyperledger/aries-cloudagent-python) as it supports persistent storage. This service has the capability to communicate with other agents using the peer-to-peer Aries protocol. It is recommended that this service be launched in a Docker container. Post-launch, the following actions must be carried out:
@@ -61,4 +69,4 @@ The IIN Agent interacts with other IIN Agents in the following ways:
 * With local network agents: to launch or participate in a flow that collects a multi-signature over a foreign network's unit's security group
 * With foreign network agents: to request/offer membership and security group presentations, prove membership within its network, and prove ownership of a security group
 
-Details of these protocols can be found [here](../../protocols/id-config-sharing-protocol/README.md).
+Details of these protocols can be found [here](../../protocols/identity/readme.md).
