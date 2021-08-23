@@ -9,6 +9,7 @@ Copyright IBM Corp. All Rights Reserved.
 SPDX-License-Identifier: CC-BY-4.0
 -->
 
+<!--
 In this document, we detail the steps using which you can bring up networks using the default configuration settings and by fetching pre-built Weaver interoperation modules, SDK libraries, and relay docker image, drivers docker images from Github Package repositories. To customize these settings (e.g., hostnames, ports), refer to the [Advanced Configuration page](./advanced-configuration.md).
 
 _Note_: All components are run within Docker containers, except client applications.
@@ -355,3 +356,4 @@ cd tests/network-setups/fabric/dev
 make clean
 cd -
 ```
+-->
