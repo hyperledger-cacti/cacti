@@ -92,6 +92,8 @@ test(testCase, async (t: Test) => {
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
 
+  await connector.onPluginInit();
+
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
