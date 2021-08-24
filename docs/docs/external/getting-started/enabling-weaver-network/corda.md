@@ -308,7 +308,7 @@ To prepare your network for interoperation with a foreign network, you need to r
       "rules":
           [
               {
-                  "principal":"ExporterMSP",
+                  "principal":"PartyA",
                   "principalType":"ca",
                   "resource":"tradelogisticschannel:shipmentcc:GetBillOfLading:*",
                   "read":true
@@ -316,9 +316,28 @@ To prepare your network for interoperation with a foreign network, you need to r
           ]
   }
   ```
-  In this sample, a single rule is specified for requests coming from `trade-finance-network`: it states that a `GetBillOfLading` query made to the `shipmentcc` contract installed on the `tradelogisticschannel` channel is permitted for a requestor possessing credentials certified by an MSP with the `ExporterMSP` identity. The `*` at the end indicates that any arguments passed to the function will pass the access control check.
+  In this sample, a single rule is specified for requests coming from `trade-finance-network`: it states that a `GetBillOfLading` query made to the `shipmentcc` contract installed on the `tradelogisticschannel` channel is permitted for a requestor possessing credentials certified by an node with the `PartyA` identity. The `*` at the end indicates that any arguments passed to the function will pass the access control check.
+  If your remote network is **Fabric**, please check [here](./fabric.md#ledger-initialization) to record an access control policy in fabric network.
+  
+  If remote network is **Corda** then policy will look like:
+  ```json
+  {
+      "securityDomain":"trade-finance-network",
+      "rules":
+          [
+              {
+                  "principal":"<certificate-pem>",
+                  "principalType":"certificate",
+                  "resource":"exporternode:10003;carriernode:10003#com.mynetwork.flow.GetBillOfLading:*",
+                  "read":true
+              }
+          ]
+  }
+  ```
+  In this sample, a single rule is specified for requests coming from `trade-finance-network`: it states that a workflow call to `com.mynetwork.flow.GetBillOfLading` made to `exporter` node and `carrier` node of remote corda network is permitted for a requestor whose certificate is specified in `principal`. The `*` at the end indicates that any arguments passed to the function will pass the access control check.
 
-  You need to record this policy rule on your `trade-logistics-network` i.e. Fabric network's channel by invoking either the `CreateAccessControlPolicy` function or the `UpdateAccessControlPolicy` function on the Fabric Interoperation Chaincode that is already installed on that channel; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. In either case, the chaincode function will take a single argument, which is the policy in the form of a JSON string (make sure you escape the double quotes before sending the request to avoid parsing errors). You can do this in one of two ways: (1) writing a small piece of code in Layer-2 that invokes the contract using the Fabric SDK Gateway API, or (2) running a `peer chaincode invoke` command from within a Docker container built on the `hyperledger/fabric-tools` image. Either approach should be familiar to a Fabric practitioner.
+  You need to record this policy rule on your `trade-logistics-network` i.e. Corda network's vault by invoking either the `AccessControlPolicyManager.createAccessControlPolicyState` function or the `AccessControlPolicyManager.updateAccessControlPolicyState` function on the `weaver-corda-sdk`; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. The above JSON needs to be converted to profobuf object of `com.weaver.protos.common.access_control.AccessControl.AccessControlPolicy`, using google's protobuf library, and the object is the second argument of above functions (first being the instance of CordaRPCOps).
+  
 - **Verification policies**:
   Taking the same example as above, an example of a verification policy for a B/L requested by the `trade-finance-network` from the `trade-logistics-network` is as follows:
   ```json
@@ -341,7 +360,7 @@ To prepare your network for interoperation with a foreign network, you need to r
           ]
   }
   ```
-  In this sample, a single verification policy rule is specified for data views coming from `trade-logistics-network`: it states that the data returned by the `GetBillOfLading` query made to the `shipmentcc` chaincode on the `tradelogisticschannel` channel requires as proof two signatures, one from a peer in the organization whose MSP ID is `ExporterMSP` and another from a peer in the organization whose MSP ID is `CarrierMSP`.
+  In this sample, a single verification policy rule is specified for data views coming from `trade-logistics-network`: it states that the data returned by the `GetBillOfLading` query made to the `shipmentcc` chaincode on the `tradelogisticschannel` channel requires as proof two signatures, one from a peer in the organization whose MSP ID is `ExporterMSP` and another from a peer in the organization whose MSP ID is `CarrierMSP`. (Note: if remote network is corda, the resource from access control policy can be used here as pattern, along with changing the node names in criteria.)
 
   You need to record this policy rule on your Corda network's vault by invoking corda sdk's function `VerificationPolicyManager.createVerificationPolicyState(proxy, verificationPolicyProto)`, where `proxy` is an instance of `CordaRPCOps` as described in previous sections, and `verificationPolicyProto` is an object of protobuf `com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass.VerificationPolicy`. Refer [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/common/protos/common/verification_policy.proto) for protos details. Google's protobuf library can be used to convert above JSON to protobuf object.
 
