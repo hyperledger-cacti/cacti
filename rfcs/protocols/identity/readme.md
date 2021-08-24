@@ -146,53 +146,71 @@ Example NetworkDID creation request:
 
 ```json
 {
-  "id": "did:<iin_name>:<network_name>",
-  "networkParticipants": [
-    "did:<iin_name>:<network_participant_1>",
-    "did:<iin_name>:<network_participant_2>",
-    "did:<iin_name>:<network_participant_3>"
-  ],
-  "verificationMethod": [{
-      "id": "did:<iin_name>:<network_name>#multisig",
-      "type": "BlockchainNetworkMultiSig",
-      "controller": "did:<iin_name>:<network_name>",
-      "multisigKeys": [
-        "did:<iin_name>:<network_participant_1>#key1",
-        "did:<iin_name>:<network_participant_2>#key3",
-        "did:<iin_name>:<network_participant_3>#key1"
-      ],
-      "updatePolicy": {
-        "id": "did:<iin_name>:<network_name>#updatepolicy",
+  "NetworkDIDDocument": {
+    "id": "did:<iin_name>:<network_name>",
+    "networkParticipants": [
+      "did:<iin_name>:<network_participant_1>",
+      "did:<iin_name>:<network_participant_2>",
+      "did:<iin_name>:<network_participant_3>"
+    ],
+    "verificationMethod": [{
+        "id": "did:<iin_name>:<network_name>#multisig",
+        "type": "BlockchainNetworkMultiSig",
         "controller": "did:<iin_name>:<network_name>",
-        "type": "VerifiableCondition2021",
-        "conditionAnd": [{
-            "id": "did:<iin_name>:<network_name>#updatepolicy-1",
-            "controller": "did:<iin_name>:<network_name>",
-            "type": "VerifiableCondition2021",
-            "conditionOr": ["did:<iin_name>:<network_participant_3>#key1",
-              "did:<iin_name>:<network_participant_2>#key3"
-            ]
-          },
-          "did:<iin_name>:<network_participant_1>#key1"
-        ]
-      }
-    },
+        "multisigKeys": [
+          "did:<iin_name>:<network_participant_1>#key1",
+          "did:<iin_name>:<network_participant_2>#key3",
+          "did:<iin_name>:<network_participant_3>#key1"
+        ],
+        "updatePolicy": {
+          "id": "did:<iin_name>:<network_name>#updatepolicy",
+          "controller": "did:<iin_name>:<network_name>",
+          "type": "VerifiableCondition2021",
+          "conditionAnd": [{
+              "id": "did:<iin_name>:<network_name>#updatepolicy-1",
+              "controller": "did:<iin_name>:<network_name>",
+              "type": "VerifiableCondition2021",
+              "conditionOr": ["did:<iin_name>:<network_participant_3>#key1",
+                "did:<iin_name>:<network_participant_2>#key3"
+              ]
+            },
+            "did:<iin_name>:<network_participant_1>#key1"
+          ]
+        }
+      },
 
-    {
-      "id": "did:<iin_name>:<network_name>#fabriccerts",
-      "type": "DataplaneCredentials",
-      "controller": "did:<iin_name>:<network_name>",
-      "FabricRootCertificates": {
-        "did:<iin_name>:<network_participant_1>": "Certificate3_Hash",
-        "did:<iin_name>:<network_participant_2>": "Certificate2_Hash",
-        "did:<iin_name>:<network_participant_3>": "Certificate3_Hash"
+      {
+        "id": "did:<iin_name>:<network_name>#fabriccerts",
+        "type": "DataplaneCredentials",
+        "controller": "did:<iin_name>:<network_name>",
+        "FabricCredentials": {
+          "did:<iin_name>:<network_participant_1>": "Certificate3_Hash",
+          "did:<iin_name>:<network_participant_2>": "Certificate2_Hash",
+          "did:<iin_name>:<network_participant_3>": "Certificate3_Hash"
+        }
       }
-    }
-  ],
-  "authentication": [
-    "did:<iin_name>:<network_name>#multisig"
-  ]
+    ],
+    "authentication": [
+      "did:<iin_name>:<network_name>#multisig"
+    ],
+    "relayEndpoints": [{
+        "hostname": "10.0.0.8",
+        "port": "8888"
+      },
+      {
+        "hostname": "10.0.0.9",
+        "port": "8888"
+      }
+
+    ]
+  },
+  "signatures": {
+    "did:<iin_name>:<network_participant_1>": "...",
+    "did:<iin_name>:<network_participant_2>": "...",
+    "did:<iin_name>:<network_participant_3>": "..."
+  }
 }
+
 ```
 
 How this request is created is out of the scopt of this specification. However, generally it is recommended that the signatures of the request are collected through a smart contract in the network blockchain itself.
@@ -255,7 +273,7 @@ After discovery of the network and fetching the Network DID document, the authen
 
 ## Data Plane Identity Configuration
 
-A single participant unit cannot update a foreign network identity information in the network's ledger. This needs agreement among the participanting units. This agreement is ensured through collection of signatures through an application level flow as discussed in detail [here](./data-plane-identity-configuration.md).
+After foreign network identities are validated, it has to be configured in the data plane for interoperation. A single participant unit cannot update identity information in the network's ledger. This needs agreement among all the participanting units. This agreement is ensured through collection of signatures through an application level flow as discussed in detail [here](./data-plane-identity-configuration.md).
 
 ## Updating Network DID with changing Network Structure
 

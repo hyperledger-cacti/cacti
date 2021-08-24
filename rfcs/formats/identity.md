@@ -132,6 +132,10 @@ In Fabric, each participant unit has a Membership Service Provider (MSP) that ha
 Therefore for Fabric, `[PLATFORM]Credentials`  will be `FabricCredentials`: Map of participant unit DID to Hash of fabric root certificates of the participant.
 
 
+### relayEndpoints
+
+This is a special property required for Network DIDs that specify addresses of the [relays](../models/relays.md) in the data plane that can be used for interoperation. It is a list of relayEndpoint objects containing `hostname` and `port` of the relay.
+
 
 
 ### Example of Network DID format:
@@ -183,6 +187,17 @@ Therefore for Fabric, `[PLATFORM]Credentials`  will be `FabricCredentials`: Map 
   ],
   "authentication": [
     "did:<iin_name>:<network_name>#multisig"
+  ],
+  "relayEndpoints": [
+    {
+      "hostname":"10.0.0.8",
+      "port":"8888"
+    },
+    {
+      "hostname":"10.0.0.9",
+      "port":"8888"
+    }
+
   ]
 }
 ```
