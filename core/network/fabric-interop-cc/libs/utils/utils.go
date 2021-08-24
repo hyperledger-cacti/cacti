@@ -13,8 +13,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
-    "github.com/hyperledger/fabric-chaincode-go/pkg/cid"
-    pb "github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 )
 
 func GetInteropChaincodeIDKey() string {
@@ -63,7 +63,7 @@ func IsClientRelay(stub shim.ChaincodeStubInterface) (bool, error) {
 	// check if caller certificate has the attribute "relay"
 	// we don't care about the actual value of the attribute for now
 	_, ok, err := cid.GetAttributeValue(stub, "relay")
-    return ok, err
+	return ok, err
 }
 
 // Access guard for Weaver relay requests: return 'true' only if access should be permitted
