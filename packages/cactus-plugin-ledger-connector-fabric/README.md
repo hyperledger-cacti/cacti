@@ -10,6 +10,7 @@ This plugin provides `Cactus` a way to interact with Fabric networks. Using this
   - [Getting Started](#getting-started)
   - [Architecture](#architecture)
   - [Usage](#usage)
+  - [Identity Providers](#identity-providers)
   - [Runing the tests](#running-the-tests)
   - [Built With](#built-with)
   - [Prometheus Exporter](#prometheus-exporter)
@@ -43,6 +44,10 @@ The above diagram shows the sequence diagram of run-transaction-endpoint. User A
 ![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
 The above diagram shows the sequence diagraom of transact() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the invocationType (FabricContractInvocationType.CALL, FabricCOntractInvocationType.SEND), corresponding responses are send back to the caller.
 
+![run-transaction-endpoint-enroll](docs/architecture/images/run-transaction-endpoint-enroll.png)
+
+The above diagram shows the sequence diagraom of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509 .. more in TODO), corresponding identity is enrolled and stored inside keychain. 
+
 ## Usage
 
 To use this import public-api and create new **PluginLedgerConnectorFabric** and **ChainCodeCompiler**.
@@ -66,8 +71,131 @@ For compile the chaincodes:
   const result = await compiler.compile(opts);
 ```
 
+To support signing of message with multiple identity types
+```typescript
+// vault server config for supporting vault identity provider
+const vaultConfig:IVaultConfig = {
+  endpoint : "http://localhost:8200",
+  transitEngineMountPath: "/transit",
+}
+// provide list of identity signing to be supported
+const supportedIdentity:FabricSigningCredentialType[] = [FabricSigningCredentialType.VaultX509,FabricSigningCredentialType.X509]
+const pluginOptions:IPluginLedgerConnectorFabricOptions = {
+  // other options
+  vaultConfig : vaultConfig,
+  supportedIdentity:supportedIdentity
+  // .. other options
+}
+const connector: PluginLedgerConnectorFabric = new PluginLedgerConnectorFabric(pluginOptions);
+```
+
+To enroll an identity
+```typescript
+await connector.enroll(
+        {
+          keychainId: "keychain-identifier-for storing-certData",
+          keychainRef: "cert-data-identifier",
+          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
+
+          // require in case of vault
+          vaultTransitKey: {
+            token: "vault-token",
+            keyName: "vault-key-label",
+          },
+        },
+        {
+          enrollmentID: "client2",
+          enrollmentSecret: "pw",
+          mspId: "Org1MSP",
+          caId: "ca.org1.example.com",
+        },
+      );
+```
+To Register an identity using register's key
+```typescript
+const secret = await connector.register(
+        {
+          keychainId: "keychain-id-that-store-certData-of-registrar",
+          keychainRef: "certData-label",
+          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
+
+          // require in case of vault
+          vaultTransitKey: {
+            token: testToken,
+            keyName: registrarKey,
+          },
+        },
+        {
+          enrollmentID: "client-enrollmentID",
+          enrollmentSecret: "pw",
+          affiliation: "org1.department1",
+        },
+        "ca.org1.example.com", // caID
+      );
+```
+
+To transact with fabric
+```typescript
+const resp = await connector.transact{
+  signingCredential: {
+          keychainId: keychainId,
+          keychainRef: "client-certData-id",
+          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
+
+          // require in case of vault
+          vaultTransitKey: {
+            token: testToken,
+            keyName: registrarKey,
+          },
+        },
+        // .. other options
+}
+```
+
+To Rotate the key
+```typescript
+await connector.rotateKey(
+  {
+        keychainId: keychainId,
+        keychainRef: "client-certData-id",
+        type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
+
+        // require in case of vault
+        vaultTransitKey: {
+          token: testToken,
+          keyName: registrarKey,
+        },
+  },
+  {
+      enrollmentID: string;
+      enrollmentSecret: string;
+      caId: string;
+  }
+)
+```
 
 > Extensive documentation and examples in the [readthedocs](https://readthedocs.org/projects/hyperledger-cactus/) (WIP)
+## Identity Providers
+
+Identity providers allows client to manage their private more effectively and securely. Cactus Fabric Connector support multiple type of providers. Each provider differ based upon where the private are stored. On High level certificate credential are stored as
+
+```typescript
+{  
+  type: FabricSigningCredentialType;
+  credentials: {
+    certificate: string;
+    // if identity type is IdentityProvidersType.X509
+    privateKey?: string;
+  };
+  mspId: string;
+}
+```
+
+Currently Cactus Fabric Connector supports following Identity Providers
+
+- X509 : Simple and unsecured provider wherein `private` key is stored along with certificate in some `datastore`. Whenever connector require signature on fabric message, private key is brought from the `datastore` and message signed at the connector.
+- Vault-X.509 : Secure provider wherein `private` key is stored with vault's transit transit engine and certificate in `certDatastore`. Rather then bringing the key to the connector, message digest are sent to the vault server which returns the `signature`.
+- WS-X.509 (Future Work) : Secure provider wherein `private` key is stored with `client` and certificate in `certDatastore`. To get the fabric messages signed, message digest is sent to the client via `webSocket` connection opened by the client in the beginning.
 
 ## Running the tests
 

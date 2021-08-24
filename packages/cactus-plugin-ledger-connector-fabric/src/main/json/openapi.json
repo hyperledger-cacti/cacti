@@ -31,6 +31,40 @@
     ],
     "components": {
         "schemas": {
+            "VaultTransitKey" : {
+                "type": "object",
+                "nullable": false,
+                "required": [
+                    "keyName",
+                    "token"
+                ],
+                "properties": {
+                    "keyName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false,
+                        "description": "label of private key"
+                    },
+                    "token": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false,
+                        "description": "token for accessing private key"
+                    }
+                },
+                "description": "vault key details for signing fabric message with private key stored with transit engine."
+            },
+            "FabricSigningCredentialType" : {
+                "type": "string",
+                "enum": [
+                    "X.509",
+                    "Vault-X.509"
+                ],
+                "nullable": false,
+                "description": "different type of identity provider for singing fabric messages supported by this package"
+            },
             "FabricSigningCredential": {
                 "type": "object",
                 "required": [
@@ -49,6 +83,14 @@
                         "minLength": 1,
                         "maxLength": 100,
                         "nullable": false
+                    },
+                    "type" : {
+                        "$ref" : "#/components/schemas/FabricSigningCredentialType",
+                        "description" : "singing identity type to be used for signing fabric message , by by default default is supported"
+                    },
+                    "vaultTransitKey" : {
+                        "$ref" : "#/components/schemas/VaultTransitKey",
+                        "properties" : "vault key details , if Vault-X.509 identity provider to be used for singing fabric messages"
                     }
                 }
             },
