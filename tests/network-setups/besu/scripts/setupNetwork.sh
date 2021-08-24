@@ -49,8 +49,6 @@ cp ../../artifacts/network$1/config1.toml .
 sed -i 's,miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",miner-coinbase="'"${firstNode}"'",g' config1.toml
 
 # Run for other nodes:
-#bootnodeID=$(curl -X POST --data '{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}' http://127.0.0.1:8545 | python3 -c "import sys, json; print(json.load(sys.stdin)['result'])")
-
 cd ../Node-2/
 cp ../../artifacts/network$1/config2.toml .
 sed -i 's,miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",miner-coinbase="'"${firstNode}"'",g' config2.toml
@@ -66,30 +64,25 @@ sed -i 's,miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",miner-coin
 cd ../../SampleBesuNetwork$1
 
 # User instructions
-#echo "To complete the setup of the SampleBesuNetwork do the following:" 
-#echo "Open five terminals and run these:"
 echo "Five tmux sessions will be started for Network $1 to run EthSigner and the four validator nodes: EthSigner_session and Node1_session to Node4_session"
 
-#chainId=$(($1 + 1336)) # chainId starts from 1337 for Network 1 and increments by 1 for each network
-#downstreamPort=$((1000*$1 + 7590)) #downstream port i.e., port for Node-1, is 8590 for Network 1 and increments by 1000 for each network
-#tmux new-session -d -s EthSigner_session 'ethsigner --chain-id='${chainId}' --downstream-http-port='${downstreamPort}' multikey-signer --directory=keys/'
+#Terminal 1: Run ethsigner
 tmux new-session -d -s Network$1_EthSigner_session 'ethsigner --config-file=configEthSigner.toml multikey-signer --directory=keys/'
-#echo "Terminal 1: Go to the SampleBesuNetwork folder; Run ethsigner --chain-id=1337 --downstream-http-port=8590 multikey-signer --directory=keys/"
 
+#Terminal 2: Go to SampleBesuNetwork/Node-1/; Run besu --config-file=config1.toml"
 tmux new-session -d -s Network$1_Node1_session 'cd Node-1/; besu --config-file=config1.toml'
-#echo "Terminal 2: Go to SampleBesuNetwork/Node-1/; Run besu --config-file=config1.toml"
 
 # Wait 10 seconds for the first Node to start
 sleep 10s
 
+#Terminal 3: Go to SampleBesuNetwork/Node-2/; Assign bootnodeID=$(curl -X POST --data '"'"'{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}'"'"' http://127.0.0.1:8545 | python3 -c "import sys, json; print(json.load(sys.stdin)['"'"'result'"'"'])");(bootnodeID value is without the semi-colon) Run besu --config-file=config2.toml --bootnodes=$bootnodeID'
 tmux new-session -d -s Network$1_Node2_session 'bash ../scripts/Node_session.sh 2 '"$1"
-#echo 'Terminal 3: Go to SampleBesuNetwork/Node-2/; Assign bootnodeID=$(curl -X POST --data '"'"'{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}'"'"' http://127.0.0.1:8545 | python3 -c "import sys, json; print(json.load(sys.stdin)['"'"'result'"'"'])");(bootnodeID value is without the semi-colon) Run besu --config-file=config2.toml --bootnodes=$bootnodeID'
 
+#Terminal 4: Go to SampleBesuNetwork/Node-3/; Assign bootnodeID=$(curl -X POST --data '"'"'{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}'"'"' http://127.0.0.1:8545 | python3 -c "import sys, json; print(json.load(sys.stdin)['"'"'result'"'"'])");(bootnodeID value is without the semi-colon) Run besu --config-file=config3.toml --bootnodes=$bootnodeID'
 tmux new-session -d -s Network$1_Node3_session 'bash ../scripts/Node_session.sh 3 '"$1"
-#echo 'Terminal 4: Go to SampleBesuNetwork/Node-3/; Assign bootnodeID=$(curl -X POST --data '"'"'{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}'"'"' http://127.0.0.1:8545 | python3 -c "import sys, json; print(json.load(sys.stdin)['"'"'result'"'"'])");(bootnodeID value is without the semi-colon) Run besu --config-file=config3.toml --bootnodes=$bootnodeID'
 
+#Terminal 5: Go to SampleBesuNetwork/Node-4/; Assign bootnodeID=$(curl -X POST --data '"'"'{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}'"'"' http://127.0.0.1:8545 | python3 -c "import sys, json; print(json.load(sys.stdin)['"'"'result'"'"'])");(bootnodeID value is without the semi-colon) Run besu --config-file=config4.toml --bootnodes=$bootnodeID'
 tmux new-session -d -s Network$1_Node4_session 'bash ../scripts/Node_session.sh 4 '"$1"
-#echo 'Terminal 5: Go to SampleBesuNetwork/Node-4/; Assign bootnodeID=$(curl -X POST --data '"'"'{"jsonrpc":"2.0","method":"net_enode","params":[],"id":1}'"'"' http://127.0.0.1:8545 | python3 -c "import sys, json; print(json.load(sys.stdin)['"'"'result'"'"'])");(bootnodeID value is without the semi-colon) Run besu --config-file=config4.toml --bootnodes=$bootnodeID'
 
 echo "Running a tmux ls after starting the five sessions"
 tmux ls

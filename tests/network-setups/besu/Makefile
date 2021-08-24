@@ -6,8 +6,12 @@ start-network1:
 start-network2:
 	bash scripts/setupNetwork.sh 2
 
-test:
+test: test-network1 test-network2
+
+test-network1:
 	bash scripts/testSetup.sh 1 8545
+
+test-network2:
 	bash scripts/testSetup.sh 2 9544
 
 clean: clean-network1 clean-network2
