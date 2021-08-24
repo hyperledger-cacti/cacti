@@ -58,15 +58,6 @@ func init() {
 	queryCmd.Flags().String("debug", "false", "shows debug logs when running. Disabled by default. To enable --debug=true")
 }
 
-/*func setLogLevel(lvl log.Level) {
-	switch lvl {
-	case log.DebugLevel:
-		log.SetLevel(log.DebugLevel)
-	case log.InfoLevel:
-		log.SetLevel(log.InfoLevel)
-	}
-}*/
-
 func chaincodeQuery(args []string, localNetwork string, username string, logDebug string) error {
 	if len(args) < 4 {
 		return fmt.Errorf("not enough arguements supplied")
@@ -74,7 +65,7 @@ func chaincodeQuery(args []string, localNetwork string, username string, logDebu
 	currentLogLevel := log.GetLevel()
 
 	if logDebug == "true" {
-		setLogLevel(log.DebugLevel)
+		helpers.SetLogLevel(log.DebugLevel)
 		log.Debug("debugging is enabled")
 	}
 
@@ -94,18 +85,19 @@ func chaincodeQuery(args []string, localNetwork string, username string, logDebu
 		return fmt.Errorf("failed unmarshalling arguement: %s", args[3])
 	}
 
+	userNetwork := username + "@org1." + localNetwork + ".com"
 	query := helpers.QueryType{
 		ContractName: args[1],
 		Channel:      args[0],
 		CcFunc:       args[2],
 		Args:         arrayArgs,
 	}
-	_, err = helpers.Invoke(query, netConfig.ConnProfilePath, localNetwork, netConfig.MspId, username)
+	_, err = helpers.Invoke(query, netConfig.ConnProfilePath, localNetwork, netConfig.MspId, userNetwork)
 	if err != nil {
 		return err
 	}
 
 	// restore the original log level
-	setLogLevel(currentLogLevel)
+	helpers.SetLogLevel(currentLogLevel)
 	return nil
 }

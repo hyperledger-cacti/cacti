@@ -11,14 +11,20 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
+	"time"
 
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/proto"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/interoperablehelper"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
-	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/cmd"
 	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers"
 	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers/interopsetup"
 )
@@ -49,90 +55,131 @@ func connectSimpleStateWithSDK() {
 }
 
 func connectSimpleAssetWithSDK(assetId string) {
-	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
 	query := helpers.QueryType{
 		ContractName: "simpleasset",
 		Channel:      "mychannel",
 		CcFunc:       "GetAllAssets",
 		Args:         []string{},
 	}
-	result, err := helpers.Query(query, connProfilePath, "network1", "Org1MSP", "")
+	_, err := helpers.Query(query, connProfilePath, "network1", "Org1MSP", "")
 	if err != nil {
 		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
-	log.Printf("%s helpers.Query result: %s", query.CcFunc, string(result))
 
-	// result, err = contract.SubmitTransaction("CreateAsset", "t1", assetId, "User1", "Treasury", "500", "02 Dec 29 15:04 MST")
-	// if err != nil {
-	// 	log.Fatalf("failed Invoke with error: %+v", err)
-	// }
-	// log.Println(string(result))
-
-	/*query = helpers.QueryType{
-		ContractName: "simpleasset",
-		Channel:      "mychannel",
-		CcFunc:       "CreateAsset",
-		Args:         []string{"t1", assetId + "3", "User1", "Treasury", "455", "02 Dec 29 15:04 MST"},
-	}
-	result, err = helpers.Invoke(query, connProfilePath, "network1", "Org1MSP", "")
-	if err != nil {
-		log.Fatalf("%s helpers.Invoke error: %+v", query.CcFunc, err.Error())
-	}
-	log.Printf("%s helpers.Invoke %v", query.CcFunc, string(result))*/
-
-	result, err = interopsetup.HelperInvoke("CreateAsset", []string{"t1", assetId, "User1", "Treasury", "455", "02 Dec 29 15:04 MST"}, "simpleasset", "mychannel", connProfilePath, "network1")
+	query.CcFunc = "CreateAsset"
+	query.Args = []string{"t1", assetId, "User1", "Treasury", "500", "02 Dec 29 15:04 MST"}
+	_, err = helpers.Invoke(query, connProfilePath, "network1", "Org1MSP", "")
 	if err != nil {
 		log.Fatalf("%s helpers.Invoke error: %s", query.CcFunc, err.Error())
 	}
-	log.Printf("%s helpers.Invoke %v", query.CcFunc, string(result))
 
-	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
-	result, err = contract.EvaluateTransaction("ReadAsset", "t1", assetId, "true")
+	query.CcFunc = "ReadAsset"
+	query.Args = []string{"t1", assetId, "true"}
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", "")
 	if err != nil {
-		log.Fatalf("failed Query with error: %s", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
-	log.Println(string(result))
 
-	/*result, err = contract.SubmitTransaction("CreateTokenAssetType", "token1", "Central Bank", "1")
+	query.CcFunc = "CreateTokenAssetType"
+	query.Args = []string{"token1", "Central Bank", "1"}
+	_, err = helpers.Invoke(query, connProfilePath, "network1", "Org1MSP", "")
 	if err != nil {
-		log.Fatalf("failed Invoke with error: %+v", err)
+		log.Fatalf("%s helpers.Invoke error: %s", query.CcFunc, err.Error())
 	}
-	log.Println(string(result))
 
-	result, err = contract.SubmitTransaction("IssueTokenAssets", "token1", "5", "User1")
+	query.CcFunc = "IssueTokenAssets"
+	query.Args = []string{"token1", "5", "User1"}
+	_, err = helpers.Invoke(query, connProfilePath, "network1", "Org1MSP", "")
 	if err != nil {
-		log.Fatalf("failed Invoke with error: %+v", err)
+		log.Fatalf("%s helpers.Invoke error: %s", query.CcFunc, err.Error())
 	}
-	log.Println(string(result))
 
-	result, err = contract.EvaluateTransaction("GetBalance", "token1", "User1")
+	query.CcFunc = "GetBalance"
+	query.Args = []string{"token1", "User1"}
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", "")
 	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
-	log.Println(string(result))
-	*/
 }
 
-/*
+func registerEvent(contract *gateway.Contract, eventName string) (fab.Registration, <-chan *fab.CCEvent, error) {
+	reg, notifier, errEventRegistration := contract.RegisterEvent(eventName)
+	if errEventRegistration != nil {
+		log.Errorf("failed to register contract event: %s", errEventRegistration)
+	}
+
+	return reg, notifier, errEventRegistration
+}
+
+func receiveEvent(notifier <-chan *fab.CCEvent, eventName string) {
+
+	var ccEvent *fab.CCEvent
+	select {
+	case ccEvent = <-notifier:
+		{
+			log.Infof("received CC event: %#v", ccEvent)
+			if eventName == "LockAsset" || eventName == "ClaimAsset" || eventName == "UnlockAsset" {
+				contractInfo := &common.AssetContractHTLC{}
+				err := proto.Unmarshal(ccEvent.Payload, contractInfo)
+				if err != nil {
+					log.Errorf("failed to unmarshal event: %+v", err)
+				}
+				log.Debugf("received CC event %s is: %+v\n", ccEvent.EventName, contractInfo)
+			} else if eventName == "LockFungibleAsset" || eventName == "ClaimFungibleAsset" || eventName == "UnlockFungibleAsset" {
+				contractInfo := &common.FungibleAssetContractHTLC{}
+				err := proto.Unmarshal(ccEvent.Payload, contractInfo)
+				if err != nil {
+					log.Errorf("failed to unmarshal event: %+v", err)
+				}
+				log.Debugf("received CC event %s is: %+v\n", ccEvent.EventName, contractInfo)
+			}
+		}
+	case <-time.After(time.Second * 20):
+		log.Errorf("did NOT receive CC event for eventName(%s)\n", eventName)
+	}
+}
+
 func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 
-	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
-	if err != nil {
-		log.Fatalf("failed FabricHelper with error: %+v", err)
+	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	query := helpers.QueryType{
+		ContractName: "simpleasset",
+		Channel:      "mychannel",
+		CcFunc:       "",
+		Args:         []string{},
 	}
-	contractU2, idU2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com", "connection-org1.yaml")
+	user1Network1 := "User1@org1.network1.com"
+	user2Network1 := "Admin@org1.network1.com"
+
+	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user1Network1)
 	if err != nil {
-		log.Fatalf("failed FabricHelper with error: %+v", err)
+		log.Fatalf("failed FabricHelper with error: %s", err.Error())
+	}
+	idU1, err := helpers.GetIdentityFromWallet(wallet1, user1Network1)
+	if err != nil {
+		log.Fatalf("failed to get identity for %s with error: %s", user1Network1, err.Error())
+	}
+	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user2Network1)
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %s", err.Error())
+	}
+	idU2, err := helpers.GetIdentityFromWallet(wallet2, user2Network1)
+	if err != nil {
+		log.Fatalf("failed to get identity for %s with error: %s", user2Network1, err.Error())
 	}
 
 	// register for chaincode event
-	reg, notifier, errEventRegistration := registerEvent(contractU2, "LockAsset")
+	eventName := "LockAsset"
+	reg, notifier, errEventRegistration := registerEvent(contractU2, eventName)
 	defer contractU2.Unregister(reg)
 
 	fmt.Println("Going to create asset ", assetId)
-	err = helpers.Invoke(contractU2, "CreateAsset", "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), "Treasury", "500", "02 Dec 29 15:04 MST")
+	query.CcFunc = "CreateAsset"
+	query.Args = []string{"t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), "Treasury", "500", "02 Dec 29 15:04 MST"}
+	_, err = helpers.Invoke(query, connProfilePath, "network1", "Org1MSP", user2Network1)
 	if err != nil {
-		log.Fatalf("failed Invoke with error: %+v", err)
+		log.Fatalf("%s helpers.Invoke error: %s", query.CcFunc, err.Error())
 	}
 
 	preimage := "abcd"
@@ -141,47 +188,50 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 	expiryTimeSecs := currentTimeSecs + 600
 
 	log.Println("Going to lock asset by locker ..")
-	result, err := am.CreateHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	result, err := am.CreateHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
 	if err != nil {
 		log.Fatalf("failed CreateHTLC with error: %+v", err)
 	}
 	log.Println(result)
 
 	if errEventRegistration == nil {
-		receiveEvent(notifier)
+		receiveEvent(notifier, eventName)
 	}
 
-	err = helpers.Query(contractU2, "ReadAsset", "t1", assetId, "false")
+	query.CcFunc = "ReadAsset"
+	query.Args = []string{"t1", assetId, "false"}
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", user2Network1)
 	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
 
 	log.Println("Going to query if asset is locked using locker ..")
-	result, err = am.IsAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	result, err = am.IsAssetLockedInHTLC(contractU2, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
 		log.Fatalf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 	log.Println("Going to query if asset is locked using recipient ..")
-	result, err = am.IsAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	result, err = am.IsAssetLockedInHTLC(contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
 	if err != nil {
 		log.Fatalf("failed IsAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 
 	log.Println("Going to claim a locked asset by recipient ..")
-	result, err = am.ClaimAssetInHTLC(am.NewGatewayContractInterface(), contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(preimage)))
+	result, err = am.ClaimAssetInHTLC(contractU1, "t1", assetId, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)), base64.StdEncoding.EncodeToString([]byte(preimage)))
 	if err != nil {
 		log.Fatalf("failed ClaimAssetInHTLC with error: %+v", err)
 	}
 	log.Println(result)
-	err = helpers.Query(contractU1, "ReadAsset", "t1", assetId, "false")
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", user1Network1)
 	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
 
 }
 
+/*
 func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 
 	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
@@ -373,33 +423,58 @@ func testLockAssetAndUnlockAssetUsingContractIdOfBondAsset(assetId string) {
 	}
 
 }
+*/
 
 func testLockAssetAndClaimAssetOfTokenAsset() {
 
 	assetType := "token1"
 	numUnits := uint64(5)
-	contractU1, idU1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "User1@org1.network1.com", "connection-org1.yaml")
-	if err != nil {
-		log.Fatalf("failed FabricHelper with error: %+v", err)
+
+	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	query := helpers.QueryType{
+		ContractName: "simpleasset",
+		Channel:      "mychannel",
+		CcFunc:       "",
+		Args:         []string{},
 	}
-	contractU2, idU2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", "../../../tests/network-setups/fabric/shared", "network1", "Org1MSP", "Admin@org1.network1.com", "connection-org1.yaml")
+	user1Network1 := "User1@org1.network1.com"
+	user2Network1 := "Admin@org1.network1.com"
+
+	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user1Network1)
 	if err != nil {
-		log.Fatalf("failed FabricHelper with error: %+v", err)
+		log.Fatalf("failed FabricHelper with error: %s", err.Error())
+	}
+	idU1, err := helpers.GetIdentityFromWallet(wallet1, user1Network1)
+	if err != nil {
+		log.Fatalf("failed to get identity for %s with error: %s", user1Network1, err.Error())
+	}
+	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user2Network1)
+	if err != nil {
+		log.Fatalf("failed FabricHelper with error: %s", err.Error())
+	}
+	idU2, err := helpers.GetIdentityFromWallet(wallet2, user2Network1)
+	if err != nil {
+		log.Fatalf("failed to get identity for %s with error: %s", user2Network1, err.Error())
 	}
 
 	// register for chaincode event
-	reg, notifier, errEventRegistration := registerEvent(contractU2, "LockFungibleAsset")
+	eventName := "LockFungibleAsset"
+	reg, notifier, errEventRegistration := registerEvent(contractU2, eventName)
 	defer contractU2.Unregister(reg)
 
 	fmt.Println("Going to create token assets: ", numUnits)
-	err = helpers.Invoke(contractU2, "IssueTokenAssets", assetType, "6", base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	query.CcFunc = "IssueTokenAssets"
+	query.Args = []string{assetType, "6", base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate))}
+	_, err = helpers.Invoke(query, connProfilePath, "network1", "Org1MSP", user2Network1)
 	if err != nil {
-		log.Fatalf("failed Invoke with error: %+v", err)
+		log.Fatalf("%s helpers.Invoke error: %s", query.CcFunc, err.Error())
 	}
 	log.Println("Query the token balance for locker after issueance ..")
-	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	query.CcFunc = "GetBalance"
+	query.Args = []string{assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate))}
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", user2Network1)
 	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
 
 	preimage := "abcd"
@@ -408,7 +483,7 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	expiryTimeSecs := currentTimeSecs + 600
 
 	log.Println("Going to lock asset by locker ..")
-	result, err := am.CreateFungibleHTLC(am.NewGatewayContractInterface(), contractU2, assetType, numUnits, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
+	result, err := am.CreateFungibleHTLC(contractU2, assetType, numUnits, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)), hashBase64, expiryTimeSecs)
 	if err != nil {
 		log.Fatalf("failed CreateFungibleHTLC with error: %+v", err)
 	}
@@ -416,52 +491,57 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	contractId := result
 
 	if errEventRegistration == nil {
-		receiveEvent(notifier)
+		receiveEvent(notifier, eventName)
 	}
 
 	log.Println("Query the token balance for locker before claim ..")
-	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	query.CcFunc = "GetBalance"
+	query.Args = []string{assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate))}
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", user2Network1)
 	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
 	log.Println("Query the token balance for recipient before claim ..")
-	err = helpers.Query(contractU1, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
+	query.Args = []string{assetType, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate))}
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", user1Network1)
 	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
 
 	log.Println("Locker going to query if asset is locked ..")
-	result, err = am.IsFungibleAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU2, contractId)
+	result, err = am.IsFungibleAssetLockedInHTLC(contractU2, contractId)
 	if err != nil {
 		log.Fatalf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 	log.Println("Recipient going to query if asset is locked ..")
-	result, err = am.IsFungibleAssetLockedInHTLC(am.NewGatewayContractInterface(), contractU1, contractId)
+	result, err = am.IsFungibleAssetLockedInHTLC(contractU1, contractId)
 	if err != nil {
 		log.Fatalf("failed IsFungibleAssetLockedInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 
 	log.Println("Going to claim a locked asset by recipient ..")
-	result, err = am.ClaimFungibleAssetInHTLC(am.NewGatewayContractInterface(), contractU1, contractId, base64.StdEncoding.EncodeToString([]byte(preimage)))
+	result, err = am.ClaimFungibleAssetInHTLC(contractU1, contractId, base64.StdEncoding.EncodeToString([]byte(preimage)))
 	if err != nil {
 		log.Fatalf("failed ClaimAssetInHTLC with error: %+v", err)
 	}
 	log.Println(result)
 	log.Println("Query the token balance for locker after claim..")
-	err = helpers.Query(contractU2, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate)))
+	query.Args = []string{assetType, base64.StdEncoding.EncodeToString([]byte(idU2.Credentials.Certificate))}
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", user2Network1)
 	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
 	log.Println("Query the token balance for recipient after claim..")
-	err = helpers.Query(contractU1, "GetBalance", assetType, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate)))
+	query.Args = []string{assetType, base64.StdEncoding.EncodeToString([]byte(idU1.Credentials.Certificate))}
+	_, err = helpers.Query(query, connProfilePath, "network1", "Org1MSP", user2Network1)
 	if err != nil {
-		log.Fatalf("failed Query with error: %+v", err)
+		log.Fatalf("%s helpers.Query error: %s", query.CcFunc, err.Error())
 	}
-
 }
 
+/*
 func testLockAssetAndUnlockAssetOfTokenAsset() {
 
 	assetType := "token1"
@@ -703,22 +783,19 @@ func main() {
 
 	//interop("a", "network1", "Org1MSP", "localhost:9080/network1/mychannel:simplestate:Read:a")
 
-	args := []string{".set_env"}
-	cmd.SetFile(args)
-
 	//configureNetwork("network1")
 	//fetchAccessControlPolicy("network1")
 	//fetchMembership("network1")
 	//fetchVerificationPolicy("network1")
 
 	//connectSimpleStateWithSDK() // needs the chaincode simplestate on the channel
-	//connectSimpleAssetWithSDK("a001") // needs the chaincode simpleasset on the channel
-	//testLockAssetAndClaimAssetOfBondAsset("a020")  // needs the chaincodes simpleasset and interop on the channel
+	//connectSimpleAssetWithSDK("a001")             // needs the chaincode simpleasset on the channel
+	////testLockAssetAndClaimAssetOfBondAsset("a020") // needs the chaincodes simpleasset and interop on the channel
 	//testLockAssetAndUnlockAssetOfBondAsset("a021") // needs the chaincodes simpleasset and interop on the channel
 
 	//testLockAssetAndClaimAssetUsingContractIdOfBondAsset("a040")  // needs the chaincodes simpleasset and interop on the channel
 	//testLockAssetAndUnlockAssetUsingContractIdOfBondAsset("a041") // needs the chaincodes simpleasset and interop on the channel
 
-	//testLockAssetAndClaimAssetOfTokenAsset()  // needs the chaincodes simpleasset and interop on the channel
+	testLockAssetAndClaimAssetOfTokenAsset() // needs the chaincodes simpleasset and interop on the channel
 	//testLockAssetAndUnlockAssetOfTokenAsset() // needs the chaincodes simpleasset and interop on the channel
 }

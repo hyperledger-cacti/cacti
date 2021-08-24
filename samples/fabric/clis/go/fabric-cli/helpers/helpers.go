@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package helpers
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
@@ -174,4 +175,22 @@ func AddData(filename string, connProfilePath string, networkName string, query 
 	}
 
 	return nil
+}
+
+// function to generate a "SHA256" hash in base64 format for a given preimage
+func GenerateSHA256HashInBase64Form(preimage string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(preimage))
+	shaHash := hasher.Sum(nil)
+	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
+	return shaHashBase64
+}
+
+func SetLogLevel(lvl log.Level) {
+	switch lvl {
+	case log.DebugLevel:
+		log.SetLevel(log.DebugLevel)
+	case log.InfoLevel:
+		log.SetLevel(log.InfoLevel)
+	}
 }
