@@ -1,0 +1,5 @@
+# Ethsigner Config
+
+chain-id="1338"
+downstream-http-port="9590"
+http-listen-port="9544" # 9545 seems to be taken by something in Truffle 
