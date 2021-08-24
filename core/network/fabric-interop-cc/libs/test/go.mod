@@ -1,4 +1,4 @@
-module github.com/VRamakrishna/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/test
+module github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/test
 
 go 1.16
 
