@@ -22,3 +22,6 @@ export {
   ICompilationOptions,
   ICompilationResult,
 } from "./chain-code-compiler";
+
+export { IVaultConfig } from "./identity/identity-provider";
+export { IIdentityData } from "./identity/internal/cert-datastore";
