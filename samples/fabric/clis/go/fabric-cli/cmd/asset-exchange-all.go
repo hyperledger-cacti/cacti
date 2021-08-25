@@ -88,6 +88,14 @@ func init() {
 
 func assetExchangeAllSteps(network1, network2, secret string, timeout, twiceTimeout uint64, logDebug string, args []string) error {
 
+	currentLogLevel := log.GetLevel()
+	changedLogLevel := false
+	if logDebug == "true" && currentLogLevel != log.DebugLevel {
+		changedLogLevel = true
+		helpers.SetLogLevel(log.DebugLevel)
+		log.Debug("debugging is enabled")
+	}
+
 	var hashSecretBase64 string
 	if secret == "" {
 		log.Fatal("--secret needs to be specified")
@@ -196,6 +204,11 @@ func assetExchangeAllSteps(network1, network2, secret string, timeout, twiceTime
 		return fmt.Errorf("could not claim asset in %s", network1)
 	}
 	log.Infof("asset claimed: %s", result)
+
+	if changedLogLevel {
+		// restore the original log level
+		helpers.SetLogLevel(currentLogLevel)
+	}
 
 	return nil
 }

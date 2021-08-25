@@ -63,8 +63,9 @@ func chaincodeQuery(args []string, localNetwork string, username string, logDebu
 		return fmt.Errorf("not enough arguements supplied")
 	}
 	currentLogLevel := log.GetLevel()
-
-	if logDebug == "true" {
+	changedLogLevel := false
+	if logDebug == "true" && currentLogLevel != log.DebugLevel {
+		changedLogLevel = true
 		helpers.SetLogLevel(log.DebugLevel)
 		log.Debug("debugging is enabled")
 	}
@@ -97,7 +98,9 @@ func chaincodeQuery(args []string, localNetwork string, username string, logDebu
 		return err
 	}
 
-	// restore the original log level
-	helpers.SetLogLevel(currentLogLevel)
+	if changedLogLevel {
+		// restore the original log level
+		helpers.SetLogLevel(currentLogLevel)
+	}
 	return nil
 }
