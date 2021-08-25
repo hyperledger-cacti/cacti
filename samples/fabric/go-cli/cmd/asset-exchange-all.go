@@ -35,7 +35,7 @@ var exchangeAllCmd = &cobra.Command{
 	Long: `Perform asset exchange 'all steps' using single command
 
 Example:
-  fabric-cli asset exchange --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:Type1:a04:alice:token1:100`,
+  fabric-cli asset exchange-all --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:Type1:a04:alice:token1:100`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		network1, _ := cmd.Flags().GetString("network1")
