@@ -28,6 +28,12 @@ var ValidKeys = []string{
 	"CONFIG_PATH",
 }
 
+// Valid keys for config
+var ConfigKeys = []string{
+	"connProfilePath",
+	"relayEndpoint",
+}
+
 type NetworkConfig struct {
 	RelayEndPoint   string `json:"relayEndPoint"`
 	ConnProfilePath string `json:"connProfilePath"`
