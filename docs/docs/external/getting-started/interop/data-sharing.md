@@ -22,11 +22,11 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network1`, relay, and driver)
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following:
-  * Host Deployment:
+  * If Relays and Drivers are deployed in the host machine:
     ```bash
     ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
     ```
-  * Dockerized Deployment:
+  * If Relays and Drivers are deployed in the Docker containers:
     ```bash
     ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a
     ```
@@ -39,11 +39,11 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network2`, relay, and driver)
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following:
-  * Host Deployment:
+  * If Relays and Drivers are deployed in the host machine:
     ```bash
     ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus
     ```
-  * Dockerized Deployment:
+  * If Relays and Drivers are deployed in the Docker containers:
     ```bash
     ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
     ```
@@ -59,11 +59,11 @@ To test the scenario where `network1` requests the value of the state (key) `H` 
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - Run the following:
-  * Host Deployment:
+  * If Relays and Drivers are deployed in the host machine:
     ```bash
     ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
     ```
-  * Dockerized Deployment:
+  * If Relays and Drivers are deployed in the Docker containers:
     ```bash
     ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
     ```
@@ -77,11 +77,11 @@ To test the scenario where `network2` requests the value of the state (key) `H` 
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - Run the following:
-  * Host Deployment:
+  * If Relays and Drivers are deployed in the host machine:
     ```bash
     ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
     ```
-  * Dockerized Deployment:
+  * If Relays and Drivers are deployed in the Docker containers:
     ```bash
     ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
     ```
@@ -97,11 +97,11 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - Run the following:
-  * Host Deployment:
+  * If Relays and Drivers are deployed in the host machine:
     ```bash
     ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
     ```
-  * Dockerized Deployment:
+  * If Relays and Drivers are deployed in the Docker containers:
     ```bash
     ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
     ```
@@ -115,11 +115,11 @@ To test the scenario where `network2` requests the value of the state (key) `a` 
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - Run the following:
-  * Host Deployment:
+  * If Relays and Drivers are deployed in the host machine:
     ```bash
     ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
     ```
-  * Dockerized Deployment:
+  * If Relays and Drivers are deployed in the Docker containers:
     ```bash
     ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a
     ```

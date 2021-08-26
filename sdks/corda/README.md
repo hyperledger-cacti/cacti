@@ -10,7 +10,7 @@ interop calls.
 
 ## Setup
 
-### Build Locally:
+### Alternative 1: Build Locally:
 
 Build Weaver dependencies:
 ```
@@ -28,7 +28,7 @@ To build the SDK locally (delete `github.properties` if present, else it will tr
 make build
 ```
 
-### Build with Github Packages
+### Alternative 2:  Build with Github Packages
 
 To build the driver executable using dependencies from Github Packages, follow the steps:
 * Create a Personal Access Token with write, read, and delete packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
@@ -43,11 +43,11 @@ make build
 **NOTE:** If you see compile errors about classes not being found, it may be that gradle
 hasn't downloaded the required dependencies. To install the dependencies (with or without Github Packages support), run:
 
-**FOR DEVS:** Now you can run `make publish` as well to publish it to Github Packages, but never publish directly to `hyperledger-labs`. Always first test it by publishing to your own fork, then create a PR to merge your changes, and then you can publish. To publish to your own fork, change `url` in `github.properties`, and replace `hyperledger-labs` with your github username.
-
 ```
 make build-refresh-dependencies[-local]
 ```
+
+**FOR DEVS:** Now you can run `make publish` as well to publish it to Github Packages, but never publish directly to `hyperledger-labs`. Always first test it by publishing to your own fork, then create a PR to merge your changes, and then you can publish. To publish to your own fork, change `url` in `github.properties`, and replace `hyperledger-labs` with your github username.
 
 ## Usage
 

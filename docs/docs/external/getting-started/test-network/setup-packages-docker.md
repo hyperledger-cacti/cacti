@@ -73,46 +73,14 @@ The code for this lies in the `core/relay` folder.
 
 Navigate to the `core/relay` folder and run a relay as follows:
 
-* Run: `make convert-compose-method2` to uncomment and comment some lines.
-* For `network1`, create a `.env.n1` file by copying `.env.template.2` and set values as (_Values are given wrt our testnet deployed completely in docker_):
- ```
- PATH_TO_REMOTE_RELAYS_DEFINITIONS=./docker/remote-relay-dns-config
- NETWORK_NAME=network1
- NETWORK_TYPE=Fabric
- DRIVER_HOST=fabric-driver-network1
- DRIVER_PORT=9090
- DRIVER_NAME=fabric-driver-network1
- RELAY_NAME=relay-network1
- RELAY_PORT=9080
- DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-relay-server
- DOCKER_TAG=1.2.1
- EXTERNAL_NETWORK=network1_net
- COMPOSE_PROJECT_NAME=network1
- COMPOSE_PROJECT_NETWORK=net
- ```
-* For `network2`, create a `.env.n2` file by copying `.env.template.2` and set values as:
- ```
- PATH_TO_REMOTE_RELAYS_DEFINITIONS=./docker/remote-relay-dns-config
- NETWORK_NAME=network2
- NETWORK_TYPE=Fabric
- DRIVER_HOST=fabric-driver-network2
- DRIVER_PORT=9095
- DRIVER_NAME=fabric-driver-network2
- RELAY_NAME=relay-network2
- RELAY_PORT=9083
- DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-relay-server
- DOCKER_TAG=1.2.1
- EXTERNAL_NETWORK=network2_net
- COMPOSE_PROJECT_NAME=network2
- COMPOSE_PROJECT_NETWORK=net
- ```
-* To deploy the relay for `network1`, run:
+* Run: `make convert-compose-method2` to uncomment and comment some lines in `docker-compose.yaml`.
+* For `network1`, there's `.env.n1` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
  ```bash
- make start-server COMPOSE_ARG='--env-file .env.n1'
+ make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
  ```
-* To deploy the relay for `network2`, run:
+ * For `network2`, there's `.env.n2` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
  ```bash
- make start-server COMPOSE_ARG='--env-file .env.n2'
+ make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
  ```
 
 For more information, see the [relay-docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/relay/relay-docker.md).
@@ -124,41 +92,15 @@ The code for this lies in the `core/drivers/fabric-driver` folder.
 
 Following steps demonstrate how to run a fabric driver in docker container (_replace `<PATH-TO-WEAVER>` with location of the clone of your weaver_).
 - Navigate to the `core/drivers/fabric-driver` folder.
-- For `network1`, create a `.env.n1` file by copying `.env.docker.template` and set values as:
- ```
- CONNECTION_PROFILE=<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.docker.json
- DRIVER_CONFIG=./config.json
- RELAY_ENDPOINT=relay-network1:9080
- NETWORK_NAME=network1
- DRIVER_PORT=9090
- INTEROP_CHAINCODE=interop
- DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-fabric-driver
- DOCKER_TAG=1.2.1
- EXTERNAL_NETWORK=network1_net
- COMPOSE_PROJECT_NAME=network1
- COMPOSE_PROJECT_NETWORK=net
- ```
-- For `network2`, create a `.env.n2` file by copying `.env.docker.template` and set values as:
- ```
- CONNECTION_PROFILE=<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.docker.json
- DRIVER_CONFIG=./config.json
- RELAY_ENDPOINT=relay-network2:9083
- NETWORK_NAME=network2
- DRIVER_PORT=9095
- INTEROP_CHAINCODE=interop
- DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-fabric-driver
- DOCKER_TAG=1.2.1
- EXTERNAL_NETWORK=network2_net
- COMPOSE_PROJECT_NAME=network2
- COMPOSE_PROJECT_NETWORK=net
- ```
-- Run following to start the fabric-driver for `network1`:
+- For `network1`, there's `.env.n1` file in `docker-testnet-envs` directory, that will be used to start a fabric driver in docker. Edit that file and replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder.
+- Repeat above step for `.env.n2` file in `docker-testnet-envs` directory, that will be used to start fabric driver for `network2` in docker.
+- To deploy fabric driver for `network1`, run:
  ```bash
- make deploy COMPOSE_ARG='--env-file .env.n1'
+ make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
  ```
-- Run following to start the fabric-driver for `network2`:
+- To deploy fabric driver for `network2`, run:
  ```bash
- make deploy COMPOSE_ARG='--env-file .env.n2'
+ make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
  ```
  
 ### Fabric Client (Application)
@@ -180,7 +122,7 @@ You can install `fabric-cli` as follows:
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
 - Run the following to install dependencies:
 ```bash
-npm install
+make build
 ```
 - Use the `fabric-cli` executable in the `bin` folder for subsequent actions.
 
@@ -211,51 +153,22 @@ If the Corda node and notary start up successfully, you should something like th
 ### Corda Relay
 
 Navigate to the `core/relay` folder and run a relay for `Corda_Network` in docker as follows:
-* Run: `make convert-compose` to uncomment and comment some lines.
-* Copy `.env.template.2` file to `.env.corda`.
-* Update following Environment Variables in `.env.corda` (_Values are given wrt our testnet deployed completely in docker_) :
- ```
- PATH_TO_REMOTE_RELAYS_DEFINITIONS=./docker/remote-relay-dns-config
- NETWORK_NAME=Corda_Network
- NETWORK_TYPE=Corda
- DRIVER_HOST=corda-driver-Corda_Network
- DRIVER_PORT=9099
- DRIVER_NAME=corda-driver-Corda_Network
- RELAY_NAME=relay-corda
- RELAY_PORT=9081
- DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-relay-server
- DOCKER_TAG=1.2.1
- EXTERNAL_NETWORK=corda_default
- COMPOSE_PROJECT_NAME=corda
- COMPOSE_PROJECT_NETWORK=default
- ```
-* To deploy the relay, run:
+* Run: `make convert-compose-method2` to uncomment and comment some lines in `docker-compose.yaml`.
+* There's `.env.corda` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
  ```bash
- make start-server COMPOSE_ARG='--env-file .env.corda'
+ make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
  ```
 
 ### Corda Driver
 
 Run a Corda driver as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
-- Create a `.env` file by copying `.env.docker.template` and set values as:
- ```
- NETWORK_NAME=Corda_Network
- DRIVER_PORT=9099
- DRIVER_RPC_USERNAME=driverUser1
- DRIVER_RPC_PASSWORD=test
- DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-corda-driver
- DOCKER_TAG=1.2.3
- EXTERNAL_NETWORK=corda_default
- COMPOSE_PROJECT_NAME=corda
- COMPOSE_PROJECT_NETWORK=default
- ```
-- To start the corda driver, run:
+- There's a `.env.corda` file in `docker-testnet-envs` directory, that will be used to start a corda driver in docker. To deploy, run:
  ```bash
- make deploy
+ make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
  ```
 
-If the driver starts successfully, it should log the following message:
+If the driver starts successfully, it should log the following message, when you run `docker logs corda-driver-Corda_Network`:
 ```
 Corda driver gRPC server started. Listening on port 9099
 ```

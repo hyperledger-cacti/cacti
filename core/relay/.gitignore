@@ -5,6 +5,3 @@ proto-rs/*
 !proto-rs/.gitkeep
 /db
 .env
-.env.n1
-.env.n2
-.env.corda
