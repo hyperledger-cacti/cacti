@@ -5,5 +5,5 @@ clean:
 	rm -rf ./bin
 
 .PHONY: build
-build:
+build: clean
 	go build -o ./bin/fabric-cli fabric-cli.go

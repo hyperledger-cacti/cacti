@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
 )
 
 // helper functions to log and return errors

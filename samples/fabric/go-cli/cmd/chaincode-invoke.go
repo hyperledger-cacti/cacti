@@ -19,8 +19,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
 	"github.com/spf13/cobra"
-	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers"
 
 	log "github.com/sirupsen/logrus"
 )

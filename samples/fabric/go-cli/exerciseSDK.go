@@ -25,8 +25,8 @@ import (
 	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/interoperablehelper"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
-	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers"
-	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers/interopsetup"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers/interopsetup"
 )
 
 func connectSimpleStateWithSDK() {

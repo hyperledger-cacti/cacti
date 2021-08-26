@@ -1,4 +1,4 @@
-module github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli
+module github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli
 
 go 1.16
 

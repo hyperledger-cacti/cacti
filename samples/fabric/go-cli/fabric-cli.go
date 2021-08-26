@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/cmd"
+import "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/cmd"
 
 func main() {
 	cmd.Execute()

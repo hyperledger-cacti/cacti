@@ -22,10 +22,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
 	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers"
 )
 
 // exchangeStepCmd represents the exchange-step command

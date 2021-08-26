@@ -100,14 +100,15 @@ func AddAssets(dataFilePath, networkName, connProfilePath string, query QueryTyp
 		}
 		log.Debugf("assetJson: %v", assetJson)
 
-		_, _, wallet, err := FabricHelper(NewGatewayNetworkInterface(), channelName, contractName, connProfilePath, networkName, mspId, assetJson["owner"].(string))
+		assetOwner := assetJson["owner"].(string) + "@org1." + networkName + ".com"
+		_, _, wallet, err := FabricHelper(NewGatewayNetworkInterface(), channelName, contractName, connProfilePath, networkName, mspId, assetOwner)
 		if err != nil {
 			return logThenErrorf("failed helpers.FabricHelper with error: %s", err.Error())
 		}
 
-		identity, err := wallet.Get(assetJson["owner"].(string))
+		identity, err := wallet.Get(assetOwner)
 		if err != nil {
-			return logThenErrorf("fetching username %s from wallet error: %s", assetJson["owner"].(string), err.Error())
+			return logThenErrorf("fetching username %s from wallet error: %s", assetOwner, err.Error())
 		}
 
 		certificate := identity.(*gateway.X509Identity).Certificate()
@@ -121,7 +122,7 @@ func AddAssets(dataFilePath, networkName, connProfilePath string, query QueryTyp
 		}
 
 		log.Debugf("query: %+v", currentQuery)
-		_, err = Invoke(currentQuery, connProfilePath, networkName, mspId, assetJson["owner"].(string))
+		_, err = Invoke(currentQuery, connProfilePath, networkName, mspId, assetOwner)
 		if err != nil {
 			logThenErrorf("%s Invoke error: %s", query.CcFunc, err.Error())
 		}

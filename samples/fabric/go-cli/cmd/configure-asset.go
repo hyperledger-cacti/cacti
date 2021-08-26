@@ -26,7 +26,7 @@ var assetCmd = &cobra.Command{
 	Long: `Configure for asset networks
 
 Example:
-  fabric-cli configure asset all --target-network=network1 --type=bond	`,
+  fabric-cli configure asset add --target-network=network1 --type=bond --data-file=src/data/assets.json`,
 	//Run: func(cmd *cobra.Command, args []string) {
 	//	fmt.Println("asset called")
 	//},

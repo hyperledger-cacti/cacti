@@ -18,12 +18,12 @@ package cmd
 import (
 	log "github.com/sirupsen/logrus"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
 	"github.com/spf13/cobra"
-	"github.com/weaver-dlt-interoperability/samples/fabric/clis/go/fabric-cli/helpers"
 )
 
-// addCmd represents the add command
-var addCmd = &cobra.Command{
+// assetAddCmd represents the asset add command
+var assetAddCmd = &cobra.Command{
 	Use:   "add --target-network=<network-name> --type=<bond|token --data-file=<path-to-data-file>>",
 	Short: "adds assets to asset network",
 	Long: `Adds assets to asset network
@@ -66,9 +66,9 @@ Example:
 }
 
 func init() {
-	assetCmd.AddCommand(addCmd)
+	assetCmd.AddCommand(assetAddCmd)
 
-	addCmd.Flags().String("target-network", "", "target-network network for command. <network1|network2>")
-	addCmd.Flags().String("type", "", "Type of network <bond|token>")
-	addCmd.Flags().String("data-file", "", "Path to data file which stores assets in json format")
+	assetAddCmd.Flags().String("target-network", "", "target-network network for command. <network1|network2>")
+	assetAddCmd.Flags().String("type", "", "Type of network <bond|token>")
+	assetAddCmd.Flags().String("data-file", "", "Path to data file which stores assets in json format")
 }

@@ -1,15 +1,15 @@
 {
-  "a03": {
+  "a030": {
     "assetType": "bond01",
-    "id": "a03",
+    "id": "a030",
     "owner": "User1",
     "issuer": "treasury",
     "facevalue": "500",
     "maturitydate": "01 Jan 22 00:00 MST"
   },
-  "a04": {
+  "a0400": {
     "assetType": "bond01",
-    "id": "a04",
+    "id": "a0400",
     "owner": "Admin",
     "issuer": "treasury",
     "facevalue": "700",
