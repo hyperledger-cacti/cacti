@@ -181,9 +181,9 @@ Bring down the various components as follows (_Navigate to the root folder of we
 To bring down the relays (for all 3 networks), run:
 ```bash
 cd core/relay
-make stop COMPOSE_ARG='--env-file .env.n1'
-make stop COMPOSE_ARG='--env-file .env.n2'
-make stop COMPOSE_ARG='--env-file .env.corda'
+make stop COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
+make stop COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
+make stop COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
 cd -
 ```
 
@@ -191,8 +191,8 @@ cd -
 To bring down the fabric drivers (for both networks), run:
 ```bash
 cd core/drivers/fabric-driver
-make stop COMPOSE_ARG='--env-file .env.n1'
-make stop COMPOSE_ARG='--env-file .env.n2'
+make stop COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
+make stop COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
 cd -
 ```
 
@@ -200,7 +200,7 @@ cd -
 To bring down the corda driver, run:
 ```bash
 cd core/drivers/corda-driver
-make stop
+make stop '--env-file docker-testnet-envs/.env.corda'
 cd -
 ```
 
