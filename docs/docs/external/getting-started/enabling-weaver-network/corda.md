@@ -310,25 +310,7 @@ To prepare your network for interoperation with a foreign network, you need to r
       "rules":
           [
               {
-                  "principal":"PartyA",
-                  "principalType":"ca",
-                  "resource":"tradelogisticschannel:shipmentcc:GetBillOfLading:*",
-                  "read":true
-              }
-          ]
-  }
-  ```
-  In this sample, a single rule is specified for requests coming from `trade-finance-network`: it states that a `GetBillOfLading` query made to the `shipmentcc` contract installed on the `tradelogisticschannel` channel is permitted for a requestor possessing credentials certified by a node with the `PartyA` identity. The `*` at the end indicates that any arguments passed to the function will pass the access control check.
-  If your remote network is built on **Fabric**, please check [here](./fabric.md#ledger-initialization) for instructions to record an access control policy in it.
-  
-  If remote network is built on **Corda** then the policy rule will look like:
-  ```json
-  {
-      "securityDomain":"trade-finance-network",
-      "rules":
-          [
-              {
-                  "principal":"<certificate-pem>",
+                  "principal":"<PartyA-certificate-pem>",
                   "principalType":"certificate",
                   "resource":"exporternode:10003;carriernode:10003#com.mynetwork.flow.GetBillOfLading:*",
                   "read":true
@@ -338,7 +320,7 @@ To prepare your network for interoperation with a foreign network, you need to r
   ```
   In this sample, a single rule is specified for requests coming from `trade-finance-network`: it states that a workflow call to `com.mynetwork.flow.GetBillOfLading` made to `exporter` and `carrier` nodes of remote Corda network is permitted for a requestor whose certificate is specified in the `principal` attribute. The `*` at the end indicates that any arguments passed to the function will pass the access control check. The `exporternode:10003` and `carriernode:10003` are of form `<hostname/IP>:<RPC_Port>`, for `exporter` and `carrier` nodes respectively in the remote Corda network.
 
-  You need to record this policy rule on your `trade-logistics-network` i.e. Corda network's vault by invoking either the `AccessControlPolicyManager.createAccessControlPolicyState` function or the `AccessControlPolicyManager.updateAccessControlPolicyState` function on the `weaver-corda-sdk`; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. The above JSON needs to be converted to profobuf object of `com.weaver.protos.common.access_control.AccessControl.AccessControlPolicy`, using google's protobuf library, and the object is the second argument of above functions (first being the instance of CordaRPCOps).
+  You need to record this policy rule on your Corda network's vault by invoking either the `AccessControlPolicyManager.createAccessControlPolicyState` function or the `AccessControlPolicyManager.updateAccessControlPolicyState` function on the `weaver-corda-sdk`; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. The above JSON needs to be converted to protobuf object of `com.weaver.protos.common.access_control.AccessControl.AccessControlPolicy`, using google's protobuf library, and the object is the second argument of above functions (first being the instance of CordaRPCOps).
   
 - **Verification policies**:
   Taking the same example as above, an example of a verification policy for a B/L requested by the `trade-finance-network` from the `trade-logistics-network` is as follows:
