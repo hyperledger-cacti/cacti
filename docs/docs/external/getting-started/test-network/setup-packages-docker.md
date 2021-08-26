@@ -150,6 +150,8 @@ If the Corda node and notary start up successfully, you should something like th
 
 ![Corda network startup screenshot](/setup-assets/Corda_network.jpg)
 
+It's safe to press `Ctrl-C` here, as what you are seeing are the container logs.
+
 ### Corda Relay
 
 Navigate to the `core/relay` folder and run a relay for `Corda_Network` in docker as follows:
