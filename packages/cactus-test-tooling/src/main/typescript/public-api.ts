@@ -51,6 +51,20 @@ export {
 } from "./fabric/fabric-test-ledger-v1";
 
 export {
+  IrohaTestLedger,
+  IIrohaTestLedgerOptions,
+  IROHA_TEST_LEDGER_DEFAULT_OPTIONS,
+  IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
+} from "./iroha/iroha-test-ledger";
+
+export {
+  PostgresTestContainer,
+  IPostgresTestContainerConstructorOptions,
+  POSTGRES_TEST_CONTAINER_DEFAULT_OPTIONS,
+  POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA,
+} from "./postgres/postgres-test-container";
+
+export {
   CactusKeychainVaultServer,
   ICactusKeychainVaultServerOptions,
   K_DEFAULT_KEYCHAIN_VAULT_HTTP_PORT,
