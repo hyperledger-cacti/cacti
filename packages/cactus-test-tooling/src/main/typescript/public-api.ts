@@ -131,6 +131,11 @@ export {
   RustcContainer,
 } from "./rustc-container/rustc-container";
 
+export {
+  ISubstrateTestLedgerOptions,
+  SubstrateTestLedger,
+} from "./substrate-test-ledger/substrate-test-ledger";
+
 export { RustcBuildCmd } from "./rustc-container/rustc-build-cmd";
 
 export { Streams } from "./common/streams";

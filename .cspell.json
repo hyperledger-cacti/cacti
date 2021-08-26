@@ -21,6 +21,7 @@
         "cids",
         "Corda",
         "Cordapp",
+        "couchdb",
         "dclm",
         "DHTAPI",
         "DockerOde",
