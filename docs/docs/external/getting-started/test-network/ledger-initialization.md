@@ -34,12 +34,12 @@ Prepare `fabric-cli` for configuration as follows:
     - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
     - Otherwise, leave the default values unchanged.
 - Create a `.env` file by copying `.env.template` and setting following parameter values (_replace `<PATH-TO-WEAVER>` with the location of your clone of weaver_):
-  * For Host deployment:
+  * If Relays and Drivers are deployed in the host machine:
     ```
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials
     CONFIG_PATH=./config.json
     ```
-  * For Dockerized deployment:
+  * If Relays and Drivers are deployed in the Docker containers:
     ```
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials_docker
     CONFIG_PATH=./config.json
@@ -74,11 +74,11 @@ Just as we did for either Fabric network, the Corda network ledger (or _vault_ o
 Bootstrap the Corda network and application states as follows:
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following: 
-  * For host deployment:
+  * If Relays and Drivers are deployed in the host machine:
     ```bash
     make initialise-vault
     ```
-  * For dockerized deployment:
+  * If Relays and Drivers are deployed in the Docker containers:
     ```bash
     make initialise-vault-docker
     ```
