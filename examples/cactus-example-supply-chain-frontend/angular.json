@@ -12,8 +12,14 @@
       "schematics": {},
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
+            "customWebpackConfig": {
+              "path": "./webpack.config.overrides.js",
+              "mergeRules": {
+                "externals": "replace"
+              }
+            },
             "outputPath": "www",
             "index": "src/index.html",
             "main": "src/main.ts",

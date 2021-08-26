@@ -1,13 +1,13 @@
 {
   "name": "@hyperledger/cactus-plugin-consortium-manual",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A web service plugin that provides management capabilities on a Cactus consortium as a whole for administrative purposes.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-consortium-manual.node.umd.min.js",
   "browser": "dist/cactus-plugin-consortium-manual.web.umd.js",
   "browserMinified": "dist/cactus-plugin-consortium-manual.web.umd.min.js",
   "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/types/main/typescript/index.d.ts",
+  "types": "dist/lib/main/typescript/index.d.ts",
   "files": [
     "dist/*"
   ],
@@ -72,9 +72,9 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.7.0",
-    "@hyperledger/cactus-core": "0.7.0",
-    "@hyperledger/cactus-core-api": "0.7.0",
+    "@hyperledger/cactus-common": "0.8.0",
+    "@hyperledger/cactus-core": "0.8.0",
+    "@hyperledger/cactus-core-api": "0.8.0",
     "axios": "0.21.1",
     "body-parser": "1.19.0",
     "express": "4.17.1",

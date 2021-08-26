@@ -97,8 +97,12 @@ enum Web3SigningCredentialType {
     NONE = 'NONE'
 }
 ```
+
 > Extensive documentation and examples in the [readthedocs](https://readthedocs.org/projects/hyperledger-cactus/) (WIP) 
 
+
+## Transaction Privacy Feature
+Private transactions using Besu are currently enabled.
 
 ### Building/running the container image locally
 

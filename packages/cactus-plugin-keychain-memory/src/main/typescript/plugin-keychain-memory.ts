@@ -58,6 +58,7 @@ export class PluginKeychainMemory {
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+    this.prometheusExporter.startMetricsCollection();
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
     this.log.warn(

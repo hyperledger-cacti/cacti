@@ -17,6 +17,7 @@ import {
 
 import { DefaultApi } from "@hyperledger/cactus-plugin-keychain-vault";
 import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
+import path from "path";
 
 test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   const vaultTestContainer = new VaultTestServer({});
@@ -57,9 +58,18 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   });
   const apiClient = new DefaultApi(configuration);
 
+  const pluginsPath = path.join(
+    __dirname, // start at the current file's path
+    "../../../../../../", // walk back up to the project root
+    ".tmp/test/cmd-api-server/remote-plugin-imports_test", // the dir path from the root
+    uuidv4(), // then a random directory to ensure proper isolation
+  );
+  const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
+
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+  apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;

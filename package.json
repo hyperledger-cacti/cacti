@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "run-ci": "./tools/ci.sh",
+    "reset": "git clean -f -X && yarn run configure",
     "configure": "yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend",
     "install-yarn": "npm install --global yarn@1.19.0",
     "custom-checks": "ts-node ./tools/custom-checks/run-custom-checks.ts",
@@ -40,6 +41,7 @@
     "test:plugin-ledger-connector-besu": "tap --ts --jobs=1 --timeout=60 \"packages/cactus-*-besu/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-htlc-eth-besu-erc20": "lerna exec --stream --scope 'packages/*htlc-eth-besu-erc20' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "test:plugin-htlc-besu-erc20": "tap --jobs=1 --timeout=600 \"packages/*htlc-eth-besu-erc20/src/test/typescript/{unit,integration}/\"",
+    "test:plugin": "tap --jobs=1 --timeout=600 \"packages/*test-plugin-htlc-eth-besu/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-quorum": "lerna exec --stream --scope '*/*connector-quorum' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "test:plugin-ledger-connector-quorum": "tap --ts --jobs=1 --timeout=60 \"packages/cactus-*-quorum/src/test/typescript/{unit,integration}/\"",
     "build:dev:plugin-ledger-connector-fabric": "lerna exec --stream --scope '*/*connector-fabric' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
@@ -77,6 +79,7 @@
     "@openapitools/openapi-generator-cli": "2.3.3",
     "@types/fs-extra": "9.0.11",
     "@types/jasminewd2": "2.0.10",
+    "@types/node": "15.14.7",
     "@types/node-fetch": "2.5.4",
     "@types/tape": "4.13.0",
     "@types/tape-promise": "4.0.1",
@@ -127,17 +130,13 @@
     "typescript": "4.2.4",
     "webpack": "5.36.2",
     "webpack-bundle-analyzer": "4.4.2",
-    "webpack-cli": "4.7.2"
+    "webpack-cli": "4.7.2",
+    "cspell": "5.4.0"
   },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
-  },
-  "dependencies": {
-    "@types/ssh2": "0.5.46",
-    "artillery": "1.7.2",
-    "cspell": "5.4.0"
   }
 }
