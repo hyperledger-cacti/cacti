@@ -51,7 +51,7 @@ initialise-vault:
 
 .PHONY: initialise-vault-docker
 initialise-vault-docker:
-	./clients/build/install/clients/bin/clients configure-all network1-docker
+	./clients/build/install/clients/bin/clients configure-all network1-docker,network2-docker
 
 .PHONY: get-access-control-policies
 get-access-control-policies:

@@ -33,12 +33,17 @@ Prepare `fabric-cli` for configuration as follows:
   * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
     - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
     - Otherwise, leave the default values unchanged.
-- Create a `.env` file by copying `.env.template` and setting suitable parameter values:
-  * The `MEMBER_CREDENTIAL_FOLDER` should refer to the folder containing the credentials (security group and policy info) of all the foreign networks.
-    - If you specify a non-existent or new folder, `fabric-cli` will automatically generate sample credentials for you in that folder.
-    - For this exercise, simply point to the folder `src/data/credentials` (_you must specify the full absolute path here_).
-  * The `CONFIG_PATH` must point to a JSON file that contains connection info for networks and relays.
-    - For this exercise, set the value to `./config.json`.
+- Create a `.env` file by copying `.env.template` and setting following parameter values (_replace `<PATH-TO-WEAVER>` with the location of your clone of weaver_):
+  * If Relays and Drivers are deployed in the host machine:
+    ```
+    MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials
+    CONFIG_PATH=./config.json
+    ```
+  * If Relays and Drivers are deployed in the Docker containers:
+    ```
+    MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials_docker
+    CONFIG_PATH=./config.json
+    ```
   * Leave the default values unchanged for the other parameters.
 - Run the following commands:
   ```
@@ -68,7 +73,12 @@ Just as we did for either Fabric network, the Corda network ledger (or _vault_ o
 
 Bootstrap the Corda network and application states as follows:
 - Navigate to the `samples/corda/corda-simple-application` folder.
-- Run the following:
-  ```bash
-  make initialise-vault
-  ```
+- Run the following: 
+  * If Relays and Drivers are deployed in the host machine:
+    ```bash
+    make initialise-vault
+    ```
+  * If Relays and Drivers are deployed in the Docker containers:
+    ```bash
+    make initialise-vault-docker
+    ```

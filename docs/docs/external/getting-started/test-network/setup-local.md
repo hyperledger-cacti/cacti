@@ -202,7 +202,6 @@ Configure `fabric-driver` for `network1` as follows:
 
 Build the Fabric driver module as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
-- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following:
   ```bash
   make build-local
@@ -239,8 +238,19 @@ Build the interoperation Cordapp as follows:
   ```bash
   make build-local
   ```
+  
+### Corda Interoperation SDK
 
-### Corda Client (Application)
+A client-layer library is defined in the `sdks/corda` folder. This contains functions for Corda based client applications to exercise interoperation capabilities via relays and also several utility/helper functions. The Corda Client tool, which we will use later, depends on this library.
+
+To build the library, do the following:
+- Navigate to the `sdks/corda` folder.
+- Run the following command (_make sure there is no github.properties file present in the directory_):
+```bash
+make build
+```
+
+### Corda Simple Application and Client (Application)
 
 This is a simple Cordapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 The code for this lies in the `samples/corda/corda-simple-application` folder.
@@ -256,8 +266,6 @@ Build the `corda-simple-application` Cordapp as follows:
 
 The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary. This network uses `samples/corda/corda-simple-application` which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 
-#### Running with Interoperation Cordapp from Github Packages
-
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
 - To spin up the Corda network with the interoperation Cordapp, run:
@@ -268,6 +276,8 @@ Follow the instructions below to build and launch the network:
 If the Corda node and notary start up successfully, you should something like the following:
 
 ![Corda network startup screenshot](/setup-assets/Corda_network.jpg)
+
+It's safe to press `Ctrl-C` here, as what you are seeing are the container logs.
 
 ### Corda Relay
 

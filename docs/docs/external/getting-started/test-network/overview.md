@@ -22,11 +22,14 @@ Weaver offers a basic test network launching capability, both to demonstrate int
 - [Fabric Interop chaincode](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/network/fabric-interop-cc) - The Fabric interoperability contracts handle the dual process of servicing requests for views from external networks, and verifying requested views for integrity
 
 You can launch these components in one of several different ways:
-1. [Setup with Locally Built Weaver Components](./setup-local.md): Build the above components purely from your local clone of the Weaver code repository. If you wish to experiment with source code modifications, this is the right option to choose.
-2. [Setup with Locally Built Dockerized Weaver Components](./setup-local-docker.md): This is similar to the above option, except with relays and drivers launched in Docker containers rather than in the host.
-3. [Setup with Imported Weaver Components](./setup-packages.md): Import pre-built Weaver components from Github Packages instead of building them locally. If you wish to see how Weaver works using pre-tested components and without, choose this option.
-4. [Setup with Imported Dockerized Weaver Components](./setup-packages-docker.md): This is similar to the above option, except with relays and drivers launched in Docker containers rather than in the host.
+* **Setup with Locally Built Weaver Components**:
+    - [Deployed on Host Machine](./setup-local.md): Build the above components purely from your local clone of the Weaver code repository. If you wish to experiment with source code modifications, this is the right option to choose.
+    - [Deployed in Docker containers](./setup-local-docker.md): This is similar to the above option, except with relays and drivers launched in Docker containers rather than in the host.
+* **Setup with Imported Weaver Components**:
+    - [Deployed on Host Machine](./setup-packages.md): Import pre-built Weaver components from Github Packages instead of building them locally. If you wish to see how Weaver works using pre-tested components and without, choose this option.
+    - [Deployed in Docker containers](./setup-packages-docker.md): This is similar to the above option, except with relays and drivers launched in Docker containers rather than in the host.
 
-After setting up and launching the components, you can test the following interoperation modes:
+After setting up and launching the components, you must initialize the network by following steps in [Ledger Initialization](ledger-initialization.md). 
+Then you can test the following interoperation modes:
 - [Data Sharing](../interop/data-sharing.md) among Fabric and Corda networks
 - [Asset Exchange](../interop/asset-exchange.md) between Fabric networks

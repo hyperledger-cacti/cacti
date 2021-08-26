@@ -2,6 +2,7 @@ DOCKER_IMAGE_NAME ?= weaver-corda-driver
 DOCKER_TAG ?= 1.2.3
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/corda-driver
+COMPOSE_ARG ?=
 
 .PHONY: build-local
 build-local:
@@ -22,11 +23,11 @@ build-refresh-dependencies: github.properties
 	
 .PHONY: image
 image: github.properties
-	docker build --build-arg GIT_URL=$(GIT_URL) -t corda-driver:latest .
+	docker build --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
 
 .PHONY: push-image	
 push-image: image
-	docker tag corda-driver:latest $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
+	docker tag $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 .PHONY: run
@@ -35,7 +36,11 @@ run:
 	
 .PHONY: deploy
 deploy:
-	docker-compose up -d
+	docker-compose $(COMPOSE_ARG) up -d
+	
+.PHONY: stop
+stop:
+	docker-compose $(COMPOSE_ARG) down
 	
 .PHONY: clean
 clean:

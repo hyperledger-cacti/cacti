@@ -166,8 +166,8 @@ fun createGrpcConnection(address: String) = try {
 fun createCordaNodeConnection(rpcAddress: RpcAddress) = try {
     val rpc = CordaNodeRPCConnection(
             host = rpcAddress.host,
-            username = "driverUser1",
-            password = "test",
+            username = System.getenv("DRIVER_RPC_USERNAME")?.toString() ?: "driverUser1",
+            password = System.getenv("DRIVER_RPC_PASSWORD")?.toString() ?: "test",
             rpcPort = rpcAddress.port)
     Right(rpc.proxy)
 } catch (e: Exception) {
