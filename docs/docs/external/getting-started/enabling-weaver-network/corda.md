@@ -144,7 +144,14 @@ Typically, pre-configuration involves:
 
 * _Bootstraping Network_: Generating node folders for each participating node in the network, which contains CorDapps, certificates,  persistence db, etc sub directories. Using Gradle task `net.corda.plugins.Cordform` or `net.corda.plugins.Dockerform`, the folders get created under the directory `build/nodes` (this path is used in above sample code for Identity Service).
 
-The RPC address, username and password specified in above task will be used to create an instance of `CordaRPCOps`, which is the first argument for most `weaver-corda-sdk` static functions as we saw in previous section.
+The RPC address, username and password specified in above task will be used to create an instance of `CordaRPCOps`, which is the first argument for most `weaver-corda-sdk` static functions as we saw in previous section. For example, one of them is `InteroperableHelper.interopFlow`:
+```kotlin
+val response = InteroperableHelper.interopFlow(
+    proxy,                                // CordaRPCOps instance to start flows
+    viewAddress,
+    <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
+)
+```
 Also, the Corda Driver (which we will setup in the following sections) needs a specific RPC user to be created, so make sure to add that in the Gradle task above, and note the credentials.
 
 Sample `net.corda.plugins.Dockerform` task:
