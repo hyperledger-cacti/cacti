@@ -142,65 +142,66 @@ No changes are required in your network's pre-configuration process for Weaver e
 
 Typically, pre-configuration involves:
 
-* _Bootstraping Network_: Generating node folders for each participating node in the network, which contains CorDapps, certificates,  persistence db, etc sub directories. Using Gradle task `net.corda.plugins.Cordform` or `net.corda.plugins.Dockerform`, the folders get created under the directory `build/nodes` (this path is used in above sample code for Identity Service).
+* _Bootstraping Network_:
+    Generating node folders for each participating node in the network, which contains CorDapps, certificates,  persistence db, etc sub directories. Using Gradle task `net.corda.plugins.Cordform` or `net.corda.plugins.Dockerform`, the folders get created under the directory `build/nodes` (this path is used in above sample code for Identity Service).
+    
+    The RPC address, username and password specified in above task will be used to create an instance of `CordaRPCOps`, which is the first argument for most `weaver-corda-sdk` static functions as we saw in previous section. For example, one of them is `InteroperableHelper.interopFlow`:
+    ```kotlin
+    val response = InteroperableHelper.interopFlow(
+        proxy,                                // CordaRPCOps instance to start flows
+        viewAddress,
+        <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
+    )
+    ```
+    Also, the Corda Driver (which we will setup in the following sections) needs a specific RPC user to be created, so make sure to add that in the Gradle task above, and note the credentials.
 
-The RPC address, username and password specified in above task will be used to create an instance of `CordaRPCOps`, which is the first argument for most `weaver-corda-sdk` static functions as we saw in previous section. For example, one of them is `InteroperableHelper.interopFlow`:
-```kotlin
-val response = InteroperableHelper.interopFlow(
-    proxy,                                // CordaRPCOps instance to start flows
-    viewAddress,
-    <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
-)
-```
-Also, the Corda Driver (which we will setup in the following sections) needs a specific RPC user to be created, so make sure to add that in the Gradle task above, and note the credentials.
-
-Sample `net.corda.plugins.Dockerform` task:
-```groovy
-task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
-    def HOST_ADDRESS = "0.0.0.0"
-    nodeDefaults {
-        projectCordapp {
-            deploy = false
+    Sample `net.corda.plugins.Dockerform` task:
+    ```groovy
+    task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
+        def HOST_ADDRESS = "0.0.0.0"
+        nodeDefaults {
+            projectCordapp {
+                deploy = false
+            }
+        }
+        node {
+            name "O=Notary,L=London,C=GB"
+            notary = [validating : true]
+            p2pPort 10004
+            rpcSettings {
+                address("$HOST_ADDRESS:10003")
+                adminAddress("$HOST_ADDRESS:10005")
+            }
+            cordapps.clear()
+        }
+        node {
+            name "O=PartyA,L=London,C=GB"
+            p2pPort 10007
+            rpcSettings {
+                address("$HOST_ADDRESS:10003")
+                adminAddress("$HOST_ADDRESS:10005")
+            }
+            rpcUsers = [
+                    [ user: "user1", "password": "test", "permissions": ["ALL"]],
+                    [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]] // <-- Driver RPC User
+        }
+        node {
+            name "O=PartyB,L=London,C=GB"
+            p2pPort 10009
+            rpcSettings {
+                address("$HOST_ADDRESS:10003")
+                adminAddress("$HOST_ADDRESS:10005")
+            }
+            rpcUsers = [
+                    [ user: "user1", "password": "test", "permissions": ["ALL"]],
+                    [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]] // <-- Driver RPC User
         }
     }
-    node {
-        name "O=Notary,L=London,C=GB"
-        notary = [validating : true]
-        p2pPort 10004
-        rpcSettings {
-            address("$HOST_ADDRESS:10003")
-            adminAddress("$HOST_ADDRESS:10005")
-        }
-        cordapps.clear()
-    }
-    node {
-        name "O=PartyA,L=London,C=GB"
-        p2pPort 10007
-        rpcSettings {
-            address("$HOST_ADDRESS:10003")
-            adminAddress("$HOST_ADDRESS:10005")
-        }
-        rpcUsers = [
-                [ user: "user1", "password": "test", "permissions": ["ALL"]],
-                [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]] // <-- Driver RPC User
-    }
-    node {
-        name "O=PartyB,L=London,C=GB"
-        p2pPort 10009
-        rpcSettings {
-            address("$HOST_ADDRESS:10003")
-            adminAddress("$HOST_ADDRESS:10005")
-        }
-        rpcUsers = [
-                [ user: "user1", "password": "test", "permissions": ["ALL"]],
-                [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]] // <-- Driver RPC User
-    }
-}
-```
+    ```
 
 * _Copy Interoperation CorDapps_: After bootstrapping the nodes folder, copy the following two CorDapps in `build/nodes/PartyA/cordapps` and `build/nodes/PartyB/cordapps` folders (`PartyA` and `PartyB` node names are for example only):
-- [com.weaver.corda.app.interop.interop-contracts](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906215)
-- [com.weaver.corda.app.interop.interop-workflows](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906216)
+    - [com.weaver.corda.app.interop.interop-contracts](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906215)
+    - [com.weaver.corda.app.interop.interop-workflows](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906216)
 
 ### Startup and Bootstrap Weaver components
 
