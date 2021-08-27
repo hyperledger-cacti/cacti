@@ -23,10 +23,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cp github.properties.template github.properties
-        echo "Using ${GITHUB_ACTOR} user."
-        sed -i "s/${GITHUB_ACTOR}/<GITHUB email>/g" github.properties
-        sed -i "s/${GITHUB_TOKEN}/<GITHUB Personal Access Token>/g" github.properties
+        echo "Using ${GITHUB_EMAIL} user."
+        echo "username=${GITHUB_EMAIL}" > github.properties
+        echo "password=${GITHUB_TOKEN}" > github.properties
+        echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" > github.properties
         cat github.properties
       working-directory: core/network/corda-interop-app
     - name: Build Corda Interop App
