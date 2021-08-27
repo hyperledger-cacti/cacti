@@ -52,6 +52,10 @@ jobs:
         working-directory: core/network/corda-interop-app
         
       # RELAY
+      - name: Edit docker compose
+        run: make convert-compose-method2
+        working-directory: core/relay
+        
       - name: Start Relay for network1
         run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
         working-directory: core/relay
@@ -65,6 +69,12 @@ jobs:
 #         working-directory: core/relay
         
       # FABRIC DRIVER
+      - name: Setup .env
+        run: |
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n1
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n2
+        working-directory: core/drivers/fabric-driver
+        
       - name: Start Fabric Driver for network1
         run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
         working-directory: core/drivers/fabric-driver
@@ -78,48 +88,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
-      - name: Configure ALL
-        run: ./bin/fabric-cli configure all network1 network2
-        working-directory: samples/fabric/fabric-cli
-      - name: Data Transfer Test 1
-        run: |
-          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
-          ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
-        working-directory: samples/fabric/fabric-cli
-      - name: Data Transfer Test 2
-        run: |
-          ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
-          ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
-        working-directory: samples/fabric/fabric-cli
-        
-  setup-weaver:
-    runs-on: ubuntu-latest
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      
-      # FABRIC DRIVER
-      - name: Setup .env
-        run: |
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n1
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n2
-        working-directory: core/drivers/fabric-driver
-
-      # RELAY
-      - name: Edit docker compose
-        run: make convert-compose-method2
-        working-directory: core/relay
-  
-  setup-fabric-cli:
-    runs-on: ubuntu-latest
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14.x
+          
       - name: Setup .npmrc
         run: |
           cp .npmrc.template .npmrc
@@ -143,5 +112,18 @@ jobs:
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           cat .env
         working-directory: samples/fabric/fabric-cli
-      
+        
+      - name: Configure ALL
+        run: ./bin/fabric-cli configure all network1 network2
+        working-directory: samples/fabric/fabric-cli
+      - name: Data Transfer Test 1
+        run: |
+          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
+        working-directory: samples/fabric/fabric-cli
+      - name: Data Transfer Test 2
+        run: |
+          ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
+        working-directory: samples/fabric/fabric-cli
       
