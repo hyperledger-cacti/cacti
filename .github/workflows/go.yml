@@ -100,9 +100,8 @@ jobs:
         go-version: 1.16
         
     - name: Setup
-      env:
-        GOMODCACHE: ${{ env.GOMODCACHE }}
       run: |
+        GOMODCACHE=`go env GOMODCACHE`
         echo "GO MOD Path: ${GOMODCACHE}"
         go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
         rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
