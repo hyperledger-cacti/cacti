@@ -76,13 +76,6 @@ jobs:
         
   setup-fabric-cli:
     runs-on: ubuntu-latest
-    env:
-      DEFAULT_CHANNEL=mychannel
-      DEFAULT_CHAINCODE=interop
-      MEMBER_CREDENTIAL_FOLDER=${{ env.GITHUB_WORKSPACE }}/samples/fabric/fabric-cli/src/data/credentials_docker
-      LOCAL=true
-      DEFAULT_APPLICATION_CHAINCODE=simplestate
-      CONFIG_PATH=${{ env.GITHUB_WORKSPACE }}/samples/fabric/fabric-cli/config.json
     steps:
       - name: Use Node.js 14.x
         uses: actions/setup-node@v2
@@ -97,20 +90,27 @@ jobs:
           cp config.template.json config.json
           sed -i "s/<PATH-TO-WEAVER>/${$GITHUB_WORKSPACE}/g" config.json
         working-directory: samples/fabric/fabric-cli
-      - name: Test env
-        run: |
-          ./bin/fabric-cli env get MEMBER_CREDENTIAL_FOLDER
-          ./bin/fabric-cli env get CONFIG_PATH
-        working-directory: samples/fabric/fabric-cli
         
   run-data-transfer:
     needs: [start-fabric-network, relay, fabric-driver, setup-fabric-cli]
     runs-on: ubuntu-latest
+    env:
+      DEFAULT_CHANNEL: mychannel
+      DEFAULT_CHAINCODE: interop
+      MEMBER_CREDENTIAL_FOLDER: ${{ env.GITHUB_WORKSPACE }}/samples/fabric/fabric-cli/src/data/credentials_docker
+      LOCAL: true
+      DEFAULT_APPLICATION_CHAINCODE: simplestate
+      CONFIG_PATH: ${{ env.GITHUB_WORKSPACE }}/samples/fabric/fabric-cli/config.json
     steps:
       - name: Use Node.js 14.x
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
+      - name: Test env
+        run: |
+          ./bin/fabric-cli env get MEMBER_CREDENTIAL_FOLDER
+          ./bin/fabric-cli env get CONFIG_PATH
+        working-directory: samples/fabric/fabric-cli
       - name: Configure ALL
         run: ./bin/fabric-cli configure all network1 network2
         working-directory: samples/fabric/fabric-cli
