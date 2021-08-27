@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Data Transfer End to End Tests (Docker)
+name: Data Transfer Tests (Docker)
 
 # Controls when the workflow will run
 on:
