@@ -39,6 +39,7 @@ jobs:
       run: |
         mv go.mod go.mod.bkp
         cp go.mod.local go.mod
+      working-directory: core/network/fabric-interop-cc/contracts/interop
         
     - name: Build
       run: go build -v ./...
@@ -50,4 +51,5 @@ jobs:
       
     - name: Undo Local Setup
       run: mv go.mod.bkp go.mod
+      working-directory: core/network/fabric-interop-cc/contracts/interop
 
