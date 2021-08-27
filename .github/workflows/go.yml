@@ -104,6 +104,7 @@ jobs:
         GOMODCACHE=`go env GOMODCACHE`
         echo "GO MOD Path: ${GOMODCACHE}"
         go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
+        chmod +wr -R ${GOMODCACHE}
         rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
         cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/
         ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*
