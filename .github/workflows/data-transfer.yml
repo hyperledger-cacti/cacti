@@ -52,10 +52,6 @@ jobs:
         working-directory: core/network/corda-interop-app
         
       # RELAY
-      - name: Edit docker compose
-        run: make convert-compose-method2
-        working-directory: core/relay
-        
       - name: Start Relay for network1
         run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
         working-directory: core/relay
@@ -96,6 +92,24 @@ jobs:
           ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
         working-directory: samples/fabric/fabric-cli
         
+  setup-weaver:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      # FABRIC DRIVER
+      - name: Setup .env
+        run: |
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n1
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n2
+        working-directory: core/drivers/fabric-driver
+
+      # RELAY
+      - name: Edit docker compose
+        run: make convert-compose-method2
+        working-directory: core/relay
+  
   setup-fabric-cli:
     runs-on: ubuntu-latest
     steps:
