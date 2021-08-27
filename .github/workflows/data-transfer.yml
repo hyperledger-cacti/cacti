@@ -133,43 +133,80 @@ jobs:
         
       # CORDA CLIENT
       - name: Corda CLI Initialize Vault
-        run: make initialize-vault-docker
+        run: make initialise-vault-docker
         working-directory: samples/corda/corda-simple-application
-        
-      # DATA TRANSFERS
-      - name: Data Transfer Corda - Fabric1
+    
+      - name: Data Transfer Corda Client Tests
         run: |
+          COUNT=0
+          TOTAL=4
+
+          # CORDA - FABRIC1
           ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a
-          ./clients/build/install/clients/bin/clients get-state a
-        working-directory: samples/corda/corda-simple-application
-      - name: Data Transfer Corda - Fabric2
-        run: |
-          ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
-          ./clients/build/install/clients/bin/clients get-state Arcturus
+           > tmp.out
+          tail -n 1 tmp.out | grep "SimpleState(key=a, value=Arcturus" && COUNT=$(( COUNT + 1 ))
+
+          ./clients/build/install/clients/bin/clients get-state a > tmp.out
+          tail -n 1 tmp.out | grep "SimpleState(key=a, value=Arcturus" && COUNT=$(( COUNT + 1 ))
+
+          # CORDA - FABRIC2
+          ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus > tmp.out
+          tail -n 1 tmp.out | grep "SimpleState(key=Arcturus, value=17.671" && COUNT=$(( COUNT + 1 ))
+
+          ./clients/build/install/clients/bin/clients get-state Arcturus > tmp.out
+          tail -n 1 tmp.out | grep "SimpleState(key=Arcturus, value=17.671" && COUNT=$(( COUNT + 1 ))
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
         working-directory: samples/corda/corda-simple-application
         
       # FABRIC CLI
-      - name: Data Transfer Fabric1 - Corda
+      - name: Data Transfer Fabric CLI Testss
         run: |
-          ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+          COUNT=0
+          TOTAL=8
+
+          # FABRIC2 - FABRIC1
+          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a > tmp.out
+          tail -n 1 tmp.out | grep "Called Function Create. With Args: a, Arcturus" && COUNT=$(( COUNT + 1 ))
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2 > tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: Arcturus" && COUNT=$(( COUNT + 1 ))
+
+          # FABRIC1 - FABRIC2
+          ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus > tmp.out
+          tail -n 1 tmp.out | grep "Called Function Create. With Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 ))
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1 > tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: 17.671" && COUNT=$(( COUNT + 1 ))
+
+          # FABRIC1 - CORDA
+          ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true > tmp.out
+          tail -n 1 tmp.out | grep "Called Function Create. With Args: H, 1" && COUNT=$(( COUNT + 1 ))
+
           ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1
+          tail -n 1 tmp.out | grep "Result from network query: 1" && COUNT=$(( COUNT + 1 ))
+
+          # FABRIC2 - CORDA
+          ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true > tmp.out
+          tail -n 1 tmp.out | grep "Called Function Create. With Args: C, 20" && COUNT=$(( COUNT + 1 ))
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2
+          tail -n 1 tmp.out | grep "Result from network query: 20" && COUNT=$(( COUNT + 1 ))
+
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
         working-directory: samples/fabric/fabric-cli
-      - name: Data Transfer Fabric2 - Corda
-        run: |
-          ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
-          ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network2
-        working-directory: samples/fabric/fabric-cli
-        
-      - name: Data Transfer Fabric2-Fabric1
-        run: |
-          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a
-          ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
-        working-directory: samples/fabric/fabric-cli
-        
-      - name: Data Transfer Fabric1-Fabric2
-        run: |
-          ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
-          ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
-        working-directory: samples/fabric/fabric-cli
-        
-      
