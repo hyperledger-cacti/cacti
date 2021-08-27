@@ -40,6 +40,26 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
+      
+      - name: Install RUST Toolchain minimal stable with clippy and rustfmt
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+          
+      - name: Get Latest Relay Dependencies
+        run: |
+          cargo update -p nom
+          cargo update -p lexical-core
+          
+      - name: Use Protoc 3.15
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          go get -u google.golang.org/protobuf/cmd/protoc-gen-go
+          go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
           
     
       # PROTOS
