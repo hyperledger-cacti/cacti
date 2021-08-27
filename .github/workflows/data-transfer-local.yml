@@ -73,13 +73,7 @@ jobs:
         run: make build
         working-directory: common/protos-java-kt
         
-      # Build Dependencies
-      - name: Build Fabric Driver
-        run: |
-          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
-          make build-local
-        working-directory: core/drivers/fabric-driver
-        
+      # Build Dependencies        
       - name: Build Corda Interop App
         run: make build-local
         working-directory: core/network/corda-interop-app
@@ -103,6 +97,10 @@ jobs:
       - name: Build Relay
         run: make
         working-directory: core/relay
+        
+      - name: Build Fabric Driver
+        run: make build-local
+        working-directory: core/drivers/fabric-driver
         
       - name: Build Corda Driver
         run: make build-local
