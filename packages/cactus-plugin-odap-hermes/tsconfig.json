@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/lib/", /* Redirect output structure to the directory. */
+    "declarationDir": "dist/types",
+    "resolveJsonModule": true,
+    "allowJs": false,
+  },
+  "ts-node": {
+    "files": true
+  },
+  "include": [
+    "./src"
+  ],
+  "exclude":[
+    "./src/test/typescript/fabric-contracts/lock-asset/chaincode-typescript./**/*.ts"
+  ]
+}

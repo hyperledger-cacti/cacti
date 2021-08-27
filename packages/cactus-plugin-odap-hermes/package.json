@@ -1,0 +1,91 @@
+{
+  "name": "@hyperledger/cactus-plugin-odap-hermes",
+  "version": "1.0.0-rc.1",
+  "description": "proof of concept of odap",
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "codegen:openapi": "npm run generate-sdk",
+    "codegen": "run-p 'codegen:*'",
+    "pretsc": "npm run generate-sdk",
+    "tsc": "tsc --project ./tsconfig.json",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "tsc": {
+      "patterns": [
+        "src/",
+        "src/*/json/**/openapi*"
+      ],
+      "ignore": [
+        "src/**/generated/*"
+      ],
+      "extensions": [
+        "ts",
+        "json"
+      ],
+      "quiet": true,
+      "verbose": false,
+      "runOnChangeOnly": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "author": "Tzu-Shen, Wang",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/crypto-js": "4.0.1",
+    "@types/express": "4.17.8",
+    "@types/tape": "4.13.0",
+    "crypto-js": "4.0.0",
+    "typescript": "4.3.2"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-cmd-api-server": "1.0.0-rc.2",
+    "@hyperledger/cactus-common": "1.0.0-rc.2",
+    "@hyperledger/cactus-core": "1.0.0-rc.2",
+    "@hyperledger/cactus-core-api": "1.0.0-rc.2",
+    "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.2",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "1.0.0-rc.2",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "1.0.0-rc.2",
+    "@hyperledger/cactus-plugin-object-store-ipfs": "1.0.0-rc.2",
+    "@hyperledger/cactus-test-tooling": "1.0.0-rc.2",
+    "axios": "0.21.1",
+    "crypto-js": "4.0.0",
+    "dockerode": "3.3.0",
+    "express": "4.17.1",
+    "joi": "14.3.1",
+    "openapi-types": "7.0.1",
+    "prom-client": "13.1.0",
+    "rxjs": "6.6.7",
+    "secp256k1": "4.0.2",
+    "socket.io": "4.1.3",
+    "socket.io-client": "4.1.3",
+    "tape": "5.2.2",
+    "ts-node": "8.9.1",
+    "typescript-optional": "2.0.1",
+    "web3": "1.2.7",
+    "web3-utils": "1.2.7"
+  }
+}
