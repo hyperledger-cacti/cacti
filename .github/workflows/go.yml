@@ -1,4 +1,4 @@
-name: Fabric Interop CC Unit Tests
+name: Fabric Interop CC and Sample Chaincode Unit Tests
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test_github:
+  test_interopcc_github:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -25,7 +25,7 @@ jobs:
       run: go test -v ./...
       working-directory: core/network/fabric-interop-cc/contracts/interop
       
-  test_local:
+  test_interopcc_local:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -52,4 +52,67 @@ jobs:
     - name: Test
       run: go test -v ./...
       working-directory: core/network/fabric-interop-cc/contracts/interop
+      
+  test_assetmgmt:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+      
+    - name: Test
+      run: go test -v ./...
+      working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+      
+  test_simpleasset:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: samples/fabric/simpleasset
+      
+    - name: Test
+      run: go test -v ./...
+      working-directory: samples/fabric/simpleasset
+      
+  test_simpleasset_local:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+        
+    - name: Setup
+      run: |
+        echo "GOPATH: ${GOPATH}"
+        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
+        rm -rf ${GOPATH}/pkgs/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
+        cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* ${GOPATH}/pkgs/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/
+        ls -lh ${GOPATH}/pkgs/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*
+      working-directory: samples/fabric/simpleasset
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: samples/fabric/simpleasset
+      
+    - name: Test
+      run: go test -v ./...
+      working-directory: samples/fabric/simpleasset
 
