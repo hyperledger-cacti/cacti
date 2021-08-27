@@ -1,0 +1,53 @@
+name: Fabric Interop CC Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_github:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: core/network/fabric-interop-cc/contracts/interop
+      
+    - name: Test
+      run: go test -v ./...
+      working-directory: core/network/fabric-interop-cc/contracts/interop
+      
+  test_local:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+        
+    - name: Local Setup
+      run: |
+        mv go.mod go.mod.bkp
+        cp go.mod.local go.mod
+        
+    - name: Build
+      run: go build -v ./...
+      working-directory: core/network/fabric-interop-cc/contracts/interop
+      
+    - name: Test
+      run: go test -v ./...
+      working-directory: core/network/fabric-interop-cc/contracts/interop
+      
+    - name: Undo Local Setup
+      run: mv go.mod.bkp go.mod
+
