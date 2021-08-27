@@ -82,6 +82,7 @@ test(testCase, async (t: Test) => {
     apiSrvOpts.apiCorsDomainCsv = "*";
     apiSrvOpts.apiPort = 0;
     apiSrvOpts.cockpitPort = 0;
+    apiSrvOpts.grpcPort = 0;
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [
       {

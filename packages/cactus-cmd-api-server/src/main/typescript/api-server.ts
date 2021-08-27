@@ -5,10 +5,13 @@ import path from "path";
 import tls from "tls";
 import { Server, createServer } from "http";
 import { createServer as createSecureServer } from "https";
+import { RuntimeError } from "run-time-error";
 import { gte } from "semver";
 import lmify from "lmify";
 import fs from "fs-extra";
 import expressHttpProxy from "express-http-proxy";
+import { Server as GrpcServer } from "@grpc/grpc-js";
+import { ServerCredentials as GrpcServerCredentials } from "@grpc/grpc-js";
 import type { Application, Request, Response, RequestHandler } from "express";
 import express from "express";
 import { OpenApiValidator } from "express-openapi-validator";
@@ -43,16 +46,20 @@ import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { AuthorizerFactory } from "./authzn/authorizer-factory";
 import { WatchHealthcheckV1 } from "./generated/openapi/typescript-axios";
 import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-endpoint";
-import { RuntimeError } from "run-time-error";
+import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service";
+import { GrpcServerApiServer } from "./web-services/grpc/grpc-server-api-server";
+import { determineAddressFamily } from "./common/determine-address-family";
+
 export interface IApiServerConstructorOptions {
-  pluginManagerOptions?: { pluginsPath: string };
-  pluginRegistry?: PluginRegistry;
-  httpServerApi?: Server | SecureServer;
-  wsServerApi?: SocketIoServer;
-  wsOptions?: SocketIoServerOptions;
-  httpServerCockpit?: Server | SecureServer;
-  config: ICactusApiServerOptions;
-  prometheusExporter?: PrometheusExporter;
+  readonly pluginManagerOptions?: { pluginsPath: string };
+  readonly pluginRegistry?: PluginRegistry;
+  readonly httpServerApi?: Server | SecureServer;
+  readonly wsServerApi?: SocketIoServer;
+  readonly grpcServer?: GrpcServer;
+  readonly wsOptions?: SocketIoServerOptions;
+  readonly httpServerCockpit?: Server | SecureServer;
+  readonly config: ICactusApiServerOptions;
+  readonly prometheusExporter?: PrometheusExporter;
 }
 
 export class ApiServer {
@@ -73,6 +80,7 @@ export class ApiServer {
   private readonly httpServerApi: Server | SecureServer;
   private readonly httpServerCockpit: Server | SecureServer;
   private readonly wsApi: SocketIoServer;
+  private readonly grpcServer: GrpcServer;
   private readonly expressApi: Application;
   private readonly expressCockpit: Application;
   private readonly pluginsPath: string;
@@ -114,6 +122,7 @@ export class ApiServer {
       this.httpServerCockpit = createServer();
     }
 
+    this.grpcServer = this.options.grpcServer || new GrpcServer({});
     this.wsApi = new SocketIoServer();
     this.expressApi = express();
     this.expressCockpit = express();
@@ -169,6 +178,7 @@ export class ApiServer {
   async start(): Promise<{
     addressInfoCockpit: AddressInfo;
     addressInfoApi: AddressInfo;
+    addressInfoGrpc: AddressInfo;
   }> {
     this.checkNodeVersion();
     const tlsMaxVersion = this.options.config.tlsDefaultMaxVersion;
@@ -179,6 +189,13 @@ export class ApiServer {
       const { cockpitTlsEnabled, apiTlsEnabled } = this.options.config;
       const addressInfoCockpit = await this.startCockpitFileServer();
       const addressInfoApi = await this.startApiServer();
+      const addressInfoGrpc = await this.startGrpcServer();
+
+      {
+        const { port, address } = addressInfoGrpc;
+        const grpcUrl = `${address}:${port}`;
+        this.log.info(`Cactus gRPC reachable ${grpcUrl}`);
+      }
 
       {
         const { apiHost: host } = this.options.config;
@@ -196,7 +213,7 @@ export class ApiServer {
         this.log.info(`Cactus Cockpit reachable ${httpUrl}`);
       }
 
-      return { addressInfoCockpit, addressInfoApi };
+      return { addressInfoCockpit, addressInfoApi, addressInfoGrpc };
     } catch (ex) {
       const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
       this.log.error(errorMessage);
@@ -368,6 +385,21 @@ export class ApiServer {
       await Servers.shutdown(this.httpServerCockpit);
       this.log.info(`Close HTTP server of the cockpit OK`);
     }
+
+    if (this.grpcServer) {
+      this.log.info(`Closing gRPC server ...`);
+      await new Promise<void>((resolve, reject) => {
+        this.grpcServer.tryShutdown((ex?: Error) => {
+          if (ex) {
+            this.log.error("Failed to shut down gRPC server: ", ex);
+            reject(ex);
+          } else {
+            resolve();
+          }
+        });
+      });
+      this.log.info(`Close gRPC server OK`);
+    }
   }
 
   async startCockpitFileServer(): Promise<AddressInfo> {
@@ -499,6 +531,45 @@ export class ApiServer {
       httpPathPrometheus,
       prometheusExporterHandler,
     );
+  }
+
+  async startGrpcServer(): Promise<AddressInfo> {
+    return new Promise((resolve, reject) => {
+      // const grpcHost = "0.0.0.0"; // FIXME - make this configurable (config-service.ts)
+      const grpcHost = "127.0.0.1"; // FIXME - make this configurable (config-service.ts)
+      const grpcHostAndPort = `${grpcHost}:${this.options.config.grpcPort}`;
+
+      const grpcTlsCredentials = this.options.config.grpcMtlsEnabled
+        ? GrpcServerCredentials.createSsl(
+            Buffer.from(this.options.config.apiTlsCertPem),
+            [
+              {
+                cert_chain: Buffer.from(this.options.config.apiTlsCertPem),
+                private_key: Buffer.from(this.options.config.apiTlsKeyPem),
+              },
+            ],
+            true,
+          )
+        : GrpcServerCredentials.createInsecure();
+
+      this.grpcServer.bindAsync(
+        grpcHostAndPort,
+        grpcTlsCredentials,
+        (error: Error | null, port: number) => {
+          if (error) {
+            return reject(new RuntimeError("Binding gRPC failed: ", error));
+          }
+          this.grpcServer.addService(
+            default_service.org.hyperledger.cactus.cmd_api_server
+              .UnimplementedDefaultServiceService.definition,
+            new GrpcServerApiServer(),
+          );
+          this.grpcServer.start();
+          const family = determineAddressFamily(grpcHost);
+          resolve({ address: grpcHost, port, family });
+        },
+      );
+    });
   }
 
   async startApiServer(): Promise<AddressInfo> {
