@@ -191,17 +191,17 @@ jobs:
 
           # FABRIC1 - CORDA
           ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true > tmp.out
-          #tail -n 1 tmp.out | grep "Args: H, [SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          #tail -n 1 tmp.out | grep "Args: H, \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
 
-          ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1
-          tail -n 1 tmp.out | grep "Result from network query: [SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1 > tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
 
           # FABRIC2 - CORDA
           ./bin/fabric-cli interop --key=C --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true > tmp.out
-          #tail -n 1 tmp.out | grep "Args: C, [SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          #tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
 
-          ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2
-          tail -n 1 tmp.out | grep "Result from network query: [SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2 > tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
 
 
           # RESULT
