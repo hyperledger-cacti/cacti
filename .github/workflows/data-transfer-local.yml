@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Data Transfer End to End Tests (Local)
+name: Data Transfer Tests (Local)
 
 # Controls when the workflow will run
 on:
@@ -52,6 +52,7 @@ jobs:
         run: |
           cargo update -p nom
           cargo update -p lexical-core
+        working-directory: core/relay
           
       - name: Use Protoc 3.15
         run: |
