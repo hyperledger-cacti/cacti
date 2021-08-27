@@ -307,16 +307,13 @@ export class PostgresTestContainer implements ITestLedger {
   }
 
   private validateConstructorOptions(): void {
-    const validationResult = Joi.validate<
-      IPostgresTestContainerConstructorOptions
-    >(
+    const validationResult = POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA.validate(
       {
         imageVersion: this.imageVersion,
         imageName: this.imageName,
         postgresPort: this.postgresPort,
         envVars: this.envVars,
       },
-      POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA,
     );
 
     if (validationResult.error) {

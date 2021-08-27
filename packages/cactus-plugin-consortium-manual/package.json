@@ -80,13 +80,13 @@
     "express": "4.17.1",
     "jose": "1.28.1",
     "json-stable-stringify": "1.0.1",
-    "prom-client": "13.0.0",
+    "prom-client": "13.2.0",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@types/express": "4.17.8",
-    "@types/json-stable-stringify": "1.0.32",
-    "@types/uuid": "8.3.0"
+    "@types/express": "4.17.13",
+    "@types/json-stable-stringify": "1.0.33",
+    "@types/uuid": "8.3.1"
   }
 }

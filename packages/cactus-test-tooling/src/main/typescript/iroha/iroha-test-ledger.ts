@@ -386,21 +386,18 @@ export class IrohaTestLedger implements ITestLedger {
   }
 
   private validateConstructorOptions(): void {
-    const validationResult = Joi.validate<IIrohaTestLedgerOptions>(
-      {
-        adminPriv: this.adminPriv,
-        adminPub: this.adminPub,
-        nodePriv: this.nodePriv,
-        nodePub: this.nodePub,
-        postgresHost: this.postgresHost,
-        postgresPort: this.postgresPort,
-        imageVersion: this.imageVersion,
-        imageName: this.imageName,
-        rpcToriiPort: this.rpcToriiPort,
-        envVars: this.envVars,
-      },
-      IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
-    );
+    const validationResult = IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA.validate({
+      adminPriv: this.adminPriv,
+      adminPub: this.adminPub,
+      nodePriv: this.nodePriv,
+      nodePub: this.nodePub,
+      postgresHost: this.postgresHost,
+      postgresPort: this.postgresPort,
+      imageVersion: this.imageVersion,
+      imageName: this.imageName,
+      rpcToriiPort: this.rpcToriiPort,
+      envVars: this.envVars,
+    });
 
     if (validationResult.error) {
       throw new Error(
