@@ -146,16 +146,20 @@ jobs:
           # CORDA - FABRIC1
           ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a &> tmp.out    
           tail -n 1 tmp.out | grep "SimpleState(key=a, value=Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           ./clients/build/install/clients/bin/clients get-state a &> tmp.out
           tail -n 1 tmp.out | grep "SimpleState(key=a, value=Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           # CORDA - FABRIC2
           ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "SimpleState(key=Arcturus, value=17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           ./clients/build/install/clients/bin/clients get-state Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "SimpleState(key=Arcturus, value=17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           # RESULT
           echo "Passed $COUNT/$TOTAL Tests."
@@ -176,30 +180,38 @@ jobs:
           # FABRIC2 - FABRIC1
           ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a &> tmp.out
           tail -n 1 tmp.out | grep "Args: a, Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           # FABRIC1 - FABRIC2
           ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           # FABRIC1 - CORDA
           ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true &> tmp.out
           tail -n 1 tmp.out | grep "Args: H, \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           # FABRIC2 - CORDA
           ./bin/fabric-cli interop --key=C --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true &> tmp.out
           tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
           ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
 
 
           # RESULT
