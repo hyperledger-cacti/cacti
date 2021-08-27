@@ -54,7 +54,7 @@ jobs:
       - name: Start Corda Network
         run: |
           sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
-          make start > corda-net.out &
+          make start &> corda-net.out &
         working-directory: tests/network-setups/corda
       
       # FABRIC NETWORK
