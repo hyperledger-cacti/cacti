@@ -32,7 +32,7 @@ jobs:
 
       # FABRIC NETWORK
       - name: Start Fabric Network
-        run: make start-interop
+        run: make start-interop > fabric-net.out &
         working-directory: tests/network-setups/fabric/dev
         
       # CORDA NETWORK
@@ -55,10 +55,15 @@ jobs:
         run: |
           sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
           make start
-          echo "Waiting till corda network to start."
-          sleep 60
-          docker logs corda_partya_1
         working-directory: tests/network-setups/corda
+        
+      - name: Wait
+        run: |
+          echo "Waiting for networks to start."
+          sleep 60
+          cat tests/network-setups/fabric/dev/fabric-net.out
+          echo -e "\n#########################################\n"
+          docker logs corda_partya_1
         
       # RELAY
       - name: Edit docker compose
