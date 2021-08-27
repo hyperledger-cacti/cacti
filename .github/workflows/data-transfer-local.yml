@@ -137,13 +137,13 @@ jobs:
         working-directory: core/drivers/corda-driver
       
       # FABRIC CLI
-      - name: Setup CLI Config
+      - name: Setup Fabric CLI Config
         run: |
           echo ${GITHUB_WORKSPACE}
           cp config.template.json config.json
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" config.json
         working-directory: samples/fabric/fabric-cli
-      - name: Setup CLI ENV
+      - name: Setup Fabric CLI ENV
         run: |
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
@@ -191,7 +191,7 @@ jobs:
         working-directory: samples/corda/corda-simple-application
         
       # FABRIC CLI
-      - name: Data Transfer Fabric CLI Testss
+      - name: Data Transfer Fabric CLI Tests
         run: |
           COUNT=0
           TOTAL=8
