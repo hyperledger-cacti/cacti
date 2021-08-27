@@ -41,6 +41,8 @@ jobs:
         cp go.mod.local go.mod
         cp -r ../../../../../common/protos-go ./protos-go
         cp -r ../../libs/assetexchange ./assetexchange
+        rm go.sum
+        go mod tidy
       working-directory: core/network/fabric-interop-cc/contracts/interop
         
     - name: Build
