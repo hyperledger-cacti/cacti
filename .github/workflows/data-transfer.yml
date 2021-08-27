@@ -34,8 +34,34 @@ jobs:
       - name: Start Fabric Network
         run: make start-interop
         working-directory: tests/network-setups/fabric/dev
-        
+  
+  start-corda-network:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+      
+#       - name: Set up JDK 8
+#         uses: actions/setup-java@v2
+#         with:
+#           java-version: '8'
+#           distribution: 'adopt'
+    
+#       - name: Generate github.properties
+#         run: |
+#           echo "Using ${GITHUB_ACTOR} user."
+#           echo "username=${GITHUB_ACTOR}" >> github.properties
+#           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+#           echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+#           cat github.properties
+#         working-directory: core/network/corda-interop-app
+#       # Runs a set of commands using the runners shell
+#       - name: Start Corda Network
+#         run: make start
+#         working-directory: tests/network-setups/corda
+
   relay:
+    needs: [start-fabric-network, start-corda-network]
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -81,10 +107,19 @@ jobs:
   setup-fabric-cli:
     runs-on: ubuntu-latest
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
       - name: Use Node.js 14.x
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
+      - name: Setup .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: samples/fabric/fabric-cli
       - name: Build CLI
         run: npm install
         working-directory: samples/fabric/fabric-cli
@@ -107,6 +142,9 @@ jobs:
     needs: [start-fabric-network, relay, fabric-driver, setup-fabric-cli]
     runs-on: ubuntu-latest
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
       - name: Use Node.js 14.x
         uses: actions/setup-node@v2
         with:
