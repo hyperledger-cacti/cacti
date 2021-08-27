@@ -1,0 +1,39 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Weaver Interop Node SDK Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  node_sdk_github:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Setup .npmrc
+      run: |
+        cp .npmrc.template .npmrc
+        sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+        cat .npmrc
+      working-directory: sdks/fabric/interoperation-node-sdk
+    - name: Build
+      run: make build
+      working-directory: sdks/fabric/interoperation-node-sdk
+    - name: Tests
+      run: npm run test
+      working-directory: sdks/fabric/interoperation-node-sdk
