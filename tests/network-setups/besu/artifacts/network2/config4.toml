@@ -1,0 +1,21 @@
+# Path
+data-path="data"
+
+# Network
+p2p-port=31306
+
+rpc-http-enabled=true
+rpc-http-host="0.0.0.0"
+rpc-http-port=9548
+rpc-http-api=["ETH","NET","IBFT"]
+rpc-http-cors-origins=["all"]
+
+host-allowlist=["*"]
+
+# Chain
+genesis-file="../genesis.json" # Path to the custom genesis file
+
+# Mining
+min-gas-price=0
+miner-enabled=true
+miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"

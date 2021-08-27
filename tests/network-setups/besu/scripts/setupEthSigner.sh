@@ -2,18 +2,17 @@
 
 # Create a directory in the Besu network's home folder to store the password and key files
 
-cd SampleBesuNetwork
+cd SampleBesuNetwork$1
 mkdir keys
 
 
 # Generate key files
 
-cp ../artifacts/passwordFile keys/
+cp ../artifacts/network$1/passwordFile keys/
 
 #Node-1
 Node=Node-1
-cp ../artifacts/createKeyFile.js .
-#key=`cat $Node/data/key`
+cp ../artifacts/network$1/createKeyFile.js .
 key=`cat $Node/data/key`
 sed -i "s/<AccountPrivateKey>/$key/g" createKeyFile.js
 touch keys/keyFile_${Node}
@@ -34,8 +33,7 @@ cd ../
 
 #Node-2
 Node=Node-2
-cp ../artifacts/createKeyFile.js .
-#key=`cat $Node/data/key`
+cp ../artifacts/network$1/createKeyFile.js .
 key=`cat $Node/data/key`
 sed -i "s/<AccountPrivateKey>/$key/g" createKeyFile.js
 touch keys/keyFile_${Node}
@@ -57,8 +55,7 @@ cd ../
 
 #Node-3
 Node=Node-3
-cp ../artifacts/createKeyFile.js .
-#key=`cat $Node/data/key`
+cp ../artifacts/network$1/createKeyFile.js .
 key=`cat $Node/data/key`
 sed -i "s/<AccountPrivateKey>/$key/g" createKeyFile.js
 touch keys/keyFile_${Node}
@@ -80,8 +77,7 @@ cd ../
 
 #Node-1
 Node=Node-4
-cp ../artifacts/createKeyFile.js .
-#key=`cat $Node/data/key`
+cp ../artifacts/network$1/createKeyFile.js .
 key=`cat $Node/data/key`
 sed -i "s/<AccountPrivateKey>/$key/g" createKeyFile.js
 touch keys/keyFile_${Node}

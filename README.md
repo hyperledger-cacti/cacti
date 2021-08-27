@@ -26,7 +26,7 @@ For more details and illustrations, see the [project overview](./OVERVIEW.md).
 
 ## Repository Structure
 - Blockchain practitioners who wish to use and experiment with our code should check the [Documentation](https://hyperledger-labs.github.io/weaver-dlt-interoperability).
-  * To dive straight into running a basic setup and testing sample interoperation scenarios, start with [Getting Started](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/getting-started).
+  * To dive straight into running a basic setup and testing sample interoperation scenarios, start with [Getting Started](https://labs.hyperledger.org/weaver-dlt-interoperability/docs/external/getting-started/guide).
   * The source code for the documents lies in the [docs folder](./docs).
 - Comprehensive specifications of our architecture and protocol suite are written in the style of RFCs and found in the [rfcs folder](./rfcs).
 - Core Weaver components are implemented in the [core folder](./core).
