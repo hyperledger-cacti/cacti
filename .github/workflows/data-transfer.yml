@@ -118,7 +118,7 @@ jobs:
         working-directory: samples/fabric/fabric-cli
       - name: Data Transfer Test 1
         run: |
-          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
+          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a
           ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
         working-directory: samples/fabric/fabric-cli
       - name: Data Transfer Test 2
