@@ -127,7 +127,7 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp config.template.json config.json
-          sed -i "s/<PATH-TO-WEAVER>/${GITHUB_WORKSPACE}/g" config.json
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" config.json
         working-directory: samples/fabric/fabric-cli
       - name: Setup CLI ENV
         run: |
