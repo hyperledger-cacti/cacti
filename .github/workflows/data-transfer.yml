@@ -64,18 +64,18 @@ jobs:
         run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
         working-directory: core/relay
         
-      - name: Start Relay for Corda_Network
-        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
-        working-directory: core/relay
+#       - name: Start Relay for Corda_Network
+#         run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
+#         working-directory: core/relay
         
       # FABRIC DRIVER
       - name: Start Fabric Driver for network1
         run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
-        working-directory: core/relay
+        working-directory: core/drivers/fabric-driver
       
       - name: Start Fabric Driver for network2
         run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
-        working-directory: core/relay
+        working-directory: core/drivers/fabric-driver
         
       # FABRIC CLI
       - name: Use Node.js 14.x
