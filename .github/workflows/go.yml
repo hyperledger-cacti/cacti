@@ -52,8 +52,4 @@ jobs:
     - name: Test
       run: go test -v ./...
       working-directory: core/network/fabric-interop-cc/contracts/interop
-      
-    - name: Undo Local Setup
-      run: mv go.mod.bkp go.mod
-      working-directory: core/network/fabric-interop-cc/contracts/interop
 
