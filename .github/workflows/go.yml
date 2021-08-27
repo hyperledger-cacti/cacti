@@ -86,7 +86,7 @@ jobs:
       working-directory: samples/fabric/simplestate
       
     - name: Test
-      run: go test -v ./...
+      run: make test
       working-directory: samples/fabric/simplestate
   
   test_simpleasset_github:
