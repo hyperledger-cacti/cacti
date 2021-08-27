@@ -71,7 +71,25 @@ jobs:
       run: go test -v ./...
       working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
       
-  test_simpleasset:
+  test_simplestate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: samples/fabric/simplestate
+      
+    - name: Test
+      run: go test -v ./...
+      working-directory: samples/fabric/simplestate
+  
+  test_simpleasset_github:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
