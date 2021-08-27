@@ -49,7 +49,16 @@ jobs:
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
           echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
           cat github.properties
-        working-directory: core/network/corda-interop-app
+        working-directory: tests/network-setups/corda
+        
+      - name: Start Corda Network
+        run: |
+          sed -i "docker logs corda_partya_1 -f"' s/^/#/' scripts/start-nodes.sh
+          make start
+          echo "Waiting till corda network to start."
+          sleep 60
+          docker logs corda_partya_1
+        working-directory: tests/network-setups/corda
         
       # RELAY
       - name: Edit docker compose
@@ -64,9 +73,9 @@ jobs:
         run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
         working-directory: core/relay
         
-#       - name: Start Relay for Corda_Network
-#         run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
-#         working-directory: core/relay
+      - name: Start Relay for Corda_Network
+        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
+        working-directory: core/relay
         
       # FABRIC DRIVER
       - name: Setup .env
@@ -82,6 +91,11 @@ jobs:
       - name: Start Fabric Driver for network2
         run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
         working-directory: core/drivers/fabric-driver
+        
+      # CORDA DRIVER
+      - name: Start Corda Driver
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
+        working-directory: core/drivers/corda-driver
         
       # FABRIC CLI
       - name: Use Node.js 14.x
@@ -113,17 +127,49 @@ jobs:
           cat .env
         working-directory: samples/fabric/fabric-cli
         
-      - name: Configure ALL
+      - name: Fabric CLI Configure ALL
         run: ./bin/fabric-cli configure all network1 network2
         working-directory: samples/fabric/fabric-cli
-      - name: Data Transfer Test 1
+        
+      # CORDA CLIENT
+      - name: Corda CLI Initialize Vault
+        run: make initialize-vault-docker
+        working-directory: samples/corda/corda-simple-application
+        
+      # DATA TRANSFERS
+      - name: Data Transfer Corda - Fabric1
+        run: |
+          ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a
+          ./clients/build/install/clients/bin/clients get-state a
+        working-directory: samples/corda/corda-simple-application
+      - name: Data Transfer Corda - Fabric2
+        run: |
+          ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
+          ./clients/build/install/clients/bin/clients get-state Arcturus
+        working-directory: samples/corda/corda-simple-application
+        
+      # FABRIC CLI
+      - name: Data Transfer Fabric1 - Corda
+        run: |
+          ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1
+        working-directory: samples/fabric/fabric-cli
+      - name: Data Transfer Fabric2 - Corda
+        run: |
+          ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network2
+        working-directory: samples/fabric/fabric-cli
+        
+      - name: Data Transfer Fabric2-Fabric1
         run: |
           ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a
           ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
         working-directory: samples/fabric/fabric-cli
-      - name: Data Transfer Test 2
+        
+      - name: Data Transfer Fabric1-Fabric2
         run: |
           ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
           ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
         working-directory: samples/fabric/fabric-cli
+        
       
