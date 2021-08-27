@@ -1,0 +1,127 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Data Transfer CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  start-fabric-network:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      # Runs a set of commands using the runners shell
+      - name: Start Fabric Network
+        run: make start-interop
+        working-directory: tests/network-setups/fabric/dev
+        
+  relay:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Start Relay for network1
+        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
+        working-directory: core/relay
+      
+      - name: Start Relay for network2
+        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
+        working-directory: core/relay
+        
+      - name: Start Relay for Corda_Network
+        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
+        working-directory: core/relay
+        
+  fabric-driver:
+    needs: start-fabric-network
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Start Fabric Driver for network1
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
+        working-directory: core/relay
+      
+      - name: Start Fabric Driver for network2
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
+        working-directory: core/relay
+        
+  setup-fabric-cli:
+    runs-on: ubuntu-latest
+    env:
+      DEFAULT_CHANNEL=mychannel
+      DEFAULT_CHAINCODE=interop
+      MEMBER_CREDENTIAL_FOLDER=${{ env.GITHUB_WORKSPACE }}/samples/fabric/fabric-cli/src/data/credentials_docker
+      LOCAL=true
+      DEFAULT_APPLICATION_CHAINCODE=simplestate
+      CONFIG_PATH=${{ env.GITHUB_WORKSPACE }}/samples/fabric/fabric-cli/config.json
+    steps:
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Build CLI
+        run: make build
+        working-directory: samples/fabric/fabric-cli
+      - name: Setup CLI Config
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cp config.template.json config.json
+          sed -i "s/<PATH-TO-WEAVER>/${$GITHUB_WORKSPACE}/g" config.json
+        working-directory: samples/fabric/fabric-cli
+      - name: Test env
+        run: |
+          ./bin/fabric-cli env get MEMBER_CREDENTIAL_FOLDER
+          ./bin/fabric-cli env get CONFIG_PATH
+        working-directory: samples/fabric/fabric-cli
+        
+  run-data-transfer:
+    needs: [start-fabric-network, relay, fabric-driver, setup-fabric-cli]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Configure ALL
+        run: ./bin/fabric-cli configure all network1 network2
+        working-directory: samples/fabric/fabric-cli
+      - name: Data Transfer Test 1
+        run: |
+          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
+        working-directory: samples/fabric/fabric-cli
+      - name: Data Transfer Test 2
+        run: |
+          ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
+        working-directory: samples/fabric/fabric-cli
+
