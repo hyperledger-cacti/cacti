@@ -10,7 +10,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test_github_packages:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -27,16 +27,27 @@ jobs:
         echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
         cat github.properties
       working-directory: core/network/corda-interop-app
-    - name: Build Corda Interop App
+    - name: Build Corda Interop App (Github Packages)
       run: make build
       working-directory: core/network/corda-interop-app
     - name: Run Tests (Github Packages)
-      run: make test
+      run: |
+        make test
+        rm github.properties
       working-directory: core/network/corda-interop-app
-    - name: Build Protos Locally
+  test_local:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+    - name: Build Protos (Local)
       run: make build
       working-directory: common/protos-java-kt
-    - name: Build Corda Interop App Locally
+    - name: Build Corda Interop App (Local)
       run: make build-local
       working-directory: core/network/corda-interop-app
     - name: Run Tests (Local)
