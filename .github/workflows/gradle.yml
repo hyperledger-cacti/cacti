@@ -14,11 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    
     - name: Set up JDK 8
       uses: actions/setup-java@v2
       with:
         java-version: '8'
         distribution: 'adopt'
+        
     - name: Generate github.properties
       run: |
         echo "Using ${GITHUB_ACTOR} user."
@@ -27,29 +29,38 @@ jobs:
         echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
         cat github.properties
       working-directory: core/network/corda-interop-app
+      
     - name: Build Corda Interop App (Github Packages)
       run: make build
       working-directory: core/network/corda-interop-app
+      
     - name: Run Tests (Github Packages)
-      run: |
-        make test
-        rm github.properties
+      run: make test
       working-directory: core/network/corda-interop-app
+      
+    - name: Delete github.properties
+      run: rm github.properties
+      working-directory: core/network/corda-interop-app
+      
   test_local:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    
     - name: Set up JDK 8
       uses: actions/setup-java@v2
       with:
         java-version: '8'
         distribution: 'adopt'
+        
     - name: Build Protos (Local)
       run: make build
       working-directory: common/protos-java-kt
+      
     - name: Build Corda Interop App (Local)
       run: make build-local
       working-directory: core/network/corda-interop-app
+      
     - name: Run Tests (Local)
       run: make test
       working-directory: core/network/corda-interop-app
