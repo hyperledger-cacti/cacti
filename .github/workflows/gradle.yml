@@ -20,11 +20,13 @@ jobs:
         java-version: '8'
         distribution: 'adopt'
     - name: Generate github.properties
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cp github.properties.template github.properties
         echo "Using ${GITHUB_ACTOR} user."
-        sed -i "s/${{ secrets.GITHUB_TOKEN }}/<GITHUB email>/g" github.properties
-        sed -i "s/${GITHUB_ACTOR}/<GITHUB Personal Access Token>/g" github.properties
+        sed -i "s/${GITHUB_ACTOR}/<GITHUB email>/g" github.properties
+        sed -i "s/${GITHUB_TOKEN}/<GITHUB Personal Access Token>/g" github.properties
         cat github.properties
       working-directory: core/network/corda-interop-app
     - name: Build Corda Interop App
