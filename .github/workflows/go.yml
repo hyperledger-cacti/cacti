@@ -101,14 +101,13 @@ jobs:
         
     - name: Setup
       env:
-        GOPATH: ${PWD}/tmp_gopath
+        GOMODCACHE: ${{ env.GOMODCACHE }}
       run: |
-        mkdir -p ${GOPATH}
-        echo "GOPATH: ${GOPATH}"
+        echo "GO MOD Path: ${GOMODCACHE}"
         go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
-        rm -rf ${GOPATH}/pkgs/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
-        cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* ${GOPATH}/pkgs/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/
-        ls -lh ${GOPATH}/pkgs/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*
+        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
+        cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/
+        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*
       working-directory: samples/fabric/simpleasset
 
     - name: Build
