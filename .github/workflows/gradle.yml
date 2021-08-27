@@ -20,12 +20,10 @@ jobs:
         java-version: '8'
         distribution: 'adopt'
     - name: Generate github.properties
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "Using ${GITHUB_EMAIL} user."
-        echo "username=${GITHUB_EMAIL}" > github.properties
-        echo "password=${GITHUB_TOKEN}" > github.properties
+        echo "Using ${GITHUB_ACTOR} user."
+        echo "username=${GITHUB_ACTOR}" > github.properties
+        echo "password=${{ secrets.GITHUB_TOKEN }}" > github.properties
         echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" > github.properties
         cat github.properties
       working-directory: core/network/corda-interop-app
