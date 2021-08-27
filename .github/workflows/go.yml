@@ -100,7 +100,10 @@ jobs:
         go-version: 1.16
         
     - name: Setup
+      env:
+        GOPATH: ${PWD}/tmp_gopath
       run: |
+        mkdir -p ${GOPATH}
         echo "GOPATH: ${GOPATH}"
         go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
         rm -rf ${GOPATH}/pkgs/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
