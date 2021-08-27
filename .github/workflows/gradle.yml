@@ -22,9 +22,9 @@ jobs:
     - name: Generate github.properties
       run: |
         echo "Using ${GITHUB_ACTOR} user."
-        echo "username=${GITHUB_ACTOR}" > github.properties
-        echo "password=${{ secrets.GITHUB_TOKEN }}" > github.properties
-        echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" > github.properties
+        echo "username=${GITHUB_ACTOR}" >> github.properties
+        echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+        echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
         cat github.properties
       working-directory: core/network/corda-interop-app
     - name: Build Corda Interop App
