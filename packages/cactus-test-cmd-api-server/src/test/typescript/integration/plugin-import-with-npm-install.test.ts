@@ -47,6 +47,7 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;
   apiServerOptions.cockpitPort = 0;
+  apiServerOptions.grpcPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [
     {

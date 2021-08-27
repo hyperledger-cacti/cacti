@@ -14,3 +14,5 @@
 # **/coverage/**
 
 # typings/**
+
+**/src/main/typescript/generated/proto/**

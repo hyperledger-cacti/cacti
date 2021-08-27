@@ -395,14 +395,11 @@ export class QuorumTestLedger implements ITestLedger {
   }
 
   private validateConstructorOptions(): void {
-    const validationResult = Joi.validate<IQuorumTestLedgerConstructorOptions>(
-      {
-        containerImageVersion: this.containerImageVersion,
-        containerImageName: this.containerImageName,
-        rpcApiHttpPort: this.rpcApiHttpPort,
-      },
-      QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
-    );
+    const validationResult = QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA.validate({
+      containerImageVersion: this.containerImageVersion,
+      containerImageName: this.containerImageName,
+      rpcApiHttpPort: this.rpcApiHttpPort,
+    });
 
     if (validationResult.error) {
       throw new Error(

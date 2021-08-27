@@ -184,6 +184,7 @@ test(testCase, async (t: Test) => {
       apiServerOptions.apiCorsDomainCsv = "*";
       apiServerOptions.apiPort = addressInfo1.port;
       apiServerOptions.cockpitPort = 0;
+      apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
       const config = configService.newExampleConfigConvict(apiServerOptions);
 
@@ -226,6 +227,7 @@ test(testCase, async (t: Test) => {
       apiServerOptions.apiCorsDomainCsv = "*";
       apiServerOptions.apiPort = addressInfo2.port;
       apiServerOptions.cockpitPort = 0;
+      apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
       const config = configService.newExampleConfigConvict(apiServerOptions);
 
