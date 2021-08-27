@@ -516,15 +516,12 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
   private validateConstructorOptions(): void {
     const fnTag = "FabricTestLedgerV1#validateConstructorOptions()";
-    const result = Joi.validate<IFabricTestLedgerV1ConstructorOptions>(
-      {
-        imageVersion: this.imageVersion,
-        imageName: this.imageName,
-        publishAllPorts: this.publishAllPorts,
-        envVars: this.envVars,
-      },
-      OPTS_JOI_SCHEMA,
-    );
+    const result = OPTS_JOI_SCHEMA.validate({
+      imageVersion: this.imageVersion,
+      imageName: this.imageName,
+      publishAllPorts: this.publishAllPorts,
+      envVars: this.envVars,
+    });
 
     if (result.error) {
       throw new Error(`${fnTag} ${result.error.annotate()}`);

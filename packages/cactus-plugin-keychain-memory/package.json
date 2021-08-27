@@ -77,10 +77,10 @@
     "@hyperledger/cactus-core-api": "0.8.0",
     "axios": "0.21.1",
     "express": "4.17.1",
-    "prom-client": "13.1.0",
+    "prom-client": "13.2.0",
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@types/express": "4.17.8"
+    "@types/express": "4.17.13"
   }
 }

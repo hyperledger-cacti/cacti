@@ -396,17 +396,14 @@ export class CordaTestLedger implements ITestLedger {
 
   private validateConstructorOptions(): void {
     const fnTag = `${this.className}#validateConstructorOptions()`;
-    const validationResult = Joi.validate<ICordaTestLedgerConstructorOptions>(
-      {
-        imageVersion: this.imageVersion,
-        imageName: this.imageName,
-        rpcPortNotary: this.rpcPortNotary,
-        rpcPortA: this.rpcPortA,
-        rpcPortB: this.rpcPortB,
-        rpcPortC: this.rpcPortC,
-      },
-      JOI_SCHEMA,
-    );
+    const validationResult = JOI_SCHEMA.validate({
+      imageVersion: this.imageVersion,
+      imageName: this.imageName,
+      rpcPortNotary: this.rpcPortNotary,
+      rpcPortA: this.rpcPortA,
+      rpcPortB: this.rpcPortB,
+      rpcPortC: this.rpcPortC,
+    });
 
     if (validationResult.error) {
       throw new Error(`${fnTag} ${validationResult.error.annotate()}`);

@@ -83,12 +83,11 @@
         "@hyperledger/cactus-plugin-ledger-connector-besu": "0.8.0",
         "axios": "0.21.1",
         "express": "4.17.1",
-        "joi": "14.3.1",
-        "openapi-types": "7.0.1",
+        "joi": "17.4.2",
+        "openapi-types": "9.1.0",
         "typescript-optional": "2.0.1"
     },
     "devDependencies": {
-        "@types/express": "4.17.8",
-        "@types/joi": "14.3.4"
+        "@types/express": "4.17.13"
     }
 }
