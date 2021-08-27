@@ -1,0 +1,44 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Corda Interop App Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+    - name: Generate github.properties
+      run: |
+        cp github.properties.template github.properties
+        echo "Using ${GITHUB_ACTOR} user."
+        sed -i "s/${{ secrets.GITHUB_TOKEN }}/<GITHUB email>/g" github.properties
+        sed -i "s/${GITHUB_ACTOR}/<GITHUB Personal Access Token>/g" github.properties
+        cat github.properties
+      working-directory: core/network/corda-interop-app
+    - name: Build Corda Interop App
+      run: make build
+      working-directory: core/network/corda-interop-app
+    - name: Run Tests (Github Packages)
+      run: make test
+      working-directory: core/network/corda-interop-app
+    - name: Build Protos Locally
+      run: make build
+      working-directory: common/protos-java-kt
+    - name: Build Corda Interop App Locally
+      run: make build-local
+      working-directory: core/network/corda-interop-app
+    - name: Run Tests (Local)
+      run: make test
+      working-directory: core/network/corda-interop-app
