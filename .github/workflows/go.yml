@@ -39,6 +39,8 @@ jobs:
       run: |
         mv go.mod go.mod.bkp
         cp go.mod.local go.mod
+        cp -r ../../../../../common/protos-go ./protos-go
+        cp -r ../../libs/assetexchange ./assetexchange
       working-directory: core/network/fabric-interop-cc/contracts/interop
         
     - name: Build
