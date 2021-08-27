@@ -116,6 +116,7 @@ const main = async () => {
   apiServerOptions.apiCorsDomainCsv = "your.domain.example.com";
   apiServerOptions.apiPort = 3000;
   apiServerOptions.cockpitPort = 3100;
+  apiServerOptions.grpcPort = 5000;
   // Disble TLS (or provide TLS certs for secure HTTP if you are deploying to production)
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [

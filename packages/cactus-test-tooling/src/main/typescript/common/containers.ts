@@ -1,5 +1,5 @@
 import path from "path";
-import { Stream } from "stream";
+import { Duplex } from "stream";
 import { IncomingMessage } from "http";
 import { Container, ContainerInfo } from "dockerode";
 import Dockerode from "dockerode";
@@ -328,7 +328,7 @@ export class Containers {
     return new Promise((resolve, reject) => {
       log.debug(`Calling Exec Start on Docker Engine API...`);
 
-      exec.start({ Tty: true }, (err: any, stream: Stream) => {
+      exec.start({ Tty: true }, (err: Error, stream: Duplex | undefined) => {
         const timeoutIntervalId = setInterval(() => {
           reject(new Error(`Docker Exec timed out after ${timeoutMs}ms`));
         }, timeoutMs);
@@ -338,6 +338,10 @@ export class Containers {
           const errorMessage = `Docker Engine API Exec Start Failed:`;
           log.error(errorMessage, err);
           return reject(new RuntimeError(errorMessage, err));
+        }
+        if (!stream) {
+          const msg = `${fnTag} container engine returned falsy stream object, cannot continue.`;
+          return reject(new RuntimeError(msg));
         }
         log.debug(`Obtained output stream of Exec Start OK`);
         let output = "";

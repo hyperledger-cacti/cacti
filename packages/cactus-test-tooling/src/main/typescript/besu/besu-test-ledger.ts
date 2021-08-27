@@ -411,15 +411,12 @@ export class BesuTestLedger implements ITestLedger {
   }
 
   private validateConstructorOptions(): void {
-    const validationResult = Joi.validate<IBesuTestLedgerConstructorOptions>(
-      {
-        containerImageVersion: this.containerImageVersion,
-        containerImageName: this.containerImageName,
-        rpcApiHttpPort: this.rpcApiHttpPort,
-        envVars: this.envVars,
-      },
-      BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
-    );
+    const validationResult = BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA.validate({
+      containerImageVersion: this.containerImageVersion,
+      containerImageName: this.containerImageName,
+      rpcApiHttpPort: this.rpcApiHttpPort,
+      envVars: this.envVars,
+    });
 
     if (validationResult.error) {
       throw new Error(

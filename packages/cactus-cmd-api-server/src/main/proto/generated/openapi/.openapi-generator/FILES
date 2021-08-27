@@ -1,0 +1,6 @@
+.openapi-generator-ignore
+README.md
+models/health_check_response_pb.proto
+models/memory_usage_pb.proto
+models/watch_healthcheck_v1_pb.proto
+services/default_service.proto
