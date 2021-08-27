@@ -53,7 +53,7 @@ jobs:
         
       - name: Start Corda Network
         run: |
-          sed -i "docker logs corda_partya_1 -f"' s/^/#/' scripts/start-nodes.sh
+          sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
           make start
           echo "Waiting till corda network to start."
           sleep 60
