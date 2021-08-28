@@ -77,23 +77,23 @@
                     "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
                 ]
             },
-            "ConsensusAlgorithmFamiliesWithTxFinality":{
+            "ConsensusAlgorithmFamiliesWithTxFinality": {
                 "type": "string",
                 "description": "Enumerates a list of consensus algorithm families that provide immediate finality",
                 "enum": [
                     "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY",
                     "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"
                 ]
-
             },
-            "ConsensusAlgorithmFamiliesWithOutTxFinality":{
-                "description":"Enumerates a list of consensus algorithm families that do not provide immediate finality",
+            "ConsensusAlgorithmFamiliesWithOutTxFinality": {
+                "description": "Enumerates a list of consensus algorithm families that do not provide immediate finality",
                 "type": "string",
                 "enum": [
                     "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
                 ],
-                "x-enum-varnames": ["WORK"]
-
+                "x-enum-varnames": [
+                    "WORK"
+                ]
             },
             "PrimaryKey": {
                 "type": "string",
@@ -614,6 +614,74 @@
                         "nullable": false
                     }
                 }
+            },
+            "DeleteKeychainEntryRequestV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to check the presence of on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeleteKeychainEntryResponseV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was deleted from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "HasKeychainEntryRequestV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key to check for presence in the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "HasKeychainEntryResponseV1": {
+              "type": "object",
+              "required": ["key", "isPresent", "checkedAt"],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "The key that was used to check the presence of the value in the entry store.",
+                  "minLength": 1,
+                  "maxLength": 1024,
+                  "nullable": false
+                },
+                "checkedAt": {
+                  "type": "string",
+                  "description": "Date and time encoded as JSON when the presence check was performed by the plugin backend.",
+                  "nullable": false
+                },
+                "isPresent": {
+                  "type": "boolean",
+                  "description": "The boolean true or false indicating the presence or absence of an entry under 'key'.",
+                  "nullable": false
+                }
+              }
             }
         },
         "requestBodies": {
@@ -671,6 +739,28 @@
                         }
                     }
                 }
+            },
+            "keychain_has_entry_request_body": {
+                "description": "Request body for checking a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/HasKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            },
+            "keychain_delete_entry_request_body": {
+                "description": "Request body to delete a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/DeleteKeychainEntryRequestV1"
+                        }
+                    }
+                }
             }
         },
         "responses": {
@@ -707,13 +797,13 @@
             "keychain_get_entry_200": {
                 "description": "OK",
                 "content": {
-                   "application/json": {
-                      "schema": {
-                         "$ref": "#/components/schemas/GetKeychainEntryResponse"
-                      }
-                   }
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/GetKeychainEntryResponse"
+                        }
+                    }
                 }
-             },
+            },
             "keychain_get_entry_400": {
                 "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
             },
@@ -730,11 +820,11 @@
                 "description": "OK",
                 "content": {
                     "application/json": {
-                       "schema": {
-                          "$ref": "#/components/schemas/SetKeychainEntryResponse"
-                       }
+                        "schema": {
+                            "$ref": "#/components/schemas/SetKeychainEntryResponse"
+                        }
                     }
-                 }
+                }
             },
             "keychain_set_entry_400": {
                 "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
@@ -743,6 +833,44 @@
                 "description": "Authorization information is missing or invalid."
             },
             "keychain_set_entry_500": {
+                "description": "Unexpected error."
+            },
+            "keychain_has_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/HasKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_has_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_has_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_has_entry_500": {
+                "description": "Unexpected error."
+            },
+            "keychain_delete_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/DeleteKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_delete_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_delete_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_delete_entry_500": {
                 "description": "Unexpected error."
             }
         }
