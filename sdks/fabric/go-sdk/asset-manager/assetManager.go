@@ -16,28 +16,12 @@ import (
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	log "github.com/sirupsen/logrus"
 
-	//"google.golang.org/protobuf/proto"
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 )
 
-type GatewayContractInterface interface {
-	SubmitTransaction(*gateway.Contract, string, ...string) ([]byte, error)
-	EvaluateTransaction(*gateway.Contract, string, ...string) ([]byte, error)
-}
-
-type fabricGatewayContract struct{}
-
-func (f fabricGatewayContract) SubmitTransaction(contract *gateway.Contract, ccFunc string, args ...string) ([]byte, error) {
-	return contract.SubmitTransaction(ccFunc, args...)
-}
-
-func (f fabricGatewayContract) EvaluateTransaction(contract *gateway.Contract, ccFunc string, args ...string) ([]byte, error) {
-	return contract.EvaluateTransaction(ccFunc, args...)
-}
-
-func NewGatewayContractInterface() GatewayContractInterface {
-	return fabricGatewayContract{}
+type GatewayContract interface {
+	SubmitTransaction(string, ...string) ([]byte, error)
+	EvaluateTransaction(string, ...string) ([]byte, error)
 }
 
 // helper functions to log and return errors
@@ -135,7 +119,7 @@ func GenerateSHA256HashInBase64Form(hashPreimage string) string {
 	return shaHashBase64
 }
 
-func CreateHTLC(gci GatewayContractInterface, contract *gateway.Contract, assetType string, assetId string, recipientECertBase64 string,
+func CreateHTLC(contract GatewayContract, assetType string, assetId string, recipientECertBase64 string,
 	hashBase64 string, expiryTimeSecs uint64) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
@@ -167,7 +151,7 @@ func CreateHTLC(gci GatewayContractInterface, contract *gateway.Contract, assetT
 	}
 
 	// Normal invoke function
-	result, err := gci.SubmitTransaction(contract, "LockAsset", assetExchangeAgreementStr, lockInfoStr)
+	result, err := contract.SubmitTransaction("LockAsset", assetExchangeAgreementStr, lockInfoStr)
 	if err != nil {
 		return "", logThenErrorf("error in contract.SubmitTransaction LockAsset: %+v", err.Error())
 	}
@@ -175,7 +159,7 @@ func CreateHTLC(gci GatewayContractInterface, contract *gateway.Contract, assetT
 	return string(result), nil
 }
 
-func CreateFungibleHTLC(gci GatewayContractInterface, contract *gateway.Contract, assetType string, numUnits uint64, recipientECertBase64 string,
+func CreateFungibleHTLC(contract GatewayContract, assetType string, numUnits uint64, recipientECertBase64 string,
 	hashBase64 string, expiryTimeSecs uint64) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
@@ -207,7 +191,7 @@ func CreateFungibleHTLC(gci GatewayContractInterface, contract *gateway.Contract
 	}
 
 	// Normal invoke function
-	result, err := gci.SubmitTransaction(contract, "LockFungibleAsset", assetExchangeAgreementStr, lockInfoStr)
+	result, err := contract.SubmitTransaction("LockFungibleAsset", assetExchangeAgreementStr, lockInfoStr)
 	if err != nil {
 		return "", logThenErrorf("error in contract.SubmitTransaction LockFungibleAsset: %+v", err.Error())
 	}
@@ -215,7 +199,7 @@ func CreateFungibleHTLC(gci GatewayContractInterface, contract *gateway.Contract
 	return string(result), nil
 }
 
-func IsAssetLockedInHTLC(gci GatewayContractInterface, contract *gateway.Contract, assetType string, assetId string, recipientECertBase64 string, lockerECertBase64 string) (string, error) {
+func IsAssetLockedInHTLC(contract GatewayContract, assetType string, assetId string, recipientECertBase64 string, lockerECertBase64 string) (string, error) {
 
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
@@ -239,7 +223,7 @@ func IsAssetLockedInHTLC(gci GatewayContractInterface, contract *gateway.Contrac
 	}
 
 	// Normal invoke function
-	result, err := gci.EvaluateTransaction(contract, "IsAssetLocked", assetExchangeAgreementStr)
+	result, err := contract.EvaluateTransaction("IsAssetLocked", assetExchangeAgreementStr)
 	if err != nil {
 		return "", logThenErrorf("error in contract.EvaluateTransaction IsAssetLocked: %+v", err.Error())
 	}
@@ -247,7 +231,7 @@ func IsAssetLockedInHTLC(gci GatewayContractInterface, contract *gateway.Contrac
 	return string(result), nil
 }
 
-func IsFungibleAssetLockedInHTLC(gci GatewayContractInterface, contract *gateway.Contract, contractId string) (string, error) {
+func IsFungibleAssetLockedInHTLC(contract GatewayContract, contractId string) (string, error) {
 
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
@@ -257,7 +241,7 @@ func IsFungibleAssetLockedInHTLC(gci GatewayContractInterface, contract *gateway
 	}
 
 	// Normal invoke function
-	result, err := gci.EvaluateTransaction(contract, "IsFungibleAssetLocked", contractId)
+	result, err := contract.EvaluateTransaction("IsFungibleAssetLocked", contractId)
 	if err != nil {
 		return "", logThenErrorf("error in contract.EvaluateTransaction IsFungibleAssetLocked: %+v", err.Error())
 	}
@@ -265,7 +249,7 @@ func IsFungibleAssetLockedInHTLC(gci GatewayContractInterface, contract *gateway
 	return string(result), nil
 }
 
-func IsAssetLockedInHTLCqueryUsingContractId(gci GatewayContractInterface, contract *gateway.Contract, contractId string) (string, error) {
+func IsAssetLockedInHTLCqueryUsingContractId(contract GatewayContract, contractId string) (string, error) {
 
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
@@ -275,7 +259,7 @@ func IsAssetLockedInHTLCqueryUsingContractId(gci GatewayContractInterface, contr
 	}
 
 	// Normal invoke function
-	result, err := gci.EvaluateTransaction(contract, "IsAssetLockedQueryUsingContractId", contractId)
+	result, err := contract.EvaluateTransaction("IsAssetLockedQueryUsingContractId", contractId)
 	if err != nil {
 		return "", logThenErrorf("error in contract.EvaluateTransaction IsAssetLockedQueryUsingContractId: %+v", err.Error())
 	}
@@ -283,7 +267,7 @@ func IsAssetLockedInHTLCqueryUsingContractId(gci GatewayContractInterface, contr
 	return string(result), nil
 }
 
-func ClaimAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract, assetType string, assetId string, lockerECertBase64 string, hashPreimageBase64 string) (string, error) {
+func ClaimAssetInHTLC(contract GatewayContract, assetType string, assetId string, lockerECertBase64 string, hashPreimageBase64 string) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
 	}
@@ -311,7 +295,7 @@ func ClaimAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract, 
 	}
 
 	// Normal invoke function
-	result, err := gci.SubmitTransaction(contract, "ClaimAsset", assetExchangeAgreementStr, claimInfoStr)
+	result, err := contract.SubmitTransaction("ClaimAsset", assetExchangeAgreementStr, claimInfoStr)
 	if err != nil {
 		return "", logThenErrorf("error in contract.SubmitTransaction ClaimAsset: %+v", err.Error())
 	}
@@ -319,7 +303,7 @@ func ClaimAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract, 
 	return string(result), nil
 }
 
-func ClaimFungibleAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract, contractId string, hashPreimageBase64 string) (string, error) {
+func ClaimFungibleAssetInHTLC(contract GatewayContract, contractId string, hashPreimageBase64 string) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
 	}
@@ -336,7 +320,7 @@ func ClaimFungibleAssetInHTLC(gci GatewayContractInterface, contract *gateway.Co
 	}
 
 	// Normal invoke function
-	result, err := gci.SubmitTransaction(contract, "ClaimFungibleAsset", contractId, claimInfoStr)
+	result, err := contract.SubmitTransaction("ClaimFungibleAsset", contractId, claimInfoStr)
 	if err != nil {
 		return "", logThenErrorf("error in contract.SubmitTransaction ClaimFungibleAsset: %+v", err.Error())
 	}
@@ -344,7 +328,7 @@ func ClaimFungibleAssetInHTLC(gci GatewayContractInterface, contract *gateway.Co
 	return string(result), nil
 }
 
-func ClaimAssetInHTLCusingContractId(gci GatewayContractInterface, contract *gateway.Contract, contractId string, hashPreimageBase64 string) (string, error) {
+func ClaimAssetInHTLCusingContractId(contract GatewayContract, contractId string, hashPreimageBase64 string) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
 	}
@@ -361,7 +345,7 @@ func ClaimAssetInHTLCusingContractId(gci GatewayContractInterface, contract *gat
 	}
 
 	// Normal invoke function
-	result, err := gci.SubmitTransaction(contract, "ClaimAssetUsingContractId", contractId, claimInfoStr)
+	result, err := contract.SubmitTransaction("ClaimAssetUsingContractId", contractId, claimInfoStr)
 	if err != nil {
 		return "", logThenErrorf("error in contract.SubmitTransaction ClaimAssetUsingContractId: %+v", err.Error())
 	}
@@ -369,7 +353,7 @@ func ClaimAssetInHTLCusingContractId(gci GatewayContractInterface, contract *gat
 	return string(result), nil
 }
 
-func ReclaimAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract, assetType string, assetId string, recipientECertBase64 string) (string, error) {
+func ReclaimAssetInHTLC(contract GatewayContract, assetType string, assetId string, recipientECertBase64 string) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
 	}
@@ -389,7 +373,7 @@ func ReclaimAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract
 	}
 
 	// Normal invoke function
-	result, err := gci.SubmitTransaction(contract, "UnlockAsset", assetExchangeAgreementStr)
+	result, err := contract.SubmitTransaction("UnlockAsset", assetExchangeAgreementStr)
 	if err != nil {
 		return "", logThenErrorf("error in contract.SubmitTransaction UnlockAsset: %+v", err.Error())
 	}
@@ -397,7 +381,7 @@ func ReclaimAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract
 	return string(result), nil
 }
 
-func ReclaimFungibleAssetInHTLC(gci GatewayContractInterface, contract *gateway.Contract, contractId string) (string, error) {
+func ReclaimFungibleAssetInHTLC(contract GatewayContract, contractId string) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
 	}
@@ -406,7 +390,7 @@ func ReclaimFungibleAssetInHTLC(gci GatewayContractInterface, contract *gateway.
 	}
 
 	// Normal invoke function
-	result, err := gci.SubmitTransaction(contract, "UnlockFungibleAsset", contractId)
+	result, err := contract.SubmitTransaction("UnlockFungibleAsset", contractId)
 	if err != nil {
 		return "", logThenErrorf("error in contract.SubmitTransaction UnlockFungibleAsset: %+v", err.Error())
 	}
@@ -414,7 +398,7 @@ func ReclaimFungibleAssetInHTLC(gci GatewayContractInterface, contract *gateway.
 	return string(result), nil
 }
 
-func ReclaimAssetInHTLCusingContractId(gci GatewayContractInterface, contract *gateway.Contract, contractId string) (string, error) {
+func ReclaimAssetInHTLCusingContractId(contract GatewayContract, contractId string) (string, error) {
 	if contract == nil {
 		return "", logThenErrorf("contract handle not supplied")
 	}
@@ -423,7 +407,7 @@ func ReclaimAssetInHTLCusingContractId(gci GatewayContractInterface, contract *g
 	}
 
 	// Normal invoke function
-	result, err := gci.SubmitTransaction(contract, "UnlockAssetUsingContractId", contractId)
+	result, err := contract.SubmitTransaction("UnlockAssetUsingContractId", contractId)
 	if err != nil {
 		return "", logThenErrorf("error in contract.SubmitTransaction UnlockAssetUsingContractId: %+v", err.Error())
 	}

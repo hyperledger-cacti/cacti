@@ -12,8 +12,8 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-cli/helpers"
 	log "github.com/sirupsen/logrus"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
 )
 
 // helper functions to log and return errors
