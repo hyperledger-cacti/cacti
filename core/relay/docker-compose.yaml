@@ -10,7 +10,7 @@ services:
   # image configured to work with the dummy driver.
   #
   relay-server:
-    image: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}-server:${DOCKER_TAG}
+    image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
     container_name: ${RELAY_NAME}
     environment:
     # General Configuration
@@ -176,6 +176,8 @@ services:
     # Uncomment this to expose ports internally and externally from the container
     # ports:
     # - "9083:9083"
+    networks:
+        - relay
 # This networks section is required for when the peers have networks specified
 networks:
   base-network:

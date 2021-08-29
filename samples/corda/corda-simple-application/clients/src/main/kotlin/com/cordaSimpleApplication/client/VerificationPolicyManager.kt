@@ -9,19 +9,17 @@ package com.cordaSimpleApplication.client
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.flatMap
-import com.weaver.corda.app.interop.flows.*
-import com.weaver.corda.app.interop.states.VerificationPolicyState
-import com.weaver.corda.app.interop.states.Policy
-import com.weaver.corda.app.interop.states.Identifier
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.google.gson.Gson
 import java.io.File
 import java.lang.Exception
 import kotlinx.coroutines.runBlocking
 import net.corda.core.messaging.startFlow
+import com.google.protobuf.util.JsonFormat
+
+import com.weaver.corda.sdk.VerificationPolicyManager
+import com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass
 
 /**
  * TODO: Documentation
@@ -30,54 +28,37 @@ class CreateVerificationPolicyCommand : CliktCommand(help = "Creates a Verificat
     val config by requireObject<Map<String, String>>()
     val network by argument()
     override fun run() = runBlocking {
-        val result = createVerificationPolicyFromFile(network, config)
-        println(result)
+        createVerificationPolicyFromFile(network, config)
     }
 }
 
 /**
  * Helper function to create a verification policy for an external network
  */
-fun createVerificationPolicyFromFile(network: String, config: Map<String, String>): Either<Error, String> {
+fun createVerificationPolicyFromFile(network: String, config: Map<String, String>) {
     val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
     val filepath = "${credentialPath}/${network}/verification-policy.json"
-    return try {
-        val file = File(filepath).readText(Charsets.UTF_8)
-        val verificationPolicy = Gson().fromJson(file, VerificationPolicyState::class.java)
-        println("Verification policy from file: $verificationPolicy")
-        writeVerificationPolicyToVault(
-                verificationPolicy,
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt()
-        )
-    } catch (e: Exception) {
-      println("Error: Credentials directory ${filepath} not found.")
-      Left(Error("Error: Credentials directory ${filepath} not found."))
-    }
-}
-
-/**
- * Helper function used by createVerificationPolicyFromFile to interact with the Corda network
- */
-fun writeVerificationPolicyToVault(
-        verificationPolicy: VerificationPolicyState,
-        host: String,
-        port: Int): Either<Error, String> {
-    println("Storing verification policy in the vault")
     val rpc = NodeRPCConnection(
-            host = host,
+            host = config["CORDA_HOST"]!!,
             username = "clientUser1",
             password = "test",
-            rpcPort = port)
-    return try {
+            rpcPort = config["CORDA_PORT"]!!.toInt())
+    try {
+        val verificationPolicy = File(filepath).readText(Charsets.UTF_8)
+        println("Verification policy from file: $verificationPolicy")
+        var verificationPolicyBuilder = VerificationPolicyOuterClass.VerificationPolicy.newBuilder()
+        JsonFormat.parser().merge(
+            verificationPolicy, 
+            verificationPolicyBuilder
+        );
         println("Storing verification policy in the vault")
-        val proxy = rpc.proxy
-        val stateId = proxy.startFlow(::CreateVerificationPolicyState, verificationPolicy)
-                .returnValue.get()
-        println("Verification Policy stored with linearId $stateId")
-        Right(stateId.toString())
+        val res = VerificationPolicyManager.createVerificationPolicyState(
+            rpc.proxy,
+            verificationPolicyBuilder.build()
+        )
+        println("Verification Policy Create Result: $res")
     } catch (e: Exception) {
-        Left(Error("${e.message}"))
+      println("Error: ${e.toString()}")
     } finally {
         rpc.close()
     }
@@ -88,51 +69,39 @@ fun writeVerificationPolicyToVault(
  */
 class UpdateVerificationPolicyCommand : CliktCommand(help = "Updates a Verification Policy for an external network. Requires securityDomain, identifier and policy arguments") {
     val config by requireObject<Map<String, String>>()
-
-    //    TODO: make these flags instead of positional arguments
-    val securityDomain by argument()
-    val identifier by argument()
-    val policyType by argument()
-    val policyCriteria by argument()
+    val network: String by argument()
     override fun run() = runBlocking {
-        // TODO: Lookup local config file for network based on provided securityDomain
-        val verificationPolicy = VerificationPolicyState(
-                securityDomain = securityDomain,
-                identifiers = listOf(Identifier(
-                        pattern = identifier,
-                        policy = Policy(policyType, listOf(policyCriteria)))
-                )
-        )
-        val eitherErrorStateId = updateVerificationPolicy(
-                verificationPolicy,
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt())
-        println("Corda network returned: $eitherErrorStateId")
+        updateVerificationPolicyFromFile(network, config)
     }
 }
 
 /**
- * Helper function used by UpdateVerificationPolicyCommand to interact with the Corda network
+ * Helper function for UpdateVerificationPolicyCommand
  */
-fun updateVerificationPolicy(
-        verificationPolicy: VerificationPolicyState,
-        host: String,
-        port: Int): Either<Error, String> {
-    println("Updating verification policy for network ${verificationPolicy.securityDomain}")
+fun updateVerificationPolicyFromFile(network: String, config: Map<String, String>) {
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val filepath = "${credentialPath}/${network}/verification-policy.json"
     val rpc = NodeRPCConnection(
-            host = host,
+            host = config["CORDA_HOST"]!!,
             username = "clientUser1",
             password = "test",
-            rpcPort = port)
-    return try {
-        println("Updating verification policy for network ${verificationPolicy.securityDomain}")
-        val proxy = rpc.proxy
-        val stateId = proxy.startFlow(::UpdateVerificationPolicyState, verificationPolicy)
-                .returnValue.get()
-        println("Verification Policy stored with linearId $stateId")
-        Right(stateId.toString())
+            rpcPort = config["CORDA_PORT"]!!.toInt())
+    try {
+        val verificationPolicy = File(filepath).readText(Charsets.UTF_8)
+        println("Verification policy from file: $verificationPolicy")
+        var verificationPolicyBuilder = VerificationPolicyOuterClass.VerificationPolicy.newBuilder()
+        JsonFormat.parser().merge(
+            verificationPolicy, 
+            verificationPolicyBuilder
+        );
+        println("Updating verification policy for network")
+        val res = VerificationPolicyManager.updateVerificationPolicyState(
+            rpc.proxy,
+            verificationPolicyBuilder.build()
+        )
+        println("Verification Policy Update Result: $res")
     } catch (e: Exception) {
-        Left(Error("${e.message}"))
+        println("Error: ${e.toString()}")
     } finally {
         rpc.close()
     }
@@ -147,42 +116,22 @@ class DeleteVerificationPolicyCommand : CliktCommand(help = "Deletes a Verificat
     //    TODO: make this a flag instead of positional arguments
     val securityDomain by argument()
     override fun run() = runBlocking {
-        val eitherErrorStateId = deleteVerificationPolicy(
-                securityDomain,
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt())
-        println("Corda network returned: $eitherErrorStateId")
-    }
-}
-
-/**
- * Helper function used by DeleteVerificationPolicyCommand to interact with the Corda network
- */
-fun deleteVerificationPolicy(
-    securityDomain: String,
-    host: String,
-    port: Int
-): Either<Error, String> {
-    val rpc = NodeRPCConnection(
-            host = host,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = port)
-    return try {
-        println("Deleting verification policy for securityDomain $securityDomain")
-        val proxy = rpc.proxy
-        val result = runCatching {
-            proxy.startFlow(::DeleteVerificationPolicyState, securityDomain)
-                    .returnValue.get().flatMap {
-                        println("Verification Policy for securityDomain $securityDomain deleted\n")
-                        Right(it.toString())
-                    }
-        }.fold({ it }, { Left(Error(it.message)) })
-        result
-    } catch (e: Exception) {
-        Left(Error("Corda Network Error: ${e.message}"))
-    } finally {
-        rpc.close()
+        val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val res = VerificationPolicyManager.deleteVerificationPolicyState(
+                rpc.proxy, 
+                securityDomain
+            )
+            println("Delete Verification Policy State Result: ${res}")
+        } catch (e: Exception) {
+            println("Error: ${e.toString()}")
+        } finally {
+            rpc.close()
+        }
     }
 }
 
@@ -193,47 +142,22 @@ class GetVerificationPolicyCommand : CliktCommand(help = "Gets Verification Poli
     val config by requireObject<Map<String, String>>()
     val securityDomain by argument()
     override fun run() = runBlocking {
-        val eitherErrorStateId = getVerificationPolicy(
-                securityDomain,
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt())
-        println("Get Verification Policy result: $eitherErrorStateId")
-    }
-}
-
-/**
- * Helper function used by GetVerificationPolicyCommand to interact with the Corda network
- */
-fun getVerificationPolicy(
-        securityDomain: String,
-        host: String,
-        port: Int): Either<Error, VerificationPolicyState> {
-    println("Getting verification policy for securityDomain $securityDomain")
-    val rpc = NodeRPCConnection(
-            host = host,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = port)
-    return try {
-        println("Getting verification policy for securityDomain $securityDomain")
-        val proxy = rpc.proxy
-        val verificationPolicy = runCatching {
-            proxy.startFlow(::GetVerificationPolicyStateBySecurityDomain, securityDomain)
-                    .returnValue.get().fold({
-                        println("Error getting policy from network: ${it.message}")
-                        Left(Error("Corda Network Error: ${it.message}"))
-                    }, {
-                        println("Verification Policy for securityDomain $securityDomain: ${it.state.data} \n")
-                        Right(it.state.data)
-                    })
-        }.fold({ it }, {
-            Left(Error("Corda Network Error: ${it.message}"))
-        })
-        verificationPolicy
-    } catch (e: Exception) {
-        Left(Error("Error with network connection: ${e.message}"))
-    } finally {
-        rpc.close()
+        val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val res = VerificationPolicyManager.getVerificationPolicyState(
+                rpc.proxy, 
+                securityDomain
+            )
+            println("Get Verification Policy State Result: ${res}")
+        } catch (e: Exception) {
+            println("Error: ${e.toString()}")
+        } finally {
+            rpc.close()
+        }
     }
 }
 
@@ -243,35 +167,20 @@ fun getVerificationPolicy(
 class GetVerificationPoliciesCommand : CliktCommand(help = "Gets all Verification Policies") {
     val config by requireObject<Map<String, String>>()
     override fun run() = runBlocking {
-        val eitherErrorStateId = getVerificationPolicies(
-                config["CORDA_HOST"]!!,
-                config["CORDA_PORT"]!!.toInt())
-        println("Get Verification Policy result: $eitherErrorStateId")
-    }
-}
-
-/**
- * Helper function used by GetVerificationPoliciesCommand to interact with the Corda network
- */
-fun getVerificationPolicies(
-    host: String,
-    port: Int
-): Either<Error, String> {
-    val rpc = NodeRPCConnection(
-            host = host,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = port)
-    return try {
-        println("Getting all verification policies")
-        val proxy = rpc.proxy
-        val verificationPolicies = proxy.startFlow(::GetVerificationPolicies)
-                .returnValue.get()
-        println("Verification Policies: $verificationPolicies\n")
-        Right(verificationPolicies.toString())
-    } catch (e: Exception) {
-        Left(Error("${e.message}"))
-    } finally {
-        rpc.close()
+        val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val res = VerificationPolicyManager.getVerificationPolicies(
+                rpc.proxy
+            )
+            println("Get All Verification Policies Result:\n${res}")
+        } catch (e: Exception) {
+            println("Error: ${e.toString()}")
+        } finally {
+            rpc.close()
+        }
     }
 }

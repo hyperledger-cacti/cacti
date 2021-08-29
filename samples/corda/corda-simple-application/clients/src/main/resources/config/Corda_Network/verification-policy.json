@@ -1,18 +1,10 @@
 {
   "securityDomain": "Corda_Network",
-  "identifiers": [
-    {
-      "pattern": "localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*",
-      "policy": {
-        "type": "Signature",
-        "criteria": [
-          "PartyA"
-        ]
-      }
+  "identifiers": [{
+    "pattern": "localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*",
+    "policy": {
+      "type": "Signature",
+      "criteria": ["PartyA"]
     }
-  ],
-  "linearId": {
-    "id": "02d0a524-df2a-4af8-acd0-9057b4f23c0b"
-  },
-  "participants": []
+  }]
 }

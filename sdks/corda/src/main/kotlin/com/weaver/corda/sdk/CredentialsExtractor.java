@@ -1,4 +1,10 @@
-package com.cordaSimpleApplication.client;
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+ 
+package com.weaver.corda.sdk;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -294,7 +300,6 @@ public class CredentialsExtractor {
 	}
 
 	public static String getConfig(String baseNodesPath, String[] nodes) {
-		//String[] nodes = new String[] { "BuyerBankNode", "SellerBankNode" };
 		KeyStore ks = null;
 		try {
 			ks = KeyStore.getInstance(KeyStore.getDefaultType());

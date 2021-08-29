@@ -13,6 +13,19 @@ from the external network.
 
 To build the driver executable locally (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages), run the following:
 
+_Prerequisites_: Build the following dependencies in sequence:
+**Protobufs**
+```
+cd ../../../common/protos-java-kt
+make build
+```
+**Interoperation CorDapp**
+```
+cd ../../../core/network/corda-interop-app
+make build-local
+```
+
+Now build the driver as follows:
 ```
 make build-local
 ```
@@ -44,10 +57,14 @@ To run the driver, use the following:
 
 The driver gRPC server will be listening on port `9099`.
 
-## Changing the default port configuration
+## Driver configuration
 
 By default, the driver gRPC server listens on port `9099`. To change the port, set 
 the `DRIVER_PORT` as an environment variable. 
+
+Set `DRIVER_RPC_USERNAME` to a rpc user created for driver in the corda network.
+
+Set `DRIVER_RPC_PASSWORD` to the password of above user.
 
 ## Docker
 

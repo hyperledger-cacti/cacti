@@ -12,6 +12,7 @@ COMMIT = $(shell git log -1 --oneline | cut -d ' ' -f 1)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 TIMESTAMP = $(shell date +%FT%T%z)
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability
+COMPOSE_ARG ?=
 
 .PHONY: all
 all: 	build-local
@@ -141,17 +142,25 @@ pushi-images: push-server push-client push-driver push-allinone
 .PHONY: start
 start:
 	docker network create relay || true
-	docker-compose up -d
+	docker-compose $(COMPOSE_ARG) up -d
 # Starts an instance of the relay container.
 #
 .PHONY: start-server
 start-server:
 	docker network create relay || true
-	docker-compose up -d relay-server
+	docker-compose $(COMPOSE_ARG) up -d relay-server
 
 .PHONY: stop
 stop:
-	docker-compose down
+	docker-compose $(COMPOSE_ARG) down
+	
+.PHONY: convert-compose-method1
+convert-compose-method1:
+	./scripts/convert-compose.sh 1
+	
+.PHONY: convert-compose-method2
+convert-compose-method2:
+	./scripts/convert-compose.sh 2
 
 # Cleans up all the build artifacts.
 #

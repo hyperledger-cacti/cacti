@@ -7,7 +7,7 @@
 version: '2'
 services:
   fabric-driver:
-    image: ${DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+    image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
     container_name: fabric-driver-${NETWORK_NAME}
     environment:
       - NETWORK_NAME=${NETWORK_NAME}
