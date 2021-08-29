@@ -41,6 +41,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	//cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
