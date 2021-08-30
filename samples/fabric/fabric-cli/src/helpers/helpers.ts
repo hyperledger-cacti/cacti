@@ -306,7 +306,7 @@ const readJSONFromFile = (jsonfile, logger = console) => {
 // Used for getting network configuration from config.json file.
 const getNetworkConfig = (
   networkId: string
-): { relayEndpoint?: string; connProfilePath: string; username?: string; mspId?:string; channelName?: string; chaincode?: string } => {
+): { relayEndpoint?: string; connProfilePath: string; username?: string; mspId?:string; aclPolicyPrincipalType?: string; channelName?: string; chaincode?: string } => {
   const configPath = process.env.CONFIG_PATH
     ? path.join(process.env.CONFIG_PATH)
     : path.join(__dirname, '../../config.json')
@@ -316,13 +316,13 @@ const getNetworkConfig = (
       logger.error(
         `Network: ${networkId} does not exist in the config.json file`
       )
-      return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', channelName: '', chaincode: '' }
+      return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', aclPolicyPrincipalType: '', channelName: '', chaincode: '' }
     }
     // console.log(configJSON[networkId])
     return configJSON[networkId]
   } catch (err) {
     logger.error(`Network: ${networkId} does not exist in the config.json file`)
-    return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', channelName: '', chaincode: '' }
+    return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', aclPolicyPrincipalType: '', channelName: '', chaincode: '' }
   }
 }
 export {

@@ -72,7 +72,7 @@ const command: GluegunCommand = {
       ? path.resolve(options.template)
       : path.resolve(
           __dirname,
-          '../../../data/interop/accessControlTemplate.json'
+          '../../../data/interop/accessControlTemplate_' + networkEnv.aclPolicyPrincipalType + '.json'
         )
     logger.info(`Template path: ${templatePath}`)
     await generateAccessControl(
