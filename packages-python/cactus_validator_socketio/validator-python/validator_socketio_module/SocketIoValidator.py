@@ -7,6 +7,9 @@ import jwt
 
 # from indy import ledger, pool
 from indy import pool
+from indy.error import ErrorCode, IndyError
+from .utils import get_pool_genesis_txn_path, PROTOCOL_VERSION
+
 
 from .Settings import Settings
 from .IndyConnector import IndyConnector
@@ -122,9 +125,30 @@ class SocketIoValidator:
     def init_indy(self):
         """ Initialization process for INDY """
         print(f'##called init_indy()')
+
+        self.run_coroutine(self.init_indy_pool)
         self.run_coroutine(self.open_pool)
         time.sleep(1)
 
+    # for INDY
+    async def init_indy_pool(self):
+        pool_ = {
+            'name': 'pool1'
+        }
+        print("Open Pool Ledger: {}".format(pool_['name']))
+        pool_['genesis_txn_path'] = get_pool_genesis_txn_path(pool_['name'])
+        pool_['config'] = json.dumps({"genesis_txn": str(pool_['genesis_txn_path'])})
+
+        # Set protocol version 2 to work with Indy Node 1.4
+        await pool.set_protocol_version(PROTOCOL_VERSION)
+
+        try:
+            await pool.create_pool_ledger_config(pool_['name'], pool_['config'])
+            print('##init_indy_pool create pool ledger config completed')
+        except IndyError as ex:
+            if ex.error_code == ErrorCode.PoolLedgerConfigAlreadyExistsError:
+                pass
+    
     # for INDY
     async def open_pool(self):
         # open the pool and get handler
