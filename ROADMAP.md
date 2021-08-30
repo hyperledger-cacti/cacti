@@ -69,21 +69,11 @@ Halves are defined as:
 
 **Features**
 
-1. Minimum Viable AuthN/AuthZ via OpenID Connect
-2. Indy powered Consortium Plugin Implementation
-    * With at least one of the examples using it as well
-3. Kubernetes Integration
-    * Helm Charts
-    * KNative
-    * Minikube based end to end testing
-4. Public Test Deployment of a Cactus Consortium
-    * Multiple nodes
-    * Public domain: https://cactus.stream
-5. Keychain Plugin Implementations:
+1. Keychain Plugin Implementations:
     * AWS Secret Manager
-6. Indy Validator
-7. test docker container for Indy
-8. test docker container for Iroha
+2. Indy Validator
+3. test docker container for Indy
+4. test docker container for Iroha
 
 **Fixes:**
 
@@ -92,17 +82,11 @@ Halves are defined as:
 **Security Fixes**:
 
 1. Current vulnerable dependencies to be updated or removed (recurring roadmap item)
-2. SSH host key verification for 
-    * Fabric contract deployment
-    * Corda contract deployment
 
 **Documentation**
 
 1. Climate Action SIG Example Implementation
-2. Atomic Swaps Example
-    * CBDC, bonds for cash
-3. Cloud deployment playbook
-4. Cactus ReadTheDocs Site
+2. Cactus ReadTheDocs Site
 
 ## 2021 Q3
 
@@ -147,19 +131,16 @@ Halves are defined as:
 
 1. Keychain Plugin Implementations:
     * Azure Key Vault
-2. Corda Enterprise Support
 3. Besu Private Transactions
 4. Fabric Private Transactions
-5. Federated Authentication: SAML **and/or** LDAP
 6. transaction signer features
     * Hyperledger ledgers (Iroha, Sawtooth, Fabric v2, Indy, Quorum, Corda)
-7. Corda Enterprise Support
-8. SDK for BLP
-9. SDK for LedgerPlugin
-10. Dockernize
-11. Method for providing packages
-12. refactor config files on /etc/cactus of server directory
-13. Error Handling
+7. SDK for BLP
+8. SDK for LedgerPlugin
+9.  Dockernize
+10. Method for providing packages
+11. refactor config files on /etc/cactus of server directory
+12. Error Handling
 
 **Fixes:**
 
@@ -173,10 +154,36 @@ Halves are defined as:
 
 **Features**
 
+1. Corda Enterprise Support [#877](https://github.com/hyperledger/cactus/issues/877)
+2. Multi-protocol Support in the API Server: [#503](https://github.com/hyperledger/cactus/issues/503)
+3. Support WebAssembly Modules as Plugins [#1281](https://github.com/hyperledger/cactus/issues/1281)
+4. Indy powered Consortium Plugin Implementation [#675](https://github.com/hyperledger/cactus/issues/675)
+    * With at least one of the examples using it as well
+
 **Fixes:**
 
 **Security Fixes**:
 
 1. Current vulnerable dependencies to be updated or removed (recurring roadmap item)
+2. CII Best Practices 100% Compliance [#357](https://github.com/hyperledger/cactus/issues/357)
+   * Fuzzer security testing
+   * Vulnerability disclosures
 
 **Documentation**
+
+1. Atomic Swaps Example
+    * CBDC, bonds for cash
+2. Green aluminum use-case with BAFT DLPCs
+    * In partnership with the Hyperledger Trace Finance SIG
+3. Cloud deployment playbook(s)
+   * Kubernetes Integration
+     * Helm Charts
+     * KNative
+     * Minikube based end to end testing
+4. Public Test Deployment of a Cactus Consortium
+    * Multiple nodes/API servers scenarios covered
+    * Public domain: https://cactus.stream
+5. Reproducible benchmarks
+    * Scripts to pull up and tear down cloud provider resources automatically
+    * Benchmarks to be published 
+    * Emphasize the horizontal scalability of the API server to showcase the stateless design
