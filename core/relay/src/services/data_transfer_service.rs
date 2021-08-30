@@ -14,6 +14,7 @@ use config;
 use serde;
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
+use base64::{encode, decode};
 
 pub struct DataTransferService {
     pub config_lock: RwLock<config::Config>,
@@ -73,7 +74,12 @@ impl DataTransfer for DataTransferService {
         request: Request<ViewPayload>,
     ) -> Result<Response<Ack>, Status> {
         let state = request.into_inner().clone();
-        println!("Received State from driver: {:?}", state.clone());
+        let state_clone = state.clone();
+        println!("Received State from driver: {:?}", state_clone.request_id);
+        match state_clone.state.as_ref().unwrap() {
+            view_payload::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
+            view_payload::State::Error(e) => println!("Error: {:?}", e),
+        }
         let request_id = state.request_id.to_string();
         let conf = self.config_lock.read().await;
         // Database access/storage
@@ -105,9 +111,13 @@ impl DataTransfer for DataTransferService {
     async fn send_state(&self, request: Request<ViewPayload>) -> Result<Response<Ack>, Status> {
         let request_view_payload = request.into_inner().clone();
         println!(
-            "Received state from remote relay: {:?}",
-            request_view_payload
+            "Received state from remote relay: Request ID = {:?}",
+            request_view_payload.request_id
         );
+        match request_view_payload.state.as_ref().unwrap() {
+            view_payload::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
+            view_payload::State::Error(e) => println!("Error: {:?}", e),
+        }
         let request_id = &request_view_payload.request_id.to_string();
         let conf = self.config_lock.read().await.clone();
         // Database access/storage
@@ -330,7 +340,11 @@ fn spawn_request_driver_state(query: Query, driver_address: String, conf: config
 // When it errors it currently logs to console. Needs improving
 fn spawn_send_state(state: ViewPayload, requester_port: String) {
     tokio::spawn(async move {
-        println!("Sending state back to requesting relay: {:?}", state);
+        println!("Sending state back to requesting relay: Request ID = {:?}", state.request_id);
+        match state.state.as_ref().unwrap() {
+            view_payload::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
+            view_payload::State::Error(e) => println!("Error: {:?}", e),
+        }
         let client_addr = format!("http://{}", requester_port);
         let client_result = DataTransferClient::connect(client_addr).await;
         match client_result {
