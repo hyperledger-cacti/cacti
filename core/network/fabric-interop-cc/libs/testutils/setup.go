@@ -12,10 +12,12 @@ package testutils
 import (
 	"os"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/hyperledger/fabric-protos-go/peer"
 )
 
 const (
@@ -43,6 +45,10 @@ func PrepMockStub() (*mocks.TransactionContext, *mocks.ChaincodeStub) {
 	return transactionContext, chaincodeStub
 }
 
+func SetMockStubCCId(chaincodeStub *mocks.ChaincodeStub, ccName string) {
+	chaincodeStub.GetSignedProposalReturns(generateSignedProposal(ccName), nil)
+}
+
 func prepMocks(orgMSP, clientID string) (*mocks.TransactionContext, *mocks.ChaincodeStub) {
 	chaincodeStub := &mocks.ChaincodeStub{}
 	transactionContext := &mocks.TransactionContext{}
@@ -55,4 +61,25 @@ func prepMocks(orgMSP, clientID string) (*mocks.TransactionContext, *mocks.Chain
 	os.Setenv("CORE_PEER_LOCALMSPID", orgMSP)
 	transactionContext.GetClientIdentityReturns(clientIdentity)
 	return transactionContext, chaincodeStub
+}
+
+func generateSignedProposal(ccName string) *peer.SignedProposal {
+	cis := &peer.ChaincodeInvocationSpec{
+		ChaincodeSpec: &peer.ChaincodeSpec {
+			ChaincodeId: &peer.ChaincodeID {
+				Name: ccName,
+				Version: "v0",	// Any random string will do here
+			},
+			Input: &peer.ChaincodeInput {
+				Args: [][]byte{},
+			},
+		},
+	}
+	cisb, _ := proto.Marshal(cis)
+	cp := &peer.ChaincodeProposalPayload{ Input: cisb }
+	cpb, _ := proto.Marshal(cp)
+	prop := &peer.Proposal{ Payload: cpb }
+	propb, _ := proto.Marshal(prop)
+	sp := &peer.SignedProposal{ ProposalBytes: propb }
+	return sp
 }

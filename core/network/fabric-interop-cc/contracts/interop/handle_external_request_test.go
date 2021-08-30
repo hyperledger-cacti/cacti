@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	protoV2 "google.golang.org/protobuf/proto"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 func TestHandleExternalRequest(t *testing.T) {
@@ -113,7 +114,8 @@ func TestHandleExternalRequest(t *testing.T) {
 }
 
 func testHandleExternalRequestInvalidJSON(t *testing.T) {
-	ctx, _, interopcc := prepMockStub()
+	ctx, _ := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Invalid Input
 	_, err := interopcc.HandleExternalRequest(ctx, "Invalid Input")
@@ -121,7 +123,8 @@ func testHandleExternalRequestInvalidJSON(t *testing.T) {
 }
 
 func testHandleExternalRequestSignatureNotBase64(t *testing.T, query *common.Query) {
-	ctx, _, interopcc := prepMockStub()
+	ctx, _ := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	queryBytes, err := protoV2.Marshal(query)
 	require.NoError(t, err)
@@ -132,7 +135,8 @@ func testHandleExternalRequestSignatureNotBase64(t *testing.T, query *common.Que
 }
 
 func testHandleExternalRequestSignatureCertificateMismatch(t *testing.T, query *common.Query) {
-	ctx, _, interopcc := prepMockStub()
+	ctx, _ := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// set correct values for this test case
 	query.RequestorSignature = "U2lnbmF0dXJl"
@@ -145,7 +149,8 @@ func testHandleExternalRequestSignatureCertificateMismatch(t *testing.T, query *
 }
 
 func testHandleExternalRequestInvalidCert(t *testing.T, query *common.Query) {
-	ctx, _, interopcc := prepMockStub()
+	ctx, _ := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// set correct values for this test case
 	query.Certificate = "cert"
@@ -158,7 +163,8 @@ func testHandleExternalRequestInvalidCert(t *testing.T, query *common.Query) {
 }
 
 func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, validCertificate string, signature []byte, pbResp pb.Response, accessControl *common.AccessControlPolicy, membership *common.Membership) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// set correct values for the success case
 	query.Certificate = validCertificate
@@ -189,7 +195,8 @@ func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, 
 }
 
 func testHandleExternalRequestED25519Signature(t *testing.T, query *common.Query, pbResp pb.Response, accessControl *common.AccessControlPolicy, fabricMembership *common.Membership, template x509.Certificate) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// create ed25519 cert and signature
 	certBytes, privKey, err := createED25519CertAndKeyFromTemplate(template)
@@ -223,7 +230,8 @@ func testHandleExternalRequestED25519Signature(t *testing.T, query *common.Query
 }
 
 func testHandleExternalRequestNoMembership(t *testing.T, query *common.Query, validCertificate string, signature []byte, pbResp pb.Response) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// set correct values for this test case
 	query.Certificate = validCertificate
@@ -241,7 +249,8 @@ func testHandleExternalRequestNoMembership(t *testing.T, query *common.Query, va
 }
 
 func testHandleExternalRequestNoAccessControlPolicy(t *testing.T, query *common.Query, validCertificate string, signature []byte, pbResp pb.Response, membership *common.Membership) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// set correct values for this test case
 	query.Certificate = validCertificate

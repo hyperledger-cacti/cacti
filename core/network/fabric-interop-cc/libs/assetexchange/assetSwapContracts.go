@@ -22,6 +22,7 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	log "github.com/sirupsen/logrus"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 // Object used to capture the HashLock details used in Asset Locking
@@ -51,6 +52,7 @@ const (
 	assetKeyPrefix    = "AssetKey_"   // prefix for the map, asset-key --> asset-object
 	assetKeyDelimiter = "_"           // delimiter for the asset-key
 	contractIdPrefix  = "ContractId_" // prefix for the map, contractId --> asset-key
+	callerCCIdPrefix  = "CallerCCId_" // prefix for the caller CC ID map, contractId --> caller-cc-id
 )
 
 // helper functions to log and return errors
@@ -74,12 +76,17 @@ func generateContractIdMapKey(contractId string) string {
 	return contractIdPrefix + contractId
 }
 
+// function to return the key to fetch a calling chaincode ID from the map using contractId
+func generateContractIdMapCCKey(contractId string) string {
+	return callerCCIdPrefix + generateContractIdMapKey(contractId)
+}
+
 /*
  * Function to generate asset-lock key (which is combination of asset-type and asset-id)
  * and contract-id (which is a hash on asset-lock key) for the non-fungible asset locking on the ledger
  */
-func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) (string, string, error) {
-	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{assetAgreement.Type, assetAgreement.Id})
+func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.AssetExchangeAgreement) (string, string, error) {
+	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.Type, assetAgreement.Id})
 	if err != nil {
 		return "", "", logThenErrorf("error while creating composite key: %+v", err)
 	}
@@ -214,7 +221,27 @@ func getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64 string) (interface{}, uint
 
 // LockAsset cc is used to record locking of an asset on the ledger
 func LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
+	// First, verify that this call is legal
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return "", logThenErrorf(err.Error())
+	}
+	localChaincodeID, err := ctx.GetStub().GetState(wutils.GetLocalChaincodeIDKey())
+	if err != nil {
+		return "", logThenErrorf(err.Error())
+	}
+	interopChaincodeID, err := ctx.GetStub().GetState(wutils.GetInteropChaincodeIDKey())
+	if err != nil {
+		return "", logThenErrorf(err.Error())
+	}
+	if string(interopChaincodeID) == string(localChaincodeID) {
+		// This is the Fabric Interop CC; it should only be invoked by another chaincode and not a client
+		if callerChaincodeID == string(localChaincodeID) {
+			return "", logThenErrorf("Illegal access: LockAsset being called directly by client")
+		}
+	}
 
+	// Start the locking process now
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
 		return "", logThenErrorf("error in base64 decode of asset agreement: %+v", err)
@@ -238,7 +265,7 @@ func LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesB
 		return "", logThenErrorf(err.Error())
 	}
 
-	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, assetAgreement)
+	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
@@ -269,16 +296,23 @@ func LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesB
 		return "", logThenErrorf("marshal error: %+v", err)
 	}
 
+	// Associate lock with asset details.
 	err = ctx.GetStub().PutState(generateContractIdMapKey(contractId), assetLockKeyBytes)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
+
+	// Associate lock with chaincode ID of caller.
+	err = ctx.GetStub().PutState(generateContractIdMapCCKey(contractId), []byte(callerChaincodeID))
+	if err != nil {
+		return "", logThenErrorf(err.Error())
+	}
+
 	return contractId, nil
 }
 
 // UnlockAsset cc is used to record unlocking of an asset on the ledger
 func UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) error {
-
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
 		return logThenErrorf("error in base64 decode of asset agreement: %+v", err)
@@ -297,11 +331,17 @@ func UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementByte
 		return logThenErrorf("error in validation of asset agreement parties: %+v", err)
 	}
 
-	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, assetAgreement)
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
 		return logThenErrorf(err.Error())
 	}
 
+	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
+
+	// Resume the asset unlocking process
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
 		return logThenErrorf(err.Error())
@@ -335,6 +375,10 @@ func UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementByte
 	if err != nil {
 		return logThenErrorf("failed to delete the contractId %s as part of asset unlock: %v", contractId, err)
 	}
+	err = ctx.GetStub().DelState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf("failed to delete the calling chaincode Id associated with the contract Id %s: %+v", contractId, err.Error())
+	}
 
 	return nil
 }
@@ -355,7 +399,12 @@ func IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementBy
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
-	assetLockKey, _, err := GenerateAssetLockKeyAndContractId(ctx, assetAgreement)
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return false, logThenErrorf(err.Error())
+	}
+
+	assetLockKey, _, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
 		return false, logThenErrorf(err.Error())
 	}
@@ -463,7 +512,6 @@ func getClaimInfo(claimInfoBytesBase64 string) (*common.AssetClaim, error) {
 
 // ClaimAsset cc is used to record claim of an asset on the ledger
 func ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, claimInfoBytesBase64 string) error {
-
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
 		return logThenErrorf("error in base64 decode of asset agreement: %+v", err)
@@ -487,11 +535,17 @@ func ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes
 		return logThenErrorf(err.Error())
 	}
 
-	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, assetAgreement)
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
 		return logThenErrorf(err.Error())
 	}
 
+	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
+
+	// Resume the asset claiming process
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
 		return logThenErrorf(err.Error())
@@ -535,6 +589,10 @@ func ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytes
 	if err != nil {
 		return logThenErrorf("failed to delete the contractId %s as part of asset claim: %v", contractId, err)
 	}
+	err = ctx.GetStub().DelState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf("failed to delete the calling chaincode Id associated with the contract Id %s: %+v", contractId, err.Error())
+	}
 
 	return nil
 }
@@ -576,7 +634,21 @@ func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface
 
 // UnlockAssetUsingContractId cc is used to record unlocking of an asset on the ledger (this uses the contractId)
 func UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
+	// Verify that this call comes from the same chaincode the lock instruction came from
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
 
+	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
+	if callerChaincodeID != string(lockerChaincodeID) {
+		return logThenErrorf("Illegal access: UnlockAssetUsingContractId being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
+	}
+
+	// Resume the asset unlocking process
 	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
 		return logThenErrorf(err.Error())
@@ -608,12 +680,31 @@ func UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, con
 		return logThenErrorf("failed to delete the contractId %s as part of asset unlock: %v", contractId, err)
 	}
 
+	err = ctx.GetStub().DelState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf("failed to delete the calling chaincode Id associated with the contract Id %s: %+v", contractId, err.Error())
+	}
+
 	return nil
 }
 
 // ClaimAsset cc is used to record claim of an asset on the ledger (this uses the contractId)
 func ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
+	// Verify that this call comes from the same chaincode the lock instruction came from
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
 
+	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
+	if callerChaincodeID != string(lockerChaincodeID) {
+		return logThenErrorf("Illegal access: ClaimAssetUsingContractId being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
+	}
+
+	// Resume the asset claiming process
 	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
 		return logThenErrorf(err.Error())
@@ -659,6 +750,11 @@ func ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, cont
 		return logThenErrorf("failed to delete the contractId %s as part of asset claim: %+v", contractId, err)
 	}
 
+	err = ctx.GetStub().DelState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf("failed to delete the calling chaincode Id associated with the contract Id %s: %+v", contractId, err.Error())
+	}
+
 	return nil
 }
 
@@ -681,7 +777,27 @@ func IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterfa
 
 // LockFungibleAsset cc is used to record locking of a group of fungible assets of an asset-type on the ledger
 func LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
+	// First, verify that this call comes from another chaincode rather than directly from the client
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return "", logThenErrorf(err.Error())
+	}
+	localChaincodeID, err := ctx.GetStub().GetState(wutils.GetLocalChaincodeIDKey())
+	if err != nil {
+		return "", logThenErrorf(err.Error())
+	}
+	interopChaincodeID, err := ctx.GetStub().GetState(wutils.GetInteropChaincodeIDKey())
+	if err != nil {
+		return "", logThenErrorf(err.Error())
+	}
+	if string(interopChaincodeID) == string(localChaincodeID) {
+		// This is the Fabric Interop CC; it should only be invoked by another chaincode and not a client
+		if callerChaincodeID == string(localChaincodeID) {
+			return "", logThenErrorf("Illegal access: LockFungibleAsset being called directly by client")
+		}
+	}
 
+	// Start the locking process now
 	fungibleAssetAgreementBytes, err := base64.StdEncoding.DecodeString(fungibleAssetAgreementBytesBase64)
 	if err != nil {
 		return "", logThenErrorf("error in base64 decode of asset agreement: %+v", err)
@@ -726,9 +842,16 @@ func LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAsse
 		return "", logThenErrorf("marshal error: %s", err)
 	}
 
+	// Associate lock with asset details.
 	err = ctx.GetStub().PutState(generateContractIdMapKey(contractId), assetLockValBytes)
 	if err != nil {
 		return "", logThenErrorf("failed to write to the world state: %+v", err)
+	}
+
+	// Associate lock with chaincode ID of caller.
+	err = ctx.GetStub().PutState(generateContractIdMapCCKey(contractId), []byte(callerChaincodeID))
+	if err != nil {
+		return "", logThenErrorf(err.Error())
 	}
 
 	return contractId, nil
@@ -758,7 +881,21 @@ func fetchFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contr
 
 // IsFungibleAssetLocked cc is used to query the ledger and find out if a fungible asset is locked or not
 func IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+	// Verify that this call comes from the same chaincode the lock instruction came from
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return false, logThenErrorf(err.Error())
+	}
 
+	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return false, logThenErrorf(err.Error())
+	}
+	if callerChaincodeID != string(lockerChaincodeID) {
+		return false, logThenErrorf("Illegal access: IsFungibleAssetLocked being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
+	}
+
+	// Resume the asset status checking process
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
 		return false, logThenErrorf(err.Error())
@@ -775,7 +912,21 @@ func IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contract
 
 // ClaimFungibleAsset cc is used to record claim of a fungible asset on the ledger
 func ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
+	// Verify that this call comes from the same chaincode the lock instruction came from
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
 
+	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
+	if callerChaincodeID != string(lockerChaincodeID) {
+		return logThenErrorf("Illegal access: ClaimFungibleAsset being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
+	}
+
+	// Resume the asset claiming process
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
 		return logThenErrorf(err.Error())
@@ -816,13 +967,31 @@ func ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId 
 	if err != nil {
 		return logThenErrorf("failed to delete the contractId %s as part of fungible asset claim: %+v", contractId, err)
 	}
+	err = ctx.GetStub().DelState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf("failed to delete the calling chaincode Id associated with the contract Id %s: %+v", contractId, err.Error())
+	}
 
 	return nil
 }
 
 // UnlockFungibleAsset cc is used to record unlocking of a fungible asset on the ledger
 func UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) error {
+	// Verify that this call comes from the same chaincode the lock instruction came from
+	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
 
+	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf(err.Error())
+	}
+	if callerChaincodeID != string(lockerChaincodeID) {
+		return logThenErrorf("Illegal access: UnlockFungibleAsset being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
+	}
+
+	// Resume the asset unlocking process
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
 		return logThenErrorf(err.Error())
@@ -847,6 +1016,10 @@ func UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId
 	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
 		return logThenErrorf("failed to delete the contractId %s as part of fungible asset unlock: %v", contractId, err)
+	}
+	err = ctx.GetStub().DelState(generateContractIdMapCCKey(contractId))
+	if err != nil {
+		return logThenErrorf("failed to delete the calling chaincode Id associated with the contract Id %s: %+v", contractId, err.Error())
 	}
 
 	return nil

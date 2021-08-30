@@ -15,6 +15,7 @@ import (
 	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 var cordaB64View = `CjQIBBIcVHVlIE5vdiAxNyAwMDoxMzo0NiBHTVQgMjAyMBoMTm90YXJpemF0aW9uIgRKU09OEtYHCoQGClhhMjZHVW9WYythenlIMENUYjN2K2pTdmp3Y255M0hFd3AyMlJrdDkvZC9GcXN4WVVvYXhVWTdUOWNKRk9TVTZiVW42UFIwNmFVckxxdjZLbzZ1NG5CUT09Ep8FLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ3akNDQVYrZ0F3SUJBZ0lJVUprUXZtS20zNVl3RkFZSUtvWkl6ajBFQXdJR0NDcUdTTTQ5QXdFSE1DOHgKQ3pBSkJnTlZCQVlUQWtkQ01ROHdEUVlEVlFRSERBWk1iMjVrYjI0eER6QU5CZ05WQkFvTUJsQmhjblI1UVRBZQpGdzB5TURBM01qUXdNREF3TURCYUZ3MHlOekExTWpBd01EQXdNREJhTUM4eEN6QUpCZ05WQkFZVEFrZENNUTh3CkRRWURWUVFIREFaTWIyNWtiMjR4RHpBTkJnTlZCQW9NQmxCaGNuUjVRVEFxTUFVR0F5dGxjQU1oQU1NS2FSRUsKaGNUZ1NCTU16Szgxb1BVU1BvVm1HL2ZKTUxYcS91alNtc2U5bzRHSk1JR0dNQjBHQTFVZERnUVdCQlJNWHREcwpLRlp6VUxkUTNjMkRDVUV4M1QxQ1VEQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01Bc0dBMVVkRHdRRUF3SUNoREFUCkJnTlZIU1VFRERBS0JnZ3JCZ0VGQlFjREFqQWZCZ05WSFNNRUdEQVdnQlI0aHdMdUxnZklaTUVXekc0bjNBeHcKZmdQYmV6QVJCZ29yQmdFRUFZT0tZZ0VCQkFNQ0FRWXdGQVlJS29aSXpqMEVBd0lHQ0NxR1NNNDlBd0VIQTBjQQpNRVFDSUM3SjQ2U3hERHozTGpETnJFUGpqd1AycHJnTUVNaDdyL2dKcG91UUhCaytBaUErS3pYRDBkNW1pSTg2CkQybVlLNEMzdFJsaTNYM1ZnbkNlOENPcWZZeXVRZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0aBlBhcnR5QRLMAQpsW1NpbXBsZVN0YXRlKGtleT1ILCB2YWx1ZT0xLCBvd25lcj1PPVBhcnR5QSwgTD1Mb25kb24sIEM9R0IsIGxpbmVhcklkPTIzMTRkNmI3LTFlY2EtNDg5Mi04OGY4LTc2ZDg1YjhhODVjZCldElxsb2NhbGhvc3Q6OTA4MC9Db3JkYV9OZXR3b3JrL2xvY2FsaG9zdDoxMDAwNiNjb20uY29yZGFTaW1wbGVBcHBsaWNhdGlvbi5mbG93LkdldFN0YXRlQnlLZXk6SA==`
@@ -75,7 +76,8 @@ var network1VerificationPolicy = common.VerificationPolicy{
 
 func TestWriteExternalState(t *testing.T) {
 	// Happy case: Fabric
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 	// mock all the calls to the chaincode stub
 	network1VerificationPolicyBytes, err := json.Marshal(&network1VerificationPolicy)
 	require.NoError(t, err)
@@ -103,7 +105,8 @@ func TestWriteExternalState(t *testing.T) {
 	require.EqualError(t, err, "Number of addresses (1) does not match number of views (0)")
 
 	// Happy case: Corda
-	ctx, chaincodeStub, interopcc = prepMockStub()
+	ctx, chaincodeStub = wtest.PrepMockStub()
+	interopcc = SmartContract{}
 	// mock all the calls to the chaincode stub
 	cordaVerificationPolicyBytes, err := json.Marshal(&cordaVerificationPolicy)
 	require.NoError(t, err)
@@ -120,7 +123,8 @@ func TestWriteExternalState(t *testing.T) {
 	require.NoError(t, err)
 
 	// Test case: Invalid cert in Membership
-	ctx, chaincodeStub, interopcc = prepMockStub()
+	ctx, chaincodeStub = wtest.PrepMockStub()
+	interopcc = SmartContract{}
 	network1Membership.Members["Org1MSP"].Value = "invalid cert"
 	invalidMembershipBytes, err := json.Marshal(&network1Membership)
 	require.NoError(t, err)
@@ -130,7 +134,8 @@ func TestWriteExternalState(t *testing.T) {
 	require.EqualError(t, err, "VerifyView error: Verify membership failed. Certificate not valid: Client cert not in a known PEM format")
 
 	// Test case: Invalid policy in verification policy
-	ctx, chaincodeStub, interopcc = prepMockStub()
+	ctx, chaincodeStub = wtest.PrepMockStub()
+	interopcc = SmartContract{}
 	network1VerificationPolicy.Identifiers[0].Pattern = "not matching policy"
 	invalidVerificationPolicyBytes, err := json.Marshal(&network1VerificationPolicy)
 	require.NoError(t, err)

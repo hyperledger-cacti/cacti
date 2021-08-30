@@ -19,6 +19,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 var member = common.Member{
@@ -33,7 +34,8 @@ var membershipAsset = common.Membership{
 }
 
 func TestGetMembershipBySecurityDomain(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Case when no Membership is found
 	acString, getError := interopcc.GetMembershipBySecurityDomain(ctx, "2345")
@@ -49,7 +51,8 @@ func TestGetMembershipBySecurityDomain(t *testing.T) {
 }
 
 func TestCreateMembership(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	membershipBytes, err := json.Marshal(&membershipAsset)
 	require.NoError(t, err)
@@ -66,7 +69,8 @@ func TestCreateMembership(t *testing.T) {
 }
 
 func TestUpdateMembership(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	membershipBytes, err := json.Marshal(&membershipAsset)
 	require.NoError(t, err)
@@ -84,7 +88,8 @@ func TestUpdateMembership(t *testing.T) {
 }
 
 func TestDeleteMembership(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Case when a Membership exists
 	chaincodeStub.GetStateReturns([]byte{}, nil)
@@ -103,7 +108,8 @@ func TestDeleteMembership(t *testing.T) {
 }
 
 func TestVerifyMembership(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// 1. create all mock data for tests
 

@@ -13,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 var accessControlAsset = common.AccessControlPolicy{
@@ -26,7 +27,8 @@ var accessControlAsset = common.AccessControlPolicy{
 }
 
 func TestGetAccessControlPolicyBySecurityDomain(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Case when no access control policy is found
 	acString, getError := interopcc.GetAccessControlPolicyBySecurityDomain(ctx, "2345")
@@ -43,7 +45,8 @@ func TestGetAccessControlPolicyBySecurityDomain(t *testing.T) {
 }
 
 func TestCreateAccessControlPolicy(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Happy case. No existing access control policy is found creates one.
 	accessControlBytes, err := json.Marshal(&accessControlAsset)
@@ -60,7 +63,8 @@ func TestCreateAccessControlPolicy(t *testing.T) {
 }
 
 func TestUpdateAccessControlPolicy(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Case when no access control policy is found
 	accessControlBytes, err := json.Marshal(&accessControlAsset)
@@ -78,7 +82,8 @@ func TestUpdateAccessControlPolicy(t *testing.T) {
 }
 
 func TestDeleteAccessControlPolicy(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Case when a policy exists
 	chaincodeStub.GetStateReturns([]byte{}, nil)
@@ -97,7 +102,8 @@ func TestDeleteAccessControlPolicy(t *testing.T) {
 }
 
 func TestVerifyAccessToCC(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// data for tests
 	validAddressStruct := FabricViewAddress{
