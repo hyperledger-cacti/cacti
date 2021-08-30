@@ -25,11 +25,29 @@ import (
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 // SmartContract provides functions for managing arbitrary key-value pairs
 type SmartContract struct {
 	contractapi.Contract
+	testMode bool
+}
+
+// Record Interoperation Chaincode ID on ledger
+func (s *SmartContract) Init(ctx contractapi.TransactionContextInterface, ccId string) error {
+	ccBytes := []byte(ccId)
+	fmt.Printf("Init called. CC ID: %s\n", ccId)
+
+    err := ctx.GetStub().PutState(wutils.GetInteropChaincodeIDKey(), ccBytes)
+	if err != nil {
+		return err
+	}
+	localCCId, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		return err
+	}
+	return ctx.GetStub().PutState(wutils.GetLocalChaincodeIDKey(), []byte(localCCId))
 }
 
 // Create adds a new entry with the specified key and value
@@ -42,6 +60,16 @@ func (s *SmartContract) Create(ctx contractapi.TransactionContextInterface, key 
 
 // Read returns the value of the entry with the specified key
 func (s *SmartContract) Read(ctx contractapi.TransactionContextInterface, key string) (string, error) {
+	if !s.testMode {
+		relayAccessCheck, err := wutils.CheckAccessIfRelayClient(ctx.GetStub())
+		if err != nil {
+			return "", err
+		}
+		if !relayAccessCheck {
+			return "", fmt.Errorf("Illegal access by relay")
+		}
+	}
+
 	bytes, err := ctx.GetStub().GetState(key)
 
 	if err != nil {
@@ -71,6 +99,7 @@ func (s *SmartContract) Delete(ctx contractapi.TransactionContextInterface, key 
 
 func main() {
 	sc := new(SmartContract)
+	sc.testMode = false
 	chaincode, err := contractapi.NewChaincode(sc)
 
 	if err != nil {
