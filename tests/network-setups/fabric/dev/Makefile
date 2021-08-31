@@ -21,8 +21,18 @@ start-network1:	.fabric-setup setup-cc
 	./network.sh up createChannel -ca -nw network1
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1
 
+.PHONY: start-network1-local
+start-network1-local: .fabric-setup setup-cc-local
+	./network.sh up createChannel -ca -nw network1
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1
+
 .PHONY: start-network2
 start-network2: .fabric-setup setup-cc
+	./network.sh up createChannel -ca -nw network2
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2
+
+.PHONY: start-network2-local
+start-network2-local: .fabric-setup setup-cc-local
 	./network.sh up createChannel -ca -nw network2
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2
 
@@ -30,13 +40,13 @@ start-network2: .fabric-setup setup-cc
 start-interop-network1:	setup-interop-cc start-network1 setup-interop-network1
 
 .PHONY: start-interop-network1-local
-start-interop-network1-local: setup-interop-cc-local start-network1 setup-interop-network1-local
+start-interop-network1-local: setup-interop-cc-local start-network1-local setup-interop-network1-local
 
 .PHONY: start-interop-network2
 start-interop-network2: setup-interop-cc start-network2 setup-interop-network2
 
 .PHONY: start-interop-network2-local
-start-interop-network2-local: setup-interop-cc-local start-network2 setup-interop-network2-local
+start-interop-network2-local: setup-interop-cc-local start-network2-local setup-interop-network2-local
 
 .PHONY: setup-interop-network1
 setup-interop-network1: setup-interop-cc
@@ -66,9 +76,16 @@ setup-interop-cc-local:
 setup-cc:
 	./scripts/setupAppCC.sh $(CHAINCODE_NAME)
 
+.PHONY: setup-cc-local
+setup-cc-local:
+	./scripts/setupAppCCLocal.sh $(CHAINCODE_NAME)
+
 .PHONY: deploy-cc
-deploy-cc:
-	./scripts/setupAppCC.sh $(CHAINCODE_NAME)
+deploy-cc: setup-cc
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw $(NW)
+
+.PHONY: deploy-cc-local
+deploy-cc-local: setup-cc-local
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw $(NW)
 
 
