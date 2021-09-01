@@ -105,9 +105,9 @@ This folder contains code to create and launch networks `network1` and `network2
 Follow the instructions below to build and launch the networks:
 - Navigate to the `tests/network-setups/fabric/dev` folder.
 - To spin up both network1 and network2 with interoperation chaincode installed, run:
-```
-make start-interop-local
-```
+  ```
+  make start-interop-local
+  ```
 
 For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/fabric/dev).
 
@@ -130,10 +130,10 @@ make build-server-local
 #### Deployment
 
 * Run: `make convert-compose-method2` to uncomment and comment some lines in `docker-compose.yaml`.
-* For `network1`, there's `.env.n1` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. Edit the file, and update following value:
-```
-DOCKER_IMAGE_NAME=weaver-relay-server
-```
+* For `network1`, there's `.env.n1` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. Edit the file, and update the following value:
+  ```
+  DOCKER_IMAGE_NAME=weaver-relay-server
+  ```
 * Repeat above step for `.env.n2` file in `docker/testnet-envs` directory, that will be used to start relay server for `network2` in docker.
 * To deploy relay server for `network1`, run:
   ```bash
@@ -164,7 +164,7 @@ make build-image-local
 Following steps demonstrate how to run a fabric driver in docker container (_replace `<PATH-TO-WEAVER>` with location of the clone of your weaver_).
 * For `network1`, there's `.env.n1` file in `docker-testnet-envs` directory, that will be used to start a fabric driver in docker. 
   - Edit that file and replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder.
-  - Update following value:
+  - Update the following value:
     ```
     DOCKER_IMAGE_NAME=weaver-fabric-driver
     ```
@@ -195,9 +195,9 @@ _Note_: The setup and running instructions below were tested with all Node.js ve
 You can install `fabric-cli` as follows:
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - Run the following to install dependencies:
-```bash
-make build-local
-```
+  ```bash
+  make build-local
+  ```
 - Use the `fabric-cli` executable in the `bin` folder for [subsequent actions](./ledger-initialization.md).
 
 ## Corda Components
@@ -262,9 +262,9 @@ Navigate to the `core/relay` folder. Refer [here](#building-relay-image) to buil
 
 * Run: `make convert-compose-method2` to uncomment and comment some lines in `docker-compose.yaml`.
 * There's `.env.corda` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. Edit the file, and modify following values:
-```
-DOCKER_IMAGE_NAME=weaver-relay-server
-```
+  ```
+  DOCKER_IMAGE_NAME=weaver-relay-server
+  ```
 * To deploy, run:
   ```bash
   make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
@@ -276,7 +276,7 @@ Navigate to the `core/drivers/corda-driver` folder.
 
 #### Building
 
-* To build the corda driver docker image, run:
+To build the corda driver docker image, run:
 ```bash
 make image-local
 ```
@@ -284,7 +284,7 @@ make image-local
 #### Deployment
 
 Run a Corda driver as follows:
-- There's a `.env.corda` file in `docker-testnet-envs` directory, that will be used to start a corda driver in docker. Edit the file and update following value:
+- There's a `.env.corda` file in `docker-testnet-envs` directory, that will be used to start a corda driver in docker. Edit the file and update the following value:
   ```
   DOCKER_IMAGE_NAME=weaver-corda-driver
   ```

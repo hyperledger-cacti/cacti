@@ -56,9 +56,9 @@ This folder contains code to create and launch networks `network1` and `network2
 Follow the instructions below to build and launch the networks:
 - Navigate to the `tests/network-setups/fabric/dev` folder.
 - To spin up both network1 and network2 with interoperation chaincode installed, run:
-```
-make start-interop
-```
+  ```
+  make start-interop
+  ```
 - (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to install only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2`.)
 
 For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/fabric/dev).
@@ -121,9 +121,9 @@ You can install `fabric-cli` as follows:
 - Navigate to the `samples/fabric/fabric-cli` folder.
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
 - Run the following to install dependencies:
-```bash
-make build
-```
+  ```bash
+  make build
+  ```
 - Use the `fabric-cli` executable in the `bin` folder for [subsequent actions](./ledger-initialization.md).
 
 ## Corda Components
