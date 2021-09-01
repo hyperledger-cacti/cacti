@@ -31,7 +31,7 @@ import {
 import {
   ICarbonAccountingFabricContractDeploymentInfo,
   ICarbonAccountingXdaiContractDeploymentInfo,
-} from "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin/dist/lib/main/typescript/i-carbon-accounting-contract-deployment-info";
+} from "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin";
 
 export interface ICarbonAccountingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
