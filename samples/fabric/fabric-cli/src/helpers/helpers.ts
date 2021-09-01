@@ -21,7 +21,9 @@ const validKeys = [
   'DEFAULT_CHANNEL',
   'DEFAULT_CHAINCODE',
   'MEMBER_CREDENTIAL_FOLDER',
-  'LOCAL'
+  'LOCAL',
+  'DEFAULT_APPLICATION_CHAINCODE',
+  'CONFIG_PATH'
 ]
 // Valid keys for config
 const configKeys = ['connProfilePath', 'relayEndpoint']

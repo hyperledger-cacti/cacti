@@ -26,7 +26,7 @@ const command: GluegunCommand = {
         print,
         toolbox,
         `fabric-cli asset exchange-step --step=1 --target-network=network1 --secret=secrettext --timeout-duration=100 --locker=bob --recipient=alice --param=Type1:a04`,
-        'fabric-cli asset exchange-step --step=<1-8> --target-network=<network1|network2> --secret=<secret> --hash=<hashvalue> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> --locker=<locker-userid> --recipient=<recipient-userid> --secret=<preimage> --contract-id=<contract-id> --param=<param>',
+        'fabric-cli asset exchange-step --step=<1-8> --target-network=<network1|network2> --secret=<secret> --hash=<hashvalue> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> --locker=<locker-userid> --recipient=<recipient-userid> --contract-id=<contract-id> --param=<param>',
         [
           {
             name: '--step',
