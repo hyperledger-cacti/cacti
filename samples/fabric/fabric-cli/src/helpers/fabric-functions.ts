@@ -79,13 +79,15 @@ const walletSetup = async (
       logger.error(`Identity ${userName} does not exist. Please add user in the network.\n`)
       return
     }
-    var secret;
+    var secret, enrollment;
+    var enrollmentDone = false
     try {
       if (!userPwd) {
         secret = await ca.register(
           {
             affiliation: 'org1.department1',
             enrollmentID: userName,
+            maxEnrollments: -1,
             role: 'client'
           },
           adminUser
@@ -97,7 +99,7 @@ const walletSetup = async (
             affiliation: 'org1.department1',
             enrollmentID: userName,
             enrollmentSecret: userPwd,
-            maxEnrollments: 100,
+            maxEnrollments: -1,
             role: 'client'
           },
           adminUser
@@ -105,18 +107,29 @@ const walletSetup = async (
       }
       logger.info(`Wallet Setup: Sucessful ${secret}`)
     } catch(error) {
-      if (!userPwd) {
-        throw new Error(`WalletSetup: User Secret not provided, cannot enroll already registered user ${userName} without secret`)
+      const registeredUser = `Identity '${userName}' is already `
+      if (!error.message.includes(registeredUser)) {
+        throw new Error(`user ${userName} registration with Fabric CA failed with error: ${error}`)
+      } else {
+        try {
+          enrollment = await ca.enroll({
+            enrollmentID: userName,
+            enrollmentSecret: userPwd
+          })
+          enrollmentDone = true
+        } catch (error) {
+          throw new Error(`user ${userName} registration with Fabric CA failed with error: ${error}`)
+        }
       }
-      secret = userPwd
-      logger.info(`User already registered: ${error}`)
-      throw new Error('WalletSetup: Max enrollment reached, cannot enroll again.')
-
     }
-    const enrollment = await ca.enroll({
-      enrollmentID: userName,
-      enrollmentSecret: secret
-    })
+
+    if (!enrollmentDone) {
+      enrollment = await ca.enroll({
+        enrollmentID: userName,
+        enrollmentSecret: secret
+      })
+    }
+
     const x509Identity = {
       credentials: {
         certificate: enrollment.certificate,
