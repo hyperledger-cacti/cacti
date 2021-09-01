@@ -124,7 +124,7 @@ You can install `fabric-cli` as follows:
 ```bash
 make build
 ```
-- Use the `fabric-cli` executable in the `bin` folder for subsequent actions.
+- Use the `fabric-cli` executable in the `bin` folder for [subsequent actions](./ledger-initialization.md).
 
 ## Corda Components
 
