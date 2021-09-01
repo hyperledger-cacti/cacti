@@ -22,16 +22,16 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers/interopsetup"
 	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/interoperablehelper"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers/interopsetup"
 )
 
 func connectSimpleStateWithSDK() {
 	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
-	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", "User1@org1.network1.com")
+	_, contract, _, _ := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simplestate", connProfilePath, "network1", "Org1MSP", true, "User1@org1.network1.com", "", false)
 
 	result, err := contract.EvaluateTransaction("Read", "a")
 	if err != nil {
@@ -55,7 +55,7 @@ func connectSimpleStateWithSDK() {
 }
 
 func connectSimpleAssetWithSDK(assetId string) {
-	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
 	query := helpers.QueryType{
 		ContractName: "simpleasset",
 		Channel:      "mychannel",
@@ -142,7 +142,7 @@ func receiveEvent(notifier <-chan *fab.CCEvent, eventName string) {
 
 func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 
-	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
 	query := helpers.QueryType{
 		ContractName: "simpleasset",
 		Channel:      "mychannel",
@@ -152,7 +152,7 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 	user1Network1 := "User1@org1.network1.com"
 	user2Network1 := "Admin@org1.network1.com"
 
-	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user1Network1)
+	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user1Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -160,7 +160,7 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 	if err != nil {
 		log.Fatalf("failed to get identity for %s with error: %s", user1Network1, err.Error())
 	}
-	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user2Network1)
+	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user2Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -233,7 +233,7 @@ func testLockAssetAndClaimAssetOfBondAsset(assetId string) {
 
 func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 
-	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
 	query := helpers.QueryType{
 		ContractName: "simpleasset",
 		Channel:      "mychannel",
@@ -243,7 +243,7 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 	user1Network1 := "User1@org1.network1.com"
 	user2Network1 := "Admin@org1.network1.com"
 
-	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user1Network1)
+	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user1Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -251,7 +251,7 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 	if err != nil {
 		log.Fatalf("failed to get identity for %s with error: %s", user1Network1, err.Error())
 	}
-	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user2Network1)
+	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user2Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -325,7 +325,7 @@ func testLockAssetAndUnlockAssetOfBondAsset(assetId string) {
 
 func testLockAssetAndClaimAssetUsingContractIdOfBondAsset(assetId string) {
 
-	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
 	query := helpers.QueryType{
 		ContractName: "simpleasset",
 		Channel:      "mychannel",
@@ -335,7 +335,7 @@ func testLockAssetAndClaimAssetUsingContractIdOfBondAsset(assetId string) {
 	user1Network1 := "User1@org1.network1.com"
 	user2Network1 := "Admin@org1.network1.com"
 
-	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user1Network1)
+	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user1Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -343,7 +343,7 @@ func testLockAssetAndClaimAssetUsingContractIdOfBondAsset(assetId string) {
 	if err != nil {
 		log.Fatalf("failed to get identity for %s with error: %s", user1Network1, err.Error())
 	}
-	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user2Network1)
+	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user2Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -416,7 +416,7 @@ func testLockAssetAndClaimAssetUsingContractIdOfBondAsset(assetId string) {
 
 func testLockAssetAndUnlockAssetUsingContractIdOfBondAsset(assetId string) {
 
-	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
 	query := helpers.QueryType{
 		ContractName: "simpleasset",
 		Channel:      "mychannel",
@@ -426,7 +426,7 @@ func testLockAssetAndUnlockAssetUsingContractIdOfBondAsset(assetId string) {
 	user1Network1 := "User1@org1.network1.com"
 	user2Network1 := "Admin@org1.network1.com"
 
-	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user1Network1)
+	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user1Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -434,7 +434,7 @@ func testLockAssetAndUnlockAssetUsingContractIdOfBondAsset(assetId string) {
 	if err != nil {
 		log.Fatalf("failed to get identity for %s with error: %s", user1Network1, err.Error())
 	}
-	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user2Network1)
+	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user2Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -512,7 +512,7 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	assetType := "token1"
 	numUnits := uint64(5)
 
-	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
 	query := helpers.QueryType{
 		ContractName: "simpleasset",
 		Channel:      "mychannel",
@@ -522,7 +522,7 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	user1Network1 := "User1@org1.network1.com"
 	user2Network1 := "Admin@org1.network1.com"
 
-	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user1Network1)
+	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user1Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -530,7 +530,7 @@ func testLockAssetAndClaimAssetOfTokenAsset() {
 	if err != nil {
 		log.Fatalf("failed to get identity for %s with error: %s", user1Network1, err.Error())
 	}
-	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user2Network1)
+	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user2Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -628,7 +628,7 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 	assetType := "token1"
 	numUnits := uint64(5)
 
-	connProfilePath := "../../../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
+	connProfilePath := "../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.yaml"
 	query := helpers.QueryType{
 		ContractName: "simpleasset",
 		Channel:      "mychannel",
@@ -638,7 +638,7 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 	user1Network1 := "User1@org1.network1.com"
 	user2Network1 := "Admin@org1.network1.com"
 
-	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user1Network1)
+	_, contractU1, wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user1Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -646,7 +646,7 @@ func testLockAssetAndUnlockAssetOfTokenAsset() {
 	if err != nil {
 		log.Fatalf("failed to get identity for %s with error: %s", user1Network1, err.Error())
 	}
-	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", user2Network1)
+	_, contractU2, wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), "mychannel", "simpleasset", connProfilePath, "network1", "Org1MSP", true, user2Network1, "", false)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -838,7 +838,7 @@ func interop(key string, localNetwork string, requestingOrg string, address stri
 	username := "User1@org1." + localNetwork + ".com"
 
 	_, contract, wallet, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), channel, contractName, connProfilePath,
-		networkName, mspId, username)
+		networkName, mspId, true, username, "", false)
 	if err != nil {
 		log.Fatalf("failed helpers.FabricHelper with error: %s", err.Error())
 	}
@@ -899,7 +899,7 @@ func main() {
 	//fetchVerificationPolicy("network1")
 
 	//connectSimpleStateWithSDK() // needs the chaincode simplestate on the channel
-	//connectSimpleAssetWithSDK("a001")             // needs the chaincode simpleasset on the channel
+	//connectSimpleAssetWithSDK("a001") // needs the chaincode simpleasset on the channel
 	testLockAssetAndClaimAssetOfBondAsset("a020") // needs the chaincodes simpleasset and interop on the channel
 	//testLockAssetAndUnlockAssetOfBondAsset("a021") // needs the chaincodes simpleasset and interop on the channel
 

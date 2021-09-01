@@ -85,7 +85,7 @@ func chaincodeInvoke(args []string, localNetwork string, username string, logDeb
 		return fmt.Errorf("failed unmarshalling arguement: %s", args[3])
 	}
 
-	userNetwork := username + "@org1." + localNetwork + ".com"
+	userNetwork := username
 	query := helpers.QueryType{
 		ContractName: args[1],
 		Channel:      args[0],

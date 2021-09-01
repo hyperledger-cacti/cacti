@@ -152,10 +152,10 @@ func assetExchangeStepByStep(exchangeStep int, targetNetwork, secret, hashBase64
 		param2 = params[1]
 	}
 
-	lockerNetwork := locker + "@org1." + targetNetwork + ".com"
-	recipientNetwork := recipient + "@org1." + targetNetwork + ".com"
+	lockerNetwork := locker
+	recipientNetwork := recipient
 
-	_, lockerContract, lockerWallet, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), networkConfig.ChannelName, networkConfig.Chaincode, networkConfig.ConnProfilePath, targetNetwork, networkConfig.MspId, lockerNetwork)
+	_, lockerContract, lockerWallet, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), networkConfig.ChannelName, networkConfig.Chaincode, networkConfig.ConnProfilePath, targetNetwork, networkConfig.MspId, true, lockerNetwork, "", false)
 	if err != nil {
 		return fmt.Errorf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -163,7 +163,7 @@ func assetExchangeStepByStep(exchangeStep int, targetNetwork, secret, hashBase64
 	if err != nil {
 		return fmt.Errorf("failed to get identity for %s with error: %s", lockerNetwork, err.Error())
 	}
-	_, recipientContract, recipientWallet, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), networkConfig.ChannelName, networkConfig.Chaincode, networkConfig.ConnProfilePath, targetNetwork, networkConfig.MspId, recipientNetwork)
+	_, recipientContract, recipientWallet, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), networkConfig.ChannelName, networkConfig.Chaincode, networkConfig.ConnProfilePath, targetNetwork, networkConfig.MspId, true, recipientNetwork, "", false)
 	if err != nil {
 		return fmt.Errorf("failed FabricHelper with error: %s", err.Error())
 	}

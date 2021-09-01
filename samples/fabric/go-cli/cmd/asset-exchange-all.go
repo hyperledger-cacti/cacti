@@ -136,10 +136,10 @@ func assetExchangeAllSteps(network1, network2, secret string, timeout, twiceTime
 		return fmt.Errorf("please use a valid --network2, no valid environment found for %s", network2)
 	}
 
-	user1Network1 := user1 + "@org1." + network1 + ".com"
-	user2Network1 := user2 + "@org1." + network1 + ".com"
+	user1Network1 := user1
+	user2Network1 := user2
 
-	_, user1Contract1, user1Wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), network1Config.ChannelName, network1Config.Chaincode, network1Config.ConnProfilePath, network1, network1Config.MspId, user1Network1)
+	_, user1Contract1, user1Wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), network1Config.ChannelName, network1Config.Chaincode, network1Config.ConnProfilePath, network1, network1Config.MspId, true, user1Network1, "", false)
 	if err != nil {
 		return fmt.Errorf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -147,7 +147,7 @@ func assetExchangeAllSteps(network1, network2, secret string, timeout, twiceTime
 	if err != nil {
 		return fmt.Errorf("failed to get identity for %s with error: %s", user1Network1, err.Error())
 	}
-	_, user2Contract1, user2Wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), network1Config.ChannelName, network1Config.Chaincode, network1Config.ConnProfilePath, network1, network1Config.MspId, user2Network1)
+	_, user2Contract1, user2Wallet1, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), network1Config.ChannelName, network1Config.Chaincode, network1Config.ConnProfilePath, network1, network1Config.MspId, true, user2Network1, "", false)
 	if err != nil {
 		return fmt.Errorf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -156,10 +156,10 @@ func assetExchangeAllSteps(network1, network2, secret string, timeout, twiceTime
 		return fmt.Errorf("failed to get identity for %s with error: %s", user2Network1, err.Error())
 	}
 
-	user1Network2 := user1 + "@org1." + network2 + ".com"
-	user2Network2 := user2 + "@org1." + network2 + ".com"
+	user1Network2 := user1
+	user2Network2 := user2
 
-	_, user1Contract2, user1Wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), network2Config.ChannelName, network2Config.Chaincode, network2Config.ConnProfilePath, network2, network2Config.MspId, user1Network2)
+	_, user1Contract2, user1Wallet2, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), network2Config.ChannelName, network2Config.Chaincode, network2Config.ConnProfilePath, network2, network2Config.MspId, true, user1Network2, "", false)
 	if err != nil {
 		return fmt.Errorf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -167,7 +167,7 @@ func assetExchangeAllSteps(network1, network2, secret string, timeout, twiceTime
 	if err != nil {
 		return fmt.Errorf("failed to get identity for %s with error: %s", user1Network2, err.Error())
 	}
-	_, user2Contract2, _, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), network2Config.ChannelName, network2Config.Chaincode, network2Config.ConnProfilePath, network2, network2Config.MspId, user2Network2)
+	_, user2Contract2, _, err := helpers.FabricHelper(helpers.NewGatewayNetworkInterface(), network2Config.ChannelName, network2Config.Chaincode, network2Config.ConnProfilePath, network2, network2Config.MspId, true, user2Network2, "", false)
 	if err != nil {
 		return fmt.Errorf("failed FabricHelper with error: %s", err.Error())
 	}
@@ -204,6 +204,7 @@ func assetExchangeAllSteps(network1, network2, secret string, timeout, twiceTime
 		return fmt.Errorf("could not claim asset in %s", network1)
 	}
 	log.Infof("asset claimed: %s", result)
+	log.Infof("asset exchange completed")
 
 	if changedLogLevel {
 		// restore the original log level

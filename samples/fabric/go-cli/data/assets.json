@@ -2,7 +2,7 @@
   "a03": {
     "assetType": "bond01",
     "id": "a03",
-    "owner": "User1",
+    "owner": "alice",
     "issuer": "treasury",
     "facevalue": "500",
     "maturitydate": "01 Jan 22 00:00 MST"
@@ -10,7 +10,7 @@
   "a04": {
     "assetType": "bond01",
     "id": "a04",
-    "owner": "Admin",
+    "owner": "bob",
     "issuer": "treasury",
     "facevalue": "700",
     "maturitydate": "01 Jul 22 00:00 MST"

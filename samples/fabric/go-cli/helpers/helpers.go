@@ -100,8 +100,8 @@ func AddAssets(dataFilePath, networkName, connProfilePath string, query QueryTyp
 		}
 		log.Debugf("assetJson: %v", assetJson)
 
-		assetOwner := assetJson["owner"].(string) + "@org1." + networkName + ".com"
-		_, _, wallet, err := FabricHelper(NewGatewayNetworkInterface(), channelName, contractName, connProfilePath, networkName, mspId, assetOwner)
+		assetOwner := assetJson["owner"].(string)
+		_, _, wallet, err := FabricHelper(NewGatewayNetworkInterface(), channelName, contractName, connProfilePath, networkName, mspId, true, assetOwner, "", true)
 		if err != nil {
 			return logThenErrorf("failed helpers.FabricHelper with error: %s", err.Error())
 		}
