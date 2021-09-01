@@ -146,7 +146,7 @@ async function invoke(
         return viewPayload;
     } catch (error) {
         console.error(`Failed to submit transaction: ${error}`);
-        throw new Error("Failed to submit transaction: ${error}");
+        throw error;
     }
 }
 
