@@ -14,7 +14,7 @@ Below are the steps to exercise asset exchange using `fabric-cli`.
 ```bash
    make start-interop CHAINCODE_NAME=simpleasset
 ```
-2. Go to `fabric-cli` directory and run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adding the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
+2. Go to the Fabric Client `fabric-cli` directory (the folder `samples/fabric/fabric-cli` if you want to exercise the CLI using `node`, or the folder `samples/fabric/go-cli` if you want to exercise the CLI using `go`) and run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adding the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
 ```bash
    sh scripts/initAsset.sh
 ```
