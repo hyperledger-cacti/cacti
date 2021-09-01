@@ -67,5 +67,5 @@ func init() {
 
 	userAddCmd.Flags().String("target-network", "", "target-network network for command. <network1|network2>")
 	userAddCmd.Flags().String("id", "", "username to be added to the network")
-	userAddCmd.Flags().String("secret", "", "password for the username being added")
+	userAddCmd.Flags().String("secret", "", "password for the username being added (Optional: random password is used)")
 }

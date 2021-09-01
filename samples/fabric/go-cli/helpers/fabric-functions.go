@@ -86,31 +86,35 @@ func WalletSetup(connProfilePath, networkName, mspId, username, userPwd string, 
 		var register msp.RegistrationRequest
 		if userPwd == "" {
 			register = msp.RegistrationRequest{
-				Name:        username,
-				Type:        "client",
-				Affiliation: "org1.department1",
+				Name:           username,
+				Type:           "client",
+				Affiliation:    "org1.department1",
+				MaxEnrollments: -1,
 			}
 		} else {
 			register = msp.RegistrationRequest{
 				Name:           username,
 				Type:           "client",
 				Affiliation:    "org1.department1",
-				MaxEnrollments: 100,
+				MaxEnrollments: -1,
 				Secret:         userPwd,
 			}
 		}
+		// enrollSecret will be set to userPwd if userPwd is provided; otherwise it's set to some random value
 		enrollSecret, err := clientMSP.Register(&register)
+		log.Debugf("enrollSecret: %s", enrollSecret)
 		if err != nil && !strings.Contains(err.Error(), "Identity '"+username+"' is already registered") {
 			return wallet, fmt.Errorf("user registration with Fabric CA failed with error: %s", err.Error())
 		} else if err != nil {
-			err = clientMSP.Reenroll(username)
+			// below, WithType is optional with default value as "x509"
+			err = clientMSP.Enroll(username, msp.WithSecret(userPwd), msp.WithType("x509"))
 			if err != nil {
-				return wallet, fmt.Errorf("reenrollment of user failed with error: %s", err.Error())
+				return wallet, fmt.Errorf("enrollment of user failed with error: %s", err.Error())
 			}
 		} else {
 			//attrReqs := []*msp.AttributeRequest{{Name: "optional-name", Optional: true}}
 			//err = clientMSP.Enroll(username, msp.WithSecret(enrollSecret), msp.WithAttributeRequests(attrReqs), msp.WithType("x509"))
-			err = clientMSP.Enroll(username, msp.WithSecret(enrollSecret))
+			err = clientMSP.Enroll(username, msp.WithSecret(enrollSecret), msp.WithType("x509"))
 			if err != nil {
 				return wallet, fmt.Errorf("enrollment of user failed with error: %s", err.Error())
 			}

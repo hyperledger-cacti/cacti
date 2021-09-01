@@ -24,7 +24,23 @@ const command: GluegunCommand = {
         toolbox,
         `fabric-cli user add --target-network=network1 --id=user --secret=userpw`,
         `fabric-cli user add --target-network=<network-name> --id=<id> --secret=<secret>`,
-        [],
+        [
+          {
+            name: '--target-network',
+            description:
+              'target-network network for command. <network1|network2>'
+          },
+          {
+            name: '--id',
+            description:
+              'username to be added to the network'
+          },
+          {
+            name: '--secret',
+            description:
+              'password for the username being added (Optional: random password is used)'
+          }
+        ],
         command,
         ['user', 'add']
       )
@@ -36,9 +52,6 @@ const command: GluegunCommand = {
     if (!options['id']) {
       print.error('--id is required arguement, please specify the username here')
     }
-    // if (!options['secret']) {
-    //   print.error('--secret is required arguement, please specify the password for the user here')
-    // }
 
     const userName = options['id']
     const userPwd = options['secret']
