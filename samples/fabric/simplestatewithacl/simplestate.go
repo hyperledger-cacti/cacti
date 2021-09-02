@@ -39,15 +39,7 @@ func (s *SmartContract) Init(ctx contractapi.TransactionContextInterface, ccId s
 	ccBytes := []byte(ccId)
 	fmt.Printf("Init called. CC ID: %s\n", ccId)
 
-    err := ctx.GetStub().PutState(wutils.GetInteropChaincodeIDKey(), ccBytes)
-	if err != nil {
-		return err
-	}
-	localCCId, err := wutils.GetLocalChaincodeID(ctx.GetStub())
-	if err != nil {
-		return err
-	}
-	return ctx.GetStub().PutState(wutils.GetLocalChaincodeIDKey(), []byte(localCCId))
+	return ctx.GetStub().PutState(wutils.GetInteropChaincodeIDKey(), ccBytes)
 }
 
 // Create adds a new entry with the specified key and value
