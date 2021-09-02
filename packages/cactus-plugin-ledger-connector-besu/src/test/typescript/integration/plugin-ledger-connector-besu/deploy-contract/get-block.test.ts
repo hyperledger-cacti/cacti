@@ -52,6 +52,7 @@ test("can get block from blockchain", async (t: Test) => {
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
+  await connector.onPluginInit();
 
   const request: GetBlockV1Request = { blockHashOrBlockNumber: 0 };
   const currentBlock = await connector.getBlock(request);

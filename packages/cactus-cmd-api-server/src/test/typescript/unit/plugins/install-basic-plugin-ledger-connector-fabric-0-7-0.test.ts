@@ -9,18 +9,31 @@ import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api";
 
-import { K_CACTUS_API_SERVER_TOTAL_PLUGIN_IMPORTS } from "../../../main/typescript/prometheus-exporter/metrics";
+import { K_CACTUS_API_SERVER_TOTAL_PLUGIN_IMPORTS } from "../../../../main/typescript/prometheus-exporter/metrics";
 
-import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api";
+import { DefaultApi as ApiServerApi } from "../../../../main/typescript/public-api";
+import path from "path";
 
 const logLevel: LogLevelDesc = "TRACE";
 
-test("can import plugins at runtime (CLI)", async (t: Test) => {
+test("can install plugin-ledger-connector-fabric", async (t: Test) => {
+  const pluginsPath = path.join(
+    __dirname, // start at the current file's path
+    "../../../../../../../", // walk back up to the project root
+    ".tmp/test/cmd-api-server/runtime-plugin-imports_test", // the dir path from the root
+    uuidv4(), // then a random directory to ensure proper isolation
+  );
+  const pluginManagerOptionsJson = JSON.stringify({
+    pluginsPath,
+    npmInstallMode: "noCache",
+  });
+
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+  apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;
@@ -28,12 +41,13 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [
     {
-      packageName: "@hyperledger/cactus-plugin-keychain-memory",
+      packageName: "@hyperledger/cactus-plugin-ledger-connector-fabric",
       type: PluginImportType.Local,
       options: {
         instanceId: uuidv4(),
-        keychainId: uuidv4(),
         logLevel,
+        connectionProfile: {},
+        peerBinary: "peer",
       },
     },
   ];
@@ -42,6 +56,8 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
   const apiServer = new ApiServer({
     config: config.getProperties(),
   });
+
+  test.onFinish(() => apiServer.shutdown());
 
   const startResponse = apiServer.start();
   await t.doesNotReject(startResponse, "started API server dynamic imports OK");
@@ -79,6 +95,4 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
       "Total 1 plugins imported as expected. RESULT OK",
     );
   }
-
-  test.onFinish(() => apiServer.shutdown());
 });

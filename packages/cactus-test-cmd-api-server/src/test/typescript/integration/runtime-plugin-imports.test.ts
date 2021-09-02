@@ -1,3 +1,4 @@
+import path from "path";
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
@@ -13,15 +14,23 @@ import { PluginImportType } from "@hyperledger/cactus-core-api";
 const logLevel: LogLevelDesc = "TRACE";
 
 test("can import plugins at runtime (CLI)", async (t: Test) => {
-  // const pluginRegistry = new PluginRegistry({ plugins: [] });
+  const pluginsPath = path.join(
+    __dirname, // start at the current file's path
+    "../../../../../../", // walk back up to the project root
+    ".tmp/test/cmd-api-server/runtime-plugin-imports_test", // the dir path from the root
+    uuidv4(), // then a random directory to ensure proper isolation
+  );
+  const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
   const configService = new ConfigService();
   const apiServerOptions = configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+  apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;
   apiServerOptions.cockpitPort = 0;
+  apiServerOptions.grpcPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [
     {

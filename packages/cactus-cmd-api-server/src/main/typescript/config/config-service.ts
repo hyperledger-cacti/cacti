@@ -26,6 +26,7 @@ convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
 
 export interface ICactusApiServerOptions {
+  pluginManagerOptionsJson: string;
   authorizationProtocol: AuthorizationProtocol;
   authorizationConfigJson: IAuthorizationConfig;
   configFile: string;
@@ -51,6 +52,8 @@ export interface ICactusApiServerOptions {
   apiTlsCertPem: string;
   apiTlsKeyPem: string;
   apiTlsClientCaPem: string;
+  grpcPort: number;
+  grpcMtlsEnabled: boolean;
   plugins: PluginImport[];
   keyPairPem: string;
   keychainSuffixKeyPairPem: string;
@@ -88,6 +91,14 @@ export class ConfigService {
 
   private static getConfigSchema(): Schema<ICactusApiServerOptions> {
     return {
+      pluginManagerOptionsJson: {
+        doc:
+          "Can be used to override npm registry and authentication details for example. See https://www.npmjs.com/package/live-plugin-manager#pluginmanagerconstructoroptions-partialpluginmanageroptions for further details.",
+        format: "*",
+        default: "{}",
+        env: "PLUGIN_MANAGER_OPTIONS_JSON",
+        arg: "plugin-manager-options-json",
+      },
       authorizationProtocol: {
         doc:
           "The name of the authorization protocol to use. Accepted values" +
@@ -348,6 +359,22 @@ export class ConfigService {
         arg: "api-tls-key-pem",
         default: null as string | null,
       },
+      grpcPort: {
+        doc: "The gRPC port to serve web services on.",
+        format: "port",
+        env: "GRPC_PORT",
+        arg: "grpc-port",
+        default: 5000,
+      },
+      grpcMtlsEnabled: {
+        doc:
+          "Enable TLS termination on the grpc server. Useful if you do not have/want to " +
+          "have a reverse proxy or load balancer doing the SSL/TLS termination in your environment.",
+        format: Boolean,
+        env: "GRPC_TLS_ENABLED",
+        arg: "grpc-tls-enabled",
+        default: true,
+      },
       keyPairPem: {
         sensitive: true,
         doc:
@@ -436,6 +463,8 @@ export class ConfigService {
     const apiPort = (schema.apiPort as SchemaObj).default;
     const apiProtocol = apiTlsEnabled ? "https:" : "http";
     const apiBaseUrl = `${apiProtocol}//${apiHost}:${apiPort}`;
+    const grpcPort = (schema.grpcPort as SchemaObj).default;
+    const grpcMtlsEnabled = (schema.grpcMtlsEnabled as SchemaObj).default;
 
     const keyPair = JWK.generateSync("EC", "secp256k1", { use: "sig" }, true);
     const keyPairPem = keyPair.toPEM(true);
@@ -518,6 +547,7 @@ export class ConfigService {
     };
 
     return {
+      pluginManagerOptionsJson: "{}",
       authorizationProtocol: AuthorizationProtocol.JSON_WEB_TOKEN,
       authorizationConfigJson,
       configFile: ".config.json",
@@ -535,6 +565,8 @@ export class ConfigService {
       apiTlsCertPem: pkiServer.certificatePem,
       apiTlsKeyPem: pkiServer.privateKeyPem,
       apiTlsClientCaPem: "-", // API mTLS is off so this will not crash the server
+      grpcPort,
+      grpcMtlsEnabled,
       cockpitHost,
       cockpitPort,
       cockpitWwwRoot: (schema.cockpitWwwRoot as SchemaObj).default,
@@ -558,6 +590,8 @@ export class ConfigService {
     if (!ConfigService.config) {
       const schema: Schema<ICactusApiServerOptions> = ConfigService.getConfigSchema();
       ConfigService.config = (convict as any)(schema, options);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       if (ConfigService.config.get("configFile")) {
         const configFilePath = ConfigService.config.get("configFile");
         ConfigService.config.loadFile(configFilePath);

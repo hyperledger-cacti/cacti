@@ -1,8 +1,8 @@
 FROM docker:20.10.2-dind
 
-ARG SAMPLES_KOTLIN_SHA=c6d386057957ae1a717751abe61f82e7aef4e035
+ARG SAMPLES_KOTLIN_SHA=30fd841dd035934bae75ab8910da3b6e3d5d6ee7
 ARG SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH="./Advanced/obligation-cordapp/"
-ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.5
+ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.7
 
 WORKDIR /
 
@@ -66,6 +66,19 @@ RUN java -jar /corda-tools-shell-cli-all.jar install-shell-extensions
 RUN git clone https://github.com/corda/samples-kotlin.git
 WORKDIR /samples-kotlin
 RUN git checkout ${SAMPLES_KOTLIN_SHA}
+
+RUN sed -i 's/4.8/4.7/g' Accounts/constants.properties
+RUN sed -i 's/=10/=9/g' Accounts/constants.properties
+RUN sed -i 's/4.8/4.7/g' Advanced/constants.properties
+RUN sed -i 's/=10/=9/g' Advanced/constants.properties
+RUN sed -i 's/4.8/4.7/g' Basic/constants.properties
+RUN sed -i 's/=10/=9/g' Basic/constants.properties
+RUN sed -i 's/4.8/4.7/g' BusinessNetworks/constants.properties
+RUN sed -i 's/=10/=9/g' BusinessNetworks/constants.properties
+RUN sed -i 's/4.8/4.7/g' Features/constants.properties
+RUN sed -i 's/=10/=9/g' Features/constants.properties
+RUN sed -i 's/4.8/4.7/g' Tokens/constants.properties
+RUN sed -i 's/=10/=9/g' Tokens/constants.properties
 
 WORKDIR /samples-kotlin/${SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH}
 

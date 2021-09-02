@@ -13,17 +13,12 @@ import {
   Configuration,
 } from "@hyperledger/cactus-core-api";
 
-import { ConsortiumRepository } from "@hyperledger/cactus-core";
-
 import {
   PluginConsortiumManual,
   IPluginConsortiumManualOptions,
-} from "../../../../main/typescript/plugin-consortium-manual";
-
-import {
-  GetNodeJwsEndpoint,
-  //  IGetNodeJwsEndpointOptions,
 } from "../../../../main/typescript/public-api";
+
+import { GetNodeJwsEndpoint } from "../../../../main/typescript/public-api";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -44,14 +39,12 @@ test("Can provide JWS", async (t: Test) => {
     ledger: [],
     pluginInstance: [],
   };
-  const consortiumRepo = new ConsortiumRepository({ db });
 
   // Creating the PluginConsortiumManual object to observe the prometheus metrics.
   const options: IPluginConsortiumManualOptions = {
     instanceId: uuidv4(),
     keyPairPem: keyPairPem,
     consortiumDatabase: db,
-    consortiumRepo,
   };
 
   const pluginConsortiumManual: PluginConsortiumManual = new PluginConsortiumManual(
@@ -138,7 +131,7 @@ test("Can provide JWS", async (t: Test) => {
     publicKeyPem: "",
   };
 
-  consortiumRepo.consortiumDatabase.cactusNode.push(dummyCactusNode);
+  db.cactusNode.push(dummyCactusNode);
   // The invocation of the node JWS endpoint internally triggers the update
   // of the metrics so after it has executed we can expect the metrics to
   // show the new values for our assertions below
