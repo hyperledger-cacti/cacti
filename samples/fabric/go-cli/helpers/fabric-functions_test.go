@@ -69,7 +69,7 @@ func TestFarbicHelper(t *testing.T) {
 	require.Contains(t, err.Error(), expectedError)
 
 	logrus.Printf("Test FabricHelper() failure to connect to gateway")
-	userWalletPath := filepath.Join("wallet", "example", "User1@org1.example.com.id")
+	userWalletPath := filepath.Join("../../../tests/network-setups/fabric/shared/", "example/wallet", "User1@org1.example.com.id")
 	// store the user credentials to restore it later
 	userCredentials, err := ioutil.ReadFile(filepath.Clean(userWalletPath))
 	if err != nil {

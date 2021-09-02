@@ -40,7 +40,7 @@ const walletSetup = async (
 
   const walletPath = process.env.WALLET_PATH
     ? process.env.WALLET_PATH
-    : path.join(__dirname, '../', `wallet-${networkName}`)
+    : path.join(__dirname, '../../../../../tests/network-setups/fabric/shared/', `${networkName}/wallet`)
   const wallet = await Wallets.newFileSystemWallet(walletPath)
 
   logger.info(`Wallet Setup: wallet path: ${walletPath}`)

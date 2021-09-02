@@ -54,11 +54,12 @@ func logThenErrorf(format string, args ...interface{}) error {
 
 func WalletSetup(connProfilePath, networkName, mspId, username, userPwd string, register bool) (*gateway.Wallet, error) {
 
-	wallet, err := gateway.NewFileSystemWallet(filepath.Join("wallet/" + networkName))
+	walletPath := filepath.Join("../../../tests/network-setups/fabric/shared/" + networkName + "/wallet")
+	wallet, err := gateway.NewFileSystemWallet(walletPath)
 	if err != nil {
 		return nil, logThenErrorf("failed to create wallet: %s", err.Error())
 	}
-	log.Debugf("wallet path: %s", filepath.Join("wallet/"+networkName))
+	log.Infof("wallet path: %s", walletPath)
 
 	if !wallet.Exists(username) {
 		if !register {

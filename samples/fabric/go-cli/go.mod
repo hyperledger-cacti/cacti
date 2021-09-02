@@ -2,14 +2,14 @@ module github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go
 
 go 1.16
 
-replace github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk => ./../../../sdks/fabric/go-sdk
-
 require (
 	github.com/cloudflare/cfssl v1.4.1
-	github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk v0.0.0-00010101000000-000000000000
+	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.2.3-alpha.1
+	github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk v1.2.3-alpha.2
 	github.com/hyperledger/fabric-sdk-go v1.0.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
+	google.golang.org/protobuf v1.27.1
 )
