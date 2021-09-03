@@ -13,4 +13,5 @@ shared/charts/username
 *.real.*
 *.tar.gz
 *.env
-fabric/dev/log.txt
+fabric/dev/log.txtaa
+wallet
