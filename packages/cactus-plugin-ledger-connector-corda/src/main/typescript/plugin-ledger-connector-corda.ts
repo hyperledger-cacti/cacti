@@ -5,6 +5,8 @@ import { Optional } from "typescript-optional";
 import { Config as SshConfig } from "node-ssh";
 import { Express } from "express";
 
+import OAS from "../json/openapi.json";
+
 import {
   IPluginLedgerConnector,
   IWebServiceEndpoint,
@@ -78,6 +80,10 @@ export class PluginLedgerConnectorCorda
       `${fnTag} options.prometheusExporter`,
     );
     this.prometheusExporter.startMetricsCollection();
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getPrometheusExporter(): PrometheusExporter {

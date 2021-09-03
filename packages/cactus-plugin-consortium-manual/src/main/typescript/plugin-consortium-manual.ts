@@ -8,6 +8,8 @@ import { JWS, JWK } from "jose";
 import jsonStableStringify from "json-stable-stringify";
 import { v4 as uuidv4 } from "uuid";
 
+import OAS from "../json/openapi.json";
+
 import {
   ConsortiumDatabase,
   IPluginWebService,
@@ -96,6 +98,10 @@ export class PluginConsortiumManual
     );
     this.prometheusExporter.startMetricsCollection();
     this.prometheusExporter.setNodeCount(this.getNodeCount());
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getInstanceId(): string {

@@ -26,6 +26,8 @@ import {
 
 import { Optional } from "typescript-optional";
 
+import OAS from "../json/openapi.json";
+
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
@@ -200,6 +202,10 @@ export class PluginLedgerConnectorFabric
       vaultConfig: opts.vaultConfig,
     });
     this.certStore = new CertDatastore(opts.pluginRegistry);
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public async shutdown(): Promise<void> {

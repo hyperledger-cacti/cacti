@@ -9,6 +9,8 @@ import Web3 from "web3";
 import { Contract, ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
 
+import OAS from "../json/openapi.json";
+
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
@@ -118,6 +120,10 @@ export class PluginLedgerConnectorXdai
     );
 
     this.prometheusExporter.startMetricsCollection();
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public async hasTransactionFinality(): Promise<boolean> {

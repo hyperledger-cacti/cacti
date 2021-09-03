@@ -12,6 +12,8 @@ const Contract = new Web3().eth.Contract;
 import { ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
 
+import OAS from "../json/openapi.json";
+
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
@@ -121,6 +123,10 @@ export class PluginLedgerConnectorQuorum
     );
 
     this.prometheusExporter.startMetricsCollection();
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getPrometheusExporter(): PrometheusExporter {
