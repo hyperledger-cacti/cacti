@@ -3,6 +3,7 @@ FABRIC_CA_VERSION=1.4.7
 FABRIC_COUCH_VERSION=0.4.20
 CHAINCODE_NAME?=simplestate
 NW?=network1
+WITH_RELAY_ACL?=
 
 .PHONY:	all
 all: start
@@ -19,22 +20,22 @@ start-interop-local: start-interop-network1-local start-interop-network2-local
 .PHONY: start-network1
 start-network1:	.fabric-setup setup-cc
 	./network.sh up createChannel -ca -nw network1
-	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1 -wa $(WITH_RELAY_ACL)
 
 .PHONY: start-network1-local
 start-network1-local: .fabric-setup setup-cc-local
 	./network.sh up createChannel -ca -nw network1
-	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1 -wa $(WITH_RELAY_ACL)
 
 .PHONY: start-network2
 start-network2: .fabric-setup setup-cc
 	./network.sh up createChannel -ca -nw network2
-	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2 -wa $(WITH_RELAY_ACL)
 
 .PHONY: start-network2-local
 start-network2-local: .fabric-setup setup-cc-local
 	./network.sh up createChannel -ca -nw network2
-	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2 -wa $(WITH_RELAY_ACL)
 
 .PHONY: start-interop-network1
 start-interop-network1:	setup-interop-cc start-network1 setup-interop-network1
@@ -50,19 +51,19 @@ start-interop-network2-local: setup-interop-cc-local start-network2-local setup-
 
 .PHONY: setup-interop-network1
 setup-interop-network1: setup-interop-cc
-	./network.sh deployCC -ch interop -nw network1
+	./network.sh deployCC -ch interop -nw network1 -wa $(WITH_RELAY_ACL)
 
 .PHONY: setup-interop-network1-local
 setup-interop-network1-local: setup-interop-cc-local
-	./network.sh deployCC -ch interop -nw network1
+	./network.sh deployCC -ch interop -nw network1 -wa $(WITH_RELAY_ACL)
 
 .PHONY: setup-interop-network2
 setup-interop-network2: setup-interop-cc
-	./network.sh deployCC -ch interop -nw network2
+	./network.sh deployCC -ch interop -nw network2 -wa $(WITH_RELAY_ACL)
 
 .PHONY: setup-interop-network2-local
 setup-interop-network2-local: setup-interop-cc-local
-	./network.sh deployCC -ch interop -nw network2
+	./network.sh deployCC -ch interop -nw network2 -wa $(WITH_RELAY_ACL)
 
 .PHONY: setup-interop-cc
 setup-interop-cc:
@@ -74,19 +75,19 @@ setup-interop-cc-local:
 
 .PHONY: setup-cc
 setup-cc:
-	./scripts/setupAppCC.sh $(CHAINCODE_NAME)
+	./scripts/setupAppCC.sh $(CHAINCODE_NAME) $(WITH_RELAY_ACL)
 
 .PHONY: setup-cc-local
 setup-cc-local:
-	./scripts/setupAppCCLocal.sh $(CHAINCODE_NAME)
+	./scripts/setupAppCCLocal.sh $(CHAINCODE_NAME) $(WITH_RELAY_ACL)
 
 .PHONY: deploy-cc
 deploy-cc: setup-cc
-	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw $(NW)
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw $(NW) -wa $(WITH_RELAY_ACL)
 
 .PHONY: deploy-cc-local
 deploy-cc-local: setup-cc-local
-	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw $(NW)
+	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw $(NW) -wa $(WITH_RELAY_ACL)
 
 
 .fabric-setup:

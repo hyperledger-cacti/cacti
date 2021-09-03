@@ -402,7 +402,7 @@ function createChannel() {
 ## Call the script to isntall and instantiate a chaincode on the channel
 function deployCC() {
   echo "In function deployCC $APP_ROOT for $COMPOSE_PROJECT_NAME"
-  scripts/deployCC.sh $CHANNEL_NAME $CC_SRC_LANGUAGE $VERSION $CLI_DELAY $MAX_RETRY $VERBOSE $CC_CHAIN_CODE $NW_CFG_PATH $PEER_PORT $ORDERER_PORT $APP_ROOT $COMPOSE_PROJECT_NAME
+  scripts/deployCC.sh $CHANNEL_NAME $CC_SRC_LANGUAGE $VERSION $CLI_DELAY $MAX_RETRY $VERBOSE $CC_CHAIN_CODE $NW_CFG_PATH $PEER_PORT $ORDERER_PORT $APP_ROOT $COMPOSE_PROJECT_NAME $WITH_RELAY_ACL
 
   if [ $? -ne 0 ]; then
     echo "ERROR !!! Deploying chaincode failed"
@@ -494,6 +494,7 @@ CC_CHAIN_CODE=""
 ROLE="network1"
 ROLE_FILE=""
 ORDERER_LISTENPORT="$ORDERER_LISTENPORT"
+WITH_RELAY_ACL=
 
 export N1_CA_ORG1_PORT=${N1_CA_ORG1_PORT:-7054}
 export N1_CA_ORDERER_PORT=${N1_CA_ORDERER_PORT:-9054}
@@ -598,6 +599,10 @@ while [[ $# -ge 1 ]] ; do
   -nw )
     ROLE="$2"
     echo "ROLE:$ROLE"
+    shift
+    ;;
+  -wa )
+    WITH_RELAY_ACL="$2"
     shift
     ;;
   * )

@@ -60,6 +60,7 @@ func (s *SmartContract) Read(ctx contractapi.TransactionContextInterface, key st
 		if !relayAccessCheck {
 			return "", fmt.Errorf("Illegal access by relay")
 		}
+		fmt.Printf("Relay access check passed. Key: %s\n", key)
 	}
 
 	bytes, err := ctx.GetStub().GetState(key)
