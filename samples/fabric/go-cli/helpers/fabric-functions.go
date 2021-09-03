@@ -54,7 +54,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 
 func WalletSetup(connProfilePath, networkName, mspId, username, userPwd string, register bool) (*gateway.Wallet, error) {
 
-	walletPath := filepath.Join("../../../tests/network-setups/fabric/shared/" + networkName + "/wallet")
+	walletPath := filepath.Join("../../../../tests/network-setups/fabric/shared/" + networkName + "/wallet")
 	wallet, err := gateway.NewFileSystemWallet(walletPath)
 	if err != nil {
 		return nil, logThenErrorf("failed to create wallet: %s", err.Error())
@@ -63,7 +63,13 @@ func WalletSetup(connProfilePath, networkName, mspId, username, userPwd string, 
 
 	if !wallet.Exists(username) {
 		if !register {
-			return wallet, logThenErrorf("identity %s does not exist, please add user in the network", username)
+			_, err = populateWallet(wallet, connProfilePath, networkName, mspId, username)
+			if err != nil && strings.Contains(err.Error(), "directory credPath") && strings.Contains(err.Error(), "doesn't exist") {
+				return wallet, logThenErrorf("identity %s does not exist, please add user in the network", username)
+			} else if err != nil {
+				return wallet, logThenErrorf("failed populateWallet with error: %s", err.Error())
+			}
+			return wallet, nil
 		}
 
 		sdk, err := fabsdk.New(config.FromFile(connProfilePath))
