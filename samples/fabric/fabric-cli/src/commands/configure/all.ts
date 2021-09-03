@@ -67,7 +67,7 @@ const command: GluegunCommand = {
         )
         return
       }
-      const username = currusername || `User1@org1.${network}.com`
+      const username = currusername || `user1`
       print.info(`Generating membership for network: ${network}`)
       // 1. Generate network configs (membership, access control and verification policy)
       await generateMembership(

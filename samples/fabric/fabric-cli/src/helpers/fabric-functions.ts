@@ -429,7 +429,7 @@ async function fabricHelper({
   //   : path.join(__dirname, '../', `wallet-${networkName}`)
 
   if (!userString) {
-    userString = `User1@org1.${networkName}.com`
+    userString = `user1`
   }
 
   const wallet = await walletSetup(networkName, ccp, mspId, userString, userPwd, registerUser, logger)

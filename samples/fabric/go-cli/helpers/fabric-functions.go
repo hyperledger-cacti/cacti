@@ -63,12 +63,7 @@ func WalletSetup(connProfilePath, networkName, mspId, username, userPwd string, 
 
 	if !wallet.Exists(username) {
 		if !register {
-			//return wallet, logThenErrorf("identity %s does not exist, please add user in the network", username)
-			_, err := populateWallet(wallet, connProfilePath, networkName, mspId, username)
-			if err != nil {
-				return wallet, logThenErrorf("failed populateWallet with error: %s", err.Error())
-			}
-			return wallet, nil
+			return wallet, logThenErrorf("identity %s does not exist, please add user in the network", username)
 		}
 
 		sdk, err := fabsdk.New(config.FromFile(connProfilePath))
@@ -155,7 +150,7 @@ func FabricHelper(gni GatewayNetworkInterface, channel, contractName, connProfil
 		"userString: %s", channel, contractName, connProfilePath, networkName, mspId, userString)
 
 	if userString == "" {
-		userString = "User1@org1." + networkName + ".com"
+		userString = "user1"
 		// default user already exists, don't register
 		registerUser = false
 	}
