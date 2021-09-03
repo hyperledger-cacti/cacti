@@ -1,2 +1,4 @@
 wallet
-./bin/fabric-cli
+bin
+.env
+config.json
