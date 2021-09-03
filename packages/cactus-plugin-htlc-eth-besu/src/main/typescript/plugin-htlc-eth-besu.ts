@@ -4,6 +4,8 @@ import { Server as SecureServer } from "https";
 import { Express } from "express";
 import { Optional } from "typescript-optional";
 
+import OAS from "../json/openapi.json";
+
 import {
   IPluginWebService,
   ICactusPlugin,
@@ -59,6 +61,10 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
 
   public get className(): string {
     return PluginHtlcEthBesu.CLASS_NAME;
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   /**

@@ -11,6 +11,8 @@ import {
 import type { Express } from "express";
 import { Optional } from "typescript-optional";
 
+import OAS from "../json/openapi.json";
+
 import {
   Logger,
   Checks,
@@ -139,6 +141,10 @@ export class PluginKeychainAwsSm
     });
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getAwsClient(): SecretsManager {

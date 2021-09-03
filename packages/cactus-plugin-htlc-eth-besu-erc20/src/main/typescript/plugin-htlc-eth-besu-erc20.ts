@@ -4,6 +4,8 @@ import { Server as SecureServer } from "https";
 import { Express } from "express";
 import { Optional } from "typescript-optional";
 
+import OAS from "../json/openapi.json";
+
 import {
   IPluginWebService,
   ICactusPlugin,
@@ -54,6 +56,10 @@ export class PluginHtlcEthBesuErc20
     Checks.nonBlankString(opts.instanceId, `${fnTag} opts.instanceId`);
     this.instanceId = opts.instanceId;
     this.pluginRegistry = opts.pluginRegistry;
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public get className(): string {

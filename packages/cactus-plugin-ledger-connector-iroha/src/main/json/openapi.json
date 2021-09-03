@@ -9,26 +9,6 @@
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "servers": [
-    {
-      "url": "https://www.cactus.stream/{basePath}",
-      "description": "Public test instance",
-      "variables": {
-        "basePath": {
-          "default": ""
-        }
-      }
-    },
-    {
-      "url": "http://localhost:4000/{basePath}",
-      "description": "Local test instance",
-      "variables": {
-        "basePath": {
-          "default": ""
-        }
-      }
-    }
-  ],
   "components": {
     "schemas": {
       "IrohaCommand": {
@@ -175,6 +155,7 @@
       "RunTransactionRequestV1": {
         "type": "object",
         "required": ["commandName", "params"],
+        "additionalProperties": false,
         "properties": {
           "commandName": {
             "type": "string",
@@ -238,6 +219,7 @@
       },
       "InvokeContractV1Request": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "contractName": {}
         }

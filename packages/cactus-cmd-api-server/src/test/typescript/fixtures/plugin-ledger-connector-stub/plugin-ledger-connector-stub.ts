@@ -66,6 +66,10 @@ export class PluginLedgerConnectorStub
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
+  public getOpenApiSpec(): unknown {
+    return null;
+  }
+
   public getInstanceId(): string {
     return this.instanceId;
   }

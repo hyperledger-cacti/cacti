@@ -7,6 +7,8 @@ import type { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
 
+import OAS from "../json/openapi.json";
+
 import Web3 from "web3";
 
 import type { WebsocketProvider } from "web3-core";
@@ -160,6 +162,10 @@ export class PluginLedgerConnectorBesu
     );
 
     this.prometheusExporter.startMetricsCollection();
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getPrometheusExporter(): PrometheusExporter {

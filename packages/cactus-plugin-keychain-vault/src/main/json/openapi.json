@@ -18,6 +18,7 @@
       "HasKeychainEntryRequestV1": {
         "type": "object",
         "required": ["key"],
+        "additionalProperties": false,
         "properties": {
           "key": {
             "type": "string",
@@ -54,6 +55,7 @@
       "DeleteKeychainEntryRequestV1": {
         "type": "object",
         "required": ["key"],
+        "additionalProperties": false,
         "properties": {
           "key": {
             "type": "string",

@@ -90,7 +90,7 @@
     "express": "4.17.1",
     "express-http-proxy": "1.6.2",
     "express-jwt": "6.0.0",
-    "express-openapi-validator": "3.10.0",
+    "express-openapi-validator": "4.12.12",
     "fs-extra": "10.0.0",
     "jose": "1.28.1",
     "lmify": "0.3.0",

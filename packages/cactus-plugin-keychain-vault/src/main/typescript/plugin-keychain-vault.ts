@@ -6,6 +6,8 @@ import { Optional } from "typescript-optional";
 import Vault from "node-vault";
 import HttpStatus from "http-status-codes";
 
+import OAS from "../json/openapi.json";
+
 import {
   Logger,
   Checks,
@@ -119,6 +121,10 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     this.log.info(`Created Vault backend OK. Endpoint=${this.endpoint}`);
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getPrometheusExporter(): PrometheusExporter {
