@@ -261,6 +261,32 @@ export enum Constants {
 /**
  * 
  * @export
+ * @interface DeleteKeychainEntryRequestV1
+ */
+export interface DeleteKeychainEntryRequestV1 {
+    /**
+     * The key for the entry to check the presence of on the keychain.
+     * @type {string}
+     * @memberof DeleteKeychainEntryRequestV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface DeleteKeychainEntryResponseV1
+ */
+export interface DeleteKeychainEntryResponseV1 {
+    /**
+     * The key that was deleted from the keychain.
+     * @type {string}
+     * @memberof DeleteKeychainEntryResponseV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
  * @interface GetKeychainEntryRequest
  */
 export interface GetKeychainEntryRequest {
@@ -321,6 +347,44 @@ export interface GetObjectResponseV1 {
      * @memberof GetObjectResponseV1
      */
     value: string;
+}
+/**
+ * 
+ * @export
+ * @interface HasKeychainEntryRequestV1
+ */
+export interface HasKeychainEntryRequestV1 {
+    /**
+     * The key to check for presence in the keychain.
+     * @type {string}
+     * @memberof HasKeychainEntryRequestV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface HasKeychainEntryResponseV1
+ */
+export interface HasKeychainEntryResponseV1 {
+    /**
+     * The key that was used to check the presence of the value in the entry store.
+     * @type {string}
+     * @memberof HasKeychainEntryResponseV1
+     */
+    key: string;
+    /**
+     * Date and time encoded as JSON when the presence check was performed by the plugin backend.
+     * @type {string}
+     * @memberof HasKeychainEntryResponseV1
+     */
+    checkedAt: string;
+    /**
+     * The boolean true or false indicating the presence or absence of an entry under \'key\'.
+     * @type {boolean}
+     * @memberof HasKeychainEntryResponseV1
+     */
+    isPresent: boolean;
 }
 /**
  * 

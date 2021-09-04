@@ -1,0 +1,29 @@
+@startuml Sequence Diagram - Transaction
+
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+box "Users" #LightBlue
+actor "User A" as a
+end box
+
+box "Hyperledger Cactus" #LightGray
+entity "API Client" as apic
+entity "API Server" as apis
+end box
+
+box "Ledger Connector" #LightGreen
+database "Iroha" as irohacon
+end box
+
+a --> apic : Tx Iroha Ledger
+apic --> apis: Request
+apis --> irohacon: transact()
+irohacon --> apis: Response
+apis --> apic: Formatted Response
+apic --> a: RunTransactionResponse
+@enduml

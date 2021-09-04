@@ -1,6 +1,8 @@
 import fs from "fs-extra";
 import path from "path";
-import globby from "globby";
+import { fileURLToPath } from "url";
+import { globby, Options as GlobbyOptions } from "globby";
+// import * as globby from "globby";
 import { RuntimeError } from "run-time-error";
 import { hasProperty } from "./has-property";
 import { isStdLibRecord } from "./is-std-lib-record";
@@ -18,6 +20,8 @@ export async function checkOpenApiJsonSpecs(
   req: ICheckOpenApiJsonSpecsRequest,
 ): Promise<[boolean, string[]]> {
   const TAG = "[tools/check-open-api-json-specs.ts]";
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   const SCRIPT_DIR = __dirname;
   const PROJECT_DIR = path.join(SCRIPT_DIR, "../../");
   console.log(`${TAG} SCRIPT_DIR=${SCRIPT_DIR}`);
@@ -33,7 +37,7 @@ export async function checkOpenApiJsonSpecs(
     throw new RuntimeError(`req.env cannot be falsy.`);
   }
 
-  const globbyOpts: globby.GlobbyOptions = {
+  const globbyOpts: GlobbyOptions = {
     cwd: PROJECT_DIR,
     ignore: ["node_modules"],
   };
@@ -41,7 +45,8 @@ export async function checkOpenApiJsonSpecs(
   const DEFAULT_GLOB = "**/cactus-*/src/main/json/openapi.json";
 
   const oasPaths = await globby(DEFAULT_GLOB, globbyOpts);
-  console.log(`openapi.json paths: (${oasPaths.length}): `, oasPaths);
+  console.log(`openapi.json paths: (${oasPaths.length}): `);
+  // const oasPaths = oasPathsEntries.map((it) => it.path);
 
   const errors: string[] = [];
 

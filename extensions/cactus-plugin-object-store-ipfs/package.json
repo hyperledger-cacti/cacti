@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-object-store-ipfs",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "IPFS backed objec store plugin implementation for Hyperledger Cactus",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-object-store-ipfs.node.umd.min.js",
@@ -72,19 +72,20 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.7.0",
-    "@hyperledger/cactus-core": "0.7.0",
-    "@hyperledger/cactus-core-api": "0.7.0",
+    "@hyperledger/cactus-common": "0.8.0",
+    "@hyperledger/cactus-core": "0.8.0",
+    "@hyperledger/cactus-core-api": "0.8.0",
     "axios": "0.21.1",
-    "ipfs-http-client": "50.1.0",
+    "ipfs-http-client": "51.0.1",
     "run-time-error": "1.4.0",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "0.7.0",
-    "@types/express": "4.17.8",
+    "@hyperledger/cactus-test-tooling": "0.8.0",
+    "@types/express": "4.17.13",
     "express": "4.17.1",
-    "ipfs-core-types": "0.5.0"
+    "ipfs-core-types": "0.6.1",
+    "multiformats": "9.4.6"
   }
 }

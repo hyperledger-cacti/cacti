@@ -1,5 +1,5 @@
 import path from "path";
-import { Stream } from "stream";
+import { Duplex } from "stream";
 import { IncomingMessage } from "http";
 import { Container, ContainerInfo } from "dockerode";
 import Dockerode from "dockerode";
@@ -308,6 +308,7 @@ export class Containers {
     cmd: string[],
     timeoutMs = 300000, // 5 minutes default timeout
     logLevel: LogLevelDesc = "INFO",
+    workingDir?: string,
   ): Promise<string> {
     const fnTag = "Containers#exec()";
     Checks.truthy(container, `${fnTag} container`);
@@ -318,17 +319,21 @@ export class Containers {
 
     const log = LoggerProvider.getOrCreate({ label: fnTag, level: logLevel });
 
-    const exec = await container.exec({
+    const execOptions: Record<string, unknown> = {
       Cmd: cmd,
       AttachStdout: true,
       AttachStderr: true,
       Tty: true,
-    });
+    };
+    if (workingDir) {
+      execOptions.WorkingDir = workingDir;
+    }
+    const exec = await container.exec(execOptions);
 
     return new Promise((resolve, reject) => {
       log.debug(`Calling Exec Start on Docker Engine API...`);
 
-      exec.start({ Tty: true }, (err: any, stream: Stream) => {
+      exec.start({ Tty: true }, (err: Error, stream: Duplex | undefined) => {
         const timeoutIntervalId = setInterval(() => {
           reject(new Error(`Docker Exec timed out after ${timeoutMs}ms`));
         }, timeoutMs);
@@ -338,6 +343,10 @@ export class Containers {
           const errorMessage = `Docker Engine API Exec Start Failed:`;
           log.error(errorMessage, err);
           return reject(new RuntimeError(errorMessage, err));
+        }
+        if (!stream) {
+          const msg = `${fnTag} container engine returned falsy stream object, cannot continue.`;
+          return reject(new RuntimeError(msg));
         }
         log.debug(`Obtained output stream of Exec Start OK`);
         let output = "";

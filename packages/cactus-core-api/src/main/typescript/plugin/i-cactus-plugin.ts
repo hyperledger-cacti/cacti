@@ -76,6 +76,7 @@ export function isICactusPlugin(x: unknown): x is ICactusPlugin {
   return (
     !!x &&
     typeof (x as ICactusPlugin).getPackageName === "function" &&
-    typeof (x as ICactusPlugin).getInstanceId === "function"
+    typeof (x as ICactusPlugin).getInstanceId === "function" &&
+    typeof (x as ICactusPlugin).onPluginInit === "function"
   );
 }

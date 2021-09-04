@@ -64,6 +64,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 4000;
   apiServerOptions.cockpitPort = 0;
+  apiServerOptions.grpcPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.logLevel = "info";
   apiServerOptions.plugins = [
