@@ -63,7 +63,7 @@ class WriteExternalStateInitiator(
                     participants = listOf(ourIdentity),
                     meta = view.meta.toByteArray(),
                     state = view.data.toByteArray())
-            println("Storing ExternalState in the vault: $state \n")
+            println("Storing ExternalState in the vault:\n\tLinear Id = ${state.linearId}\n\tParticipants = ${state.participants}\n\tMeta = ${view.meta}\tState = ${Base64.getEncoder().encodeToString(state.state)}\n")
 
             // 3. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
