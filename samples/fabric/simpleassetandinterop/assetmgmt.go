@@ -67,7 +67,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 		return "", logThenErrorf(err.Error())
 	}
 
-	contractId, err := assetexchange.LockAsset(ctx, assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+	contractId, err := assetexchange.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
@@ -117,7 +117,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 		return "", logThenErrorf("cannot lock token asset of type %s as there are not enough tokens", assetAgreement.Type)
 	}
 
-	contractId, err := assetexchange.LockFungibleAsset(ctx, fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+	contractId, err := assetexchange.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
@@ -138,7 +138,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 
 // Check whether this asset has been locked by anyone (not just by caller)
 func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-	return assetexchange.IsAssetLocked(ctx, assetAgreementSerializedProto64)
+	return assetexchange.IsAssetLocked(ctx, "", assetAgreementSerializedProto64)
 }
 
 // Check whether a bond asset has been locked using contractId by anyone (not just by caller)
@@ -157,7 +157,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		return false, err
 	}
 	claimed := false
-	err = assetexchange.ClaimAsset(ctx, assetAgreementSerializedProto64, claimInfoSerializedProto64)
+	_, err = assetexchange.ClaimAsset(ctx, "", assetAgreementSerializedProto64, claimInfoSerializedProto64)
 	if err != nil {
 		return false, logThenErrorf(err.Error())
 	} else {
@@ -274,7 +274,7 @@ func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	unlocked := false
-	err = assetexchange.UnlockAsset(ctx, assetAgreementSerializedProto64)
+	_, err = assetexchange.UnlockAsset(ctx, "", assetAgreementSerializedProto64)
 	if err != nil {
 		return false, logThenErrorf(err.Error())
 	} else {
