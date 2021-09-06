@@ -161,8 +161,9 @@ npm run start:api-server
 ```
 
 After starting the API server, you will see in the logs that plugins were loaded
-and that the API is reachable on the port you specified (4000 by default) and
-the Web UI (Cockpit) is reachable through port on the port your config
+and that the API is reachable on the port you specified (4000 by default). The Web UI (Cockpit)
+is disabled by default but can be enabled by changing the property value 'cockpitEnabled'
+to true and it is reachable through port on the port your config
 specified (3000 by default).
 
 > You may need to enable manually the CORS patterns in the configuration file.

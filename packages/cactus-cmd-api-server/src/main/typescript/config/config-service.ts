@@ -34,6 +34,7 @@ export interface ICactusApiServerOptions {
   consortiumId: string;
   logLevel: LogLevelDesc;
   tlsDefaultMaxVersion: SecureVersion;
+  cockpitEnabled: boolean;
   cockpitHost: string;
   cockpitPort: number;
   cockpitCorsDomainCsv: string;
@@ -200,6 +201,13 @@ export class ConfigService {
         default: "TLSv1.3",
         env: "TLS_DEFAULT_MAX_VERSION",
         arg: "tls-default-max-version",
+      },
+      cockpitEnabled: {
+        doc: "Enable Cockpit server.",
+        format: Boolean,
+        env: "COCKPIT_ENABLED",
+        arg: "cockpit-enabled",
+        default: false,
       },
       cockpitHost: {
         doc:
@@ -579,6 +587,7 @@ export class ConfigService {
       apiTlsClientCaPem: "-", // API mTLS is off so this will not crash the server
       grpcPort,
       grpcMtlsEnabled,
+      cockpitEnabled: (schema.cockpitEnabled as SchemaObj).default,
       cockpitHost,
       cockpitPort,
       cockpitWwwRoot: (schema.cockpitWwwRoot as SchemaObj).default,

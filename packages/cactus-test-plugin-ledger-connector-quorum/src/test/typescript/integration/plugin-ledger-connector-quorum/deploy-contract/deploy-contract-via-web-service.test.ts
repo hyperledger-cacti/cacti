@@ -64,7 +64,7 @@ describe(testCase, () => {
     quorumGenesisOptions: IQuorumGenesisOptions,
     firstHighNetWorthAccount: string,
     apiServerStartOut: {
-      addressInfoCockpit: AddressInfo;
+      addressInfoCockpit?: AddressInfo;
       addressInfoApi: AddressInfo;
       addressInfoGrpc: AddressInfo;
     };
