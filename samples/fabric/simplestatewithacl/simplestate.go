@@ -50,6 +50,25 @@ func (s *SmartContract) Create(ctx contractapi.TransactionContextInterface, key 
 	return ctx.GetStub().PutState(key, bytes)
 }
 
+// CreateFromRemote adds a new entry with the specified key and value obtained (with proof) from a remote network
+func (s *SmartContract) CreateFromRemote(ctx contractapi.TransactionContextInterface, key string, value string) error {
+	if !s.testMode {
+		callerCheck, err := wutils.IsCallerInteropChaincode(ctx.GetStub())
+		if err != nil {
+			return err
+		}
+		if !callerCheck {
+			return fmt.Errorf("Illegal access; function can only be invoked from Interop Chaincode")
+		}
+		fmt.Printf("Caller access check passed. Key: %s\n", key)
+	}
+
+	bytes := []byte(value)
+	fmt.Printf("Create called. Key: %s Value: %s\n", key, value)
+
+	return ctx.GetStub().PutState(key, bytes)
+}
+
 // Read returns the value of the entry with the specified key
 func (s *SmartContract) Read(ctx contractapi.TransactionContextInterface, key string) (string, error) {
 	if !s.testMode {

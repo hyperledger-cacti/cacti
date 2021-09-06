@@ -66,15 +66,8 @@ func IsClientRelay(stub shim.ChaincodeStubInterface) (bool, error) {
 	return ok, err
 }
 
-// Access guard for Weaver relay requests: return 'true' only if access should be permitted
-func CheckAccessIfRelayClient(stub shim.ChaincodeStubInterface) (bool, error) {
-	isClientRelay, err := IsClientRelay(stub)
-	if err != nil {
-		return false, err
-	}
-	if !isClientRelay {
-		return true, nil
-	}
+// Check if the caller is the Interop Chaincode
+func IsCallerInteropChaincode(stub shim.ChaincodeStubInterface) (bool, error) {
 	interopChaincodeID, err := stub.GetState(GetInteropChaincodeIDKey())
 	if err != nil {
 		return false, err
@@ -87,4 +80,16 @@ func CheckAccessIfRelayClient(stub shim.ChaincodeStubInterface) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+// Access guard for Weaver relay requests: return 'true' only if access should be permitted
+func CheckAccessIfRelayClient(stub shim.ChaincodeStubInterface) (bool, error) {
+	isClientRelay, err := IsClientRelay(stub)
+	if err != nil {
+		return false, err
+	}
+	if !isClientRelay {
+		return true, nil
+	}
+	return IsCallerInteropChaincode(stub)
 }
