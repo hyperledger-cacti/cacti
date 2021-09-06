@@ -6,31 +6,34 @@
  */
 
 import { Request } from 'express';
-import { RequestInfo } from '../../packages/routing-interface/RequestInfo';
-import { TradeInfo } from '../../packages/routing-interface/TradeInfo';
+import { RequestInfo } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RequestInfo';
+import { TradeInfo } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo';
 import { TransactionInfoManagement } from './TransactionInfoManagement';
 import { TransactionInfo } from './TransactionInfo';
 import { TransactionData } from './TransactionData';
 import { BusinessLogicInquireCartradeStatus } from './BusinessLogicInquireCartradeStatus';
 import { TxInfoData } from './TxInfoData';
-import { transactionManagement } from '../../packages/routing-interface/routes/index';
-import { verifierFactory } from '../../packages/routing-interface/routes/index';
-import { LedgerOperation } from '../../packages/business-logic-plugin/LedgerOperation';
-import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
+import { transactionManagement } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index';
+import { verifierFactory } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index';
+import { LedgerOperation } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/LedgerOperation';
+import { BusinessLogicBase } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase';
 import { makeRawTransaction } from './TransactionEthereum'
 import { makeSignedProposal } from './TransactionFabric';
 import { getDataFromIndy } from './TransactionIndy';
-import { ApiInfo, LedgerEvent } from '../../packages/ledger-plugin/LedgerPlugin';
-import { json2str } from '../../packages/ledger-plugin/DriverCommon'
+import { ApiInfo, LedgerEvent } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin';
+import { json2str } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon'
 import { CartradeStatus } from './define'
-import { RIFUtil } from '../../packages/routing-interface/util/RIFUtil';
-import { LPInfoHolder } from '../../packages/routing-interface/util/LPInfoHolder';
-import { VerifierBase } from '../../packages/ledger-plugin/VerifierBase';
+import { RIFUtil } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/RIFUtil';
+import { LPInfoHolder } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/LPInfoHolder';
+import { VerifierBase } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/VerifierBase';
 
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/default.json"), 'utf8'));
+const yaml = require('js-yaml');
+//const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
+const config: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/default.yaml", 'utf8'));
+
 import { getLogger } from "log4js";
 const moduleName = 'BusinessLogicCartrade';
 const logger = getLogger(`${moduleName}`);

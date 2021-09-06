@@ -1,19 +1,19 @@
 cd ../..
 
 ## Build validator for Sawtooth
-cd ./packages/ledger-plugin/sawtooth/validator/src
+cd ./packages/cactus-plugin-ledger-connector-sawtooth-socketio
 ./script-build-validator.sh
-cd ../../../../..
+cd ../..
 
 ## build validator for Ethereum
-cd ./packages/ledger-plugin/go-ethereum/validator/src
+cd ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio
 ./script-build-validator.sh
-cd ../../../../..
+cd ../..
 
 ## build packages
-cd ./packages
+cd ./packages/cactus-cmd-socketio-server
 ./script-build-packages.sh
-cd ..
+cd ../..
 
 ## build cartrade apps
 cd ./examples/electricity-trade
