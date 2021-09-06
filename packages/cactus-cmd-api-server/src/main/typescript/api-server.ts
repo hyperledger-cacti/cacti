@@ -86,7 +86,7 @@ export class ApiServer {
   private readonly log: Logger;
   private pluginRegistry: PluginRegistry | undefined;
   private readonly httpServerApi: Server | SecureServer;
-  private readonly httpServerCockpit: Server | SecureServer;
+  private readonly httpServerCockpit?: Server | SecureServer;
   private readonly wsApi: SocketIoServer;
   private readonly grpcServer: GrpcServer;
   private readonly expressApi: Application;
@@ -129,15 +129,17 @@ export class ApiServer {
       this.httpServerApi = createServer();
     }
 
-    if (this.options.httpServerCockpit) {
-      this.httpServerCockpit = this.options.httpServerCockpit;
-    } else if (this.options.config.cockpitTlsEnabled) {
-      this.httpServerCockpit = createSecureServer({
-        key: this.options.config.cockpitTlsKeyPem,
-        cert: this.options.config.cockpitTlsCertPem,
-      });
-    } else {
-      this.httpServerCockpit = createServer();
+    if (this.options.config.cockpitEnabled) {
+      if (this.options.httpServerCockpit) {
+        this.httpServerCockpit = this.options.httpServerCockpit;
+      } else if (this.options.config.cockpitTlsEnabled) {
+        this.httpServerCockpit = createSecureServer({
+          key: this.options.config.cockpitTlsKeyPem,
+          cert: this.options.config.cockpitTlsCertPem,
+        });
+      } else {
+        this.httpServerCockpit = createServer();
+      }
     }
 
     this.grpcServer = this.options.grpcServer || new GrpcServer({});
@@ -194,7 +196,7 @@ export class ApiServer {
   }
 
   async start(): Promise<{
-    addressInfoCockpit: AddressInfo;
+    addressInfoCockpit?: AddressInfo;
     addressInfoApi: AddressInfo;
     addressInfoGrpc: AddressInfo;
   }> {
@@ -205,7 +207,10 @@ export class ApiServer {
 
     try {
       const { cockpitTlsEnabled, apiTlsEnabled } = this.options.config;
-      const addressInfoCockpit = await this.startCockpitFileServer();
+      let addressInfoCockpit: AddressInfo | undefined;
+      if (this.options.config.cockpitEnabled) {
+        addressInfoCockpit = await this.startCockpitFileServer();
+      }
       const addressInfoApi = await this.startApiServer();
       const addressInfoGrpc = await this.startGrpcServer();
 
@@ -223,9 +228,9 @@ export class ApiServer {
         this.log.info(`Cactus API reachable ${httpUrl}`);
       }
 
-      {
+      if (this.options.config.cockpitEnabled) {
         const { cockpitHost: host } = this.options.config;
-        const { port } = addressInfoCockpit;
+        const { port } = addressInfoCockpit as AddressInfo;
         const protocol = cockpitTlsEnabled ? "https:" : "http:";
         const httpUrl = `${protocol}//${host}:${port}`;
         this.log.info(`Cactus Cockpit reachable ${httpUrl}`);
@@ -269,7 +274,7 @@ export class ApiServer {
     return this.httpServerApi;
   }
 
-  public getHttpServerCockpit(): Server | SecureServer {
+  public getHttpServerCockpit(): Server | SecureServer | undefined {
     return this.httpServerCockpit;
   }
 
@@ -493,19 +498,19 @@ export class ApiServer {
     const cockpitPort: number = this.options.config.cockpitPort;
     const cockpitHost: string = this.options.config.cockpitHost;
 
-    if (!this.httpServerCockpit.listening) {
+    if (!this.httpServerCockpit?.listening) {
       await new Promise((resolve, reject) => {
-        this.httpServerCockpit.once("error", reject);
-        this.httpServerCockpit.once("listening", resolve);
-        this.httpServerCockpit.listen(cockpitPort, cockpitHost);
+        this.httpServerCockpit?.once("error", reject);
+        this.httpServerCockpit?.once("listening", resolve);
+        this.httpServerCockpit?.listen(cockpitPort, cockpitHost);
       });
     }
-    this.httpServerCockpit.on("request", app);
+    this.httpServerCockpit?.on("request", app);
 
     // the address() method returns a string for unix domain sockets and null
     // if the server is not listening but we don't car about any of those cases
     // so the casting here should be safe. Famous last words... I know.
-    const addressInfo = this.httpServerCockpit.address() as AddressInfo;
+    const addressInfo = this.httpServerCockpit?.address() as AddressInfo;
     this.log.info(`Cactus Cockpit net.AddressInfo`, addressInfo);
 
     return addressInfo;
