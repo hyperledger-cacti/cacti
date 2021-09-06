@@ -1,5 +1,5 @@
 cd ../..
 
 echo "[process] Start the validator for Sawtooth"
-cd ./packages/ledger-plugin/sawtooth/validator/src
+cd ./packages/cactus-plugin-ledger-connector-sawtooth-socketio
 npm run start
