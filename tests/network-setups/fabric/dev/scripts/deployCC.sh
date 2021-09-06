@@ -12,7 +12,6 @@ AA="$9"
 ORD_P=${10}
 APP_R=${11}
 NW_NAME=${12}
-WITH_RELAY_ACL=${13}
 
 : ${CHANNEL_NAME:="mychannel"}
 : ${CC_SRC_LANGUAGE:="golang"}
@@ -276,11 +275,9 @@ chaincodeInvokeInit() {
   if [ "$CC_CHAIN_CODE" = "interop" ]; then
         peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":["appId"]}' >&log.txt
   elif [ "$CC_CHAIN_CODE" = "simplestate" ]; then
-        if [ "$WITH_RELAY_ACL" = "" ]; then
-            peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"create","Args":["a","b"]}' >&log.txt
-        else
-            peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"init","Args":["interop"]}' >&log.txt
-        fi
+        peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"create","Args":["a","b"]}' >&log.txt
+  elif [ "$CC_CHAIN_CODE" = "simplestatewithacl" ]; then
+        peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"init","Args":["interop"]}' >&log.txt
   elif [ "$CC_CHAIN_CODE" = "simpleasset" ] && [ "$NW_NAME" = "network1" ]; then
         peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":["Bond", "interop"]}' >&log.txt
   elif [ "$CC_CHAIN_CODE" = "simpleasset" ] && [ "$NW_NAME" = "network2" ]; then

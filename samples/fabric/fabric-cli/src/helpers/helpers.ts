@@ -139,7 +139,9 @@ const addData = ({
           contractName: process.env.DEFAULT_APPLICATION_CHAINCODE
             ? process.env.DEFAULT_APPLICATION_CHAINCODE
             : 'simplestate',
-          ccFunc: 'Create',
+          ccFunc: process.env.DEFAULT_APPLICATION_FUNC
+            ? process.env.DEFAULT_APPLICATION_FUNC
+            : 'Create',
           args: []
         }
     currentQuery.args = [...currentQuery.args, item[0], item[1]]

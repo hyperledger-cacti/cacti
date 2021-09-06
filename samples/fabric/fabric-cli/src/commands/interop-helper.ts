@@ -123,14 +123,14 @@ const command: GluegunCommand = {
       return
     }
     const spinner = print.spin(`Starting interop flow`)
-    const applicationFunction = 'Create'
+    const applicationFunction = process.env.DEFAULT_APPLICATION_FUNC ? process.env.DEFAULT_APPLICATION_FUNC : 'Create'
     const key = options.key || uuidv4()
     try {
       const invokeObject = {
         channel,
         ccFunc: applicationFunction,
         ccArgs: [key, ''],
-        contractName: 'simplestate'
+        contractName: process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
       }
       const interopFlowResponse = await InteroperableHelper.interopFlow(
         //@ts-ignore this comment can be removed after using published version of interop-sdk
