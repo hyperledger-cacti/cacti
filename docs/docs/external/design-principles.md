@@ -22,7 +22,7 @@ We list principles and considerations that guide the design of a framework for i
   * Individual network participants are untrustworthy.
   * The network is trustworthy in the collective.
   * The internal consensus mechanism of a network protects it from Byzantine failures.
-  * Interoperability needs will not force structural changes or forks in a network not constrain that network's internal evolution.
+  * Interoperability needs will not force structural changes or forks in a network nor constrain that network's internal evolution.
 
 
 ### Principles and Ideals for Interoperability Solution Design
@@ -44,7 +44,7 @@ Here are our guiding principles that accord with our assumptions and approach, i
 - Network members retain collective sovereignty over their internal processes as well as access control rules governing remote interoperation.
 - Networks have full and collective control, via their native consensus and smart contract mechanisms, over exposure of data, assets, and transactions to other networks.
   * A network acts as a unit for framing and enforcing rules controlling access to information held on its ledger(s) by a remote network.
-- Similarly, networks have full and collective control, via their native consensus and smart contract mechanisms, over acceptance of data or assets and verifications of transactions occurrin in, other networks.
+- Similarly, networks have full and collective control, via their native consensus and smart contract mechanisms, over acceptance of data or assets and verifications of transactions occurring in, other networks.
 
 #### Minimize Network Coupling
 - Networks/consortia must retain independence for governance and configuration
@@ -93,7 +93,7 @@ Here are our guiding principles that accord with our assumptions and approach, i
 ### Design Guidelines for Network Architects and Developers
 - Architects and application developers (both in the smart contract and services layers) must design with interoperability in mind:
   * This has the advantage of minimizing or eliminating any code adaptations required for interoperability during a network's life cycle.
-- Apply standards when defining assets, data and logic within network apps to maximise external consumption:
+- Apply standards when defining assets, data and logic within network apps to maximize external consumption:
   * Networks with well-defined standards-based interfaces simplifies interoperability:
     - Interfaces include: contracts, data/assets, identity, APIs, protocol, messaging.
 - Enables network implementation to evolve while eliminating or minimising external impact:
