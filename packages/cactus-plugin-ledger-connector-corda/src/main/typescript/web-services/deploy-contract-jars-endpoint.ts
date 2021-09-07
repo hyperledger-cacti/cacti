@@ -77,10 +77,10 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
     return this.authorizationOptionsProvider;
   }
 
-  public get oasOperation() {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars"
-    ].post;
+    ];
   }
 
   /**
@@ -88,7 +88,7 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
    * the openapi-spec.ts file.
    */
   public get operationId(): string {
-    return this.oasOperation.operationId;
+    return this.oasPath.post.operationId;
   }
 
   /**
@@ -96,11 +96,15 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
    * API server of Cactus.
    */
   public getPath(): string {
-    return this.oasOperation["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasOperation["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.oasPath.post.operationId;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {

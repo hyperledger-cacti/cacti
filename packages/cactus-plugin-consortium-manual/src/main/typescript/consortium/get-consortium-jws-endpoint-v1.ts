@@ -72,22 +72,22 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public getOperationId(): string {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
-    ].post.operationId;
+    ];
+  }
+
+  public getOperationId(): string {
+    return this.oasPath.post.operationId;
   }
 
   public getPath(): string {
-    return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
-    ].post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
-    ].post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public async registerExpress(

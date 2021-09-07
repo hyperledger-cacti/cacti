@@ -12,6 +12,7 @@ import {
   PluginFactoryHtlcEthBesu,
   NewContractObj,
   InitializeRequest,
+  HashTimeLockJson,
 } from "@hyperledger/cactus-plugin-htlc-eth-besu";
 import {
   PluginFactoryLedgerConnector,
@@ -33,7 +34,6 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
-import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu/src/main/solidity/contracts/HashTimeLock.json";
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
@@ -85,8 +85,8 @@ test(testCase, async (t: Test) => {
     logLevel,
   });
   keychainPlugin.set(
-    HashTimeLockJSON.contractName,
-    JSON.stringify(HashTimeLockJSON),
+    HashTimeLockJson.contractName,
+    JSON.stringify(HashTimeLockJson),
   );
 
   const factory = new PluginFactoryLedgerConnector({
