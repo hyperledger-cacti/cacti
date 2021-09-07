@@ -1,3 +1,6 @@
+import * as OpenApiJson from "../json/openapi.json";
+export { OpenApiJson };
+
 export * from "./generated/openapi/typescript-axios/index";
 export * from "./generated/openapi/typescript-axios/base";
 
