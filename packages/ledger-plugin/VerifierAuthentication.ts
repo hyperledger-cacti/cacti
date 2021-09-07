@@ -23,7 +23,7 @@ export class VerifierAuthentication {
             const publicKey = fs.readFileSync(path.resolve(__dirname, keyPath));
 
             const option = {
-                algorithms: 'RS256'
+                algorithms: 'ES256'
             }
 
             jwt.verify(targetData, publicKey, option, function(err, decoded) {

@@ -20,7 +20,7 @@ export class ValidatorAuthentication {
     static sign(payload: object): string {
 
         const option = {
-            algorithm: 'RS256',
+            algorithm: 'ES256',
             expiresIn: '1000'
         }
 
