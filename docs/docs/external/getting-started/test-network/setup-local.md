@@ -246,9 +246,9 @@ A client-layer library is defined in the `sdks/corda` folder. This contains func
 To build the library, do the following:
 - Navigate to the `sdks/corda` folder.
 - Run the following command (_make sure there is no github.properties file present in the directory_):
-```bash
-make build
-```
+  ```bash
+  make build
+  ```
 
 ### Corda Simple Application and Client (Application)
 
@@ -307,9 +307,9 @@ The code for this lies in the `core/drivers/corda-driver` folder.
 Build the Corda driver module as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
 - Run the following:
-```bash
-make build-local
-```
+  ```bash
+  make build-local
+  ```
 
 #### Running
 
