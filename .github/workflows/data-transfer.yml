@@ -112,7 +112,7 @@ jobs:
           cat .npmrc
         working-directory: samples/fabric/fabric-cli
       - name: Build Fabric CLI
-        run: npm install
+        run: make build
         working-directory: samples/fabric/fabric-cli
       - name: Setup Fabric CLI Config
         run: |
@@ -269,6 +269,10 @@ jobs:
           go get -u google.golang.org/protobuf/cmd/protoc-gen-go
           go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
           
+      # PROTOS
+      - name: Build GO Protos
+        run: make build
+        working-directory: common/protos-go
     
       # PROTOS
       - name: Build JS Protos
