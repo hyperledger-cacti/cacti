@@ -194,20 +194,20 @@ jobs:
           TOTAL=4
 
           # CORDA - FABRIC1
-          ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a &> tmp.out    
+          ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a 1> tmp.out    
           tail -n 1 tmp.out | grep "SimpleState(key=a, value=Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
-          ./clients/build/install/clients/bin/clients get-state a &> tmp.out
+          ./clients/build/install/clients/bin/clients get-state a 1> tmp.out
           tail -n 1 tmp.out | grep "SimpleState(key=a, value=Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           # CORDA - FABRIC2
-          ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
+          ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus 1> tmp.out
           tail -n 1 tmp.out | grep "SimpleState(key=Arcturus, value=17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
-          ./clients/build/install/clients/bin/clients get-state Arcturus &> tmp.out
+          ./clients/build/install/clients/bin/clients get-state Arcturus 1> tmp.out
           tail -n 1 tmp.out | grep "SimpleState(key=Arcturus, value=17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
