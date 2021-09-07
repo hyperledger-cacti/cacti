@@ -18,21 +18,23 @@ import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
 
 import OAS from "../../json/openapi.json";
 
-export interface IInvokeContractEndpointOptions {
+export interface IInvokeContractEndpointJsonObjectOptions {
   logLevel?: LogLevelDesc;
   connector: PluginLedgerConnectorQuorum;
 }
 
-export class InvokeContractEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "InvokeContractEndpoint";
+export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "InvokeContractJsonObjectEndpoint";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return InvokeContractEndpoint.CLASS_NAME;
+    return InvokeContractJsonObjectEndpoint.CLASS_NAME;
   }
 
-  constructor(public readonly options: IInvokeContractEndpointOptions) {
+  constructor(
+    public readonly options: IInvokeContractEndpointJsonObjectOptions,
+  ) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.connector, `${fnTag} arg options.connector`);
@@ -42,22 +44,24 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"] {
+  public getOasPath() {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object"
     ];
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.oasPath.post.operationId;
+    return this.getOasPath().post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -86,9 +90,7 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody = req.body;
     try {
-      const resBody = await this.options.connector.getContractInfoKeychain(
-        reqBody,
-      );
+      const resBody = await this.options.connector.getContractInfo(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
