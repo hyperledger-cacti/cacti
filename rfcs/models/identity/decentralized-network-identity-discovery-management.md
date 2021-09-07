@@ -59,7 +59,7 @@ What we cannot know beforehand is what configuration of DID registries or VC iss
 
 The below figure (Fig. 3) illustrates our identity plane architecture:
 * A set of identity providers and verifiers to establish a trust basis for exchange of identity and any other network configuration information. We assume, without loss of generality, that such identity providers belong to networks which we term as _Interoperation Identity Networks (IINs)_.
-* A set of agents that act on behalf of members (participant units) within a network that collectively supply and fetch membership, identity, and any other configuration information, of the counterparty network.
+* A set of agents, called *IIN Agents* that act on behalf of members (participant units) within a network that collectively supply and fetch membership, identity, and any other configuration information, of the counterparty network.
 
 <div align="center">
 <img src="../../resources/images/identity-plane.jpg" width=70%>
@@ -69,6 +69,10 @@ The below figure (Fig. 3) illustrates our identity plane architecture:
 <br/>
 
 _Some Notes on IINs (Pertaining to the Design Choices Described Earlier)_:
+
+
+
+
 * _The term 'Interoperation Identity Network' is a placeholder to describe a unit of our proposed architecture, and is subject to change in the future. A term that may replace it is 'Distributed Identity Registry', which captures both the role and the nature of this entity, and which practitioners may already be familiar with_.
 * _An IIN is not a new concept or system we are inventing for interoperation purposes but is rather an extrapolation of the concept of a DID registry, many varieties of which exist today, to a distributed system that may maintain DID records through consensus among a committee on a shared ledger rather than maintain them in a centralized repository_.
 * _An IIN brings within its purview both a DID registry maintained as a shared ledger as well as well-known issuers of DIDs and verifiable credentials (VCs) who collectively maintain that ledger. In the real-world, registries as well as issuers already exist, though not necessarily part of a single network. The design and protocol we describe can accommodate existing DID registries and VC issuers, even though they be independent (and centralized) entities, but in our discussion we will assume, without loss of generality, that they belong to one or the other network (labeled as an IIN). Our mechanisms rely on the ability to negotiate with issuers and read/write to DID registries; neither function is constrained by the nature of the issuers or the registries_.
@@ -127,53 +131,3 @@ To allow seamless interoperation across two different DLT networks, the identity
 
 The network discovrery protocols specifications are elaborated [here](../../protocols/discovery/readme.md).
 
-<!-- 
-
-# Network Structure and IIN Agents
-
-See specifications for an IIN Agent as well as the specifications for augmenting a DLT network connected to an IIN via these agents [here](./iin-agent.md).
-
-
-## Forms of Identity
-
-Our framework consists of both hierarchical and decentralized identities. Decentralized identities belong to constituent units of participating DLT networks, each of whom is assumed to be an independent actor with an identity that is may not owe its existence to the network in question. Yet, for interoperation purposes, that decentralized identity will be associated with the corresponding network's identity, as will the identities of all the other units of that network. Below are the primary identities that will be maintained and used in identity plane protocols:
-* _Network Identity_: The identity of a network recognized by an IIN. This is not a DID but rather an attribute recorded on the IIN ledger.
-* _Steward Verinym_: This is a static DID representing an IIN steward, created at IIN bootstrap time.
-* _Network Unit Verinym_: The identity of a network unit represented by an IIN Agent. This is a DID issued by an IIN steward or trust agent. On a given IIN, this DID may be associated with one or more network identities.
-
-
-# Artifacts in Ledgers and Wallets
-
-Trust bases are created and maintained through artifacts on the ledgers of the networks as well as the IINs.
-* On an IIN ledger, we maintain the following:
-  * Network membership list credential schema (corresponding to Steward Verinym)
-  * Network membership list credential definition (public key) (corresponding to Steward Verinym)
-  * Network unit membership credential schema (corresponding to network unit DID)
-  * Network unit membership credential definition (public key) (corresponding to Network Unit Verinym)
-* On a participating network's ledger, we maintain the following:
-  * Trust store containing a list of IINs trusted to verify a foreign network's units' identities
-  * A [Security Group definition](../security.md) corresponding to each network unit
-    * _This is augmented with a DID attribute denoting the identity owned by the IIN Agent associated with this network unit/security group_
-Indy agents (both stewards and IIN Agents) maintain wallets containing credentials and private keys:
-* IIN Steward:
-  * Network IDs
-  * Membership lists for each network ID: `[<Network Unit Verinym>,<IIN Agent Endpoint>]`
-* IIN Agent:
-  * Membership info: `[<Network Unit Verinym>,<Network ID>,<Name within Network and Other Attributes.....>]` (this corresponds to names of organizations or other groupings along with any other relevant metadata)
-
-
-# Protocol: End-to-End Network Membership and Credential Sharing
-
-Prerequisites:
-* Each network must have a module installed to initialize and maintain a trust store for foreign IINs
-* Each network must have a module installed to initialize and maintain Security Groups for foreign networks
-Unless it is techically infeasible, we recommend that these modules be implemented as smart contracts using the native programming and consensus models of their networks' respective DLTs.
-
-There are three distinct phases of this protocol serving separate functions, though they must be carried out in the following chronological order:
-1. **Network unit registration**: a network unit acquires a verinym (DID) from a steward of an IIN, and the IIN updates the membership list for this network. (_Note_: this may need be done just once in the lifetime of a network as long as the unit is an active part of it.)
-2. **Fetch foreign network membership info**: each IIN Agent within a network fetches membership information for a foreign network and subsequently fetches Security Group information from each unit of that network present in the membership list. (_Note_: this is done concurrently and independently by each IIN Agent.)
-3. **Update foreign network Security Group info**: the IIN Agents collect signatures over a validated set of Security Groups for a given foreign network ID through an application-layer flow, and subsequently record it to the local ledger via a module/smart contract that can validate the signatures for unanimity or a quorum. (_Note_: this operation is idempotent, so multiple agents can do this parallelly without requiring any coordination.)
-
-_TODO: Remove and revoke a network unit_
-
-A full specification of this protocol is provided [here](../../protocols/id-config-sharing/README.md). -->

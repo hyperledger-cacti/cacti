@@ -100,7 +100,7 @@ In this architecture, the identity validating trust anchors can issue VCs to the
 
 ## Trust Anchors
 
-DID documents are implicitely not tied to any physical identity. Thus after obtaining a Network DID document or a participant DID document, it has to be validated based on some trust basis. For this validation the local network participants may rely on some trust anchors.
+DID documents are implicitly not tied to any physical identity. Thus after obtaining a Network DID document or a participant DID document, it has to be validated based on some trust basis. For this validation the local network participants may rely on some trust anchors.
 
 These trust anchors are entities that the participants trust and whose identity are already known to them. For example, trust anchors may be well known organizations that validate network identities, just like certificate authorities (CA) in the internet. Which trust anchor to use as trust basis entirely depends on the validator. Any entity with an IIN agent can itself become a trust anchor.
 

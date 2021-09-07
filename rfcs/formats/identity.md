@@ -54,7 +54,7 @@ For interoperation in the data plane, network specific identity credentials such
 
 ### Multi-signature based verificationMethod
 
-A network DID must be controlled jointly by the network's participant units for operations such as creation of the DID, and its updation with changing network structure, and for other operations such as rotating/refreshing keys, updating verification methods etc. To enable this group, we introduce a `verificationMethod` that uses multi-signatures and associated policies.
+A network DID must be controlled jointly by the network's participant units for operations such as creation of the DID, and its updation with changing network structure, and for other operations such as rotating/refreshing keys, updating verification methods, etc. To enable this group control, we introduce a `verificationMethod` that uses multi-signatures and associated policies.
 
 The `verificationMethod` will have the following properties:
 
@@ -66,7 +66,7 @@ The `verificationMethod` will have the following properties:
 
 **Verification Material for BlockchainNetworkMultiSig:**
 
-**multisigKeys** - Map of participant DID to its verificationMethod. This contains one entry for each participant unit in `networkParticipants` list. The key is the participant unit's DID and the value is a DID URI to the verification method of the participant DID.
+**multisigKeys** - Map of participant DID to its verificationMethod. This contains one entry for each participant unit in `networkParticipants` list. The key is the participant unit's DID, and the value is a DID URI to the verification method of the participant DID.
 
 
 Eg. If `network_participant_1` has a DID `did:<iin_name>:<network_participant_1>`, then `multisigKeys` will contain one verification method of the DID Document like `"did:<iin_name>:<network_participant_1>":"did:<iin_name>:<network_participant_1>#verificationMethod1"`
@@ -79,29 +79,7 @@ For creation of Network DID, the IIN registry must authenticate the DID creation
 
 
 
-**updatePolicy** - Defines a combination of participant units that must sign and authenticate a Network DID updation request. This `updatePolicy` has the condition format as specified in [`verifiablecondition2021`](https://w3c.github.io/did-spec-registries/#verifiablecondition2021) verification method. It can be used to combine different verification methods together to create complex conditional expressions such as logical operations, thresholds, weighted thresholds, relationships and a delegation to external verification methods.
-
-When a blockchain network changes with participant members leaving and new participants joining, the existing members of the network can update the Network DID as long as they can authenticate the update request by collecting enough signatures to satisfy the `updatePolicy`.
-
-
-Eg. 
-```json
-{
-  "id": "did:<iin_name>:<network_name>#updatepolicy",
-  "controller": "did:<iin_name>:<network_name>",
-  "type": "VerifiableCondition2021",
-  "conditionAnd": [{
-      "id": "did:<iin_name>:<network_name>#updatepolicy-1",
-      "controller": "did:<iin_name>:<network_name>",
-      "type": "VerifiableCondition2021",
-      "conditionOr": ["did:<iin_name>:<network_participant_3>#key1",
-        "did:<iin_name>:<network_participant_2>#key3"
-      ]
-    },
-    "did:<iin_name>:<network_participant_1>#key1"
-  ]
-}
-```
+**updatePolicy** - Defines a combination of participant units that must sign and authenticate a Network DID updation request. The `updatePolicy` is discussed in detail [here](./../models/identity-update-policy.md).
 
 
 
