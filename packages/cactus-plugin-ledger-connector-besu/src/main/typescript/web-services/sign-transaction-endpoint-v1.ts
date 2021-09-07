@@ -54,24 +54,22 @@ export class BesuSignTransactionEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public getOasPath() {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"
     ];
   }
 
   getPath(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   getVerbLowerCase(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return this.oasPath.post.operationId;
   }
 
   public async registerExpress(
