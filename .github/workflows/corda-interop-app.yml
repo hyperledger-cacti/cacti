@@ -31,8 +31,8 @@ jobs:
         cat github.properties
       working-directory: core/network/corda-interop-app
       
-    - name: Generate github.properties (on push)
-      if: ${{ github.event_name == 'push' }}
+    - name: Generate github.properties (else)
+      if: ${{ github.event_name != 'pull_request' }}
       run: |
         echo "Using ${GITHUB_ACTOR} user."
         echo "username=${GITHUB_ACTOR}" >> github.properties
