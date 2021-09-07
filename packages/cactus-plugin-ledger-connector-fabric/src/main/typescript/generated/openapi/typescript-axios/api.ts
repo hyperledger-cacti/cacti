@@ -535,7 +535,29 @@ export interface FabricSigningCredential {
      * @memberof FabricSigningCredential
      */
     keychainRef: string;
+    /**
+     * 
+     * @type {FabricSigningCredentialType}
+     * @memberof FabricSigningCredential
+     */
+    type?: FabricSigningCredentialType;
+    /**
+     * 
+     * @type {VaultTransitKey}
+     * @memberof FabricSigningCredential
+     */
+    vaultTransitKey?: VaultTransitKey;
 }
+/**
+ * different type of identity provider for singing fabric messages supported by this package
+ * @export
+ * @enum {string}
+ */
+export enum FabricSigningCredentialType {
+    X509 = 'X.509',
+    VaultX509 = 'Vault-X.509'
+}
+
 /**
  * Represents a file-system file that has a name and a body which holds the file contents as a Base64 encoded string
  * @export
@@ -790,6 +812,25 @@ export interface SSHExecCommandResponse {
      * @memberof SSHExecCommandResponse
      */
     signal: string | null;
+}
+/**
+ * vault key details for signing fabric message with private key stored with transit engine.
+ * @export
+ * @interface VaultTransitKey
+ */
+export interface VaultTransitKey {
+    /**
+     * label of private key
+     * @type {string}
+     * @memberof VaultTransitKey
+     */
+    keyName: string;
+    /**
+     * token for accessing private key
+     * @type {string}
+     * @memberof VaultTransitKey
+     */
+    token: string;
 }
 
 /**

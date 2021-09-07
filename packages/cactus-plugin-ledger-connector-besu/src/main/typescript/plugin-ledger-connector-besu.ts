@@ -364,7 +364,7 @@ export class PluginLedgerConnectorBesu
         };
         const network = { [networkId]: address };
         contractJSON.networks = network;
-        keychainPlugin.set(contractName, contractJSON);
+        keychainPlugin.set(contractName, JSON.stringify(contractJSON));
       }
       const contract = new this.web3.eth.Contract(
         contractJSON.abi,
@@ -810,11 +810,9 @@ export class PluginLedgerConnectorBesu
 
         if (status && contractAddress) {
           const networkInfo = { address: contractAddress };
-
           const contractStr = await keychainPlugin.get(contractName);
           const contractJSON = JSON.parse(contractStr);
           this.log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
-
           const contract = new this.web3.eth.Contract(
             contractJSON.abi,
             contractAddress,
