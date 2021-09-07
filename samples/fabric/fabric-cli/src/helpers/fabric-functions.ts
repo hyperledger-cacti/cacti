@@ -108,7 +108,7 @@ const walletSetup = async (
       logger.info(`Wallet Setup: Sucessful ${secret}`)
     } catch(error) {
       const registeredUser = `Identity '${userName}' is already `
-      if (!error.message.includes(registeredUser)) {
+      if (!(error.message.includes("Identity ") && error.message.includes(userName) && error.message.includes(" is already registered"))) {
         throw new Error(`user ${userName} registration with Fabric CA failed with error: ${error}`)
       } else {
         try {
@@ -430,6 +430,7 @@ async function fabricHelper({
 
   if (!userString) {
     userString = `user1`
+    userPwd = `user1pw`
   }
 
   const wallet = await walletSetup(networkName, ccp, mspId, userString, userPwd, registerUser, logger)

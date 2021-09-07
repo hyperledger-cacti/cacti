@@ -14,4 +14,3 @@ shared/charts/username
 *.tar.gz
 *.env
 fabric/dev/log.txtaa
-wallet

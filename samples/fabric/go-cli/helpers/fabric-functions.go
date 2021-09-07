@@ -54,7 +54,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 
 func WalletSetup(connProfilePath, networkName, mspId, username, userPwd string, register bool) (*gateway.Wallet, error) {
 
-	walletPath := filepath.Join("../../../../tests/network-setups/fabric/shared/" + networkName + "/wallet")
+	walletPath := filepath.Join("./wallets/" + networkName)
 	wallet, err := gateway.NewFileSystemWallet(walletPath)
 	if err != nil {
 		return nil, logThenErrorf("failed to create wallet: %s", err.Error())
@@ -157,8 +157,9 @@ func FabricHelper(gni GatewayNetworkInterface, channel, contractName, connProfil
 
 	if userString == "" {
 		userString = "user1"
+		userPwd = "user1pw"
 		// default user already exists, don't register
-		registerUser = false
+		registerUser = true
 	}
 
 	// default value of discoverEnabled is true
