@@ -123,7 +123,7 @@ const command: GluegunCommand = {
       networkName: options['local-network'],
       mspId: options.mspId
     })
-    const username = `User1@org1.${options['local-network']}.com`
+    const username = `user1`
     console.log(relayEnv.relayEndpoint, relayEnv.connProfilePath)
     const relay = new RelayHelper.Relay(
       relayEnv.relayEndpoint || options.relayEndpoint

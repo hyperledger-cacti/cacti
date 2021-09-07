@@ -13,11 +13,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
+	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 )
 
@@ -49,29 +52,125 @@ func logThenErrorf(format string, args ...interface{}) error {
 	return errors.New(errorMsg)
 }
 
-func FabricHelper(gni GatewayNetworkInterface, channel string, contractName string, connProfilePath string, networkName string, mspId string, userString string) (*gateway.Gateway, *gateway.Contract, *gateway.Wallet, error) {
+func WalletSetup(connProfilePath, networkName, mspId, username, userPwd string, register bool) (*gateway.Wallet, error) {
+
+	walletPath := filepath.Join("./wallets/" + networkName)
+	wallet, err := gateway.NewFileSystemWallet(walletPath)
+	if err != nil {
+		return nil, logThenErrorf("failed to create wallet: %s", err.Error())
+	}
+	log.Infof("wallet path: %s", walletPath)
+
+	if !wallet.Exists(username) {
+		if !register {
+			_, err = populateWallet(wallet, connProfilePath, networkName, mspId, username)
+			if err != nil && strings.Contains(err.Error(), "directory credPath") && strings.Contains(err.Error(), "doesn't exist") {
+				return wallet, logThenErrorf("identity %s does not exist, please add user in the network", username)
+			} else if err != nil {
+				return wallet, logThenErrorf("failed populateWallet with error: %s", err.Error())
+			}
+			return wallet, nil
+		}
+
+		sdk, err := fabsdk.New(config.FromFile(connProfilePath))
+		if err != nil {
+			return wallet, fmt.Errorf("failed calling fabsdk.New with error: %s", err.Error())
+		}
+		clientContext := sdk.Context()
+		if clientContext == nil {
+			return wallet, fmt.Errorf("got nil ClientProvider context")
+		}
+		clientMSP, err := msp.New(clientContext)
+		if err != nil {
+			return wallet, fmt.Errorf("failed to create client instance with error: %s", err.Error())
+		}
+
+		var register msp.RegistrationRequest
+		if userPwd == "" {
+			register = msp.RegistrationRequest{
+				Name:           username,
+				Type:           "client",
+				Affiliation:    "org1.department1",
+				MaxEnrollments: -1,
+			}
+		} else {
+			register = msp.RegistrationRequest{
+				Name:           username,
+				Type:           "client",
+				Affiliation:    "org1.department1",
+				MaxEnrollments: -1,
+				Secret:         userPwd,
+			}
+		}
+		// enrollSecret will be set to userPwd if userPwd is provided; otherwise it's set to some random value
+		enrollSecret, err := clientMSP.Register(&register)
+		log.Debugf("enrollSecret: %s", enrollSecret)
+		if err != nil && !strings.Contains(err.Error(), "Identity '"+username+"' is already registered") {
+			return wallet, fmt.Errorf("user registration with Fabric CA failed with error: %s", err.Error())
+		} else if err != nil {
+			// below, WithType is optional with default value as "x509"
+			err = clientMSP.Enroll(username, msp.WithSecret(userPwd), msp.WithType("x509"))
+			if err != nil {
+				return wallet, fmt.Errorf("enrollment of user failed with error: %s", err.Error())
+			}
+		} else {
+			//attrReqs := []*msp.AttributeRequest{{Name: "optional-name", Optional: true}}
+			//err = clientMSP.Enroll(username, msp.WithSecret(enrollSecret), msp.WithAttributeRequests(attrReqs), msp.WithType("x509"))
+			err = clientMSP.Enroll(username, msp.WithSecret(enrollSecret), msp.WithType("x509"))
+			if err != nil {
+				return wallet, fmt.Errorf("enrollment of user failed with error: %s", err.Error())
+			}
+		}
+
+		enrolledUser, err := clientMSP.GetSigningIdentity(username)
+		if err != nil {
+			return wallet, fmt.Errorf("failed getting signing identity with error: %s", err.Error())
+		}
+		privKey, err := enrolledUser.PrivateKey().Bytes()
+		if err != nil {
+			return wallet, fmt.Errorf("failed getting the private key with error: %s", err.Error())
+		}
+		x509Identity := &gateway.X509Identity{
+			Version: 1,
+			MspID:   mspId,
+			IDType:  "X.509",
+		}
+		x509Identity.Credentials.Certificate = string(enrolledUser.EnrollmentCertificate())
+		x509Identity.Credentials.Key = string(privKey)
+		log.Debugf("x509Identity: %v", x509Identity)
+
+		err = wallet.Put(username, x509Identity)
+		if err != nil {
+			return wallet, logThenErrorf("failed wallet.Put with error: %s", err.Error())
+		}
+
+		return wallet, nil
+	}
+
+	log.Infof("user %s already exists in the wallet", username)
+	return wallet, nil
+}
+
+func FabricHelper(gni GatewayNetworkInterface, channel, contractName, connProfilePath, networkName, mspId string, discoverEnabled bool, userString, userPwd string, registerUser bool) (*gateway.Gateway, *gateway.Contract, *gateway.Wallet, error) {
 	log.Infof("fabricHelper(): parameters passed are.. channel: %s, contractName: %s, connProfilePath: %s, networkName: %s, mspId: %s, "+
 		"userString: %s", channel, contractName, connProfilePath, networkName, mspId, userString)
 
 	if userString == "" {
-		userString = "User1@org1." + networkName + ".com"
+		userString = "user1"
+		userPwd = "user1pw"
+		// default user already exists, don't register
+		registerUser = true
 	}
 
-	err := os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	// default value of discoverEnabled is true
+	err := os.Setenv("DISCOVERY_AS_LOCALHOST", strconv.FormatBool(discoverEnabled))
 	if err != nil {
 		return nil, nil, nil, logThenErrorf("error setting DISCOVERY_AS_LOCALHOST environemnt variable: %+v", err)
 	}
 
-	wallet, err := gateway.NewFileSystemWallet("wallet/" + networkName)
+	wallet, err := WalletSetup(connProfilePath, networkName, mspId, userString, userPwd, registerUser)
 	if err != nil {
-		return nil, nil, nil, logThenErrorf("failed to create wallet: %+v", err)
-	}
-
-	if !wallet.Exists(userString) {
-		_, err = populateWallet(wallet, connProfilePath, networkName, mspId, userString)
-		if err != nil {
-			return nil, nil, nil, logThenErrorf("failed to populate wallet contents: %+v", err)
-		}
+		return nil, nil, nil, logThenErrorf("failed WalletSetup with error: %s", err.Error())
 	}
 
 	ccpPath := filepath.Join(connProfilePath)
@@ -117,6 +216,13 @@ func populateWallet(wallet *gateway.Wallet, connProfilePath string, networkName 
 	ccpParts := strings.Split(connProfilePath, "org1."+networkName+".com")
 	credPath := filepath.Join(ccpParts[0], "org1."+networkName+".com", "users", userString, "msp")
 
+	fileExists, err := CheckIfFileOrDirectoryExists(credPath)
+	if err != nil {
+		return identity, logThenErrorf("failed to find credPath %q: %+s", credPath, err.Error())
+	} else if !fileExists {
+		return identity, logThenErrorf("directory credPath %q doesn't exist", credPath)
+	}
+
 	certPath := filepath.Join(credPath, "signcerts", "cert.pem")
 	// read the certificate pem
 	cert, err := ioutil.ReadFile(filepath.Clean(certPath))
@@ -146,14 +252,14 @@ func populateWallet(wallet *gateway.Wallet, connProfilePath string, networkName 
 		return identity, logThenErrorf(err.Error())
 	}
 
-	return identity, err
+	return identity, nil
 }
 
 func Query(query QueryType, connProfilePath string, networkName string, mspId string, userString string) ([]byte, error) {
 	log.Info("query(): running query on Fabric network")
 	log.Infof("query: %+v, connProfilePath: %s, networkName: %s", query, connProfilePath, networkName)
 
-	_, contract, _, err := FabricHelper(NewGatewayNetworkInterface(), query.Channel, query.ContractName, connProfilePath, networkName, mspId, userString)
+	_, contract, _, err := FabricHelper(NewGatewayNetworkInterface(), query.Channel, query.ContractName, connProfilePath, networkName, mspId, true, userString, "", true)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
@@ -170,7 +276,7 @@ func Query(query QueryType, connProfilePath string, networkName string, mspId st
 func Invoke(query QueryType, connProfilePath string, networkName string, mspId string, userString string) ([]byte, error) {
 	log.Info("invoke(): running invoke on Fabric network")
 
-	_, contract, _, err := FabricHelper(NewGatewayNetworkInterface(), query.Channel, query.ContractName, connProfilePath, networkName, mspId, userString)
+	_, contract, _, err := FabricHelper(NewGatewayNetworkInterface(), query.Channel, query.ContractName, connProfilePath, networkName, mspId, true, userString, "", true)
 	if err != nil {
 		log.Fatalf("failed FabricHelper with error: %+v", err)
 	}
@@ -196,7 +302,7 @@ func GetCurrentNetworkCredentialPath(networkId string) string {
 
 func GenerateMembership(channel, contractName, connProfilePath, networkName, mspId, userString string) error {
 	gni := NewGatewayNetworkInterface()
-	gw, _, _, err := FabricHelper(gni, channel, contractName, connProfilePath, networkName, mspId, userString)
+	gw, _, _, err := FabricHelper(gni, channel, contractName, connProfilePath, networkName, mspId, true, userString, "", true)
 	if err != nil {
 		logThenErrorf("failed calling FabricHelper with error: %+v", err)
 	}
@@ -293,7 +399,7 @@ type AccessControlPolicy struct {
 
 func GenerateAccessControl(channel, contractName, connProfilePath, networkName, templatePath, mspId, userString string) error {
 	gni := NewGatewayNetworkInterface()
-	_, _, wallet, err := FabricHelper(gni, channel, contractName, connProfilePath, networkName, mspId, userString)
+	_, _, wallet, err := FabricHelper(gni, channel, contractName, connProfilePath, networkName, mspId, true, userString, "", true)
 	if err != nil {
 		logThenErrorf("failed calling FabricHelper with error: %+v", err)
 	}
@@ -351,7 +457,7 @@ type VerificationPolicy struct {
 
 func GenerateVerificationPolicy(channel, contractName, connProfilePath, networkName, templatePath, mspId, userString string) error {
 	gni := NewGatewayNetworkInterface()
-	_, _, _, err := FabricHelper(gni, channel, contractName, connProfilePath, networkName, mspId, userString)
+	_, _, _, err := FabricHelper(gni, channel, contractName, connProfilePath, networkName, mspId, true, userString, "", true)
 	if err != nil {
 		logThenErrorf("failed calling FabricHelper with error: %+v", err)
 	}

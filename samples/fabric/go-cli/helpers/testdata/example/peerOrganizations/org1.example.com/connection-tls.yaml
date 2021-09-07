@@ -16,6 +16,7 @@ client:
 organizations:
   Org1:
     mspid: Org1MSP
+    cryptoPath: users/{username}@org1.example.com/msp
     peers:
     - peer0.org1.example.com
     certificateAuthorities:
@@ -80,7 +81,10 @@ peers:
 certificateAuthorities:
   ca.org1.example.com:
     url: https://localhost:7054
-    caName: ca-org1
+    caName: ca.org1.example.com
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
     tlsCACerts:
       pem:
         - |

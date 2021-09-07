@@ -5,6 +5,9 @@
  -->
 # Weaver: DLT Interoperability
 
+![Data transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/data-transfer.yml/badge.svg?event=push)
+![Asset exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/asset-exchange.yml/badge.svg?event=push)
+
 ## Short Description
 A framework, with a family of protocols, to enable interoperation for data sharing and asset movements between independent networks built on heterogeneous DLTs in a manner that preserves the core blockchain tenets of decentralization and security.
 

@@ -43,7 +43,7 @@ func ConfigureAll(networkId string) error {
 		logThenErrorf("please use a valid network, no valid environment found for %s", networkId)
 	}
 
-	username := "User1@org1." + networkId + ".com"
+	username := "user1"
 	log.Infof("generating membership for network: %s", networkId)
 
 	// 1. Generate network configs (membership, access control and verification policy)

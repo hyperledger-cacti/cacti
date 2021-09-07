@@ -51,6 +51,7 @@ orderers:
 organizations:
   Org1:
     mspid: Org1MSP
+    cryptoPath: users/{username}@org1.network2.com/msp
     peers:
     - peer0.org1.network2.com
     certificateAuthorities:
@@ -81,7 +82,10 @@ peers:
 certificateAuthorities:
   ca.org1.network2.com:
     url: https://localhost:5054
-    caName: ca-org1
+    caName: ca.org1.network2.com
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
     tlsCACerts:
       pem:
         - |
