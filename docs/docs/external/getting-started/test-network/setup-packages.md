@@ -230,9 +230,9 @@ Build the Corda driver module as follows:
 - Create a copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - Run the following:
-```bash
-make build
-```
+  ```bash
+  make build
+  ```
 
 #### Running
 
