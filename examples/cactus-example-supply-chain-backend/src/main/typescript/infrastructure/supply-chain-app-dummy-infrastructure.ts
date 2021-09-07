@@ -113,7 +113,7 @@ export class SupplyChainAppDummyInfrastructure {
     this.fabric = new FabricTestLedgerV1({
       publishAllPorts: true,
       imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
-      imageVersion: "2021-03-02-ssh-hotfix",
+      imageVersion: "2021-09-02--fix-876-supervisord-retries",
       logLevel: level,
       emitContainerLogs: true,
     });
