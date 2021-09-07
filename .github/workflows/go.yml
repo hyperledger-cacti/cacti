@@ -7,23 +7,23 @@ on:
     branches: [ main ]
 
 jobs:
-  test_interopcc_github:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-
-    - name: Build
-      run: go build -v ./...
-      working-directory: core/network/fabric-interop-cc/contracts/interop
-      
-    - name: Test
-      run: go test -v ./...
-      working-directory: core/network/fabric-interop-cc/contracts/interop
+  # test_interopcc_github:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  # 
+  #   - name: Set up Go
+  #     uses: actions/setup-go@v2
+  #     with:
+  #       go-version: 1.16
+  # 
+  #   - name: Build
+  #     run: go build -v ./...
+  #     working-directory: core/network/fabric-interop-cc/contracts/interop
+  # 
+  #   - name: Test
+  #     run: go test -v ./...
+  #     working-directory: core/network/fabric-interop-cc/contracts/interop
       
   test_interopcc_local:
     runs-on: ubuntu-latest
@@ -89,23 +89,23 @@ jobs:
       run: make test
       working-directory: samples/fabric/simplestate
   
-  test_simpleasset_github:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-
-    - name: Build
-      run: go build -v ./...
-      working-directory: samples/fabric/simpleasset
-      
-    - name: Test
-      run: go test -v ./...
-      working-directory: samples/fabric/simpleasset
+  # test_simpleasset_github:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  # 
+  #   - name: Set up Go
+  #     uses: actions/setup-go@v2
+  #     with:
+  #       go-version: 1.16
+  # 
+  #   - name: Build
+  #     run: go build -v ./...
+  #     working-directory: samples/fabric/simpleasset
+  # 
+  #   - name: Test
+  #     run: go test -v ./...
+  #     working-directory: samples/fabric/simpleasset
       
   test_simpleasset_local:
     runs-on: ubuntu-latest
@@ -136,23 +136,23 @@ jobs:
       run: go test -v ./...
       working-directory: samples/fabric/simpleasset
       
-  test_simpleassetandinterop_github:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-
-    - name: Build
-      run: go build -v ./...
-      working-directory: samples/fabric/simpleassetandinterop
-      
-    - name: Test
-      run: go test -v ./...
-      working-directory: samples/fabric/simpleassetandinterop
+  # test_simpleassetandinterop_github:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  # 
+  #   - name: Set up Go
+  #     uses: actions/setup-go@v2
+  #     with:
+  #       go-version: 1.16
+  # 
+  #   - name: Build
+  #     run: go build -v ./...
+  #     working-directory: samples/fabric/simpleassetandinterop
+  # 
+  #   - name: Test
+  #     run: go test -v ./...
+  #     working-directory: samples/fabric/simpleassetandinterop
       
   test_simpleassetandinterop_local:
     runs-on: ubuntu-latest

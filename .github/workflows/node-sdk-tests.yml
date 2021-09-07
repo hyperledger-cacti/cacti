@@ -10,7 +10,7 @@ on:
     branches: [ main ]
 
 jobs:
-  node_sdk_github:
+  node_sdk_local:
 
     runs-on: ubuntu-latest
 
@@ -24,15 +24,18 @@ jobs:
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
-        node-version: ${{ matrix.node-version }}
-    - name: Setup .npmrc
+        node-version: ${{ matrix.node-version }}      
+    - name: Use Protoc 3.15
       run: |
-        cp .npmrc.template .npmrc
-        sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
-        cat .npmrc
-      working-directory: sdks/fabric/interoperation-node-sdk
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+    - name: Build JS Protos
+      run: |
+        export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+        make build
+      working-directory: common/protos-js
     - name: Build
-      run: make build
+      run: make build-local
       working-directory: sdks/fabric/interoperation-node-sdk
     - name: Tests
       run: npm run test
