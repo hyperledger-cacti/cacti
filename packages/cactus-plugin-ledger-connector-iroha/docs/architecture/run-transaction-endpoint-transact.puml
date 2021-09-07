@@ -1,0 +1,28 @@
+@startuml
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransact() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "PluginLedgerConnectorIroha" as t << (C,#ADD1B2) class >>
+
+autoactivate on
+
+activate caller
+caller -> t: transact(RunTransactionRequest)
+
+alt #LightBlue commandName is an Iroha command
+    t -> t: generate Iroha commandOptions
+    return RunTransactionResponse
+    t --> caller: return RunTransactionResponse
+else #LightGreen commandName is an Iroha query
+    t -> t: generate Iroha queryOptions
+    return RunTransactionResponse
+    t --> caller: return RunTransactionResponse
+else #LightCoral default
+  t --> caller: throw RuntimeError("command or query does not exist)
+end
+@enduml

@@ -20,6 +20,9 @@ export interface IIrohaTestLedgerOptions {
   readonly adminPub?: string;
   readonly nodePriv?: string;
   readonly nodePub?: string;
+  readonly tlsCert?: string;
+  readonly tlsKey?: string;
+  readonly toriiTlsPort?: number;
   readonly postgresHost: string;
   readonly postgresPort: number;
   readonly imageVersion?: string;
@@ -40,7 +43,10 @@ export const IROHA_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   adminPub: " ",
   nodePriv: " ",
   nodePub: " ",
+  tlsCert: " ",
+  tlsKey: " ",
   rpcToriiPort: 50051,
+  toriiTlsPort: 55552,
   envVars: [
     "IROHA_POSTGRES_USER=postgres",
     "IROHA_POSTGRES_PASSWORD=my-secret-password",
@@ -57,11 +63,14 @@ export const IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().key
     adminPub: Joi.string().min(1).max(64).required(),
     nodePriv: Joi.string().min(1).max(64).required(),
     nodePub: Joi.string().min(1).max(64).required(),
+    tlsCert: Joi.string().min(1).required(),
+    tlsKey: Joi.string().min(1).required(),
+    toriiTlsPort: Joi.number().port().required(),
     postgresPort: Joi.number().port().required(),
     postgresHost: Joi.string().hostname().required(),
     imageVersion: Joi.string().min(5).required(),
     imageName: Joi.string().min(1).required(),
-    rpcToriiPort: Joi.number().min(1024).max(65535).required(),
+    rpcToriiPort: Joi.number().port().required(),
     envVars: Joi.array().allow(null).required(),
   },
 );
@@ -78,6 +87,9 @@ export class IrohaTestLedger implements ITestLedger {
   public readonly adminPub: string;
   public readonly nodePriv: string;
   public readonly nodePub: string;
+  public readonly tlsCert?: string;
+  public readonly tlsKey?: string;
+  public readonly toriiTlsPort?: number;
 
   private readonly log: Logger;
   private container: Container | undefined;
@@ -110,6 +122,11 @@ export class IrohaTestLedger implements ITestLedger {
     this.envVars = options.envVars || [
       ...IROHA_TEST_LEDGER_DEFAULT_OPTIONS.envVars,
     ];
+    this.tlsCert = options.tlsCert || IROHA_TEST_LEDGER_DEFAULT_OPTIONS.tlsCert;
+    this.tlsKey = options.tlsKey || IROHA_TEST_LEDGER_DEFAULT_OPTIONS.tlsKey;
+    this.toriiTlsPort =
+      options.toriiTlsPort || IROHA_TEST_LEDGER_DEFAULT_OPTIONS.toriiTlsPort;
+
     this.envVars.push(`IROHA_POSTGRES_HOST=${this.postgresHost}`);
     this.envVars.push(`IROHA_POSTGRES_PORT=${this.postgresPort}`);
     this.envVars.push(`ADMIN_PRIV=${this.adminPriv}`);
@@ -156,12 +173,30 @@ export class IrohaTestLedger implements ITestLedger {
   }
 
   /**
-   * Output is based on the standard Iroha genesis.block contents.
+   * Output is based on the standard Iroha genesis.block content.
    *
    * @see https://github.com/hyperledger/iroha/blob/main/example/genesis.block
    */
-  public getGenesisAdminAccount(): string {
-    return "admin@test";
+  public getInternalAddr(): string {
+    return "127.0.0.1:10001";
+  }
+
+  /**
+   * Output is based on the standard Iroha genesis.block content.
+   *
+   * @see https://github.com/hyperledger/iroha/blob/main/example/genesis.block
+   */
+  public getDefaultAdminAccount(): string {
+    return "admin";
+  }
+
+  /**
+   * Output is based on the standard Iroha genesis.block content.
+   *
+   * @see https://github.com/hyperledger/iroha/blob/main/example/genesis.block
+   */
+  public getDefaultDomain(): string {
+    return "test";
   }
 
   /**
@@ -234,7 +269,9 @@ export class IrohaTestLedger implements ITestLedger {
     }
 
     return new Promise<Container>((resolve, reject) => {
-      const userID = this.getGenesisAdminAccount();
+      const admin = this.getDefaultAdminAccount();
+      const domain = this.getDefaultDomain();
+      const adminID = `${admin}@${domain}`;
       const toriiPort = this.getDefaultToriiPort();
       const eventEmitter: EventEmitter = docker.run(
         this.imageFqn,
@@ -249,7 +286,7 @@ export class IrohaTestLedger implements ITestLedger {
             //Healthcheck script usage: python3 /healthcheck.py userID toriiPort
             Test: [
               "CMD-SHELL",
-              `python3 /healthcheck.py ${userID} ${toriiPort}`,
+              `python3 /healthcheck.py ${adminID} ${toriiPort}`,
             ],
             Interval: 1000000000, // 1 second
             Timeout: 3000000000, // 3 seconds
@@ -391,6 +428,9 @@ export class IrohaTestLedger implements ITestLedger {
       adminPub: this.adminPub,
       nodePriv: this.nodePriv,
       nodePub: this.nodePub,
+      tlsCert: this.tlsCert,
+      tlsKey: this.tlsKey,
+      toriiTlsPort: this.toriiTlsPort,
       postgresHost: this.postgresHost,
       postgresPort: this.postgresPort,
       imageVersion: this.imageVersion,

@@ -72,6 +72,7 @@ import {
   ChainCodeLifeCycleCommandResponses,
   FabricSigningCredential,
   DefaultEventHandlerStrategy,
+  FabricSigningCredentialType,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -87,10 +88,21 @@ import {
   IDeployContractEndpointV1Options,
 } from "./deploy-contract/deploy-contract-endpoint-v1";
 import { sourceLangToRuntimeLang } from "./peer/source-lang-to-runtime-lang";
-import FabricCAServices from "fabric-ca-client";
+import FabricCAServices, {
+  IEnrollmentRequest,
+  IRegisterRequest,
+} from "fabric-ca-client";
 import { createGateway } from "./common/create-gateway";
-import { Endorser } from "fabric-common";
-
+import { Endorser, ICryptoKey } from "fabric-common";
+import {
+  IVaultConfig,
+  SecureIdentityProviders,
+  IIdentity,
+} from "./identity/identity-provider";
+import {
+  CertDatastore,
+  IIdentityData,
+} from "./identity/internal/cert-datastore";
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
  * observed on fabric deployments that are produced by the official examples
@@ -118,6 +130,8 @@ export interface IPluginLedgerConnectorFabricOptions
   prometheusExporter?: PrometheusExporter;
   discoveryOptions?: GatewayDiscoveryOptions;
   eventHandlerOptions?: GatewayEventHandlerOptions;
+  supportedIdentity?: FabricSigningCredentialType[];
+  vaultConfig?: IVaultConfig;
 }
 
 export class PluginLedgerConnectorFabric
@@ -139,6 +153,8 @@ export class PluginLedgerConnectorFabric
   private readonly cliContainerGoPath: string;
   public prometheusExporter: PrometheusExporter;
   private endpoints: IWebServiceEndpoint[] | undefined;
+  private readonly secureIdentity: SecureIdentityProviders;
+  private readonly certStore: CertDatastore;
 
   public get className(): string {
     return PluginLedgerConnectorFabric.CLASS_NAME;
@@ -175,6 +191,15 @@ export class PluginLedgerConnectorFabric
     this.log = LoggerProvider.getOrCreate({ level, label });
     this.instanceId = opts.instanceId;
     this.prometheusExporter.startMetricsCollection();
+    // default is supported if supportedIdentity is empty
+    this.secureIdentity = new SecureIdentityProviders({
+      activatedProviders: opts.supportedIdentity || [
+        FabricSigningCredentialType.X509,
+      ],
+      logLevel: opts.logLevel || "INFO",
+      vaultConfig: opts.vaultConfig,
+    });
+    this.certStore = new CertDatastore(opts.pluginRegistry);
   }
 
   public async shutdown(): Promise<void> {
@@ -823,6 +848,8 @@ export class PluginLedgerConnectorFabric
           strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         },
         gatewayOptions: req.gatewayOptions,
+        secureIdentity: this.secureIdentity,
+        certStore: this.certStore,
       });
     } else {
       return this.createGatewayLegacy(req.signingCredential);
@@ -834,27 +861,44 @@ export class PluginLedgerConnectorFabric
   ): Promise<Gateway> {
     const { connectionProfile, eventHandlerOptions: eho } = this.opts;
 
-    const wallet = await Wallets.newInMemoryWallet();
+    const iType = signingCredential.type || FabricSigningCredentialType.X509;
 
-    const keychain = this.opts.pluginRegistry.findOneByKeychainId(
+    const certData = await this.certStore.get(
       signingCredential.keychainId,
-    );
-    this.log.debug(
-      "transact() obtained keychain by ID=%o OK",
-      signingCredential.keychainId,
-    );
-
-    const fabricX509IdentityJson = await keychain.get(
       signingCredential.keychainRef,
     );
-    this.log.debug(
-      "transact() obtained keychain entry Key=%o OK",
-      signingCredential.keychainRef,
-    );
-    const identity = JSON.parse(fabricX509IdentityJson);
-
-    await wallet.put(signingCredential.keychainRef, identity);
-    this.log.debug("transact() imported identity to in-memory wallet OK");
+    if (iType !== certData.type) {
+      throw new Error(
+        `identity type mismatch, sorted of type = ${certData.type} but provided = ${iType}`,
+      );
+    }
+    let key: ICryptoKey;
+    switch (iType) {
+      case FabricSigningCredentialType.VaultX509:
+        if (!signingCredential.vaultTransitKey) {
+          throw new Error(`require signingCredential.vaultTransitKey`);
+        }
+        key = this.secureIdentity.getVaultKey({
+          token: signingCredential.vaultTransitKey.token,
+          keyName: signingCredential.vaultTransitKey.keyName,
+        });
+        break;
+      case FabricSigningCredentialType.X509:
+        key = this.secureIdentity.getDefaultKey({
+          private: certData.credentials.privateKey as string,
+        });
+        break;
+      default:
+        throw new Error(`UNRECOGNIZED_IDENTITY_TYPE type = ${iType}`);
+    }
+    const identity: IIdentity = {
+      type: iType,
+      mspId: certData.mspId,
+      credentials: {
+        certificate: certData.credentials.certificate,
+        key: key,
+      },
+    };
 
     const eventHandlerOptions: DefaultEventHandlerOptions = {
       commitTimeout: this.opts.eventHandlerOptions?.commitTimeout || 300,
@@ -868,8 +912,8 @@ export class PluginLedgerConnectorFabric
     const gatewayOptions: GatewayOptions = {
       discovery: this.opts.discoveryOptions,
       eventHandlerOptions,
-      identity: signingCredential.keychainRef,
-      wallet,
+      identity: identity,
+      identityProvider: this.secureIdentity,
     };
 
     this.log.debug(`discovery=%o`, gatewayOptions.discovery);
@@ -904,6 +948,7 @@ export class PluginLedgerConnectorFabric
 
     try {
       const gateway = await this.createGateway(req);
+      // const gateway = await this.createGatewayLegacy(req.signingCredential);
       const network = await gateway.getNetwork(channelName);
       // const channel = network.getChannel();
       // const endorsers = channel.getEndorsers();
@@ -997,6 +1042,7 @@ export class PluginLedgerConnectorFabric
         functionOutput: outUtf8,
         success,
       };
+      gateway.disconnect();
       this.log.debug(`transact() response: %o`, res);
       this.prometheusExporter.addCurrentTransaction();
 
@@ -1066,5 +1112,176 @@ export class PluginLedgerConnectorFabric
       this.log.error(`enrollAdmin() Failure:`, ex);
       throw new Error(`${fnTag} Exception: ${ex?.message}`);
     }
+  }
+  /**
+   * @description enroll a client and store the enrolled certificate inside keychain
+   * @param identity details about client's key
+   * @param request , enroll request for fabric-ca-server
+   */
+  public async enroll(
+    identity: FabricSigningCredential,
+    request: {
+      enrollmentID: string;
+      enrollmentSecret: string;
+      caId: string;
+      mspId: string;
+    },
+  ): Promise<void> {
+    const fnTag = `${this.className}#enroll`;
+    const iType = identity.type || FabricSigningCredentialType.X509;
+    this.log.debug(
+      `${fnTag} enroll identity of type = ${iType} with ca = ${request.caId}`,
+    );
+    Checks.nonBlankString(identity.keychainId, `${fnTag} identity.keychainId`);
+    Checks.nonBlankString(
+      identity.keychainRef,
+      `${fnTag} identity.keychainRef`,
+    );
+    Checks.nonBlankString(request.mspId, `${fnTag} request.mspId`);
+    const ca = await this.createCaClient(request.caId);
+    const enrollmentRequest: IEnrollmentRequest = {
+      enrollmentID: request.enrollmentID,
+      enrollmentSecret: request.enrollmentSecret,
+    };
+    switch (iType) {
+      case FabricSigningCredentialType.VaultX509:
+        if (!identity.vaultTransitKey) {
+          throw new Error(`${fnTag} require identity.vaultTransitKey`);
+        }
+        const key = this.secureIdentity.getVaultKey({
+          token: identity.vaultTransitKey.token,
+          keyName: identity.vaultTransitKey.keyName,
+        });
+        enrollmentRequest.csr = await key.generateCSR(request.enrollmentID);
+        break;
+    }
+    const resp = await ca.enroll(enrollmentRequest);
+    const certData: IIdentityData = {
+      type: iType,
+      mspId: request.mspId,
+      credentials: {
+        certificate: resp.certificate,
+      },
+    };
+    if (resp.key) {
+      certData.credentials.privateKey = resp.key.toBytes();
+    }
+    await this.certStore.put(
+      identity.keychainId,
+      identity.keychainRef,
+      certData,
+    );
+  }
+
+  public async register(
+    registrar: FabricSigningCredential,
+    request: IRegisterRequest,
+    caId: string,
+  ): Promise<string> {
+    const fnTag = `${this.className}#register`;
+    const iType = registrar.type || FabricSigningCredentialType.X509;
+    this.log.debug(
+      `${fnTag} register client using registrar identity of type = ${iType}`,
+    );
+    Checks.nonBlankString(
+      registrar.keychainId,
+      `${fnTag} registrar.keychainId`,
+    );
+    Checks.nonBlankString(
+      registrar.keychainRef,
+      `${fnTag} registrar.keychainRef`,
+    );
+    const certData = await this.certStore.get(
+      registrar.keychainId,
+      registrar.keychainRef,
+    );
+    if (certData.type != iType) {
+      throw new Error(
+        `${fnTag} identity type mismatch, stored ${certData.type} but provided ${iType}`,
+      );
+    }
+    let key: ICryptoKey;
+    switch (iType) {
+      case FabricSigningCredentialType.X509:
+        key = this.secureIdentity.getDefaultKey({
+          private: certData.credentials.privateKey as string,
+        });
+        break;
+      case FabricSigningCredentialType.VaultX509:
+        if (!registrar.vaultTransitKey) {
+          throw new Error(`${fnTag} require registrar.vaultTransitKey`);
+        }
+        key = this.secureIdentity.getVaultKey({
+          token: registrar.vaultTransitKey.token,
+          keyName: registrar.vaultTransitKey.keyName,
+        });
+        break;
+      default:
+        throw new Error(`${fnTag} UNRECOGNIZED_IDENTITY_TYPE type = ${iType}`);
+    }
+    const user = await this.secureIdentity.getUserContext(
+      {
+        type: iType,
+        credentials: {
+          certificate: certData.credentials.certificate,
+          key: key,
+        },
+        mspId: certData.mspId,
+      },
+      "registrar",
+    );
+
+    const ca = await this.createCaClient(caId);
+    return await ca.register(request, user);
+  }
+
+  /**
+   * @description re-enroll a client with new private key
+   * @param identity
+   */
+  public async rotateKey(
+    identity: FabricSigningCredential,
+    request: {
+      enrollmentID: string;
+      enrollmentSecret: string;
+      caId: string;
+    },
+  ): Promise<void> {
+    const fnTag = `${this.className}#rotateKey`;
+    const iType = identity.type || FabricSigningCredentialType.X509;
+    this.log.debug(
+      `${fnTag} identity of type = ${iType} with ca = ${request.caId}`,
+    );
+    this.log.debug(
+      `${fnTag} enroll identity of type = ${iType} with ca = ${request.caId}`,
+    );
+    Checks.nonBlankString(identity.keychainId, `${fnTag} identity.keychainId`);
+    Checks.nonBlankString(
+      identity.keychainRef,
+      `${fnTag} identity.keychainRef`,
+    );
+    const certData = await this.certStore.get(
+      identity.keychainId,
+      identity.keychainRef,
+    );
+    switch (iType) {
+      case FabricSigningCredentialType.VaultX509:
+        if (!identity.vaultTransitKey) {
+          throw new Error(`${fnTag} require identity.vaultTransitKey)`);
+        }
+        const key = this.secureIdentity.getVaultKey({
+          keyName: identity.vaultTransitKey.keyName,
+          token: identity.vaultTransitKey.token,
+        });
+        await key.rotate();
+        break;
+    }
+    identity.type = iType;
+    await this.enroll(identity, {
+      enrollmentID: request.enrollmentID,
+      enrollmentSecret: request.enrollmentSecret,
+      caId: request.caId,
+      mspId: certData.mspId,
+    });
   }
 }

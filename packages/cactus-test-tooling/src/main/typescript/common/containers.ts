@@ -308,6 +308,7 @@ export class Containers {
     cmd: string[],
     timeoutMs = 300000, // 5 minutes default timeout
     logLevel: LogLevelDesc = "INFO",
+    workingDir?: string,
   ): Promise<string> {
     const fnTag = "Containers#exec()";
     Checks.truthy(container, `${fnTag} container`);
@@ -318,12 +319,16 @@ export class Containers {
 
     const log = LoggerProvider.getOrCreate({ label: fnTag, level: logLevel });
 
-    const exec = await container.exec({
+    const execOptions: Record<string, unknown> = {
       Cmd: cmd,
       AttachStdout: true,
       AttachStderr: true,
       Tty: true,
-    });
+    };
+    if (workingDir) {
+      execOptions.WorkingDir = workingDir;
+    }
+    const exec = await container.exec(execOptions);
 
     return new Promise((resolve, reject) => {
       log.debug(`Calling Exec Start on Docker Engine API...`);

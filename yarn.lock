@@ -3776,6 +3776,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/jsrsasign@8.0.13":
+  version "8.0.13"
+  resolved "https://registry.yarnpkg.com/@types/jsrsasign/-/jsrsasign-8.0.13.tgz#770c1e429107dfb0cc4f5b78b472584511a55a28"
+  integrity sha512-+0Ij59D6NXP48KkeLhPXeQKOyLjvA9CD7zacc0Svy2IWHdl62BmDeTvGSIwKaGZSoamLJOo+on1AG/wPRLsd7A==
+
 "@types/keyv@*":
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/@types/keyv/-/keyv-3.1.2.tgz#5d97bb65526c20b6e0845f6b0d2ade4f28604ee5"
@@ -3852,6 +3857,13 @@
     "@types/node" "*"
     "@types/ssh2" "*"
     "@types/ssh2-streams" "*"
+
+"@types/node-vault@0.9.13":
+  version "0.9.13"
+  resolved "https://registry.yarnpkg.com/@types/node-vault/-/node-vault-0.9.13.tgz#10d9fe5c9b53995c0ee24fcaeb11ba27241d6c50"
+  integrity sha512-TQ9zYIzFT4Oo6NVTISk9p4qbuWkVmrs7Rds53uc16sSvQeIC4WGp2y9BXVaKMoGkYQ7jAWlveFTPXLEzuCZffQ==
+  dependencies:
+    node-vault "*"
 
 "@types/node@*", "@types/node@>=10.0.0", "@types/node@>=12.12.47", "@types/node@>=13.7.0":
   version "16.7.2"
@@ -5274,7 +5286,7 @@ bn.js@4.11.6:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.6.tgz#53344adb14617a13f6e8dd2ce28905d1c0ba3215"
   integrity sha1-UzRK2xRhehP26N0s4okF0cC6MhU=
 
-bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.11.0, bn.js@^4.11.1, bn.js@^4.11.6, bn.js@^4.11.8, bn.js@^4.11.9:
+bn.js@4.12.0, bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.11.0, bn.js@^4.11.1, bn.js@^4.11.6, bn.js@^4.11.8, bn.js@^4.11.9:
   version "4.12.0"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.12.0.tgz#775b3f278efbb9718eec7361f483fb36fbbfea88"
   integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
@@ -8998,6 +9010,16 @@ fabric-ca-client@2.2.8:
     url "^0.11.0"
     winston "^2.4.5"
 
+fabric-ca-client@2.3.0-snapshot.49:
+  version "2.3.0-snapshot.49"
+  resolved "https://registry.yarnpkg.com/fabric-ca-client/-/fabric-ca-client-2.3.0-snapshot.49.tgz#7e3beb354c1b3a4548674e8a31707bb7a0238457"
+  integrity sha512-+JialKe65E5NO3nKOafXDHg5PTXbSq5kmNzuR74EOCVPQBbLzmn+Q6CUDT4V8BC1Nnez2kv2Yziwi44TLMvvpA==
+  dependencies:
+    fabric-common "2.3.0-snapshot.50"
+    jsrsasign "^8.0.24"
+    url "^0.11.0"
+    winston "^2.4.5"
+
 fabric-common@2.2.8:
   version "2.2.8"
   resolved "https://registry.yarnpkg.com/fabric-common/-/fabric-common-2.2.8.tgz#efdede0efd6b6362dbc6974511cdda8f24b50bbd"
@@ -9006,6 +9028,44 @@ fabric-common@2.2.8:
     callsite "^1.0.0"
     elliptic "^6.5.4"
     fabric-protos "2.2.8"
+    js-sha3 "^0.8.0"
+    jsrsasign "^8.0.24"
+    long "^4.0.0"
+    nconf "^0.11.2"
+    promise-settle "^0.3.0"
+    sjcl "^1.0.8"
+    winston "^2.4.5"
+    yn "^4.0.0"
+  optionalDependencies:
+    pkcs11js "^1.0.6"
+
+fabric-common@2.3.0-snapshot.49:
+  version "2.3.0-snapshot.49"
+  resolved "https://registry.yarnpkg.com/fabric-common/-/fabric-common-2.3.0-snapshot.49.tgz#92b03ee299d131cdb61e9f710d09ec2c044195e0"
+  integrity sha512-CJHMwjBCdP/asH8G5X1/VuumpHdz8U0sWQzmT7fJxiLt8/0bSjPX9rkfd41p8ztK8sqjSBWTk/TZE4o08iyS6Q==
+  dependencies:
+    callsite "^1.0.0"
+    elliptic "^6.5.4"
+    fabric-protos "2.3.0-snapshot.49"
+    js-sha3 "^0.8.0"
+    jsrsasign "^8.0.24"
+    long "^4.0.0"
+    nconf "^0.11.2"
+    promise-settle "^0.3.0"
+    sjcl "^1.0.8"
+    winston "^2.4.5"
+    yn "^4.0.0"
+  optionalDependencies:
+    pkcs11js "^1.0.6"
+
+fabric-common@2.3.0-snapshot.50:
+  version "2.3.0-snapshot.50"
+  resolved "https://registry.yarnpkg.com/fabric-common/-/fabric-common-2.3.0-snapshot.50.tgz#37a627e7c2966306dcd237be7fb11ed336dc17c2"
+  integrity sha512-9M3kWVor5KBmiV+W7Ul14LLYeRiFW39V9+YjJYAiKWMdIUWJjgY8cfwBllnzlEbIe1/Ju+3h1UJZtikc1ZoBww==
+  dependencies:
+    callsite "^1.0.0"
+    elliptic "^6.5.4"
+    fabric-protos "2.3.0-snapshot.50"
     js-sha3 "^0.8.0"
     jsrsasign "^8.0.24"
     long "^4.0.0"
@@ -9027,10 +9087,38 @@ fabric-network@2.2.8:
     long "^4.0.0"
     nano "^9.0.3"
 
+fabric-network@2.3.0-snapshot.49:
+  version "2.3.0-snapshot.49"
+  resolved "https://registry.yarnpkg.com/fabric-network/-/fabric-network-2.3.0-snapshot.49.tgz#d4bf5f3210feb7c2a866a381f8a2d8ac58af2554"
+  integrity sha512-rqyBWmzL+TgnpB0PDY8GeLtCiqgwKcMkeg9/I0JgqLpzf/zjMHpDHNx8ToqcBOkGtYnlAHzKCorgCVqDFCyv2g==
+  dependencies:
+    fabric-common "2.3.0-snapshot.50"
+    fabric-protos "2.3.0-snapshot.50"
+    long "^4.0.0"
+    nano "^9.0.3"
+
 fabric-protos@2.2.8:
   version "2.2.8"
   resolved "https://registry.yarnpkg.com/fabric-protos/-/fabric-protos-2.2.8.tgz#a41c4d87e6c301bc1064dc12b7e20933f99629bf"
   integrity sha512-5e3MDLtXdsZpXs92kfTGRirIomaaQ3MaKQ59kp0y9QtYZGced4k9Donl1G3nREoBi0yy1bp45lkDnjRIOG9v+g==
+  dependencies:
+    "@grpc/grpc-js" "^1.3.4"
+    "@grpc/proto-loader" "^0.6.2"
+    protobufjs "^6.11.2"
+
+fabric-protos@2.3.0-snapshot.49:
+  version "2.3.0-snapshot.49"
+  resolved "https://registry.yarnpkg.com/fabric-protos/-/fabric-protos-2.3.0-snapshot.49.tgz#650e5cbf08e67e4fece2e07dc9e563d301439bc3"
+  integrity sha512-zlEm/Xz1MCwEmv+ZA8p6TpOfe2oUxmTeRSM6lNAktZZCYWZDNzTFfXmG1kuYScVgsTH9/WvmVj1HHf6tWdfE1Q==
+  dependencies:
+    "@grpc/grpc-js" "^1.3.4"
+    "@grpc/proto-loader" "^0.6.2"
+    protobufjs "^6.11.2"
+
+fabric-protos@2.3.0-snapshot.50:
+  version "2.3.0-snapshot.50"
+  resolved "https://registry.yarnpkg.com/fabric-protos/-/fabric-protos-2.3.0-snapshot.50.tgz#d1b6721dacdca997526438dfd9b8510fc612fcab"
+  integrity sha512-6dRn2sXognFx21SQ9DrHOwZpYj8VphZHLES5COkDRhOnVBs/iDfMptwokcfOOdlDsvx8wmdNjnNMhdPABMDdKA==
   dependencies:
     "@grpc/grpc-js" "^1.3.4"
     "@grpc/proto-loader" "^0.6.2"
@@ -12015,6 +12103,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+jsrsasign@10.4.0:
+  version "10.4.0"
+  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-10.4.0.tgz#362cc787079c03a363a958c03eb68d8545ba92f7"
+  integrity sha512-C8qLhiAssh/b74KJpGhWuFGG9cFhJqMCVuuHXRibb3Z5vPuAW0ue0jUirpoExCdpdhv4nD3sZ1DAwJURYJTm9g==
+
 jsrsasign@^8.0.24:
   version "8.0.24"
   resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-8.0.24.tgz#fc26bac45494caac3dd8f69c1f95847c4bda6c83"
@@ -13879,7 +13972,7 @@ node-ssh@12.0.0:
     shell-escape "^0.2.0"
     ssh2 "^1.1.0"
 
-node-vault@0.9.22:
+node-vault@*, node-vault@0.9.22:
   version "0.9.22"
   resolved "https://registry.yarnpkg.com/node-vault/-/node-vault-0.9.22.tgz#052ab9b36c29d80d1ecfad61275259fe710d179e"
   integrity sha512-/IR+YvINFhCzxJA5x/KHUDymJerFaeqvPUE2zwceRig8yEIA41qfVKusmO6bqRGFkr/2f6CaBVp7YfabzQyteg==
