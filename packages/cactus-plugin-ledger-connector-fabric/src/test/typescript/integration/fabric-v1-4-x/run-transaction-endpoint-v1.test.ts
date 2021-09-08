@@ -62,7 +62,7 @@ test(testCase, async (t: Test) => {
     emitContainerLogs: true,
     logLevel,
     imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
-    imageVersion: "2020-12-16-3ddfd8f-v1.4.8",
+    imageVersion: "2021-09-02--fix-876-supervisord-retries",
     envVars: new Map([
       ["FABRIC_VERSION", "1.4.8"],
       ["CA_VERSION", "1.4.9"],

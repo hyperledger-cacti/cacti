@@ -1,3 +1,6 @@
+import * as OpenApiJson from "../json/openapi.json";
+export { OpenApiJson };
+
 export {
   GetConsortiumEndpointV1,
   IGetConsortiumJwsEndpointOptions,

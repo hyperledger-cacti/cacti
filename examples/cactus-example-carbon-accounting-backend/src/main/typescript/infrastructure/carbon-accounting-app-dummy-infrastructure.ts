@@ -31,7 +31,7 @@ import {
 import {
   ICarbonAccountingFabricContractDeploymentInfo,
   ICarbonAccountingXdaiContractDeploymentInfo,
-} from "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin/dist/lib/main/typescript/i-carbon-accounting-contract-deployment-info";
+} from "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin";
 
 export interface ICarbonAccountingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -127,7 +127,7 @@ export class CarbonAccountingAppDummyInfrastructure {
     this.fabric = new FabricTestLedgerV1({
       publishAllPorts: true,
       imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-      imageVersion: "2021-04-20-nodejs",
+      imageVersion: "2021-09-02--fix-876-supervisord-retries",
       envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
       logLevel: this.options.logLevel || "INFO",
     });

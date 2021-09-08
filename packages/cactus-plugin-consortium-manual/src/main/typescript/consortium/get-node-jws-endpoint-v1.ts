@@ -70,24 +70,22 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public getOasPath() {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"
     ];
   }
 
   public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return this.oasPath.post.operationId;
   }
 
   public getPath(): string {
-    const oasPath = this.getOasPath();
-    return oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    const oasPath = this.getOasPath();
-    return oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public async registerExpress(

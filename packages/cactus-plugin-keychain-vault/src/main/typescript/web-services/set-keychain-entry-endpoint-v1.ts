@@ -49,10 +49,10 @@ export class SetKeychainEntryEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
-  public get oasPath() {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry"
-    ].post;
+    ];
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -73,13 +73,16 @@ export class SetKeychainEntryEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return this.oasPath["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
+  public getOperationId(): string {
+    return this.oasPath.post.operationId;
+  }
   public getExpressRequestHandler(): IExpressRequestHandler {
     return this.handleRequest.bind(this);
   }
