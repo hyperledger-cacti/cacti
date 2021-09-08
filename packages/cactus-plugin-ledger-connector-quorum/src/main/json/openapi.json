@@ -53,8 +53,8 @@
                     "ethAccount": {
                         "type": "string",
                         "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional terminology of authentication.",
-                        "minLength": 64,
-                        "maxLength": 64,
+                        "minLength": 66,
+                        "maxLength": 66,
                         "nullable": false
                     },
                     "secret": {
@@ -79,8 +79,8 @@
                     "ethAccount": {
                         "type": "string",
                         "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.",
-                        "minLength": 64,
-                        "maxLength": 64,
+                        "minLength": 66,
+                        "maxLength": 66,
                         "nullable": false
                     },
                     "keychainEntryKey": {
@@ -111,8 +111,8 @@
                     "ethAccount": {
                         "type": "string",
                         "description": "The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.",
-                        "minLength": 64,
-                        "maxLength": 64,
+                        "minLength": 66,
+                        "maxLength": 66,
                         "nullable": false
                     },
                     "secret": {
@@ -312,9 +312,9 @@
                     },
                     "transactionHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     },
                     "transactionIndex": {
                         "type": "number",
@@ -322,9 +322,9 @@
                     },
                     "blockHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     },
                     "blockNumber": {
                         "type": "number",
