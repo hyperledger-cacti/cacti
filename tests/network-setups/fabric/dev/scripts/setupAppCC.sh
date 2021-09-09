@@ -1,7 +1,7 @@
 CC_NAME=${1:-"simplestate"}
 
 CHAINCODE_PATH=$PWD/../shared/chaincode
-APP_CC_PATH=$PWD/../../../../samples/fabric/${CC_NAME}$2
+APP_CC_PATH=$PWD/../../../../samples/fabric/${CC_NAME}
 
 echo "Copying ${CC_NAME}..."
 
