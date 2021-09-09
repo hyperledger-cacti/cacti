@@ -103,6 +103,7 @@ export interface IrohaBaseConfig {
  * @export
  * @enum {string}
  */
+
 export enum IrohaCommand {
     /**
     * Make entity in the system, capable of sending transactions or queries, storing signatories, personal data and identifiers.
@@ -191,6 +192,7 @@ export enum IrohaCommand {
  * @export
  * @enum {string}
  */
+
 export enum IrohaQuery {
     /**
     * To get the state of an account

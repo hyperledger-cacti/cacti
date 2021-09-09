@@ -88,6 +88,7 @@ export interface MemoryUsage {
  * @export
  * @enum {string}
  */
+
 export enum WatchHealthcheckV1 {
     Subscribe = 'org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Subscribe',
     Next = 'org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Next',
