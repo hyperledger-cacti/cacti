@@ -114,7 +114,7 @@ const command: GluegunCommand = {
       mspId: options.mspId,
       logger
     })
-    const username = options.username || `User1@org1.${networkName}.com`
+    const username = options.username || `user1`
     const [keyCert, keyCertError] = await handlePromise(
       getKeyAndCertForRemoteRequestbyUserName(wallet, username)
     )

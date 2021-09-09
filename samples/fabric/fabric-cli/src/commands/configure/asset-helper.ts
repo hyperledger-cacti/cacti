@@ -20,7 +20,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli configure asset all --target-network=network1 --type=bond',
+        'fabric-cli configure asset add --target-network=network1 --type=bond',
         'fabric-cli configure asset <subcommand>',
         [],
         command,

@@ -66,7 +66,7 @@ const command: GluegunCommand = {
       `Generating ${options['local-network']} network with access control`
     )
     const username =
-      options.username || `User1@org1.${options['local-network']}.com`
+      options.username || `user1`
 
     const templatePath = options.template
       ? path.resolve(options.template)

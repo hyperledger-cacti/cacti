@@ -21,7 +21,9 @@ const validKeys = [
   'DEFAULT_CHANNEL',
   'DEFAULT_CHAINCODE',
   'MEMBER_CREDENTIAL_FOLDER',
-  'LOCAL'
+  'LOCAL',
+  'DEFAULT_APPLICATION_CHAINCODE',
+  'CONFIG_PATH'
 ]
 // Valid keys for config
 const configKeys = ['connProfilePath', 'relayEndpoint']
@@ -232,7 +234,8 @@ const customHelp = (toolbox: Toolbox): void => {
         !command.commandPath.includes('fabric-cli') &&
         !command.commandPath.includes('env') &&
         !command.commandPath.includes('helper') &&
-        !command.commandPath.includes('config')
+        !command.commandPath.includes('config') &&
+        !command.commandPath.includes('asset')
     )
     // Maps commands to include alias in title
     .map(command => {

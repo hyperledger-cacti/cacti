@@ -59,7 +59,7 @@ const command: GluegunCommand = {
       return
     }
     const username =
-      options.username || `User1@org1.${options['local-network']}.com`
+      options.username || `user1`
     const helperObject = await fabricHelper({
       channel,
       contractName,

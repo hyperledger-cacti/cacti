@@ -1,8 +1,22 @@
-FROM node:14
+ARG BUILD_TAG
+
+# Local Build
+FROM node:14 AS builder-local
+
+WORKDIR /fabric-driver
+
+ADD protos-js /fabric-driver/protos-js
+
+# Remote build
+FROM node:14 AS builder-remote
 
 WORKDIR /fabric-driver
 
 ADD .npmrc .
+
+# Common Build for both
+FROM builder-${BUILD_TAG} AS prod
+
 ADD package.json .
 
 RUN npm install --unsafe-perm
