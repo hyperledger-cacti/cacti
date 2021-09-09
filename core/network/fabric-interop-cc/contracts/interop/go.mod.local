@@ -3,9 +3,9 @@ module github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabr
 go 1.16
 
 replace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go => ./protos-go
-replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange => ./assetexchange
-replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils => ./utils
-replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils => ./testutils
+replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange => ./libs/assetexchange
+replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils => ./libs/utils
+replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils => ./libs/testutils
 
 require (
 	github.com/golang/protobuf v1.5.2
