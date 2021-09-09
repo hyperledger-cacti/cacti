@@ -131,6 +131,7 @@ export interface CactusNodeMeta {
  * @export
  * @enum {string}
  */
+
 export enum ConsensusAlgorithmFamiliesWithOutTxFinality {
     WORK = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK'
 }
@@ -140,6 +141,7 @@ export enum ConsensusAlgorithmFamiliesWithOutTxFinality {
  * @export
  * @enum {string}
  */
+
 export enum ConsensusAlgorithmFamiliesWithTxFinality {
     Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
     Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE'
@@ -150,6 +152,7 @@ export enum ConsensusAlgorithmFamiliesWithTxFinality {
  * @export
  * @enum {string}
  */
+
 export enum ConsensusAlgorithmFamily {
     Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
     Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE',
@@ -254,6 +257,7 @@ export interface ConsortiumMember {
  * @export
  * @enum {string}
  */
+
 export enum Constants {
     SocketIoConnectionPathV1 = '/api/v1/async/socket-io/connect'
 }
@@ -498,6 +502,7 @@ export interface Ledger {
  * @export
  * @enum {string}
  */
+
 export enum LedgerType {
     Besu1X = 'BESU_1X',
     Besu2X = 'BESU_2X',
@@ -539,6 +544,7 @@ export interface PluginImport {
  * @export
  * @enum {string}
  */
+
 export enum PluginImportType {
     Local = 'org.hyperledger.cactus.plugin_import_type.LOCAL',
     Remote = 'org.hyperledger.cactus.plugin_import_type.REMOTE'

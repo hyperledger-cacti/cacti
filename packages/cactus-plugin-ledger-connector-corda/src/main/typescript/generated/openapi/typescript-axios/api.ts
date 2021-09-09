@@ -318,6 +318,7 @@ export interface DiagnoseNodeV1Response {
  * @export
  * @enum {string}
  */
+
 export enum FlowInvocationType {
     TrackedFlowDynamic = 'TRACKED_FLOW_DYNAMIC',
     FlowDynamic = 'FLOW_DYNAMIC'
@@ -473,6 +474,7 @@ export interface JvmType {
  * @export
  * @enum {string}
  */
+
 export enum JvmTypeKind {
     Primitive = 'PRIMITIVE',
     Reference = 'REFERENCE'
