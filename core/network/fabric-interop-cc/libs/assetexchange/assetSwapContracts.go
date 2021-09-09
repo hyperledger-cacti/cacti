@@ -78,8 +78,8 @@ func generateContractIdMapKey(contractId string) string {
  * Function to generate asset-lock key (which is combination of asset-type and asset-id)
  * and contract-id (which is a hash on asset-lock key) for the non-fungible asset locking on the ledger
  */
-func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) (string, string, error) {
-	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{assetAgreement.Type, assetAgreement.Id})
+func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.AssetExchangeAgreement) (string, string, error) {
+	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.Type, assetAgreement.Id})
 	if err != nil {
 		return "", "", logThenErrorf("error while creating composite key: %+v", err)
 	}
@@ -92,8 +92,8 @@ func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterfa
  * Function to generate contract-id for fungible asset-locking on the ledger (which is
  * a hash on the attributes of the fungible asset exchange agreement)
  */
-func GenerateFungibleAssetLockContractId(ctx contractapi.TransactionContextInterface, assetAgreement *common.FungibleAssetExchangeAgreement) string {
-	preimage := assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
+func GenerateFungibleAssetLockContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.FungibleAssetExchangeAgreement) string {
+	preimage := chaincodeId + assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
 		assetAgreement.Locker + assetAgreement.Recipient + ctx.GetStub().GetTxID()
 	contractId := GenerateSHA256HashInBase64Form(preimage)
 	return contractId
@@ -213,7 +213,7 @@ func getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64 string) (interface{}, uint
 }
 
 // LockAsset cc is used to record locking of an asset on the ledger
-func LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
+func LockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64, lockInfoBytesBase64 string) (string, error) {
 
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
@@ -238,7 +238,7 @@ func LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesB
 		return "", logThenErrorf(err.Error())
 	}
 
-	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, assetAgreement)
+	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
@@ -277,70 +277,70 @@ func LockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesB
 }
 
 // UnlockAsset cc is used to record unlocking of an asset on the ledger
-func UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) error {
+func UnlockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
 
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
-		return logThenErrorf("error in base64 decode of asset agreement: %+v", err)
+		return "", logThenErrorf("error in base64 decode of asset agreement: %+v", err)
 	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
 	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
 	err = validateAndSetLockerOfAssetAgreement(ctx, assetAgreement)
 	if err != nil {
-		return logThenErrorf("error in validation of asset agreement parties: %+v", err)
+		return "", logThenErrorf("error in validation of asset agreement parties: %+v", err)
 	}
 
-	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, assetAgreement)
+	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 
 	if assetLockValBytes == nil {
-		return logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
 	}
 
 	assetLockVal := AssetLockValue{}
 	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
 	if err != nil {
-		return logThenErrorf("unmarshal error: %s", err)
+		return "", logThenErrorf("unmarshal error: %s", err)
 	}
 
 	if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		return logThenErrorf("cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
+		return "", logThenErrorf("cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
 	}
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs < assetLockVal.ExpiryTimeSecs {
-		return logThenErrorf("cannot unlock asset of type %s and ID %s as the expiry time is not yet elapsed", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("cannot unlock asset of type %s and ID %s as the expiry time is not yet elapsed", assetAgreement.Type, assetAgreement.Id)
 	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
-		return logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+		return "", logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
 	}
 	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
-		return logThenErrorf("failed to delete the contractId %s as part of asset unlock: %v", contractId, err)
+		return "", logThenErrorf("failed to delete the contractId %s as part of asset unlock: %v", contractId, err)
 	}
 
-	return nil
+	return contractId, nil
 }
 
 // IsAssetLocked cc is used to query the ledger and findout if an asset is locked or not
-func IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (bool, error) {
+func IsAssetLocked(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (bool, error) {
 
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
@@ -355,7 +355,7 @@ func IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementBy
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
-	assetLockKey, _, err := GenerateAssetLockKeyAndContractId(ctx, assetAgreement)
+	assetLockKey, _, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
 		return false, logThenErrorf(err.Error())
 	}
@@ -462,81 +462,81 @@ func getClaimInfo(claimInfoBytesBase64 string) (*common.AssetClaim, error) {
 }
 
 // ClaimAsset cc is used to record claim of an asset on the ledger
-func ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, claimInfoBytesBase64 string) error {
+func ClaimAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64, claimInfoBytesBase64 string) (string, error) {
 
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
-		return logThenErrorf("error in base64 decode of asset agreement: %+v", err)
+		return "", logThenErrorf("error in base64 decode of asset agreement: %+v", err)
 	}
 
 	assetAgreement := &common.AssetExchangeAgreement{}
 	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 	// display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
 
 	err = validateAndSetRecipientOfAssetAgreement(ctx, assetAgreement)
 	if err != nil {
-		return logThenErrorf("error in recipient validation: %+v", err)
+		return "", logThenErrorf("error in recipient validation: %+v", err)
 	}
 
 	claimInfo, err := getClaimInfo(claimInfoBytesBase64)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 
-	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, assetAgreement)
+	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 
 	if assetLockValBytes == nil {
-		return logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
 	}
 
 	assetLockVal := AssetLockValue{}
 	err = json.Unmarshal(assetLockValBytes, &assetLockVal)
 	if err != nil {
-		return logThenErrorf("unmarshal error: %s", err)
+		return "", logThenErrorf("unmarshal error: %s", err)
 	}
 
 	if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		return logThenErrorf("cannot claim asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
+		return "", logThenErrorf("cannot claim asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
 	}
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= assetLockVal.ExpiryTimeSecs {
-		return logThenErrorf("cannot claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("cannot claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
 	}
 
 	if claimInfo.LockMechanism == common.LockMechanism_HTLC {
 		isCorrectPreimage, err := validateHashPreimage(claimInfo, assetLockVal.LockInfo)
 		if err != nil {
-			return logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
+			return "", logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
 		}
 		if !isCorrectPreimage {
-			return logThenErrorf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
+			return "", logThenErrorf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
 		}
 	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
-		return logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+		return "", logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
 	}
 	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
-		return logThenErrorf("failed to delete the contractId %s as part of asset claim: %v", contractId, err)
+		return "", logThenErrorf("failed to delete the contractId %s as part of asset claim: %v", contractId, err)
 	}
 
-	return nil
+	return contractId, nil
 }
 
 // function to fetch the asset-lock <key, value> from the ledger using contractId
@@ -612,7 +612,7 @@ func UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, con
 }
 
 // ClaimAsset cc is used to record claim of an asset on the ledger (this uses the contractId)
-func ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
+func ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoBytesBase64 string) error {
 
 	assetLockKey, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
@@ -680,7 +680,7 @@ func IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterfa
 }
 
 // LockFungibleAsset cc is used to record locking of a group of fungible assets of an asset-type on the ledger
-func LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetAgreementBytesBase64 string, lockInfoBytesBase64 string) (string, error) {
+func LockFungibleAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, fungibleAssetAgreementBytesBase64, lockInfoBytesBase64 string) (string, error) {
 
 	fungibleAssetAgreementBytes, err := base64.StdEncoding.DecodeString(fungibleAssetAgreementBytesBase64)
 	if err != nil {
@@ -707,7 +707,7 @@ func LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAsse
 	}
 
 	// generate the contractId for the fungible asset lock agreement
-	contractId := GenerateFungibleAssetLockContractId(ctx, assetAgreement)
+	contractId := GenerateFungibleAssetLockContractId(ctx, callerChaincodeID, assetAgreement)
 
 	assetLockVal := FungibleAssetLockValue{Type: assetAgreement.Type, NumUnits: assetAgreement.NumUnits, Locker: assetAgreement.Locker,
 		Recipient: assetAgreement.Recipient, LockInfo: lockInfo, ExpiryTimeSecs: expiryTimeSecs}
@@ -774,7 +774,7 @@ func IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contract
 }
 
 // ClaimFungibleAsset cc is used to record claim of a fungible asset on the ledger
-func ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
+func ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId, claimInfoBytesBase64 string) error {
 
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {

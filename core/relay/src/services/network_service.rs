@@ -16,6 +16,7 @@ use sled::open;
 use tokio::sync::RwLock;
 use tonic::{Code, Request, Response, Status};
 use uuid::Uuid;
+use base64::{encode, decode};
 
 pub struct NetworkService {
     pub config_lock: RwLock<config::Config>,
@@ -29,15 +30,29 @@ impl Network for NetworkService {
         &self,
         request: Request<GetStateMessage>,
     ) -> Result<Response<RequestState>, Status> {
-        println!("Received GetState request from network: {:?}", request);
+        println!("\nReceived GetState request from network: {:?}", request);
         let conf = self.config_lock.read().await.clone();
         let db = Database {
             db_path: conf.get_str("db_path").unwrap(),
         };
         let result = db.get::<RequestState>(request.into_inner().request_id);
-        println!("Sending back RequestState to network: {:?}\n", result);
         match result {
-            Ok(request_state) => Ok(Response::new(request_state)),
+            Ok(request_state) => {
+                println!("Sending back RequestState to network: Request ID = {:?}, Status = {:?}",
+                         request_state.request_id,
+                         request_state.status
+                         );
+                match request_state.state.as_ref() {
+                    Some(state) => {
+                        match state {
+                            request_state::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
+                            request_state::State::Error(e) => println!("Error: {:?}", e),
+                        }
+                    },
+                    None => {},
+                }
+                return Ok(Response::new(request_state));
+            },
             Err(e) => Err(Status::new(
                 Code::NotFound,
                 format!("Request not found. Error: {:?}", e),

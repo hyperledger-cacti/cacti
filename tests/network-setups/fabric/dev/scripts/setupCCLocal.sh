@@ -18,8 +18,12 @@ cp -r ${INTEROP_CC_PATH} .
 
 cd fabric-interop-cc
 cp -r $PWD/../../../../../../common/protos-go contracts/interop/
-cp -r $PWD/../../../../../../core/network/fabric-interop-cc/libs/assetexchange contracts/interop/
-cd contracts/interop/
+cp -r $PWD/../../../../../../core/network/fabric-interop-cc/libs contracts/interop/
+cd contracts/interop/libs/assetexchange
+mv go.mod.local go.mod
+rm go.sum
+go mod tidy
+cd ../..
 mv go.mod.local go.mod
 rm go.sum
 go mod tidy

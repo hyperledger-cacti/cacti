@@ -58,7 +58,7 @@ const command: GluegunCommand = {
     // 3. Loads configs from other networks in the credentials folder
     for (const network of array) {
       // GET NETWORK-CONFIGS
-      const { connProfilePath, username: currusername } = getNetworkConfig(
+      const { connProfilePath, username: currusername, aclPolicyPrincipalType } = getNetworkConfig(
         network
       )
       if (!connProfilePath) {
@@ -89,7 +89,7 @@ const command: GluegunCommand = {
         network,
         path.resolve(
           __dirname,
-          '../../data/interop/accessControlTemplate.json'
+          '../../data/interop/accessControlTemplate_' + aclPolicyPrincipalType + '.json'
         ),
         username,
         global.__DEFAULT_MSPID__,

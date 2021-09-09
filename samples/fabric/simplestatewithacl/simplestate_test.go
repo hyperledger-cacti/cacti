@@ -28,6 +28,7 @@ func TestCreate(t *testing.T) {
 func TestRead(t *testing.T) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	ss := SmartContract{}
+	ss.testMode = true
 
 	key := "test-key"
 	value := "test-value"

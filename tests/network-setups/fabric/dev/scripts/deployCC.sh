@@ -89,6 +89,7 @@ packageChaincode() {
   ORG=$1
   setGlobals $ORG $AA $NW_NAME
   set -x
+  # Select a different chaincode folder depending on whether it is regular chaincode or chaincode adapted to control access from relay clients
   peer lifecycle chaincode package $CC_CHAIN_CODE.tar.gz --path ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE} --label ${CC_CHAIN_CODE}_${VERSION} >&log.txt
   res=$?
   set +x
@@ -275,6 +276,8 @@ chaincodeInvokeInit() {
         peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":["appId"]}' >&log.txt
   elif [ "$CC_CHAIN_CODE" = "simplestate" ]; then
         peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"create","Args":["a","b"]}' >&log.txt
+  elif [ "$CC_CHAIN_CODE" = "simplestatewithacl" ]; then
+        peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"init","Args":["interop"]}' >&log.txt
   elif [ "$CC_CHAIN_CODE" = "simpleasset" ] && [ "$NW_NAME" = "network1" ]; then
         peer chaincode invoke -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CC_CHAIN_CODE $PEER_CONN_PARMS --isInit -c '{"function":"initLedger","Args":["Bond", "interop"]}' >&log.txt
   elif [ "$CC_CHAIN_CODE" = "simpleasset" ] && [ "$NW_NAME" = "network2" ]; then

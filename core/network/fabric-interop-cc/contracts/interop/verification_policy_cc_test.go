@@ -13,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 var identifier = common.Identifier{
@@ -30,7 +31,8 @@ var verificationPolicyAsset = common.VerificationPolicy{
 }
 
 func TestGetVerificationPolicyBySecurityDomain(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Case when no VerificationPolicy is found
 	acString, err := interopcc.GetVerificationPolicyBySecurityDomain(ctx, "2345")
@@ -45,7 +47,8 @@ func TestGetVerificationPolicyBySecurityDomain(t *testing.T) {
 	require.Equal(t, assetRead, string(value))
 }
 func TestCreateVerificationPolicy(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	verificationPolicyBytes, err := json.Marshal(&verificationPolicyAsset)
 	require.NoError(t, err)
@@ -64,7 +67,8 @@ func TestCreateVerificationPolicy(t *testing.T) {
 }
 
 func TestUpdateVerificationPolicy(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	verificationPolicyBytes, err := json.Marshal(&verificationPolicyAsset)
 	require.NoError(t, err)
@@ -83,7 +87,8 @@ func TestUpdateVerificationPolicy(t *testing.T) {
 }
 
 func TestDeleteVerificationPolicy(t *testing.T) {
-	ctx, chaincodeStub, interopcc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
 
 	// Case when a VerificationPolicy exists
 	chaincodeStub.GetStateReturns([]byte{}, nil)

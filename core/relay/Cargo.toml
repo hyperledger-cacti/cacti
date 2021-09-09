@@ -32,6 +32,7 @@ serde = {version="1.0.110", features = ["derive"]}
 config = "0.10.1"
 listenfd = "0.3"
 futures = { version = "0.3.5" }
+base64 = "0.13.0"
 
 
 [build-dependencies]

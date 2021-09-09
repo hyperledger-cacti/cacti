@@ -14,6 +14,7 @@ import (
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 const applicationCCKey = "applicationccid"
@@ -21,6 +22,7 @@ const applicationCCKey = "applicationccid"
 // SmartContract provides functions for managing arbitrary key-value pairs
 type SmartContract struct {
 	contractapi.Contract
+	testMode bool
 }
 
 func init() {
@@ -52,6 +54,28 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 		return errors.New(errMsg)
 	}
 
+	// Infer local chaincode ID
+	localCCId, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	if err != nil {
+		errMsg := fmt.Sprintf("Error getting this chaincode's ID: %s", err.Error())
+		fmt.Printf(errMsg)
+		return errors.New(errMsg)
+	}
+	// Record local chaincode ID for lookup during asset lock management
+	err = ctx.GetStub().PutState(wutils.GetLocalChaincodeIDKey(), []byte(localCCId))
+	if err != nil {
+		errMsg := fmt.Sprintf("Error saving this chaincode's ID: %s", err.Error())
+		fmt.Printf(errMsg)
+		return errors.New(errMsg)
+	}
+	// This is the Interop chaincode; record its ID for lookup during asset lock management
+	err = ctx.GetStub().PutState(wutils.GetInteropChaincodeIDKey(), []byte(localCCId))
+	if err != nil {
+		errMsg := fmt.Sprintf("Error saving this chaincode's ID: %s", err.Error())
+		fmt.Printf(errMsg)
+		return errors.New(errMsg)
+	}
+
 	return nil
 }
 
@@ -65,7 +89,9 @@ func (s *SmartContract) GetApplicationID(ctx contractapi.TransactionContextInter
 }
 
 func main() {
-	chaincode, err := contractapi.NewChaincode(new(SmartContract))
+	sc := new(SmartContract)
+	sc.testMode = false
+	chaincode, err := contractapi.NewChaincode(sc)
 
 	if err != nil {
 		fmt.Printf("Error creating Interop chaincode: %s", err.Error())
