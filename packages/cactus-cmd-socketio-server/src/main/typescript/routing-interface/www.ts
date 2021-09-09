@@ -11,16 +11,16 @@
  * Module dependencies.
  */
 
-import app from '../business-logic-plugin/app';
-import debugModule = require('debug');
-import http = require('http');
-import { ConfigUtil } from './util/ConfigUtil';
+import app from "../business-logic-plugin/app";
+import debugModule = require("debug");
+import http = require("http");
+import { ConfigUtil } from "./util/ConfigUtil";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-const moduleName = 'www';
+const moduleName = "www";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
@@ -28,9 +28,11 @@ logger.level = config.logLevel;
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || config.applicationHostInfo.hostPort);
+const port = normalizePort(
+  process.env.PORT || config.applicationHostInfo.hostPort,
+);
 logger.info(`listening on *: ${port}`);
-app.set('port', port);
+app.set("port", port);
 
 /**
  * Create HTTP server.
@@ -43,8 +45,8 @@ const server = http.createServer(app);
  */
 
 server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+server.on("error", onError);
+server.on("listening", onListening);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -71,22 +73,20 @@ function normalizePort(val: string): number | string | boolean {
  */
 
 function onError(error): void {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  const bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
-    case 'EACCES':
-      logger.error(bind + ' requires elevated privileges');
+    case "EACCES":
+      logger.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
-    case 'EADDRINUSE':
-      logger.error(bind + ' is already in use');
+    case "EADDRINUSE":
+      logger.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -100,8 +100,6 @@ function onError(error): void {
 
 function onListening(): void {
   const addr = server.address();
-  const bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debugModule('Listening on ' + bind);
+  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debugModule("Listening on " + bind);
 }

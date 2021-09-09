@@ -69,7 +69,7 @@ server.on('listening', onListening);
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  const port = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -277,7 +277,7 @@ io.on('connection', function(client) {
                 emitType = "monitor_error";
             }
             client.emit(emitType, callbackData);
-        }
+        };
 
         Smonitor.startMonitor(client.id, cb);
     });

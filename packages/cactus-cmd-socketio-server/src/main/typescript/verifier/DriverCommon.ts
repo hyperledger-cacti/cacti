@@ -5,14 +5,14 @@
  * DriverCommon.ts
  */
 
-import { ApiInfo, RequestedData, } from './LedgerPlugin'
-import { ConfigUtil } from '../routing-interface/util/ConfigUtil';
+import { ApiInfo, RequestedData } from "./LedgerPlugin";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-const moduleName = 'DriverCommon';
+const moduleName = "DriverCommon";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
@@ -29,7 +29,7 @@ export function json2str(jsonObj: object) {
 // Validator test program.(socket.io client)
 
 export function makeApiInfoList(targetApiInfo: any): ApiInfo[] {
-  const retApiInfoList: ApiInfo[] = new Array();
+  const retApiInfoList: ApiInfo[] = [];
   for (const item of targetApiInfo) {
     const apiInfo: ApiInfo = new ApiInfo();
     apiInfo.apiType = item.apiType;
@@ -45,7 +45,7 @@ export function makeApiInfoList(targetApiInfo: any): ApiInfo[] {
 }
 
 // store on socket
-const socketArray = new Array();
+const socketArray = [];
 
 // Returns the index of socketArray as a return value
 export function addSocket(socket: any): number {
@@ -57,7 +57,7 @@ export function addSocket(socket: any): number {
 
 export function getStoredSocket(index: number): any {
   logger.debug(`##getSocket, index = ${index}`);
-  return (socketArray[index]);
+  return socketArray[index];
 }
 
 export function deleteAndDisconnectSocke(index: number) {
@@ -68,14 +68,11 @@ export function deleteAndDisconnectSocke(index: number) {
       if (socket.connected) {
         logger.debug(`##call disconnect, index = ${index}`);
         socket.disconnect();
-      }
-      else {
+      } else {
         logger.debug(`##already disconnected, index = ${index}`);
       }
     }
-  }
-  catch (err) {
+  } catch (err) {
     logger.warn(`##error:deleteAndDisconnectSocke, index = ${index}, ${err}`);
   }
 }
-

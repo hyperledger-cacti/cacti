@@ -12,349 +12,367 @@
  */
 
 // config file
-import { SplugConfig } from './PluginConfig';
-import { config } from '../common/core/config/default';
+import { SplugConfig } from "./PluginConfig";
+import { config } from "../common/core/config/default";
 // Log settings
 import { getLogger } from "log4js";
-const logger = getLogger('ServerPlugin[' + process.pid + ']');
+const logger = getLogger("ServerPlugin[" + process.pid + "]");
 logger.level = config.logLevel;
 // utility
-var SplugUtil = require('./PluginUtil.js');
-import { ValidatorAuthentication } from './ValidatorAuthentication';
+const SplugUtil = require("./PluginUtil.js");
+import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Read the library, SDK, etc. according to EC specifications as needed
-var fabric = require('./fabricaccess.js');
+const fabric = require("./fabricaccess.js");
 
-var FabricClient = require('fabric-client');
-var copService = require('fabric-ca-client');
-var path = require('path');
-const { FileSystemWallet, Gateway } = require('fabric-network');
-const fs = require('fs');
-const ccpPath = path.resolve(__dirname, 'connection.json');
-const ccpJSON = fs.readFileSync(ccpPath, 'utf8');
+const FabricClient = require("fabric-client");
+const copService = require("fabric-ca-client");
+const path = require("path");
+const { FileSystemWallet, Gateway } = require("fabric-network");
+const fs = require("fs");
+const ccpPath = path.resolve(__dirname, "connection.json");
+const ccpJSON = fs.readFileSync(ccpPath, "utf8");
 const ccp = JSON.parse(ccpJSON);
-const walletPath = path.resolve(__dirname, 'wallet');
+const walletPath = path.resolve(__dirname, "wallet");
 const connUserName = SplugConfig.fabric.connUserName;
 
 // Cryptographic for fabric
-const hash = require('fabric-client/lib/hash');
-const jsrsa = require('jsrsasign');
+const hash = require("fabric-client/lib/hash");
+const jsrsa = require("jsrsasign");
 const { KEYUTIL } = jsrsa;
-const elliptic = require('elliptic');
+const elliptic = require("elliptic");
 const EC = elliptic.ec;
 
 //let xChannel = undefined; // Channel
-
 
 /*
  * ServerPlugin
  * ServerPlugin class definition
  */
 export class ServerPlugin {
-    /*
-     * constructor
-     */
-    constructor() {
-        // Define settings specific to the dependent part
-    }
+  /*
+   * constructor
+   */
+  constructor() {
+    // Define settings specific to the dependent part
+  }
 
-    /*
-     * isExistFunction
-     *
-     * @param {String} funcName : The function name you want to determine.
-     *
-     * @return {Boolean} true : exist / false : not exist
-     *
-     * @desc Determines if the specified function exists in its class.
-     *       Make sure that the support status of your class can be determined by your class.
-     *       Functions that you do not want to call directly need to be devised such as implemented outside of this class like utilities.
-     */
-    isExistFunction(funcName) {
-        if (this[funcName] != undefined) {
-            return true;
-        } else {
-            return false;
-        }
+  /*
+   * isExistFunction
+   *
+   * @param {String} funcName : The function name you want to determine.
+   *
+   * @return {Boolean} true : exist / false : not exist
+   *
+   * @desc Determines if the specified function exists in its class.
+   *       Make sure that the support status of your class can be determined by your class.
+   *       Functions that you do not want to call directly need to be devised such as implemented outside of this class like utilities.
+   */
+  isExistFunction(funcName) {
+    if (this[funcName] != undefined) {
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    /*
-     * contractTransaction(Sync)
-     *
-     * @param {Object} args :  JSON Object
-     * {
-     *     "contract": {
-     *         "channelName": <channel name>,
-     *         "contractName": <contract name>
-     *     },
-     *     "args": {
-     *         "args":[
-     *             <Car ID>,
-     *             <   :  >,
-     *             <   :  >
-     *         ]
-     *     },
-     *     "method": {
-     *         "method": <method name>
-     *         ]
-     *     },
-     *     "reqID":<req ID> // option
-     * }
-     * @return {Object} JSON object
-     */
-    contractTransaction(args) {
-        return new Promise((resolve, reject) => {
-            logger.info("evaluateTransaction start");
-            // logger.debug(`##evaluateTransaction(A)`);
-            var retObj = {};
-            var reqID = args['reqID'];
-            if (reqID === undefined) {
-                reqID = null;
+  /*
+   * contractTransaction(Sync)
+   *
+   * @param {Object} args :  JSON Object
+   * {
+   *     "contract": {
+   *         "channelName": <channel name>,
+   *         "contractName": <contract name>
+   *     },
+   *     "args": {
+   *         "args":[
+   *             <Car ID>,
+   *             <   :  >,
+   *             <   :  >
+   *         ]
+   *     },
+   *     "method": {
+   *         "method": <method name>
+   *         ]
+   *     },
+   *     "reqID":<req ID> // option
+   * }
+   * @return {Object} JSON object
+   */
+  contractTransaction(args) {
+    return new Promise((resolve, reject) => {
+      logger.info("evaluateTransaction start");
+      // logger.debug(`##evaluateTransaction(A)`);
+      let retObj = {};
+      let reqID = args["reqID"];
+      if (reqID === undefined) {
+        reqID = null;
+      }
+      // logger.debug(`##evaluateTransaction(Aa): args: ${JSON.stringify(args.args.args)}, reqID: ${reqID}`);
+      const reqparam = {
+        method: args.method,
+        args: args.args.args,
+        channelName: args.contract.channelName,
+        contractName: args.contract.contractName,
+      };
+      // Block generation event monitoring target because it is performed from the operation request by the CC chain code
+      InvokeSync(reqparam)
+        .then((returnvalue: any) => {
+          // logger.debug(`##evaluateTransaction(B)`);
+          // logger.debug(`##evaluateTransaction(B1), returnvalue: ${returnvalue}`);
+          if (returnvalue == null) {
+            logger.debug(`##evaluateTransaction(B2), returnvalue: null`);
+          } else if (returnvalue == undefined) {
+            logger.debug(`##evaluateTransaction(B3), returnvalue: undefined`);
+          } else if (returnvalue == "") {
+            logger.debug(
+              `##evaluateTransaction(B4), returnvalue: empty string`,
+            );
+          }
+          if (returnvalue != null) {
+            // logger.debug(`##evaluateTransaction(B5)`);
+            let objRetValue = {};
+            if (returnvalue != "") {
+              // logger.debug(`##evaluateTransaction(B6)`);
+              objRetValue = JSON.parse(returnvalue);
             }
-            // logger.debug(`##evaluateTransaction(Aa): args: ${JSON.stringify(args.args.args)}, reqID: ${reqID}`);
-            var reqparam = { method: args.method, args: args.args.args, channelName: args.contract.channelName, contractName: args.contract.contractName };
-            // Block generation event monitoring target because it is performed from the operation request by the CC chain code
-            InvokeSync(reqparam)
-                .then((returnvalue: any) => {
-                    // logger.debug(`##evaluateTransaction(B)`);
-                    // logger.debug(`##evaluateTransaction(B1), returnvalue: ${returnvalue}`);
-                    if (returnvalue == null) {
-                        logger.debug(`##evaluateTransaction(B2), returnvalue: null`);
-                    }
-                    else if (returnvalue == undefined) {
-                        logger.debug(`##evaluateTransaction(B3), returnvalue: undefined`);
-                    }
-                    else if (returnvalue == "") {
-                        logger.debug(`##evaluateTransaction(B4), returnvalue: empty string`);
-                    }
-                    if (returnvalue != null) {
-                        // logger.debug(`##evaluateTransaction(B5)`);
-                        let objRetValue = {};
-                        if (returnvalue != "") {
-                            // logger.debug(`##evaluateTransaction(B6)`);
-                            objRetValue = JSON.parse(returnvalue);
-                        }
-                        const signedResults = ValidatorAuthentication.sign({"result":objRetValue});
-                        retObj = {
-                            "resObj" : {
-                                "status" : 200,
-                                "data": signedResults
-                            }
-                        };
-                        if (reqID !== null) {
-                            retObj["id"] = reqID;
-                        }
-                        logger.debug(`##evaluateTransaction(C1c) retObj: ${retObj}`);
-                        return resolve(retObj);
-                    }
-                }).catch(err => {
-                    logger.debug(`##evaluateTransaction(D)`);
-                    var emsg = err.toString().replace(/Error: /g, "");
-                    logger.error(emsg);
-                    retObj = {
-                        "resObj" : {
-                            "status": 504,
-                            "errorDetail": emsg
-                        }
-                    };
-                    return reject(retObj);
-                });
-        });
-    }
-
-    /**
-     * Offline trading
-     * @param {object} args :  JSON Object
-     * {
-     *     "args": {
-     *         "contract": {"channelName": channelName},
-     *         "args":[
-     *             {
-     *                 "signedCommitProposal":<signedCommitProposal>,
-     *                 "commitReq":<commitReq>
-     *             }
-     *         ]
-     *     },
-     *     "reqID":<req ID> // option
-     * }
-     * @return {Object} JSON object
-     */
-    sendSignedTransaction(args) {
-        return new Promise((resolve, reject) => {
-            logger.info("sendSignedTransaction start");
-            var retObj = {};
-            // parameter check
-            logger.info("sendSignedTransaction parameter check");
-            var channelName = args.contract.channelName;
-            var signedCommitProposal = args.args.args[0].signedCommitProposal;
-            var commitReq = args.args.args[0].commitReq;
-            // logger.debug(`##sendSignedTransaction: channelName = ${channelName}`);
-            // logger.debug(`##sendSignedTransaction: signedCommitProposal = ${JSON.stringify(signedCommitProposal)}`);
-            // logger.debug(`##sendSignedTransaction: commitReq = ${JSON.stringify(commitReq)}`);
-            if (signedCommitProposal == undefined || commitReq == undefined) {
-                var emsg = "Insufficient parameters.";
-                logger.info(emsg);
-                retObj = {
-                    "status": 504,
-                    "errorDetail": emsg
-                };
-                return reject(retObj);
-            }
-            var reqparam = {
-                signedCommitProposal: signedCommitProposal,
-                commitReq: commitReq,
-                channelName: channelName
+            const signedResults = ValidatorAuthentication.sign({
+              result: objRetValue,
+            });
+            retObj = {
+              resObj: {
+                status: 200,
+                data: signedResults,
+              },
             };
-            // call chainncode
-            InvokeSendSignedTransaction(reqparam)
-                .then((returnvalue) => {
-                    if (returnvalue != null) {
-                        retObj = {
-                            "status": 200,
-                            "data": returnvalue
-                        };
-                        return resolve(retObj);
-                    }
-                }).catch(err => {
-                    var emsg = err.toString().replace(/Error: /g, "");
-                    logger.error(emsg);
-                    retObj = {
-                        "status": 504,
-                        "errorDetail": emsg
-                    };
-                    return reject(retObj);
-                });
-        });
-    }
-
-
-    /**
-     * sendSignedProposal with commit.
-     * @param {object} args :  JSON Object
-     * {
-     *     "args": {
-     *         "contract": {"channelName": channelName},
-     *         "args":[
-     *             {
-     *                 "transactionProposalReq":<transactionProposalReq>,
-     *                 "certPem":<certPem>,
-     *                 "privateKeyPem":<privateKeyPem>
-     *             }
-     *         ]
-     *     },
-     *     "reqID":<req ID> // option
-     * }
-     * @return {Object} JSON object
-     */
-    sendSignedProposal(args) {
-        return new Promise((resolve, reject) => {
-            logger.info("sendSignedProposal start");
-            var retObj = {};
-
-            const channelName = args.contract.channelName;
-            const transactionProposalReq = args.args.args.transactionProposalReq;
-            const certPem = args.args.args.certPem;
-            const privateKeyPem = args.args.args.privateKeyPem;
-            var reqID = args['reqID'];
-            if (reqID === undefined) {
-                reqID = null;
+            if (reqID !== null) {
+              retObj["id"] = reqID;
             }
-            logger.info(`##sendSignedProposal: reqID: ${reqID}`);
-
-            // call chainncode
-            InvokeSendSignedProposal(channelName, transactionProposalReq, certPem, privateKeyPem)
-                .then((signedTx) => {
-                    if (signedTx != null) {
-                        const signedResults = ValidatorAuthentication.sign({"result":signedTx});
-                        retObj = {
-                            "resObj" : {
-                                "status": 200,
-                                // "data": signedTx
-                                "data": signedResults
-                            }
-                        };
-                        if (reqID !== null) {
-                            retObj["id"] = reqID;
-                        }
-                        logger.info(`sendSignedProposal resolve`);
-                        return resolve(retObj);
-                    }
-                }).catch(err => {
-                    var emsg = err.toString().replace(/Error: /g, "");
-                    logger.error(emsg);
-                    retObj = {
-                        "resObj" : {
-                            "status": 504,
-                            "errorDetail": emsg
-                        }
-                    };
-                    logger.info(`sendSignedProposal reject`);
-                    return reject(retObj);
-                });
+            logger.debug(`##evaluateTransaction(C1c) retObj: ${retObj}`);
+            return resolve(retObj);
+          }
+        })
+        .catch((err) => {
+          logger.debug(`##evaluateTransaction(D)`);
+          const emsg = err.toString().replace(/Error: /g, "");
+          logger.error(emsg);
+          retObj = {
+            resObj: {
+              status: 504,
+              errorDetail: emsg,
+            },
+          };
+          return reject(retObj);
         });
-    }
+    });
+  }
 
-}   /* class */
+  /**
+   * Offline trading
+   * @param {object} args :  JSON Object
+   * {
+   *     "args": {
+   *         "contract": {"channelName": channelName},
+   *         "args":[
+   *             {
+   *                 "signedCommitProposal":<signedCommitProposal>,
+   *                 "commitReq":<commitReq>
+   *             }
+   *         ]
+   *     },
+   *     "reqID":<req ID> // option
+   * }
+   * @return {Object} JSON object
+   */
+  sendSignedTransaction(args) {
+    return new Promise((resolve, reject) => {
+      logger.info("sendSignedTransaction start");
+      let retObj = {};
+      // parameter check
+      logger.info("sendSignedTransaction parameter check");
+      const channelName = args.contract.channelName;
+      const signedCommitProposal = args.args.args[0].signedCommitProposal;
+      const commitReq = args.args.args[0].commitReq;
+      // logger.debug(`##sendSignedTransaction: channelName = ${channelName}`);
+      // logger.debug(`##sendSignedTransaction: signedCommitProposal = ${JSON.stringify(signedCommitProposal)}`);
+      // logger.debug(`##sendSignedTransaction: commitReq = ${JSON.stringify(commitReq)}`);
+      if (signedCommitProposal == undefined || commitReq == undefined) {
+        const emsg = "Insufficient parameters.";
+        logger.info(emsg);
+        retObj = {
+          status: 504,
+          errorDetail: emsg,
+        };
+        return reject(retObj);
+      }
+      const reqparam = {
+        signedCommitProposal: signedCommitProposal,
+        commitReq: commitReq,
+        channelName: channelName,
+      };
+      // call chainncode
+      InvokeSendSignedTransaction(reqparam)
+        .then((returnvalue) => {
+          if (returnvalue != null) {
+            retObj = {
+              status: 200,
+              data: returnvalue,
+            };
+            return resolve(retObj);
+          }
+        })
+        .catch((err) => {
+          const emsg = err.toString().replace(/Error: /g, "");
+          logger.error(emsg);
+          retObj = {
+            status: 504,
+            errorDetail: emsg,
+          };
+          return reject(retObj);
+        });
+    });
+  }
 
+  /**
+   * sendSignedProposal with commit.
+   * @param {object} args :  JSON Object
+   * {
+   *     "args": {
+   *         "contract": {"channelName": channelName},
+   *         "args":[
+   *             {
+   *                 "transactionProposalReq":<transactionProposalReq>,
+   *                 "certPem":<certPem>,
+   *                 "privateKeyPem":<privateKeyPem>
+   *             }
+   *         ]
+   *     },
+   *     "reqID":<req ID> // option
+   * }
+   * @return {Object} JSON object
+   */
+  sendSignedProposal(args) {
+    return new Promise((resolve, reject) => {
+      logger.info("sendSignedProposal start");
+      let retObj = {};
+
+      const channelName = args.contract.channelName;
+      const transactionProposalReq = args.args.args.transactionProposalReq;
+      const certPem = args.args.args.certPem;
+      const privateKeyPem = args.args.args.privateKeyPem;
+      let reqID = args["reqID"];
+      if (reqID === undefined) {
+        reqID = null;
+      }
+      logger.info(`##sendSignedProposal: reqID: ${reqID}`);
+
+      // call chainncode
+      InvokeSendSignedProposal(
+        channelName,
+        transactionProposalReq,
+        certPem,
+        privateKeyPem,
+      )
+        .then((signedTx) => {
+          if (signedTx != null) {
+            const signedResults = ValidatorAuthentication.sign({
+              result: signedTx,
+            });
+            retObj = {
+              resObj: {
+                status: 200,
+                // "data": signedTx
+                data: signedResults,
+              },
+            };
+            if (reqID !== null) {
+              retObj["id"] = reqID;
+            }
+            logger.info(`sendSignedProposal resolve`);
+            return resolve(retObj);
+          }
+        })
+        .catch((err) => {
+          const emsg = err.toString().replace(/Error: /g, "");
+          logger.error(emsg);
+          retObj = {
+            resObj: {
+              status: 504,
+              errorDetail: emsg,
+            },
+          };
+          logger.info(`sendSignedProposal reject`);
+          return reject(retObj);
+        });
+    });
+  }
+} /* class */
 
 /*
  * Invoke function
  * @param reqBody   [json object]  {fcn:<Chain code function name>, args:[arg1>,<arg2>,,,]}
  * @return [string] Success: Chain code execution result
  *                  Failure: Chain code error or internal error
-*/
+ */
 async function Invoke(reqBody) {
-    var txId = null;
-    var theUser = null;
-    var eventhubs = [];
-    //var invokeResponse; //Return value from chain code
+  let txId = null;
+  const theUser = null;
+  const eventhubs = [];
+  //var invokeResponse; //Return value from chain code
 
-    try {
-        logger.info('##fablicaccess: Invoke start');
+  try {
+    logger.info("##fablicaccess: Invoke start");
 
-        var fcn = reqBody.fcn;
-        var args = reqBody.args;
+    const fcn = reqBody.fcn;
+    const args = reqBody.args;
 
-        // Create a new file system based wallet for managing identities.
-        //const walletPath = path.join(process.cwd(), 'wallet');
-        const wallet = new FileSystemWallet(walletPath);
-        console.log(`Wallet path: ${walletPath}`);
+    // Create a new file system based wallet for managing identities.
+    //const walletPath = path.join(process.cwd(), 'wallet');
+    const wallet = new FileSystemWallet(walletPath);
+    console.log(`Wallet path: ${walletPath}`);
 
-        // Check to see if we've already enrolled the user.
-        const userExists = await wallet.exists(connUserName);
-        if (!userExists) {
-            //logger.error(`An identity for the user ${connUserName} does not exist in the wallet`);
-            const errMsg = `An identity for the user ${connUserName} does not exist in the wallet`;
-            logger.error(errMsg);
-            logger.error('Run the registerUser.js application before retrying');
-        }
-
-        // Create a new gateway for connecting to our peer node.
-        const gateway = new Gateway();
-        await gateway.connect(ccp, { wallet, identity: connUserName, discovery: { enabled: false } });
-
-        // Get the network (channel) our contract is deployed to.
-        const network = await gateway.getNetwork(reqBody.channelName);
-
-        // Get the contract from the network.
-        const contract = network.getContract(reqBody.contractName);
-
-        // Submit the specified transaction.
-        logger.info(`##fablicaccess: Invoke Params: fcn=${fcn}, args0=${args[0]}, args1=${args[1]}`);
-        const transaction = contract.createTransaction(fcn);
-
-        txId = transaction.getTransactionID().getTransactionID();
-        logger.info('##fablicaccess: txId = ' + txId);
-
-        const respData = await transaction.submit(args[0], args[1]);
-
-        // const respData = await contract.submitTransaction(fcn, args[0], args[1]);
-        logger.info('Transaction has been submitted');
-
-        // Disconnect from the gateway.
-        await gateway.disconnect();
-
-    } catch (error) {
-        logger.error(`Failed to submit transaction: ${error}`);
+    // Check to see if we've already enrolled the user.
+    const userExists = await wallet.exists(connUserName);
+    if (!userExists) {
+      //logger.error(`An identity for the user ${connUserName} does not exist in the wallet`);
+      const errMsg = `An identity for the user ${connUserName} does not exist in the wallet`;
+      logger.error(errMsg);
+      logger.error("Run the registerUser.js application before retrying");
     }
+
+    // Create a new gateway for connecting to our peer node.
+    const gateway = new Gateway();
+    await gateway.connect(ccp, {
+      wallet,
+      identity: connUserName,
+      discovery: { enabled: false },
+    });
+
+    // Get the network (channel) our contract is deployed to.
+    const network = await gateway.getNetwork(reqBody.channelName);
+
+    // Get the contract from the network.
+    const contract = network.getContract(reqBody.contractName);
+
+    // Submit the specified transaction.
+    logger.info(
+      `##fablicaccess: Invoke Params: fcn=${fcn}, args0=${args[0]}, args1=${args[1]}`,
+    );
+    const transaction = contract.createTransaction(fcn);
+
+    txId = transaction.getTransactionID().getTransactionID();
+    logger.info("##fablicaccess: txId = " + txId);
+
+    const respData = await transaction.submit(args[0], args[1]);
+
+    // const respData = await contract.submitTransaction(fcn, args[0], args[1]);
+    logger.info("Transaction has been submitted");
+
+    // Disconnect from the gateway.
+    await gateway.disconnect();
+  } catch (error) {
+    logger.error(`Failed to submit transaction: ${error}`);
+  }
 }
 
 /*
@@ -362,149 +380,165 @@ async function Invoke(reqBody) {
  * @param reqBody   [json object]  {fcn:<Chain code function name>, args:[arg1>,<arg2>,,,], channelName:<channelName>, contractName:<contractName>}
  * @return [string] Success: Chain code execution result
  *                  Failure: Chain code error or internal error
-*/
+ */
 async function InvokeSync(reqBody) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            logger.info('##fablicaccess: InvokeSync start');
-            // logger.debug(`##InvokeSync(A)`);
+  return new Promise(async function (resolve, reject) {
+    try {
+      logger.info("##fablicaccess: InvokeSync start");
+      // logger.debug(`##InvokeSync(A)`);
 
-            var type = reqBody.method.type;
-            var fcn = reqBody.method.command;
-            var args = reqBody.args;
+      const type = reqBody.method.type;
+      const fcn = reqBody.method.command;
+      const args = reqBody.args;
 
-            // Create a new file system based wallet for managing identities.
-            //const walletPath = path.join(process.cwd(), 'wallet');
-            // logger.debug(`##InvokeSync(B)`);
-            const wallet = new FileSystemWallet(walletPath);
-            console.log(`Wallet path: ${walletPath}`);
+      // Create a new file system based wallet for managing identities.
+      //const walletPath = path.join(process.cwd(), 'wallet');
+      // logger.debug(`##InvokeSync(B)`);
+      const wallet = new FileSystemWallet(walletPath);
+      console.log(`Wallet path: ${walletPath}`);
 
-            // Check to see if we've already enrolled the user.
-            // logger.debug(`##InvokeSync(C)`);
-            const userExists = await wallet.exists(connUserName);
-            if (!userExists) {
-                logger.debug(`##InvokeSync(C1)`);
-                //logger.error(`An identity for the user ${connUserName} does not exist in the wallet`);
-                const errMsg = `An identity for the user ${connUserName} does not exist in the wallet`;
-                logger.error(errMsg);
-                logger.error('Run the registerUser.js application before retrying');
-                return reject(errMsg);
-            }
+      // Check to see if we've already enrolled the user.
+      // logger.debug(`##InvokeSync(C)`);
+      const userExists = await wallet.exists(connUserName);
+      if (!userExists) {
+        logger.debug(`##InvokeSync(C1)`);
+        //logger.error(`An identity for the user ${connUserName} does not exist in the wallet`);
+        const errMsg = `An identity for the user ${connUserName} does not exist in the wallet`;
+        logger.error(errMsg);
+        logger.error("Run the registerUser.js application before retrying");
+        return reject(errMsg);
+      }
 
-            // Create a new gateway for connecting to our peer node.
-            // logger.debug(`##InvokeSync(D)`);
-            const gateway = new Gateway();
-            await gateway.connect(ccp, { wallet, identity: connUserName, discovery: { enabled: false } });
+      // Create a new gateway for connecting to our peer node.
+      // logger.debug(`##InvokeSync(D)`);
+      const gateway = new Gateway();
+      await gateway.connect(ccp, {
+        wallet,
+        identity: connUserName,
+        discovery: { enabled: false },
+      });
 
-            // Get the network (channel) our contract is deployed to.
-            // logger.debug(`##InvokeSync(E)`);
-            const network = await gateway.getNetwork(reqBody.channelName);
+      // Get the network (channel) our contract is deployed to.
+      // logger.debug(`##InvokeSync(E)`);
+      const network = await gateway.getNetwork(reqBody.channelName);
 
-            // Get the contract from the network.
-            // logger.debug(`##InvokeSync(F)`);
-            const contract = network.getContract(reqBody.contractName);
+      // Get the contract from the network.
+      // logger.debug(`##InvokeSync(F)`);
+      const contract = network.getContract(reqBody.contractName);
 
-            // Submit the specified transaction.
-            // logger.debug(`##InvokeSync(G)`);
-            logger.info(`##fablicaccess: InvokeSync Params: type=${type}, fcn=${fcn}, args0=${args[0]}, args1=${args[1]}, args2=${args[2]}`);
-            // const transaction = contract.createTransaction(fcn);
-            var result: any = null;
-            switch (args.length) {
-              case 0:
-                // logger.debug(`##InvokeSync(G1): No args.`);
-                if (type === "evaluateTransaction") {
-                    logger.debug(`##InvokeSync(G1): call evaluateTransaction`);
-                    result = await contract.evaluateTransaction(fcn);
-                } else {
-                    logger.debug(`##InvokeSync(G1): call submitTransaction`);
-                    result = await contract.submitTransaction(fcn);
-                }
-                break;
-              case 1:
-                // logger.debug(`##InvokeSync(G2): One arg.`);
-                if (type === "evaluateTransaction") {
-                    logger.debug(`##InvokeSync(G1): call evaluateTransaction`);
-                    result = await contract.evaluateTransaction(fcn, args[0]);
-                } else {
-                    logger.debug(`##InvokeSync(G1): call submitTransaction`);
-                    result = await contract.submitTransaction(fcn, args[0]);
-                }
-                break;
-              case 2:
-                // logger.debug(`##InvokeSync(G3): Two args.`);
-                if (type === "evaluateTransaction") {
-                    logger.debug(`##InvokeSync(G1): call evaluateTransaction`);
-                    result = await contract.evaluateTransaction(fcn, args[0], args[1]);
-                } else {
-                    logger.debug(`##InvokeSync(G1): call submitTransaction`);
-                    result = await contract.submitTransaction(fcn, args[0], args[1]);
-                }
-                break;
-              case 3:
-                // logger.debug(`##InvokeSync(G4): Three args.`);
-                if (type === "evaluateTransaction") {
-                    logger.debug(`##InvokeSync(G1): call evaluateTransaction`);
-                    result = await contract.evaluateTransaction(fcn, args[0], args[1], args[2]);
-                } else {
-                    logger.debug(`##InvokeSync(G1): call submitTransaction`);
-                    result = await contract.submitTransaction(fcn, args[0], args[1], args[2]);
-                }
-                break;
-            }
-            logger.info(`##fablicaccess: InvokeSync result: ${result}`);
-            console.log(`##fablicaccess: InvokeSync result: ${result}`);
+      // Submit the specified transaction.
+      // logger.debug(`##InvokeSync(G)`);
+      logger.info(
+        `##fablicaccess: InvokeSync Params: type=${type}, fcn=${fcn}, args0=${args[0]}, args1=${args[1]}, args2=${args[2]}`,
+      );
+      // const transaction = contract.createTransaction(fcn);
+      let result: any = null;
+      switch (args.length) {
+        case 0:
+          // logger.debug(`##InvokeSync(G1): No args.`);
+          if (type === "evaluateTransaction") {
+            logger.debug(`##InvokeSync(G1): call evaluateTransaction`);
+            result = await contract.evaluateTransaction(fcn);
+          } else {
+            logger.debug(`##InvokeSync(G1): call submitTransaction`);
+            result = await contract.submitTransaction(fcn);
+          }
+          break;
+        case 1:
+          // logger.debug(`##InvokeSync(G2): One arg.`);
+          if (type === "evaluateTransaction") {
+            logger.debug(`##InvokeSync(G1): call evaluateTransaction`);
+            result = await contract.evaluateTransaction(fcn, args[0]);
+          } else {
+            logger.debug(`##InvokeSync(G1): call submitTransaction`);
+            result = await contract.submitTransaction(fcn, args[0]);
+          }
+          break;
+        case 2:
+          // logger.debug(`##InvokeSync(G3): Two args.`);
+          if (type === "evaluateTransaction") {
+            logger.debug(`##InvokeSync(G1): call evaluateTransaction`);
+            result = await contract.evaluateTransaction(fcn, args[0], args[1]);
+          } else {
+            logger.debug(`##InvokeSync(G1): call submitTransaction`);
+            result = await contract.submitTransaction(fcn, args[0], args[1]);
+          }
+          break;
+        case 3:
+          // logger.debug(`##InvokeSync(G4): Three args.`);
+          if (type === "evaluateTransaction") {
+            logger.debug(`##InvokeSync(G1): call evaluateTransaction`);
+            result = await contract.evaluateTransaction(
+              fcn,
+              args[0],
+              args[1],
+              args[2],
+            );
+          } else {
+            logger.debug(`##InvokeSync(G1): call submitTransaction`);
+            result = await contract.submitTransaction(
+              fcn,
+              args[0],
+              args[1],
+              args[2],
+            );
+          }
+          break;
+      }
+      logger.info(`##fablicaccess: InvokeSync result: ${result}`);
+      console.log(`##fablicaccess: InvokeSync result: ${result}`);
 
-            // Disconnect from the gateway.
-            // logger.debug(`##InvokeSync(H)`);
-            await gateway.disconnect();
-            
-            logger.debug(`##InvokeSync(I)`);
-            return resolve(result);
+      // Disconnect from the gateway.
+      // logger.debug(`##InvokeSync(H)`);
+      await gateway.disconnect();
 
-        } catch (error) {
-            // logger.debug(`##InvokeSync(Z)`);
-            const errMsg = `Failed to submit transaction: ${error}`;
-            logger.error(errMsg);
-            return reject(errMsg);
-        }
-    });
+      logger.debug(`##InvokeSync(I)`);
+      return resolve(result);
+    } catch (error) {
+      // logger.debug(`##InvokeSync(Z)`);
+      const errMsg = `Failed to submit transaction: ${error}`;
+      logger.error(errMsg);
+      return reject(errMsg);
+    }
+  });
 }
-
 
 // BEGIN Signature process=====================================================================================
 // this ordersForCurve comes from CryptoSuite_ECDSA_AES.js and will be part of the
 // stand alone fabric-sig package in future.
 const ordersForCurve = {
-    'secp256r1': {
-        'halfOrder': elliptic.curves.p256.n.shrn(1),
-        'order': elliptic.curves.p256.n
-    },
-    'secp384r1': {
-        'halfOrder': elliptic.curves.p384.n.shrn(1),
-        'order': elliptic.curves.p384.n
-    }
+  secp256r1: {
+    halfOrder: elliptic.curves.p256.n.shrn(1),
+    order: elliptic.curves.p256.n,
+  },
+  secp384r1: {
+    halfOrder: elliptic.curves.p384.n.shrn(1),
+    order: elliptic.curves.p384.n,
+  },
 };
-
 
 // this function comes from CryptoSuite_ECDSA_AES.js and will be part of the
 // stand alone fabric-sig package in future.
 function preventMalleability(sig, curveParams) {
-    const halfOrder = ordersForCurve[curveParams.name].halfOrder;
-    if (!halfOrder) {
-        throw new Error('Can not find the half order needed to calculate "s" value for immalleable signatures. Unsupported curve name: ' + curveParams.name);
-    }
+  const halfOrder = ordersForCurve[curveParams.name].halfOrder;
+  if (!halfOrder) {
+    throw new Error(
+      'Can not find the half order needed to calculate "s" value for immalleable signatures. Unsupported curve name: ' +
+        curveParams.name,
+    );
+  }
 
-    // in order to guarantee 's' falls in the lower range of the order, as explained in the above link,
-    // first see if 's' is larger than half of the order, if so, it needs to be specially treated
-    if (sig.s.cmp(halfOrder) === 1) { // module 'bn.js', file lib/bn.js, method cmp()
-        // convert from BigInteger used by jsrsasign Key objects and bn.js used by elliptic Signature objects
-        const bigNum = ordersForCurve[curveParams.name].order;
-        sig.s = bigNum.sub(sig.s);
-    }
+  // in order to guarantee 's' falls in the lower range of the order, as explained in the above link,
+  // first see if 's' is larger than half of the order, if so, it needs to be specially treated
+  if (sig.s.cmp(halfOrder) === 1) {
+    // module 'bn.js', file lib/bn.js, method cmp()
+    // convert from BigInteger used by jsrsasign Key objects and bn.js used by elliptic Signature objects
+    const bigNum = ordersForCurve[curveParams.name].order;
+    sig.s = bigNum.sub(sig.s);
+  }
 
-    return sig;
+  return sig;
 }
-
 
 /**
  * this method is used for test at this moment. In future this
@@ -514,76 +548,82 @@ function preventMalleability(sig, curveParams) {
  * @param {Buffer} proposalBytes proposal bytes
  */
 function sign(privateKey, proposalBytes, algorithm, keySize) {
-    const hashAlgorithm = algorithm.toUpperCase();
-    const hashFunction = hash[`${hashAlgorithm}_${keySize}`];
-    const ecdsaCurve = elliptic.curves[`p${keySize}`];
-    const ecdsa = new EC(ecdsaCurve);
-    const key = KEYUTIL.getKey(privateKey);
+  const hashAlgorithm = algorithm.toUpperCase();
+  const hashFunction = hash[`${hashAlgorithm}_${keySize}`];
+  const ecdsaCurve = elliptic.curves[`p${keySize}`];
+  const ecdsa = new EC(ecdsaCurve);
+  const key = KEYUTIL.getKey(privateKey);
 
-    const signKey = ecdsa.keyFromPrivate(key.prvKeyHex, 'hex');
-    const digest = hashFunction(proposalBytes);
+  const signKey = ecdsa.keyFromPrivate(key.prvKeyHex, "hex");
+  const digest = hashFunction(proposalBytes);
 
-    let sig = ecdsa.sign(Buffer.from(digest, 'hex'), signKey);
-    sig = preventMalleability(sig, key.ecparams);
+  let sig = ecdsa.sign(Buffer.from(digest, "hex"), signKey);
+  sig = preventMalleability(sig, key.ecparams);
 
-    return Buffer.from(sig.toDER());
+  return Buffer.from(sig.toDER());
 }
 
 function signProposal(proposalBytes, paramPrivateKeyPem) {
-    logger.debug("signProposal start");
+  logger.debug("signProposal start");
 
-    const signature = sign(paramPrivateKeyPem, proposalBytes, 'sha2', 256);
-    const signedProposal = { signature, proposal_bytes: proposalBytes };
-    return signedProposal;
+  const signature = sign(paramPrivateKeyPem, proposalBytes, "sha2", 256);
+  const signedProposal = { signature, proposal_bytes: proposalBytes };
+  return signedProposal;
 }
 // END Signature process=========================================================================================
 
-
 /**
  * setup TLS for this client
- * @param {*} client 
- * @param {*} enrollmentID 
- * @param {*} secret 
+ * @param {*} client
+ * @param {*} enrollmentID
+ * @param {*} secret
  */
 async function TLSSetup(client, enrollmentID, secret) {
-    const tlsOptions = {
-        trustedRoots: [],
-        verify: false
-    };
-    logger.info("tlssetup start");
-    const caService = new copService(SplugConfig.fabric.ca.url, tlsOptions, SplugConfig.fabric.ca.name);
-    const req = {
-        enrollmentID: enrollmentID,
-        enrollmentSecret: secret,
-        profile: 'tls'
-    };
-    const enrollment = await caService.enroll(req);
-    client.setTlsClientCertAndKey(enrollment.certificate, enrollment.key.toBytes());
+  const tlsOptions = {
+    trustedRoots: [],
+    verify: false,
+  };
+  logger.info("tlssetup start");
+  const caService = new copService(
+    SplugConfig.fabric.ca.url,
+    tlsOptions,
+    SplugConfig.fabric.ca.name,
+  );
+  const req = {
+    enrollmentID: enrollmentID,
+    enrollmentSecret: secret,
+    profile: "tls",
+  };
+  const enrollment = await caService.enroll(req);
+  client.setTlsClientCertAndKey(
+    enrollment.certificate,
+    enrollment.key.toBytes(),
+  );
 }
 
 /**
  * Creating a channel object
- * @param {string} channelName 
+ * @param {string} channelName
  */
 async function setupChannel(channelName) {
-    logger.info("setupChannel start");
-    const client = new FabricClient();
-    await TLSSetup(client, SplugConfig.fabric.submitter.name, SplugConfig.fabric.submitter.secret);
-    const channel = client.newChannel(channelName);
+  logger.info("setupChannel start");
+  const client = new FabricClient();
+  await TLSSetup(
+    client,
+    SplugConfig.fabric.submitter.name,
+    SplugConfig.fabric.submitter.secret,
+  );
+  const channel = client.newChannel(channelName);
 
-    for (var i = 0; i < SplugConfig.fabric.peers.length; i++) {
-        var peer = client.newPeer(
-            SplugConfig.fabric.peers[i].requests
-        );
-        channel.addPeer(peer);
-    }
+  for (let i = 0; i < SplugConfig.fabric.peers.length; i++) {
+    const peer = client.newPeer(SplugConfig.fabric.peers[i].requests);
+    channel.addPeer(peer);
+  }
 
-    const orderer = client.newOrderer(
-        SplugConfig.fabric.orderer.url
-    );
-    channel.addOrderer(orderer);
-    logger.info("setupChannel end");
-    return channel;
+  const orderer = client.newOrderer(SplugConfig.fabric.orderer.url);
+  channel.addOrderer(orderer);
+  logger.info("setupChannel end");
+  return channel;
 }
 
 /**
@@ -593,43 +633,44 @@ async function setupChannel(channelName) {
  *                 Failure: Chain code error or internal error
  */
 async function InvokeSendSignedTransaction(reqBody) {
-    return new Promise(async function (resolve, reject) {
-        logger.info("InvokeSendSignedTransaction start");
+  return new Promise(async function (resolve, reject) {
+    logger.info("InvokeSendSignedTransaction start");
 
-        var invokeResponse1; // Return value from chain code
-        var channel1; // Channel
+    let invokeResponse1; // Return value from chain code
+    let channel1; // Channel
 
-        try {
-            //channel object generation
-            if (channel1 == undefined) {
-                channel1 = await setupChannel(reqBody.channelName);
-            }
+    try {
+      //channel object generation
+      if (channel1 == undefined) {
+        channel1 = await setupChannel(reqBody.channelName);
+      }
 
-            // logger.debug(`##InvokeSendSignedTransaction: reqBody.signedCommitProposal: ${JSON.stringify(reqBody.signedCommitProposal)}`);
-            // logger.debug(`##InvokeSendSignedTransaction: reqBody.commitReq: ${JSON.stringify(reqBody.commitReq)}`);
-            // logger.debug(`##InvokeSendSignedTransaction: (A)`);
-            const response = await channel1.sendSignedTransaction({
-                signedProposal: reqBody.signedCommitProposal,
-                request: reqBody.commitReq
-            });
-            // logger.debug(`##InvokeSendSignedTransaction: (B)`);
-            logger.info("successfully send signedCommitProposal");
-            // logger.info("response : " + JSON.stringify(response));
-            if (response.status === 'SUCCESS') {
-                // logger.debug(`##InvokeSendSignedTransaction: (C)`);
-                invokeResponse1 = response;
-                return resolve(invokeResponse1);
-            } else {
-                logger.debug(`##InvokeSendSignedTransaction: (D)`);
-                throw new Error('Failed to order the transaction. Error code: ' + response.status);
-            }
-        } catch (e) {
-            logger.debug(`##InvokeSendSignedTransaction: (E)`);
-            return reject(e);
-        }
-    });
+      // logger.debug(`##InvokeSendSignedTransaction: reqBody.signedCommitProposal: ${JSON.stringify(reqBody.signedCommitProposal)}`);
+      // logger.debug(`##InvokeSendSignedTransaction: reqBody.commitReq: ${JSON.stringify(reqBody.commitReq)}`);
+      // logger.debug(`##InvokeSendSignedTransaction: (A)`);
+      const response = await channel1.sendSignedTransaction({
+        signedProposal: reqBody.signedCommitProposal,
+        request: reqBody.commitReq,
+      });
+      // logger.debug(`##InvokeSendSignedTransaction: (B)`);
+      logger.info("successfully send signedCommitProposal");
+      // logger.info("response : " + JSON.stringify(response));
+      if (response.status === "SUCCESS") {
+        // logger.debug(`##InvokeSendSignedTransaction: (C)`);
+        invokeResponse1 = response;
+        return resolve(invokeResponse1);
+      } else {
+        logger.debug(`##InvokeSendSignedTransaction: (D)`);
+        throw new Error(
+          "Failed to order the transaction. Error code: " + response.status,
+        );
+      }
+    } catch (e) {
+      logger.debug(`##InvokeSendSignedTransaction: (E)`);
+      return reject(e);
+    }
+  });
 }
-
 
 /**
  * Function for InvokeSendSignedProposal
@@ -638,81 +679,101 @@ async function InvokeSendSignedTransaction(reqBody) {
  * @param privateKeyPem   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
  * @return [string] signed transaction.
  */
-async function InvokeSendSignedProposal(channelName: string, transactionProposalReq: object, certPem: string, privateKeyPem: string) {
-    logger.debug(`InvokeSendSignedProposal start`);
-    
-    var invokeResponse2; // Return value from chain code
-    var channel2; // Channel
+async function InvokeSendSignedProposal(
+  channelName: string,
+  transactionProposalReq: object,
+  certPem: string,
+  privateKeyPem: string,
+) {
+  logger.debug(`InvokeSendSignedProposal start`);
 
-    //channel object generation
-    if (channel2 == undefined) {
-        channel2 = await setupChannel(channelName);
+  let invokeResponse2; // Return value from chain code
+  let channel2; // Channel
+
+  //channel object generation
+  if (channel2 == undefined) {
+    channel2 = await setupChannel(channelName);
+  }
+
+  const { proposal, txId } = channel2.generateUnsignedProposal(
+    transactionProposalReq,
+    SplugConfig.fabric.mspid,
+    certPem,
+  );
+  logger.debug("proposal end");
+  logger.debug(`##InvokeSendSignedProposal; txId: ${txId.getTransactionID()}`);
+  const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
+
+  const targets = [];
+  for (const peerInfo of SplugConfig.fabric.peers) {
+    const peer = channel2.getPeer(peerInfo.requests.split("//")[1]);
+    targets.push(peer);
+  }
+  const sendSignedProposalReq = { signedProposal, targets };
+  const proposalResponses = await channel2.sendSignedProposal(
+    sendSignedProposalReq,
+  );
+  logger.debug("##InvokeSendSignedProposal: successfully send signedProposal");
+  let allGood = true;
+  for (const proposalResponse of proposalResponses) {
+    let oneGood = false;
+    if (
+      proposalResponses &&
+      proposalResponse.response &&
+      proposalResponse.response.status === 200
+    ) {
+      if (proposalResponse.response.payload) {
+        invokeResponse2 = proposalResponse.response.payload;
+      }
+      oneGood = true;
+    } else {
+      logger.debug("##InvokeSendSignedProposal: transaction proposal was bad");
+      const resStr = proposalResponse.toString();
+      const errMsg = resStr.replace("Error: ", "");
+      throw new Error(errMsg);
     }
+    allGood = allGood && oneGood;
+  }
+  // If the return value of invoke is an empty string, store txID
+  if (invokeResponse2 === "") {
+    invokeResponse2 = txId.getTransactionID();
+  }
+  // Error if all peers do not return status 200
+  if (!allGood) {
+    const errMsg =
+      "'Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...";
+    logger.debug(`##InvokeSendSignedProposal: ${errMsg}`);
+    throw new Error(errMsg);
+  }
 
-    const { proposal, txId } = channel2.generateUnsignedProposal(transactionProposalReq, SplugConfig.fabric.mspid, certPem);
-    logger.debug("proposal end");
-    logger.debug(`##InvokeSendSignedProposal; txId: ${txId.getTransactionID()}`);
-    const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
+  /**
+   * End the endorse step.
+   * Start to commit the tx.
+   */
+  const commitReq = {
+    proposalResponses,
+    proposal,
+  };
+  const commitProposal = channel2.generateUnsignedTransaction(commitReq);
+  logger.debug(
+    `##InvokeSendSignedProposal: Successfully build commit transaction proposal`,
+  );
 
-    const targets = [];
-    for (const peerInfo of SplugConfig.fabric.peers) {
-        const peer = channel2.getPeer(peerInfo.requests.split("//")[1]);
-        targets.push(peer);
-    }
-    const sendSignedProposalReq = { signedProposal, targets };
-    const proposalResponses = await channel2.sendSignedProposal(sendSignedProposalReq);
-    logger.debug("##InvokeSendSignedProposal: successfully send signedProposal")
-    let allGood: boolean = true;
-    for (const proposalResponse of proposalResponses) {
-        let oneGood = false;
-        if (proposalResponses && proposalResponse.response && proposalResponse.response.status === 200) {
-            if (proposalResponse.response.payload) {
-                invokeResponse2 = proposalResponse.response.payload;
-            }
-            oneGood = true;
-        } else {
-            logger.debug('##InvokeSendSignedProposal: transaction proposal was bad');
-            const resStr = proposalResponse.toString();
-            const errMsg = resStr.replace("Error: ", "");
-            throw new Error(errMsg);
-        }
-        allGood = allGood && oneGood;
-    }
-    // If the return value of invoke is an empty string, store txID
-    if (invokeResponse2 === "") {
-        invokeResponse2 = txId.getTransactionID();
-    }
-    // Error if all peers do not return status 200
-    if (!allGood) {
-        const errMsg = "'Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...";
-        logger.debug(`##InvokeSendSignedProposal: ${errMsg}`);
-        throw new Error(errMsg);
-    }
+  // sign this commit proposal at local
+  const signedCommitProposal = signProposal(
+    commitProposal.toBuffer(),
+    privateKeyPem,
+  );
 
-    /**
-     * End the endorse step.
-     * Start to commit the tx.
-     */
-    const commitReq = {
-        proposalResponses,
-        proposal,
-    };
-    const commitProposal = channel2.generateUnsignedTransaction(commitReq);
-    logger.debug(`##InvokeSendSignedProposal: Successfully build commit transaction proposal`);
+  const signedTx = {
+    signedCommitProposal: signedCommitProposal,
+    commitReq: commitReq,
+    txId: txId.getTransactionID(),
+  };
 
-    // sign this commit proposal at local
-    const signedCommitProposal = signProposal(commitProposal.toBuffer(), privateKeyPem);
-
-    const signedTx = {
-        signedCommitProposal: signedCommitProposal,
-        commitReq: commitReq,
-        txId: txId.getTransactionID()
-    };
-    
-    // logger.debug(`##InvokeSendSignedProposal: signature: ${signedCommitProposal.signature}`);
-    // logger.debug(`##InvokeSendSignedProposal: proposal_bytes: ${signedCommitProposal.proposal_bytes}`);
-    // logger.debug(`##InvokeSendSignedProposal: signedTx: ${JSON.stringify(signedTx)}`);
-    logger.debug(`##InvokeSendSignedProposal: signedTx: ${signedTx}`);
-    return signedTx;
+  // logger.debug(`##InvokeSendSignedProposal: signature: ${signedCommitProposal.signature}`);
+  // logger.debug(`##InvokeSendSignedProposal: proposal_bytes: ${signedCommitProposal.proposal_bytes}`);
+  // logger.debug(`##InvokeSendSignedProposal: signedTx: ${JSON.stringify(signedTx)}`);
+  logger.debug(`##InvokeSendSignedProposal: signedTx: ${signedTx}`);
+  return signedTx;
 }
-

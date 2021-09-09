@@ -122,6 +122,10 @@
         "**/node_modules/**",
         "**/build/**",
         "**/src/main/typescript/generated/**",
-        "packages/cactus-plugin-verifier-cc/**"
+        "packages/cactus-plugin-verifier-cc/**",
+        "packages/cactus-cmd-socketio-server/**",
+        "packages/cactus-plugin-ledger-connector-sawtooth-socketio/**",
+        "packages/cactus-plugin-ledger-connector-go-ethereum-socketio/**",
+        "packages/cactus-plugin-ledger-connector-*-socketio/**"
     ]
 }

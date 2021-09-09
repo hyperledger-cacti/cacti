@@ -6,11 +6,11 @@
  */
 
 export class TradeInfo {
-    businessLogicID: string;
-    tradeID: string;
+  businessLogicID: string;
+  tradeID: string;
 
-    constructor(businessLogicID: string, tradeID: string) {
-        this.businessLogicID = businessLogicID;
-        this.tradeID = tradeID;
-    }
+  constructor(businessLogicID: string, tradeID: string) {
+    this.businessLogicID = businessLogicID;
+    this.tradeID = tradeID;
+  }
 }

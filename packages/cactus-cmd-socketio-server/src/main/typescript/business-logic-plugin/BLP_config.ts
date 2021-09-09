@@ -5,8 +5,10 @@
  * BLP_config.ts
  */
 
-import { BusinessLogicPlugin } from './BusinessLogicPlugin';
+import { BusinessLogicPlugin } from "./BusinessLogicPlugin";
 
-export function getTargetBLPInstance(businessLogicID: string): BusinessLogicPlugin | null {
-    return null;
+export function getTargetBLPInstance(
+  businessLogicID: string,
+): BusinessLogicPlugin | null {
+  return null;
 }

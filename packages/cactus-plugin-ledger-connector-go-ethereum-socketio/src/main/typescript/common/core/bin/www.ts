@@ -276,7 +276,7 @@ io.on('connection', function(client) {
                 emitType = "monitor_error";
             }
             client.emit(emitType, callbackData);
-        }
+        };
 
         Smonitor.startMonitor(client.id, cb);
     });

@@ -1,5 +1,5 @@
 {
-  "name": "connector",
+  "name": "@hyperledger/cactus-plugin-ledger-connector-sawtooth-socketio",
   "version": "0.0.0",
   "private": true,
   "scripts": {
