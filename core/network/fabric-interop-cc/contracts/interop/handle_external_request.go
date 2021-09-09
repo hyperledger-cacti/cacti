@@ -30,7 +30,7 @@ import (
 // 4. Calls application chaincode
 func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContextInterface, b64QueryBytes string) (string, error) {
 	if !s.testMode {
-		relayAccessCheck, err := wutils.CheckAccessIfRelayClient(ctx.GetStub())
+		relayAccessCheck, err := wutils.IsClientRelay(ctx.GetStub())
 		if err != nil {
 			return "", err
 		}
