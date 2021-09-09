@@ -22,6 +22,7 @@ const applicationCCKey = "applicationccid"
 // SmartContract provides functions for managing arbitrary key-value pairs
 type SmartContract struct {
 	contractapi.Contract
+	testMode bool
 }
 
 func init() {
@@ -88,7 +89,9 @@ func (s *SmartContract) GetApplicationID(ctx contractapi.TransactionContextInter
 }
 
 func main() {
-	chaincode, err := contractapi.NewChaincode(new(SmartContract))
+	sc := new(SmartContract)
+	sc.testMode = false
+	chaincode, err := contractapi.NewChaincode(sc)
 
 	if err != nil {
 		fmt.Printf("Error creating Interop chaincode: %s", err.Error())
