@@ -5,42 +5,44 @@
  * ContractInfoHolder.ts
  */
 
-import { DBAccess } from './DBAccess';
-import { ConfigUtil } from '../util/ConfigUtil';
+import { DBAccess } from "./DBAccess";
+import { ConfigUtil } from "../util/ConfigUtil";
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-const moduleName = 'ContractInfoHolder';
+const moduleName = "ContractInfoHolder";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 export class ContractInfoHolder {
-    contractInfo: [] = [];
+  contractInfo: [] = [];
 
-    constructor() {
-        // TODO: Get contract information for all contracts
-        const dbAccess: DBAccess = new DBAccess();
-        this.contractInfo = dbAccess.getContractInfo();
-    }
+  constructor() {
+    // TODO: Get contract information for all contracts
+    const dbAccess: DBAccess = new DBAccess();
+    this.contractInfo = dbAccess.getContractInfo();
+  }
 
-    getContractInfo(contractName?: string): string {
-        // TODO: Get information about the specified LedgerPlugin
+  getContractInfo(contractName?: string): string {
+    // TODO: Get information about the specified LedgerPlugin
 
-        if (contractName) {
-            let ret: string = "";
-            this.contractInfo.forEach(info => {
-                if (info['contractName'] === contractName) {
-                    ret = JSON.stringify(info);
-                }
-            });
-            if (ret === "") {
-                logger.warn('ContractInfo is Not Found : contractName = ' + contractName);
-            }
-            return ret;
-        } else {
-            return JSON.stringify(this.contractInfo);
+    if (contractName) {
+      let ret = "";
+      this.contractInfo.forEach((info) => {
+        if (info["contractName"] === contractName) {
+          ret = JSON.stringify(info);
         }
+      });
+      if (ret === "") {
+        logger.warn(
+          "ContractInfo is Not Found : contractName = " + contractName,
+        );
+      }
+      return ret;
+    } else {
+      return JSON.stringify(this.contractInfo);
     }
+  }
 }

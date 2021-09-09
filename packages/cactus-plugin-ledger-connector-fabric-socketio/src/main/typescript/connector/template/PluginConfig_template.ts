@@ -1,7 +1,7 @@
 /*
  * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * PluginConfig_template.js
  */
 
@@ -12,5 +12,5 @@
  */
 
 module.exports = {
-    // Nothing special
+  // Nothing special
 };

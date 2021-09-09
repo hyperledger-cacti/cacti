@@ -57,9 +57,6 @@
       "path": "./packages/cactus-plugin-ledger-connector-xdai/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-verifier-cc/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-test-api-client/tsconfig.json"
     },
     {
@@ -100,9 +97,6 @@
     },
     {
       "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-verifier-cc-cartrade/tsconfig.json"
     },
     {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"

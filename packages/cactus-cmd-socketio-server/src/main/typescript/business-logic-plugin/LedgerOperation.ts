@@ -6,13 +6,13 @@
  */
 
 export class LedgerOperation {
-    apiType: string;
-    progress: string;
-    data: {};
+  apiType: string;
+  progress: string;
+  data: {};
 
-    constructor(apiType: string, progress: string, data: {}) {
-        this.apiType = apiType;
-        this.progress = progress;
-        this.data = data;
-    }
+  constructor(apiType: string, progress: string, data: {}) {
+    this.apiType = apiType;
+    this.progress = progress;
+    this.data = data;
+  }
 }
