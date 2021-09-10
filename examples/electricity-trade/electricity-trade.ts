@@ -6,9 +6,9 @@
  */
 
 import { Router, NextFunction, Request, Response } from 'express';
-import { TransactionManagement } from '../../packages/routing-interface/TransactionManagement';
-import { RIFError } from '../../packages/routing-interface/RIFError';
-import { ConfigUtil } from '../../packages/routing-interface/util/ConfigUtil';
+import { TransactionManagement } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TransactionManagement';
+import { RIFError } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError';
+import { ConfigUtil } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');

@@ -1,0 +1,27 @@
+contractInfo:
+  - 
+    transactionHash: "0x8387ee93223da535a2cc0177d6f86df0a9dbf56f14573baf11d94cb9c9269fb1"
+    address: "0x89d266156b47c69b8a6f3152c0c56b87b5dea427"
+    abi:
+      - 
+        constant: false
+        inputs:
+          - 
+            name: _addAsset
+            type: uint256
+        name: addAsset
+        outputs: []
+        payable: false
+        stateMutability: nonpayable
+        type: function
+      - 
+        constant: true
+        inputs: []
+        name: getAsset
+        outputs:
+          - 
+            name: ""
+            type: uint256
+        payable: false
+        stateMutability: view
+        type: function
