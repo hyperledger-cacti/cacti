@@ -2,11 +2,16 @@
   "name": "@hyperledger/cactus",
   "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
   "private": true,
-  "workspaces": [
-    "packages/cactus-*",
-    "examples/cactus-*",
-    "extensions/cactus-*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/cactus-*",
+      "examples/cactus-*",
+      "extensions/cactus-*"
+    ],
+    "nohoist": [
+      "**/iroha-helpers-ts"
+    ]
+  },
   "scripts": {
     "run-ci": "./tools/ci.sh",
     "reset": "git clean -f -X && yarn run configure",
@@ -79,9 +84,10 @@
     "@typescript-eslint/parser": "4.29.1",
     "buffer": "6.0.3",
     "codecov": "3.8.3",
-    "cross-env": "7.0.3",
     "cpy-cli": "3.1.1",
+    "cross-env": "7.0.3",
     "crypto-browserify": "3.12.0",
+    "cspell": "5.6.6",
     "del-cli": "4.0.1",
     "electron": "13.1.9",
     "es-main": "1.0.2",
@@ -96,6 +102,7 @@
     "fs-extra": "10.0.0",
     "git-cz": "4.7.6",
     "globby": "12.0.0",
+    "google-protobuf": "3.18.0-rc.2",
     "grpc-tools": "1.11.2",
     "grpc_tools_node_protoc_ts": "5.3.1",
     "husky": "7.0.1",
@@ -127,7 +134,6 @@
     "typescript": "4.3.5",
     "webpack": "5.50.0",
     "webpack-bundle-analyzer": "4.4.2",
-    "webpack-cli": "4.7.2",
-    "cspell": "5.6.6"
+    "webpack-cli": "4.7.2"
   }
 }
