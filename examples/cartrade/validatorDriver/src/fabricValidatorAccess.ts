@@ -28,7 +28,7 @@ const apiInfoListForFabric = [
         ],
     },
     {
-        apiType: "sendSignedProposal",
+        apiType: "sendSignedTransaction",
         requestedData: [
             {
                 dataName: "signedCommitProposal",
@@ -115,7 +115,7 @@ class FabricVerifier implements Verifier {
         // NOTE: Return API information that can be used with Fabric version of requestLedgerOperation.
         //       Fabric version returns 2 kinds of API information.
         //          - changeCarOwner
-        //          - sendSignedProposal
+        //          - sendSignedTransaction
         return makeApiInfoList(apiInfoListForFabric);
     }
 
@@ -169,8 +169,8 @@ class FabricVerifier implements Verifier {
                 console.log('requestData : ' + JSON.stringify(requestData));
                 socket.emit('request', requestData);
                 return;
-            } else if (apiType === 'sendSignedProposal') {
-                // sendSignedProposal
+            } else if (apiType === 'sendSignedTransaction') {
+                // sendSignedTransaction
                 this.checkNull(data.signedCommitProposal, 'signedCommitProposal');
                 this.checkNull(data.commitReq, 'commitReq');
                 

@@ -6,9 +6,9 @@
  */
 
 import { Router, NextFunction, Request, Response } from 'express';
-import { RIFUtil } from '../../packages/routing-interface/util/RIFUtil';
-import { ConfigUtil } from '../../packages/routing-interface/util/ConfigUtil';
-import { RIFError, BadRequestError, InternalServerError } from '../../packages/routing-interface/RIFError';
+import { RIFUtil } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/RIFUtil';
+import { ConfigUtil } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil';
+import { RIFError, BadRequestError, InternalServerError } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError';
 import { AssetManagement } from './AssetManagement';
 
 const fs = require('fs');

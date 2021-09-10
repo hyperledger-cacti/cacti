@@ -3,5 +3,5 @@
 cd ../..
 
 echo "[process] Start the validator for Fabric"
-cd ./packages/ledger-plugin/fabric/validator/src
+cd ./packages/cactus-plugin-ledger-connector-fabric-socketio
 npm run start

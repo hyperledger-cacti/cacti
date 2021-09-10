@@ -6,27 +6,29 @@
  */
 
 import { Request } from 'express';
-import { RequestInfo } from '../../packages/routing-interface/RequestInfo';
-import { TradeInfo } from '../../packages/routing-interface/TradeInfo';
+import { RequestInfo } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RequestInfo';
+import { TradeInfo } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo';
 import { TransactionInfoManagement } from './TransactionInfoManagement';
 import { TransactionInfo } from './TransactionInfo';
 import { TransactionData } from './TransactionData';
 import { BusinessLogicInquireCartradeStatus } from './BusinessLogicInquireCartradeStatus';
 import { TxInfoData } from './TxInfoData';
-import { transactionManagement } from '../../packages/routing-interface/routes/index';
-import { verifierFactory } from '../../packages/routing-interface/routes/index';
-import { LedgerOperation } from '../../packages/business-logic-plugin/LedgerOperation';
-import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
+import { transactionManagement } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index';
+import { verifierFactory } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index';
+import { LedgerOperation } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/LedgerOperation';
+import { BusinessLogicBase } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase';
 import { makeRawTransaction } from './TransactionEthereum'
 import { makeSignedProposal } from './TransactionFabric';
-import { ApiInfo, LedgerEvent } from '../../packages/ledger-plugin/LedgerPlugin';
-import { json2str } from '../../packages/ledger-plugin/DriverCommon'
+import { ApiInfo, LedgerEvent } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin';
+import { json2str } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon'
 import { CartradeStatus } from './define'
-import { RIFUtil } from '../../packages/routing-interface/util/RIFUtil';
+import { RIFUtil } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/RIFUtil';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/default.json"), 'utf8'));
+const yaml = require('js-yaml');
+//const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
+const config: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/default.yaml", 'utf8'));
 import { getLogger } from "log4js";
 const moduleName = 'BusinessLogicCartrade';
 const logger = getLogger(`${moduleName}`);
@@ -173,13 +175,19 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
             carID, // CarID
             fabricAccountTo // Owner
         ];
-        makeSignedProposal(ccFncName, ccArgs)
+        makeSignedProposal(ccFncName, ccArgs, verifierFabric)
             .then(result => {
+                // logger.info(`##ret makeSignedProposal: result: ${JSON.stringify(result)}`);
                 logger.info('secondTransaction txId : ' + result.txId);
 
                 // Register transaction data in DB
                 const transactionData: TransactionData = new TransactionData("transfer", "ledger002", result.txId);
                 this.transactionInfoManagement.setTransactionData(tradeInfo, transactionData);
+                
+                // NOTE: Convert properties to binary. 
+                //       If you do not convert the following, you will get an error.
+                result.data["signedCommitProposal"].signature = Buffer.from(result.data["signedCommitProposal"].signature);
+                result.data["signedCommitProposal"].proposal_bytes = Buffer.from(result.data["signedCommitProposal"].proposal_bytes);
 
                 // Set Parameter
                 //logger.debug('secondTransaction data : ' + JSON.stringify(result.data));
@@ -187,11 +195,8 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                 const method = {"type": "sendSignedTransaction"};
                 const template = "default";
                 const args = {"args": [result.data]};
-                // const method = "default";
-                // const args = {"method": {"type": "sendSignedTransaction"},"args": {"args": [result.data]}};
 
                 // Run Verifier (Fabric)
-                // verifierFabric.requestLedgerOperationNeo(contract, method, args);
                 verifierFabric.sendSignedTransaction(contract, method, template, args);
             })
             .catch(err => {
@@ -415,10 +420,10 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
                     this.completedTransaction(tradeInfo);
                     break;
                 case CartradeStatus.Completed:
-                    logger.warn('##WARN: already completed, txinfo: ${json2str(transactionInfo)}');
+                    logger.warn(`##WARN: already completed, txinfo: ${json2str(transactionInfo)}`);
                     return;
                 default:
-                    logger.error('##ERR: bad txStatus: ${txStatus}');
+                    logger.error(`##ERR: bad txStatus: ${txStatus}`);
                     return;
             }
         }
