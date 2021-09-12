@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
@@ -19,7 +21,7 @@ type BondAsset struct {
 }
 
 func getBondAssetKey(assetType string, assetId string) string {
-        return assetType + assetId
+	return assetType + assetId
 }
 
 // InitBondAssetLedger adds a base set of assets to the ledger
@@ -98,7 +100,7 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, a
 		return nil, err
 	}
 	// In the update owner context, the TxCreator will be the newOwner. Hence don't check if the TxCreator is the current owner.
-	if isUpdateOwnerContext == false {
+	if !isUpdateOwnerContext {
 		owner, err := getECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return nil, err
@@ -113,15 +115,76 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, a
 
 // DeleteAsset deletes an given asset from the world state.
 func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, assetType, id string) error {
-	exists, err := s.AssetExists(ctx, assetType, id)
+	assetKey := getBondAssetKey(assetType, id)
+	assetJSON, err := ctx.GetStub().GetState(assetKey)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read asset status from world state: %v", err)
 	}
-	if !exists {
-		return fmt.Errorf("the bond asset of type %s and id %s does not exist", assetType, id)
+	if assetJSON == nil {
+		return fmt.Errorf("the asset %s does not exist", id)
+	}
+	// Ensure that the client is the owner of the asset
+	if !s.CheckAccessToAsset(ctx, assetJSON) {
+		return fmt.Errorf("Cannot delete asset %s", id)
 	}
 
-	return ctx.GetStub().DelState(getBondAssetKey(assetType, id))
+	return ctx.GetStub().DelState(assetKey)
+}
+
+// IsCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
+func (s *SmartContract) IsCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
+	caller, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	return (asset.Owner == caller)
+}
+
+// IsBondAssetLocked returns true only if the asset is presently locked
+func (s *SmartContract) IsBondAssetLocked(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
+	bondAssetAgreement := &common.AssetExchangeAgreement{
+		Type: asset.Type,
+		Id: asset.ID,
+		Recipient: "*",
+		Locker: asset.Owner,
+	}
+	bondAssetAgreementJSON, err := json.Marshal(bondAssetAgreement)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	bondAssetAgreementJSON64 := base64.StdEncoding.EncodeToString(bondAssetAgreementJSON)
+	locked, err := s.IsAssetLocked(ctx, bondAssetAgreementJSON64)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	return locked
+}
+
+// CheckAccessToAsset checks several conditions under which an asset can be put on hold (i.e., not available for regular business operation)
+func (s *SmartContract) CheckAccessToAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte) bool {
+	var asset BondAsset
+	err := json.Unmarshal(assetJSON, &asset)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+
+	// Ensure that the client is the owner of the asset
+	if !s.IsCallerAssetOwner(ctx, &asset) {
+		fmt.Printf("Illegal update: caller is not owner of asset %s", asset.ID)
+		return false
+	}
+
+	// Ensure that the asset is not locked
+	if !s.IsBondAssetLocked(ctx, &asset) {
+		fmt.Printf("Cannot update owner of locked asset %s", asset.ID)
+		return false
+	}
+
+	return true
 }
 
 // AssetExists returns true when asset with given ID exists in world state
@@ -160,6 +223,11 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 
+	// Ensure that the asset is free to be modified
+	if !s.CheckAccessToAsset(ctx, assetJSON) {
+		return fmt.Errorf("Cannot update owner of asset %s", id)
+	}
+
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 // UpdateMaturityDate sets the maturity date of the asset to an updated date as passed in the parameters.
@@ -175,6 +243,11 @@ func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInt
 		return err
 	}
 
+	// Ensure that the asset is free to be modified
+	if !s.CheckAccessToAsset(ctx, assetJSON) {
+		return fmt.Errorf("Cannot update maturity date of asset %s", id)
+	}
+
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 // UpdateFaceValue sets the face value of an asset to the new value passed.
@@ -188,6 +261,11 @@ func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterf
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
 		return err
+	}
+
+	// Ensure that the asset is free to be modified
+	if !s.CheckAccessToAsset(ctx, assetJSON) {
+		return fmt.Errorf("Cannot update face value of asset %s", id)
 	}
 
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)

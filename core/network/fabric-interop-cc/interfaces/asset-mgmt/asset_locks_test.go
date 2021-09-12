@@ -81,7 +81,7 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         assetAgreement := &common.FungibleAssetExchangeAgreement{}
         arg0, _ := base64.StdEncoding.DecodeString(args[0])
         _ = proto.Unmarshal([]byte(arg0), assetAgreement)
-	val := assetAgreement.Type + ":" + strconv.Itoa(int(assetAgreement.NumUnits)) + ":" + string(caller) + ":" + assetAgreement.Recipient
+        val := assetAgreement.Type + ":" + strconv.Itoa(int(assetAgreement.NumUnits)) + ":" + string(caller) + ":" + assetAgreement.Recipient
         contractId := generateSHA256HashInBase64Form(val)
         cc.fungibleAssetLockMap[contractId] = val
 	if cc.fungibleAssetLockedCount[assetAgreement.Type] == 0 {
