@@ -74,6 +74,10 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20210909191523-de832057a3ab h1:XE++jGXUlT5QpQMTa/TmYmTFFkUAPYJfpnQbIIgvWNw=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20210909191523-de832057a3ab/go.mod h1:Nke1cGAeCHSgK8x/+tjzojTAT5L/V6e7ERxPUSbnA/8=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils v0.0.0-20210909191523-de832057a3ab h1:0SD+Rnu1oH0QMOiRUfkJcc1Ud8TEToi2VFYbrCicnrY=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils v0.0.0-20210909191523-de832057a3ab/go.mod h1:WKKjvakP/ka2PKQATfOE7rFVSLuCwL5rtXYlpEI1rQ4=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20200424173110-d7076418f212/go.mod h1:N7H3sA7Tx4k/YzFq7U0EPdqJtqvM4Kild0JoCc7C0Dc=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20210718160520-38d29fabecb9 h1:1cAZHHrBYFrX3bwQGhOZtOB4sCM9QWVppd81O8vsPXs=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20210718160520-38d29fabecb9/go.mod h1:N7H3sA7Tx4k/YzFq7U0EPdqJtqvM4Kild0JoCc7C0Dc=
