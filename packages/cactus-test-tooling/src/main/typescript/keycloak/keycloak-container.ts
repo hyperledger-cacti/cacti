@@ -86,7 +86,7 @@ export class KeycloakContainer {
     }
     const docker = new Docker();
 
-    await Containers.pullImage(this.imageFqn);
+    await Containers.pullImage(this.imageFqn, {}, this.options.logLevel);
 
     const Env = [
       ...[

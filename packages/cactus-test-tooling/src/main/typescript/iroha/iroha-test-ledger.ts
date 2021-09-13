@@ -264,7 +264,7 @@ export class IrohaTestLedger implements ITestLedger {
     const docker = new Docker();
     if (!omitPull) {
       this.log.debug(`Pulling container image ${this.imageFqn} ...`);
-      await Containers.pullImage(this.imageFqn);
+      await Containers.pullImage(this.imageFqn, {}, this.options.logLevel);
       this.log.debug(`Pulled ${this.imageFqn} OK. Starting container...`);
     }
 
