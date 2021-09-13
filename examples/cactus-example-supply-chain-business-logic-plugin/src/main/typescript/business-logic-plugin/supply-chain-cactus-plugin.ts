@@ -2,6 +2,7 @@ import type { Server } from "http";
 import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
 import { Express } from "express";
+import OAS from "../../json/openapi.json";
 import {
   Logger,
   Checks,
@@ -76,6 +77,10 @@ export class SupplyChainCactusPlugin
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
     this.instanceId = options.instanceId;
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {

@@ -4,6 +4,8 @@ import type { Server as SecureServer } from "https";
 import type { Express } from "express";
 import { Optional } from "typescript-optional";
 
+import OAS from "../json/openapi.json";
+
 import {
   Logger,
   Checks,
@@ -122,6 +124,10 @@ export class PluginKeychainAzureKv
     }
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {

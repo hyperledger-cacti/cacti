@@ -26,6 +26,7 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  * @export
  * @enum {string}
  */
+
 export enum ChainCodeLanguageRuntime {
     Golang = 'golang',
     Node = 'node',
@@ -86,6 +87,7 @@ export interface ChainCodeLifeCycleCommandResponses {
  * @export
  * @enum {string}
  */
+
 export enum ChainCodeProgrammingLanguage {
     Golang = 'golang',
     Javascript = 'javascript',
@@ -180,6 +182,7 @@ export interface ConnectionProfileClient {
  * @export
  * @enum {string}
  */
+
 export enum DefaultEventHandlerStrategy {
     MspidScopeAllfortx = 'MSPID_SCOPE_ALLFORTX',
     MspidScopeAnyfortx = 'MSPID_SCOPE_ANYFORTX',
@@ -511,6 +514,7 @@ export interface DeploymentTargetOrganization {
  * @export
  * @enum {string}
  */
+
 export enum FabricContractInvocationType {
     Send = 'FabricContractInvocationType.SEND',
     Call = 'FabricContractInvocationType.CALL',
@@ -553,6 +557,7 @@ export interface FabricSigningCredential {
  * @export
  * @enum {string}
  */
+
 export enum FabricSigningCredentialType {
     X509 = 'X.509',
     VaultX509 = 'Vault-X.509'

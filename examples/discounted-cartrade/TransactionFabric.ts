@@ -15,12 +15,14 @@
  * In this case, it is used only when transferring assets.
  */
 
-import { TransactionSigner } from '../../packages/ledger-plugin/util/TransactionSigner';
-import { VerifierBase } from '../../packages/ledger-plugin/VerifierBase';
+import { TransactionSigner } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/util/TransactionSigner';
+import { VerifierBase } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/VerifierBase';
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/default.json"), 'utf8'));
+const yaml = require('js-yaml');
+//const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
+const config: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/default.yaml", 'utf8'));
 import { getLogger } from "log4js";
 const moduleName = 'TransactionFabric';
 const logger = getLogger(`${moduleName}`);

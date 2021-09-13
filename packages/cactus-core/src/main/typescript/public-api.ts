@@ -11,3 +11,6 @@ export {
 } from "./web-services/authorization-options-provider";
 
 export { consensusHasTransactionFinality } from "./consensus-has-transaction-finality";
+
+export { IInstallOpenapiValidationMiddlewareRequest } from "./web-services/install-open-api-validator-middleware";
+export { installOpenapiValidationMiddleware } from "./web-services/install-open-api-validator-middleware";

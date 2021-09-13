@@ -9,6 +9,8 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
+import OAS from "../json/openapi.json";
+
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { Express } from "express";
 
@@ -65,6 +67,10 @@ export class PluginKeychainMemory {
       `Never use ${this.className} in production. ` +
         `It does not support encryption. It stores everything in plain text.`,
     );
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getPrometheusExporter(): PrometheusExporter {

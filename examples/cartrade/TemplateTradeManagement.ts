@@ -6,9 +6,9 @@
  */
 
 import { Request } from 'express';
-import { LPInfoHolder } from '../../packages/routing-interface/util/LPInfoHolder';
-import { VerifierBase } from '../../packages/ledger-plugin/VerifierBase';
-import { ConfigUtil } from '../../packages/routing-interface/util/ConfigUtil';
+import { LPInfoHolder } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/LPInfoHolder';
+import { VerifierBase } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/VerifierBase';
+import { ConfigUtil } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');

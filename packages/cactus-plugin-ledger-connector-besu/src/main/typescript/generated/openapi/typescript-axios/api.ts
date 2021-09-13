@@ -207,6 +207,7 @@ export interface DeployContractSolidityBytecodeV1Response {
  * @export
  * @enum {string}
  */
+
 export enum EthContractInvocationType {
     Send = 'SEND',
     Call = 'CALL'
@@ -754,6 +755,7 @@ export interface InvokeContractV1Response {
  * @export
  * @enum {string}
  */
+
 export enum ReceiptType {
     NodeTxPoolAck = 'NODE_TX_POOL_ACK',
     LedgerBlockAck = 'LEDGER_BLOCK_ACK'
@@ -913,6 +915,7 @@ export interface SolidityContractJsonArtifact {
  * @export
  * @enum {string}
  */
+
 export enum WatchBlocksV1 {
     Subscribe = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Subscribe',
     Next = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Next',
@@ -1105,6 +1108,7 @@ export interface Web3SigningCredentialPrivateKeyHex {
  * @export
  * @enum {string}
  */
+
 export enum Web3SigningCredentialType {
     CactusKeychainRef = 'CACTUS_KEYCHAIN_REF',
     GethKeychainPassword = 'GETH_KEYCHAIN_PASSWORD',

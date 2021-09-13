@@ -143,6 +143,7 @@ export interface DeployContractSolidityBytecodeV1Response {
  * @export
  * @enum {string}
  */
+
 export enum EthContractInvocationType {
     Send = 'SEND',
     Call = 'CALL'
@@ -616,6 +617,7 @@ export interface Web3SigningCredentialPrivateKeyHex {
  * @export
  * @enum {string}
  */
+
 export enum Web3SigningCredentialType {
     CactusKeychainRef = 'CACTUS_KEYCHAIN_REF',
     GethKeychainPassword = 'GETH_KEYCHAIN_PASSWORD',

@@ -9,26 +9,6 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "servers": [
-        {
-            "url": "https://www.cactus.stream/{basePath}",
-            "description": "Public test instance",
-            "variables": {
-                "basePath": {
-                    "default": ""
-                }
-            }
-        },
-        {
-            "url": "http://localhost:4000/{basePath}",
-            "description": "Local test instance",
-            "variables": {
-                "basePath": {
-                    "default": ""
-                }
-            }
-        }
-    ],
     "components": {
         "schemas": {
             "Constants": {
@@ -426,6 +406,7 @@
                 "required": [
                     "key"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "key": {
                         "type": "string",
@@ -464,6 +445,7 @@
                 "required": [
                     "key"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "key": {
                         "type": "string",
@@ -507,6 +489,7 @@
                     "key",
                     "value"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "key": {
                         "type": "string",
@@ -560,6 +543,7 @@
                     "key",
                     "value"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "key": {
                         "type": "string",
@@ -583,6 +567,7 @@
                     "key",
                     "value"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "key": {
                         "type": "string",
@@ -635,6 +620,7 @@
                 "required": [
                     "key"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "key": {
                         "type": "string",
@@ -650,6 +636,7 @@
                 "required": [
                     "key"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "key": {
                         "type": "string",

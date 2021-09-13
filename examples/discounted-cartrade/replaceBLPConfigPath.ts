@@ -6,9 +6,9 @@
  */
 const fs = require('fs')
 
-const targetFile = '../../dist/packages/config/BLP_config.js';
+const targetFile = '../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BLP_config.js';
 const srcStr = '"../BusinessLogicCartrade"';
-const distStr = '"../../examples/discounted-cartrade/BusinessLogicCartrade"';
+const distStr = '"../../../../../../examples/discounted-cartrade/BusinessLogicCartrade"';
 
 fs.readFile(targetFile, 'utf8', (readErr, data) => {
   if (readErr) {

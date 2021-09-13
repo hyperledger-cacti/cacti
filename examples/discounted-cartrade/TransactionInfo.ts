@@ -5,7 +5,7 @@
  * TransactionInfo.ts
  */
 
-import { RequestInfo } from '../../packages/routing-interface/RequestInfo';
+import { RequestInfo } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RequestInfo';
 
 export class TransactionInfo {
     businessLogicID: string;
