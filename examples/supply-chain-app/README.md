@@ -14,7 +14,7 @@
       -p 4000:4000 \
       -p 4100:4100 \
       -p 4200:4200 \
-      ghcr.io/hyperledger/cactus-example-supply-chain-app:2021-07-20--fix-720
+      ghcr.io/hyperledger/cactus-example-supply-chain-app:2021-09-08--docs-1312
     ```
 2. Observe the example application pulling up in the logs
    1. the test ledger containers,
@@ -38,11 +38,27 @@ DOCKER_BUILDKIT=1 docker build -f ./examples/supply-chain-app/Dockerfile . -t sc
 docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:4000 -p 4100:4100 -p 4200:4200 scaeb
 ```
 
-## Configuring and running the example as a process
+## Running the Example Application Locally
 
-1. If the `cactus-example-supply-chain-frontend` is in another directory from the default or need expose the API in another port, check the `process.env`
-2. Execute the following command:
+> Make sure you have all the dependencies set up as explained in `BUILD.md`
 
-```
- npm run start
-```
+On the terminal, issue the following commands:
+
+1. `npm run install-yarn`
+2. `yarn configure`
+3. `yarn start:example-supply-chain`
+
+## Debugging the Example Application Locally
+
+On the terminal, issue the following commands (steps 1 to 6) and then perform the rest of the steps manually.
+
+1. `npm run install-yarn`
+2. `yarn configure`
+3. `yarn build:dev`
+4. `cd ./examples/supply-chain-app/`
+5. `yarn --no-lockfile`
+6. `cd ../../`
+7. Locate the `.vscode/template.launch.json` file
+8. Within that file locate the entry named `"Example: Supply Chain App"`
+9. Copy the VSCode debug definition object from 2) to your `.vscode/launch.json` file
+10. At this point the VSCode `Run and Debug` panel on the left should have an option also titled `"Example: Supply Chain App"` which

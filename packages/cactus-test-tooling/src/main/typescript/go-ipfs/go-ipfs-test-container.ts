@@ -87,7 +87,7 @@ export class GoIpfsTestContainer {
     // otherwise we carry on with launching the container
 
     if (!omitPull) {
-      await Containers.pullImage(this.imageFqn);
+      await Containers.pullImage(this.imageFqn), {}, this.options.logLevel;
     }
 
     const dockerEnvVars: string[] = new Array(...this.envVars).map(
