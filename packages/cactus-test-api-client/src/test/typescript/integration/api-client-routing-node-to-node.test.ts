@@ -162,6 +162,7 @@ test(testCase, async (t: Test) => {
       const pluginRegistry = new PluginRegistry({ plugins: [] });
 
       const pluginQuorumConnector = new PluginLedgerConnectorQuorum({
+        privateUrl: rpcApiHttpHost1,
         instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost1,
         logLevel,
@@ -208,6 +209,7 @@ test(testCase, async (t: Test) => {
       const pluginRegistry = new PluginRegistry({ plugins: [] });
 
       const pluginQuorumConnector = new PluginLedgerConnectorQuorum({
+        privateUrl: rpcApiHttpHost2,
         instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost2,
         logLevel,

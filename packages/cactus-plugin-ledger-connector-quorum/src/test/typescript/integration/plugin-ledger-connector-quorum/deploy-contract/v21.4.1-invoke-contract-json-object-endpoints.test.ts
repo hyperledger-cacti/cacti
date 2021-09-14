@@ -65,6 +65,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       rpcApiHttpHost,
       logLevel,
       pluginRegistry: new PluginRegistry(),
+      privateUrl: rpcApiHttpHost,
     },
   );
 

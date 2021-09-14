@@ -24,6 +24,7 @@ docker run \
   --publish 3000:3000 \
   --publish 8545:8545 \
   --publish 8546:8546 \
+  --publish 8999:8999 \
   --publish 9001:9001 \
   --publish 9081:9081 \
   --publish 9082:9082 \
@@ -37,7 +38,7 @@ docker run \
   --publish 20004:20004 \
   --publish 20005:20005 \
   --publish 25000:25000 \
-  ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one:latest
+  ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one:2021-08-20--quorum-multi-party-ledger
 
 ```
 
