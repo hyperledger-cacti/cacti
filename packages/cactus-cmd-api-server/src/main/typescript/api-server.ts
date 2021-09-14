@@ -14,7 +14,7 @@ import { Server as GrpcServer } from "@grpc/grpc-js";
 import { ServerCredentials as GrpcServerCredentials } from "@grpc/grpc-js";
 import type { Application, Request, Response, RequestHandler } from "express";
 import express from "express";
-import { OpenApiValidator } from "express-openapi-validator";
+import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 import compression from "compression";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -35,12 +35,13 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
 import { Logger, LoggerProvider, Servers } from "@hyperledger/cactus-common";
 
 import { ICactusApiServerOptions } from "./config/config-service";
 import OAS from "../json/openapi.json";
-import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
+// import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { AuthorizerFactory } from "./authzn/authorizer-factory";
@@ -606,8 +607,8 @@ export class ApiServer {
       this.log.info(`Authorization request handler configured OK.`);
     }
 
-    const openApiValidator = this.createOpenApiValidator();
-    await openApiValidator.install(app);
+    // const openApiValidator = this.createOpenApiValidator();
+    // await openApiValidator.install(app);
 
     this.getOrCreateWebServices(app); // The API server's own endpoints
 
@@ -619,6 +620,9 @@ export class ApiServer {
       .map(async (plugin: ICactusPlugin) => {
         const p = plugin as IPluginWebService;
         await p.getOrCreateWebServices();
+        const apiSpec = p.getOpenApiSpec() as OpenAPIV3.Document;
+        if (apiSpec)
+          await installOpenapiValidationMiddleware({ app, apiSpec, logLevel });
         const webSvcs = await p.registerWebServices(app, wsApi);
         return webSvcs;
       });
@@ -681,14 +685,6 @@ export class ApiServer {
       const { E_NON_EXEMPT_UNPROTECTED_ENDPOINTS } = ApiServer;
       throw new Error(`${E_NON_EXEMPT_UNPROTECTED_ENDPOINTS} ${csv}`);
     }
-  }
-
-  createOpenApiValidator(): OpenApiValidator {
-    return new OpenApiValidator({
-      apiSpec: OAS as OpenAPIV3.Document,
-      validateRequests: true,
-      validateResponses: false,
-    });
   }
 
   createCorsMiddleware(allowedDomains: string[]): RequestHandler {

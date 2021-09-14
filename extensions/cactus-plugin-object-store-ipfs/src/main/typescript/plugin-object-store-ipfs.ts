@@ -20,6 +20,8 @@ import type {
   SetObjectResponseV1,
 } from "@hyperledger/cactus-core-api";
 
+import OAS from "../json/openapi.json";
+
 import { GetObjectEndpointV1 } from "./web-services/get-object-endpoint-v1";
 import { SetObjectEndpointV1 } from "./web-services/set-object-endpoint-v1";
 import { HasObjectEndpointV1 } from "./web-services/has-object-endpoint-v1";
@@ -74,6 +76,10 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     this.instanceId = this.opts.instanceId;
 
     this.log.info(`Created ${this.className}. InstanceID=${opts.instanceId}`);
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public async onPluginInit(): Promise<unknown> {

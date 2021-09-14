@@ -4,6 +4,8 @@ import { Server as SecureServer } from "https";
 import { Express } from "express";
 import { Optional } from "typescript-optional";
 
+import OAS from "../json/openapi.json";
+
 import {
   Logger,
   Checks,
@@ -69,6 +71,10 @@ export class PluginKeychainVaultRemoteAdapter
     this.keychainId = opts.keychainId;
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   /**

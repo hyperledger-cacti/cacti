@@ -16,6 +16,7 @@ export interface IPluginWebService extends ICactusPlugin {
 
   getHttpServer(): Optional<Server | SecureServer>;
   shutdown(): Promise<void>;
+  getOpenApiSpec(): unknown;
 }
 
 export function isIPluginWebService(x: unknown): x is IPluginWebService {
@@ -26,6 +27,7 @@ export function isIPluginWebService(x: unknown): x is IPluginWebService {
     typeof (x as IPluginWebService).getHttpServer === "function" &&
     typeof (x as IPluginWebService).getPackageName === "function" &&
     typeof (x as IPluginWebService).getInstanceId === "function" &&
-    typeof (x as IPluginWebService).shutdown === "function"
+    typeof (x as IPluginWebService).shutdown === "function" &&
+    typeof (x as IPluginWebService).getOpenApiSpec === "function"
   );
 }

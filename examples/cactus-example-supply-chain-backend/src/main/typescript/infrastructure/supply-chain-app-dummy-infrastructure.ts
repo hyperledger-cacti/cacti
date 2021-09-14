@@ -105,6 +105,7 @@ export class SupplyChainAppDummyInfrastructure {
 
     this.besu = new BesuTestLedger({
       logLevel: level,
+      emitContainerLogs: true,
     });
     this.quorum = new QuorumTestLedger({
       logLevel: level,
@@ -113,7 +114,7 @@ export class SupplyChainAppDummyInfrastructure {
     this.fabric = new FabricTestLedgerV1({
       publishAllPorts: true,
       imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
-      imageVersion: "2021-03-02-ssh-hotfix",
+      imageVersion: "2021-09-02--fix-876-supervisord-retries",
       logLevel: level,
       emitContainerLogs: true,
     });
@@ -150,11 +151,9 @@ export class SupplyChainAppDummyInfrastructure {
   public async start(): Promise<void> {
     try {
       this.log.info(`Starting dummy infrastructure...`);
-      await Promise.all([
-        this.besu.start(),
-        this.quorum.start(),
-        this.fabric.start(),
-      ]);
+      await this.fabric.start();
+      await this.besu.start();
+      await this.quorum.start();
       this.log.info(`Started dummy infrastructure OK`);
     } catch (ex) {
       this.log.error(`Starting of dummy infrastructure crashed: `, ex);
@@ -172,11 +171,11 @@ export class SupplyChainAppDummyInfrastructure {
 
       await this.keychain.set(
         BookshelfRepositoryJSON.contractName,
-        BookshelfRepositoryJSON.contractName,
+        JSON.stringify(BookshelfRepositoryJSON),
       );
       await this.keychain.set(
         BambooHarvestRepositoryJSON.contractName,
-        BambooHarvestRepositoryJSON.contractName,
+        JSON.stringify(BambooHarvestRepositoryJSON),
       );
       {
         this._quorumAccount = await this.quorum.createEthTestAccount(2000000);

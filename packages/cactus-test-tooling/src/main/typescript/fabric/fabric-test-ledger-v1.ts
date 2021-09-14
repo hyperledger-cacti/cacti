@@ -37,8 +37,8 @@ export interface IFabricTestLedgerV1ConstructorOptions {
  * Provides default options for Fabric container
  */
 const DEFAULT_OPTS = Object.freeze({
-  imageVersion: "2021-01-05-3400c06",
   imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
+  imageVersion: "2021-09-02--fix-876-supervisord-retries",
   envVars: new Map([["FABRIC_VERSION", "1.4.8"]]),
 });
 export const FABRIC_TEST_LEDGER_DEFAULT_OPTIONS = DEFAULT_OPTS;
@@ -356,7 +356,8 @@ export class FabricTestLedgerV1 implements ITestLedger {
   }
 
   public async start(omitPull = false): Promise<Container> {
-    const containerNameAndTag = this.getContainerImageName();
+    const imageFqn = this.getContainerImageName();
+    this.log.debug(`Launching: ${imageFqn} ...`);
     const dockerEnvVars: string[] = new Array(...this.envVars).map(
       (pairs) => `${pairs[0]}=${pairs[1]}`,
     );
@@ -368,7 +369,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const docker = new Docker();
 
     if (!omitPull) {
-      await Containers.pullImage(containerNameAndTag);
+      await Containers.pullImage(imageFqn, {}, this.options.logLevel);
     }
 
     const createOptions: ContainerCreateOptions = {
@@ -425,7 +426,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
-        containerNameAndTag,
+        imageFqn,
         [],
         [],
         createOptions,

@@ -77,7 +77,7 @@ export class LocalStackContainer {
     }
     const docker = new Docker();
 
-    await Containers.pullImage(this.imageFqn);
+    await Containers.pullImage(this.imageFqn, {}, this.options.logLevel);
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(

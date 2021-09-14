@@ -5,7 +5,7 @@
  * BLP_config.ts
  */
 
-import { BusinessLogicPlugin } from '../../../packages/business-logic-plugin/BusinessLogicPlugin';
+import { BusinessLogicPlugin } from '../../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicPlugin';
 import { BusinessLogicCartrade } from '../BusinessLogicCartrade';
 // import { BusinessLogicCartrade } from '../examples/cartrade/BusinessLogicXxxxTrade';
 

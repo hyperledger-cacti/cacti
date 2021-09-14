@@ -13,6 +13,8 @@ import {
   GrantablePermissionMap,
 } from "iroha-helpers-ts/lib/proto/primitive_pb";
 
+import OAS from "../json/openapi.json";
+
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
@@ -108,6 +110,10 @@ export class PluginLedgerConnectorIroha
     );
 
     this.prometheusExporter.startMetricsCollection();
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   deployContract(): Promise<never> {

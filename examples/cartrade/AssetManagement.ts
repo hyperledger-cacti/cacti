@@ -5,10 +5,10 @@
  * AssetManagement.ts
  */
 
-import { LPInfoHolder } from '../../packages/routing-interface/util/LPInfoHolder';
-import { VerifierBase } from '../../packages/ledger-plugin/VerifierBase';
-import { ContractInfoHolder } from '../../packages/routing-interface/util/ContractInfoHolder';
-import { ConfigUtil } from '../../packages/routing-interface/util/ConfigUtil';
+import { LPInfoHolder } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/LPInfoHolder';
+import { VerifierBase } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/VerifierBase';
+import { ContractInfoHolder } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ContractInfoHolder';
+import { ConfigUtil } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil';
 
 const fs = require('fs');
 const path = require('path');

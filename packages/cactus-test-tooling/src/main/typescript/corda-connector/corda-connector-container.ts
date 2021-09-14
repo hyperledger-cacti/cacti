@@ -98,7 +98,7 @@ export class CordaConnectorContainer {
   }
 
   public async start(skipPull = false): Promise<Container> {
-    const containerNameAndTag = this.getContainerImageName();
+    const imageFqn = this.getContainerImageName();
 
     if (this.container) {
       await this.container.stop();
@@ -107,12 +107,12 @@ export class CordaConnectorContainer {
     const docker = new Docker();
 
     if (!skipPull) {
-      await Containers.pullImage(containerNameAndTag);
+      await Containers.pullImage(imageFqn, {}, this.opts.logLevel);
     }
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
-        containerNameAndTag,
+        imageFqn,
         [],
         [],
         {

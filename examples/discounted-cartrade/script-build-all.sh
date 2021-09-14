@@ -3,20 +3,20 @@
 cd ../..
 
 ## Build validator for Fabric
-cd ./packages/ledger-plugin/fabric/validator/src
+cd ./packages/cactus-plugin-ledger-connector-fabric-socketio
 ./script-build-validator.sh
-cp -a ../../../../../examples/discounted-cartrade/build/wallet .
-cd ../../../../..
+cp -a ../../examples/discounted-cartrade/build/wallet ./dist/connector
+cd ../../
 
 ## build validator for Ethereum
-cd ./packages/ledger-plugin/go-ethereum/validator/src
+cd ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio
 ./script-build-validator.sh
-cd ../../../../..
+cd ../../
 
 ## build packages
-cd ./packages
+cd ./packages/cactus-cmd-socketio-server
 ./script-build-packages.sh
-cd ..
+cd ../..
 
 ## build cartrade apps
 cd ./examples/discounted-cartrade

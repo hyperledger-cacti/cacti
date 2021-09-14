@@ -2,8 +2,8 @@
   "name": "discounted-cartrade",
   "private": true,
   "scripts": {
-    "start": "node ../../dist/packages/routing-interface/www.js",
-    "debug": "nodemon --inspect ../../dist/packages/routing-interface/www.js",
+    "start": "node ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
+    "debug": "nodemon --inspect ../../dist//packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
     "build": "npm run build-ts && npm run copy-static-assets && npm run copy-blp-config && npm run replace-blp-config-path",
     "build-ts": "tsc -p ./tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json './*.ts'",

@@ -124,7 +124,7 @@ export class RustcContainer {
     }
     if (!omitPull) {
       this.log.debug(`Pulling image ${this.imageFqn}...`);
-      await Containers.pullImage(this.imageFqn);
+      await Containers.pullImage(this.imageFqn, {}, this.opts.logLevel);
       this.log.debug(`Pulled image ${this.imageFqn} OK`);
     }
 

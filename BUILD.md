@@ -204,3 +204,20 @@ To figure out which script could work for rebuilding Cactus, please follow
 the following decision tree (and keep in mind that we have `npm run watch` too)
 
 ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
+
+## Getting into the SSH connection
+Upload your public key onto github if not done so already. A public key is necessary to join the ssh connection to use upterm. For a comprehensive guide, see the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
+
+Locate the `ci.yml` within `.github/workflows` and add to the `ci.yml` code listed below: 
+  - name: Setup upterm session
+    uses: lhotari/action-upterm@v1
+    with: 
+      repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v2.3.4) to ensure that the CI doesn't hang without before the debugging step occurs. Editing the `ci.yml` will create a new upterm session within `.github/workflows` by adding a new build step. For more details, see the [Debug your GitHub Actions by using ssh](https://github.com/marketplace/actions/debugging-with-ssh). 
+
+By creating a PR for the edited `ci.yml` file, this will the CI to run their tests. There are two ways to navigate to CIs. 
+  1) Go to the PR and click the `checks` tab
+  2) Go to the `Actions` tab within the main Hyperledger Cactus Repository
+
+Click on the `CI Cactus workflow`. There should be a new job you've created be listed underneath the `build (ubuntu-20.04)` jobs. Click on the the new job (what's you've named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session. 

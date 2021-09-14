@@ -26,6 +26,7 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  * @export
  * @enum {string}
  */
+
 export enum AuthzJwtClaim {
     /**
     * The &quot;iss&quot; (issuer) claim identifies the principal that issued the JWT.  The processing of this claim is generally application specific. The &quot;iss&quot; value is a case-sensitive string containing a StringOrURI value.  Use of this claim is OPTIONAL.
@@ -38,6 +39,7 @@ export enum AuthzJwtClaim {
  * @export
  * @enum {string}
  */
+
 export enum AuthzScope {
     /**
     * Identities with the group:admin scope are administrators of the system.
@@ -124,6 +126,7 @@ export interface DaoTokenGetAllowanceResponse {
  * @export
  * @enum {string}
  */
+
 export enum EnrollAdminInfo {
     SUCCESSFULLY_ENROLLED_ADMIN = 'Successfully enrolled admin user and imported it into the wallet',
     ORG_ADMIN_REGISTERED = 'ORG ADMIN REGISTERED'

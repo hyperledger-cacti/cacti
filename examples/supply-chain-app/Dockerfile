@@ -1,55 +1,3 @@
-FROM node:16.3.0-buster-slim as builder
-
-RUN apt-get update
-RUN apt-get -y upgrade
-
-# Generic dependencies that are usually needed by other software
-RUN apt-get install -y build-essential libssl-dev libffi-dev python3-dev
-
-# Need git because some of our npm depedencies might be coming
-# straight from github instead of being an npm package on npmjs.com.
-RUN apt-get install -y git
-
-# Need OpenJDK for the OpenAPI generator tool
-ENV DEBIAN_FRONTEND=noninteractive
-
-WORKDIR /opt
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        curl \
-    && curl \
-        -L \
-        -o openjdk.tar.gz \
-        https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz \
-    && mkdir jdk \
-    && tar zxf openjdk.tar.gz -C jdk --strip-components=1 \
-    && rm -rf openjdk.tar.gz \
-    && ln -sf /opt/jdk/bin/* /usr/local/bin/ \
-    && java  --version \
-    && javac --version \
-    && jlink --version
-
-# Some install scripts of the npm package fabric-network need python/pip
-RUN apt-get install -y python3-pip
-
-WORKDIR /
-RUN mkdir /app/
-WORKDIR /app/
-COPY ./ ./
-RUN npm ci
-RUN ./node_modules/.bin/lerna clean --yes
-RUN ./node_modules/.bin/lerna bootstrap
-RUN npm rebuild
-RUN npm run build:dev:backend
-RUN npm run webpack:dev:web
-RUN npm run build:dev:frontend -- --scope='@hyperledger/cactus-example-supply-chain-frontend'
-
-RUN rm -rf ./packages/cactus-test-plugin*
-RUN rm -rf ./packages/cactus-test-cmd*
-RUN rm -rf ./packages/cactus-test-api*
-RUN rm -rf ./node_modules/
-
 FROM cruizba/ubuntu-dind:19.03.11 as runner
 
 USER root
@@ -76,22 +24,23 @@ RUN useradd -m ${APP_USER}
 RUN usermod -a -G ${APP_USER} ${APP_USER}
 RUN mkdir -p ${APP}
 
-COPY --chown=$APP_USER:$APP_USER --from=builder /app/ ${APP}
-
 RUN mkdir -p "${APP}/log/"
-RUN chown -R $APP_USER:$APP_USER "${APP}/log/"
+RUN chown -R $APP_USER:$APP_USER "${APP}/"
 
 # TODO: Can we hack it together so that the whole thing works rootless?
 USER ${APP_USER}
+WORKDIR ${APP}
 
 SHELL ["/bin/bash", "--login", "-i", "-c"]
-
 # Installing Node Version Manager (nvm)
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-RUN source ~/.bashrc && nvm install 16.3.0
+RUN source ~/.bashrc && \
+    nvm install 16.8.0 && \
+    npm install -g yarn && \
+    yarn add @hyperledger/cactus-example-supply-chain-backend@0.9.1-docs-1312.bcfd3c31.6+bcfd3c31 --ignore-engines --production
+
 SHELL ["/bin/bash", "--login", "-c"]
 
-WORKDIR ${APP}
 
 COPY --chown=${APP_USER}:${APP_USER} ./examples/supply-chain-app/healthcheck.sh /
 
@@ -100,7 +49,7 @@ ENV AUTHORIZATION_PROTOCOL=NONE
 ENV CACTUS_NODE_ID=-
 ENV CONSORTIUM_ID=-
 ENV KEY_PAIR_PEM=-
-ENV COCKPIT_WWW_ROOT=examples/cactus-example-supply-chain-frontend/www/
+ENV COCKPIT_WWW_ROOT=/usr/src/app/node_modules/@hyperledger/cactus-example-supply-chain-frontend/www/
 ENV COCKPIT_TLS_ENABLED=false
 ENV COCKPIT_CORS_DOMAIN_CSV=\*
 ENV COCKPIT_MTLS_ENABLED=false
@@ -117,6 +66,7 @@ ENV API_TLS_CLIENT_CA_PEM=-
 ENV API_TLS_KEY_PEM=-
 ENV API_HOST=0.0.0.0
 ENV API_PORT=4000
+ENV GRPC_TLS_ENABLED=false
 ENV LOG_LEVEL=TRACE
 
 COPY examples/supply-chain-app/supervisord.conf /etc/supervisord.conf
