@@ -110,6 +110,7 @@ describe(testCase, () => {
     const ledgerConnectorQuorum = new PluginLedgerConnectorQuorum({
       instanceId: uuidV4(),
       rpcApiHttpHost,
+      privateUrl: rpcApiHttpHost,
       pluginRegistry: new PluginRegistry({ plugins: [kvStoragePlugin] }),
     });
     plugins.push(ledgerConnectorQuorum);

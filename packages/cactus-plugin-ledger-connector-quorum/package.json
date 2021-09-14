@@ -77,7 +77,8 @@
     "prom-client": "13.2.0",
     "typescript-optional": "2.0.1",
     "web3": "1.5.2",
-    "web3-eth-contract": "1.5.2"
+    "web3-eth-contract": "1.5.2",
+    "web3js-quorum": "21.7.0-rc1"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.3",

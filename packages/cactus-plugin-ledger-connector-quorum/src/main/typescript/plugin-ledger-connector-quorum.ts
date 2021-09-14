@@ -3,6 +3,8 @@ import { Server as SecureServer } from "https";
 
 import { Express } from "express";
 import Web3 from "web3";
+import Web3JsQuorum from "web3js-quorum";
+
 // The strange way of obtaining the contract class here is like this because
 // web3-eth internally sub-classes the Contract class at runtime
 // @see https://stackoverflow.com/a/63639280/698470
@@ -66,6 +68,7 @@ import {
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
   rpcApiHttpHost: string;
+  privateUrl: string;
   logLevel?: LogLevelDesc;
   prometheusExporter?: PrometheusExporter;
   pluginRegistry: PluginRegistry;
@@ -84,8 +87,10 @@ export class PluginLedgerConnectorQuorum
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
+  private readonly privateUrl: string;
   private readonly log: Logger;
   private readonly web3: Web3;
+  private readonly web3JsQuorum: any;
   private httpServer: Server | SecureServer | null = null;
 
   private endpoints: IWebServiceEndpoint[] | undefined;
@@ -106,10 +111,18 @@ export class PluginLedgerConnectorQuorum
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
 
+    this.privateUrl = options.privateUrl;
+
     const web3Provider = new Web3.providers.HttpProvider(
       this.options.rpcApiHttpHost,
     );
     this.web3 = new Web3(web3Provider);
+    this.web3JsQuorum = Web3JsQuorum(
+      this.web3,
+      { privateUrl: this.privateUrl },
+      true,
+    );
+
     this.instanceId = options.instanceId;
     this.pluginRegistry = options.pluginRegistry as PluginRegistry;
     this.prometheusExporter =
@@ -337,6 +350,7 @@ export class PluginLedgerConnectorQuorum
       const txReq: RunTransactionRequest = {
         transactionConfig,
         web3SigningCredential,
+        privateTransactionConfig: req.privateTransactionConfig,
         timeoutMs: req.timeoutMs || 60000,
       };
       const out = await this.transact(txReq);
@@ -411,6 +425,11 @@ export class PluginLedgerConnectorQuorum
     const {
       secret,
     } = web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
+
+    if (txIn.privateTransactionConfig) {
+      return this.transactPrivate(txIn);
+    }
+
     try {
       const txHash = await sendTransaction(transactionConfig, secret);
       const transactionReceipt = await this.pollForTxReceipt(txHash);
@@ -432,6 +451,10 @@ export class PluginLedgerConnectorQuorum
       secret,
     } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
+    if (req.privateTransactionConfig) {
+      return this.transactPrivate(req);
+    }
+
     const signedTx = await this.web3.eth.accounts.signTransaction(
       transactionConfig,
       secret,
@@ -447,11 +470,56 @@ export class PluginLedgerConnectorQuorum
     }
   }
 
+  public async transactPrivate(
+    req: RunTransactionRequest,
+  ): Promise<RunTransactionResponse> {
+    const { web3SigningCredential } = req;
+    const {
+      secret,
+    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+
+    const address = JSON.parse(req.transactionConfig.from as string).address;
+
+    const transactionReceipt = await this.web3JsQuorum.eth.sendTransaction({
+      from: address,
+      to: req.transactionConfig.to,
+      value: req.transactionConfig.value,
+      gasLimit: req.transactionConfig.gas,
+      gasPrice: req.transactionConfig.gasPrice,
+      data: req.transactionConfig.data?.startsWith("0x")
+        ? req.transactionConfig.data.slice(2)
+        : req.transactionConfig.data,
+      nonce: req.transactionConfig.nonce,
+      privateFrom: req.privateTransactionConfig?.privateFrom,
+      privateFor: req.privateTransactionConfig?.privateFor,
+      privateKey: secret,
+      isPrivate: true,
+    });
+
+    return { transactionReceipt };
+  }
+
+  public async getPrivateTxReceipt(
+    privateFrom: string,
+    txHash: string,
+  ): Promise<RunTransactionResponse> {
+    const txPoolReceipt = {} as any;
+
+    console.log(privateFrom);
+    console.log(txHash);
+
+    return { transactionReceipt: txPoolReceipt };
+  }
+
   public async transactCactusKeychainRef(
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactCactusKeychainRef()`;
-    const { transactionConfig, web3SigningCredential } = req;
+    const {
+      transactionConfig,
+      web3SigningCredential,
+      privateTransactionConfig,
+    } = req;
     const {
       ethAccount,
       keychainEntryKey,
@@ -484,6 +552,7 @@ export class PluginLedgerConnectorQuorum
     }
 
     return this.transactPrivateKey({
+      privateTransactionConfig,
       transactionConfig,
       web3SigningCredential: {
         ethAccount,

@@ -292,6 +292,25 @@
                     }
                 }
             },
+            "QuorumPrivateTransactionConfig" : {
+                "type": "object",
+                "required" : [
+                    "privateFor"
+                ],
+                "properties" : {
+                    "privateFrom": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "privateFor": {
+                        "type": "array",
+                        "default": [],
+                        "items": {},
+                        "nullable": false
+                    }
+
+                }
+            },
             "Web3TransactionReceipt": {
                 "type": "object",
                 "required": [
@@ -427,6 +446,9 @@
                         "minimum": 0,
                         "default": 60000,
                         "nullable": false
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },
@@ -473,7 +495,15 @@
                         "nullable": false
                     },
                     "gasPrice": {
-                        "type": "string",
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "nonce": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "number",
                         "nullable": false
                     },
                     "timeoutMs": {
@@ -493,6 +523,9 @@
                         "type": "array",
                         "default": [],
                         "items": {}
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },
@@ -717,6 +750,9 @@
                         "$ref": "#/components/schemas/ContractJSON",
                         "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },

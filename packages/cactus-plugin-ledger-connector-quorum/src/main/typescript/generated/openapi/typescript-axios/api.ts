@@ -183,10 +183,22 @@ export interface DeployContractSolidityBytecodeV1Request {
     gas?: number;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof DeployContractSolidityBytecodeV1Request
      */
-    gasPrice?: string;
+    gasPrice?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    nonce?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    value?: number;
     /**
      * The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
      * @type {number}
@@ -205,6 +217,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     constructorArgs?: Array<any>;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 
@@ -302,6 +320,12 @@ export interface InvokeContractJsonObjectV1Request {
      * @memberof InvokeContractJsonObjectV1Request
      */
     contractJSON: ContractJSON;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 
@@ -404,6 +428,25 @@ export interface InvokeContractV1Response {
 /**
  * 
  * @export
+ * @interface QuorumPrivateTransactionConfig
+ */
+export interface QuorumPrivateTransactionConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateFrom?: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateFor: Array<any>;
+}
+/**
+ * 
+ * @export
  * @interface QuorumTransactionConfig
  */
 export interface QuorumTransactionConfig {
@@ -482,6 +525,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     timeoutMs?: number;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof RunTransactionRequest
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 

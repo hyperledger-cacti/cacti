@@ -17,6 +17,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
 
 import OAS from "../../json/openapi.json";
+import { RunTransactionRequest } from "../generated/openapi/typescript-axios/api";
 
 export interface IRunTransactionEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -84,7 +85,7 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody = req.body;
+    const reqBody: RunTransactionRequest = req.body;
     try {
       const resBody = await this.options.connector.transact(reqBody);
       res.json({ success: true, data: resBody });

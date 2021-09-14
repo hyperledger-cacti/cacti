@@ -275,6 +275,7 @@ export class SupplyChainApp {
     });
 
     const quorumConnector = new PluginLedgerConnectorQuorum({
+      privateUrl: rpcApiHostB,
       instanceId: "PluginLedgerConnectorQuorum_B",
       rpcApiHttpHost: rpcApiHostB,
       logLevel: this.options.logLevel,
