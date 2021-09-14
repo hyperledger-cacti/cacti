@@ -283,19 +283,17 @@ export class BesuTestLedger implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 180000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 360000): Promise<void> {
     const fnTag = "BesuTestLedger#waitForHealthCheck()";
-    // const httpUrl = await this.getRpcApiHttpHost();
     const startedAt = Date.now();
     let isHealthy = false;
     do {
       if (Date.now() >= startedAt + timeoutMs) {
         throw new Error(`${fnTag} timed out (${timeoutMs}ms)`);
       }
-      const containerInfo = await this.getContainerInfo();
-      this.log.debug(`ContainerInfo.Status=%o`, containerInfo.Status);
-      this.log.debug(`ContainerInfo.State=%o`, containerInfo.State);
-      isHealthy = containerInfo.Status.endsWith("(healthy)");
+      const { Status, State } = await this.getContainerInfo();
+      this.log.debug(`ContainerInfo.Status=%o, State=O%`, Status, State);
+      isHealthy = Status.endsWith("(healthy)");
       if (!isHealthy) {
         await new Promise((resolve2) => setTimeout(resolve2, 1000));
       }
