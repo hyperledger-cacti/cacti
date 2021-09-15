@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
@@ -88,7 +89,7 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, assetType, id string, isUpdateOwnerContext bool) (*BondAsset, error) {
 	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
 	if err != nil {
-		return nil, fmt.Errorf("failed to read from world state: %v", err)
+		return nil, fmt.Errorf("failed to read asset record from world state: %v", err)
 	}
 	if assetJSON == nil {
 		return nil, fmt.Errorf("the asset %s does not exist", id)
@@ -118,10 +119,10 @@ func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface,
 	assetKey := getBondAssetKey(assetType, id)
 	assetJSON, err := ctx.GetStub().GetState(assetKey)
 	if err != nil {
-		return fmt.Errorf("failed to read asset status from world state: %v", err)
+		return fmt.Errorf("failed to read asset record from world state: %v", err)
 	}
 	if assetJSON == nil {
-		return fmt.Errorf("the asset %s does not exist", id)
+		return fmt.Errorf("the bond asset of type %s and id %s does not exist", assetType, id)
 	}
 	// Ensure that the client is the owner of the asset
 	if !s.CheckAccessToAsset(ctx, assetJSON) {
@@ -149,13 +150,35 @@ func (s *SmartContract) IsBondAssetLocked(ctx contractapi.TransactionContextInte
 		Recipient: "*",
 		Locker: asset.Owner,
 	}
-	bondAssetAgreementJSON, err := json.Marshal(bondAssetAgreement)
+	bondAssetAgreementProtoSerialized, err := proto.Marshal(bondAssetAgreement)
 	if err != nil {
 		fmt.Println(err.Error())
 		return false
 	}
-	bondAssetAgreementJSON64 := base64.StdEncoding.EncodeToString(bondAssetAgreementJSON)
-	locked, err := s.IsAssetLocked(ctx, bondAssetAgreementJSON64)
+	bondAssetAgreementProto64 := base64.StdEncoding.EncodeToString(bondAssetAgreementProtoSerialized)
+	locked, err := s.IsAssetLocked(ctx, bondAssetAgreementProto64)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	return locked
+}
+
+// IsBondAssetLockedForMe returns true only if the asset is presently locked for me
+func (s *SmartContract) IsBondAssetLockedForMe(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
+	bondAssetAgreement := &common.AssetExchangeAgreement{
+		Type: asset.Type,
+		Id: asset.ID,
+		Recipient: "",
+		Locker: asset.Owner,
+	}
+	bondAssetAgreementProtoSerialized, err := proto.Marshal(bondAssetAgreement)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	bondAssetAgreementProto64 := base64.StdEncoding.EncodeToString(bondAssetAgreementProtoSerialized)
+	locked, err := s.IsAssetLocked(ctx, bondAssetAgreementProto64)
 	if err != nil {
 		fmt.Println(err.Error())
 		return false
@@ -174,13 +197,13 @@ func (s *SmartContract) CheckAccessToAsset(ctx contractapi.TransactionContextInt
 
 	// Ensure that the client is the owner of the asset
 	if !s.IsCallerAssetOwner(ctx, &asset) {
-		fmt.Printf("Illegal update: caller is not owner of asset %s", asset.ID)
+		fmt.Printf("Illegal update: caller is not owner of asset %s\n", asset.ID)
 		return false
 	}
 
 	// Ensure that the asset is not locked
-	if !s.IsBondAssetLocked(ctx, &asset) {
-		fmt.Printf("Cannot update owner of locked asset %s", asset.ID)
+	if s.IsBondAssetLocked(ctx, &asset) {
+		fmt.Printf("Cannot update attributes of locked asset %s\n", asset.ID)
 		return false
 	}
 
@@ -191,7 +214,7 @@ func (s *SmartContract) CheckAccessToAsset(ctx contractapi.TransactionContextInt
 func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface, assetType, id string) (bool, error) {
 	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
 	if err != nil {
-		return false, fmt.Errorf("failed to read from world state: %v", err)
+		return false, fmt.Errorf("failed to read asset record from world state: %v", err)
 	}
 
 	return assetJSON != nil, nil
@@ -223,13 +246,21 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 
-	// Ensure that the asset is free to be modified
-	if !s.CheckAccessToAsset(ctx, assetJSON) {
-		return fmt.Errorf("Cannot update owner of asset %s", id)
+	// If the asset is locked, only the lock recipient can update the Owner field
+	if s.IsBondAssetLocked(ctx, asset) {
+		if !s.IsBondAssetLockedForMe(ctx, asset) {
+			return fmt.Errorf("Illegal update: caller is not recipient of locked asset %s\n", asset.ID)
+		}
+	} else {
+		// If asset is not locked, only the owner can update the Owner field
+		if !s.IsCallerAssetOwner(ctx, asset) {
+			return fmt.Errorf("Illegal update: caller is not owner of asset %s\n", asset.ID)
+		}
 	}
 
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
+
 // UpdateMaturityDate sets the maturity date of the asset to an updated date as passed in the parameters.
 func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInterface, assetType, id string, newMaturityDate time.Time) error {
 	asset, err := s.ReadAsset(ctx, assetType, id, false)
