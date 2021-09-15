@@ -9,21 +9,32 @@ import (
 	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
 	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset"
 	"github.com/stretchr/testify/require"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
+	wtestmocks "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
+)
+
+const (
+	sourceNetworkID = "sourcenetwork"
+	destNetworkID   = "destinationnetwork"
 )
 
 func TestInitBondAssetLedger(t *testing.T) {
-	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
 
-	err := simpleAsset.InitBondAssetLedger(transactionContext)
+	err := simpleAsset.InitBondAssetLedger(transactionContext, sourceNetworkID)
 	require.NoError(t, err)
 
 	chaincodeStub.PutStateReturns(fmt.Errorf("failed inserting key"))
-	err = simpleAsset.InitBondAssetLedger(transactionContext)
+	err = simpleAsset.InitBondAssetLedger(transactionContext, sourceNetworkID)
 	require.EqualError(t, err, "failed to put to world state. failed inserting key")
 }
 
 func TestCreateAsset(t *testing.T) {
-	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
 
 	err := simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 26 15:04 MST")
 	require.NoError(t, err)
@@ -40,11 +51,13 @@ func TestCreateAsset(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	err = simpleAsset.CreateAsset(transactionContext, "", "asset1", "", "", 0, "")
-	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
+	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 }
 
 func TestReadAsset(t *testing.T) {
-	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
 
 	expectedAsset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
@@ -57,7 +70,7 @@ func TestReadAsset(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	_, err = simpleAsset.ReadAsset(transactionContext, "", "", false)
-	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
+	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 
 	chaincodeStub.GetStateReturns(nil, nil)
 	asset, err = simpleAsset.ReadAsset(transactionContext, "", "asset1", false)
@@ -66,7 +79,9 @@ func TestReadAsset(t *testing.T) {
 }
 
 func TestUpdateFaceValue(t *testing.T) {
-	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
 
 	expectedAsset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
@@ -82,11 +97,13 @@ func TestUpdateFaceValue(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	err = simpleAsset.UpdateFaceValue(transactionContext, "", "asset1", 0)
-	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
+	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 }
 
 func TestUpdateMaturityDate(t *testing.T) {
-	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
 
 	expectedAsset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(expectedAsset)
@@ -102,11 +119,13 @@ func TestUpdateMaturityDate(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	err = simpleAsset.UpdateMaturityDate(transactionContext, "", "asset1", time.Now())
-	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
+	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 }
 
 func TestDeleteAsset(t *testing.T) {
-	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
 
 	asset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
@@ -123,11 +142,13 @@ func TestDeleteAsset(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	err = simpleAsset.DeleteAsset(transactionContext, "", "")
-	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
+	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 }
 
 func TestUpdateOwner(t *testing.T) {
-	transactionContext, chaincodeStub, simpleAsset := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
 
 	asset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
@@ -139,11 +160,14 @@ func TestUpdateOwner(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	err = simpleAsset.UpdateOwner(transactionContext, "", "", "")
-	require.EqualError(t, err, "failed to read from world state: unable to retrieve asset")
+	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 }
 
 func TestGetMyAssets(t *testing.T) {
-	transactionContext, chaincodeStub, iterator, simpleAsset := prepMockStubwithIterator()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
+	iterator := &wtestmocks.StateQueryIterator{}
 
 	asset := &sa.BondAsset{ID: "asset1", Owner: getTestTxCreatorECertBase64()}
 	bytes, err := json.Marshal(asset)
@@ -173,7 +197,10 @@ func TestGetMyAssets(t *testing.T) {
 }
 
 func TestGetAllAssets(t *testing.T) {
-	transactionContext, chaincodeStub, iterator, simpleAsset := prepMockStubwithIterator()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
+	iterator := &wtestmocks.StateQueryIterator{}
 
 	asset := &sa.BondAsset{ID: "asset1"}
 	bytes, err := json.Marshal(asset)
