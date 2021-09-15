@@ -49,7 +49,7 @@ test("BEFORE " + testCase, async (t: Test) => {
   t.end();
 });
 
-test(testCase, async (t: Test) => {
+test.skip(testCase, async (t: Test) => {
   test.onFailure(async () => {
     await Containers.logDiagnostics({ logLevel });
   });
