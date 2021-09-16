@@ -51,6 +51,15 @@ func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextIn
 
 // CreateAsset issues a new asset to the world state with given details.
 func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, assetType, id, owner, issuer string, faceValue int, maturityDate string) error {
+	if assetType == "" {
+		return fmt.Errorf("Asset type cannot be blank")
+	}
+	if id == "" {
+		return fmt.Errorf("Asset ID cannot be blank")
+	}
+	if owner == "" && issuer == "" {
+		return fmt.Errorf("Asset Owner and Issuer cannot both be blank")
+	}
 	exists, err := s.AssetExists(ctx, assetType, id)
 	if err != nil {
 		return err

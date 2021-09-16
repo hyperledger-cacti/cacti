@@ -13,6 +13,13 @@ import (
 	wtestmocks "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
 )
 
+const (
+	defaultAssetType    = "BearerBonds"
+	defaultAssetId      = "asset1"
+	defaultAssetOwner   = "Alice"
+	defaultAssetIssuer  = "Treasury"
+)
+
 func TestInitBondAssetLedger(t *testing.T) {
 	transactionContext, chaincodeStub := wtest.PrepMockStub()
 	simpleAsset := sa.SmartContract{}
@@ -30,20 +37,32 @@ func TestCreateAsset(t *testing.T) {
 	simpleAsset := sa.SmartContract{}
 
 	err := simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 26 15:04 MST")
+	require.Error(t, err)
+
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, "", "", "", 0, "02 Jan 26 15:04 MST")
+	require.Error(t, err)
+
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, "", "", 0, "02 Jan 26 15:04 MST")
+	require.Error(t, err)
+
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "02 Jan 26 15:04 MST")
 	require.NoError(t, err)
 
-	err = simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 06 15:04 MST")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, "", defaultAssetIssuer, 0, "02 Jan 26 15:04 MST")
+	require.NoError(t, err)
+
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "02 Jan 06 15:04 MST")
 	require.EqualError(t, err, "maturity date can not be in past.")
 
-	err = simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "")
 	require.EqualError(t, err, "maturity date provided is not in correct format, please use this format: 02 Jan 06 15:04 MST")
 
 	chaincodeStub.GetStateReturns([]byte{}, nil)
-	err = simpleAsset.CreateAsset(transactionContext, "", "asset1", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "")
 	require.EqualError(t, err, "the asset asset1 already exists")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = simpleAsset.CreateAsset(transactionContext, "", "asset1", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "")
 	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 }
 

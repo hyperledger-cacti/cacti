@@ -9,14 +9,47 @@ import (
 	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
 	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset"
 	"github.com/stretchr/testify/require"
+	"github.com/hyperledger/fabric-chaincode-go/shim"
 	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 	wtestmocks "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
 )
 
 const (
-	sourceNetworkID = "sourcenetwork"
-	destNetworkID   = "destinationnetwork"
+	defaultAssetType    = "BearerBonds"
+	defaultAssetId      = "asset1"
+	defaultAssetOwner   = "Alice"
+	defaultAssetIssuer  = "Treasury"
+	defaultFaceValue    = 10000
+	sourceNetworkID     = "sourcenetwork"
+	destNetworkID       = "destinationnetwork"
+	localNetworkIdKey   = "localNetworkID"
 )
+
+type BondAsset struct {
+	Type          string      `json:"type"`
+	ID            string      `json:"id"`
+	Owner         string      `json:"owner"`
+	Issuer        string      `json:"issuer"`
+	FaceValue     int         `json:"facevalue"`
+	MaturityDate  time.Time   `json:"maturitydate"`
+}
+
+type BondAssetPledge struct {
+	AssetDetails        BondAsset   `json:"assetdetails"`
+	LocalNetworkID      string      `json:"localnetworkid"`
+	RemoteNetworkID     string      `json:"remotenetworkid"`
+	RecipientCert       string      `json:"recipientcert"`
+	ExpiryTimeSecs      uint64      `json:"expirytimesecs"`
+}
+
+type ClaimStatusAndTime struct {
+	AssetDetails        BondAsset   `json:"assetdetails"`
+	LocalNetworkID      string      `json:"localnetworkid"`
+	RemoteNetworkID     string      `json:"remotenetworkid"`
+	RecipientCert       string      `json:"recipientcert"`
+	ClaimStatus         bool        `json:"claimstatus"`
+	ProbeTime           uint64      `json:"probetime"`
+}
 
 func TestInitBondAssetLedger(t *testing.T) {
 	transactionContext, chaincodeStub := wtest.PrepMockStub()
@@ -37,20 +70,32 @@ func TestCreateAsset(t *testing.T) {
 	simpleAsset.ConfigureInterop("interopcc")
 
 	err := simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 26 15:04 MST")
+	require.Error(t, err)
+
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, "", "", "", 0, "02 Jan 26 15:04 MST")
+	require.Error(t, err)
+
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, "", "", 0, "02 Jan 26 15:04 MST")
+	require.Error(t, err)
+
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "02 Jan 26 15:04 MST")
 	require.NoError(t, err)
 
-	err = simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 06 15:04 MST")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, "", defaultAssetIssuer, 0, "02 Jan 26 15:04 MST")
+	require.NoError(t, err)
+
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "02 Jan 06 15:04 MST")
 	require.EqualError(t, err, "maturity date can not be in past.")
 
-	err = simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "")
 	require.EqualError(t, err, "maturity date provided is not in correct format, please use this format: 02 Jan 06 15:04 MST")
 
 	chaincodeStub.GetStateReturns([]byte{}, nil)
-	err = simpleAsset.CreateAsset(transactionContext, "", "asset1", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "")
 	require.EqualError(t, err, "the asset asset1 already exists")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = simpleAsset.CreateAsset(transactionContext, "", "asset1", "", "", 0, "")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "")
 	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 }
 
@@ -225,4 +270,69 @@ func TestGetAllAssets(t *testing.T) {
 	assets, err = simpleAsset.GetAllAssets(transactionContext)
 	require.EqualError(t, err, "failed retrieving all assets")
 	require.Nil(t, assets)
+}
+
+func TestPledgeAsset(t *testing.T) {
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
+
+	// Pledge non-existent asset
+	expiry := uint64(time.Now().Unix()) + (5 * 60)      // Expires 5 minutes from now
+	err := simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
+	require.Error(t, err)
+
+	maturityDate := "02 Jan 26 15:04 MST"
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, maturityDate)
+	require.NoError(t, err)
+
+	bondAssetKey := defaultAssetType + defaultAssetId
+	md_time, err := time.Parse(time.RFC822, maturityDate)
+	bondAsset := BondAsset{
+		Type: defaultAssetType,
+		ID: defaultAssetId,
+		Owner: defaultAssetOwner,
+		Issuer: defaultAssetIssuer,
+		FaceValue: defaultFaceValue,
+		MaturityDate: md_time,
+	}
+	bondAssetJSON, _ := json.Marshal(bondAsset)
+	chaincodeStub.GetStateReturnsForKey(bondAssetKey, bondAssetJSON, nil)
+	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("locker")), nil)
+	err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
+	require.Error(t, err)       // Asset owner is not the pledger
+
+	bondAsset.Owner = getLockerECertBase64()
+	bondAssetJSON, _ = json.Marshal(bondAsset)
+	chaincodeStub.GetStateReturnsForKey(bondAssetKey, bondAssetJSON, nil)
+	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte("true")))
+	err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
+	require.Error(t, err)       // Already locked asset cannot be pledged
+
+	bondAssetPledgeKey := "Pledged_" + defaultAssetType + defaultAssetId
+	bondAssetPledge := BondAssetPledge{
+		AssetDetails: bondAsset,
+		LocalNetworkID: "localNetwork",
+		RemoteNetworkID: destNetworkID,
+		RecipientCert: getRecipientECertBase64(),
+		ExpiryTimeSecs: expiry,
+	}
+	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
+	chaincodeStub.GetStateReturnsForKey(bondAssetPledgeKey, bondAssetPledgeJSON, nil)
+	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte("false")))
+	err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, "someremoteNetwork", getRecipientECertBase64(), expiry)
+	require.Error(t, err)       // Already pledged asset cannot be pledged if the pledge attributes don't match the recorded value
+
+	err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
+	require.NoError(t, err)     // Asset is already pledged, so there is nothing more to be done
+
+	chaincodeStub.GetStateClearForKey(bondAssetPledgeKey)
+	err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry - (10 * 60))
+	require.Error(t, err)       // Invalid pledge as its expiry time in the past
+
+	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(sourceNetworkID), nil)
+	chaincodeStub.PutStateReturns(nil)
+	chaincodeStub.DelStateReturns(nil)
+	err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
+	require.NoError(t, err)     // Asset pledge is recorded
 }
