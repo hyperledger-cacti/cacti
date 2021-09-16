@@ -24,6 +24,55 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
+ * @interface DeployContractSolidityBytecodeJsonObjectV1Request
+ */
+export interface DeployContractSolidityBytecodeJsonObjectV1Request {
+    /**
+     * The contract name for retrieve the contracts json on the keychain.
+     * @type {string}
+     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     */
+    contractName: string;
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     */
+    web3SigningCredential: Web3SigningCredential;
+    /**
+     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
+     * @type {string}
+     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     */
+    bytecode: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     */
+    gas?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     */
+    gasPrice?: string;
+    /**
+     * The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     */
+    timeoutMs?: number;
+    /**
+     * For use when not using keychain, pass the contract in as this variable
+     * @type {object}
+     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     */
+    contractJSON?: object;
+}
+/**
+ * 
+ * @export
  * @interface DeployContractSolidityBytecodeV1Request
  */
 export interface DeployContractSolidityBytecodeV1Request {
@@ -69,6 +118,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     timeoutMs?: number;
+    /**
+     * For use when not using keychain, pass the contract in as this variable
+     * @type {object}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    contractJSON?: object;
 }
 /**
  * 
@@ -94,6 +149,91 @@ export enum EthContractInvocationType {
     Call = 'CALL'
 }
 
+/**
+ * 
+ * @export
+ * @interface InvokeContractJsonObjectV1Request
+ */
+export interface InvokeContractJsonObjectV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    contractName: string;
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    signingCredential: Web3SigningCredential;
+    /**
+     * 
+     * @type {EthContractInvocationType}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    invocationType: EthContractInvocationType;
+    /**
+     * The name of the contract method to invoke.
+     * @type {string}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    methodName: string;
+    /**
+     * The list of arguments to pass in to the contract method being invoked.
+     * @type {Array<any>}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    params: Array<any>;
+    /**
+     * The application binary interface of the solidity contract, optional parameter
+     * @type {Array<any>}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    contractAbi?: Array<any>;
+    /**
+     * Address of the solidity contract, optional parameter
+     * @type {string}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    contractAddress?: string;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    value?: string | number;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    gas?: string | number;
+    /**
+     * 
+     * @type {string | number}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    gasPrice?: string | number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    nonce?: number;
+    /**
+     * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND
+     * @type {number}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    timeoutMs?: number;
+    /**
+     * The contract object to be passed if not using keychain.
+     * @type {object}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    contractJSON?: object;
+}
 /**
  * 
  * @export
@@ -178,6 +318,12 @@ export interface InvokeContractV1Request {
      * @memberof InvokeContractV1Request
      */
     keychainId?: string;
+    /**
+     * The contract object to be passed if not using keychain.
+     * @type {object}
+     * @memberof InvokeContractV1Request
+     */
+    contractJSON?: object;
 }
 /**
  * 
@@ -401,7 +547,7 @@ export interface Web3SigningCredentialCactusKeychainRef {
      * @type {string}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    keychainId: string;
+    keychainId?: string;
 }
 /**
  * 
@@ -552,6 +698,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Deploys the bytecode of a Solidity contract.
+         * @param {DeployContractSolidityBytecodeJsonObjectV1Request} [deployContractSolidityBytecodeJsonObjectV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployContractSolBytecodeJsonObjectV1: async (deployContractSolidityBytecodeJsonObjectV1Request?: DeployContractSolidityBytecodeJsonObjectV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-json-object`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractSolidityBytecodeJsonObjectV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Deploys the bytecode of a Solidity contract.
          * @param {DeployContractSolidityBytecodeV1Request} [deployContractSolidityBytecodeV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -649,6 +829,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Invokes a contract on a besu ledger
+         * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invokeContractV1NoKeychain: async (invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(invokeContractJsonObjectV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Executes a transaction on a quorum ledger
          * @param {RunTransactionRequest} [runTransactionRequest] 
          * @param {*} [options] Override http request option.
@@ -694,6 +908,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Deploys the bytecode of a Solidity contract.
+         * @param {DeployContractSolidityBytecodeJsonObjectV1Request} [deployContractSolidityBytecodeJsonObjectV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request?: DeployContractSolidityBytecodeJsonObjectV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractSolidityBytecodeV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Deploys the bytecode of a Solidity contract.
          * @param {DeployContractSolidityBytecodeV1Request} [deployContractSolidityBytecodeV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -725,6 +950,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Invokes a contract on a besu ledger
+         * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async invokeContractV1NoKeychain(invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeContractV1NoKeychain(invokeContractJsonObjectV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Executes a transaction on a quorum ledger
          * @param {RunTransactionRequest} [runTransactionRequest] 
          * @param {*} [options] Override http request option.
@@ -744,6 +980,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
     return {
+        /**
+         * 
+         * @summary Deploys the bytecode of a Solidity contract.
+         * @param {DeployContractSolidityBytecodeJsonObjectV1Request} [deployContractSolidityBytecodeJsonObjectV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request?: DeployContractSolidityBytecodeJsonObjectV1Request, options?: any): AxiosPromise<DeployContractSolidityBytecodeV1Response> {
+            return localVarFp.deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request, options).then((request) => request(axios, basePath));
+        },
         /**
          * 
          * @summary Deploys the bytecode of a Solidity contract.
@@ -775,6 +1021,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Invokes a contract on a besu ledger
+         * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invokeContractV1NoKeychain(invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
+            return localVarFp.invokeContractV1NoKeychain(invokeContractJsonObjectV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Executes a transaction on a quorum ledger
          * @param {RunTransactionRequest} [runTransactionRequest] 
          * @param {*} [options] Override http request option.
@@ -793,6 +1049,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
+    /**
+     * 
+     * @summary Deploys the bytecode of a Solidity contract.
+     * @param {DeployContractSolidityBytecodeJsonObjectV1Request} [deployContractSolidityBytecodeJsonObjectV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request?: DeployContractSolidityBytecodeJsonObjectV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Deploys the bytecode of a Solidity contract.
@@ -826,6 +1094,18 @@ export class DefaultApi extends BaseAPI {
      */
     public invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any) {
         return DefaultApiFp(this.configuration).invokeContractV1(invokeContractV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Invokes a contract on a besu ledger
+     * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public invokeContractV1NoKeychain(invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).invokeContractV1NoKeychain(invokeContractJsonObjectV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

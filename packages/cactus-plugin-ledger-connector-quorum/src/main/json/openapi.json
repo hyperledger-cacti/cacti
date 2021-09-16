@@ -70,7 +70,6 @@
                 "required": [
                     "type",
                     "ethAccount",
-                    "keychainId",
                     "keychainEntryKey"
                 ],
                 "properties": {
@@ -434,6 +433,11 @@
                         "minimum": 0,
                         "default": 60000,
                         "nullable": false
+                    },
+                    "contractJSON": {
+                        "type": "object",
+                        "description": "For use when not using keychain, pass the contract in as this variable",
+                        "nullable": false
                     }
                 }
             },
@@ -445,6 +449,55 @@
                 "properties": {
                     "transactionReceipt": {
                         "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
+            "DeployContractSolidityBytecodeJsonObjectV1Request": { 
+                "type": "object",
+                "required": [
+                    "contractName",
+                    "bytecode",
+                    "web3SigningCredential",
+                    "contractJson"
+                ],
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "description": "The contract name for retrieve the contracts json on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 24576,
+                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
+                    },
+                    "gas": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasPrice": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    },
+                    "contractJSON": {
+                        "type": "object",
+                        "description": "For use when not using keychain, pass the contract in as this variable",
+                        "nullable": false
                     }
                 }
             },
@@ -541,6 +594,106 @@
                         "description": "The keychainId for retrieve the contracts json.",
                         "minLength": 1,
                         "maxLength": 100
+                    },
+                    "contractJSON":{
+                        "type": "object",
+                        "description": "The contract object to be passed if not using keychain.",
+                        "nullable": false
+                    }
+                }
+            },
+            "InvokeContractJsonObjectV1Request": {
+                "type": "object",
+                "required": [
+                    "contractName",
+                    "signingCredential",
+                    "invocationType",
+                    "methodName",
+                    "params",
+                    "contractJson"
+                ],
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "signingCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "invocationType": {
+                        "$ref": "#/components/schemas/EthContractInvocationType",
+                        "nullable": false,
+                        "description": "Indicates wether it is a CALL or a SEND type of  invocation where only SEND ends up creating an actual transaction on the ledger."
+                    },
+                    "methodName": {
+                        "description": "The name of the contract method to invoke.",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 2048
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass in to the contract method being invoked.",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    },
+                    "contractAbi": {
+                        "description": "The application binary interface of the solidity contract, optional parameter",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "description": "Address of the solidity contract, optional parameter",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gas": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gasPrice": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "nonce": {
+                        "type": "number"
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    },
+                    "contractJSON":{
+                        "type": "object",
+                        "description": "The contract object to be passed if not using keychain.",
+                        "nullable": false
                     }
                 }
             },
@@ -583,6 +736,40 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/DeployContractSolidityBytecodeV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractSolidityBytecodeV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-json-object": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-json-object"
+                    }
+                },
+                "operationId": "deployContractSolBytecodeJsonObjectV1",
+                "summary": "Deploys the bytecode of a Solidity contract.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractSolidityBytecodeJsonObjectV1Request"
                             }
                         }
                     }
@@ -651,6 +838,40 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/InvokeContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeContractV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object"
+                    }
+                },
+                "operationId": "invokeContractV1NoKeychain",
+                "summary": "Invokes a contract on a besu ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeContractJsonObjectV1Request"
                             }
                         }
                     }
