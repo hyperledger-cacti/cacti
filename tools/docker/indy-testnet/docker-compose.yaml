@@ -5,28 +5,8 @@ services:
     container_name: indy_pool
     image: indy_pool
     build:
-      # context: ./indy_pool
-      # dockerfile: indy_pool.dockerfile
-      context: ${INDY_SDK_ROOT}
+      context: ./indy_pool
       dockerfile: indy-pool.dockerfile
-      args:
-      - HTTP_PROXY=$HTTP_PROXY
-      - http_proxy=$HTTP_PROXY
-      - HTTPS_PROXY=$HTTP_PROXY
-      - https_proxy=$HTTP_PROXY
-      - FTP_PROXY=$HTTP_PROXY
-      - ftp_proxy=$HTTP_PROXY
-      - NO_PROXY=$NO_PROXY
-      - no_proxy=$NO_PROXY
-    environment:
-    - HTTP_PROXY=$HTTP_PROXY
-    - http_proxy=$HTTP_PROXY
-    - HTTPS_PROXY=$HTTP_PROXY
-    - https_proxy=$HTTP_PROXY
-    - FTP_PROXY=$HTTP_PROXY
-    - ftp_proxy=$HTTP_PROXY
-    - NO_PROXY=$NO_PROXY
-    - no_proxy=$NO_PROXY
     ports: 
     - "9701:9701"
     - "9702:9702"
@@ -40,7 +20,7 @@ services:
       indy_net:
         ipv4_address: 172.16.0.2
     volumes:
-    - ./sandbox:/var/lib/indy/sandbox/
+    - ./indy_pool/sandbox:/var/lib/indy/sandbox/
 
   nginx:
     container_name: nginx
@@ -58,46 +38,29 @@ services:
       indy_net:
         ipv4_address: 172.16.0.3
 
-  validator:
-    container_name: validator
+  clientbase:
+    container_name: immediately_exits
+    image: clientbase
     build:
-      context: ../../../packages-python/cactus_validator_socketio/
-      dockerfile: build/valipy.dockerfile
-      args:
-      - pool_ip=172.16.0.2
-      - HTTP_PROXY=$HTTP_PROXY
-      - http_proxy=$HTTP_PROXY
-      - HTTPS_PROXY=$HTTP_PROXY
-      - https_proxy=$HTTP_PROXY
-      - FTP_PROXY=$HTTP_PROXY
-      - ftp_proxy=$HTTP_proxy
-      - NO_PROXY=$NO_PROXY
-      - no_proxy=$no_proxy
+      context: ./clientbase/
+      dockerfile: Dockerfile
+
+  validator:
+    container_name:  validator
+    image: validator
     environment:
-    - HTTP_PROXY=$HTTP_PROXY
-    - http_proxy=$HTTP_PROXY
-    - HTTPS_PROXY=$HTTP_PROXY
-    - https_proxy=$HTTP_PROXY
-    - FTP_PROXY=$HTTP_PROXY
-    - ftp_proxy=$HTTP_proxy
-    - NO_PROXY=$NO_PROXY
-    - no_proxy=$no_proxy
-    image: valipy
+    - TEST_POOL_IP=172.16.0.2
+    depends_on:
+      - clientbase
+    build:
+      context: ./validator
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     networks:
       indy_net:
         ipv4_address: 172.16.0.4
-    volumes:
-      - type: bind
-        source: "../../../packages-python/cactus_validator_socketio/validator-python/"
-        target: "/root/validator"
-      - type: bind
-        source: "../../../packages-python/cactus_validator_socketio/etc/cactus/"
-        target: "/etc/cactus"
-      - type: bind
-        source: "../../../../indy-sdk/"
-        target: "/root/indy-sdk"
+
 networks:
   indy_net:
     name: indy_net
@@ -106,4 +69,3 @@ networks:
       driver: default
       config:
         - subnet: 172.16.0.0/24
-
