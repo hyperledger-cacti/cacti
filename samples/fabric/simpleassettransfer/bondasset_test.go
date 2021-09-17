@@ -312,7 +312,7 @@ func TestPledgeAsset(t *testing.T) {
 	bondAssetPledgeKey := "Pledged_" + defaultAssetType + defaultAssetId
 	bondAssetPledge := BondAssetPledge{
 		AssetDetails: bondAsset,
-		LocalNetworkID: "localNetwork",
+		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
 		RecipientCert: getRecipientECertBase64(),
 		ExpiryTimeSecs: expiry,
@@ -335,4 +335,57 @@ func TestPledgeAsset(t *testing.T) {
 	chaincodeStub.DelStateReturns(nil)
 	err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
 	require.NoError(t, err)     // Asset pledge is recorded
+}
+
+func TestClaimAsset(t *testing.T) {
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleAsset := sa.SmartContract{}
+	simpleAsset.ConfigureInterop("interopcc")
+
+	maturityDate := "02 Jan 26 15:04 MST"
+	md_time, err := time.Parse(time.RFC822, maturityDate)
+	bondAsset := BondAsset{
+		Type: defaultAssetType,
+		ID: defaultAssetId,
+		Owner: getLockerECertBase64(),
+		Issuer: defaultAssetIssuer,
+		FaceValue: defaultFaceValue,
+		MaturityDate: md_time,
+	}
+
+	expiry := uint64(time.Now().Unix()) - (5 * 60)
+	bondAssetPledge := BondAssetPledge{
+		AssetDetails: bondAsset,
+		LocalNetworkID: sourceNetworkID,
+		RemoteNetworkID: destNetworkID,
+		RecipientCert: getLockerECertBase64(),
+		ExpiryTimeSecs: expiry,
+	}
+	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
+
+	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("recipient")), nil)
+	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
+	require.Error(t, err)       // Expired pledge
+
+	bondAssetPledge.ExpiryTimeSecs = bondAssetPledge.ExpiryTimeSecs + (10 * 60)
+	bondAssetPledgeJSON, _ = json.Marshal(bondAssetPledge)
+	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
+	require.Error(t, err)       // Claimer doesn't match pledge recipient
+
+	bondAssetPledge.RecipientCert = getRecipientECertBase64()
+	bondAssetPledgeJSON, _ = json.Marshal(bondAssetPledge)
+	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), destNetworkID, string(bondAssetPledgeJSON))
+	require.Error(t, err)       // Pledge not made for the claiming network
+
+	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
+	require.Error(t, err)       // Unexpected pledged asset owner
+
+	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(sourceNetworkID), nil)
+	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
+	require.Error(t, err)
+
+	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(destNetworkID), nil)
+	chaincodeStub.PutStateReturns(nil)
+	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
+	require.NoError(t, err)
 }

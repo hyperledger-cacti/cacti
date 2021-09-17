@@ -226,21 +226,21 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return err
 	}
-    if pledge.RecipientCert != claimer {
+	if pledge.RecipientCert != claimer {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged to the claimer", id)
+	}
+	if pledge.LocalNetworkID != remoteNetworkId {
+		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given network", id)
+	}
+	if pledge.AssetDetails.Owner != owner {
+		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given owner", id)
 	}
 	localNetworkId, err := ctx.GetStub().GetState(localNetworkIdKey)
 	if err != nil {
 		return err
 	}
-    if pledge.RemoteNetworkID != string(localNetworkId) {
+	if pledge.RemoteNetworkID != string(localNetworkId) {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged to a claimer in this network", id)
-	}
-    if pledge.LocalNetworkID != remoteNetworkId {
-		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given network", id)
-	}
-    if pledge.AssetDetails.Owner != owner {
-		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given owner", id)
 	}
 
 	// Make the recipient the owner of the asset, in effect recreating the asset in this network and chaincode
@@ -250,20 +250,20 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	}
 
 	// Record claim on the ledger for later verification by a foreign network
-    claimStatusAndTime := ClaimStatusAndTime{
+	claimStatusAndTime := ClaimStatusAndTime{
 		AssetDetails: pledge.AssetDetails,
 		LocalNetworkID: string(localNetworkId),
 		RemoteNetworkID: remoteNetworkId,
 		RecipientCert: claimer,
-        ClaimStatus: true,
-        ProbeTime: currentTimeSecs,
+		ClaimStatus: true,
+		ProbeTime: currentTimeSecs,
 	}
-    claimJSON, err := json.Marshal(claimStatusAndTime)
+	claimJSON, err := json.Marshal(claimStatusAndTime)
 	if err != nil {
 		return err
 	}
 
-    claimKey := getBondAssetClaimKey(assetType, id)
+	claimKey := getBondAssetClaimKey(assetType, id)
 	return ctx.GetStub().PutState(claimKey, claimJSON)
 }
 
@@ -271,7 +271,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId, claimStatusAndTimeJSON string) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
-    pledgeKey := getBondAssetPledgeKey(assetType, id)
+	pledgeKey := getBondAssetPledgeKey(assetType, id)
 	pledgeJSON, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
 		return fmt.Errorf("failed to read asset pledge status from world state: %v", err)
@@ -299,7 +299,7 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	}
 	// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
 	if !matchClaimWithAssetPledge(&pledge, &claimStatusAndTime) {
-        return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %+v", id, pledge.AssetDetails)
+		return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %+v", id, pledge.AssetDetails)
 	}
 	if (claimStatusAndTime.ProbeTime < pledge.ExpiryTimeSecs) {
 		return fmt.Errorf("cannot reclaim asset %s as the pledge has not yet expired", id)
@@ -311,17 +311,17 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if err != nil {
 		return err
 	}
-    if claimStatusAndTime.RemoteNetworkID != string(localNetworkId) {
+	if claimStatusAndTime.RemoteNetworkID != string(localNetworkId) {
 		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged by a claimer in this network", id)
 	}
-    if claimStatusAndTime.LocalNetworkID != remoteNetworkId {
+	if claimStatusAndTime.LocalNetworkID != remoteNetworkId {
 		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
 	}
-    if claimStatusAndTime.RecipientCert != recipientCert {
+	if claimStatusAndTime.RecipientCert != recipientCert {
 		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given recipient", id)
 	}
 
-    // Now we can safely delete the pledge as it has served its purpose:
+	// Now we can safely delete the pledge as it has served its purpose:
 	// (1) Pledge time has expired
 	// (2) A claim was not submitted in time in the remote network, so the asset can be reclaimed
 	err = ctx.GetStub().DelState(pledgeKey)
