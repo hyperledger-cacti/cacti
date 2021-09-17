@@ -77,7 +77,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "0.9.0",
     "@hyperledger/cactus-test-tooling": "0.9.0",
     "async-exit-hook": "2.0.1",
-    "axios": "0.21.1",
+    "axios": "0.21.4",
     "express": "4.17.1",
     "fabric-network": "2.2.8",
     "jose": "1.28.1",
