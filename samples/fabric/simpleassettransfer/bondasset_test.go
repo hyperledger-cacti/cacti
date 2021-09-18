@@ -25,32 +25,6 @@ const (
 	localNetworkIdKey   = "localNetworkID"
 )
 
-type BondAsset struct {
-	Type          string      `json:"type"`
-	ID            string      `json:"id"`
-	Owner         string      `json:"owner"`
-	Issuer        string      `json:"issuer"`
-	FaceValue     int         `json:"facevalue"`
-	MaturityDate  time.Time   `json:"maturitydate"`
-}
-
-type BondAssetPledge struct {
-	AssetDetails        BondAsset   `json:"assetdetails"`
-	LocalNetworkID      string      `json:"localnetworkid"`
-	RemoteNetworkID     string      `json:"remotenetworkid"`
-	RecipientCert       string      `json:"recipientcert"`
-	ExpiryTimeSecs      uint64      `json:"expirytimesecs"`
-}
-
-type ClaimStatusAndTime struct {
-	AssetDetails        BondAsset   `json:"assetdetails"`
-	LocalNetworkID      string      `json:"localnetworkid"`
-	RemoteNetworkID     string      `json:"remotenetworkid"`
-	RecipientCert       string      `json:"recipientcert"`
-	ClaimStatus         bool        `json:"claimstatus"`
-	ProbeTime           uint64      `json:"probetime"`
-}
-
 func TestInitBondAssetLedger(t *testing.T) {
 	transactionContext, chaincodeStub := wtest.PrepMockStub()
 	simpleAsset := sa.SmartContract{}
@@ -288,7 +262,7 @@ func TestPledgeAsset(t *testing.T) {
 
 	bondAssetKey := defaultAssetType + defaultAssetId
 	md_time, err := time.Parse(time.RFC822, maturityDate)
-	bondAsset := BondAsset{
+	bondAsset := sa.BondAsset{
 		Type: defaultAssetType,
 		ID: defaultAssetId,
 		Owner: defaultAssetOwner,
@@ -310,7 +284,7 @@ func TestPledgeAsset(t *testing.T) {
 	require.Error(t, err)       // Already locked asset cannot be pledged
 
 	bondAssetPledgeKey := "Pledged_" + defaultAssetType + defaultAssetId
-	bondAssetPledge := BondAssetPledge{
+	bondAssetPledge := sa.BondAssetPledge{
 		AssetDetails: bondAsset,
 		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
@@ -344,7 +318,7 @@ func TestClaimAsset(t *testing.T) {
 
 	maturityDate := "02 Jan 26 15:04 MST"
 	md_time, err := time.Parse(time.RFC822, maturityDate)
-	bondAsset := BondAsset{
+	bondAsset := sa.BondAsset{
 		Type: defaultAssetType,
 		ID: defaultAssetId,
 		Owner: getLockerECertBase64(),
@@ -354,7 +328,7 @@ func TestClaimAsset(t *testing.T) {
 	}
 
 	expiry := uint64(time.Now().Unix()) - (5 * 60)
-	bondAssetPledge := BondAssetPledge{
+	bondAssetPledge := sa.BondAssetPledge{
 		AssetDetails: bondAsset,
 		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
@@ -397,7 +371,7 @@ func TestReclaimAsset(t *testing.T) {
 
 	maturityDate := "02 Jan 26 15:04 MST"
 	md_time, err := time.Parse(time.RFC822, maturityDate)
-	bondAsset := BondAsset{
+	bondAsset := sa.BondAsset{
 		Type: defaultAssetType,
 		ID: defaultAssetId,
 		Owner: getLockerECertBase64(),
@@ -407,7 +381,7 @@ func TestReclaimAsset(t *testing.T) {
 	}
 
 	expiry := uint64(time.Now().Unix()) + (5 * 60)
-	bondAssetPledge := BondAssetPledge{
+	bondAssetPledge := sa.BondAssetPledge{
 		AssetDetails: bondAsset,
 		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
@@ -416,7 +390,7 @@ func TestReclaimAsset(t *testing.T) {
 	}
 	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
 
-	claimStatusAndTime := ClaimStatusAndTime{
+	claimStatusAndTime := sa.ClaimStatusAndTime{
 		AssetDetails: bondAsset,
 		LocalNetworkID: destNetworkID,
 		RemoteNetworkID: sourceNetworkID,
@@ -481,7 +455,7 @@ func TestAssetTransferQueries(t *testing.T) {
 
 	maturityDate := "02 Jan 26 15:04 MST"
 	md_time, err := time.Parse(time.RFC822, maturityDate)
-	bondAsset := BondAsset{
+	bondAsset := sa.BondAsset{
 		Type: defaultAssetType,
 		ID: defaultAssetId,
 		Owner: getLockerECertBase64(),
@@ -492,7 +466,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	bondAssetJSON, _ := json.Marshal(bondAsset)
 
 	expiry := uint64(time.Now().Unix()) + (5 * 60)
-	bondAssetPledge := BondAssetPledge{
+	bondAssetPledge := sa.BondAssetPledge{
 		AssetDetails: bondAsset,
 		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
@@ -501,7 +475,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	}
 	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
 
-	claimStatusAndTime := ClaimStatusAndTime{
+	claimStatusAndTime := sa.ClaimStatusAndTime{
 		AssetDetails: bondAsset,
 		LocalNetworkID: destNetworkID,
 		RemoteNetworkID: sourceNetworkID,
@@ -515,7 +489,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("locker")), nil)
 	pledgeStatus, err := simpleAsset.GetAssetPledgeStatus(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), destNetworkID, getRecipientECertBase64())
 	require.NoError(t, err)
-	var lookupPledge BondAssetPledge
+	var lookupPledge sa.BondAssetPledge
 	json.Unmarshal([]byte(pledgeStatus), &lookupPledge)
 	require.Equal(t, "", lookupPledge.AssetDetails.Type)
 	require.Equal(t, "", lookupPledge.AssetDetails.ID)
@@ -543,7 +517,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("recipient")), nil)
 	claimStatus, err := simpleAsset.GetAssetClaimStatusAndTime(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), getLockerECertBase64(), sourceNetworkID)
 	require.NoError(t, err)
-	var lookupClaim ClaimStatusAndTime
+	var lookupClaim sa.ClaimStatusAndTime
 	json.Unmarshal([]byte(claimStatus), &lookupClaim)
 	require.Equal(t, "", lookupClaim.AssetDetails.Type)
 	require.Equal(t, "", lookupClaim.AssetDetails.ID)
