@@ -12,7 +12,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/stretchr/testify/require"
-	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset"
+	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleassettransfer"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )

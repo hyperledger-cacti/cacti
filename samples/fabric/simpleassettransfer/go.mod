@@ -1,4 +1,4 @@
-module github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset
+module github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleassettransfer
 
 go 1.15
 

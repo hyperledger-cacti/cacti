@@ -280,6 +280,8 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 		return fmt.Errorf("the asset %s has not been pledged", id)
 	}
 
+	// At this point, a pledge has been recorded, which means the asset isn't on the ledger; so we don't need to check the asset's presence
+
 	// Make sure the pledge has expired
 	var pledge BondAssetPledge
 	err = json.Unmarshal(pledgeJSON, &pledge)
@@ -301,11 +303,17 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if !matchClaimWithAssetPledge(&pledge, &claimStatusAndTime) {
 		return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %+v", id, pledge.AssetDetails)
 	}
+	if (claimStatusAndTime.ClaimStatus) {
+		return fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
+	}
 	if (claimStatusAndTime.ProbeTime < pledge.ExpiryTimeSecs) {
 		return fmt.Errorf("cannot reclaim asset %s as the pledge has not yet expired", id)
 	}
-	if (claimStatusAndTime.ClaimStatus) {
-		return fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
+	if claimStatusAndTime.LocalNetworkID != remoteNetworkId {
+		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
+	}
+	if claimStatusAndTime.RecipientCert != recipientCert {
+		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given recipient", id)
 	}
 	localNetworkId, err := ctx.GetStub().GetState(localNetworkIdKey)
 	if err != nil {
@@ -313,12 +321,6 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	}
 	if claimStatusAndTime.RemoteNetworkID != string(localNetworkId) {
 		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged by a claimer in this network", id)
-	}
-	if claimStatusAndTime.LocalNetworkID != remoteNetworkId {
-		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
-	}
-	if claimStatusAndTime.RecipientCert != recipientCert {
-		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given recipient", id)
 	}
 
 	// Now we can safely delete the pledge as it has served its purpose:
@@ -474,7 +476,7 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 		return string(claimStatusAndTimeJSON), nil      // Return blank
 	}
 
-	return string(claimStatusAndTimeJSON), nil
+	return string(lookupClaimJSON), nil
 }
 
 // DeleteAsset deletes an given asset from the world state.
