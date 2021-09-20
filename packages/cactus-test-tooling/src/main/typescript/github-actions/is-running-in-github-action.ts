@@ -23,5 +23,10 @@ export function isRunningInGithubAction(
 ): boolean {
   Checks.truthy(env, "isRunningInGithubAction():env");
 
-  return env.GITHUB_ACTIONS === "true";
+  // Force a negative result in order to re-enable image caching for tests.
+  // This is a potentially temporary change that we can only test across multiple
+  // pull requests because it has to do with the stability of the CI/build/tests
+  // and therefore the hacky workaround here instead of just deleteing the whole
+  // mechanism completely.
+  return false;
 }

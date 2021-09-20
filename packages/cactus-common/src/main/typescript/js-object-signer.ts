@@ -6,16 +6,16 @@ import secp256k1 from "secp256k1";
 import sha3 from "sha3";
 import stringify from "json-stable-stringify";
 
-export type SignatureFunction = (msg: any, pkey: any) => any;
+export type SignatureFunction = (msg: unknown, pkey: Uint8Array) => Uint8Array;
 export type VerifySignatureFunction = (
-  msg: any,
-  signature: any,
+  msg: unknown,
+  signature: Uint8Array,
   pubKey: Uint8Array,
 ) => boolean;
-export type HashFunction = (data: any) => string;
+export type HashFunction = (data: unknown) => string;
 
 export interface IJsObjectSignerOptions {
-  privateKey: any;
+  privateKey: Uint8Array | string;
   signatureFunc?: SignatureFunction;
   verifySignatureFunc?: VerifySignatureFunction;
   hashFunc?: HashFunction;
@@ -23,10 +23,10 @@ export interface IJsObjectSignerOptions {
 }
 
 export class JsObjectSigner {
-  private privateKey: any;
-  private signatureFunc: any;
-  private verifySignatureFunc: any;
-  private hashFunc: any;
+  private privateKey: Uint8Array;
+  private signatureFunc?: SignatureFunction;
+  private verifySignatureFunc?: VerifySignatureFunction;
+  private hashFunc?: HashFunction;
   private readonly logger: Logger;
 
   constructor(public readonly options: IJsObjectSignerOptions) {
@@ -37,7 +37,14 @@ export class JsObjectSigner {
       throw new Error(`JsObjectSigner#ctor options.privateKey falsy.`);
     }
 
-    this.privateKey = options.privateKey;
+    // allows for private keys to passed as strings, but will automatically convert them to byte arrays for consistency
+    // type check is needed to satisfy compiler
+    if (typeof options.privateKey === "string") {
+      this.privateKey = Buffer.from(options.privateKey, `hex`);
+    } else {
+      this.privateKey = options.privateKey;
+    }
+
     this.signatureFunc = options.signatureFunc;
     this.verifySignatureFunc = options.verifySignatureFunc;
     this.hashFunc = options.hashFunc;
@@ -53,21 +60,23 @@ export class JsObjectSigner {
    * @param msg
    * @returns Generated signature
    */
-  public sign(msg: any): any {
+  public sign(msg: unknown): Uint8Array {
     this.logger.debug("Message to sign: " + stringify(msg));
 
     if (this.signatureFunc) {
       return this.signatureFunc(msg, this.privateKey);
     } else {
-      let hashMsg: any;
+      let hashMsg: string;
       if (this.hashFunc) {
         hashMsg = this.hashFunc(msg);
       } else {
         hashMsg = this.dataHash(msg);
       }
 
-      const pkey = Buffer.from(this.privateKey, `hex`);
-      const signObj = secp256k1.ecdsaSign(Buffer.from(hashMsg, `hex`), pkey);
+      const signObj = secp256k1.ecdsaSign(
+        Buffer.from(hashMsg, `hex`),
+        this.privateKey,
+      );
       return signObj.signature;
     }
   }
@@ -79,7 +88,11 @@ export class JsObjectSigner {
    * @param signature
    * @returns {boolean}
    */
-  public verify(msg: any, signature: Uint8Array, pubKey: any): boolean {
+  public verify(
+    msg: unknown,
+    signature: Uint8Array,
+    pubKey: Uint8Array,
+  ): boolean {
     if (this.verifySignatureFunc) {
       return this.verifySignatureFunc(msg, signature, pubKey);
     }
@@ -95,7 +108,7 @@ export class JsObjectSigner {
    * @param data
    * @returns {string}
    */
-  private dataHash(data: any): string {
+  private dataHash(data: unknown): string {
     const hashObj = new sha3.SHA3Hash(256);
     hashObj.update(stringify(data));
     const hashMsg = hashObj.digest(`hex`);
