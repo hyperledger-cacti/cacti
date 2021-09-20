@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/golang/protobuf v1.5.2
-	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.2.1
+	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.2.3
 	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.2.3
 	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20210909191523-de832057a3ab
 	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils v0.0.0-20210909191523-de832057a3ab
