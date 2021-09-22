@@ -665,9 +665,9 @@
                     },
                     "transactionHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     },
                     "transactionIndex": {
                         "type": "number",
@@ -675,9 +675,9 @@
                     },
                     "blockHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     },
                     "blockNumber": {
                         "type": "number",
@@ -989,9 +989,9 @@
                     },
                     "transactionHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     }
                 }
             },
