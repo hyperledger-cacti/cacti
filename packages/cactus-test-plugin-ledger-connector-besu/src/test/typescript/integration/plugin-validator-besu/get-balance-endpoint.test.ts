@@ -157,7 +157,6 @@ test(testCase, async (t: Test) => {
   */
 
   const request: GetBalanceV1Request = {
-    //is it suppose to be GetBalanceV1Request?
     address: testAccount.address,
   };
 

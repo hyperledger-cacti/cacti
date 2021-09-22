@@ -8,7 +8,6 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 import {
-  GetKeychainEntryRequestV1,
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
@@ -17,22 +16,23 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginKeychainAwsSm } from "../plugin-keychain-aws-sm";
+import { HasKeychainEntryRequestV1 } from "../generated/openapi/typescript-axios/api";
 
-export interface IGetKeychainEntryEndpointOptions {
+export interface IHasKeychainEntryEndpointOptions {
   logLevel?: LogLevelDesc;
   connector: PluginKeychainAwsSm;
 }
 
-export class GetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "GetKeychainEntryV1Endpoint";
+export class HasKeychainEntryV1Endpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "HasKeychainEntryV1Endpoint";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return GetKeychainEntryV1Endpoint.CLASS_NAME;
+    return HasKeychainEntryV1Endpoint.CLASS_NAME;
   }
 
-  constructor(public readonly options: IGetKeychainEntryEndpointOptions) {
+  constructor(public readonly options: IHasKeychainEntryEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.connector, `${fnTag} arg options.connector`);
@@ -44,7 +44,7 @@ export class GetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
 
   public getOasPath() {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-keychain-entry"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/has-keychain-entry"
     ];
   }
 
@@ -86,25 +86,23 @@ export class GetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const { key } = req.body as GetKeychainEntryRequestV1;
-    //const reqBody = req.body;
     try {
-      const value = await this.options.connector.get(key);
-      //const resBody = await this.options.connector.get(reqBody.key);
-      res.json({ key, value });
+      const reqBody = req.body as HasKeychainEntryRequestV1;
+      const { key } = reqBody;
+      const checkedAt = new Date().toJSON();
+      const isPresent = await this.options.connector.has(key);
+      const resBody = {
+        isPresent,
+        key,
+        checkedAt,
+      };
+      res.json(resBody);
     } catch (ex) {
-      if (ex?.message?.includes(`${key} secret not found`)) {
-        res.status(404).json({
-          key,
-          error: ex?.stack || ex?.message,
-        });
-      } else {
-        this.log.error(`Crash while serving ${reqTag}`, ex);
-        res.status(500).json({
-          message: "Internal Server Error",
-          error: ex?.stack || ex?.message,
-        });
-      }
+      this.log.error(`Crash while serving ${reqTag}`, ex);
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: ex?.stack || ex?.message,
+      });
     }
   }
 }

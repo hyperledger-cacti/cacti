@@ -1,6 +1,13 @@
 import test, { Test } from "tape-promise/tape";
-import { v4 as internalIpV4 } from "internal-ip";
 
+import express from "express";
+import bodyParser from "body-parser";
+import http from "http";
+import { AddressInfo } from "net";
+
+import { IListenOptions, Servers } from "@hyperledger/cactus-common";
+
+import { v4 as internalIpV4 } from "internal-ip";
 import {
   Containers,
   LocalStackContainer,
@@ -17,9 +24,15 @@ import {
   AwsCredentialType,
 } from "../../../main/typescript/public-api";
 
+import {
+  DefaultApi as KeychainAwsSmApi,
+  Configuration,
+} from "../../../main/typescript/generated/openapi/typescript-axios/index";
+
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -56,6 +69,7 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
     const options1: IPluginKeychainAwsSmOptions = {
       instanceId: uuidv4(),
       keychainId: uuidv4(),
+      pluginRegistry: new PluginRegistry({}),
       awsEndpoint: localstackHost,
       awsRegion: "us-east-1",
       awsProfile: "default",
@@ -65,82 +79,95 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
     };
     const plugin1 = new PluginKeychainAwsSm(options1);
 
+    const expressApp = express();
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    const server = http.createServer(expressApp);
+    const listenOptions: IListenOptions = {
+      hostname: "0.0.0.0",
+      port: 0,
+      server,
+    };
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    test.onFinish(async () => await Servers.shutdown(server));
+    const { address, port } = addressInfo;
+    const apiHost = `http://${address}:${port}`;
+    const config = new Configuration({ basePath: apiHost });
+    const apiClient = new KeychainAwsSmApi(config);
+
+    await plugin1.registerWebServices(expressApp);
+
     t.equal(plugin1.getKeychainId(), options1.keychainId, "Keychain ID set OK");
     t.equal(plugin1.getInstanceId(), options1.instanceId, "Instance ID set OK");
 
-    const key1 = uuidv4();
-    const value1 = uuidv4();
+    const key = uuidv4();
+    const value = uuidv4();
 
-    const hasPrior1 = await plugin1.has(key1);
+    //const hasPrior1 = await plugin1.has(key1);
+    //t.false(hasPrior1, "hasPrior1 === false OK");
 
-    t.false(hasPrior1, "hasPrior1 === false OK");
+    const res1 = await apiClient.hasKeychainEntryV1({ key });
+    t.true(res1.status >= 200, "res1.status >= 200 OK");
+    t.true(res1.status < 300, "res1.status < 300");
 
-    await plugin1.set(key1, value1);
+    t.ok(res1.data, "res1.data truthy OK");
+    t.false(res1.data.isPresent, "res1.data.isPresent === false OK");
+    t.ok(res1.data.checkedAt, "res1.data.checkedAt truthy OK");
+    t.equal(res1.data.key, key, "res1.data.key === key OK");
 
-    const hasAfter1 = await plugin1.has(key1);
-    t.true(hasAfter1, "hasAfter1 === true OK");
+    const res2 = await apiClient.setKeychainEntryV1({
+      key: key,
+      value: value,
+    });
+    t.true(res2.status >= 200, "res2.status >= 200 OK");
+    t.true(res2.status < 300, "res2.status < 300 OK");
+    t.notOk(res2.data, "res2.data truthy OK");
 
-    const valueAfter1 = await plugin1.get(key1);
-    t.ok(valueAfter1, "valueAfter1 truthy OK");
-    t.equal(valueAfter1, value1, "valueAfter1 === value OK");
+    const res3 = await apiClient.hasKeychainEntryV1({ key });
+    t.true(res3.status >= 200, "res3.status >= 200 OK");
+    t.true(res3.status < 300, "res3.status < 300 OK");
+    t.ok(res3.data, "res3.data truthy OK");
+    t.true(res3.data.isPresent, "res3.data.isPresent === true OK");
+    t.ok(res3.data.checkedAt, "res3.data.checkedAt truthy OK");
+    t.equal(res3.data.key, key, "res3.data.key === key OK");
 
-    await plugin1.delete(key1);
+    const res4 = await apiClient.getKeychainEntryV1({
+      key: key,
+    });
+    t.true(res4.status >= 200, "res4.status >= 200 OK");
+    t.true(res4.status < 300, "res4.status < 300 OK");
+    t.ok(res4.data, "res4.data truthy OK");
+    t.equal(res4.data.value, value, "res4.data.value === value OK");
 
-    const hasAfterDelete1 = await plugin1.has(key1);
-    t.false(hasAfterDelete1, "hasAfterDelete1 === false OK");
+    const res5 = await apiClient.deleteKeychainEntryV1({ key });
+    t.true(res5.status >= 200, "res5.status >= 200 OK");
+    t.true(res5.status < 300, "res5.status < 300 OK");
+    t.notOk(res5.data, "res5.data falsy OK");
 
-    const valueAfterDelete1 = await plugin1.get(key1);
-    t.notok(valueAfterDelete1, "valueAfterDelete1 falsy OK");
+    const res6 = await apiClient.hasKeychainEntryV1({ key });
+    t.true(res6.status >= 200, "res6.status >= 200 OK");
+    t.true(res6.status < 300, "res6.status < 300 OK");
+    t.ok(res6.data, "res6.data truthy OK");
+    t.false(res6.data.isPresent, "res6.data.isPresent === false OK");
+    t.ok(res6.data.checkedAt, "res6.data.checkedAt truthy OK");
+    t.equal(res6.data.key, key, "res6.data.key === key OK");
 
-    await (async () => {
-      await fs.promises.unlink(`${tmpDirPath}/credentials`);
-      await fs.promises.rmdir(`${tmpDirPath}`);
-    })();
-  }
-
-  // Using awsCredentialType: AwsCredentialType.FromCodeVariable
-  // Test for AWS access credentials cannot be performed over Localstack, as the opensourced version of it
-  // doesn't support AWS IAM authentication.
-  {
-    const options2: IPluginKeychainAwsSmOptions = {
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
-      awsEndpoint: localstackHost,
-      awsRegion: "us-east-1",
-      awsProfile: "default",
-      awsCredentialType: AwsCredentialType.InMemory,
-      awsAccessKeyId: "fake",
-      awsSecretAccessKey: "fake",
-      logLevel: logLevel,
-    };
-    const plugin2 = new PluginKeychainAwsSm(options2);
-
-    t.equal(plugin2.getKeychainId(), options2.keychainId, "Keychain ID set OK");
-    t.equal(plugin2.getInstanceId(), options2.instanceId, "Instance ID set OK");
-
-    const key2 = uuidv4();
-    const value2 = uuidv4();
-
-    const hasPrior2 = await plugin2.has(key2);
-
-    t.false(hasPrior2, "hasPrior2 === false OK");
-
-    await plugin2.set(key2, value2);
-
-    const hasAfter2 = await plugin2.has(key2);
-    t.true(hasAfter2, "hasAfter2 === true OK");
-
-    const valueAfter2 = await plugin2.get(key2);
-    t.ok(valueAfter2, "valueAfter2 truthy OK");
-    t.equal(valueAfter2, value2, "valueAfter2 === value OK");
-
-    await plugin2.delete(key2);
-
-    const hasAfterDelete2 = await plugin2.has(key2);
-    t.false(hasAfterDelete2, "hasAfterDelete2 === false OK");
-
-    const valueAfterDelete2 = await plugin2.get(key2);
-    t.notok(valueAfterDelete2, "valueAfterDelete2 falsy OK");
+    try {
+      await apiClient.getKeychainEntryV1({ key });
+      t.fail(
+        "Failing because getKeychainEntryV1 did not throw when called with non-existent key.",
+      );
+    } catch (ex) {
+      t.ok(ex, "res7 -> ex truthy");
+      const res7 = ex.response;
+      t.equal(res7.status, 404, "res7.status === 404 OK");
+      t.ok(res7.data, "res7.data truthy OK");
+      t.ok(res7.data.error, "res7.data.error truthy OK");
+      t.equal(typeof res7.data.error, "string", "res7.data.error truthy OK");
+      t.true(
+        res7.data.error.includes(`${key} secret not found`),
+        "res7.data.error contains legible error message about missing key OK",
+      );
+    }
   }
 
   t.end();
