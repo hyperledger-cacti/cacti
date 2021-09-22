@@ -21,9 +21,9 @@ jobs:
       run: go build -v ./...
       working-directory: core/network/fabric-interop-cc/contracts/interop
 
-  - name: Build
-    run: go test -v ./...
-    working-directory: core/network/fabric-interop-cc/contracts/interop
+    - name: Build
+      run: go test -v ./...
+      working-directory: core/network/fabric-interop-cc/contracts/interop
       
   test_interopcc_local:
     runs-on: ubuntu-latest
