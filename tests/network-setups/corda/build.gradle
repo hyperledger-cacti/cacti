@@ -100,9 +100,21 @@ task deployNodes(type: net.corda.plugins.Cordform) {
                 [ user: "clientUser1", "password": "test", "permissions": ["ALL"]],
                 [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]]
     }
+    node {
+        name "O=PartyB,L=London,C=GB"
+        p2pPort 10008
+        rpcSettings {
+            address("localhost:10009")
+            adminAddress("localhost:10049")
+        }
+        rpcUsers = [
+                [ user: "clientUser1", "password": "test", "permissions": ["ALL"]],
+                [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]]
+    }
 }
 
 task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
+    dockerImage = "corda/corda-zulu-java1.8-4.8"
     nodeDefaults {
         projectCordapp {
             deploy = false
@@ -120,6 +132,17 @@ task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) 
     node {
         name "O=PartyA,L=London,C=GB"
         p2pPort 10004
+        rpcSettings {
+            address("localhost:10003")
+            adminAddress("localhost:10005")
+        }
+        rpcUsers = [
+                [ user: "clientUser1", "password": "test", "permissions": ["ALL"]],
+                [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]]
+    }
+    node {
+        name "O=PartyB,L=London,C=GB"
+        p2pPort 10007
         rpcSettings {
             address("localhost:10003")
             adminAddress("localhost:10005")

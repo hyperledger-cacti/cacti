@@ -10,7 +10,7 @@ COPY .npmrc /root
 #RUN npm install -g yarn
 
 #RUN npm install @res-dlt-interop/fabric-cli
-RUN yarn
+# RUN yarn
 RUN npm install
 RUN yarn link
 
