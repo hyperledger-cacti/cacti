@@ -325,7 +325,7 @@ cd -
 To bring down the corda driver, run:
 ```bash
 cd core/drivers/corda-driver
-make stop
+make stop COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
 cd -
 ```
 
