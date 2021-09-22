@@ -19,7 +19,7 @@
     "reset:yarn-lock": "del-cli yarn.lock && yarn install --update-checksums --force",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
     "configure": "yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend",
-    "install-yarn": "npm install --global yarn@1.19.0",
+    "install-yarn": "npm install --global yarn@1.18.0",
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
