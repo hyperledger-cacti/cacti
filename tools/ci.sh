@@ -39,6 +39,25 @@ function dumpDiskUsageInfo()
   fi
 }
 
+function checkOnlyDocumentation()
+{
+  z=0
+
+  for i in $CHANGED_FILES; do
+    z=$((z+1))
+    if [ ${i: -3} != ".md" ]; then
+      break
+    elif [ ${i: -3} == ".md" ] && [ $(echo ${CHANGED_FILES} | wc -l) == $z ]; then
+      echo 'There are only changes in the documentation files.'
+      ENDED_AT=`date +%s`
+      runtime=$((ENDED_AT-STARTED_AT))
+      echo "$(date +%FT%T%z) [CI] SUCCESS - runtime=$runtime seconds."
+      checkWorkTreeStatus
+      exit 0
+    fi
+  done
+}
+
 function mainTask()
 {
   set -euxo pipefail
@@ -60,6 +79,9 @@ function mainTask()
   else
     smem --abbreviate --totals --system || true
   fi
+
+  # Check if the modified files are only for documentation.
+  checkOnlyDocumentation
 
   dumpDiskUsageInfo
 
