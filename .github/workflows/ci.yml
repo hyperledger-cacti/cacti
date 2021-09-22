@@ -11,15 +11,14 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: false
 
     strategy:
       fail-fast: false
-      max-parallel: 1024
+      max-parallel: 2
       matrix:
         os: [ubuntu-20.04]
-        node-version: [v12.22.3, v14.15.1, v16.2.0]
-        experimental: [false]
+        node-version: [v14.17.6, v16.9.1]
 
     steps:
     - name: Set Swap Space to 10GB
