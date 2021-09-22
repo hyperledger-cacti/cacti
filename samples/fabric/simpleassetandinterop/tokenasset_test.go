@@ -11,10 +11,12 @@ import (
 	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleassetandinterop"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/stretchr/testify/require"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 func TestInitTokenAssetLedger(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	err := simpleToken.InitTokenAssetLedger(transactionContext)
 	require.NoError(t, err)
@@ -25,7 +27,8 @@ func TestInitTokenAssetLedger(t *testing.T) {
 }
 
 func TestCreateTokenAssetType(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	// Successful Case
 	res, err := simpleToken.CreateTokenAssetType(transactionContext, "", "", 0)
@@ -53,7 +56,8 @@ func TestCreateTokenAssetType(t *testing.T) {
 }
 
 func TestReadTokenAssetType(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	expectedAsset := &sa.TokenAssetType{Issuer: "CentralBank", Value: 10}
 	bytes, err := json.Marshal(expectedAsset)
@@ -78,7 +82,8 @@ func TestReadTokenAssetType(t *testing.T) {
 }
 
 func TestDeleteTokenAssetType(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	chaincodeStub.DelStateReturns(nil)
 	err := simpleToken.DeleteTokenAssetType(transactionContext, "")
@@ -97,7 +102,8 @@ func TestDeleteTokenAssetType(t *testing.T) {
 }
 
 func TestIssueTokenAssets(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	expectedAsset := &sa.TokenWallet{WalletMap: walletMap}
@@ -127,7 +133,8 @@ func TestIssueTokenAssets(t *testing.T) {
 }
 
 func TestDeleteTokenAssets(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
@@ -163,7 +170,8 @@ func TestDeleteTokenAssets(t *testing.T) {
 
 }
 func TestTransferTokenAssets(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
@@ -184,7 +192,8 @@ func TestTransferTokenAssets(t *testing.T) {
 	require.EqualError(t, err, "failed to read from world state: Failed to read state")
 }
 func TestGetBalance(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
@@ -211,7 +220,8 @@ func TestGetBalance(t *testing.T) {
 }
 
 func TestGetMyWallet(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
@@ -239,7 +249,8 @@ func TestGetMyWallet(t *testing.T) {
 }
 
 func TestTokenAssetsExist(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5

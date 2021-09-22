@@ -2,7 +2,7 @@ module github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/si
 
 go 1.15
 
-replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils => ./testutils
+replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils => ./libs/testutils
 
 require (
 	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20210829173151-532300d55db5

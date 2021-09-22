@@ -2,6 +2,7 @@ module github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabr
 
 go 1.15
 
+replace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go => ../../protos-go
 replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils => ../utils
 
 require (

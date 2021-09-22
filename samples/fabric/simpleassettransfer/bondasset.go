@@ -215,6 +215,12 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return err
 	}
+	if pledge.AssetDetails.Type != assetType {
+		return fmt.Errorf("cannot claim asset %s as its type doesn't match the pledge", id)
+	}
+	if pledge.AssetDetails.ID != id {
+		return fmt.Errorf("cannot claim asset %s as its ID doesn't match the pledge", id)
+	}
 
 	// Make sure the pledge has not expired (we assume the expiry timestamp set by the remote network)
 	currentTimeSecs := uint64(time.Now().Unix())
@@ -299,28 +305,35 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if err != nil {
 		return err
 	}
-	// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
-	if !matchClaimWithAssetPledge(&pledge, &claimStatusAndTime) {
-		return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %+v", id, pledge.AssetDetails)
-	}
-	if (claimStatusAndTime.ClaimStatus) {
-		return fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
-	}
-	if (claimStatusAndTime.ProbeTime < pledge.ExpiryTimeSecs) {
+	if claimStatusAndTime.ProbeTime < pledge.ExpiryTimeSecs {
 		return fmt.Errorf("cannot reclaim asset %s as the pledge has not yet expired", id)
 	}
-	if claimStatusAndTime.LocalNetworkID != remoteNetworkId {
-		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
-	}
-	if claimStatusAndTime.RecipientCert != recipientCert {
-		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given recipient", id)
-	}
-	localNetworkId, err := ctx.GetStub().GetState(localNetworkIdKey)
-	if err != nil {
-		return err
-	}
-	if claimStatusAndTime.RemoteNetworkID != string(localNetworkId) {
-		return fmt.Errorf("cannot reclaim asset %s as it has not been pledged by a claimer in this network", id)
+	if (claimStatusAndTime.AssetDetails.Type != "" &&
+		claimStatusAndTime.AssetDetails.ID != "" &&
+		claimStatusAndTime.AssetDetails.Owner != "" &&
+		claimStatusAndTime.LocalNetworkID != "" &&
+		claimStatusAndTime.RemoteNetworkID != "" &&
+		claimStatusAndTime.RecipientCert != "") {
+		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
+		if !matchClaimWithAssetPledge(&pledge, &claimStatusAndTime) {
+			return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %+v", id, pledge.AssetDetails)
+		}
+		if claimStatusAndTime.ClaimStatus {
+			return fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
+		}
+		if claimStatusAndTime.LocalNetworkID != remoteNetworkId {
+			return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
+		}
+		if claimStatusAndTime.RecipientCert != recipientCert {
+			return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given recipient", id)
+		}
+		localNetworkId, err := ctx.GetStub().GetState(localNetworkIdKey)
+		if err != nil {
+			return err
+		}
+		if claimStatusAndTime.RemoteNetworkID != string(localNetworkId) {
+			return fmt.Errorf("cannot reclaim asset %s as it has not been pledged by a claimer in this network", id)
+		}
 	}
 
 	// Now we can safely delete the pledge as it has served its purpose:
@@ -430,8 +443,8 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 		LocalNetworkID: "",
 		RemoteNetworkID: "",
 		RecipientCert: "",
-        ClaimStatus: false,
-        ProbeTime: 0,
+		ClaimStatus: false,
+		ProbeTime: uint64(time.Now().Unix()),
 	}
     claimStatusAndTimeJSON, err := json.Marshal(claimStatusAndTime)
     if err != nil {
