@@ -4,13 +4,13 @@
     {
       "principal": "<certificate>",
       "principalType": "certificate",
-      "resource": "mychannel:simplestate:Read:*",
+      "resource": "mychannel:simpleassettransfer:GetAssetPledgeStatus:*",
       "read": true
     },
     {
       "principal": "<certificate>",
       "principalType": "certificate",
-      "resource": "mychannel:simplestatewithacl:Read:*",
+      "resource": "mychannel:simpleassettransfer:GetAssetClaimStatusAndTime:*",
       "read": true
     }
   ]

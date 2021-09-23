@@ -323,13 +323,42 @@ const getNetworkConfig = (
       )
       return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', aclPolicyPrincipalType: '', channelName: '', chaincode: '' }
     }
-    // console.log(configJSON[networkId])
     return configJSON[networkId]
   } catch (err) {
     logger.error(`Network: ${networkId} does not exist in the config.json file`)
     return { relayEndpoint: '', connProfilePath: '', username: '', mspId: '', aclPolicyPrincipalType: '', channelName: '', chaincode: '' }
   }
 }
+
+// Used for getting network configuration from config.json file.
+const getChaincodeConfig = (
+  chaincodeId: string,
+  chaincodeFunc: string
+): { args: Array<string>; replaceIndices: Array<number> } => {
+  const ccPath = process.env.CHAINCODE_PATH
+    ? path.join(process.env.CHAINCODE_PATH)
+    : path.join(__dirname, '../../chaincode.json')
+  try {
+    const ccJSON = JSON.parse(fs.readFileSync(ccPath).toString())
+    if (!ccJSON[chaincodeId]) {
+      logger.error(
+        `Chaincode: ${chaincodeId} does not exist in the chaincode.json file`
+      )
+      return { args: [], replaceIndices: [] }
+    }
+    if (!ccJSON[chaincodeId][chaincodeFunc]) {
+      logger.error(
+        `Chaincode: ${chaincodeId} does not have a ${chaincodeFunc} function attribute in the chaincode.json file`
+      )
+      return { args: [], replaceIndices: [] }
+    }
+    return ccJSON[chaincodeId][chaincodeFunc]
+  } catch (err) {
+    logger.error(`Chaincode: ${chaincodeId} does not exist in the chaincode.json file`)
+    return { args: [], replaceIndices: [] }
+  }
+}
+
 export {
   commandHelp,
   customHelp,
@@ -339,6 +368,7 @@ export {
   readJSONFromFile,
   signMessage,
   getNetworkConfig,
+  getChaincodeConfig,
   validKeys,
   configKeys,
   addAssets

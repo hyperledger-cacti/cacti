@@ -65,11 +65,12 @@ const command: GluegunCommand = {
     logger.info(
       `Generating ${options['local-network']} network with verification policy`
     )
+    const appccid = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
     const templatePath = options.template
       ? path.resolve(options.template)
       : path.resolve(
           __dirname,
-          '../../../data/interop/verificationPolicyTemplate.json'
+          '../../../data/interop/' + appccid + '/verificationPolicyTemplate.json'
         )
     logger.info(`Template path: ${templatePath}`)
     await generateVerificationPolicy(

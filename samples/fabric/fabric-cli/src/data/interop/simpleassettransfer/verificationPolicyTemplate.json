@@ -1,0 +1,19 @@
+{
+    "securityDomain": "<network-id>",
+    "identifiers": [
+      {
+        "pattern": "mychannel:simpleassettransfer:GetAssetPledgeStatus:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      },
+      {
+        "pattern": "mychannel:simpleassettransfer:GetAssetClaimStatusAndTime:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      }
+    ]
+}
