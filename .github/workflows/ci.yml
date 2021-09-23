@@ -21,6 +21,10 @@ jobs:
         node-version: [v14.17.6, v16.9.1]
 
     steps:
+    - name: Set Swap Space to 10GB
+      uses: pierotofy/set-swap-space@v1.0
+      with:
+        swap-size-gb: 10
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2.1.2
       with:
