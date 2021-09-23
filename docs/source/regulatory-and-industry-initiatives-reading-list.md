@@ -26,10 +26,11 @@ https://readiness.digitalizetrade.org/
 
 https://iccwbo.org/media-wall/news-speeches/digital-trade-standards-initiative-launches-under-the-umbrella-of-icc/
 
-### BAFT Digital Payment ledger Commitment (Private sector - Banking Industry)
+### BAFT Digital Ledger Payment Commitment - Technical and Business Best Practices (Private sector - Banking Industry)
 
-https://www.baft.org/about-baft/news-and-press-releases/2019/04/23/baft-releases-best-practices-for-digital-ledger-payment-commitments
+https://www.baft.org/wp-content/uploads/2021/03/baft-dlpc-technical-bps-v1-1.pdf
 
+https://www.baft.org/wp-content/uploads/2021/03/baft-dlpc-business-bps-v1-1.pdf
 ### DCSA Digital Container  Shipping Association (Private sector - shipping industry)
 
 https://dcsa.org/dcsa-publishes-standards-for-the-bill-of-lading/
