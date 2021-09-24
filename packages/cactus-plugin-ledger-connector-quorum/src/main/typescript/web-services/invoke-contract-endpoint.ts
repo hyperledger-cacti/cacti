@@ -86,7 +86,9 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody = req.body;
     try {
-      const resBody = await this.options.connector.invokeContract(reqBody);
+      const resBody = await this.options.connector.getContractInfoKeychain(
+        reqBody,
+      );
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

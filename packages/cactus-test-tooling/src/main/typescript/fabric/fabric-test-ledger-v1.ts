@@ -356,7 +356,8 @@ export class FabricTestLedgerV1 implements ITestLedger {
   }
 
   public async start(omitPull = false): Promise<Container> {
-    const containerNameAndTag = this.getContainerImageName();
+    const imageFqn = this.getContainerImageName();
+    this.log.debug(`Launching: ${imageFqn} ...`);
     const dockerEnvVars: string[] = new Array(...this.envVars).map(
       (pairs) => `${pairs[0]}=${pairs[1]}`,
     );
@@ -368,7 +369,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const docker = new Docker();
 
     if (!omitPull) {
-      await Containers.pullImage(containerNameAndTag);
+      await Containers.pullImage(imageFqn, {}, this.options.logLevel);
     }
 
     const createOptions: ContainerCreateOptions = {
@@ -425,7 +426,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
-        containerNameAndTag,
+        imageFqn,
         [],
         [],
         createOptions,

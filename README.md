@@ -2,8 +2,9 @@
 
 # Hyperledger Cactus
 
+ [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/hyperledger/cactus)
  ![license](https://img.shields.io/github/license/hyperledger/cactus) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089) [![codecov](https://codecov.io/gh/hyperledger/cactus/branch/main/graph/badge.svg?token=BJklIsqf1S)](https://codecov.io/gh/hyperledger/cactus)
- ![GitHub issues](https://img.shields.io/github/issues/hyperledger/cactus) ![Travis (.org)](https://img.shields.io/travis/hyperledger/cactus)
+ ![GitHub issues](https://img.shields.io/github/issues/hyperledger/cactus)
 
 This project is an _Incubation_ Hyperledger project. For more information on the history of this project see the [Cactus wiki page](https://wiki.hyperledger.org/display/cactus). Information on what _Active_ entails can be found in
 the [Hyperledger Project Lifecycle document](https://wiki.hyperledger.org/display/TSC/Project+Lifecycle).
@@ -31,7 +32,7 @@ As blockchain technology proliferates, blockchain integration will become an inc
       -p 4000:4000 \
       -p 4100:4100 \
       -p 4200:4200 \
-      ghcr.io/hyperledger/cactus-example-supply-chain-app:2021-07-20--fix-720
+      ghcr.io/hyperledger/cactus-example-supply-chain-app:2021-09-08--docs-1312
     ```
 3. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3100`
 4. Visit http://localhost:3100 in a web browser with Javascript enabled

@@ -48,6 +48,28 @@
       "console": "integratedTerminal",
       "sourceMaps": true,
       "cwd": "${workspaceRoot}"
+    },
+    {
+      "name": "Example: Supply Chain App",
+      "type": "node",
+      "request": "launch",
+      "protocol": "inspector",
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json"
+      },
+      "args": [
+        "../cactus-example-supply-chain-backend/src/main/typescript/supply-chain-app-cli.ts",
+        "dotenv_config_path=process.env"
+      ],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register",
+        "-r",
+        "dotenv/config"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "cwd": "${workspaceFolder}/examples/supply-chain-app/"
     }
   ]
 }

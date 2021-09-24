@@ -1,4 +1,4 @@
-name: Cactus CI Github Workflow
+name: Cactus_CI
 
 # Triggers the workflow on push or pull request events
 on:
@@ -22,6 +22,10 @@ jobs:
         experimental: [false]
 
     steps:
+    - name: Set Swap Space to 10GB
+      uses: pierotofy/set-swap-space@v1.0
+      with:
+        swap-size-gb: 10
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2.1.2
       with:
