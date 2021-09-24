@@ -5,9 +5,9 @@
  -->
 # IIN Agents in a DLT Network
 
-* Authors: Venkatraman Ramakrishna
-* Status: Draft
-* Since: 15-Oct-2020
+* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+* Status: Proposed
+* Since: 24-September-2021
 
 
 # Summary
@@ -34,12 +34,12 @@ This view is illustrated in the figure below (Fig.1), which maps quite naturally
 
 The following artifacts in the data plane are relevant to identity plane protocols:
 * _Identity trust store_: this is a set of IINs and Trust anchors `<IIN>,<Trust-Anchor-DID>`. It implies that the network trusts a given trust anchor or all trust anchors in a given IIN to certify the identity/membership credentials of foreign network units. 
-<!-- * Each network unit can be described directly by the network ID and a DID or the set can be described using a pattern (like a regular expression; e.g., Kleene closure `*`).  -->
+
 * The IIN definition can additionally contain peer connectivity information (to access the IIN ledger). This data will be looked up in the identity sharing protocol, while fetching membership information for a foreign network. It can also be used in proof verification (or view validation) in data plane protocols.
 * _Foreign network identities and configurations_: these are [security groups](../security.md), containing identities and certificates corresponding to a foreign network's units. (_Each security group is augmented with a DID attribute denoting the identity owned by the IIN Agent associated with this network unit/security group_). The IIN Agent of the network participants together update these configurations from the identity plane information.
 
 
-# Indy implementation of IIN Agent
+# Hyperledger Indy implementation of IIN Agent
 
 An IIN Agent represents a network unit that is also a self-certified identity provider for some subset of the network, as stated earlier in the summary. It is simultaneously an IIN (Indy) client and a network (Fabric, Corda, etc.) client. Therefore, there are different ways in which it can be implemented, but its core feature is that it lies within the trust boundary of a root identity provider of a network.
 

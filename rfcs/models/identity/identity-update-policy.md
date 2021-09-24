@@ -6,8 +6,8 @@
 # Network Identity Update Policies
 
 * Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
-* Status: Draft
-* Since: 25-July-2021
+* Status: Proposed
+* Since: 24-September-2021
 
 ## updatePolicy
 

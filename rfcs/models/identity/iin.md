@@ -5,9 +5,9 @@
  -->
 # Interoperation Identity Network
 
-* Authors: Venkatraman Ramakrishna, Bishakh Chandra Ghosh, Krishnasuri Narayanam
-* Status: Draft
-* Since: 15-Oct-2020
+* Authors: Venkatraman Ramakrishna, Bishakh Chandra Ghosh, Krishnasuri Narayanam, Ermyas Abebe
+* Status: Proposed
+* Since: 24-September-2021
 
 
 # Summary
@@ -58,22 +58,6 @@ For each verifiable credential, the IIN must store the corresponding [schema](ht
 
 
 
-
-<!-- 
-An IIN contains the following:
-* Identity record: `<DID>,<Service-Endpoint>` for each of the following:
-  * Every steward
-  * (If applicable) every trust anchor created by a steward of this IIN
-  * Every network unit certified by a steward or a trust anchor of this IIN
-* Credential schemas corresponding to the following:
-  * Membership list for a network, with the following attributes: `<Network-ID>`, `[<DID1>,<DID2>,......]`
-  * Membership info for a network unit, with the following attributes: `<Network-ID>` (_Currently, this is the only attribute relevant for identify information sharing, but we can add more for other kinds of information sharing_)
-* Credential definitions corresponding to the following:
-  * Membership list for a network: signing (issuing) key owned by a steward or trust anchor of this IIN
-  * Membership information for a network unit: signing (issuing) key owned by a steward or trust anchor of this IIN
-  * 
-  *  -->
-
 # IIN DID Method
 
 An IIN can have any distributed DID registry based on any platform, provided it supports the DID method operations stated as follows: 
@@ -108,34 +92,3 @@ These trust anchors are entities that the participants trust and whose identity 
 ## IIN Agents
 
 DLT networks interact with the IINs through a components called IIN Agent. Each participant unit in a DLT network has have atleast one IIN Agent using which it exposes its identity as well as discovers and verifies foreign network identities. The IIN Agents are detailed [here](./iin-agent.md).
-
-
-<!-- 
-# IIN Structure and Bootstrap
-
-This is a Hyperledger Indy network that is collectively managed by a set of _stewards_. For an IIN to facilitate bilateral interoperation between networks N1 and N2, the following constraint must hold: _for every unit in N1 and N2, there exists at least one steward that is trusted, directly or transitively, by that network unit_.
-
-In the limiting, or trivial, case, an IIN can contain just one steward that is trusted by every unit in N1 and N2. For the purpose of our protocol, such a network would be functionally indistinguishable from, though less trustworthy than, a truly distributed IIN that contains multiple stewards representing trusted authorities that have agreed to join that IIN and are bound by a shared ledger.
-
-_Proposal for initial implementation_: Build an IIN that contains four Indy nodes (as per the reference Indy implementation) and two stewards. This implementation will be non-trivial and will have one steward corresponding to each interoperating network (i.e., consortium) in at least some demo scenarios. _Example_: for interoperation between TradeLens and We.Trade, we build an IIN containing two stewards by default: one representing Maersk (to certify TradeLens units) and another representing IBM (to certify We.Trade units). -->
-
-<!-- 
-## Bootstrap procedure:
-1. Create network artifacts:
-   * Configuration file with network name (`NETWORK_NAME`) set to `IIN`(or something unique, if there is more than one IIN)
-   * Keys for each Indy node: ed25519 transport/communication keys, BLS keys for multisig and state proofs
-   * Genesis transactions: pool transactions genesis file, domain transactions genesis file with specification for stewards (each with a unique name assigned a priori) 
-2. Launch the 4-node Indy pool network by starting each node in a separate Docker container.
-3. Start an IIN steward agent for each steward in a separate Docker container. A steward agent is built on a Hyperledger Aries instance.
-
-## Reference:
-* Hyperledger Indy Node: Create a Network and Start a 4-Node Indy Pool [link](https://hyperledger-indy.readthedocs.io/projects/node/en/latest/start-nodes.html)
-* Implementation of single-node/single-steward Indy pool in Docker containers [link](https://github.com/identity-interop/iin_deployment)
-
-
-
-
-# Interfaces
-Standard Indy SDK API will be used for communication between identity owners' agents and between agents and Indy pool nodes.
-Standard Indy SDK API will be used for creating and maintaining wallets (for DIDs, keys, secrets, and credentials) at the agents. 
--->

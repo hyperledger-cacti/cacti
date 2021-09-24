@@ -1,8 +1,8 @@
 # Data Plane Identity Configuration
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh
-* Status: Draft
-* Since: 20-August-2021
+* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+* Status: Proposed
+* Since: 24-September-2021
 
 ### Overview
 

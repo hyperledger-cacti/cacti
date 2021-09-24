@@ -1,9 +1,9 @@
 
 ## Network Identity Validation
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh
-* Status: Draft
-* Since: 10-June-2020
+* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+* Status: Proposed
+* Since: 24-September-2021
 
 ### Summary
 When a network ("local network" from here on) tries to configure the idetntity of another network ("foreign network" from here on) for interoperation, the broad steps involved are (i) Network Discovery (ii) Network Identity Validation. Both these steps are carried out by the IIN agent of the participants of the local network.

@@ -4,8 +4,8 @@
  SPDX-License-Identifier: CC-BY-4.0
  -->
 # Discovery Protocol
-* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam
-* Status: Draft
+* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
+* Status: Proposed
 * Since: 25-July-2021
 
 

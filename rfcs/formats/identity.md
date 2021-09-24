@@ -5,9 +5,9 @@
  -->
 # Identity Plane Data Formats
 
-* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam
-* Status: Draft
-* Since: 25-July-2021
+* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
+* Status: Proposed
+* Since: 24-September-2021
 
 
 ## Participant Unit Identity
