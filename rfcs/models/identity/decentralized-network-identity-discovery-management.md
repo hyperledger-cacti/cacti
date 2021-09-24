@@ -5,7 +5,7 @@
  -->
 # Decentralized Network-Identity Discovery and Management for Interoperation
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh
+* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
 * Status: Draft
 * Since: 10-June-2020
 

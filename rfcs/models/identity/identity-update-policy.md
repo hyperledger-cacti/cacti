@@ -3,13 +3,13 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Identity Plane Data Formats
+# Network Identity Update Policies
 
-* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam
+* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
 * Status: Draft
 * Since: 25-July-2021
 
-# updatePolicy
+## updatePolicy
 
 The memberships in a blockchain network are not guaranteed to be static. Often existing participant members of a network leave while new participants join. As a result, the `verificationMethod` and `networkParticipants` of the *Network DID* must also be updated to capture the updated network structure.
 
@@ -37,7 +37,7 @@ Example of `updatePolicy`.
 }
 ```
 
-# Network DID updates
+## Network DID updates
 
 Any request to update the *Network DID* must be authenticated based on different policies for the different scenarios of (i) participants leaving the network, (ii) new participants joining the network, and (iii) other updates to the Network DID.
 
