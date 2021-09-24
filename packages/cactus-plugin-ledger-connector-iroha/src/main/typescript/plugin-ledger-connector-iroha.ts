@@ -6,8 +6,6 @@ import { QueryService_v1Client as QueryService } from "iroha-helpers-ts/lib/prot
 import commands from "iroha-helpers-ts/lib/commands/index";
 import queries from "iroha-helpers-ts/lib/queries";
 import type { Express } from "express";
-import { promisify } from "util";
-import { Optional } from "typescript-optional";
 import {
   GrantablePermission,
   GrantablePermissionMap,
@@ -138,16 +136,8 @@ export class PluginLedgerConnectorIroha
     return;
   }
 
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
-  }
-
   public async shutdown(): Promise<void> {
-    const serverMaybe = this.getHttpServer();
-    if (serverMaybe.isPresent()) {
-      const server = serverMaybe.get();
-      await promisify(server.close.bind(server))();
-    }
+    this.log.info(`Shutting down ${this.className}...`);
   }
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {

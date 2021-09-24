@@ -1,8 +1,4 @@
-import { Server } from "http";
-import { Server as SecureServer } from "https";
-
 import { Express } from "express";
-import { Optional } from "typescript-optional";
 
 import OAS from "../json/openapi.json";
 
@@ -92,10 +88,6 @@ export class PluginKeychainVaultRemoteAdapter
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   public registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     return this.getOrCreateWebServices();
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async shutdown(): Promise<void> {
