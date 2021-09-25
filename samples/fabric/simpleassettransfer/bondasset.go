@@ -215,6 +215,9 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return err
 	}
+	if pledge.AssetDetails.ID == "" {
+		return fmt.Errorf("cannot claim asset %s as it has not been pledged in %s", id, remoteNetworkId)
+	}
 	if pledge.AssetDetails.Type != assetType {
 		return fmt.Errorf("cannot claim asset %s as its type doesn't match the pledge", id)
 	}
@@ -308,6 +311,9 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if claimStatusAndTime.ProbeTime < pledge.ExpiryTimeSecs {
 		return fmt.Errorf("cannot reclaim asset %s as the pledge has not yet expired", id)
 	}
+	if claimStatusAndTime.ClaimStatus {
+		return fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
+	}
 	if (claimStatusAndTime.AssetDetails.Type != "" &&
 		claimStatusAndTime.AssetDetails.ID != "" &&
 		claimStatusAndTime.AssetDetails.Owner != "" &&
@@ -317,9 +323,6 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
 		if !matchClaimWithAssetPledge(&pledge, &claimStatusAndTime) {
 			return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %+v", id, pledge.AssetDetails)
-		}
-		if claimStatusAndTime.ClaimStatus {
-			return fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
 		}
 		if claimStatusAndTime.LocalNetworkID != remoteNetworkId {
 			return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
@@ -446,10 +449,10 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 		ClaimStatus: false,
 		ProbeTime: uint64(time.Now().Unix()),
 	}
-    claimStatusAndTimeJSON, err := json.Marshal(claimStatusAndTime)
-    if err != nil {
-        return "", err
-    }
+	claimStatusAndTimeJSON, err := json.Marshal(claimStatusAndTime)
+	if err != nil {
+		return "", err
+	}
 
 	// The asset should be recorded if it has been claimed, so we should look that up first
 	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
@@ -487,6 +490,11 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 	// Match claim with request parameters
 	if lookupClaim.AssetDetails.Owner != pledger || lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.RecipientCert != recipientCert {
 		return string(claimStatusAndTimeJSON), nil      // Return blank
+	}
+	lookupClaim.ProbeTime = claimStatusAndTime.ProbeTime
+	lookupClaimJSON, err = json.Marshal(lookupClaim)
+	if err != nil {
+		return "", err
 	}
 
 	return string(lookupClaimJSON), nil

@@ -102,15 +102,17 @@ const command: GluegunCommand = {
     const contractName = process.env.DEFAULT_CHAINCODE
       ? process.env.DEFAULT_CHAINCODE
       : 'interop'
+    const username = options['user'] || `user1`
     const { wallet, contract } = await fabricHelper({
       channel,
       contractName,
       connProfilePath: relayEnv.connProfilePath,
       networkName,
       mspId: options.mspId,
-      logger
+      logger,
+      discoveryEnabled: true,
+      userString: username
     })
-    const username = options.username || `user1`
     const [keyCert, keyCertError] = await handlePromise(
       getKeyAndCertForRemoteRequestbyUserName(wallet, username)
     )

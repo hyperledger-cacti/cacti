@@ -417,19 +417,19 @@ func TestReclaimAsset(t *testing.T) {
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), destNetworkID, string(claimStatusAndTimeJSON))
 	require.Error(t, err)       // claim probe time was before expiration time
 
-	claimStatusAndTime.ProbeTime = expiry - (5 * 60)
-	claimStatusAndTime.AssetDetails.ID = "someid"
-	claimStatusAndTimeJSON, _ = json.Marshal(claimStatusAndTime)
-	err = simpleAsset.ReclaimAsset(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), destNetworkID, string(claimStatusAndTimeJSON))
-	require.Error(t, err)       // claim was for a different asset
-
-	claimStatusAndTime.AssetDetails.ID = defaultAssetId
 	claimStatusAndTime.ClaimStatus = true
 	claimStatusAndTimeJSON, _ = json.Marshal(claimStatusAndTime)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), destNetworkID, string(claimStatusAndTimeJSON))
 	require.Error(t, err)       // claim was successfully made
 
+	claimStatusAndTime.ProbeTime = expiry - (5 * 60)
+	claimStatusAndTime.AssetDetails.ID = "someid"
 	claimStatusAndTime.ClaimStatus = false
+	claimStatusAndTimeJSON, _ = json.Marshal(claimStatusAndTime)
+	err = simpleAsset.ReclaimAsset(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), destNetworkID, string(claimStatusAndTimeJSON))
+	require.Error(t, err)       // claim was for a different asset
+
+	claimStatusAndTime.AssetDetails.ID = defaultAssetId
 	claimStatusAndTimeJSON, _ = json.Marshal(claimStatusAndTime)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), "somenetworkid", string(claimStatusAndTimeJSON))
 	require.Error(t, err)       // claim was probed in a different network than expected

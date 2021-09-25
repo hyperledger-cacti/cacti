@@ -1,0 +1,18 @@
+{
+  "simplestate": {
+    "Create": {
+      "args": ["a", ""],
+      "replaceIndices": [1]
+    }
+  },
+  "simpleassettransfer": {
+    "ClaimRemoteAsset": {
+      "args": ["<assettype>", "<assetid>", "<alice>", "network1", ""],
+      "replaceIndices": [4]
+    },
+    "ReclaimAsset": {
+      "args": ["<assettype>", "<assetid>", "<bob>", "network2", ""],
+      "replaceIndices": [4]
+    }
+  }
+}

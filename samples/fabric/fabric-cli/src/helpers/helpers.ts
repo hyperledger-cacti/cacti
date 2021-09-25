@@ -92,6 +92,8 @@ const addAssets = ({
     } else if (ccType == 'token') {
       currentQuery.ccFunc = 'IssueTokenAssets'
       currentQuery.args = [...currentQuery.args, item[1]['tokenassettype'], item[1]['numunits'], userCert]
+    } else {
+      throw new Error(`Unrecognized asset category: ${ccType}`)
     }
     console.log(currentQuery)
     try {
@@ -113,6 +115,96 @@ const addAssets = ({
   })
 }
 
+// Basic function to add data to network, it assumes function is CREATE
+// TODO: Pass function name as parameter
+const pledgeAsset = async ({
+  dataFilePath,
+  sourceNetworkName,
+  destNetworkName,
+  recipient,
+  expirySecs,
+  connProfilePath,
+  query,
+  mspId = global.__DEFAULT_MSPID__,
+  channelName,
+  contractName,
+  ccFunc,
+  ccType,
+  assetRef,
+  logger
+}: {
+  dataFilePath: string
+  sourceNetworkName: string
+  destNetworkName: string
+  recipient: string
+  expirySecs: number
+  connProfilePath: string
+  query?: Query
+  mspId?: string
+  channelName?: string
+  contractName?: string
+  ccFunc?: string
+  ccType: string
+  assetRef: string
+  logger?: any
+}): Promise<any> => {
+  const filepath = path.resolve(dataFilePath)
+  const data = JSON.parse(fs.readFileSync(filepath).toString())
+  const item = data[assetRef]
+  if (!item) {
+    throw new Error(`Cannot find asset ref ${assetRef} in file ${filepath}`)
+  }
+  const currentQuery = query
+    ? query
+    : {
+        channel: channelName,
+        contractName: contractName
+          ? contractName
+          : 'simpleasset',
+        ccFunc: '',
+        args: []
+      }
+
+  const { gateway, contract, wallet } = await fabricHelper({
+    channel: channelName,
+    contractName: contractName,
+    connProfilePath: connProfilePath,
+    networkName: sourceNetworkName,
+    mspId: mspId,
+    userString: item['owner'],
+    registerUser: false
+  })
+  const recipientId = JSON.parse(fs.readFileSync(__dirname + '/../wallet-' + destNetworkName + '/' + recipient + '.id').toString())
+  const recipientCert = Buffer.from(recipientId.credentials.certificate).toString('base64')
+  const expirationTime = (Math.floor(Date.now()/1000 + expirySecs)).toString()
+
+  if (ccType == 'bond') {
+    currentQuery.ccFunc = 'PledgeAsset'
+    currentQuery.args = [...currentQuery.args, item['assetType'], item['id'], destNetworkName, recipientCert, expirationTime]
+  } else {
+    throw new Error(`Unrecognized asset category: ${ccType}`)
+  }
+  console.log(currentQuery)
+  try {
+    const read = await contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
+    const state = Buffer.from(read).toString()
+    if (state) {
+      logger.debug(`Response From Network: ${state}`)
+    } else {
+      logger.debug('No Response from network')
+    }
+
+    // Disconnect from the gateway.
+    await gateway.disconnect()
+    return state
+  } catch (error) {
+    console.error(`Failed to submit transaction: ${error}`)
+    throw new Error(error)
+  }
+}
+
+// Basic function to add data to network, it assumes function is CREATE
+// TODO: Pass function name as parameter
 const addData = ({
   filename,
   networkName,
@@ -371,5 +463,6 @@ export {
   getChaincodeConfig,
   validKeys,
   configKeys,
-  addAssets
+  addAssets,
+  pledgeAsset
 }
