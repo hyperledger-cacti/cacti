@@ -290,6 +290,7 @@ func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInt
 
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
+
 // UpdateFaceValue sets the face value of an asset to the new value passed.
 func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterface, assetType, id string, newFaceValue int) error {
 	asset, err := s.ReadAsset(ctx, assetType, id, false)

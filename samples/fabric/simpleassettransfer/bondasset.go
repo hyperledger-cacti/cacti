@@ -634,9 +634,7 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 
 	// If the asset is locked, only the lock recipient can update the Owner field
 	if s.IsBondAssetLocked(ctx, asset) {
-		if !s.IsBondAssetLockedForMe(ctx, asset) {
-			return fmt.Errorf("Illegal update: caller is not recipient of locked asset %s\n", asset.ID)
-		}
+		return fmt.Errorf("Illegal update: cannot change ownership of locked asset %s in this transaction\n", asset.ID)
 	} else {
 		// If asset is not locked, only the owner can update the Owner field
 		if !s.IsCallerAssetOwner(ctx, asset) {
@@ -646,6 +644,7 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
+
 // UpdateMaturityDate sets the maturity date of the asset to an updated date as passed in the parameters.
 func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInterface, assetType, id string, newMaturityDate time.Time) error {
 	asset, err := s.ReadAsset(ctx, assetType, id, false)
@@ -666,6 +665,7 @@ func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInt
 
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
+
 // UpdateFaceValue sets the face value of an asset to the new value passed.
 func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterface, assetType, id string, newFaceValue int) error {
 	asset, err := s.ReadAsset(ctx, assetType, id, false)
