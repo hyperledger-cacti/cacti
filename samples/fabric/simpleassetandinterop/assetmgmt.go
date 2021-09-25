@@ -8,6 +8,7 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
@@ -169,7 +170,16 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
-		err = s.UpdateOwner(ctx, assetAgreement.Type, assetAgreement.Id, string(recipientECertBase64))
+		asset, err := s.ReadAsset(ctx, assetAgreement.Type, assetAgreement.Id, true)
+		if err != nil {
+			return false, logThenErrorf(err.Error())
+		}
+		asset.Owner = string(recipientECertBase64)
+		assetJSON, err := json.Marshal(asset)
+		if err != nil {
+			return false, logThenErrorf(err.Error())
+		}
+		err = ctx.GetStub().PutState(getBondAssetKey(assetAgreement.Type, assetAgreement.Id), assetJSON)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -211,7 +221,16 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 			return false, logThenErrorf(err.Error())
 		}
 
-		err = s.UpdateOwner(ctx, assetType, assetId, recipientECertBase64)
+		asset, err := s.ReadAsset(ctx, assetType, assetId, true)
+		if err != nil {
+			return false, logThenErrorf(err.Error())
+		}
+		asset.Owner = recipientECertBase64
+		assetJSON, err := json.Marshal(asset)
+		if err != nil {
+			return false, logThenErrorf(err.Error())
+		}
+		err = ctx.GetStub().PutState(getBondAssetKey(assetType, assetId), assetJSON)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}

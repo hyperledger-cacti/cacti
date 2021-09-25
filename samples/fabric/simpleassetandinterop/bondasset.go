@@ -257,9 +257,7 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 
 	// If the asset is locked, only the lock recipient can update the Owner field
 	if s.IsBondAssetLocked(ctx, asset) {
-		if !s.IsBondAssetLockedForMe(ctx, asset) {
-			return fmt.Errorf("Illegal update: caller is not recipient of locked asset %s\n", asset.ID)
-		}
+		return fmt.Errorf("Illegal update: cannot change ownership of locked asset %s in this transaction\n", asset.ID)
 	} else {
 		// If asset is not locked, only the owner can update the Owner field
 		if !s.IsCallerAssetOwner(ctx, asset) {
