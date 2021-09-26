@@ -16,4 +16,4 @@ VIEW_ADDRESS=$(node getAssetTransferViewAddress.js reclaim network1 alice networ
 cd ..
 
 # Run interop query using view address
-./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP $VIEW_ADDRESS --user=alice
+./bin/fabric-cli interop --local-network=network1 --remote-network=network2 --requesting-org=Org1MSP $VIEW_ADDRESS --user=alice

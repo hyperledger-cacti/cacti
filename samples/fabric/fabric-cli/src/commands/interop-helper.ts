@@ -14,6 +14,7 @@ import {
   commandHelp,
   getNetworkConfig,
   getChaincodeConfig,
+  generateViewAddress,
   handlePromise
 } from '../helpers/helpers'
 import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
@@ -140,7 +141,12 @@ const command: GluegunCommand = {
         relayEnv.relayEndpoint,
         replaceIndices,
         [{
-          address: array[0],
+          address: await generateViewAddress(           // Typically a noop, but for some functions, we may want to do some extra processing
+                            array[0],
+                            options['local-network'],
+                            options['remote-network'],
+                            logger
+                            ),
           Sign: true
         }],
         keyCert

@@ -39,7 +39,8 @@ type ClaimStatusAndTime struct {
 	RemoteNetworkID     string      `json:"remotenetworkid"`
 	RecipientCert       string      `json:"recipientcert"`
 	ClaimStatus         bool        `json:"claimstatus"`
-	ProbeTime           uint64      `json:"probetime"`
+	ExpiryTimeSecs      uint64      `json:"expirytimesecs"`
+	ExpirationStatus    bool        `json:"expirationstatus"`
 }
 
 func getBondAssetKey(assetType string, assetId string) string {
@@ -265,7 +266,8 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 		RemoteNetworkID: remoteNetworkId,
 		RecipientCert: claimer,
 		ClaimStatus: true,
-		ProbeTime: currentTimeSecs,
+		ExpiryTimeSecs: pledge.ExpiryTimeSecs,
+		ExpirationStatus: false,
 	}
 	claimJSON, err := json.Marshal(claimStatusAndTime)
 	if err != nil {
@@ -308,7 +310,11 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if err != nil {
 		return err
 	}
-	if claimStatusAndTime.ProbeTime < pledge.ExpiryTimeSecs {
+	// We first match the expiration timestamps to ensure that the view address for the claim status was accurate
+	if claimStatusAndTime.ExpiryTimeSecs != pledge.ExpiryTimeSecs {
+		return fmt.Errorf("cannot reclaim asset %s as the expiration timestamps in the pledge and the claim don't match", id)
+	}
+	if !claimStatusAndTime.ExpirationStatus {
 		return fmt.Errorf("cannot reclaim asset %s as the pledge has not yet expired", id)
 	}
 	if claimStatusAndTime.ClaimStatus {
@@ -431,7 +437,7 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 }
 
 // GetAssetClaimStatusAndTime returns the asset claim status and present time (of invocation).
-func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string) (string, error) {
+func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
     claimStatusAndTime := &ClaimStatusAndTime{
@@ -447,7 +453,8 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 		RemoteNetworkID: "",
 		RecipientCert: "",
 		ClaimStatus: false,
-		ProbeTime: uint64(time.Now().Unix()),
+		ExpiryTimeSecs: pledgeExpiryTimeSecs,
+		ExpirationStatus: (uint64(time.Now().Unix()) >= pledgeExpiryTimeSecs),
 	}
 	claimStatusAndTimeJSON, err := json.Marshal(claimStatusAndTime)
 	if err != nil {
@@ -491,7 +498,8 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 	if lookupClaim.AssetDetails.Owner != pledger || lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.RecipientCert != recipientCert {
 		return string(claimStatusAndTimeJSON), nil      // Return blank
 	}
-	lookupClaim.ProbeTime = claimStatusAndTime.ProbeTime
+	lookupClaim.ExpiryTimeSecs = claimStatusAndTime.ExpiryTimeSecs
+	lookupClaim.ExpirationStatus = claimStatusAndTime.ExpirationStatus
 	lookupClaimJSON, err = json.Marshal(lookupClaim)
 	if err != nil {
 		return "", err

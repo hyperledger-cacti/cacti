@@ -34,7 +34,8 @@ const signMessage = (message, privateKey) => {
   sign.end()
   return sign.sign(privateKey)
 }
-// Basic function to add data to network, it assumes function is CREATE
+
+// Basic function to add assets to network, it assumes function is CreateAsset
 // TODO: Pass function name as parameter
 const addAssets = ({
   dataFilePath,
@@ -115,7 +116,7 @@ const addAssets = ({
   })
 }
 
-// Basic function to add data to network, it assumes function is CREATE
+// Basic function to pledge an asset in one network to another, it assumes function is PledgeAsset
 // TODO: Pass function name as parameter
 const pledgeAsset = async ({
   dataFilePath,
@@ -182,7 +183,7 @@ const pledgeAsset = async ({
     currentQuery.ccFunc = 'PledgeAsset'
     currentQuery.args = [...currentQuery.args, item['assetType'], item['id'], destNetworkName, recipientCert, expirationTime]
   } else {
-    throw new Error(`Unrecognized asset category: ${ccType}`)
+    throw new Error(`Unrecognized/unsupported asset category: ${ccType}`)
   }
   console.log(currentQuery)
   try {
@@ -203,7 +204,88 @@ const pledgeAsset = async ({
   }
 }
 
-// Basic function to add data to network, it assumes function is CREATE
+// Basic function to query asset pledge details from a network, it assumes function is GetAssetPledgeStatus
+// TODO: Pass function name as parameter
+const getAssetPledgeDetails = async ({
+  sourceNetworkName,
+  pledger,
+  pledgerCert,
+  destNetworkName,
+  recipient,
+  recipientCert,
+  query,
+  mspId = global.__DEFAULT_MSPID__,
+  ccFunc,
+  assetType,
+  assetRef,
+  logger
+}: {
+  sourceNetworkName: string
+  pledger: string
+  pledgerCert: string
+  destNetworkName: string
+  recipient: string
+  recipientCert: string
+  query?: Query
+  mspId?: string
+  ccFunc?: string
+  assetType: string
+  assetRef: string
+  logger?: any
+}): Promise<any> => {
+  const netConfig = getNetworkConfig(sourceNetworkName)
+
+  const currentQuery = query
+    ? query
+    : {
+        channel: netConfig.channelName,
+        contractName: netConfig.chaincode
+          ? netConfig.chaincode
+          : 'simpleasset',
+        ccFunc: '',
+        args: []
+      }
+
+  const { gateway, contract, wallet } = await fabricHelper({
+    channel: netConfig.channelName,
+    contractName: netConfig.chaincode,
+    connProfilePath: netConfig.connProfilePath,
+    networkName: sourceNetworkName,
+    mspId: netConfig.mspId,
+    userString: pledger,
+    registerUser: false
+  })
+  if (!pledgerCert) {
+    const pledgerId = JSON.parse(fs.readFileSync(__dirname + '/../wallet-' + sourceNetworkName + '/' + pledger + '.id').toString())
+    pledgerCert = Buffer.from(pledgerId.credentials.certificate).toString('base64')
+  }
+  if (!recipientCert) {
+    const recipientId = JSON.parse(fs.readFileSync(__dirname + '/../wallet-' + destNetworkName + '/' + recipient + '.id').toString())
+    recipientCert = Buffer.from(recipientId.credentials.certificate).toString('base64')
+  }
+
+  currentQuery.ccFunc = 'GetAssetPledgeStatus'
+  currentQuery.args = [...currentQuery.args, assetType, assetRef, pledgerCert, destNetworkName, recipientCert]
+  console.log(currentQuery)
+  try {
+    const read = await contract.evaluateTransaction(currentQuery.ccFunc, ...currentQuery.args)
+    const state = Buffer.from(read).toString()
+    if (state) {
+      logger.debug(`Response From Network: ${state}`)
+    } else {
+      logger.debug('No Response from network')
+    }
+
+    // Disconnect from the gateway.
+    await gateway.disconnect()
+    return state
+  } catch (error) {
+    console.error(`Failed to submit transaction: ${error}`)
+    throw new Error(error)
+  }
+}
+
+// Basic function to add data to network, it assumes function is Create
 // TODO: Pass function name as parameter
 const addData = ({
   filename,
@@ -451,6 +533,46 @@ const getChaincodeConfig = (
   }
 }
 
+// Update view address if needed
+const generateViewAddress = async (
+  viewAddress: string,
+  sourceNetwork: string,
+  destNetwork: string,
+  logger?: any
+): Promise<string> => {
+  if (!viewAddress || viewAddress.length === 0) {
+    throw new Error('Empty view address')
+  }
+  if (viewAddress.indexOf('#') >= 0) {
+    return viewAddress
+  }
+  if (viewAddress.indexOf('GetAssetClaimStatusAndTime') >= 0) {
+    // Get asset pledge details
+    const ccFunc = 'GetAssetClaimStatusAndTime'
+    const addressParts = viewAddress.substring(viewAddress.indexOf(ccFunc) + ccFunc.length + 1).split(':')
+    if (addressParts.length != 5) {
+      throw new Error(`Expected 5 arguments for ${ccFunc}; found ${addressParts.length}`)
+    }
+    if (addressParts[4] != sourceNetwork) {
+      throw new Error(`Passed source network ID ${sourceNetwork} does not match last chaincode argument in view address ${addressParts[4]}`)
+    }
+    const pledgeDetails = await getAssetPledgeDetails({
+      sourceNetworkName: addressParts[4],
+      pledger: '',
+      pledgerCert: addressParts[3],
+      destNetworkName: destNetwork,
+      recipient: '',
+      recipientCert: addressParts[2],
+      assetType: addressParts[0],
+      assetRef: addressParts[1],
+      logger: logger
+    });
+    return viewAddress + ':' + JSON.parse(pledgeDetails).expirytimesecs;
+  } else {
+    return viewAddress
+  }
+}
+
 export {
   commandHelp,
   customHelp,
@@ -464,5 +586,7 @@ export {
   validKeys,
   configKeys,
   addAssets,
-  pledgeAsset
+  pledgeAsset,
+  getAssetPledgeDetails,
+  generateViewAddress
 }

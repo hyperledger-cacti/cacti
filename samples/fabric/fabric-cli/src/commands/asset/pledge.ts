@@ -29,7 +29,7 @@ const command: GluegunCommand = {
         print,
         toolbox,
         'fabric-cli configure asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assets.json',
-        'fabric-cli configure asset pledge --source-network=<source-network-name> --dest-network=<dest-network-name> --recipient=<owner-id> --expiry-secs=<expiry-in-seconds> --type=<bond|token> --ref=<asset-id> --data-file=<path-to-data-file>>',
+        'fabric-cli configure asset pledge --source-network=<source-network-name> --dest-network=<dest-network-name> --recipient=<recipient-id> --expiry-secs=<expiry-in-seconds> --type=<bond|token> --ref=<asset-id> --data-file=<path-to-data-file>>',
         [
           {
             name: '--debug',
