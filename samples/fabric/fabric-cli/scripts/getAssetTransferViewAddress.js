@@ -40,7 +40,7 @@ function getReclaimViewAddress(sourceNetwork, pledger, destNetwork, recipient, a
         console.log('Unrecognized destination network:', destNetwork);
         process.exit(1);
     }
-    address = address + 'mychannel:simpleassettransfer:GetAssetClaimStatusAndTime:' + assetType + ':' + assetId + ':';
+    address = address + 'mychannel:simpleassettransfer:GetAssetClaimStatus:' + assetType + ':' + assetId + ':';
     const recipientCert = getECertBase64(destNetwork, recipient);
     address = address + recipientCert + ':';
     const pledgerCert = getECertBase64(sourceNetwork, pledger);

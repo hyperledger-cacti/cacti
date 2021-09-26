@@ -9,7 +9,7 @@
         }
       },
       {
-        "pattern": "mychannel:simpleassettransfer:GetAssetClaimStatusAndTime:*",
+        "pattern": "mychannel:simpleassettransfer:GetAssetClaimStatus:*",
         "policy": {
           "type": "Signature",
           "criteria": []

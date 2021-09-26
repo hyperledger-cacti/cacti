@@ -10,7 +10,7 @@
     {
       "principal": "<certificate>",
       "principalType": "certificate",
-      "resource": "mychannel:simpleassettransfer:GetAssetClaimStatusAndTime:*",
+      "resource": "mychannel:simpleassettransfer:GetAssetClaimStatus:*",
       "read": true
     }
   ]

@@ -10,7 +10,7 @@
     {
       "principal": "<mspid>",
       "principalType": "ca",
-      "resource": "mychannel:simpleassettransfer:GetAssetClaimStatusAndTime:*",
+      "resource": "mychannel:simpleassettransfer:GetAssetClaimStatus:*",
       "read": true
     }
   ]

@@ -390,7 +390,7 @@ func TestReclaimAsset(t *testing.T) {
 	}
 	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
 
-	claimStatusAndTime := sa.ClaimStatusAndTime{
+	claimStatusAndTime := sa.BondAssetClaimStatus{
 		AssetDetails: bondAsset,
 		LocalNetworkID: destNetworkID,
 		RemoteNetworkID: sourceNetworkID,
@@ -477,7 +477,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	}
 	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
 
-	claimStatusAndTime := sa.ClaimStatusAndTime{
+	claimStatusAndTime := sa.BondAssetClaimStatus{
 		AssetDetails: bondAsset,
 		LocalNetworkID: destNetworkID,
 		RemoteNetworkID: sourceNetworkID,
@@ -518,9 +518,9 @@ func TestAssetTransferQueries(t *testing.T) {
 
 	// Query for claim when no asset or claim exists
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("recipient")), nil)
-	claimStatus, err := simpleAsset.GetAssetClaimStatusAndTime(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), getLockerECertBase64(), sourceNetworkID, expiry)
+	claimStatus, err := simpleAsset.GetAssetClaimStatus(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), getLockerECertBase64(), sourceNetworkID, expiry)
 	require.NoError(t, err)
-	var lookupClaim sa.ClaimStatusAndTime
+	var lookupClaim sa.BondAssetClaimStatus
 	json.Unmarshal([]byte(claimStatus), &lookupClaim)
 	require.Equal(t, "", lookupClaim.AssetDetails.Type)
 	require.Equal(t, "", lookupClaim.AssetDetails.ID)
@@ -538,7 +538,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	bondAssetJSON, _ = json.Marshal(bondAsset)
 	chaincodeStub.GetStateReturnsForKey(bondAssetKey, bondAssetJSON, nil)
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("recipient")), nil)
-	claimStatus, err = simpleAsset.GetAssetClaimStatusAndTime(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), getLockerECertBase64(), sourceNetworkID, expiry)
+	claimStatus, err = simpleAsset.GetAssetClaimStatus(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), getLockerECertBase64(), sourceNetworkID, expiry)
 	require.NoError(t, err)
 	json.Unmarshal([]byte(claimStatus), &lookupClaim)
 	require.Equal(t, "", lookupClaim.AssetDetails.Type)
@@ -553,7 +553,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	// Query for claim after recording both an asset and a claim
 	bondAssetClaimKey := "Claimed_" + defaultAssetType + defaultAssetId
 	chaincodeStub.GetStateReturnsForKey(bondAssetClaimKey, claimStatusAndTimeJSON, nil)
-	claimStatus, err = simpleAsset.GetAssetClaimStatusAndTime(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), getLockerECertBase64(), sourceNetworkID, expiry)
+	claimStatus, err = simpleAsset.GetAssetClaimStatus(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), getLockerECertBase64(), sourceNetworkID, expiry)
 	require.NoError(t, err)
 	json.Unmarshal([]byte(claimStatus), &lookupClaim)
 	require.Equal(t, claimStatusAndTime.AssetDetails.Type, lookupClaim.AssetDetails.Type)

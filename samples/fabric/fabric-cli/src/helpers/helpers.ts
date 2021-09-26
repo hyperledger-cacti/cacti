@@ -546,9 +546,9 @@ const generateViewAddress = async (
   if (viewAddress.indexOf('#') >= 0) {
     return viewAddress
   }
-  if (viewAddress.indexOf('GetAssetClaimStatusAndTime') >= 0) {
+  if (viewAddress.indexOf('GetAssetClaimStatus') >= 0) {
     // Get asset pledge details
-    const ccFunc = 'GetAssetClaimStatusAndTime'
+    const ccFunc = 'GetAssetClaimStatus'
     const addressParts = viewAddress.substring(viewAddress.indexOf(ccFunc) + ccFunc.length + 1).split(':')
     if (addressParts.length != 5) {
       throw new Error(`Expected 5 arguments for ${ccFunc}; found ${addressParts.length}`)

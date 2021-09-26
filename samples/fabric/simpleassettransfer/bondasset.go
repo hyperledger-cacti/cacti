@@ -33,7 +33,7 @@ type BondAssetPledge struct {
 	ExpiryTimeSecs      uint64      `json:"expirytimesecs"`
 }
 
-type ClaimStatusAndTime struct {
+type BondAssetClaimStatus struct {
 	AssetDetails        BondAsset   `json:"assetdetails"`
 	LocalNetworkID      string      `json:"localnetworkid"`
 	RemoteNetworkID     string      `json:"remotenetworkid"`
@@ -55,7 +55,7 @@ func getBondAssetClaimKey(assetType string, assetId string) string {
 	return "Claimed_" + assetType + assetId
 }
 
-func matchClaimWithAssetPledge(pledge *BondAssetPledge, claim *ClaimStatusAndTime) bool {
+func matchClaimWithAssetPledge(pledge *BondAssetPledge, claim *BondAssetClaimStatus) bool {
 	return (pledge.AssetDetails.Type == claim.AssetDetails.Type &&
 		pledge.AssetDetails.ID == claim.AssetDetails.ID &&
 		pledge.AssetDetails.Owner == claim.AssetDetails.Owner &&
@@ -260,7 +260,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	}
 
 	// Record claim on the ledger for later verification by a foreign network
-	claimStatusAndTime := ClaimStatusAndTime{
+	claimStatus := BondAssetClaimStatus{
 		AssetDetails: pledge.AssetDetails,
 		LocalNetworkID: string(localNetworkId),
 		RemoteNetworkID: remoteNetworkId,
@@ -269,7 +269,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 		ExpiryTimeSecs: pledge.ExpiryTimeSecs,
 		ExpirationStatus: false,
 	}
-	claimJSON, err := json.Marshal(claimStatusAndTime)
+	claimJSON, err := json.Marshal(claimStatus)
 	if err != nil {
 		return err
 	}
@@ -279,7 +279,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 }
 
 // ReclaimAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
-func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId, claimStatusAndTimeJSON string) error {
+func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId, claimStatusJSON string) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	pledgeKey := getBondAssetPledgeKey(assetType, id)
@@ -305,42 +305,42 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	}
 
 	// Make sure the asset has not been claimed within the given time
-	var claimStatusAndTime ClaimStatusAndTime
-	err = json.Unmarshal([]byte(claimStatusAndTimeJSON), &claimStatusAndTime)
+	var claimStatus BondAssetClaimStatus
+	err = json.Unmarshal([]byte(claimStatusJSON), &claimStatus)
 	if err != nil {
 		return err
 	}
 	// We first match the expiration timestamps to ensure that the view address for the claim status was accurate
-	if claimStatusAndTime.ExpiryTimeSecs != pledge.ExpiryTimeSecs {
+	if claimStatus.ExpiryTimeSecs != pledge.ExpiryTimeSecs {
 		return fmt.Errorf("cannot reclaim asset %s as the expiration timestamps in the pledge and the claim don't match", id)
 	}
-	if !claimStatusAndTime.ExpirationStatus {
+	if !claimStatus.ExpirationStatus {
 		return fmt.Errorf("cannot reclaim asset %s as the pledge has not yet expired", id)
 	}
-	if claimStatusAndTime.ClaimStatus {
+	if claimStatus.ClaimStatus {
 		return fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
 	}
-	if (claimStatusAndTime.AssetDetails.Type != "" &&
-		claimStatusAndTime.AssetDetails.ID != "" &&
-		claimStatusAndTime.AssetDetails.Owner != "" &&
-		claimStatusAndTime.LocalNetworkID != "" &&
-		claimStatusAndTime.RemoteNetworkID != "" &&
-		claimStatusAndTime.RecipientCert != "") {
+	if (claimStatus.AssetDetails.Type != "" &&
+		claimStatus.AssetDetails.ID != "" &&
+		claimStatus.AssetDetails.Owner != "" &&
+		claimStatus.LocalNetworkID != "" &&
+		claimStatus.RemoteNetworkID != "" &&
+		claimStatus.RecipientCert != "") {
 		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
-		if !matchClaimWithAssetPledge(&pledge, &claimStatusAndTime) {
+		if !matchClaimWithAssetPledge(&pledge, &claimStatus) {
 			return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %+v", id, pledge.AssetDetails)
 		}
-		if claimStatusAndTime.LocalNetworkID != remoteNetworkId {
+		if claimStatus.LocalNetworkID != remoteNetworkId {
 			return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
 		}
-		if claimStatusAndTime.RecipientCert != recipientCert {
+		if claimStatus.RecipientCert != recipientCert {
 			return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given recipient", id)
 		}
 		localNetworkId, err := ctx.GetStub().GetState(localNetworkIdKey)
 		if err != nil {
 			return err
 		}
-		if claimStatusAndTime.RemoteNetworkID != string(localNetworkId) {
+		if claimStatus.RemoteNetworkID != string(localNetworkId) {
 			return fmt.Errorf("cannot reclaim asset %s as it has not been pledged by a claimer in this network", id)
 		}
 	}
@@ -436,11 +436,11 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 	return string(lookupPledgeJSON), nil
 }
 
-// GetAssetClaimStatusAndTime returns the asset claim status and present time (of invocation).
-func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
+// GetAssetClaimStatus returns the asset claim status and present time (of invocation).
+func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
-    claimStatusAndTime := &ClaimStatusAndTime{
+    claimStatus := &BondAssetClaimStatus{
 		AssetDetails: BondAsset{
 			Type: "",
 			ID: "",
@@ -456,7 +456,7 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 		ExpiryTimeSecs: pledgeExpiryTimeSecs,
 		ExpirationStatus: (uint64(time.Now().Unix()) >= pledgeExpiryTimeSecs),
 	}
-	claimStatusAndTimeJSON, err := json.Marshal(claimStatusAndTime)
+	claimStatusJSON, err := json.Marshal(claimStatus)
 	if err != nil {
 		return "", err
 	}
@@ -467,7 +467,7 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 		return "", fmt.Errorf("failed to read asset record from world state: %v", err)
 	}
 	if assetJSON == nil {
-		return string(claimStatusAndTimeJSON), nil      // Return blank
+		return string(claimStatusJSON), nil      // Return blank
 	}
 
     // Check if this asset is owned by the given recipient
@@ -477,7 +477,7 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 		return "", err
 	}
 	if asset.Owner != recipientCert {
-		return string(claimStatusAndTimeJSON), nil      // Return blank
+		return string(claimStatusJSON), nil      // Return blank
 	}
 
 	// Lookup claim record
@@ -487,19 +487,19 @@ func (s *SmartContract) GetAssetClaimStatusAndTime(ctx contractapi.TransactionCo
 		return "", fmt.Errorf("failed to read asset claim status from world state: %v", err)
 	}
 	if lookupClaimJSON == nil {
-		return string(claimStatusAndTimeJSON), nil      // Return blank
+		return string(claimStatusJSON), nil      // Return blank
 	}
-	var lookupClaim ClaimStatusAndTime
+	var lookupClaim BondAssetClaimStatus
 	err = json.Unmarshal(lookupClaimJSON, &lookupClaim)
 	if err != nil {
 		return "", err
 	}
 	// Match claim with request parameters
 	if lookupClaim.AssetDetails.Owner != pledger || lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.RecipientCert != recipientCert {
-		return string(claimStatusAndTimeJSON), nil      // Return blank
+		return string(claimStatusJSON), nil      // Return blank
 	}
-	lookupClaim.ExpiryTimeSecs = claimStatusAndTime.ExpiryTimeSecs
-	lookupClaim.ExpirationStatus = claimStatusAndTime.ExpirationStatus
+	lookupClaim.ExpiryTimeSecs = claimStatus.ExpiryTimeSecs
+	lookupClaim.ExpirationStatus = claimStatus.ExpirationStatus
 	lookupClaimJSON, err = json.Marshal(lookupClaim)
 	if err != nil {
 		return "", err
