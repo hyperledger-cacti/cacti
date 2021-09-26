@@ -31,6 +31,9 @@
       "extensions": "sol"
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=10",
     "npm": ">=6"
