@@ -522,7 +522,7 @@
                     }
                 }
             },
-            "GetKeychainEntryRequest": {
+            "GetKeychainEntryRequestV1": {
                 "type": "object",
                 "required": [
                     "key"
@@ -537,7 +537,7 @@
                     }
                 }
             },
-            "GetKeychainEntryResponse": {
+            "GetKeychainEntryResponseV1": {
                 "type": "object",
                 "required": [
                     "key",
@@ -561,7 +561,7 @@
                     }
                 }
             },
-            "SetKeychainEntryRequest": {
+            "SetKeychainEntryRequestV1": {
                 "type": "object",
                 "required": [
                     "key",
@@ -585,7 +585,7 @@
                     }
                 }
             },
-            "SetKeychainEntryResponse": {
+            "SetKeychainEntryResponseV1": {
                 "type": "object",
                 "required": [
                     "key"
@@ -711,7 +711,7 @@
                 "content": {
                     "application/json": {
                         "schema": {
-                            "$ref": "#/components/schemas/GetKeychainEntryRequest"
+                            "$ref": "#/components/schemas/GetKeychainEntryRequestV1"
                         }
                     }
                 }
@@ -722,7 +722,7 @@
                 "content": {
                     "application/json": {
                         "schema": {
-                            "$ref": "#/components/schemas/SetKeychainEntryRequest"
+                            "$ref": "#/components/schemas/SetKeychainEntryRequestV1"
                         }
                     }
                 }
@@ -786,7 +786,7 @@
                 "content": {
                     "application/json": {
                         "schema": {
-                            "$ref": "#/components/schemas/GetKeychainEntryResponse"
+                            "$ref": "#/components/schemas/GetKeychainEntryResponseV1"
                         }
                     }
                 }
@@ -808,7 +808,7 @@
                 "content": {
                     "application/json": {
                         "schema": {
-                            "$ref": "#/components/schemas/SetKeychainEntryResponse"
+                            "$ref": "#/components/schemas/SetKeychainEntryResponseV1"
                         }
                     }
                 }

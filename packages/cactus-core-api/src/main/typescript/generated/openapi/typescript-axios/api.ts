@@ -291,32 +291,32 @@ export interface DeleteKeychainEntryResponseV1 {
 /**
  * 
  * @export
- * @interface GetKeychainEntryRequest
+ * @interface GetKeychainEntryRequestV1
  */
-export interface GetKeychainEntryRequest {
+export interface GetKeychainEntryRequestV1 {
     /**
      * The key for the entry to get from the keychain.
      * @type {string}
-     * @memberof GetKeychainEntryRequest
+     * @memberof GetKeychainEntryRequestV1
      */
     key: string;
 }
 /**
  * 
  * @export
- * @interface GetKeychainEntryResponse
+ * @interface GetKeychainEntryResponseV1
  */
-export interface GetKeychainEntryResponse {
+export interface GetKeychainEntryResponseV1 {
     /**
      * The key that was used to retrieve the value from the keychain.
      * @type {string}
-     * @memberof GetKeychainEntryResponse
+     * @memberof GetKeychainEntryResponseV1
      */
     key: string;
     /**
      * The value associated with the requested key on the keychain.
      * @type {string}
-     * @memberof GetKeychainEntryResponse
+     * @memberof GetKeychainEntryResponseV1
      */
     value: string;
 }
@@ -572,32 +572,32 @@ export interface PluginInstance {
 /**
  * 
  * @export
- * @interface SetKeychainEntryRequest
+ * @interface SetKeychainEntryRequestV1
  */
-export interface SetKeychainEntryRequest {
+export interface SetKeychainEntryRequestV1 {
     /**
      * The key for the entry to set on the keychain.
      * @type {string}
-     * @memberof SetKeychainEntryRequest
+     * @memberof SetKeychainEntryRequestV1
      */
     key: string;
     /**
      * The value that will be associated with the key on the keychain.
      * @type {string}
-     * @memberof SetKeychainEntryRequest
+     * @memberof SetKeychainEntryRequestV1
      */
     value: string;
 }
 /**
  * 
  * @export
- * @interface SetKeychainEntryResponse
+ * @interface SetKeychainEntryResponseV1
  */
-export interface SetKeychainEntryResponse {
+export interface SetKeychainEntryResponseV1 {
     /**
      * The key that was used to set the value on the keychain.
      * @type {string}
-     * @memberof SetKeychainEntryResponse
+     * @memberof SetKeychainEntryResponseV1
      */
     key: string;
 }

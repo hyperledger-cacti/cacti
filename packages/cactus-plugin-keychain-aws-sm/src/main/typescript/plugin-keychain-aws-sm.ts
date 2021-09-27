@@ -1,6 +1,3 @@
-import type { Server } from "http";
-import type { Server as SecureServer } from "https";
-
 import {
   SharedIniFileCredentials,
   config as awsConfig,
@@ -9,7 +6,6 @@ import {
 } from "aws-sdk";
 
 import type { Express } from "express";
-import { Optional } from "typescript-optional";
 
 import OAS from "../json/openapi.json";
 
@@ -170,10 +166,6 @@ export class PluginKeychainAwsSm
 
   public async onPluginInit(): Promise<unknown> {
     return;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async shutdown(): Promise<void> {

@@ -1,6 +1,3 @@
-import type { Server } from "http";
-import type { Server as SecureServer } from "https";
-import { Optional } from "typescript-optional";
 import { Express } from "express";
 import OAS from "../../json/openapi.json";
 import {
@@ -150,10 +147,6 @@ export class SupplyChainCactusPlugin
       listShipment,
     ];
     return this.endpoints;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async shutdown(): Promise<void> {
