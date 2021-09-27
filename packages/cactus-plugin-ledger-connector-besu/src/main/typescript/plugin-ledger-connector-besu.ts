@@ -4,7 +4,6 @@ import { Server as SecureServer } from "https";
 import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
 import type { Express } from "express";
-import { promisify } from "util";
 import { Optional } from "typescript-optional";
 
 import OAS from "../json/openapi.json";
@@ -187,17 +186,8 @@ export class PluginLedgerConnectorBesu
     this.web3EEA = EEAClient(this.web3, chainId);
   }
 
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
-  }
-
   public async shutdown(): Promise<void> {
-    const serverMaybe = this.getHttpServer();
-    if (serverMaybe.isPresent()) {
-      const server = serverMaybe.get();
-      await promisify(server.close.bind(server))();
-    }
-    this.web3Provider.disconnect(1000, "Shutting down...");
+    this.log.info(`Shutting down ${this.className}...`);
   }
 
   async registerWebServices(

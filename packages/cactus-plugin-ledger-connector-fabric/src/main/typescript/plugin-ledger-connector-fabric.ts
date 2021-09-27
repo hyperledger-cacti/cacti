@@ -1,7 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { Server } from "http";
-import { Server as SecureServer } from "https";
 
 import { Certificate } from "@fidm/x509";
 import { Express } from "express";
@@ -23,8 +21,6 @@ import {
   TransientMap,
   Wallet,
 } from "fabric-network";
-
-import { Optional } from "typescript-optional";
 
 import OAS from "../json/openapi.json";
 
@@ -228,10 +224,6 @@ export class PluginLedgerConnectorFabric
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-ledger-connector-fabric`;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async onPluginInit(): Promise<unknown> {

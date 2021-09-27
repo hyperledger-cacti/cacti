@@ -2,8 +2,6 @@ import { Server } from "http";
 import { Server as SecureServer } from "https";
 
 import { Express } from "express";
-import { promisify } from "util";
-import { Optional } from "typescript-optional";
 import Web3 from "web3";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
@@ -150,16 +148,8 @@ export class PluginLedgerConnectorXdai
     return;
   }
 
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
-  }
-
   public async shutdown(): Promise<void> {
-    const serverMaybe = this.getHttpServer();
-    if (serverMaybe.isPresent()) {
-      const server = serverMaybe.get();
-      await promisify(server.close.bind(server))();
-    }
+    this.log.info(`Shutting down ${this.className}...`);
   }
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {

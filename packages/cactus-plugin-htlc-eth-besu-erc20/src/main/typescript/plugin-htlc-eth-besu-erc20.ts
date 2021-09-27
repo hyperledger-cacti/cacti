@@ -1,8 +1,4 @@
-import { Server } from "http";
-import { Server as SecureServer } from "https";
-
 import { Express } from "express";
-import { Optional } from "typescript-optional";
 
 import OAS from "../json/openapi.json";
 
@@ -64,13 +60,6 @@ export class PluginHtlcEthBesuErc20
 
   public get className(): string {
     return PluginHtlcEthBesuErc20.CLASS_NAME;
-  }
-
-  /**
-   * Feature is deprecated, we won't need this method in the future.
-   */
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   /**
