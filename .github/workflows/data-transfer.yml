@@ -147,6 +147,7 @@ jobs:
           ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials_docker
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           cat .env
+          cp chaincode.json.template chaincode.json
         working-directory: samples/fabric/fabric-cli
         
       - name: Fabric CLI Configure ALL
@@ -406,6 +407,7 @@ jobs:
           ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           cat .env
+          cp chaincode.json.template chaincode.json
         working-directory: samples/fabric/fabric-cli
         
       - name: Fabric CLI Configure ALL
