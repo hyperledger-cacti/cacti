@@ -94,8 +94,10 @@ object AssetFlow {
 
         override fun call(): AssetState {
             val inputState = inputStatePointer.resolve(serviceHub).state.data
-            //return AssetState(inputState.quantity, inputState.tokenType, serviceHub.myInfo.legalIdentities.first())
-            return inputState.copy(owner = serviceHub.myInfo.legalIdentities.first())
+            // below creates an asset state with a different linearId
+            return AssetState(inputState.quantity, inputState.tokenType, serviceHub.myInfo.legalIdentities.first())
+            // below creates an asset state with the same linearId
+            //return inputState.copy(owner = serviceHub.myInfo.legalIdentities.first())
         }
     }
 
@@ -356,6 +358,8 @@ object AssetFlow {
 
             val mergedState = AssetState(assetState1.state.data.quantity + assetState2.state.data.quantity, assetState1.state.data.tokenType, serviceHub.myInfo.legalIdentities.first())
 
+            println("Merged asset state proposed: ${mergedState}\n")
+
             val txCommand = Command(AssetContract.Commands.Merge(), mergedState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
                 .addInputState(assetState1)
@@ -430,10 +434,11 @@ object AssetFlow {
             }
             val splitState = assetStatesWithLinearId.first()
 
-            println("Split  asset state from the ledger: $splitState.state.data\n")
+            println("Split asset state from the ledger: $splitState.state.data\n")
 
             val outputState1 = AssetState(quantity1, splitState.state.data.tokenType, serviceHub.myInfo.legalIdentities.first())
             val outputState2 = AssetState(quantity2, splitState.state.data.tokenType, serviceHub.myInfo.legalIdentities.first())
+            println("Proposed states after split: ${assetState1} and ${assetState2}\n")
 
             val txCommand = Command(AssetContract.Commands.Split(), splitState.state.data.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
