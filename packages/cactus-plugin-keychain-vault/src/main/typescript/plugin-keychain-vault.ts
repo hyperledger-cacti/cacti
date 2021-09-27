@@ -1,8 +1,4 @@
-import type { Server } from "http";
-import type { Server as SecureServer } from "https";
-
 import type { Express } from "express";
-import { Optional } from "typescript-optional";
 import Vault from "node-vault";
 import HttpStatus from "http-status-codes";
 
@@ -188,10 +184,6 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     this.endpoints = endpoints;
 
     return endpoints;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async shutdown(): Promise<void> {

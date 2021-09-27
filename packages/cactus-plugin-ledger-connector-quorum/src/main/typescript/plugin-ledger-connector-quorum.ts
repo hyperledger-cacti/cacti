@@ -2,8 +2,6 @@ import { Server } from "http";
 import { Server as SecureServer } from "https";
 
 import { Express } from "express";
-import { promisify } from "util";
-import { Optional } from "typescript-optional";
 import Web3 from "web3";
 // The strange way of obtaining the contract class here is like this because
 // web3-eth internally sub-classes the Contract class at runtime
@@ -147,16 +145,8 @@ export class PluginLedgerConnectorQuorum
     return this.instanceId;
   }
 
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
-  }
-
   public async shutdown(): Promise<void> {
-    const serverMaybe = this.getHttpServer();
-    if (serverMaybe.isPresent()) {
-      const server = serverMaybe.get();
-      await promisify(server.close.bind(server))();
-    }
+    this.log.info(`Shutting down ${this.className}...`);
   }
 
   public async onPluginInit(): Promise<unknown> {
