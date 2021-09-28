@@ -210,12 +210,12 @@ test(testCase, async (t: Test) => {
   );
   try {
     const fakeId = "0x66616b654964";
-    const res = await api.getSingleStatusV1(
-      fakeId,
-      fakeWeb3SigningCredential,
+    const res = await api.getSingleStatusV1({
+      id: fakeId,
+      web3SigningCredential: fakeWeb3SigningCredential,
       connectorId,
-      "",
-    );
+      keychainId: "",
+    });
     t.equal(res.status, 500, "response status is 500");
   } catch (e) {
     t.equal(e.response.status, 500);

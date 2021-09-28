@@ -238,12 +238,12 @@ test(testCase, async (t: Test) => {
   t.comment("Get status with invalid id");
 
   const fakeId = "0x66616b654964";
-  const res = await api.getSingleStatusV1(
-    fakeId,
+  const res = await api.getSingleStatusV1({
+    id: fakeId,
     web3SigningCredential,
     connectorId,
     keychainId,
-  );
+  });
   t.equal(res.status, 200, "response status is 200 OK");
   t.equal(res.data, 0, "the contract status is 0 - INVALID");
   t.end();
