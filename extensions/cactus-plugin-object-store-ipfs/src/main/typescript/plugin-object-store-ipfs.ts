@@ -1,10 +1,7 @@
 import path from "path";
-import type { Server } from "http";
-import type { Server as SecureServer } from "https";
 import type { Express } from "express";
 import { create } from "ipfs-http-client";
 import type { Options } from "ipfs-http-client";
-import { Optional } from "typescript-optional";
 import { RuntimeError } from "run-time-error";
 import { Logger, Checks, LoggerProvider } from "@hyperledger/cactus-common";
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
@@ -184,10 +181,6 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
     return {
       key: req.key,
     };
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async shutdown(): Promise<void> {

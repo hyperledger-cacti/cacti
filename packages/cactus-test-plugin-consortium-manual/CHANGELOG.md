@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/hyperledger/cactus/compare/v0.9.0...v0.10.0) (2021-09-28)
+
+
+### Bug Fixes
+
+* openapi validation test for consortium-manual plugin ([c568ad3](https://github.com/hyperledger/cactus/commit/c568ad3627f2f55a83ad9586b72824c44719e08a)), closes [#1297](https://github.com/hyperledger/cactus/issues/1297) [#847](https://github.com/hyperledger/cactus/issues/847)
+
+
+### Features
+
+* **core-api:** discontinue dedicated HTTP listeners for web service plugins ([3fbd2fc](https://github.com/hyperledger/cactus/commit/3fbd2fcb60d49090bf4e986bea74d4e988348659)), closes [#358](https://github.com/hyperledger/cactus/issues/358)
+
+
+
+
+
 # [0.9.0](https://github.com/hyperledger/cactus/compare/v0.8.0...v0.9.0) (2021-08-31)
 
 
