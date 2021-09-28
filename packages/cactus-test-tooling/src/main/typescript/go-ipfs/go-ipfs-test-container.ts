@@ -7,6 +7,7 @@ import { Logger, Checks, Bools } from "@hyperledger/cactus-common";
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import { Containers } from "../common/containers";
+import axios from "axios";
 
 export interface IGoIpfsTestContainerOptions {
   readonly logLevel?: LogLevelDesc;
@@ -150,8 +151,17 @@ export class GoIpfsTestContainer {
         try {
           await Containers.waitForHealthCheck(this.containerId.get());
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

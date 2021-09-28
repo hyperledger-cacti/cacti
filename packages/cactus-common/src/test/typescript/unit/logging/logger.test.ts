@@ -1,7 +1,8 @@
+import { RuntimeError } from "run-time-error";
 import test, { Test } from "tape";
 import { v4 as uuidv4 } from "uuid";
 import { LoggerProvider } from "../../../../main/typescript/public-api";
-
+import axios from "axios";
 // FIXME(2020-11-12) this does not work because for some reason the stdout
 // stream does not emit 'data' events with anything even though it should.
 // Suspecting that the test runner library does some internal magic with
@@ -52,8 +53,17 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
     });
 
     didNotThrow = true;
-  } catch (ex) {
-    didNotThrow = false;
+  } catch (ex: unknown) {
+    if (axios.isAxiosError(ex)) {
+      didNotThrow = false;
+    } else if (ex instanceof Error) {
+      throw new RuntimeError("unexpected exception", ex);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(ex),
+      );
+    }
   }
 
   process.stdout.off("data", stdOutDataHandler as any);

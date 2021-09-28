@@ -3,6 +3,8 @@
 import { ApiServer } from "../api-server";
 import { ConfigService } from "../config/config-service";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "cactus-api",
@@ -31,9 +33,18 @@ export async function launchApp(): Promise<void> {
   try {
     await main();
     log.info(`Cactus API server launched OK `);
-  } catch (ex) {
-    log.error(`Cactus API server crashed: `, ex);
-    process.exit(1);
+  } catch (ex: unknown) {
+    if (axios.isAxiosError(ex)) {
+      log.error(`Cactus API server crashed: `, ex);
+      process.exit(1);
+    } else if (ex instanceof Error) {
+      throw new RuntimeError("unexpected exception", ex);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(ex),
+      );
+    }
   }
 }
 

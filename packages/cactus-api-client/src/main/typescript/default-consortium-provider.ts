@@ -12,6 +12,9 @@ import {
   GetConsortiumJwsResponse,
 } from "@hyperledger/cactus-plugin-consortium-manual";
 
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
+
 export interface IDefaultConsortiumProviderOptions {
   logLevel?: LogLevelDesc;
   apiClient: ConsortiumManualApi;
@@ -63,10 +66,19 @@ export class DefaultConsortiumProvider
     try {
       const res = await this.options.apiClient.getConsortiumJwsV1();
       return this.parseConsortiumJws(res.data);
-    } catch (ex) {
-      const innerException = (ex.toJSON && ex.toJSON()) || ex;
-      this.log.error(`Request for Consortium JWS failed: `, innerException);
-      throw ex;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        const innerException = (ex.toJSON && ex.toJSON()) || ex;
+        this.log.error(`Request for Consortium JWS failed: `, innerException);
+        throw ex;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 }

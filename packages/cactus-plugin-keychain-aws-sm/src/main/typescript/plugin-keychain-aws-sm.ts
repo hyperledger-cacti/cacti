@@ -29,6 +29,8 @@ import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-end
 import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-endpoint-v1";
 import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1";
 import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export enum AwsCredentialType {
   LocalFile = "LOCAL_FILE",
@@ -228,17 +230,25 @@ export class PluginKeychainAwsSm
           `${fnTag}: Invalid response received from AWS SecretsManager. Expected "response.SecretString" property chain to be truthy`,
         );
       }
-    } catch (ex) {
-      const errorStatus = (ex as Error).message.includes(
-        SECRETMANAGER_STATUS_KEY_NOT_FOUND,
-      );
-      if (errorStatus) {
-        // FIXME: Throw if the value was not present instead of returning null
-        //return (null as unknown) as string;
-        throw new Error(`${key} secret not found`);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        const errorStatus = (ex as Error).message.includes(
+          SECRETMANAGER_STATUS_KEY_NOT_FOUND,
+        );
+        if (errorStatus) {
+          // FIXME: Throw if the value was not present instead of returning null
+          return (null as unknown) as string;
+        } else {
+          this.log.error(`Error retriving secret value for the key "${key}"`);
+          throw ex;
+        }
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
       } else {
-        this.log.error(`Error retriving secret value for the key "${key}"`);
-        throw ex;
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
       }
     }
   }
@@ -253,15 +263,24 @@ export class PluginKeychainAwsSm
         })
         .promise();
       return true;
-    } catch (ex) {
-      const errorStatus = (ex as Error).message.includes(
-        SECRETMANAGER_STATUS_KEY_NOT_FOUND,
-      );
-      if (errorStatus) {
-        return false;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        const errorStatus = (ex as Error).message.includes(
+          SECRETMANAGER_STATUS_KEY_NOT_FOUND,
+        );
+        if (errorStatus) {
+          return false;
+        } else {
+          this.log.error(`${fnTag}: Presence check of "${key}" crashed:`, ex);
+          throw ex;
+        }
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
       } else {
-        this.log.error(`${fnTag}: Presence check of "${key}" crashed:`, ex);
-        throw ex;
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
       }
     }
   }
@@ -276,9 +295,18 @@ export class PluginKeychainAwsSm
           SecretString: value,
         })
         .promise();
-    } catch (ex) {
-      this.log.error(` ${fnTag}: Error writing secret "${key}"`);
-      throw ex;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(` ${fnTag}: Error writing secret "${key}"`);
+        throw ex;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 
@@ -292,9 +320,18 @@ export class PluginKeychainAwsSm
           ForceDeleteWithoutRecovery: true,
         })
         .promise();
-    } catch (ex) {
-      this.log.error(`${fnTag} Error deleting secret "${key}"`);
-      throw ex;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`${fnTag} Error deleting secret "${key}"`);
+        throw ex;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 }

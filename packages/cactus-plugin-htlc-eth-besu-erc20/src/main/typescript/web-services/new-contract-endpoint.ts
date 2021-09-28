@@ -15,7 +15,6 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { NewContractRequest } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20";
-
 export interface INewContractEndpointOptions {
   logLevel?: LogLevelDesc;
   plugin: PluginHtlcEthBesuErc20;
@@ -83,12 +82,19 @@ export class NewContractEndpoint implements IWebServiceEndpoint {
       const request: NewContractRequest = req.body as NewContractRequest;
       const result = await this.options.plugin.newContract(request);
       res.send(result);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(400).json({
-        message: "Bad request",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(400).json({
+          message: "Bad request",
+          error: ex.stack || ex.message,
+        });
+      } else {
+        res.status(400).json({
+          message: "Bad request",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

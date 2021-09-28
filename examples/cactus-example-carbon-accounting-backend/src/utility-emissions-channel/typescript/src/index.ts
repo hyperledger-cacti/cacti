@@ -14,6 +14,8 @@ import {
   MsgSuccess,
 } from "./util/const";
 import { logger, stringToBytes } from "./util/util";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export class EmissionsChaincode {
   private methods: {
@@ -95,9 +97,18 @@ export class EmissionsChaincode {
         fieldsMap.url,
         fieldsMap.md5,
       );
-    } catch (error) {
-      console.log(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.log(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     logger.debug(`${MsgSuccess} recordEmissions success ${byte.toString()}`);
     return Shim.success(byte);
@@ -132,9 +143,18 @@ export class EmissionsChaincode {
       byte = await new EmissionsRecordContract(stub).updateEmissionsRecord(
         recordI,
       );
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     return Shim.success(byte);
   }
@@ -156,9 +176,18 @@ export class EmissionsChaincode {
     let byte: Uint8Array;
     try {
       byte = await new EmissionsRecordContract(stub).getEmissionsData(args[0]);
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected excpetion", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     return Shim.success(byte);
   }
@@ -183,9 +212,18 @@ export class EmissionsChaincode {
         args[0],
         args[1],
       );
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     return Shim.success(byte);
   }
@@ -211,9 +249,18 @@ export class EmissionsChaincode {
       byte = await new EmissionsRecordContract(
         stub,
       ).getAllEmissionsDataByDateRange(args[0], args[1]);
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     return Shim.success(byte);
   }
@@ -239,9 +286,18 @@ export class EmissionsChaincode {
       byte = await new EmissionsRecordContract(
         stub,
       ).getAllEmissionsDataByDateRangeAndParty(args[0], args[1], args[2]);
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     return Shim.success(byte);
   }
@@ -297,9 +353,18 @@ export class EmissionsChaincode {
       byte = await new EmissionsRecordContract(stub).importUtilityFactor(
         factorI,
       );
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     logger.debug(
       `${MsgSuccess} importUtilityFactor success ${byte.toString()}`,
@@ -358,9 +423,18 @@ export class EmissionsChaincode {
       byte = await new EmissionsRecordContract(stub).updateUtilityFactor(
         factorI,
       );
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     logger.debug(
       `${MsgSuccess} updateUtilityFactor success ${byte.toString()}`,
@@ -389,9 +463,18 @@ export class EmissionsChaincode {
     let byte: Uint8Array;
     try {
       byte = await new EmissionsRecordContract(stub).getUtilityFactor(args[0]);
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     return Shim.success(byte);
   }
@@ -434,11 +517,20 @@ export class EmissionsChaincode {
       let division: DivisionsInterface;
       try {
         division = JSON.parse(args[6]) as DivisionsInterface;
-      } catch (error) {
-        logger.error(
-          `${ErrInvalidArgument} : invalid divsion json input ${error}`,
-        );
-        return Shim.error(stringToBytes((error as Error).message));
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          logger.error(
+            `${ErrInvalidArgument} : invalid divsion json input ${error}`,
+          );
+          return Shim.error(stringToBytes(error.message));
+        } else if (error instanceof Error) {
+          throw new RuntimeError("unexpected exception", error);
+        } else {
+          throw new RuntimeError(
+            "unexpected exception with incorrect type",
+            JSON.stringify(error),
+          );
+        }
       }
       identifier.divisions = division;
     }
@@ -447,9 +539,18 @@ export class EmissionsChaincode {
       byte = await new EmissionsRecordContract(stub).importUtilityIdentifier(
         identifier,
       );
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     logger.debug(
       `${MsgSuccess} importUtilityIdentifier success ${byte.toString()}`,
@@ -516,9 +617,18 @@ export class EmissionsChaincode {
       byte = await new EmissionsRecordContract(stub).updateUtilityIdentifier(
         identifier,
       );
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected excpetion", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     logger.debug(
       `${MsgSuccess} updateUtilityIdentifier success ${byte.toString()}`,
@@ -549,9 +659,18 @@ export class EmissionsChaincode {
       byte = await new EmissionsRecordContract(stub).getUtilityIdentifier(
         args[0],
       );
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected excpetion with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     logger.debug(
       `${MsgSuccess} getUtilityIdentifier success ${byte.toString()}`,
@@ -567,9 +686,18 @@ export class EmissionsChaincode {
     let byte: Uint8Array;
     try {
       byte = await new EmissionsRecordContract(stub).getAllUtilityIdentifiers();
-    } catch (error) {
-      logger.error(error);
-      return Shim.error(stringToBytes((error as Error).message));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        logger.error(error);
+        return Shim.error(stringToBytes(error.message));
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     return Shim.success(byte);
   }

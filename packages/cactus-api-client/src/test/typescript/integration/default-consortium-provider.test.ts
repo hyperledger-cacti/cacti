@@ -7,6 +7,9 @@ import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
 import { DefaultConsortiumProvider } from "../../../main/typescript";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
+
 test("Reports failures with meaningful information", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
 
@@ -31,15 +34,24 @@ test("Reports failures with meaningful information", async (t: Test) => {
     try {
       await provider.get();
       t2.fail("Provider.get() did not throw despite API errors.");
-    } catch (ex) {
-      t2.ok(ex, "Thrown error truthy OK");
-      t2.ok(ex.message, "Thrown error.message truthy OK");
-      t2.equal(
-        typeof ex.message,
-        "string",
-        "Thrown error.message type string OK",
-      );
-      t2.true(ex.message.includes("timeout"), "Has timeout in msg OK");
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        t2.ok(ex, "Thrown error truthy OK");
+        t2.ok(ex.message, "Thrown error.message truthy OK");
+        t2.equal(
+          typeof ex.message,
+          "string",
+          "Thrown error.message type string OK",
+        );
+        t2.true(ex.message.includes("timeout"), "Has timeout in msg OK");
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
     t2.end();
   });
@@ -56,18 +68,27 @@ test("Reports failures with meaningful information", async (t: Test) => {
     try {
       await provider.get();
       t2.fail("Provider.get() did not throw despite API errors.");
-    } catch (ex) {
-      t2.ok(ex, "Thrown error truthy OK");
-      t2.ok(ex.message, "Thrown error.message truthy OK");
-      t2.equal(
-        typeof ex.message,
-        "string",
-        "Thrown error.message type string OK",
-      );
-      t2.true(
-        ex.message.includes("status code 404"),
-        "Has Status Code in msg OK",
-      );
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        t2.ok(ex, "Thrown error truthy OK");
+        t2.ok(ex.message, "Thrown error.message truthy OK");
+        t2.equal(
+          typeof ex.message,
+          "string",
+          "Thrown error.message type string OK",
+        );
+        t2.true(
+          ex.message.includes("status code 404"),
+          "Has Status Code in msg OK",
+        );
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
     t2.end();
   });

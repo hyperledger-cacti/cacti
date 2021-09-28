@@ -24,6 +24,7 @@ import { SetObjectEndpointV1 } from "./web-services/set-object-endpoint-v1";
 import { HasObjectEndpointV1 } from "./web-services/has-object-endpoint-v1";
 import type { IIpfsHttpClient } from "./i-ipfs-http-client";
 import { isIpfsHttpClientOptions } from "./i-ipfs-http-client";
+import axios from "axios";
 
 export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
   "HTTPError: file does not exist";
@@ -155,13 +156,25 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
       const statResult = await this.ipfs.files.stat(keyPath);
       this.log.debug(`StatResult for ${req.key}: %o`, statResult);
       return { key: req.key, checkedAt, isPresent: true };
-    } catch (ex) {
-      if (ex?.stack?.includes(K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST)) {
-        const msg = `Stat ${req.key} failed with error message containing phrase "${K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST}" Returning isPresent=false ...`;
-        this.log.debug(msg);
-        return { key: req.key, checkedAt, isPresent: false };
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        if (ex.stack?.includes(K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST)) {
+          const msg = `Stat ${req.key} failed with error message containing phrase "${K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST}" Returning isPresent=false ...`;
+          this.log.debug(msg);
+          return { key: req.key, checkedAt, isPresent: false };
+        } else {
+          throw new RuntimeError(
+            `Checking presence of ${req.key} crashed:`,
+            ex,
+          );
+        }
+      } else if (ex instanceof Error) {
+        throw new RuntimeError(`unexpected exception`, ex);
       } else {
-        throw new RuntimeError(`Checking presence of ${req.key} crashed:`, ex);
+        throw new RuntimeError(
+          "unexpected exception with incorrect type ",
+          JSON.stringify(ex),
+        );
       }
     }
   }
@@ -175,8 +188,18 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
         create: true,
         parents: true,
       });
-    } catch (ex) {
-      throw new RuntimeError(`Can't set object ${keyPath}. Write failed:`, ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        throw new RuntimeError(
+          `Can't set object ${keyPath}. Write failed:`,
+          ex as Error,
+        );
+      } else {
+        throw new RuntimeError(
+          "expected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
     return {
       key: req.key,

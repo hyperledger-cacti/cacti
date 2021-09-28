@@ -92,10 +92,17 @@ export class SetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex?.stack || ex?.message,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

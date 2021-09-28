@@ -14,6 +14,8 @@ import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { Configuration } from "@hyperledger/cactus-core-api";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 const testCase = "API server enforces authorization rules when configured";
 const logLevel: LogLevelDesc = "TRACE";
@@ -104,9 +106,18 @@ test(testCase, async (t: Test) => {
     t.ok(resHc.data.success, "resHc.data.success truthy OK");
     t.true(isHealthcheckResponse(resHc.data), "isHealthcheckResponse OK");
     t.end();
-  } catch (ex) {
-    log.error(ex);
-    t.fail("Exception thrown during test execution, see above for details!");
-    throw ex;
+  } catch (ex: unknown) {
+    if (axios.isAxiosError(ex)) {
+      log.error(ex);
+      t.fail("Exception thrown during test execution, see above for details!");
+      throw ex;
+    } else if (ex instanceof Error) {
+      throw new RuntimeError("unexpected exception", ex);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(ex),
+      );
+    }
   }
 });

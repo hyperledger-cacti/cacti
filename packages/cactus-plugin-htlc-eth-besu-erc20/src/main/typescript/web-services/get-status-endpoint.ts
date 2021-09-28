@@ -15,7 +15,6 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import OAS from "../../json/openapi.json";
 import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20";
-
 export interface IGetStatusEndpointOptions {
   logLevel?: LogLevelDesc;
   plugin: PluginHtlcEthBesuErc20;
@@ -83,12 +82,19 @@ export class GetStatusEndpoint implements IWebServiceEndpoint {
       const { callOutput } = await this.options.plugin.getStatus(req.body);
 
       res.send(callOutput);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(400).json({
-        message: "Bad request",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(400).json({
+          message: "Bad request",
+          error: ex.stack || ex.message,
+        });
+      } else {
+        res.status(400).json({
+          message: "Bad request",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

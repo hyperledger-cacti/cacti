@@ -114,10 +114,15 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
 
       res.json(body);
       res.status(200);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.debug(`${tag} Failed to serve request:`, ex);
-      res.status(500);
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.json({ error: ex.stack });
+      } else {
+        res.status(500);
+        res.json({ error: JSON.stringify(ex) });
+      }
     }
   }
 }

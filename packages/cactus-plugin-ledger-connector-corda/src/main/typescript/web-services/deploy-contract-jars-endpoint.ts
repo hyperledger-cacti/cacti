@@ -131,14 +131,23 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
       const body = await this.callInternalContainer(req.body);
       res.status(200);
       res.json(body);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.json({
-        error: ex?.message,
-        // FIXME do not include stack trace
-        errorStack: ex?.stack,
-      });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.json({
+          error: ex.message,
+          // FIXME do not include stack trace
+          errorStack: ex.stack,
+        });
+      } else {
+        res.status(500);
+        res.json({
+          error: JSON.stringify(ex),
+          // FIXME do not include stack trace
+          errorStack: JSON.stringify(ex),
+        });
+      }
     }
   }
 

@@ -101,12 +101,19 @@ export class CounterpartyHTLCEndpoint implements IWebServiceEndpoint {
       }) as unknown) as PluginHTLCCoordinatorBesu;
       const resBody = await connector.counterpartyHTLC(request);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex.stack || ex.message,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

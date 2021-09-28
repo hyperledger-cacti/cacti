@@ -91,10 +91,15 @@ export class GetObjectEndpointV1 implements IWebServiceEndpoint {
       const resBody = await this.plugin.get(reqBody);
       res.status(200);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`${tag} Failed to serve request:`, ex);
-      res.status(500);
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.json({ error: ex.stack });
+      } else {
+        res.status(500);
+        res.json({ error: JSON.stringify(ex) });
+      }
     }
   }
 }

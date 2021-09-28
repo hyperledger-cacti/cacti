@@ -101,12 +101,19 @@ export class OwnHTLCEndpoint implements IWebServiceEndpoint {
       }) as unknown) as PluginHTLCCoordinatorBesu;
       const resBody = await connector.ownHTLC(request);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex,
+        });
+      }
     }
   }
 }

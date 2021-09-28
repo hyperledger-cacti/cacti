@@ -9,6 +9,7 @@ import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import { Containers } from "../common/containers";
 import { RustcBuildCmd } from "./rustc-build-cmd";
+import axios from "axios";
 
 export const K_DEFAULT_RUSTC_CONTAINER_WORKDIR = "/usr/src/host-sources-dir/";
 
@@ -195,9 +196,18 @@ export class RustcContainer {
           await Containers.waitForHealthCheck(this.containerId.get());
           this.log.debug(`Healthcheck passed OK`);
           resolve(container);
-        } catch (ex) {
-          this.log.error(ex);
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            this.log.error(ex);
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

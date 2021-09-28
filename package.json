@@ -72,7 +72,7 @@
   "devDependencies": {
     "@commitlint/cli": "13.1.0",
     "@commitlint/config-conventional": "13.1.0",
-    "@openapitools/openapi-generator-cli": "2.4.14",
+    "@openapitools/openapi-generator-cli": "2.4.5",
     "@types/fs-extra": "9.0.12",
     "@types/jasminewd2": "2.0.10",
     "@types/jest": "26.0.24",
@@ -135,7 +135,7 @@
     "ts-jest": "27.0.3",
     "ts-loader": "9.2.5",
     "ts-node": "10.2.0",
-    "typescript": "4.3.5",
+    "typescript": "4.4.3",
     "webpack": "5.50.0",
     "webpack-bundle-analyzer": "4.4.2",
     "webpack-cli": "4.7.2"

@@ -33,6 +33,7 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import axios from "axios";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -156,17 +157,21 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
       t.fail(
         "Failing because getKeychainEntryV1 did not throw when called with non-existent key.",
       );
-    } catch (ex) {
-      t.ok(ex, "res7 -> ex truthy");
-      const res7 = ex.response;
-      t.equal(res7.status, 404, "res7.status === 404 OK");
-      t.ok(res7.data, "res7.data truthy OK");
-      t.ok(res7.data.error, "res7.data.error truthy OK");
-      t.equal(typeof res7.data.error, "string", "res7.data.error truthy OK");
-      t.true(
-        res7.data.error.includes(`${key} secret not found`),
-        "res7.data.error contains legible error message about missing key OK",
-      );
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        t.ok(ex, "res7 -> ex truthy");
+        const res7 = ex.response;
+        t.equal(res7?.status, 404, "res7.status === 404 OK");
+        t.ok(res7?.data, "res7.data truthy OK");
+        t.ok(res7?.data.error, "res7.data.error truthy OK");
+        t.equal(typeof res7?.data.error, "string", "res7.data.error truthy OK");
+        t.true(
+          res7?.data.error.includes(`${key} secret not found`),
+          "res7.data.error contains legible error message about missing key OK",
+        );
+      } else {
+        t.fail("expected an axios error, got something else");
+      }
     }
   }
 

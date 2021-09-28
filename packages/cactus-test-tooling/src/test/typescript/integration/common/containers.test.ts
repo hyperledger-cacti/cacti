@@ -9,6 +9,7 @@ import {
   HttpEchoContainer,
   Containers,
 } from "../../../../main/typescript/public-api";
+import { RuntimeError } from "run-time-error";
 
 LoggerProvider.setLogLevel("DEBUG");
 const log: Logger = LoggerProvider.getOrCreate({ label: "containers-test" });
@@ -114,12 +115,20 @@ test("Can report error if docker daemon is not accessable", async (t: Test) => {
       },
     });
     t.fail("Containers.getDiagnostics was supposed to fail but did not.");
-  } catch (ex) {
-    t.ok(ex, "exception thrown is truthy OK");
-    t.ok(ex.cause, "ex.cause truthy OK");
-    t.ok(ex.cause.message, "ex.cause.message truthy OK");
-    const causeMsgIsInformative = ex.cause.message.includes(badSocketPath);
-    t.true(causeMsgIsInformative, "causeMsgIsInformative");
+  } catch (ex: unknown) {
+    if (ex instanceof RuntimeError) {
+      t.ok(ex, "exception thrown is truthy OK");
+      t.ok(ex.cause, "ex.cause truthy OK");
+      if (ex.cause instanceof Error) {
+        t.ok(ex.cause?.message, "ex.cause.message truthy OK");
+        const causeMsgIsInformative = ex.cause.message.includes(badSocketPath);
+        t.true(causeMsgIsInformative, "causeMsgIsInformative");
+      } else {
+        t.fail("cause of exception was not instance of Error", ex);
+      }
+    } else {
+      t.fail("tested code threw an exception that aws not a RuntimeError");
+    }
   }
   t.end();
 });

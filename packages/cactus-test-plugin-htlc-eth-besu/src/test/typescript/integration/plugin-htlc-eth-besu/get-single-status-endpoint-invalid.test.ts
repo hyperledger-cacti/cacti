@@ -34,6 +34,7 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
+import axios from "axios";
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
@@ -217,8 +218,12 @@ test(testCase, async (t: Test) => {
       keychainId: "",
     });
     t.equal(res.status, 500, "response status is 500");
-  } catch (e) {
-    t.equal(e.response.status, 500);
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e)) {
+      t.equal(e.response?.status, 500);
+    } else {
+      t.fail("expected an axios error, got something else");
+    }
   }
   t.end();
 });

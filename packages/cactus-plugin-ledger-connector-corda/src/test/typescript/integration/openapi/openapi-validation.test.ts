@@ -24,6 +24,8 @@ import {
   PublicKey,
 } from "../../../../main/typescript/generated/openapi/typescript-axios/index";
 import { Configuration } from "@hyperledger/cactus-core-api";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 const testCase = "openapi validation on corda JVM implementation";
 const logLevel: LogLevelDesc = "TRACE";
@@ -433,12 +435,16 @@ test(testCase, async (t: Test) => {
       } as unknown) as DeployContractJarsV1Request;
       await apiClient.deployContractJarsV1(depReq);
       t2.fail(`${fDeploy} - ${cWithoutParams}: should fail`);
-    } catch (e) {
-      t2.equal(
-        e.response?.data?.status,
-        400,
-        "Deploy contract response status code === 400 OK",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.data?.status,
+          400,
+          "Deploy contract response status code === 400 OK",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -452,12 +458,16 @@ test(testCase, async (t: Test) => {
       } as unknown) as InvokeContractV1Request;
       await apiClient.invokeContractV1(req);
       t2.fail(`${fInvoke} - ${cWithoutParams}: should fail`);
-    } catch (e) {
-      t2.equal(
-        e.response?.data?.status,
-        400,
-        "Invoke contract response status code === 400 OK",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.data?.status,
+          400,
+          "Invoke contract response status code === 400 OK",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -471,12 +481,16 @@ test(testCase, async (t: Test) => {
       };
       await apiClient.deployContractJarsV1(depReq);
       t2.fail(`${fDeploy} - ${cInvalidParams}: should fail`);
-    } catch (e) {
-      t2.equal(
-        e.response?.data?.status,
-        400,
-        "Deploy contract response status code === 400 OK",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.data?.status,
+          400,
+          "Deploy contract response status code === 400 OK",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -486,12 +500,16 @@ test(testCase, async (t: Test) => {
       const req = { fake: 4 } as ListFlowsV1Request;
       await apiClient.listFlowsV1(req);
       t2.fail(`${fFlows} - ${cInvalidParams}: should fail`);
-    } catch (e) {
-      t2.equal(
-        e.response?.data?.status,
-        400,
-        "List flows response status code === 400 OK",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.data?.status,
+          400,
+          "List flows response status code === 400 OK",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -501,12 +519,16 @@ test(testCase, async (t: Test) => {
       const req = ({ fake: 4 } as unknown) as DiagnoseNodeV1Request;
       await apiClient.diagnoseNodeV1(req);
       t2.fail(`${fDiagnose} - ${cInvalidParams}: should fail`);
-    } catch (e) {
-      t2.equal(
-        e.response?.data?.status,
-        400,
-        "Diagnose node response status code === 400 OK",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.data?.status,
+          400,
+          "Diagnose node response status code === 400 OK",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });

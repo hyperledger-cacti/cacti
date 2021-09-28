@@ -2,6 +2,8 @@ import { AddressInfo, ListenOptions } from "net";
 import { Server, createServer } from "http";
 import { Server as SecureServer } from "https";
 import { Checks } from "./checks";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export interface IListenOptions {
   server: Server | SecureServer;
@@ -88,10 +90,18 @@ export class Servers {
       try {
         const server = await Servers.startOnPort(preferredPort, host);
         return server;
-      } catch (ex) {
-        // if something else went wrong we still want to just give up
-        if (!ex.message.includes("EADDRINUSE")) {
-          throw ex;
+      } catch (ex: unknown) {
+        if (axios.isAxiosError(ex)) {
+          if (!ex.message.includes("EADDRINUSE")) {
+            throw ex;
+          }
+        } else if (ex instanceof Error) {
+          throw new RuntimeError("unexpected exception", ex);
+        } else {
+          throw new RuntimeError(
+            "unexpected exception with incorrect type",
+            JSON.stringify(ex),
+          );
         }
       }
       return Servers.startOnPort(0);

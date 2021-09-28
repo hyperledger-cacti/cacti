@@ -15,6 +15,8 @@ import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
 import { Containers } from "../common/containers";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;
@@ -278,8 +280,17 @@ export class BesuTestLedger implements ITestLedger {
           await this.waitForHealthCheck();
           this.log.debug(`Healthcheck passing OK.`);
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

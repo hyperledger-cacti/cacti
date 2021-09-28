@@ -267,12 +267,14 @@ test("identity-clients", async (t: Test) => {
         try {
           await client.getPub(testNotFoundKey);
           t.fail("Should not get here");
-        } catch (error) {
-          t.true(
-            (error as Error).message.includes(
-              `keyName = ${testNotFoundKey} not found`,
-            ),
-          );
+        } catch (error: unknown) {
+          if (axios.isAxiosError(error)) {
+            t.true(
+              error.message.includes(`keyName = ${testNotFoundKey} not found`),
+            );
+          } else {
+            t.fail("expected an axios error, got something else");
+          }
         }
       }
       t.end();

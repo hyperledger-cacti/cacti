@@ -30,6 +30,8 @@ import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
 import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
 import { AuthorizationProtocol } from "./authorization-protocol";
 import { IAuthorizationConfig } from "../authzn/i-authorization-config";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
@@ -702,8 +704,17 @@ export class ConfigService {
 
     try {
       await generalVerify(jws, keyPair);
-    } catch (ex) {
-      throw new Error(`${fnTag} Invalid key pair PEM: ${ex && ex.stack}`);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        throw new Error(`${fnTag} Invalid key pair PEM: ${ex && ex.stack}`);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 }

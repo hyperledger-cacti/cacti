@@ -83,12 +83,19 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
       );
 
       res.send(callOutput);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(400).json({
-        message: "Bad request",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(400).json({
+          message: "Bad request",
+          error: ex.stack || ex.message,
+        });
+      } else {
+        res.status(400).json({
+          message: "Bad request",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

@@ -12,6 +12,7 @@ import {
 } from "jose";
 import { StatusCodes } from "http-status-codes";
 import jsonStableStringify from "json-stable-stringify";
+import axios from "axios";
 
 import {
   AuthorizationProtocol,
@@ -37,6 +38,7 @@ import {
   CarbonAccountingApp,
   ICarbonAccountingAppOptions,
 } from "../../../main/typescript/carbon-accounting-app";
+import { RuntimeError } from "run-time-error";
 
 const testCase = "can enroll new admin users onto the Fabric org";
 const logLevel: LogLevelDesc = "TRACE";
@@ -180,17 +182,24 @@ test.skip(testCase, async (t: Test) => {
   try {
     await apiClientBad.enrollAdminV1({ orgName: "does-not-matter" });
     t.fail("enroll admin response status === 403 FAIL");
-  } catch (out) {
-    t.ok(out, "error thrown for forbidden endpoint truthy OK");
-    t.ok(out.response, "enroll admin response truthy OK");
-    t.equal(
-      out.response.status,
-      StatusCodes.FORBIDDEN,
-      "enroll admin response status === 403 OK",
-    );
-    t.notok(out.response.data.data, "out.response.data.data falsy OK");
-    t.notok(out.response.data.success, "out.response.data.success falsy OK");
+  } catch (out: unknown) {
+    if (!out) {
+      const errorMessage = `out is falsy`;
+      throw new RuntimeError(errorMessage);
+    }
+    if (axios.isAxiosError(out)) {
+      t.ok(out, "error thrown for forbidden endpoint truthy OK");
+      t.ok(out.response, "enroll admin response truthy OK");
+      t.equal(
+        out.response?.status,
+        StatusCodes.FORBIDDEN,
+        "enroll admin response status === 403 OK",
+      );
+      t.notok(out.response?.data.data, "out.response.data.data falsy OK");
+      t.notok(out.response?.data.success, "out.response.data.success falsy OK");
+    } else {
+      t.fail("expected an axios error, got something else");
+    }
   }
-
   t.end();
 });

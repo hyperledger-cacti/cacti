@@ -34,10 +34,17 @@ export async function registerWebServiceEndpoint(
     } else {
       registrationMethod(httpPath, requestHandler);
     }
-  } catch (ex) {
-    throw new Error(
-      `${fnTag} Express verb method ${httpVerb} threw ` +
-        ` while registering endpoint: ${ex.message}`,
-    );
+  } catch (ex: unknown) {
+    if (ex instanceof Error) {
+      throw new Error(
+        `${fnTag} Express verb method ${httpVerb} threw ` +
+          ` while registering endpoint: ${ex.message}`,
+      );
+    } else {
+      throw new Error(
+        `${fnTag} Express verb method ${httpVerb} threw ` +
+          ` while registering endpoint: ${JSON.stringify(ex)}`,
+      );
+    }
   }
 }

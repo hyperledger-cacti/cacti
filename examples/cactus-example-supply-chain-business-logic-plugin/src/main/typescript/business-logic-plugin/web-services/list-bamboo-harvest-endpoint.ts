@@ -21,7 +21,6 @@ import {
 
 import OAS from "../../../json/openapi.json";
 import { BambooHarvestConverter } from "../../model/converter/bamboo-harvest-converter";
-
 export interface IListBambooHarvestEndpointOptions {
   logLevel?: LogLevelDesc;
   contractName: string;
@@ -116,10 +115,15 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
       const body = { data: rows };
       res.status(200);
       res.json(body);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.debug(`${tag} Failed to serve request:`, ex);
-      res.status(500);
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.json({ error: ex.stack });
+      } else {
+        res.status(500);
+        res.json({ error: JSON.stringify(ex) });
+      }
     }
   }
 }

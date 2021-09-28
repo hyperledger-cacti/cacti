@@ -19,6 +19,7 @@ import {
   Logger,
 } from "@hyperledger/cactus-common";
 import { IDockerPullProgress } from "./i-docker-pull-progress";
+import axios from "axios";
 
 export interface IPruneDockerResourcesRequest {
   logLevel?: LogLevelDesc;
@@ -103,9 +104,21 @@ export class Containers {
         version,
       };
       return response;
-    } catch (ex) {
-      log.error("Failed to get diagnostics of Docker daemon", ex);
-      throw new RuntimeError("Failed to get diagnostics of Docker daemon", ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        log.error("Failed to get diagnostics of Docker daemon", ex);
+        throw new RuntimeError(
+          "Failed to get diagnostics of Docker daemon",
+          ex as Error,
+        );
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
   /**
@@ -522,7 +535,7 @@ export class Containers {
       try {
         const { Status } = await Containers.getById(containerId);
         reachable = Status.endsWith(" (healthy)");
-      } catch (ex) {
+      } catch (ex: unknown) {
         // FIXME: if the container is slow to start this might trip with a
         // false positive because there is no container YET in the beginning.
         // if (ex.stack.includes(`no container by ID"${containerId}"`)) {
@@ -530,10 +543,21 @@ export class Containers {
         //     `${fnTag} container crashed while awaiting healthheck -> ${ex.stack}`,
         //   );
         // }
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
+        if (axios.isAxiosError(ex)) {
+          if (Date.now() >= startedAt + timeoutMs) {
+            throw new Error(
+              `${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`,
+            );
+          }
+          reachable = false;
+        } else if (ex instanceof Error) {
+          throw new RuntimeError("unexpected exception", ex);
+        } else {
+          throw new RuntimeError(
+            "unexpected exception with incorrect type",
+            JSON.stringify(ex),
+          );
         }
-        reachable = false;
       }
       await new Promise((resolve2) => setTimeout(resolve2, 1000));
     } while (!reachable);
@@ -566,28 +590,70 @@ export class Containers {
     try {
       const { all } = await execa("docker", ["system", "df"], { all: true });
       log.debug(all);
-    } catch (ex) {
-      log.info(`Ignoring failure of docker system df.`, ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        log.info(`Ignoring failure of docker system df.`, ex);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
     try {
       containers = await docker.pruneContainers();
-    } catch (ex) {
-      log.warn(`Failed to prune docker containers: `, ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        log.warn(`Failed to prune docker containers: `, ex);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
     try {
       images = await docker.pruneImages();
-    } catch (ex) {
-      log.warn(`Failed to prune docker images: `, ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        log.warn(`Failed to prune docker images: `, ex);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception:", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
     try {
       volumes = await docker.pruneVolumes();
-    } catch (ex) {
-      log.warn(`Failed to prune docker volumes: `, ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        log.warn(`Failed to prune docker volumes: `, ex);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError("unexpected exception", JSON.stringify(ex));
+      }
     }
     try {
       networks = await docker.pruneNetworks();
-    } catch (ex) {
-      log.warn(`Failed to prune docker networks: `, ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        log.warn(`Failed to prune docker networks: `, ex);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
 
     const existingImages = await docker.listImages();
@@ -603,10 +669,19 @@ export class Containers {
         const { all, command } = await execa(binary, args, { all: true });
         log.debug(command);
         log.debug(all);
-      } catch (ex) {
-        // The first 3 commands might fail if there are no containers or images
-        // to delete (e.g. their number is zero)
-        log.info("Ignoring docker resource cleanup command failure.", ex);
+      } catch (ex: unknown) {
+        if (axios.isAxiosError(ex)) {
+          // The first 3 commands might fail if there are no containers or images
+          // to delete (e.g. their number is zero)
+          log.info("Ignoring docker resource cleanup command failure.", ex);
+        } else if (ex instanceof Error) {
+          throw new RuntimeError("unexpected exception", ex);
+        } else {
+          throw new RuntimeError(
+            "unexpected exception with incorrect type",
+            JSON.stringify(ex),
+          );
+        }
       }
     }
     const response: IPruneDockerResourcesResponse = {
@@ -620,14 +695,32 @@ export class Containers {
     try {
       const { all } = await execa("df", [], { all: true });
       log.debug(all);
-    } catch (ex) {
-      log.info(`Ignoring failure of df.`, ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        log.info(`Ignoring failure of df.`, ex);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
     try {
       const { all } = await execa("docker", ["system", "df"], { all: true });
       log.debug(all);
-    } catch (ex) {
-      log.info(`Ignoring failure of docker system df.`, ex);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        log.info(`Ignoring failure of docker system df.`, ex);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
     return response;
   }

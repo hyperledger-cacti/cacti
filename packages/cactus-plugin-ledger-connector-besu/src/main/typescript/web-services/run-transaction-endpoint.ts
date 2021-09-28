@@ -89,12 +89,19 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
     try {
       const resBody = await this.options.connector.transact(reqBody);
       res.json({ success: true, data: resBody });
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex.stack || ex.message,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

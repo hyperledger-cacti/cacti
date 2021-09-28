@@ -95,10 +95,15 @@ export class SetKeychainEntryEndpointV1 implements IWebServiceEndpoint {
       const resBody = await this.plugin.set(key, value);
       res.status(200);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.debug(`${tag} Failed to serve request:`, ex);
-      res.status(500);
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.json({ error: ex.stack });
+      } else {
+        res.status(500);
+        res.json({ error: JSON.stringify(ex) });
+      }
     }
   }
 }

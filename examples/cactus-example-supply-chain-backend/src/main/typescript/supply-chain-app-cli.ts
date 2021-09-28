@@ -2,6 +2,8 @@
 
 import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
 import { LoggerProvider } from "@hyperledger/cactus-common";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 import { ISupplyChainAppOptions, SupplyChainApp } from "./supply-chain-app";
 
 export async function launchApp(
@@ -19,10 +21,19 @@ export async function launchApp(
   const supplyChainApp = new SupplyChainApp(appOptions);
   try {
     await supplyChainApp.start();
-  } catch (ex) {
-    console.error(`SupplyChainApp crashed. Existing...`, ex);
-    await supplyChainApp?.stop();
-    process.exit(-1);
+  } catch (ex: unknown) {
+    if (axios.isAxiosError(ex)) {
+      console.error(`SupplyChainApp crashed. Existing...`, ex);
+      await supplyChainApp?.stop();
+      process.exit(-1);
+    } else if (ex instanceof Error) {
+      throw new RuntimeError("unexpected exception", ex);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(ex),
+      );
+    }
   }
 }
 

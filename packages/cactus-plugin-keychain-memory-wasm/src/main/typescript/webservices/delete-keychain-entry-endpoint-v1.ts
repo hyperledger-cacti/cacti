@@ -90,12 +90,19 @@ export class DeleteKeychainEntryV1Endpoint implements IWebServiceEndpoint {
       const { key } = req.body as DeleteKeychainEntryRequestV1;
       const resBody = await this.options.plugin.delete(key);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex?.stack || ex?.message,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

@@ -16,6 +16,8 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import { DefaultApi } from "./generated/openapi/typescript-axios";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export interface IPluginKeychainVaultRemoteAdapterOptions
   extends ICactusPluginOptions {
@@ -106,10 +108,19 @@ export class PluginKeychainVaultRemoteAdapter
     try {
       await this.backend.getKeychainEntryV1({ key });
       return true;
-    } catch (ex) {
+    } catch (ex: unknown) {
       // FIXME check for errors being thrown due to something other than
       // the key not being present...
-      return false;
+      if (axios.isAxiosError(ex)) {
+        return false;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 

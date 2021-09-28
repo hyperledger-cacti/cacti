@@ -42,6 +42,8 @@ export interface organizationDefinitionFabricV2 {
   stateDatabase: STATE_DATABASE;
   port: string;
 }
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 /*
  * Contains options for Fabric container
@@ -181,9 +183,18 @@ export class FabricTestLedgerV1 implements ITestLedger {
       this.log.debug(`createCaClient() caName=%o caUrl=%o`, caName, caUrl);
       this.log.debug(`createCaClient() tlsOptions=%o`, tlsOptions);
       return new FabricCAServices(caUrl, tlsOptions, caName);
-    } catch (ex) {
-      this.log.error(`createCaClient() Failure:`, ex);
-      throw new Error(`${fnTag} Inner Exception: ${ex}`);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`createCaClient() Failure:`, ex);
+        throw new Error(`${fnTag} Inner Exception: ${ex.message}`);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 
@@ -242,9 +253,18 @@ export class FabricTestLedgerV1 implements ITestLedger {
       this.log.debug(`Wallet import of "${enrollmentID}" OK`);
 
       return [x509Identity, wallet];
-    } catch (ex) {
-      this.log.error(`enrollUser() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex}`);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`enrollUser() Failure:`, ex);
+        throw new Error(`${fnTag} Exception: ${ex.message}`);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 
@@ -273,9 +293,15 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
       await wallet.put("admin", x509Identity);
       return [x509Identity, wallet];
-    } catch (ex) {
-      this.log.error(`enrollAdmin() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex}`);
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`enrollAdmin() Failure:`, ex);
+        throw new Error(`${fnTag} Exception: ${ex.message}`);
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError("unexpected exception with incorrect type");
+      }
     }
   }
 
@@ -1341,8 +1367,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
             }
           }
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });
@@ -1356,10 +1391,21 @@ export class FabricTestLedgerV1 implements ITestLedger {
       try {
         const { Status } = await this.getContainerInfo();
         reachable = Status.endsWith(" (healthy)");
-      } catch (ex) {
-        reachable = false;
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex}`);
+      } catch (ex: unknown) {
+        if (axios.isAxiosError(ex)) {
+          reachable = false;
+          if (Date.now() >= startedAt + timeoutMs) {
+            throw new Error(
+              `${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`,
+            );
+          }
+        } else if (ex instanceof Error) {
+          throw new RuntimeError("unexpected exception", ex);
+        } else {
+          throw new RuntimeError(
+            "unexpected exception with incorrect type",
+            JSON.stringify(ex),
+          );
         }
       }
       await new Promise((resolve2) => setTimeout(resolve2, 1000));

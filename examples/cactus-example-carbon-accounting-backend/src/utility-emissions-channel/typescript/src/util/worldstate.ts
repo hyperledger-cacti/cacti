@@ -9,6 +9,8 @@ import {
   ErrInvalidQueryString,
   ErrStateAlreadyExists,
 } from "./const";
+import { RuntimeError } from "run-time-error";
+import axios from "axios";
 /**
  * WorldState class is a wrapper around chaincode stub
  * for managing lifecycle of a asset of type T (interface) on HL fabric
@@ -64,8 +66,17 @@ export abstract class WorldState<T> extends State {
     let iterator: Iterators.StateQueryIterator;
     try {
       iterator = await this.stub.getQueryResult(queryString);
-    } catch (error) {
-      throw new Error(`${ErrInvalidQueryString} : ${(error as Error).message}`);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(`${ErrInvalidQueryString} : ${error.message}`);
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
     return await this.getAssetFromIterator(iterator);
   }

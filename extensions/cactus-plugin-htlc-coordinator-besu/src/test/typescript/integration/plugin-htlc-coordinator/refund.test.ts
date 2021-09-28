@@ -44,6 +44,9 @@ import HashTimeLockJSON from "@hyperledger/cactus-plugin-htlc-eth-besu-erc20/src
 import TestTokenJSON from "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/Test_Token.json";
 import DemoHelperJSON from "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/DemoHelpers.json";
 
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
+
 const logLevel: LogLevelDesc = "INFO";
 const estimatedGas = 6721975;
 const expiration = 2147483648;
@@ -312,11 +315,20 @@ test(testCase, async (t: Test) => {
 
   try {
     await htlcCoordinatorBesuApi.withdrawCounterpartyV1(withdrawCounterparty);
-  } catch (exp) {
-    const revertReason = exp.response.data.error.receipt.revertReason;
-    const regExp = new RegExp(/0e494e56414c49445f5345435245540/);
-    const rejectMsg = "response === throws OK";
-    t.match(revertReason, regExp, rejectMsg);
+  } catch (exp: unknown) {
+    if (axios.isAxiosError(exp)) {
+      const revertReason = exp.response?.data.error.receipt.revertReason;
+      const regExp = new RegExp(/0e494e56414c49445f5345435245540/);
+      const rejectMsg = "response === throws OK";
+      t.match(revertReason, regExp, rejectMsg);
+    } else if (exp instanceof Error) {
+      throw new RuntimeError("unexpected exception", exp);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(exp),
+      );
+    }
   }
 
   t.comment("Get balance of receiver account");

@@ -141,7 +141,7 @@ export class FilesApiMock implements FilesAPI {
     throw new RuntimeError("Method mv() not implemented");
   }
 
-  public async flush(
+  public async flush (
     ipfsPath: string,
     options?: AbortOptions | undefined,
   ): Promise<CID> {

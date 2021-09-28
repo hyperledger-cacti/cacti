@@ -10,6 +10,8 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { Containers } from "../common/containers";
+import { RuntimeError } from "run-time-error";
+import axios from "axios";
 
 export interface ICactusKeychainVaultServerOptions {
   envVars?: string[];
@@ -102,8 +104,17 @@ export class CactusKeychainVaultServer {
         try {
           await Containers.waitForHealthCheck(this.containerId);
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

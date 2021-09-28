@@ -9,11 +9,13 @@
 
 /* tslint:disable:max-classes-per-file */
 import { ChaincodeStub } from "fabric-shim";
+import { RuntimeError } from "run-time-error";
 import { ErrStateNotFound } from "../util/const";
 import { State } from "../util/state";
 import { QueryResult, WorldState } from "../util/worldstate";
 import { getYearFromDate } from "./emissions-calc";
 import { UtilityLookupItemInterface } from "./utilityLookupItem";
+import axios from "axios";
 
 const UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFIER =
   "org.hyperledger.blockchain-carbon-accounting.utilityemissionsfactoritem";
@@ -167,9 +169,18 @@ export class UtilityEmissionsFactorState extends WorldState<
 
     try {
       year = getYearFromDate(thruDate);
-    } catch (error) {
-      console.error("could not fetch year");
-      console.error(error);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error("could not fetch year");
+        console.error(error);
+      } else if (error instanceof Error) {
+        throw new RuntimeError("unexpected exception", error);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(error),
+        );
+      }
     }
 
     console.log("fetching utilityFactors");

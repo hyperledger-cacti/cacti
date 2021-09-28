@@ -22,6 +22,7 @@ import {
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
 
 import { SecretManagerServiceClientMock } from "../mock/plugin-keychain-google-sm-mock";
+import axios from "axios";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -114,23 +115,25 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
   t.equal(res6.data.key, key, "res6.data.key === key OK");
   try {
     await apiClient.getKeychainEntryV1({ key });
-  } catch (out) {
-    t.ok(out, "error thrown for not found endpoint truthy OK");
-    t.ok(out.response, "deploy contract response truthy OK");
-    t.ok(out.response.data, "out.response.data truthy OK");
-    t.ok(out.response.data.error, "out.response.data.error truthy OK");
-    t.true(
-      out.response.data.error.includes(`${key} secret not found`),
-      "HTTP 404 response for non-existent key contains legible error message OK",
-    );
-
-    t.equal(
-      out.response.status,
-      StatusCodes.NOT_FOUND,
-      "deploy contract response status === 404 OK",
-    );
-    t.notok(out.response.data.success, "out.response.data.success falsy OK");
+  } catch (out: unknown) {
+    if (axios.isAxiosError(out)) {
+      t.ok(out, "error thrown for not found endpoint truthy OK");
+      t.ok(out.response, "deploy contract response truthy OK");
+      t.ok(out.response?.data, "out.response.data truthy OK");
+      t.ok(out.response?.data.error, "out.response.data.error truthy OK");
+      t.true(
+        out.response?.data.error.includes(`${key} secret not found`),
+        "HTTP 404 response for non-existent key contains legible error message OK",
+      );
+      t.equal(
+        out.response?.status,
+        StatusCodes.NOT_FOUND,
+        "deploy contract response status === 404 OK",
+      );
+      t.notok(out.response?.data.success, "out.response.data.success falsy OK");
+    } else {
+      t.fail("expected an axios error, got something else");
+    }
   }
-
   t.end();
 });

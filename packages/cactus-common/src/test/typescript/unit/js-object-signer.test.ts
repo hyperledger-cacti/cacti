@@ -211,9 +211,11 @@ test("Test missing required constructor field", async (assert: Test) => {
       privateKey: pkey as Uint8Array,
     };
     new JsObjectSigner(jsObjectSignerOptions);
-  } catch (e) {
+  } catch (e: unknown) {
     if (e instanceof Error) {
       assert.equal(e.message, "JsObjectSigner#ctor options.privateKey falsy.");
+    } else {
+      assert.fail("expected an axios error, got something else");
     }
   }
   assert.end();

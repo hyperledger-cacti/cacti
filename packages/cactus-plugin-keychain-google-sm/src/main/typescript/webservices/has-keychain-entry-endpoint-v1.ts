@@ -91,12 +91,19 @@ export class HasKeychainEntryV1Endpoint implements IWebServiceEndpoint {
       const isPresent = await this.options.connector.has(reqBody.key);
       const checkedAt = new Date().toJSON();
       res.json({ key, isPresent, checkedAt });
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex.stack || ex.message,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

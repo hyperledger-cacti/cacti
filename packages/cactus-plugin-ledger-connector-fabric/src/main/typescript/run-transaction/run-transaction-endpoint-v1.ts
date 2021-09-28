@@ -88,11 +88,17 @@ export class RunTransactionEndpointV1 implements IWebServiceEndpoint {
       const resBody = await this.opts.connector.transact(reqBody);
       res.status(200);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.statusMessage = ex.message;
+        res.json({ error: ex.stack });
+      } else {
+        res.status(500);
+        res.statusMessage = JSON.stringify(ex);
+        res.json({ error: JSON.stringify(ex) });
+      }
     }
   }
 }

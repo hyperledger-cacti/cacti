@@ -34,6 +34,8 @@ import {
 import { DiscoveryOptions } from "fabric-network";
 import { SHIPMENT_CONTRACT_GO_SOURCE } from "../../go/shipment";
 import { IPluginKeychain } from "@hyperledger/cactus-core-api";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export const org1Env = {
   CORE_PEER_LOCALMSPID: "Org1MSP",
@@ -141,9 +143,18 @@ export class SupplyChainAppDummyInfrastructure {
         this.fabric.stop().then(() => this.fabric.destroy()),
       ]);
       this.log.info(`Stopped OK`);
-    } catch (ex) {
-      this.log.error(`Stopping crashed: `, ex);
-      throw ex;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`Stopping crashed: `, ex);
+        throw ex;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 
@@ -154,9 +165,18 @@ export class SupplyChainAppDummyInfrastructure {
       await this.besu.start();
       await this.quorum.start();
       this.log.info(`Started dummy infrastructure OK`);
-    } catch (ex) {
-      this.log.error(`Starting of dummy infrastructure crashed: `, ex);
-      throw ex;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`Starting of dummy infrastructure crashed: `, ex);
+        throw ex;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 
@@ -331,9 +351,18 @@ export class SupplyChainAppDummyInfrastructure {
       this.log.info(`Deployed smart contracts OK`);
 
       return out;
-    } catch (ex) {
-      this.log.error(`Deployment of smart contracts crashed: `, ex);
-      throw ex;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`Deployment of smart contracts crashed: `, ex);
+        throw ex;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 }

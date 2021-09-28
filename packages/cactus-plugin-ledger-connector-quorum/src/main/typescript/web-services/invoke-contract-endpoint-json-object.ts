@@ -17,6 +17,8 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorQuorum } from "../plugin-ledger-connector-quorum";
 
 import OAS from "../../json/openapi.json";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export interface IInvokeContractEndpointJsonObjectOptions {
   logLevel?: LogLevelDesc;
@@ -92,12 +94,21 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
     try {
       const resBody = await this.options.connector.getContractInfo(reqBody);
       res.json(resBody);
-    } catch (ex) {
-      this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`Crash while serving ${reqTag}`, ex);
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex.stack || ex.message,
+        });
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 }

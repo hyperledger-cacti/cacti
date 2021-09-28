@@ -36,6 +36,7 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import TestTokenJSON from "../../../solidity/token-erc20-contract/Test_Token.json";
 import DemoHelperJSON from "../../../solidity/token-erc20-contract/DemoHelpers.json";
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
+import axios from "axios";
 
 const logLevel: LogLevelDesc = "INFO";
 const estimatedGas = 6721975;
@@ -584,8 +585,12 @@ test("Test invalid refund with invalid time", async (t: Test) => {
     };
     const resRefund = await api.refundV1(refundRequest);
     t.equal(resRefund.status, 400, "response status is 400");
-  } catch (error) {
-    t.equal(error.response.status, 400, "response status is 400");
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      t.equal(error.response?.status, 400, "response status is 400");
+    } else {
+      t.fail("expected an axios error, got something else");
+    }
   }
 
   t.comment("Get balance of account");

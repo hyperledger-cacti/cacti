@@ -40,6 +40,7 @@ import {
 } from "@hyperledger/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
 import { AddressInfo } from "net";
+import axios from "axios";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testCase = "cactus-plugin-keychain-aws-sm API";
@@ -157,16 +158,20 @@ test(testCase, async (t: Test) => {
       await apiClient.setKeychainEntryV1(({
         value: value,
       } as any) as SetKeychainEntryRequestV1);
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fSet} without required key: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fSet} without required key: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(fields.includes("key"), "Rejected because key is required");
+      } else {
+        t.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -176,16 +181,20 @@ test(testCase, async (t: Test) => {
       await apiClient.getKeychainEntryV1(
         ({} as any) as GetKeychainEntryRequestV1,
       );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fGet} without required key: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fGet} without required key: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(fields.includes("key"), "Rejected because key is required");
+      } else {
+        t.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -195,16 +204,20 @@ test(testCase, async (t: Test) => {
       await apiClient.hasKeychainEntryV1(
         ({} as any) as HasKeychainEntryRequestV1,
       );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fHas} without required key: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fHas} without required key: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(fields.includes("key"), "Rejected because key is required");
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -214,16 +227,20 @@ test(testCase, async (t: Test) => {
       await apiClient.deleteKeychainEntryV1(
         ({} as any) as DeleteKeychainEntryRequestV1,
       );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDelete} without required key: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fDelete} without required key: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(fields.includes("key"), "Rejected because key is required");
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -235,19 +252,23 @@ test(testCase, async (t: Test) => {
         value,
         fake: 4,
       } as any) as SetKeychainEntryRequestV1);
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fSet} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fSet} with fake=4: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("fake"),
+          "Rejected because fake is not a valid parameter",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -258,19 +279,23 @@ test(testCase, async (t: Test) => {
         key,
         fake: 4,
       } as any) as GetKeychainEntryRequestV1);
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fGet} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fGet} with fake=4: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("fake"),
+          "Rejected because fake is not a valid parameter",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -281,19 +306,23 @@ test(testCase, async (t: Test) => {
         key,
         fake: 4,
       } as any) as HasKeychainEntryRequestV1);
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fHas} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fHas} with fake=4: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("fake"),
+          "Rejected because fake is not a valid parameter",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -304,19 +333,23 @@ test(testCase, async (t: Test) => {
         key,
         fake: 4,
       } as any) as DeleteKeychainEntryRequestV1);
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("fake"),
+          "Rejected because fake is not a valid parameter",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });

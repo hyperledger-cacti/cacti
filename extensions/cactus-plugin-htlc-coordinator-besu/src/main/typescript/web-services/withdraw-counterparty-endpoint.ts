@@ -101,11 +101,18 @@ export class WithdrawCounterpartyEndpoint implements IWebServiceEndpoint {
       }) as unknown) as PluginHTLCCoordinatorBesu;
       const resBody = await connector.withdrawCounterparty(request);
       res.json(resBody);
-    } catch (ex) {
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex,
-      });
+    } catch (ex: unknown) {
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex,
+        });
+      }
     }
   }
 }

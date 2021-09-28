@@ -17,6 +17,7 @@ import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
 import { IQuorumGenesisOptions } from "./i-quorum-genesis-options";
 import { Containers } from "../common/containers";
+import { RuntimeError } from "run-time-error";
 
 export interface IQuorumTestLedgerConstructorOptions {
   containerImageVersion?: string;
@@ -256,8 +257,17 @@ export class QuorumTestLedger implements ITestLedger {
           await this.waitForHealthCheck();
           this.log.debug("Quorum Test Ledger container passed healthcheck OK");
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });
@@ -272,10 +282,21 @@ export class QuorumTestLedger implements ITestLedger {
       try {
         const res = await axios.get(httpUrl);
         reachable = res.status > 199 && res.status < 300;
-      } catch (ex) {
-        reachable = false;
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
+      } catch (ex: unknown) {
+        if (axios.isAxiosError(ex)) {
+          reachable = false;
+          if (Date.now() >= startedAt + timeoutMs) {
+            throw new Error(
+              `${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`,
+            );
+          }
+        } else if (ex instanceof Error) {
+          throw new RuntimeError("unexpected exception", ex);
+        } else {
+          throw new RuntimeError(
+            "unexpected exception with incorrect type",
+            JSON.stringify(ex),
+          );
         }
       }
       await new Promise((resolve2) => setTimeout(resolve2, 100));

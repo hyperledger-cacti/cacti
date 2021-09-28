@@ -19,6 +19,7 @@ import { PluginLedgerConnectorStub } from "../fixtures/plugin-ledger-connector-s
 import { RunTransactionEndpoint } from "../fixtures/plugin-ledger-connector-stub/web-services/run-transaction-endpoint";
 import { DeployContractEndpoint } from "../fixtures/plugin-ledger-connector-stub/web-services/deploy-contract-endpoint";
 import { UnprotectedActionEndpoint } from "../fixtures/plugin-ledger-connector-stub/web-services/unprotected-action-endpoint";
+import { RuntimeError } from "run-time-error";
 
 const testCase =
   "API server enforces scope requirements on top of generic authz";
@@ -143,21 +144,45 @@ test(testCase, async (t: Test) => {
         },
       });
       t.fail("deploy contract response status === 403 FAIL");
-    } catch (out) {
-      t.ok(out, "error thrown for forbidden endpoint truthy OK");
-      t.ok(out.response, "deploy contract response truthy OK");
-      t.equal(
-        out.response.status,
-        StatusCodes.FORBIDDEN,
-        "deploy contract response status === 403 OK",
-      );
-      t.notok(out.response.data.data, "out.response.data.data falsy OK");
-      t.notok(out.response.data.success, "out.response.data.success falsy OK");
+    } catch (out: unknown) {
+      if (axios.isAxiosError(out)) {
+        t.ok(out, "error thrown for forbidden endpoint truthy OK");
+        t.ok(out.response, "deploy contract response truthy OK");
+        t.equal(
+          out.response?.status,
+          StatusCodes.FORBIDDEN,
+          "deploy contract response status === 403 OK",
+        );
+        t.notok(
+          out.response?.data.data,
+          "(out as any).response.data.data falsy OK",
+        );
+        t.notok(
+          out.response?.data.success,
+          "(out as any).response.data.success falsy OK",
+        );
+      } else if (out instanceof Error) {
+        throw new RuntimeError("unexpected exception", out);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(out),
+        );
+      }
     }
     t.end();
-  } catch (ex) {
-    log.error(ex);
-    t.fail("Exception thrown during test execution, see above for details!");
-    throw ex;
+  } catch (ex: unknown) {
+    if (axios.isAxiosError(ex)) {
+      log.error(ex);
+      t.fail("Exception thrown during test execution, see above for details!");
+      throw ex;
+    } else if (ex instanceof Error) {
+      throw new RuntimeError("unexpected exception", ex);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(ex),
+      );
+    }
   }
 });

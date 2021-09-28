@@ -100,10 +100,15 @@ export class GetKeychainEntryEndpointV1 implements IWebServiceEndpoint {
       };
       res.status(200);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.debug(`${tag} Failed to serve request:`, ex);
-      res.status(500);
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.json({ error: ex.stack });
+      } else {
+        res.status(500);
+        res.json({ error: JSON.stringify(ex) });
+      }
     }
   }
 }

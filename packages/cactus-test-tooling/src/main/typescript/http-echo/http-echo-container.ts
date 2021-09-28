@@ -3,6 +3,8 @@ import isPortReachable from "is-port-reachable";
 import Joi from "joi";
 import { EventEmitter } from "events";
 import { ITestLedger } from "../i-test-ledger";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 const OPTS_SCHEMA: Joi.Schema = Joi.object().keys({
   imageVersion: Joi.string().min(5).required(),
@@ -109,8 +111,17 @@ export class HttpEchoContainer implements ITestLedger {
             await new Promise((resolve2) => setTimeout(resolve2, 100));
           } while (!reachable);
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

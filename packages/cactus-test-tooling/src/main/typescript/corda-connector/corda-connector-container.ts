@@ -12,6 +12,8 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { Containers } from "../common/containers";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 /*
  * Provides default options for Corda connector server
@@ -147,9 +149,18 @@ export class CordaConnectorContainer {
         try {
           await Containers.waitForHealthCheck(this.containerId);
           resolve(container);
-        } catch (ex) {
-          this.log.error(`Waiting for healthcheck to pass failed:`, ex);
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            this.log.error(`Waiting for healthcheck to pass failed:`, ex);
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

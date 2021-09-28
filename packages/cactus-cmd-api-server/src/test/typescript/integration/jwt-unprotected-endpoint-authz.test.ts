@@ -17,6 +17,7 @@ import {
 
 import { PluginLedgerConnectorStub } from "../fixtures/plugin-ledger-connector-stub/plugin-ledger-connector-stub";
 import { UnprotectedActionEndpoint } from "../fixtures/plugin-ledger-connector-stub/web-services/unprotected-action-endpoint";
+import { RuntimeError } from "run-time-error";
 
 const testCase =
   "API server enforces scope requirements on top of generic authz";
@@ -119,9 +120,18 @@ test(testCase, async (t: Test) => {
       req1.requestId,
       "res1.data.requestId === req1.requestId OK",
     );
-  } catch (ex) {
-    log.error(ex);
-    t.fail("Exception thrown during test execution, see above for details!");
-    throw ex;
+  } catch (ex: unknown) {
+    if (axios.isAxiosError(ex)) {
+      log.error(ex);
+      t.fail("Exception thrown during test execution, see above for details!");
+      throw ex;
+    } else if (ex instanceof Error) {
+      throw new RuntimeError("unexpected exception", ex);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(ex),
+      );
+    }
   }
 });

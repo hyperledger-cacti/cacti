@@ -14,6 +14,8 @@ import {
 
 import { Containers } from "../common/containers";
 import RealmRepresentation from "keycloak-admin/lib/defs/realmRepresentation";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export interface IKeycloakContainerOptions {
   envVars?: string[];
@@ -132,8 +134,17 @@ export class KeycloakContainer {
         try {
           await Containers.waitForHealthCheck(this._containerId);
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

@@ -62,6 +62,8 @@ import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
@@ -415,11 +417,20 @@ export class PluginLedgerConnectorQuorum
       const txHash = await sendTransaction(transactionConfig, secret);
       const transactionReceipt = await this.pollForTxReceipt(txHash);
       return { transactionReceipt };
-    } catch (ex) {
-      throw new Error(
-        `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `InnerException: ${ex.stack}`,
-      );
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        throw new Error(
+          `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
+            `InnerException: ${ex.stack}`,
+        );
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 

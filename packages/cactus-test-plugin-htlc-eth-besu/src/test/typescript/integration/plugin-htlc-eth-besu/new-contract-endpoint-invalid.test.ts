@@ -34,6 +34,7 @@ import {
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu/src/main/solidity/contracts/HashTimeLock.json";
+import axios from "axios";
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
@@ -191,7 +192,11 @@ test(testCase, async (t: Test) => {
     t.ok(resp, "response newContract is OK");
     t.equal(resp.status, 200, "response status newContract is OK");
   } catch (error) {
-    t.equal(error.response.status, 500, "response status is 500");
+    if (axios.isAxiosError(error)) {
+      t.equal(error.response?.status, 500, "response status is 500");
+    } else {
+      t.fail("expected an axios error, got something else");
+    }
   }
   t.end();
 });

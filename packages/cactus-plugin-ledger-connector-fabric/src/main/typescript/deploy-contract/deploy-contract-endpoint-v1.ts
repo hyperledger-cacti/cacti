@@ -95,11 +95,17 @@ export class DeployContractEndpointV1 implements IWebServiceEndpoint {
       const resBody = await connector.deployContract(reqBody);
       res.status(HttpStatus.OK);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`${fnTag} failed to serve contract deploy request`, ex);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR);
+        res.statusMessage = ex.message;
+        res.json({ error: ex.stack });
+      } else {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR);
+        res.statusMessage = JSON.stringify(ex);
+        res.json({ error: JSON.stringify(ex) });
+      }
     }
   }
 }

@@ -15,6 +15,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { NewContractObj } from "../generated/openapi/typescript-axios/api";
 import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu";
 import OAS from "../../json/openapi.json";
+
 export interface INewContractEndpointOptions {
   logLevel?: LogLevelDesc;
   plugin: PluginHtlcEthBesu;
@@ -90,12 +91,19 @@ export class NewContractEndpoint implements IWebServiceEndpoint {
         res.status(200);
         res.send(result);
       }
-    } catch (ex) {
+    } catch (ex: unknown) {
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: ex.stack || ex.message,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: JSON.stringify(ex),
+        });
+      }
     }
   }
 }

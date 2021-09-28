@@ -14,6 +14,8 @@ import {
   InternalServerError,
 } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
 import { AssetManagement } from "./AssetManagement";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 const fs = require("fs");
 const path = require("path");
@@ -38,18 +40,25 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
       .catch((err) => {
         logger.error(err);
       });
-  } catch (err) {
-    logger.error(`##err name: ${err.constructor.name}`);
-
-    if (err instanceof RIFError) {
-      logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
-      res.status(err.statusCode);
-      res.send(err.message);
-      return;
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      logger.error(`##err name: ${err.constructor.name}`);
+      if (err instanceof RIFError) {
+        logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
+        res.status(err.statusCode);
+        res.send(err.message);
+        return;
+      }
+      logger.error(`##err in asset: ${err}`);
+      next(err);
+    } else if (err instanceof Error) {
+      throw new RuntimeError("unexpected exception", err);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(err),
+      );
     }
-
-    logger.error(`##err in asset: ${err}`);
-    next(err);
   }
 });
 
@@ -65,18 +74,25 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
       .catch((err) => {
         logger.error(err);
       });
-  } catch (err) {
-    logger.error(`##err name: ${err.constructor.name}`);
-
-    if (err instanceof RIFError) {
-      logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
-      res.status(err.statusCode);
-      res.send(err.message);
-      return;
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      logger.error(`##err name: ${err.constructor.name}`);
+      if (err instanceof RIFError) {
+        logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
+        res.status(err.statusCode);
+        res.send(err.message);
+        return;
+      }
+      logger.error(`##err in asset: ${err}`);
+      next(err);
+    } else if (err instanceof Error) {
+      throw new RuntimeError("unexpected exception", err);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(err),
+      );
     }
-
-    logger.error(`##err in asset: ${err}`);
-    next(err);
   }
 });
 

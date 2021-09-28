@@ -7,6 +7,9 @@ import {
   CarbonAccountingApp,
 } from "./carbon-accounting-app";
 
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
+
 export async function launchApp(): Promise<void> {
   const configService = new ConfigService();
   const config = await configService.getOrCreate();
@@ -19,10 +22,19 @@ export async function launchApp(): Promise<void> {
   const carbonAccountingApp = new CarbonAccountingApp(appOptions);
   try {
     await carbonAccountingApp.start();
-  } catch (ex) {
-    console.error(`CarbonAccountingApp crashed. Existing...`, ex);
-    await carbonAccountingApp?.stop();
-    process.exit(-1);
+  } catch (ex: unknown) {
+    if (axios.isAxiosError(ex)) {
+      console.error(`CarbonAccountingApp crashed. Existing...`, ex);
+      await carbonAccountingApp?.stop();
+      process.exit(-1);
+    } else if (ex instanceof Error) {
+      throw new RuntimeError("unexpected exception", ex);
+    } else {
+      throw new RuntimeError(
+        "unexpected exception with incorrect type",
+        JSON.stringify(ex),
+      );
+    }
   }
 }
 

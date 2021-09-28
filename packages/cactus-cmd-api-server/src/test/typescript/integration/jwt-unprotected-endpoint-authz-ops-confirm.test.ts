@@ -14,6 +14,7 @@ import {
 } from "../../../main/typescript/public-api";
 
 import { PluginLedgerConnectorStub } from "../fixtures/plugin-ledger-connector-stub/plugin-ledger-connector-stub";
+import axios from "axios";
 
 const testCase =
   "block unprotected endpoint if not confirmed by ops via deploy-time configuration";
@@ -75,9 +76,16 @@ test(testCase, async (t: Test) => {
       mainAssertion,
     );
     t.end();
-  } catch (ex) {
-    log.error(ex);
-    t.fail("Exception thrown during test execution, see above for details!");
-    throw ex;
+  } catch (ex: unknown) {
+    if (axios.isAxiosError(ex)) {
+      log.error(ex);
+      t.fail("Exception thrown during test execution, see above for details!");
+      throw ex;
+    } else {
+      log.error(ex);
+      t.fail("Exception thrown during test execution, see above for details!");
+      throw ex;
+    }
   }
+  t.end();
 });

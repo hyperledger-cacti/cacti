@@ -11,6 +11,7 @@ import { LoggerProvider } from "@hyperledger/cactus-common";
 import { Containers } from "../common/containers";
 import { RuntimeError } from "run-time-error";
 import { EventEmitter } from "events";
+import axios from "axios";
 
 export interface IBesuMpTestLedgerOptions {
   readonly logLevel?: LogLevelDesc;
@@ -160,9 +161,18 @@ export class BesuMpTestLedger {
         try {
           await Containers.waitForHealthCheck(this.containerId.get());
           resolve(container);
-        } catch (ex) {
-          this.log.error(ex);
-          reject(ex);
+        } catch (ex: unknown) {
+          if (axios.isAxiosError(ex)) {
+            this.log.error(ex);
+            reject(ex);
+          } else if (ex instanceof Error) {
+            throw new RuntimeError("unexpected exception", ex);
+          } else {
+            throw new RuntimeError(
+              "unexpected exception with incorrect type",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });
