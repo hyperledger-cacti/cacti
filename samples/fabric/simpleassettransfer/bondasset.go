@@ -26,7 +26,7 @@ type BondAsset struct {
 }
 
 type BondAssetPledge struct {
-	AssetDetails        BondAsset   `json:"assetdetails"`
+	AssetDetails        []byte      `json:"assetdetails"`
 	LocalNetworkID      string      `json:"localnetworkid"`
 	RemoteNetworkID     string      `json:"remotenetworkid"`
 	RecipientCert       string      `json:"recipientcert"`
@@ -34,7 +34,7 @@ type BondAssetPledge struct {
 }
 
 type BondAssetClaimStatus struct {
-	AssetDetails        BondAsset   `json:"assetdetails"`
+	AssetDetails        []byte      `json:"assetdetails"`
 	LocalNetworkID      string      `json:"localnetworkid"`
 	RemoteNetworkID     string      `json:"remotenetworkid"`
 	RecipientCert       string      `json:"recipientcert"`
@@ -56,12 +56,23 @@ func getBondAssetClaimKey(assetType string, assetId string) string {
 }
 
 func matchClaimWithAssetPledge(pledge *BondAssetPledge, claim *BondAssetClaimStatus) bool {
-	return (pledge.AssetDetails.Type == claim.AssetDetails.Type &&
-		pledge.AssetDetails.ID == claim.AssetDetails.ID &&
-		pledge.AssetDetails.Owner == claim.AssetDetails.Owner &&
-		pledge.AssetDetails.Issuer == claim.AssetDetails.Issuer &&
-		pledge.AssetDetails.FaceValue == claim.AssetDetails.FaceValue &&
-		pledge.AssetDetails.MaturityDate.Equal(claim.AssetDetails.MaturityDate))
+	var pledgeAsset, claimAsset BondAsset
+	err := json.Unmarshal(pledge.AssetDetails, &pledgeAsset)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	err = json.Unmarshal(claim.AssetDetails, &claimAsset)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	return (pledgeAsset.Type == claimAsset.Type &&
+		pledgeAsset.ID == claimAsset.ID &&
+		pledgeAsset.Owner == claimAsset.Owner &&
+		pledgeAsset.Issuer == claimAsset.Issuer &&
+		pledgeAsset.FaceValue == claimAsset.FaceValue &&
+		pledgeAsset.MaturityDate.Equal(claimAsset.MaturityDate))
 }
 
 // InitBondAssetLedger adds a base set of assets to the ledger
@@ -187,7 +198,7 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 	pledge = BondAssetPledge{
-		AssetDetails: asset,
+		AssetDetails: assetJSON,
 		LocalNetworkID: string(localNetworkId),
 		RemoteNetworkID: remoteNetworkId,
 		RecipientCert: recipientCert,
@@ -216,13 +227,18 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return err
 	}
-	if pledge.AssetDetails.ID == "" {
+	var asset BondAsset
+	err = json.Unmarshal([]byte(pledge.AssetDetails), &asset)
+	if err != nil {
+		return err
+	}
+	if asset.ID == "" {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged in %s", id, remoteNetworkId)
 	}
-	if pledge.AssetDetails.Type != assetType {
+	if asset.Type != assetType {
 		return fmt.Errorf("cannot claim asset %s as its type doesn't match the pledge", id)
 	}
-	if pledge.AssetDetails.ID != id {
+	if asset.ID != id {
 		return fmt.Errorf("cannot claim asset %s as its ID doesn't match the pledge", id)
 	}
 
@@ -242,7 +258,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if pledge.LocalNetworkID != remoteNetworkId {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given network", id)
 	}
-	if pledge.AssetDetails.Owner != owner {
+	if asset.Owner != owner {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given owner", id)
 	}
 	localNetworkId, err := ctx.GetStub().GetState(localNetworkIdKey)
@@ -254,7 +270,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	}
 
 	// Make the recipient the owner of the asset, in effect recreating the asset in this network and chaincode
-	err = s.CreateAsset(ctx, assetType, id, claimer, pledge.AssetDetails.Owner, pledge.AssetDetails.FaceValue, pledge.AssetDetails.MaturityDate.Format(time.RFC822))
+	err = s.CreateAsset(ctx, assetType, id, claimer, asset.Owner, asset.FaceValue, asset.MaturityDate.Format(time.RFC822))
 	if err != nil {
 		return err
 	}
@@ -320,15 +336,20 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if claimStatus.ClaimStatus {
 		return fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
 	}
-	if (claimStatus.AssetDetails.Type != "" &&
-		claimStatus.AssetDetails.ID != "" &&
-		claimStatus.AssetDetails.Owner != "" &&
+	var claimAsset BondAsset
+	err = json.Unmarshal(claimStatus.AssetDetails, &claimAsset)
+	if err != nil {
+		return err
+	}
+	if (claimAsset.Type != "" &&
+		claimAsset.ID != "" &&
+		claimAsset.Owner != "" &&
 		claimStatus.LocalNetworkID != "" &&
 		claimStatus.RemoteNetworkID != "" &&
 		claimStatus.RecipientCert != "") {
 		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
 		if !matchClaimWithAssetPledge(&pledge, &claimStatus) {
-			return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %+v", id, pledge.AssetDetails)
+			return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %s", id, pledge.AssetDetails)
 		}
 		if claimStatus.LocalNetworkID != remoteNetworkId {
 			return fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
@@ -354,12 +375,7 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	}
 
 	// Recover asset state (Put)
-	assetJSON, err := json.Marshal(pledge.AssetDetails)
-	if err != nil {
-		return err
-	}
-
-	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
+	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), pledge.AssetDetails)
 }
 
 // ReadAsset returns the asset stored in the world state with given id.
@@ -396,26 +412,31 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, a
 func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, owner, recipientNetworkId, recipientCert string) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
-    pledge := &BondAssetPledge{
-		AssetDetails: BondAsset{
-			Type: "",
-			ID: "",
-			Owner: "",
-			Issuer: "",
-			FaceValue: 0,
-            MaturityDate: time.Unix(0, 0),
-		},
+	blankAsset := BondAsset{
+		Type: "",
+		ID: "",
+		Owner: "",
+		Issuer: "",
+		FaceValue: 0,
+		MaturityDate: time.Unix(0, 0),
+	}
+	blankAssetJSON, err := json.Marshal(blankAsset)
+	if err != nil {
+		return "", err
+	}
+	pledge := &BondAssetPledge{
+		AssetDetails: blankAssetJSON,
 		LocalNetworkID: "",
 		RemoteNetworkID: "",
 		RecipientCert: "",
-        ExpiryTimeSecs: 0,
+		ExpiryTimeSecs: 0,
 	}
-    pledgeJSON, err := json.Marshal(pledge)
-    if err != nil {
-        return "", err
-    }
+	pledgeJSON, err := json.Marshal(pledge)
+	if err != nil {
+		return "", err
+	}
 
-    pledgeKey := getBondAssetPledgeKey(assetType, id)
+	pledgeKey := getBondAssetPledgeKey(assetType, id)
 	lookupPledgeJSON, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to read asset pledge status from world state: %v", err)
@@ -428,8 +449,13 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 	if err != nil {
 		return "", err
 	}
+	var lookupPledgeAsset BondAsset
+	err = json.Unmarshal(lookupPledge.AssetDetails, &lookupPledgeAsset)
+	if err != nil {
+		return "", err
+	}
 	// Match pledge with request parameters
-	if lookupPledge.RecipientCert != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId || lookupPledge.AssetDetails.Owner != owner {
+	if lookupPledge.RecipientCert != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId || lookupPledgeAsset.Owner != owner {
 		return string(pledgeJSON), nil      // Return blank
 	}
 
@@ -440,15 +466,20 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
-    claimStatus := &BondAssetClaimStatus{
-		AssetDetails: BondAsset{
-			Type: "",
-			ID: "",
-			Owner: "",
-			Issuer: "",
-			FaceValue: 0,
-            MaturityDate: time.Unix(0, 0),
-		},
+	blankAsset := BondAsset{
+		Type: "",
+		ID: "",
+		Owner: "",
+		Issuer: "",
+		FaceValue: 0,
+		MaturityDate: time.Unix(0, 0),
+	}
+	blankAssetJSON, err := json.Marshal(blankAsset)
+	if err != nil {
+		return "", err
+	}
+	claimStatus := &BondAssetClaimStatus{
+		AssetDetails: blankAssetJSON,
 		LocalNetworkID: "",
 		RemoteNetworkID: "",
 		RecipientCert: "",
@@ -470,7 +501,7 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 		return string(claimStatusJSON), nil      // Return blank
 	}
 
-    // Check if this asset is owned by the given recipient
+	// Check if this asset is owned by the given recipient
 	var asset BondAsset
 	err = json.Unmarshal(assetJSON, &asset)
 	if err != nil {
@@ -481,7 +512,7 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 	}
 
 	// Lookup claim record
-    claimKey := getBondAssetClaimKey(assetType, id)
+	claimKey := getBondAssetClaimKey(assetType, id)
 	lookupClaimJSON, err := ctx.GetStub().GetState(claimKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to read asset claim status from world state: %v", err)
@@ -494,8 +525,13 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 	if err != nil {
 		return "", err
 	}
+	var lookupClaimAsset BondAsset
+	err = json.Unmarshal(lookupClaim.AssetDetails, &lookupClaimAsset)
+	if err != nil {
+		return "", err
+	}
 	// Match claim with request parameters
-	if lookupClaim.AssetDetails.Owner != pledger || lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.RecipientCert != recipientCert {
+	if lookupClaimAsset.Owner != pledger || lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.RecipientCert != recipientCert {
 		return string(claimStatusJSON), nil      // Return blank
 	}
 	lookupClaim.ExpiryTimeSecs = claimStatus.ExpiryTimeSecs
