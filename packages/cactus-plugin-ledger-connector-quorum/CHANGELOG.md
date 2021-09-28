@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/hyperledger/cactus/compare/v0.9.0...v0.10.0) (2021-09-28)
+
+
+### Bug Fixes
+
+* openapi validation test for quorum plugin ([8a4222a](https://github.com/hyperledger/cactus/commit/8a4222aacf3999838573d72fb82099398b955d99)), closes [#1286](https://github.com/hyperledger/cactus/issues/1286) [#847](https://github.com/hyperledger/cactus/issues/847)
+
+
+### Features
+
+* **core-api:** discontinue dedicated HTTP listeners for web service plugins ([3fbd2fc](https://github.com/hyperledger/cactus/commit/3fbd2fcb60d49090bf4e986bea74d4e988348659)), closes [#358](https://github.com/hyperledger/cactus/issues/358)
+* **core:** add installOpenapiValidationMiddleware ([1f6ea5f](https://github.com/hyperledger/cactus/commit/1f6ea5fe3aa1ba997a655098d632034f13f232a5)), closes [#847](https://github.com/hyperledger/cactus/issues/847)
+* **quorum-connector:** remove hard dependency on keychain ([5bf13e9](https://github.com/hyperledger/cactus/commit/5bf13e9830c00d6cca00042b5dafa22325f50a90))
+
+
+
+
+
 # [0.9.0](https://github.com/hyperledger/cactus/compare/v0.8.0...v0.9.0) (2021-08-31)
 
 
