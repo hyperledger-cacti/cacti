@@ -1,6 +1,7 @@
 {
   "name": "@hyperledger/cactus-cmd-socketio-server",
-  "private": false,
+  "version": "0.10.0",
+  "private": true,
   "scripts": {
     "build": "npm run build-ts && npm run copy-static-assets",
     "build-ts": "tsc",
