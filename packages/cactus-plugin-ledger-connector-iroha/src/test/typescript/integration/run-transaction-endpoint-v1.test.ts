@@ -553,7 +553,7 @@ test.skip(testCase, async (t: Test) => {
     t.equal(res.status, 200);
     /**
      * Iroha Javascript SDK maps each permission to an index number
-     * @see https://github.com/hyperledger/iroha-javascript/blob/master/src/proto/primitive_pb.d.ts#L193-L247
+     * @see https://github.com/hyperledger/iroha-javascript/blob/main/src/proto/primitive_pb.d.ts#L193-L247
      */
     const permissionArr = [3, 11, 12, 13];
     t.deepEqual(res.data.transactionReceipt, permissionArr);
