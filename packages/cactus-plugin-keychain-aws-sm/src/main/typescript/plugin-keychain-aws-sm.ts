@@ -30,6 +30,7 @@ import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-end
 import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1";
 import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1";
 import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export enum AwsCredentialType {
   LocalFile = "LOCAL_FILE",
@@ -242,8 +243,10 @@ export class PluginKeychainAwsSm
         this.log.error(`Error retriving secret value for the key "${key}"`);
         throw ex;
       } else {
-        this.log.error(`Error retriving secret value for the key "${key}"`);
-        throw ex;
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
       }
     }
   }
@@ -258,15 +261,24 @@ export class PluginKeychainAwsSm
         })
         .promise();
       return true;
-    } catch (ex) {
-      const errorStatus = (ex as Error).message.includes(
-        SECRETMANAGER_STATUS_KEY_NOT_FOUND,
-      );
-      if (errorStatus) {
-        return false;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        const errorStatus = (ex as Error).message.includes(
+          SECRETMANAGER_STATUS_KEY_NOT_FOUND,
+        );
+        if (errorStatus) {
+          return false;
+        } else {
+          this.log.error(`${fnTag}: Presence check of "${key}" crashed:`, ex);
+          throw ex;
+        }
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
       } else {
-        this.log.error(`${fnTag}: Presence check of "${key}" crashed:`, ex);
-        throw ex;
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
       }
     }
   }
@@ -281,9 +293,18 @@ export class PluginKeychainAwsSm
           SecretString: value,
         })
         .promise();
-    } catch (ex) {
-      this.log.error(` ${fnTag}: Error writing secret "${key}"`);
-      throw ex;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(` ${fnTag}: Error writing secret "${key}"`);
+        throw ex;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 
@@ -297,9 +318,18 @@ export class PluginKeychainAwsSm
           ForceDeleteWithoutRecovery: true,
         })
         .promise();
-    } catch (ex) {
-      this.log.error(`${fnTag} Error deleting secret "${key}"`);
-      throw ex;
+    } catch (ex: unknown) {
+      if (axios.isAxiosError(ex)) {
+        this.log.error(`${fnTag} Error deleting secret "${key}"`);
+        throw ex;
+      } else if (ex instanceof Error) {
+        throw new RuntimeError("unexpected exception", ex);
+      } else {
+        throw new RuntimeError(
+          "unexpected exception with incorrect type",
+          JSON.stringify(ex),
+        );
+      }
     }
   }
 }
