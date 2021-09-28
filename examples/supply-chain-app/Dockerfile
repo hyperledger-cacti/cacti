@@ -34,10 +34,11 @@ WORKDIR ${APP}
 SHELL ["/bin/bash", "--login", "-i", "-c"]
 # Installing Node Version Manager (nvm)
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+ARG NPM_PKG_VERSION=latest
 RUN source ~/.bashrc && \
     nvm install 16.8.0 && \
     npm install -g yarn && \
-    yarn add @hyperledger/cactus-example-supply-chain-backend@0.9.1-docs-1312.bcfd3c31.6+bcfd3c31 --ignore-engines --production
+    yarn add @hyperledger/cactus-example-supply-chain-backend@${NPM_PKG_VERSION} --ignore-engines --production
 
 SHELL ["/bin/bash", "--login", "-c"]
 
