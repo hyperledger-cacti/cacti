@@ -160,7 +160,7 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	// Ensure that the client is the owner of the asset
-	if !s.CheckAccessToAsset(ctx, assetJSON) {
+	if !checkAccessToAsset(s, ctx, assetJSON) {
 		return fmt.Errorf("Canot pledge asset %s", id)
 	}
 
@@ -555,15 +555,15 @@ func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface,
 		return fmt.Errorf("the bond asset of type %s and id %s does not exist", assetType, id)
 	}
 	// Ensure that the client is the owner of the asset
-	if !s.CheckAccessToAsset(ctx, assetJSON) {
+	if !checkAccessToAsset(s, ctx, assetJSON) {
 		return fmt.Errorf("Cannot delete asset %s", id)
 	}
 
 	return ctx.GetStub().DelState(assetKey)
 }
 
-// IsCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
-func (s *SmartContract) IsCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
+// isCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
+func isCallerAssetOwner(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	caller, err := getECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -572,8 +572,8 @@ func (s *SmartContract) IsCallerAssetOwner(ctx contractapi.TransactionContextInt
 	return (asset.Owner == caller)
 }
 
-// IsBondAssetLocked returns true only if the asset is presently locked
-func (s *SmartContract) IsBondAssetLocked(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
+// isBondAssetLocked returns true only if the asset is presently locked
+func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
 		Type: asset.Type,
 		Id: asset.ID,
@@ -594,8 +594,8 @@ func (s *SmartContract) IsBondAssetLocked(ctx contractapi.TransactionContextInte
 	return locked
 }
 
-// IsBondAssetLockedForMe returns true only if the asset is presently locked for me
-func (s *SmartContract) IsBondAssetLockedForMe(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
+// isBondAssetLockedForMe returns true only if the asset is presently locked for me
+func isBondAssetLockedForMe(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
 		Type: asset.Type,
 		Id: asset.ID,
@@ -616,8 +616,8 @@ func (s *SmartContract) IsBondAssetLockedForMe(ctx contractapi.TransactionContex
 	return locked
 }
 
-// CheckAccessToAsset checks several conditions under which an asset can be put on hold (i.e., not available for regular business operation)
-func (s *SmartContract) CheckAccessToAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte) bool {
+// checkAccessToAsset checks several conditions under which an asset can be put on hold (i.e., not available for regular business operation)
+func checkAccessToAsset(s *SmartContract, ctx contractapi.TransactionContextInterface, assetJSON []byte) bool {
 	var asset BondAsset
 	err := json.Unmarshal(assetJSON, &asset)
 	if err != nil {
@@ -626,13 +626,13 @@ func (s *SmartContract) CheckAccessToAsset(ctx contractapi.TransactionContextInt
 	}
 
 	// Ensure that the client is the owner of the asset
-	if !s.IsCallerAssetOwner(ctx, &asset) {
+	if !isCallerAssetOwner(s, ctx, &asset) {
 		fmt.Printf("Illegal update: caller is not owner of asset %s\n", asset.ID)
 		return false
 	}
 
 	// Ensure that the asset is not locked
-	if s.IsBondAssetLocked(ctx, &asset) {
+	if isBondAssetLocked(s, ctx, &asset) {
 		fmt.Printf("Cannot update attributes of locked asset %s\n", asset.ID)
 		return false
 	}
@@ -677,11 +677,11 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 	}
 
 	// If the asset is locked, only the lock recipient can update the Owner field
-	if s.IsBondAssetLocked(ctx, asset) {
+	if isBondAssetLocked(s, ctx, asset) {
 		return fmt.Errorf("Illegal update: cannot change ownership of locked asset %s in this transaction\n", asset.ID)
 	} else {
 		// If asset is not locked, only the owner can update the Owner field
-		if !s.IsCallerAssetOwner(ctx, asset) {
+		if !isCallerAssetOwner(s, ctx, asset) {
 			return fmt.Errorf("Illegal update: caller is not owner of asset %s\n", asset.ID)
 		}
 	}
@@ -703,7 +703,7 @@ func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInt
 	}
 
 	// Ensure that the asset is free to be modified
-	if !s.CheckAccessToAsset(ctx, assetJSON) {
+	if !checkAccessToAsset(s, ctx, assetJSON) {
 		return fmt.Errorf("Cannot update maturity date of asset %s", id)
 	}
 
@@ -724,7 +724,7 @@ func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterf
 	}
 
 	// Ensure that the asset is free to be modified
-	if !s.CheckAccessToAsset(ctx, assetJSON) {
+	if !checkAccessToAsset(s, ctx, assetJSON) {
 		return fmt.Errorf("Cannot update face value of asset %s", id)
 	}
 
