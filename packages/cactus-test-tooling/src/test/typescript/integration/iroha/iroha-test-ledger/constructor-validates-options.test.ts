@@ -12,7 +12,7 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 const logLevel: LogLevelDesc = "TRACE";
 
-test("constructor throws if invalid input is provided", (t: Test) => {
+test.skip("constructor throws if invalid input is provided", (t: Test) => {
   t.ok(IrohaTestLedger);
   t.throws(
     () =>
@@ -25,7 +25,7 @@ test("constructor throws if invalid input is provided", (t: Test) => {
   t.end();
 });
 
-test("constructor does not throw if valid input is provided", (t: Test) => {
+test.skip("constructor does not throw if valid input is provided", (t: Test) => {
   t.ok(IrohaTestLedger);
   t.doesNotThrow(
     () =>
@@ -62,7 +62,7 @@ test("constructor does not throw if valid input is provided", (t: Test) => {
  * ```
  */
 
-test("starts/stops/destroys a docker container", async (t: Test) => {
+test.skip("starts/stops/destroys a docker container", async (t: Test) => {
   const postgresTestContainer = new PostgresTestContainer({ logLevel });
 
   test.onFinish(async () => {
