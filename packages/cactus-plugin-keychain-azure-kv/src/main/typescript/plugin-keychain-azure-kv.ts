@@ -180,10 +180,6 @@ export class PluginKeychainAzureKv
     return `@hyperledger/cactus-plugin-keychain-vault`;
   }
 
-  async rotateEncryptionKeys(): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
   public getEncryptionAlgorithm(): string {
     return (null as unknown) as string;
   }

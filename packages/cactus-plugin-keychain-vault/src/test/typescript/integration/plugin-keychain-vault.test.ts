@@ -320,22 +320,6 @@ test("API client get,set,has,delete alters state", async (t: Test) => {
   t.end();
 });
 
-test("rotateEncryptionKeys() fails fast", async (t: Test) => {
-  const options: IPluginKeychainVaultOptions = {
-    instanceId: uuidv4(),
-    keychainId: uuidv4(),
-    endpoint: "http://127.0.0.1:9200",
-    token: "root",
-  };
-  const plugin = new PluginKeychainVault(options);
-
-  const promise = plugin.rotateEncryptionKeys();
-  const expected = /not implemented/;
-  await t.rejects(promise, expected, "rotateEncryptionKeys() rejects OK");
-
-  t.end();
-});
-
 test("getEncryptionAlgorithm() returns null", (t: Test) => {
   const options: IPluginKeychainVaultOptions = {
     instanceId: uuidv4(),
