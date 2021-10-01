@@ -110,10 +110,6 @@ export class PluginKeychainGoogleSm
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-keychain-vault`;
   }
-
-   async rotateEncryptionKeys(): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
     
   public getEncryptionAlgorithm(): string {
     return "AES-256";
