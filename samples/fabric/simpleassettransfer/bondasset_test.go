@@ -12,6 +12,7 @@ import (
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 	wtestmocks "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 const (
@@ -284,7 +285,7 @@ func TestPledgeAsset(t *testing.T) {
 	require.Error(t, err)       // Already locked asset cannot be pledged
 
 	bondAssetPledgeKey := "Pledged_" + defaultAssetType + defaultAssetId
-	bondAssetPledge := sa.BondAssetPledge{
+	bondAssetPledge := wutils.AssetPledge{
 		AssetDetails: bondAssetJSON,
 		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
@@ -329,11 +330,11 @@ func TestClaimAsset(t *testing.T) {
 	bondAssetJSON, _ := json.Marshal(bondAsset)
 
 	expiry := uint64(time.Now().Unix()) - (5 * 60)
-	bondAssetPledge := sa.BondAssetPledge{
+	bondAssetPledge := wutils.AssetPledge{
 		AssetDetails: bondAssetJSON,
 		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
-		RecipientCert: getLockerECertBase64(),
+		RecipientCert: getRecipientECertBase64(),
 		ExpiryTimeSecs: expiry,
 	}
 	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
@@ -344,6 +345,12 @@ func TestClaimAsset(t *testing.T) {
 
 	bondAssetPledge.ExpiryTimeSecs = bondAssetPledge.ExpiryTimeSecs + (10 * 60)
 	bondAssetPledgeJSON, _ = json.Marshal(bondAssetPledge)
+
+	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
+	require.Error(t, err)       // Unexpected pledged asset owner
+
+	bondAssetPledge.RecipientCert = getLockerECertBase64()
+	bondAssetPledgeJSON, _ = json.Marshal(bondAssetPledge)
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
 	require.Error(t, err)       // Claimer doesn't match pledge recipient
 
@@ -351,9 +358,6 @@ func TestClaimAsset(t *testing.T) {
 	bondAssetPledgeJSON, _ = json.Marshal(bondAssetPledge)
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), destNetworkID, string(bondAssetPledgeJSON))
 	require.Error(t, err)       // Pledge not made for the claiming network
-
-	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
-	require.Error(t, err)       // Unexpected pledged asset owner
 
 	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(sourceNetworkID), nil)
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, string(bondAssetPledgeJSON))
@@ -383,7 +387,7 @@ func TestReclaimAsset(t *testing.T) {
 	bondAssetJSON, _ := json.Marshal(bondAsset)
 
 	expiry := uint64(time.Now().Unix()) + (5 * 60)
-	bondAssetPledge := sa.BondAssetPledge{
+	bondAssetPledge := wutils.AssetPledge{
 		AssetDetails: bondAssetJSON,
 		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
@@ -392,7 +396,7 @@ func TestReclaimAsset(t *testing.T) {
 	}
 	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
 
-	claimStatusAndTime := sa.BondAssetClaimStatus{
+	claimStatusAndTime := wutils.AssetClaimStatus{
 		AssetDetails: bondAssetJSON,
 		LocalNetworkID: destNetworkID,
 		RemoteNetworkID: sourceNetworkID,
@@ -474,7 +478,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	bondAssetJSON, _ := json.Marshal(bondAsset)
 
 	expiry := uint64(time.Now().Unix()) + (5 * 60)
-	bondAssetPledge := sa.BondAssetPledge{
+	bondAssetPledge := wutils.AssetPledge{
 		AssetDetails: bondAssetJSON,
 		LocalNetworkID: sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
@@ -483,7 +487,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	}
 	bondAssetPledgeJSON, _ := json.Marshal(bondAssetPledge)
 
-	claimStatusAndTime := sa.BondAssetClaimStatus{
+	claimStatusAndTime := wutils.AssetClaimStatus{
 		AssetDetails: bondAssetJSON,
 		LocalNetworkID: destNetworkID,
 		RemoteNetworkID: sourceNetworkID,
@@ -498,7 +502,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("locker")), nil)
 	pledgeStatus, err := simpleAsset.GetAssetPledgeStatus(transactionContext, defaultAssetType, defaultAssetId, getLockerECertBase64(), destNetworkID, getRecipientECertBase64())
 	require.NoError(t, err)
-	var lookupPledge sa.BondAssetPledge
+	var lookupPledge wutils.AssetPledge
 	json.Unmarshal([]byte(pledgeStatus), &lookupPledge)
 	var lookupPledgeAsset sa.BondAsset
 	json.Unmarshal([]byte(lookupPledge.AssetDetails), &lookupPledgeAsset)
@@ -531,7 +535,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("recipient")), nil)
 	claimStatus, err := simpleAsset.GetAssetClaimStatus(transactionContext, defaultAssetType, defaultAssetId, getRecipientECertBase64(), getLockerECertBase64(), sourceNetworkID, expiry)
 	require.NoError(t, err)
-	var lookupClaim sa.BondAssetClaimStatus
+	var lookupClaim wutils.AssetClaimStatus
 	json.Unmarshal([]byte(claimStatus), &lookupClaim)
 	var lookupClaimAsset sa.BondAsset
 	json.Unmarshal([]byte(lookupClaim.AssetDetails), &lookupClaimAsset)
