@@ -1,9 +1,8 @@
-const tap = require("tap");
-import { BesuTestLedger } from "../../../main/typescript/public-api";
+import test, { Test } from "tape-promise/tape";
 
-tap.pass("Test file can be executed");
+import * as apiSurface from "../../../main/typescript/public-api";
 
-tap.test("Library can be loaded", (assert: any) => {
-  assert.ok(BesuTestLedger);
-  assert.end();
+test("Library can be loaded", (t: Test) => {
+  t.ok(apiSurface, "apiSurface truthy OK");
+  t.end();
 });

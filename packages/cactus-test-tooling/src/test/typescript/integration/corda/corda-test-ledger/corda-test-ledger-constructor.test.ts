@@ -1,7 +1,7 @@
 import test, { Test } from "tape-promise/tape";
 import { CordaTestLedger } from "../../../../../main/typescript/public-api";
 
-test("constructor throws if invalid input is provided", (assert: any) => {
+test("constructor throws if invalid input is provided", (assert: unknown) => {
   assert.ok(CordaTestLedger);
   assert.throws(() => new CordaTestLedger({ imageVersion: "nope" }));
   assert.end();
