@@ -13,7 +13,6 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu";
-import { Web3SigningCredential } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
 export interface IGetSingleStatusEndpointOptions {
@@ -43,15 +42,15 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getOperationId(): string {
-    return this.oasPath.get.operationId;
+    return this.oasPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -77,18 +76,10 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
 
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = "GetSingleStatusEndpoint#handleRequest()";
-    this.log.debug(`GET ${this.getPath()}`);
+    this.log.debug(`POST ${this.getPath()}`);
     try {
-      const id = req.query["id"];
-      const connectorId = req.query["connectorId"];
-      const keychainId = req.query["keychainId"];
-      const web3SigningCredential = req.query["web3SigningCredential"];
-
       const { callOutput } = await this.options.plugin.getSingleStatus(
-        id as string,
-        connectorId as string,
-        keychainId as string,
-        (web3SigningCredential as unknown) as Web3SigningCredential,
+        req.body,
       );
 
       if (callOutput === undefined) {

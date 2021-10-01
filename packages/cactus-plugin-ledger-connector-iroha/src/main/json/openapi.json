@@ -168,7 +168,6 @@
           "params": {
             "description": "The list of arguments to pass in to the transaction request.",
             "type": "array",
-            "default": [],
             "items": {}
           }
         }

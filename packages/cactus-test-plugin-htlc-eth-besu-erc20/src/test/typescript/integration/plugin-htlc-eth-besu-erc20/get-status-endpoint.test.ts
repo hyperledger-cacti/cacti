@@ -272,12 +272,12 @@ test(testCase, async (t: Test) => {
     ],
   });
   const ids = [responseTxId.callOutput as string];
-  const res = await api.getStatusV1(
+  const res = await api.getStatusV1({
     ids,
     web3SigningCredential,
     connectorId,
     keychainId,
-  );
+  });
   t.equal(res.status, 200, "response status is 200 OK");
   t.equal(res.data[0], "1", "the contract status is 1 - Active");
   t.end();
@@ -458,12 +458,12 @@ test("Test get invalid id status", async (t: Test) => {
 
   t.comment("Get invalid status of HTLC");
   const fakeId = "0x66616b654964";
-  const res = await api.getStatusV1(
-    [fakeId],
+  const res = await api.getStatusV1({
+    ids: [fakeId],
     web3SigningCredential,
     connectorId,
     keychainId,
-  );
+  });
   t.equal(res.status, 200, "response status is 200 OK");
   t.equal(res.data[0], "0", "the contract status is 0 - INVALID");
   t.end();
