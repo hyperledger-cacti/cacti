@@ -1,7 +1,5 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
-
-import { Optional } from "typescript-optional";
 import { Config as SshConfig } from "node-ssh";
 import { Express } from "express";
 
@@ -173,10 +171,6 @@ export class PluginLedgerConnectorCorda
     }
     this.log.info(`Instantiated endpoints of ${pkgName}`);
     return endpoints;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
   }
 
   public async shutdown(): Promise<void> {

@@ -13,21 +13,21 @@ import stringify from "json-stable-stringify";
 
 const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
 
-const hashFunction = (data: any): string => {
+const hashFunction = (data: unknown): string => {
   return crypto.createHash("sha256").update(stringify(data)).digest("hex");
 };
 
-const signFunction = (msg: any, pkey: any): any => {
+const signFunction = (msg: unknown, pkey: Uint8Array): Uint8Array => {
   const signObj = secp256k1.ecdsaSign(
     Buffer.from(hashFunction(msg), `hex`),
-    Buffer.from(pkey, `hex`),
+    pkey,
   );
   return signObj.signature;
 };
 
 const verifySignFunction = (
-  msg: any,
-  signature: any,
+  msg: unknown,
+  signature: Uint8Array,
   pubKey: Uint8Array,
 ): boolean => {
   return secp256k1.ecdsaVerify(
@@ -117,6 +117,8 @@ test("Circular JSON Test", async (assert: Test) => {
   };
   const jsObjectSigner = new JsObjectSigner(jsObjectSignerOptions);
 
+  // "any" type actually makes sense here in order to create a circular json
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const obj: any = { a: "foo" };
   obj.b = obj;
 
@@ -204,12 +206,15 @@ test("Test optional hash function", async (assert: Test) => {
 
 test("Test missing required constructor field", async (assert: Test) => {
   try {
+    const pkey: unknown = undefined;
     const jsObjectSignerOptions: IJsObjectSignerOptions = {
-      privateKey: undefined,
+      privateKey: pkey as Uint8Array,
     };
     new JsObjectSigner(jsObjectSignerOptions);
   } catch (e) {
-    assert.equal(e.message, "JsObjectSigner#ctor options.privateKey falsy.");
+    if (e instanceof Error) {
+      assert.equal(e.message, "JsObjectSigner#ctor options.privateKey falsy.");
+    }
   }
   assert.end();
 });

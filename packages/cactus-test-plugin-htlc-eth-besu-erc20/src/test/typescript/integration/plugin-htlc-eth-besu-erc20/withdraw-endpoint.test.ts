@@ -293,12 +293,12 @@ test(testCase, async (t: Test) => {
   t.equal(resWithdraw.status, 200, "response status is 200 OK");
 
   t.comment("Get status of HTLC");
-  const resStatus = await api.getSingleStatusV1(
+  const resStatus = await api.getSingleStatusV1({
     id,
     web3SigningCredential,
     connectorId,
     keychainId,
-  );
+  });
   t.equal(resStatus.status, 200, "response status is 200 OK");
   t.equal(resStatus.data, 3, "the contract status is 3 - Withdrawn");
 

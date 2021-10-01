@@ -1,8 +1,4 @@
-import { Server } from "http";
-import { Server as SecureServer } from "https";
-
 import { Express } from "express";
-import { Optional } from "typescript-optional";
 
 import {
   ConsensusAlgorithmFamily,
@@ -72,10 +68,6 @@ export class PluginLedgerConnectorStub
 
   public getInstanceId(): string {
     return this.instanceId;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async onPluginInit(): Promise<unknown> {

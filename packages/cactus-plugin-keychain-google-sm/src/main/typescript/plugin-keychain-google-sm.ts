@@ -1,8 +1,4 @@
-import type { Server } from "http";
-import type { Server as SecureServer } from "https";
-
 import type { Express } from "express";
-import { Optional } from "typescript-optional";
 
 import OAS from "../json/openapi.json";
 
@@ -97,10 +93,6 @@ export class PluginKeychainGoogleSm
     this.endpoints = endpoints;
 
     return endpoints;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async shutdown(): Promise<void> {
