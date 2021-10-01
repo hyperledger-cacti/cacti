@@ -101,14 +101,14 @@ export class QuorumTestLedger implements ITestLedger {
   }
 
   public async getFileContents(filePath: string): Promise<string> {
-    const response: any = await this.getContainer().getArchive({
+    const response = await this.getContainer().getArchive({
       path: filePath,
     });
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
       let fileContents = "";
-      extract.on("entry", async (header: any, stream, next) => {
+      extract.on("entry", async (header: unknown, stream, next) => {
         stream.on("error", (err: Error) => {
           reject(err);
         });
@@ -227,7 +227,7 @@ export class QuorumTestLedger implements ITestLedger {
           PublishAllPorts: true,
         },
         {},
-        (err: any) => {
+        (err: unknown) => {
           if (err) {
             reject(err);
           }
@@ -279,10 +279,10 @@ export class QuorumTestLedger implements ITestLedger {
     } while (!reachable);
   }
 
-  public stop(): Promise<any> {
+  public stop(): Promise<unknown> {
     return new Promise((resolve, reject) => {
       if (this.container) {
-        this.container.stop({}, (err: any, result: any) => {
+        this.container.stop({}, (err: unknown, result: unknown) => {
           if (err) {
             reject(err);
           } else {
@@ -299,7 +299,7 @@ export class QuorumTestLedger implements ITestLedger {
     });
   }
 
-  public destroy(): Promise<any> {
+  public destroy(): Promise<unknown> {
     if (this.container) {
       return this.container.remove();
     } else {
@@ -372,25 +372,28 @@ export class QuorumTestLedger implements ITestLedger {
     }
   }
 
-  private pullContainerImage(containerNameAndTag: string): Promise<any[]> {
+  private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: any, stream: any) => {
-        if (pullError) {
-          reject(pullError);
-        } else {
-          docker.modem.followProgress(
-            stream,
-            (progressError: any, output: any[]) => {
-              if (progressError) {
-                reject(progressError);
-              } else {
-                resolve(output);
-              }
-            },
-          );
-        }
-      });
+      docker.pull(
+        containerNameAndTag,
+        (pullError: unknown, stream: unknown) => {
+          if (pullError) {
+            reject(pullError);
+          } else {
+            docker.modem.followProgress(
+              stream,
+              (progressError: unknown, output: unknown[]) => {
+                if (progressError) {
+                  reject(progressError);
+                } else {
+                  resolve(output);
+                }
+              },
+            );
+          }
+        },
+      );
     });
   }
 
