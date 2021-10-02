@@ -75,7 +75,7 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
-  public getOasPath() {
+  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
     ];

@@ -55,6 +55,7 @@ export class GetAllowanceEndpoint implements IWebServiceEndpoint {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public get oasPath(): { post: any } {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"
