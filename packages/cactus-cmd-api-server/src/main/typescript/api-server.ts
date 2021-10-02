@@ -1,15 +1,20 @@
-import path from "path";
 import type { AddressInfo } from "net";
+import type { Server as SecureServer } from "https";
+import os from "os";
+import path from "path";
 import tls from "tls";
 import { Server, createServer } from "http";
-import type { Server as SecureServer } from "https";
 import { createServer as createSecureServer } from "https";
+import { RuntimeError } from "run-time-error";
 import { gte } from "semver";
-import npm from "npm";
+import lmify from "lmify";
+import fs from "fs-extra";
 import expressHttpProxy from "express-http-proxy";
+import { Server as GrpcServer } from "@grpc/grpc-js";
+import { ServerCredentials as GrpcServerCredentials } from "@grpc/grpc-js";
 import type { Application, Request, Response, RequestHandler } from "express";
 import express from "express";
-import { OpenApiValidator } from "express-openapi-validator";
+import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 import compression from "compression";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -30,25 +35,32 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
 import { Logger, LoggerProvider, Servers } from "@hyperledger/cactus-common";
 
 import { ICactusApiServerOptions } from "./config/config-service";
 import OAS from "../json/openapi.json";
-import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
+// import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { AuthorizerFactory } from "./authzn/authorizer-factory";
 import { WatchHealthcheckV1 } from "./generated/openapi/typescript-axios";
 import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-endpoint";
+import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service";
+import { GrpcServerApiServer } from "./web-services/grpc/grpc-server-api-server";
+import { determineAddressFamily } from "./common/determine-address-family";
+
 export interface IApiServerConstructorOptions {
-  pluginRegistry?: PluginRegistry;
-  httpServerApi?: Server | SecureServer;
-  wsServerApi?: SocketIoServer;
-  wsOptions?: SocketIoServerOptions;
-  httpServerCockpit?: Server | SecureServer;
-  config: ICactusApiServerOptions;
-  prometheusExporter?: PrometheusExporter;
+  readonly pluginManagerOptions?: { pluginsPath: string };
+  readonly pluginRegistry?: PluginRegistry;
+  readonly httpServerApi?: Server | SecureServer;
+  readonly wsServerApi?: SocketIoServer;
+  readonly grpcServer?: GrpcServer;
+  readonly wsOptions?: SocketIoServerOptions;
+  readonly httpServerCockpit?: Server | SecureServer;
+  readonly config: ICactusApiServerOptions;
+  readonly prometheusExporter?: PrometheusExporter;
 }
 
 export class ApiServer {
@@ -69,8 +81,10 @@ export class ApiServer {
   private readonly httpServerApi: Server | SecureServer;
   private readonly httpServerCockpit: Server | SecureServer;
   private readonly wsApi: SocketIoServer;
+  private readonly grpcServer: GrpcServer;
   private readonly expressApi: Application;
   private readonly expressCockpit: Application;
+  private readonly pluginsPath: string;
   public prometheusExporter: PrometheusExporter;
 
   public get className(): string {
@@ -109,6 +123,7 @@ export class ApiServer {
       this.httpServerCockpit = createServer();
     }
 
+    this.grpcServer = this.options.grpcServer || new GrpcServer({});
     this.wsApi = new SocketIoServer();
     this.expressApi = express();
     this.expressCockpit = express();
@@ -120,12 +135,30 @@ export class ApiServer {
         pollingIntervalInMin: 1,
       });
     }
+    this.prometheusExporter.startMetricsCollection();
     this.prometheusExporter.setTotalPluginImports(this.getPluginImportsCount());
 
     this.log = LoggerProvider.getOrCreate({
       label: "api-server",
       level: options.config.logLevel,
     });
+
+    const defaultPluginsPath = path.join(
+      os.tmpdir(),
+      "org",
+      "hyperledger",
+      "cactus",
+      "plugins",
+    );
+
+    const { pluginsPath } = {
+      ...{ pluginsPath: defaultPluginsPath },
+      ...JSON.parse(this.options.config.pluginManagerOptionsJson),
+      ...this.options.pluginManagerOptions,
+    } as { pluginsPath: string };
+
+    this.pluginsPath = pluginsPath;
+    this.log.debug("pluginsPath: %o", pluginsPath);
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -146,6 +179,7 @@ export class ApiServer {
   async start(): Promise<{
     addressInfoCockpit: AddressInfo;
     addressInfoApi: AddressInfo;
+    addressInfoGrpc: AddressInfo;
   }> {
     this.checkNodeVersion();
     const tlsMaxVersion = this.options.config.tlsDefaultMaxVersion;
@@ -156,6 +190,13 @@ export class ApiServer {
       const { cockpitTlsEnabled, apiTlsEnabled } = this.options.config;
       const addressInfoCockpit = await this.startCockpitFileServer();
       const addressInfoApi = await this.startApiServer();
+      const addressInfoGrpc = await this.startGrpcServer();
+
+      {
+        const { port, address } = addressInfoGrpc;
+        const grpcUrl = `${address}:${port}`;
+        this.log.info(`Cactus gRPC reachable ${grpcUrl}`);
+      }
 
       {
         const { apiHost: host } = this.options.config;
@@ -173,7 +214,7 @@ export class ApiServer {
         this.log.info(`Cactus Cockpit reachable ${httpUrl}`);
       }
 
-      return { addressInfoCockpit, addressInfoApi };
+      return { addressInfoCockpit, addressInfoApi, addressInfoGrpc };
     } catch (ex) {
       const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
       this.log.error(errorMessage);
@@ -255,8 +296,16 @@ export class ApiServer {
 
     await this.installPluginPackage(pluginImport);
 
+    const packagePath = path.join(
+      this.pluginsPath,
+      options.instanceId,
+      "node_modules",
+      packageName,
+    );
+    this.log.debug("Package path: %o", packagePath);
+
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const pluginPackage = require(/* webpackIgnore: true */ packageName);
+    const pluginPackage = require(/* webpackIgnore: true */ packagePath);
     const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
 
     const pluginFactoryOptions: IPluginFactoryOptions = {
@@ -275,54 +324,38 @@ export class ApiServer {
     const fnTag = `ApiServer#installPluginPackage()`;
     const { packageName: pkgName } = pluginImport;
 
-    const npmLogHandler = (message: unknown) => {
-      this.log.debug(`${fnTag} [npm-log]:`, message);
-    };
-
-    const cleanUpNpmLogHandler = () => {
-      npm.off("log", npmLogHandler);
-    };
-
+    const instanceId = pluginImport.options.instanceId;
+    const pluginPackageDir = path.join(this.pluginsPath, instanceId);
     try {
-      this.log.info(`Installing ${pkgName} for plugin import`, pluginImport);
-      npm.on("log", npmLogHandler);
-
-      await new Promise<void>((resolve, reject) => {
-        npm.load((err?: Error) => {
-          if (err) {
-            this.log.error(`${fnTag} npm load fail:`, err);
-            const { message, stack } = err;
-            reject(new Error(`${fnTag} npm load fail: ${message}: ${stack}`));
-          } else {
-            // do not touch package.json
-            npm.config.set("save", false);
-            // do not touch package-lock.json
-            npm.config.set("package-lock", false);
-            // do not waste resources on running an audit
-            npm.config.set("audit", false);
-            // do not wast resources on rendering a progress bar
-            npm.config.set("progress", false);
-            resolve();
-          }
-        });
-      });
-
-      await new Promise<unknown>((resolve, reject) => {
-        const npmInstallHandler = (errInstall?: Error, result?: unknown) => {
-          if (errInstall) {
-            this.log.error(`${fnTag} npm install failed:`, errInstall);
-            const { message: m, stack } = errInstall;
-            reject(new Error(`${fnTag} npm install fail: ${m}: ${stack}`));
-          } else {
-            this.log.info(`Installed ${pkgName} OK`, result);
-            resolve(result);
-          }
-        };
-
-        npm.commands.install([pkgName], npmInstallHandler);
-      });
-    } finally {
-      cleanUpNpmLogHandler();
+      await fs.mkdirp(pluginPackageDir);
+      this.log.debug(`${pkgName} plugin package dir: %o`, pluginPackageDir);
+    } catch (ex) {
+      const errorMessage =
+        "Could not create plugin installation directory, check the file-system permissions.";
+      throw new RuntimeError(errorMessage, ex);
+    }
+    try {
+      lmify.setPackageManager("npm");
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      lmify.setRootDir(pluginPackageDir);
+      this.log.debug(`Installing ${pkgName} for plugin import`, pluginImport);
+      const out = await lmify.install([
+        pkgName,
+        "--production",
+        "--audit=false",
+        "--progress=false",
+        "--fund=false",
+        `--prefix=${pluginPackageDir}`,
+        // "--ignore-workspace-root-check",
+      ]);
+      this.log.debug("%o install result: %o", pkgName, out);
+      if (out.exitCode !== 0) {
+        throw new RuntimeError("Non-zero exit code: ", JSON.stringify(out));
+      }
+      this.log.info(`Installed ${pkgName} OK`);
+    } catch (ex) {
+      throw new RuntimeError(`${fnTag} plugin install fail: ${pkgName}`, ex);
     }
   }
 
@@ -352,6 +385,21 @@ export class ApiServer {
       this.log.info(`Closing HTTP server of the cockpit ...`);
       await Servers.shutdown(this.httpServerCockpit);
       this.log.info(`Close HTTP server of the cockpit OK`);
+    }
+
+    if (this.grpcServer) {
+      this.log.info(`Closing gRPC server ...`);
+      await new Promise<void>((resolve, reject) => {
+        this.grpcServer.tryShutdown((ex?: Error) => {
+          if (ex) {
+            this.log.error("Failed to shut down gRPC server: ", ex);
+            reject(ex);
+          } else {
+            resolve();
+          }
+        });
+      });
+      this.log.info(`Close gRPC server OK`);
     }
   }
 
@@ -486,6 +534,45 @@ export class ApiServer {
     );
   }
 
+  async startGrpcServer(): Promise<AddressInfo> {
+    return new Promise((resolve, reject) => {
+      // const grpcHost = "0.0.0.0"; // FIXME - make this configurable (config-service.ts)
+      const grpcHost = "127.0.0.1"; // FIXME - make this configurable (config-service.ts)
+      const grpcHostAndPort = `${grpcHost}:${this.options.config.grpcPort}`;
+
+      const grpcTlsCredentials = this.options.config.grpcMtlsEnabled
+        ? GrpcServerCredentials.createSsl(
+            Buffer.from(this.options.config.apiTlsCertPem),
+            [
+              {
+                cert_chain: Buffer.from(this.options.config.apiTlsCertPem),
+                private_key: Buffer.from(this.options.config.apiTlsKeyPem),
+              },
+            ],
+            true,
+          )
+        : GrpcServerCredentials.createInsecure();
+
+      this.grpcServer.bindAsync(
+        grpcHostAndPort,
+        grpcTlsCredentials,
+        (error: Error | null, port: number) => {
+          if (error) {
+            return reject(new RuntimeError("Binding gRPC failed: ", error));
+          }
+          this.grpcServer.addService(
+            default_service.org.hyperledger.cactus.cmd_api_server
+              .UnimplementedDefaultServiceService.definition,
+            new GrpcServerApiServer(),
+          );
+          this.grpcServer.start();
+          const family = determineAddressFamily(grpcHost);
+          resolve({ address: grpcHost, port, family });
+        },
+      );
+    });
+  }
+
   async startApiServer(): Promise<AddressInfo> {
     const { options, expressApi: app, wsApi } = this;
     const { config } = options;
@@ -520,8 +607,8 @@ export class ApiServer {
       this.log.info(`Authorization request handler configured OK.`);
     }
 
-    const openApiValidator = this.createOpenApiValidator();
-    await openApiValidator.install(app);
+    // const openApiValidator = this.createOpenApiValidator();
+    // await openApiValidator.install(app);
 
     this.getOrCreateWebServices(app); // The API server's own endpoints
 
@@ -533,6 +620,9 @@ export class ApiServer {
       .map(async (plugin: ICactusPlugin) => {
         const p = plugin as IPluginWebService;
         await p.getOrCreateWebServices();
+        const apiSpec = p.getOpenApiSpec() as OpenAPIV3.Document;
+        if (apiSpec)
+          await installOpenapiValidationMiddleware({ app, apiSpec, logLevel });
         const webSvcs = await p.registerWebServices(app, wsApi);
         return webSvcs;
       });
@@ -595,14 +685,6 @@ export class ApiServer {
       const { E_NON_EXEMPT_UNPROTECTED_ENDPOINTS } = ApiServer;
       throw new Error(`${E_NON_EXEMPT_UNPROTECTED_ENDPOINTS} ${csv}`);
     }
-  }
-
-  createOpenApiValidator(): OpenApiValidator {
-    return new OpenApiValidator({
-      apiSpec: OAS as OpenAPIV3.Document,
-      validateRequests: true,
-      validateResponses: false,
-    });
   }
 
   createCorsMiddleware(allowedDomains: string[]): RequestHandler {

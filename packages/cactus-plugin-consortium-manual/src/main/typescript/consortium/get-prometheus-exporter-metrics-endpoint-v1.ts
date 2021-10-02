@@ -57,16 +57,22 @@ export class GetPrometheusExporterMetricsEndpointV1
     return this.handleRequest.bind(this);
   }
 
-  public getPath(): string {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics"
-    ].get["x-hyperledger-cactus"].http.path;
+    ];
+  }
+
+  public getPath(): string {
+    return this.oasPath.get["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics"
-    ].get["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.oasPath.get.operationId;
   }
 
   public async registerExpress(

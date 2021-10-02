@@ -49,7 +49,7 @@ test("BEFORE " + testCase, async (t: Test) => {
   t.end();
 });
 
-test(testCase, async (t: Test) => {
+test.skip(testCase, async (t: Test) => {
   test.onFailure(async () => {
     await Containers.logDiagnostics({ logLevel });
   });
@@ -60,7 +60,7 @@ test(testCase, async (t: Test) => {
     // imageName: "faio14x",
     // imageVersion: "latest",
     imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
-    imageVersion: "2021-04-21-2016750",
+    imageVersion: "2021-09-02--fix-876-supervisord-retries",
   });
 
   const tearDown = async () => {

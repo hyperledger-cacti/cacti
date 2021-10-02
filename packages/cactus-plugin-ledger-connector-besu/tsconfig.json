@@ -3,14 +3,14 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist/lib/",
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/lib",
     "resolveJsonModule": true,
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-besu.tsbuildinfo"
   },
   "include": [
     "./src",
-    "src/**/*.json",
+    "src/**/*.json"
   ],
   "references": [
     {

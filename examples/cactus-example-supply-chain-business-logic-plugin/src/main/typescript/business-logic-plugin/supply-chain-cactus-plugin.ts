@@ -1,7 +1,5 @@
-import type { Server } from "http";
-import type { Server as SecureServer } from "https";
-import { Optional } from "typescript-optional";
 import { Express } from "express";
+import OAS from "../../json/openapi.json";
 import {
   Logger,
   Checks,
@@ -78,6 +76,10 @@ export class SupplyChainCactusPlugin
     this.instanceId = options.instanceId;
   }
 
+  public getOpenApiSpec(): unknown {
+    return OAS;
+  }
+
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
@@ -145,10 +147,6 @@ export class SupplyChainCactusPlugin
       listShipment,
     ];
     return this.endpoints;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async shutdown(): Promise<void> {

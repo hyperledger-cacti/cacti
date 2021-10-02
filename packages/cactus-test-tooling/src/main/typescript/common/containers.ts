@@ -1,6 +1,7 @@
 import path from "path";
-import { Stream } from "stream";
+import { Duplex, Stream } from "stream";
 import { IncomingMessage } from "http";
+import throttle from "lodash/throttle";
 import { Container, ContainerInfo } from "dockerode";
 import Dockerode from "dockerode";
 import execa from "execa";
@@ -16,6 +17,7 @@ import {
   Strings,
   ILoggerOptions,
 } from "@hyperledger/cactus-common";
+import { IDockerPullProgress } from "./i-docker-pull-progress";
 
 export interface IPruneDockerResourcesRequest {
   logLevel?: LogLevelDesc;
@@ -156,7 +158,7 @@ export class Containers {
 
       const pack = tar.pack({ autoDestroy: true });
 
-      pack.entry({ name: opts.dstFileName }, fileAsString, (err: any) => {
+      pack.entry({ name: opts.dstFileName }, fileAsString, (err: unknown) => {
         if (err) {
           reject(err);
         } else {
@@ -167,11 +169,11 @@ export class Containers {
     });
 
     return new Promise((resolve, reject) => {
-      const handler = (err: any, data: any) => {
+      const handler = (err: unknown, data: unknown) => {
         if (err) {
           reject(err);
         } else {
-          resolve(data);
+          resolve(data as IncomingMessage);
         }
       };
 
@@ -210,12 +212,12 @@ export class Containers {
     Checks.truthy(container, "Containers#pullFile() container");
     Checks.truthy(filePath, "Containers#pullFile() filePath");
 
-    const response: any = await container.getArchive({ path: filePath });
+    const response = await container.getArchive({ path: filePath });
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
       let fileContents = "";
-      extract.on("entry", async (header: any, stream, next) => {
+      extract.on("entry", async (header: unknown, stream, next) => {
         stream.on("error", (err: Error) => {
           reject(err);
         });
@@ -247,12 +249,12 @@ export class Containers {
     Checks.truthy(container, `${fnTag} container`);
     Checks.truthy(filePath, `${fnTag} filePath`);
 
-    const response: any = await container.getArchive({ path: filePath });
+    const response = await container.getArchive({ path: filePath });
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
       let buffer: Buffer;
-      extract.on("entry", async (header: any, stream, next) => {
+      extract.on("entry", async (header: unknown, stream, next) => {
         stream.on("error", (err: Error) => {
           reject(err);
         });
@@ -308,6 +310,7 @@ export class Containers {
     cmd: string[],
     timeoutMs = 300000, // 5 minutes default timeout
     logLevel: LogLevelDesc = "INFO",
+    workingDir?: string,
   ): Promise<string> {
     const fnTag = "Containers#exec()";
     Checks.truthy(container, `${fnTag} container`);
@@ -318,17 +321,21 @@ export class Containers {
 
     const log = LoggerProvider.getOrCreate({ label: fnTag, level: logLevel });
 
-    const exec = await container.exec({
+    const execOptions: Record<string, unknown> = {
       Cmd: cmd,
       AttachStdout: true,
       AttachStderr: true,
       Tty: true,
-    });
+    };
+    if (workingDir) {
+      execOptions.WorkingDir = workingDir;
+    }
+    const exec = await container.exec(execOptions);
 
     return new Promise((resolve, reject) => {
       log.debug(`Calling Exec Start on Docker Engine API...`);
 
-      exec.start({ Tty: true }, (err: any, stream: Stream) => {
+      exec.start({ Tty: true }, (err: Error, stream: Duplex | undefined) => {
         const timeoutIntervalId = setInterval(() => {
           reject(new Error(`Docker Exec timed out after ${timeoutMs}ms`));
         }, timeoutMs);
@@ -338,6 +345,10 @@ export class Containers {
           const errorMessage = `Docker Engine API Exec Start Failed:`;
           log.error(errorMessage, err);
           return reject(new RuntimeError(errorMessage, err));
+        }
+        if (!stream) {
+          const msg = `${fnTag} container engine returned falsy stream object, cannot continue.`;
+          return reject(new RuntimeError(msg));
         }
         log.debug(`Obtained output stream of Exec Start OK`);
         let output = "";
@@ -395,9 +406,9 @@ export class Containers {
   }
   public static pullImage(
     imageFqn: string,
-    options: any = {},
+    options: Record<string, unknown> = {},
     logLevel?: LogLevelDesc,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const defaultLoggerOptions: ILoggerOptions = {
       label: "containers#pullImage()",
       level: logLevel || "INFO",
@@ -415,9 +426,9 @@ export class Containers {
 
   public static tryPullImage(
     imageFqn: string,
-    options: any = {},
+    options: Record<string, unknown> = {},
     logLevel?: LogLevelDesc,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const loggerOptions: ILoggerOptions = {
         label: "containers#tryPullImage()",
@@ -427,7 +438,11 @@ export class Containers {
 
       const docker = new Dockerode();
 
-      const pullStreamStartedHandler = (pullError: any, stream: any) => {
+      const progressPrinter = throttle((msg: IDockerPullProgress): void => {
+        log.debug(JSON.stringify(msg.progress || msg.status));
+      }, 1000);
+
+      const pullStreamStartedHandler = (pullError: unknown, stream: Stream) => {
         if (pullError) {
           log.error(`Could not even start ${imageFqn} pull:`, pullError);
           reject(pullError);
@@ -435,7 +450,7 @@ export class Containers {
           log.debug(`Started ${imageFqn} pull progress stream OK`);
           docker.modem.followProgress(
             stream,
-            (progressError: any, output: any[]) => {
+            (progressError: unknown, output: unknown[]) => {
               if (progressError) {
                 log.error(`Failed to finish ${imageFqn} pull:`, progressError);
                 reject(progressError);
@@ -444,6 +459,7 @@ export class Containers {
                 resolve(output);
               }
             },
+            (msg: IDockerPullProgress): void => progressPrinter(msg),
           );
         }
       };
@@ -452,11 +468,11 @@ export class Containers {
     });
   }
 
-  public static stop(container: Container): Promise<any> {
+  public static stop(container: Container): Promise<unknown> {
     const fnTag = "Containers#stop()";
     return new Promise((resolve, reject) => {
       if (container) {
-        container.stop({}, (err: any, result: any) => {
+        container.stop({}, (err: unknown, result: unknown) => {
           if (err) {
             reject(err);
           } else {

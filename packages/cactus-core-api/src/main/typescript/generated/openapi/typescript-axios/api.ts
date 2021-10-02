@@ -131,6 +131,7 @@ export interface CactusNodeMeta {
  * @export
  * @enum {string}
  */
+
 export enum ConsensusAlgorithmFamiliesWithOutTxFinality {
     WORK = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK'
 }
@@ -140,6 +141,7 @@ export enum ConsensusAlgorithmFamiliesWithOutTxFinality {
  * @export
  * @enum {string}
  */
+
 export enum ConsensusAlgorithmFamiliesWithTxFinality {
     Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
     Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE'
@@ -150,6 +152,7 @@ export enum ConsensusAlgorithmFamiliesWithTxFinality {
  * @export
  * @enum {string}
  */
+
 export enum ConsensusAlgorithmFamily {
     Authority = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY',
     Stake = 'org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE',
@@ -254,6 +257,7 @@ export interface ConsortiumMember {
  * @export
  * @enum {string}
  */
+
 export enum Constants {
     SocketIoConnectionPathV1 = '/api/v1/async/socket-io/connect'
 }
@@ -261,32 +265,58 @@ export enum Constants {
 /**
  * 
  * @export
- * @interface GetKeychainEntryRequest
+ * @interface DeleteKeychainEntryRequestV1
  */
-export interface GetKeychainEntryRequest {
+export interface DeleteKeychainEntryRequestV1 {
     /**
-     * The key for the entry to get from the keychain.
+     * The key for the entry to check the presence of on the keychain.
      * @type {string}
-     * @memberof GetKeychainEntryRequest
+     * @memberof DeleteKeychainEntryRequestV1
      */
     key: string;
 }
 /**
  * 
  * @export
- * @interface GetKeychainEntryResponse
+ * @interface DeleteKeychainEntryResponseV1
  */
-export interface GetKeychainEntryResponse {
+export interface DeleteKeychainEntryResponseV1 {
+    /**
+     * The key that was deleted from the keychain.
+     * @type {string}
+     * @memberof DeleteKeychainEntryResponseV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetKeychainEntryRequestV1
+ */
+export interface GetKeychainEntryRequestV1 {
+    /**
+     * The key for the entry to get from the keychain.
+     * @type {string}
+     * @memberof GetKeychainEntryRequestV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetKeychainEntryResponseV1
+ */
+export interface GetKeychainEntryResponseV1 {
     /**
      * The key that was used to retrieve the value from the keychain.
      * @type {string}
-     * @memberof GetKeychainEntryResponse
+     * @memberof GetKeychainEntryResponseV1
      */
     key: string;
     /**
      * The value associated with the requested key on the keychain.
      * @type {string}
-     * @memberof GetKeychainEntryResponse
+     * @memberof GetKeychainEntryResponseV1
      */
     value: string;
 }
@@ -321,6 +351,44 @@ export interface GetObjectResponseV1 {
      * @memberof GetObjectResponseV1
      */
     value: string;
+}
+/**
+ * 
+ * @export
+ * @interface HasKeychainEntryRequestV1
+ */
+export interface HasKeychainEntryRequestV1 {
+    /**
+     * The key to check for presence in the keychain.
+     * @type {string}
+     * @memberof HasKeychainEntryRequestV1
+     */
+    key: string;
+}
+/**
+ * 
+ * @export
+ * @interface HasKeychainEntryResponseV1
+ */
+export interface HasKeychainEntryResponseV1 {
+    /**
+     * The key that was used to check the presence of the value in the entry store.
+     * @type {string}
+     * @memberof HasKeychainEntryResponseV1
+     */
+    key: string;
+    /**
+     * Date and time encoded as JSON when the presence check was performed by the plugin backend.
+     * @type {string}
+     * @memberof HasKeychainEntryResponseV1
+     */
+    checkedAt: string;
+    /**
+     * The boolean true or false indicating the presence or absence of an entry under \'key\'.
+     * @type {boolean}
+     * @memberof HasKeychainEntryResponseV1
+     */
+    isPresent: boolean;
 }
 /**
  * 
@@ -434,6 +502,7 @@ export interface Ledger {
  * @export
  * @enum {string}
  */
+
 export enum LedgerType {
     Besu1X = 'BESU_1X',
     Besu2X = 'BESU_2X',
@@ -475,6 +544,7 @@ export interface PluginImport {
  * @export
  * @enum {string}
  */
+
 export enum PluginImportType {
     Local = 'org.hyperledger.cactus.plugin_import_type.LOCAL',
     Remote = 'org.hyperledger.cactus.plugin_import_type.REMOTE'
@@ -502,32 +572,32 @@ export interface PluginInstance {
 /**
  * 
  * @export
- * @interface SetKeychainEntryRequest
+ * @interface SetKeychainEntryRequestV1
  */
-export interface SetKeychainEntryRequest {
+export interface SetKeychainEntryRequestV1 {
     /**
      * The key for the entry to set on the keychain.
      * @type {string}
-     * @memberof SetKeychainEntryRequest
+     * @memberof SetKeychainEntryRequestV1
      */
     key: string;
     /**
      * The value that will be associated with the key on the keychain.
      * @type {string}
-     * @memberof SetKeychainEntryRequest
+     * @memberof SetKeychainEntryRequestV1
      */
     value: string;
 }
 /**
  * 
  * @export
- * @interface SetKeychainEntryResponse
+ * @interface SetKeychainEntryResponseV1
  */
-export interface SetKeychainEntryResponse {
+export interface SetKeychainEntryResponseV1 {
     /**
      * The key that was used to set the value on the keychain.
      * @type {string}
-     * @memberof SetKeychainEntryResponse
+     * @memberof SetKeychainEntryResponseV1
      */
     key: string;
 }

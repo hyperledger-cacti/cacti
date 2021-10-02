@@ -98,7 +98,7 @@ export class CordaConnectorContainer {
   }
 
   public async start(skipPull = false): Promise<Container> {
-    const containerNameAndTag = this.getContainerImageName();
+    const imageFqn = this.getContainerImageName();
 
     if (this.container) {
       await this.container.stop();
@@ -107,12 +107,12 @@ export class CordaConnectorContainer {
     const docker = new Docker();
 
     if (!skipPull) {
-      await Containers.pullImage(containerNameAndTag);
+      await Containers.pullImage(imageFqn, {}, this.opts.logLevel);
     }
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
-        containerNameAndTag,
+        imageFqn,
         [],
         [],
         {
@@ -226,14 +226,11 @@ export class CordaConnectorContainer {
 
   private validateConstructorOptions(): void {
     const fnTag = `${this.className}#validateConstructorOptions()`;
-    const validationResult = Joi.validate<ICordaConnectorContainerOptions>(
-      {
-        imageVersion: this.imageVersion,
-        imageName: this.imageName,
-        apiPort: this.apiPort,
-      },
-      JOI_SCHEMA,
-    );
+    const validationResult = JOI_SCHEMA.validate({
+      imageVersion: this.imageVersion,
+      imageName: this.imageName,
+      apiPort: this.apiPort,
+    });
 
     if (validationResult.error) {
       throw new Error(`${fnTag} ${validationResult.error.annotate()}`);

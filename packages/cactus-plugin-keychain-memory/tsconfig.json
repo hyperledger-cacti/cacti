@@ -3,13 +3,13 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist/lib/",
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/lib",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-keychain-memory.tsbuildinfo"
   },
   "include": [
     "./src",
-    "**/openapi.json",
+    "**/openapi.json"
   ],
   "references": [
     {

@@ -1,62 +1,111 @@
 {
   "files": [],
   "references": [
-    { "path": "./packages/cactus-common/tsconfig.json" },
-    { "path": "./packages/cactus-core-api/tsconfig.json" },
-    { "path": "./packages/cactus-test-tooling/tsconfig.json" },
-    { "path": "./packages/cactus-core/tsconfig.json" },
-    { "path": "./packages/cactus-plugin-consortium-manual/tsconfig.json" },
-    { "path": "./packages/cactus-plugin-keychain-memory/tsconfig.json" },
-    { "path": "./packages/cactus-plugin-keychain-vault/tsconfig.json" },
-    { "path": "./packages/cactus-plugin-ledger-connector-corda/tsconfig.json" },
-    { "path": "./packages/cactus-api-client/tsconfig.json" },
-    { "path": "./packages/cactus-plugin-ledger-connector-besu/tsconfig.json" },
     {
-      "path": "./packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
+      "path": "./packages/cactus-api-client/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-cmd-api-server/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-common/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-core/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-consortium-manual/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-htlc-eth-besu/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-htlc-eth-besu-erc20/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-keychain-aws-sm/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-keychain-azure-kv/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-keychain-google-sm/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-keychain-memory/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-keychain-vault/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-besu/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-corda/tsconfig.json"
     },
     {
       "path": "./packages/cactus-plugin-ledger-connector-quorum/tsconfig.json"
     },
-    { "path": "./packages/cactus-plugin-ledger-connector-xdai/tsconfig.json" },
     {
-      "path": "./examples/cactus-example-carbon-accounting-business-logic-plugin/tsconfig.json"
+      "path": "./packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
+    },
+    { "path": "./packages/cactus-plugin-ledger-connector-iroha/tsconfig.json" },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-xdai/tsconfig.json"
     },
     {
-      "path": "./examples/cactus-example-supply-chain-business-logic-plugin/tsconfig.json"
+      "path": "./packages/cactus-test-api-client/tsconfig.json"
     },
-    { "path": "./packages/cactus-plugin-htlc-eth-besu-erc20/tsconfig.json" },
-    { "path": "./packages/cactus-plugin-htlc-eth-besu/tsconfig.json" },
     {
-      "path": "./examples/cactus-example-carbon-accounting-frontend/tsconfig.json"
+      "path": "./packages/cactus-test-cmd-api-server/tsconfig.json"
     },
-    { "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json" },
-    { "path": "./packages/cactus-cmd-api-server/tsconfig.json" },
     {
-      "path": "./examples/cactus-example-carbon-accounting-backend/tsconfig.json"
+      "path": "./packages/cactus-test-plugin-consortium-manual/tsconfig.json"
     },
-    { "path": "./examples/cactus-example-supply-chain-backend/tsconfig.json" },
-
-
-    { "path": "./packages/cactus-test-api-client/tsconfig.json" },
-    { "path": "./packages/cactus-test-cmd-api-server/tsconfig.json" },
-    { "path": "./packages/cactus-test-plugin-consortium-manual/tsconfig.json" },
+    {
+      "path": "./packages/cactus-test-plugin-htlc-eth-besu/tsconfig.json"
+    },
     {
       "path": "./packages/cactus-test-plugin-htlc-eth-besu-erc20/tsconfig.json"
     },
-    { "path": "./packages/cactus-test-plugin-htlc-eth-besu/tsconfig.json" },
     {
       "path": "./packages/cactus-test-plugin-ledger-connector-besu/tsconfig.json"
     },
     {
       "path": "./packages/cactus-test-plugin-ledger-connector-quorum/tsconfig.json"
     },
-
+    {
+      "path": "./packages/cactus-test-tooling/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-carbon-accounting-backend/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-carbon-accounting-business-logic-plugin/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-carbon-accounting-frontend/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-supply-chain-backend/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-supply-chain-business-logic-plugin/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json"
+    },
+    {
+      "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"
+    }
   ],
   "compilerOptions": {
-    /* Basic Options */
-    "incremental": true /* Enable incremental compilation */,
-    "target": "ES2017" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
-    "module": "CommonJS" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
+    "incremental": true,
+    "target": "ES2017",
+    "module": "CommonJS",
     "lib": [
       "es2015",
       "es2016",
@@ -67,8 +116,8 @@
     // "allowJs": true,                       /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */
     // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
-    "declaration": true /* Generates corresponding '.d.ts' file. */,
-    // "declarationDir": "dist/types",
+    "declaration": true, /* Generates corresponding '.d.ts' file. */
+    // "declarationDir": "dist/lib",
     // "declarationMap": true,                /* Generates a sourcemap for each corresponding '.d.ts' file. */
     // "sourceMap": true, /* Generates corresponding '.map' file. */
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
@@ -104,21 +153,9 @@
     "typeRoots": [
       "./node_modules/@types",
       "./typings"
-    ] /* List of folders to include type definitions from. */,
-    // "types": [],                           /* Type declaration files to be included in compilation. */
-    // "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
-    "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
-    // "preserveSymlinks": true,              /* Do not resolve the real path of symlinks. */
-    // "allowUmdGlobalAccess": true,          /* Allow accessing UMD globals from modules. */
-    /* Source Map Options */
-    // "sourceRoot": "",                      /* Specify the location where debugger should locate TypeScript files instead of source locations. */
-    // "mapRoot": "",                         /* Specify the location where debugger should locate map files instead of generated locations. */
-    "inlineSourceMap": true /* Emit a single file with source maps instead of having a separate file. */,
-    // "inlineSources": true,                 /* Emit the source alongside the sourcemaps within a single file; requires '--inlineSourceMap' or '--sourceMap' to be set. */
-    /* Experimental Options */
-    // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
-    // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
-    /* Advanced Options */
-    "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
+    ],
+    "esModuleInterop": true,
+    "inlineSourceMap": true,
+    "forceConsistentCasingInFileNames": true
   }
 }

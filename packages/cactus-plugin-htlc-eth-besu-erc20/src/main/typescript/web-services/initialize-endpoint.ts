@@ -41,24 +41,22 @@ export class InitializeEndpoint implements IWebServiceEndpoint {
     return InitializeEndpoint.CLASS_NAME;
   }
 
-  public getOasPath() {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize"
     ];
   }
 
   public getVerbLowerCase(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return this.oasPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

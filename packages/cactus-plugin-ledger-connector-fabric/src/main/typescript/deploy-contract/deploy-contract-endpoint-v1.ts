@@ -49,7 +49,7 @@ export class DeployContractEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath() {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract"
     ];
@@ -61,6 +61,10 @@ export class DeployContractEndpointV1 implements IWebServiceEndpoint {
 
   public getVerbLowerCase(): string {
     return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.oasPath.post.operationId;
   }
 
   public async registerExpress(

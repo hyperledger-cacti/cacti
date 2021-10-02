@@ -51,6 +51,20 @@ export {
 } from "./fabric/fabric-test-ledger-v1";
 
 export {
+  IrohaTestLedger,
+  IIrohaTestLedgerOptions,
+  IROHA_TEST_LEDGER_DEFAULT_OPTIONS,
+  IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
+} from "./iroha/iroha-test-ledger";
+
+export {
+  PostgresTestContainer,
+  IPostgresTestContainerConstructorOptions,
+  POSTGRES_TEST_CONTAINER_DEFAULT_OPTIONS,
+  POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA,
+} from "./postgres/postgres-test-container";
+
+export {
   CactusKeychainVaultServer,
   ICactusKeychainVaultServerOptions,
   K_DEFAULT_KEYCHAIN_VAULT_HTTP_PORT,
@@ -66,6 +80,14 @@ export {
   K_DEFAULT_VAULT_HTTP_PORT,
   K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
 } from "./vault-test-server/vault-test-server";
+
+export {
+  ILocalStackContainerOptions,
+  LocalStackContainer,
+  K_DEFAULT_LOCALSTACK_HTTP_PORT,
+  K_DEFAULT_LOCALSTACK_IMAGE_NAME,
+  K_DEFAULT_LOCALSTACK_IMAGE_VERSION,
+} from "./localstack/localstack-container";
 
 export {
   CORDA_CONNECTOR_DEFAULT_OPTIONS,
@@ -109,9 +131,16 @@ export {
   RustcContainer,
 } from "./rustc-container/rustc-container";
 
+export {
+  ISubstrateTestLedgerOptions,
+  SubstrateTestLedger,
+} from "./substrate-test-ledger/substrate-test-ledger";
+
 export { RustcBuildCmd } from "./rustc-container/rustc-build-cmd";
 
 export { Streams } from "./common/streams";
 
 export { isRunningInGithubAction } from "./github-actions/is-running-in-github-action";
 export { pruneDockerAllIfGithubAction } from "./github-actions/prune-docker-all-if-github-action";
+export { IDockerPullProgress } from "./common/i-docker-pull-progress";
+export { IDockerPullProgressDetail } from "./common/i-docker-pull-progress";

@@ -14,3 +14,11 @@
 # **/coverage/**
 
 # typings/**
+
+**/src/main/typescript/generated/proto/**
+packages/cactus-verifier/src/main/typescript/
+
+packages/cactus-cmd-socketio-server/**
+packages/cactus-plugin-ledger-connector-sawtooth-socketio/**
+packages/cactus-plugin-ledger-connector-go-ethereum-socketio/**
+packages/cactus-plugin-ledger-connector-*-socketio/**

@@ -8,7 +8,9 @@
 import { MeterInfo } from './MeterInfo';
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/default.json"), 'utf8'));
+const yaml = require('js-yaml');
+//const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
+const config: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/default.yaml", 'utf8'));
 import { getLogger } from "log4js";
 const moduleName = 'MeterManagement';
 const logger = getLogger(`${moduleName}`);

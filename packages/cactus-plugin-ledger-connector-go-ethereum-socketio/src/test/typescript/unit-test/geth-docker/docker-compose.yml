@@ -1,0 +1,77 @@
+# Copyright 2021 Hyperledger Cactus Contributors
+# SPDX-License-Identifier: Apache-2.0
+version: '3'
+services:
+  geth1:
+    container_name: geth1
+    image: ethereum/client-go:v1.8.27
+    volumes:
+      - "$PWD/data-ec1:/root/data"
+      - "$PWD/genesis/genesis-ec1.json:/root/data/genesis.json" # mount genesis.js from host
+    working_dir: /root
+    ports:
+      - "8545:8545" #uncomment this line to enable JSON-RPC access from outside of network
+    #  - "30303:30303"
+    expose:
+      - "8545" # enable JSON-RPC access fron only inside of network
+    networks:
+      - ec1net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # following parameters are given to geth
+    command: >
+      --rpc
+      --networkid 10
+      --nodiscover
+      --datadir=/root/data
+      --rpcaddr "0.0.0.0"
+      --rpcport "8545"
+      --rpccorsdomain "*"
+      --rpcvhosts "*"
+      --rpcapi "eth,web3"
+      --unlock 0,1,2,3,4
+      --password "/dev/null"
+      --gasprice 0
+      --mine --minerthreads=1
+  geth2:
+    container_name: geth2
+    image: ethereum/client-go:v1.8.27
+    volumes:
+      - "$PWD/data-ec2:/root/data"
+      - "$PWD/genesis/genesis-ec2.json:/root/data/genesis.json" # mount genesis.js from host
+    working_dir: /root
+    ports:
+      - "8546:8545" #uncomment this line to enable JSON-RPC access from outside of network
+    #  - "30303:30303"
+    expose:
+      - "8545" # enable JSON-RPC access fron only inside of network
+    networks:
+      - ec2net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # following parameters are given to geth
+    command: >
+      --rpc
+      --networkid 10
+      --nodiscover
+      --datadir=/root/data
+      --rpcaddr "0.0.0.0"
+      --rpcport "8545"
+      --rpccorsdomain "*"
+      --rpcvhosts "*"
+      --rpcapi "eth,web3"
+      --unlock 0,1,2,3,4
+      --password "/dev/null"
+      --gasprice 0
+      --mine --minerthreads=1
+networks:
+  ec1net:
+    external: true
+  ec2net:
+    external: true

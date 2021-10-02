@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/hyperledger/cactus/compare/v0.9.0...v0.10.0) (2021-09-28)
+
+
+### Features
+
+* **core-api:** discontinue dedicated HTTP listeners for web service plugins ([3fbd2fc](https://github.com/hyperledger/cactus/commit/3fbd2fcb60d49090bf4e986bea74d4e988348659)), closes [#358](https://github.com/hyperledger/cactus/issues/358)
+* **core:** add installOpenapiValidationMiddleware ([1f6ea5f](https://github.com/hyperledger/cactus/commit/1f6ea5fe3aa1ba997a655098d632034f13f232a5)), closes [#847](https://github.com/hyperledger/cactus/issues/847)
+
+
+
+
+
+# [0.9.0](https://github.com/hyperledger/cactus/compare/v0.8.0...v0.9.0) (2021-08-31)
+
+
+### Bug Fixes
+
+* **cmd-api-server:** add missing deps remove unused ones [#1226](https://github.com/hyperledger/cactus/issues/1226) ([b348e42](https://github.com/hyperledger/cactus/commit/b348e4266369fed502610b4c0769d4d6b19f9115))
+
+
+### Features
+
+* besu private transaction support ([53b4980](https://github.com/hyperledger/cactus/commit/53b49808615aced96b628bf1498a1b62c5c9ca42))
+* **cmd-api-server:** support grpc web services [#1189](https://github.com/hyperledger/cactus/issues/1189) ([4cace1d](https://github.com/hyperledger/cactus/commit/4cace1dca3377e09d2ed37fdadeec6b125d47896))
+
+
+
+
+
+# [0.8.0](https://github.com/hyperledger/cactus/compare/v0.7.0...v0.8.0) (2021-08-17)
+
+
+### Bug Fixes
+
+* **cmd-api-server:** plugins interfere with API server deps [#1192](https://github.com/hyperledger/cactus/issues/1192) ([a96ce68](https://github.com/hyperledger/cactus/commit/a96ce689dae74345b41d5bd94dd46dd3e9bc3e71)), closes [#1203](https://github.com/hyperledger/cactus/issues/1203)
+* **prometheus:** metrics.ts leaks to global registry [#1202](https://github.com/hyperledger/cactus/issues/1202) ([ce076d7](https://github.com/hyperledger/cactus/commit/ce076d709f8e0cba143f8fe9d71f1de1df8f71dc))
+
+
+
+
+
+# [0.7.0](https://github.com/hyperledger/cactus/compare/v0.6.0...v0.7.0) (2021-08-04)
+
+
+### Bug Fixes
+
+* **connector-corda:** fix build broken by operationId rename ([291dd3b](https://github.com/hyperledger/cactus/commit/291dd3bc666939fffbc3780eaefd9059c756878a))
+
+
+
+
+
 # [0.6.0](https://github.com/hyperledger/cactus/compare/v0.4.1...v0.6.0) (2021-07-19)
 
 

@@ -9,17 +9,19 @@ import { Request } from 'express';
 import { RequestInfo } from './RequestInfo';
 import { MeterManagement } from './MeterManagement';
 import { MeterInfo } from './MeterInfo';
-import { TradeInfo } from '../../packages/routing-interface/TradeInfo';
-import { transactionManagement } from '../../packages/routing-interface/routes/index';
-import { verifierFactory } from '../../packages/routing-interface/routes/index';
-import { BusinessLogicBase } from '../../packages/business-logic-plugin/BusinessLogicBase';
+import { TradeInfo } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo';
+import { transactionManagement } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index';
+import { verifierFactory } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index';
+import { BusinessLogicBase } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase';
 import { makeRawTransaction } from './TransactionEthereum'
-import { LedgerEvent } from '../../packages/ledger-plugin/LedgerPlugin';
-import { json2str } from '../../packages/ledger-plugin/DriverCommon'
+import { LedgerEvent } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin';
+import { json2str } from '../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon'
 
 const fs = require('fs');
 const path = require('path');
-const config: any = JSON.parse(fs.readFileSync(path.resolve(__dirname, "./config/default.json"), 'utf8'));
+const yaml = require('js-yaml');
+//const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
+const config: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/default.yaml", 'utf8'));
 import { getLogger } from "log4js";
 const moduleName = 'BusinessLogicElectricityTrade';
 const logger = getLogger(`${moduleName}`);

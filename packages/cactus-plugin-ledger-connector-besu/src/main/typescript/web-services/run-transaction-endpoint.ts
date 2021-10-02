@@ -17,6 +17,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
 
 import OAS from "../../json/openapi.json";
+import { RunTransactionRequest } from "../generated/openapi/typescript-axios";
 
 export interface IRunTransactionEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -42,24 +43,22 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath() {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction"
     ];
   }
 
   public getPath(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return this.oasPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -86,7 +85,7 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody = req.body;
+    const reqBody: RunTransactionRequest = req.body;
     try {
       const resBody = await this.options.connector.transact(reqBody);
       res.json({ success: true, data: resBody });

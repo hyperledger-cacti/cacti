@@ -85,6 +85,26 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
     console.log(newTsConfigJson);
     await fs.writeFile(tsConfigPath, newTsConfigJson);
   }
+
+  const tsConfigReferences = tsConfigPaths.map((it) => ({
+    path: "./" + path.relative(PROJECT_DIR, it),
+  }));
+  await updateRootTsConfig({ PROJECT_DIR, tsConfigReferences });
 };
+
+export async function updateRootTsConfig(req: {
+  PROJECT_DIR: string;
+  tsConfigReferences: Array<{ path: string }>;
+}): Promise<void> {
+  const tsConfigPath = path.join(req.PROJECT_DIR, "./tsconfig.json");
+  const tsConfigBuffer = await fs.readFile(tsConfigPath);
+  const tsConfigJson = tsConfigBuffer.toString("utf-8");
+  const tsConfig = JSON5.parse(tsConfigJson);
+  tsConfig.references = req.tsConfigReferences;
+  const newTsConfigJson = JSON.stringify(tsConfig, null, 2);
+  console.log(`New tsconfig.json contents for ${tsConfigPath}: `);
+  console.log(newTsConfigJson);
+  await fs.writeFile(tsConfigPath, newTsConfigJson);
+}
 
 main(process.argv, process.env);

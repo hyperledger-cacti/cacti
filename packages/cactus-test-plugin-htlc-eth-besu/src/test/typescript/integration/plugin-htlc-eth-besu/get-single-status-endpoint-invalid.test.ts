@@ -12,6 +12,7 @@ import {
   PluginFactoryHtlcEthBesu,
   NewContractObj,
   InitializeRequest,
+  HashTimeLockJson,
 } from "@hyperledger/cactus-plugin-htlc-eth-besu";
 import {
   PluginFactoryLedgerConnector,
@@ -33,7 +34,6 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
-import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu/src/main/solidity/contracts/HashTimeLock.json";
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
@@ -79,10 +79,15 @@ test(testCase, async (t: Test) => {
     // pre-provision keychain with mock backend holding the private key of the
     // test account that we'll reference while sending requests with the
     // signing credential pointing to this keychain entry.
-    backend: new Map([[DemoHelperJSON.contractName, DemoHelperJSON]]),
+    backend: new Map([
+      [DemoHelperJSON.contractName, JSON.stringify(DemoHelperJSON)],
+    ]),
     logLevel,
   });
-  keychainPlugin.set(HashTimeLockJSON.contractName, HashTimeLockJSON);
+  keychainPlugin.set(
+    HashTimeLockJson.contractName,
+    JSON.stringify(HashTimeLockJson),
+  );
 
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
@@ -205,12 +210,12 @@ test(testCase, async (t: Test) => {
   );
   try {
     const fakeId = "0x66616b654964";
-    const res = await api.getSingleStatusV1(
-      fakeId,
-      fakeWeb3SigningCredential,
+    const res = await api.getSingleStatusV1({
+      id: fakeId,
+      web3SigningCredential: fakeWeb3SigningCredential,
       connectorId,
-      "",
-    );
+      keychainId: "",
+    });
     t.equal(res.status, 500, "response status is 500");
   } catch (e) {
     t.equal(e.response.status, 500);

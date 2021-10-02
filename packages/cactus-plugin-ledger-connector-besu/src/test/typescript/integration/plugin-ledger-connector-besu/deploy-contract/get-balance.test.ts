@@ -48,7 +48,7 @@ test("can get balance of an account", async (t: Test) => {
   });
   keychainPlugin.set(
     HelloWorldContractJson.contractName,
-    HelloWorldContractJson,
+    JSON.stringify(HelloWorldContractJson),
   );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
@@ -59,6 +59,7 @@ test("can get balance of an account", async (t: Test) => {
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
+  await connector.onPluginInit();
 
   const req: GetBalanceV1Request = { address: firstHighNetWorthAccount };
   const currentBalance = await connector.getBalance(req);

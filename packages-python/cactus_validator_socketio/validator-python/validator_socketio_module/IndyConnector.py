@@ -31,7 +31,17 @@ class IndyConnector(AbstractConnector):
         
         command = args['method']['command']
         if command== 'indy_ledger_submit_request':
-            return self.load_schema_or_credential_definition(args['args'])
+            print(f"##execSyncFunction : args['args']['args'] : {args['args']['args']}")
+            # return self.load_schema_or_credential_definition(args['args']['args'])
+
+        if command== 'get_schema' or command== 'get_cred_def':
+            print(f"##execSyncFunction get_schema_or_cred_def: args['args']['args'] : {args['args']['args']}")
+            resTuple = self.run_coroutine(self.get_schema_or_cred_def, command, args['args']['args'])
+            # resList = json.dumps(resTuple)
+            resJson = {"result": resTuple}
+            # resJson = {"data":str(resObj)}
+            print(f"##execSyncFunction resObj : {resJson}")
+            return resJson
             
         print(f"##{self.moduleName} unknown command : {command}")
         return "unknown command."
@@ -44,6 +54,8 @@ class IndyConnector(AbstractConnector):
         pool_handle = self.indy_dic['pool_handle']
         responseStr = self.run_coroutine_ensure_previous_request_applied(pool_handle, args, lambda response: response['result']['data'] is not None)
         
+        print(f"##{self.moduleName}.responseStr: {responseStr}")
+
         response = json.loads(responseStr)
         
         return response
@@ -64,6 +76,28 @@ class IndyConnector(AbstractConnector):
         """Nop function for testing"""
         print(f"##{self.moduleName}.nop()")
 
+    def run_coroutine_ensure_previous_request_applied(self, pool_handle, checker_request, checker, loop=None):
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        results = loop.run_until_complete(self.ensure_previous_request_applied(pool_handle, checker_request, checker))
+        return results
+
+    async def get_schema_or_cred_def(self, command, args):
+        print(f"##{self.moduleName}.get_schema_or_cred_def()")
+
+        pool_handle = self.indy_dic['pool_handle']
+        did = args["did"]
+        schema_id = args["schemaId"]
+        if command== 'get_schema':
+            response = await self.get_schema(pool_handle, did, schema_id)
+        elif command== 'get_cred_def':
+            response = await self.get_cred_def(pool_handle, did, schema_id)
+
+        print(f"##get_schema_or_cred_def response : {response}")
+
+        return response
+        
+
     async def ensure_previous_request_applied(self, pool_handle, checker_request, checker):
         for _ in range(3):
             response = json.loads(await ledger.submit_request(pool_handle, checker_request))
@@ -74,8 +108,23 @@ class IndyConnector(AbstractConnector):
                 pass
             time.sleep(5)
 
-    def run_coroutine_ensure_previous_request_applied(self, pool_handle, checker_request, checker, loop=None):
+    async def get_schema(self, pool_handle, _did, schema_id):
+        print(f"##{self.moduleName}.get_schema()")
+        get_schema_request = await ledger.build_get_schema_request(_did, schema_id)
+        get_schema_response = await self.ensure_previous_request_applied(
+            pool_handle, get_schema_request, lambda response: response['result']['data'] is not None)
+        return await ledger.parse_get_schema_response(get_schema_response)
+
+    async def get_cred_def(self, pool_handle, _did, cred_def_id):
+        print(f"##{self.moduleName}.get_cred_def()")
+        get_cred_def_request = await ledger.build_get_cred_def_request(_did, cred_def_id)
+        get_cred_def_response = \
+            await self.ensure_previous_request_applied(pool_handle, get_cred_def_request,
+                                                lambda response: response['result']['data'] is not None)
+        return await ledger.parse_get_cred_def_response(get_cred_def_response)
+
+    def run_coroutine(self, coroutine, command, args, loop=None):
         if loop is None:
             loop = asyncio.get_event_loop()
-        results = loop.run_until_complete(self.ensure_previous_request_applied(pool_handle, checker_request, checker))
-        return results
+        result = loop.run_until_complete(coroutine(command, args))
+        return result

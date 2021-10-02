@@ -24,6 +24,25 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
+ * @interface BesuPrivateTransactionConfig
+ */
+export interface BesuPrivateTransactionConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof BesuPrivateTransactionConfig
+     */
+    privateFrom: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof BesuPrivateTransactionConfig
+     */
+    privateFor: Array<any>;
+}
+/**
+ * 
+ * @export
  * @interface BesuTransactionConfig
  */
 export interface BesuTransactionConfig {
@@ -163,6 +182,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     timeoutMs?: number;
+    /**
+     * 
+     * @type {BesuPrivateTransactionConfig}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    privateTransactionConfig?: BesuPrivateTransactionConfig;
 }
 /**
  * 
@@ -182,6 +207,7 @@ export interface DeployContractSolidityBytecodeV1Response {
  * @export
  * @enum {string}
  */
+
 export enum EthContractInvocationType {
     Send = 'SEND',
     Call = 'CALL'
@@ -692,6 +718,12 @@ export interface InvokeContractV1Request {
      * @memberof InvokeContractV1Request
      */
     keychainId?: string;
+    /**
+     * 
+     * @type {BesuPrivateTransactionConfig}
+     * @memberof InvokeContractV1Request
+     */
+    privateTransactionConfig?: BesuPrivateTransactionConfig;
 }
 /**
  * 
@@ -723,6 +755,7 @@ export interface InvokeContractV1Response {
  * @export
  * @enum {string}
  */
+
 export enum ReceiptType {
     NodeTxPoolAck = 'NODE_TX_POOL_ACK',
     LedgerBlockAck = 'LEDGER_BLOCK_ACK'
@@ -752,6 +785,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     consistencyStrategy: ConsistencyStrategy;
+    /**
+     * 
+     * @type {BesuPrivateTransactionConfig}
+     * @memberof RunTransactionRequest
+     */
+    privateTransactionConfig?: BesuPrivateTransactionConfig;
 }
 /**
  * 
@@ -876,6 +915,7 @@ export interface SolidityContractJsonArtifact {
  * @export
  * @enum {string}
  */
+
 export enum WatchBlocksV1 {
     Subscribe = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Subscribe',
     Next = 'org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Next',
@@ -1068,6 +1108,7 @@ export interface Web3SigningCredentialPrivateKeyHex {
  * @export
  * @enum {string}
  */
+
 export enum Web3SigningCredentialType {
     CactusKeychainRef = 'CACTUS_KEYCHAIN_REF',
     GethKeychainPassword = 'GETH_KEYCHAIN_PASSWORD',

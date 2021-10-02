@@ -102,7 +102,7 @@ export class OpenEthereumTestLedger {
     }
     const docker = new Docker();
 
-    await Containers.pullImage(this.imageFqn);
+    await Containers.pullImage(this.imageFqn, {}, this.options.logLevel);
 
     const Env = [...[], ...this.envVars];
     this.log.debug(`Effective Env of container: %o`, Env);

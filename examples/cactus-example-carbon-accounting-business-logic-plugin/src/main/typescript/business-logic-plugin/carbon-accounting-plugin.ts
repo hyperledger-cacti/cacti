@@ -1,9 +1,7 @@
-import { Server } from "http";
-import { Server as SecureServer } from "https";
-
-import { Optional } from "typescript-optional";
 import { Express } from "express";
 import { v4 as uuidv4 } from "uuid";
+
+import OAS from "../../json/openapi.json";
 
 import {
   Logger,
@@ -101,6 +99,10 @@ export class CarbonAccountingPlugin
     this.instanceId = options.instanceId;
   }
 
+  public getOpenApiSpec(): unknown {
+    return OAS;
+  }
+
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
     webServices.forEach((ws) => ws.registerExpress(app));
@@ -124,10 +126,6 @@ export class CarbonAccountingPlugin
     const theEndpoints = [getAllowanceEp, enrollAdminEp];
     this.endpoints = theEndpoints;
     return theEndpoints;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
   }
 
   public async shutdown(): Promise<void> {
@@ -165,7 +163,7 @@ export class CarbonAccountingPlugin
       enrollmentSecret,
     );
 
-    this.keychain.set(identityId, identity);
+    this.keychain.set(identityId, JSON.stringify(identity));
     this.log.debug(`Stored Fabric admin identity on keychain as ${identityId}`);
 
     const res: EnrollAdminV1Response = {

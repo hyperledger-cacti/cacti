@@ -1,12 +1,9 @@
-import { Server } from "http";
-import { Server as SecureServer } from "https";
-import { Optional } from "typescript-optional";
-import { promisify } from "util";
-import express, { Express } from "express";
-import bodyParser from "body-parser";
+import { Express } from "express";
 import { JWS, JWK } from "jose";
 import jsonStableStringify from "json-stable-stringify";
 import { v4 as uuidv4 } from "uuid";
+
+import OAS from "../json/openapi.json";
 
 import {
   ConsortiumDatabase,
@@ -48,20 +45,23 @@ export interface IWebAppOptions {
 export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
   keyPairPem: string;
   consortiumDatabase: ConsortiumDatabase;
-  consortiumRepo: ConsortiumRepository;
   prometheusExporter?: PrometheusExporter;
   pluginRegistry?: PluginRegistry;
   logLevel?: LogLevelDesc;
-  webAppOptions?: IWebAppOptions;
 }
 
 export class PluginConsortiumManual
   implements ICactusPlugin, IPluginWebService {
+  public static readonly CLASS_NAME = "PluginConsortiumManual";
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
   private readonly instanceId: string;
+  private readonly repo: ConsortiumRepository;
   private endpoints: IWebServiceEndpoint[] | undefined;
-  private httpServer: Server | SecureServer | null = null;
+
+  public get className(): string {
+    return PluginConsortiumManual.CLASS_NAME;
+  }
 
   constructor(public readonly options: IPluginConsortiumManualOptions) {
     const fnTag = `PluginConsortiumManual#constructor()`;
@@ -73,18 +73,28 @@ export class PluginConsortiumManual
       options.consortiumDatabase,
       `${fnTag} options.consortiumDatabase`,
     );
+
     this.log = LoggerProvider.getOrCreate({
       label: "plugin-consortium-manual",
     });
+
     this.instanceId = this.options.instanceId;
+    this.repo = new ConsortiumRepository({ db: options.consortiumDatabase });
+
     this.prometheusExporter =
       options.prometheusExporter ||
       new PrometheusExporter({ pollingIntervalInMin: 1 });
+
     Checks.truthy(
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+    this.prometheusExporter.startMetricsCollection();
     this.prometheusExporter.setNodeCount(this.getNodeCount());
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getInstanceId(): string {
@@ -99,6 +109,10 @@ export class PluginConsortiumManual
     return this.prometheusExporter;
   }
 
+  public async shutdown(): Promise<void> {
+    return;
+  }
+
   public async getPrometheusExporterMetrics(): Promise<string> {
     const res: string = await this.prometheusExporter.getPrometheusMetrics();
     this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
@@ -106,12 +120,8 @@ export class PluginConsortiumManual
   }
 
   public getNodeCount(): number {
-    const consortiumDatabase: ConsortiumDatabase = this.options
-      .consortiumDatabase;
-    const consortiumRepo: ConsortiumRepository = new ConsortiumRepository({
-      db: consortiumDatabase,
-    });
-    return consortiumRepo.allNodes.length;
+    Checks.truthy(this.repo, `${this.className}.this.repo`);
+    return this.repo.allNodes.length;
   }
 
   /**
@@ -120,55 +130,15 @@ export class PluginConsortiumManual
    * only affects **the metrics**.
    */
   public updateMetricNodeCount(): void {
-    const consortiumDatabase: ConsortiumDatabase = this.options
-      .consortiumDatabase;
-    const consortiumRepo: ConsortiumRepository = new ConsortiumRepository({
-      db: consortiumDatabase,
-    });
-    this.prometheusExporter.setNodeCount(consortiumRepo.allNodes.length);
-  }
-
-  public async shutdown(): Promise<void> {
-    this.log.info(`Shutting down...`);
-    const serverMaybe = this.getHttpServer();
-    if (serverMaybe.isPresent()) {
-      this.log.info(`Awaiting server.close() ...`);
-      const server = serverMaybe.get();
-      await promisify(server.close.bind(server))();
-      this.log.info(`server.close() OK`);
-    } else {
-      this.log.info(`No HTTP server found, skipping...`);
-    }
+    const nodeCount = this.getNodeCount();
+    this.prometheusExporter.setNodeCount(nodeCount);
   }
 
   public async registerWebServices(
     app: Express,
   ): Promise<IWebServiceEndpoint[]> {
-    const webApp: Express = this.options.webAppOptions ? express() : app;
-
-    if (this.options.webAppOptions) {
-      this.log.info(`Creating dedicated HTTP server...`);
-      const { port, hostname } = this.options.webAppOptions;
-
-      webApp.use(bodyParser.json({ limit: "50mb" }));
-
-      const address = await new Promise((resolve, reject) => {
-        const httpServer = webApp.listen(port, hostname, (err?: any) => {
-          if (err) {
-            reject(err);
-            this.log.error(`Failed to create dedicated HTTP server`, err);
-          } else {
-            this.httpServer = httpServer;
-            const theAddress = this.httpServer.address();
-            resolve(theAddress);
-          }
-        });
-      });
-      this.log.info(`Creation of HTTP server OK`, { address });
-    }
-
     const webServices = await this.getOrCreateWebServices();
-    webServices.forEach((ws) => ws.registerExpress(webApp));
+    webServices.forEach((ws) => ws.registerExpress(app));
     return webServices;
   }
 
@@ -183,10 +153,8 @@ export class PluginConsortiumManual
     // presence of webAppOptions implies that caller wants the plugin to configure it's own express instance on a custom
     // host/port to listen on
 
-    const { consortiumDatabase, keyPairPem } = this.options;
-    const consortiumRepo = new ConsortiumRepository({
-      db: consortiumDatabase,
-    });
+    const { keyPairPem } = this.options;
+    const consortiumRepo = this.repo;
 
     const endpoints: IWebServiceEndpoint[] = [];
     {
@@ -219,20 +187,17 @@ export class PluginConsortiumManual
     return endpoints;
   }
 
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
-  }
-
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-consortium-manual`;
   }
 
   public async getNodeJws(): Promise<JWSGeneral> {
-    const { keyPairPem, consortiumRepo: repo } = this.options;
+    Checks.truthy(this.repo, `${this.className}.this.repo`);
+    const { keyPairPem } = this.options;
 
     this.updateMetricNodeCount();
     const keyPair = JWK.asKey(keyPairPem);
-    const payloadObject = { consortiumDatabase: repo.consortiumDatabase };
+    const payloadObject = { consortiumDatabase: this.repo.consortiumDatabase };
     const payloadJson = jsonStableStringify(payloadObject);
     const _protected = {
       iat: Date.now(),
@@ -244,7 +209,7 @@ export class PluginConsortiumManual
   }
 
   public async getConsortiumJws(): Promise<JWSGeneral> {
-    const nodes = this.options.consortiumRepo.allNodes;
+    const nodes = this.repo.allNodes;
 
     const requests = nodes
       .map((cnm) => cnm.nodeApiHost)

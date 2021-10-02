@@ -17,7 +17,7 @@ export interface IPluginKeychain extends ICactusPlugin {
   getKeychainId(): string;
 
   has(key: string): Promise<boolean>;
-  get<T>(key: string): Promise<T>;
-  set<T>(key: string, value: T): Promise<void>;
+  get(key: string): Promise<string>;
+  set(key: string, value: string): Promise<void>;
   delete(key: string): Promise<void>;
 }

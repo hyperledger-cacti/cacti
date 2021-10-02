@@ -56,7 +56,7 @@ test("deploys contract via .json file", async (t: Test) => {
   });
   keychainPlugin.set(
     HelloWorldContractJson.contractName,
-    HelloWorldContractJson,
+    JSON.stringify(HelloWorldContractJson),
   );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
@@ -67,6 +67,8 @@ test("deploys contract via .json file", async (t: Test) => {
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
+
+  await connector.onPluginInit();
 
   await connector.transact({
     web3SigningCredential: {

@@ -75,10 +75,15 @@ test(testCase, async (t: Test) => {
     // pre-provision keychain with mock backend holding the private key of the
     // test account that we'll reference while sending requests with the
     // signing credential pointing to this keychain entry.
-    backend: new Map([[DemoHelperJSON.contractName, DemoHelperJSON]]),
+    backend: new Map([
+      [DemoHelperJSON.contractName, JSON.stringify(DemoHelperJSON)],
+    ]),
     logLevel,
   });
-  keychainPlugin.set(HashTimeLockJSON.contractName, HashTimeLockJSON);
+  keychainPlugin.set(
+    HashTimeLockJSON.contractName,
+    JSON.stringify(HashTimeLockJSON),
+  );
 
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
@@ -215,12 +220,12 @@ test(testCase, async (t: Test) => {
     "Balance of account is OK",
   );
 
-  const res = await api.getSingleStatusV1(
-    callOutput as string,
+  const res = await api.getSingleStatusV1({
+    id: callOutput as string,
     web3SigningCredential,
     connectorId,
     keychainId,
-  );
+  });
   t.equal(res.status, 200);
   t.equal(res.data, 1, "the contract status is 1 - Active");
   t.end();

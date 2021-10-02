@@ -20,7 +20,7 @@ import {
   Ledger,
   LedgerType,
 } from "@hyperledger/cactus-core-api";
-import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   DefaultApi as QuorumApi,
   PluginLedgerConnectorQuorum,
@@ -128,8 +128,6 @@ test(testCase, async (t: Test) => {
     pluginInstance: [],
   };
 
-  const consortiumRepo = new ConsortiumRepository({ db: consortiumDatabase });
-
   const config = new Configuration({ basePath: consortium.mainApiHost });
   const mainApiClient = new ApiClient(config);
 
@@ -176,7 +174,6 @@ test(testCase, async (t: Test) => {
         keyPairPem: keyPair1.toPEM(true),
         consortiumDatabase,
         logLevel,
-        consortiumRepo,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
 
@@ -187,6 +184,7 @@ test(testCase, async (t: Test) => {
       apiServerOptions.apiCorsDomainCsv = "*";
       apiServerOptions.apiPort = addressInfo1.port;
       apiServerOptions.cockpitPort = 0;
+      apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
       const config = configService.newExampleConfigConvict(apiServerOptions);
 
@@ -219,7 +217,6 @@ test(testCase, async (t: Test) => {
         keyPairPem: keyPair2.toPEM(true),
         consortiumDatabase,
         logLevel,
-        consortiumRepo,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
 
@@ -230,6 +227,7 @@ test(testCase, async (t: Test) => {
       apiServerOptions.apiCorsDomainCsv = "*";
       apiServerOptions.apiPort = addressInfo2.port;
       apiServerOptions.cockpitPort = 0;
+      apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
       const config = configService.newExampleConfigConvict(apiServerOptions);
 

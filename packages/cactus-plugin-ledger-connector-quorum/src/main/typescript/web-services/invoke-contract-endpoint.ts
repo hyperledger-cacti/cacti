@@ -42,24 +42,22 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath() {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"
     ];
   }
 
   public getPath(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return this.oasPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -88,7 +86,9 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody = req.body;
     try {
-      const resBody = await this.options.connector.invokeContract(reqBody);
+      const resBody = await this.options.connector.getContractInfoKeychain(
+        reqBody,
+      );
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

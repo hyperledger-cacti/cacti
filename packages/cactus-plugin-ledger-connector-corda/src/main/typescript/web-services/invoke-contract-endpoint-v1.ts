@@ -17,7 +17,6 @@ import {
 import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-
 import { PluginLedgerConnectorCorda } from "../plugin-ledger-connector-corda";
 
 export interface IInvokeContractEndpointV1Options {
@@ -54,16 +53,22 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public getPath(): string {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"
-    ].post["x-hyperledger-cactus"].http.path;
+    ];
+  }
+
+  public getPath(): string {
+    return this.oasPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"
-    ].post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+  }
+
+  public getOperationId(): string {
+    return this.oasPath.post.operationId;
   }
 
   public async registerExpress(

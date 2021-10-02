@@ -9,26 +9,6 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "servers": [
-        {
-            "url": "https://www.cactus.stream/{basePath}",
-            "description": "Public test instance",
-            "variables": {
-                "basePath": {
-                    "default": ""
-                }
-            }
-        },
-        {
-            "url": "http://localhost:4000/{basePath}",
-            "description": "Local test instance",
-            "variables": {
-                "basePath": {
-                    "default": ""
-                }
-            }
-        }
-    ],
     "components": {
         "schemas": {
             "GetBalanceV1Response": {
@@ -47,6 +27,7 @@
                 "required":[
                     "address"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "address": {
                         "type":"string"
@@ -175,6 +156,7 @@
             "GetTransactionV1Request": {
                 "type": "object",
                 "required": ["transactionHash"],
+                "additionalProperties": false,
                 "properties": {
                     "transactionHash":{
                         "type": "string"
@@ -198,6 +180,7 @@
             },
             "GetPastLogsV1Request": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                     "toBlock": {
                     },
@@ -260,10 +243,11 @@
             },
             "GetBlockV1Request": {
                 "required": ["blockHashOrBlockNumber"],
+                "additionalProperties": false,
                 "type": "object",
                 "properties": {
                     "blockHashOrBlockNumber": {
-                    }
+                }
                 }
             },
             "WatchBlocksV1": {
@@ -641,6 +625,26 @@
                     }
                 }
             },
+            "BesuPrivateTransactionConfig" : {
+                "type": "object",
+                "required" : [
+                    "privateFrom",
+                    "privateFor"
+                ],
+                "properties" : {
+                    "privateFrom": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "privateFor": {
+                        "type": "array",
+                        "default": [],
+                        "items": {},
+                        "nullable": false
+                    }
+
+                }
+            },
             "Web3TransactionReceipt": {
                 "type": "object",
                 "required": [
@@ -661,9 +665,9 @@
                     },
                     "transactionHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     },
                     "transactionIndex": {
                         "type": "number",
@@ -671,9 +675,9 @@
                     },
                     "blockHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     },
                     "blockNumber": {
                         "type": "number",
@@ -704,6 +708,7 @@
                     "transactionConfig",
                     "consistencyStrategy"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
@@ -715,6 +720,9 @@
                     },
                     "consistencyStrategy": {
                         "$ref": "#/components/schemas/ConsistencyStrategy"
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/BesuPrivateTransactionConfig"
                     }
                 }
             },
@@ -739,6 +747,7 @@
                     "keychainId",
                     "constructorArgs"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "contractName": {
                         "type": "string",
@@ -790,6 +799,9 @@
                         "minimum": 0,
                         "default": 60000,
                         "nullable": false
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/BesuPrivateTransactionConfig"
                     }
                 }
             },
@@ -813,6 +825,7 @@
                     "methodName",
                     "params"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "contractName": {
                         "type": "string",
@@ -896,6 +909,9 @@
                         "description": "The keychainId for retrieve the contracts json.",
                         "minLength": 1,
                         "maxLength": 100
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/BesuPrivateTransactionConfig"
                     }
                 }
             },
@@ -922,6 +938,7 @@
                     "keychainId",
                     "keychainRef"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "keychainId": {
                         "type": "string",
@@ -965,15 +982,16 @@
             },
             "GetBesuRecordV1Request":{
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                     "invokeCall": {
                         "$ref": "#/components/schemas/InvokeContractV1Request"
                     },
                     "transactionHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     }
                 }
             },

@@ -1,9 +1,9 @@
 import { Server } from "http";
 import { Server as SecureServer } from "https";
-
-import { Optional } from "typescript-optional";
 import { Config as SshConfig } from "node-ssh";
 import { Express } from "express";
+
+import OAS from "../json/openapi.json";
 
 import {
   IPluginLedgerConnector,
@@ -77,6 +77,11 @@ export class PluginLedgerConnectorCorda
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+    this.prometheusExporter.startMetricsCollection();
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -166,10 +171,6 @@ export class PluginLedgerConnectorCorda
     }
     this.log.info(`Instantiated endpoints of ${pkgName}`);
     return endpoints;
-  }
-
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
   }
 
   public async shutdown(): Promise<void> {

@@ -3,13 +3,13 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist/lib/",
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/lib",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-example-carbon-accounting-business-logic-plugin.tsbuildinfo"
   },
   "include": [
     "./src",
-    "src/**/*.json",
+    "src/**/*.json"
   ],
   "references": [
     {

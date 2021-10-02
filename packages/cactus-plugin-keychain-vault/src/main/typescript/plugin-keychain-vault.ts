@@ -1,10 +1,8 @@
-import type { Server } from "http";
-import type { Server as SecureServer } from "https";
-
 import type { Express } from "express";
-import { Optional } from "typescript-optional";
 import Vault from "node-vault";
 import HttpStatus from "http-status-codes";
+
+import OAS from "../json/openapi.json";
 
 import {
   Logger,
@@ -114,10 +112,15 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+    this.prometheusExporter.startMetricsCollection();
 
     this.log.info(`Created Vault backend OK. Endpoint=${this.endpoint}`);
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -183,10 +186,6 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     return endpoints;
   }
 
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.empty();
-  }
-
   public async shutdown(): Promise<void> {
     throw new Error("Method not implemented.");
   }
@@ -207,10 +206,6 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     return;
   }
 
-  async rotateEncryptionKeys(): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
   public getEncryptionAlgorithm(): string {
     return "AES256";
   }
@@ -219,7 +214,7 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     return `${this.kvSecretsMountPath}${key}`;
   }
 
-  async get<T>(key: string): Promise<T> {
+  async get(key: string): Promise<string> {
     const fnTag = `${this.className}#get(key: string)`;
     const path = this.pathFor(key);
     try {
@@ -233,8 +228,9 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
         );
       }
     } catch (ex) {
+      // FIXME: Throw if not found, detect it in the endpoint code, status=404
       if (ex?.response?.statusCode === HttpStatus.NOT_FOUND) {
-        return (null as unknown) as T;
+        return (null as unknown) as string;
       } else {
         this.log.error(`Retrieval of "${key}" crashed:`, ex);
         throw ex;
@@ -269,7 +265,7 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     }
   }
 
-  async set<T>(key: string, value: T): Promise<void> {
+  async set(key: string, value: string): Promise<void> {
     const path = this.pathFor(key);
     await this.backend.write(path, { data: { value } });
     this.prometheusExporter.setTotalKeyCounter(key, "set");

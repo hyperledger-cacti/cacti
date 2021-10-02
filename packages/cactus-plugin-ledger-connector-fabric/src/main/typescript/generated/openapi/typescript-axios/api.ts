@@ -26,6 +26,7 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  * @export
  * @enum {string}
  */
+
 export enum ChainCodeLanguageRuntime {
     Golang = 'golang',
     Node = 'node',
@@ -86,6 +87,7 @@ export interface ChainCodeLifeCycleCommandResponses {
  * @export
  * @enum {string}
  */
+
 export enum ChainCodeProgrammingLanguage {
     Golang = 'golang',
     Javascript = 'javascript',
@@ -180,6 +182,7 @@ export interface ConnectionProfileClient {
  * @export
  * @enum {string}
  */
+
 export enum DefaultEventHandlerStrategy {
     MspidScopeAllfortx = 'MSPID_SCOPE_ALLFORTX',
     MspidScopeAnyfortx = 'MSPID_SCOPE_ANYFORTX',
@@ -511,6 +514,7 @@ export interface DeploymentTargetOrganization {
  * @export
  * @enum {string}
  */
+
 export enum FabricContractInvocationType {
     Send = 'FabricContractInvocationType.SEND',
     Call = 'FabricContractInvocationType.CALL',
@@ -535,7 +539,30 @@ export interface FabricSigningCredential {
      * @memberof FabricSigningCredential
      */
     keychainRef: string;
+    /**
+     * 
+     * @type {FabricSigningCredentialType}
+     * @memberof FabricSigningCredential
+     */
+    type?: FabricSigningCredentialType;
+    /**
+     * 
+     * @type {VaultTransitKey}
+     * @memberof FabricSigningCredential
+     */
+    vaultTransitKey?: VaultTransitKey;
 }
+/**
+ * different type of identity provider for singing fabric messages supported by this package
+ * @export
+ * @enum {string}
+ */
+
+export enum FabricSigningCredentialType {
+    X509 = 'X.509',
+    VaultX509 = 'Vault-X.509'
+}
+
 /**
  * Represents a file-system file that has a name and a body which holds the file contents as a Base64 encoded string
  * @export
@@ -681,6 +708,12 @@ export interface InlineResponse501 {
  */
 export interface RunTransactionRequest {
     /**
+     * An array of MSP IDs to set as the list of endorsing peers for the transaction.
+     * @type {Array<string>}
+     * @memberof RunTransactionRequest
+     */
+    endorsingPeers?: Array<string>;
+    /**
      * 
      * @type {object}
      * @memberof RunTransactionRequest
@@ -784,6 +817,25 @@ export interface SSHExecCommandResponse {
      * @memberof SSHExecCommandResponse
      */
     signal: string | null;
+}
+/**
+ * vault key details for signing fabric message with private key stored with transit engine.
+ * @export
+ * @interface VaultTransitKey
+ */
+export interface VaultTransitKey {
+    /**
+     * label of private key
+     * @type {string}
+     * @memberof VaultTransitKey
+     */
+    keyName: string;
+    /**
+     * token for accessing private key
+     * @type {string}
+     * @memberof VaultTransitKey
+     */
+    token: string;
 }
 
 /**

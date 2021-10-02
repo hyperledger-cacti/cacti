@@ -9,6 +9,8 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
+import OAS from "../json/openapi.json";
+
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { Express } from "express";
 
@@ -19,7 +21,7 @@ import {
 
 export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
-  backend?: Map<string, unknown>;
+  backend?: Map<string, string>;
   keychainId: string;
   prometheusExporter?: PrometheusExporter;
 }
@@ -27,7 +29,7 @@ export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
 export class PluginKeychainMemory {
   public static readonly CLASS_NAME = "PluginKeychainMemory";
 
-  private readonly backend: Map<string, unknown>;
+  private readonly backend: Map<string, string>;
   private readonly log: Logger;
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
@@ -58,12 +60,17 @@ export class PluginKeychainMemory {
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+    this.prometheusExporter.startMetricsCollection();
 
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
     this.log.warn(
       `Never use ${this.className} in production. ` +
         `It does not support encryption. It stores everything in plain text.`,
     );
+  }
+
+  public getOpenApiSpec(): unknown {
+    return OAS;
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -116,15 +123,20 @@ export class PluginKeychainMemory {
     return;
   }
 
-  async get<T>(key: string): Promise<T> {
-    return this.backend.get(key) as T;
+  async get(key: string): Promise<string> {
+    const value = this.backend.get(key);
+    if (value) {
+      return value;
+    } else {
+      throw new Error(`Keychain entry for "${key}" not found.`);
+    }
   }
 
   async has(key: string): Promise<boolean> {
     return this.backend.has(key);
   }
 
-  async set<T>(key: string, value: T): Promise<void> {
+  async set(key: string, value: string): Promise<void> {
     this.backend.set(key, value);
     this.prometheusExporter.setTotalKeyCounter(this.backend.size);
   }

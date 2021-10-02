@@ -22,6 +22,68 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
+ * Defines the parameters for retrieving the single status of the HTLC swap.
+ * @export
+ * @interface GetSingleStatusRequest
+ */
+export interface GetSingleStatusRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetSingleStatusRequest
+     */
+    id: string;
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof GetSingleStatusRequest
+     */
+    web3SigningCredential: Web3SigningCredential;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetSingleStatusRequest
+     */
+    connectorId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetSingleStatusRequest
+     */
+    keychainId: string;
+}
+/**
+ * Defines the parameters for retrieving the status of the HTLC swap.
+ * @export
+ * @interface GetStatusRequest
+ */
+export interface GetStatusRequest {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GetStatusRequest
+     */
+    ids: Array<string>;
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof GetStatusRequest
+     */
+    web3SigningCredential: Web3SigningCredential;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetStatusRequest
+     */
+    connectorId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetStatusRequest
+     */
+    keychainId: string;
+}
+/**
  * 
  * @export
  * @interface InitializeRequest
@@ -292,6 +354,7 @@ export interface Web3SigningCredentialPrivateKeyHex {
  * @export
  * @enum {string}
  */
+
 export enum Web3SigningCredentialType {
     CactusKeychainRef = 'CACTUS_KEYCHAIN_REF',
     GethKeychainPassword = 'GETH_KEYCHAIN_PASSWORD',
@@ -414,22 +477,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @param {string} id 
-         * @param {Web3SigningCredential} web3SigningCredential 
-         * @param {string} connectorId 
-         * @param {string} keychainId 
+         * @param {GetSingleStatusRequest} [getSingleStatusRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSingleStatusV1: async (id: string, web3SigningCredential: Web3SigningCredential, connectorId: string, keychainId: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('getSingleStatusV1', 'id', id)
-            // verify required parameter 'web3SigningCredential' is not null or undefined
-            assertParamExists('getSingleStatusV1', 'web3SigningCredential', web3SigningCredential)
-            // verify required parameter 'connectorId' is not null or undefined
-            assertParamExists('getSingleStatusV1', 'connectorId', connectorId)
-            // verify required parameter 'keychainId' is not null or undefined
-            assertParamExists('getSingleStatusV1', 'keychainId', keychainId)
+        getSingleStatusV1: async (getSingleStatusRequest?: GetSingleStatusRequest, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -438,31 +490,18 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (id !== undefined) {
-                localVarQueryParameter['id'] = id;
-            }
-
-            if (web3SigningCredential !== undefined) {
-                localVarQueryParameter['web3SigningCredential'] = web3SigningCredential;
-            }
-
-            if (connectorId !== undefined) {
-                localVarQueryParameter['connectorId'] = connectorId;
-            }
-
-            if (keychainId !== undefined) {
-                localVarQueryParameter['keychainId'] = keychainId;
-            }
-
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getSingleStatusRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -471,22 +510,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {Array<string>} ids 
-         * @param {Web3SigningCredential} web3SigningCredential 
-         * @param {string} connectorId 
-         * @param {string} keychainId 
+         * @param {GetStatusRequest} [getStatusRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatusV1: async (ids: Array<string>, web3SigningCredential: Web3SigningCredential, connectorId: string, keychainId: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'ids' is not null or undefined
-            assertParamExists('getStatusV1', 'ids', ids)
-            // verify required parameter 'web3SigningCredential' is not null or undefined
-            assertParamExists('getStatusV1', 'web3SigningCredential', web3SigningCredential)
-            // verify required parameter 'connectorId' is not null or undefined
-            assertParamExists('getStatusV1', 'connectorId', connectorId)
-            // verify required parameter 'keychainId' is not null or undefined
-            assertParamExists('getStatusV1', 'keychainId', keychainId)
+        getStatusV1: async (getStatusRequest?: GetStatusRequest, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -495,31 +523,18 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (ids) {
-                localVarQueryParameter['ids'] = ids;
-            }
-
-            if (web3SigningCredential !== undefined) {
-                localVarQueryParameter['web3SigningCredential'] = web3SigningCredential;
-            }
-
-            if (connectorId !== undefined) {
-                localVarQueryParameter['connectorId'] = connectorId;
-            }
-
-            if (keychainId !== undefined) {
-                localVarQueryParameter['keychainId'] = keychainId;
-            }
-
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getStatusRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -670,28 +685,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} id 
-         * @param {Web3SigningCredential} web3SigningCredential 
-         * @param {string} connectorId 
-         * @param {string} keychainId 
+         * @param {GetSingleStatusRequest} [getSingleStatusRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSingleStatusV1(id: string, web3SigningCredential: Web3SigningCredential, connectorId: string, keychainId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getSingleStatusV1(id, web3SigningCredential, connectorId, keychainId, options);
+        async getSingleStatusV1(getSingleStatusRequest?: GetSingleStatusRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSingleStatusV1(getSingleStatusRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {Array<string>} ids 
-         * @param {Web3SigningCredential} web3SigningCredential 
-         * @param {string} connectorId 
-         * @param {string} keychainId 
+         * @param {GetStatusRequest} [getStatusRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getStatusV1(ids: Array<string>, web3SigningCredential: Web3SigningCredential, connectorId: string, keychainId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<number>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getStatusV1(ids, web3SigningCredential, connectorId, keychainId, options);
+        async getStatusV1(getStatusRequest?: GetStatusRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<number>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStatusV1(getStatusRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -746,27 +755,21 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @param {string} id 
-         * @param {Web3SigningCredential} web3SigningCredential 
-         * @param {string} connectorId 
-         * @param {string} keychainId 
+         * @param {GetSingleStatusRequest} [getSingleStatusRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSingleStatusV1(id: string, web3SigningCredential: Web3SigningCredential, connectorId: string, keychainId: string, options?: any): AxiosPromise<number> {
-            return localVarFp.getSingleStatusV1(id, web3SigningCredential, connectorId, keychainId, options).then((request) => request(axios, basePath));
+        getSingleStatusV1(getSingleStatusRequest?: GetSingleStatusRequest, options?: any): AxiosPromise<number> {
+            return localVarFp.getSingleStatusV1(getSingleStatusRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {Array<string>} ids 
-         * @param {Web3SigningCredential} web3SigningCredential 
-         * @param {string} connectorId 
-         * @param {string} keychainId 
+         * @param {GetStatusRequest} [getStatusRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatusV1(ids: Array<string>, web3SigningCredential: Web3SigningCredential, connectorId: string, keychainId: string, options?: any): AxiosPromise<Array<number>> {
-            return localVarFp.getStatusV1(ids, web3SigningCredential, connectorId, keychainId, options).then((request) => request(axios, basePath));
+        getStatusV1(getStatusRequest?: GetStatusRequest, options?: any): AxiosPromise<Array<number>> {
+            return localVarFp.getStatusV1(getStatusRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -816,30 +819,24 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export class DefaultApi extends BaseAPI {
     /**
      * 
-     * @param {string} id 
-     * @param {Web3SigningCredential} web3SigningCredential 
-     * @param {string} connectorId 
-     * @param {string} keychainId 
+     * @param {GetSingleStatusRequest} [getSingleStatusRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getSingleStatusV1(id: string, web3SigningCredential: Web3SigningCredential, connectorId: string, keychainId: string, options?: any) {
-        return DefaultApiFp(this.configuration).getSingleStatusV1(id, web3SigningCredential, connectorId, keychainId, options).then((request) => request(this.axios, this.basePath));
+    public getSingleStatusV1(getSingleStatusRequest?: GetSingleStatusRequest, options?: any) {
+        return DefaultApiFp(this.configuration).getSingleStatusV1(getSingleStatusRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {Array<string>} ids 
-     * @param {Web3SigningCredential} web3SigningCredential 
-     * @param {string} connectorId 
-     * @param {string} keychainId 
+     * @param {GetStatusRequest} [getStatusRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getStatusV1(ids: Array<string>, web3SigningCredential: Web3SigningCredential, connectorId: string, keychainId: string, options?: any) {
-        return DefaultApiFp(this.configuration).getStatusV1(ids, web3SigningCredential, connectorId, keychainId, options).then((request) => request(this.axios, this.basePath));
+    public getStatusV1(getStatusRequest?: GetStatusRequest, options?: any) {
+        return DefaultApiFp(this.configuration).getStatusV1(getStatusRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

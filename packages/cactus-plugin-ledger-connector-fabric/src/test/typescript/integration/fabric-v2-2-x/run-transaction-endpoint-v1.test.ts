@@ -65,7 +65,7 @@ test(testCase, async (t: Test) => {
     publishAllPorts: true,
     logLevel,
     imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    imageVersion: "2021-04-20-nodejs",
+    imageVersion: "2021-09-02--fix-876-supervisord-retries",
     envVars: new Map([
       ["FABRIC_VERSION", "2.2.0"],
       ["CA_VERSION", "1.4.9"],
@@ -229,6 +229,29 @@ test(testCase, async (t: Test) => {
       res.data.includes(promMetricsOutput),
       "Total Transaction Count of 3 recorded as expected. RESULT OK",
     );
+  }
+
+  {
+    const req: RunTransactionRequest = {
+      signingCredential,
+      gatewayOptions: {
+        identity: keychainEntryKey,
+        wallet: {
+          json: keychainEntryValue,
+        },
+      },
+      channelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName,
+      methodName: "CreateAsset",
+      params: ["asset388", "green", "111", assetOwner, "299"],
+      endorsingPeers: ["org1.example.com", "Org2MSP"],
+    };
+
+    const res = await apiClient.runTransactionV1(req);
+    t.ok(res, "Create green asset response truthy OK");
+    t.ok(res.data, "Create green asset response.data truthy OK");
+    t.equal(res.status, 200, "Create green asset response.status=200 OK");
   }
 
   {

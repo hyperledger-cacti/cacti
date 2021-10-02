@@ -101,7 +101,7 @@ Photo by Pontus Wellgraf on Unsplash
         - [5.4.1.1.2 Configuration Schema - API Server](#54112-configuration-schema---api-server)
         - [5.4.1.1.3 Plugin Loading/Validation](#54113-plugin-loadingvalidation)
       - [5.4.1.2 core-api](#5412-core-api)
-      - [5.4.1.3 sdk](#5413-sdk)
+      - [5.4.1.3 API Client](#5413-api-client)
       - [5.4.1.4 keychain](#5414-keychain)
       - [5.4.1.5 tracing](#5415-tracing)
       - [5.4.1.6 audit](#5416-audit)
@@ -886,207 +886,116 @@ APIs of Verifier and Validator are described as the following table:
 
 | No. | Component | API Name | Input | Description |
 | --- | --- | --- | --- | --- |
-| 1. | Verifier | getVerifierInformation | none | Get the verifier information including version, name, ID, and other information |
-| 2. | Verifier | getSmartContractList | none | Get the list of available smart contracts at the connected ledger |
-| 3. | Verifier | sendSignedTransaction | `signedTransaction`(string) | Request a verifier to execute a ledger operation |
-| 4. | Verifier | getBalance | `address`(string) | Get balance of an account for native token on a ledger |
-| 5. | Verifier | execSyncFunction | `address`(string)<br>`funcName`(string)<br>`args`(string[]) | Execute a synchronous function held by a smart contract |
-| 6. | Verifier | startMonitor | `clientId`(string)<br>`cb`(function) | Request a verifier to start monitoring ledger |
-| 7. | Verifier | stopMonitor | `clientId`(string) | Rrequest a verifier to stop monitoring ledger |
-| 8. | Verifier | connect | `validatorURL`(string)<br>authentication credential | request a validator to start a bi-directional communication channel via a verifier |
-| 9. | Verifier | disconnect | none | request a validator to stop a bi-directional communication channel via a verifier |
-| 10. | Validator | getValidatorInformation | `validatorURL`(string) | Get the validator information including version, name, ID, and other information |
-| 11. | Verifier | getSmartContractList | none | Get the list of available smart contracts at the connected ledger |
-| 12. | Validator | sendSignedTransaction | `signedTransaction`(string) | Send already-signed transactions to a ledger |
-| 13. | Validator | getBalance | `address`(string) | Get balance of an account for native token on a ledger |
-| 14. | Validator | execSyncFunction | `address`(string)<br>`funcName`(string)<br>`args`(string[]) | Execute a synchronous function held by a smart contract |
-| 15. | Validator | startMonitor | `clientId`(string)<br>`cb`(function) | Request a validator to start monitoring ledger |
-| 16. | Validator | stopMonitor | `clientId`(string) | Request a validator to stop monitoring ledger |
+| 1. | Verifier | sendAsyncRequest | `contract` (object)<br>`method` (object)<br>`args` (object) | Sends an asynchronous request to the validator |
+| 2. | Verifier | sendSyncRequest | `contract` (object)<br>`method` (object)<br>`args` (object) | Sends a synchronous request to the validator |
+| 3. | Verifier | startMonitor | `id` (string)<br>`eventListener` (VerifierEventListener) | Request a verifier to start monitoring ledger |
+| 4. | Verifier | stopMonitor | `id` (string) | Request a verifier to stop monitoring ledger |
+| 5. | Validator | sendAsyncRequest | `args` (Object) | Called when the validator receives an asynchronous operation request from the verifier |
+| 6. | Validator | sendSyncRequest | `args` (Object) | Called when the validator receives a synchronous operation request from the verifier |
+| 7. | Validator | startMonitor | `cb` (function) | Called when monitoring ledger is needed |
+| 8. | Validator | stopMonitor | none | Called when monitoring ledger is no longer needed |
 
 The detail information is described as following:
 
-- `package/ledger-plugin/ledger-plugin.js`
-	- interface `Verifier`
-		```
-		interface Verifier {
-			// BLP -> Verifier
-			getSmartContractList(): List<ApiInfo>;
-			sendSignedTransaction();
-			getBalance();
-			execSyncFunction();
-			startMonitor();
-			stopMonitor();
-			connect();
-			disconnect();
-			// Validator -> Verifier
-			getVerifierInfo(): List<VerifierInfo>;
-		}
-		```
+- `packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin.ts`
+  - interface `IVerifier`
 
-		- class `SmartContractInfo`, `RequestedData`
-			```
-			class SmartContractInfo {
-				address: string,
-				function: List<SmartContractFunction>
-			}
-			class SmartContractFunction {
-				functionName: string,
-				functionArgs: List<string> (e.g. {"int", "string", ...})
-			}
-			```
+    ```typescript
+    interface IVerifier {
+      // BLP -> Verifier
+      sendAsyncRequest(contract: Object, method: Object, args: Object): Promise<void>;
+      sendSyncRequest(contract: Object, method: Object, args: Object): Promise<any>;
+      startMonitor(id: string, options: Object, eventListener: VerifierEventListener): Promise<void>;
+      stopMonitor(id: string): void;
+    }
+    ```
 
-		- class `VerifierInfo`
-			```
-			class VerifierInfo {
-				version: string,
-				name: string,
-				ID: string,
-				otherData: List<VerifierInfoOtherData>
-			}
-			class VerifierInfoOtherData {
-				dataName: string,
-				dataType: string {"int", "string", ...}
-			}
-			```
+    - function `sendAsyncRequest(contract: object, method: object, args: object): Promise<void>`
+      - description:
+        - Send a request to the validator (and the ledger behind it) that takes time to finish e.g. writing to the ledger.
+      - input parameters:
+        - `contract` (Object): specify the smart contract
+        - `method` (Object): name of the method
+        - `args` (Object): arguments to the method
+      - returns:
+        - `Promise<void>`: `resolve()` when it successfully sent the request to the validator, `reject()` otherwise.
 
-		- function `getSmartContractList()`: `List<SmartContractInfo>`
-			- description:
-				- Get the list of available smart contracts at the connected ledger
-			- input parameter:
-				- none
+    - function `sendSyncRequest: Promise<any>`
+      - description:
+        - Send a request to the validator, e.g. searching a datablock.
+      - input parameters:
+        - `contract` (Object): specify the smart contract
+        - `method` (Object): name of the method
+        - `args` (Object): arguments to the method
+      - returns:
+        - `Promise<any>`: search result is returned.
 
-		- function `sendSignedTransaction()`: `Promise<LedgerEvent>`
-			- description:
-				- Send already-signed transactions to a ledger
-			- input parameter:
-				- `signedTransaction`(string): signed transaction which is already serialized to string
+    - function `startMonitor(id: string, options: Object, eventListener: VerifierEventListener): Promise<void>`
+      - description:
+        - Request the verifier to start monitoring ledger.
+      - input parameters:
+        - `id` (string): a user (Business Logic Plugin) generated string to identify the ledgerEvent object.
+        - `options` (Object): parameters to monitor functionality in the validator. specify `{}` if no options are necessary
+        - `eventListener` (VerifierEventListener): the callback function of this object is called when there are new blocks written to the ledger.
+      - returns:
+        - `Promise<void>`: `resolve()` when it successfully started monitoring, `reject()` otherwise.
 
-		- function `getBalance()`: `Promise<LedgerEvent>`
-			- description:
-				- Get balance of an account for native token on a ledger
-				- If the connected ledger does not have any default currency system (e.g. Hyperledger fabric), the function is set to be blank)
-			- input parameter:
-				- `address`(string): an account address
+    - function `stopMonitor(id: string): void`
+      - description:
+        - Request the verifier to remove an `eventListener` from event monitors list.
+      - input parameter:
+        - `id` (string): a string identifying the ledgerEvent.
+      - returns:
+        - none
 
-		- function `execSyncFunction()`: `Promise<LedgerEvent>`
-			- description:
-				- Execute a synchronous function held by a smart contract
-				- If the connected ledger does not have any smart contract system (e.g. Bitcoin), the function is set to be blank)
-			- input parameter:
-				- `address`(string): an address of a smart contract
-				- `funcName`(string): a name of a synchronous function of the smart contract
-				- `args`(string[]): arguments for the synchronous function
+  - interface `IValidator`
 
-		- function `getVerifierInformation()`: `List<VerifierInfo>`
-			- description:
-				- Get the verifier information including version, name, ID, and other information
-			- input parameter:
-				- none
+    ```typescript
+    interface IValidator {
+      // Verifier -> Validator
+      sendAsyncRequest(args: Object): Object;
+      sendSyncRequest(args: Object): Object;
+      startMonitor(cb: function): Promise<void>;
+      stopMonitor(): void;
+    }
+    ```
 
-		- function `startMonitor()`: `Promise<LedgerEvent>`
-			- description:
-				- Request a verifier to start monitoring ledger
-			- input parameter:
-				- `clientId`(string): Client ID of the monitoring start request source
-				- `cb`(function): Callback function that receives the monitoring result at any time
+    - function `sendAsyncRequest(args: Object): Object`
+      - description:
+        - Send a request to the ledger that takes time to finish e.g. writing to the ledger.
+          The implementer of a validator for new distributed ledger technology (DLT) is expected to extract parameters from `args` object and cal the API (of the target DLT).
+      - input parameter:
+        - `args` (Ojbect): parameters of verifier's `sendAsyncRequest` API are included in this object.
+      - returns:
+        - Object
+        - Editor's Note: check return type
 
-		- function `stopMonitor()`:
-			- description:
-				- Request a verifier to stop monitoring ledger
-			- input parameter:
-				- `clientId`(string): Client ID of the monitoring start request source
+    - function `sendSyncRequest(args: Object): Object`
+      - description:
+        - Send a request to a validator, e.g. searching a datablock.
+      - input parameter:
+        - `args` (Object): parameters of verifier's `sendSyncRequest` API are inlucded in this object.
+      - returns:
+        - Object: result of the requested operation.
 
-		- function `connect()`:
-			- description:
-				- Request a verifier to start a bi-directional communication channel
-			- input parameter:
-				- none
-			- connecting profile:
-				- `validatorURL`(string)
-				- authentication credential
+    - function `startMonitor(cb: function): Promise<void>`
+      - description:
+        - Start monitoring of the ledger.
+          The implementer of a validator for new distributed ledger technology (DLT) is expected to start monitoring ledger events of the target DLT.
+          If there are any new block written to the ledger, the monitoring code should call `cb(data)`.
+          The parameter to the `cb` is the new data from the ledger.
+      - input parameter:
+        - `cb` (function): callback function called when there are new data in the ledger.
+      - returns:
+        - Promise: `resolve()` when it successfully started monitorinig the ledger, `reject()` otherwise.
 
-		- function `disconnect()`:
-			- description:
-				- Request a verifier to stop a bi-directional communication channel
-			- input parameter:
-				- none
-			- connecting profile:
-				- none
-
-	- interface `Validator`
-		```
-		interface Validator {
-			// Verifier -> Validator
-			getValidatorInfo(): List<ValidatorInfo>
-			getSmartContractList();
-			sendSignedTransaction();
-			getBalance();
-			execSyncFunction();
-			startMonitor();
-			stopMonitor();
-		}
-		```
-
-		- class `ValidatorInfo`
-			```
-			class ValidatorInfo {
-				version: string,
-				name: string,
-				ID: string,
-				otherData: List<ValidatorInfoOtherData>
-			}
-			class ValidatorInfoOtherData {
-				dataName: string,
-				dataType: string {"int", "string", ...}
-			}
-			```
-
-		- function `getValidatorInformation()`:
-			- description:
-				- Get the validator information including version, name, ID, and other information
-			- input parameter:
-				- `validatorURL`(string)
-
-		- function `getSmartContractList()`: `List<SmartContractInfo>`
-			- description:
-				- Get the list of available smart contracts at the connected ledger
-			- input parameter:
-				- none
-
-		- function `sendSignedTransaction()`: `Promise<LedgerEvent>`
-			- description:
-				- Send already-signed transactions to a ledger
-			- input parameter:
-				- `signedTransaction`(string): signed transaction which is already serialized to string
-
-		- function `getBalance()`: `Promise<LedgerEvent>`
-			- description:
-				- Get balance of an account for native token on a ledger
-				- If the connected ledger does not have any default currency system (e.g. Hyperledger fabric), the function is set to be blank)
-			- input parameter:
-				- `address`(string) : an account address
-
-		- function `execSyncFunction()`: `Promise<LedgerEvent>`
-			- description:
-				- Execute a synchronous function held by a smart contract
-				- If the connected ledger does not have any smart contract system (e.g. Bitcoin), the function is set to be blank)
-			- input parameter:
-				- `address`(string): an address of a smart contract
-				- `funcName`(string): a name of a synchronous function of the smart contract
-				- `args`(string[]): arguments for the synchronous function
-
-		- function `startMonitor()`: `Promise<LedgerEvent>`
-			- description:
-				- Request a verifier to start monitoring ledger
-			- input parameter:
-				- `clientId`(string): Client ID of the monitoring start request source
-				- `cb`(function): Callback function that receives the monitoring result at any time
-
-		- function `stopMonitor()`:
-			- description:
-				- Request a verifier to stop monitoring ledger
-			- input parameter:
-				- `clientId`(string): Client ID of the monitoring start request source
+    - function `stopMonitor(void): void`:
+      - description:
+        - Stop monitoring the ledger.
+      - input parameter:
+        - none
+      - returns:
+        - none
 
 ### 5.3.3 Exection of "business logic" at "Business Logic Plugin"
 
@@ -1112,7 +1021,6 @@ All packages have a prefix of `cactus-*` to avoid potential naming conflicts wit
 
 Naming conventions for packages:
 * cmd-* for packages that ship their own executable
-* sdk-* for packages designed to be used directly by application developers except for the Javacript SDK which is named just `sdk` for simplicity.
 * All other packages should be named preferably as a single English word suggesting the most important feature/responsibility of the package itself.
 
 #### 5.4.1.1 cmd-api-server
@@ -1235,9 +1143,9 @@ Plugin loading happens through NodeJS's built-in module loader and the validatio
 Contains interface definitions for the plugin architecture and other system level components that are to be shared among many other packages.
 `core-api` is intended to be a leaf package meaning that it shouldn't depend on other packages in order to make it safe for any and all packages to depend on `core-api` without having to deal with circular dependency issues.
 
-#### 5.4.1.3 sdk
+#### 5.4.1.3 API Client
 
-Javascript SDK (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
+Javascript API Client (bindings) for the RESTful HTTP API provided by `cmd-api-server`.
 Compatible with both NodeJS and Web Browser (HTML 5 DOM + ES6) environments.
 
 #### 5.4.1.4 keychain
@@ -1512,10 +1420,10 @@ seen below:
         }
 ```
 
-The configuration above will cause the `Consortium JWS` REST API endpoint (callable via the SDK) to respond with a
+The configuration above will cause the `Consortium JWS` REST API endpoint (callable via the API Client) to respond with a
 consortium JWS that looks similar to what is pasted below.
 
-Code examples of how to use the SDK to call this endpoint can be seen at
+Code examples of how to use the API Client to call this endpoint can be seen at
 `./packages/cactus-cockpit/src/app/consortium-inspector/consortium-inspector.page.ts`
 
 ```json

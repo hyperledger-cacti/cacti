@@ -2,13 +2,12 @@ import { Server } from "http";
 import { Server as SecureServer } from "https";
 
 import { Express } from "express";
-import { promisify } from "util";
-import { Optional } from "typescript-optional";
 import Web3 from "web3";
-import { AbiItem } from "web3-utils";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
+
+import OAS from "../json/openapi.json";
 
 import {
   ConsensusAlgorithmFamily,
@@ -121,6 +120,10 @@ export class PluginLedgerConnectorXdai
     this.prometheusExporter.startMetricsCollection();
   }
 
+  public getOpenApiSpec(): unknown {
+    return OAS;
+  }
+
   public async hasTransactionFinality(): Promise<boolean> {
     const consensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
     return consensusHasTransactionFinality(consensusAlgorithmFamily);
@@ -133,6 +136,7 @@ export class PluginLedgerConnectorXdai
   public async getPrometheusExporterMetrics(): Promise<string> {
     const res: string = await this.prometheusExporter.getPrometheusMetrics();
     this.log.debug(`getPrometheusExporterMetrics() response: %o`, res);
+
     return res;
   }
 
@@ -144,16 +148,8 @@ export class PluginLedgerConnectorXdai
     return;
   }
 
-  public getHttpServer(): Optional<Server | SecureServer> {
-    return Optional.ofNullable(this.httpServer);
-  }
-
   public async shutdown(): Promise<void> {
-    const serverMaybe = this.getHttpServer();
-    if (serverMaybe.isPresent()) {
-      const server = serverMaybe.get();
-      await promisify(server.close.bind(server))();
-    }
+    this.log.info(`Shutting down ${this.className}...`);
   }
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
@@ -231,7 +227,8 @@ export class PluginLedgerConnectorXdai
           `${fnTag} Cannot create an instance of the contract because the contractName and the contractName of the JSON doesn't match`,
         );
       }
-      const contractJSON = (await keychainPlugin.get(contractName)) as any;
+      const contractStr = (await keychainPlugin.get(contractName)) as any;
+      const contractJSON = JSON.parse(contractStr);
       if (
         contractJSON.networks === undefined ||
         contractJSON.networks[networkId] === undefined ||
@@ -264,7 +261,7 @@ export class PluginLedgerConnectorXdai
         };
         const network = { [networkId]: address };
         contractJSON.networks = network;
-        keychainPlugin.set(contractName, contractJSON);
+        keychainPlugin.set(contractName, JSON.stringify(contractJSON));
       }
       const contract = new this.web3.eth.Contract(
         contractJSON.abi,
@@ -460,7 +457,7 @@ export class PluginLedgerConnectorXdai
 
     // Now use the found keychain plugin to actually perform the lookup of
     // the private key that we need to run the transaction.
-    const privateKeyHex = await keychainPlugin?.get<string>(keychainEntryKey);
+    const privateKeyHex = await keychainPlugin.get(keychainEntryKey);
 
     return this.transactPrivateKey({
       transactionConfig,
@@ -580,24 +577,19 @@ export class PluginLedgerConnectorXdai
         if (status && contractAddress) {
           const networkInfo = { address: contractAddress };
 
-          type SolcJson = {
-            abi: AbiItem[];
-            networks: unknown;
-          };
-          const contractJSON = await keychainPlugin.get<SolcJson>(contractName);
-
+          const contractJSON = await keychainPlugin.get(contractName);
+          const contractPojo = JSON.parse(contractJSON);
           this.log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
 
           const contract = new this.web3.eth.Contract(
-            contractJSON.abi,
+            contractPojo.abi,
             contractAddress,
           );
           this.contracts[contractName] = contract;
 
           const network = { [networkId]: networkInfo };
-          contractJSON.networks = network;
-
-          keychainPlugin.set(contractName, contractJSON);
+          contractPojo.networks = network;
+          await keychainPlugin.set(contractName, JSON.stringify(contractPojo));
         }
       }
       return runTxResponse;

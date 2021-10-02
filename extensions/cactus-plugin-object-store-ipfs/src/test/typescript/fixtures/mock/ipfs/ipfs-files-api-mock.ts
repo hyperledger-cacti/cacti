@@ -14,11 +14,12 @@ import {
   WriteOptions,
 } from "ipfs-core-types/src/files";
 
-import { Logger, Checks, LogLevelDesc } from "@hyperledger/cactus-common";
-import { LoggerProvider } from "@hyperledger/cactus-common";
 import { AbortOptions } from "ipfs-core-types";
 import { IPFSPath } from "ipfs-core-types/src/utils";
 import { RuntimeError } from "run-time-error";
+
+import { Logger, Checks, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger/cactus-common";
 import { K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST } from "../../../../../main/typescript/plugin-object-store-ipfs";
 
 export interface IFilesApiMockOptions {
@@ -139,7 +140,7 @@ export class FilesApiMock implements FilesAPI {
   public async flush(
     ipfsPath: string,
     options?: AbortOptions | undefined,
-  ): Promise<import("cids")> {
+  ): Promise<any> {
     throw new RuntimeError("Method flush() not implemented");
   }
 

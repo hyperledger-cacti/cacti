@@ -145,7 +145,7 @@ export class BesuTestLedger implements ITestLedger {
    * @see https://github.com/hyperledger/besu/blob/1.5.1/config/src/main/resources/dev.json
    */
   public getGenesisAccountPubKey(): string {
-    return "627306090abaB3A6e1400e9345bC60c78a8BEf57";
+    return "0x627306090abaB3A6e1400e9345bC60c78a8BEf57";
   }
 
   /**
@@ -283,19 +283,17 @@ export class BesuTestLedger implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 180000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 360000): Promise<void> {
     const fnTag = "BesuTestLedger#waitForHealthCheck()";
-    // const httpUrl = await this.getRpcApiHttpHost();
     const startedAt = Date.now();
     let isHealthy = false;
     do {
       if (Date.now() >= startedAt + timeoutMs) {
         throw new Error(`${fnTag} timed out (${timeoutMs}ms)`);
       }
-      const containerInfo = await this.getContainerInfo();
-      this.log.debug(`ContainerInfo.Status=%o`, containerInfo.Status);
-      this.log.debug(`ContainerInfo.State=%o`, containerInfo.State);
-      isHealthy = containerInfo.Status.endsWith("(healthy)");
+      const { Status, State } = await this.getContainerInfo();
+      this.log.debug(`ContainerInfo.Status=%o, State=O%`, Status, State);
+      isHealthy = Status.endsWith("(healthy)");
       if (!isHealthy) {
         await new Promise((resolve2) => setTimeout(resolve2, 1000));
       }
@@ -411,15 +409,12 @@ export class BesuTestLedger implements ITestLedger {
   }
 
   private validateConstructorOptions(): void {
-    const validationResult = Joi.validate<IBesuTestLedgerConstructorOptions>(
-      {
-        containerImageVersion: this.containerImageVersion,
-        containerImageName: this.containerImageName,
-        rpcApiHttpPort: this.rpcApiHttpPort,
-        envVars: this.envVars,
-      },
-      BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
-    );
+    const validationResult = BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA.validate({
+      containerImageVersion: this.containerImageVersion,
+      containerImageName: this.containerImageName,
+      rpcApiHttpPort: this.rpcApiHttpPort,
+      envVars: this.envVars,
+    });
 
     if (validationResult.error) {
       throw new Error(

@@ -49,7 +49,7 @@ test("can get past logs of an account", async (t: Test) => {
   });
   keychainPlugin.set(
     HelloWorldContractJson.contractName,
-    HelloWorldContractJson,
+    JSON.stringify(HelloWorldContractJson),
   );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
@@ -61,6 +61,7 @@ test("can get past logs of an account", async (t: Test) => {
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
+  await connector.onPluginInit();
 
   const req: GetPastLogsV1Request = { address: firstHighNetWorthAccount };
   const pastLogs = await connector.getPastLogs(req);

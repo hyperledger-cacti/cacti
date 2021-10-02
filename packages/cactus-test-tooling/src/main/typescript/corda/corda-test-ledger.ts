@@ -120,7 +120,7 @@ export class CordaTestLedger implements ITestLedger {
   }
 
   public async start(skipPull = false): Promise<Container> {
-    const containerNameAndTag = this.getContainerImageName();
+    const imageFqn = this.getContainerImageName();
 
     if (this.container) {
       await this.container.stop();
@@ -129,12 +129,12 @@ export class CordaTestLedger implements ITestLedger {
     const docker = new Docker();
 
     if (!skipPull) {
-      await Containers.pullImage(containerNameAndTag);
+      await Containers.pullImage(imageFqn, {}, this.opts.logLevel);
     }
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
-        containerNameAndTag,
+        imageFqn,
         [],
         [],
         {
@@ -396,17 +396,14 @@ export class CordaTestLedger implements ITestLedger {
 
   private validateConstructorOptions(): void {
     const fnTag = `${this.className}#validateConstructorOptions()`;
-    const validationResult = Joi.validate<ICordaTestLedgerConstructorOptions>(
-      {
-        imageVersion: this.imageVersion,
-        imageName: this.imageName,
-        rpcPortNotary: this.rpcPortNotary,
-        rpcPortA: this.rpcPortA,
-        rpcPortB: this.rpcPortB,
-        rpcPortC: this.rpcPortC,
-      },
-      JOI_SCHEMA,
-    );
+    const validationResult = JOI_SCHEMA.validate({
+      imageVersion: this.imageVersion,
+      imageName: this.imageName,
+      rpcPortNotary: this.rpcPortNotary,
+      rpcPortA: this.rpcPortA,
+      rpcPortB: this.rpcPortB,
+      rpcPortC: this.rpcPortC,
+    });
 
     if (validationResult.error) {
       throw new Error(`${fnTag} ${validationResult.error.annotate()}`);

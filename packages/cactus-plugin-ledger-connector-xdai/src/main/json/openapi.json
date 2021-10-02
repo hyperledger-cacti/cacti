@@ -9,26 +9,6 @@
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "servers": [
-        {
-            "url": "https://www.cactus.stream/{basePath}",
-            "description": "Public test instance",
-            "variables": {
-                "basePath": {
-                    "default": ""
-                }
-            }
-        },
-        {
-            "url": "http://localhost:4000/{basePath}",
-            "description": "Local test instance",
-            "variables": {
-                "basePath": {
-                    "default": ""
-                }
-            }
-        }
-    ],
     "components": {
         "schemas": {
             "ReceiptType": {
@@ -335,9 +315,9 @@
                     },
                     "transactionHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     },
                     "transactionIndex": {
                         "type": "number",
@@ -345,9 +325,9 @@
                     },
                     "blockHash": {
                         "type": "string",
-                        "minLength": 64,
-                        "maxLength": 64,
-                        "pattern": "/^0x([A-Fa-f0-9]{64})$/"
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
                     },
                     "blockNumber": {
                         "type": "number",
@@ -378,6 +358,7 @@
                     "transactionConfig",
                     "consistencyStrategy"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
@@ -413,6 +394,7 @@
                     "keychainId",
                     "constructorArgs"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "contractName": {
                         "type": "string",
@@ -487,6 +469,7 @@
                     "methodName",
                     "params"
                 ],
+                "additionalProperties": false,
                 "properties": {
                     "contractName": {
                         "type": "string",

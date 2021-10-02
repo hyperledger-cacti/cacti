@@ -1,3 +1,4 @@
+import path from "path";
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import { JWK } from "jose";
@@ -29,13 +30,24 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
     pluginInstance: [],
   };
 
+  const pluginsPath = path.join(
+    __dirname,
+    "../../../../../../", // walk back up to the project root
+    ".tmp/test/test-cmd-api-server/plugin-import-with-npm-install_test/", // the dir path from the root
+    uuidv4(), // then a random directory to ensure proper isolation
+  );
+  const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
+
   const configService = new ConfigService();
+
   const apiServerOptions = configService.newExampleConfig();
+  apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = 0;
   apiServerOptions.cockpitPort = 0;
+  apiServerOptions.grpcPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [
     {

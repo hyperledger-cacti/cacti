@@ -11,7 +11,7 @@ This section contains the components to form Hyperledger Cactus.
    CMD Api Server <packages/cactus-cmd-api-server.md>
    Cactus Cockpit <packages/cactus-cockpit.md>
    Cactus Common <packages/cactus-common.md>
-   Catus Core <packages/cactus-core.md>
+   Cactus Core <packages/cactus-core.md>
    Core Api<packages/cactus-core-api.md>
    Consortium Manual <packages/cactus-consortium-manual.md>
    Keychain Memory <packages/cactus-plugin-keychain-memory.md>

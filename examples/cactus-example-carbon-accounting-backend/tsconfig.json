@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist/lib/",
-    "declarationDir": "dist/types",
+    "declarationDir": "dist/lib",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-example-carbon-accounting-backend.tsbuildinfo"
   },
@@ -41,7 +41,7 @@
   ],
   "include": [
     "./src",
-    "src/**/*.json",
+    "src/**/*.json"
   ],
   "exclude": [
     "./src/utility-emissions-channel"

@@ -39,6 +39,25 @@ function dumpDiskUsageInfo()
   fi
 }
 
+function checkOnlyDocumentation()
+{
+  z=0
+
+  for i in $CHANGED_FILES; do
+    z=$((z+1))
+    if [ ${i: -3} != ".md" ]; then
+      break
+    elif [ ${i: -3} == ".md" ] && [ $(echo ${CHANGED_FILES} | wc -l) == $z ]; then
+      echo 'There are only changes in the documentation files.'
+      ENDED_AT=`date +%s`
+      runtime=$((ENDED_AT-STARTED_AT))
+      echo "$(date +%FT%T%z) [CI] SUCCESS - runtime=$runtime seconds."
+      checkWorkTreeStatus
+      exit 0
+    fi
+  done
+}
+
 function mainTask()
 {
   set -euxo pipefail
@@ -60,6 +79,9 @@ function mainTask()
   else
     smem --abbreviate --totals --system || true
   fi
+
+  # Check if the modified files are only for documentation.
+  checkOnlyDocumentation
 
   dumpDiskUsageInfo
 
@@ -95,26 +117,20 @@ function mainTask()
 
   yarn run configure
 
-  # Tests are still flaky (on weak hardware such as the CI env) despite our best
-  # efforts so here comes the mighty hammer of brute force. 3 times the charm...
-  {
-    dumpDiskUsageInfo
-    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] First (#1) try of tests succeeded OK."
-  } ||
-  {
-    dumpDiskUsageInfo
-    echo "$(date +%FT%T%z) [CI] First (#1) try of tests failed starting second try now..."
-    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Second (#2) try of tests succeeded OK."
+  # Obtains the major NodeJS version such as "12" from "v12.14.1"
+  # We only run the custom checks above v12 because the globby dependency's
+  # latest version is forcing us to use Ecmascript Modules which do not work
+  # on NodeJS 12 even with the additional flags passed in.
+  nodejs_version=`node --version | awk -v range=1 '{print substr($0,range+1,2)}'`
+  if [ "$nodejs_version" -gt "12" ]; then
+    echo "$(date +%FT%T%z) [CI] NodeJS is newer than v12, running custom checks..."
+    yarn run custom-checks
+  fi
 
-  } ||
-  {
-    dumpDiskUsageInfo
-    # If the third try fails then the execution will reach the last echo and the exit 1 statement
-    # ensuring that the script crashes if 3 out of 3 test runs have failed.
-    echo "$(date +%FT%T%z) [CI] Second (#2) try of tests failed starting third and last try now..."
-    yarn run test:all -- --bail && echo "$(date +%FT%T%z) [CI] Third (#3) try of tests succeeded OK." || \
-      echo "$(date +%FT%T%z) [CI] Third (#3) try of tests failed so giving up at this point" ; exit 1
-  }
+  node ./tools/validate-bundle-names.js
+
+  dumpDiskUsageInfo
+  yarn run test:all -- --bail
 
   dumpDiskUsageInfo
 

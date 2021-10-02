@@ -11,5 +11,5 @@ import * as shell from 'shelljs';
 //      Example:
 //        shell.cp('-R', 'src/routing-interface/views', 'dist/routing-interface/views/');
 //shell.cp('-R', 'config/default.json', 'dist/examples/cartrade/config/');
-shell.cp('-R', 'config/default.json', '../../dist/examples/cartrade/config/');
-shell.cp('-R', 'config/usersetting.json', '../../dist/packages/config/');
+shell.cp('-R', 'config/default.yaml', '/etc/cactus/');
+shell.cp('-R', 'config/usersetting.yaml', '/etc/cactus/');

@@ -78,7 +78,7 @@ test(testCase, async (t: Test) => {
   });
   keychainPlugin.set(
     HelloWorldContractJson.contractName,
-    HelloWorldContractJson,
+    JSON.stringify(HelloWorldContractJson),
   );
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
@@ -91,6 +91,8 @@ test(testCase, async (t: Test) => {
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });
+
+  await connector.onPluginInit();
 
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));

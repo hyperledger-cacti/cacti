@@ -24,7 +24,7 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 
-import { InsertBambooHarvestEndpoint as Constants } from "./insert-bamboo-harvest-endpoint-constants";
+import OAS from "../../../json/openapi.json";
 import { InsertBambooHarvestRequest } from "../../generated/openapi/typescript-axios";
 
 export interface IInsertBambooHarvestEndpointOptions {
@@ -43,20 +43,15 @@ const K_DEFAULT_AUTHORIZATION_OPTIONS: IEndpointAuthzOptions = {
 };
 
 export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
-  public static readonly HTTP_PATH = Constants.HTTP_PATH;
-
-  public static readonly HTTP_VERB_LOWER_CASE = Constants.HTTP_VERB_LOWER_CASE;
-
-  public static readonly OPENAPI_OPERATION_ID = Constants.OPENAPI_OPERATION_ID;
-
   public static readonly CLASS_NAME = "InsertBambooHarvestEndpoint";
 
   private readonly log: Logger;
-  private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
 
   public get className(): string {
     return InsertBambooHarvestEndpoint.CLASS_NAME;
   }
+
+  private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
 
   constructor(public readonly opts: IInsertBambooHarvestEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
@@ -80,6 +75,12 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
+  public getOasPath() {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
+    ];
+  }
+
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
     return this.authorizationOptionsProvider;
   }
@@ -92,11 +93,13 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
   }
 
   public getVerbLowerCase(): string {
-    return InsertBambooHarvestEndpoint.HTTP_VERB_LOWER_CASE;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return InsertBambooHarvestEndpoint.HTTP_PATH;
+    const apiPath = this.getOasPath();
+    return apiPath.post["x-hyperledger-cactus"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {
