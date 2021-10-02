@@ -438,7 +438,7 @@ object AssetFlow {
 
             val outputState1 = AssetState(quantity1, splitState.state.data.tokenType, serviceHub.myInfo.legalIdentities.first())
             val outputState2 = AssetState(quantity2, splitState.state.data.tokenType, serviceHub.myInfo.legalIdentities.first())
-            println("Proposed states after split: ${assetState1} and ${assetState2}\n")
+            println("Proposed states after split: ${outputState1} and ${outputState2}\n")
 
             val txCommand = Command(AssetContract.Commands.Split(), splitState.state.data.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
