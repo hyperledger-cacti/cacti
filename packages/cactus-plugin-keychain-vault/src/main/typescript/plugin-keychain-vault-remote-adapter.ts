@@ -94,10 +94,6 @@ export class PluginKeychainVaultRemoteAdapter
     return;
   }
 
-  public rotateEncryptionKeys(): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
   public getEncryptionAlgorithm(): string {
     throw new Error("Method not implemented.");
   }
