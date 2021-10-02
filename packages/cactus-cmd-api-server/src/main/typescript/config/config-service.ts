@@ -436,14 +436,17 @@ export class ConfigService {
     cactusApiServerOptions?: ICactusApiServerOptions,
   ): { [key: string]: string } {
     cactusApiServerOptions = cactusApiServerOptions || this.newExampleConfig();
-    const configSchema: any = ConfigService.getConfigSchema();
+    const configSchema = ConfigService.getConfigSchema() as Record<
+      string,
+      { env: string }
+    >;
     return Object.entries(cactusApiServerOptions).reduce(
-      (acc: any, [key, value]) => {
-        const schemaObj: any = configSchema[key];
+      (acc, [key, value]) => {
+        const schemaObj = configSchema[key];
         acc[schemaObj.env] = value;
         return acc;
       },
-      {},
+      {} as { [key: string]: string },
     );
   }
 
