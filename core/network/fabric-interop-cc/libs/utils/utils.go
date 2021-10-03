@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -19,6 +20,7 @@ import (
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange"
 )
 
 
@@ -139,35 +141,52 @@ func getAssetClaimKey(assetType string, assetId string) string {
 	return "Claimed_" + assetType + assetId
 }
 
+func generateAssetPledgeContractId(ctx contractapi.TransactionContextInterface, assetType string, numUnits uint64, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) string {
+	preimage := assetType + strconv.Itoa(int(numUnits)) + owner + remoteNetworkId + recipientCert + strconv.Itoa(int(expiryTimeSecs)) + ctx.GetStub().GetTxID()
+	contractId := assetexchange.GenerateSHA256HashInBase64Form(preimage)
+	return contractId
+}
+
 // PledgeAsset locks an asset for transfer to a different ledger/network.
-func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, id, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) error {
-	pledgeKey := getAssetPledgeKey(assetType, id)
+func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, id string, numUnits uint64, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) (string, error) {
+	if id == "" && numUnits == 0 {
+		return "", fmt.Errorf("no asset ID or unit count provided")
+	}
+	if id != "" && numUnits > 0 {
+        return "", fmt.Errorf("ambiguous pledge instruction: both asset ID and unit count provided")
+	}
+	assetId := id           // Non-fungible asset
+	if assetId == "" {      // Fungible asset
+		assetId = generateAssetPledgeContractId(ctx, assetType, numUnits, owner, remoteNetworkId, recipientCert, expiryTimeSecs)
+	}
+
+	pledgeKey := getAssetPledgeKey(assetType, assetId)
 	pledgeJSON, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
-		return fmt.Errorf("failed to read asset pledge status from world state: %v", err)
+		return "", fmt.Errorf("failed to read asset pledge status from world state: %v", err)
 	}
 	var pledge AssetPledge
 	if pledgeJSON != nil {
 		err = json.Unmarshal(pledgeJSON, &pledge)
 		if err != nil {
-			return err
+			return "", err
 		}
 		if (pledge.RemoteNetworkID == remoteNetworkId && pledge.RecipientCert == recipientCert && pledge.ExpiryTimeSecs == expiryTimeSecs) {
-			return nil
+			return assetId, nil
 		} else {
-			return fmt.Errorf("the asset %s has already been pledged", id)
+			return "", fmt.Errorf("the asset %s has already been pledged", id)
 		}
 	}
 
 	// Make sure the pledge has an expiry time in the future
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= expiryTimeSecs {
-		return fmt.Errorf("expiry time cannot be less than current time")
+		return "", fmt.Errorf("expiry time cannot be less than current time")
 	}
 
 	localNetworkId, err := ctx.GetStub().GetState(GetLocalNetworkIDKey())
 	if err != nil {
-		return err
+		return "", err
 	}
 	pledge = AssetPledge{
 		AssetDetails: assetJSON,
@@ -178,10 +197,10 @@ func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, 
 	}
 	pledgeJSON, err = json.Marshal(pledge)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return ctx.GetStub().PutState(pledgeKey, pledgeJSON)
+	return assetId, ctx.GetStub().PutState(pledgeKey, pledgeJSON)
 }
 
 // ClaimRemoteAsset gets ownership of an asset transferred from a different ledger/network.
