@@ -257,6 +257,7 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, a
 func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, owner, recipientNetworkId, recipientCert string) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
+	// Create blank asset details using app-specific-logic
 	blankAsset := BondAsset{
 		Type: "",
 		ID: "",
@@ -269,48 +270,34 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 	if err != nil {
 		return "", err
 	}
-	pledge := &wutils.AssetPledge{
-		AssetDetails: blankAssetJSON,
-		LocalNetworkID: "",
-		RemoteNetworkID: "",
-		RecipientCert: "",
-		ExpiryTimeSecs: 0,
-	}
-	pledgeJSON, err := json.Marshal(pledge)
+
+	// Fetch asset pledge details using common (library) logic
+	pledgeAssetDetails, pledgeJSON, blankPledgeJSON, err := wutils.GetAssetPledgeStatus(ctx, assetType, id, recipientNetworkId, recipientCert, blankAssetJSON)
 	if err != nil {
-		return "", err
+		return blankPledgeJSON, err
+	}
+	if pledgeAssetDetails == nil {
+		return blankPledgeJSON, err
 	}
 
-	pledgeKey := getBondAssetPledgeKey(assetType, id)
-	lookupPledgeJSON, err := ctx.GetStub().GetState(pledgeKey)
-	if err != nil {
-		return "", fmt.Errorf("failed to read asset pledge status from world state: %v", err)
-	}
-	if lookupPledgeJSON == nil {
-		return string(pledgeJSON), nil      // Return blank
-	}
-	var lookupPledge wutils.AssetPledge
-	err = json.Unmarshal(lookupPledgeJSON, &lookupPledge)
-	if err != nil {
-		return "", err
-	}
+	// Validate returned asset details using app-specific-logic
 	var lookupPledgeAsset BondAsset
-	err = json.Unmarshal(lookupPledge.AssetDetails, &lookupPledgeAsset)
+	err = json.Unmarshal(pledgeAssetDetails, &lookupPledgeAsset)
 	if err != nil {
-		return "", err
+		return blankPledgeJSON, err
 	}
-	// Match pledge with request parameters
-	if lookupPledge.RecipientCert != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId || lookupPledgeAsset.Owner != owner {
-		return string(pledgeJSON), nil      // Return blank
+	if lookupPledgeAsset.Owner != owner {
+		return blankPledgeJSON, nil      // Return blank
 	}
 
-	return string(lookupPledgeJSON), nil
+	return pledgeJSON, nil
 }
 
 // GetAssetClaimStatus returns the asset claim status and present time (of invocation).
 func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
+	// Create blank asset details using app-specific-logic
 	blankAsset := BondAsset{
 		Type: "",
 		ID: "",
@@ -323,70 +310,48 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 	if err != nil {
 		return "", err
 	}
-	claimStatus := &wutils.AssetClaimStatus{
-		AssetDetails: blankAssetJSON,
-		LocalNetworkID: "",
-		RemoteNetworkID: "",
-		RecipientCert: "",
-		ClaimStatus: false,
-		ExpiryTimeSecs: pledgeExpiryTimeSecs,
-		ExpirationStatus: (uint64(time.Now().Unix()) >= pledgeExpiryTimeSecs),
-	}
-	claimStatusJSON, err := json.Marshal(claimStatus)
+
+	// Fetch asset claim details using common (library) logic
+	claimAssetDetails, claimJSON, blankClaimJSON, err := wutils.GetAssetClaimStatus(ctx, assetType, id, recipientCert, pledger, pledgerNetworkId, pledgeExpiryTimeSecs, blankAssetJSON)
 	if err != nil {
-		return "", err
+		return blankClaimJSON, err
 	}
+	if claimAssetDetails == nil {
+		return blankClaimJSON, err
+	}
+
+	// Validate returned asset details using app-specific-logic
 
 	// The asset should be recorded if it has been claimed, so we should look that up first
 	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
 	if err != nil {
-		return "", fmt.Errorf("failed to read asset record from world state: %v", err)
+		return blankClaimJSON, fmt.Errorf("failed to read asset record from world state: %v", err)
 	}
 	if assetJSON == nil {
-		return string(claimStatusJSON), nil      // Return blank
+		return blankClaimJSON, nil      // Return blank
 	}
 
 	// Check if this asset is owned by the given recipient
 	var asset BondAsset
 	err = json.Unmarshal(assetJSON, &asset)
 	if err != nil {
-		return "", err
+		return blankClaimJSON, err
 	}
 	if asset.Owner != recipientCert {
-		return string(claimStatusJSON), nil      // Return blank
+		return blankClaimJSON, nil      // Return blank
 	}
 
-	// Lookup claim record
-	claimKey := getBondAssetClaimKey(assetType, id)
-	lookupClaimJSON, err := ctx.GetStub().GetState(claimKey)
-	if err != nil {
-		return "", fmt.Errorf("failed to read asset claim status from world state: %v", err)
-	}
-	if lookupClaimJSON == nil {
-		return string(claimStatusJSON), nil      // Return blank
-	}
-	var lookupClaim wutils.AssetClaimStatus
-	err = json.Unmarshal(lookupClaimJSON, &lookupClaim)
-	if err != nil {
-		return "", err
-	}
+	// Match pledger identity in claim with request parameters
 	var lookupClaimAsset BondAsset
-	err = json.Unmarshal(lookupClaim.AssetDetails, &lookupClaimAsset)
+	err = json.Unmarshal(claimAssetDetails, &lookupClaimAsset)
 	if err != nil {
-		return "", err
+		return blankClaimJSON, err
 	}
-	// Match claim with request parameters
-	if lookupClaimAsset.Owner != pledger || lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.RecipientCert != recipientCert {
-		return string(claimStatusJSON), nil      // Return blank
-	}
-	lookupClaim.ExpiryTimeSecs = claimStatus.ExpiryTimeSecs
-	lookupClaim.ExpirationStatus = claimStatus.ExpirationStatus
-	lookupClaimJSON, err = json.Marshal(lookupClaim)
-	if err != nil {
-		return "", err
+	if lookupClaimAsset.Owner != pledger {
+		return blankClaimJSON, nil      // Return blank
 	}
 
-	return string(lookupClaimJSON), nil
+	return claimJSON, nil
 }
 
 // DeleteAsset deletes an given asset from the world state.

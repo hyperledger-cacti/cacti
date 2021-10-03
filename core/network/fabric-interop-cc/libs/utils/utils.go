@@ -302,3 +302,88 @@ func ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, re
 
 	return claimStatus.AssetDetails, pledge.AssetDetails, nil
 }
+
+// GetAssetPledgeStatus returns the asset pledge status.
+func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientNetworkId, recipientCert string, blankAssetJSON []byte) ([]byte, string, string, error) {
+	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
+
+	pledge := &AssetPledge{
+		AssetDetails: blankAssetJSON,
+		LocalNetworkID: "",
+		RemoteNetworkID: "",
+		RecipientCert: "",
+		ExpiryTimeSecs: 0,
+	}
+	pledgeJSON, err := json.Marshal(pledge)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	pledgeKey := getAssetPledgeKey(assetType, id)
+	lookupPledgeJSON, err := ctx.GetStub().GetState(pledgeKey)
+	if err != nil {
+		return nil, string(pledgeJSON), string(pledgeJSON), fmt.Errorf("failed to read asset pledge status from world state: %v", err)
+	}
+	if lookupPledgeJSON == nil {
+		return nil, string(pledgeJSON), string(pledgeJSON), nil      // Return blank
+	}
+	var lookupPledge AssetPledge
+	err = json.Unmarshal(lookupPledgeJSON, &lookupPledge)
+	if err != nil {
+		return nil, string(pledgeJSON), string(pledgeJSON), err
+	}
+
+	// Match pledge with request parameters
+	if lookupPledge.RecipientCert != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId {
+		return nil, string(pledgeJSON), string(pledgeJSON), nil      // Return blank
+	}
+
+	return lookupPledge.AssetDetails, string(lookupPledgeJSON), string(pledgeJSON), nil
+}
+
+// GetAssetClaimStatus returns the asset claim status and present time (of invocation).
+func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) ([]byte, string, string, error) {
+	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
+
+	claimStatus := &AssetClaimStatus{
+		AssetDetails: blankAssetJSON,
+		LocalNetworkID: "",
+		RemoteNetworkID: "",
+		RecipientCert: "",
+		ClaimStatus: false,
+		ExpiryTimeSecs: pledgeExpiryTimeSecs,
+		ExpirationStatus: (uint64(time.Now().Unix()) >= pledgeExpiryTimeSecs),
+	}
+	claimStatusJSON, err := json.Marshal(claimStatus)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	// Lookup claim record
+	claimKey := getAssetClaimKey(assetType, id)
+	lookupClaimJSON, err := ctx.GetStub().GetState(claimKey)
+	if err != nil {
+		return nil, string(claimStatusJSON), string(claimStatusJSON), fmt.Errorf("failed to read asset claim status from world state: %v", err)
+	}
+	if lookupClaimJSON == nil {
+		return nil, string(claimStatusJSON), string(claimStatusJSON), nil      // Return blank
+	}
+	var lookupClaim AssetClaimStatus
+	err = json.Unmarshal(lookupClaimJSON, &lookupClaim)
+	if err != nil {
+		return nil, string(claimStatusJSON), string(claimStatusJSON), err
+	}
+
+	// Match claim with request parameters
+	if lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.RecipientCert != recipientCert {
+		return nil, string(claimStatusJSON), string(claimStatusJSON), nil      // Return blank
+	}
+	lookupClaim.ExpiryTimeSecs = claimStatus.ExpiryTimeSecs
+	lookupClaim.ExpirationStatus = claimStatus.ExpirationStatus
+	lookupClaimJSON, err = json.Marshal(lookupClaim)
+	if err != nil {
+		return nil, string(claimStatusJSON), string(claimStatusJSON), err
+	}
+
+	return lookupClaim.AssetDetails, string(lookupClaimJSON), string(claimStatusJSON), nil
+}
