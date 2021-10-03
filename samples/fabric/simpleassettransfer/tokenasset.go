@@ -8,11 +8,11 @@ import (
 )
 
 type TokenAssetType struct {
-	Issuer            string            `json:"issuer"`
-	Value             int               `json:"value"`
+	Issuer          string              `json:"issuer"`
+	Value           int                 `json:"value"`
 }
 type TokenWallet struct {
-	WalletMap            map[string]uint64    `json:"walletlist"`
+	WalletMap       map[string]uint64   `json:"walletlist"`
 }
 
 
@@ -27,6 +27,9 @@ func (s *SmartContract) InitTokenAssetLedger(ctx contractapi.TransactionContextI
 
 // CreateTokenAssetType issues a new token asset type to the world state with given details.
 func (s *SmartContract) CreateTokenAssetType(ctx contractapi.TransactionContextInterface, tokenAssetType string, issuer string, value int) (bool, error) {
+	if tokenAssetType == "" {
+		return false, fmt.Errorf("Token asset type cannot be blank")
+	}
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return false, err
@@ -103,6 +106,10 @@ func (s *SmartContract) TokenAssetTypeExists(ctx contractapi.TransactionContextI
 
 // IssueTokenAssets issues new token assets to an owner.
 func (s *SmartContract) IssueTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, owner string) error {
+	if owner == "" {
+		return fmt.Errorf("Owner cannot be blank")
+	}
+
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return err
@@ -133,8 +140,8 @@ func (s *SmartContract) DeleteTokenAssets(ctx contractapi.TransactionContextInte
 	return subTokenAssetsHelper(ctx, tokenAssetType, numUnits, id)
 }
 
-// TransferTokenAssets transfers the token assets from an owner to newOwner
-func (s *SmartContract) TransferTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, owner string, newOwner string) error {
+// TransferTokenAssets transfers the token assets from client's account to newOwner
+func (s *SmartContract) TransferTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64, newOwner string) error {
 	exists, err := s.TokenAssetTypeExists(ctx, tokenAssetType)
 	if err != nil {
 		return err
@@ -143,6 +150,14 @@ func (s *SmartContract) TransferTokenAssets(ctx contractapi.TransactionContextIn
 		return fmt.Errorf("the token asset type %s does not exist", tokenAssetType)
 	}
 
+	if newOwner == "" {
+		return fmt.Errorf("New owner cannot be blank")
+	}
+
+	owner, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return err
+	}
 
 	ownerId := getWalletId(owner)
 	newOwnerId := getWalletId(newOwner)
@@ -151,14 +166,7 @@ func (s *SmartContract) TransferTokenAssets(ctx contractapi.TransactionContextIn
 	if err != nil {
 		return err
 	}
-	err = addTokenAssetsHelper(ctx, tokenAssetType, numUnits, newOwnerId)
-	if err != nil {
-		// Revert subtraction from the original owner
-		// Assuming following will succeed (not sure what to do if it does not)
-		_ = addTokenAssetsHelper(ctx, tokenAssetType, numUnits, ownerId)
-		return err
-	}
-	return nil
+	return addTokenAssetsHelper(ctx, tokenAssetType, numUnits, newOwnerId)
 }
 
 // GetBalance returns the amount of given token asset type owned by an owner.

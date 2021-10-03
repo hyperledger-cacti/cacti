@@ -30,8 +30,12 @@ func TestCreateTokenAssetType(t *testing.T) {
 	transactionContext, chaincodeStub := wtest.PrepMockStub()
 	simpleToken := sa.SmartContract{}
 
-	// Successful Case
+	// Should fail if token asset type is empty
 	res, err := simpleToken.CreateTokenAssetType(transactionContext, "", "", 0)
+	require.Error(t, err)
+
+	// Successful Case
+	res, err = simpleToken.CreateTokenAssetType(transactionContext, "sometokentype", "", 0)
 	require.NoError(t, err)
 	require.Equal(t, res, true)
 
@@ -110,25 +114,30 @@ func TestIssueTokenAssets(t *testing.T) {
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
-	// Checking succesful case
+	// Should fail of owner is blank
 	chaincodeStub.GetStateReturns(bytes, nil)
 	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "")
+	require.Error(t, err)
+
+	// Checking succesful case
+	chaincodeStub.GetStateReturns(bytes, nil)
+	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "someowner")
 	require.NoError(t, err)
 
 	// Check if writing state after issuing fails
 	chaincodeStub.GetStateReturns(bytes, nil)
 	chaincodeStub.PutStateReturns(fmt.Errorf("failed to put state"))
-	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "")
+	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "someowner")
 	require.EqualError(t, err, "failed to put state")
 
 	// Error check
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("failed to read state"))
-	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "")
+	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "someowner")
 	require.EqualError(t, err, "failed to read from world state: failed to read state")
 
 	// Check if given token asset type doesn't exist
 	chaincodeStub.GetStateReturns(nil, nil)
-	err = simpleToken.IssueTokenAssets(transactionContext, "token1", 0, "")
+	err = simpleToken.IssueTokenAssets(transactionContext, "token1", 0, "someowner")
 	require.EqualError(t, err, "cannot issue: the token asset type token1 does not exist")
 }
 
@@ -180,11 +189,15 @@ func TestTransferTokenAssets(t *testing.T) {
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 2, "", "")
+	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 2, "")
+	require.Error(t, err)
+
+	chaincodeStub.GetStateReturns(bytes, nil)
+	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 2, "newowner")
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 10, "", "")
+	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 10, "newowner")
 	require.EqualError(t, err, "the owner does not possess enough units of the token asset type token1")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("Failed to read state"))
