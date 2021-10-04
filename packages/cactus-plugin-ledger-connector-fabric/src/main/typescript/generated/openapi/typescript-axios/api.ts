@@ -120,7 +120,7 @@ export interface ConnectionProfile {
      * @type {string}
      * @memberof ConnectionProfile
      */
-    description: string;
+    description?: string;
     /**
      * 
      * @type {string}
