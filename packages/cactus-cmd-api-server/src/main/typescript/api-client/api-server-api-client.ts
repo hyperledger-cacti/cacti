@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { Socket, io, SocketOptions } from "socket.io-client";
