@@ -1,4 +1,4 @@
-.. Hyperledger Cactus documentation master file, created by
+.. Hyperledger Cactus documentation primary file, created by
    sphinx-quickstart on Thu Mar 31 08:42:27 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -13,7 +13,7 @@ Hyperledger Cactus is currently undergoing a major refactoring effort to enable 
 
 **What is Cactus?**
 
-A pluggable, enterprise-grade framework to transact on multiple distributed ledgers without introducing yet another competing blockchain. 
+A pluggable, enterprise-grade framework to transact on multiple distributed ledgers without introducing yet another competing blockchain.
 
    * Cactus allows developers to abstract the application layer from the DLT addressing protocol fragmentation, lowering coupling and reducing implementation risks​
 
