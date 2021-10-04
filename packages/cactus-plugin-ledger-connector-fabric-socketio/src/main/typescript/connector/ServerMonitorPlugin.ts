@@ -67,7 +67,7 @@ export class ServerMonitorPlugin {
         })
         .then((submitter) => {
           const peer = this._filterTable[clientId].newPeer(
-            network.fabric.peers[0].requests,
+            network.fabric.peers[0].requests
           );
           this._eh = channel.newChannelEventHub(peer);
           logger.info("Connecting the event hub");
