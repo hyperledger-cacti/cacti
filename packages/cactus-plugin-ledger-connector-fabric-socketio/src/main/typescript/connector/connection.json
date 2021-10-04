@@ -1,43 +1,52 @@
 {
-    "name": "first-network-org3",
+    "name": "basic-network",
     "version": "1.0.0",
     "client": {
-        "organization": "Org3",
+        "organization": "Org1",
         "connection": {
             "timeout": {
                 "peer": {
                     "endorser": "300"
-                }
+                },
+                "orderer": "300"
+            }
+        }
+    },
+    "channels": {
+        "mychannel": {
+            "orderers": [
+                "orderer.example.com"
+            ],
+            "peers": {
+                "peer0.org1.example.com": {}
             }
         }
     },
     "organizations": {
-        "Org3": {
-            "mspid": "Org3MSP",
+        "Org1": {
+            "mspid": "Org1MSP",
             "peers": [
-                "peer0.org3.example.com",
-                "peer1.org3.example.com"
+                "peer0.org1.example.com"
+            ],
+            "certificateAuthorities": [
+                "ca.example.com"
             ]
         }
     },
+    "orderers": {
+        "orderer.example.com": {
+            "url": "grpc://localhost:7050"
+        }
+    },
     "peers": {
-        "peer0.org3.example.com": {
-            "url": "grpcs://localhost:11051",
-            "tlsCACerts": {
-                "path": "org3-artifacts/crypto-config/peerOrganizations/org3.example.com/tlsca/tlsca.org3.example.com-cert.pem"
-            },
-            "grpcOptions": {
-                "ssl-target-name-override": "peer0.org3.example.com"
-            }
-        },
-        "peer1.org3.example.com": {
-            "url": "grpcs://localhost:12051",
-            "tlsCACerts": {
-                "path": "org3-artifacts/crypto-config/peerOrganizations/org3.example.com/tlsca/tlsca.org3.example.com-cert.pem"
-            },
-            "grpcOptions": {
-                "ssl-target-name-override": "peer1.org3.example.com"
-            }
+        "peer0.org1.example.com": {
+            "url": "grpc://localhost:7051"
+        }
+    },
+    "certificateAuthorities": {
+        "ca.example.com": {
+            "url": "http://localhost:7054",
+            "caName": "ca.example.com"
         }
     }
 }
