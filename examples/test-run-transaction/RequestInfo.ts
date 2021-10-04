@@ -7,22 +7,21 @@
 
 // request information
 export class RequestInfo {
-    businessLogicID: string;
-    tradeID: string;
+  businessLogicID: string;
+  tradeID: string;
 
-    keychainId: string;
-    keychainRef: string;
-    channelName: string;
-    invocationType: string;
-    functionName: string;
-    functionArgs: Array<any>;
+  keychainId: string;
+  keychainRef: string;
+  channelName: string;
+  invocationType: string;
+  functionName: string;
+  functionArgs: Array<any>;
 
-    setBusinessLogicID(businessLogicID: string) {
-        this.businessLogicID = businessLogicID;
-    }
+  setBusinessLogicID(businessLogicID: string) {
+    this.businessLogicID = businessLogicID;
+  }
 
-    setTradeID(tradeID: string) {
-        this.tradeID = tradeID;
-    }
+  setTradeID(tradeID: string) {
+    this.tradeID = tradeID;
+  }
 }
-
