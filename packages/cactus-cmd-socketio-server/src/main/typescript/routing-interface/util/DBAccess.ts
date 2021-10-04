@@ -6,20 +6,25 @@
  */
 
 import { ConfigUtil } from "../util/ConfigUtil";
+import {
+  ValidatorRegistry,
+  LedgerPluginInfo,
+} from "../../verifier/validator-registry";
 
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 const configDefault: any = ConfigUtil.getConfig();
-const configVerifier: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/verifier-config.yaml", "utf8"),
+// const configVerifier: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/validator-registry-config.yaml", 'utf8'));
+const configVerifier: ValidatorRegistry = new ValidatorRegistry(
+  path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml")
 );
 const configContract: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/contractInfo.yaml", "utf8"),
+  fs.readFileSync("/etc/cactus/contractInfo.yaml", "utf8")
 );
 
 export class DBAccess {
-  ledgerPluginInfo: [];
+  ledgerPluginInfo: LedgerPluginInfo[];
   contractInfo: [];
   blpRegistryInfo: [];
 
@@ -27,7 +32,7 @@ export class DBAccess {
     // TODO: DB Access Initialization
   }
 
-  getLedgerPluginInfo(): [] {
+  getLedgerPluginInfo(): LedgerPluginInfo[] {
     // TODO: Future access to DB for connection information
 
     this.ledgerPluginInfo = configVerifier.ledgerPluginInfo;

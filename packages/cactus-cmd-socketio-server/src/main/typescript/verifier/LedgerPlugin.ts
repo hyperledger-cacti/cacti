@@ -7,13 +7,20 @@
 
 import { LedgerOperation } from "./../business-logic-plugin/LedgerOperation";
 
-export interface Verifier {
+export interface IVerifier {
   // BLP -> Verifier
-  getApiList(): ApiInfo[];
-  requestLedgerOperation(param: LedgerOperation): void;
-  startMonitor(): Promise<LedgerEvent>;
-  stopMonitor(soketId: string): void;
-  setEventListener(eventListener: VerifierEventListener | null): void;
+  sendAsyncRequest(
+    contract: object,
+    method: object,
+    args: object
+  ): Promise<void>;
+  sendSyncRequest(contract: object, method: object, args: object): Promise<any>;
+  startMonitor(
+    id: string,
+    options: Object,
+    eventListener: VerifierEventListener
+  ): Promise<void>;
+  stopMonitor(id?: string): void;
 
   // Validator -> Verifier
   // NOTE: The following methods are not implemented this time
