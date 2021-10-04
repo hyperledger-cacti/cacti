@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import type { AddressInfo } from "net";
 import type { Server as SecureServer } from "https";
 import os from "os";
@@ -690,7 +691,7 @@ export class ApiServer {
   createCorsMiddleware(allowedDomains: string[]): RequestHandler {
     const allDomainsOk = allowedDomains.includes("*");
 
-    const corsOptionsDelegate = (req: Request, callback: any) => {
+    const corsOptionsDelegate = (req: Request, callback: Record<string, unknown>) => {
       const origin = req.header("Origin");
       const isDomainOk = origin && allowedDomains.includes(origin);
       // this.log.debug("CORS %j %j %s", allDomainsOk, isDomainOk, req.originalUrl);
