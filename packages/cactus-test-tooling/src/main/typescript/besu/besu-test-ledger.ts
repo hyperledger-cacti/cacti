@@ -205,7 +205,7 @@ export class BesuTestLedger implements ITestLedger {
     return { publicKey, privateKey };
   }
 
-  public async start(): Promise<Container> {
+  public async start(omitPull = false): Promise<Container> {
     const imageFqn = this.getContainerImageName();
 
     if (this.container) {
@@ -214,9 +214,11 @@ export class BesuTestLedger implements ITestLedger {
     }
     const docker = new Docker();
 
-    this.log.debug(`Pulling container image ${imageFqn} ...`);
-    await this.pullContainerImage(imageFqn);
-    this.log.debug(`Pulled ${imageFqn} OK. Starting container...`);
+    if (!omitPull) {
+      this.log.debug(`Pulling container image ${imageFqn} ...`);
+      await this.pullContainerImage(imageFqn);
+      this.log.debug(`Pulled ${imageFqn} OK. Starting container...`);
+    }
 
     return new Promise<Container>((resolve, reject) => {
       const eventEmitter: EventEmitter = docker.run(
