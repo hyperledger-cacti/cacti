@@ -438,7 +438,7 @@ export class ApiServer {
         this.log.debug(`PROXY ${srcHost} => ${destHost} :: ${thePath}`);
 
         // make sure self signed certs are accepted if it was configured as such by the user
-        (proxyReqOpts as any).rejectUnauthorized = rejectUnauthorized;
+        (proxyReqOpts as Record<string, unknown>).rejectUnauthorized = rejectUnauthorized;
         return proxyReqOpts;
       },
     });
