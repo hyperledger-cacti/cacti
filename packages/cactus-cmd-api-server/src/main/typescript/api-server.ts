@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import type { AddressInfo } from "net";
 import type { Server as SecureServer } from "https";
 import os from "os";
