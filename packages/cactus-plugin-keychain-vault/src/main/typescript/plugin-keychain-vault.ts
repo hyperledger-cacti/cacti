@@ -206,10 +206,6 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     return;
   }
 
-  async rotateEncryptionKeys(): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
   public getEncryptionAlgorithm(): string {
     return "AES256";
   }
