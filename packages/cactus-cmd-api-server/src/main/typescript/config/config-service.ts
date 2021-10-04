@@ -438,7 +438,7 @@ export class ConfigService {
     cactusApiServerOptions?: ICactusApiServerOptions,
   ): { [key: string]: string } {
     cactusApiServerOptions = cactusApiServerOptions || this.newExampleConfig();
-    const configSchema: any = ConfigService.getConfigSchema();
+    const configSchema: SchemaObj = ConfigService.getConfigSchema();
     return Object.entries(cactusApiServerOptions).reduce(
       (acc: any, [key, value]) => {
         const schemaObj: any = configSchema[key];
