@@ -184,10 +184,6 @@ export class PluginKeychainAwsSm
     return `@hyperledger/cactus-plugin-keychain-aws-sm`;
   }
 
-  async rotateEncryptionKeys(): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
   public getEncryptionAlgorithm(): string {
     return (null as unknown) as string;
   }
