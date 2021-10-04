@@ -4,19 +4,21 @@
  *
  * ReplacePath.js
  */
-const fs = require('fs')
+const fs = require("fs");
 
-const targetFile = '../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BLP_config.js';
+const targetFile =
+  "../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BLP_config.js";
 const srcStr = '"../BusinessLogicElectricityTrade"';
-const distStr = '"../../../../../../examples/electricity-trade/BusinessLogicElectricityTrade"';
+const distStr =
+  '"../../../../../../examples/electricity-trade/BusinessLogicElectricityTrade"';
 
-fs.readFile(targetFile, 'utf8', (readErr, data) => {
+fs.readFile(targetFile, "utf8", (readErr, data) => {
   if (readErr) {
     return console.log(readErr);
   }
   const result = data.replace(srcStr, distStr);
 
-  fs.writeFile(targetFile, result, 'utf8', (writeErr) => {
-     if (writeErr) return console.log(writeErr);
+  fs.writeFile(targetFile, result, "utf8", (writeErr) => {
+    if (writeErr) return console.log(writeErr);
   });
 });
