@@ -58,6 +58,7 @@ export interface ICactusApiServerOptions {
   keyPairPem: string;
   keychainSuffixKeyPairPem: string;
   minNodeVersion: string;
+  default: null
 }
 
 export class ConfigService {
@@ -70,7 +71,7 @@ export class ConfigService {
     `========================\n\n`;
 
   public static getHelpText(): string {
-    const schema: any = ConfigService.getConfigSchema();
+    const schema: SchemaObj = ConfigService.getConfigSchema();
 
     const argsHelpText = Object.keys(schema)
       .map(
@@ -396,6 +397,7 @@ export class ConfigService {
         format: "*",
         default: "CACTUS_NODE_KEY_PAIR_PEM",
       },
+      default: null,
     };
   }
 
@@ -580,6 +582,7 @@ export class ConfigService {
       keychainSuffixKeyPairPem: (schema.keychainSuffixKeyPairPem as SchemaObj)
         .default,
       plugins,
+      default: null,
     };
   }
 
