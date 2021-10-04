@@ -37,7 +37,7 @@ export class ContractInfoHolder {
       });
       if (ret === "") {
         logger.warn(
-          "ContractInfo is Not Found : contractName = " + contractName,
+          "ContractInfo is Not Found : contractName = " + contractName
         );
       }
       return ret;

@@ -34,7 +34,7 @@ export class BLPRegistry {
       });
       if (ret === "") {
         logger.warn(
-          "BLPRegistryInfo is Not Found : businessLogicId = " + businessLogicId,
+          "BLPRegistryInfo is Not Found : businessLogicId = " + businessLogicId
         );
       }
       return ret;
