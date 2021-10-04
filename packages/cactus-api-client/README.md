@@ -13,7 +13,7 @@
 ## Summary
 
 The Hyperledger Cactus API Client package is designed to be a generic extension with convenience features wrapped around the
-[**typescript-axios** flavored API clients](https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/typescript-axios.md) that we auto-generate and ship with each web service-enabled
+[**typescript-axios** flavored API clients][(https://github.com/OpenAPITools/openapi-generator/blob/v5.2.1/docs/generators/typescript-axios.md](https://github.com/OpenAPITools/openapi-generator/blob/v5.2.1/docs/generators/typescript-axios.md)) that we auto-generate and ship with each web service-enabled
 plugin such as the API clients of the
 * [**Manual Consortium Plugin** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-consortium-manual/src/main/typescript/generated/openapi/typescript-axios)
 * [**Besu Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-besu/src/main/typescript/generated/openapi/typescript-axios)

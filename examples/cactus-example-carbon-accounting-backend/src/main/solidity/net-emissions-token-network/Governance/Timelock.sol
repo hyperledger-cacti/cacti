@@ -24,7 +24,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-// Original work from Compound: https://github.com/compound-finance/compound-protocol/blob/master/contracts/Timelock.sol
+// Original work from Compound: https://github.com/compound-finance/compound-protocol/blob/9bcff34a5c9c76d51e51bcb0ca1139588362ef96/contracts/Timelock.sol
 // Modified to work in the NetEmissionsTokenNetwork system
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
