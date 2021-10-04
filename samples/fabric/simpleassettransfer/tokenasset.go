@@ -331,12 +331,12 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 	return pledgeJSON, nil
 }
 
-// TODO: GetTokenAssetClaimStatus returns the asset claim status and present time (of invocation).
-/*func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
+// GetTokenAssetClaimStatus returns the asset claim status and present time (of invocation).
+func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
 	// Create blank asset details using app-specific-logic
-	blankAsset := BondAsset{
+	blankAsset := TokenAsset{
 		Type: "",
 		Owner: "",
 		NumUnits: 0,
@@ -357,27 +357,17 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 
 	// Validate returned asset details using app-specific-logic
 
-	// The asset should be recorded if it has been claimed, so we should look that up first
-	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
-	if err != nil {
-		return blankClaimJSON, fmt.Errorf("failed to read asset record from world state: %v", err)
-	}
-	if assetJSON == nil {
-		return blankClaimJSON, nil      // Return blank
-	}
-
-	// Check if this asset is owned by the given recipient
-	var asset BondAsset
-	err = json.Unmarshal(assetJSON, &asset)
+	// The asset type should be recorded, so we should look that up first
+	exists, err := s.TokenAssetTypeExists(ctx, assetType)
 	if err != nil {
 		return blankClaimJSON, err
 	}
-	if asset.Owner != recipientCert {
-		return blankClaimJSON, nil      // Return blank
+	if !exists {
+		return blankClaimJSON, fmt.Errorf("the token asset type %s does not exist", assetType)
 	}
 
 	// Match pledger identity in claim with request parameters
-	var lookupClaimAsset BondAsset
+	var lookupClaimAsset TokenAsset
 	err = json.Unmarshal(claimAssetDetails, &lookupClaimAsset)
 	if err != nil {
 		return blankClaimJSON, err
@@ -386,8 +376,17 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 		return blankClaimJSON, nil      // Return blank
 	}
 
+	// Check if this token type has at least numUnits for this owner
+	balance, err := s.GetBalance(ctx, assetType, recipientCert)
+	if err != nil {
+		return blankClaimJSON, err
+	}
+	if balance < lookupClaimAsset.NumUnits {
+		return blankClaimJSON, fmt.Errorf("the token asset type %s does not have enough balance", assetType)
+	}
+
 	return claimJSON, nil
-}*/
+}
 
 // GetBalance returns the amount of given token asset type owned by an owner.
 func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface, tokenAssetType string, owner string) (uint64, error) {

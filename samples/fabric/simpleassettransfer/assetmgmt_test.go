@@ -149,7 +149,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(4, bondAssetBytes, nil)
 	chaincodeStub.InvokeChaincodeReturnsOnCall(0, shim.Success([]byte(bondContractId)))
 	bondContractId, err = sc.LockAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
-        require.NoError(t, err)
+	require.NoError(t, err)
 	require.NotEmpty(t, bondContractId)
 
 
@@ -168,7 +168,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
 	}
-        tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
+	tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
 	chaincodeStub.GetStateReturnsOnCall(5, tokenAssetTypeBytes, nil)
 	walletMap = make(map[string]uint64)
 	walletMap[tokenType] = numTokens
