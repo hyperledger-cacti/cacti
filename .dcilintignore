@@ -1,2 +1,20 @@
 # Besu CLI argument
 tools/docker/besu-all-in-one/supervisord.conf
+
+# Cannot be edited due to how yarn operates
+.yarn/**
+
+# Cannot be edited due to configuration schema of third party software
+docs/source/conf.py
+
+# Cannot be edited due to configuration schema of third party software
+examples/register-indy-data/req_discounted_cartrade.py
+
+# Cannot be edited due to configuration schema of third party software
+tools/docker/indy-testnet/indy_pool/indy-pool.dockerfile
+
+# Cannot be edited due to configuration schema of third party software
+packages/cactus-test-tooling/src/main/typescript/keycloak/keycloak-container.ts
+
+# Generated code that cannot be modified
+examples/cactus-example-carbon-accounting-backend/src/main/json/generated/build-info/**

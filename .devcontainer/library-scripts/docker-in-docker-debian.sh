@@ -4,7 +4,7 @@
 # Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
 #-------------------------------------------------------------------------------------------------------------
 #
-# Docs: https://github.com/microsoft/vscode-dev-containers/blob/master/script-library/docs/docker-in-docker.md
+# Docs: https://github.com/microsoft/vscode-dev-containers/blob/main/script-library/docs/docker-in-docker.md
 # Maintainer: The VS Code and Codespaces Teams
 #
 # Syntax: ./docker-in-docker-debian.sh [enable non-root docker access flag] [non-root user] [use moby]
@@ -54,7 +54,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Install docker/dockerd dependencies if missing
 if ! dpkg -s apt-transport-https curl ca-certificates lsb-release lxc pigz iptables > /dev/null 2>&1 || ! type gpg > /dev/null 2>&1; then
     apt-get-update-if-needed
-    apt-get -y install --no-install-recommends apt-transport-https curl ca-certificates lsb-release lxc pigz iptables gnupg2 
+    apt-get -y install --no-install-recommends apt-transport-https curl ca-certificates lsb-release lxc pigz iptables gnupg2
 fi
 
 # Swap to legacy iptables for compatibility
@@ -82,7 +82,7 @@ fi
 
 echo "Finished installing docker / moby"
 
-# Install Docker Compose if not already installed 
+# Install Docker Compose if not already installed
 if type docker-compose > /dev/null 2>&1; then
     echo "Docker Compose already installed."
 else
@@ -107,7 +107,7 @@ if [ "${ENABLE_NONROOT_DOCKER}" = "true" ]; then
 fi
 
 tee /usr/local/share/docker-init.sh > /dev/null \
-<< 'EOF' 
+<< 'EOF'
 #!/usr/bin/env bash
 #-------------------------------------------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
@@ -131,7 +131,7 @@ sudoIf find /run /var/run -iname 'container*.pid' -delete || :
 set -e
 
 ## Dind wrapper script from docker team
-# Maintained: https://github.com/moby/moby/blob/master/hack/dind
+# Maintained: https://github.com/moby/moby/blob/v20.10.8/hack/dind
 
 export container=docker
 
@@ -177,7 +177,7 @@ set -e
 
 set +e
 
-# Execute whatever commands were passed in (if any). This allows us 
+# Execute whatever commands were passed in (if any). This allows us
 # to set this script to ENTRYPOINT while still executing the default CMD.
 exec "$@"
 EOF
