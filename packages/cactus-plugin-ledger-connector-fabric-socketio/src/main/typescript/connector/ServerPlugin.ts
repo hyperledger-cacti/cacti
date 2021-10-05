@@ -126,7 +126,7 @@ export class ServerPlugin {
             logger.debug(`##evaluateTransaction(B3), returnvalue: undefined`);
           } else if (returnvalue == "") {
             logger.debug(
-              `##evaluateTransaction(B4), returnvalue: empty string`,
+              `##evaluateTransaction(B4), returnvalue: empty string`
             );
           }
           if (returnvalue != null) {
@@ -271,7 +271,7 @@ export class ServerPlugin {
         channelName,
         transactionProposalReq,
         certPem,
-        privateKeyPem,
+        privateKeyPem
       )
         .then((signedTx) => {
           if (signedTx != null) {
@@ -356,7 +356,7 @@ async function Invoke(reqBody) {
 
     // Submit the specified transaction.
     logger.info(
-      `##fablicaccess: Invoke Params: fcn=${fcn}, args0=${args[0]}, args1=${args[1]}`,
+      `##fablicaccess: Invoke Params: fcn=${fcn}, args0=${args[0]}, args1=${args[1]}`
     );
     const transaction = contract.createTransaction(fcn);
 
@@ -429,7 +429,7 @@ async function InvokeSync(reqBody) {
       // Submit the specified transaction.
       // logger.debug(`##InvokeSync(G)`);
       logger.info(
-        `##fablicaccess: InvokeSync Params: type=${type}, fcn=${fcn}, args0=${args[0]}, args1=${args[1]}, args2=${args[2]}`,
+        `##fablicaccess: InvokeSync Params: type=${type}, fcn=${fcn}, args0=${args[0]}, args1=${args[1]}, args2=${args[2]}`
       );
       // const transaction = contract.createTransaction(fcn);
       let result: any = null;
@@ -472,7 +472,7 @@ async function InvokeSync(reqBody) {
               fcn,
               args[0],
               args[1],
-              args[2],
+              args[2]
             );
           } else {
             logger.debug(`##InvokeSync(G1): call submitTransaction`);
@@ -480,7 +480,7 @@ async function InvokeSync(reqBody) {
               fcn,
               args[0],
               args[1],
-              args[2],
+              args[2]
             );
           }
           break;
@@ -524,7 +524,7 @@ function preventMalleability(sig, curveParams) {
   if (!halfOrder) {
     throw new Error(
       'Can not find the half order needed to calculate "s" value for immalleable signatures. Unsupported curve name: ' +
-        curveParams.name,
+        curveParams.name
     );
   }
 
@@ -587,7 +587,7 @@ async function TLSSetup(client, enrollmentID, secret) {
   const caService = new copService(
     SplugConfig.fabric.ca.url,
     tlsOptions,
-    SplugConfig.fabric.ca.name,
+    SplugConfig.fabric.ca.name
   );
   const req = {
     enrollmentID: enrollmentID,
@@ -597,7 +597,7 @@ async function TLSSetup(client, enrollmentID, secret) {
   const enrollment = await caService.enroll(req);
   client.setTlsClientCertAndKey(
     enrollment.certificate,
-    enrollment.key.toBytes(),
+    enrollment.key.toBytes()
   );
 }
 
@@ -611,7 +611,7 @@ async function setupChannel(channelName) {
   await TLSSetup(
     client,
     SplugConfig.fabric.submitter.name,
-    SplugConfig.fabric.submitter.secret,
+    SplugConfig.fabric.submitter.secret
   );
   const channel = client.newChannel(channelName);
 
@@ -662,7 +662,7 @@ async function InvokeSendSignedTransaction(reqBody) {
       } else {
         logger.debug(`##InvokeSendSignedTransaction: (D)`);
         throw new Error(
-          "Failed to order the transaction. Error code: " + response.status,
+          "Failed to order the transaction. Error code: " + response.status
         );
       }
     } catch (e) {
@@ -683,7 +683,7 @@ async function InvokeSendSignedProposal(
   channelName: string,
   transactionProposalReq: object,
   certPem: string,
-  privateKeyPem: string,
+  privateKeyPem: string
 ) {
   logger.debug(`InvokeSendSignedProposal start`);
 
@@ -698,7 +698,7 @@ async function InvokeSendSignedProposal(
   const { proposal, txId } = channel2.generateUnsignedProposal(
     transactionProposalReq,
     SplugConfig.fabric.mspid,
-    certPem,
+    certPem
   );
   logger.debug("proposal end");
   logger.debug(`##InvokeSendSignedProposal; txId: ${txId.getTransactionID()}`);
@@ -711,7 +711,7 @@ async function InvokeSendSignedProposal(
   }
   const sendSignedProposalReq = { signedProposal, targets };
   const proposalResponses = await channel2.sendSignedProposal(
-    sendSignedProposalReq,
+    sendSignedProposalReq
   );
   logger.debug("##InvokeSendSignedProposal: successfully send signedProposal");
   let allGood = true;
@@ -756,13 +756,13 @@ async function InvokeSendSignedProposal(
   };
   const commitProposal = channel2.generateUnsignedTransaction(commitReq);
   logger.debug(
-    `##InvokeSendSignedProposal: Successfully build commit transaction proposal`,
+    `##InvokeSendSignedProposal: Successfully build commit transaction proposal`
   );
 
   // sign this commit proposal at local
   const signedCommitProposal = signProposal(
     commitProposal.toBuffer(),
-    privateKeyPem,
+    privateKeyPem
   );
 
   const signedTx = {
