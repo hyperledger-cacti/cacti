@@ -19,13 +19,10 @@
     "codegen:proto": "run-s proto:openapi proto:protoc-gen-ts",
     "codegen": "run-p 'codegen:*'",
     "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev webpack:prod",
+    "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:prod": "npm-run-all webpack:prod:node webpack:prod:web",
-    "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js",
-    "webpack:prod:node": "echo 'SKIPPING script webpack:prod:node for @hyperledger/cactus-cmd-api-server' the dev bundle will be used as fallback until npm can be processed by the Webpack Terser."
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js"
   },
   "watch": {
     "codegen:openapi": {
