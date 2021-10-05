@@ -137,7 +137,6 @@
                 "type": "object",
                 "required": [
                     "name",
-                    "description",
                     "version",
                     "organizations",
                     "peers"
