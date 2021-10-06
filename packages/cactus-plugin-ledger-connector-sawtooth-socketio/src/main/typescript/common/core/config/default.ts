@@ -17,7 +17,7 @@ export const config = {
   blockMonitor: {
     request: {
       method: "GET",
-      host: "http://localhost:8008/",
+      host: "http://rest-api:8008/",
       getLatestBlockNumberCommand: "blocks?limit=1",
       periodicMonitoringCommand1: "blocks?start=",
       periodicMonitoringCommand2: "&reverse",
