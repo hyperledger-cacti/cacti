@@ -5,6 +5,7 @@ import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.contract.AssetContract
 import javassist.NotFoundException
 import net.corda.core.contracts.Command
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.identity.Party
 import net.corda.core.contracts.StaticPointer
 import net.corda.core.contracts.UniqueIdentifier
@@ -384,6 +385,35 @@ object AssetFlow {
             val session = listOf<FlowSession>()
             // Notarise and record the transaction in the party's vault.
             return subFlow(FinalityFlow(signedTx, session, FINALISING_TRANSACTION.childProgressTracker()))
+        }
+    }
+
+    /**
+     * The RetrieveStateAndRef flow is used to retrieve an [AssetState] from the vault based on the tokenType and quantity.
+     *
+     * @property tokenType the filter for the [AssetState] list to be retrieved.
+     * @property quantity the number of fungible token assets to be part of the [AssetState] to be issued.
+     */
+    @InitiatingFlow
+    @StartableByRPC
+    class RetrieveStateAndRef(private val tokenType: String, private val quantity: Int) : FlowLogic<StateAndRef<AssetState>?>() {
+
+        override fun call(): StateAndRef<AssetState>? {
+
+            val states = serviceHub.vaultService.queryBy<AssetState>().states
+                .filter { it.state.data.tokenType == tokenType }
+                .filter { it.state.data.quantity == quantity }
+
+            var fetchedState: StateAndRef<AssetState>? = null
+
+            if (states.isNotEmpty()) {
+                fetchedState = states.first()
+                println("Retrieved state with tokenType $tokenType: $fetchedState\n")
+            } else {
+                println("No state found with tokenType $tokenType\n")
+            }
+
+            return fetchedState
         }
     }
 

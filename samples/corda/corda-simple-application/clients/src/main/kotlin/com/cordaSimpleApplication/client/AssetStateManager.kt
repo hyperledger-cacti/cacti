@@ -191,6 +191,37 @@ class MergeAssetStatesCommand : CliktCommand(help = "Invokes the MergeAssetState
 }
 
 /**
+ * The CLI command used to trigger a RetrieveStateAndRef flow.
+ *
+ * @property tokenType The token type of [AssetState] to be retrieved.
+ * @property quantity The number of fungible tokens in [AssetState] to be retrieved.
+ */
+class RetrieveAssetStateAndRefCommand : CliktCommand(help = "Invokes the RetrieveStateAndRef flow. Requires tokenType and quantity") {
+    val tokenType: String by argument()
+    val quantity: String by argument()
+    val config by requireObject<Map<String, String>>()
+    override fun run() {
+        println("RetrieveStateAndRef flow with tokenType $tokenType and $quantity")
+        val rpc = NodeRPCConnection(
+            host = config["CORDA_HOST"]!!,
+            username = "clientUser1",
+            password = "test",
+            rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val proxy = rpc.proxy
+            val stateAndRef = proxy.startFlow(com.cordaSimpleApplication.flow.AssetFlow::RetrieveStateAndRef, tokenType, quantity.toInt())
+                .returnValue.get()
+            println(stateAndRef.toString())
+        } catch (e: Exception) {
+            println(e.toString())
+        } finally {
+            rpc.close()
+        }
+    }
+}
+
+
+/**
  * The CLI command used to trigger a DeleteAssetState flow.
  *
  * @property linearId The filter for the [AssetState] to be split.

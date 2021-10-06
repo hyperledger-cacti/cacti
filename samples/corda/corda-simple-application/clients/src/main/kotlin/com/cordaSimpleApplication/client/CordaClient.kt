@@ -59,6 +59,7 @@ fun main(args: Array<String>) = App()
                 GetAssetStatesByTypeCommand(),
                 IssueAssetStateFromStateRefCommand(),
                 MergeAssetStatesCommand(),
+                RetrieveAssetStateAndRefCommand(),
                 SplitAssetStateCommand(),
                 TransferAssetStateCommand(),
                 CreateVerificationPolicyCommand(),
