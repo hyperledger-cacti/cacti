@@ -326,6 +326,10 @@ export class ApiServer {
 
     const instanceId = pluginImport.options.instanceId;
     const pluginPackageDir = path.join(this.pluginsPath, instanceId);
+    // version of the npm package
+    const pluginVersion = pluginImport.options.version
+      ? "@".concat(pluginImport.options.version)
+      : "";
     try {
       await fs.mkdirp(pluginPackageDir);
       this.log.debug(`${pkgName} plugin package dir: %o`, pluginPackageDir);
@@ -341,7 +345,7 @@ export class ApiServer {
       lmify.setRootDir(pluginPackageDir);
       this.log.debug(`Installing ${pkgName} for plugin import`, pluginImport);
       const out = await lmify.install([
-        pkgName,
+        pkgName.concat(pluginVersion), // empty if no version was specified
         "--production",
         "--audit=false",
         "--progress=false",
