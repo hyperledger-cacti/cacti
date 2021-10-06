@@ -109,7 +109,7 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
     if (result) {
       return [result];
     } else {
-      throw new Error(`${request.name?.split("?")[1] || ""} secret not found.`);
+      throw new Error(`${request.name || ""} secret not found.`);
     }
   }
 }
