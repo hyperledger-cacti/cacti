@@ -12,7 +12,7 @@ export interface BusinessLogicPlugin {
   startTransaction(
     req: Request,
     businessLogicID: string,
-    tradeID: string,
+    tradeID: string
   ): void;
   getOperationStatus(tradeID: string): object;
   setConfig(data: []): object;
@@ -20,7 +20,7 @@ export interface BusinessLogicPlugin {
   getEventDataNum(ledgerEvent: LedgerEvent): number;
   getTxIDFromEvent(
     ledgerEvent: LedgerEvent,
-    targetIndex: number,
+    targetIndex: number
   ): string | null;
   hasTxIDInTransactions(txID: string): boolean;
 }
