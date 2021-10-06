@@ -98,11 +98,35 @@ enum Web3SigningCredentialType {
 }
 ```
 
+### Transaction Privacy Feature
+Private transactions using Besu are currently enabled.
+
+The privateFor and privateFrom fields must be populated, more information about Besu Private Transactions [here](https://besu.hyperledger.org/en/stable/Concepts/Privacy/Private-Transactions/).
+
+Call example to deploy a private contract:
+```typescript
+  const deployOut = await connector1.deployContract({
+    bytecode: SmartContract.bytecode,
+    contractAbi: SmartContract.abi,
+    contractName: SmartContract.contractName,
+    constructorArgs: [],
+    privateTransactionConfig: {
+      privateFrom: SendingTesseraPublicKey,
+      privateFor: [
+        Member1TesseraPrivateKey,
+        Member2TesseraPrivateKey,
+      ],
+    },
+    web3SigningCredential: {
+      secret:SendingBesuPrivateKey,
+      type: Web3SigningCredentialType.PrivateKeyHex,
+    },
+    gas: 3000000
+  });
+```
+
 > Extensive documentation and examples in the [readthedocs](https://readthedocs.org/projects/hyperledger-cactus/) (WIP) 
 
-
-## Transaction Privacy Feature
-Private transactions using Besu are currently enabled.
 
 ### Building/running the container image locally
 
