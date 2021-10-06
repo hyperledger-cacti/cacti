@@ -8,7 +8,7 @@
 import { BusinessLogicPlugin } from "./BusinessLogicPlugin";
 
 export function getTargetBLPInstance(
-  businessLogicID: string,
+  businessLogicID: string
 ): BusinessLogicPlugin | null {
   return null;
 }
