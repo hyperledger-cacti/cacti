@@ -15,6 +15,7 @@
 - [Prometheus Exporter](#prometheus-exporter)
   - [Usage Prometheus](#usage-prometheus)
   - [Prometheus Integration](#prometheus-integration)
+  - [Shutdown Hook](#shutdown-hook)
   - [Helper code](#helper-code)
         - [response.type.ts](#responsetypets)
         - [data-fetcher.ts](#data-fetcherts)
@@ -383,6 +384,18 @@ Here the `host:port` is where the prometheus exporter metrics are exposed. The t
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
 On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus_api_server_total_plugin_imports** and click **execute**
+
+### Shutdown Hook
+
+The API config contains a flag:
+```json
+    {
+      "enableShutdownHook": true
+    }
+```
+This allows for graceful shutdown of the API server after a SIGINT via cli CTRL + C. This hook can be disabled by passing in false either via the TypeScript constructor or the JSON config file.
+
+
 
 ### Helper code
 

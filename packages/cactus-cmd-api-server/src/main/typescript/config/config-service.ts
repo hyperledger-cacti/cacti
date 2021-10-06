@@ -58,6 +58,7 @@ export interface ICactusApiServerOptions {
   keyPairPem: string;
   keychainSuffixKeyPairPem: string;
   minNodeVersion: string;
+  enableShutdownHook: boolean;
 }
 
 export class ConfigService {
@@ -396,6 +397,16 @@ export class ConfigService {
         format: "*",
         default: "CACTUS_NODE_KEY_PAIR_PEM",
       },
+      enableShutdownHook: {
+        doc:
+          "It will cause the API server to listen to OS process signals and will attempt " +
+          "to gracefully shut itself down in response to these when the flag is enabled " +
+          "(which is the default behavior). You will want to turn this off if you are embedding " +
+          "the API server in your own application and would like to stop the API server from " +
+          "meddling in the OS process signal handling when you take care of it yourself in your own code.",
+        format: Boolean,
+        default: true,
+      },
     };
   }
 
@@ -465,6 +476,7 @@ export class ConfigService {
     const apiBaseUrl = `${apiProtocol}//${apiHost}:${apiPort}`;
     const grpcPort = (schema.grpcPort as SchemaObj).default;
     const grpcMtlsEnabled = (schema.grpcMtlsEnabled as SchemaObj).default;
+    const enableShutdownHook = (schema.enableShutdownHook as SchemaObj).default;
 
     const keyPair = JWK.generateSync("EC", "secp256k1", { use: "sig" }, true);
     const keyPairPem = keyPair.toPEM(true);
@@ -580,6 +592,7 @@ export class ConfigService {
       keychainSuffixKeyPairPem: (schema.keychainSuffixKeyPairPem as SchemaObj)
         .default,
       plugins,
+      enableShutdownHook,
     };
   }
 

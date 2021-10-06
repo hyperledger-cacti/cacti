@@ -1,5 +1,6 @@
 import type { AddressInfo } from "net";
 import type { Server as SecureServer } from "https";
+import exitHook from "async-exit-hook";
 import os from "os";
 import path from "path";
 import tls from "tls";
@@ -37,7 +38,12 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
-import { Logger, LoggerProvider, Servers } from "@hyperledger/cactus-common";
+import {
+  Bools,
+  Logger,
+  LoggerProvider,
+  Servers,
+} from "@hyperledger/cactus-common";
 
 import { ICactusApiServerOptions } from "./config/config-service";
 import OAS from "../json/openapi.json";
@@ -61,6 +67,7 @@ export interface IApiServerConstructorOptions {
   readonly httpServerCockpit?: Server | SecureServer;
   readonly config: ICactusApiServerOptions;
   readonly prometheusExporter?: PrometheusExporter;
+  readonly enableShutdownHook?: boolean;
 }
 
 export class ApiServer {
@@ -85,6 +92,8 @@ export class ApiServer {
   private readonly expressApi: Application;
   private readonly expressCockpit: Application;
   private readonly pluginsPath: string;
+  private readonly enableShutdownHook: boolean;
+
   public prometheusExporter: PrometheusExporter;
 
   public get className(): string {
@@ -97,6 +106,14 @@ export class ApiServer {
     }
     if (!options.config) {
       throw new Error(`ApiServer#ctor options.config was falsy`);
+    }
+
+    this.enableShutdownHook = Bools.isBooleanStrict(options.enableShutdownHook)
+      ? (options.enableShutdownHook as boolean)
+      : true;
+
+    if (this.enableShutdownHook) {
+      exitHook(() => this.shutdown());
     }
 
     LoggerProvider.setLogLevel(options.config.logLevel);

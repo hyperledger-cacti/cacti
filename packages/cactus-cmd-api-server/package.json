@@ -85,6 +85,7 @@
     "convict": "6.0.0",
     "convict-format-with-validator": "6.2.0",
     "cors": "2.8.5",
+    "async-exit-hook": "2.0.1",
     "express": "4.17.1",
     "express-http-proxy": "1.6.2",
     "express-jwt": "6.0.0",
