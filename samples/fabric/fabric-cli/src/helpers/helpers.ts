@@ -131,7 +131,9 @@ const pledgeAsset = async ({
   contractName,
   ccFunc,
   ccType,
+  assetOwner,
   assetRef,
+  assetUnits,
   logger
 }: {
   dataFilePath: string
@@ -146,14 +148,26 @@ const pledgeAsset = async ({
   contractName?: string
   ccFunc?: string
   ccType: string
+  assetOwner: string
   assetRef: string
+  assetUnits: number
   logger?: any
 }): Promise<any> => {
   const filepath = path.resolve(dataFilePath)
   const data = JSON.parse(fs.readFileSync(filepath).toString())
-  const item = data[assetRef]
-  if (!item) {
-    throw new Error(`Cannot find asset ref ${assetRef} in file ${filepath}`)
+  let item
+  if (assetRef) {
+    item = data[assetRef]
+    if (!item) {
+      throw new Error(`Cannot find asset ref ${assetRef} in file ${filepath}`)
+    }
+  } else if (assetOwner) {
+    item = data[assetOwner]
+    if (!item) {
+      throw new Error(`Cannot find asset owner ${assetOwner} in file ${filepath}`)
+    }
+  } else {
+    throw new Error(`Neither asset owner nor reference is supplied`)
   }
   const currentQuery = query
     ? query
@@ -182,6 +196,9 @@ const pledgeAsset = async ({
   if (ccType == 'bond') {
     currentQuery.ccFunc = 'PledgeAsset'
     currentQuery.args = [...currentQuery.args, item['assetType'], item['id'], destNetworkName, recipientCert, expirationTime]
+  } else if (ccType == 'token') {
+    currentQuery.ccFunc = 'PledgeTokenAsset'
+    currentQuery.args = [...currentQuery.args, item['tokenassettype'], '' + assetUnits, destNetworkName, recipientCert, expirationTime]
   } else {
     throw new Error(`Unrecognized/unsupported asset category: ${ccType}`)
   }
@@ -546,9 +563,14 @@ const generateViewAddress = async (
   if (viewAddress.indexOf('#') >= 0) {
     return viewAddress
   }
-  if (viewAddress.indexOf('GetAssetClaimStatus') >= 0) {
+  if (viewAddress.indexOf('GetAssetClaimStatus') >= 0 || viewAddress.indexOf('GetTokenAssetClaimStatus') >= 0) {
     // Get asset pledge details
-    const ccFunc = 'GetAssetClaimStatus'
+    let ccFunc
+    if (viewAddress.indexOf('GetAssetClaimStatus') >= 0) {
+      ccFunc = 'GetAssetClaimStatus'
+    } else {
+      ccFunc = 'GetTokenAssetClaimStatus'
+    }
     const addressParts = viewAddress.substring(viewAddress.indexOf(ccFunc) + ccFunc.length + 1).split(':')
     if (addressParts.length != 5) {
       throw new Error(`Expected 5 arguments for ${ccFunc}; found ${addressParts.length}`)

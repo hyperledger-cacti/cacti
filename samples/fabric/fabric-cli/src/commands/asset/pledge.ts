@@ -28,8 +28,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli configure asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assets.json',
-        'fabric-cli configure asset pledge --source-network=<source-network-name> --dest-network=<dest-network-name> --recipient=<recipient-id> --expiry-secs=<expiry-in-seconds> --type=<bond|token> --ref=<asset-id> --data-file=<path-to-data-file>>',
+        'fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assets.json\r\nfabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=token --owner=alice --units=50 --data-file=src/data/assets.json',
+        'fabric-cli asset pledge --source-network=<source-network-name> --dest-network=<dest-network-name> --recipient=<recipient-id> --expiry-secs=<expiry-in-seconds> --type=<bond|token> [--owner=<owner-id>] [--ref=<asset-id>] [--units=<number-of-units>] --data-file=<path-to-data-file>>',
         [
           {
             name: '--debug',
@@ -62,9 +62,19 @@ const command: GluegunCommand = {
               'Type of network <bond|token>'
           },
           {
+            name: '--owner',
+            description:
+              'Asset owner ID used as key in the asset data file'
+          },
+          {
             name: '--ref',
             description:
               'Asset ID used as key in the asset data file'
+          },
+          {
+            name: '--units',
+            description:
+              'Number of units of fungible asset'
           },
           {
             name: '--data-file',
@@ -73,7 +83,7 @@ const command: GluegunCommand = {
           }
         ],
         command,
-        ['configure', 'asset', 'pledge']
+        ['asset', 'pledge']
       )
       return
     }
@@ -107,9 +117,24 @@ const command: GluegunCommand = {
       print.error('--type of network needs to be specified')
       return
     }
-    if (!options['ref'])
+    if (options['type'] === 'bond' && !options['ref'])
     {
-      print.error('--ref needs to be specified')
+      print.error('--ref needs to be specified for "bond" type')
+      return
+    }
+    if (options['type'] === 'token' && !options['owner'])
+    {
+      print.error('--owner needs to be specified for "token" type')
+      return
+    }
+    if (options['type'] === 'token' && !options['units'])
+    {
+      print.error('--units needs to be specified for "token" type')
+      return
+    }
+    if (options['units'] && isNaN(options['units']))
+    {
+      print.error('--units must be an integer')
       return
     }
     if (!options['data-file'])
@@ -127,7 +152,7 @@ const command: GluegunCommand = {
       return
     }
 
-    await pledgeAsset({
+    const pledgeResult = await pledgeAsset({
       dataFilePath: options['data-file'],
       sourceNetworkName: options['source-network'],
       destNetworkName: options['dest-network'],
@@ -138,9 +163,14 @@ const command: GluegunCommand = {
       channelName: netConfig.channelName,
       contractName: netConfig.chaincode,
       ccType: options['type'],
+      assetOwner: options['owner'],
       assetRef: options['ref'],
+      assetUnits: parseInt(options['units']),
       logger: logger
     })
+    if (pledgeResult) {
+      console.log('Asset pledged with ID', pledgeResult)
+    }
   }
 }
 

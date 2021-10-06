@@ -9,6 +9,8 @@
 package utils
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,7 +22,6 @@ import (
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange"
 )
 
 
@@ -141,9 +142,18 @@ func getAssetClaimKey(assetType string, assetId string) string {
 	return "Claimed_" + assetType + assetId
 }
 
+// function to generate a "SHA256" hash in hex format for a given preimage
+func generateSHA256HashInHexForm(preimage string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(preimage))
+	shaHash := hasher.Sum(nil)
+	shaHashHex := hex.EncodeToString(shaHash)
+	return shaHashHex
+}
+
 func generateAssetPledgeContractId(ctx contractapi.TransactionContextInterface, assetType string, numUnits uint64, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) string {
 	preimage := assetType + strconv.Itoa(int(numUnits)) + owner + remoteNetworkId + recipientCert + strconv.Itoa(int(expiryTimeSecs)) + ctx.GetStub().GetTxID()
-	contractId := assetexchange.GenerateSHA256HashInBase64Form(preimage)
+	contractId := generateSHA256HashInHexForm(preimage)
 	return contractId
 }
 
@@ -200,13 +210,17 @@ func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, 
 		return "", err
 	}
 
-	return assetId, ctx.GetStub().PutState(pledgeKey, pledgeJSON)
+	err = ctx.GetStub().PutState(pledgeKey, pledgeJSON)
+	if err != nil {
+		return "", err
+	}
+	return assetId, nil
 }
 
 // ClaimRemoteAsset gets ownership of an asset transferred from a different ledger/network.
 func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, assetType, id, owner, remoteNetworkId, pledgeJSON, claimer string) ([]byte, error) {
 	var pledge AssetPledge
-    err := json.Unmarshal([]byte(pledgeJSON), &pledge)
+	err := json.Unmarshal([]byte(pledgeJSON), &pledge)
 	if err != nil {
 		return nil, err
 	}

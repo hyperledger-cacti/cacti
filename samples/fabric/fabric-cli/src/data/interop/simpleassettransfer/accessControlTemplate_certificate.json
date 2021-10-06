@@ -12,6 +12,18 @@
       "principalType": "certificate",
       "resource": "mychannel:simpleassettransfer:GetAssetClaimStatus:*",
       "read": true
+    },
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:simpleassettransfer:GetTokenAssetPledgeStatus:*",
+      "read": true
+    },
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:simpleassettransfer:GetTokenAssetClaimStatus:*",
+      "read": true
     }
   ]
 }

@@ -212,7 +212,7 @@ func (s *SmartContract) PledgeTokenAsset(ctx contractapi.TransactionContextInter
 	asset := TokenAsset{
 		Type: assetType,
 		Owner: owner,
-        NumUnits: numUnits,
+		NumUnits: numUnits,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
@@ -220,7 +220,7 @@ func (s *SmartContract) PledgeTokenAsset(ctx contractapi.TransactionContextInter
 	}
 
 	// Pledge the asset using common (library) logic
-    if contractId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, "", numUnits, owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
+	if contractId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, "", numUnits, owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
 		// Deduce asset balance using app-specific logic
 		return contractId, s.DeleteTokenAssets(ctx, assetType, numUnits)
 	} else {
@@ -276,7 +276,7 @@ func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInte
 	}
 
 	// Validate reclaimed asset details using app-specific-logic
-	var claimAsset TokenAsset
+	var claimAsset, pledgeAsset TokenAsset
 	err = json.Unmarshal(claimAssetDetails, &claimAsset)
 	if err != nil {
 		return err
@@ -291,7 +291,11 @@ func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInte
 	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic
-	return s.IssueTokenAssets(ctx, assetType, claimAsset.NumUnits, claimAsset.Owner)
+	err = json.Unmarshal(pledgeAssetDetails, &pledgeAsset)
+	if err != nil {
+		return err
+	}
+	return s.IssueTokenAssets(ctx, assetType, pledgeAsset.NumUnits, pledgeAsset.Owner)
 }
 
 // GetTokenAssetPledgeStatus returns the asset pledge status.

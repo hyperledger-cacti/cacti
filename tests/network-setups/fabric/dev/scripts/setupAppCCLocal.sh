@@ -23,7 +23,7 @@ then
     rm go.sum
     go mod tidy
     cd ../..
-    cd ${CHAINCODE_PATH}/${CC_NAME}/interfaces/asset-mgmt
+    cd interfaces/asset-mgmt
     mv go.mod.local go.mod
     rm go.sum
     go mod tidy

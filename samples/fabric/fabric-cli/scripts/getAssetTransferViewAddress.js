@@ -9,7 +9,7 @@ function getECertBase64(networkId, userId) {
     return Buffer.from(userIdJSON.credentials.certificate).toString('base64');
 }
 
-function getClaimViewAddress(sourceNetwork, pledger, destNetwork, recipient, assetType, assetId) {
+function getClaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwork, recipient, assetType, assetId) {
     let address = 'localhost:';
 
     if (sourceNetwork === 'network1') {
@@ -20,7 +20,16 @@ function getClaimViewAddress(sourceNetwork, pledger, destNetwork, recipient, ass
         console.log('Unrecognized source network:', sourceNetwork);
         process.exit(1);
     }
-    address = address + 'mychannel:simpleassettransfer:GetAssetPledgeStatus:' + assetType + ':' + assetId + ':';
+    address = address + 'mychannel:simpleassettransfer:';
+    if (assetCategory === 'bond') {
+        address = address + 'GetAssetPledgeStatus';
+    } else if (assetCategory === 'token') {
+        address = address + 'GetTokenAssetPledgeStatus';
+    } else {
+        console.log('Unecognized asset category:', assetCategory);
+        process.exit(1);
+    }
+    address = address + ':' + assetType + ':' + assetId + ':';
     const pledgerCert = getECertBase64(sourceNetwork, pledger);
     address = address + pledgerCert + ':' + destNetwork + ':';
     const recipientCert = getECertBase64(destNetwork, recipient);
@@ -29,7 +38,7 @@ function getClaimViewAddress(sourceNetwork, pledger, destNetwork, recipient, ass
     return address;
 }
 
-function getReclaimViewAddress(sourceNetwork, pledger, destNetwork, recipient, assetType, assetId) {
+function getReclaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwork, recipient, assetType, assetId) {
     let address = 'localhost:';
 
     if (destNetwork === 'network1') {
@@ -40,7 +49,16 @@ function getReclaimViewAddress(sourceNetwork, pledger, destNetwork, recipient, a
         console.log('Unrecognized destination network:', destNetwork);
         process.exit(1);
     }
-    address = address + 'mychannel:simpleassettransfer:GetAssetClaimStatus:' + assetType + ':' + assetId + ':';
+    address = address + 'mychannel:simpleassettransfer:';
+    if (assetCategory === 'bond') {
+        address = address + 'GetAssetClaimStatus';
+    } else if (assetCategory === 'token') {
+        address = address + 'GetTokenAssetClaimStatus';
+    } else {
+        console.log('Unecognized asset category:', assetCategory);
+        process.exit(1);
+    }
+    address = address + ':' + assetType + ':' + assetId + ':';
     const recipientCert = getECertBase64(destNetwork, recipient);
     address = address + recipientCert + ':';
     const pledgerCert = getECertBase64(sourceNetwork, pledger);
@@ -49,16 +67,16 @@ function getReclaimViewAddress(sourceNetwork, pledger, destNetwork, recipient, a
     return address;
 }
 
-if (process.argv.length != 5 && process.argv.length != 9) {
-    console.log('Usage: node getAssetTransferViewAddress.js claim|reclaim <source-network-id> <pledger-id> <dest-network-id> <recipient-id> <asset-type> <asset-id>');
+if (process.argv.length != 5 && process.argv.length != 10) {
+    console.log('Usage: node getAssetTransferViewAddress.js claim|reclaim bond|token <source-network-id> <pledger-id> <dest-network-id> <recipient-id> <asset-type> <asset-id>');
     console.log('Usage: node getAssetTransferViewAddress.js getusercert <network-id> <user-id>');
     process.exit(1);
 }
 
 if (process.argv[2] === 'claim') {
-    console.log(getClaimViewAddress(process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8]));
+    console.log(getClaimViewAddress(process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8], process.argv[9]));
 } else if (process.argv[2] === 'reclaim') {
-    console.log(getReclaimViewAddress(process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8]));
+    console.log(getReclaimViewAddress(process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8], process.argv[9]));
 } else if (process.argv[2] === 'getusercert') {
     console.log(getECertBase64(process.argv[3], process.argv[4]));
 } else {

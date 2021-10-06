@@ -1,12 +1,12 @@
 package main
 
 import (
-  "fmt"
-  "os"
+	"fmt"
+	"os"
 
-  "github.com/hyperledger/fabric-chaincode-go/shim"
-  "github.com/hyperledger/fabric-contract-api-go/contractapi"
-  am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
+	"github.com/hyperledger/fabric-chaincode-go/shim"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
 )
 
 // SmartContract provides functions for managing an BondAsset and TokenAsset
@@ -16,17 +16,16 @@ type SmartContract struct {
 }
 
 func (s *SmartContract) ConfigureInterop(interopChaincodeId string) {
-  s.amc.Configure(interopChaincodeId)
+	s.amc.Configure(interopChaincodeId)
 }
 
-func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface, ccType string, interopChaincodeId string, localNetworkId string) error {
-  s.ConfigureInterop(interopChaincodeId)
-  if ccType == "Bond" {
-    return s.InitBondAssetLedger(ctx, localNetworkId)
-  } else if ccType == "Token" {
-    return s.InitTokenAssetLedger(ctx)
-  }
-  return fmt.Errorf("only Bond and Token are accepted as ccType.")
+func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface, interopChaincodeId string, localNetworkId string) error {
+	s.ConfigureInterop(interopChaincodeId)
+	var err error
+	if err = s.InitBondAssetLedger(ctx, localNetworkId); err != nil {
+		return err
+	}
+	return s.InitTokenAssetLedger(ctx)
 }
 
 func main() {
