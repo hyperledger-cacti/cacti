@@ -5,16 +5,13 @@
  * ResultTransactionStatusData.ts
  */
 
-import { TransactionStatus } from './TransactionStatus';
+import { TransactionStatus } from "./TransactionStatus";
 
 export class ResultTransactionStatusData {
+  constructor() {
+    this.transactionStatus = [];
+  }
 
-    constructor() {
-        this.transactionStatus = new Array();
-    }
-
-    stateInfo: number;
-    transactionStatus: TransactionStatus[];
-
+  stateInfo: number;
+  transactionStatus: TransactionStatus[];
 }
-
