@@ -3,7 +3,7 @@
 /*
  * Copyright 2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * www.js
  */
 
@@ -15,23 +15,23 @@
  * Module dependencies.
  */
 
-import app from '../app';
-const debug = require('debug')('connector:server');
-import https = require('https');
-import { config } from '../config/default';
-import fs = require('fs');
+import app from "../app";
+const debug = require("debug")("connector:server");
+import https = require("https");
+import { config } from "../config/default";
+import fs = require("fs");
 
 // Log settings
 import { getLogger } from "log4js";
-const logger = getLogger('connector_main[' + process.pid + ']');
+const logger = getLogger("connector_main[" + process.pid + "]");
 logger.level = config.logLevel;
 
 // implementation class of a part dependent of end-chains (server plugin)
-import { ServerPlugin } from '../../../connector/ServerPlugin';
+import { ServerPlugin } from "../../../connector/ServerPlugin";
 //const Splug = new ServerPlugin();
 
 // destination dependency (MONITOR) implementation class
-import { ServerMonitorPlugin } from '../../../connector/ServerMonitorPlugin';
+import { ServerMonitorPlugin } from "../../../connector/ServerMonitorPlugin";
 const Smonitor = new ServerMonitorPlugin();
 
 /**
@@ -39,30 +39,30 @@ const Smonitor = new ServerMonitorPlugin();
  */
 
 const sslport = normalizePort(process.env.PORT || config.sslParam.port);
-app.set('port', sslport);
+app.set("port", sslport);
 
 // Specify private key and certificate
 const sslParam = {
-    key: fs.readFileSync(config.sslParam.key),
-    cert: fs.readFileSync(config.sslParam.cert)
+  key: fs.readFileSync(config.sslParam.key),
+  cert: fs.readFileSync(config.sslParam.cert),
 };
 
 /**
  * Create HTTPS server.
  */
 
-const server = https.createServer(sslParam, app);   // Start as an https server.
-const io = require('socket.io')(server);
+const server = https.createServer(sslParam, app); // Start as an https server.
+const io = require("socket.io")(server);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(sslport, function(){
-    console.log('listening on *:' + sslport);
+server.listen(sslport, function () {
+  console.log("listening on *:" + sslport);
 });
-server.on('error', onError);
-server.on('listening', onListening);
+server.on("error", onError);
+server.on("listening", onListening);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -89,22 +89,21 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  const bind = typeof sslport === 'string'
-    ? 'Pipe ' + sslport
-    : 'Port ' + sslport;
+  const bind =
+    typeof sslport === "string" ? "Pipe " + sslport : "Port " + sslport;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -118,24 +117,22 @@ function onError(error) {
 
 function onListening() {
   const addr = server.address();
-  const bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
 }
 
-io.on('connection', function(client) {
-    logger.info('Client ' + client.id + ' connected.');
+io.on("connection", function (client) {
+  logger.info("Client " + client.id + " connected.");
 
-    /**
-     * request: The server plugin's request to execute a function
-     * @param {JSON} data: Request Body (following format)
-     * JSON: {
-     *          "func":        (string) Function name ,// For example : "transferNumericAsset"
-     *          "args":        (Object) argument// for example , {"from" : "xxx" , "to" : "yyy" , "value" : "10,000"}
-     *       }
-    **/
-/*
+  /**
+   * request: The server plugin's request to execute a function
+   * @param {JSON} data: Request Body (following format)
+   * JSON: {
+   *          "func":        (string) Function name ,// For example : "transferNumericAsset"
+   *          "args":        (Object) argument// for example , {"from" : "xxx" , "to" : "yyy" , "value" : "10,000"}
+   *       }
+   **/
+  /*
     client.on('request', function(data) {
         const func = data.func;
         const args = data.args;
@@ -235,29 +232,29 @@ io.on('connection', function(client) {
     });
 */
 
-    /**
-     * startMonitor: starting block generation event monitoring
-    **/
-    client.on('startMonitor', function(data) {
-        // Callback to receive monitoring results
-        const cb = function(callbackData) {
-            let emitType = "";
-            if(callbackData.status == 200) {
-                emitType = "eventReceived";
-                logger.info('event data callbacked.');
-            } else {
-                emitType = "monitor_error";
-            }
-            client.emit(emitType, callbackData);
-        };
+  /**
+   * startMonitor: starting block generation event monitoring
+   **/
+  client.on("startMonitor", function (data) {
+    // Callback to receive monitoring results
+    const cb = function (callbackData) {
+      let emitType = "";
+      if (callbackData.status == 200) {
+        emitType = "eventReceived";
+        logger.info("event data callbacked.");
+      } else {
+        emitType = "monitor_error";
+      }
+      client.emit(emitType, callbackData);
+    };
 
-        Smonitor.startMonitor(client.id, data.filterKey, cb);
-    });
+    Smonitor.startMonitor(client.id, data.filterKey, cb);
+  });
 
-    /**
-     * stopMonitor: block generation events monitoring stopping
-    **/
-/*
+  /**
+   * stopMonitor: block generation events monitoring stopping
+   **/
+  /*
     // I think it is more common to stop from the disconnect described later, but I will prepare for it.
     client.on('stopMonitor', function(reason) {
         Smonitor.stopMonitor(client.id);
@@ -271,6 +268,4 @@ io.on('connection', function(client) {
         Smonitor.stopMonitor(client.id);
     });
 */
-
 });
-

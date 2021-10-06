@@ -6,10 +6,8 @@
  */
 
 export class TransactionStatus {
-
-    state: string;
-    ledger: string;
-    txID: string;
-    txInfo: string; // JSON string
-
+  state: string;
+  ledger: string;
+  txID: string;
+  txInfo: string; // JSON string
 }
