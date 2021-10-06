@@ -17,6 +17,10 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
+import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1";
+import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-endpoint-v1";
+import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1";
+import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1";
 
 export interface IPluginKeychainGoogleSmOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -71,8 +75,25 @@ export class PluginKeychainGoogleSm
     if (Array.isArray(this.endpoints)) {
       return this.endpoints;
     }
-    const endpoints: IWebServiceEndpoint[] = [];
-
+    //const endpoints: IWebServiceEndpoint[] = [];
+    const endpoints: IWebServiceEndpoint[] = [
+      new SetKeychainEntryV1Endpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new GetKeychainEntryV1Endpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new DeleteKeychainEntryV1Endpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new HasKeychainEntryV1Endpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+    ];
     // TODO: Writing the getExpressRequestHandler() method for
     // GetKeychainEntryEndpointV1 and SetKeychainEntryEndpointV1
 
@@ -108,7 +129,9 @@ export class PluginKeychainGoogleSm
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-keychain-vault`;
+    // TODO: Add custom validation to the CI so that package names in plugin
+    // code are guaranteed to be correct (e.g. matching the one in package.json)
+    return "@hyperledger/cactus-plugin-keychain-google-sm";
   }
 
   public getEncryptionAlgorithm(): string {
