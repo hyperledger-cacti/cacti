@@ -10,7 +10,8 @@ import { TransactionManagement } from "../TransactionManagement";
 import { VerifierFactory } from "../../verifier/VerifierFactory";
 
 const router: Router = Router();
-export const transactionManagement: TransactionManagement = new TransactionManagement();
+export const transactionManagement: TransactionManagement =
+  new TransactionManagement();
 export const verifierFactory: VerifierFactory = new VerifierFactory();
 
 /* GET home page. */
@@ -31,7 +32,7 @@ router.get(
     } catch (err) {
       next(err);
     }
-  },
+  }
 );
 
 // Show Specification of Business Logic
@@ -43,12 +44,12 @@ router.get(
         "Not Implemented (Show Specification of Business Logic" +
           ", id=" +
           req.params.id +
-          ")\n",
+          ")\n"
       );
     } catch (err) {
       next(err);
     }
-  },
+  }
 );
 
 // Register a Wallet
@@ -60,7 +61,7 @@ router.post(
     } catch (err) {
       next(err);
     }
-  },
+  }
 );
 
 // Show Wallet List
@@ -72,7 +73,7 @@ router.get(
     } catch (err) {
       next(err);
     }
-  },
+  }
 );
 
 // Update Existing Wallets
@@ -84,12 +85,12 @@ router.put(
         "Not Implemented (Update Existing Wallets" +
           ", id=" +
           req.params.id +
-          ")\n",
+          ")\n"
       );
     } catch (err) {
       next(err);
     }
-  },
+  }
 );
 
 // Delete a Wallet
@@ -98,12 +99,12 @@ router.delete(
   (req: Request, res: Response, next: NextFunction) => {
     try {
       res.send(
-        "Not Implemented (Delete a Wallet" + ", id=" + req.params.id + ")\n",
+        "Not Implemented (Delete a Wallet" + ", id=" + req.params.id + ")\n"
       );
     } catch (err) {
       next(err);
     }
-  },
+  }
 );
 
 export default router;

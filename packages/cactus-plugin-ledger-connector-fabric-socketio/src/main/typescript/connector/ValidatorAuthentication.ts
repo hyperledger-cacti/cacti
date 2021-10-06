@@ -14,7 +14,7 @@ const logger = getLogger("ValidatorAuthentication[" + process.pid + "]");
 logger.level = config.logLevel;
 
 const privateKey = fs.readFileSync(
-  path.resolve(__dirname, config.validatorKeyPath),
+  path.resolve(__dirname, config.validatorKeyPath)
 );
 
 export class ValidatorAuthentication {
