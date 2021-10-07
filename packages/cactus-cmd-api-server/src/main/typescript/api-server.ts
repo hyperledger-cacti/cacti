@@ -332,6 +332,26 @@ export class ApiServer {
     const pluginFactory = await createPluginFactory(pluginFactoryOptions);
 
     const plugin = await pluginFactory.create(pluginOptions);
+
+    // need to invoke the i-cactus-plugin onPluginInit functionality here before plugin registry can be used further
+    try {
+      await plugin.onPluginInit();
+    } catch (error) {
+      const fnTag = `${this.className}#instantiatePlugin`;
+      const packageName = plugin.getPackageName();
+      const instanceId = plugin.getInstanceId();
+
+      const errorMessage = `${fnTag} failed calling onPluginInit() on the plugin '${packageName}' with the instanceId '${instanceId}'`;
+
+      this.log.error(errorMessage, error);
+
+      if (error instanceof Error) {
+        throw new RuntimeError(errorMessage, error);
+      } else {
+        throw new RuntimeError(errorMessage, JSON.stringify(error));
+      }
+    }
+
     return plugin;
   }
 
