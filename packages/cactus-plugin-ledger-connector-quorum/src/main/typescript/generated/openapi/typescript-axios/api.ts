@@ -24,27 +24,102 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
+ * @interface ContractJSON
+ */
+export interface ContractJSON {
+    [key: string]: object | any;
+
+    /**
+     * 
+     * @type {string}
+     * @memberof ContractJSON
+     */
+    contractName: string;
+    /**
+     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
+     * @type {string}
+     * @memberof ContractJSON
+     */
+    bytecode: string;
+    /**
+     * The application binary interface of the solidity contract, optional parameter
+     * @type {Array<any>}
+     * @memberof ContractJSON
+     */
+    abi?: Array<any>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContractJSON
+     */
+    metadata?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContractJSON
+     */
+    deployedBytecode?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContractJSON
+     */
+    sourceMap?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContractJSON
+     */
+    deployedSourceMap?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ContractJSON
+     */
+    sourcePath?: string;
+    /**
+     * 
+     * @type {object}
+     * @memberof ContractJSON
+     */
+    compiler?: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof ContractJSON
+     */
+    networks?: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof ContractJSON
+     */
+    ast?: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof ContractJSON
+     */
+    functionHashes?: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof ContractJSON
+     */
+    gasEstimates?: object;
+}
+/**
+ * 
+ * @export
  * @interface DeployContractSolidityBytecodeJsonObjectV1Request
  */
 export interface DeployContractSolidityBytecodeJsonObjectV1Request {
-    /**
-     * The contract name for retrieve the contracts json on the keychain.
-     * @type {string}
-     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
-     */
-    contractName: string;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
      */
     web3SigningCredential: Web3SigningCredential;
-    /**
-     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
-     * @type {string}
-     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
-     */
-    bytecode: string;
     /**
      * 
      * @type {number}
@@ -64,11 +139,11 @@ export interface DeployContractSolidityBytecodeJsonObjectV1Request {
      */
     timeoutMs?: number;
     /**
-     * For use when not using keychain, pass the contract in as this variable
-     * @type {object}
+     * 
+     * @type {ContractJSON}
      * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
      */
-    contractJSON?: object;
+    contractJSON: ContractJSON;
 }
 /**
  * 
@@ -88,12 +163,6 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     web3SigningCredential: Web3SigningCredential;
-    /**
-     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
-     * @type {string}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    bytecode: string;
     /**
      * The keychainId for retrieve the contracts json.
      * @type {string}
@@ -157,16 +226,10 @@ export enum EthContractInvocationType {
 export interface InvokeContractJsonObjectV1Request {
     /**
      * 
-     * @type {string}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    contractName: string;
-    /**
-     * 
      * @type {Web3SigningCredential}
      * @memberof InvokeContractJsonObjectV1Request
      */
-    signingCredential: Web3SigningCredential;
+    web3SigningCredential: Web3SigningCredential;
     /**
      * 
      * @type {EthContractInvocationType}
@@ -186,17 +249,11 @@ export interface InvokeContractJsonObjectV1Request {
      */
     params: Array<any>;
     /**
-     * The application binary interface of the solidity contract, optional parameter
-     * @type {Array<any>}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    contractAbi?: Array<any>;
-    /**
-     * Address of the solidity contract, optional parameter
+     * Address of the solidity contract
      * @type {string}
      * @memberof InvokeContractJsonObjectV1Request
      */
-    contractAddress?: string;
+    contractAddress: string;
     /**
      * 
      * @type {string | number}
@@ -228,11 +285,11 @@ export interface InvokeContractJsonObjectV1Request {
      */
     timeoutMs?: number;
     /**
-     * The contract object to be passed if not using keychain.
-     * @type {object}
+     * 
+     * @type {ContractJSON}
      * @memberof InvokeContractJsonObjectV1Request
      */
-    contractJSON?: object;
+    contractJSON: ContractJSON;
 }
 /**
  * 
@@ -241,7 +298,7 @@ export interface InvokeContractJsonObjectV1Request {
  */
 export interface InvokeContractV1Request {
     /**
-     * 
+     * The contract name to find it in the keychain plugin
      * @type {string}
      * @memberof InvokeContractV1Request
      */
@@ -251,7 +308,7 @@ export interface InvokeContractV1Request {
      * @type {Web3SigningCredential}
      * @memberof InvokeContractV1Request
      */
-    signingCredential: Web3SigningCredential;
+    web3SigningCredential: Web3SigningCredential;
     /**
      * 
      * @type {EthContractInvocationType}
@@ -270,18 +327,6 @@ export interface InvokeContractV1Request {
      * @memberof InvokeContractV1Request
      */
     params: Array<any>;
-    /**
-     * The application binary interface of the solidity contract, optional parameter
-     * @type {Array<any>}
-     * @memberof InvokeContractV1Request
-     */
-    contractAbi?: Array<any>;
-    /**
-     * Address of the solidity contract, optional parameter
-     * @type {string}
-     * @memberof InvokeContractV1Request
-     */
-    contractAddress?: string;
     /**
      * 
      * @type {string | number}
@@ -317,13 +362,7 @@ export interface InvokeContractV1Request {
      * @type {string}
      * @memberof InvokeContractV1Request
      */
-    keychainId?: string;
-    /**
-     * The contract object to be passed if not using keychain.
-     * @type {object}
-     * @memberof InvokeContractV1Request
-     */
-    contractJSON?: object;
+    keychainId: string;
 }
 /**
  * 
