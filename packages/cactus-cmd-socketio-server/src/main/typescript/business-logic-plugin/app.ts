@@ -16,7 +16,6 @@ import bodyParser = require("body-parser");
 
 import indexRouter from "../routing-interface/routes/index";
 import loginRouter from "../routing-interface/routes/login";
-import blockmonitorRouter from "../routing-interface/routes/blockmonitor";
 import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 
 const config: any = ConfigUtil.getConfig();
@@ -33,7 +32,6 @@ app.use(bodyParser.json());
 
 app.use("/", indexRouter);
 app.use("/api/v1/bl/login/", loginRouter);
-app.use("/api/v1/bl/blockmonitor/", blockmonitorRouter);
 
 // Dynamic loading
 console.debug(`start Dynamic loading.`);
@@ -53,7 +51,7 @@ app.use(
     err: { message: string; status?: number },
     req: Request,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
   ) => {
     // set locals, only providing error in development
     res.locals.message = err.message;
@@ -68,7 +66,7 @@ app.use(
     // render the error page
     res.status(err.status || 500);
     res.send(errorResponse);
-  },
+  }
 );
 
 export default app;

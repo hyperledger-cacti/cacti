@@ -29,7 +29,7 @@ logger.level = config.logLevel;
  */
 
 const port = normalizePort(
-  process.env.PORT || config.applicationHostInfo.hostPort,
+  process.env.PORT || config.applicationHostInfo.hostPort
 );
 logger.info(`listening on *: ${port}`);
 app.set("port", port);

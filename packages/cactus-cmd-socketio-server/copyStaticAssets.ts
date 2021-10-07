@@ -5,10 +5,14 @@
  * copyStaticAssets.ts
  */
 
-import * as shell from 'shelljs';
+import * as shell from "shelljs";
 
 // NOTE: Copy the static assets to the dist folder.
 //      Example:
 //        shell.cp('-R', 'src/routing-interface/views', 'dist/routing-interface/views/');
-shell.cp('-R', './src/main/typescript/verifier/validatorKey/', '../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/verifier/');
-shell.cp('-R', '../../etc/cactus/*.yaml', '/etc/cactus/');
+shell.cp(
+  "-R",
+  "./src/main/typescript/verifier/validatorKey/",
+  "../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/verifier/"
+);
+shell.cp("-R", "../../etc/cactus/*.yaml", "/etc/cactus/");

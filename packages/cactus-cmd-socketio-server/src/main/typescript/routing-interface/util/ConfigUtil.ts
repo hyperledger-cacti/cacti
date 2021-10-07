@@ -17,10 +17,10 @@ export class ConfigUtil {
    */
   static getConfig(): object {
     const configCommon: any = yaml.safeLoad(
-      fs.readFileSync("/etc/cactus/default.yaml", "utf8"),
+      fs.readFileSync("/etc/cactus/default.yaml", "utf8")
     );
     const configAppli: any = yaml.safeLoad(
-      fs.readFileSync("/etc/cactus/usersetting.yaml", "utf8"),
+      fs.readFileSync("/etc/cactus/usersetting.yaml", "utf8")
     );
     return ConfigUtil.mergeObjects(configCommon, configAppli);
   }
@@ -42,7 +42,7 @@ export class ConfigUtil {
         if (isObject(sourceValue) && target.hasOwnProperty(sourceKey)) {
           mergeObject[sourceKey] = ConfigUtil.mergeObjects(
             targetValue,
-            sourceValue,
+            sourceValue
           );
         } else {
           Object.assign(mergeObject, { [sourceKey]: sourceValue });

@@ -64,7 +64,7 @@ export class ServerMonitorPlugin {
     httpReq.open(
       config.blockMonitor.request.method,
       config.blockMonitor.request.host +
-        config.blockMonitor.request.getLatestBlockNumberCommand,
+        config.blockMonitor.request.getLatestBlockNumberCommand
     );
     httpReq.send();
   }
@@ -95,7 +95,7 @@ export class ServerMonitorPlugin {
         const transactionDataArray = [];
         for (const batchData of blockData.batches) {
           logger.debug(
-            `transaction_ids.length = ${batchData.header.transaction_ids.length}`,
+            `transaction_ids.length = ${batchData.header.transaction_ids.length}`
           );
           if (batchData.header.transaction_ids.length < 1) {
             logger.debug(`skip block (No transactions) = ${targetBlockNumber}`);
@@ -104,13 +104,13 @@ export class ServerMonitorPlugin {
           for (const transactionData of batchData.transactions) {
             if (transactionData.header.family_name !== filterKey) {
               logger.debug(
-                `skip transaction (Not target) = ${transactionData.header_signature}`,
+                `skip transaction (Not target) = ${transactionData.header_signature}`
               );
               continue;
             }
             const transactionDataPlus = Object.assign({}, transactionData);
             transactionDataPlus["payload_decoded"] = SplugUtil.deccodeCbor(
-              SplugUtil.decodeBase64(transactionData.payload),
+              SplugUtil.decodeBase64(transactionData.payload)
             );
             transactionDataArray.push(transactionDataPlus);
           }
@@ -121,13 +121,13 @@ export class ServerMonitorPlugin {
         if (transactionDataArray.length > 0) {
           logger.info("*** SEND TRANSACTION DATA ***");
           logger.debug(
-            `transactionDataArray = ${JSON.stringify(transactionDataArray)}`,
+            `transactionDataArray = ${JSON.stringify(transactionDataArray)}`
           );
           const signedTransactionDataArray = ValidatorAuthentication.sign({
             blockData: transactionDataArray,
           });
           logger.debug(
-            `signedTransactionDataArray = ${signedTransactionDataArray}`,
+            `signedTransactionDataArray = ${signedTransactionDataArray}`
           );
           const retObj = {
             status: 200,

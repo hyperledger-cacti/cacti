@@ -68,7 +68,7 @@ export class ServerMonitorPlugin {
             const blockData = web3.eth.getBlock(blockHash, true);
             const trLength = blockData.transactions.length;
             logger.info(
-              trLength + " transactions in block " + blockData.number,
+              trLength + " transactions in block " + blockData.number
             );
             console.log("##[HL-BC] Validate transactions(D3)");
             console.log("##[HL-BC] digital sign on valid transaction(D4)");
