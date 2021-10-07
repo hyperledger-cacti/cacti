@@ -7,6 +7,7 @@
 
 import { DBAccess } from "./DBAccess";
 import { ConfigUtil } from "../util/ConfigUtil";
+import { LedgerPluginInfo } from "../../verifier/validator-registry";
 
 const fs = require("fs");
 const path = require("path");
@@ -17,7 +18,7 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 export class LPInfoHolder {
-  ledgerPluginInfo: [] = [];
+  ledgerPluginInfo: LedgerPluginInfo[];
 
   constructor() {
     // TODO: Get connection information for all LedgerPlugins
@@ -37,7 +38,7 @@ export class LPInfoHolder {
       });
       if (ret === "") {
         logger.warn(
-          "LegerPluginInfo is Not Found : validatorId = " + validatorId,
+          "LegerPluginInfo is Not Found : validatorId = " + validatorId
         );
       }
       return ret;

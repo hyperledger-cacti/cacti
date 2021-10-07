@@ -18,6 +18,7 @@ import {
   IListenOptions,
   LogLevelDesc,
   Servers,
+  LoggerProvider,
 } from "@hyperledger/cactus-common";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -55,6 +56,9 @@ test("BEFORE " + testCase, async (t: Test) => {
 
 test(testCase, async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
+  const level = "INFO";
+  const label = "fabric run transaction test";
+  const log = LoggerProvider.getOrCreate({ level, label });
 
   test.onFailure(async () => {
     await Containers.logDiagnostics({ logLevel });
@@ -187,7 +191,18 @@ test(testCase, async (t: Test) => {
     const res = await apiClient.runTransactionV1(req);
     t.ok(res);
     t.ok(res.data);
+    t.ok(res.data.transactionId);
     t.equal(res.status, 200);
+    const res2 = await apiClient.getTransactionReceiptByTxIDV1({
+      signingCredential,
+      channelName,
+      contractName: "qscc",
+      invocationType: FabricContractInvocationType.Call,
+      methodName: "GetBlockByTxID",
+      params: [channelName, res.data.transactionId],
+    } as RunTransactionRequest);
+    t.ok(res2);
+    log.info(res2.data);
   }
 
   {
@@ -222,12 +237,14 @@ test(testCase, async (t: Test) => {
       '{type="' +
       K_CACTUS_FABRIC_TOTAL_TX_COUNT +
       '"} 3';
+    t.comment(promMetricsOutput);
     t.ok(res);
     t.ok(res.data);
+    t.comment(res.data);
     t.equal(res.status, 200);
     t.true(
       res.data.includes(promMetricsOutput),
-      "Total Transaction Count of 3 recorded as expected. RESULT OK",
+      "Total Transaction Count of 4 recorded as expected. RESULT OK",
     );
   }
 
