@@ -25,7 +25,7 @@ export class BusinessLogicBase implements BusinessLogicPlugin {
   startTransaction(
     req: Request,
     businessLogicID: string,
-    tradeID: string,
+    tradeID: string
   ): void {
     // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
   }
@@ -55,11 +55,11 @@ export class BusinessLogicBase implements BusinessLogicPlugin {
 
   setEventFilter(filter: object): void {
     logger.debug(
-      `##called setEventFilter(before): ${json2str(this.eventFilter)}`,
+      `##called setEventFilter(before): ${json2str(this.eventFilter)}`
     );
     this.eventFilter = filter;
     logger.debug(
-      `##called setEventFilter(after): ${json2str(this.eventFilter)}`,
+      `##called setEventFilter(after): ${json2str(this.eventFilter)}`
     );
   }
 
@@ -70,7 +70,7 @@ export class BusinessLogicBase implements BusinessLogicPlugin {
 
   getTxIDFromEvent(
     ledgerEvent: LedgerEvent,
-    targetIndex: number,
+    targetIndex: number
   ): string | null {
     // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
     return null;

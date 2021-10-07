@@ -12,7 +12,7 @@
  */
 
 export const SplugConfig = {
-  // URL to operate and monitor
-  //"provider" : 'http://geth1:8545'
-  provider: "http://localhost:8545",
+    // URL to operate and monitor
+    "provider" : 'http://geth1:8545'
+    // "provider" : 'http://localhost:8545'
 };

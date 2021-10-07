@@ -47,7 +47,7 @@ function getSubmitter(cli) {
         cryptoSuite.setCryptoKeyStore(
           FabricClient.newCryptoKeyStore({
             path: storePath,
-          }),
+          })
         );
         cli.setCryptoSuite(cryptoSuite);
       }
@@ -67,7 +67,7 @@ function getSubmitter(cli) {
           return member.setEnrollment(
             enrollment.key,
             enrollment.certificate,
-            SplugConfig.fabric.mspid,
+            SplugConfig.fabric.mspid
           );
         })
         .then(() => {
@@ -135,7 +135,7 @@ function getClientAndChannel() {
       cryptoSuite.setCryptoKeyStore(
         FabricClient.newCryptoKeyStore({
           path: storePath,
-        }),
+        })
       );
       client.setCryptoSuite(cryptoSuite);
 
