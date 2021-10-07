@@ -194,7 +194,7 @@ export class ServerPlugin {
           retObj["reqID"] = reqID;
         }
         logger.debug(
-          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`,
+          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`
         );
         return resolve(retObj);
       } catch (e) {
@@ -211,7 +211,7 @@ export class ServerPlugin {
           retObj["reqID"] = reqID;
         }
         logger.debug(
-          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`,
+          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`
         );
         return reject(retObj);
       }
@@ -386,7 +386,7 @@ export class ServerPlugin {
             logger.debug(`##contract: Two args.`);
             result = contract[sendCommand][sendFunction](
               sendArgs[0],
-              sendArgs[1],
+              sendArgs[1]
             );
             break;
           case 3:
@@ -394,7 +394,7 @@ export class ServerPlugin {
             result = contract[sendCommand][sendFunction](
               sendArgs[0],
               sendArgs[1],
-              sendArgs[2],
+              sendArgs[2]
             );
             break;
         }

@@ -5,6 +5,7 @@ import asyncio
 from .AbstractConnector import AbstractConnector
 from iroha import Iroha, IrohaCrypto, IrohaGrpc
 import schedule
+#import binascii ### for sendAsyncRequest
 
 class IrohaConnector(AbstractConnector):
     def __init__(self, socketio, sessionid, iroha_dic, socketIoValidator):
@@ -24,10 +25,17 @@ class IrohaConnector(AbstractConnector):
         """Get the validator information including version, name, ID, and other information"""
         print(f"##{self.moduleName}.getValidatorInformation()")
 
-    def sendSignedTransaction(self, signedTransaction):
+    def sendAsyncRequest(self, requestData):
         """Request a verifier to execute a ledger operation"""
-        print(f"##{self.moduleName}.sendSignedTransaction()")
+        print(f"##{self.moduleName}.sendAsyncRequest()")
+        command = requestData['method']['command']
+        if command == 'sendTx':
+            return send_tx(requestData['args']['tx'])
     
+    def send_tx(self, tx):
+        #hex_hash = binascii.hexlify(IrohaCrypto.hash(tx))
+        net.send_tx(tx)
+
     def getBalance(self, address):
         """Get balance of an account for native token on a leder"""
         print(f"##{self.moduleName}.getBalance()")

@@ -1,6 +1,7 @@
 ledgerPluginInfo:
   - 
     validatorID: 84jUisrs
+    validatorType: socketio
     validatorURL: https://localhost:5050
     validatorKeyPath: ./validatorKey/84jUisrs/key84jUisrs.crt
     ledgerInfo:
@@ -33,6 +34,7 @@ ledgerPluginInfo:
 
   - 
     validatorID: r9IS4dDf
+    validatorType: socketio
     validatorURL: https://localhost:5040
     validatorKeyPath: ./validatorKey/r9IS4dDf/keyr9IS4dDf.crt
     ledgerInfo:
@@ -59,6 +61,7 @@ ledgerPluginInfo:
 
   - 
     validatorID: sUr7d10R
+    validatorType: socketio
     validatorURL: https://localhost:5140
     validatorKeyPath: ./validatorKey/sUr7d10R/keysUr7d10R.crt
     ledgerInfo:
@@ -66,7 +69,17 @@ ledgerPluginInfo:
     apiInfo: []
 
   - 
+    validatorID: 3PfTJw8g
+    validatorType: socketio
+    validatorURL: http://172.16.0.4:8000
+    validatorKeyPath: ./validatorKey/3PfTJw8g/3PfTJw8g.crt
+    ledgerInfo:
+      ledgerAbstract: "Indy Ledger"
+    apiInfo: []
+
+  - 
     validatorID: vIdO32CB
+    validatorType: openapi
     validatorURL: http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/
     validatorKeyPath: ""
     ledgerInfo:
@@ -75,6 +88,7 @@ ledgerPluginInfo:
 
   - 
     validatorID: vIdO32CF
+    validatorType: openapi
     validatorURL: http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/
     validatorKeyPath: ""
     ledgerInfo:
@@ -83,20 +97,12 @@ ledgerPluginInfo:
 
   - 
     validatorID: vIdO32CQ
-    host: http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/
+    validatorType: openapi
+    validatorURL: http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/
     validatorKeyPath: ""
     ledgerInfo:
       ledgerAbstract: "Cactus Quorum Ledger via http connection"
     apiInfo: []
-
-  - 
-    validatorID: 3PfTJw8g
-    validatorURL: http://172.16.0.4:8000
-    validatorKeyPath: ./validatorKey/3PfTJw8g/3PfTJw8g.crt
-    ledgerInfo:
-      ledgerAbstract: "Indy Ledger"
-    apiInfo: []
-
 
 signTxInfo:
   ethereum:
