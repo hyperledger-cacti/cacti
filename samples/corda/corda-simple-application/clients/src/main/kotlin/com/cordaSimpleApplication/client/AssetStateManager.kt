@@ -78,12 +78,12 @@ class IssueAssetStateFromStateRefCommand : CliktCommand(help = "Invokes the Issu
 }
 
 /**
- * The CLI command used to trigger a GetStateByTokenType flow.
+ * The CLI command used to trigger a GetStatesByTokenType flow.
  *
  * @property tokenType The filter criteria for the [AssetState]s to be retrieved.
  */
 class GetAssetStatesByTypeCommand : CliktCommand(help = "Get asset states by token type. Requires a token type") {
-    val tokenType: String by argument()
+    private val tokenType: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
         println("Get states with type $tokenType")
@@ -111,7 +111,7 @@ class GetAssetStatesByTypeCommand : CliktCommand(help = "Get asset states by tok
  * @property linearId The linearId for the [AssetState] to be retrieved.
  */
 class GetAssetStateUsingLinearIdCommand : CliktCommand(help = "Gets asset state by linearId. Requires a linearId") {
-    val linearId: String by argument()
+    private val linearId: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
         println("Get state with linearId $linearId")
@@ -139,7 +139,7 @@ class GetAssetStateUsingLinearIdCommand : CliktCommand(help = "Gets asset state 
  * @property linearId The filter for the [AssetState] to be deleted.
  */
 class DeleteAssetStateCommand : CliktCommand(help = "Invokes the DeleteAssetState flow. Requires a linearId") {
-    val linearId: String by argument()
+    private val linearId: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
         println("DeleteAssetState flow with linearId $linearId")
@@ -162,13 +162,14 @@ class DeleteAssetStateCommand : CliktCommand(help = "Invokes the DeleteAssetStat
 }
 
 /**
- * The CLI command used to trigger a DeleteAssetState flow.
+ * The CLI command used to trigger a MergeAssetStates flow.
  *
- * @property linearId The filter for the [AssetState] to be deleted.
+ * @property linearId1 The filter for the first token asset [AssetState] used in the merge operation.
+ * @property linearId2 The filter for the second token asset [AssetState] used in the merge operation.
  */
 class MergeAssetStatesCommand : CliktCommand(help = "Invokes the MergeAssetStates flow. Requires two linearIds") {
-    val linearId1: String by argument()
-    val linearId2: String by argument()
+    private val linearId1: String by argument()
+    private val linearId2: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
         println("MergeAssetStates flow with linearIds $linearId1 and $linearId2")
@@ -222,9 +223,11 @@ class RetrieveAssetStateAndRefCommand : CliktCommand(help = "Invokes the Retriev
 
 
 /**
- * The CLI command used to trigger a DeleteAssetState flow.
+ * The CLI command used to trigger a SplitAssetState flow.
  *
  * @property linearId The filter for the [AssetState] to be split.
+ * @property quantity1 The number of fungible tokens in the first [AssetState] created after split.
+ * @property quantity2 The number of fungible tokens in the second [AssetState] created after split.
  */
 class SplitAssetStateCommand : CliktCommand(help = "Invokes the SplitAssetState flow. Requires a linearId") {
     private val linearId: String by argument()
@@ -252,7 +255,7 @@ class SplitAssetStateCommand : CliktCommand(help = "Invokes the SplitAssetState 
 }
 
 /**
- * The CLI command used to trigger a TransferAssetState flow.
+ * The CLI command used to trigger a TransferAssetStateInitiator flow.
  *
  * @property linearId The filter for the [AssetState] to be transferred.
  * @property otherParty The Party to whom the [AssetState] will be transferred to

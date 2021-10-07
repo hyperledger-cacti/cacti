@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package com.cordaSimpleApplication.flow
 
 import co.paralleluniverse.fibers.Suspendable
@@ -18,6 +24,7 @@ import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
 import net.corda.core.contracts.requireThat
+import sun.security.x509.UniqueIdentity
 import java.util.*
 
 
@@ -64,10 +71,11 @@ object AssetFlow {
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
             // Generate an unsigned transaction.
-            val assetState = AssetState(numerOfTokens, tokenType, serviceHub.myInfo.legalIdentities.first())
+            val assetState: AssetState = AssetState(numerOfTokens, tokenType, serviceHub.myInfo.legalIdentities.first())
 
-            val txCommand = Command(AssetContract.Commands.Issue(), assetState.participants.map { it.owningKey })
-            val txBuilder = TransactionBuilder(notary)
+            val commandData: AssetContract.Commands.Issue = AssetContract.Commands.Issue()
+            val txCommand: Command<AssetContract.Commands.Issue> = Command(commandData, assetState.participants.map { it.owningKey })
+            val txBuilder: TransactionBuilder = TransactionBuilder(notary)
                     .addOutputState(assetState, AssetContract.ID)
                     .addCommand(txCommand)
 
@@ -79,7 +87,7 @@ object AssetFlow {
             // Stage 3.
             progressTracker.currentStep = SIGNING_TRANSACTION
             // Sign the transaction.
-            val signedTx = serviceHub.signInitialTransaction(txBuilder)
+            val signedTx: SignedTransaction = serviceHub.signInitialTransaction(txBuilder)
 
             // Stage 4.
             progressTracker.currentStep = FINALISING_TRANSACTION
@@ -257,24 +265,24 @@ object AssetFlow {
         override fun call(): SignedTransaction {
 
             // Obtain a reference from a notary we wish to use.
-            val notary = serviceHub.networkMapCache.notaryIdentities.single()
+            val notary: Party = serviceHub.networkMapCache.notaryIdentities.single()
 
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
             // Generate an unsigned transaction.
 
-            val uuid = UniqueIdentifier.Companion.fromString(linearId)
-            val criteria = QueryCriteria.LinearStateQueryCriteria(null, Arrays.asList(uuid),
+            val uuid: UniqueIdentifier = UniqueIdentifier.Companion.fromString(linearId)
+            val criteria: QueryCriteria.LinearStateQueryCriteria = QueryCriteria.LinearStateQueryCriteria(null, Arrays.asList(uuid),
                 Vault.StateStatus.UNCONSUMED, null)
-            val assetStates = serviceHub.vaultService.queryBy<AssetState>(criteria).states
-            val pointedToState = assetStates.first()
+            val assetStates: List<StateAndRef<AssetState>> = serviceHub.vaultService.queryBy<AssetState>(criteria).states
+            val pointedToState: StateAndRef<AssetState> = assetStates.first()
             println("Retrieved asset state with linearId $linearId: $pointedToState\n")
 
-            val stateStaticPointer = StaticPointer(pointedToState.ref, pointedToState.state.data.javaClass)
+            val stateStaticPointer: StaticPointer<AssetState> = StaticPointer(pointedToState.ref, pointedToState.state.data.javaClass)
             //val pointedToStateCopy = stateStaticPointer.resolve(serviceHub).state.data
             //val assetState = AssetState(pointedToStateCopy.quantity, pointedToStateCopy.tokenType, serviceHub.myInfo.legalIdentities.first())
 
-            val assetState = subFlow(IssueAssetStateFromStateRefHelper(stateStaticPointer))
+            val assetState: AssetState = subFlow(IssueAssetStateFromStateRefHelper(stateStaticPointer))
 
             val txCommand = Command(AssetContract.Commands.Issue(), assetState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
@@ -392,7 +400,7 @@ object AssetFlow {
      * The RetrieveStateAndRef flow is used to retrieve an [AssetState] from the vault based on the tokenType and quantity.
      *
      * @property tokenType the filter for the [AssetState] list to be retrieved.
-     * @property quantity the number of fungible token assets to be part of the [AssetState] to be issued.
+     * @property quantity the number of fungible token assets to be part of the [AssetState] to be retrieved.
      */
     @InitiatingFlow
     @StartableByRPC
