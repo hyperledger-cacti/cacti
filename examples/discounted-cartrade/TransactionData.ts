@@ -6,13 +6,13 @@
  */
 
 export class TransactionData {
-    target: string;     // "escrow" or "transfer" or "settlement"
-    ledger: string;
-    txID: string;
+  target: string; // "escrow" or "transfer" or "settlement"
+  ledger: string;
+  txID: string;
 
-    constructor(target: string, ledger: string, txID: string) {
-        this.target = target;
-        this.ledger = ledger;
-        this.txID = txID;
-    }
+  constructor(target: string, ledger: string, txID: string) {
+    this.target = target;
+    this.ledger = ledger;
+    this.txID = txID;
+  }
 }
