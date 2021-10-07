@@ -5,6 +5,7 @@
  * TransactionSigner.ts
  */
 import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
+import { ValidatorRegistry } from "../verifier/validator-registry";
 
 const ethJsCommon = require("ethereumjs-common").default;
 const ethJsTx = require("ethereumjs-tx").Transaction;
@@ -14,8 +15,9 @@ const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 const config: any = ConfigUtil.getConfig();
-const configVerifier: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/verifier-config.yaml", "utf8"),
+// const configVerifier: any = yaml.safeLoad(fs.readFileSync("", 'utf8'));
+const configVerifier: ValidatorRegistry = new ValidatorRegistry(
+  path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml")
 );
 import { getLogger } from "log4js";
 const moduleName = "TransactionEthereum";
@@ -46,7 +48,7 @@ export class TransactionSigner {
         networkId: configVerifier.signTxInfo.ethereum.networkID,
         chainId: configVerifier.signTxInfo.ethereum.chainID,
       },
-      configVerifier.signTxInfo.ethereum.hardfork,
+      configVerifier.signTxInfo.ethereum.hardfork
     );
 
     const privKey: Buffer = Buffer.from(signPkey, "hex");
@@ -73,7 +75,7 @@ export class TransactionSigner {
   static async signTxFabric(
     transactionProposalReq: object,
     certPem: string,
-    privateKeyPem: string,
+    privateKeyPem: string
   ) {
     logger.debug(`######call signTxFabric()`);
     let invokeResponse; // Return value from chain code
@@ -81,20 +83,20 @@ export class TransactionSigner {
     // channel object generation
     if (fabricChannel === undefined) {
       fabricChannel = await TransactionSigner.setupChannel(
-        configVerifier.signTxInfo.fabric.channelName,
+        configVerifier.signTxInfo.fabric.channelName
       );
     }
 
     const { proposal, txId } = fabricChannel.generateUnsignedProposal(
       transactionProposalReq,
       configVerifier.signTxInfo.fabric.mspID,
-      certPem,
+      certPem
     );
     logger.debug("proposal end");
     logger.debug(`##txId: ${txId.getTransactionID()}`);
     const signedProposal = TransactionSigner.signProposal(
       proposal.toBuffer(),
-      privateKeyPem,
+      privateKeyPem
     );
 
     const targets = [];
@@ -104,7 +106,7 @@ export class TransactionSigner {
     }
     const sendSignedProposalReq = { signedProposal, targets };
     const proposalResponses = await fabricChannel.sendSignedProposal(
-      sendSignedProposalReq,
+      sendSignedProposalReq
     );
     logger.debug("successfully send signedProposal");
     let allGood = true;
@@ -135,7 +137,7 @@ export class TransactionSigner {
     // Error if all peers do not return status 200
     if (!allGood) {
       throw new Error(
-        "Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...",
+        "Failed to send Proposal or receive valid response. Response null or status is not 200. exiting..."
       );
     }
 
@@ -153,7 +155,7 @@ export class TransactionSigner {
     // sign this commit proposal at local
     const signedCommitProposal = TransactionSigner.signProposal(
       commitProposal.toBuffer(),
-      privateKeyPem,
+      privateKeyPem
     );
 
     const signedTx = {
@@ -187,7 +189,7 @@ export class TransactionSigner {
     if (!halfOrder) {
       throw new Error(
         'Can not find the half order needed to calculate "s" value for immalleable signatures. Unsupported curve name: ' +
-          curveParams.name,
+          curveParams.name
       );
     }
 
@@ -233,7 +235,7 @@ export class TransactionSigner {
       paramPrivateKeyPem,
       proposalBytes,
       "sha2",
-      256,
+      256
     );
     const signedProposal = { signature, proposal_bytes: proposalBytes };
     return signedProposal;
@@ -250,7 +252,7 @@ export class TransactionSigner {
     const caService = new classFabricCAService(
       configVerifier.signTxInfo.fabric.ca.URL,
       tlsOptions,
-      configVerifier.signTxInfo.fabric.ca.name,
+      configVerifier.signTxInfo.fabric.ca.name
     );
     const req = {
       enrollmentID: enrollmentID,
@@ -260,7 +262,7 @@ export class TransactionSigner {
     const enrollment = await caService.enroll(req);
     client.setTlsClientCertAndKey(
       enrollment.certificate,
-      enrollment.key.toBytes(),
+      enrollment.key.toBytes()
     );
   }
 
@@ -271,7 +273,7 @@ export class TransactionSigner {
     await TransactionSigner.TLSSetup(
       client,
       configVerifier.signTxInfo.fabric.submitter.name,
-      configVerifier.signTxInfo.fabric.submitter.secret,
+      configVerifier.signTxInfo.fabric.submitter.secret
     );
     const channel = client.newChannel(channelName);
 
@@ -280,7 +282,7 @@ export class TransactionSigner {
     // const peerPEMCert = fs.readFileSync(peerTLSCertPath, 'utf8');
     for (const peerInfo of configVerifier.signTxInfo.fabric.peers) {
       const peer = client.newPeer(
-        peerInfo.requests,
+        peerInfo.requests
         /*{
                     pem: peerPEMCert,
                     'ssl-target-name-override': 'peer0.org1.example.com',
@@ -296,7 +298,7 @@ export class TransactionSigner {
         const ordererPEMCert = fs.readFileSync(ordererTLSCertPath, 'utf8');
         */
     const orderer = client.newOrderer(
-      configVerifier.signTxInfo.fabric.orderer.URL,
+      configVerifier.signTxInfo.fabric.orderer.URL
       /*{
                 pem: ordererPEMCert,
                 'ssl-target-name-override': 'orderer.example.com',

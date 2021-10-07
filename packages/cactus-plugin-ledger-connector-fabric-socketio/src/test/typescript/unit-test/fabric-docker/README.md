@@ -11,9 +11,9 @@
 
 ## a) clone the directories
     curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.4.0
-Then, `fabric-samples` directory is made in the current directory, including `basic-network`, `bin`, `chaincode/fabcar`, and `fabcar`. 
+Then, `fabric-samples` directory is made in the current directory, including `basic-network`, `bin`, `chaincode/fabcar`, and `fabcar`.
 
-- c.f.: https://hyperledger-fabric.readthedocs.io/en/master/install.html#install-samples-binaries-and-docker-images
+- c.f.: https://hyperledger-fabric.readthedocs.io/en/latest/install.html#install-samples-binaries-and-docker-images
 - If you are behind an proxy environment, use the command that `curl -x http://yourProxyURL:yourProxyPortNumber` instead of `curl`
 
 ## b) Initialization
