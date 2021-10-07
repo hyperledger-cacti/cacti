@@ -144,6 +144,12 @@ export interface DeployContractSolidityBytecodeJsonObjectV1Request {
      * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
      */
     contractJSON: ContractJSON;
+    /**
+     * The list of arguments to pass in to the constructor of the contract being deployed.
+     * @type {Array<any>}
+     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     */
+    constructorArgs?: Array<any>;
 }
 /**
  * 
@@ -193,6 +199,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     contractJSON?: object;
+    /**
+     * The list of arguments to pass in to the constructor of the contract being deployed.
+     * @type {Array<any>}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    constructorArgs?: Array<any>;
 }
 /**
  * 
