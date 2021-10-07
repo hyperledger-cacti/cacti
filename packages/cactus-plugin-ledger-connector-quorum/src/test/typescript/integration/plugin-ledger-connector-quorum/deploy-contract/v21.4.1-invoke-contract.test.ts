@@ -107,7 +107,6 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      bytecode: HelloWorldContractJson.bytecode,
       gas: 1000000,
     });
     t2.ok(deployOut, "deployContract() output is truthy OK");
@@ -132,7 +131,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
@@ -153,7 +152,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
@@ -170,7 +169,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: firstHighNetWorthAccount,
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
@@ -192,7 +191,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
@@ -207,7 +206,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         invocationType: EthContractInvocationType.Call,
         methodName: "getName",
         params: [],
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: firstHighNetWorthAccount,
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
@@ -259,7 +258,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -276,7 +275,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: testEthAccount.address,
           secret: testEthAccount.privateKey,
           type: Web3SigningCredentialType.PrivateKeyHex,
@@ -298,7 +297,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -313,7 +312,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -327,7 +326,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
   test("invoke Web3SigningCredentialType.CactusKeychainRef", async (t2: Test) => {
     const newName = `DrCactus${uuidV4()}`;
 
-    const signingCredential: Web3SigningCredentialCactusKeychainRef = {
+    const web3SigningCredential: Web3SigningCredentialCactusKeychainRef = {
       ethAccount: testEthAccount.address,
       keychainEntryKey,
       keychainId: keychainPlugin.getKeychainId(),
@@ -341,7 +340,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       methodName: "setName",
       params: [newName],
       gas: 1000000,
-      signingCredential,
+      web3SigningCredential,
       nonce: 3,
     });
     t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
@@ -354,7 +353,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: firstHighNetWorthAccount,
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
@@ -376,7 +375,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential,
+      web3SigningCredential,
     });
     t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
 
@@ -387,7 +386,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential,
+      web3SigningCredential,
     });
     t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
 

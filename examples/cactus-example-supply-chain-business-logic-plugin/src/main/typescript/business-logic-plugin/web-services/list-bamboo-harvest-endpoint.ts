@@ -43,7 +43,7 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.apiClient, `${fnTag} options.apiClient`);
-    //  Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
+    // Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
     //  Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
       opts.contractName,
@@ -103,7 +103,7 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
         methodName: "getAllRecords",
         gas: 1000000,
         params: [],
-        signingCredential: {
+        web3SigningCredential: {
           type: Web3SigningCredentialType.None,
         },
         keychainId: this.opts.keychainId,

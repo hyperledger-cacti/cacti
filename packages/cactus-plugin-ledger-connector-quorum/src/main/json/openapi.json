@@ -348,6 +348,63 @@
                     }
                 }
             },
+            "ContractJSON": {
+                "type": "object",
+                "required": [
+                    "contractName",
+                    "bytecode"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 24576,
+                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
+                    },
+                    "abi": {
+                        "description": "The application binary interface of the solidity contract, optional parameter",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "metadata": {
+                        "type": "string"
+                    },
+                    "deployedBytecode": {
+                        "type": "string"
+                    },
+                    "sourceMap": {
+                        "type": "string"
+                    },
+                    "deployedSourceMap": {
+                        "type": "string"
+                    },
+                    "sourcePath": {
+                        "type": "string"
+                    },
+                    "compiler": {
+                        "type": "object"
+                    },
+                    "networks": {
+                        "type": "object"
+                    },
+                    "ast": {
+                        "type": "object"
+                    },
+                    "functionHashes": {
+                        "type": "object"
+                    },
+                    "gasEstimates": {
+                        "type": "object"
+                    }
+                }
+            },
             "RunTransactionRequest": {
                 "type": "object",
                 "required": [
@@ -388,7 +445,6 @@
                 "type": "object",
                 "required": [
                     "contractName",
-                    "bytecode",
                     "web3SigningCredential",
                     "keychainId"
                 ],
@@ -404,13 +460,6 @@
                     "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
                         "nullable": false
-                    },
-                    "bytecode": {
-                        "type": "string",
-                        "nullable": false,
-                        "minLength": 1,
-                        "maxLength": 24576,
-                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
                     },
                     "keychainId": {
                         "type": "string",
@@ -455,29 +504,14 @@
             "DeployContractSolidityBytecodeJsonObjectV1Request": { 
                 "type": "object",
                 "required": [
-                    "contractName",
-                    "bytecode",
                     "web3SigningCredential",
-                    "contractJson"
+                    "contractJSON"
                 ],
+                "additionalProperties": false,
                 "properties": {
-                    "contractName": {
-                        "type": "string",
-                        "description": "The contract name for retrieve the contracts json on the keychain.",
-                        "minLength": 1,
-                        "maxLength": 100,
-                        "nullable": false
-                    },
                     "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
                         "nullable": false
-                    },
-                    "bytecode": {
-                        "type": "string",
-                        "nullable": false,
-                        "minLength": 1,
-                        "maxLength": 24576,
-                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
                     },
                     "gas": {
                         "type": "number",
@@ -494,8 +528,8 @@
                         "default": 60000,
                         "nullable": false
                     },
-                    "contractJSON": {
-                        "type": "object",
+                    "contractJSON": { 
+                        "$ref": "#/components/schemas/ContractJSON",
                         "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
                     }
@@ -504,19 +538,21 @@
             "InvokeContractV1Request": {
                 "type": "object",
                 "required": [
-                    "contractName",
-                    "signingCredential",
+                    "web3SigningCredential",
                     "invocationType",
                     "methodName",
-                    "params"
+                    "params",
+                    "contractName",
+                    "keychainId"
                 ],
                 "additionalProperties": false,
                 "properties": {
                     "contractName": {
+                        "description": "The contract name to find it in the keychain plugin",
                         "type": "string",
                         "nullable": false
                     },
-                    "signingCredential": {
+                    "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
                         "nullable": false
                     },
@@ -537,17 +573,6 @@
                         "type": "array",
                         "default": [],
                         "items": {}
-                    },
-                    "contractAbi": {
-                        "description": "The application binary interface of the solidity contract, optional parameter",
-                        "type": "array",
-                        "items": {},
-                        "nullable": false
-                    },
-                    "contractAddress": {
-                        "description": "Address of the solidity contract, optional parameter",
-                        "type": "string",
-                        "nullable": false
                     },
                     "value": {
                         "oneOf": [
@@ -594,30 +619,22 @@
                         "description": "The keychainId for retrieve the contracts json.",
                         "minLength": 1,
                         "maxLength": 100
-                    },
-                    "contractJSON":{
-                        "type": "object",
-                        "description": "The contract object to be passed if not using keychain.",
-                        "nullable": false
                     }
                 }
             },
             "InvokeContractJsonObjectV1Request": {
                 "type": "object",
                 "required": [
-                    "contractName",
-                    "signingCredential",
+                    "web3SigningCredential",
                     "invocationType",
                     "methodName",
                     "params",
-                    "contractJson"
+                    "contractJSON",
+                    "contractAddress"
                 ],
+                "additionalProperties": false,
                 "properties": {
-                    "contractName": {
-                        "type": "string",
-                        "nullable": false
-                    },
-                    "signingCredential": {
+                    "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
                         "nullable": false
                     },
@@ -639,14 +656,8 @@
                         "default": [],
                         "items": {}
                     },
-                    "contractAbi": {
-                        "description": "The application binary interface of the solidity contract, optional parameter",
-                        "type": "array",
-                        "items": {},
-                        "nullable": false
-                    },
                     "contractAddress": {
-                        "description": "Address of the solidity contract, optional parameter",
+                        "description": "Address of the solidity contract",
                         "type": "string",
                         "nullable": false
                     },
@@ -690,9 +701,9 @@
                         "default": 60000,
                         "nullable": false
                     },
-                    "contractJSON":{
-                        "type": "object",
-                        "description": "The contract object to be passed if not using keychain.",
+                    "contractJSON": { 
+                        "$ref": "#/components/schemas/ContractJSON",
+                        "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
                     }
                 }
