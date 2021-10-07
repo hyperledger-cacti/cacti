@@ -551,6 +551,12 @@ export interface FabricSigningCredential {
      * @memberof FabricSigningCredential
      */
     vaultTransitKey?: VaultTransitKey;
+    /**
+     * 
+     * @type {WebSocketKey}
+     * @memberof FabricSigningCredential
+     */
+    webSocketKey?: WebSocketKey;
 }
 /**
  * different type of identity provider for singing fabric messages supported by this package
@@ -560,7 +566,8 @@ export interface FabricSigningCredential {
 
 export enum FabricSigningCredentialType {
     X509 = 'X.509',
-    VaultX509 = 'Vault-X.509'
+    VaultX509 = 'Vault-X.509',
+    WsX509 = 'WS-X.509'
 }
 
 /**
@@ -978,6 +985,25 @@ export interface VaultTransitKey {
      * @memberof VaultTransitKey
      */
     token: string;
+}
+/**
+ * web-socket key details for signing fabric message with private key stored with external client
+ * @export
+ * @interface WebSocketKey
+ */
+export interface WebSocketKey {
+    /**
+     * session Id to access client
+     * @type {string}
+     * @memberof WebSocketKey
+     */
+    sessionId: string;
+    /**
+     * signature of the session ID
+     * @type {string}
+     * @memberof WebSocketKey
+     */
+    signature: string;
 }
 
 /**
