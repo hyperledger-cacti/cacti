@@ -5,34 +5,34 @@
  * ledger-plugin.ts
  */
 
-export interface Verifier {
-    // BLP -> Verifier
-    getApiList(): Array<ApiInfo>;
-    requestLedgerOperation(param: any): void;
-    startMonitor(): Promise<LedgerEvent>;
-    stopMonitor(param: any): void;
+export interface IVerifier {
+  // BLP -> Verifier
+  getApiList(): Array<ApiInfo>;
+  requestLedgerOperation(param: any): void;
+  startMonitor(): Promise<LedgerEvent>;
+  stopMonitor(param: any): void;
 
-    // Validator -> Verifier
-    // NOTE: The following methods are not implemented this time
-    // connect(): void;
-    // disconnect(): void;
-    // getVerifierInfo(): VerifierInfo[];
+  // Validator -> Verifier
+  // NOTE: The following methods are not implemented this time
+  // connect(): void;
+  // disconnect(): void;
+  // getVerifierInfo(): VerifierInfo[];
 }
 
 export class ApiInfo {
-    apiType: string = "";
-    requestedData: Array<RequestedData> = new Array();
+  apiType = "";
+  requestedData: Array<RequestedData> = [];
 }
 
 export class RequestedData {
-    dataName: string = "";
-    dataType: string = "";
+  dataName = "";
+  dataType = "";
 }
 
 export class LedgerEvent {
-  id: string = "";
-    // NOTE: A class that represents an event.
-    //       The purpose is to receive the event of Ledger on the Verifier side.
+  id = "";
+  // NOTE: A class that represents an event.
+  //       The purpose is to receive the event of Ledger on the Verifier side.
 }
 
 // NOTE: The following methods are not implemented this time
@@ -47,4 +47,3 @@ export class LedgerEvent {
 //     dataName: string = "";
 //     dataType: string[] = [];
 // }
-
