@@ -5,129 +5,123 @@
  * MeterManagement.ts
  */
 
-import { MeterInfo } from './MeterInfo';
-const fs = require('fs');
-const path = require('path');
-const yaml = require('js-yaml');
+import { MeterInfo } from "./MeterInfo";
+const fs = require("fs");
+const path = require("path");
+const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/default.yaml", 'utf8'));
+const config: any = yaml.safeLoad(
+  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
+);
 import { getLogger } from "log4js";
-const moduleName = 'MeterManagement';
+const moduleName = "MeterManagement";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 // Meter Management Class
 export class MeterManagement {
+  fileName = "MeterInfo.json";
 
-    fileName: string = "MeterInfo.json";
+  constructor() {}
 
-    constructor() {
-        ;
+  // For debugging
+  fileDump() {
+    const confirmData: string = fs.readFileSync(this.fileName, "utf8");
+    const arrayData: MeterInfo[] = JSON.parse(confirmData).table as MeterInfo[];
+    logger.debug(arrayData);
+  }
+
+  addMeterInfo(addMeterInfo: MeterInfo): object {
+    // Existence check of table file
+    try {
+      fs.statSync(this.fileName);
+    } catch (err) {
+      // Creating an empty table file
+      const emptyTable = {
+        table: [],
+      };
+      const emptyTableJson: string = JSON.stringify(emptyTable);
+      fs.writeFileSync(this.fileName, emptyTableJson, "utf8");
     }
 
-    // For debugging
-    fileDump() {
+    // Read table file
+    const meterInfoFileData: string = fs.readFileSync(this.fileName, "utf8");
+    const meterInfoTable: string[] = JSON.parse(meterInfoFileData)
+      .table as string[];
 
-        const confirmData: string = fs.readFileSync(this.fileName, 'utf8');
-        const arrayData: MeterInfo[] = JSON.parse(confirmData).table as MeterInfo[];
-        logger.debug(arrayData);
+    // Search target records / replace data
+    const meterInfoTableNew = {
+      table: [],
+    };
+    let existFlag = false;
+    let action = "";
+    meterInfoTable.forEach((meterInfoJSON, index) => {
+      const meterInfo: MeterInfo = JSON.parse(meterInfoJSON) as MeterInfo;
 
+      // Determine if it is a target record
+      if (meterInfo.meterID === addMeterInfo.meterID) {
+        // Change Status
+        meterInfo.bankAccount = addMeterInfo.bankAccount;
+        meterInfo.bankAccountPKey = addMeterInfo.bankAccountPKey;
+        meterInfo.powerCompanyAccount = addMeterInfo.powerCompanyAccount;
+        existFlag = true;
+        action = "update";
+      }
+
+      // Register Record
+      const meterInfoNewJson: string = JSON.stringify(meterInfo);
+      //            logger.debug(`meter info = ${meterInfoNewJson}`);
+      meterInfoTableNew.table.push(meterInfoNewJson);
+    });
+    if (existFlag === false) {
+      const addMeterInfoJson: string = JSON.stringify(addMeterInfo);
+      logger.debug(`add meter info = ${addMeterInfoJson}`);
+      meterInfoTableNew.table.push(addMeterInfoJson);
+      action = "add";
     }
 
-    addMeterInfo(addMeterInfo: MeterInfo): object {
+    // Table File Write
+    const meterInfoTableNewJson: string = JSON.stringify(meterInfoTableNew);
+    fs.writeFileSync(this.fileName, meterInfoTableNewJson, "utf8");
 
-        // Existence check of table file
-        try {
-            fs.statSync(this.fileName);
-        } catch (err) {
-            // Creating an empty table file
-            const emptyTable = {
-                table: []
-            };
-            const emptyTableJson: string = JSON.stringify(emptyTable);
-            fs.writeFileSync(this.fileName, emptyTableJson, 'utf8');
-        }
+    //        this.fileDump();
 
-        // Read table file
-        const meterInfoFileData: string = fs.readFileSync(this.fileName, 'utf8');
-        const meterInfoTable: string[] = JSON.parse(meterInfoFileData).table as string[];
+    const result = {
+      action: action,
+      meterID: addMeterInfo.meterID,
+    };
+    return result;
+  }
 
-        // Search target records / replace data
-        const meterInfoTableNew = {
-            table: []
-        };
-        let existFlag: boolean = false;
-        let action: string = "";
-        meterInfoTable.forEach((meterInfoJSON, index) => {
-            const meterInfo: MeterInfo = JSON.parse(meterInfoJSON) as MeterInfo;
-
-            // Determine if it is a target record
-            if (meterInfo.meterID === addMeterInfo.meterID) {
-                // Change Status
-                meterInfo.bankAccount = addMeterInfo.bankAccount;
-                meterInfo.bankAccountPKey = addMeterInfo.bankAccountPKey;
-                meterInfo.powerCompanyAccount = addMeterInfo.powerCompanyAccount;
-                existFlag = true;
-                action = "update";
-            }
-
-            // Register Record
-            const meterInfoNewJson: string = JSON.stringify(meterInfo);
-//            logger.debug(`meter info = ${meterInfoNewJson}`);
-            meterInfoTableNew.table.push(meterInfoNewJson);
-        });
-        if (existFlag === false) {
-            const addMeterInfoJson: string = JSON.stringify(addMeterInfo);
-            logger.debug(`add meter info = ${addMeterInfoJson}`);
-            meterInfoTableNew.table.push(addMeterInfoJson);
-            action = "add";
-        }
-        
-        // Table File Write
-        const meterInfoTableNewJson: string = JSON.stringify(meterInfoTableNew);
-        fs.writeFileSync(this.fileName, meterInfoTableNewJson, 'utf8');
-
-//        this.fileDump();
-
-        const result = {
-            "action": action,
-            "meterID": addMeterInfo.meterID
-        }
-        return result;
+  getMeterInfo(meterID: string): MeterInfo {
+    // Existence check of table file
+    try {
+      fs.statSync(this.fileName);
+    } catch (err) {
+      throw err;
     }
 
-    getMeterInfo(meterID: string): MeterInfo {
+    // Read table file
+    const meterInfoFileData: string = fs.readFileSync(this.fileName, "utf8");
+    const meterInfoTable: string[] = JSON.parse(meterInfoFileData)
+      .table as string[];
 
-        // Existence check of table file
-        try {
-            fs.statSync(this.fileName);
-        } catch (err) {
-            throw err;
-        }
+    // Search target records
+    let retMeterInfo: MeterInfo | null = null;
+    meterInfoTable.forEach((meterInfoJSON, index) => {
+      const meterInfo: MeterInfo = JSON.parse(meterInfoJSON) as MeterInfo;
 
-        // Read table file
-        const meterInfoFileData: string = fs.readFileSync(this.fileName, 'utf8');
-        const meterInfoTable: string[] = JSON.parse(meterInfoFileData).table as string[];
+      // Determine if it is a target record
+      if (meterInfo.meterID === meterID) {
+        retMeterInfo = meterInfo;
+        return;
+      }
+    });
 
-        // Search target records
-        let retMeterInfo: MeterInfo | null = null;
-        meterInfoTable.forEach((meterInfoJSON, index) => {
-            const meterInfo: MeterInfo = JSON.parse(meterInfoJSON) as MeterInfo;
+    return retMeterInfo;
+  }
 
-            // Determine if it is a target record
-            if (meterInfo.meterID === meterID) {
-                retMeterInfo = meterInfo;
-                return;
-            }
-        });
-
-        return retMeterInfo;
-    }
-
-
-
-
-/*
+  /*
     setStatus(tradeInfo: TradeInfo, status: CartradeStatus) {
 
         // Existence check of table file
@@ -271,14 +265,14 @@ export class MeterManagement {
         this.fileDump();
     }
 */
-    /**
-     * Get transaction data corresponding to the specified txId.
-     * (*Return if any of escrowTxID, transferTxID, settlementTxID matches txId)
-     *
-     * @return Transaction data corresponding to txId. Returns null if it does not exist.
-     *
-     */
-/*
+  /**
+   * Get transaction data corresponding to the specified txId.
+   * (*Return if any of escrowTxID, transferTxID, settlementTxID matches txId)
+   *
+   * @return Transaction data corresponding to txId. Returns null if it does not exist.
+   *
+   */
+  /*
     getTransactionInfoByTxId(txId: string): TransactionInfo {
 
         // Existence check of table file

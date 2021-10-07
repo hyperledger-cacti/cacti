@@ -1,0 +1,33 @@
+version: "3"
+services:
+  blp_container:
+    container_name: blp_container
+    image: blp_container
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+      - HTTP_PROXY=$HTTP_PROXY
+      - http_proxy=$HTTP_PROXY
+      - HTTPS_PROXY=$HTTPS_PROXY
+      - https_proxy=$HTTP_PROXY
+      - FTP_PROXY=$HTTP_PROXY
+      - ftp_proxy=$HTTP_PROXY
+      - NO_PROXY=$NO_PROXY
+      - no_proxy=$NO_PROXY
+    #volumes:
+    #  - type: bind
+    #    source: "../../../cactus/"
+    #    target: "/root/cactus/"
+    # ports:
+    # - "5034:5034"
+    environment:
+    - HTTP_PROXY=$HTTP_PROXY
+    - http_proxy=$HTTP_PROXY
+    - HTTPS_PROXY=$HTTPS_PROXY
+    - https_proxy=$HTTP_PROXY
+    - FTP_PROXY=$HTTP_PROXY
+    - ftp_proxy=$HTTP_PROXY
+    - NO_PROXY=$NO_PROXY
+    - no_proxy=$NO_PROXY
+    network_mode: "host"
