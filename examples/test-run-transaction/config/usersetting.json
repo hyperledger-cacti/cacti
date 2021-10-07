@@ -7,7 +7,7 @@
     ],
     "logLevel": "debug",
     "applicationHostInfo": {
-        "hostName": "http://xxx.xxxxx.xxx:xxxx",
+        "hostName": "http://aaa.bbb.ccc.ddd",
         "hostPort": 5034
     },
     "appRouters": [
