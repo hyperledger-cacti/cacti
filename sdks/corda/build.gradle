@@ -42,7 +42,7 @@ repositories {
     if (file("$projectDir/./github.properties").exists()) {
         file("$projectDir/github.properties").withInputStream { constants.load(it) }
         maven {
-            url 'https://maven.pkg.github.com/sanvenDev/weaver-dlt-interoperability'
+            url	constants.url
             credentials {
                 username constants.username
                 password constants.password

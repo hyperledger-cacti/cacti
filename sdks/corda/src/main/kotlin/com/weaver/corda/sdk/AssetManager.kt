@@ -28,6 +28,41 @@ class AssetManager {
         private val logger = LoggerFactory.getLogger(AssetManager::class.java)
 
         @JvmStatic
+        fun createHTLC(
+            proxy: CordaRPCOps,
+            assetType: String,
+            assetId: String,
+            recipientParty: String,
+	        hashBase64: String,
+            expiryTimeSecs: Long,
+            getAssetStateAndRefFlow: String,
+            deleteAssetStateCommand: CommandData
+        ): Either<Error, String> {
+            return try {
+                AssetManager.logger.debug("Sending asset-lock request to Corda as part of asset-exchange.\n")
+                val contractId = runCatching {
+
+                    val assetAgreement = createAssetExchangeAgreement(assetType, assetId, recipientParty, "")
+                    val lockInfo = createAssetLockInfo(hashBase64, expiryTimeSecs)
+
+                    proxy.startFlow(::LockAsset, lockInfo, assetAgreement, getAssetStateAndRefFlow, deleteAssetStateCommand)
+                        .returnValue.get()
+                }.fold({
+                    it.map { linearId ->
+                        AssetManager.logger.debug("Locking asset was successful and the state was stored with linearId $linearId.\n")
+                        linearId.toString()
+                    }
+                }, {
+                    Left(Error("Corda Network Error: Error running LockAsset flow: ${it.message}\n"))
+                })
+                contractId
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error locking asset in Corda network: ${e.message}\n")
+                Left(Error("Error locking asset in Corda network: ${e.message}"))
+            }
+        }
+
+        @JvmStatic
         fun createFungibleHTLC(
             proxy: CordaRPCOps,
             tokenType: String,
@@ -39,7 +74,7 @@ class AssetManager {
             deleteAssetStateCommand: CommandData
         ): Either<Error, String> {
             return try {
-                AssetManager.logger.debug("Sending asset-lock request to Corda as part of asset-exchange.\n")
+                AssetManager.logger.debug("Sending fungible asset-lock request to Corda as part of asset-exchange.\n")
                 val contractId = runCatching {
                     
                     val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, recipientParty, "")
@@ -49,7 +84,7 @@ class AssetManager {
                         .returnValue.get()
                 }.fold({
                     it.map { linearId ->
-                        AssetManager.logger.debug("Locking asset was successful and the state was stored with linearId $linearId.\n")
+                        AssetManager.logger.debug("Locking fungible asset was successful and the state was stored with linearId $linearId.\n")
                         linearId.toString()
                     }
                 }, {
@@ -57,8 +92,8 @@ class AssetManager {
                 })
                 contractId
             } catch (e: Exception) {
-                AssetManager.logger.error("Error locking asset in Corda network: ${e.message}\n")
-                Left(Error("Error locking asset in Corda network: ${e.message}"))
+                AssetManager.logger.error("Error locking fungible asset in Corda network: ${e.message}\n")
+                Left(Error("Error locking fungible asset in Corda network: ${e.message}"))
             }
         }
 
@@ -162,6 +197,22 @@ class AssetManager {
                 AssetManager.logger.error("Error querying HTLC state from Corda network: ${e.message}\n")
                 Left(Error("Error querying HTLC state from Corda network: ${e.message}"))
             }
+        }
+
+        fun createAssetExchangeAgreement(
+            assetType: String,
+            assetId: String,
+            recipient: String,
+            locker: String): AssetLocks.AssetExchangeAgreement {
+
+                val assetAgreement = AssetLocks.AssetExchangeAgreement.newBuilder()
+                    .setType(assetType)
+                    .setId(assetId)
+                    .setLocker(locker)
+                    .setRecipient(recipient)
+                    .build()
+
+                return assetAgreement
         }
 
         fun createFungibleAssetExchangeAgreement(
