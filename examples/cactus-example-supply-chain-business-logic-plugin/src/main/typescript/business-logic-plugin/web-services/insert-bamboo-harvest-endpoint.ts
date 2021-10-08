@@ -57,7 +57,6 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(opts, `${fnTag} arg options`);
     Checks.truthy(opts.apiClient, `${fnTag} options.apiClient`);
-    // Checks.truthy(opts.contractAddress, `${fnTag} options.contractAddress`);
     // Checks.truthy(opts.contractAbi, `${fnTag} options.contractAbi`);
     Checks.nonBlankString(
       opts.contractName,
@@ -120,7 +119,7 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
         methodName: "insertRecord",
         gas: 1000000,
         params: [bambooHarvest],
-        signingCredential: this.opts.web3SigningCredential,
+        web3SigningCredential: this.opts.web3SigningCredential,
         keychainId: this.opts.keychainId,
       });
 

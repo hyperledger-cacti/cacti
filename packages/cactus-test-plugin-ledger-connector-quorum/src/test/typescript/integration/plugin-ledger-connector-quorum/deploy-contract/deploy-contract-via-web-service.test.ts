@@ -135,7 +135,6 @@ test(testCase, async (t: Test) => {
   // 7. Assemble request to invoke the deploy contract method of the quorum ledger connector plugin via the REST API
   const req: DeployContractSolidityBytecodeV1Request = {
     contractName: HelloWorldContractJson.contractName,
-    bytecode: HelloWorldContractJson.bytecode,
     web3SigningCredential: {
       ethAccount: firstHighNetWorthAccount,
       secret: "",
@@ -181,7 +180,7 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
-      signingCredential: {
+      web3SigningCredential: {
         type: Web3SigningCredentialType.None,
       },
       keychainId: kvStoragePlugin.getKeychainId(),
@@ -207,7 +206,7 @@ test(testCase, async (t: Test) => {
       methodName: "setName",
       params: [newName],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -226,7 +225,7 @@ test(testCase, async (t: Test) => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -251,7 +250,7 @@ test(testCase, async (t: Test) => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,

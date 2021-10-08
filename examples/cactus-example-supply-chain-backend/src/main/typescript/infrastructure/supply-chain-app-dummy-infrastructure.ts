@@ -192,7 +192,6 @@ export class SupplyChainAppDummyInfrastructure {
 
         const res = await connector.deployContract({
           contractName: BambooHarvestRepositoryJSON.contractName,
-          bytecode: BambooHarvestRepositoryJSON.bytecode,
           gas: 1000000,
           web3SigningCredential: {
             ethAccount: this.quorumAccount.address,

@@ -6,25 +6,40 @@ Cactus **car-trade** is a sample application where users can exchange car owners
 
 ![car-trade image](./images/car-trade-image.png)
 
-## Prerequisites
-
-Before you begin, you need to check that you have all the prerequisites installed as follows:
-- OS: Linux (recommended: Ubuntu18.04 or CentOS7)
+## Required software components
+- OS: Linux (CentOS7)
 - Docker (recommend: v17.06.2-ce or greater)
 - Docker-compose (recommend: v1.14.0 or greater)
 - node.js v12 (recommend: v12.20.2 or greater)
-- The ports 5034, 5040, 5050 are available (If they are already used, the following processes can be done by changing the port number setting)
+
+## Prerequisites
+
+- Available ports:
+	- `5034`: the port of `cactus-cmd-socker-server`
+	- `5040`: the port of `cactus-plugin-ledger-connector-fabric-socketio`
+	- `5050`: the port of `cactus-plugin-ledger-connector-go-ethereum-socketio`
+	- If it is already used, the following processes can be done by changing the port number setting
+- Available directory (This directory must be empty):
+	- `/etc/cactus`: the directory for storing the config files of `cactus-cmd-socket-server`
 
 ## Boot method
 
-1. Before booting, please modify the following information for your environment
-	- `applicationHostInfo.hostName` (IP address of the host on the Location header) on `/packages/config/default.json`
-1. (Optional) Please modify the following information for your environment if necessary. This procedure should only be performed by users who cannot use port 5034.
-	- `applicationHostInfo.hostPort` (The port number of Routing-interface http server, the default is 5034) on `/packages/config/default.json`
-1. Go to the following directory:
+1. Before booting, please prepare the directory for storing config files on the directoty `/etc/cactus` on your server
 	```
-	cd cactus/examples/cartrade/
+	sudo mkdir /etc/cactus
+	sudo chmod 777 /etc/cactus
 	```
+
+1. Before booting, please modify `applicationHostInfo.hostName` and `applicationHostInfo.hostPort` on `cactus/etc/cactus/default.yaml` to adjust to your environment.
+	```
+	vi cactus/etc/cactus/default.yaml
+
+	[cactus/etc/cactus/default.yaml]
+	applicationHostInfo:
+	  hostName: http://aaa.bbb.ccc.ddd # please change hostName to your IP address
+	  hostPort: 5034 # if you want to change the port number, please change hostPort to the port number which you want to use
+	```
+
 1. Start ledgers:
 	```
 	./script-start-ledgers.sh
@@ -41,24 +56,41 @@ Before you begin, you need to check that you have all the prerequisites installe
 		aceb0e52e9c7        hyperledger/fabric-orderer                                                                               "orderer"                About a minute ago   Up About a minute   0.0.0.0:7050->7050/tcp                                   orderer.example.com
 		ec57c9f78d0d        ethereum/client-go:v1.8.27                                                                               "geth --rpc --networ…"   2 minutes ago        Up 2 minutes        8546/tcp, 0.0.0.0:8545->8545/tcp, 30303/tcp, 30303/udp   geth1
 		```
-1. Build validators, packages, and the cartrade app:
-	```
-	./script-build-all.sh
-	```
-1. Start validators and the cartrade app
-	- Please open three consoles and execute the following:.
-	- Start the validator for Fabric on the first console using the port 5040:
+
+1. Please prepare the three consoles on your machine as the following:
+	- **console 1**: console for launching `cactus-plugin-ledger-connector-go-ethereum-socketio`
+	- **console 2**: console for launching `cactus-plugin-ledger-connector-fabric-socketio`
+	- **console 3**: console for launching `cactus-cmd-socker-server` including `cartrade` business logic application.
+
+1. Launch the validators:
+	- Please execute [the boot methods](../../packages/cactus-plugin-ledger-connector-go-ethereum-socketio/README.md#boot-methods) of `cactus-plugin-ledger-connector-go-ethereum-socketio` on the **console 1** using the port `5050`
+	- Please execute [the boot methods](../../packages/cactus-plugin-ledger-connector-fabric-socketio/README.md#boot-methods) of `cactus-plugin-ledger-connector-fabric-socketio` on the **console 2** using the port `5040`
+
+2. Launch `cactus-cmd-socker-server` including `cartrade` business logic application
+	- Use the **console 3**
+	- Install and build npm packages on `cactus-cmd-socker-server`
 		```
-		./script-start-validator-fabric.sh
+		cd cactus/packages/cactus-cmd-socker-server
+		npm install
+		npm run build
 		```
-	- Start the validator for Ethereum on the second console using the port 5050: 
+	- Install and build npm packages on `cactus/examples/cartrade`
 		```
-		./script-start-validator-ethereum.sh
+		cd cactus/examples/cartrade
+		npm install
+		npm run build
 		```
-	- Start the cartrade app on the third console using the port 5034:
+	- Create the symbolic link to node_modules. This script is enough to execute only once.
 		```
-		./script-start-cartrade.sh
+		cd cactus/examples/cartrade
+		npm run init-cartrade
 		```
+	- Launch the `cactus-cmd-server-socket` `cactus-cmd-socker-server` including `cartrade` business logic application
+		```
+		cd cactus/examples/cartrade
+		npm run start
+		```
+	- After executing the above script, `cactus-cmd-socker-server` is launched on the port `5034`.
 
 ## How to use this application
 
@@ -77,6 +109,9 @@ Before you begin, you need to check that you have all the prerequisites installe
 		Transaction has been evaluated, result is: {"colour":"red","make":"Ford","model":"Mustang","owner":"Brad"}
 		```
 1. Run the transaction execution using the following script
+	```
+	curl localhost:5034/api/v1/bl/trades/ -XPOST -H "Content-Type: application/json" -d '{"businessLogicID":"guks32pf","tradeParams":["0x06fc56347d91c6ad2dae0c3ba38eb12ab0d72e97", "0x9d624f7995e8bd70251f8265f2f9f2b49f169c55", "Brad", "Cathy", 50, "CAR1"],"authParams":["none"]}'
+	```
 	- `./script-post-cartrade-sample.sh`
 	- After this, the transactions are executed by order. When the following log appears on the above third console (the console of `./script-start-cartrade.sh`), the transactions are completed.
 		```
@@ -98,8 +133,12 @@ Before you begin, you need to check that you have all the prerequisites installe
 
 ## How to stop the application and Docker containers
 
-1. Stop the above validators (`./script-start-validator-fabric.sh` and `./script-start-validator-ethereum.sh`) and the cartrade app (`./script-start-cartrade.sh`).
-	- Press Ctrl+C on the above three consoles.
+1. Stop the validators and `cactus-cmd-server-socket`
+	- Press Ctrl+C on the above the **console 1, 2, and 3**.
+1. Remove the config files on your machine
+	```
+	sudo rm -r /etc/cactus/
+	```
 1. Stop the docker containers of Ethereum and Fabric
 	- Press the command `docker stop <CONTAINER ID>` to stop the container corresponding to the above containers which were launched by `./script-start-ledgers.sh` on the boot method. If you want to destroy the docker containers, press the command `docker rm <CONTAINER ID>` after the above.
 	- If any other docker containers are not running on your machine, you can destroy the Docker containers only with `docker ps -aq | xargs docker stop` and `docker ps -aq | xargs docker rm`.
