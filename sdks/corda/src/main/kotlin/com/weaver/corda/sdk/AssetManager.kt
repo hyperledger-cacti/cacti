@@ -35,15 +35,16 @@ class AssetManager {
             recipientParty: String,
 	        hashBase64: String,
             expiryTimeSecs: Long,
+            timeSpec: Int,
             getAssetStateAndRefFlow: String,
             deleteAssetStateCommand: CommandData
         ): Either<Error, String> {
             return try {
                 AssetManager.logger.debug("Sending asset-lock request to Corda as part of asset-exchange.\n")
-                val contractId = runCatching {
 
+                val contractId = runCatching {
                     val assetAgreement = createAssetExchangeAgreement(assetType, assetId, recipientParty, "")
-                    val lockInfo = createAssetLockInfo(hashBase64, expiryTimeSecs)
+                    val lockInfo = createAssetLockInfo(hashBase64, timeSpec, expiryTimeSecs)
 
                     proxy.startFlow(::LockAsset, lockInfo, assetAgreement, getAssetStateAndRefFlow, deleteAssetStateCommand)
                         .returnValue.get()
@@ -70,6 +71,7 @@ class AssetManager {
             recipientParty: String,
 	        hashBase64: String,
             expiryTimeSecs: Long,
+            timeSpec: Int,
             getAssetStateAndRefFlow: String,
             deleteAssetStateCommand: CommandData
         ): Either<Error, String> {
@@ -78,7 +80,7 @@ class AssetManager {
                 val contractId = runCatching {
                     
                     val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, recipientParty, "")
-                    val lockInfo = createAssetLockInfo(hashBase64, expiryTimeSecs)
+                    val lockInfo = createAssetLockInfo(hashBase64, timeSpec, expiryTimeSecs)
 
                     proxy.startFlow(::LockFungibleAsset, lockInfo, assetAgreement, getAssetStateAndRefFlow, deleteAssetStateCommand)
                         .returnValue.get()
@@ -100,7 +102,7 @@ class AssetManager {
         @JvmStatic
         fun claimAssetInHTLC(
             proxy: CordaRPCOps,
-            contractId: net.corda.core.contracts.UniqueIdentifier,
+            contractId: String,
             hashPreimage: String,
             createAssetStateCommand: CommandData,
             assetStateContractId: String,
@@ -132,7 +134,7 @@ class AssetManager {
         @JvmStatic
         fun reclaimAssetInHTLC(
             proxy: CordaRPCOps,
-            contractId: net.corda.core.contracts.UniqueIdentifier,
+            contractId: String,
             createAssetStateCommand: CommandData,
             assetStateContractId: String
         ): Either<Error, SignedTransaction> {
@@ -160,7 +162,7 @@ class AssetManager {
         @JvmStatic
         fun isAssetLockedInHTLC(
             proxy: CordaRPCOps,
-            contractId: net.corda.core.contracts.UniqueIdentifier
+            contractId: String
         ): Boolean {
             return try {
                 AssetManager.logger.debug("Querying if asset is locked in Corda as part of asset-exchange.\n")
@@ -176,7 +178,7 @@ class AssetManager {
         @JvmStatic
         fun readHTLCStateByContractId(
             proxy: CordaRPCOps,
-            contractId: net.corda.core.contracts.UniqueIdentifier
+            contractId: String
         ): Either<Error, StateAndRef<AssetExchangeHTLCState>> {
             return try {
                 AssetManager.logger.debug("Querying asset-lock HTLC state from Corda as part of asset-exchange.\n")
@@ -233,10 +235,12 @@ class AssetManager {
 
         fun createAssetLockInfo(
             hashBase64: String,
+            timeSpec: Int,
             expiryTimeSecs: Long): AssetLocks.AssetLock {
 	        
             val lockInfoHTLC = AssetLocks.AssetLockHTLC.newBuilder()
                 .setHashBase64(ByteString.copyFrom(hashBase64.toByteArray()))
+                .setTimeSpecValue(timeSpec)
                 .setExpiryTimeSecs(expiryTimeSecs)
                 .build()
 
@@ -249,10 +253,10 @@ class AssetManager {
         }
 
         fun createAssetClaimInfo(
-            hashPreimageBase64: String): AssetLocks.AssetClaim {
+            hashPreimage: String): AssetLocks.AssetClaim {
 	        
             val claimInfoHTLC = AssetLocks.AssetClaimHTLC.newBuilder()
-                .setHashPreimageBase64(ByteString.copyFrom(hashPreimageBase64.toByteArray()))
+                .setHashPreimageBase64(ByteString.copyFrom(Base64.getEncoder().encodeToString(hashPreimage.toByteArray()).toByteArray()))
                 .build()
 
             val claimInfo = AssetLocks.AssetClaim.newBuilder()
