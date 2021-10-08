@@ -61,6 +61,15 @@ class SocketIoValidator:
         def handle_event():
             self.session_dict[request.sid].cb('data-from-blockchain')
 
+        @self.socketio.on('sendAsyncRequest')
+        def handle_sendAsyncRequest(requestData):
+            print('received sendAsyncRequest')
+            print(f"##requestData: {requestData}")
+            result = self.session_dict[request.sid].sendAsyncRequest(requestData)
+            resp_obj = self.build_res_obj(200, requestData["reqID"], result)
+            #respJson = json.dumps(resp_obj)
+            self.socketio.emit("response", resp_obj)
+
         @self.socketio.on('request2')
         def handle_execSyncFunction(requestData):
             print('received request2')

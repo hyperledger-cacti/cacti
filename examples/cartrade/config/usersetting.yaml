@@ -6,7 +6,7 @@ blpRegistry:
 logLevel: debug
 
 applicationHostInfo:
-  hostName: http://xxx.xxxxx.xxx:xxxx
+  hostName: http://aaa.bbb.ccc.ddd # please change hostName to your IP address
   hostPort: 5034
 
 socketOptions:
@@ -31,7 +31,8 @@ appRouters:
   - 
     path: /api/v1/bl/cars/
     routerJs: ../../../../../../examples/cartrade/cars.js
-  - 
-    path: /api/v1/bl/template-trade/
-    routerJs: ../../../../../../examples/cartrade/template-trade.js
+  # abolish template-trade
+  # - 
+    # path: /api/v1/bl/template-trade/
+    # routerJs: ../../../../../../examples/cartrade/template-trade.js
 

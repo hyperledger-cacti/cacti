@@ -24,6 +24,11 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import { homedir } from "os";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1";
+import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-endpoint-v1";
+import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1";
+import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1";
 
 export enum AwsCredentialType {
   LocalFile = "LOCAL_FILE",
@@ -31,6 +36,8 @@ export enum AwsCredentialType {
 }
 
 export interface IPluginKeychainAwsSmOptions extends ICactusPluginOptions {
+  instanceId: string;
+  pluginRegistry: PluginRegistry;
   logLevel?: LogLevelDesc;
   keychainId: string;
   awsProfile: string;
@@ -157,7 +164,24 @@ export class PluginKeychainAwsSm
     if (Array.isArray(this.endpoints)) {
       return this.endpoints;
     }
-    const endpoints: IWebServiceEndpoint[] = [];
+    const endpoints: IWebServiceEndpoint[] = [
+      new SetKeychainEntryV1Endpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new GetKeychainEntryV1Endpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new DeleteKeychainEntryV1Endpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new HasKeychainEntryV1Endpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+    ];
 
     this.endpoints = endpoints;
 
@@ -210,7 +234,8 @@ export class PluginKeychainAwsSm
       );
       if (errorStatus) {
         // FIXME: Throw if the value was not present instead of returning null
-        return (null as unknown) as string;
+        //return (null as unknown) as string;
+        throw new Error(`${key} secret not found`);
       } else {
         this.log.error(`Error retriving secret value for the key "${key}"`);
         throw ex;

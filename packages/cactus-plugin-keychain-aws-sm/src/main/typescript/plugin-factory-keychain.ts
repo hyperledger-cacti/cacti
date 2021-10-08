@@ -1,31 +1,31 @@
-import { v4 as uuidv4 } from "uuid";
+import { Checks } from "@hyperledger/cactus-common";
 import {
   IPluginFactoryOptions,
+  IPluginKeychain,
   PluginFactory,
+  PluginImportType,
 } from "@hyperledger/cactus-core-api";
 
 import {
-  AwsCredentialType,
   IPluginKeychainAwsSmOptions,
   PluginKeychainAwsSm,
 } from "./plugin-keychain-aws-sm";
 
 export class PluginFactoryKeychain extends PluginFactory<
-  PluginKeychainAwsSm,
+  IPluginKeychain,
   IPluginKeychainAwsSmOptions,
   IPluginFactoryOptions
 > {
-  async create(
-    pluginOptions: IPluginKeychainAwsSmOptions = {
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
-      logLevel: "TRACE",
-      awsProfile: "",
-      awsRegion: "",
-      awsEndpoint: "",
-      awsCredentialType: AwsCredentialType.InMemory,
-    },
-  ): Promise<PluginKeychainAwsSm> {
-    return new PluginKeychainAwsSm(pluginOptions);
+  async create(options: any): Promise<IPluginKeychain> {
+    const fnTag = "PluginFactoryKeychain#create()";
+
+    const { pluginImportType } = this.options;
+    Checks.truthy(options, `${fnTag}:options`);
+
+    if (pluginImportType === PluginImportType.Local) {
+      return new PluginKeychainAwsSm(options);
+    } else {
+      throw new Error(`${fnTag} No PluginImportType: ${pluginImportType}`);
+    }
   }
 }
