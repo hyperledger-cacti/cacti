@@ -21,7 +21,7 @@ import net.corda.core.identity.Party
  * @param owner the party owning the tokens.
  */
 @BelongsToContract(AssetContract::class)
-data class AssetState(val quantity: Int,
+data class AssetState(val quantity: Long,
                     val tokenType: String,
                     val owner: Party,
                     override val linearId: UniqueIdentifier = UniqueIdentifier()):

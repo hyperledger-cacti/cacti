@@ -6,9 +6,16 @@
 
 package com.cordaSimpleApplication.client
 
-import com.cordaSimpleApplication.flow.AssetFlow.IssueAssetState
-import com.cordaSimpleApplication.flow.AssetFlow.GetStatesByTokenType
-import com.cordaSimpleApplication.flow.AssetFlow.IssueAssetStateFromStateRef
+import com.cordaSimpleApplication.flow.IssueAssetState
+import com.cordaSimpleApplication.flow.GetStatesByTokenType
+import com.cordaSimpleApplication.flow.IssueAssetStateFromStateRef
+import com.cordaSimpleApplication.flow.DeleteAssetState
+import com.cordaSimpleApplication.flow.GetAssetStateByLinearId
+import com.cordaSimpleApplication.flow.RetrieveStateAndRef
+import com.cordaSimpleApplication.flow.MergeAssetStates
+import com.cordaSimpleApplication.flow.SplitAssetState
+
+import com.cordaSimpleApplication.flow.TransferAssetStateInitiator
 import com.cordaSimpleApplication.state.AssetState
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
@@ -28,14 +35,14 @@ class IssueAssetStateCommand : CliktCommand(help = "Invokes the IssueAssetState 
     private val tokenType: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
-        issueAssetStateHelper(quantity.toInt(), tokenType, config)
+        issueAssetStateHelper(quantity.toLong(), tokenType, config)
     }
 }
 
 /**
  * Helper function used by IssueAssetStateCommand
  */
-fun issueAssetStateHelper(numberOfTokens: Int, tokenType: String, config: Map<String, String>) {
+fun issueAssetStateHelper(numberOfTokens: Long, tokenType: String, config: Map<String, String>) {
     val rpc = NodeRPCConnection(
             host = config["CORDA_HOST"]!!,
             username = "clientUser1",
@@ -106,11 +113,11 @@ class GetAssetStatesByTypeCommand : CliktCommand(help = "Get asset states by tok
 }
 
 /**
- * The CLI command used to trigger a GetStateByLinearId flow.
+ * The CLI command used to trigger a GetAssetStateByLinearId flow.
  *
  * @property linearId The linearId for the [AssetState] to be retrieved.
  */
-class GetAssetStateUsingLinearIdCommand : CliktCommand(help = "Gets asset state by linearId. Requires a linearId") {
+class GetAssetStateByLinearIdCommand : CliktCommand(help = "Gets asset state by linearId. Requires a linearId") {
     private val linearId: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
@@ -122,7 +129,7 @@ class GetAssetStateUsingLinearIdCommand : CliktCommand(help = "Gets asset state 
             rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
             val proxy = rpc.proxy
-            val state = proxy.startFlow(com.cordaSimpleApplication.flow.AssetFlow::GetStateByLinearId, linearId)
+            val state = proxy.startFlow(::GetAssetStateByLinearId, linearId)
                 .returnValue.get()
             println(state)
         } catch (e: Exception) {
@@ -150,7 +157,7 @@ class DeleteAssetStateCommand : CliktCommand(help = "Invokes the DeleteAssetStat
             rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
             val proxy = rpc.proxy
-            val deletedState = proxy.startFlow(com.cordaSimpleApplication.flow.AssetFlow::DeleteAssetState, linearId)
+            val deletedState = proxy.startFlow(::DeleteAssetState, linearId)
                 .returnValue.get().inputs.first()
             println(deletedState)
         } catch (e: Exception) {
@@ -180,7 +187,7 @@ class MergeAssetStatesCommand : CliktCommand(help = "Invokes the MergeAssetState
             rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
             val proxy = rpc.proxy
-            val mergedState = proxy.startFlow(com.cordaSimpleApplication.flow.AssetFlow::MergeAssetStates, linearId1, linearId2)
+            val mergedState = proxy.startFlow(::MergeAssetStates, linearId1, linearId2)
                 .returnValue.get().inputs.first()
             println(mergedState)
         } catch (e: Exception) {
@@ -210,7 +217,7 @@ class RetrieveAssetStateAndRefCommand : CliktCommand(help = "Invokes the Retriev
             rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
             val proxy = rpc.proxy
-            val stateAndRef = proxy.startFlow(com.cordaSimpleApplication.flow.AssetFlow::RetrieveStateAndRef, tokenType, quantity.toInt())
+            val stateAndRef = proxy.startFlow(::RetrieveStateAndRef, tokenType, quantity.toLong())
                 .returnValue.get()
             println(stateAndRef.toString())
         } catch (e: Exception) {
@@ -243,7 +250,7 @@ class SplitAssetStateCommand : CliktCommand(help = "Invokes the SplitAssetState 
             rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
             val proxy = rpc.proxy
-            val outputStates = proxy.startFlow(com.cordaSimpleApplication.flow.AssetFlow::SplitAssetState, linearId, quantity1.toInt(), quantity2.toInt())
+            val outputStates = proxy.startFlow(::SplitAssetState, linearId, quantity1.toLong(), quantity2.toLong())
                 .returnValue.get().inputs
             println(outputStates)
         } catch (e: Exception) {
@@ -275,7 +282,7 @@ class TransferAssetStateCommand : CliktCommand(help = "Invokes the TransferAsset
             val proxy = rpc.proxy
             val partyX500Name = CordaX500Name.parse(partyName)
             val otherParty = proxy.wellKnownPartyFromX500Name(partyX500Name) ?: return println("Party named $partyName cannot be found.\n")
-            val outputStates = proxy.startFlow(com.cordaSimpleApplication.flow.AssetFlow::TransferAssetStateInitiator, linearId, otherParty)
+            val outputStates = proxy.startFlow(::TransferAssetStateInitiator, linearId, otherParty)
                 .returnValue.get().inputs
             println(outputStates)
         } catch (e: Exception) {

@@ -54,7 +54,7 @@ fun main(args: Array<String>) = App()
                 GetStatesCommand(),
                 RequestStateCommand(),
                 IssueAssetStateCommand(),
-                GetAssetStateUsingLinearIdCommand(),
+                GetAssetStateByLinearIdCommand(),
                 DeleteAssetStateCommand(),
                 GetAssetStatesByTypeCommand(),
                 IssueAssetStateFromStateRefCommand(),
