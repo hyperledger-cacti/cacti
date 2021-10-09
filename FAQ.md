@@ -13,6 +13,7 @@
   - [Prototyping something and the linter blocking my builds is slowing me down needlessly](#prototyping-something-and-the-linter-blocking-my-builds-is-slowing-me-down-needlessly)
   - [Why do all the tests bind the HTTP/S listeners to a random port?](#why-do-all-the-tests-bind-the-https-listeners-to-a-random-port)
   - [HTTP requests sent with Postman/curl/etc. hang if I'm debugging a test case with VSCode, why?](#http-requests-sent-with-postmancurletc-hang-if-im-debugging-a-test-case-with-vscode-why)
+  - [How do I run test cases with my own ledger images?](#how-do-i-run-test-cases-with-my-own-ledger-images)
 
 ## What are the minimum and recommended hardware specs? Do you have a cool story about this?
 
@@ -150,3 +151,34 @@ proceed via the UI/shortcuts of the debugger.
 
 Once you let the execution continue, requests that previously appeared to be
 hanging should finish successfully.
+
+## How do I run test cases with my own ledger images?
+
+Build and tag the image locally using a name that is non-ambiguous with the official tags. Modify the test code to skip the pull using the start method's omitPull parameter - e.g. replace
+
+`await this.fabric.start();`
+
+with
+
+`await this.fabric.start(true);`
+
+Then, modify the test to use the locally built image with the tag you specified. 
+Exact variable names may differ between test ledger classes, be sure to check the constructors for the right convention. Examples:
+
+Fabric
+```
+this.fabric = new FabricTestLedgerV1({
+  imageName: "*your image name*",
+  imageVersion: "*your image tag*",
+  ...
+});
+```
+
+Quorum
+```
+this.quorum = new QuorumTestLedger({
+  containerImageName: "*your image name*",
+  containerImageVersion: "*your image tag*",
+  ...
+});
+```
