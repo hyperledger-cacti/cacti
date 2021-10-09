@@ -154,13 +154,16 @@ export class OpenEthereumTestLedger {
       eventEmitter.once("start", async (container: Container) => {
         this._container = container;
         this._containerId = container.id;
+
         if (this.emitContainerLogs) {
-          const logOptions = { follow: true, stderr: true, stdout: true };
-          const logStream = await container.logs(logOptions);
-          logStream.on("data", (data: Buffer) => {
-            this.log.debug(`[${this.imageFqn}] %o`, data.toString("utf-8"));
+          const fnTag = `[${this.imageFqn}]`;
+          await Containers.streamLogs({
+            container: this.container,
+            tag: fnTag,
+            log: this.log,
           });
         }
+
         try {
           await Containers.waitForHealthCheck(this._containerId);
           resolve(container);

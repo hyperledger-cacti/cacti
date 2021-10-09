@@ -443,11 +443,11 @@ export class FabricTestLedgerV1 implements ITestLedger {
         this.containerId = container.id;
 
         if (this.emitContainerLogs) {
-          const logOptions = { follow: true, stderr: true, stdout: true };
-          const logStream = await container.logs(logOptions);
-          logStream.on("data", (data: Buffer) => {
-            const fnTag = `[${this.getContainerImageName()}]`;
-            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          const fnTag = `[${this.getContainerImageName()}]`;
+          await Containers.streamLogs({
+            container: this.getContainer(),
+            tag: fnTag,
+            log: this.log,
           });
         }
 
