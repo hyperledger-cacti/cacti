@@ -132,6 +132,8 @@ test(testCase, async (t: Test) => {
   const cWithoutParams = "not sending all required parameters";
   const cInvalidParams = "sending invalid parameters";
 
+  let contractAddress: string;
+
   test(`${testCase} - ${fDeploy} - ${cOk}`, async (t2: Test) => {
     const parameters = {
       contractName: HelloWorldContractJson.contractName,
@@ -141,7 +143,6 @@ test(testCase, async (t: Test) => {
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      bytecode: HelloWorldContractJson.bytecode,
       gas: 1000000,
     };
     const res = await apiClient.deployContractSolBytecodeV1(
@@ -154,6 +155,8 @@ test(testCase, async (t: Test) => {
       200,
       `Endpoint ${fDeploy}: response.status === 200 OK`,
     );
+
+    contractAddress = res.data.transactionReceipt.contractAddress as string;
 
     t2.end();
   });
@@ -184,10 +187,6 @@ test(testCase, async (t: Test) => {
         fields.includes("contractName"),
         "Rejected because contractName is required",
       );
-      t2.ok(
-        fields.includes("bytecode"),
-        "Rejected because bytecode is required",
-      );
       t2.notOk(fields.includes("gas"), "gas is not required");
     }
 
@@ -204,7 +203,6 @@ test(testCase, async (t: Test) => {
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
         },
-        bytecode: HelloWorldContractJson.bytecode,
         gas: 1000000,
         fake: 4,
       };
@@ -237,7 +235,7 @@ test(testCase, async (t: Test) => {
       methodName: "setName",
       params: [`DrCactus${uuidV4()}`],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
@@ -265,7 +263,7 @@ test(testCase, async (t: Test) => {
         invocationType: EthContractInvocationType.Send,
         params: [`DrCactus${uuidV4()}`],
         gas: 1000000,
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: firstHighNetWorthAccount,
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
@@ -276,14 +274,10 @@ test(testCase, async (t: Test) => {
       t2.equal(
         e.response.status,
         400,
-        `Endpoint ${fInvoke} without required contractName and methodName: response.status === 400 OK`,
+        `Endpoint ${fInvoke} without required methodName: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
         param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("contractName"),
-        "Rejected because contractName is required",
       );
       t2.ok(
         fields.includes("methodName"),
@@ -299,12 +293,13 @@ test(testCase, async (t: Test) => {
     try {
       const parameters = {
         contractName: HelloWorldContractJson.contractName,
+        contractAddress,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [`DrCactus${uuidV4()}`],
         gas: 1000000,
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: firstHighNetWorthAccount,
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,

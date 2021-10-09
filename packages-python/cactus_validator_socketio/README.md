@@ -4,39 +4,27 @@
 
 ### Build and run containers
 
-go to cactus/tools/docker/indy-testnet and 
+Go to cactus/tools/docker/indy-testnet directory and follow the [instructions](https://github.com/hyperledger/cactus/blob/main/tools/docker/indy-testnet/README.md).
+This will build Indy related images and start the containers.
 
-```
-$ cd cactus/tools/docker/indy-testnet
-$ docker-compose -f ./under-construction-docker-compose.yaml up
-Starting nginx     ... done
-Starting validator ... done
-Starting indy_pool ... done
-```
+You need to:
 
-Type Ctrl + C to stop these containers.
+- edit `.env` file if necessary (if you are behind firewall).
+
+- run `./run-before-build.sh`.
+
+- run `docker-comopse build` to build images.
+
+- run `docker-compose up` will start the containers. It will pull a docker image (nginx) first time you do this.
+
+You can `Ctrl-c` to stop the containers.
 
 ### Verify that containers are actually up
 
 Type following in the host environemnt:
 
-```
-　$ docker ps | grep -e indy_pool -e nginx -e valipy
-```
-Three containers `indy_pool`, `nginx` and `valipy` must be printed.
-
-### Start Indy validator server
-
-Run following commands (from host environment) to log into validator container:
-
-```
-$ sudo docker exec -it validator /bin/bash
-```
- and run the server using these commands:
-
-```
-$ cd /root/validator
-$ pip install pyyaml
-$ TEST_POOL_IP=172.16.0.2 python -m main
+```bash
+docker ps | grep -e indy_pool -e nginx -e validator
 ```
 
+Three containers `indy_pool`, `nginx` and `validator` must be printed.
