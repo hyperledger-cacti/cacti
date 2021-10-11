@@ -1,5 +1,6 @@
 {
-  "name": "packages",
+  "name": "@hyperledger/cactus-cmd-socket-server",
+  "version": "0.10.0",
   "private": true,
   "scripts": {
     "build": "npm run build-ts && npm run copy-static-assets",
