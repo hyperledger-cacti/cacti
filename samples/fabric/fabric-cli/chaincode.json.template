@@ -3,6 +3,10 @@
     "Create": {
       "args": ["a", ""],
       "replaceIndices": [1]
+    },
+    "CreateFromRemote": {
+      "args": ["a", ""],
+      "replaceIndices": [1]
     }
   },
   "simpleassettransfer": {

@@ -156,24 +156,24 @@ Below are the steps to exercise asset exchange using the `fabric-cli` tool.
    make start-interop-local CHAINCODE_NAME=simpleasset
    ```
    depending on whether you are using pre-built Github packages or using local builds from this clone of the repository.
-2. Go to the Fabric Client `fabric-cli` directory (the folder `samples/fabric/fabric-cli` if you want to exercise the CLI using `node`, or the folder `samples/fabric/go-cli` if you want to exercise the CLI using `go`).
+2. You can use the `fabric-cli` executable in the `bin` folder (for the executable built using Node.js) or the one built using the [Golang version](../go-cli/bin/fabric-cli) after running `make build-local` [here](../go-cli).
 3. If a `config.json` (or equivalent, as set in the `CONFIG_PATH` property in `.env`) doesn't exist, create one by making a copy of `config.template.json`. In the `config.json`, set the `chaincode` field in both the `network1` and `network2` sections to `simpleasset`.
 4. Run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adding the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
    ```bash
-   sh scripts/initAsset.sh
+   ./scripts/initAsset.sh
    ```
-3. Check the status of the assets owned by `Alice` and `Bob` in the the networks `network1` and `network2`, by running
+3. Check the status of the assets owned by `Alice` and `Bob` in the two networks `network1` and `network2`, by running
    ```bash
-   sh scripts/getAssetStatus.sh
+   ./scripts/getAssetStatus.sh
    ```
 4. Initiate exchange of bond asset `bond01:a04` of `Bob` in `network1` with token assets `token1:100` of `Alice` in `network2`, by running
-   ```
+   ```bash
    ./bin/fabric-cli asset exchange-all --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:bond01:a04:alice:token1:100
    ```
-   Repeat the step 3 to observe the change in the ownership of assets as a result of the `asset echange` exercise.
+   Repeat the step 3 to observe the change in the ownership of assets as a result of the `asset exchange` exercise.
 
 5. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange-step` CLI commands):
-   ```
+   ```bash
    ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --secret=<hash-pre-image> --target-network=network1 --param=bond01:a03
    ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
    ./bin/fabric-cli asset exchange-step --step=3 --timeout-duration=1800 --locker=bob --recipient=alice --hash=<hash-value> --target-network=network2 --param=token1:100

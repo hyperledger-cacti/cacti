@@ -16,6 +16,10 @@ Once the networks, relays, and drivers have been launched, and the ledgers boots
 2. **Fabric to Corda**: Either Fabric network requests state and proof from the Corda network
 3. **Fabric to Fabric**: One Fabric network requests state and proof from another Fabric network
 
+We assume that one of the following chaincodes have been deployed in either Fabric network you are testing with:
+* `simplestate`
+* `simplestatewithacl`
+
 ## Corda to Fabric
 
 To test the scenario where `Corda_Network` requests the value of the state (key) `a` from `network1`, do the following:
@@ -56,10 +60,9 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
 
 To test the scenario where `network1` requests the value of the state (key) `H` from `Corda_Network`, do the following:
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network1`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` folder.
+- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Copy `chaincode.json.template` to `chaincode.json` (this file specified the arguments of the transaction to be locally invoked after fetching a remote view).
-- In the `simplestate:Create:args` attribute, replace the argument `"a"` with `"H"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
+- Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"H"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
   ```json
   "args": ["a", ""]
   ```
@@ -83,10 +86,9 @@ To test the scenario where `network1` requests the value of the state (key) `H` 
 
 To test the scenario where `network2` requests the value of the state (key) `H` from `Corda_Network`, do the following:
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` folder.
+- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Copy `chaincode.json.template` to `chaincode.json` (this file specified the arguments of the transaction to be locally invoked after fetching a remote view).
-- In the `simplestate:Create:args` attribute, replace the argument `"a"` with `"H"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
+- Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"H"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
   ```json
   "args": ["a", ""]
   ```
@@ -112,10 +114,9 @@ To test the scenario where `network2` requests the value of the state (key) `H` 
 
 To test the scenario where `network1` requests the value of the state (key) `Arcturus` from `network2`, do the following:
 - (_Make sure the following are running_: Fabric `network1`, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` folder.
+- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Copy `chaincode.json.template` to `chaincode.json` (this file specified the arguments of the transaction to be locally invoked after fetching a remote view).
-- In the `simplestate:Create:args` attribute, replace the argument `"a"` with `"Arcturus"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
+- Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"Arcturus"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
   ```json
   "args": ["a", ""]
   ```
@@ -139,10 +140,9 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
 
 To test the scenario where `network2` requests the value of the state (key) `a` from `network1`, do the following:
 - (_Make sure the following are running_: Fabric `network1`, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` folder.
+- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
-- Copy `chaincode.json.template` to `chaincode.json` (this file specified the arguments of the transaction to be locally invoked after fetching a remote view).
-- (There is no need to change the key as the default argument `"a"` is what we intend to use in this data sharing use scenario.)
+- (There is no need to edit `chaincode.json` to change the key as the default argument `"a"` is what we intend to use in this data sharing use scenario.)
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     ```bash

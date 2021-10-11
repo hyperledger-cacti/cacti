@@ -9,41 +9,61 @@ title: Asset Exchange
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-Below are the steps to exercise asset exchange using the CLI `fabric-cli`.
-1. Spin up both `network1` and `network2` with interoperation chaincode installed along with the `simpleasset` application, by running
-   ```bash
-   make start-interop CHAINCODE_NAME=simpleasset
-   ```
-2. Go to the Fabric Client `fabric-cli` directory (the folder `samples/fabric/fabric-cli` if you want to exercise the CLI using `node`, or the folder `samples/fabric/go-cli` if you want to exercise the CLI using `go`) and run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adding the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
-   ```bash
-   sh scripts/initAsset.sh
-   ```
-3. Check the status of the assets owned by `Alice` and `Bob` in the the networks `network1` and `network2`, by running
-   ```bash
-   sh scripts/getAssetStatus.sh
-   ```
-4. Initiate exchange of bond asset `bond01:a04` of `Bob` in `network1` with token assets `token1:100` of `Alice` in `network2`, by running
-   ```
-   ./bin/fabric-cli asset exchange-all --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:bond01:a04:alice:token1:100
-   ```
-   Repeat the step 3 to observe the change in the ownership of assets as a result of the `asset echange` exercise.
+This document lists sample ways in which you can exercise the asset-exchange interoperation protocol on the test network [launched earlier](../test-network/overview).
 
-5. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange-step` CLI commands):
-   ```
-   ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --secret=<hash-pre-image> --target-network=network1 --param=bond01:a03
-   ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
-   ./bin/fabric-cli asset exchange-step --step=3 --timeout-duration=1800 --locker=bob --recipient=alice --hash=<hash-value> --target-network=network2 --param=token1:100
-   ./bin/fabric-cli asset exchange-step --step=4 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
-   ./bin/fabric-cli asset exchange-step --step=5 --recipient=alice --locker=bob --target-network=network2 --contract-id=<contract-id> --secret=<hash-pre-image>
-   ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
-   ./bin/fabric-cli asset exchange-step --step=7 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
-   ./bin/fabric-cli asset exchange-step --step=8 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
-   ```
- 
- The `asset exchange` scenario is demonstrated above using an application chaincode `simpleasset` and the `interop` chaincode, where the application chaincode makes invocations into the `interop` chaincode when it needs to lock, claim, or reclaim/unlock assets. However, the same `asset exchange` scenario can be demonstrated with the help of just the application chaincode `simpleassetandinterop` which also includes the scripts to lock, claim, or reclaim/unlock assets. This requires the steps 1-5 to be exercised with minor modifications as indicated below:
-- Spin up the networks by running the below command (update to step 1)
+For this scenario, you only need the networks to be running with the appropriate contracts deployed and the ledgers bootstrapped. You do not need to run relays and drivers. You can run the following combinations of exchanges (_other combinations of DLTs will be supported soon_):
+1. **Fabric with Fabric**: One Fabric network transfers a bond from Alice to Bob in exchange for a transfer of tokens from Bob to Alice in the other network
+
+Assuming that one of the following chaincodes have been deployed in both networks:
+* `simpleasset`
+* `simpleassetandinterop`
+* `simpleassettransfer`
+run the following steps:
+1. Navigate to either the `samples/fabric/fabric-cli` folder or the `samples/fabric/go-cli` folder in your clone of the Weaver repository.
+2. Run the following to verify the status of the assets owned by `alice` and `bob` in the two networks:
    ```bash
-   make start CHAINCODE_NAME=simpleassetandinterop
+   ./scripts/getAssetStatus.sh
    ```
-- Replace `simpleasset` with `simpleassetandinterop` in the `config.json` file used to populate the `.env` file that is part of the script `initAsset.sh` (update to step 2)
-- Replace `simpleasset` with `simpleassetandinterop` in the script `getAssetStatus.sh` (update to step 3)
+3. Complete the asset exchange in either of the two different ways:
+   * Using a single command:
+     - Run the following to trigger exchange of bond `bond01:a03` owned by `alice` in `network1` with `100` units of tokens `token1` owned by `bob` in `network2`:
+       ```bash
+       ./bin/fabric-cli asset exchange-all --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 alice:bond01:a03:bob:token1:100
+       ```
+     - To verify that `bob` now owns a bond in exchange for `alice` owning some tokens, run the following:
+       ```bash
+       ./scripts/getAssetStatus.sh
+       ```
+   * Using step-by-step commands:
+     - Run the following to trigger `alice` locking `bond01:a03` for `bob` in `network1`
+       ```bash
+       ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --secret=<hash-pre-image> --target-network=network1 --param=bond01:a03
+       ```
+     - Run the following to verify `alice`'s lock:
+       ```bash
+       ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
+       ```
+     - Run the following to trigger `bob` locking `100` units of `token1` for `alice` in `network2`:
+       ```bash
+       ./bin/fabric-cli asset exchange-step --step=3 --timeout-duration=1800 --locker=bob --recipient=alice --hash=<hash-value> --target-network=network2 --param=token1:100
+       ```
+     - Run the following to verify `bob`'s lock:
+       ```bash
+       ./bin/fabric-cli asset exchange-step --step=4 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
+       ```
+     - Run the following to trigger `alice`'s claim for `100` units of `token1` locked by `bob` in `network2`:
+       ```bash
+       ./bin/fabric-cli asset exchange-step --step=5 --recipient=alice --locker=bob --target-network=network2 --contract-id=<contract-id> --secret=<hash-pre-image>
+       ```
+     - Run the following to verify the claim:
+       ```bash
+       ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
+       ```
+     - Run the following to trigger `bob`'s claim for `bond01:a03` locked by `alice` in `network1`:
+       ```bash
+       ./bin/fabric-cli asset exchange-step --step=7 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
+       ```
+     - Run the following to verify the claim:
+       ```bash
+       ./bin/fabric-cli asset exchange-step --step=8 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
+       ```
