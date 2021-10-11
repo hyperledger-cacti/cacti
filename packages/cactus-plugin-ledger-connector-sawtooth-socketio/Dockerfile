@@ -24,13 +24,13 @@ RUN apt-get install -y \
 
 # install python 3.9.5
 #RUN apt-get install -y python3 python3-pip
-RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-RUN echo 'export PATH="$HOME"/.pyenv/bin:$PATH' >> ~/.rc
-RUN . ~/.rc && pyenv install 3.9.5
-RUN echo 'eval "$(pyenv init -)"' >> ~/.rc
-RUN echo 'eval "$(pyenv init --path)"' >> ~/.rc
-RUN cat ~/.rc >> ~/.bashrc
-RUN . ~/.rc && pyenv global 3.9.5
+#RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+#RUN echo 'export PATH="$HOME"/.pyenv/bin:$PATH' >> ~/.rc
+#RUN . ~/.rc && pyenv install 3.9.5
+#RUN echo 'eval "$(pyenv init -)"' >> ~/.rc
+#RUN echo 'eval "$(pyenv init --path)"' >> ~/.rc
+#RUN cat ~/.rc >> ~/.bashrc
+#RUN . ~/.rc && pyenv global 3.9.5
 
 RUN apt-get install -y nodejs npm
 RUN npm install n -g
