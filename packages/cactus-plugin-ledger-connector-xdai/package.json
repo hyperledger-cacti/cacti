@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-xdai",
-  "version": "0.10.0",
+  "version": "1.0.0-rc.1",
   "description": "Allows Cactus nodes to connect to a Xdai ledger.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-ledger-connector-xdai.node.umd.min.js",
@@ -69,9 +69,9 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "0.10.0",
-    "@hyperledger/cactus-core": "0.10.0",
-    "@hyperledger/cactus-core-api": "0.10.0",
+    "@hyperledger/cactus-common": "1.0.0-rc.1",
+    "@hyperledger/cactus-core": "1.0.0-rc.1",
+    "@hyperledger/cactus-core-api": "1.0.0-rc.1",
     "axios": "0.21.4",
     "express": "4.17.1",
     "joi": "17.4.2",
@@ -82,8 +82,8 @@
     "web3-utils": "1.5.2"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "0.10.0",
-    "@hyperledger/cactus-test-tooling": "0.10.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.1",
+    "@hyperledger/cactus-test-tooling": "1.0.0-rc.1",
     "@types/express": "4.17.13"
   }
 }

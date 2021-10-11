@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio",
-  "version": "0.10.0",
+  "version": "1.0.0-rc.1",
   "private": true,
   "scripts": {
     "start": "cd ./dist && node common/core/bin/www.js",
