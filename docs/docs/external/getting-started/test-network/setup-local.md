@@ -115,13 +115,13 @@ This folder contains code to create and launch networks `network1` and `network2
 
 _Note_: for new users, we recommend testing the Data Sharing feature first with the `simplestate` contract. To test the other modes, you can simply [tear down](#tear-down-the-setup) the Fabric networks and restart them with the appropriate chaincodes installed.
 
-Follow the instructions below to build and launch the networks (with the default `simplestate` chaincode):
+Follow the instructions below to build and launch the networks:
 - Navigate to the `tests/network-setups/fabric/dev` folder.
-- To spin up both network1 and network2 with the interoperation chaincode installed, run:
+- To spin up both network1 and network2 with the interoperation chaincode and the default `simplestate` chaincode installed, run:
   ```bash
   make start-interop-local
   ```
-- _To launch the networks with a different chaincode from the above list, run_:
+- _To launch the networks with a different application chaincode from the above list, run_:
   ```bash
   make start-interop-local <chaincode-name>
   ```

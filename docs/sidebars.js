@@ -31,6 +31,7 @@ module.exports = {
                     items: [
                         "external/getting-started/interop/data-sharing",
                         "external/getting-started/interop/asset-exchange",
+                        "external/getting-started/interop/asset-transfer",
                     ],
                 },
                 {

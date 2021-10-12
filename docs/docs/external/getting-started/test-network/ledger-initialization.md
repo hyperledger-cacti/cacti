@@ -55,15 +55,15 @@ Prepare `fabric-cli` for configuration suitably as follows.
     CONFIG_PATH=./config.json
     CHAINCODE_PATH=./chaincode.json
     ```
-  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver and <chaincode-name> with the name of the deployed chaincode, either `simpleasset` or `simpleassetwithacl`.
+  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver and `<chaincode-name>` with the name of the deployed chaincode, either `simpleasset` or `simpleassetwithacl`.
   * If `simplestate` is deployed, set `<function-name>` to `Create`, and if `simpleassetwithacl` if deployed, set `<function-name>` to `CreateFromRemote`.
   * Leave the default values unchanged for the other parameters.
 - Run the following command:
-  ```
+  ```bash
   ./bin/fabric-cli env set-file ./.env
   ```
 - _Note_: If you don't set the `CONFIG_PATH` environment variable in `.env` appropriately, then you should also run:
-  ```
+  ```bash
   ./bin/fabric-cli config set-file ./config.json
   ```
 
@@ -112,7 +112,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
 - Create a `config.json` file by copying the `config.template.json` and setting (or adding or removing) suitable values:
   * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
     - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
-    - Set `chaincode` in each network to the deployed chaincode name (`simpleasset` or `simpleassetandinterop` or `simpleassettransfer`).
+    - Set the `chaincode` attribute in each network to the deployed chaincode name (`simpleasset` or `simpleassetandinterop` or `simpleassettransfer`).
     - Otherwise, leave the default values unchanged.
 - Create a `.env` file by copying `.env.template` and setting following parameter values:
   * If Relays and Drivers are deployed in the host machine:
@@ -128,11 +128,11 @@ Prepare `fabric-cli` for configuration suitably as follows.
   * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.
   * Leave the default values unchanged for the other parameters.
 - Run the following command:
-  ```
+  ```bash
   ./bin/fabric-cli env set-file ./.env
   ```
 - _Note_: If you don't set the `CONFIG_PATH` environment variable in `.env` appropriately, then you should also run:
-  ```
+  ```bash
   ./bin/fabric-cli config set-file ./config.json
   ```
 
@@ -155,4 +155,68 @@ We use the Fabric CLI (`fabric-cli`) built earlier (in `samples/fabric/fabric-cl
 
 #### Configuring the Fabric CLI
 
-_TBD_
+During bootstrap, the ledgers in both `network1` and `network2` must be populated with the following information scoped by the interoperation chaincode:
+- Access control policies governing requests from foreign networks
+- Security group info for foreign networks (i.e., identities of network units and their membership providers' certificate chains)
+- Verification policies for proofs supplied by foreign networks
+Knowledge of foreign networks that must be configured in this stage is as follows:
+- `network1` has policies and security group info for `network2` and `Corda_Network`
+- `network2` has policies and security group info for `network1` and `Corda_Network`
+(_The Corda sample application doesn't support asset transfer yet, but there is no harm in including it above._)
+The ledgers must also be populated with sample key-value pairs for testing interoperation flows, scoped by the sample application chaincode.
+
+Prepare `fabric-cli` for configuration suitably as follows.
+- Navigate to the `samples/fabric/fabric-cli` folder (_the Go CLI doesn't support asset transfer yet_).
+- Create a `config.json` file by copying the `config.template.json` and setting (or adding or removing) suitable values:
+  * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
+    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
+    - Set the `chaincode` attribute in each network to `simpleassettransfer`.
+    - Set the `aclPolicyPrincipalType` attribute in `network2` to `ca`.
+    - Otherwise, leave the default values unchanged.
+- Create a `.env` file by copying `.env.template` and setting the following parameter values:
+  * If Relays and Drivers are deployed in the host machine:
+    ```
+    MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials
+    DEFAULT_APPLICATION_CHAINCODE=simpleassettransfer
+    CONFIG_PATH=./config.json
+    CHAINCODE_PATH=./chaincode.json
+    ```
+  * If Relays and Drivers are deployed in the Docker containers:
+    ```
+    MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials_docker
+    DEFAULT_APPLICATION_CHAINCODE=simpleassettransfer
+    CONFIG_PATH=./config.json
+    CHAINCODE_PATH=./chaincode.json
+    ```
+  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.
+  * Leave the default values unchanged for the other parameters.
+- Run the following command:
+  ```
+  ./bin/fabric-cli env set-file ./.env
+  ```
+- _Note_: If you don't set the `CONFIG_PATH` environment variable in `.env` appropriately, then you should also run:
+  ```
+  ./bin/fabric-cli config set-file ./config.json
+  ```
+
+#### Bootstrapping Network and Application State
+
+Create appropriate access control and verification policies for `network1` and `network2` by running:
+
+```bash
+./bin/fabric-cli configure create all --local-network=network1
+./bin/fabric-cli configure create all --local-network=network2
+```
+
+Load access control and verification policies onto the ledgers of `network1` and `network2` by running:
+
+```bash
+./bin/fabric-cli configure network --local-network=network1
+./bin/fabric-cli configure network --local-network=network2
+```
+
+Initialize bond and token asset states and ownerships on the `network1` ledger by running the following (this step will also create a user `alice` in `network1` and a user `bob` in `network2`):
+
+```bash
+./scripts/initAssetsForTransfer.sh
+```

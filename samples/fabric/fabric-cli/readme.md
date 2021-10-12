@@ -200,7 +200,7 @@ Below are the steps to exercise asset exchange using the `fabric-cli` tool.
 You can repeat the above experiment with the `simpleassettransfer` chaincode as well, though this chaincode contains augmentations that serve to demonstrate asset transfers (see below).
 
 
-## Asset Exchange
+## Asset Transfer
 
 Below are the steps to exercise asset transfers from `network1` to `network2` using the `fabric-cli` tool.
 1. Spin up both `network1` and `network2` with interoperation chaincode installed along with the `simpleassettransfer` application by navigating to the `tests/network-setups/fabric/dev` folder and running either
@@ -219,12 +219,12 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
    {
       "network1": {
          ...
-         "chaincode": "simpleasset",
+         "chaincode": "simpleassettransfer",
          ...
       },
       "network2": {
          ...
-         "chaincode": "simpleasset",
+         "chaincode": "simpleassettransfer",
          "aclPolicyPrincipalType": "ca"
       }
    }
@@ -300,7 +300,7 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
    ```
    You should see an error message like `Error: the asset a04 does not exist`.
 
-**The following sequence of operations will illustrate transfers and recoveries of a bond (non-fungible) asset.**
+**The following sequence of operations will illustrate transfers and recoveries of token (fungible) assets.**
 
 18. Verify that `alice` in `network1` owns `10000` tokens as follows:
    ```bash
