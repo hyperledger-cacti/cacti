@@ -1,8 +1,8 @@
 # Ignore any locally-used artifacts
-artifacts/*.jar
-artifacts/*.zip
-artifacts/clients-0.1
-artifacts/clients-0.2
+shared/artifacts/*.jar
+shared/artifacts/*.zip
+shared/artifacts/clients-0.1
+shared/artifacts/clients-0.2
 
 # Eclipse, ctags, Mac metadata, log files
 .classpath

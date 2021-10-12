@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+# Allow the script to be run from outside the nodes directory.
+basedir=$( dirname "$0" )
+cd "$basedir"
+
+if [ -z "$JAVA_HOME" ] && which osascript >/dev/null; then
+    # use default version of java installed on mac
+    /usr/libexec/java_home --exec java -jar runnodes.jar "$@"
+else
+    "${JAVA_HOME:+$JAVA_HOME/bin/}java" -jar runnodes.jar "$@"
+fi
