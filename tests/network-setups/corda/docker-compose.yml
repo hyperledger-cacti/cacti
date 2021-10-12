@@ -42,14 +42,14 @@ services:
     image: corda/corda-zulu-java1.8-4.8
   partyb:
     volumes:
-    - /data/dlt-interop/weaver-fork/tests/network-setups/corda/build/nodes/PartyB/node.conf:/etc/corda/node.conf
-    - /data/dlt-interop/weaver-fork/tests/network-setups/corda/build/nodes/PartyB/certificates:/opt/corda/certificates
-    - /data/dlt-interop/weaver-fork/tests/network-setups/corda/build/nodes/PartyB/logs:/opt/corda/logs
-    - /data/dlt-interop/weaver-fork/tests/network-setups/corda/build/nodes/PartyB/persistence:/opt/corda/persistence
-    - /data/dlt-interop/weaver-fork/tests/network-setups/corda/build/nodes/PartyB/cordapps:/opt/corda/cordapps
-    - /data/dlt-interop/weaver-fork/tests/network-setups/corda/build/nodes/PartyB/network-parameters:/opt/corda/network-parameters
-    - /data/dlt-interop/weaver-fork/tests/network-setups/corda/build/nodes/PartyB/additional-node-infos:/opt/corda/additional-node-infos
-    - /data/dlt-interop/weaver-fork/tests/network-setups/corda/build/nodes/PartyB/drivers:/opt/corda/drivers
+    - ./build/nodes/PartyB/node.conf:/etc/corda/node.conf
+    - ./build/nodes/PartyB/certificates:/opt/corda/certificates
+    - ./build/nodes/PartyB/logs:/opt/corda/logs
+    - ./build/nodes/PartyB/persistence:/opt/corda/persistence
+    - ./build/nodes/PartyB/cordapps:/opt/corda/cordapps
+    - ./build/nodes/PartyB/network-parameters:/opt/corda/network-parameters
+    - ./build/nodes/PartyB/additional-node-infos:/opt/corda/additional-node-infos
+    - ./build/nodes/PartyB/drivers:/opt/corda/drivers
     environment:
     - ACCEPT_LICENSE=${ACCEPT_LICENSE}
     user: root
