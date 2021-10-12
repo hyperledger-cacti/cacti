@@ -20,7 +20,7 @@ Through out the RFCs if you come across terminology that might be not well defin
 | 01-003 | Views                           | Model    | [Proposed](./models/views.md)                                 |
 | 02-004 | Events                          | Model    | [Draft](./models/events.md)                                   |
 | 01-005 | Fair Exchange                   | Model    | [Draft](./models/fair-exchange.md)                            |
-| 01-006 | Identity                        | Model    | [Draft](./models/identity/distributed-identity-management.md) |
+| 01-006 | Identity                        | Model    | [Draft](./models/identity/decentralized-network-identity-discovery-management.md) |
 | 01-007 | Relays                          | Model    | [Draft](./models/relays.md)                                   |
 |        | Security                        | Model    | [Draft](./models/security.md)                                 |
 | 02-001 | Event Bus                       | Protocol | [Draft](./protocols/event-bus.md)                             |

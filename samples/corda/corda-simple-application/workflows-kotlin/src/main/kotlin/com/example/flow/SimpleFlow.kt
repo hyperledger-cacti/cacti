@@ -13,11 +13,14 @@ import javassist.NotFoundException
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
+import net.corda.core.node.services.Vault
 import net.corda.core.node.services.queryBy
+import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
+import java.util.Arrays.asList
 
 /**
  * The CreateState flow is used to create a new [SimpleState].
@@ -270,9 +273,10 @@ class GetStateByLinearId(val linearId: String) : FlowLogic<String>() {
      * @return returns the [SimpleState].
      */
     override fun call(): String {
-        val states = serviceHub.vaultService.queryBy<SimpleState>().states
-                .filter { it.state.data.linearId == UniqueIdentifier.Companion.fromString(linearId) }
-                .map { it.state.data }
+        val uuid = UniqueIdentifier.Companion.fromString(linearId)
+        val criteria = QueryCriteria.LinearStateQueryCriteria(null, asList(uuid),
+            Vault.StateStatus.UNCONSUMED, null)
+        val states = serviceHub.vaultService.queryBy<SimpleState>(criteria).states
         val state = states.first()
         println("Retrieved state with linearId $linearId: $state\n")
         return state.toString()
