@@ -127,7 +127,7 @@ function mainTask()
     yarn run custom-checks
   fi
 
-  node ./tools/validate-bundle-names.js
+  yarn tools:validate-bundle-names
 
   dumpDiskUsageInfo
   yarn run test:all -- --bail
