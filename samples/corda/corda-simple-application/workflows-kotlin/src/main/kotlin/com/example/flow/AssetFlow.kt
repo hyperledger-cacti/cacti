@@ -96,16 +96,25 @@ class IssueAssetState(val numerOfTokens: Long, val tokenType: String) : FlowLogi
     }
 }
 
+/*
+ * This flow only updates the owner field of the AssetState pointed by Static Pointer 
+ * argument. This flow doesn't creates any transaction or updates the states in vault.
+ * @property inputStatePointer [StaticPointer<AssetState>]
+ */
 @InitiatingFlow
 @StartableByRPC
-class IssueAssetStateFromStateRefHelper(private val inputStatePointer: StaticPointer<AssetState>) : FlowLogic<AssetState>() {
-
+class UpdateAssetOwnerFromPointer(
+    private val inputStatePointer: StaticPointer<AssetState>
+) : FlowLogic<AssetState>() {
+    /*
+     * @Returns AssetState
+     */
     override fun call(): AssetState {
         val inputState = inputStatePointer.resolve(serviceHub).state.data
         // below creates an asset state with a different linearId
-        return AssetState(inputState.quantity, inputState.tokenType, serviceHub.myInfo.legalIdentities.first())
+        // return AssetState(inputState.quantity, inputState.tokenType, serviceHub.myInfo.legalIdentities.first())
         // below creates an asset state with the same linearId
-        //return inputState.copy(owner = serviceHub.myInfo.legalIdentities.first())
+        return inputState.copy(owner=ourIdentity)
     }
 }
 
@@ -281,7 +290,7 @@ class IssueAssetStateFromStateRef(val linearId: String) : FlowLogic<SignedTransa
         //val pointedToStateCopy = stateStaticPointer.resolve(serviceHub).state.data
         //val assetState = AssetState(pointedToStateCopy.quantity, pointedToStateCopy.tokenType, serviceHub.myInfo.legalIdentities.first())
 
-        val assetState: AssetState = subFlow(IssueAssetStateFromStateRefHelper(stateStaticPointer))
+        val assetState: AssetState = subFlow(UpdateAssetOwnerFromPointer(stateStaticPointer))
 
         val txCommand = Command(AssetContract.Commands.Issue(), assetState.participants.map { it.owningKey })
         val txBuilder = TransactionBuilder(notary)

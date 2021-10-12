@@ -142,6 +142,46 @@ To make a request from a Corda network to a Fabric network, run:
 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:Arcturus
 ```
 
+## HTLC Flows:
+
+* Initialise fungible assets:
+```
+./scripts/initAsset.sh
+```
+
+* Get asset status in corda:
+```
+./scripts/getAssetStatus.sh 
+```
+
+* Lock 50 tokens of type t1 in corda by PartyB for PartyA:
+```
+CORDA_PORT=10009 ./clients/build/install/clients/bin/clients lock-asset --fungible --hashBase64=<hash-in-base64> --timeout=1800 --recipient="O=PartyA,L=London,C=GB" --param=<token-type>:<token-amount>
+```
+
+* Claim of 50 t1 tokens in corda by PartyA:
+```
+CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset --contract-id=<contract-id> --secret=<hash-preimage>
+```
+
+* Unlock after timeout in Corda by PartyB:
+```
+CORDA_PORT=10009 ./clients/build/install/clients/bin/clients unlock-asset --contract-id=<contract-id>
+```
+
+* Query in Corda using PartyA:
+```
+CORDA_PORT=10006 ./clients/build/install/clients/bin/clients is-asset-locked --contract-id=<contract-id>
+```
+
+```
+CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-lock-state --contract-id=<contract-id>
+```
+
+**Note:** You can also use `CORDA_PORT=10009` i.e. using PartyB to run above query commands.
+
+
+
 ## Development tips
 
 _Note_: Optionally add the `-local` suffix to various build commands as indicated below if you wish to avoid depending on Artifactory.
