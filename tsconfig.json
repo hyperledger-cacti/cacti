@@ -38,6 +38,9 @@
       "path": "./packages/cactus-plugin-keychain-memory/tsconfig.json"
     },
     {
+      "path": "./packages/cactus-plugin-keychain-memory-wasm/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-plugin-keychain-vault/tsconfig.json"
     },
     {
