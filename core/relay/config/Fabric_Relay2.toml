@@ -20,9 +20,13 @@ network="Fabric"
 [relays.Corda_Relay]
 hostname="localhost"
 port="9081"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [relays.Fabric_Relay]
 hostname="localhost"
 port="9080"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 
 
 [drivers]

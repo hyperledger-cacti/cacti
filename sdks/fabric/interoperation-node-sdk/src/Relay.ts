@@ -8,6 +8,7 @@
  * Relay file includes the class and methods to communicate with a relay over grpc.
  **/
 /** End file docs */
+import fs from "fs";
 import * as grpcJs from "@grpc/grpc-js";
 import networksGrpcPb from "@hyperledger-labs/weaver-protos-js/networks/networks_grpc_pb";
 import networksPb from "@hyperledger-labs/weaver-protos-js/networks/networks_pb";
@@ -18,8 +19,12 @@ import * as helpers from "./helpers";
  * The Relay class represents a relay in the target blockchain network.
  */
 class Relay {
-    timeoutTime = 3000;
+    static defaultTimeout = 3000;
+    timeoutTime = Relay.defaultTimeout;
     _endPoint = "";
+    _useTls = false;
+    _tlsRootCACerts = '';
+
     /**
      * Construct a Relay object with the given url. A Relay object
      * encapsulates the properties of a Relay and the interactions with it
@@ -28,13 +33,24 @@ class Relay {
      * @param {string} url - The URL with format of "http(s)://host:port".
      * @returns {Relay} The Relay instance.
      */
-    constructor(endPoint: string, timeoutTime = 30000) {
+    constructor(endPoint: string, timeoutTime = 30000, useTls = false, tlsRootCACertPaths?: Array<string>) {
         if (!endPoint) {
             throw new Error("Invalid Arguments");
         }
         this.timeoutTime = timeoutTime;
         // eslint-disable-next-line
         this._endPoint = endPoint;
+        this._useTls = useTls;
+        if (useTls) {
+            if (tlsRootCACertPaths && tlsRootCACertPaths.length > 0) {
+                for(let i = 0 ; i < tlsRootCACertPaths.length ; i++) {
+                    if (!fs.existsSync(tlsRootCACertPaths[i])) {
+                        throw new Error("Invalid TLS root CA file path: " + tlsRootCACertPaths[i]);
+                    }
+                    this._tlsRootCACerts = this._tlsRootCACerts + fs.readFileSync(tlsRootCACertPaths[i]).toString();
+                }
+            }
+        }
     }
 
     /**
@@ -62,7 +78,9 @@ class Relay {
         try {
             const networkClient = new networksGrpcPb.NetworkClient(
                 this.getEndpoint(),
-                grpcJs.credentials.createInsecure(),
+                this._useTls ? 
+                    (this._tlsRootCACerts.length == 0 ? grpcJs.credentials.createSsl() : grpcJs.credentials.createSsl(Buffer.from(this._tlsRootCACerts))) : 
+                    grpcJs.credentials.createInsecure()
             );
             const {
                 requestState,
@@ -154,7 +172,12 @@ class Relay {
      * @returns {object} The request object from the relay
      */
     async GetRequest(requestId: string, asJson = true): Promise<any> {
-        const networkClient = new networksGrpcPb.NetworkClient(this.getEndpoint(), grpcJs.credentials.createInsecure());
+        const networkClient = new networksGrpcPb.NetworkClient(
+            this.getEndpoint(),
+            this._useTls ? 
+                (this._tlsRootCACerts.length == 0 ? grpcJs.credentials.createSsl() : grpcJs.credentials.createSsl(Buffer.from(this._tlsRootCACerts))) : 
+                grpcJs.credentials.createInsecure()
+        );
         const {
             getState,
         }: { getState: (message: networksPb.GetStateMessage) => Promise<statePb.RequestState> } = helpers.promisifyAll(

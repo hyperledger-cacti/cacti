@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import fs from 'fs';
 import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
 import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
 import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
@@ -77,10 +78,22 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
     if (!process.env.RELAY_ENDPOINT) {
         throw new Error('RELAY_ENDPOINT is not set.');
     }
-    const client = new datatransfer_grpc_pb.DataTransferClient(
-        process.env.RELAY_ENDPOINT,
-        credentials.createInsecure(),
-    );
+    let client;
+    if (process.env.RELAY_TLS === 'true') {
+        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+        }
+        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+        client = new datatransfer_grpc_pb.DataTransferClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createSsl(rootCert)
+        );
+    } else {
+        client = new datatransfer_grpc_pb.DataTransferClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createInsecure()
+        );
+    }
     const cert = Certificate.fromPEM(Buffer.from(query.getCertificate()));
     const orgName = cert.issuer.organizationName;
     // Invokes the fabric network

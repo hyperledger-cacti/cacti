@@ -4,6 +4,8 @@ use std::io::{Error, ErrorKind};
 pub struct LocationSegment {
     pub hostname: String,
     pub port: String,
+    pub tls: bool,
+    pub tlsca_cert_path: String,
 }
 
 #[derive(PartialEq, PartialOrd, Debug)]
@@ -40,6 +42,8 @@ fn parse_location(location: String) -> Result<LocationSegment, Error> {
     Ok(LocationSegment {
         hostname: v[0].to_string(),
         port: v[1].to_string(),
+        tls: false,
+        tlsca_cert_path: "".to_string(),
     })
 }
 
@@ -70,6 +74,8 @@ mod tests {
                 location: LocationSegment {
                     hostname: "localhost".to_string(),
                     port: "8080".to_string(),
+                    tls: false,
+                    tlsca_cert_path: "".to_string(),
                 },
             }
         );
@@ -81,6 +87,8 @@ mod tests {
                 location: LocationSegment {
                     hostname: "marcopolo-res-dlt-interop.sl.cloud9.ibm.com".to_string(),
                     port: "9081".to_string(),
+                    tls: false,
+                    tlsca_cert_path: "".to_string(),
                 },
             }
         );
