@@ -87,6 +87,18 @@ fun main(args: Array<String>) = App()
                 ClaimAssetCommand(),
                 UnlockAssetCommand(),
                 IsAssetLockedCommand(),
-                GetLockStateCommand()
+                GetLockStateCommand(),
+                HouseTokenCommand().subcommands(
+                    InitHouseCommand(),
+                    IssueHouseCommand(),
+                    GetHouseBalCommand(),
+                    RedeemHouseTokenCommand(),
+                    MoveHouseTokenCommand(),
+                    LockHouseTokenCommand(),
+                    ClaimHouseTokenCommand(),
+                    UnlockHouseTokenCommand(),
+                    IsHouseTokenLockedCommand(),
+                    GetHouseTokenLockStateCommand()
+                )
                 )
         .main(args)

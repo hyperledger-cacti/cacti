@@ -5,3 +5,6 @@ CORDA_PORT=10006 ./clients/build/install/clients/bin/clients issue-asset-state 3
 echo -e "\n -- \n"
 echo "Adding 50 t1 tokens to PartyB"
 CORDA_PORT=10009 ./clients/build/install/clients/bin/clients issue-asset-state 50 t1
+echo -e "\n -- \n"
+echo "Adding 50 t1 tokens to PartyC"
+CORDA_PORT=10012 ./clients/build/install/clients/bin/clients issue-asset-state 50 t1

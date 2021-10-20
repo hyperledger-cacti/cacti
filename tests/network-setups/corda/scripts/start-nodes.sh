@@ -2,25 +2,19 @@
 
 directory=$(dirname $0)
 simpleAppVersion="0.4"
-weaverVersion="1.2.4-alpha.3"
+weaverVersion="1.2.4-alpha.4"
 
-cp $directory/../shared/artifacts/contracts-kotlin-$simpleAppVersion.jar build/nodes/Notary/cordapps
-cp $directory/../shared/artifacts/contracts-kotlin-$simpleAppVersion.jar build/nodes/PartyA/cordapps
-cp $directory/../shared/artifacts/contracts-kotlin-$simpleAppVersion.jar build/nodes/PartyB/cordapps
-cp $directory/../shared/artifacts/workflows-kotlin-$simpleAppVersion.jar build/nodes/Notary/cordapps
-cp $directory/../shared/artifacts/workflows-kotlin-$simpleAppVersion.jar build/nodes/PartyA/cordapps
-cp $directory/../shared/artifacts/workflows-kotlin-$simpleAppVersion.jar build/nodes/PartyB/cordapps
+parties="Notary PartyA PartyB PartyC"
 
-cp $directory/../shared/artifacts/interop-contracts-$weaverVersion.jar build/nodes/Notary/cordapps
-cp $directory/../shared/artifacts/interop-contracts-$weaverVersion.jar build/nodes/PartyA/cordapps
-cp $directory/../shared/artifacts/interop-contracts-$weaverVersion.jar build/nodes/PartyB/cordapps
-cp $directory/../shared/artifacts/interop-workflows-$weaverVersion.jar build/nodes/Notary/cordapps
-cp $directory/../shared/artifacts/interop-workflows-$weaverVersion.jar build/nodes/PartyA/cordapps
-cp $directory/../shared/artifacts/interop-workflows-$weaverVersion.jar build/nodes/PartyB/cordapps
-
-cp $directory/../shared/artifacts/protos-java-kt-$weaverVersion.jar build/nodes/Notary/cordapps
-cp $directory/../shared/artifacts/protos-java-kt-$weaverVersion.jar build/nodes/PartyA/cordapps
-cp $directory/../shared/artifacts/protos-java-kt-$weaverVersion.jar build/nodes/PartyB/cordapps
+for party in ${parties}; do
+  cp $directory/../shared/artifacts/contracts-kotlin-$simpleAppVersion.jar build/nodes/${party}/cordapps
+  cp $directory/../shared/artifacts/workflows-kotlin-$simpleAppVersion.jar build/nodes/${party}/cordapps
+  
+  cp $directory/../shared/artifacts/interop-contracts-$weaverVersion.jar build/nodes/${party}/cordapps
+  cp $directory/../shared/artifacts/interop-workflows-$weaverVersion.jar build/nodes/${party}/cordapps
+  
+  cp $directory/../shared/artifacts/protos-java-kt-$weaverVersion.jar build/nodes/${party}/cordapps
+done;
 
 docker-compose up -d
 docker ps -a

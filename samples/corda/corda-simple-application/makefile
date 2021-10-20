@@ -7,6 +7,7 @@ build-local-weaver-dependencies:
 	
 .PHONY: build-local	
 build-local:
+	cd ../fungible-house-token && make build
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies-local
@@ -27,6 +28,7 @@ test-local: build-local-weaver-dependencies
 
 .PHONY: build
 build: github.properties
+	cd ../fungible-house-token && make build
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies
@@ -39,6 +41,7 @@ build-cordapp: github.properties
 
 .PHONY: build-cli
 build-cli: github.properties
+	cd ../fungible-house-token && make build
 	./gradlew installDist
 
 .PHONY: test

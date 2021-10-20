@@ -1,10 +1,10 @@
-2021-10-04 12:50:01 jdbc[3]: exception
+2021-10-20 05:53:17 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "NODE_CHECKPOINTS" not found; SQL statement:
 select count(*) from node_checkpoints [42102-199]
-2021-10-04 12:50:06 jdbc[3]: exception
+2021-10-20 05:53:24 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DATABASECHANGELOGLOCK" not found; SQL statement:
 SELECT COUNT(*) FROM PUBLIC.DATABASECHANGELOGLOCK [42102-199]
-2021-10-04 12:50:07 jdbc[3]: exception
+2021-10-20 05:53:25 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "T.RELEVANCY_STATUS" not found; SQL statement:
 select t.relevancy_status from PUBLIC.vault_states t where 0=1 [42122-199]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:451)
@@ -57,7 +57,7 @@ select t.relevancy_status from PUBLIC.vault_states t where 0=1 [42122-199]
 	at picocli.CommandLine.parseWithHandlers(CommandLine.java:1526)
 	at net.corda.cliutils.CordaCliWrapperKt.start(CordaCliWrapper.kt:89)
 	at net.corda.node.Corda.main(Corda.kt:13)
-2021-10-04 12:50:08 jdbc[3]: exception
+2021-10-20 05:53:26 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "T.STATE_MACHINE_RUN_ID" not found; SQL statement:
 select t.state_machine_run_id from PUBLIC.node_transactions t where 0=1 [42122-199]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:451)
