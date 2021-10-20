@@ -25,6 +25,8 @@ pub struct DataTransferService {
 pub struct Driver {
     port: String,
     hostname: String,
+    tls: bool,
+    tlsca_cert_path: String,
 }
 
 #[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Debug)]
@@ -236,8 +238,9 @@ fn request_state_helper(
         .clone();
     let port = driver_info.port.to_string();
     let hostname = driver_info.hostname.to_string();
-    let driver_address = format!("http://{}:{}", hostname, port);
-    spawn_request_driver_state(query, driver_address.to_string(), conf.clone());
+    let tls = driver_info.tls;
+    let tlsca_cert_path = driver_info.tlsca_cert_path.to_string();
+    spawn_request_driver_state(query, hostname, port, tls, tlsca_cert_path, conf.clone());
     return Ok(Ack {
         status: ack::Status::Ok as i32,
         request_id,
@@ -280,9 +283,31 @@ fn send_driver_state_helper(
 
 async fn spawn_request_driver_state_helper(
     query: Query,
-    driver_address: String,
+    hostname: String,
+    port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
 ) -> Result<(), Error> {
-    let client = DriverCommunicationClient::connect(driver_address).await?;
+    let driver_address = format!("http://{}:{}", hostname, port);
+    let client;
+    if use_tls {
+        let pem = tokio::fs::read(tlsca_cert_path).await?;
+        let ca = Certificate::from_pem(pem);
+
+        let tls = ClientTlsConfig::new()
+            .ca_certificate(ca)
+            .domain_name(hostname);
+
+        let channel = Channel::from_shared(driver_address).unwrap()
+            .tls_config(tls)
+            .connect()
+            .await
+            .unwrap();
+
+        client = DriverCommunicationClient::new(channel);
+    } else {
+        client = DriverCommunicationClient::connect(driver_address).await?;
+    }
     println!("Sending request to driver with query {:?}", query.clone());
     let ack = client
         .clone()
@@ -302,9 +327,9 @@ async fn spawn_request_driver_state_helper(
 }
 
 // Function that starts a thread which sends the query information to the driver
-fn spawn_request_driver_state(query: Query, driver_address: String, conf: config::Config) {
+fn spawn_request_driver_state(query: Query, hostname: String, port: String, use_tls: bool, tlsca_cert_path: String, conf: config::Config) {
     tokio::spawn(async move {
-        let result = spawn_request_driver_state_helper(query.clone(), driver_address).await;
+        let result = spawn_request_driver_state_helper(query.clone(), hostname, port, use_tls, tlsca_cert_path).await;
         match result {
             Ok(_) => {
                 // Do nothing

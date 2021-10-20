@@ -38,10 +38,16 @@ tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [drivers.Fabric]
 hostname="localhost"
 port="9090"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [drivers.Corda]
 hostname="localhost"
 port="9099"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [drivers.Dummy]
 hostname="localhost"
 port="9092"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 

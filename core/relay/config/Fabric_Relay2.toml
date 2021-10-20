@@ -33,4 +33,6 @@ tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [drivers.Fabric]
 hostname="localhost"
 port="9095"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 
