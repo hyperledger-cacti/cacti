@@ -25,7 +25,7 @@ your local machine for development and testing purposes.
 
 In the root of the project to install the dependencies execute the command:
 ```sh
-npm run comfigure
+npm run configure
 ```
 
 ### Compiling
