@@ -100,6 +100,9 @@
     },
     {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"
+    },
+    {
+      "path": "./extensions/cactus-plugin-htlc-coordinator-besu/tsconfig.json"
     }
   ],
   "compilerOptions": {

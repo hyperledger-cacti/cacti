@@ -1,0 +1,45 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "allowJs": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/types",
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-htlc-coordinator-besu.tsbuildinfo"
+  },
+  "include": [
+    "./src",
+    "src/**/*.json",
+  ],
+  "references": [
+    {
+      "path": "../../packages/cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-test-tooling/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-ledger-connector-besu/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-htlc-eth-besu-erc20/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-plugin-htlc-eth-besu/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-test-plugin-htlc-eth-besu-erc20/tsconfig.json"
+    }
+  ]
+}
