@@ -71,7 +71,7 @@ Follow the instructions below to build and launch the networks:
   ```
 - _To launch the networks with a different application chaincode from the above list, run_:
   ```bash
-  make start-interop <chaincode-name>
+  make start-interop CHAINCODE_NAME=<chaincode-name>
   ```
 - (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to install only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2`.)
 
