@@ -28,6 +28,8 @@ module.exports = {
       net: require.resolve("net-browserify"),
       http: require.resolve("stream-http"),
       https: require.resolve("https-browserify"),
+      net: require.resolve("net-browserify"),
+      querystring: require.resolve("querystring-es3"),
       os: require.resolve("os-browserify/browser"),
       path: require.resolve("path-browserify"),
       stream: require.resolve("stream-browserify"),

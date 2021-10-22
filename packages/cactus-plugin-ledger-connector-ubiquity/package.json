@@ -59,6 +59,7 @@
         "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
         "@ubiquity/ubiquity-ts-client-modified": "https://github.com/RafaelAPB/ubiquity-ts-client-mirror.git",
         "dotenv": "16.0.1",
+        "prom-client": "13.2.0",
         "typescript-optional": "2.0.1"
     },
     "devDependencies": {

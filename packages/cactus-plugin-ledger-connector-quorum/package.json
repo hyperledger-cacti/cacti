@@ -48,7 +48,7 @@
   "scripts": {
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "run-p generate-sdk:*",
+    "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
@@ -67,10 +67,12 @@
     "run-time-error": "1.4.0",
     "rxjs": "7.8.1",
     "sanitize-html": "2.7.0",
+    "socket.io-client": "4.5.4",
     "typescript-optional": "2.0.1",
     "web3": "1.6.1",
     "web3-eth-contract": "1.6.1",
-    "web3-utils": "1.6.1"
+    "web3-utils": "1.6.1",
+    "web3js-quorum": "22.4.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
@@ -79,6 +81,7 @@
     "@types/minimist": "1.2.2",
     "@types/sanitize-html": "2.6.2",
     "chalk": "4.1.2",
+    "socket.io": "4.5.4",
     "web3-eth": "1.6.1"
   },
   "engines": {

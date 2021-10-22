@@ -19,6 +19,7 @@ import { TransactionReceipt } from "web3-eth";
 import {
   GetBalanceV1Request,
   GetBalanceV1Response,
+  Web3TransactionReceipt,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -668,7 +669,9 @@ export class PluginLedgerConnectorBesu
       throw new RuntimeError(`priv.getTransactionReceipt provided no receipt.`);
     }
 
-    return { transactionReceipt: txPoolReceipt };
+    return {
+      transactionReceipt: (txPoolReceipt as unknown) as Web3TransactionReceipt,
+    };
   }
 
   public async transactPrivateKey(

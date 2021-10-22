@@ -13,7 +13,9 @@ module.exports = {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
     "no-prototype-builtins": "error",
+    "@typescript-eslint/no-duplicate-enum-values": "warn",
     "@typescript-eslint/no-var-requires": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
     "no-dupe-class-members": "off",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [

@@ -322,10 +322,7 @@ test(testCase, async (t: Test) => {
     });
     t.comment(`getName Call output: ${JSON.stringify(callOutput)}`);
     t.ok(callOutput, "callOutput truthy OK");
-    const name = web3QuorumMember1.eth.abi.decodeParameter(
-      "string",
-      callOutput,
-    );
+    const name = web3Member1.eth.abi.decodeParameter("string", callOutput);
     t.equal(name, "ProfessorCactus - #1", "getName() member 1 equals #1");
   }
 

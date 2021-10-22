@@ -40,6 +40,12 @@
     "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@types/config": "0.0.41",
+    "@types/cookie-parser": "1.4.3",
+    "@types/elliptic": "6.4.14",
+    "@types/express": "4.17.13",
+    "@types/http-errors": "2.0.1",
+    "@types/jsrsasign": "10.5.8",
+    "@types/lodash": "4.14.195",
     "ts-node": "9.1.1"
   }
 }

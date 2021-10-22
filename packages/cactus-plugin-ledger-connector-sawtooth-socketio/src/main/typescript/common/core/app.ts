@@ -9,7 +9,7 @@
  *
  */
 
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import createError = require("http-errors");
 import express = require("express");
 import cookieParser = require("cookie-parser");

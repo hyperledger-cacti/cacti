@@ -45,7 +45,7 @@
   "scripts": {
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "run-p generate-sdk:*",
+    "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected",
     "watch": "npm-watch",
@@ -66,12 +66,13 @@
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
-    "@types/body-parser": "1.19.1",
+    "@types/body-parser": "1.19.2",
     "@types/express": "4.17.13",
     "@types/internal-ip": "4.1.0",
     "@types/request": "2.48.7",
     "@types/tape-promise": "4.0.1",
     "@types/uuid": "8.3.1",
+    "express": "4.17.3",
     "internal-ip": "6.2.0",
     "openapi-types": "9.1.0"
   },

@@ -54,10 +54,15 @@
     "@hyperledger/cactus-core": "2.0.0-alpha.1",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
     "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-alpha.1",
-    "rxjs": "7.8.1"
+    "jsonwebtoken": "9.0.0",
+    "rxjs": "7.8.1",
+    "socket.io-client": "4.5.4"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1"
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
+    "@types/jsonwebtoken": "9.0.0",
+    "@types/lodash": "4.14.195",
+    "lodash": "4.17.21"
   },
   "engines": {
     "node": ">=10",

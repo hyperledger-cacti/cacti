@@ -54,6 +54,8 @@ export function verifyValidatorJwt(
       algorithms: supportedJwtAlgos,
     };
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: FIXME https://github.com/hyperledger/cacti/issues/2523
     verify(
       targetData,
       publicKey,

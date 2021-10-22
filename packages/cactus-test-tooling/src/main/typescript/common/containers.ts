@@ -416,7 +416,7 @@ export class Containers {
     };
     const log = LoggerProvider.getOrCreate(defaultLoggerOptions);
     const task = () => Containers.tryPullImage(imageFqn, options, logLevel);
-    const retryOptions: pRetry.Options = {
+    const retryOptions: pRetry.Options & { retries: number } = {
       retries: 6,
       onFailedAttempt: async (ex) => {
         log.debug(`Failed attempt at pulling container image ${imageFqn}`, ex);

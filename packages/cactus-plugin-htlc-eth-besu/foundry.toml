@@ -25,10 +25,10 @@ block_coinbase = '0x0000000000000000000000000000000000000000' # the address of `
 block_timestamp = 0                                           # the value of `block.timestamp` in tests
 block_difficulty = 0      
 fuzz = { runs = 256 }                                         # the number of fuzz runs for tests
-libs = ["../../node_modules"]
+libs = ["./node_modules"]
 remappings = [
-    "ds-test/=../../node_modules/ds-test/src/",
-    "forge-std/=../../node_modules/forge-std/src/",
+    "ds-test/=./node_modules/ds-test/src/",
+    "forge-std/=./node_modules/forge-std/src/",
 ]
 
 # Fuzzing CI

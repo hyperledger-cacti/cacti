@@ -45,7 +45,7 @@
   "scripts": {
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "run-p generate-sdk:*",
+    "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected",
     "watch": "npm-watch",
@@ -81,6 +81,7 @@
     "sanitize-filename": "1.6.3",
     "sanitize-html": "2.7.0",
     "secp256k1": "4.0.3",
+    "socket.io-client": "4.5.4",
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.2",
@@ -89,6 +90,7 @@
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
+    "@types/bn.js": "5.1.0",
     "@types/express": "4.17.13",
     "@types/fs-extra": "9.0.12",
     "@types/jsrsasign": "8.0.13",
@@ -98,6 +100,8 @@
     "@types/temp": "0.9.1",
     "@types/uuid": "8.3.1",
     "fs-extra": "10.0.0",
+    "internal-ip": "6.2.0",
+    "socket.io": "4.5.4",
     "ws-wallet": "1.1.5"
   },
   "engines": {

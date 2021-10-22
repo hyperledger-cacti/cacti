@@ -45,7 +45,7 @@
   "scripts": {
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "run-p generate-sdk",
-    "generate-sdk": "run-p generate-sdk:*",
+    "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
@@ -76,6 +76,7 @@
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@types/express": "4.17.8",
+    "express": "4.17.3",
     "socket.io": "4.5.4"
   },
   "engines": {

@@ -5,7 +5,6 @@
   "main": "dist/www.js",
   "module": "dist/www.js",
   "types": "dist/www.d.ts",
-  "private": false,
   "scripts": {
     "start": "docker-compose build && docker-compose up",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
@@ -13,6 +12,8 @@
     "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
   },
   "dependencies": {
+    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",
+    "@hyperledger/cactus-verifier-client": "2.0.0-alpha.1",
     "@types/node": "14.18.12",
     "body-parser": "1.19.2",
     "cookie-parser": "1.4.6",
@@ -35,9 +36,12 @@
     "xmlhttprequest": "1.8.0"
   },
   "devDependencies": {
+    "@types/body-parser": "1.19.2",
+    "@types/cookie-parser": "1.4.2",
+    "@types/escape-html": "1.0.1",
+    "@types/express": "4.17.13",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
-    "@types/escape-html": "1.0.1",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.4.0",
     "eslint-plugin-prettier": "4.0.0",

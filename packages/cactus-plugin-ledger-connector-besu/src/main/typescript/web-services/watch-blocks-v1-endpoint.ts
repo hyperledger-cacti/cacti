@@ -50,11 +50,11 @@ export class WatchBlocksV1Endpoint {
         const next: WatchBlocksV1Progress = {
           // Cast needed because somewhere between Web3 v1.5.2 and v1.6.1 they
           // made the receiptRoot property of the BlockHeader type optional.
-          // This could be accopmanied by a breaking change in their code or
+          // This could be accompanied by a breaking change in their code or
           // it could've been just a mistake in their typings that they corrected.
           // Either way, with the next major release, we need to make it optional
           // in our API specs as well so that they match up.
-          blockHeader: (blockHeader as unknown as Web3BlockHeader),
+          blockHeader: (blockHeader as unknown) as Web3BlockHeader,
         };
         socket.emit(WatchBlocksV1.Next, next);
       }

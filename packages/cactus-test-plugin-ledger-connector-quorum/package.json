@@ -61,7 +61,9 @@
     "web3-utils": "1.6.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1"
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
+    "@types/convict": "6.1.1",
+    "@types/lodash": "4.14.195"
   },
   "engines": {
     "node": ">=10",
