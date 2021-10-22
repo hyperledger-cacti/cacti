@@ -14,7 +14,7 @@
   },
   "scripts": {
     "run-ci": "./tools/ci.sh",
-    "reset:node-modules": "del-cli --dry-run '**/node_modules'",
+    "reset:node-modules": "del-cli '**/node_modules'",
     "reset:git": "git clean -f -X",
     "reset:yarn-lock": "del-cli yarn.lock && yarn install --update-checksums --force",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
