@@ -255,7 +255,7 @@ jobs:
         rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*/*
         cp -r ../../../core/network/fabric-interop-cc/libs/utils/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*/
         ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*
-      working-directory: samples/fabric/simpleasset
+      working-directory: samples/fabric/simpleassettransfer
 
     - name: Build
       run: go build -v ./...
