@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-const fs = require("fs-extra");
-const { getPackageInfoList } = require("./get-package-info-list");
+import fs from "fs-extra";
+import { getPackageInfoList } from "./get-package-info-list";
 
 const main = async () => {
   const packageInfoList = await getPackageInfoList([]);
