@@ -10,7 +10,11 @@ test("Servers", async (tParent: Test) => {
     {
       const server = createServer();
       await t.rejects(
-        Servers.listen({ hostname: "x", port: "" as any, server }),
+        Servers.listen({
+          hostname: "x",
+          port: ("" as unknown) as number,
+          server,
+        }),
         /options\.port/,
         "Rejects when port specified as empty string OK",
       );
@@ -19,7 +23,11 @@ test("Servers", async (tParent: Test) => {
     {
       const server = createServer();
       await t.rejects(
-        Servers.listen({ hostname: "localhost", port: false as any, server }),
+        Servers.listen({
+          hostname: "localhost",
+          port: (false as unknown) as number,
+          server,
+        }),
         /options\.port/,
         "Rejects when port specified as literal false boolean OK",
       );

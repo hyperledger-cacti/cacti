@@ -10,4 +10,4 @@ import { PluginFactory } from "./plugin/plugin-factory";
  */
 export type PluginFactoryFactory = (
   pluginFactoryOptions: IPluginFactoryOptions,
-) => Promise<PluginFactory<ICactusPlugin, any, IPluginFactoryOptions>>;
+) => Promise<PluginFactory<ICactusPlugin, unknown, IPluginFactoryOptions>>;

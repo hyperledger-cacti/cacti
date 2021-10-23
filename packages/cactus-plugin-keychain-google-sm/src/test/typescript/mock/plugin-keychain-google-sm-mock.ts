@@ -51,13 +51,25 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
 
   createSecret(
     request: protos.google.cloud.secretmanager.v1.ICreateSecretRequest,
-  ): any {
+  ): Promise<
+    [
+      protos.google.cloud.secretmanager.v1.ISecret,
+      protos.google.cloud.secretmanager.v1.ICreateSecretRequest | undefined,
+      {} | undefined,
+    ]
+  > {
     if (request.secretId && request.parent) {
       this.secrets.set(request.secretId, "");
       const result = {
         name: `${request.parent}?${request.secretId}`,
       };
-      return [result];
+      return ([result] as unknown) as Promise<
+        [
+          protos.google.cloud.secretmanager.v1.ISecret,
+          protos.google.cloud.secretmanager.v1.ICreateSecretRequest | undefined,
+          {} | undefined,
+        ]
+      >;
     } else {
       throw new Error(
         "Incomplete secret details. Required request.secretId and request.parent",
@@ -67,13 +79,28 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
 
   addSecretVersion(
     request: protos.google.cloud.secretmanager.v1.IAddSecretVersionRequest,
-  ): any {
+  ): Promise<
+    [
+      protos.google.cloud.secretmanager.v1.ISecretVersion,
+      protos.google.cloud.secretmanager.v1.IAddSecretVersionRequest | undefined,
+      {} | undefined,
+    ]
+  > {
     if (request.parent && request.payload && request.payload.data) {
       this.secrets.set(
         request.parent.split("?")[1],
         request.payload.data.toString(),
       );
-      return [request.payload.data.toString()];
+      return ([request.payload.data.toString()] as unknown) as Promise<
+        [
+          protos.google.cloud.secretmanager.v1.ISecretVersion,
+          (
+            | protos.google.cloud.secretmanager.v1.IAddSecretVersionRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]
+      >;
     } else {
       throw new Error(
         "Incomplete request. Required request.parent, request.payload.data",
@@ -83,31 +110,83 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
 
   deleteSecret(
     request: protos.google.cloud.secretmanager.v1.IDeleteSecretRequest,
-  ): any {
+  ): Promise<
+    [
+      protos.google.protobuf.IEmpty,
+      protos.google.cloud.secretmanager.v1.IDeleteSecretRequest | undefined,
+      {} | undefined,
+    ]
+  > {
     if (request.name) {
       this.secrets.delete(request.name.split("?")[1]);
     } else {
       throw new Error("request.name not passed");
     }
+    return (undefined as unknown) as Promise<
+      [
+        protos.google.protobuf.IEmpty,
+        protos.google.cloud.secretmanager.v1.IDeleteSecretRequest | undefined,
+        {} | undefined,
+      ]
+    >;
   }
 
   accessSecretVersion(
     request: protos.google.cloud.secretmanager.v1.IAccessSecretVersionRequest,
-  ): any {
+  ): Promise<
+    [
+      protos.google.cloud.secretmanager.v1.IAccessSecretVersionResponse,
+      (
+        | protos.google.cloud.secretmanager.v1.IAccessSecretVersionRequest
+        | undefined
+      ),
+      {} | undefined,
+    ]
+  > {
     const result = this.secrets.has(request.name?.split("?")[1] || "");
     if (result) {
-      return true;
+      return (true as unknown) as Promise<
+        [
+          protos.google.cloud.secretmanager.v1.IAccessSecretVersionResponse,
+          (
+            | protos.google.cloud.secretmanager.v1.IAccessSecretVersionRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]
+      >;
     } else {
-      return false;
+      return (false as unknown) as Promise<
+        [
+          protos.google.cloud.secretmanager.v1.IAccessSecretVersionResponse,
+          (
+            | protos.google.cloud.secretmanager.v1.IAccessSecretVersionRequest
+            | undefined
+          ),
+          {} | undefined,
+        ]
+      >;
     }
   }
 
   getSecret(
     request: protos.google.cloud.secretmanager.v1.IGetSecretRequest,
-  ): any {
+  ): Promise<
+    [
+      protos.google.cloud.secretmanager.v1.ISecret,
+      protos.google.cloud.secretmanager.v1.IGetSecretRequest | undefined,
+      {} | undefined,
+    ]
+  > {
     const result = this.secrets.get(request.name?.split("?")[1] || "");
     if (result) {
-      return [result];
+      return ([result] as unknown) as Promise<
+        [
+          protos.google.cloud.secretmanager.v1.ISecret,
+          protos.google.cloud.secretmanager.v1.IGetSecretRequest | undefined,
+          {} | undefined,
+        ]
+      >;
     } else {
       throw new Error(`${request.name || ""} secret not found.`);
     }
