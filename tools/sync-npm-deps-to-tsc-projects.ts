@@ -1,9 +1,14 @@
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import path from "path";
 import JSON5 from "json5";
 import fs from "fs-extra";
-import globby from "globby";
+import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
 import lernaJson from "../lerna.json";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
   if (!argv) {
@@ -28,7 +33,7 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
   );
   console.log("Globbing lerna package patterns: ", pkgJsonGlobPatterns);
 
-  const globbyOptions: globby.GlobbyOptions = {
+  const globbyOptions: GlobbyOptions = {
     cwd: PROJECT_DIR,
     absolute: true,
   };
