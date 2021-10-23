@@ -1,5 +1,8 @@
-const { execSync } = require("child_process");
-const { readJsonSync } = require("fs-extra");
+// Turning this off for this file is needed so that ESLint doesn't bother
+// us with unfixable warnings in a Javascript file (not Typescript).
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { execSync } from "child_process";
+import fs from "fs-extra";
 
 /**
  * Example:
@@ -56,7 +59,7 @@ const getDependencyGraph = () => {
  *
  * @returns {PackageInfo[]}
  */
-module.exports.getPackageInfoList = (ignorePatterns = []) => {
+export function getPackageInfoList(ignorePatterns = []) {
   const cliCommand = `./node_modules/.bin/lerna list --all --json --toposort`;
   const processOutputBuffer = execSync(cliCommand);
   const processOutput = processOutputBuffer.toString("utf-8");
@@ -67,7 +70,7 @@ module.exports.getPackageInfoList = (ignorePatterns = []) => {
   );
 
   pkgInfoList.forEach((pkgInfo) => {
-    pkgInfo.packageObject = readJsonSync(`${pkgInfo.location}/package.json`);
+    pkgInfo.packageObject = fs.readJsonSync(`${pkgInfo.location}/package.json`);
   });
 
   /** @type {PackageDependencyGraph} */
@@ -80,4 +83,4 @@ module.exports.getPackageInfoList = (ignorePatterns = []) => {
   });
 
   return pkgInfoList;
-};
+}
