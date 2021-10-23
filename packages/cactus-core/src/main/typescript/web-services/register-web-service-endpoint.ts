@@ -21,7 +21,12 @@ export async function registerWebServiceEndpoint(
   const provider = endpoint.getAuthorizationOptionsProvider();
   const { isProtected, requiredRoles } = await provider.get();
 
-  const registrationMethod = (webApp as any)[httpVerb].bind(webApp);
+  const webAppCasted = (webApp as unknown) as Record<
+    string,
+    (...a: unknown[]) => unknown
+  >;
+
+  const registrationMethod = webAppCasted[httpVerb].bind(webApp);
   try {
     if (isProtected) {
       const scopeCheckMiddleware = expressJwtAuthz(requiredRoles);
