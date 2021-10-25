@@ -42,13 +42,15 @@ import { Configuration } from "@hyperledger/cactus-core-api";
 const testCase = "deploys Fabric 2.x contract from javascript source";
 const logLevel: LogLevelDesc = "TRACE";
 
-test("BEFORE " + testCase, async (t: Test) => {
+// Skipping due to test being flaky, see https://github.com/hyperledger/cactus/issues/1471
+test.skip("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
-test(testCase, async (t: Test) => {
+// Skipping due to test being flaky, see https://github.com/hyperledger/cactus/issues/1471
+test.skip(testCase, async (t: Test) => {
   const channelId = "mychannel";
   const channelName = channelId;
 
