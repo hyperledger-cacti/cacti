@@ -16,6 +16,7 @@
 # typings/**
 
 **/src/main/typescript/generated/proto/**
+**/src/main/typescript/generated/wasm-pack/**
 packages/cactus-verifier/src/main/typescript/
 
 packages/cactus-cmd-socketio-server/**
