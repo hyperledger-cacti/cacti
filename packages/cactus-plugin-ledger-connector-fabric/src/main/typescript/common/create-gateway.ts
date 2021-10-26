@@ -90,6 +90,20 @@ export async function createGateway(
         keyName: ctx.gatewayOptions.wallet.keychain.vaultTransitKey.keyName,
       });
       break;
+    case FabricSigningCredentialType.WsX509:
+      if (
+        !ctx.gatewayOptions.wallet.keychain ||
+        !ctx.gatewayOptions.wallet.keychain.webSocketKey
+      ) {
+        throw new Error(
+          `require ctx.gatewayOptions.wallet.keychain.webSocketKey`,
+        );
+      }
+      key = ctx.secureIdentity.getWebSocketKey({
+        sessionId: ctx.gatewayOptions.wallet.keychain.webSocketKey.sessionId,
+        signature: ctx.gatewayOptions.wallet.keychain.webSocketKey.signature,
+      });
+      break;
     case FabricSigningCredentialType.X509:
       key = ctx.secureIdentity.getDefaultKey({
         private: certData.credentials.privateKey as string,

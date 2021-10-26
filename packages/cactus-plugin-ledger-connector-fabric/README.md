@@ -46,7 +46,7 @@ The above diagram shows the sequence diagraom of transact() method of the Plugin
 
 ![run-transaction-endpoint-enroll](docs/architecture/images/run-transaction-endpoint-enroll.png)
 
-The above diagram shows the sequence diagraom of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509 .. more in TODO), corresponding identity is enrolled and stored inside keychain. 
+The above diagram shows the sequence diagraom of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509, FabricSigningCredentialType.WsX509), corresponding identity is enrolled and stored inside keychain. 
 
 ## Usage
 
@@ -78,29 +78,39 @@ const vaultConfig:IVaultConfig = {
   endpoint : "http://localhost:8200",
   transitEngineMountPath: "/transit",
 }
+// web-socket server config for supporting vault identity provider
+const webSocketConfig:IVaultConfig = {
+  server: socketServer as FabricSocketServer
+}
 // provide list of identity signing to be supported
-const supportedIdentity:FabricSigningCredentialType[] = [FabricSigningCredentialType.VaultX509,FabricSigningCredentialType.X509]
+const supportedIdentity:FabricSigningCredentialType[] = [FabricSigningCredentialType.VaultX509,FabricSigningCredentialType.WsX509,FabricSigningCredentialType.X509]
 const pluginOptions:IPluginLedgerConnectorFabricOptions = {
   // other options
   vaultConfig : vaultConfig,
+  webSocketConfig : webSocketConfig,
   supportedIdentity:supportedIdentity
   // .. other options
 }
 const connector: PluginLedgerConnectorFabric = new PluginLedgerConnectorFabric(pluginOptions);
 ```
-
 To enroll an identity
 ```typescript
 await connector.enroll(
         {
           keychainId: "keychain-identifier-for storing-certData",
           keychainRef: "cert-data-identifier",
-          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
 
           // require in case of vault
+          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
           vaultTransitKey: {
             token: "vault-token",
             keyName: "vault-key-label",
+          },
+          // required in case of web-socket server
+          type: FabricSigningCredentialType.WsX509,
+          webSocketKey: {
+            signature: signature,
+            sessionId: sessionId,
           },
         },
         {
@@ -111,18 +121,25 @@ await connector.enroll(
         },
       );
 ```
+
 To Register an identity using register's key
 ```typescript
 const secret = await connector.register(
         {
           keychainId: "keychain-id-that-store-certData-of-registrar",
           keychainRef: "certData-label",
-          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
 
           // require in case of vault
+          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
           vaultTransitKey: {
             token: testToken,
             keyName: registrarKey,
+          },
+          // required in case of web-socket server
+          type: FabricSigningCredentialType.WsX509,
+          webSocketKey: {
+            signature: signature,
+            sessionId: sessionId,
           },
         },
         {
@@ -140,12 +157,18 @@ const resp = await connector.transact{
   signingCredential: {
           keychainId: keychainId,
           keychainRef: "client-certData-id",
-          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
 
           // require in case of vault
+          type: FabricSigningCredentialType.VaultX509, // FabricSigningCredentialType.X509
           vaultTransitKey: {
             token: testToken,
             keyName: registrarKey,
+          },
+          // required in case of web-socket server
+          type: FabricSigningCredentialType.WsX509,
+          webSocketKey: {
+            signature: signature,
+            sessionId: sessionId,
           },
         },
         // .. other options
@@ -165,6 +188,9 @@ await connector.rotateKey(
           token: testToken,
           keyName: registrarKey,
         },
+        // key rotation currently not available using web-socket server
+        // web-socket connection not used to manages external keys
+        // user should re-enroll with new pub/priv key pair
   },
   {
       enrollmentID: string;
@@ -195,7 +221,16 @@ Currently Cactus Fabric Connector supports following Identity Providers
 
 - X509 : Simple and unsecured provider wherein `private` key is stored along with certificate in some `datastore`. Whenever connector require signature on fabric message, private key is brought from the `datastore` and message signed at the connector.
 - Vault-X.509 : Secure provider wherein `private` key is stored with vault's transit transit engine and certificate in `certDatastore`. Rather then bringing the key to the connector, message digest are sent to the vault server which returns the `signature`.
-- WS-X.509 (Future Work) : Secure provider wherein `private` key is stored with `client` and certificate in `certDatastore`. To get the fabric messages signed, message digest is sent to the client via `webSocket` connection opened by the client in the beginning.
+- WS-X.509 : Secure provider wherein `private` key is stored with `client` and certificate in `certDatastore`. To get the fabric messages signed, message digest is sent to the client via `webSocket` connection opened by the client in the beginning (as described above)
+
+### setting up a WS-X.509 provider
+The following packages are used to access private keys (via web-socket)  stored on a clients external device (e.g., browser, mobile app, or an IoT device...).
+  -[ws-identity](https://github.com/brioux/ws-identity): web-socket server that issues new ws-session tickets, authenticates incoming connections, and sends signature requests
+  -[ws-identity-client](https://github.com/brioux/ws-identity-client): backend connector to send requests from fabric application to ws-identity
+  -[ws-wallet](https://github.com/brioux/ws-wallet): external clients crypto key tool: create new key pair, request session ticket and open web-socket connection with ws-identity
+
+### Building the ws-identity docker image
+
 
 ## Running the tests
 
@@ -217,6 +252,7 @@ Build with a specific version of the npm package:
 ```sh
 DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=0.4.1 -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile . -t cplcb
 ```
+
 
 #### Running the container
 
