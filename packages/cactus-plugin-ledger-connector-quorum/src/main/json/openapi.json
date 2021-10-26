@@ -487,6 +487,12 @@
                         "type": "object",
                         "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
+                    },
+                    "constructorArgs": {
+                        "description": "The list of arguments to pass in to the constructor of the contract being deployed.",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
                     }
                 }
             },
@@ -532,6 +538,12 @@
                         "$ref": "#/components/schemas/ContractJSON",
                         "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
+                    },
+                    "constructorArgs": {
+                        "description": "The list of arguments to pass in to the constructor of the contract being deployed.",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
                     }
                 }
             },
