@@ -75,11 +75,37 @@
                 },
                 "description": "vault key details for signing fabric message with private key stored with transit engine."
             },
+            "WebSocketKey" : {
+                "type": "object",
+                "nullable": false,
+                "required": [
+                    "sessionId",
+                    "signature"
+                ],
+                "properties": {
+                    "sessionId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false,
+                        "description": "session Id to access client"
+                    },
+                    "signature": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false,
+                        "description": "signature of the session ID"
+                    }
+                },
+                "description": "web-socket key details for signing fabric message with private key stored with external client"
+            },
             "FabricSigningCredentialType" : {
                 "type": "string",
                 "enum": [
                     "X.509",
-                    "Vault-X.509"
+                    "Vault-X.509",
+                    "WS-X.509"
                 ],
                 "nullable": false,
                 "description": "different type of identity provider for singing fabric messages supported by this package"
@@ -110,6 +136,10 @@
                     "vaultTransitKey" : {
                         "$ref" : "#/components/schemas/VaultTransitKey",
                         "properties" : "vault key details , if Vault-X.509 identity provider to be used for singing fabric messages"
+                    },
+                    "webSocketKey" : {
+                        "$ref" : "#/components/schemas/WebSocketKey",
+                        "properties" : "web-socket key details , if WS-X.509 identity provider to be used for singing fabric messages"
                     }
                 }
             },

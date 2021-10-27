@@ -461,5 +461,35 @@ test(testCase, async (t: Test) => {
     t2.end();
   });
 
+  test("deploys contract via .json file with constructorArgs", async (t2: Test) => {
+    const deployOut = await connector.deployContract({
+      contractName: HelloWorldContractJson.contractName,
+      contractJSON: HelloWorldContractJson,
+      keychainId: keychainPlugin.getKeychainId(),
+      web3SigningCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+      gas: 1000000,
+      constructorArgs: ["Test Arg"],
+    });
+    t2.ok(deployOut, "deployContract() output is truthy OK");
+    t2.ok(
+      deployOut.transactionReceipt,
+      "deployContract() output.transactionReceipt is truthy OK",
+    );
+    t2.ok(
+      deployOut.transactionReceipt.contractAddress,
+      "deployContract() output.transactionReceipt.contractAddress is truthy OK",
+    );
+
+    contractAddress = deployOut.transactionReceipt.contractAddress as string;
+    t2.ok(
+      typeof contractAddress === "string",
+      "contractAddress typeof string OK",
+    );
+  });
+
   t.end();
 });
