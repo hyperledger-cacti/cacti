@@ -1,15 +1,15 @@
 import { Server } from "http";
 import * as grpc from "grpc";
 import { Server as SecureServer } from "https";
-import { CommandService_v1Client as CommandService } from "iroha-helpers-ts/lib/proto/endpoint_grpc_pb";
-import { QueryService_v1Client as QueryService } from "iroha-helpers-ts/lib/proto/endpoint_grpc_pb";
-import commands from "iroha-helpers-ts/lib/commands/index";
-import queries from "iroha-helpers-ts/lib/queries";
+import { CommandService_v1Client as CommandService } from "iroha-helpers/lib/proto/endpoint_grpc_pb";
+import { QueryService_v1Client as QueryService } from "iroha-helpers/lib/proto/endpoint_grpc_pb";
+import commands from "iroha-helpers/lib/commands";
+import queries from "iroha-helpers/lib/queries";
 import type { Express } from "express";
 import {
   GrantablePermission,
   GrantablePermissionMap,
-} from "iroha-helpers-ts/lib/proto/primitive_pb";
+} from "iroha-helpers/lib/proto/primitive_pb";
 
 import OAS from "../json/openapi.json";
 
@@ -264,7 +264,8 @@ export class PluginLedgerConnectorIroha
               accountId: req.params[0],
               key: req.params[1],
               value: req.params[2],
-              oldValue: req.params[3],
+              oldValue: req.params[3] ? undefined : req.params[3],
+              checkEmpty: req.params[4],
             },
           );
           return { transactionReceipt: response };
@@ -518,6 +519,10 @@ export class PluginLedgerConnectorIroha
           const response = await queries.getPendingTransactions(queryOptions, {
             pageSize: req.params[0],
             firstTxHash: req.params[1],
+            ordering: {
+              field: undefined,
+              direction: undefined,
+            },
           });
           return { transactionReceipt: response };
         } catch (err) {
@@ -530,6 +535,10 @@ export class PluginLedgerConnectorIroha
             accountId: req.params[0],
             pageSize: req.params[1],
             firstTxHash: req.params[2],
+            ordering: {
+              field: undefined,
+              direction: undefined,
+            },
           });
           return { transactionReceipt: response };
         } catch (err) {
@@ -545,6 +554,10 @@ export class PluginLedgerConnectorIroha
               assetId: req.params[1],
               pageSize: req.params[2],
               firstTxHash: req.params[3],
+              ordering: {
+                field: undefined,
+                direction: undefined,
+              },
             },
           );
           return { transactionReceipt: response };

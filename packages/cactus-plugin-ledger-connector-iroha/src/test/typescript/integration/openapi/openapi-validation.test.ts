@@ -34,7 +34,7 @@ import {
   KeyPair,
   RunTransactionRequestV1,
 } from "../../../../main/typescript/generated/openapi/typescript-axios";
-import cryptoHelper from "iroha-helpers-ts/lib/cryptoHelper";
+import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 
 import OAS from "../../../../main/json/openapi.json";
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";

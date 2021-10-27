@@ -1,0 +1,19 @@
+diff --git a/node_modules/iroha-helpers/lib/util.js b/node_modules/iroha-helpers/lib/util.js
+index 0409412..fd49b69 100644
+--- a/node_modules/iroha-helpers/lib/util.js
++++ b/node_modules/iroha-helpers/lib/util.js
+@@ -113,11 +113,11 @@ function sendTransactions(txs, txClient, timeoutLimit, requiredStatusesStr) {
+                 .map(function (h) { return _streamVerifier(h, txClient, requiredStatusesStr); });
+             Promise.all(requests)
+                 .then(function (res) {
+-                var status = res
+-                    .map(function (r) { return reverseEnum(endpoint_pb_1.TxStatus)[r.tx.getTxStatus()]; });
++                    const status = res.map(r => reverseEnum(endpoint_pb_1.TxStatus)[r.tx.getTxStatus()])
++                    const hash = res.map(r => r.tx.getTxHash())
+                 return res.some(function (r) { return r.error; })
+                     ? reject(new Error("Command response error: expected=" + requiredStatusesStr + ", actual=" + status))
+-                    : resolve();
++                    : resolve({ txHash: hash, status: status })
+             });
+         });
+     });

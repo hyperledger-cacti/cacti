@@ -33,7 +33,7 @@ import {
   IrohaQuery,
   KeyPair,
 } from "../../../main/typescript/generated/openapi/typescript-axios";
-import cryptoHelper from "iroha-helpers-ts/lib/cryptoHelper";
+import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 
 const testCase = "runs tx on an Iroha v1.2.0 ledger";
 const logLevel: LogLevelDesc = "ERROR";
@@ -49,7 +49,7 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 // Flaky test, does not always work, fix it once we have time
-test.skip(testCase, async (t: Test) => {
+test(testCase, async (t: Test) => {
   const postgres1 = new PostgresTestContainer({ logLevel });
   const postgres2 = new PostgresTestContainer({ logLevel });
   test.onFinish(async () => {
@@ -95,6 +95,12 @@ test.skip(testCase, async (t: Test) => {
     await iroha1.stop();
     await iroha2.stop();
   });
+
+  test.onFailure(async () => {
+    await iroha1.stop();
+    await iroha2.stop();
+  });
+
   await iroha1.start();
   await iroha2.start();
   const irohaHost1 = await internalIpV4();
@@ -188,7 +194,7 @@ test.skip(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   //Verify the generated priv/pub keys are equivalent to those pulled from the ledger.
@@ -221,7 +227,7 @@ test.skip(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
   //Iroha1's admin is initialized with 100 (coolcoin#test).
   {
@@ -242,7 +248,7 @@ test.skip(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   // Iroha1's admin transfers 30 (coolcoin#test) to Iroha2's admin.
@@ -265,7 +271,7 @@ test.skip(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
   //i.e., Iroha2's admin adds 30 (coolcoin#test).
   {
@@ -286,7 +292,7 @@ test.skip(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
   //Verification: iroha1's admin has 70 (coolcoin#test).
   {

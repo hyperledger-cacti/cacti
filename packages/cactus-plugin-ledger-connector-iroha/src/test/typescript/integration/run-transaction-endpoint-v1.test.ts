@@ -34,7 +34,7 @@ import {
   IrohaQuery,
   KeyPair,
 } from "../../../main/typescript/generated/openapi/typescript-axios";
-import cryptoHelper from "iroha-helpers-ts/lib/cryptoHelper";
+import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 
 const testCase = "runs tx on an Iroha v1.2.0 ledger";
 const logLevel: LogLevelDesc = "INFO";
@@ -883,7 +883,7 @@ test.skip(testCase, async (t: Test) => {
         timeoutLimit: 5000,
         tls: false,
       },
-      params: [userID, "age", "118", "18"], //change age from 18 to 118
+      params: [userID, "age", "118", "18", true], //change age from 18 to 118
     };
     const res = await apiClient.runTransactionV1(req);
     t.ok(res);
