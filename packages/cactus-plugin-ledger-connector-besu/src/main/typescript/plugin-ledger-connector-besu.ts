@@ -92,6 +92,7 @@ import { GetPastLogsEndpoint } from "./web-services/get-past-logs-endpoint";
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
 import { GetBlockEndpoint } from "./web-services/get-block-v1-endpoint-";
 import { GetBesuRecordEndpointV1 } from "./web-services/get-besu-record-endpoint-v1";
+import { AbiItem } from "web3-utils";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
@@ -416,7 +417,8 @@ export class PluginLedgerConnectorBesu
           );
           privKey = await keychainPlugin?.get(keychainEntryKey);
         } else {
-          privKey = (req.signingCredential as any).secret;
+          privKey = (req.signingCredential as Web3SigningCredentialPrivateKeyHex)
+            .secret;
         }
 
         const fnParams = {
@@ -442,7 +444,7 @@ export class PluginLedgerConnectorBesu
         success = true;
         this.log.debug(`Web3 EEA Call output: `, callOutput);
       } else {
-        callOutput = await (method as any).call();
+        callOutput = await method.call();
         success = true;
       }
       return { success, callOutput };
@@ -542,7 +544,7 @@ export class PluginLedgerConnectorBesu
 
   public async getTxReceipt(
     request: RunTransactionRequest,
-    txPoolReceipt: any,
+    txPoolReceipt: TransactionReceipt,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#getTxReceipt()`;
 
@@ -915,7 +917,7 @@ export class PluginLedgerConnectorBesu
   ): Promise<GetBesuRecordV1Response> {
     const fnTag = `${this.className}#getBesuRecord()`;
     //////////////////////////////////////////////
-    let abi: any = undefined;
+    let abi: AbiItem[] | AbiItem = [];
     const resp: GetBesuRecordV1Response = {};
     const txHash = request.transactionHash;
 
