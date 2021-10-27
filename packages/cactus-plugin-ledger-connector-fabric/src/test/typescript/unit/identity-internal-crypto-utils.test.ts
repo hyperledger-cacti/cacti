@@ -69,10 +69,8 @@ GfNTZZQn1F9PQCxOequ4XS4XFmng3MD8jkP58Sak/6QaXYvqAEB6pBT/gA==
       "base64",
     );
     const csrPem = CryptoUtil.getPemCSR(csr, signature);
-    // console.log(KJUR.asn1.csr.CSRUtil);
     {
       const csr = KJ.asn1.csr.CSRUtil.getParam(csrPem);
-      console.log(csr);
       t.equal("/CN=Cactus", csr.subject.str);
     }
     t.end();

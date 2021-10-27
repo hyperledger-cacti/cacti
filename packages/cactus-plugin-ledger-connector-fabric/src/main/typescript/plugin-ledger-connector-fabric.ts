@@ -95,6 +95,7 @@ import { createGateway } from "./common/create-gateway";
 import { Endorser, ICryptoKey } from "fabric-common";
 import {
   IVaultConfig,
+  IWebSocketConfig,
   SecureIdentityProviders,
   IIdentity,
 } from "./identity/identity-provider";
@@ -136,6 +137,7 @@ export interface IPluginLedgerConnectorFabricOptions
   eventHandlerOptions?: GatewayEventHandlerOptions;
   supportedIdentity?: FabricSigningCredentialType[];
   vaultConfig?: IVaultConfig;
+  webSocketConfig?: IWebSocketConfig;
 }
 
 export class PluginLedgerConnectorFabric
@@ -202,6 +204,7 @@ export class PluginLedgerConnectorFabric
       ],
       logLevel: opts.logLevel || "INFO",
       vaultConfig: opts.vaultConfig,
+      webSocketConfig: opts.webSocketConfig,
     });
     this.certStore = new CertDatastore(opts.pluginRegistry);
   }
@@ -895,6 +898,15 @@ export class PluginLedgerConnectorFabric
           keyName: signingCredential.vaultTransitKey.keyName,
         });
         break;
+      case FabricSigningCredentialType.WsX509:
+        if (!signingCredential.webSocketKey) {
+          throw new Error(`require signingCredential.webSocketKey`);
+        }
+        key = this.secureIdentity.getWebSocketKey({
+          sessionId: signingCredential.webSocketKey.sessionId,
+          signature: signingCredential.webSocketKey.signature,
+        });
+        break;
       case FabricSigningCredentialType.X509:
         key = this.secureIdentity.getDefaultKey({
           private: certData.credentials.privateKey as string,
@@ -1169,14 +1181,25 @@ export class PluginLedgerConnectorFabric
       enrollmentID: request.enrollmentID,
       enrollmentSecret: request.enrollmentSecret,
     };
+    let key;
     switch (iType) {
       case FabricSigningCredentialType.VaultX509:
         if (!identity.vaultTransitKey) {
           throw new Error(`${fnTag} require identity.vaultTransitKey`);
         }
-        const key = this.secureIdentity.getVaultKey({
+        key = this.secureIdentity.getVaultKey({
           token: identity.vaultTransitKey.token,
           keyName: identity.vaultTransitKey.keyName,
+        });
+        enrollmentRequest.csr = await key.generateCSR(request.enrollmentID);
+        break;
+      case FabricSigningCredentialType.WsX509:
+        if (!identity.webSocketKey) {
+          throw new Error(`${fnTag} require identity.webSocketKey`);
+        }
+        key = this.secureIdentity.getWebSocketKey({
+          sessionId: identity.webSocketKey.sessionId,
+          signature: identity.webSocketKey.signature,
         });
         enrollmentRequest.csr = await key.generateCSR(request.enrollmentID);
         break;
@@ -1242,6 +1265,15 @@ export class PluginLedgerConnectorFabric
           keyName: registrar.vaultTransitKey.keyName,
         });
         break;
+      case FabricSigningCredentialType.WsX509:
+        if (!registrar.webSocketKey) {
+          throw new Error(`${fnTag} require registrar.webSocketKey`);
+        }
+        key = this.secureIdentity.getWebSocketKey({
+          sessionId: registrar.webSocketKey.sessionId,
+          signature: registrar.webSocketKey.signature,
+        });
+        break;
       default:
         throw new Error(`${fnTag} UNRECOGNIZED_IDENTITY_TYPE type = ${iType}`);
     }
@@ -1300,6 +1332,11 @@ export class PluginLedgerConnectorFabric
           token: identity.vaultTransitKey.token,
         });
         await key.rotate();
+        break;
+      case FabricSigningCredentialType.WsX509:
+        throw new Error(
+          `${fnTag} web socket is not setup to rotate keys. Client should enroll with a new key)`,
+        );
         break;
     }
     identity.type = iType;

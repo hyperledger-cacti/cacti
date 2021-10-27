@@ -92,7 +92,8 @@
     "prom-client": "13.2.0",
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
-    "uuid": "8.3.2"
+    "uuid": "8.3.2",
+    "ws-identity-client": "1.0.2"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.1",
@@ -104,6 +105,7 @@
     "@types/node-vault": "0.9.13",
     "@types/temp": "0.9.1",
     "@types/uuid": "8.3.1",
-    "fs-extra": "10.0.0"
+    "fs-extra": "10.0.0",
+    "ws-wallet": "1.1.5"
   }
 }

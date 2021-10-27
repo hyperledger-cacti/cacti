@@ -7,3 +7,4 @@
 packages/core
 packages/connection-chain
 contribs/
+**/src/main/typescript/generated/**

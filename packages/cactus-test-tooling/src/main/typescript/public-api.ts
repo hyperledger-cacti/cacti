@@ -82,6 +82,12 @@ export {
 } from "./vault-test-server/vault-test-server";
 
 export {
+  IWsTestServerOptions,
+  WsTestServer,
+  WS_IDENTITY_HTTP_PORT,
+} from "./ws-test-server/ws-test-server";
+
+export {
   ILocalStackContainerOptions,
   LocalStackContainer,
   K_DEFAULT_LOCALSTACK_HTTP_PORT,

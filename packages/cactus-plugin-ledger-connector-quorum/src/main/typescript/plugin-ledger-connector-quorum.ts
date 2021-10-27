@@ -503,13 +503,26 @@ export class PluginLedgerConnectorQuorum
     }
   }
 
+  private async generateBytecode(req: any): Promise<string> {
+    const tmpContract = new this.web3.eth.Contract(
+      (req.contractJSON as any).abi,
+    );
+    const deployment = tmpContract.deploy({
+      data: req.contractJSON.bytecode,
+      arguments: req.constructorArgs,
+    });
+    const abi = deployment.encodeABI();
+    return abi.startsWith("0x") ? abi : `0x${abi}`;
+  }
+
   async runDeploy(req: any): Promise<DeployContractSolidityBytecodeV1Response> {
     const web3SigningCredential = req.web3SigningCredential as
       | Web3SigningCredentialGethKeychainPassword
       | Web3SigningCredentialPrivateKeyHex;
+
     const receipt = await this.transact({
       transactionConfig: {
-        data: `0x${req.contractJSON.bytecode}`,
+        data: await this.generateBytecode(req),
         from: web3SigningCredential.ethAccount,
         gas: req.gas,
         gasPrice: req.gasPrice,

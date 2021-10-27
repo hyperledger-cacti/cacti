@@ -1,20 +1,17 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as internalIpV4 } from "internal-ip";
-
+import { AxiosError } from "axios";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
-
+import { v4 as uuidv4 } from "uuid";
 import {
   Containers,
   K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
   K_DEFAULT_VAULT_HTTP_PORT,
   VaultTestServer,
 } from "@hyperledger/cactus-test-tooling";
-
-import { v4 as uuidv4 } from "uuid";
-
 import {
   LogLevelDesc,
   IListenOptions,
@@ -139,98 +136,97 @@ test(`${testCase}`, async (t: Test) => {
 
   test(`${testCase} - ${fSet} - ${cWithoutParams}`, async (t2: Test) => {
     try {
-      await apiClient.setKeychainEntryV1(({
+      await apiClient.setKeychainEntryV1({
         value: value1,
-      } as any) as SetKeychainEntryRequest);
-    } catch (e) {
+      } as SetKeychainEntryRequest);
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fSet} without required key: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param) =>
         param.path.replace(".body.", ""),
       );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      t2.ok(fields?.includes("key"), "Rejected because key is required");
     }
     t2.end();
   });
 
   test(`${testCase} - ${fHas} - ${cWithoutParams}`, async (t2: Test) => {
     try {
-      await apiClient.hasKeychainEntryV1(
-        ({} as any) as HasKeychainEntryRequestV1,
-      );
-    } catch (e) {
+      await apiClient.hasKeychainEntryV1({} as HasKeychainEntryRequestV1);
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fHas} without required key: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param) =>
         param.path.replace(".body.", ""),
       );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      t2.ok(fields?.includes("key"), "Rejected because key is required");
     }
     t2.end();
   });
 
   test(`${testCase} - ${fGet} - ${cWithoutParams}`, async (t2: Test) => {
     try {
-      await apiClient.getKeychainEntryV1(
-        ({} as any) as GetKeychainEntryRequest,
-      );
-    } catch (e) {
+      await apiClient.getKeychainEntryV1({} as GetKeychainEntryRequest);
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fGet} without required key: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param) =>
         param.path.replace(".body.", ""),
       );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      t2.ok(fields?.includes("key"), "Rejected because key is required");
     }
     t2.end();
   });
 
   test(`${testCase} - ${fDelete} - ${cWithoutParams}`, async (t2: Test) => {
     try {
-      await apiClient.deleteKeychainEntryV1(
-        ({} as any) as DeleteKeychainEntryRequestV1,
-      );
-    } catch (e) {
+      await apiClient.deleteKeychainEntryV1({} as DeleteKeychainEntryRequestV1);
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fDelete} without required key: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param) =>
         param.path.replace(".body.", ""),
       );
-      t2.ok(fields.includes("key"), "Rejected because key is required");
+      t2.ok(fields?.includes("key"), "Rejected because key is required");
     }
     t2.end();
   });
 
   test(`${testCase} - ${fSet} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      await apiClient.setKeychainEntryV1(({
+      await apiClient.setKeychainEntryV1({
         key: key1,
         value: value1,
         fake: 4,
-      } as any) as SetKeychainEntryRequest);
-    } catch (e) {
+      } as SetKeychainEntryRequest);
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fSet} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -239,21 +235,22 @@ test(`${testCase}`, async (t: Test) => {
 
   test(`${testCase} - ${fHas} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      await apiClient.hasKeychainEntryV1(({
+      await apiClient.hasKeychainEntryV1({
         key: key1,
         fake: 4,
-      } as any) as HasKeychainEntryRequestV1);
-    } catch (e) {
+      } as HasKeychainEntryRequestV1);
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fHas} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
@@ -262,19 +259,20 @@ test(`${testCase}`, async (t: Test) => {
 
   test(`${testCase} - ${fGet} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      await apiClient.getKeychainEntryV1(({
+      await apiClient.getKeychainEntryV1({
         key: key1,
         fake: 4,
-      } as any) as GetKeychainEntryRequest);
-    } catch (e) {
+      } as GetKeychainEntryRequest);
+    } catch (err) {
+      const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
-        e.response.status,
+        e?.response?.status,
         400,
         `Endpoint ${fGet} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
+      const fields =
+        e?.response?.data.map((param) => param.path.replace(".body.", "")) ||
+        [];
       t2.ok(
         fields.includes("fake"),
         "Rejected because fake is not a valid parameter",
@@ -285,21 +283,22 @@ test(`${testCase}`, async (t: Test) => {
 
   test(`${testCase} - ${fDelete} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      await apiClient.deleteKeychainEntryV1(({
+      await apiClient.deleteKeychainEntryV1({
         key: key1,
         fake: 4,
-      } as any) as GetKeychainEntryRequest);
-    } catch (e) {
+      } as GetKeychainEntryRequest);
+    } catch (err) {
+      const e = err as AxiosError;
       t2.equal(
-        e.response.status,
+        (e as AxiosError)?.response?.status,
         400,
         `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e?.response?.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
-        fields.includes("fake"),
+        fields?.includes("fake"),
         "Rejected because fake is not a valid parameter",
       );
     }
