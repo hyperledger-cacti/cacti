@@ -262,11 +262,16 @@ Follow the instructions below to build and launch the network:
   make start-local
   ```
 
-If the Corda node and notary start up successfully, you should something like the following:
-
-![Corda network startup screenshot](/setup-assets/Corda_network.jpg)
-
-It's safe to press `Ctrl-C` here, as what you are seeing are the container logs.
+You should see the following message in the terminal:
+```
+Waiting for network node services to start
+```
+The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following:
+```bash
+PartyA node services started
+PartyB node services started
+Notary node services started
+```
 
 ### Corda Relay
 
@@ -310,9 +315,14 @@ If the driver starts successfully, it should log the following message, when you
 Corda driver gRPC server started. Listening on port 9099
 ```
 
+## Next Steps
+
+The test networks are up and running. Next, you must [configure the networks and initialize the ledgers](./ledger-initialization.md) before running interoperation flows.
+
+
 ## Tear Down the Setup
 
-Bring down the various components as follows (_Navigate to the root folder of weaver_):
+Bring down the various components as follows (_Navigate to the root folder of your clone of the Weaver repository_):
 
 ### Relay
 To bring down the relays (for all 3 networks), run:

@@ -280,15 +280,20 @@ The Corda network code lies in the `tests/network-setups/corda` folder. You can 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
 - To spin up the Corda network with the interoperation Cordapp, run:
-    ```bash
-    make start-local
-    ```
+  ```bash
+  make start-local
+  ```
 
-If the Corda node and notary start up successfully, you should something like the following:
-
-![Corda network startup screenshot](/setup-assets/Corda_network.jpg)
-
-It's safe to press `Ctrl-C` here, as what you are seeing are the container logs.
+You should see the following message in the terminal:
+```
+Waiting for network node services to start
+```
+The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following:
+```bash
+PartyA node services started
+PartyB node services started
+Notary node services started
+```
 
 ### Corda Relay
 
@@ -336,6 +341,11 @@ If the driver starts successfully, it should log the following message on your t
 Corda driver gRPC server started. Listening on port 9099
 ```
 
+## Next Steps
+
+The test networks are up and running. Next, you must [configure the networks and initialize the ledgers](./ledger-initialization.md) before running interoperation flows.
+
+
 ## Tear Down the Setup
 
 Bring down the test network's components as follows:
@@ -343,13 +353,13 @@ Bring down the test network's components as follows:
 - To bring down the running Corda network:
   * Navigate to the `tests/network-setups/corda` folder.
   * Run the following:
-  ```bash
-  make clean
-  ```
+    ```bash
+    make clean
+    ```
 - To bring down all the running Fabric networks:
   * Navigate to the `tests/network-setups/fabric/dev` folder.
   * Run the following:
-  ```bash
-  make clean
-  ```
+    ```bash
+    make clean
+    ```
 
