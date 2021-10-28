@@ -1,0 +1,30 @@
+{
+  "simplestate": {
+    "Create": {
+      "args": ["a", ""],
+      "replaceIndices": [1]
+    },
+    "CreateFromRemote": {
+      "args": ["a", ""],
+      "replaceIndices": [1]
+    }
+  },
+  "simpleassettransfer": {
+    "ClaimRemoteAsset": {
+      "args": ["<assettype>", "<assetid>", "<alice>", "network1", ""],
+      "replaceIndices": [4]
+    },
+    "ReclaimAsset": {
+      "args": ["<assettype>", "<assetid>", "<bob>", "network2", ""],
+      "replaceIndices": [4]
+    },
+    "ClaimRemoteTokenAsset": {
+      "args": ["<assettype>", "<assetid>", "<numunits>", "<alice>", "network1", ""],
+      "replaceIndices": [5]
+    },
+    "ReclaimTokenAsset": {
+      "args": ["<assettype>", "<assetid>", "<bob>", "network2", ""],
+      "replaceIndices": [4]
+    }
+  }
+}

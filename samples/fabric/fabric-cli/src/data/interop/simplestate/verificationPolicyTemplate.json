@@ -7,13 +7,6 @@
           "type": "Signature",
           "criteria": []
         }
-      },
-      {
-        "pattern": "mychannel:simplestatewithacl:Read:*",
-        "policy": {
-          "type": "Signature",
-          "criteria": []
-        }
       }
     ]
 }

@@ -1,0 +1,11 @@
+{
+  "securityDomain": "",
+  "rules": [
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:simplestate:Read:*",
+      "read": true
+    }
+  ]
+}

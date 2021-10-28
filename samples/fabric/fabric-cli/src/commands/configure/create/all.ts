@@ -88,9 +88,10 @@ const command: GluegunCommand = {
     const username =
       options.username || `user1`
 
+    const appccid = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
     let templatePath = path.resolve(
           __dirname,
-          '../../../data/interop/accessControlTemplate_' + networkEnv.aclPolicyPrincipalType + '.json'
+          '../../../data/interop/' + appccid + '/accessControlTemplate_' + networkEnv.aclPolicyPrincipalType + '.json'
         )
     logger.info(`Template path: ${templatePath}`)
     await generateAccessControl(
@@ -117,7 +118,7 @@ const command: GluegunCommand = {
     )
     templatePath = path.resolve(
           __dirname,
-          '../../../data/interop/verificationPolicyTemplate.json'
+          '../../../data/interop/' + appccid + '/verificationPolicyTemplate.json'
         )
     logger.info(`Template path: ${templatePath}`)
     await generateVerificationPolicy(

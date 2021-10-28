@@ -31,7 +31,6 @@ import (
 // SmartContract provides functions for managing arbitrary key-value pairs
 type SmartContract struct {
 	contractapi.Contract
-	testMode bool
 }
 
 // Record Interoperation Chaincode ID on ledger
@@ -52,16 +51,14 @@ func (s *SmartContract) Create(ctx contractapi.TransactionContextInterface, key 
 
 // CreateFromRemote adds a new entry with the specified key and value obtained (with proof) from a remote network
 func (s *SmartContract) CreateFromRemote(ctx contractapi.TransactionContextInterface, key string, value string) error {
-	if !s.testMode {
-		callerCheck, err := wutils.IsCallerInteropChaincode(ctx.GetStub())
-		if err != nil {
-			return err
-		}
-		if !callerCheck {
-			return fmt.Errorf("Illegal access; function can only be invoked from Interop Chaincode")
-		}
-		fmt.Printf("Caller access check passed. Key: %s\n", key)
+	callerCheck, err := wutils.IsCallerInteropChaincode(ctx.GetStub())
+	if err != nil {
+		return err
 	}
+	if !callerCheck {
+		return fmt.Errorf("Illegal access; function can only be invoked from Interop Chaincode")
+	}
+	fmt.Printf("Caller access check passed. Key: %s\n", key)
 
 	bytes := []byte(value)
 	fmt.Printf("Create called. Key: %s Value: %s\n", key, value)
@@ -71,16 +68,14 @@ func (s *SmartContract) CreateFromRemote(ctx contractapi.TransactionContextInter
 
 // Read returns the value of the entry with the specified key
 func (s *SmartContract) Read(ctx contractapi.TransactionContextInterface, key string) (string, error) {
-	if !s.testMode {
-		relayAccessCheck, err := wutils.CheckAccessIfRelayClient(ctx.GetStub())
-		if err != nil {
-			return "", err
-		}
-		if !relayAccessCheck {
-			return "", fmt.Errorf("Illegal access by relay")
-		}
-		fmt.Printf("Relay access check passed. Key: %s\n", key)
+	relayAccessCheck, err := wutils.CheckAccessIfRelayClient(ctx.GetStub())
+	if err != nil {
+		return "", err
 	}
+	if !relayAccessCheck {
+		return "", fmt.Errorf("Illegal access by relay")
+	}
+	fmt.Printf("Relay access check passed. Key: %s\n", key)
 
 	bytes, err := ctx.GetStub().GetState(key)
 
@@ -110,9 +105,7 @@ func (s *SmartContract) Delete(ctx contractapi.TransactionContextInterface, key 
 }
 
 func main() {
-	sc := new(SmartContract)
-	sc.testMode = false
-	chaincode, err := contractapi.NewChaincode(sc)
+	chaincode, err := contractapi.NewChaincode(new(SmartContract))
 
 	if err != nil {
 		fmt.Printf("Error create SimpleState chaincode: %s", err.Error())

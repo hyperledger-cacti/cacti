@@ -31,6 +31,7 @@ module.exports = {
                     items: [
                         "external/getting-started/interop/data-sharing",
                         "external/getting-started/interop/asset-exchange",
+                        "external/getting-started/interop/asset-transfer",
                     ],
                 },
                 {
@@ -53,8 +54,8 @@ module.exports = {
                 "external/what-is-interoperability/integration-patterns",
             ],
         },
-                "external/interoperability-modes",
-                "external/design-principles",
+        "external/interoperability-modes",
+        "external/design-principles",
         {
             type: "category",
             label: "User Stories",

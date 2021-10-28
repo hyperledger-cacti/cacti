@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator() in locker/recipient context
@@ -61,7 +62,9 @@ type ContractedFungibleAsset struct {
 
 // test case for "asset exchange" happy path
 func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
-	ctx, chaincodeStub, sc := prepMockStub()
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	sc := sa.SmartContract{}
+	sc.ConfigureInterop("interopcc")
 
 	bondLocker := getLockerECertBase64()
 	bondRecipient := getRecipientECertBase64()
@@ -144,9 +147,9 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	bondAssetBytes, err := json.Marshal(bondAsset)
 	chaincodeStub.GetCreatorReturnsOnCall(0, []byte(getCreatorInContext("locker")), nil)
 	chaincodeStub.GetStateReturnsOnCall(4, bondAssetBytes, nil)
-	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte(bondContractId)))
+	chaincodeStub.InvokeChaincodeReturnsOnCall(0, shim.Success([]byte(bondContractId)))
 	bondContractId, err = sc.LockAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(lockInfoBytes))
-        require.NoError(t, err)
+	require.NoError(t, err)
 	require.NotEmpty(t, bondContractId)
 
 
@@ -165,14 +168,14 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
 	}
-        tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
+	tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
 	chaincodeStub.GetStateReturnsOnCall(5, tokenAssetTypeBytes, nil)
 	walletMap = make(map[string]uint64)
 	walletMap[tokenType] = numTokens
 	tokensWallet = &sa.TokenWallet{WalletMap: walletMap}
 	tokensWalletBytes, _ = json.Marshal(tokensWallet)
 	chaincodeStub.GetStateReturnsOnCall(6, tokensWalletBytes, nil)
-	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte(tokensContractId)))
+	chaincodeStub.InvokeChaincodeReturnsOnCall(1, shim.Success([]byte(tokensContractId)))
 	chaincodeStub.GetCreatorReturnsOnCall(2, []byte(getCreatorInContext("recipient")), nil)
 	chaincodeStub.GetStateReturnsOnCall(7, tokenAssetTypeBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(8, tokensWalletBytes, nil)
@@ -193,13 +196,13 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 		LockMechanism: common.LockMechanism_HTLC,
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
-	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
+	chaincodeStub.InvokeChaincodeReturnsOnCall(2, shim.Success(nil))
 	chaincodeStub.GetCreatorReturnsOnCall(3, []byte(getCreatorInContext("locker")), nil)
 	tokenAssetType = sa.TokenAssetType {
 		Issuer: tokenIssuer,
 		Value: tokenValue,
 	}
-        tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
+	tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
 	contractedTokenAsset := ContractedFungibleAsset{
 		Type: tokenType,
 		NumUnits: numTokens,
@@ -210,16 +213,18 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(10, contractedTokenAssetBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(11, nil, nil)
 	_, err = sc.ClaimFungibleAsset(ctx, base64.StdEncoding.EncodeToString(tokensAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
-        require.NoError(t, err)
+	require.NoError(t, err)
 
 
 	// Claim bond asset in network1 by Bob
 	fmt.Println("*** Claim bond asset in network1 by Bob ***")
-	chaincodeStub.InvokeChaincodeReturns(shim.Success(nil))
+	chaincodeStub.InvokeChaincodeReturnsOnCall(3, shim.Success(nil))
+	chaincodeStub.InvokeChaincodeReturnsOnCall(4, shim.Success([]byte("true")))
+	chaincodeStub.InvokeChaincodeReturnsOnCall(5, shim.Success([]byte("true")))
 	chaincodeStub.GetCreatorReturnsOnCall(4, []byte(getCreatorInContext("recipient")), nil)
 	chaincodeStub.GetStateReturnsOnCall(12, bondAssetBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(13, []byte(bondContractId), nil)
 	_, err = sc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
-        require.NoError(t, err)
+	require.NoError(t, err)
 
 }

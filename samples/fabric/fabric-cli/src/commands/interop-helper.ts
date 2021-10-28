@@ -13,6 +13,8 @@ import {
 import {
   commandHelp,
   getNetworkConfig,
+  getChaincodeConfig,
+  generateViewAddress,
   handlePromise
 } from '../helpers/helpers'
 import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
@@ -61,11 +63,6 @@ const command: GluegunCommand = {
             description: 'Sends signature to relay, usage: --sign=true'
           },
           {
-            name: '--key',
-            description:
-              'Additional key to be sent to chaincode (used to store result if usign Write)'
-          },
-          {
             name: '--user',
             description: 'User for interop.'
           },
@@ -106,15 +103,17 @@ const command: GluegunCommand = {
     const contractName = process.env.DEFAULT_CHAINCODE
       ? process.env.DEFAULT_CHAINCODE
       : 'interop'
+    const username = options['user'] || `user1`
     const { wallet, contract } = await fabricHelper({
       channel,
       contractName,
       connProfilePath: relayEnv.connProfilePath,
       networkName,
       mspId: options.mspId,
-      logger
+      logger,
+      discoveryEnabled: true,
+      userString: username
     })
-    const username = options.username || `user1`
     const [keyCert, keyCertError] = await handlePromise(
       getKeyAndCertForRemoteRequestbyUserName(wallet, username)
     )
@@ -123,14 +122,15 @@ const command: GluegunCommand = {
       return
     }
     const spinner = print.spin(`Starting interop flow`)
+    const appChaincodeId = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
     const applicationFunction = process.env.DEFAULT_APPLICATION_FUNC ? process.env.DEFAULT_APPLICATION_FUNC : 'Create'
-    const key = options.key || uuidv4()
+    const { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
     try {
       const invokeObject = {
         channel,
         ccFunc: applicationFunction,
-        ccArgs: [key, ''],
-        contractName: process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
+        ccArgs: args,
+        contractName: appChaincodeId
       }
       const interopFlowResponse = await InteroperableHelper.interopFlow(
         //@ts-ignore this comment can be removed after using published version of interop-sdk
@@ -139,9 +139,14 @@ const command: GluegunCommand = {
         invokeObject,
         options['requesting-org'] || '',
         relayEnv.relayEndpoint,
-        [1],
+        replaceIndices,
         [{
-          address: array[0],
+          address: await generateViewAddress(           // Typically a noop, but for some functions, we may want to do some extra processing
+                            array[0],
+                            options['local-network'],
+                            options['remote-network'],
+                            logger
+                            ),
           Sign: true
         }],
         keyCert

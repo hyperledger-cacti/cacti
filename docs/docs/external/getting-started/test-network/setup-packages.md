@@ -54,13 +54,24 @@ The code for this lies in the `tests/network-setups` folder.
 This folder contains code to create and launch networks `network1` and `network2` of identical specifications:
 - Network: 1 peer, 1 peer CA, 1 ordering service node, 1 ordering service CA
 - Single channel named `mychannel`
-- Single contract named `simplestate` (deployed on `mychannel`) that supports simple transactions (`Create`, `Read`, `Update`, `Delete`) involving storage and lookup of <key, value> pairs.
+- One of the following contracts deployed on `mychannel`, the choice depending on the [interoperability mode](../../interoperability-modes.md) you wish to test:
+  * `simplestate` ([Data Sharing](../interop/data-sharing.md)): supports simple transactions (`Create`, `Read`, `Update`, `Delete`) involving storage and lookup of <key, value> pairs.
+  * `simplestatewithacl` ([Data Sharing](../interop/data-sharing.md)): identical to `simplestate` but with extra security features to ensure that the Weaver infrastructure cannot be bypassed by a malicious client of the network.
+  * `simpleasset` ([Asset Exchange](../interop/asset-exchange.md)): supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple bonds and tokens (examples of non-fungible and fungible assets respectively).
+  * `simpleassetandinterop` ([Asset Exchange](../interop/asset-exchange.md)): identical to `simpleasset` but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperaton Chaincode (a Weaver component).
+  * `simpleassettransfer` ([Asset Exchange](../interop/asset-exchange.md) or [Asset Transfer](../interop/asset-transfer.md)): augmentation of `simpleasset` with asset pledging, claiming, and reclaiming features for cross-network transfers.
+
+_Note_: for new users, we recommend testing the Data Sharing feature first with the `simplestate` contract. To test the other modes, you can simply [tear down](#tear-down-the-setup) the Fabric networks and restart them with the appropriate chaincodes installed.
 
 Follow the instructions below to build and launch the networks:
 - Navigate to the `tests/network-setups/fabric/dev` folder.
-- To spin up both network1 and network2 with interoperation chaincode installed, run:
-  ```
+- To spin up both network1 and network2 with the interoperation chaincode and the default `simplestate` chaincode installed, run:
+  ```bash
   make start-interop
+  ```
+- _To launch the networks with a different application chaincode from the above list, run_:
+  ```bash
+  make start-interop CHAINCODE_NAME=<chaincode-name>
   ```
 - (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to install only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2`.)
 
@@ -73,20 +84,20 @@ For more information, refer to the associated [README](https://github.com/hyperl
 
 The CLI is used to interact with a Fabric network, configure it and run chaincode transactions to record data on the channel ledger or query data. It is also used to interact with remote networks through the relay to trigger an interoperation flow for data request and acceptance.
 
-The `fabric-cli` source code is located in the `samples/fabric/fabric-cli` folder.
+The `fabric-cli` Node.js source code is located in the `samples/fabric/fabric-cli` folder and the Golang source code in the `samples/fabric/go-cli` folder.
 
 #### Prerequisites
 
 If you are using a Linux system, make sure that lib64 is installed.
 
-_Note_: The setup and running instructions below were tested with all Node.js versions from v11.14.0 to v14.17.3.
+_Note_: For the Node.js version of the `fabric-cli`, the setup and running instructions below were tested with all Node.js versions from v11.14.0 to v14.17.3.
 
 #### Installation
 
-You can install `fabric-cli` as follows:
-- Navigate to the `samples/fabric/fabric-cli` folder.
+You can install `fabric-cli` as follows (for both the Node.js and Golang versions):
+- Navigate to the `samples/fabric/fabric-cli` folder or the `samples/fabric/go-cli` folder.
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
-- Run the following to install dependencies:
+- Run the following to install dependencies (for the Node.js version) or the executable (for the Golang version):
   ```bash
   make build
   ```
@@ -190,15 +201,20 @@ Follow the instructions below to build and launch the network:
 - Create a copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - To spin up the Corda network with the interoperation Cordapp, run:
-    ```bash
-    make start
-    ```
+  ```bash
+  make start
+  ```
 
-If the Corda node and notary start up successfully, you should something like the following:
-
-![Corda network startup screenshot](/setup-assets/Corda_network.jpg)
-
-It's safe to press `Ctrl-C` here, as what you are seeing are the container logs.
+You should see the following message in the terminal:
+```
+Waiting for network node services to start
+```
+The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following:
+```bash
+PartyA node services started
+PartyB node services started
+Notary node services started
+```
 
 ### Corda Relay
 
@@ -248,6 +264,11 @@ If the driver starts successfully, it should log the following message on your t
 Corda driver gRPC server started. Listening on port 9099
 ```
 
+## Next Steps
+
+The test networks are up and running. Next, you must [configure the networks and initialize the ledgers](./ledger-initialization.md) before running interoperation flows.
+
+
 ## Tear Down the Setup
 
 Bring down the test network's components as follows:
@@ -255,13 +276,13 @@ Bring down the test network's components as follows:
 - To bring down the running Corda network:
   * Navigate to the `tests/network-setups/corda` folder.
   * Run the following:
-  ```bash
-  make clean
-  ```
+    ```bash
+    make clean
+    ```
 - To bring down all the running Fabric networks:
   * Navigate to the `tests/network-setups/fabric/dev` folder.
   * Run the following:
-  ```bash
-  make clean
-  ```
+    ```bash
+    make clean
+    ```
 

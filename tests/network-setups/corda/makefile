@@ -3,6 +3,7 @@ start: github.properties
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh
 	./scripts/start-nodes.sh
+	./scripts/check-nodes-status.sh
 
 .PHONY: start-house
 start-house:
@@ -23,6 +24,7 @@ start-local:
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh local
 	./scripts/start-nodes.sh
+	./scripts/check-nodes-status.sh
 
 .PHONY: restart-with-new-interop-app
 restart-with-new-interop-app: stop
@@ -32,7 +34,7 @@ restart-with-new-interop-app: stop
 
 .PHONY:	stop
 stop: 
-	docker-compose down
+	docker-compose down --volumes
 
 .PHONY: clean
 clean:	stop

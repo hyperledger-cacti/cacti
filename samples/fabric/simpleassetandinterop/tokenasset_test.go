@@ -11,10 +11,12 @@ import (
 	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleassetandinterop"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/stretchr/testify/require"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 func TestInitTokenAssetLedger(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	err := simpleToken.InitTokenAssetLedger(transactionContext)
 	require.NoError(t, err)
@@ -25,10 +27,15 @@ func TestInitTokenAssetLedger(t *testing.T) {
 }
 
 func TestCreateTokenAssetType(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
+
+	// Should fail if token asset type is empty
+	res, err := simpleToken.CreateTokenAssetType(transactionContext, "", "", 0)
+	require.Error(t, err)
 
 	// Successful Case
-	res, err := simpleToken.CreateTokenAssetType(transactionContext, "", "", 0)
+	res, err = simpleToken.CreateTokenAssetType(transactionContext, "sometokentype", "", 0)
 	require.NoError(t, err)
 	require.Equal(t, res, true)
 
@@ -53,7 +60,8 @@ func TestCreateTokenAssetType(t *testing.T) {
 }
 
 func TestReadTokenAssetType(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	expectedAsset := &sa.TokenAssetType{Issuer: "CentralBank", Value: 10}
 	bytes, err := json.Marshal(expectedAsset)
@@ -78,7 +86,8 @@ func TestReadTokenAssetType(t *testing.T) {
 }
 
 func TestDeleteTokenAssetType(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	chaincodeStub.DelStateReturns(nil)
 	err := simpleToken.DeleteTokenAssetType(transactionContext, "")
@@ -97,37 +106,44 @@ func TestDeleteTokenAssetType(t *testing.T) {
 }
 
 func TestIssueTokenAssets(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	expectedAsset := &sa.TokenWallet{WalletMap: walletMap}
 	bytes, err := json.Marshal(expectedAsset)
 	require.NoError(t, err)
 
-	// Checking succesful case
+	// Should fail of owner is blank
 	chaincodeStub.GetStateReturns(bytes, nil)
 	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "")
+	require.Error(t, err)
+
+	// Checking succesful case
+	chaincodeStub.GetStateReturns(bytes, nil)
+	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "someowner")
 	require.NoError(t, err)
 
 	// Check if writing state after issuing fails
 	chaincodeStub.GetStateReturns(bytes, nil)
 	chaincodeStub.PutStateReturns(fmt.Errorf("failed to put state"))
-	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "")
+	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "someowner")
 	require.EqualError(t, err, "failed to put state")
 
 	// Error check
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("failed to read state"))
-	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "")
+	err = simpleToken.IssueTokenAssets(transactionContext, "", 0, "someowner")
 	require.EqualError(t, err, "failed to read from world state: failed to read state")
 
 	// Check if given token asset type doesn't exist
 	chaincodeStub.GetStateReturns(nil, nil)
-	err = simpleToken.IssueTokenAssets(transactionContext, "token1", 0, "")
+	err = simpleToken.IssueTokenAssets(transactionContext, "token1", 0, "someowner")
 	require.EqualError(t, err, "cannot issue: the token asset type token1 does not exist")
 }
 
 func TestDeleteTokenAssets(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
@@ -163,7 +179,8 @@ func TestDeleteTokenAssets(t *testing.T) {
 
 }
 func TestTransferTokenAssets(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
@@ -172,11 +189,15 @@ func TestTransferTokenAssets(t *testing.T) {
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 2, "", "")
+	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 2, "")
+	require.Error(t, err)
+
+	chaincodeStub.GetStateReturns(bytes, nil)
+	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 2, "newowner")
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 10, "", "")
+	err = simpleToken.TransferTokenAssets(transactionContext, "token1", 10, "newowner")
 	require.EqualError(t, err, "the owner does not possess enough units of the token asset type token1")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("Failed to read state"))
@@ -184,7 +205,8 @@ func TestTransferTokenAssets(t *testing.T) {
 	require.EqualError(t, err, "failed to read from world state: Failed to read state")
 }
 func TestGetBalance(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
@@ -211,7 +233,8 @@ func TestGetBalance(t *testing.T) {
 }
 
 func TestGetMyWallet(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5
@@ -239,7 +262,8 @@ func TestGetMyWallet(t *testing.T) {
 }
 
 func TestTokenAssetsExist(t *testing.T) {
-	transactionContext, chaincodeStub, simpleToken := prepMockStub()
+	transactionContext, chaincodeStub := wtest.PrepMockStub()
+	simpleToken := sa.SmartContract{}
 
 	walletMap := make(map[string]uint64)
 	walletMap["token1"] = 5

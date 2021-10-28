@@ -144,6 +144,7 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
+          sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
           ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials_docker
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           cat .env
@@ -198,7 +199,8 @@ jobs:
           TOTAL=8
 
           # FABRIC2 - FABRIC1
-          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a &> tmp.out
+          cp chaincode.json.template chaincode.json
+          ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a &> tmp.out
           tail -n 1 tmp.out | grep "Args: a, Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -207,7 +209,8 @@ jobs:
           cat tmp.out
 
           # FABRIC1 - FABRIC2
-          ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -216,7 +219,9 @@ jobs:
           cat tmp.out
 
           # FABRIC1 - CORDA
-          ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true &> tmp.out
+          cp chaincode.json.template chaincode.json
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"H\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true &> tmp.out
           tail -n 1 tmp.out | grep "Args: H, \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -225,7 +230,9 @@ jobs:
           cat tmp.out
 
           # FABRIC2 - CORDA
-          ./bin/fabric-cli interop --key=C --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true &> tmp.out
+          cp chaincode.json.template chaincode.json
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"C\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true &> tmp.out
           tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -403,9 +410,11 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
+          sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
           ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           cat .env
+          cp chaincode.json.template chaincode.json
         working-directory: samples/fabric/fabric-cli
         
       - name: Fabric CLI Configure ALL
@@ -457,7 +466,8 @@ jobs:
           TOTAL=8
 
           # FABRIC2 - FABRIC1
-          ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a &> tmp.out
+          cp chaincode.json.template chaincode.json
+          ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a &> tmp.out
           tail -n 1 tmp.out | grep "Args: a, Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -466,7 +476,8 @@ jobs:
           cat tmp.out
 
           # FABRIC1 - FABRIC2
-          ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -475,7 +486,9 @@ jobs:
           cat tmp.out
 
           # FABRIC1 - CORDA
-          ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true &> tmp.out
+          cp chaincode.json.template chaincode.json
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"H\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true &> tmp.out
           tail -n 1 tmp.out | grep "Args: H, \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -484,7 +497,9 @@ jobs:
           cat tmp.out
 
           # FABRIC2 - CORDA
-          ./bin/fabric-cli interop --key=C --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true --debug=true &> tmp.out
+          cp chaincode.json.template chaincode.json
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"C\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true --debug=true &> tmp.out
           tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 

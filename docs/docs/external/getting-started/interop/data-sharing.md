@@ -16,6 +16,10 @@ Once the networks, relays, and drivers have been launched, and the ledgers boots
 2. **Fabric to Corda**: Either Fabric network requests state and proof from the Corda network
 3. **Fabric to Fabric**: One Fabric network requests state and proof from another Fabric network
 
+We assume that one of the following chaincodes have been deployed in either Fabric network you are testing with:
+* `simplestate`
+* `simplestatewithacl`
+
 ## Corda to Fabric
 
 To test the scenario where `Corda_Network` requests the value of the state (key) `a` from `network1`, do the following:
@@ -56,16 +60,24 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
 
 To test the scenario where `network1` requests the value of the state (key) `H` from `Corda_Network`, do the following:
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network1`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` folder.
+- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
+- Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"H"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
+  ```json
+  "args": ["a", ""]
+  ```
+  with
+  ```json
+  "args": ["H", ""]
+  ```
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     ```bash
-    ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+    ./bin/fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
     ```
   * If Relays and Drivers are deployed in the Docker containers:
     ```bash
-    ./bin/fabric-cli interop --key=H --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+    ./bin/fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
     ```
 - Query the value of the requested state (key) `H` in `network1` using the following (replace the Args with the Args value obtained in the previous command):
   ```bash
@@ -74,16 +86,24 @@ To test the scenario where `network1` requests the value of the state (key) `H` 
 
 To test the scenario where `network2` requests the value of the state (key) `H` from `Corda_Network`, do the following:
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` folder.
+- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
+- Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"H"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
+  ```json
+  "args": ["a", ""]
+  ```
+  with
+  ```json
+  "args": ["H", ""]
+  ```
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     ```bash
-    ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+    ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
     ```
   * If Relays and Drivers are deployed in the Docker containers:
     ```bash
-    ./bin/fabric-cli interop --key=H --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+    ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
     ```
 - Query the value of the requested state (key) `H` in `network2` using the following:
   ```bash
@@ -94,16 +114,24 @@ To test the scenario where `network2` requests the value of the state (key) `H` 
 
 To test the scenario where `network1` requests the value of the state (key) `Arcturus` from `network2`, do the following:
 - (_Make sure the following are running_: Fabric `network1`, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` folder.
+- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
+- Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"Arcturus"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
+  ```json
+  "args": ["a", ""]
+  ```
+  with
+  ```json
+  "args": ["Arcturus", ""]
+  ```
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     ```bash
-    ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+    ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
     ```
   * If Relays and Drivers are deployed in the Docker containers:
     ```bash
-    ./bin/fabric-cli interop --key=Arcturus --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
+    ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
     ```
 - Query the value of the requested state (key) `Arcturus` in `network1` using the following:
   ```bash
@@ -112,19 +140,20 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
 
 To test the scenario where `network2` requests the value of the state (key) `a` from `network1`, do the following:
 - (_Make sure the following are running_: Fabric `network1`, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` folder.
+- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
+- (There is no need to edit `chaincode.json` to change the key as the default argument `"a"` is what we intend to use in this data sharing use scenario.)
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     ```bash
-    ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
+    ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
     ```
   * If Relays and Drivers are deployed in the Docker containers:
     ```bash
-    ./bin/fabric-cli interop --key=a --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a
+    ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a
     ```
 - Query the value of the requested state (key) `a` in `network2` using the following:
   ```bash
   ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2
   ```
-  
+
