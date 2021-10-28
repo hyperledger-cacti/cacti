@@ -282,10 +282,13 @@ jobs:
           echo "ERROR LOG============"
           cat tmp.err
           echo "====================="
-          ANTICIPATED_LIFECYCLE_ERROR=$(grep ERROR tmp.err | grep "Failed to execute connection life cycle listener")
-          if [[ "$ANTICIPATED_LIFECYCLE_ERROR" == "" ]]
+          ERROR_LOG=$(grep ERROR tmp.err)
+          if [[ "$ERROR_LOG" == "" ]]
           then
-              exit 1
+              ANTICIPATED_LIFECYCLE_ERROR=$(grep ERROR tmp.err | grep "Failed to execute connection life cycle listener")
+              if [[ "$ANTICIPATED_LIFECYCLE_ERROR" == "" ]]
+                  exit 1
+              fi
           fi
           tail -n 2 tmp.out | grep "Asset Unlock Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
@@ -391,10 +394,13 @@ jobs:
           echo "ERROR LOG============"
           cat tmp.err
           echo "====================="
-          ANTICIPATED_LIFECYCLE_ERROR=$(grep ERROR tmp.err | grep "Failed to execute connection life cycle listener")
-          if [[ "$ANTICIPATED_LIFECYCLE_ERROR" == "" ]]
+          ERROR_LOG=$(grep ERROR tmp.err)
+          if [[ "$ERROR_LOG" == "" ]]
           then
-              exit 1
+              ANTICIPATED_LIFECYCLE_ERROR=$(grep ERROR tmp.err | grep "Failed to execute connection life cycle listener")
+              if [[ "$ANTICIPATED_LIFECYCLE_ERROR" == "" ]]
+                  exit 1
+              fi
           fi
           tail -n 2 tmp.out | grep "Asset Unlock Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
