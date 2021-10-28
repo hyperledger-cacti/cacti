@@ -470,6 +470,19 @@ export class PluginLedgerConnectorQuorum
     // the private key that we need to run the transaction.
     const privateKeyHex = await keychainPlugin?.get(keychainEntryKey as string);
 
+    if (!transactionConfig.gas) {
+      this.log.debug(
+        `${fnTag} Gas not specified in the transaction values. Using the estimate from web3`,
+      );
+      transactionConfig.gas = await this.web3.eth.estimateGas(
+        transactionConfig,
+      );
+      this.log.debug(
+        `${fnTag} Gas estimated from web3 is: `,
+        transactionConfig.gas,
+      );
+    }
+
     return this.transactPrivateKey({
       transactionConfig,
       web3SigningCredential: {
