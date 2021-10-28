@@ -278,7 +278,7 @@ jobs:
           cat tmp.out
           
           ## Unlock asset
-          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID &> tmp.out 2>tmp.err
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID &> tmp.out
           tail -n 2 tmp.out | grep "Asset Unlock Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -379,7 +379,7 @@ jobs:
           cat tmp.out
           
           ## Unlock asset
-          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID &> tmp.out 2>tmp.err
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID &> tmp.out
           tail -n 2 tmp.out | grep "Asset Unlock Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
