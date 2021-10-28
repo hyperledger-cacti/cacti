@@ -326,7 +326,7 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Call,
       methodName: "getName",
       params: [],
-      gas: 1000000,
+      //  gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
@@ -345,7 +345,7 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Send,
       methodName: "getName",
       params: [],
-      gas: 1000000,
+      //gas: 1000000,
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
