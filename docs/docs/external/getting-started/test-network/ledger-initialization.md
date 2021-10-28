@@ -94,6 +94,10 @@ Bootstrap the Corda network and application states as follows:
     make initialise-vault-docker
     ```
 
+### Next Steps
+
+The test networks are now configured and their ledgers are initialized. You can now run the [data sharing flows](../interop/data-sharing.md).
+
 
 ## Preparation for Asset Exchange
 
@@ -143,6 +147,10 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 ```bash
 ./scripts/initAsset.sh
 ```
+
+### Next Steps
+
+The test networks are now configured and their ledgers are initialized. You can now run the [asset exchange flows](../interop/asset-exchange.md).
 
 
 ## Preparation for Asset Transfer
@@ -220,3 +228,8 @@ Initialize bond and token asset states and ownerships on the `network1` ledger b
 ```bash
 ./scripts/initAssetsForTransfer.sh
 ```
+
+### Next Steps
+
+The test networks are now configured and their ledgers are initialized. You can now run the [asset transfer flows](../interop/asset-transfer.md).
+

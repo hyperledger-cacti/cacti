@@ -68,7 +68,7 @@ Follow the instructions below to build and launch the networks:
   ```
 - _To launch the networks with a different application chaincode from the above list, run_:
   ```bash
-  make start-interop <chaincode-name>
+  make start-interop CHAINCODE_NAME=<chaincode-name>
   ```
 - (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to install only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2`.)
 
@@ -86,13 +86,13 @@ Navigate to the `core/relay` folder and run a relay as follows:
 
 * Run: `make convert-compose-method2` to uncomment and comment some lines in `docker-compose.yaml`.
 * For `network1`, there's `.env.n1` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
- ```bash
- make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
- ```
- * For `network2`, there's `.env.n2` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
- ```bash
- make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
- ```
+  ```bash
+  make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
+  ```
+* For `network2`, there's `.env.n2` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
+  ```bash
+  make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
+  ```
 
 For more information, see the [relay-docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/relay/relay-docker.md).
 
@@ -106,13 +106,13 @@ Following steps demonstrate how to run a fabric driver in docker container (_rep
 - For `network1`, there's `.env.n1` file in `docker-testnet-envs` directory, that will be used to start a fabric driver in docker. Edit that file and replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder.
 - Repeat above step for `.env.n2` file in `docker-testnet-envs` directory, that will be used to start fabric driver for `network2` in docker.
 - To deploy fabric driver for `network1`, run:
- ```bash
- make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
- ```
+  ```bash
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
+  ```
 - To deploy fabric driver for `network2`, run:
- ```bash
- make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
- ```
+  ```bash
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
+  ```
  
 ### Fabric Client (Application)
 
@@ -153,42 +153,52 @@ Follow the instructions below to build and launch the network:
 - Create copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - To spin up the Corda network with the interoperation Cordapp, run:
- ```bash
- make start
- ```
+  ```bash
+  make start
+  ```
 
-If the Corda node and notary start up successfully, you should something like the following:
-
-![Corda network startup screenshot](/setup-assets/Corda_network.jpg)
-
-It's safe to press `Ctrl-C` here, as what you are seeing are the container logs.
+You should see the following message in the terminal:
+```
+Waiting for network node services to start
+```
+The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following:
+```bash
+PartyA node services started
+PartyB node services started
+Notary node services started
+```
 
 ### Corda Relay
 
 Navigate to the `core/relay` folder and run a relay for `Corda_Network` in docker as follows:
 * Run: `make convert-compose-method2` to uncomment and comment some lines in `docker-compose.yaml`.
 * There's `.env.corda` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
- ```bash
- make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
- ```
+  ```bash
+  make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
+  ```
 
 ### Corda Driver
 
 Run a Corda driver as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
 - There's a `.env.corda` file in `docker-testnet-envs` directory, that will be used to start a corda driver in docker. To deploy, run:
- ```bash
- make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
- ```
+  ```bash
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
+  ```
 
 If the driver starts successfully, it should log the following message, when you run `docker logs corda-driver-Corda_Network`:
 ```
 Corda driver gRPC server started. Listening on port 9099
 ```
 
+## Next Steps
+
+The test networks are up and running. Next, you must [configure the networks and initialize the ledgers](./ledger-initialization.md) before running interoperation flows.
+
+
 ## Tear Down the Setup
 
-Bring down the various components as follows (_Navigate to the root folder of weaver_):
+Bring down the various components as follows (_Navigate to the root folder of your clone of the Weaver repository_):
 
 ### Relay
 To bring down the relays (for all 3 networks), run:

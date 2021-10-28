@@ -262,7 +262,7 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
    ```
 10. Get `bob` in `network2` to claim this bond asset as follows:
    ```bash
-   ./scripts/claimAsset.sh bond bond01 a03
+   ./scripts/claimAsset.sh network2 network1 bond bond01 a03
    ```
 11. Verify that `alice` in `network1` does not own this asset as follows:
    ```bash
@@ -283,12 +283,12 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
    ```
 14. Now get `bob` in `network2` to claim this bond asset as follows:
    ```bash
-   ./scripts/claimAsset.sh bond bond01 a04
+   ./scripts/claimAsset.sh network2 network1 bond bond01 a04
    ```
    This should fail as the pledge has already expired.
 15. Now get `alice` in `network1` to reclaim the asset as follows:
    ```bash
-   ./scripts/reclaimAsset.sh bond bond01 a04
+   ./scripts/reclaimAsset.sh network1 network2 bond bond01 a04
    ```
 16. Verify that `alice` in `network1` owns this asset as follows:
    ```bash
@@ -318,7 +318,7 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
    You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 21. Get `bob` in `network2` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
    ```bash
-   ./scripts/claimAsset.sh token token1 <pledge-id> 50
+   ./scripts/claimAsset.sh network2 network1 token token1 <pledge-id> 50
    ```
 22. Verify that `alice` in `network1` owns `9950` tokens (after losing `50`) as follows:
    ```bash
@@ -339,12 +339,12 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
    You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 25. Now get `bob` in `network2` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
    ```bash
-   ./scripts/claimAsset.sh token token1 <pledge-id> 100
+   ./scripts/claimAsset.sh network2 network1 token token1 <pledge-id> 100
    ```
    This should fail as the pledge has already expired.
 26. Now get `alice` in `network1` to reclaim these tokens as follows:
    ```bash
-   ./scripts/reclaimAsset.sh token token1 <pledge-id>
+   ./scripts/reclaimAsset.sh network1 network2 token token1 <pledge-id>
    ```
 27. Verify that `alice` in `network1` still owns `9950` tokens (after losing `50`) as follows:
    ```bash

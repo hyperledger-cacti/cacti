@@ -144,6 +144,7 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
+          sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
           ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials_docker
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           cat .env
@@ -208,7 +209,6 @@ jobs:
           cat tmp.out
 
           # FABRIC1 - FABRIC2
-          cp chaincode.json.template chaincode.json
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
@@ -410,6 +410,7 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
+          sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
           ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           cat .env
@@ -475,7 +476,6 @@ jobs:
           cat tmp.out
 
           # FABRIC1 - FABRIC2
-          cp chaincode.json.template chaincode.json
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"

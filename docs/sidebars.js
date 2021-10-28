@@ -54,8 +54,8 @@ module.exports = {
                 "external/what-is-interoperability/integration-patterns",
             ],
         },
-                "external/interoperability-modes",
-                "external/design-principles",
+        "external/interoperability-modes",
+        "external/design-principles",
         {
             type: "category",
             label: "User Stories",
