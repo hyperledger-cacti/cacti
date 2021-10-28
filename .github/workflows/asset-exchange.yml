@@ -283,7 +283,7 @@ jobs:
           cat tmp.err
           echo "====================="
           ERROR_LOG=$(grep ERROR tmp.err)
-          if [[ "$ERROR_LOG" == "" ]]
+          if [[ "$ERROR_LOG" != "" ]]
           then
               ANTICIPATED_LIFECYCLE_ERROR=$(grep ERROR tmp.err | grep "Failed to execute connection life cycle listener")
               if [[ "$ANTICIPATED_LIFECYCLE_ERROR" == "" ]]
@@ -395,7 +395,7 @@ jobs:
           cat tmp.err
           echo "====================="
           ERROR_LOG=$(grep ERROR tmp.err)
-          if [[ "$ERROR_LOG" == "" ]]
+          if [[ "$ERROR_LOG" != "" ]]
           then
               ANTICIPATED_LIFECYCLE_ERROR=$(grep ERROR tmp.err | grep "Failed to execute connection life cycle listener")
               if [[ "$ANTICIPATED_LIFECYCLE_ERROR" == "" ]]
