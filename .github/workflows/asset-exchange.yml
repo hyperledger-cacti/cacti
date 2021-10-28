@@ -278,7 +278,15 @@ jobs:
           cat tmp.out
           
           ## Unlock asset
-          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID &> tmp.out
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID &> tmp.out 2>tmp.err
+          echo "ERROR LOG============"
+          cat tmp.err
+          echo "====================="
+          ANTICIPATED_LIFECYCLE_ERROR=$(grep "Failed to execute connection life cycle listener" tmp.err)
+          if [[ "$ANTICIPATED_LIFECYCLE_ERROR" == "" ]]
+          then
+              exit 1
+          fi
           tail -n 2 tmp.out | grep "Asset Unlock Response: Right" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
