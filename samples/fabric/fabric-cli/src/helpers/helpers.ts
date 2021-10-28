@@ -530,9 +530,7 @@ const getChaincodeConfig = (
     ? path.join(process.env.CHAINCODE_PATH)
     : path.join(__dirname, '../../chaincode.json')
   try {
-    console.log('getChaincodeConfig: path:', ccPath)
     const ccJSON = JSON.parse(fs.readFileSync(ccPath).toString())
-    console.log('getChaincodeConfig: JSON:', ccJSON)
     if (!ccJSON[chaincodeId]) {
       logger.error(
         `Chaincode: ${chaincodeId} does not exist in the chaincode.json file`
