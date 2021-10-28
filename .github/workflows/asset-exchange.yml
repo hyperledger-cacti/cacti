@@ -279,14 +279,17 @@ jobs:
           
           ## Unlock asset
           CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset -cid $CID &> tmp.out 2>tmp.err
-          echo "ERROR LOG============"
+          echo "STDERROR============"
           cat tmp.err
           echo "====================="
           ERROR_LOG=$(grep ERROR tmp.err)
+          echo "ERROR: "$ERROR_LOG
           if [[ "$ERROR_LOG" != "" ]]
           then
               ANTICIPATED_LIFECYCLE_ERROR=$(grep ERROR tmp.err | grep "Failed to execute connection life cycle listener")
+              echo "Checking for presence of anticipated error: "$ANTICIPATED_LIFECYCLE_ERROR
               if [[ "$ANTICIPATED_LIFECYCLE_ERROR" == "" ]]
+                  echo "Found unexpected error. Exiting!!!"
                   exit 1
               fi
           fi
