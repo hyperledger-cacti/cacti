@@ -1,5 +1,5 @@
-name = "Corda_Relay"
-port="9080"
+name = "Corda_Relay2"
+port="9082"
 host="localhost"
 hostname="localhost"
 db_path="db/Corda_Relay2/requests"
@@ -7,20 +7,18 @@ db_path="db/Corda_Relay2/requests"
 remote_db_path="db/Corda_Relay2/remote_request"
 
 [networks]
-[networks.Corda_Network]
+[networks.Corda_Network2]
 network="Corda"
 [networks.Dummy_Network]
 network="Dummy"
-[networks.americantfn]
-network="Corda"
 
 [relays]
 [relays.Fabric_Relay]
 hostname="localhost"
 port="9080"
-[relays.wtln_relay]
-hostname="tradelens.sl.cloud9.ibm.com"
-port="9089"
+[relays.Fabric_Relay2]
+hostname="localhost"
+port="9083"
 [relays.Dummy_relay]
 hostname="localhost"
 port="9085"
@@ -29,12 +27,9 @@ hostname="localhost"
 port="9081"
 
 [drivers]
-[drivers.Fabric]
-hostname="localhost"
-port="9093"
 [drivers.Corda]
 hostname="localhost"
-port="9099"
+port="9098"
 [drivers.Dummy]
 hostname="localhost"
 port="9095"

@@ -9,3 +9,8 @@ port="9083"
 [relays.relay-corda]
 hostname="relay-corda"
 port="9081"
+
+[relays.relay-corda2]
+hostname="relay-corda2"
+port="9082"
+

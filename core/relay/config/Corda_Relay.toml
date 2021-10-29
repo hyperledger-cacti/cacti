@@ -6,6 +6,11 @@ db_path="db/Corda_Relay/requests"
 # This will be replaced by the task queue.
 remote_db_path="db/Corda_Relay/remote_request"
 
+#cert_path="credentials/fabric_cert.pem"
+#key_path="credentials/fabric_key"
+#tls=true
+
+
 [networks]
 [networks.Corda_Network]
 network="Corda"
@@ -29,7 +34,7 @@ hostname="localhost"
 port="9085"
 [relays.Corda_Relay2]
 hostname="localhost"
-port="9080"
+port="9082"
 
 [drivers]
 [drivers.Fabric]

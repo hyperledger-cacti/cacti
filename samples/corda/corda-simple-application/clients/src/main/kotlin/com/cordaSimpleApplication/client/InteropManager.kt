@@ -42,6 +42,7 @@ class RequestStateCommand : CliktCommand(help = "Requests state from a foreign n
     val externalStateAddress: String by argument()
     val config by requireObject<Map<String, String>>()
     override fun run() {
+        val networkName = System.getenv("NETWORK_NAME") ?: "Corda_Network"
         val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
                 username = "clientUser1",
@@ -51,7 +52,8 @@ class RequestStateCommand : CliktCommand(help = "Requests state from a foreign n
             InteroperableHelper.interopFlow(
                 rpc.proxy, 
                 localRelayAddress, 
-                externalStateAddress
+                externalStateAddress,
+                networkName
             ).fold({
                 println("Error in Interop Flow: ${it.message}")
             }, {

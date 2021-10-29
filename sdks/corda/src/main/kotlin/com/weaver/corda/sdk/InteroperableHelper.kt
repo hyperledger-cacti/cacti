@@ -79,7 +79,8 @@ class InteroperableHelper {
         fun interopFlow (
             proxy: CordaRPCOps,
             localRelayEndpoint: String,
-            externalStateAddress: String
+            externalStateAddress: String,
+            networkName: String
         ): Either<Error, String> {
             val localRelayHost = localRelayEndpoint.split(":").first()
             val localRelayPort = localRelayEndpoint.split(":").last().toInt()
@@ -91,7 +92,7 @@ class InteroperableHelper {
             )
             var result: Either<Error, String> = Left(Error(""))
             runBlocking {
-                val eitherErrorQuery = constructNetworkQuery(proxy, externalStateAddress)
+                val eitherErrorQuery = constructNetworkQuery(proxy, externalStateAddress, networkName)
                 logger.debug("\nCorda network returned: $eitherErrorQuery \n")
                 eitherErrorQuery.map { networkQuery ->
                     logger.debug("Network query: $networkQuery")
@@ -209,7 +210,8 @@ class InteroperableHelper {
          */
         suspend fun constructNetworkQuery(
             proxy: CordaRPCOps,
-            address: String
+            address: String,
+            requestingNetwork: String
         ): Either<Error, Networks.NetworkQuery> {
             logger.debug("Getting query information for foreign network from Corda network")
             try {
@@ -219,7 +221,7 @@ class InteroperableHelper {
                                     .addAllPolicy(it.policy)
                                     .setAddress(address)
                                     .setRequestingRelay("")
-                                    .setRequestingNetwork("Corda_Network")
+                                    .setRequestingNetwork(requestingNetwork)
                                     .setCertificate(it.certificate)
                                     .setRequestorSignature(it.signature)
                                     .setRequestingOrg(it.requestingOrg)

@@ -50,11 +50,13 @@ test: github.properties
 
 .PHONY: initialise-vault
 initialise-vault:
-	./clients/build/install/clients/bin/clients configure-all network1,network2
+	REMOTE_FLOW="localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all
+	(docker logs corda_network2_partya_1 && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 REMOTE_FLOW="localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all) || true
 
 .PHONY: initialise-vault-docker
 initialise-vault-docker:
-	./clients/build/install/clients/bin/clients configure-all network1-docker,network2-docker
+	MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" REMOTE_FLOW="corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" LOCAL_FLOW="corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all
+	(docker logs corda_network2_partya_1 && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" REMOTE_FLOW="corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" LOCAL_FLOW="corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all) || true
 
 .PHONY: get-access-control-policies
 get-access-control-policies:

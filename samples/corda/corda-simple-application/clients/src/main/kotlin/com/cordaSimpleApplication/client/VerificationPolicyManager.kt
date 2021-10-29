@@ -36,7 +36,7 @@ class CreateVerificationPolicyCommand : CliktCommand(help = "Creates a Verificat
  * Helper function to create a verification policy for an external network
  */
 fun createVerificationPolicyFromFile(network: String, config: Map<String, String>) {
-    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath = "${credentialPath}/${network}/verification-policy.json"
     val rpc = NodeRPCConnection(
             host = config["CORDA_HOST"]!!,
@@ -52,11 +52,24 @@ fun createVerificationPolicyFromFile(network: String, config: Map<String, String
             verificationPolicyBuilder
         );
         println("Storing verification policy in the vault")
+        val verificationPolicyProto = verificationPolicyBuilder.build()
         val res = VerificationPolicyManager.createVerificationPolicyState(
             rpc.proxy,
-            verificationPolicyBuilder.build()
+            verificationPolicyProto
         )
-        println("Verification Policy Create Result: $res")
+        if (res.isRight()) {
+            println("Verification Policy Create Succesful Result: $res")            
+        } else {
+            val getRes = VerificationPolicyManager.getVerificationPolicyState(
+                rpc.proxy, 
+                verificationPolicyProto.securityDomain
+            )
+            if (getRes.isRight()) {
+                updateVerificationPolicyFromFile(network, config)
+            } else {
+                println("Error: Verification Policy Create Failure Result: $res")    
+            }
+        }
     } catch (e: Exception) {
       println("Error: ${e.toString()}")
     } finally {
@@ -79,7 +92,7 @@ class UpdateVerificationPolicyCommand : CliktCommand(help = "Updates a Verificat
  * Helper function for UpdateVerificationPolicyCommand
  */
 fun updateVerificationPolicyFromFile(network: String, config: Map<String, String>) {
-    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath = "${credentialPath}/${network}/verification-policy.json"
     val rpc = NodeRPCConnection(
             host = config["CORDA_HOST"]!!,

@@ -38,7 +38,7 @@ class CreateAccessControlPolicyCommand : CliktCommand(
  * Helper function to create Access Control Policy for an external network
  */
 fun createAccessControlPolicyFromFile(network: String, config: Map<String, String>) {
-    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath = "${credentialPath}/${network}/access-control.json"
     val rpc = NodeRPCConnection(
             host = config["CORDA_HOST"]!!,
@@ -54,11 +54,24 @@ fun createAccessControlPolicyFromFile(network: String, config: Map<String, Strin
             accessControlPolicyBuilder
         );
         println("Storing access control policy in the vault")
+        val accessControlPolicyProto = accessControlPolicyBuilder.build()
         val res = AccessControlPolicyManager.createAccessControlPolicyState(
             rpc.proxy,
-            accessControlPolicyBuilder.build()
+            accessControlPolicyProto
         )
-        println("Access Control Policy Create Result: $res")
+        if (res.isRight()) {
+            println("Access Control Policy Create Succesful Result: $res")            
+        } else {
+            val getRes = AccessControlPolicyManager.getAccessControlPolicyState(
+                rpc.proxy, 
+                accessControlPolicyProto.securityDomain
+            )
+            if (getRes.isRight()) {
+                updateAccessControlPolicyFromFile(network, config)
+            } else {
+                println("Error: Access Control Policy Create Failure Result: $res")    
+            }
+        }
     } catch (e: Exception) {
       println("Error: ${e.toString()}")
     } finally {
@@ -83,7 +96,7 @@ class UpdateAccessControlPolicyCommand : CliktCommand(help = "Updates an Access 
  * Helper function to update Access Control Policy for an external network
  */
 fun updateAccessControlPolicyFromFile(network: String, config: Map<String, String>) {
-    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath = "${credentialPath}/${network}/access-control.json"
     val rpc = NodeRPCConnection(
             host = config["CORDA_HOST"]!!,

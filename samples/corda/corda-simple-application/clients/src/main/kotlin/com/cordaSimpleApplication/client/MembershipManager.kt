@@ -36,7 +36,7 @@ class CreateMembershipCommand : CliktCommand(help = "Creates a Membership for an
  * Helper function for CreateMembershipCommand
  */
 fun createMembershipFromFile(network: String, config: Map<String, String>) {
-    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath = "${credentialPath}/${network}/membership.json"
     val rpc = NodeRPCConnection(
             host = config["CORDA_HOST"]!!,
@@ -52,12 +52,24 @@ fun createMembershipFromFile(network: String, config: Map<String, String>) {
             membershipBuilder
         );
         println("Storing membership in the vault")
+        val membershipProto = membershipBuilder.build()
         val res = MembershipManager.createMembershipState(
             rpc.proxy,
-            membershipBuilder.build()
+            membershipProto
         )
-        println("Membership Create Result: $res")
-        
+        if (res.isRight()) {
+            println("Membership Create Succesful Result: $res")            
+        } else {
+            val getRes = MembershipManager.getMembershipState(
+                rpc.proxy, 
+                membershipProto.securityDomain
+            )
+            if (getRes.isRight()) {
+                updateMembershipFromFile(network, config)
+            } else {
+                println("Error: Membership Create Failure Result: $res")    
+            }
+        }        
     } catch (e: Exception) {
         println("Error: ${e.toString()}")
     } finally {
@@ -80,7 +92,7 @@ class UpdateMembershipCommand : CliktCommand(help = "Updates a Membership for an
  * Helper function for UpdateMembershipCommand
  */
 fun updateMembershipFromFile(network: String, config: Map<String, String>) {
-    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath = "${credentialPath}/${network}/membership.json"
     val rpc = NodeRPCConnection(
             host = config["CORDA_HOST"]!!,

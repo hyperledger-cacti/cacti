@@ -63,7 +63,7 @@ jobs:
       # CORDA NETWORK
       - name: Start Corda Network
         run: |
-          make start
+          make start-network1 PROFILE=3-nodes
           sleep 100
           docker logs corda_partya_1
           docker logs corda_partyb_1
@@ -164,7 +164,7 @@ jobs:
       # CORDA NETWORK
       - name: Start Corda Network
         run: |
-          make start-local
+          make start-network1-local PROFILE=3-nodes
           sleep 100
           docker logs corda_partya_1
           docker logs corda_partyb_1
@@ -270,7 +270,7 @@ jobs:
       # CORDA NETWORK
       - name: Start Corda Network
         run: |
-          make start-house
+          make start-network1 APP_NAME=house PROFILE=3-nodes
           sleep 100
           docker logs corda_partya_1
           docker logs corda_partyb_1
@@ -305,9 +305,9 @@ jobs:
           cat tmp.out
           
           # Timeout
-          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token lock -f -h64 ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= -t 5 -r "O=PartyB,L=London,C=GB" -p house:20 1> tmp.out
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token lock -f -h64 ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= -t 10 -r "O=PartyB,L=London,C=GB" -p house:20 1> tmp.out
           CID=$(cat tmp.out | grep "HTLC Lock State created with contract ID Right" | sed -e 's/.*Right(b=\(.*\))\./\1/')
-          sleep 5
+          sleep 10
           cat tmp.out
           
           ## Is asset lock false

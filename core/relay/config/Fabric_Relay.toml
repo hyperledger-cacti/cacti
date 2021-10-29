@@ -21,6 +21,9 @@ network="Corda"
 [relays.Corda_Relay]
 hostname="localhost"
 port="9081"
+[relays.Corda_Relay2]
+hostname="localhost"
+port="9082"
 [relays.Fabric_Relay2]
 hostname="localhost"
 port="9083"
