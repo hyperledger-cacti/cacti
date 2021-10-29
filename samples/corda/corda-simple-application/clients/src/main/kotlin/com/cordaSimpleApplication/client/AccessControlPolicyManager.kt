@@ -12,11 +12,14 @@ import arrow.core.Right
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.option
 import java.io.File
 import java.lang.Exception
 import kotlinx.coroutines.runBlocking
 import net.corda.core.messaging.startFlow
 import com.google.protobuf.util.JsonFormat
+import net.corda.core.identity.CordaX500Name
+import net.corda.core.identity.Party
 
 import com.weaver.corda.sdk.AccessControlPolicyManager
 import com.weaver.protos.common.access_control.AccessControl
@@ -29,15 +32,16 @@ class CreateAccessControlPolicyCommand : CliktCommand(
         help = "Creates an Access Control Policy for an external network. ") {
     val config by requireObject<Map<String, String>>()
     val network: String by argument()
+    val sharedPartiesNames by option("-p", "--parties", help="List of parties separated by \";\"")
     override fun run() = runBlocking {
-        createAccessControlPolicyFromFile(network, config)
+        createAccessControlPolicyFromFile(network, config, sharedPartiesNames)
     }
 }
 
 /**
  * Helper function to create Access Control Policy for an external network
  */
-fun createAccessControlPolicyFromFile(network: String, config: Map<String, String>) {
+fun createAccessControlPolicyFromFile(network: String, config: Map<String, String>, sharedPartiesNames: String? = null) {
     val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath = "${credentialPath}/${network}/access-control.json"
     val rpc = NodeRPCConnection(
@@ -45,6 +49,13 @@ fun createAccessControlPolicyFromFile(network: String, config: Map<String, Strin
             username = "clientUser1",
             password = "test",
             rpcPort = config["CORDA_PORT"]!!.toInt())
+            
+    var sharedParties: List<Party> = listOf<Party>()
+    if (sharedPartiesNames != null) {
+        for (partyName in sharedPartiesNames.split(";")) {
+            sharedParties += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(partyName))!!
+        }
+    }
     try {
         val accessControlPolicy = File(filepath).readText(Charsets.UTF_8)
         println("Access control policy from file: $accessControlPolicy")
@@ -57,7 +68,8 @@ fun createAccessControlPolicyFromFile(network: String, config: Map<String, Strin
         val accessControlPolicyProto = accessControlPolicyBuilder.build()
         val res = AccessControlPolicyManager.createAccessControlPolicyState(
             rpc.proxy,
-            accessControlPolicyProto
+            accessControlPolicyProto,
+            sharedParties
         )
         if (res.isRight()) {
             println("Access Control Policy Create Succesful Result: $res")            

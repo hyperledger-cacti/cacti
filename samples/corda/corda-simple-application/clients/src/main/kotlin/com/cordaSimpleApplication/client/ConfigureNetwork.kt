@@ -9,6 +9,7 @@ package com.cordaSimpleApplication.client
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import com.google.protobuf.util.JsonFormat
 import java.io.File
@@ -17,6 +18,7 @@ import java.util.*
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.stream.Collectors
+import net.corda.core.identity.Party
 
 import com.weaver.corda.sdk.CredentialsCreator
 
@@ -56,8 +58,9 @@ class ConfigureDataCommand : CliktCommand(name="data",
 class ConfigureNetworkCommand : CliktCommand(name="network",
         help = "Creates an Access Control Policy, Membership, and Verification Policy for an external network. ") {
     val config by requireObject<Map<String, String>>()
+    val sharedPartiesNames by option("-p", "--parties", help="List of parties separated by \";\"")
     override fun run() = runBlocking {
-        configNetworkHelper(config)
+        configNetworkHelper(config, sharedPartiesNames)
     }
 }
 
@@ -83,7 +86,7 @@ fun configDataHelper(config: Map<String, String>) {
 /**
  * Helper function used by ConfigureNetworkCommand
  */
-fun configNetworkHelper(config: Map<String, String>) {
+fun configNetworkHelper(config: Map<String, String>, sharedPartiesNames: String? = null) {
     val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val myNetworkName = System.getenv("NETWORK_NAME") ?: "Corda_Network"
     val networkNames: Set<String> = Files.list(Paths.get(credentialPath))
@@ -95,9 +98,9 @@ fun configNetworkHelper(config: Map<String, String>) {
     for (networkName in networkNames) {
         if (networkName != myNetworkName) {
             println("Network ${networkName}")
-            createMembershipFromFile(networkName, config)
-            createAccessControlPolicyFromFile(networkName, config)
-            createVerificationPolicyFromFile(networkName, config)
+            createMembershipFromFile(networkName, config, sharedPartiesNames)
+            createAccessControlPolicyFromFile(networkName, config, sharedPartiesNames)
+            createVerificationPolicyFromFile(networkName, config, sharedPartiesNames)
         }
     }
 }

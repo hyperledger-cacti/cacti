@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.identity.Party
 
 import com.weaver.corda.app.interop.states.VerificationPolicyState
 import com.weaver.corda.app.interop.states.Identifier
@@ -33,15 +34,16 @@ class VerificationPolicyManager {
          * Function to create an verification policy state in Vault
          */
         @JvmStatic
-        fun createVerificationPolicyState(
+        @JvmOverloads fun createVerificationPolicyState(
             proxy: CordaRPCOps,
-            verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy
+            verificationPolicyProto: VerificationPolicyOuterClass.VerificationPolicy,
+            sharedParties: List<Party> = listOf<Party>()
         ): Either<Error, String> {
             val verificationPolicyState = protoToState(verificationPolicyProto)
             logger.debug("Writing VerificationPolicyState: ${verificationPolicyState}")
             return try {
                 runCatching {
-                    proxy.startFlow(::CreateVerificationPolicyState, verificationPolicyState)
+                    proxy.startFlow(::CreateVerificationPolicyState, verificationPolicyState, sharedParties)
                             .returnValue.get()
                 }.fold({
                     it.flatMap {

@@ -12,11 +12,14 @@ import arrow.core.Right
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.option
 import java.io.File
 import java.lang.Exception
 import kotlinx.coroutines.runBlocking
 import net.corda.core.messaging.startFlow
 import com.google.protobuf.util.JsonFormat
+import net.corda.core.identity.CordaX500Name
+import net.corda.core.identity.Party
 
 import com.weaver.corda.sdk.MembershipManager
 import com.weaver.protos.common.membership.MembershipOuterClass
@@ -27,15 +30,16 @@ import com.weaver.protos.common.membership.MembershipOuterClass
 class CreateMembershipCommand : CliktCommand(help = "Creates a Membership for an external network. ") {
     val config by requireObject<Map<String, String>>()
     val network by argument()
+    val sharedPartiesNames by option("-p", "--parties", help="List of parties separated by \";\"")
     override fun run() = runBlocking {
-        createMembershipFromFile(network, config)
+        createMembershipFromFile(network, config, sharedPartiesNames)
     }
 }
 
 /**
  * Helper function for CreateMembershipCommand
  */
-fun createMembershipFromFile(network: String, config: Map<String, String>) {
+fun createMembershipFromFile(network: String, config: Map<String, String>, sharedPartiesNames: String? = null) {
     val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath = "${credentialPath}/${network}/membership.json"
     val rpc = NodeRPCConnection(
@@ -43,6 +47,13 @@ fun createMembershipFromFile(network: String, config: Map<String, String>) {
             username = "clientUser1",
             password = "test",
             rpcPort = config["CORDA_PORT"]!!.toInt())
+            
+    var sharedParties: List<Party> = listOf<Party>()
+    if (sharedPartiesNames != null) {
+        for (partyName in sharedPartiesNames.split(";")) {
+            sharedParties += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(partyName))!!
+        }
+    }
     try {
         val membership = File(filepath).readText(Charsets.UTF_8)
         println("Membership from file: $membership")
@@ -55,7 +66,8 @@ fun createMembershipFromFile(network: String, config: Map<String, String>) {
         val membershipProto = membershipBuilder.build()
         val res = MembershipManager.createMembershipState(
             rpc.proxy,
-            membershipProto
+            membershipProto,
+            sharedParties
         )
         if (res.isRight()) {
             println("Membership Create Succesful Result: $res")            
