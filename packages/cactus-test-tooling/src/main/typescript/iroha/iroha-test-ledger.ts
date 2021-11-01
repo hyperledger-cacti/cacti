@@ -310,13 +310,16 @@ export class IrohaTestLedger implements ITestLedger {
         this.log.debug(`Started container OK. Waiting for healthcheck...`);
         this.container = container;
         this.containerId = container.id;
+
         if (this.emitContainerLogs) {
-          const logOptions = { follow: true, stderr: true, stdout: true };
-          const logStream = await container.logs(logOptions);
-          logStream.on("data", (data: Buffer) => {
-            this.log.debug(`[${this.imageFqn}] %o`, data.toString("utf-8"));
+          const fnTag = `[${this.imageFqn}]`;
+          await Containers.streamLogs({
+            container: this.container,
+            tag: fnTag,
+            log: this.log,
           });
         }
+
         try {
           await this.waitForHealthCheck();
           this.log.debug(`Healthcheck passing OK.`);
