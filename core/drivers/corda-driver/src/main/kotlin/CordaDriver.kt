@@ -11,13 +11,13 @@ import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.list.traverse.traverse
 import com.google.gson.Gson
 import net.corda.core.messaging.startFlow
-import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.*
 import com.google.protobuf.ByteString
 import net.corda.core.messaging.CordaRPCOps
 import java.util.*
 
 import com.weaver.corda.app.interop.flows.HandleExternalRequest
+import com.weaver.corda.sdk.InteroperableHelper
 import com.weaver.protos.common.query.QueryOuterClass
 import com.weaver.protos.common.state.State
 import com.weaver.protos.corda.ViewDataOuterClass
@@ -144,11 +144,14 @@ fun createAggregatedCordaView(views: List<State.View>) : Either<Error, State.Vie
 fun createGrpcConnection(address: String) = try {
     parseRelayAddress(address).map { relayAddresses ->
     // TODO: if the first relay address fails, retry with other relay addresses in the list.
-        GrpcClient(
-                ManagedChannelBuilder.forAddress(relayAddresses[0].host, relayAddresses[0].port)
-                        .usePlaintext()
-                        .executor(Dispatchers.Default.asExecutor())
-                        .build())
+        val channel = InteroperableHelper.getChannelToRelay(
+                relayAddresses[0].host,
+                relayAddresses[0].port,
+                System.getenv("RELAY_TLS")?.toBoolean() ?: false,
+                System.getenv("RELAY_TLSCA_TRUST_STORE")?.toString() ?: "",
+                System.getenv("RELAY_TLSCA_TRUST_STORE_PASSWORD")?.toString() ?: "",
+                System.getenv("RELAY_TLSCA_CERT_PATHS")?.toString() ?: "")
+        GrpcClient(channel)
     }
 } catch (e: Exception) {
     println("Driver Error: Error creating relay gRPC client: ${e.message}")
