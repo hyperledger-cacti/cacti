@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-rc.2](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2021-11-01)
+
+
+### Bug Fixes
+
+* openapi validation for keychain-google-sm plugin ([45f8c7c](https://github.com/hyperledger/cactus/commit/45f8c7c007e604b0fe54af6cba888eaaff15519b)), closes [#847](https://github.com/hyperledger/cactus/issues/847)
+
+
+
+
+
 # [1.0.0-rc.1](https://github.com/hyperledger/cactus/compare/v0.10.0...v1.0.0-rc.1) (2021-10-11)
 
 
