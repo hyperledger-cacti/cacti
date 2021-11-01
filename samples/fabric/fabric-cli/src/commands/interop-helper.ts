@@ -67,6 +67,14 @@ const command: GluegunCommand = {
             description: 'User for interop.'
           },
           {
+            name: '--relay-tls',
+            description: 'Flag indicating whether or not the relay is TLS-enabled.'
+          },
+          {
+            name: '--relay-tls-ca-files',
+            description: 'Colon-separated list of root CA certificate paths used to connect to the relay over TLS.'
+          },
+          {
             name: '--debug',
             description:
               'Shows debug logs when running. Disabled by default. To enable --debug=true'
@@ -125,6 +133,10 @@ const command: GluegunCommand = {
     const appChaincodeId = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
     const applicationFunction = process.env.DEFAULT_APPLICATION_FUNC ? process.env.DEFAULT_APPLICATION_FUNC : 'Create'
     const { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
+    let relayTlsCAFiles = []
+    if (options['relay-tls-ca-files']) {
+      relayTlsCAFiles = options['relay-tls-ca-files'].split(':')
+    }
     try {
       const invokeObject = {
         channel,
@@ -149,7 +161,10 @@ const command: GluegunCommand = {
                             ),
           Sign: true
         }],
-        keyCert
+        keyCert,
+        false,
+        options['relay-tls'] === 'true',
+        relayTlsCAFiles
       )
       logger.info(
         `View from remote network: ${JSON.stringify(

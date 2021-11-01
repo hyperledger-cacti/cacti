@@ -9,7 +9,7 @@ remote_db_path="db/Fabric_Relay2/remote_request"
 # FOR TLS
 cert_path="credentials/fabric_cert.pem"
 key_path="credentials/fabric_key"
-# tls=true
+tls=false
 
 [networks]
 [networks.network2]
@@ -20,13 +20,19 @@ network="Fabric"
 [relays.Corda_Relay]
 hostname="localhost"
 port="9081"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [relays.Fabric_Relay]
 hostname="localhost"
 port="9080"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 
 
 [drivers]
 [drivers.Fabric]
 hostname="localhost"
 port="9095"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 
