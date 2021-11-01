@@ -57,6 +57,29 @@ To run the driver, use the following:
 
 The driver gRPC server will be listening on port `9099`.
 
+### With TLS
+
+If the relay expects a TLS connection over gRPC, you need to specify the following environment variables in the `corda-driver` command:
+- `RELAY_TLS`: should be set to `true`
+- One of the following:
+  * If the relay server TLS CA certificates are in a password-protected Java Key Store (JKS file):
+    - `RELAY_TLSCA_TRUST_STORE`: JKS file path
+    - `RELAY_TLSCA_TRUST_STORE_PASSWORD`: password used to create the JKS file
+  * If the relay server TLS CA certificates are in separate PEM files in the filesystem:
+    - `RELAY_TLSCA_CERT_PATHS`: colon-separated list of CA certificate file paths
+If you wish to run the driver service with TLS enabled, you need to specify the following environment variables in the `corda-driver` command:
+- `DRIVER_TLS`: should be set to `true`
+- `DRIVER_CERT_PATH`: driver's TLS certificate file path
+- `DRIVER_KEY_PATH`: driver's TLS private key file path
+- Example: both relay and driver are TLS-enabled, and a trust store is used as a certificate repository:
+  ```bash
+  RELAY_TLS=true RELAY_TLSCA_TRUST_STORE_PASSWORD=password RELAY_TLSCA_TRUST_STORE=trust_store.jks DRIVER_TLS=true DRIVER_CERT_PATH=cert.pem DRIVER_KEY_PATH=key.pem ./build/install/corda-driver/bin/corda-driver
+  ```
+- Example: only relay is TLS-enabled, and the driver's trusted certificates are in separate files in the filesystem:
+  ```bash
+  RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=ca_cert1.pem:ca_cert2.pem ./build/install/corda-driver/bin/corda-driver
+  ```
+
 ## Driver configuration
 
 By default, the driver gRPC server listens on port `9099`. To change the port, set 
