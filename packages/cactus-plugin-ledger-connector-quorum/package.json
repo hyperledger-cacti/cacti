@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-quorum",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Allows Cactus nodes to connect to a Quorum ledger.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-ledger-connector-quorum.node.umd.min.js",
@@ -69,9 +69,9 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "1.0.0-rc.1",
-    "@hyperledger/cactus-core": "1.0.0-rc.1",
-    "@hyperledger/cactus-core-api": "1.0.0-rc.1",
+    "@hyperledger/cactus-common": "1.0.0-rc.2",
+    "@hyperledger/cactus-core": "1.0.0-rc.2",
+    "@hyperledger/cactus-core-api": "1.0.0-rc.2",
     "axios": "0.21.4",
     "express": "4.17.1",
     "prom-client": "13.2.0",
@@ -80,8 +80,8 @@
     "web3-eth-contract": "1.5.2"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.1",
-    "@hyperledger/cactus-test-tooling": "1.0.0-rc.1",
+    "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.2",
+    "@hyperledger/cactus-test-tooling": "1.0.0-rc.2",
     "@types/express": "4.17.13",
     "web3-eth": "1.5.2"
   }
