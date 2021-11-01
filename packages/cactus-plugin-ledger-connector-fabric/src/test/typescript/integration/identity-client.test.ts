@@ -4,16 +4,21 @@ import {
   Containers,
   VaultTestServer,
   K_DEFAULT_VAULT_HTTP_PORT,
+  WsTestServer,
+  WS_IDENTITY_HTTP_PORT,
 } from "@hyperledger/cactus-test-tooling";
 import test, { Test } from "tape-promise/tape";
 import { InternalIdentityClient } from "../../../main/typescript/identity/internal/client";
 import { VaultTransitClient } from "../../../main/typescript/identity/vault-client";
+import { WebSocketClient } from "../../../main/typescript/identity/web-socket-client";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { createHash } from "crypto";
 import { ECCurveType } from "../../../main/typescript/identity/internal/crypto-util";
 import { KJUR } from "jsrsasign";
+import { WsWallet, ECCurveType as ECCurveTypeW } from "ws-wallet";
+import { WsIdentityClient } from "ws-identity-client";
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "ERROR";
 // a generic test suite for testing all the identity clients
 // supported by this package
 test("identity-clients", async (t: Test) => {
@@ -22,24 +27,59 @@ test("identity-clients", async (t: Test) => {
   const testECP384 = "test-ec-p384";
   const testNotFoundKey = "keyNotFound";
   {
+    const IpAdd = await internalIpV4();
+    //
+    // setup web-socket client
+    const wsTestContainer = new WsTestServer({
+      logLevel,
+      imageVersion: "0.0.1",
+    });
+    await wsTestContainer.start();
+    let ci = await Containers.getById(wsTestContainer.containerId);
+    const wsHostPort = await Containers.getPublicPort(
+      WS_IDENTITY_HTTP_PORT,
+      ci,
+    );
     // setup vault client
     const vaultTestContainer = new VaultTestServer({});
     await vaultTestContainer.start();
-
-    const ci = await Containers.getById(vaultTestContainer.containerId);
-    const vaultIpAddr = await internalIpV4();
+    ci = await Containers.getById(vaultTestContainer.containerId);
     const hostPort = await Containers.getPublicPort(
       K_DEFAULT_VAULT_HTTP_PORT,
       ci,
     );
-    const vaultHost = `http://${vaultIpAddr}:${hostPort}`;
+
+    const vaultHost = `http://${IpAdd}:${hostPort}`;
+    const wsUrl = `http://${IpAdd}:${wsHostPort}`;
+
+    // External client with private key
+    const wsWallet256 = new WsWallet({
+      keyName: "256",
+      logLevel,
+      strictSSL: false,
+    });
+
+    // establish session Id to be used by external client with p384 key
+    const wsWallet384 = new WsWallet({
+      keyName: "384",
+      curve: "p384" as ECCurveTypeW,
+      logLevel,
+      strictSSL: false,
+    });
+
     test.onFinish(async () => {
+      await wsTestContainer.stop();
+      await wsTestContainer.destroy();
       await vaultTestContainer.stop();
       await vaultTestContainer.destroy();
+      await wsWallet384.close();
+      await wsWallet256.close();
     });
+
     const mountPath = "/transit";
     const testToken = "myroot";
     // mount transit secret engine
+
     await axios.post(
       vaultHost + "/v1/sys/mounts" + mountPath,
       {
@@ -82,13 +122,80 @@ test("identity-clients", async (t: Test) => {
         logLevel: logLevel,
       }),
     );
+
+    const wsIdClient = new WsIdentityClient({
+      apiVersion: "v1",
+      endpoint: wsUrl,
+      rpDefaults: {
+        strictSSL: false,
+      },
+    });
+
+    const wsPathPrefix = "/identity";
+    {
+      const newSidResp = JSON.parse(
+        await wsIdClient.write(
+          "session/new",
+          {
+            pubKeyHex: wsWallet256.getPubKeyHex(),
+            keyName: wsWallet256.keyName,
+          },
+          {},
+        ),
+      );
+      const { signature, sessionId } = await wsWallet256.open(
+        newSidResp.sessionId,
+        newSidResp.url,
+      );
+
+      testClients.set(
+        "web-socket-client-256",
+        new WebSocketClient({
+          endpoint: wsUrl,
+          pathPrefix: wsPathPrefix,
+          signature,
+          sessionId,
+          logLevel,
+        }),
+      );
+    }
+    {
+      const newSidResp = JSON.parse(
+        await wsIdClient.write(
+          "session/new",
+          {
+            pubKeyHex: wsWallet384.getPubKeyHex(),
+            keyName: wsWallet384.keyName,
+          },
+          {},
+        ),
+      );
+      const { signature, sessionId } = await wsWallet384.open(
+        newSidResp.sessionId,
+        newSidResp.url,
+      );
+      testClients.set(
+        "web-socket-client-384",
+        new WebSocketClient({
+          endpoint: wsUrl,
+          pathPrefix: wsPathPrefix,
+          signature,
+          sessionId,
+          logLevel,
+        }),
+      );
+    }
   }
+
   //
   for (const [clientName, client] of testClients) {
     const digest = Buffer.from("Hello Cactus");
     const hashDigest = createHash("sha256").update(digest).digest();
     t.test(`${clientName}::sign`, async (t: Test) => {
-      {
+      if (
+        clientName == "web-socket-client-256" ||
+        clientName == "vault-client"
+      ) {
         const { sig, crv } = await client.sign(testECP256, hashDigest);
         t.equal(crv, ECCurveType.P256);
         t.ok(sig);
@@ -111,7 +218,10 @@ test("identity-clients", async (t: Test) => {
           t.true(verify.verify(sig.toString("hex")));
         }
       }
-      {
+      if (
+        clientName == "web-socket-client-384" ||
+        clientName == "vault-client"
+      ) {
         const { sig, crv } = await client.sign(testECP384, hashDigest);
         t.equal(crv, ECCurveType.P384);
         t.ok(sig);
@@ -137,17 +247,23 @@ test("identity-clients", async (t: Test) => {
       t.end();
     });
     t.test(`${clientName}::getPub`, async (t: Test) => {
-      {
+      if (
+        clientName == "web-socket-client-256" ||
+        clientName == "vault-client"
+      ) {
         const pub = await client.getPub(testECP256);
         t.ok(pub);
         t.equal((pub as any).curveName, "secp256r1");
       }
-      {
+      if (
+        //clientName == "web-socket-client-384" ||
+        clientName == "vault-client"
+      ) {
         const pub = await client.getPub(testECP384);
         t.ok(pub);
         t.equal((pub as any).curveName, "secp384r1");
       }
-      {
+      if (clientName == "vault-client") {
         try {
           await client.getPub(testNotFoundKey);
           t.fail("Should not get here");
@@ -162,7 +278,7 @@ test("identity-clients", async (t: Test) => {
       t.end();
     });
     t.test(`${clientName}::rotateKey`, async (t: Test) => {
-      {
+      if (clientName == "vault-client") {
         const pubOld = await client.getPub(testECP256);
         await client.rotateKey(testECP256);
         const pubNew = await client.getPub(testECP256);
@@ -179,7 +295,7 @@ test("identity-clients", async (t: Test) => {
           t.false(verify.verify(sig.toString("hex")));
         }
       }
-      {
+      if (clientName == "vault-client") {
         const pubOld = await client.getPub(testECP384);
         await client.rotateKey(testECP384);
         const pubNew = await client.getPub(testECP384);

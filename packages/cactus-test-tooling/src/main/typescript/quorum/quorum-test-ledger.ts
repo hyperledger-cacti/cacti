@@ -16,6 +16,7 @@ import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
 import { IQuorumGenesisOptions } from "./i-quorum-genesis-options";
+import { Containers } from "../common/containers";
 
 export interface IQuorumTestLedgerConstructorOptions {
   containerImageVersion?: string;
@@ -241,11 +242,11 @@ export class QuorumTestLedger implements ITestLedger {
         this.log.debug("Quorum Test Ledger container started booting OK.");
 
         if (this.emitContainerLogs) {
-          const logOptions = { follow: true, stderr: true, stdout: true };
-          const logStream = await container.logs(logOptions);
-          logStream.on("data", (data: Buffer) => {
-            const fnTag = `[${this.getContainerImageName()}]`;
-            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          const fnTag = `[${this.getContainerImageName()}]`;
+          await Containers.streamLogs({
+            container: this.container,
+            tag: fnTag,
+            log: this.log,
           });
         }
 

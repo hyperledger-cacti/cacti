@@ -1,5 +1,7 @@
+import type { Request, Response, NextFunction } from "express";
+
 export type IExpressRequestHandler = (
-  req: any,
-  res: any,
-  next: (err: any) => void,
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ) => void;

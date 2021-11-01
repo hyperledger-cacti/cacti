@@ -180,13 +180,14 @@ export class RustcContainer {
         this._containerId = Optional.ofNonNull(id);
 
         if (this.emitContainerLogs) {
-          const logOptions = { follow: true, stderr: true, stdout: true };
-          const logStream = await container.logs(logOptions);
-          logStream.on("data", (data: Buffer) => {
-            const fnTag = `[${this.imageFqn}]`;
-            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          const fnTag = `[${this.imageFqn}]`;
+          await Containers.streamLogs({
+            container: this.container.get(),
+            tag: fnTag,
+            log: this.log,
           });
         }
+
         this.log.debug(`Registered container log stream callbacks OK`);
 
         try {
