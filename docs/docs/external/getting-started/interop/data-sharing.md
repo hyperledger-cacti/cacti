@@ -12,13 +12,50 @@ title: Data Sharing
 This document lists sample ways in which you can exercise the data-sharing interoperation protocol on the test network [launched earlier](../test-network/overview).
 
 Once the networks, relays, and drivers have been launched, and the ledgers bootstrapped, you can trigger three different interoperation flows corresponding to distinct data-sharing combinations as follows:
-1. **Corda to Fabric**: The Corda network requests state and proof from either Fabric network
-2. **Fabric to Corda**: Either Fabric network requests state and proof from the Corda network
-3. **Fabric to Fabric**: One Fabric network requests state and proof from another Fabric network
+1. **Corda to Corda**: Either Corda network requests state and proof from another Corda network
+2. **Corda to Fabric**: The Corda network requests state and proof from either Fabric network
+3. **Fabric to Corda**: Either Fabric network requests state and proof from the Corda network
+4. **Fabric to Fabric**: One Fabric network requests state and proof from another Fabric network
 
 We assume that one of the following chaincodes have been deployed in either Fabric network you are testing with:
 * `simplestate`
 * `simplestatewithacl`
+
+## Corda to Corda
+
+To test the scenario where `Corda_Network` requests the value of the state (key) `H` from `Corda_Network2`, do the following:
+- (_Make sure the following are running_: `Corda_Network`, relay, and driver; `Corda_Network2`, relay, and driver)
+- Navigate to the `samples/corda/corda-simple-application` folder.
+- Run the following:
+  * If Relays and Drivers are deployed in the host machine:
+    ```bash
+    ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
+    ```
+  * If Relays and Drivers are deployed in the Docker containers:
+    ```bash
+    ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
+    ```
+- Query the value of the requested state, using key `H` in `Corda_Network` by running the following command:
+  ```bash
+  ./clients/build/install/clients/bin/clients get-state H
+  ```
+
+To test the scenario where `Corda_Network2` requests the value of the state (key) `C` from `Corda_Network`, do the following:
+- (_Make sure the following are running_: `Corda_Network`, relay, and driver; `Corda_Network2`, relay, and driver)
+- Navigate to the `samples/corda/corda-simple-application` folder.
+- Run the following:
+  * If Relays and Drivers are deployed in the host machine:
+    ```bash
+    ./clients/build/install/clients/bin/clients request-state localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C
+    ```
+  * If Relays and Drivers are deployed in the Docker containers:
+    ```bash
+    ./clients/build/install/clients/bin/clients request-state localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C
+    ```
+- Query the value of the requested state, using the key `C` in `Corda_Network` by running the following command:
+  ```bash
+  ./clients/build/install/clients/bin/clients get-state C
+  ```
 
 ## Corda to Fabric
 
@@ -55,6 +92,8 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
   ```bash
   ./clients/build/install/clients/bin/clients get-state Arcturus
   ```
+  
+**Note:** You can perform the same data transfer between `Corda_Network2` and either Fabric networks, by setting the env `CORDA_PORT=30006` (the `Corda_Network2` node's RPC port), and using `localhost:9082` (the local relay address) as the first argument.
 
 ## Fabric to Corda
 
@@ -109,6 +148,8 @@ To test the scenario where `network2` requests the value of the state (key) `H` 
   ```bash
   ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network2
   ```
+
+**Note:** You can perform the same data transfer between either Fabric network and `Corda_Network2`, by changing the view address, local relay address to be `localhost:9082` (or `relay-corda2:9082`), the network name `Corda_Network2` and the node's RPC endpoint which is `localhost:30006` (or `corda_network2_partya_1:10003`).
 
 ## Fabric to Fabric
 

@@ -250,17 +250,26 @@ Build the `corda-simple-application` Cordapp as follows:
   make build-local
   ```
 
+
 ### Corda Network
 
-The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary. This network uses `samples/corda/corda-simple-application` which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
-Following steps will build above cordapp and a corda-client as well in `samples/corda/client`.
+The Corda network code lies in the `tests/network-setups/corda` folder. You can launch  two corda networks (`Corda_Network` and `Corda_Network2`). The networks use `samples/corda/corda-simple-application` by default, which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
-- To spin up the Corda network with the interoperation Cordapp, run:
-  ```bash
-  make start-local
-  ```
+- To spin up the Corda networks with the interoperation Cordapp:
+  - Each consisting of 1 node and a notary (for data-transfer), run:
+    ```bash
+    make start-local
+    ```
+  - Each consisting of 2 nodes and a notary (for asset-exchange/transfer), run:
+    ```bash
+    make start-local PROFILE="2-nodes"
+    ```
+  - Each consisting of 3 nodes and a notary (for asset-exchange/transfer), run:
+    ```bash
+    make start-local PROFILE="3-nodes"
+    ```
 
 You should see the following message in the terminal:
 ```
@@ -282,9 +291,13 @@ Navigate to the `core/relay` folder. Refer [here](#building-relay-image) to buil
   ```
   DOCKER_IMAGE_NAME=weaver-relay-server
   ```
-* To deploy, run:
+* To deploy relay for `Corda_Network`, run:
   ```bash
   make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
+  ```
+* To deploy relay for `Corda_Network2`, run:
+  ```bash
+  make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda2'
   ```
 
 ### Corda Driver
@@ -305,9 +318,13 @@ Run a Corda driver as follows:
   ```
   DOCKER_IMAGE_NAME=weaver-corda-driver
   ```
-- To deploy, run:
+- To deploy corda driver for `Corda_Network`, run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
+  ```
+- To deploy corda driver for `Corda_Network2`, run:
+  ```bash
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
   ```
 
 If the driver starts successfully, it should log the following message, when you run `docker logs corda-driver-Corda_Network`:
@@ -331,6 +348,7 @@ cd core/relay
 make stop COMPOSE_ARG='--env-file .env.n1'
 make stop COMPOSE_ARG='--env-file .env.n2'
 make stop COMPOSE_ARG='--env-file .env.corda'
+make stop COMPOSE_ARG='--env-file .env.corda2'
 cd -
 ```
 
@@ -348,6 +366,7 @@ To bring down the corda driver, run:
 ```bash
 cd core/drivers/corda-driver
 make stop COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
+make stop COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
 cd -
 ```
 

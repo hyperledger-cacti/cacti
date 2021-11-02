@@ -148,6 +148,17 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 ./scripts/initAsset.sh
 ```
 
+### Initializing the Corda Networks
+
+Corda Networks needs to be initialized with assets for asset-exchange to be performed:
+Bootstrap the Corda network and application states as follows:
+- Navigate to the `samples/corda/corda-simple-application` folder.
+- Run the following: 
+  - For `cordaSimpleApplication` app, run:
+    ```
+    ./scripts/initAsset.sh
+    ```
+
 ### Next Steps
 
 The test networks are now configured and their ledgers are initialized. You can now run the [asset exchange flows](../interop/asset-exchange.md).
