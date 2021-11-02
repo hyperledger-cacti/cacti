@@ -1,17 +1,24 @@
 FROM paritytech/ci-linux:production
-LABEL AUTHORS="Rafael Belchior, Catarina Pedreira" 
-LABEL VERSION="2021-09-10"
+LABEL AUTHORS="Rafael Belchior, Catarina Pedreira"
+LABEL VERSION="2021-11-01"
 LABEL org.opencontainers.image.source=https://github.com/hyperledger/cactus
 
 WORKDIR /
-ARG WORKING_DIR=/var/www/node-template
-ARG CONTAINER_NAME=contracts-node-template-cactus
-ARG PORT=9944
-ARG DOCKER_PORT=9944
-ARG CARGO_HOME=/var/www/node-template/.cargo
+ENV WORKING_DIR=/var/www/node-template
+ENV CONTAINER_NAME=contracts-node-template-cactus
+# Specify p2p protocol TCP port
+ENV PORT=9614
 
-ENV CARGO_HOME=${CARGO_HOME}
+# Specify HTTP RPC server TCP port
+ENV RPC_PORT=9618
+
+#Specify WebSockets RPC server TCP port
+ENV WS_PORT=9944
+
+ENV DOCKER_PORT=9944
+ENV CARGO_HOME=/var/www/node-template/.cargo
 ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
+
 VOLUME .:/var/www/node-template
 
 RUN apt update
@@ -35,5 +42,7 @@ RUN rustup target add wasm32-unknown-unknown --toolchain nightly
 RUN echo "*** Installing Substrate node environment ***"
 RUN cargo install contracts-node --git https://github.com/paritytech/substrate-contracts-node.git --force --locked
 
+COPY start.sh /
+
 RUN echo "*** Start Substrate node template ***"
-CMD [ "/var/www/node-template/.cargo/bin/substrate-contracts-node", "--dev"]
+CMD /start.sh
