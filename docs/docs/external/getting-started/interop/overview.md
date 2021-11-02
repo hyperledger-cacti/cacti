@@ -1,6 +1,8 @@
 ---
 id: overview
-title: Overview
+title: Testing Interoperaton Modes Overview
+sidebar_label: Overview
+pagination_label: Testing Interoperaton Modes
 pagination_prev: external/getting-started/test-network/ledger-initialization
 ---
 
