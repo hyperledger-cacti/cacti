@@ -107,15 +107,18 @@ To push image to github container registry:
 
 **NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
 
-### Docker-compose Deployment
+### Docker-Compose Deployment
 
 * Copy `.env.docker.template` to `.env`
-    - `NETWORK_NAME`: Used as suffix to corda-driver container name, i.e. `corda-driver-<network-name>` will be the name of container.
+    - `NETWORK_NAME`: Used as suffix to corda-driver container name, i.e. `corda-driver-<network-name>` will be the name of the container.
     - `DRIVER_PORT`: Driver server port.
-    - `EXTERNAL_NETWORK`: is the docker network in which corda-network is running.
-    - `DOCKER_IMAGE_NAME`: Keep it same.
+    - `DRIVER_RPC_USERNAME`: RPC user registered for Driver.
+    - `DRIVER_RPC_PASSWORD`: Password for the above RPC user.
+    - `EXTERNAL_NETWORK`: Name of the docker network in which the Corda containers are deployed.
+    - `DOCKER_IMAGE_NAME`: _Keep this unchanged_.
     - `DOCKER_TAG`: Refer here for the image tags available: [weaver-corda-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-corda-driver)
-    - `DOCKER_REGISTRY`: Keep it same. (replace `hyperledger-labs` with your git username if testing from your fork)
+    - `COMPOSE_PROJECT_NAME`: Docker project name for the Corda network to which this driver is supposed to attach. By default, the folder name of the Corda network's `docker-compose.yml`, is the project name.
+    - `COMPOSE_PROJECT_NETWORK`: Docker project network name for the Corda network to which this driver is supposed to attach. By default, `default` is the project network name.
 * Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Run: `make deploy`.
