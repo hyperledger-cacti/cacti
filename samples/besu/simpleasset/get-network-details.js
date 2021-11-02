@@ -57,8 +57,11 @@ async function main() {
 			str = "\t\t\tfrom: \""+accounts[0]+"\","
 		}
 
+		if(!str.startsWith("}")) {
+			str = str + "\n"
+		}
+
 		truffleConfigFileString += str
-		truffleConfigFileString += "\n"
 	}
 
 	// Writing the updated content to truffle-config

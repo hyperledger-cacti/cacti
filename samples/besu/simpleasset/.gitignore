@@ -1,0 +1,4 @@
+build
+node_modules
+contracts/manageAsset.sol
+package-lock.json

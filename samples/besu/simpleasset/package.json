@@ -2,7 +2,6 @@
   "name": "sample-besu-app",
   "version": "0.1.0",
   "description": "Sample Besu Application for Demonstrating Interoperation With Other Networks",
-  "main": "truffle.js",
   "license": "Apache-2.0",
   "repository": "hyperledger-labs/weaver-dlt-interoperability/samples/besu/simpleasset",
   "bugs": {
@@ -13,13 +12,9 @@
     "test": "test"
   },
   "scripts": {
-    "ganache-start": "ganache-cli --networkId 4447 --port 7545",
-    "lint": "solium -d contracts/",
     "copy-interop-contracts": "cp ../../../core/network/besu/contracts/interop/manageAsset.sol contracts/",
     "update-truffle-config": "node get-network-details.js",
     "deploy-contract": "npm run copy-interop-contracts && npm install && npm run update-truffle-config && truffle compile && truffle migrate",
-    "ethereum-htlc": "truffle compile",
-    "test": "truffle test",
     "clean-run": "rm -rf package-lock.json build",
     "clean": "rm -rf node_modules package-lock.json build"
   },
@@ -41,9 +36,6 @@
     "solc": "^0.8.8"
   },
   "devDependencies": {
-    "eslint": "^7.5.0",
-    "ethlint": "^1.2.5",
-    "truffle": "^5.4.15",
-    "truffle-assertions": "^0.9.2"
+    "truffle": "^5.4.15"
   }
 }

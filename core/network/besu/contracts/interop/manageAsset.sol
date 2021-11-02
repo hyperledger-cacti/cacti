@@ -22,12 +22,10 @@ contract InteroperationBaseClassERC20 {
 		uint8 status;
 	}
 
-	uint8 public constant UNUSED = 0;
-	uint8 public constant LOCKED = 1;
-	uint8 public constant CLAIMED = 2;
-	uint8 public constant UNLOCKED = 3;
+	uint8 constant UNUSED = 0;
+	uint8 constant LOCKED = 1;
 
-	event NewLock(
+	event Lock(
 		address indexed sender,
 		address indexed receiver,
 		address assetContract,
@@ -98,7 +96,7 @@ contract InteroperationBaseClassERC20 {
 			LOCKED
 		);
 
-		emit NewLock(
+		emit Lock(
 			sender,
 			receiver,
 			assetContract,
@@ -119,10 +117,9 @@ contract InteroperationBaseClassERC20 {
 		
 		// Check the validity of the claim
 		require(c.status == LOCKED, "lockContract is not active");
-		require(c.expirationTime > block.timestamp, "lockContract has expired");
+		require(block.timestamp < c.expirationTime, "lockContract has expired");
 		require(c.hashLock == sha256(abi.encodePacked(preimage)),"Invalid preimage, its hash does not equal the hashLock");
 
-		c.status = CLAIMED;
 		bool transferStatus = ERC20(c.assetContract).transfer(c.receiver, c.amount);
 		require(transferStatus == true, "ERC20 transfer failed from the lockContract to the receiver");
 
@@ -138,7 +135,7 @@ contract InteroperationBaseClassERC20 {
 	}
 
 
-	// Unlocking and reclaiming a locked asset for the sender after the expiration time. Can be called by anyone.
+	// Unlocking and reclaiming a locked asset for the sender after the expiration time. Can be called by anyone, not just the sender.
 	function unlockFungibleAsset(bytes32 lockContractId)
 		external
 		returns (bool)
@@ -150,7 +147,6 @@ contract InteroperationBaseClassERC20 {
 		require(c.sender != address(0), "Sender address is invalid");
 		require(block.timestamp >= c.expirationTime, "Lock contract has expired");
 
-		c.status = UNLOCKED;
 		bool transferStatus = ERC20(c.assetContract).transfer(c.sender, c.amount);
 		require(transferStatus == true, "ERC20 transfer failed from the lockContract back to the sender");
 		
@@ -163,4 +159,20 @@ contract InteroperationBaseClassERC20 {
 		return true;
 	}
 
+	// Function to check if there is an active contract with the input lockContractId.
+	function isFungibleAssetLocked(bytes32 lockContractId)
+		external
+		returns (bool)
+	{
+		LockContract storage c = lockContracts[lockContractId];
+		
+		bool lockContractStatus;
+		if ( c.status == LOCKED ){
+			lockContractStatus = true;
+		} else {
+			lockContractStatus = false;
+		}
+
+		return lockContractStatus;
+	}
 }
