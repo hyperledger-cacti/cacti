@@ -1,6 +1,8 @@
 ---
 id: setup-packages
 title: Setup with Imported Weaver Components
+pagination_prev: external/getting-started/test-network/overview
+pagination_next: external/getting-started/test-network/ledger-initialization
 ---
 
 <!--
@@ -289,11 +291,6 @@ Run a Corda driver as follows:
   ```
   Corda driver gRPC server started. Listening on port 9098
   ```
-
-## Next Steps
-
-The test networks are up and running. Next, you must [configure the networks and initialize the ledgers](./ledger-initialization.md) before running interoperation flows.
-
 
 ## Tear Down the Setup
 

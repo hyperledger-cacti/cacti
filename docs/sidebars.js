@@ -29,6 +29,7 @@ module.exports = {
                     type: "category",
                     label: "Testing Interoperation Modes",
                     items: [
+                        "external/getting-started/interop/overview",
                         "external/getting-started/interop/data-sharing",
                         "external/getting-started/interop/asset-exchange",
                         "external/getting-started/interop/asset-transfer",

@@ -1,6 +1,8 @@
 ---
 id: ledger-initialization
 title: Ledger Initialization
+pagination_prev: external/getting-started/test-network/overview
+pagination_next: external/getting-started/interop/overview
 ---
 
 <!--

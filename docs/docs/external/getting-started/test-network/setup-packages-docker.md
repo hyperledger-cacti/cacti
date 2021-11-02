@@ -1,6 +1,8 @@
 ---
 id: setup-packages-docker
 title: Setup with Imported Dockerized Weaver Components
+pagination_prev: external/getting-started/test-network/overview
+pagination_next: external/getting-started/test-network/ledger-initialization
 ---
 
 <!--
@@ -209,11 +211,6 @@ If the driver starts successfully, it should log the following message, when you
 ```
 Corda driver gRPC server started. Listening on port 9099
 ```
-
-## Next Steps
-
-The test networks are up and running. Next, you must [configure the networks and initialize the ledgers](./ledger-initialization.md) before running interoperation flows.
-
 
 ## Tear Down the Setup
 
