@@ -159,6 +159,7 @@ contract InteroperationBaseClassERC20 {
 		return true;
 	}
 
+
 	// Function to check if there is an active contract with the input lockContractId.
 	function isFungibleAssetLocked(bytes32 lockContractId)
 		external

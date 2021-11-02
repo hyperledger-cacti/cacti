@@ -26,7 +26,6 @@ let BobERC20
 // (Assuming that the current folder is a sibling folder to build, 
 // the path to json would be ../build/contracts/ContractName.json)
 async function getContractInstance(provider, pathToJson){
-
 	const jsonFile = path.resolve(__dirname, pathToJson)
 	var jsonFileContents = fs.readFileSync(jsonFile)
 	var contractName = contract(JSON.parse(jsonFileContents))
@@ -41,14 +40,12 @@ async function getContractInstance(provider, pathToJson){
 
 // Initialization of the parameters
 async function init(provider1, provider2, contractOwner1, contractOwner2, Alice1, Bob2, tokenSupply, senderInitialBalance) {
-	
 	interopContract1 = await getContractInstance(provider1,'../build/contracts/InteroperationBaseClassERC20.json').catch(function () {
 		console.log("Failed getting interopContract1!");
 	})
 	interopContract2 = await getContractInstance(provider2,'../build/contracts/InteroperationBaseClassERC20.json').catch(function () {
 		console.log("Failed getting interopContract2!");
 	})
-
 
 	AliceERC20 = await getContractInstance(provider1, '../build/contracts/AliceERC20.json').catch(function () {
 		console.log("Failed getting AliceERC20 token contract!");
@@ -58,10 +55,10 @@ async function init(provider1, provider2, contractOwner1, contractOwner2, Alice1
 	})
 
 	// Issue AliceERC20 tokens to Alice in Network 1 and BobERC20 tokens 
-    // to Bob in Network 2. A minimal number of tokens equal to the 
-    // number of token being exchanged is issued to Alice and Bob to 
-    // ensure that the exchange in this test application does not fail 
-    // due to insufficient funds.
+	// to Bob in Network 2. A minimal number of tokens equal to the 
+	// number of token being exchanged is issued to Alice and Bob to 
+	// ensure that the exchange in this test application does not fail 
+	// due to insufficient funds.
 	await AliceERC20.transfer(Alice1, senderInitialBalance, {from: contractOwner1}).catch(function () {
 		console.log("AliceERC20 transfer threw an error; Probably the token supply is used up!");
 	})
@@ -90,7 +87,6 @@ async function claimToken(interopContract, lockContractId, recipient, preimage) 
 
 // Unlock function of a locked fungible asset/token 
 async function unlockToken(interopContract, lockContractId, sender) {
-
 	var unlockStatus = await interopContract.unlockFungibleAsset(lockContractId, {
         	from: sender
 	}).catch(function () {
@@ -107,7 +103,6 @@ async function unlockToken(interopContract, lockContractId, sender) {
 // for 'recipient' using the contract constructs of 'interopContract'
 // with hashLock and timeLock providing the conditions for claiming/unlocking
 async function lockToken(sender, recipient, tokenContract, tokenAmount, interopContract, hashLock, timeLock) {
-
 	// initiator of the swap has to first designate the swap contract as a spender of his/her money
 	// with allowance matching the swap amount
 	await tokenContract.approve(interopContract.address, tokenAmount, {from: sender}).catch(function () {
@@ -124,7 +119,7 @@ async function lockToken(sender, recipient, tokenContract, tokenAmount, interopC
 	      	{
         		from: sender
 	      	}
-    ).catch(function () {
+	).catch(function () {
  		console.log("lockFungibleAsset threw an error");
 		lockStatus = false
 	})
@@ -138,7 +133,6 @@ async function lockToken(sender, recipient, tokenContract, tokenAmount, interopC
 // Designed for printing the account balances of the sender and 
 // recipient at various stages of the exchange.
 async function getBalances(Alice1, Bob1, Alice2, Bob2) {
-
 	var AliceAliceERC20Balance = await AliceERC20.balanceOf(Alice1)
 	console.log("Alice balance of AliceERC20 in Network 1", AliceAliceERC20Balance.toString())
 	
@@ -150,13 +144,11 @@ async function getBalances(Alice1, Bob1, Alice2, Bob2) {
 	
 	var BobBobERC20Balance = await BobERC20.balanceOf(Bob2)
 	console.log("Bob balance of BobERC20 in Network 2", await BobBobERC20Balance.toString())
-
 }
 
 
 // Main entry point to the app
 async function main() {
-
 	// Network 1
 	const provider1 = new Web3.providers.HttpProvider('http://'+networkHost1+':'+networkPort1)
 	const web3N1 = new Web3(provider1)
@@ -168,7 +160,6 @@ async function main() {
 	console.log("Bob address in Network 1", Bob1)
 
 	const contractOwner1 = accounts1[0] // owner of all the minted tokens when the contract was created, given how truffleconfig.js is composed
-
 
 	// Network 2
 	const provider2 = new Web3.providers.HttpProvider('http://'+networkHost2+':'+networkPort2)
@@ -197,14 +188,14 @@ async function main() {
 	console.log("Hash: ", hash)
 
 	let timeOut = 15
-    let timeLockSeconds = Math.floor(Date.now() / 1000) + 2*timeOut
+	let timeLockSeconds = Math.floor(Date.now() / 1000) + 2*timeOut
 
 	// Creating a HTLC contract for Alice locking her AliceERC20 tokens for Bob
  	let lockTx1 = await lockToken(Alice1, Bob1, AliceERC20, tokenAmount, interopContract1, hash, timeLockSeconds)
-    if (!lockTx1) {
-        console.log("\n !!! Locking of Alice's tokens failed in Netowrk 1. Aborting here !!!")
-        return
-    }
+	if (!lockTx1) {
+		console.log("\n !!! Locking of Alice's tokens failed in Netowrk 1. Aborting here !!!")
+		return
+	}
 	let lockContractId1 = lockTx1.logs[0].args.lockContractId
 	console.log("lockContractID1: ", lockContractId1)
 
@@ -212,17 +203,17 @@ async function main() {
 	await getBalances(Alice1, Bob1, Alice2, Bob2)
 
 	// After he observes this lockContract created in Network 1, 
-    // Bob creates a similar contract in Network 2 using the same 
-    // hash to transfer the agreed upon amount of BobERC20 to Alice.
+	// Bob creates a similar contract in Network 2 using the same 
+	// hash to transfer the agreed upon amount of BobERC20 to Alice.
 	// Bob sets the timeLock such that he will have enough time to 
-    // claim Alice's tokens in Network 1 after she claims Bob's 
-    // tokens in Network 2.
+	// claim Alice's tokens in Network 1 after she claims Bob's 
+	// tokens in Network 2.
 	timeLockSeconds = Math.floor(Date.now() / 1000) + timeOut
 	let lockTx2 = await lockToken(Bob2, Alice2, BobERC20, tokenAmount, interopContract2, hash, timeLockSeconds)
-    if (!lockTx2) {
-        console.log("\n !!! Locking of Bob's tokens failed in Netowrk 2. Aborting here !!!")
-        return
-    }
+	if (!lockTx2) {
+		console.log("\n !!! Locking of Bob's tokens failed in Netowrk 2. Aborting here !!!")
+		return
+	}
 	let lockContractId2 = lockTx2.logs[0].args.lockContractId
 	console.log("lockContractID2: ", lockContractId2)
 
