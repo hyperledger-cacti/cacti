@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-rc.2](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2021-11-01)
+
+
+### Bug Fixes
+
+* fixes issue 1444 invoking the onPluginInit ([0b4dc2e](https://github.com/hyperledger/cactus/commit/0b4dc2eb121cb52d6038822efca434b9a0e4abcf)), closes [#1444](https://github.com/hyperledger/cactus/issues/1444)
+
+
+### Features
+
+* option to enable a graceful shutdown via cli ([c345cb0](https://github.com/hyperledger/cactus/commit/c345cb0aeba4ae46440ba396bcd11ca0fa5a5c96))
+
+
+
+
+
 # [1.0.0-rc.1](https://github.com/hyperledger/cactus/compare/v0.10.0...v1.0.0-rc.1) (2021-10-11)
 
 
