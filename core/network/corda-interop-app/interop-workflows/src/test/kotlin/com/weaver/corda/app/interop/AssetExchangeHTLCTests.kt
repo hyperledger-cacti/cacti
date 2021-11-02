@@ -67,6 +67,7 @@ class AssetExchangeHTLCTests {
     val alice = partyA.info.legalIdentities.first()
     val bob = partyB.info.legalIdentities.first()
     val charlie = partyC.info.legalIdentities.first()
+    val issuer = charlie
     
     val preimage = OpaqueBytes("secrettext".toByteArray())
     val hash = OpaqueBytes(Base64.getDecoder().decode("ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs="))
@@ -98,7 +99,8 @@ class AssetExchangeHTLCTests {
             lockInfo,
             assetStateRef,
             AssetStateContract.Commands.Delete(),
-            charlie
+            charlie,
+            issuer
         ))
         network.runNetwork()
         val linearIdFail = futureFail.getOrThrow()
@@ -109,7 +111,8 @@ class AssetExchangeHTLCTests {
             lockInfo,
             assetStateRef,
             AssetStateContract.Commands.Delete(),
-            bob
+            bob,
+            issuer
         ))
         network.runNetwork()
         val linearId = future.getOrThrow()
@@ -134,7 +137,8 @@ class AssetExchangeHTLCTests {
             lockInfo,
             assetStateRef,
             AssetStateContract.Commands.Delete(),
-            bob
+            bob,
+            issuer
         ))
         network.runNetwork()
         val error = futureTwo.getOrThrow()
@@ -153,8 +157,8 @@ class AssetExchangeHTLCTests {
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID,
-            "com.weaver.corda.app.interop.test.UpdateOwnerFlow"
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
         ))
         network.runNetwork()
         val stx = future.getOrThrow()
@@ -188,8 +192,8 @@ class AssetExchangeHTLCTests {
             lockId,
             wrongClaimInfo,
             AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID,
-            "com.weaver.corda.app.interop.test.UpdateOwnerFlow"
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
         ))
         network.runNetwork()
         val stxOne = futureOne.getOrThrow()
@@ -199,8 +203,8 @@ class AssetExchangeHTLCTests {
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID,
-            "com.weaver.corda.app.interop.test.UpdateOwnerFlow"
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
         ))
         network.runNetwork()
         val stxTwo = futureTwo.getOrThrow()
@@ -210,8 +214,8 @@ class AssetExchangeHTLCTests {
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID,
-            "com.weaver.corda.app.interop.test.UpdateOwnerFlow"
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
         ))
         network.runNetwork()
         val stxTwo2 = futureTwo2.getOrThrow()
@@ -223,8 +227,8 @@ class AssetExchangeHTLCTests {
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID,
-            "com.weaver.corda.app.interop.test.UpdateOwnerFlow"
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
         ))
         network.runNetwork()
         val stxThree = futureThree.getOrThrow()
@@ -243,7 +247,7 @@ class AssetExchangeHTLCTests {
         val futureOne = partyA.startFlow(UnlockAssetHTLC.Initiator(
             lockId,
             AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID
+            issuer
         ))
         network.runNetwork()
         val stxOne = futureOne.getOrThrow()
@@ -251,20 +255,11 @@ class AssetExchangeHTLCTests {
         
         Thread.sleep(10000L)
         
-        // Unhappy case: recipient trying to unlock
-        val futureTwo = partyB.startFlow(UnlockAssetHTLC.Initiator(
-            lockId,
-            AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID
-        ))
-        network.runNetwork()
-        val stxTwo = futureTwo.getOrThrow()
-        assert(stxTwo.isLeft()) { "UnlockAsset fails as only locker can unlock" }
-        
+        // Unhappy case: charlie trying to unlock
         val futureTwo2 = partyC.startFlow(UnlockAssetHTLC.Initiator(
             lockId,
             AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID
+            issuer
         ))
         network.runNetwork()
         val stxTwo2 = futureTwo2.getOrThrow()
@@ -274,12 +269,11 @@ class AssetExchangeHTLCTests {
         val future = partyA.startFlow(UnlockAssetHTLC.Initiator(
             lockId,
             AssetStateContract.Commands.Issue(),
-            AssetStateContract.ID
+            issuer
         ))
         network.runNetwork()
         val stx = future.getOrThrow()
         assert(stx.isRight()) { "UnlockAsset should be successfull" }
-        //assert(stx.isLeft()) { "UnlockAsset fails as timeout is not expired" }
 
         stx.fold({ println("Error") },{
             val states = partyA.services.vaultService
@@ -302,7 +296,8 @@ class AssetExchangeHTLCTests {
             lockInfo,
             assetStateRef,
             AssetStateContract.Commands.Delete(),
-            bob
+            bob,
+            issuer
         ))
         network.runNetwork()
         return future.getOrThrow()

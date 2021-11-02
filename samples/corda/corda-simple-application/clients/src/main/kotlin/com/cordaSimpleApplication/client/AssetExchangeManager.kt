@@ -24,6 +24,7 @@ import java.util.Base64
 import net.corda.core.utilities.OpaqueBytes
 import net.corda.core.crypto.sha256
 import java.time.Instant
+import net.corda.core.identity.CordaX500Name
 
 import com.weaver.corda.sdk.AssetManager
 import com.cordaSimpleApplication.state.AssetState
@@ -79,6 +80,7 @@ class LockAssetCommand : CliktCommand(
             try {
                 val params = param!!.split(":").toTypedArray()
                 var id: Any
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
                 if (fungible) {
                     id = AssetManager.createFungibleHTLC(
                         rpc.proxy, 
@@ -89,7 +91,8 @@ class LockAssetCommand : CliktCommand(
                         nTimeout, 
                         1,                  // nTimeout represents Duration
                         "com.cordaSimpleApplication.flow.RetrieveStateAndRef", 
-                        AssetContract.Commands.Delete()
+                        AssetContract.Commands.Delete(),
+                        issuer
                     )
                 } else {
                     id = AssetManager.createHTLC(
@@ -101,7 +104,8 @@ class LockAssetCommand : CliktCommand(
                         nTimeout,  
                         1,              // nTimeout represents Duration
                         "com.cordaSimpleApplication.flow.RetrieveStateAndRef", 
-                        AssetContract.Commands.Delete()
+                        AssetContract.Commands.Delete(),
+                        issuer
                     )
                 }
                 println("HTLC Lock State created with contract ID ${id}.")
@@ -131,13 +135,14 @@ class ClaimAssetCommand : CliktCommand(help = "Claim a locked asset. Only Recipi
                     password = "test",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
                 val res = AssetManager.claimAssetInHTLC(
                     rpc.proxy, 
                     contractId!!, 
                     secret!!,
                     AssetContract.Commands.Issue(),
-                    AssetContract.ID,
-                    "com.cordaSimpleApplication.flow.UpdateAssetOwnerFromPointer"
+                    "com.cordaSimpleApplication.flow.UpdateAssetOwnerFromPointer",
+                    issuer
                 )
                 println("Asset Claim Response: ${res}")
             } catch (e: Exception) {
@@ -165,11 +170,12 @@ class UnlockAssetCommand : CliktCommand(help = "Unlocks a locked asset after tim
                     password = "test",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
                 val res = AssetManager.reclaimAssetInHTLC(
                     rpc.proxy, 
                     contractId!!,
                     AssetContract.Commands.Issue(),
-                    AssetContract.ID
+                    issuer
                 )
                 println("Asset Unlock Response: ${res}")
             } catch (e: Exception) {

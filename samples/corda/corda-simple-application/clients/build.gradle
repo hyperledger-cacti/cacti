@@ -6,6 +6,8 @@ buildscript {
     ext.grpc_version = "1.29.0" // CURRENT_GRPC_VERSION
     ext.grpc_kotlin_version = "0.1.4" // CURRENT_GRPC_KOTLIN_VERSION
     ext.arrow_version = "0.10.4"
+    ext.tokens_release_group = 'com.r3.corda.lib.tokens'
+    ext.tokens_release_version = '1.2'
 
     repositories {
         mavenCentral()
@@ -37,6 +39,11 @@ repositories {
     jcenter()
     mavenCentral()
     mavenLocal()
+    maven { url 'https://software.r3.com/artifactory/corda-lib' }
+    flatDir {
+        dirs '../../fungible-house-token/source/contracts/build/libs'
+        dirs '../../fungible-house-token/source/workflows/build/libs'
+    }
     if (file("$projectDir/../github.properties").exists()) {
         file("$projectDir/../github.properties").withInputStream { constants.load(it) }
         maven {
@@ -74,6 +81,8 @@ dependencies {
     compile project(":workflows-kotlin")
     compile "com.github.ajalt:clikt:$clikt_version"
     
+    implementation(group: 'com.fungiblehousetoken', name: 'contracts', version: "1.0")
+    implementation(group: 'com.fungiblehousetoken', name: 'workflows', version: "1.0")
     implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_version")
     implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_version")
     implementation(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "$weaver_version")
@@ -93,6 +102,11 @@ dependencies {
 
     //// Logger dependencies
     compile "org.slf4j:slf4j-simple:1.6.1"
+
+    // Token SDK dependencies.
+    implementation "$tokens_release_group:tokens-contracts:$tokens_release_version"
+    implementation "$tokens_release_group:tokens-workflows:$tokens_release_version"
+
 }
 
 mainClassName = "com.cordaSimpleApplication.client.CordaClientKt"

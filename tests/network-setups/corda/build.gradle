@@ -13,6 +13,8 @@ buildscript {
         log4j_version = constants.getProperty("log4jVersion")
         slf4j_version = constants.getProperty("slf4jVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
+        tokens_release_group = 'com.r3.corda.lib.tokens'
+        tokens_release_version = '1.2'
     }
 
     repositories {
@@ -46,6 +48,10 @@ dependencies {
     // Corda dependencies.
     cordaRuntime "$corda_release_group:corda-node-api:$corda_release_version"
     cordaRuntime "$corda_release_group:corda:$corda_release_version"
+
+    // Token SDK dependencies.
+    cordapp "$tokens_release_group:tokens-contracts:$tokens_release_version"
+    cordapp "$tokens_release_group:tokens-workflows:$tokens_release_version"
 }
 
 
@@ -55,6 +61,7 @@ repositories {
     mavenCentral()
     maven { url 'https://software.r3.com/artifactory/corda' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://software.r3.com/artifactory/corda-lib' }
 }
 
 task ganache {
@@ -79,6 +86,9 @@ task deployNodes(type: net.corda.plugins.Cordform) {
         projectCordapp {
             deploy = false
         }
+        cordapp("$tokens_release_group:tokens-contracts:$tokens_release_version")
+        cordapp("$tokens_release_group:tokens-workflows:$tokens_release_version")
+        runSchemaMigration = true
     }
     node {
         name "O=Notary,L=London,C=GB"
@@ -111,6 +121,17 @@ task deployNodes(type: net.corda.plugins.Cordform) {
                 [ user: "clientUser1", "password": "test", "permissions": ["ALL"]],
                 [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]]
     }
+    node {
+        name "O=PartyC,L=London,C=GB"
+        p2pPort 10010
+        rpcSettings {
+            address("localhost:10012")
+            adminAddress("localhost:10052")
+        }
+        rpcUsers = [
+                [ user: "clientUser1", "password": "test", "permissions": ["ALL"]],
+                [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]]
+    }
 }
 
 task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
@@ -119,6 +140,9 @@ task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) 
         projectCordapp {
             deploy = false
         }
+        cordapp("$tokens_release_group:tokens-contracts:$tokens_release_version")
+        cordapp("$tokens_release_group:tokens-workflows:$tokens_release_version")
+        runSchemaMigration = true
     }
     node {
         name "O=Notary,L=London,C=GB"
@@ -143,6 +167,17 @@ task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) 
     node {
         name "O=PartyB,L=London,C=GB"
         p2pPort 10007
+        rpcSettings {
+            address("localhost:10003")
+            adminAddress("localhost:10005")
+        }
+        rpcUsers = [
+                [ user: "clientUser1", "password": "test", "permissions": ["ALL"]],
+                [ user: "driverUser1", "password": "test", "permissions": ["ALL"]]]
+    }
+    node {
+        name "O=PartyC,L=London,C=GB"
+        p2pPort 10010
         rpcSettings {
             address("localhost:10003")
             adminAddress("localhost:10005")

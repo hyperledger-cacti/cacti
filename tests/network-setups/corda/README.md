@@ -56,7 +56,7 @@ To get the CorDapps from Github Packages you will need to have permission to do 
 3) Replace <GITHUB Email> with your email id for github.
 4) Replace <GITHUB Personal Access Token> with your personal access token.
 
-## Running with Make
+## Running Corda Simple Application with Make
 
 If you are happy with the default configuration, you can use the following make
 targets.
@@ -84,6 +84,39 @@ targets.
       ```
 -   `make restart-with-new-interop-app` can be used to restart an already running
     Corda network with new local versions of the `corda-interop-app` CorDapp.
+-   `make stop` stops the nodes.
+-   `make clean` stops the nodes and deletes the build artifacts.
+
+## Running Fungible House Token with Make
+
+If you are happy with the default configuration, you can use the following make
+targets.
+
+-   `make start-house` builds the required node folder structure for the nodes to run,
+    gets the CorDapps from Github Packages, then starts the Corda nodes.
+-   `make start-house-local` is the same as `make start-house` except it gets the cordapps
+    from locally built jars from the `corda-interop-app`. (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages).
+    * _Prerequisites_: Before you run this command, build the following in sequence:
+      **Protobufs**
+      ```
+      cd ../../../common/protos-java-kt
+      make build
+      ```
+      **Interoperation CorDapp**
+      ```
+      cd ../../../core/network/corda-interop-app
+      make build-local
+      ```
+      **Fungible House Token CorDapp**
+      ```
+      cd ../../../samples/corda/fungible-house-token
+      make build
+      ```
+      **CLI Client and CorDapp**
+      ```
+      cd ../../../samples/corda/corda-simple-application
+      make build-local
+      ```
 -   `make stop` stops the nodes.
 -   `make clean` stops the nodes and deletes the build artifacts.
 

@@ -31,6 +31,7 @@ import net.corda.core.node.ServiceHub
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.utilities.OpaqueBytes
+import net.corda.core.utilities.unwrap
 import java.time.Instant
 import java.util.Base64
     
@@ -43,11 +44,15 @@ import java.util.Base64
 object LockAssetHTLC {
     @InitiatingFlow
     @StartableByRPC
-    class Initiator(
+    class Initiator
+    @JvmOverloads
+    constructor(
             val lockInfo: AssetLockHTLCData,
             val assetStateRef: StateAndRef<ContractState>,
             val assetStateDeleteCommand: CommandData,
-            val recipient: Party
+            val recipient: Party,
+            val issuer: Party,
+            val observers: List<Party> = listOf<Party>()
     ) : FlowLogic<Either<Error, UniqueIdentifier>>() {
         /**
          * The call() method captures the logic to create a new [AssetExchangeHTLCState] state in the vault.
@@ -77,9 +82,10 @@ object LockAssetHTLC {
                 )
             )
             val assetDeleteCmd = Command(assetStateDeleteCommand, 
-                listOf(
-                    assetExchangeHTLCState.locker.owningKey
-                )
+                setOf(
+                    assetExchangeHTLCState.locker.owningKey,
+                    issuer.owningKey
+                ).toList()
             )
             val txBuilder = TransactionBuilder(notary)
                     .addInputState(assetStateRef)
@@ -92,9 +98,28 @@ object LockAssetHTLC {
             val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
             println("Locker signed transaction.")
             
+            var sessions = listOf<FlowSession>()
             val recipientSession = initiateFlow(recipient)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(recipientSession)))
-            val storedAssetExchangeHTLCState = subFlow(FinalityFlow(fullySignedTx, setOf(recipientSession))).tx.outputStates.first() as AssetExchangeHTLCState
+            recipientSession.send(true)
+            sessions += recipientSession
+
+            /// Add issuer session if recipient or locker (i.e. me) is not issuer
+            if (!recipient.equals(issuer) && !ourIdentity.equals(issuer)) {
+                val issuerSession = initiateFlow(issuer)
+                issuerSession.send(true)
+                sessions += issuerSession
+            }
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+
+            var observerSessions = listOf<FlowSession>()
+            for (obs in observers) {
+                val obsSession = initiateFlow(obs)
+                obsSession.send(false)
+                observerSessions += obsSession
+            }
+            val storedAssetExchangeHTLCState = subFlow(FinalityFlow(
+                fullySignedTx, 
+                sessions + observerSessions)).tx.outputStates.first() as AssetExchangeHTLCState
             
             // 4. Return the linearId of the state
             println("Successfully stored: $storedAssetExchangeHTLCState\n")
@@ -106,23 +131,30 @@ object LockAssetHTLC {
     }
     
     @InitiatedBy(Initiator::class)
-    class Acceptor(val recipientSession: FlowSession) : FlowLogic<SignedTransaction>() {
+    class Acceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
-            val signTransactionFlow = object : SignTransactionFlow(recipientSession) {
-                override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                    "The output State must be AssetExchangeHTLCState" using (stx.tx.outputs.single().data is AssetExchangeHTLCState)
-                    val htlcState = stx.tx.outputs.single().data as AssetExchangeHTLCState
-                    "I must be the recipient" using (htlcState.recipient == ourIdentity)
+            val needsToSignTransaction = session.receive<Boolean>().unwrap { it }
+            if (needsToSignTransaction) {
+                val signTransactionFlow = object : SignTransactionFlow(session) {
+                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                        //"The output State must be AssetExchangeHTLCState" using (stx.tx.outputs.single().data is AssetExchangeHTLCState)
+                        //val htlcState = stx.tx.outputs.single().data as AssetExchangeHTLCState
+                        //"I must be the recipient" using (htlcState.recipient == ourIdentity)
+                    }
                 }
-            }
-            try {
-                val txId = subFlow(signTransactionFlow).id
-                println("Recipient signed transaction.")
-                return subFlow(ReceiveFinalityFlow(recipientSession, expectedTxId = txId))
-            } catch (e: Exception) {
-                println("Error signing lock asset transaction by recipient: ${e.message}\n")
-                return subFlow(ReceiveFinalityFlow(recipientSession))
+                try {
+                    val txId = subFlow(signTransactionFlow).id
+                    println("${ourIdentity} signed transaction.")
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                } catch (e: Exception) {
+                    println("Error signing lock asset transaction by ${ourIdentity}: ${e.message}\n")
+                    return subFlow(ReceiveFinalityFlow(session))
+                }
+            } else {
+                val sTx = subFlow(ReceiveFinalityFlow(session))
+                println("Received Tx: ${sTx}")
+                return sTx
             }
         }
     }
@@ -206,12 +238,15 @@ class GetAssetExchangeHTLCStateById(
 object ClaimAssetHTLC {
     @InitiatingFlow
     @StartableByRPC
-    class Initiator(
+    class Initiator
+    @JvmOverloads
+    constructor(
             val contractId: String,
             val claimInfo: AssetClaimHTLCData,
             val assetStateCreateCommand: CommandData,
-            val assetStateContractId: String,
-            val updateOwnerFlow: String
+            val updateOwnerFlow: String,
+            val issuer: Party,
+            val observers: List<Party> = listOf<Party>()
     ) : FlowLogic<Either<Error, SignedTransaction>>() {
         /**
          * The call() method captures the logic to claim the asset by revealing preimage.
@@ -227,47 +262,69 @@ object ClaimAssetHTLC {
             }, {
                 val inputState = it
                 val assetExchangeHTLCState = inputState.state.data
-                if (ourIdentity != assetExchangeHTLCState.recipient) {
+                if (!ourIdentity.equals(assetExchangeHTLCState.recipient)) {
                     println("Error: Only recipient can call claim.")
                     Left(Error("Error: Only recipient can call claim"))        
+                } else {
+                    println("Party: ${ourIdentity} ClaimAssetHTLC: ${assetExchangeHTLCState}")
+                    val notary = inputState.state.notary
+                    val claimCmd = Command(AssetExchangeHTLCStateContract.Commands.Claim(claimInfo),
+                        listOf(
+                            assetExchangeHTLCState.recipient.owningKey
+                        )
+                    )
+                    val assetCreateCmd = Command(assetStateCreateCommand, 
+                        setOf(
+                            assetExchangeHTLCState.recipient.owningKey,
+                            issuer.owningKey
+                        ).toList()
+                    )
+                    
+                    val assetStateContractId = assetExchangeHTLCState.assetStatePointer.resolve(serviceHub).state.contract
+                    
+                    resolveUpdateOwnerFlow(updateOwnerFlow, 
+                        listOf(assetExchangeHTLCState.assetStatePointer)
+                    ).fold({
+                        println("Error: Unable to resolve Update Owner Flow.\n")
+                        Left(Error("Error: Unable to resolve Update Owner Flow"))
+                    }, {
+                        println("Resolved Update owner flow to ${it}")
+                        val newAssetState = subFlow(it)
+                                    
+                        val txBuilder = TransactionBuilder(notary)
+                                .addInputState(inputState)
+                                .addOutputState(newAssetState, assetStateContractId)
+                                .addCommand(claimCmd)
+                                .addCommand(assetCreateCmd)
+                                .setTimeWindow(TimeWindow.untilOnly(assetExchangeHTLCState.lockInfo.expiryTime))
+                        
+                        // Verify and collect signatures on the transaction        
+                        txBuilder.verify(serviceHub)
+                        val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+                        println("Recipient signed transaction.")
+
+                        var sessions = listOf<FlowSession>()
+                        if (!assetExchangeHTLCState.recipient.equals(issuer)) {
+                            val issuerSession = initiateFlow(issuer)
+                            issuerSession.send(true)
+                            sessions += issuerSession
+                        }
+                        val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+
+                        var observerSessions = listOf<FlowSession>()
+                        if (!assetExchangeHTLCState.locker.equals(issuer)) {
+                            val lockerSession = initiateFlow(assetExchangeHTLCState.locker)
+                            lockerSession.send(false)
+                            observerSessions += lockerSession
+                        }
+                        for (obs in observers) {
+                            val obsSession = initiateFlow(obs)
+                            obsSession.send(false)
+                            observerSessions += obsSession
+                        }
+                        Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
+                    })
                 }
-                println("Party: ${ourIdentity} ClaimAssetHTLC: ${assetExchangeHTLCState}")
-                val notary = inputState.state.notary
-                val claimCmd = Command(AssetExchangeHTLCStateContract.Commands.Claim(claimInfo),
-                    listOf(
-                        assetExchangeHTLCState.recipient.owningKey
-                    )
-                )
-                val assetCreateCmd = Command(assetStateCreateCommand, 
-                    listOf(
-                        assetExchangeHTLCState.recipient.owningKey
-                    )
-                )
-                
-                resolveUpdateOwnerFlow(updateOwnerFlow, 
-                    listOf(assetExchangeHTLCState.assetStatePointer)
-                ).fold({
-                    println("Error: Unable to resolve Update Owner Flow.\n")
-                    Left(Error("Error: Unable to resolve Update Owner Flow"))
-                }, {
-                    println("Resolved Update owner flow to ${it}")
-                    val newAssetState = subFlow(it)
-                                
-                    val txBuilder = TransactionBuilder(notary)
-                            .addInputState(inputState)
-                            .addOutputState(newAssetState, assetStateContractId)
-                            .addCommand(claimCmd)
-                            .addCommand(assetCreateCmd)
-                            .setTimeWindow(TimeWindow.untilOnly(assetExchangeHTLCState.lockInfo.expiryTime))
-                    
-                    // Verify and collect signatures on the transaction        
-                    txBuilder.verify(serviceHub)
-                    val sTx = serviceHub.signInitialTransaction(txBuilder)
-                    println("Recipient signed transaction.")
-                    
-                    val lockerSession = initiateFlow(assetExchangeHTLCState.locker)
-                    Right(subFlow(FinalityFlow(sTx, setOf(lockerSession))))
-                })
             })
         } catch (e: Exception) {
             println("Error claiming: ${e.message}\n")
@@ -276,11 +333,28 @@ object ClaimAssetHTLC {
     }
     
     @InitiatedBy(Initiator::class)
-    class Acceptor(val lockerSession: FlowSession) : FlowLogic<SignedTransaction>() {
+    class Acceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
-            
-            return subFlow(ReceiveFinalityFlow(lockerSession))
+            val needsToSignTransaction = session.receive<Boolean>().unwrap { it }
+            if (needsToSignTransaction) {
+                val signTransactionFlow = object : SignTransactionFlow(session) {
+                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                    }
+                }
+                try {
+                    val txId = subFlow(signTransactionFlow).id
+                    println("Issuer signed transaction.")
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                } catch (e: Exception) {
+                    println("Error signing claim asset transaction by issuer: ${e.message}\n")
+                    return subFlow(ReceiveFinalityFlow(session))
+                }
+            } else {
+                val sTx = subFlow(ReceiveFinalityFlow(session))
+                println("Received Tx: ${sTx}")
+                return sTx
+            }
         }
     }
 }
@@ -293,10 +367,13 @@ object ClaimAssetHTLC {
 object UnlockAssetHTLC {
     @InitiatingFlow
     @StartableByRPC
-    class Initiator(
+    class Initiator
+    @JvmOverloads
+    constructor(
             val contractId: String,
             val assetStateCreateCommand: CommandData,
-            val assetStateContractId: String
+            val issuer: Party,
+            val observers: List<Party> = listOf<Party>()
     ) : FlowLogic<Either<Error, SignedTransaction>>() {
         /**
          * The call() method captures the logic to unlock an asset.
@@ -311,10 +388,6 @@ object UnlockAssetHTLC {
                 Left(Error("AssetExchangeHTLCState for Id: ${linearId} not found."))            
             }, {
                 val assetExchangeHTLCState = it.state.data
-                if (ourIdentity != assetExchangeHTLCState.locker) {
-                    println("Error: Only locker can call unlock.")
-                    Left(Error("Error: Only locker can call unlock"))        
-                }
                 println("Party: ${ourIdentity} UnlockAssetHTLC: ${assetExchangeHTLCState}")
                 val notary = it.state.notary
                 val unlockCmd = Command(AssetExchangeHTLCStateContract.Commands.Unlock(),
@@ -323,12 +396,15 @@ object UnlockAssetHTLC {
                     )
                 )
                 val assetCreateCmd = Command(assetStateCreateCommand, 
-                    listOf(
-                        assetExchangeHTLCState.locker.owningKey
-                    )
+                    setOf(
+                        assetExchangeHTLCState.locker.owningKey,
+                        issuer.owningKey
+                    ).toList()
                 )
                 
-                val reclaimAssetState = assetExchangeHTLCState.assetStatePointer.resolve(serviceHub).state.data
+                val reclaimAssetStateAndRef = assetExchangeHTLCState.assetStatePointer.resolve(serviceHub)
+                val reclaimAssetState = reclaimAssetStateAndRef.state.data
+                val assetStateContractId = reclaimAssetStateAndRef.state.contract
                 
                 val txBuilder = TransactionBuilder(notary)
                         .addInputState(it)
@@ -339,11 +415,35 @@ object UnlockAssetHTLC {
                         
                 // Verify and collect signatures on the transaction        
                 txBuilder.verify(serviceHub)
-                val sTx = serviceHub.signInitialTransaction(txBuilder)
-                println("Locker signed transaction.")
+                var partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+                println("${ourIdentity} signed transaction.")
                 
-                val recipientSession = initiateFlow(assetExchangeHTLCState.recipient)
-                Right(subFlow(FinalityFlow(sTx, setOf(recipientSession))))
+                var sessions = listOf<FlowSession>()
+
+                if (!ourIdentity.equals(issuer)) {
+                    val issuerSession = initiateFlow(issuer)
+                    issuerSession.send(true)
+                    sessions += issuerSession
+                }
+                if (!ourIdentity.equals(assetExchangeHTLCState.locker)) {
+                    val lockerSession = initiateFlow(assetExchangeHTLCState.locker)
+                    lockerSession.send(true)
+                    sessions += lockerSession
+                }
+                val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+
+                var observerSessions = listOf<FlowSession>()
+                if (!ourIdentity.equals(assetExchangeHTLCState.recipient) && !issuer.equals(assetExchangeHTLCState.recipient)) {
+                    val recipientSession = initiateFlow(assetExchangeHTLCState.recipient)
+                    recipientSession.send(false)
+                    observerSessions += recipientSession
+                }
+                for (obs in observers) {
+                    val obsSession = initiateFlow(obs)
+                    obsSession.send(false)
+                    observerSessions += obsSession
+                }
+                Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
             })
         } catch (e: Exception) {
             println("Error unlocking: ${e.message}\n")
@@ -352,11 +452,28 @@ object UnlockAssetHTLC {
     }
     
     @InitiatedBy(Initiator::class)
-    class Acceptor(val recipientSession: FlowSession) : FlowLogic<SignedTransaction>() {
+    class Acceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
-            
-            return subFlow(ReceiveFinalityFlow(recipientSession))
+            val needsToSignTransaction = session.receive<Boolean>().unwrap { it }
+            if (needsToSignTransaction) {
+                val signTransactionFlow = object : SignTransactionFlow(session) {
+                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                    }
+                }
+                try {
+                    val txId = subFlow(signTransactionFlow).id
+                    println("${ourIdentity} signed transaction.")
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                } catch (e: Exception) {
+                    println("Error signing unlock asset transaction by ${ourIdentity}: ${e.message}\n")
+                    return subFlow(ReceiveFinalityFlow(session))
+                }
+            } else {
+                val sTx = subFlow(ReceiveFinalityFlow(session))
+                println("Received Tx: ${sTx}")
+                return sTx
+            }
         }
     }
 }
