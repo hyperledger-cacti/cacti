@@ -2,7 +2,7 @@
 
 directory=$(dirname $0)
 houseTokenAppversion="1.0"
-weaverVersion="1.2.4-alpha.4"
+weaverVersion="1.2.4-alpha.5"
 tokenVersion="1.2"
 
 parties="Notary PartyA PartyB PartyC"
