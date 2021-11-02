@@ -1,7 +1,11 @@
 import type { EventEmitter } from "events";
 import { Optional } from "typescript-optional";
 import { RuntimeError } from "run-time-error";
-import type { Container, ContainerInfo } from "dockerode";
+import type {
+  Container,
+  ContainerCreateOptions,
+  ContainerInfo,
+} from "dockerode";
 import Docker from "dockerode";
 import { Logger, Checks, Bools } from "@hyperledger/cactus-common";
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
@@ -89,8 +93,13 @@ export class SubstrateTestLedger {
       (pairs) => `${pairs[0]}=${pairs[1]}`,
     );
 
+    const wsPort = this.envVars.get("WS_PORT") ?? 9944;
+    const portToExpose = `${wsPort}/tcp`;
+
     // TODO: dynamically expose ports for custom port mapping
-    const createOptions = {
+    const createOptions: ContainerCreateOptions & {
+      Healthcheck: Record<string, unknown>;
+    } = {
       Env: dockerEnvVars,
       Healthcheck: {
         Test: [
@@ -102,18 +111,27 @@ export class SubstrateTestLedger {
         Retries: 10,
         StartPeriod: 1000000000, // 1 second
       },
+      // Default exposed port commented to allow multiple test ledgers
       ExposedPorts: {
-        "9944/tcp": {}, // OpenSSH Server - TCP
+        // "9944/tcp": {}, // OpenSSH Server - TCP default port
       },
       HostConfig: {
         AutoRemove: true,
         PublishAllPorts: this.publishAllPorts,
         Privileged: false,
+        // Default port bindings commented to allow multiple test ledgers
         PortBindings: {
-          "9944/tcp": [{ HostPort: "9944" }],
+          // "9944/tcp": [{ HostPort: "9944" }], // default binding
         },
       },
     };
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    createOptions["ExposedPorts"]![portToExpose] = {};
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    createOptions["HostConfig"]!["PortBindings"][portToExpose] = [
+      { HostPort: wsPort },
+    ];
 
     this.log.debug(`Starting ${this.imageFqn} with options: `, createOptions);
 
@@ -163,6 +181,7 @@ export class SubstrateTestLedger {
   }
 
   public async stop(): Promise<unknown> {
+    this.log.debug("Stopping the test ledger");
     return Containers.stop(this.container.get());
   }
 
@@ -195,7 +214,6 @@ export class SubstrateTestLedger {
     }
   }
 
-  // ./scripts/docker_run.sh ./target/release/node-template purge-chain --dev
   protected async purgeDevChain(): Promise<void> {
     throw new Error("TODO");
   }
