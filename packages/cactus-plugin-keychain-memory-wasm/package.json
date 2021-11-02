@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-memory-wasm",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing. Same as the non-wasm version but this one has the backing implementation written in Rust and compiled down to WebAssembly.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-plugin-keychain-memory-wasm.node.umd.min.js",
