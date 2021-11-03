@@ -4,6 +4,8 @@ FROM docker:20.10.3-dind
 
 ARG FABRIC_VERSION=2.2.0
 ARG CA_VERSION=1.4.9
+ARG COUCH_VERSION_FABRIC=0.4
+ARG COUCH_VERSION=3.1.1
 
 WORKDIR /
 
@@ -141,6 +143,8 @@ RUN mkdir -p /etc/hyperledger/fabric/fabric-nodeenv/
 RUN mkdir -p /etc/hyperledger/fabric/fabric-tools/
 RUN mkdir -p /etc/hyperledger/fabric/fabric-baseos/
 RUN mkdir -p /etc/hyperledger/fabric/fabric-ca/
+RUN mkdir -p /etc/hyperledger/fabric/fabric-couchdb/
+RUN mkdir -p /etc/couchdb/
 
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-peer/ hyperledger/fabric-peer:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-orderer/ hyperledger/fabric-orderer:${FABRIC_VERSION}
@@ -149,6 +153,8 @@ RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-nodeenv/ hyperle
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-tools/ hyperledger/fabric-tools:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-baseos/ hyperledger/fabric-baseos:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ca/ hyperledger/fabric-ca:${CA_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-couchdb/ hyperledger/fabric-couchdb:${COUCH_VERSION_FABRIC}
+RUN /download-frozen-image-v2.sh /etc/couchdb/ couchdb:${COUCH_VERSION}
 
 # Download and execute the Fabric bootstrap script, but instruct it with the -d
 # flag to avoid pulling docker images because during the build phase of this image
@@ -176,6 +182,8 @@ ENV CORE_PEER_ADDRESS=localhost:7051
 ENV COMPOSE_PROJECT_NAME=cactusfabrictestnetwork
 ENV FABRIC_VERSION=${FABRIC_VERSION}
 ENV CA_VERSION=${CA_VERSION}
+ENV COUCH_VERSION_FABRIC=${COUCH_VERSION_FABRIC}
+ENV COUCH_VERSION=${COUCH_VERSION}
 
 # Extend the parent image's entrypoint
 # https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script

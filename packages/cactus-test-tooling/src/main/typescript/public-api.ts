@@ -48,6 +48,9 @@ export {
   IFabricTestLedgerV1ConstructorOptions,
   FABRIC_TEST_LEDGER_DEFAULT_OPTIONS,
   FABRIC_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
+  STATE_DATABASE,
+  organizationDefinitionFabricV2,
+  LedgerStartOptions,
 } from "./fabric/fabric-test-ledger-v1";
 
 export {
