@@ -32,6 +32,18 @@ import {
   IInvokeContractEndpointV1Options,
   InvokeContractEndpointV1,
 } from "./web-services/invoke-contract-endpoint-v1";
+import {
+  IListFlowsEndpointV1Options,
+  ListFlowsEndpointV1,
+} from "./web-services/list-flows-endpoint-v1";
+import {
+  INetworkMapEndpointV1Options,
+  NetworkMapEndpointV1,
+} from "./web-services/network-map-endpoint-v1";
+import {
+  IDiagnoseNodeEndpointV1Options,
+  DiagnoseNodeEndpointV1,
+} from "./web-services/diagnose-node-endpoint-v1";
 
 export interface IPluginLedgerConnectorCordaOptions
   extends ICactusPluginOptions {
@@ -41,6 +53,7 @@ export interface IPluginLedgerConnectorCordaOptions
   prometheusExporter?: PrometheusExporter;
   cordaStartCmd?: string;
   cordaStopCmd?: string;
+  apiUrl?: string;
 }
 
 export class PluginLedgerConnectorCorda
@@ -147,6 +160,7 @@ export class PluginLedgerConnectorCorda
         corDappsDir: this.options.corDappsDir,
         cordaStartCmd: this.options.cordaStartCmd,
         cordaStopCmd: this.options.cordaStopCmd,
+        apiUrl: this.options.apiUrl,
       });
 
       endpoints.push(endpoint);
@@ -154,7 +168,7 @@ export class PluginLedgerConnectorCorda
 
     {
       const opts: IInvokeContractEndpointV1Options = {
-        connector: this,
+        apiUrl: this.options.apiUrl,
         logLevel: this.options.logLevel,
       };
       const endpoint = new InvokeContractEndpointV1(opts);
@@ -169,6 +183,34 @@ export class PluginLedgerConnectorCorda
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
       endpoints.push(endpoint);
     }
+
+    {
+      const opts: IListFlowsEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new ListFlowsEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: INetworkMapEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new NetworkMapEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IDiagnoseNodeEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new DiagnoseNodeEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
     this.log.info(`Instantiated endpoints of ${pkgName}`);
     return endpoints;
   }

@@ -20,30 +20,36 @@ import OAS from "../../json/openapi.json";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import {
   DefaultApi,
-  InvokeContractV1Request,
-  InvokeContractV1Response,
+  ListFlowsV1Request,
+  ListFlowsV1Response,
 } from "../generated/openapi/typescript-axios";
 
-export interface IInvokeContractEndpointV1Options {
+export interface IListFlowsEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
 }
 
-export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
+export class ListFlowsEndpointV1 implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "ListFlowsEndpointV1";
+
   private readonly log: Logger;
   private readonly apiUrl?: string;
 
-  constructor(public readonly opts: IInvokeContractEndpointV1Options) {
-    const fnTag = "InvokeContractEndpointV1#constructor()";
+  public get className(): string {
+    return ListFlowsEndpointV1.CLASS_NAME;
+  }
 
-    Checks.truthy(opts, `${fnTag} options`);
+  constructor(public readonly options: IListFlowsEndpointV1Options) {
+    const fnTag = `${this.className}#constructor()`;
+
+    Checks.truthy(options, `${fnTag} options`);
 
     this.log = LoggerProvider.getOrCreate({
-      label: "invoke-contract-endpoint-v1",
-      level: opts.logLevel || "INFO",
+      label: "list-flows-endpoint-v1",
+      level: options.logLevel || "INFO",
     });
 
-    this.apiUrl = opts.apiUrl;
+    this.apiUrl = options.apiUrl;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -60,9 +66,9 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"] {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows"
     ];
   }
 
@@ -86,10 +92,9 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = "InvokeContractEndpointV1#handleRequest()";
+    const fnTag = "ListFlowsEndpointV1#handleRequest()";
     const verbUpper = this.getVerbLowerCase().toUpperCase();
     this.log.debug(`${verbUpper} ${this.getPath()}`);
-
     try {
       if (this.apiUrl === undefined) throw "apiUrl option is necessary";
       const resBody = await this.callInternalContainer(req.body);
@@ -104,11 +109,11 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
   }
 
   async callInternalContainer(
-    req: InvokeContractV1Request,
-  ): Promise<InvokeContractV1Response> {
+    req: ListFlowsV1Request,
+  ): Promise<ListFlowsV1Response> {
     const apiConfig = new Configuration({ basePath: this.apiUrl });
     const apiClient = new DefaultApi(apiConfig);
-    const res = await apiClient.invokeContractV1(req);
+    const res = await apiClient.listFlowsV1(req);
     return res.data;
   }
 }
