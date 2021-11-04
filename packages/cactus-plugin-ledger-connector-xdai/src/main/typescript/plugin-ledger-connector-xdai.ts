@@ -517,7 +517,7 @@ export class PluginLedgerConnectorXdai
 
   public async deployContract(
     req: DeployContractV1Request,
-  ): Promise<RunTransactionV1Response> {
+  ): Promise<DeployContractV1Response> {
     const fnTag = `${this.className}#deployContract()`;
     Checks.truthy(req, `${fnTag} req`);
     if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
@@ -592,7 +592,13 @@ export class PluginLedgerConnectorXdai
           await keychainPlugin.set(contractName, JSON.stringify(contractPojo));
         }
       }
-      return runTxResponse;
+
+      // creating contract response
+      const deployResponse: DeployContractV1Response = {
+        transactionReceipt: runTxResponse.transactionReceipt,
+      };
+
+      return deployResponse;
     }
     throw new Error(
       `${fnTag} Cannot deploy contract without keychainId and the contractName`,

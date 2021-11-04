@@ -20,26 +20,26 @@ import OAS from "../../json/openapi.json";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import {
   DefaultApi,
-  InvokeContractV1Request,
-  InvokeContractV1Response,
+  DiagnoseNodeV1Request,
+  DiagnoseNodeV1Response,
 } from "../generated/openapi/typescript-axios";
 
-export interface IInvokeContractEndpointV1Options {
+export interface IDiagnoseNodeEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
 }
 
-export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
+export class DiagnoseNodeEndpointV1 implements IWebServiceEndpoint {
   private readonly log: Logger;
   private readonly apiUrl?: string;
 
-  constructor(public readonly opts: IInvokeContractEndpointV1Options) {
-    const fnTag = "InvokeContractEndpointV1#constructor()";
+  constructor(public readonly opts: IDiagnoseNodeEndpointV1Options) {
+    const fnTag = "NetworkMapEndpointV1#constructor()";
 
     Checks.truthy(opts, `${fnTag} options`);
 
     this.log = LoggerProvider.getOrCreate({
-      label: "invoke-contract-endpoint-v1",
+      label: "diagnose-node-endpoint-v1",
       level: opts.logLevel || "INFO",
     });
 
@@ -60,9 +60,9 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"] {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node"
     ];
   }
 
@@ -86,7 +86,7 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = "InvokeContractEndpointV1#handleRequest()";
+    const fnTag = "DiagnoseNodeEndpointV1#handleRequest()";
     const verbUpper = this.getVerbLowerCase().toUpperCase();
     this.log.debug(`${verbUpper} ${this.getPath()}`);
 
@@ -104,11 +104,11 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
   }
 
   async callInternalContainer(
-    req: InvokeContractV1Request,
-  ): Promise<InvokeContractV1Response> {
+    req: DiagnoseNodeV1Request,
+  ): Promise<DiagnoseNodeV1Response> {
     const apiConfig = new Configuration({ basePath: this.apiUrl });
     const apiClient = new DefaultApi(apiConfig);
-    const res = await apiClient.invokeContractV1(req);
+    const res = await apiClient.diagnoseNodeV1(req);
     return res.data;
   }
 }
