@@ -18,28 +18,24 @@ import {
 import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import {
-  DefaultApi,
-  InvokeContractV1Request,
-  InvokeContractV1Response,
-} from "../generated/openapi/typescript-axios";
+import { DefaultApi, NodeInfo } from "../generated/openapi/typescript-axios";
 
-export interface IInvokeContractEndpointV1Options {
+export interface INetworkMapEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
 }
 
-export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
+export class NetworkMapEndpointV1 implements IWebServiceEndpoint {
   private readonly log: Logger;
   private readonly apiUrl?: string;
 
-  constructor(public readonly opts: IInvokeContractEndpointV1Options) {
-    const fnTag = "InvokeContractEndpointV1#constructor()";
+  constructor(public readonly opts: INetworkMapEndpointV1Options) {
+    const fnTag = "NetworkMapEndpointV1#constructor()";
 
     Checks.truthy(opts, `${fnTag} options`);
 
     this.log = LoggerProvider.getOrCreate({
-      label: "invoke-contract-endpoint-v1",
+      label: "network-map-endpoint-v1",
       level: opts.logLevel || "INFO",
     });
 
@@ -60,9 +56,9 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"] {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map"
     ];
   }
 
@@ -86,13 +82,13 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = "InvokeContractEndpointV1#handleRequest()";
+    const fnTag = "NetworkMapEndpointV1#handleRequest()";
     const verbUpper = this.getVerbLowerCase().toUpperCase();
     this.log.debug(`${verbUpper} ${this.getPath()}`);
 
     try {
       if (this.apiUrl === undefined) throw "apiUrl option is necessary";
-      const resBody = await this.callInternalContainer(req.body);
+      const resBody = await this.callInternalContainer();
       res.status(200);
       res.send(resBody);
     } catch (ex) {
@@ -103,12 +99,10 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
     }
   }
 
-  async callInternalContainer(
-    req: InvokeContractV1Request,
-  ): Promise<InvokeContractV1Response> {
+  async callInternalContainer(): Promise<NodeInfo[]> {
     const apiConfig = new Configuration({ basePath: this.apiUrl });
     const apiClient = new DefaultApi(apiConfig);
-    const res = await apiClient.invokeContractV1(req);
+    const res = await apiClient.networkMapV1();
     return res.data;
   }
 }

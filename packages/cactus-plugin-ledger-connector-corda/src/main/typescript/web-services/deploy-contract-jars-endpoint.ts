@@ -1,13 +1,10 @@
-import fs from "fs";
-import path from "path";
-
 import { Express, Request, Response } from "express";
-import temp from "temp";
-import { NodeSSH, Config as SshConfig } from "node-ssh";
+import { Config as SshConfig } from "node-ssh";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
+  Configuration,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -26,6 +23,7 @@ import {
 import { IEndpointAuthzOptions } from "@hyperledger/cactus-core-api";
 
 import {
+  DefaultApi,
   DeployContractJarsSuccessV1Response,
   DeployContractJarsV1Request,
 } from "../generated/openapi/typescript-axios/api";
@@ -39,6 +37,7 @@ export interface IDeployContractEndpointOptions {
   cordaStartCmd?: string;
   cordaStopCmd?: string;
   authorizationOptionsProvider?: AuthorizationOptionsProvider;
+  apiUrl?: string;
 }
 
 const K_DEFAULT_AUTHORIZATION_OPTIONS: IEndpointAuthzOptions = {
@@ -51,6 +50,7 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
 
   private readonly log: Logger;
   private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
+  private readonly apiUrl?: string;
 
   public get className(): string {
     return DeployContractJarsEndpoint.CLASS_NAME;
@@ -71,6 +71,7 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
       AuthorizationOptionsProvider.of(K_DEFAULT_AUTHORIZATION_OPTIONS, level);
 
     this.log.debug(`Instantiated ${this.className} OK`);
+    this.apiUrl = options.apiUrl;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -126,7 +127,8 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
     this.log.debug(`${verb} ${thePath} handleRequest()`);
 
     try {
-      const body = await this.doDeploy(req.body);
+      if (this.apiUrl === undefined) throw "apiUrl option is necessary";
+      const body = await this.callInternalContainer(req.body);
       res.status(200);
       res.json(body);
     } catch (ex) {
@@ -140,75 +142,12 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
     }
   }
 
-  private async doDeploy(
-    reqBody: DeployContractJarsV1Request,
+  async callInternalContainer(
+    req: DeployContractJarsV1Request,
   ): Promise<DeployContractJarsSuccessV1Response> {
-    const fnTag = `${this.className}#doDeploy()`;
-    this.log.debug(`ENTER doDeploy()`);
-
-    if (!Array.isArray(reqBody.jarFiles)) {
-      throw new TypeError(`${fnTag} expected req.files to be an array`);
-    }
-
-    const { sshConfigAdminShell, corDappsDir: cordappDir } = this.options;
-    const ssh = new NodeSSH();
-    try {
-      const resBody: DeployContractJarsSuccessV1Response = {
-        deployedJarFiles: [],
-      };
-
-      temp.track();
-      const prefix = `hyperledger-cactus-${this.className}`;
-      const tmpDirPath = temp.mkdirSync(prefix);
-
-      await ssh.connect(sshConfigAdminShell);
-
-      await this.stopCordaNode(ssh);
-
-      for (const aJarFile of reqBody.jarFiles) {
-        const localFilePath = path.join(tmpDirPath, aJarFile.filename);
-        const remoteFilePath = path.join(cordappDir, aJarFile.filename);
-
-        fs.writeFileSync(localFilePath, aJarFile.contentBase64, "base64");
-
-        this.log.debug(`SCP from/to %o => %o`, localFilePath, remoteFilePath);
-        await ssh.putFile(localFilePath, remoteFilePath);
-        this.log.debug(`SCP OK %o`, remoteFilePath);
-      }
-
-      await this.startCordaNode(ssh);
-
-      fs.rmdirSync(tmpDirPath, { recursive: true });
-
-      this.log.debug(`EXIT doDeploy()`);
-      return resBody;
-    } finally {
-      ssh.dispose();
-      temp.cleanup();
-    }
-  }
-
-  private async stopCordaNode(ssh: NodeSSH): Promise<void> {
-    const fnTag = `${this.className}#stopCordaNode()`;
-    Checks.truthy(ssh.isConnected, `${fnTag} ssh.isConnected`);
-    const cmd = this.options.cordaStopCmd || "sudo systemctl stop corda";
-    try {
-      const response = await ssh.execCommand(cmd);
-      this.log.debug(`${fnTag} stopped Corda node OK `, response);
-    } catch (ex) {
-      this.log.error(`${fnTag} stopping of Corda node failed`, ex);
-    }
-  }
-
-  private async startCordaNode(ssh: NodeSSH): Promise<void> {
-    const fnTag = `${this.className}#startCordaNode()`;
-    Checks.truthy(ssh.isConnected, `${fnTag} ssh.isConnected`);
-    const cmd = this.options.cordaStartCmd || "sudo systemctl start corda";
-    try {
-      const response = await ssh.execCommand(cmd);
-      this.log.debug(`${fnTag} started Corda node OK `, response);
-    } catch (ex) {
-      this.log.error(`${fnTag} starting of Corda node failed`, ex);
-    }
+    const apiConfig = new Configuration({ basePath: this.apiUrl });
+    const apiClient = new DefaultApi(apiConfig);
+    const res = await apiClient.deployContractJarsV1(req);
+    return res.data;
   }
 }
