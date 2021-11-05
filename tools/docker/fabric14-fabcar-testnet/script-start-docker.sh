@@ -1,7 +1,7 @@
 # Copyright 2020-2021 Hyperledger Cactus Contributors
 # SPDX-License-Identifier: Apache-2.0
 echo "[process] start docker environment for Fabric testnet"
-curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.1 1.4.1 0.4.22
+curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.12 1.4.9 0.4.22
 
 if [ -d fabric-samples/fabcar/javascript/wallet ]; then
   rm -r fabric-samples/fabcar/javascript/wallet
