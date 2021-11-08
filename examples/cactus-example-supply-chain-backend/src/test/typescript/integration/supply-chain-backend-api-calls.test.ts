@@ -28,6 +28,11 @@ test("Supply chain backend API calls can be executed", async (t: Test) => {
   const exampleConfig = configService.newExampleConfig();
   t.ok(exampleConfig, "configService.newExampleConfig() truthy OK");
 
+  // TODO: Investigate the explanation for this when we have more time, for
+  // now I just hacked it so that it does not look for a .config file on the FS.
+  // @see: https://github.com/hyperledger/cactus/issues/1516
+  exampleConfig.configFile = "";
+
   // FIXME - this hack should not be necessary, we need to re-think how we
   // do configuration parsing. The convict library may not be the path forward.
   exampleConfig.authorizationConfigJson = (JSON.stringify(
