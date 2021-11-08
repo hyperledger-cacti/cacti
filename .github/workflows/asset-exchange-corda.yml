@@ -71,7 +71,7 @@ jobs:
         
       # FABRIC CLI
       - name: Setup Corda CLI init
-        run: ./scripts/initAsset.sh
+        run: ./scripts/initAsset.sh 1
         working-directory: samples/corda/corda-simple-application
         
       - name: Asset Exchange Corda CLI Tests
@@ -172,7 +172,7 @@ jobs:
         
       # FABRIC CLI
       - name: Setup Corda CLI init
-        run: ./scripts/initAsset.sh
+        run: ./scripts/initAsset.sh 1
         working-directory: samples/corda/corda-simple-application
         
       - name: Asset Exchange Corda CLI Tests
@@ -279,7 +279,7 @@ jobs:
         
       # FABRIC CLI
       - name: Setup Corda CLI init
-        run: ./scripts/initHouseToken.sh
+        run: ./scripts/initHouseToken.sh 1
         working-directory: samples/corda/corda-simple-application
         
       - name: House Token Exchange Corda CLI Tests
