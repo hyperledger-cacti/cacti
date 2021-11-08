@@ -747,7 +747,7 @@ export class PluginLedgerConnectorBesu
 
   public async deployContract(
     req: DeployContractSolidityBytecodeV1Request,
-  ): Promise<RunTransactionResponse> {
+  ): Promise<DeployContractSolidityBytecodeV1Response> {
     const fnTag = `${this.className}#deployContract()`;
     Checks.truthy(req, `${fnTag} req`);
     if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
@@ -827,7 +827,13 @@ export class PluginLedgerConnectorBesu
           `${fnTag} Cannot create an instance of the contract because the contractName and the contractName on the keychain does not match`,
         );
       }
-      return runTxResponse;
+
+      // creating solidity byte code response
+      const deployResponse: DeployContractSolidityBytecodeV1Response = {
+        transactionReceipt: runTxResponse.transactionReceipt,
+      };
+
+      return deployResponse;
     }
     throw new Error(
       `${fnTag} Cannot deploy contract without keychainId and the contractName`,
