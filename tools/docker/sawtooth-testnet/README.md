@@ -13,7 +13,7 @@
 ## How to build
 - Execute the following command, then the docker containers will be launched.
 	```
-	./script-start-ledger.sh
+	./script-start-docker.sh
 	```
 - If the following containers appear when you display the container list with the command `docker ps`, it will be fine.
 	```
