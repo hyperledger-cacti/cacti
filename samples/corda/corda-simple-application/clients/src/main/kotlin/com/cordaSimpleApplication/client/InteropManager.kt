@@ -53,7 +53,11 @@ class RequestStateCommand : CliktCommand(help = "Requests state from a foreign n
                 rpc.proxy, 
                 localRelayAddress, 
                 externalStateAddress,
-                networkName
+                networkName,
+                config["RELAY_TLS"]!!.toBoolean(),
+                config["RELAY_TLSCA_TRUST_STORE"]!!,
+                config["RELAY_TLSCA_TRUST_STORE_PASSWORD"]!!,
+                config["RELAY_TLSCA_CERT_PATHS"]!!
             ).fold({
                 println("Error in Interop Flow: ${it.message}")
             }, {

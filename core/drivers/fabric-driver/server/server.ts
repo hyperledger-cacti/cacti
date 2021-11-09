@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import fs from 'fs';
 import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
 import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
 import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
@@ -77,10 +78,22 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
     if (!process.env.RELAY_ENDPOINT) {
         throw new Error('RELAY_ENDPOINT is not set.');
     }
-    const client = new datatransfer_grpc_pb.DataTransferClient(
-        process.env.RELAY_ENDPOINT,
-        credentials.createInsecure(),
-    );
+    let client;
+    if (process.env.RELAY_TLS === 'true') {
+        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+        }
+        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+        client = new datatransfer_grpc_pb.DataTransferClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createSsl(rootCert)
+        );
+    } else {
+        client = new datatransfer_grpc_pb.DataTransferClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createInsecure()
+        );
+    }
     const cert = Certificate.fromPEM(Buffer.from(query.getCertificate()));
     const orgName = cert.issuer.organizationName;
     // Invokes the fabric network
@@ -171,8 +184,26 @@ const configSetup = async () => {
 
 // SERVER: Start the server with the provided url.
 // TODO: We should have credentials locally to ensure that the driver can only communicate with the local relay.
-server.bindAsync(`${process.env.DRIVER_ENDPOINT}`, ServerCredentials.createInsecure(), (cb) => {
-    configSetup().then(() => {
-        server.start();
+if (process.env.DRIVER_TLS === 'true') {
+    if (!(process.env.DRIVER_TLS_CERT_PATH && fs.existsSync(process.env.DRIVER_TLS_CERT_PATH) &&
+         (process.env.DRIVER_TLS_KEY_PATH && fs.existsSync(process.env.DRIVER_TLS_KEY_PATH)))) {
+        throw new Error("Missing or invalid Driver TLS credentials");
+    }
+    const keyCertPair = {
+        cert_chain: fs.readFileSync(process.env.DRIVER_TLS_CERT_PATH),
+        private_key: fs.readFileSync(process.env.DRIVER_TLS_KEY_PATH)
+    };
+    server.bindAsync(`${process.env.DRIVER_ENDPOINT}`, ServerCredentials.createSsl(null, [ keyCertPair ], false), (cb) => {
+        configSetup().then(() => {
+            console.log('Starting server with TLS');
+            server.start();
+        });
     });
-});
+} else {
+    server.bindAsync(`${process.env.DRIVER_ENDPOINT}`, ServerCredentials.createInsecure(), (cb) => {
+        configSetup().then(() => {
+            console.log('Starting server without TLS');
+            server.start();
+        });
+    });
+}

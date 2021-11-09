@@ -2,8 +2,6 @@ buildscript {
     Properties constants = new Properties()
     file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
 
-    file("$projectDir/./github.properties").withInputStream { constants.load(it) }
-
     ext {
         corda_release_group = constants.getProperty("cordaReleaseGroup")
         corda_core_release_group =  constants.getProperty("cordaCoreReleaseGroup")
@@ -17,9 +15,9 @@ buildscript {
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
         arrow_version = constants.getProperty("arrowVersion")
         weaver_version = constants.getProperty("weaverVersion")
-        github_username = constants.getProperty("username")
-        github_password = constants.getProperty("password")
-        github_url = constants.getProperty("url")
+        github_username = ""
+        github_password = ""
+        github_url = ""
     }
 
     repositories {
@@ -57,11 +55,24 @@ allprojects {
         maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
         maven { url 'https://software.r3.com/artifactory/corda' }
         maven { url 'https://jitpack.io' }
-        maven {
-            url github_url
-            credentials {
-                username github_username
-                password github_password
+        if (file("$projectDir/./github.properties").exists()) {
+            Properties constants = new Properties()
+            file("$projectDir/./github.properties").withInputStream { constants.load(it) }
+            github_username = constants.getProperty("username")
+            github_password = constants.getProperty("password")
+            github_url = constants.getProperty("url")
+            maven {
+                url github_url
+                credentials {
+                    username github_username
+                    password github_password
+                }
+            }
+        }
+        else {
+            flatDir {
+                dirs '../../../common/protos-java-kt/build/libs'
+                dirs '../../../../common/protos-java-kt/build/libs'
             }
         }
     }
