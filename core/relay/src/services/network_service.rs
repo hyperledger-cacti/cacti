@@ -5,10 +5,9 @@ use crate::pb::common::state::{request_state, RequestState};
 use crate::pb::networks::networks::network_server::Network;
 use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase};
 use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
-use crate::relay_proto::parse_address;
+use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
 use crate::db::Database;
-use crate::error;
 
 // External modules
 use config;
@@ -17,6 +16,8 @@ use tokio::sync::RwLock;
 use tonic::{Code, Request, Response, Status};
 use uuid::Uuid;
 use base64::{encode, decode};
+
+use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
 pub struct NetworkService {
     pub config_lock: RwLock<config::Config>,
@@ -139,11 +140,8 @@ impl Network for NetworkService {
                     conf,
                     network_query,
                     request_id.to_string(),
-                    format!(
-                        "{}:{}",
-                        address.location.hostname.to_string(),
-                        address.location.port.to_string()
-                    ),
+                    address.location.hostname.to_string(),
+                    address.location.port.to_string()
                 );
                 // Send Ack back to network while request is happening in a thread
                 let reply = Ack {
@@ -173,9 +171,10 @@ fn spawn_send_request(
     conf: config::Config,
     network_query: NetworkQuery,
     request_id: String,
-    relay_address: String,
+    relay_host: String,
+    relay_port: String,
 ) {
-    println!("Sending Query to remote relay: {:?}", relay_address);
+    println!("Sending Query to remote relay: {:?}:{:?}", relay_host, relay_port);
     // Locally scoped function to update request status in db. This function is
     // called for the first time after an Ack is received from the remote relay.
     // A locally created RequestState with status Pending or Error is stored.
@@ -206,11 +205,26 @@ fn spawn_send_request(
     tokio::spawn(async move {
         let db_path = conf.get_str("db_path").unwrap();
 
+        // Iterate through the relay entries in the configuration to find a match
+        let relays_table = conf.get_table("relays").unwrap();
+        let mut relay_tls = false;
+        let mut relay_tlsca_cert_path = "".to_string();
+        for (_relay_name, relay_spec) in relays_table {
+            let relay_uri = relay_spec.clone().try_into::<LocationSegment>().unwrap();
+            if relay_host == relay_uri.hostname && relay_port == relay_uri.port {
+                relay_tls = relay_uri.tls;
+                relay_tlsca_cert_path = relay_uri.tlsca_cert_path;
+            }
+        }
+
         let result = data_transfer_call(
             conf.get_str("name").unwrap(),
-            relay_address,
+            relay_host,
+            relay_port,
             network_query,
             request_id.clone(),
+            relay_tls,
+            relay_tlsca_cert_path.to_string(),
         )
         .await;
         println!("Received Ack from remote relay: {:?}\n", result);
@@ -259,12 +273,32 @@ fn spawn_send_request(
 // Call to remote relay for the data transfer protocol.
 async fn data_transfer_call(
     relay_name: String,
-    relay_address: String,
+    relay_host: String,
+    relay_port: String,
     network_query: NetworkQuery,
     request_id: String,
-) -> Result<Response<Ack>, error::Error> {
-    let client_addr = format!("http://{}", relay_address);
-    let mut client = DataTransferClient::connect(client_addr).await?;
+    use_tls: bool,
+    tlsca_cert_path: String,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let client_addr = format!("http://{}:{}", relay_host, relay_port);
+    let mut client;
+    if use_tls {
+        let pem = tokio::fs::read(tlsca_cert_path).await?;
+        let ca = Certificate::from_pem(pem);
+
+        let tls = ClientTlsConfig::new()
+            .ca_certificate(ca)
+            .domain_name(relay_host);
+
+        let channel = Channel::from_shared(client_addr)?
+            .tls_config(tls)
+            .connect()
+            .await?;
+
+        client = DataTransferClient::new(channel);
+    } else {
+        client = DataTransferClient::connect(client_addr).await?;
+    }
     let query_request = tonic::Request::new(Query {
         policy: network_query.policy,
         address: network_query.address,

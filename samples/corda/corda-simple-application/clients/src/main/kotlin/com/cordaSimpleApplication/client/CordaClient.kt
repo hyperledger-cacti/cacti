@@ -19,6 +19,10 @@ class App : CliktCommand() {
     override fun run() {
         config["CORDA_HOST"] = System.getenv("CORDA_HOST") ?: "localhost"
         config["CORDA_PORT"] = System.getenv("CORDA_PORT") ?: "10006"
+        config["RELAY_TLS"] = System.getenv("RELAY_TLS") ?: "false"
+        config["RELAY_TLSCA_TRUST_STORE"] = System.getenv("RELAY_TLSCA_TRUST_STORE") ?: ""
+        config["RELAY_TLSCA_TRUST_STORE_PASSWORD"] = System.getenv("RELAY_TLSCA_TRUST_STORE_PASSWORD") ?: ""
+        config["RELAY_TLSCA_CERT_PATHS"] = System.getenv("RELAY_TLSCA_CERT_PATHS") ?: ""
     }
 }
 

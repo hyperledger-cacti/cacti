@@ -39,7 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let relay_name = settings.get_str("name").expect("No Relay name provided");
     println!("Relay Name: {:?}", relay_name);
     let relay_port = settings.get_str("port").expect(&format!("Port does not exist for relay name {}. Make sure the config file <{}> has the name and port specified.", relay_name, config_file_name.to_string()));
-    let host = settings.get_str("host").unwrap_or("localhost".to_string());
+    let host = settings.get_str("hostname").unwrap_or("localhost".to_string());
 
     let with_tls = settings.get_bool("tls").unwrap_or(false);
     // Converts port to a valid socket address

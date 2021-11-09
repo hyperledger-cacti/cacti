@@ -16,12 +16,30 @@ NOTE: Minimum requirement of npm v5.0 for patch-package to apply the patch for t
 
 ### Setup
 
-The .env (check .env.template, more information [here](#Environment-variables)) and config.json files need to be checked and updated to match the network and relay that it will be connecting to.
+Create a `.env` file using `.env.template` as the base and setting suitable environment variable values (see [here](#Environment-variables)) and `config.json` files need to be checked and updated to match the network and relay that it will be connecting to.
 The .env contains information related to the network and relay. The config.json contains information about the ca admin, user and its org, that is used when connecting to the network.
+
+#### Enabling TLS
+
+If the relay is TLS-enabled, set the following values in the `.env`:
+```
+RELAY_TLS=true
+RELAY_TLSCA_CERT_PATH=path_to_tls_ca_cert_pem_for_relay
+```
+- `path_to_tls_ca_cert_pem_for_relay` should be set to CA certificate file path
+
+To enforce secure communication over TLS with your driver, set the following values in the `.env`:
+```
+DRIVER_TLS=true
+DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
+DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver
+```
+- `path_to_tls_cert_pem_for_driver` should be set to driver's TLS certificate file path
+- `path_to_tls_key_pem_for_driver` should be set to driver's TLS private key file path
 
 ### Running
 
-To do a full build run then `make build-local`. This update/clones protos, generates js protos and compiles typescript.
+To do a full build run then `make build-local`. This update/clones protos, generates js protos and compiles TypeScript.
 
 For tsc compilation in watch mode: `npm run watch`
 

@@ -385,6 +385,8 @@ const interopFlow = async (
     interopJSONs: Array<InteropJSON>,
     keyCert: { key: ICryptoKey; cert: any },
     returnWithoutLocalInvocation: boolean = false,
+    useTls: boolean = false,
+    tlsRootCACertPaths?: Array<string>,
 ): Promise<{ views: Array<any>; result: any }> => {
     if (interopArgIndices.length !== interopJSONs.length) {
         throw new Error(`Number of argument indices ${interopArgIndices.length} does not match number of view addresses ${interopJSONs.length}`);
@@ -399,7 +401,9 @@ const interopFlow = async (
                 org,
                 localRelayEndpoint,
                 interopJSONs[i],
-                keyCert
+                keyCert,
+                useTls,
+                tlsRootCACertPaths
             ),
         );
         if (requestResponseError) {
@@ -497,6 +501,8 @@ const getRemoteView = async (
     localRelayEndpoint: string,
     interopJSON: InteropJSON,
     keyCert: { key: ICryptoKey; cert: any },
+    useTls: boolean = false,
+    tlsRootCACertPaths?: Array<string>,
 ): Promise<{ view: any; address: any }> => {
     const {
         address,
@@ -523,7 +529,7 @@ const getRemoteView = async (
     if (policyCriteriaError) {
         throw new Error(`InteropFlow failed to get policy criteria: ${policyCriteriaError}`);
     }
-    const relay = new Relay(localRelayEndpoint);
+    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
     const uuidValue = uuidv4();
     // Step 3
     // TODO fix types here so can return proper view
