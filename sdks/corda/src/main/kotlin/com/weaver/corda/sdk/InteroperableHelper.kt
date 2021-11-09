@@ -9,7 +9,18 @@ package com.weaver.corda.sdk;
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
+import io.grpc.okhttp.OkHttpChannelBuilder
+import javax.net.ssl.SSLContext
+import java.io.ByteArrayInputStream
+import java.io.FileInputStream
+import java.io.File
+import java.io.StringReader
+import java.security.KeyStore
+import java.security.cert.CertificateFactory
+import javax.net.ssl.TrustManagerFactory
+import org.bouncycastle.util.io.pem.PemReader
 import java.lang.Exception
 import kotlinx.coroutines.*
 import java.util.*
@@ -38,15 +49,15 @@ class InteroperableHelper {
             channelName: String,
             chaincodeName: String,
             ccFunc: String,
-            ccFuncArgs: String            
+            ccFuncArgs: String
         ): String {
             val resource = channelName +
                             ":" + chaincodeName + 
                             ":" + ccFunc +
                             ":" + ccFuncArgs
-            return remoteRelayEndpoint + "/" + securityDomain + "/" + resource            
+            return remoteRelayEndpoint + "/" + securityDomain + "/" + resource
         }
-        
+
         /**
          * Function to create an view address for interop call to a corda network.
          */
@@ -63,7 +74,62 @@ class InteroperableHelper {
                             ":" + remoteFlowArgs
             return remoteRelayEndpoint + "/" + securityDomain + "/" + resource
         }
-        
+
+        /**
+         * Function to create a ManagedChannel for a GRPC connection to the relay.
+         * The channel can be insecure or secure (TLS connection) depending on the supplied parameters.
+         */
+        @JvmStatic
+        fun getChannelToRelay (
+            localRelayHost: String,
+            localRelayPort: Int,
+            useTlsForRelay: Boolean,
+            relayTlsTrustStorePath: String,
+            relayTlsTrustStorePassword: String,
+            tlsCACertPathsForRelay: String
+        ): ManagedChannel {
+            if (useTlsForRelay) {
+                var trustStore: KeyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+                if (relayTlsTrustStorePath.length > 0) {
+                    if (relayTlsTrustStorePassword.length == 0) {
+                        throw Exception("Password not supplied for JKS trust store")
+                    }
+                    val trustStream = FileInputStream(relayTlsTrustStorePath)
+                    trustStore.load(trustStream, relayTlsTrustStorePassword.toCharArray())
+                } else if (tlsCACertPathsForRelay.length > 0) {
+                    trustStore.load(null, null)
+                    val tlsCACertPaths = tlsCACertPathsForRelay.split(":")
+                    var tlsCACertCounter = 0
+                    for (tlsCACertPath in tlsCACertPaths) {
+                        val certFactory = CertificateFactory.getInstance("X509")
+                        val certContents = File(tlsCACertPath).readText()
+                        val certReader = PemReader(StringReader(certContents)).readPemObject().getContent()
+                        val certStream = ByteArrayInputStream(certReader)
+                        val cert = certFactory.generateCertificate(certStream)
+                        trustStore.setCertificateEntry("ca-cert-" + tlsCACertCounter, cert)
+                        tlsCACertCounter++
+                    }
+                } else {
+                    throw Exception("Neither JKS trust store supplied nor CA certificate paths")
+                }
+                val tmFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+                tmFactory.init(trustStore)
+                val trustManagers = tmFactory.getTrustManagers()
+                val sslContext = SSLContext.getInstance("TLS")
+                sslContext.init(null, trustManagers, null)
+                return OkHttpChannelBuilder.forAddress(localRelayHost, localRelayPort)
+                        .useTransportSecurity()
+                        .sslSocketFactory(sslContext.getSocketFactory())
+                        .executor(Dispatchers.Default.asExecutor())
+                        .build()
+            } else {
+                return ManagedChannelBuilder.forAddress(localRelayHost, localRelayPort)
+                        .usePlaintext()
+                        .executor(Dispatchers.Default.asExecutor())
+                        .build()
+            }
+        }
+
         /**
          * Make an interop call through relay, and passes it to WriteExternalState
          * to verify the proof and write it to vault.
@@ -76,20 +142,32 @@ class InteroperableHelper {
          * list of getExternalState functions below.
          */
         @JvmStatic
-        fun interopFlow (
+        @JvmOverloads fun interopFlow (
             proxy: CordaRPCOps,
             localRelayEndpoint: String,
             externalStateAddress: String,
-            networkName: String
+            networkName: String,
+            useTlsForRelay: Boolean = false,
+            relayTlsTrustStorePath: String = "",
+            relayTlsTrustStorePassword: String = "",
+            tlsCACertPathsForRelay: String = ""
         ): Either<Error, String> {
             val localRelayHost = localRelayEndpoint.split(":").first()
             val localRelayPort = localRelayEndpoint.split(":").last().toInt()
-            val client = RelayClient(
-                ManagedChannelBuilder.forAddress(localRelayHost, localRelayPort)
-                        .usePlaintext()
-                        .executor(Dispatchers.Default.asExecutor())
-                        .build()
-            )
+            var channel: ManagedChannel
+            try {
+                channel = getChannelToRelay(
+                    localRelayHost,
+                    localRelayPort,
+                    useTlsForRelay,
+                    relayTlsTrustStorePath,
+                    relayTlsTrustStorePassword,
+                    tlsCACertPathsForRelay)
+            } catch(e: Exception) {
+                logger.error("Error creating channel to relay: ${e.message}\n")
+                return Left(Error("Error creating channel to relay: ${e.message}\n"))
+            }
+            val client = RelayClient(channel)
             var result: Either<Error, String> = Left(Error(""))
             runBlocking {
                 val eitherErrorQuery = constructNetworkQuery(proxy, externalStateAddress, networkName)

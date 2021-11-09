@@ -6,6 +6,7 @@
 
 package com.weaver.corda.driver
 
+import java.io.File
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import kotlinx.coroutines.*
@@ -21,10 +22,23 @@ import com.weaver.protos.driver.driver.DriverCommunicationGrpcKt
  * dispatching them to the correct network node and returning an Ack to the requesting gRPC client.
  */
 class GrpcServer(private val port: Int) {
-    val server: Server = ServerBuilder
-        .forPort(port)
-        .addService(GrpcService())
-        .build()
+    val server: Server
+    val useTlsForDriver = (System.getenv("DRIVER_TLS")?.toBoolean() ?: false)
+
+    init {
+        if (useTlsForDriver) {
+            server = ServerBuilder
+                .forPort(port)
+                .useTransportSecurity(File(System.getenv("DRIVER_CERT_PATH")?.toString() ?: ""), File(System.getenv("DRIVER_KEY_PATH")?.toString() ?: ""))
+                .addService(GrpcService())
+                .build()
+        } else {
+            server = ServerBuilder
+                .forPort(port)
+                .addService(GrpcService())
+                .build()
+        }
+    }
 
     /**
      * The start() method is used to bring up the gRPC server of the driver.

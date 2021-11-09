@@ -93,7 +93,7 @@ A Corda distributed application's business logic code spans three layers as illu
             val response = InteroperableHelper.interopFlow(
                 proxy,                                // CordaRPCOps instance to start flows
                 viewAddress,
-                <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
+                <trade-finance-relay-url>[:<port>]   // Replace with local network's relay address and port
             ).fold({
                 println("Error in Interop Flow: ${it.message}")
             }, {
@@ -370,3 +370,32 @@ To prepare your network for interoperation with a foreign network, you need to r
   _Note_: security group configurations (organization lists and their certificate chains) for any Fabric/Corda network are subject to change, so you should run the above procedure periodically in a loop.
 
 Your Corda network is now up and running with the necessary Weaver components, and your network's vault is bootstrapped with the initial configuration necessary for cross-network interactions!
+
+
+<!-- 
+[Some text for enabling TLS, uncomment it when TLS is fully implemented. Planning to release version 1.2.4 along with doc update. Current doc works fine with version 1.2.3 specified below.]
+
+By default, the TLS is set to false in `interopFlow`, i.e. disabled. But if you want to enable TLS, can pass additional parameters to the `interopFlow` function as follows:
+```kt
+val response = InteroperableHelper.interopFlow(
+    proxy,                                // CordaRPCOps instance to start flows
+    viewAddress,
+    <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
+    'trade-finance-network',              // Local network name (destination)
+    true,                                 // Boolean indication TLS is enabled.
+    <relayTlsTrustStorePath>              // JKS file path containing relay server TLS CA certificates
+    <relayTlsTrustStorePassword>          // password used to create the JKS file
+)
+```
+OR
+```kt
+val response = InteroperableHelper.interopFlow(
+    proxy,                                // CordaRPCOps instance to start flows
+    viewAddress,
+    <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
+    'trade-finance-network',              // Local network name (destination)
+    true,                                 // Boolean indication TLS is enabled.
+    <tlsCACertPathsForRelay>              // colon-separated list of CA certificate file paths
+)
+```
+-->
