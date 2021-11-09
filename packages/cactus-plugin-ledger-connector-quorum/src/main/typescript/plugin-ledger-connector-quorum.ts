@@ -575,7 +575,6 @@ export class PluginLedgerConnectorQuorum
     // obtain the contractJSON from keychainPlugin
     const contractStr = await keychainPlugin.get(req.contractName);
     const contractJSON = JSON.parse(contractStr);
-    req.contractJSON = contractJSON;
 
     // deploy the contract
     const receipt = await this.runDeploy(req);

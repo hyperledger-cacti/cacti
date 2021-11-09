@@ -1,39 +1,44 @@
 import { Express, Request, Response } from "express";
 
 import {
+  IWebServiceEndpoint,
+  IExpressRequestHandler,
+  IEndpointAuthzOptions,
+} from "@hyperledger/cactus-core-api";
+
+import {
   Logger,
   Checks,
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
-import {
-  IEndpointAuthzOptions,
-  IExpressRequestHandler,
-  IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
-
+import { DeployContractSolidityBytecodeJsonObjectV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
-import { InvokeContractV1Request } from "../generated/openapi/typescript-axios";
 
-export interface IInvokeContractEndpointOptions {
+export interface IDeployContractSolidityBytecodeJsonObjectOptions {
   logLevel?: LogLevelDesc;
   connector: PluginLedgerConnectorBesu;
 }
 
-export class InvokeContractEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "InvokeContractEndpoint";
+export class DeployContractSolidityBytecodeJsonObjectEndpoint
+  implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME =
+    "DeployContractSolidityBytecodeJsonObjectEndpoint";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return InvokeContractEndpoint.CLASS_NAME;
+    return DeployContractSolidityBytecodeJsonObjectEndpoint.CLASS_NAME;
   }
 
-  constructor(public readonly options: IInvokeContractEndpointOptions) {
+  constructor(
+    public readonly options: IDeployContractSolidityBytecodeJsonObjectOptions,
+  ) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.connector, `${fnTag} arg options.connector`);
@@ -43,9 +48,9 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract"] {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-json-object"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-json-object"
     ];
   }
 
@@ -85,9 +90,9 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody: InvokeContractV1Request = req.body;
+    const reqBody: DeployContractSolidityBytecodeJsonObjectV1Request = req.body;
     try {
-      const resBody = await this.options.connector.getContractInfoKeychain(
+      const resBody = await this.options.connector.deployContractJsonObject(
         reqBody,
       );
       res.json(resBody);

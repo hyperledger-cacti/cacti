@@ -198,10 +198,11 @@ test(testCase, async (t: Test) => {
   const web3EeaMember3 = Web3EEAClient(web3Member3, chainIdMember3);
   t.ok(web3EeaMember3, "web3EeaMember3 truthy OK");
 
-  const deployRes = await connector1.deployContract({
+  const deployRes = await connector1.deployContractJsonObject({
     bytecode: HelloWorldContractJson.bytecode,
     contractAbi: HelloWorldContractJson.abi,
     contractName: HelloWorldContractJson.contractName,
+    contractJSON: HelloWorldContractJson,
     constructorArgs: [],
     privateTransactionConfig: {
       privateFrom: keys.tessera.member1.publicKey,
@@ -214,7 +215,6 @@ test(testCase, async (t: Test) => {
       secret: keys.besu.member1.privateKey,
       type: Web3SigningCredentialType.PrivateKeyHex,
     },
-    keychainId: keychain1.getKeychainId(),
     gas: 3000000,
   });
 

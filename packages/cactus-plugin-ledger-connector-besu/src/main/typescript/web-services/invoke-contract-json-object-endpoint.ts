@@ -17,23 +17,25 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
 
 import OAS from "../../json/openapi.json";
-import { InvokeContractV1Request } from "../generated/openapi/typescript-axios";
+import { InvokeContractJsonObjectV1Request } from "../generated/openapi/typescript-axios";
 
-export interface IInvokeContractEndpointOptions {
+export interface IInvokeContractJsonObjectEndpointOptions {
   logLevel?: LogLevelDesc;
   connector: PluginLedgerConnectorBesu;
 }
 
-export class InvokeContractEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "InvokeContractEndpoint";
+export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "InvokeContractJsonObjectEndpoint";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return InvokeContractEndpoint.CLASS_NAME;
+    return InvokeContractJsonObjectEndpoint.CLASS_NAME;
   }
 
-  constructor(public readonly options: IInvokeContractEndpointOptions) {
+  constructor(
+    public readonly options: IInvokeContractJsonObjectEndpointOptions,
+  ) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.connector, `${fnTag} arg options.connector`);
@@ -43,9 +45,9 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract"] {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract-json-object"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract-json-object"
     ];
   }
 
@@ -85,9 +87,9 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody: InvokeContractV1Request = req.body;
+    const reqBody: InvokeContractJsonObjectV1Request = req.body;
     try {
-      const resBody = await this.options.connector.getContractInfoKeychain(
+      const resBody = await this.options.connector.getContractInfoJsonObject(
         reqBody,
       );
       res.json(resBody);
