@@ -84,15 +84,15 @@ class AssetExchangeHTLCTests {
         preimage
     )
     
-    fun createAssetTx(): StateAndRef<AssetState> {
-        val tmp = partyA.startFlow(CreateAsset("a01", alice))
+    fun createAssetTx(id: String): StateAndRef<AssetState> {
+        val tmp = partyA.startFlow(CreateAsset(id, alice))
         network.runNetwork()
         return tmp.getOrThrow()
     }
     
     @Test
     fun `LockAssetHTLC tests`() {
-        val assetStateRef = createAssetTx()
+        val assetStateRef = createAssetTx("l01")
         
         // UnHappy case: Third party trying to lock asset of alice.
         val futureFail = partyB.startFlow(LockAssetHTLC.Initiator(
@@ -287,9 +287,41 @@ class AssetExchangeHTLCTests {
         })
     }
     
+    @Test
+    fun `QueryHTLC tests`() {
+        var lockId: String = ""
+        
+        lockAsset("q01").map{ id ->
+            lockId = id.toString()
+        }
+        
+        val futureOne = partyB.startFlow(GetAssetExchangeHTLCHashById(
+            lockId
+        ))
+        network.runNetwork()
+        val hash: String = futureOne.getOrThrow().toString(Charsets.UTF_8)
+        assertEquals(hash, "ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=")
+        
+        val tmp = partyB.startFlow(ClaimAssetHTLC.Initiator(
+            lockId,
+            claimInfo,
+            AssetStateContract.Commands.Issue(),
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
+        ))
+        network.runNetwork()
+        
+        val futureTwo = partyA.startFlow(GetAssetExchangeHTLCHashPreImageById(
+            lockId
+        ))
+        network.runNetwork()
+        val hashPreimage: String = futureTwo.getOrThrow().toString(Charsets.UTF_8)
+        assertEquals(hashPreimage, "secrettext")
+    }
+    
     // Helper to successfully lock the asset
-    fun lockAsset(): Either<Error, UniqueIdentifier> {
-        val assetStateRef = createAssetTx()
+    fun lockAsset(id:String = "a01"): Either<Error, UniqueIdentifier> {
+        val assetStateRef = createAssetTx(id)
         // Assert Initial Owner of asset to be alice
         assertEquals(alice, assetStateRef.state.data.owner)
         val future = partyA.startFlow(LockAssetHTLC.Initiator(

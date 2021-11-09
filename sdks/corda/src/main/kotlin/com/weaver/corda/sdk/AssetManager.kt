@@ -209,6 +209,38 @@ class AssetManager {
                 Left(Error("Error querying HTLC state from Corda network: ${e.message}"))
             }
         }
+        
+        @JvmStatic
+        fun getHTLCHashById(
+            proxy: CordaRPCOps,
+            contractId: String
+        ): String? {
+            try {
+                AssetManager.logger.debug("Querying asset-lock HTLC Hash from Corda as part of asset-exchange.\n")
+                val obj = proxy.startFlow(::GetAssetExchangeHTLCHashPreImageById, contractId)
+                        .returnValue.get()
+                return obj.toString(Charsets.UTF_8)
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error querying HTLC Hash from Corda network: ${e.message}\n")
+                return null
+            }
+        }
+        
+        @JvmStatic
+        fun getHTLCHashPreImageById(
+            proxy: CordaRPCOps,
+            contractId: String
+        ): String? {
+            try {
+                AssetManager.logger.debug("Querying asset-lock HTLC Hash PreImage from Corda as part of asset-exchange.\n")
+                val obj = proxy.startFlow(::GetAssetExchangeHTLCHashPreImageById, contractId)
+                        .returnValue.get()
+                return obj.toString(Charsets.UTF_8)
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error querying HTLC Hash PreImage from Corda network: ${e.message}\n")
+                return null
+            }
+        }
 
         fun createAssetExchangeAgreement(
             assetType: String,

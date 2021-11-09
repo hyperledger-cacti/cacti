@@ -12,6 +12,8 @@ import com.weaver.corda.app.interop.contracts.AssetExchangeHTLCStateContract
 import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
 import com.weaver.corda.app.interop.states.AssetLockHTLCData
 import com.weaver.corda.app.interop.states.AssetClaimHTLCData
+import com.weaver.corda.app.interop.contracts.AssetExchangeTxStateContract
+import com.weaver.corda.app.interop.states.AssetExchangeTxState
 
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.CommandData
@@ -259,6 +261,75 @@ class GetAssetExchangeHTLCStateById(
 }
 
 /**
+ * The GetAssetExchangeHTLCStateById flow is used to fetch an existing AssetExchangeHTLCState.
+ *
+ * @property linearId The unique identifier for an AssetExchangeHTLCState.
+ */
+@StartableByRPC
+class GetAssetExchangeHTLCHashById(
+    val contractId: String
+) : FlowLogic<ByteArray>() {
+    /**
+     * The call() method captures the logic to fetch the AssetExchangeHTLCState.
+     *
+     * @return Returns Either<Error, AssetExchangeHTLCState>
+     */
+    @Suspendable
+    override fun call(): ByteArray {
+        val linearId = getLinearIdFromString(contractId)
+        println("Getting AssetExchangeHTLCState for linearId $linearId.")
+        val states = serviceHub.vaultService.queryBy<AssetExchangeHTLCState>(
+            QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+        ).states
+        if (states.isEmpty()) {
+            println("No states found")
+            throw NullPointerException("No such AssetExchangeHTLCState with linearId $linearId exists.")
+        } else {
+            val htlcState = states.first().state.data
+            val hashBase64 = Base64.getEncoder().encodeToString(htlcState.lockInfo.hash.bytes).toByteArray()
+            println("HashBase64: ${hashBase64.toString(Charsets.UTF_8)}")
+            return hashBase64
+        }
+    }
+}
+
+/**
+ * The GetAssetExchangeHTLCStateById flow is used to fetch an existing AssetExchangeHTLCState.
+ *
+ * @property linearId The unique identifier for an AssetExchangeHTLCState.
+ */
+@StartableByRPC
+class GetAssetExchangeHTLCHashPreImageById(
+    val contractId: String
+) : FlowLogic<ByteArray>() {
+    /**
+     * The call() method captures the logic to fetch the AssetExchangeHTLCState.
+     *
+     * @return Returns Either<Error, AssetExchangeHTLCState>
+     */
+    @Suspendable
+    override fun call(): ByteArray {
+        val linearId = getLinearIdFromString(contractId)
+        println("Getting AssetExchangeHTLCState for linearId $linearId.")
+        val states = serviceHub.vaultService.queryBy<AssetExchangeTxState>(
+            QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+        ).states
+        if (states.isEmpty()) {
+            println("No states found")
+            throw NullPointerException("No such transaction exists which consumed AssetExchangeHTLCState with linearId $linearId.")
+        } else {
+            val txId = states.first().state.data.txId
+            val sTx = serviceHub.validatedTransactions.getTransaction(txId)!!
+            val lTx = sTx.tx.toLedgerTransaction(serviceHub)
+            val claimCmd = lTx.commandsOfType<AssetExchangeHTLCStateContract.Commands.Claim>().single()
+            val secret = claimCmd.value.assetClaimHTLC.hashPreimage.bytes
+            println("Hash Pre-Image: ${secret.toString(Charsets.UTF_8)}")
+            return secret
+        }
+    }
+}
+
+/**
  * The ClaimAssetHTLC flow is used to claim a locked asset using HTLC.
  *
  * @property linearId The unique identifier for an AssetExchangeHTLCState.
@@ -380,11 +451,20 @@ object ClaimAssetHTLC {
                 }
             } else if (role == ResponderRole.LOCKER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session))
+                
+                // Record LinearId -> TxId Mapping
                 val lTx = sTx.tx.toLedgerTransaction(serviceHub)
-                val claimCmd = lTx.commandsOfType<AssetExchangeHTLCStateContract.Commands.Claim>().single()
-                val secret = claimCmd.value.assetClaimHTLC.hashPreimage.bytes.toString(Charsets.UTF_8)
-                println("Hash Pre-Image: ${secret}")
+                val htlcState = lTx.inputs[0].state.data as AssetExchangeHTLCState
+                val txState = AssetExchangeTxState(sTx.id, ourIdentity, htlcState.linearId)
+                val txBuilder = TransactionBuilder(sTx.notary)
+                        .addOutputState(txState, AssetExchangeTxStateContract.ID)
+                        .addCommand(Command(AssetExchangeTxStateContract.Commands.SaveClaimTx(), ourIdentity.owningKey))
+                txBuilder.verify(serviceHub)
+                val sTx2 = serviceHub.signInitialTransaction(txBuilder)
+                val storedTxStateTx = subFlow(FinalityFlow(sTx2, listOf<FlowSession>()))
+                
                 println("Locker Received Tx: ${sTx} and recorded relevant states.")
+                println("Stored LinearId -> TxID mappign with Tx: ${storedTxStateTx}.")
                 return sTx
             } else if (role == ResponderRole.OBSERVER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
