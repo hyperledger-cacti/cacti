@@ -1,8 +1,6 @@
-import test, { Test } from "tape-promise/tape";
+import * as apiSurface from "../../../main/typescript/public-api";
+import "jest-extended";
 
-import * as publicApi from "../../../main/typescript/public-api";
-
-test("Library can be loaded", (t: Test) => {
-  t.ok(publicApi);
-  t.end();
+test("Library can be loaded", async () => {
+  expect(apiSurface).toBeTruthy();
 });

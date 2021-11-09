@@ -1,11 +1,6 @@
-import test, { Test } from "tape-promise/tape";
+import * as apiSurface from "../../../main/typescript/public-api";
+import "jest-extended";
 
-import { PluginFactoryHTLCCoordinatorBesu } from "../../../main/typescript/public-api";
-
-test("Library can be loaded", (t: Test) => {
-  t.ok(
-    PluginFactoryHTLCCoordinatorBesu,
-    "PluginFactoryHTLCCoordinatorBesu truthy OK",
-  );
-  t.end();
+test("Library can be loaded", async () => {
+  expect(apiSurface).toBeTruthy();
 });

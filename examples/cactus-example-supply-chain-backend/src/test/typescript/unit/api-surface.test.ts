@@ -1,7 +1,6 @@
-import test, { Test } from "tape";
-import * as publicApi from "../../../main/typescript/public-api";
+import * as apiSurface from "../../../main/typescript/public-api";
+import "jest-extended";
 
-test("Public API module can be loaded", (t: Test) => {
-  t.plan(1);
-  t.ok(publicApi);
+test("Public API module can be loaded", () => {
+  expect(apiSurface).toBeTruthy();
 });
