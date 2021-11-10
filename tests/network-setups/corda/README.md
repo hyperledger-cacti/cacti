@@ -37,6 +37,8 @@ Necessary information includes:
 
 ## Requirements
 
+**Docker-Compose: Version 1.28.2 or above**
+
 The simple state and interoperation CorDapps can be sourced either from the
 local file system or from Github Packages.
 

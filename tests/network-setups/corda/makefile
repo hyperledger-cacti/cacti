@@ -2,7 +2,7 @@ APP_NAME ?= simple
 PROFILE ?= 1-node
 
 start: github.properties
-	# Network2
+	# Network1
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh $(APP_NAME)
 	./scripts/start-nodes.sh $(APP_NAME) $(PROFILE)
@@ -15,7 +15,7 @@ start: github.properties
 	./scripts/check-nodes-status.sh $(PROFILE) Corda_Network2
 	
 start-local:
-	# Network2
+	# Network1
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh $(APP_NAME) local
 	./scripts/start-nodes.sh $(APP_NAME) $(PROFILE)
