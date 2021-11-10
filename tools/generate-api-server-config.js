@@ -1,8 +1,6 @@
-const fs = require("fs");
-const inquirer = require("inquirer");
-const {
-  ConfigService,
-} = require("../packages/cactus-cmd-api-server/dist/lib/main/typescript/config/config-service");
+import fs from "fs";
+import inquirer from "inquirer";
+import { ConfigService } from "../packages/cactus-cmd-api-server/dist/lib/main/typescript/config/config-service.js";
 
 const main = async () => {
   const configService = new ConfigService();
@@ -23,7 +21,7 @@ const main = async () => {
       console.log(`Written generated config to: ${config.configFile}`);
     } else {
       console.log(
-        `You opted to not overwrite the previous configuration file at ${config.configFile}, skipping...`
+        `You opted to not overwrite the previous configuration file at ${config.configFile}, skipping...`,
       );
     }
   } else {
@@ -32,7 +30,7 @@ const main = async () => {
   }
   const apiServerCmd = `node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=${config.configFile}`;
   console.log(
-    `You can start the Cactus API server with ${config.configFile} by executing this from the project root:`
+    `You can start the Cactus API server with ${config.configFile} by executing this from the project root:`,
   );
   console.log(apiServerCmd);
 };

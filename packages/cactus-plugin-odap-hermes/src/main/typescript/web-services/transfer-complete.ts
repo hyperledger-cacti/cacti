@@ -1,5 +1,10 @@
-import type { Express, Request, Response } from "express";
+import { Express, Request, Response } from "express";
 
+import {
+  IWebServiceEndpoint,
+  IExpressRequestHandler,
+  IEndpointAuthzOptions,
+} from "@hyperledger/cactus-core-api";
 import {
   Logger,
   Checks,
@@ -7,59 +12,57 @@ import {
   LoggerProvider,
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
-import {
-  IEndpointAuthzOptions,
-  IExpressRequestHandler,
-  IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
+import { OdapGateway } from "../gateway/odap-gateway";
+import { TransferCompleteV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
-import { PluginKeychainAwsSm } from "../plugin-keychain-aws-sm";
-import { SetKeychainEntryRequestV1 } from "../generated/openapi/typescript-axios/api";
 
-export interface ISetKeychainEntryEndpointOptions {
+export interface ITransferCompleteEndpointOptions {
   logLevel?: LogLevelDesc;
-  connector: PluginKeychainAwsSm;
+  gateway: OdapGateway;
 }
 
-export class SetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "SetKeychainEntryV1Endpoint";
+export class TransferCompleteEndpointV1 implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "TransferCompleteEndpointV1";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return SetKeychainEntryV1Endpoint.CLASS_NAME;
+    return TransferCompleteEndpointV1.CLASS_NAME;
   }
 
-  constructor(public readonly options: ISetKeychainEntryEndpointOptions) {
+  constructor(public readonly options: ITransferCompleteEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.connector, `${fnTag} arg options.connector`);
+    Checks.truthy(options.gateway, `${fnTag} arg options.connector`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath() {
-    return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/set-keychain-entry"
-    ];
-  }
-
   public getPath(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    const apiPath =
+      OAS.paths[
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercomplete"
+      ];
+    return apiPath.get["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    const apiPath =
+      OAS.paths[
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercomplete"
+      ];
+    return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercomplete"
+    ].get.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -86,9 +89,9 @@ export class SetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
+    const reqBody: TransferCompleteV1Request = req.body;
     try {
-      const { key, value } = req.body as SetKeychainEntryRequestV1;
-      const resBody = await this.options.connector.set(key, value);
+      const resBody = await this.options.gateway.TransferComplete(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
