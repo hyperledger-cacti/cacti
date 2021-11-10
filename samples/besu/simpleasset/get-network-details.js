@@ -10,9 +10,6 @@ const networkPort = process.env.BESU_NETWORK_PORT ? process.env.BESU_NETWORK_POR
 
 const web3 = new Web3(new Web3.providers.HttpProvider('http://'+networkHost+':'+networkPort))
 
-var accounts1
-var networkId1
-
 async function getNetworkDetails() {
 
 	// Get the accounts linked

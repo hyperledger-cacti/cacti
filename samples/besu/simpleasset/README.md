@@ -5,9 +5,6 @@
  -->
 # A Sample Application for Asset Exchange across Two Besu Networks using HTLC
 
-## Prerequisites
-- Truffle: npm install -g truffle
-
 ## Deploy contracts
 The following command deploys the contracts on the two test networks:
 ```
@@ -26,4 +23,8 @@ The sample application will have Alice transfer AliceERC20 tokens in Network 1 t
 ```
 node app/AssetExchangeERC20.js
 ```
-Warning: Just pay attention to the number of tokens initally owned by Alice and Bob in Networks 1 and 2 respectively,  if you are running this app repeatedly on the same set of networks. You might have to comment/uncomment the parts of the app where the contractOwner assigns tokens to Alice and Bob.
+
+## Troubleshoot
+- Check if truffle is installed: npm install -g truffle
+
+- Pay attention to the number of tokens initally owned by Alice and Bob in Networks 1 and 2 respectively, if there are other applications that use/spend their tokens in parallel to this app. Ensure that there are sufficient tokens in their accounts to lock.
