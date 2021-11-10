@@ -1,3 +1,5 @@
+type WindowWithZone = { __Zone_disable_customElements: boolean } & Window & typeof globalThis;
+
 /**
  * Prevents Angular change detection from
  * running with certain Web Component callbacks
