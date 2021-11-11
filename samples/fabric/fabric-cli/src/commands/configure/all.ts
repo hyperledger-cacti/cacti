@@ -80,6 +80,7 @@ const command: GluegunCommand = {
         global.__DEFAULT_MSPID__,
         logger
       )
+      const appccid = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
       await generateAccessControl(
         process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
         process.env.DEFAULT_CHAINCODE
@@ -89,7 +90,7 @@ const command: GluegunCommand = {
         network,
         path.resolve(
           __dirname,
-          '../../data/interop/accessControlTemplate_' + aclPolicyPrincipalType + '.json'
+          '../../data/interop/' + appccid + '/accessControlTemplate_' + aclPolicyPrincipalType + '.json'
         ),
         username,
         global.__DEFAULT_MSPID__,
@@ -104,7 +105,7 @@ const command: GluegunCommand = {
         network,
         path.resolve(
           __dirname,
-          '../../data/interop/verificationPolicyTemplate.json'
+          '../../data/interop/' + appccid + '/verificationPolicyTemplate.json'
         ),
         global.__DEFAULT_MSPID__,
         logger

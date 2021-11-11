@@ -279,6 +279,10 @@ type ChaincodeStub struct {
 		result1 []byte
 		result2 error
 	}
+	getStateReturnsForKey map[string]struct {
+		result1 []byte
+		result2 error
+	}
 	GetStateByPartialCompositeKeyStub        func(string, []string) (shim.StateQueryIteratorInterface, error)
 	getStateByPartialCompositeKeyMutex       sync.RWMutex
 	getStateByPartialCompositeKeyArgsForCall []struct {
@@ -1702,7 +1706,12 @@ func (fake *ChaincodeStub) GetSignedProposalReturnsOnCall(i int, result1 *peer.S
 
 func (fake *ChaincodeStub) GetState(arg1 string) ([]byte, error) {
 	fake.getStateMutex.Lock()
-	ret, specificReturn := fake.getStateReturnsOnCall[len(fake.getStateArgsForCall)]
+	ret, specificReturn := fake.getStateReturnsForKey[arg1]
+	if specificReturn {
+		fake.getStateMutex.Unlock()
+		return ret.result1, ret.result2
+	}
+	ret, specificReturn = fake.getStateReturnsOnCall[len(fake.getStateArgsForCall)]
 	fake.getStateArgsForCall = append(fake.getStateArgsForCall, struct {
 		arg1 string
 	}{arg1})
@@ -1761,6 +1770,29 @@ func (fake *ChaincodeStub) GetStateReturnsOnCall(i int, result1 []byte, result2 
 		result1 []byte
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *ChaincodeStub) GetStateReturnsForKey(key string, result1 []byte, result2 error) {
+	fake.getStateMutex.Lock()
+	defer fake.getStateMutex.Unlock()
+	fake.GetStateStub = nil
+	if fake.getStateReturnsForKey == nil {
+		fake.getStateReturnsForKey = make(map[string]struct {
+			result1 []byte
+			result2 error
+		})
+	}
+	fake.getStateReturnsForKey[key] = struct {
+		result1 []byte
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *ChaincodeStub) GetStateClearForKey(key string) {
+	fake.getStateMutex.Lock()
+	defer fake.getStateMutex.Unlock()
+	fake.GetStateStub = nil
+	delete(fake.getStateReturnsForKey, key)
 }
 
 func (fake *ChaincodeStub) GetStateByPartialCompositeKey(arg1 string, arg2 []string) (shim.StateQueryIteratorInterface, error) {

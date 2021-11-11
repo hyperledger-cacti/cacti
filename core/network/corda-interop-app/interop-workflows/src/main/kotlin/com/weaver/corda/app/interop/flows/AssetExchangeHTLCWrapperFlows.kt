@@ -312,6 +312,7 @@ constructor(
  * @param flowArgs The list of arguments for the flow provided by the remote client.
  * @return Returns an Either with an instance of FlowLogic if it was resolvable, or an Error.
  */
+@Suppress("UNCHECKED_CAST")
 fun resolveStateAndRefFlow(flowName: String, flowArgs: List<Any>): Either<Error, FlowLogic<StateAndRef<ContractState>?>> = try {
     println("Attempting to resolve $flowName to a Corda flow.")
     val kotlinClass = Class.forName(flowName).kotlin

@@ -404,7 +404,7 @@ async function fabricHelper({
   networkName,
   mspId = global.__DEFAULT_MSPID__,
   logger = console,
-  discoverEnabled = true,
+  discoveryEnabled = true,
   userString = '',
   userPwd = '',
   registerUser = true
@@ -414,7 +414,7 @@ async function fabricHelper({
   connProfilePath: string
   networkName: string
   mspId?: string
-  discoverEnabled?: boolean
+  discoveryEnabled?: boolean
   logger?: any
   userString?: string
   userPwd?: string
@@ -448,7 +448,7 @@ async function fabricHelper({
     wallet,
     identity: identity,
     discovery: {
-      enabled: discoverEnabled,
+      enabled: discoveryEnabled,
       asLocalhost: process.env.LOCAL === 'false' ? false : true
     }
   })

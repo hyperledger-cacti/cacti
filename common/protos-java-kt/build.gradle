@@ -14,8 +14,8 @@ buildscript {
 
 plugins {
     id "maven-publish"
-	id 'java'
-	id 'com.google.protobuf' version '0.8.12'
+    id 'java'
+    id 'com.google.protobuf' version '0.8.12'
     id 'idea'
 }
 

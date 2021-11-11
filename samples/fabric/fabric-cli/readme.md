@@ -5,7 +5,7 @@
  -->
 # fabric-cli
 
-A CLI for interacting with the fabric test-net and relays. Made using [gluegun.js](https://infinitered.github.io/gluegun/#/)
+A CLI for interacting with the Fabric test-net and relays. Made using [gluegun.js](https://infinitered.github.io/gluegun/#/)
 
 fabric-cli options:
 
@@ -23,7 +23,7 @@ More documentation can be found [here](docs/commands.md)
     │   ├── commands               # Commands for the cli. Subcommands are in named folders
     │   ├── data                   # Data used across the commands, includes credentials for other networks and basic data to initialise the network with
     │    ├── helpers                # Helper functions that are used across the commands
-    │   └── wallet-${networkname}  # Wallets used by the CLI to connect with the fabric networks.
+    │   └── wallet-${networkname}  # Wallets used by the CLI to connect with the Fabric networks.
     └── ...
 
 Another naming convention made is inside the commands folder files suffixed with "`-helper`" are used to for the `--help` options for each command.
@@ -144,10 +144,30 @@ Example config:
 }
 ```
 
+## Data Transfer
+
+Examples of cross-network queries (via relays) are as follows (the last part of the command is a view address, and you will see the remote view being logged to the console):
+- Fabric network `network1` requesting a view from Fabric network `network2`
+  ```bash
+  ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+  ```
+- Fabric network `network1` requesting a view from Corda network `Corda_network`
+  ```bash
+  ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+  ```
+- Both of the above examples assume an insecure (plaintext) gRPC connection with the local network's relay. If the relay is TLS-enabled, you will need to specify the server's LS CA certificates as follows:
+  ```bash
+  ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=ca_cert.pem localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+  ./bin/fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=ca_cert1.pem:ca_cert2.pem localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
+  ```
+  * The `--relay-tls` switch indicates whether or not the local network relay requires a TLS connection
+  * The `--relay-tls-ca-files` switch indicates the path to the relay server's TLS CA certificates. Specify a colon-separated list if there are more than one.
+
+
 ## Asset Exchange
 
 Below are the steps to exercise asset exchange using the `fabric-cli` tool.
-1. Spin up both `network1` and `network2` with interoperation chaincode installed along with the `simpleasset` application, by running either
+1. Spin up both `network1` and `network2` with interoperation chaincode installed along with the `simpleasset` application by navigating to the `tests/network-setups/fabric/dev` folder and running either
    ```bash
    make start-interop CHAINCODE_NAME=simpleasset
    ```
@@ -156,22 +176,24 @@ Below are the steps to exercise asset exchange using the `fabric-cli` tool.
    make start-interop-local CHAINCODE_NAME=simpleasset
    ```
    depending on whether you are using pre-built Github packages or using local builds from this clone of the repository.
-2. Go to the Fabric Client `fabric-cli` directory (the folder `samples/fabric/fabric-cli` if you want to exercise the CLI using `node`, or the folder `samples/fabric/go-cli` if you want to exercise the CLI using `go`) and run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adding the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
+2. You can use the `fabric-cli` executable in the `bin` folder (for the executable built using Node.js) or the one built using the [Golang version](../go-cli/bin/fabric-cli) after running `make build-local` [here](../go-cli).
+3. If a `config.json` (or equivalent, as set in the `CONFIG_PATH` property in `.env`) doesn't exist, create one by making a copy of `config.template.json`. In the `config.json`, set the `chaincode` field in both the `network1` and `network2` sections to `simpleasset`.
+4. Run the below script that performs: setting the enviroment, adding the users `Alice` and `Bob` to both the networks and finally adding the non-fungible (i.e., bonds) and fungible (i.e., tokens) assets into the accounts of `Alice` and `Bob`.
    ```bash
-   sh scripts/initAsset.sh
+   ./scripts/initAsset.sh
    ```
-3. Check the status of the assets owned by `Alice` and `Bob` in the the networks `network1` and `network2`, by running
+3. Check the status of the assets owned by `Alice` and `Bob` in the two networks `network1` and `network2`, by running
    ```bash
-   sh scripts/getAssetStatus.sh
+   ./scripts/getAssetStatus.sh
    ```
 4. Initiate exchange of bond asset `bond01:a04` of `Bob` in `network1` with token assets `token1:100` of `Alice` in `network2`, by running
-   ```
+   ```bash
    ./bin/fabric-cli asset exchange-all --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:bond01:a04:alice:token1:100
    ```
-   Repeat the step 3 to observe the change in the ownership of assets as a result of the `asset echange` exercise.
+   Repeat the step 3 to observe the change in the ownership of assets as a result of the `asset exchange` exercise.
 
 5. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange-step` CLI commands):
-   ```
+   ```bash
    ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --secret=<hash-pre-image> --target-network=network1 --param=bond01:a03
    ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
    ./bin/fabric-cli asset exchange-step --step=3 --timeout-duration=1800 --locker=bob --recipient=alice --hash=<hash-value> --target-network=network2 --param=token1:100
@@ -183,17 +205,180 @@ Below are the steps to exercise asset exchange using the `fabric-cli` tool.
    ```
  
  The `asset exchange` scenario is demonstrated above using an application chaincode `simpleasset` and the `interop` chaincode, where the application chaincode makes invocations into the `interop` chaincode when it needs to lock, claim, or reclaim/unlock assets. However, the same `asset exchange` scenario can be demonstrated with the help of just the application chaincode `simpleassetandinterop` which also includes the scripts to lock, claim, or reclaim/unlock assets. This requires the steps 1-5 to be exercised with minor modifications as indicated below:
-- Spin up the networks by running the below command (update to step 1)
+- Spin up the networks by running the below command (equivalent of step 1 above)
    ```bash
    make start CHAINCODE_NAME=simpleassetandinterop
    ```
-- Replace `simpleasset` with `simpleassetandinterop` in the `config.json` file used to populate the `.env` file that is part of the script `initAsset.sh` (update to step 2)
-- Replace `simpleasset` with `simpleassetandinterop` in the script `getAssetStatus.sh` (update to step 3)
+   or
+   ```bash
+   make start-interop-local CHAINCODE_NAME=simpleassetandinterop
+   ```
+   depending on whether you are using pre-built Github packages or using local builds from this clone of the repository.
+- Replace `simpleasset` with `simpleassetandinterop` in the `config.json` file used to populate the `.env` file that is part of the script `initAsset.sh` (equivalent of step 2 above)
+- Replace `simpleasset` with `simpleassetandinterop` in the script `getAssetStatus.sh` (equivalent of step 3 above)
+
+You can repeat the above experiment with the `simpleassettransfer` chaincode as well, though this chaincode contains augmentations that serve to demonstrate asset transfers (see below).
+
+
+## Asset Transfer
+
+Below are the steps to exercise asset transfers from `network1` to `network2` using the `fabric-cli` tool.
+1. Spin up both `network1` and `network2` with interoperation chaincode installed along with the `simpleassettransfer` application by navigating to the `tests/network-setups/fabric/dev` folder and running either
+   ```bash
+   make start-interop CHAINCODE_NAME=simpleassettransfer
+   ```
+   or
+   ```bash
+   make start-interop-local CHAINCODE_NAME=simpleassettransfer
+   ```
+   depending on whether you are using pre-built Github packages or using local builds from this clone of the repository.
+2. Start relays and Fabric drivers for both `network1` and `network2`.
+3. Go to the Fabric Client `fabric-cli` directory (`samples/fabric/fabric-cli`).
+4. Create a `config.json` (you can pick a different name, but make sure you set the right reference in the `CONFIG_PATH` property in `.env`) by copying `config.template.json` and set certain properties as shown below (you can leave the others unchanged):
+   ```json
+   {
+      "network1": {
+         ...
+         "chaincode": "simpleassettransfer",
+         ...
+      },
+      "network2": {
+         ...
+         "chaincode": "simpleassettransfer",
+         "aclPolicyPrincipalType": "ca"
+      }
+   }
+   ```
+4. Set the `DEFAULT_APPLICATION_CHAINCODE` property in the `.env` to `simpleassettransfer`.
+5. Set environment variables and network configuration properties as follows:
+   ```bash
+   ./bin/fabric-cli env set-file ./.env
+   ./bin/fabric-cli config set-file ./config.json
+   ```
+6. Create default access control and verification policies and record them in the two networks' ledgers as follows:
+   ```bash
+   ./bin/fabric-cli configure create all --local-network=network1
+   ./bin/fabric-cli configure create all --local-network=network2
+   ./bin/fabric-cli configure network --local-network=network1
+   ./bin/fabric-cli configure network --local-network=network2
+   ```
+7. Initialize bond and token asset states and ownerships on the `network1` ledger as follows:
+   ```bash
+   ./scripts/initAssetsForTransfer.sh
+   ```
+   This step will also create a user `alice` in `network1` and a user `bob` in `network2`.
+
+**The following sequence of operations will illustrate transfers and recoveries of a bond (non-fungible) asset.**
+
+8. Verify that `alice` owns bonds with ids `a03` and `a04` as follows:
+   ```bash
+   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a03","true"]' --local-network=network1
+   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a04","true"]' --local-network=network1
+   ```
+   You should see a JSON structure corresponding to the bond being logged on the console in each case.
+9. Get `alice` in `network1` to pledge bond `a03` to `bob` in `network2` as follows (with a 1 hour timeout):
+   ```bash
+   ./bin/fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assetsForTransfer.json
+   ```
+10. Get `bob` in `network2` to claim this bond asset as follows:
+   ```bash
+   ./scripts/claimAsset.sh network2 network1 bond bond01 a03
+   ```
+11. Verify that `alice` in `network1` does not own this asset as follows:
+   ```bash
+   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a03","true"]' --local-network=network1
+   ```
+   You should see an error message like `Error: the asset a03 does not exist`.
+12. Verify that `bob` in `network2` now owns this asset as follows:
+   ```bash
+   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a03","true"]' --local-network=network2
+   ```
+13. Now get `alice` in `network1` to pledge bond `a04` to `bob` in `network2` as follows (with a 1 minute timeout):
+   ```bash
+   ./bin/fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=60 --type=bond --ref=a04 --data-file=src/data/assetsForTransfer.json
+   ```
+   Wait for a minute as follows:
+   ```bash
+   sleep 60
+   ```
+14. Now get `bob` in `network2` to claim this bond asset as follows:
+   ```bash
+   ./scripts/claimAsset.sh network2 network1 bond bond01 a04
+   ```
+   This should fail as the pledge has already expired.
+15. Now get `alice` in `network1` to reclaim the asset as follows:
+   ```bash
+   ./scripts/reclaimAsset.sh network1 network2 bond bond01 a04
+   ```
+16. Verify that `alice` in `network1` owns this asset as follows:
+   ```bash
+   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a04","true"]' --local-network=network1
+   ```
+17. Verify that `bob` in `network2` does not own this asset as follows:
+   ```bash
+   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a04","true"]' --local-network=network2
+   ```
+   You should see an error message like `Error: the asset a04 does not exist`.
+
+**The following sequence of operations will illustrate transfers and recoveries of token (fungible) assets.**
+
+18. Verify that `alice` in `network1` owns `10000` tokens as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network1 alice
+   ```
+19. Verify that `bob` in `network2` owns no tokens as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network2 bob
+   ```
+   You should see an error message like `Error: owner does not have a wallet`.
+20. Get `alice` in `network1` to pledge 50 tokens to `bob` in `network2` as follows (with a 1 hour timeout):
+   ```bash
+   ./bin/fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=token --units=50 --owner=alice --data-file=src/data/tokensForTransfer.json
+   ```
+   You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
+21. Get `bob` in `network2` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
+   ```bash
+   ./scripts/claimAsset.sh network2 network1 token token1 <pledge-id> 50
+   ```
+22. Verify that `alice` in `network1` owns `9950` tokens (after losing `50`) as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network1 alice
+   ```
+23. Verify that `bob` in `network2` now owns `50` tokens as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network2 bob
+   ```
+24. Now get `alice` in `network1` to pledge 100 tokens to `bob` in `network2` as follows (with a 1 minute timeout):
+   ```bash
+   ./bin/fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=60 --type=token --units=100 --owner=alice --data-file=src/data/tokensForTransfer.json
+   ```
+   Wait for a minute as follows:
+   ```bash
+   sleep 60
+   ```
+   You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
+25. Now get `bob` in `network2` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
+   ```bash
+   ./scripts/claimAsset.sh network2 network1 token token1 <pledge-id> 100
+   ```
+   This should fail as the pledge has already expired.
+26. Now get `alice` in `network1` to reclaim these tokens as follows:
+   ```bash
+   ./scripts/reclaimAsset.sh network1 network2 token token1 <pledge-id>
+   ```
+27. Verify that `alice` in `network1` still owns `9950` tokens (after losing `50`) as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network1 alice
+   ```
+28. Verify that `bob` in `network2` still owns only `50` tokens as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network2 bob
+   ```
 
 
 ## NOTE
 
-Due to how fabric works and the CA works once a wallet has been created with identities in the CA you can not create new wallet without fist revoking the original credentials. This can have some issues if you have deleted a wallet and are trying to recreate one.
+Due to how Fabric works and the CA works once a wallet has been created with identities in the CA you cannot create new wallet without fist revoking the original credentials. This can have some issues if you have deleted a wallet and are trying to recreate one.
 
 
 # License

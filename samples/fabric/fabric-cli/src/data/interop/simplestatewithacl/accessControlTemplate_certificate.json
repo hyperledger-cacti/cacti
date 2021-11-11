@@ -4,12 +4,6 @@
     {
       "principal": "<certificate>",
       "principalType": "certificate",
-      "resource": "mychannel:simplestate:Read:*",
-      "read": true
-    },
-    {
-      "principal": "<certificate>",
-      "principalType": "certificate",
       "resource": "mychannel:simplestatewithacl:Read:*",
       "read": true
     }

@@ -29,7 +29,7 @@ const command: GluegunCommand = {
         print,
         toolbox,
         'fabric-cli configure asset add --target-network=network1 --type=bond --data-file=src/data/assets.json',
-        'fabric-cli configure asset add --target-network=<network-name> --type=<bond|token --data-file=<path-to-data-file>>',
+        'fabric-cli configure asset add --target-network=<network-name> --type=<bond|token> --data-file=<path-to-data-file>>',
         [
           {
             name: '--debug',
@@ -39,7 +39,7 @@ const command: GluegunCommand = {
           {
             name: '--target-network',
             description:
-              'target-network network for command. <network1|network2>'
+              'Network where asset is to be recorded. <network1|network2>'
           },
           {
             name: '--type',

@@ -57,6 +57,29 @@ To run the driver, use the following:
 
 The driver gRPC server will be listening on port `9099`.
 
+### With TLS
+
+If the relay expects a TLS connection over gRPC, you need to specify the following environment variables in the `corda-driver` command:
+- `RELAY_TLS`: should be set to `true`
+- One of the following:
+  * If the relay server TLS CA certificates are in a password-protected Java Key Store (JKS file):
+    - `RELAY_TLSCA_TRUST_STORE`: JKS file path
+    - `RELAY_TLSCA_TRUST_STORE_PASSWORD`: password used to create the JKS file
+  * If the relay server TLS CA certificates are in separate PEM files in the filesystem:
+    - `RELAY_TLSCA_CERT_PATHS`: colon-separated list of CA certificate file paths
+If you wish to run the driver service with TLS enabled, you need to specify the following environment variables in the `corda-driver` command:
+- `DRIVER_TLS`: should be set to `true`
+- `DRIVER_CERT_PATH`: driver's TLS certificate file path
+- `DRIVER_KEY_PATH`: driver's TLS private key file path
+- Example: both relay and driver are TLS-enabled, and a trust store is used as a certificate repository:
+  ```bash
+  RELAY_TLS=true RELAY_TLSCA_TRUST_STORE_PASSWORD=password RELAY_TLSCA_TRUST_STORE=trust_store.jks DRIVER_TLS=true DRIVER_CERT_PATH=cert.pem DRIVER_KEY_PATH=key.pem ./build/install/corda-driver/bin/corda-driver
+  ```
+- Example: only relay is TLS-enabled, and the driver's trusted certificates are in separate files in the filesystem:
+  ```bash
+  RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=ca_cert1.pem:ca_cert2.pem ./build/install/corda-driver/bin/corda-driver
+  ```
+
 ## Driver configuration
 
 By default, the driver gRPC server listens on port `9099`. To change the port, set 
@@ -84,15 +107,18 @@ To push image to github container registry:
 
 **NOTE:** Push image to `hyperledger-labs` only after PR approval, first test it by deploying it on your fork by running (instead of last step above): `make push-image DOCKER_REGISTRY=ghcr.io/<username>`, where replace `<username>` with your git username.
 
-### Docker-compose Deployment
+### Docker-Compose Deployment
 
 * Copy `.env.docker.template` to `.env`
-    - `NETWORK_NAME`: Used as suffix to corda-driver container name, i.e. `corda-driver-<network-name>` will be the name of container.
+    - `NETWORK_NAME`: Used as suffix to corda-driver container name, i.e. `corda-driver-<network-name>` will be the name of the container.
     - `DRIVER_PORT`: Driver server port.
-    - `EXTERNAL_NETWORK`: is the docker network in which corda-network is running.
-    - `DOCKER_IMAGE_NAME`: Keep it same.
+    - `DRIVER_RPC_USERNAME`: RPC user registered for Driver.
+    - `DRIVER_RPC_PASSWORD`: Password for the above RPC user.
+    - `EXTERNAL_NETWORK`: Name of the docker network in which the Corda containers are deployed.
+    - `DOCKER_IMAGE_NAME`: _Keep this unchanged_.
     - `DOCKER_TAG`: Refer here for the image tags available: [weaver-corda-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-corda-driver)
-    - `DOCKER_REGISTRY`: Keep it same. (replace `hyperledger-labs` with your git username if testing from your fork)
+    - `COMPOSE_PROJECT_NAME`: Docker project name for the Corda network to which this driver is supposed to attach. By default, the folder name of the Corda network's `docker-compose.yml`, is the project name.
+    - `COMPOSE_PROJECT_NETWORK`: Docker project network name for the Corda network to which this driver is supposed to attach. By default, `default` is the project network name.
 * Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Run: `make deploy`.

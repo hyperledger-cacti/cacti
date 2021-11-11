@@ -29,16 +29,16 @@ import (
 // 3. Checks the access control policy for the requester and view address is met
 // 4. Calls application chaincode
 func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContextInterface, b64QueryBytes string) (string, error) {
-	if !s.testMode {
-		relayAccessCheck, err := wutils.IsClientRelay(ctx.GetStub())
-		if err != nil {
-			return "", err
-		}
-		if !relayAccessCheck {
-			return "", fmt.Errorf("Illegal access by relay")
-		}
-		fmt.Println("Relay access check passed")
+	// Ensure that this function cannot be called by a client without relay permissions
+	relayAccessCheck, err := wutils.IsClientRelay(ctx.GetStub())
+	if err != nil {
+		return "", err
 	}
+	if !relayAccessCheck {
+		return "", fmt.Errorf("Illegal access by relay")
+	}
+	fmt.Println("Relay access check passed")
+
 	queryBytes, err := base64.StdEncoding.DecodeString(b64QueryBytes)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unable to base64 decode data: %s", err.Error())

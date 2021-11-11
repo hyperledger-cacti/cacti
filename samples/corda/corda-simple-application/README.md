@@ -140,6 +140,22 @@ To make a request from a Corda network to a Fabric network, run:
 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:Arcturus
 ```
 
+#### With TLS
+
+If the relay expects a TLS connection over gRPC, you need to specify the following environment variables in each `request-state` command:
+- `RELAY_TLS`: should be set to `true`
+- One of the following:
+  * If the relay server TLS CA certificates are in a password-protected Java Key Store (JKS file):
+    - `RELAY_TLSCA_TRUST_STORE`: JKS file path
+    - `RELAY_TLSCA_TRUST_STORE_PASSWORD`: password used to create the JKS file
+  * If the relay server TLS CA certificates are in separate PEM files in the filesystem:
+    - `RELAY_TLSCA_CERT_PATHS`: colon-separated list of CA certificate file paths
+- Examples:
+  ```bash
+  RELAY_TLS=true RELAY_TLSCA_TRUST_STORE_PASSWORD=password RELAY_TLSCA_TRUST_STORE=trust_store.jks ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
+  RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=ca_cert1.pem:ca_cert2.pem ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
+  ```
+
 ## HTLC Flows:
 
 * Initialise fungible assets:

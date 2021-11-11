@@ -2,7 +2,7 @@
 
 directory=$(dirname $0)
 simpleAppVersion="0.4"
-weaverVersion="1.2.4-alpha.4"
+weaverVersion="1.2.4-alpha.5"
 
 parties="Notary PartyA PartyB PartyC"
 

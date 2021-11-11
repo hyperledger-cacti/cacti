@@ -16,6 +16,8 @@ use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
 use base64::{encode, decode};
 
+use tonic::transport::{Certificate, Channel, ClientTlsConfig};
+
 pub struct DataTransferService {
     pub config_lock: RwLock<config::Config>,
 }
@@ -23,6 +25,8 @@ pub struct DataTransferService {
 pub struct Driver {
     port: String,
     hostname: String,
+    tls: bool,
+    tlsca_cert_path: String,
 }
 
 #[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Debug)]
@@ -234,8 +238,9 @@ fn request_state_helper(
         .clone();
     let port = driver_info.port.to_string();
     let hostname = driver_info.hostname.to_string();
-    let driver_address = format!("http://{}:{}", hostname, port);
-    spawn_request_driver_state(query, driver_address.to_string(), conf.clone());
+    let tls = driver_info.tls;
+    let tlsca_cert_path = driver_info.tlsca_cert_path.to_string();
+    spawn_request_driver_state(query, hostname, port, tls, tlsca_cert_path, conf.clone());
     return Ok(Ack {
         status: ack::Status::Ok as i32,
         request_id,
@@ -262,7 +267,10 @@ fn send_driver_state_helper(
     let uri = relay_uri.clone().try_into::<LocationSegment>()?;
     spawn_send_state(
         state,
-        format!("{}:{}", uri.hostname.to_string(), uri.port.to_string()),
+        uri.hostname.to_string(),
+        uri.port.to_string(),
+        uri.tls,
+        uri.tlsca_cert_path.to_string(),
     );
     let reply = Ack {
         status: ack::Status::Ok as i32,
@@ -275,9 +283,31 @@ fn send_driver_state_helper(
 
 async fn spawn_request_driver_state_helper(
     query: Query,
-    driver_address: String,
+    hostname: String,
+    port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
 ) -> Result<(), Error> {
-    let client = DriverCommunicationClient::connect(driver_address).await?;
+    let driver_address = format!("http://{}:{}", hostname, port);
+    let client;
+    if use_tls {
+        let pem = tokio::fs::read(tlsca_cert_path).await?;
+        let ca = Certificate::from_pem(pem);
+
+        let tls = ClientTlsConfig::new()
+            .ca_certificate(ca)
+            .domain_name(hostname);
+
+        let channel = Channel::from_shared(driver_address).unwrap()
+            .tls_config(tls)
+            .connect()
+            .await
+            .unwrap();
+
+        client = DriverCommunicationClient::new(channel);
+    } else {
+        client = DriverCommunicationClient::connect(driver_address).await?;
+    }
     println!("Sending request to driver with query {:?}", query.clone());
     let ack = client
         .clone()
@@ -297,9 +327,9 @@ async fn spawn_request_driver_state_helper(
 }
 
 // Function that starts a thread which sends the query information to the driver
-fn spawn_request_driver_state(query: Query, driver_address: String, conf: config::Config) {
+fn spawn_request_driver_state(query: Query, hostname: String, port: String, use_tls: bool, tlsca_cert_path: String, conf: config::Config) {
     tokio::spawn(async move {
-        let result = spawn_request_driver_state_helper(query.clone(), driver_address).await;
+        let result = spawn_request_driver_state_helper(query.clone(), hostname, port, use_tls, tlsca_cert_path).await;
         match result {
             Ok(_) => {
                 // Do nothing
@@ -338,30 +368,49 @@ fn spawn_request_driver_state(query: Query, driver_address: String, conf: config
 
 // spawn_send_state sends data from the remote relay back to the requesting relay
 // When it errors it currently logs to console. Needs improving
-fn spawn_send_state(state: ViewPayload, requester_port: String) {
+fn spawn_send_state(state: ViewPayload, requestor_host: String, requester_port: String, use_tls: bool, tlsca_cert_path: String) {
     tokio::spawn(async move {
         println!("Sending state back to requesting relay: Request ID = {:?}", state.request_id);
         match state.state.as_ref().unwrap() {
             view_payload::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
             view_payload::State::Error(e) => println!("Error: {:?}", e),
         }
-        let client_addr = format!("http://{}", requester_port);
-        let client_result = DataTransferClient::connect(client_addr).await;
-        match client_result {
-            Ok(client) => {
-                let response = client.clone().send_state(state).await;
-                println!("Response ACK from requesting relay={:?}\n", response);
-                // Not returning anything here
-            }
-            Err(e) => {
-                // TODO: Add better error handling (Attempt a few times?)
-                println!(
-                    "Failed to connect to client: ${:?}. Error: {}\n",
-                    requester_port,
-                    e.to_string()
-                );
-                // TODO: Handle this error thorugh join handle after thread completes.
-                // Not actually returning anything here yet
+        let client_addr = format!("http://{}:{}", requestor_host, requester_port);
+        if use_tls {
+            let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
+            let ca = Certificate::from_pem(pem);
+
+            let tls = ClientTlsConfig::new()
+                .ca_certificate(ca)
+                .domain_name(requestor_host);
+
+            let channel = Channel::from_shared(client_addr).unwrap()
+                .tls_config(tls)
+                .connect()
+                .await
+                .unwrap();
+
+            let mut client_result = DataTransferClient::new(channel);
+            let response = client_result.send_state(state).await;
+            println!("Response ACK from requesting relay={:?}\n", response);
+        } else {
+            let client_result = DataTransferClient::connect(client_addr).await;
+            match client_result {
+                Ok(client) => {
+                    let response = client.clone().send_state(state).await;
+                    println!("Response ACK from requesting relay={:?}\n", response);
+                    // Not returning anything here
+                }
+                Err(e) => {
+                    // TODO: Add better error handling (Attempt a few times?)
+                    println!(
+                        "Failed to connect to client: ${:?}. Error: {}\n",
+                        requester_port,
+                        e.to_string()
+                    );
+                    // TODO: Handle this error thorugh join handle after thread completes.
+                    // Not actually returning anything here yet
+                }
             }
         }
     });
