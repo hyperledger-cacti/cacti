@@ -111,12 +111,12 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 		// Interop call to InteropCC itself.
 		resp := ""
 		if viewAddress.CCFunc == "GetHTLCHash" {
-			if len(viewAddress.Args) > 1 {
+			if len(viewAddress.Args) > 2 {
 				errorMessage := fmt.Sprintf("Recieved more arguments than required 1 argument.")
 				log.Error(errorMessage)
 				return "", errors.New(errorMessage)
 			}
-			resp, err = s.GetHTLCHash(ctx, viewAddress.Args[0])
+			resp, err = s.GetHTLCHash(ctx, viewAddress.Args[0], viewAddress.Args[1])
 		} else if viewAddress.CCFunc == "GetHTLCHashByContractId" {
 			if len(viewAddress.Args) > 1 {
 				errorMessage := fmt.Sprintf("Recieved more arguments than required 1 argument.")
@@ -132,12 +132,12 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 			}
 			resp, err = s.GetHTLCHashPreImageByContractId(ctx, viewAddress.Args[0])
 		} else if viewAddress.CCFunc == "GetHTLCHashPreImage" {
-			if len(viewAddress.Args) > 1 {
+			if len(viewAddress.Args) > 2 {
 				errorMessage := fmt.Sprintf("Recieved more arguments than required 1 argument.")
 				log.Error(errorMessage)
 				return "", errors.New(errorMessage)
 			}
-			resp, err = s.GetHTLCHashPreImage(ctx, viewAddress.Args[0])
+			resp, err = s.GetHTLCHashPreImage(ctx, viewAddress.Args[0], viewAddress.Args[1])
 		} else {
 			errorMessage := fmt.Sprintf("Given function can not be invoked in Interop Chaincode.")
 			err = errors.New(errorMessage)
