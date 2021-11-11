@@ -426,7 +426,7 @@ describe(testCase, () => {
       K_CACTUS_QUORUM_TOTAL_TX_COUNT +
       '{type="' +
       K_CACTUS_QUORUM_TOTAL_TX_COUNT +
-      '"} 6';
+      '"} 5';
     expect(res).toBeTruthy();
     expect(res.data).toBeTruthy();
     expect(res.status).toEqual(200);
