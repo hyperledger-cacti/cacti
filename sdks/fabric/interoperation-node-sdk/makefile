@@ -16,9 +16,11 @@ build-local:
 		cp -r ../../../common/protos-js/relay ./protos-js/ && \
 		cp -r ../../../common/protos-js/package.json ./protos-js/
 	cp package.json package-remote.json && \
+		mv package-lock.json package-lock-remote.json && \
 		cp package-local.json package.json && \
 		npm install && \
-		mv package-remote.json package.json
+		mv package-remote.json package.json && \
+		mv package-lock-remote.json package-lock.json
 	npm run build && cp -r protos-js build/
 
 .PHONE: publish
