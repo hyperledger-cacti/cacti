@@ -1,7 +1,7 @@
-import test, { Test } from "tape";
 import { CodedError } from "../../../main/typescript/coded-error";
+import "jest-extended";
 
-test("Error test", async (assert: Test) => {
+test("Error test", async () => {
   const oneMessage = "This is a error...";
   const oneCode = 1;
 
@@ -10,6 +10,5 @@ test("Error test", async (assert: Test) => {
     return e.sameCode(e);
   };
 
-  assert.true(err(oneMessage, `${oneCode}`));
-  assert.end();
+  expect(err(oneMessage, `${oneCode}`)).toBe(true);
 });
