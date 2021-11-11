@@ -1,44 +1,38 @@
-import test, { Test } from "tape";
+import "jest-extended";
 
 import { Bools } from "../../../main/typescript/public-api";
 
-test("Bools", (tParent: Test) => {
-  test("Checks#isBooleanStrict()", (t: Test) => {
-    t.true(Bools.isBooleanStrict(true), "Strictly true recognized OK");
-    t.true(Bools.isBooleanStrict(false), "Strictly false recognized OK");
+describe("Bools", () => {
+  test("Checks#isBooleanStrict()", () => {
+    expect(Bools.isBooleanStrict(true)).toBe(true);
+    expect(Bools.isBooleanStrict(false)).toBe(true);
 
-    t.false(Bools.isBooleanStrict(0), "0 not strictly bool OK");
-    t.false(Bools.isBooleanStrict(null), "null not strictly bool OK");
-    t.false(Bools.isBooleanStrict(undefined), "undefined not strictly bool OK");
-    t.false(Bools.isBooleanStrict([]), "array not strictly bool OK");
-    t.false(Bools.isBooleanStrict({}), "object literal not strictly bool OK");
-    t.false(Bools.isBooleanStrict(+0), "+0 not strictly bool OK");
-    t.false(Bools.isBooleanStrict(-0), "-0 not strictly bool OK");
-
-    t.end();
+    expect(Bools.isBooleanStrict(0)).not.toBe(true);
+    expect(Bools.isBooleanStrict(null)).not.toBe(true);
+    expect(Bools.isBooleanStrict(undefined)).not.toBe(true);
+    expect(Bools.isBooleanStrict([])).not.toBe(true);
+    expect(Bools.isBooleanStrict({})).not.toBe(true);
+    expect(Bools.isBooleanStrict(+0)).not.toBe(true);
+    expect(Bools.isBooleanStrict(-0)).not.toBe(true);
   });
 
-  test("isBooleanStrict()", async (t: Test) => {
-    t.true(Bools.isBooleanStrict(true));
-    t.true(Bools.isBooleanStrict(false));
+  test("isBooleanStrict()", async () => {
+    expect(Bools.isBooleanStrict(true)).toBe(true);
+    expect(Bools.isBooleanStrict(false)).toBe(true);
 
-    t.false(Bools.isBooleanStrict(0));
-    t.false(Bools.isBooleanStrict({}));
-    t.false(Bools.isBooleanStrict([]));
-    t.false(Bools.isBooleanStrict(null));
-    t.false(Bools.isBooleanStrict(undefined));
-    t.false(Bools.isBooleanStrict(-0));
-    t.false(Bools.isBooleanStrict(+0));
-    t.false(Bools.isBooleanStrict(new Date()));
-    t.false(Bools.isBooleanStrict(""));
-    t.false(Bools.isBooleanStrict(String("")));
-    t.false(Bools.isBooleanStrict(Number("")));
-    t.false(Bools.isBooleanStrict(Number(0)));
-    t.false(Bools.isBooleanStrict(Infinity));
-    t.false(Bools.isBooleanStrict(NaN));
-
-    t.end();
+    expect(Bools.isBooleanStrict(0));
+    expect(Bools.isBooleanStrict({}));
+    expect(Bools.isBooleanStrict([]));
+    expect(Bools.isBooleanStrict(null));
+    expect(Bools.isBooleanStrict(undefined));
+    expect(Bools.isBooleanStrict(-0));
+    expect(Bools.isBooleanStrict(+0));
+    expect(Bools.isBooleanStrict(new Date()));
+    expect(Bools.isBooleanStrict(""));
+    expect(Bools.isBooleanStrict(String("")));
+    expect(Bools.isBooleanStrict(Number("")));
+    expect(Bools.isBooleanStrict(Number(0)));
+    expect(Bools.isBooleanStrict(Infinity));
+    expect(Bools.isBooleanStrict(NaN));
   });
-
-  tParent.end();
 });
