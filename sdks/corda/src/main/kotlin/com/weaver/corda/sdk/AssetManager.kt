@@ -217,7 +217,7 @@ class AssetManager {
         ): String? {
             try {
                 AssetManager.logger.debug("Querying asset-lock HTLC Hash from Corda as part of asset-exchange.\n")
-                val obj = proxy.startFlow(::GetAssetExchangeHTLCHashPreImageById, contractId)
+                val obj = proxy.startFlow(::GetAssetExchangeHTLCHashById, contractId)
                         .returnValue.get()
                 return obj.toString(Charsets.UTF_8)
             } catch (e: Exception) {
