@@ -89,7 +89,7 @@ fun main(args: Array<String>) = App()
                 IsAssetLockedCommand(),
                 GetLockStateCommand(),
                 GetHTLCHashCommand(),
-                GetHTLCPreImageCommand()
+                GetHTLCPreImageCommand(),
                 ConfigureCommand().subcommands(
                   ConfigureDataCommand(),
                   ConfigureNetworkCommand(),
