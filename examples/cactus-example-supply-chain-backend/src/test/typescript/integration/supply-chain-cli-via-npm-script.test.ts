@@ -9,13 +9,15 @@ const testCase =
   "can launch via CLI with generated API server .config.json file";
 const logLevel: LogLevelDesc = "TRACE";
 
-test("BEFORE " + testCase, async (t: Test) => {
+test.skip("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });
 
-test("Supply chain backend API calls can be executed", async (t: Test) => {
+// FIXME: remove the skip once this issue is fixed:
+// https://github.com/hyperledger/cactus/issues/1518
+test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
   t.ok(publicApi, "Public API of the package imported OK");
   test.onFinish(async () => await pruneDockerAllIfGithubAction({ logLevel }));
 

@@ -599,6 +599,7 @@ export class ApiServer {
         grpcTlsCredentials,
         (error: Error | null, port: number) => {
           if (error) {
+            this.log.error("Binding gRPC failed: ", error);
             return reject(new RuntimeError("Binding gRPC failed: ", error));
           }
           this.grpcServer.addService(
