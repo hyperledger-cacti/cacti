@@ -1,6 +1,6 @@
-import test, { Test } from "tape-promise/tape";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
+import "jest-extended";
 import {
   QuorumTestLedger,
   IQuorumGenesisOptions,
@@ -30,41 +30,17 @@ import {
 } from "@hyperledger/cactus-cmd-api-server";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { ICactusPlugin } from "@hyperledger/cactus-core-api";
+import { ICactusPlugin, IPluginKeychain } from "@hyperledger/cactus-core-api";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { AddressInfo } from "net";
-
-const logLevel: LogLevelDesc = "TRACE";
 const testCase = "deploys contract via REST API";
-
-const log: Logger = LoggerProvider.getOrCreate({
-  label: "test-deploy-contract-via-web-service",
-  level: logLevel,
-});
-
-const contractName = "HelloWorld";
-
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
-});
-
-test(testCase, async (t: Test) => {
-  // 1. Instantiate a ledger object
-  const ledger = new QuorumTestLedger();
-
-  test.onFinish(async () => {
-    await ledger.stop();
-    await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+describe(testCase, () => {
+  const logLevel: LogLevelDesc = "TRACE";
+  const log: Logger = LoggerProvider.getOrCreate({
+    label: "test-deploy-contract-via-web-service",
+    level: logLevel,
   });
-
-  // 2. Start the actual ledger
-  await ledger.start();
-
-  // 3. Gather parameteres needed to run an embedded ApiServer which can connect to/interact with said ledger
-  const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
+  const ledger = new QuorumTestLedger();
 
   const configService = new ConfigService();
   const cactusApiServerOptions: ICactusApiServerOptions = configService.newExampleConfig();
@@ -75,83 +51,120 @@ test(testCase, async (t: Test) => {
   cactusApiServerOptions.apiPort = 0;
   const config = configService.newExampleConfigConvict(cactusApiServerOptions);
   const plugins: ICactusPlugin[] = [];
-
-  const kvStoragePlugin = new PluginKeychainMemory({
-    backend: new Map(),
-    instanceId: uuidV4(),
-    keychainId: uuidV4(),
-  });
-  kvStoragePlugin.set(
-    HelloWorldContractJson.contractName,
-    JSON.stringify(HelloWorldContractJson),
-  );
-  plugins.push(kvStoragePlugin);
-
-  const ledgerConnectorQuorum = new PluginLedgerConnectorQuorum({
-    instanceId: uuidV4(),
-    rpcApiHttpHost,
-    pluginRegistry: new PluginRegistry({ plugins: [kvStoragePlugin] }),
-  });
-  plugins.push(ledgerConnectorQuorum);
   const pluginRegistry = new PluginRegistry({ plugins });
+  const contractName = "HelloWorld";
+  let addressInfo: AddressInfo,
+    apiServer: ApiServer,
+    protocol,
+    basePath: string,
+    configuration,
+    rpcApiHttpHost: string,
+    kvStoragePlugin: IPluginKeychain,
+    client: DefaultApi,
+    quorumGenesisOptions: IQuorumGenesisOptions,
+    firstHighNetWorthAccount: string,
+    apiServerStartOut: {
+      addressInfoCockpit: AddressInfo;
+      addressInfoApi: AddressInfo;
+      addressInfoGrpc: AddressInfo;
+    };
 
-  const apiServer = new ApiServer({
-    config: config.getProperties(),
-    pluginRegistry,
+  // Instantiate a ledger object
+  // Gather parameteres needed to run an embedded ApiServer which can connect to/interact with said ledger
+
+  afterAll(async () => await apiServer.shutdown());
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
   });
-  test.onFinish(() => apiServer.shutdown());
-
-  // 4. Start the API server which now is connected to the quorum ledger
-  const apiServerStartOut = await apiServer.start();
-  log.debug(`ApiServer.started OK:`, apiServerStartOut);
-
-  // 5. Find a high net worth account in the genesis object of the quorum ledger
-  const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
-  t.ok(quorumGenesisOptions);
-  t.ok(quorumGenesisOptions.alloc);
-
-  const highNetWorthAccounts: string[] = Object.keys(
-    quorumGenesisOptions.alloc,
-  ).filter((address: string) => {
-    const anAccount: IAccount = quorumGenesisOptions.alloc[address];
-    const balance: number = parseInt(anAccount.balance, 10);
-    return balance > 10e7;
+  afterAll(async () => {
+    await ledger.stop();
+    await ledger.destroy();
   });
-  const [firstHighNetWorthAccount] = highNetWorthAccounts;
+  afterAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
+  });
 
-  // 6. Instantiate the SDK dynamically with whatever port the API server ended up bound to (port 0)
-  const httpServer = apiServer.getHttpServerApi();
-  const addressInfo = httpServer?.address() as AddressInfo;
-  log.debug(`AddressInfo: `, addressInfo);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  const protocol = config.get("apiTlsEnabled") ? "https:" : "http:";
-  const basePath = `${protocol}//${addressInfo.address}:${addressInfo.port}`;
-  log.debug(`SDK base path: %s`, basePath);
+  beforeAll(async () => {
+    await ledger.start();
+    rpcApiHttpHost = await ledger.getRpcApiHttpHost();
 
-  const configuration = new Configuration({ basePath });
-  const client = new DefaultApi(configuration);
+    kvStoragePlugin = new PluginKeychainMemory({
+      backend: new Map(),
+      instanceId: uuidV4(),
+      keychainId: uuidV4(),
+    });
+    kvStoragePlugin.set(
+      HelloWorldContractJson.contractName,
+      JSON.stringify(HelloWorldContractJson),
+    );
+    plugins.push(kvStoragePlugin);
 
-  // 7. Assemble request to invoke the deploy contract method of the quorum ledger connector plugin via the REST API
-  const req: DeployContractSolidityBytecodeV1Request = {
-    contractName: HelloWorldContractJson.contractName,
-    web3SigningCredential: {
-      ethAccount: firstHighNetWorthAccount,
-      secret: "",
-      type: Web3SigningCredentialType.GethKeychainPassword,
-    },
-    keychainId: kvStoragePlugin.getKeychainId(),
-    gas: 1000000,
-  };
+    const ledgerConnectorQuorum = new PluginLedgerConnectorQuorum({
+      instanceId: uuidV4(),
+      rpcApiHttpHost,
+      pluginRegistry: new PluginRegistry({ plugins: [kvStoragePlugin] }),
+    });
+    plugins.push(ledgerConnectorQuorum);
 
-  // 8. Deploy smart contract by issuing REST API call
-  const res = await client.deployContractSolBytecodeV1(req);
+    apiServer = new ApiServer({
+      config: config.getProperties(),
+      pluginRegistry,
+    });
 
-  t.ok(res, "Response for contract deployment is truthy");
-  t.ok(res.status > 199, "Response status code for contract deployment > 199");
-  t.ok(res.status < 300, "Response status code for contract deployment < 300");
+    // Start the API server which now is connected to the quorum ledger
+    apiServerStartOut = await apiServer.start();
+    log.debug(`ApiServer.started OK:`, apiServerStartOut);
+    const httpServer = apiServer.getHttpServerApi();
+    addressInfo = httpServer?.address() as AddressInfo;
 
-  test("Invoke contract via SDK ApiClient object", async (t2: Test) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    protocol = config.get("apiTlsEnabled") ? "https:" : "http:";
+    basePath = `${protocol}//${addressInfo.address}:${addressInfo.port}`;
+    configuration = new Configuration({ basePath });
+    client = new DefaultApi(configuration);
+    // Find a high net worth account in the genesis object of the quorum ledger
+    quorumGenesisOptions = await ledger.getGenesisJsObject();
+    const highNetWorthAccounts: string[] = Object.keys(
+      quorumGenesisOptions.alloc,
+    ).filter((address: string) => {
+      const anAccount: IAccount = quorumGenesisOptions.alloc[address];
+      const balance: number = parseInt(anAccount.balance, 10);
+      return balance > 10e7;
+    });
+    [firstHighNetWorthAccount] = highNetWorthAccounts;
+  });
+
+  test(testCase, async () => {
+    expect(quorumGenesisOptions);
+    expect(quorumGenesisOptions.alloc);
+
+    // 6. Instantiate the SDK dynamically with whatever port the API server ended up bound to (port 0)
+    log.debug(`AddressInfo: `, addressInfo);
+    log.debug(`SDK base path: %s`, basePath);
+
+    // 7. Assemble request to invoke the deploy contract method of the quorum ledger connector plugin via the REST API
+    const req: DeployContractSolidityBytecodeV1Request = {
+      contractName: HelloWorldContractJson.contractName,
+      web3SigningCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+      keychainId: kvStoragePlugin.getKeychainId(),
+      gas: 1000000,
+    };
+
+    // 8. Deploy smart contract by issuing REST API call
+    const res = await client.deployContractSolBytecodeV1(req);
+
+    expect(res).toBeTruthy();
+    expect(res.status).toBeWithin(199, 300);
+  });
+
+  test("Invoke contract via SDK ApiClient object", async () => {
     const web3 = new Web3(rpcApiHttpHost);
     const testEthAccount = web3.eth.accounts.create(uuidV4());
 
@@ -167,13 +180,12 @@ test(testCase, async (t: Test) => {
         value: 10e9,
       },
     });
-    t2.ok(res1, "Funds transfer HTTP response #1 via SDK OK");
-    t2.ok(res1.status > 199, "Response status for Funds transfer #1 > 199");
-    t2.ok(res1.status < 300, "Response status for Funds transfer #1 < 300");
+    expect(res1).toBeTruthy();
+    expect(res1.status).toBeWithin(199, 300);
 
     const balance = await web3.eth.getBalance(testEthAccount.address);
-    t2.ok(balance, "Retrieved balance of test account OK");
-    t2.equals(parseInt(balance, 10), 10e9, "Balance of test account OK");
+    expect(balance).toBeTruthy();
+    expect(parseInt(balance, 10)).toEqual(10e9);
 
     const sayHelloRes = await client.invokeContractV1({
       contractName,
@@ -185,19 +197,12 @@ test(testCase, async (t: Test) => {
       },
       keychainId: kvStoragePlugin.getKeychainId(),
     });
-    t2.ok(sayHelloRes, "sayHello() response is truthy");
-    t2.ok(sayHelloRes.status > 199, "Status for sayHello() res > 199");
-    t2.ok(sayHelloRes.status < 300, "Status for sayHello() res < 300");
-    t2.ok(sayHelloRes.data, "sayHello() response.data is truthy");
-    t2.ok(sayHelloRes.data.callOutput, "sayHello() callOutput truthy OK");
-    t2.ok(
-      typeof sayHelloRes.data.callOutput === "string",
-      "sayHello() callOutput is string type OK",
-    );
-    t2.ok(
-      sayHelloRes.data.callOutput === "Hello World!",
-      `sayHello() callOutput is "Hello World!" OK`,
-    );
+    expect(sayHelloRes).toBeTruthy();
+    expect(sayHelloRes.status).toBeWithin(199, 300);
+    expect(sayHelloRes.data).toBeTruthy();
+    expect(sayHelloRes.data.callOutput).toBeTruthy();
+    expect(typeof sayHelloRes.data.callOutput).toBeString();
+    expect(sayHelloRes.data.callOutput).toBe("Hello World!");
 
     const newName = `DrCactus${uuidV4()}`;
     const setName1Res = await client.invokeContractV1({
@@ -213,11 +218,10 @@ test(testCase, async (t: Test) => {
       },
       keychainId: kvStoragePlugin.getKeychainId(),
     });
-    t2.ok(setName1Res, "setName1Res truthy OK");
-    t2.ok(setName1Res, "setName1Res truthy OK");
-    t2.ok(setName1Res.status > 199, "Status for setName1Res > 199 OK");
-    t2.ok(setName1Res.status < 300, "Status for setName1Res < 300 OK");
-    t2.ok(setName1Res.data, "setName1Res.data is truthy OK");
+    expect(setName1Res).toBeTruthy();
+    expect(setName1Res).toBeTruthy();
+    expect(setName1Res.status).toBeWithin(199, 300);
+    expect(setName1Res.data).toBeTruthy();
 
     const getName1Res = await client.invokeContractV1({
       contractName,
@@ -232,17 +236,12 @@ test(testCase, async (t: Test) => {
       },
       keychainId: kvStoragePlugin.getKeychainId(),
     });
-    t2.ok(getName1Res, `getName1Res truthy OK`);
-    t2.true(getName1Res.status > 199, `getName1Res.status > 199 OK`);
-    t2.true(getName1Res.status < 300, `getName1Res.status < 300 OK`);
-    t2.ok(getName1Res.data, `getName1Res.data truthy OK`);
-    t2.ok(getName1Res.data.callOutput, `getName1Res.data.callOutput truthy OK`);
-    t2.equal(
-      typeof getName1Res.data.callOutput,
-      "string",
-      `getName1Res.data.callOutput typeof string OK`,
-    );
-    t2.equal(getName1Res.data.callOutput, newName, `getName1Res truthy OK`);
+    expect(getName1Res).toBeTruthy();
+    expect(getName1Res.status).toBeWithin(199, 300);
+    expect(getName1Res.data).toBeTruthy();
+    expect(getName1Res.data.callOutput).toBeTruthy();
+    expect(getName1Res.data.callOutput).toBeString();
+    expect(getName1Res.data.callOutput).toEqual(newName);
 
     const getName2Res = await client.invokeContractV1({
       contractName,
@@ -258,15 +257,9 @@ test(testCase, async (t: Test) => {
       keychainId: kvStoragePlugin.getKeychainId(),
     });
 
-    t2.ok(getName2Res, `getName2Res truthy OK`);
-    t2.true(getName2Res.status > 199, `getName2Res.status > 199 OK`);
-    t2.true(getName2Res.status < 300, `getName2Res.status < 300 OK`);
-    t2.ok(getName2Res.data, `getName2Res.data truthy OK`);
-    t2.notok(
-      getName2Res.data.callOutput,
-      `getName2Res.data.callOutput falsy OK`,
-    );
+    expect(getName2Res).toBeTruthy();
+    expect(getName2Res.status).toBeWithin(199, 300);
+    expect(getName2Res.data).toBeTruthy();
+    expect(getName2Res.data.callOutput).not.toBeTruthy();
   });
-
-  t.end();
 });

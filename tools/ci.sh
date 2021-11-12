@@ -130,7 +130,10 @@ function mainTask()
   yarn tools:validate-bundle-names
 
   dumpDiskUsageInfo
-  yarn run test:all -- --bail
+
+  yarn test:jest:all
+  
+  yarn test:tap:all -- --bail
 
   dumpDiskUsageInfo
 
