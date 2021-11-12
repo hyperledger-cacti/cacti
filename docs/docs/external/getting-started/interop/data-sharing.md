@@ -37,7 +37,7 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
     ```
 - Query the value of the requested state, using key `H` in `Corda_Network` by running the following command:
   ```bash
-  ./clients/build/install/clients/bin/clients get-state H
+  NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state H
   ```
 
 To test the scenario where `Corda_Network2` requests the value of the state (key) `C` from `Corda_Network`, do the following:
@@ -54,7 +54,7 @@ To test the scenario where `Corda_Network2` requests the value of the state (key
     ```
 - Query the value of the requested state, using the key `C` in `Corda_Network` by running the following command:
   ```bash
-  ./clients/build/install/clients/bin/clients get-state C
+  NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients get-state C
   ```
 
 ## Corda to Fabric
@@ -73,7 +73,7 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
     ```
 - Query the value of the requested state (key) `a` in `Corda_Network` using the following:
   ```bash
-  ./clients/build/install/clients/bin/clients get-state a
+  NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state a
   ```
 
 To test the scenario where `Corda_Network` requests the value of the state (key) `Arcturus` from `network2`, do the following:
@@ -90,7 +90,7 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
     ```
 - Query the value of the requested state (key) `Arcturus` in `Corda_Network` using the following:
   ```bash
-  ./clients/build/install/clients/bin/clients get-state Arcturus
+  NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state Arcturus
   ```
   
 **Note:** You can perform the same data transfer between `Corda_Network2` and either Fabric networks, by setting the env `CORDA_PORT=30006` (the `Corda_Network2` node's RPC port), `NETWORK_NAME=Corda_Network2`, and using `localhost:9082` (the local relay address) as the first argument.
