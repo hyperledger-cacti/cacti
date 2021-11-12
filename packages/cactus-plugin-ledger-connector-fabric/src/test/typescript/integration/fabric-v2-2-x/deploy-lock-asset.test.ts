@@ -64,10 +64,7 @@ test(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    // imageName: "faio2x",
-    // imageVersion: "latest",
     imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    imageVersion: "2021-04-20-nodejs",
     envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
     logLevel,
   });
