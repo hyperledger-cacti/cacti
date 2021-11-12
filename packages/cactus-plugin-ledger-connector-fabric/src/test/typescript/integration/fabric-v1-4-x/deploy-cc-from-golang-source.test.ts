@@ -57,10 +57,7 @@ test.skip(testCase, async (t: Test) => {
     emitContainerLogs: true,
     logLevel,
     publishAllPorts: true,
-    // imageName: "faio14x",
-    // imageVersion: "latest",
     imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
-    imageVersion: "2021-09-02--fix-876-supervisord-retries",
   });
 
   const tearDown = async () => {

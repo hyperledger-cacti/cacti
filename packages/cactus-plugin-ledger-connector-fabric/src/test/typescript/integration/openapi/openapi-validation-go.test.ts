@@ -6,7 +6,6 @@ import express from "express";
 import bodyParser from "body-parser";
 import {
   Containers,
-  // FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -20,7 +19,6 @@ import {
   DefaultEventHandlerStrategy,
   PluginLedgerConnectorFabric,
   DeployContractGoSourceV1Request,
-  // ConnectionProfile,
 } from "../../../../main/typescript/public-api";
 
 import { HELLO_WORLD_CONTRACT_GO_SOURCE } from "../../fixtures/go/hello-world-contract-fabric-v14/hello-world-contract-go-source";
@@ -30,7 +28,6 @@ import { DefaultApi as FabricApi } from "../../../../main/typescript/public-api"
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 
 import { DiscoveryOptions } from "fabric-network";
-// import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
@@ -49,44 +46,6 @@ test(testCase, async (t: Test) => {
   test.onFailure(async () => {
     await Containers.logDiagnostics({ logLevel });
   });
-  // const ledger = new FabricTestLedgerV1({
-  //   emitContainerLogs: true,
-  //   logLevel,
-  //   publishAllPorts: true,
-  //   imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
-  //   imageVersion: "2021-09-02--fix-876-supervisord-retries",
-  // });
-
-  // const tearDown = async () => {
-  //   await ledger.stop();
-  //   await ledger.destroy();
-  // };
-
-  // test.onFinish(tearDown);
-
-  // await ledger.start();
-  // const connectionProfile = await ledger.getConnectionProfileOrg1();
-  // const enrollAdminOut = await ledger.enrollAdmin();
-  // const adminWallet = enrollAdminOut[1];
-  // const [userIdentity] = await ledger.enrollUser(adminWallet);
-  // const sshConfig = await ledger.getSshConfig();
-
-  // const keychainInstanceId = uuidv4();
-  // const keychainId = uuidv4();
-  // const keychainEntryKey = "user2";
-  // const keychainEntryValue = JSON.stringify(userIdentity);
-
-  // const keychainPlugin = new PluginKeychainMemory({
-  //   instanceId: keychainInstanceId,
-  //   keychainId,
-  //   logLevel,
-  //   backend: new Map([
-  //     [keychainEntryKey, keychainEntryValue],
-  //     ["some-other-entry-key", "some-other-entry-value"],
-  //   ]),
-  // });
-
-  // const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
 
   const discoveryOptions: DiscoveryOptions = {
     enabled: true,

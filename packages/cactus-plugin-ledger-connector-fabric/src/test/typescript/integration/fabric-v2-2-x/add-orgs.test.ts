@@ -39,11 +39,7 @@ test.skip(testCase, async (t: Test) => {
     emitContainerLogs: true,
     publishAllPorts: true,
     logLevel: "debug",
-    // imageName: "rafaelapb/cactus-fabric2-all-in-one"
-    // imageVersion: "faio-cb-test",
-    //
     imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    imageVersion: "2021-08-19--1084--add-org-x",
     envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
     extraOrgs: [extraOrg],
   });

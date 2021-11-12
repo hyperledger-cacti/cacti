@@ -43,7 +43,6 @@ test("run-transaction-with-ws-ids", async (t: Test) => {
     emitContainerLogs: true,
     publishAllPorts: true,
     imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    imageVersion: "2021-09-02--fix-876-supervisord-retries",
     envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
     logLevel,
   });
