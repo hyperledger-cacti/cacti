@@ -46,6 +46,12 @@ import {
   InvokeContractV1Response,
   RunTransactionRequest,
   RunTransactionResponse,
+  RunTransactionGethKeychainRequest,
+  RunTransactionGethKeychainResponse,
+  RunTransactionPrivateKeyRequest,
+  RunTransactionPrivateKeyResponse,
+  RunTransactionCactusKeychainRefRequest,
+  RunTransactionCactusKeychainRefResponse,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialPrivateKeyHex,
@@ -53,6 +59,9 @@ import {
 } from "./generated/openapi/typescript-axios/";
 
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
+import { RunTransactionGethKeychainEndpoint } from "./web-services/run-transaction-geth-keychain-endpoint";
+import { RunTransactionPrivateKeyEndpoint } from "./web-services/run-transaction-private-key-endpoint";
+import { RunTransactionCactusKeychainRefEndpoint } from "./web-services/run-transaction-cactus-keychain-ref-endpoint";
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
 import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-endpoint-json-object";
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
@@ -176,6 +185,27 @@ export class PluginLedgerConnectorQuorum
     }
     {
       const endpoint = new RunTransactionEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new RunTransactionGethKeychainEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new RunTransactionPrivateKeyEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new RunTransactionCactusKeychainRefEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -403,8 +433,8 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async transactGethKeychain(
-    txIn: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
+    txIn: RunTransactionGethKeychainRequest,
+  ): Promise<RunTransactionGethKeychainResponse> {
     const fnTag = `${this.className}#transactGethKeychain()`;
     const { sendTransaction } = this.web3.eth.personal;
     const { transactionConfig, web3SigningCredential } = txIn;
@@ -424,8 +454,8 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async transactPrivateKey(
-    req: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
+    req: RunTransactionPrivateKeyRequest,
+  ): Promise<RunTransactionPrivateKeyResponse> {
     const fnTag = `${this.className}#transactPrivateKey()`;
     const { transactionConfig, web3SigningCredential } = req;
     const {
@@ -448,8 +478,8 @@ export class PluginLedgerConnectorQuorum
   }
 
   public async transactCactusKeychainRef(
-    req: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
+    req: RunTransactionCactusKeychainRefRequest,
+  ): Promise<RunTransactionCactusKeychainRefResponse> {
     const fnTag = `${this.className}#transactCactusKeychainRef()`;
     const { transactionConfig, web3SigningCredential } = req;
     const {

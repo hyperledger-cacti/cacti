@@ -441,6 +441,114 @@
                     }
                 }
             },
+            "RunTransactionGethKeychainRequest": {
+                "type": "object",
+                "required": [
+                    "web3SigningCredential",
+                    "transactionConfig"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "transactionConfig": {
+                        "$ref": "#/components/schemas/QuorumTransactionConfig",
+                        "nullable": false
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing.",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    }
+                }
+            },
+            "RunTransactionGethKeychainResponse": {
+                "type": "object",
+                "required": [
+                    "transactionReceipt"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
+            "RunTransactionPrivateKeyRequest": {
+                "type": "object",
+                "required": [
+                    "web3SigningCredential",
+                    "transactionConfig"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "transactionConfig": {
+                        "$ref": "#/components/schemas/QuorumTransactionConfig",
+                        "nullable": false
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing.",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    }
+                }
+            },
+            "RunTransactionPrivateKeyResponse": {
+                "type": "object",
+                "required": [
+                    "transactionReceipt"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
+            "RunTransactionCactusKeychainRefRequest": {
+                "type": "object",
+                "required": [
+                    "web3SigningCredential",
+                    "transactionConfig"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "transactionConfig": {
+                        "$ref": "#/components/schemas/QuorumTransactionConfig",
+                        "nullable": false
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing.",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    }
+                }
+            },
+            "RunTransactionCactusKeychainRefResponse": {
+                "type": "object",
+                "required": [
+                    "transactionReceipt"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
             "DeployContractSolidityBytecodeV1Request": {
                 "type": "object",
                 "required": [
@@ -838,6 +946,108 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/RunTransactionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-geth-keychain": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-geth-keychain"
+                    }
+                },
+                "operationId": "runTransactionGethKeychainV1",
+                "summary": "Executes a transaction on a quorum ledger using geth keychain.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionGethKeychainRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionGethKeychainResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-private-key": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-private-key"
+                    }
+                },
+                "operationId": "runTransactionPrivateKeyV1",
+                "summary": "Executes a transaction on a quorum ledger using private key.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionPrivateKeyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionPrivateKeyResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-cactus-keychain-ref": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-cacus-keychain-ref"
+                    }
+                },
+                "operationId": "runTransactionCactusKeychainRefV1",
+                "summary": "Executes a transaction on a quorum ledger using cactus keychain ref.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionCactusKeychainRefRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionCactusKeychainRefResponse"
                                 }
                             }
                         }

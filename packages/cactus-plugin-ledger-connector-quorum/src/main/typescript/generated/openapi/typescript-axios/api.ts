@@ -461,6 +461,120 @@ export interface QuorumTransactionConfig {
 /**
  * 
  * @export
+ * @interface RunTransactionCactusKeychainRefRequest
+ */
+export interface RunTransactionCactusKeychainRefRequest {
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof RunTransactionCactusKeychainRefRequest
+     */
+    web3SigningCredential: Web3SigningCredential;
+    /**
+     * 
+     * @type {QuorumTransactionConfig}
+     * @memberof RunTransactionCactusKeychainRefRequest
+     */
+    transactionConfig: QuorumTransactionConfig;
+    /**
+     * The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing.
+     * @type {number}
+     * @memberof RunTransactionCactusKeychainRefRequest
+     */
+    timeoutMs?: number;
+}
+/**
+ * 
+ * @export
+ * @interface RunTransactionCactusKeychainRefResponse
+ */
+export interface RunTransactionCactusKeychainRefResponse {
+    /**
+     * 
+     * @type {Web3TransactionReceipt}
+     * @memberof RunTransactionCactusKeychainRefResponse
+     */
+    transactionReceipt: Web3TransactionReceipt;
+}
+/**
+ * 
+ * @export
+ * @interface RunTransactionGethKeychainRequest
+ */
+export interface RunTransactionGethKeychainRequest {
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof RunTransactionGethKeychainRequest
+     */
+    web3SigningCredential: Web3SigningCredential;
+    /**
+     * 
+     * @type {QuorumTransactionConfig}
+     * @memberof RunTransactionGethKeychainRequest
+     */
+    transactionConfig: QuorumTransactionConfig;
+    /**
+     * The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing.
+     * @type {number}
+     * @memberof RunTransactionGethKeychainRequest
+     */
+    timeoutMs?: number;
+}
+/**
+ * 
+ * @export
+ * @interface RunTransactionGethKeychainResponse
+ */
+export interface RunTransactionGethKeychainResponse {
+    /**
+     * 
+     * @type {Web3TransactionReceipt}
+     * @memberof RunTransactionGethKeychainResponse
+     */
+    transactionReceipt: Web3TransactionReceipt;
+}
+/**
+ * 
+ * @export
+ * @interface RunTransactionPrivateKeyRequest
+ */
+export interface RunTransactionPrivateKeyRequest {
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof RunTransactionPrivateKeyRequest
+     */
+    web3SigningCredential: Web3SigningCredential;
+    /**
+     * 
+     * @type {QuorumTransactionConfig}
+     * @memberof RunTransactionPrivateKeyRequest
+     */
+    transactionConfig: QuorumTransactionConfig;
+    /**
+     * The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing.
+     * @type {number}
+     * @memberof RunTransactionPrivateKeyRequest
+     */
+    timeoutMs?: number;
+}
+/**
+ * 
+ * @export
+ * @interface RunTransactionPrivateKeyResponse
+ */
+export interface RunTransactionPrivateKeyResponse {
+    /**
+     * 
+     * @type {Web3TransactionReceipt}
+     * @memberof RunTransactionPrivateKeyResponse
+     */
+    transactionReceipt: Web3TransactionReceipt;
+}
+/**
+ * 
+ * @export
  * @interface RunTransactionRequest
  */
 export interface RunTransactionRequest {
@@ -914,6 +1028,108 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Executes a transaction on a quorum ledger using cactus keychain ref.
+         * @param {RunTransactionCactusKeychainRefRequest} [runTransactionCactusKeychainRefRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTransactionCactusKeychainRefV1: async (runTransactionCactusKeychainRefRequest?: RunTransactionCactusKeychainRefRequest, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-cactus-keychain-ref`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionCactusKeychainRefRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a quorum ledger using geth keychain.
+         * @param {RunTransactionGethKeychainRequest} [runTransactionGethKeychainRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTransactionGethKeychainV1: async (runTransactionGethKeychainRequest?: RunTransactionGethKeychainRequest, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-geth-keychain`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionGethKeychainRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a quorum ledger using private key.
+         * @param {RunTransactionPrivateKeyRequest} [runTransactionPrivateKeyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTransactionPrivateKeyV1: async (runTransactionPrivateKeyRequest?: RunTransactionPrivateKeyRequest, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction-private-key`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionPrivateKeyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Executes a transaction on a quorum ledger
          * @param {RunTransactionRequest} [runTransactionRequest] 
          * @param {*} [options] Override http request option.
@@ -1012,6 +1228,39 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Executes a transaction on a quorum ledger using cactus keychain ref.
+         * @param {RunTransactionCactusKeychainRefRequest} [runTransactionCactusKeychainRefRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async runTransactionCactusKeychainRefV1(runTransactionCactusKeychainRefRequest?: RunTransactionCactusKeychainRefRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionCactusKeychainRefResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionCactusKeychainRefV1(runTransactionCactusKeychainRefRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a quorum ledger using geth keychain.
+         * @param {RunTransactionGethKeychainRequest} [runTransactionGethKeychainRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async runTransactionGethKeychainV1(runTransactionGethKeychainRequest?: RunTransactionGethKeychainRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionGethKeychainResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionGethKeychainV1(runTransactionGethKeychainRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a quorum ledger using private key.
+         * @param {RunTransactionPrivateKeyRequest} [runTransactionPrivateKeyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async runTransactionPrivateKeyV1(runTransactionPrivateKeyRequest?: RunTransactionPrivateKeyRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionPrivateKeyResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionPrivateKeyV1(runTransactionPrivateKeyRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Executes a transaction on a quorum ledger
          * @param {RunTransactionRequest} [runTransactionRequest] 
          * @param {*} [options] Override http request option.
@@ -1079,6 +1328,36 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         invokeContractV1NoKeychain(invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
             return localVarFp.invokeContractV1NoKeychain(invokeContractJsonObjectV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a quorum ledger using cactus keychain ref.
+         * @param {RunTransactionCactusKeychainRefRequest} [runTransactionCactusKeychainRefRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTransactionCactusKeychainRefV1(runTransactionCactusKeychainRefRequest?: RunTransactionCactusKeychainRefRequest, options?: any): AxiosPromise<RunTransactionCactusKeychainRefResponse> {
+            return localVarFp.runTransactionCactusKeychainRefV1(runTransactionCactusKeychainRefRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a quorum ledger using geth keychain.
+         * @param {RunTransactionGethKeychainRequest} [runTransactionGethKeychainRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTransactionGethKeychainV1(runTransactionGethKeychainRequest?: RunTransactionGethKeychainRequest, options?: any): AxiosPromise<RunTransactionGethKeychainResponse> {
+            return localVarFp.runTransactionGethKeychainV1(runTransactionGethKeychainRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Executes a transaction on a quorum ledger using private key.
+         * @param {RunTransactionPrivateKeyRequest} [runTransactionPrivateKeyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runTransactionPrivateKeyV1(runTransactionPrivateKeyRequest?: RunTransactionPrivateKeyRequest, options?: any): AxiosPromise<RunTransactionPrivateKeyResponse> {
+            return localVarFp.runTransactionPrivateKeyV1(runTransactionPrivateKeyRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1157,6 +1436,42 @@ export class DefaultApi extends BaseAPI {
      */
     public invokeContractV1NoKeychain(invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options?: any) {
         return DefaultApiFp(this.configuration).invokeContractV1NoKeychain(invokeContractJsonObjectV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Executes a transaction on a quorum ledger using cactus keychain ref.
+     * @param {RunTransactionCactusKeychainRefRequest} [runTransactionCactusKeychainRefRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public runTransactionCactusKeychainRefV1(runTransactionCactusKeychainRefRequest?: RunTransactionCactusKeychainRefRequest, options?: any) {
+        return DefaultApiFp(this.configuration).runTransactionCactusKeychainRefV1(runTransactionCactusKeychainRefRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Executes a transaction on a quorum ledger using geth keychain.
+     * @param {RunTransactionGethKeychainRequest} [runTransactionGethKeychainRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public runTransactionGethKeychainV1(runTransactionGethKeychainRequest?: RunTransactionGethKeychainRequest, options?: any) {
+        return DefaultApiFp(this.configuration).runTransactionGethKeychainV1(runTransactionGethKeychainRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Executes a transaction on a quorum ledger using private key.
+     * @param {RunTransactionPrivateKeyRequest} [runTransactionPrivateKeyRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public runTransactionPrivateKeyV1(runTransactionPrivateKeyRequest?: RunTransactionPrivateKeyRequest, options?: any) {
+        return DefaultApiFp(this.configuration).runTransactionPrivateKeyV1(runTransactionPrivateKeyRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
