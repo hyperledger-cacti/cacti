@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-odap-hermes",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "proof of concept of odap",
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
