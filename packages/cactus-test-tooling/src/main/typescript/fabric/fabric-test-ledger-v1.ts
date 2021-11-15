@@ -72,7 +72,7 @@ export interface LedgerStartOptions {
  */
 const DEFAULT_OPTS = Object.freeze({
   imageName: "ghcr.io/hyperledger/cactus-fabric-all-in-one",
-  imageVersion: "2021-09-02--fix-876-supervisord-retries",
+  imageVersion: "v1.0.0-rc.2",
   envVars: new Map([["FABRIC_VERSION", "1.4.8"]]),
   stateDatabase: STATE_DATABASE.COUCH_DB,
   orgList: ["org1", "org2"],
