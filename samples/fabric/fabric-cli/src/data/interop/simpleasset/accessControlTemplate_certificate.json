@@ -16,13 +16,13 @@
     {
       "principal": "<certificate>",
       "principalType": "certificate",
-      "resource": "mychannel:simpleasset:GetHTLCHashPreImageByContractId:*",
+      "resource": "mychannel:simpleasset:GetHTLCHashPreImage:*",
       "read": true
     },
     {
       "principal": "<certificate>",
       "principalType": "certificate",
-      "resource": "mychannel:simpleasset:GetHTLCHashPreImage:*",
+      "resource": "mychannel:simpleasset:GetHTLCHashPreImageByContractId:*",
       "read": true
     }
   ]

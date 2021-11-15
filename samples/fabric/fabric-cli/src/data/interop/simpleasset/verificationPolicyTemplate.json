@@ -16,14 +16,14 @@
         }
       },
       {
-        "pattern": "mychannel:simpleasset:GetHTLCHashPreImageByContractId:*",
+        "pattern": "mychannel:simpleasset:GetHTLCHashPreImage:*",
         "policy": {
           "type": "Signature",
           "criteria": []
         }
       },
       {
-        "pattern": "mychannel:simpleasset:GetHTLCHashPreImage:*",
+        "pattern": "mychannel:simpleasset:GetHTLCHashPreImageByContractId:*",
         "policy": {
           "type": "Signature",
           "criteria": []

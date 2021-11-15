@@ -384,7 +384,7 @@ val response = InteroperableHelper.interopFlow(
     'trade-finance-network',              // Local network name (destination)
     true,                                 // Boolean indication TLS is enabled.
     <relayTlsTrustStorePath>              // JKS file path containing relay server TLS CA certificates
-    <relayTlsTrustStorePassword>          // password used to create the JKS file
+    <relayTlsTrustStorePassword>,         // password used to create the JKS file
 )
 ```
 OR
@@ -395,7 +395,7 @@ val response = InteroperableHelper.interopFlow(
     <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
     'trade-finance-network',              // Local network name (destination)
     true,                                 // Boolean indication TLS is enabled.
-    <tlsCACertPathsForRelay>              // colon-separated list of CA certificate file paths
+    <tlsCACertPathsForRelay>,             // colon-separated list of CA certificate file paths
 )
 ```
 -->

@@ -45,12 +45,12 @@ local file system or from Github Packages.
 For local versions, the `get-cordapps` script assumes that _a)_ the repositories
 for these are at the same directory level as the `networks-setup` repository,
 and _b)_ that the cordapp executables have been built in those repos. The
-required CorDapps are in
-[corda-interop-app](../../../core/network/corda-interop-app) and
-[corda-simple-application](../../../samples/corda/corda-simple-application) and
-[fungible-house-token](../../../samples/corda/fungible-house-token)
-and the instructions for building these projects can be found in their
-respective repos.
+required CorDapps are in:
+* [corda-interop-app](../../../core/network/corda-interop-app)
+* [corda-simple-application](../../../samples/corda/corda-simple-application)
+* [fungible-house-token](../../../samples/corda/fungible-house-token)
+
+The instructions for building these projects can be found in their respective folders.
 
 To get the CorDapps from Github Packages you will need to have permission to do so:
 

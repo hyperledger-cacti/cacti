@@ -6,7 +6,7 @@ profile=${2:-"1-node"}
 nw=${3:-Corda_Network}
 
 simpleAppVersion="0.4"
-houseTokenAppversion="1.0"
+houseTokenAppVersion="1.0"
 tokenVersion="1.2"
 
 weaverVersion="1.2.4-alpha.6"
@@ -20,8 +20,8 @@ for party in ${parties}; do
     cp $directory/../shared/artifacts/contracts-kotlin-$simpleAppVersion.jar dev/${nw}/build/nodes/${party}/cordapps
     cp $directory/../shared/artifacts/workflows-kotlin-$simpleAppVersion.jar dev/${nw}/build/nodes/${party}/cordapps
   elif [ "house" = "$app" ]; then
-    cp $directory/../shared/artifacts/contracts-$houseTokenAppversion.jar dev/${nw}/build/nodes/${party}/cordapps
-    cp $directory/../shared/artifacts/workflows-$houseTokenAppversion.jar dev/${nw}/build/nodes/${party}/cordapps
+    cp $directory/../shared/artifacts/contracts-$houseTokenAppVersion.jar dev/${nw}/build/nodes/${party}/cordapps
+    cp $directory/../shared/artifacts/workflows-$houseTokenAppVersion.jar dev/${nw}/build/nodes/${party}/cordapps
     
     cp $directory/../shared/artifacts/tokens-contracts-$tokenVersion.jar dev/${nw}/build/nodes/${party}/cordapps
     cp $directory/../shared/artifacts/tokens-workflows-$tokenVersion.jar dev/${nw}/build/nodes/${party}/cordapps

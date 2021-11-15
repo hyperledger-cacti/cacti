@@ -954,10 +954,6 @@ func GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contra
 	return getHTLCHashHelper(ctx, assetLockVal.LockInfo)
 }
 
-func GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
-	return getHashPreImageHelper(ctx, generateClaimContractIdMapKey(contractId))
-}
-
 func GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
 	assetAgreementBytes, err := base64.StdEncoding.DecodeString(assetAgreementBytesBase64)
 	if err != nil {
@@ -978,6 +974,10 @@ func GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChai
 	}
 	
 	return getHashPreImageHelper(ctx, claimAssetLockKey)
+}
+
+func GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+	return getHashPreImageHelper(ctx, generateClaimContractIdMapKey(contractId))
 }
 
 func getHTLCHashHelper(ctx contractapi.TransactionContextInterface, lockInfo interface{}) (string, error) {

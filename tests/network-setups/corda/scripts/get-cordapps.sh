@@ -62,9 +62,9 @@ elif [ "house" = "$app" ]; then
 
   ### Token SDK ###
 
-  wget https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/ci/ci-workflows/1.0/ci-workflows-1.0.jar -P $directory/../shared/artifacts
-  wget https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/tokens/tokens-contracts/$tokenVersion/tokens-contracts-$tokenVersion.jar -P $directory/../shared/artifacts
-  wget https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/tokens/tokens-workflows/$tokenVersion/tokens-workflows-$tokenVersion.jar -P $directory/../shared/artifacts
+  (cd $directory/../shared/artifacts && curl -O https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/ci/ci-workflows/1.0/ci-workflows-1.0.jar) || exit 1
+  (cd $directory/../shared/artifacts && curl -O https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/tokens/tokens-contracts/$tokenVersion/tokens-contracts-$tokenVersion.jar) || exit 1
+  (cd $directory/../shared/artifacts && curl -O https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/tokens/tokens-workflows/$tokenVersion/tokens-workflows-$tokenVersion.jar) || exit 1
 
 else
   echo "Cordapp not found" && exit 1
