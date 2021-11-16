@@ -62,25 +62,25 @@ run the following steps:
        ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
        ```
        
-     Above steps complete a successful asset exchange between two Fabric networks. 
-     In addition to above commands, following are the extra options:
-     - _In case_, `alice` wants to unlock the bond asset, run the following to trigger `alice`'s re-claim for `bond01:a03` locked in `network1`:
+     The above steps complete a successful asset exchange between two Fabric networks. 
+     In addition to the above commands, following are the extra options:
+     - If `alice` wants to unlock the bond asset, run the following to trigger `alice`'s re-claim for `bond01:a03` locked in `network1`:
        ```bash
        ./bin/fabric-cli asset exchange-step --step=7 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
        ```
-     - _In case_, `bob` wants to unlock the token asset, run the following to trigger `bob`'s re-claim for `token1:100` locked in `network2`:
+     - If `bob` wants to unlock the token asset, run the following to trigger `bob`'s re-claim for `token1:100` locked in `network2`:
        ```bash
        ./bin/fabric-cli asset exchange-step --step=8 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
        ```
        
 ## Fabric with Corda
 
-We will demonstrate asset exchange of a bond in fabric `network1` with tokens on `Corda_Network`.
-For fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda commands, run from `samples/corda/corda-simple-application` folder. Here `Alice` and `Bob` in fabric `network1` correspond to `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` respectively. Following are the step-by-step asset exchange process:
+We will demonstrate asset exchange of a bond in Fabric `network1` with tokens on `Corda_Network`.
+For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda commands, run from `samples/corda/corda-simple-application` folder. Here `Alice` and `Bob` in Fabric `network1` correspond to `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` respectively. Following are the step-by-step asset exchange process:
 
 (_Note: the hash pair used in following steps can be replaced by any valid `sha256` hash pair_)
 
-- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the fabric network `network1` from `samples/fabric/fabric-cli` folder:
+- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
  ```bash
  ./scripts/getAssetStatus.sh
  ```
@@ -109,12 +109,12 @@ For fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda 
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset --secret=secrettext --contract-id=<contract-id>
   ```
-  (_Note: Here the `PartyB` can see the node's log to get the revealed the hash preimage, to use it to claim bond in fabric network._)
+  (_Note: Here the `PartyB` can see the node's log to get the revealed the hash preimage, to use it to claim bond in Fabric network._)
 - Run the following to trigger `bob`'s claim for `bond01:a03` locked by `alice` in `network1`:
   ```bash
   ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=secrettext
   ```
-- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the fabric network `network1` from `samples/fabric/fabric-cli` folder:
+- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
    ```bash
    ./scripts/getAssetStatus.sh
    ```
@@ -123,14 +123,13 @@ For fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda 
   ./scripts/getAssetStatus.sh
   ```
 
-
-Above steps complete a successful asset exchange between Fabric and Corda networks. 
-In addition to above commands, following are the extra options:
-- _In case_, `alice` wants to unlock the bond asset, run the following to trigger `alice`'s re-claim for `bond01:a03` locked in `network1`:
+The above steps complete a successful asset exchange between Fabric and Corda networks. 
+In addition to the above commands, following are the extra options:
+- If `alice` wants to unlock the bond asset, run the following to trigger `alice`'s re-claim for `bond01:a03` locked in `network1`:
   ```bash
   ./bin/fabric-cli asset exchange-step --step=7 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
   ```
-- _In case_, `PartyB` wants to unlock the token asset, run the following to trigger unlock for `t1:50` locked in `Corda_Network`:
+- If `PartyB` wants to unlock the token asset, run the following to trigger unlock for `t1:50` locked in `Corda_Network`:
   ```bash
   CORDA_PORT=10009 ./clients/build/install/clients/bin/clients unlock-asset --contract-id=<contract-id>
   ```
@@ -167,7 +166,7 @@ We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on
   ```bash
   CORDA_PORT=30006 ./clients/build/install/clients/bin/clients claim-asset --secret=secrettext --contract-id=<contract-id-2>
   ```
-  (_Note: Here the `PartyB` can see the node's log to get the revealed the hash preimage, to use it to claim bond in fabric network._)
+  (_Note: Here the `PartyB` can see the node's log to get the revealed the hash preimage, to use it to claim bond in Fabric network._)
 - Run the following to trigger `PartyB`'s claim for `30` units of token type `t1` locked by `PartyA` in `Corda_Network`:
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset --secret=secrettext --contract-id=<contract-id-1>
@@ -178,13 +177,13 @@ We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on
   ```
 
 
-Above steps complete a successful asset exchange between two Corda networks. 
-In addition to above commands, following are the extra options:
-- _In case_, `PartyA` wants to unlock the token `t1:30` asset, run the following to trigger `PartyA`'s re-claim in `Corda_Network`:
+The above steps complete a successful asset exchange between two Corda networks. 
+In addition to the above commands, following are the extra options:
+- If `PartyA` wants to unlock the token `t1:30` asset, run the following to trigger `PartyA`'s re-claim in `Corda_Network`:
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset --contract-id=<contract-id-1>
   ```
-- _In case_, `PartyB` wants to unlock the token `t2:50` asset, run the following to trigger `PartyB`'s re-claim in `Corda_Network2`:
+- If `PartyB` wants to unlock the token `t2:50` asset, run the following to trigger `PartyB`'s re-claim in `Corda_Network2`:
   ```bash
   CORDA_PORT=30009 ./clients/build/install/clients/bin/clients unlock-asset --contract-id=<contract-id-2>
   ```

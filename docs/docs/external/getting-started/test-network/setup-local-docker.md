@@ -255,11 +255,11 @@ Build the `corda-simple-application` Cordapp as follows:
 
 ### Corda Network
 
-The Corda network code lies in the `tests/network-setups/corda` folder. You can launch  two corda networks (`Corda_Network` and `Corda_Network2`). The networks use `samples/corda/corda-simple-application` by default, which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
+The Corda network code lies in the `tests/network-setups/corda` folder. You can launch two Corda networks (`Corda_Network` and `Corda_Network2`). The networks use `samples/corda/corda-simple-application` by default, which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
-- To spin up the Corda networks with the interoperation Cordapp:
+- To spin up the Corda networks with the Interoperation Cordapps:
   - Each consisting of 1 node and a notary (for data-transfer), run:
     ```bash
     make start-local
@@ -320,11 +320,11 @@ Run a Corda driver as follows:
   ```
   DOCKER_IMAGE_NAME=weaver-corda-driver
   ```
-- To deploy corda driver for `Corda_Network`, run:
+- To deploy Corda driver for `Corda_Network`, run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
   ```
-- To deploy corda driver for `Corda_Network2`, run:
+- To deploy Corda driver for `Corda_Network2`, run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
   ```
