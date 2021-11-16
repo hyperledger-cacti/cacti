@@ -21,10 +21,8 @@ class Application {
     @Bean
     open fun mappingJackson2HttpMessageConverter(@Autowired rpcConnection: NodeRPCConnection): MappingJackson2HttpMessageConverter {
         val mapper = JacksonSupport.createDefaultMapper(rpcConnection.proxy)
-        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-        mapper.disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        mapper.disable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            .disable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE)
         val converter = MappingJackson2HttpMessageConverter()
         converter.objectMapper = mapper
         return converter
