@@ -50,6 +50,23 @@ func matchClaimWithAssetPledge(pledgeAssetDetails, claimAssetDetails []byte) boo
 		pledgeAsset.MaturityDate.Equal(claimAsset.MaturityDate))
 }
 
+func getBondAsset(ctx contractapi.TransactionContextInterface, assetType, id string) (*BondAsset, error) {
+	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read asset record from world state: %v", err)
+	}
+	if assetJSON == nil {
+		return nil, fmt.Errorf("the asset %s does not exist", id)
+	}
+
+	var asset BondAsset
+	err = json.Unmarshal(assetJSON, &asset)
+	if err != nil {
+		return nil, err
+	}
+	return &asset, nil
+}
+
 // InitBondAssetLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextInterface, localNetworkId string) error {
     err := ctx.GetStub().PutState(localNetworkIdKey, []byte(localNetworkId))
@@ -123,26 +140,40 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
+// ReadAsset returns the asset stored in the world state with given id.
+// This function is called with the parameter inUpdateOwnerContext value as false, except in the update-owner context
+func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, assetType, id string) (*BondAsset, error) {
+	asset, err := getBondAsset(ctx, assetType, id)
+	if err != nil {
+		return nil, err
+	}
+	if !checkAccessToAsset(s, ctx, asset) {
+		return nil, fmt.Errorf("cannot access Bond Asset %s", id)
+	}
+	return asset, nil
+}
+
+// DeleteAsset deletes an given asset from the world state.
+func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, assetType, id string) error {
+	
+	// Read the asset (which internally check access)
+	asset, err := s.ReadAsset(ctx, assetType, id)
+	if err != nil {
+		return err
+	}
+	return ctx.GetStub().DelState(getBondAssetKey(asset.Type, asset.ID))
+}
+
 // PledgeAsset locks an asset for transfer to a different ledger/network.
 func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface, assetType, id, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) error {
-	// Look up the asset details using app-specific-logic
-	assetKey := getBondAssetKey(assetType, id)
-	assetJSON, err := ctx.GetStub().GetState(assetKey)
+	// Read the asset (which internally checks access)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
-		return fmt.Errorf("failed to read asset record from world state: %v", err)
+		return err
 	}
-	if assetJSON == nil {
-		return fmt.Errorf("the asset %s does not exist", id)
-	}
-
-	// Ensure that the client is the owner of the asset using app-specific logic
-	if !checkAccessToAsset(s, ctx, assetJSON) {
-		return fmt.Errorf("Canot pledge asset %s", id)
-	}
-
-	// Get asset owner using app-specific-logic
-	var asset BondAsset
-	err = json.Unmarshal(assetJSON, &asset)
+	
+	// Create JSON of asset to be used by wutils.PledgeAsset
+	assetJSON, err := json.Marshal(asset)
 	if err != nil {
 		return err
 	}
@@ -150,14 +181,14 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 	// Pledge the asset using common (library) logic
 	if _, err = wutils.PledgeAsset(ctx, assetJSON, assetType, id, 0, asset.Owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
 		// Delete asset state using app-specific logic
-		return ctx.GetStub().DelState(assetKey)
+		return ctx.GetStub().DelState(getBondAssetKey(assetType, id))
 	} else {
 		return err
 	}
 }
 
 // ClaimRemoteAsset gets ownership of an asset transferred from a different ledger/network.
-func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, assetType, id, owner, remoteNetworkId, pledgeJSON string) error {
+func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, assetType, id, owner, remoteNetworkId string, pledgeBytes []byte) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	// Claim the asset using common (library) logic
@@ -165,7 +196,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return err
 	}
-	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, assetType, id, owner, remoteNetworkId, pledgeJSON, claimer)
+	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, assetType, id, owner, remoteNetworkId, pledgeBytes, claimer)
 	if err != nil {
 		return err
 	}
@@ -194,11 +225,11 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 }
 
 // ReclaimAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
-func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId, claimStatusJSON string) error {
+func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId string, claimStatusBytes []byte) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	// Reclaim the asset using common (library) logic
-	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, assetType, id, recipientCert, remoteNetworkId, claimStatusJSON)
+	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, assetType, id, recipientCert, remoteNetworkId, claimStatusBytes)
 	if err != nil {
 		return err
 	}
@@ -222,38 +253,8 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), pledgeAssetDetails)
 }
 
-// ReadAsset returns the asset stored in the world state with given id.
-// This function is called with the parameter inUpdateOwnerContext value as false, except in the update-owner context
-func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, assetType, id string, isUpdateOwnerContext bool) (*BondAsset, error) {
-	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
-	if err != nil {
-		return nil, fmt.Errorf("failed to read asset record from world state: %v", err)
-	}
-	if assetJSON == nil {
-		return nil, fmt.Errorf("the asset %s does not exist", id)
-	}
-
-	var asset BondAsset
-	err = json.Unmarshal(assetJSON, &asset)
-	if err != nil {
-		return nil, err
-	}
-	// In the update owner context, the TxCreator will be the newOwner. Hence don't check if the TxCreator is the current owner.
-	if !isUpdateOwnerContext {
-		owner, err := getECertOfTxCreatorBase64(ctx)
-		if err != nil {
-			return nil, err
-		}
-		if asset.Owner != owner {
-			return nil, fmt.Errorf("access not allowed to asset of type %s with id %s", assetType, id)
-		}
-	}
-
-	return &asset, nil
-}
-
 // GetAssetPledgeStatus returns the asset pledge status.
-func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, owner, recipientNetworkId, recipientCert string) (string, error) {
+func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, owner, recipientNetworkId, recipientCert string) ([]byte, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
 	// Create blank asset details using app-specific-logic
@@ -267,33 +268,33 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 	}
 	blankAssetJSON, err := json.Marshal(blankAsset)
 	if err != nil {
-		return "", err
+		return []byte(""), err
 	}
 
 	// Fetch asset pledge details using common (library) logic
-	pledgeAssetDetails, pledgeJSON, blankPledgeJSON, err := wutils.GetAssetPledgeStatus(ctx, assetType, id, recipientNetworkId, recipientCert, blankAssetJSON)
+	pledgeAssetDetails, pledgeBytes, blankPledgeBytes, err := wutils.GetAssetPledgeStatus(ctx, assetType, id, recipientNetworkId, recipientCert, blankAssetJSON)
 	if err != nil {
-		return blankPledgeJSON, err
+		return blankPledgeBytes, err
 	}
 	if pledgeAssetDetails == nil {
-		return blankPledgeJSON, err
+		return blankPledgeBytes, err
 	}
 
 	// Validate returned asset details using app-specific-logic
 	var lookupPledgeAsset BondAsset
 	err = json.Unmarshal(pledgeAssetDetails, &lookupPledgeAsset)
 	if err != nil {
-		return blankPledgeJSON, err
+		return blankPledgeBytes, err
 	}
 	if lookupPledgeAsset.Owner != owner {
-		return blankPledgeJSON, nil      // Return blank
+		return blankPledgeBytes, nil      // Return blank
 	}
 
-	return pledgeJSON, nil
+	return pledgeBytes, nil
 }
 
 // GetAssetClaimStatus returns the asset claim status and present time (of invocation).
-func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
+func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) ([]byte, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
 	// Create blank asset details using app-specific-logic
@@ -307,68 +308,40 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 	}
 	blankAssetJSON, err := json.Marshal(blankAsset)
 	if err != nil {
-		return "", err
+		return []byte(""), err
 	}
 
 	// Fetch asset claim details using common (library) logic
-	claimAssetDetails, claimJSON, blankClaimJSON, err := wutils.GetAssetClaimStatus(ctx, assetType, id, recipientCert, pledger, pledgerNetworkId, pledgeExpiryTimeSecs, blankAssetJSON)
+	claimAssetDetails, claimBytes, blankClaimBytes, err := wutils.GetAssetClaimStatus(ctx, assetType, id, recipientCert, pledger, pledgerNetworkId, pledgeExpiryTimeSecs, blankAssetJSON)
 	if err != nil {
-		return blankClaimJSON, err
+		return blankClaimBytes, err
 	}
 	if claimAssetDetails == nil {
-		return blankClaimJSON, err
+		return blankClaimBytes, err
 	}
 
 	// Validate returned asset details using app-specific-logic
 
 	// The asset should be recorded if it has been claimed, so we should look that up first
-	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
+	asset, err := getBondAsset(ctx, assetType, id)
 	if err != nil {
-		return blankClaimJSON, fmt.Errorf("failed to read asset record from world state: %v", err)
-	}
-	if assetJSON == nil {
-		return blankClaimJSON, nil      // Return blank
-	}
-
-	// Check if this asset is owned by the given recipient
-	var asset BondAsset
-	err = json.Unmarshal(assetJSON, &asset)
-	if err != nil {
-		return blankClaimJSON, err
+		return blankClaimBytes, fmt.Errorf("failed to read asset record from world state: %v", err)
 	}
 	if asset.Owner != recipientCert {
-		return blankClaimJSON, nil      // Return blank
-	}
+		return blankClaimBytes, nil      // Return blank
+	}	
 
 	// Match pledger identity in claim with request parameters
 	var lookupClaimAsset BondAsset
 	err = json.Unmarshal(claimAssetDetails, &lookupClaimAsset)
 	if err != nil {
-		return blankClaimJSON, err
+		return blankClaimBytes, err
 	}
 	if lookupClaimAsset.Owner != pledger {
-		return blankClaimJSON, nil      // Return blank
+		return blankClaimBytes, nil      // Return blank
 	}
 
-	return claimJSON, nil
-}
-
-// DeleteAsset deletes an given asset from the world state.
-func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, assetType, id string) error {
-	assetKey := getBondAssetKey(assetType, id)
-	assetJSON, err := ctx.GetStub().GetState(assetKey)
-	if err != nil {
-		return fmt.Errorf("failed to read asset record from world state: %v", err)
-	}
-	if assetJSON == nil {
-		return fmt.Errorf("the bond asset of type %s and id %s does not exist", assetType, id)
-	}
-	// Ensure that the client is the owner of the asset
-	if !checkAccessToAsset(s, ctx, assetJSON) {
-		return fmt.Errorf("Cannot delete asset %s", id)
-	}
-
-	return ctx.GetStub().DelState(assetKey)
+	return claimBytes, nil
 }
 
 // isCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
@@ -426,22 +399,15 @@ func isBondAssetLockedForMe(s *SmartContract, ctx contractapi.TransactionContext
 }
 
 // checkAccessToAsset checks several conditions under which an asset can be put on hold (i.e., not available for regular business operation)
-func checkAccessToAsset(s *SmartContract, ctx contractapi.TransactionContextInterface, assetJSON []byte) bool {
-	var asset BondAsset
-	err := json.Unmarshal(assetJSON, &asset)
-	if err != nil {
-		fmt.Println(err.Error())
-		return false
-	}
-
+func checkAccessToAsset(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	// Ensure that the client is the owner of the asset
-	if !isCallerAssetOwner(ctx, &asset) {
+	if !isCallerAssetOwner(ctx, asset) {
 		fmt.Printf("Illegal update: caller is not owner of asset %s\n", asset.ID)
 		return false
 	}
 
 	// Ensure that the asset is not locked
-	if isBondAssetLocked(s, ctx, &asset) {
+	if isBondAssetLocked(s, ctx, asset) {
 		fmt.Printf("Cannot update attributes of locked asset %s\n", asset.ID)
 		return false
 	}
@@ -458,9 +424,10 @@ func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface,
 
 	return assetJSON != nil, nil
 }
+
 // IsAssetReleased returns true if asset maturity date elapses
 func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterface, assetType, id string) (bool, error) {
-	asset, err := s.ReadAsset(ctx, assetType, id, false)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return false, err
 	}
@@ -474,7 +441,8 @@ func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterf
 
 // UpdateOwner sets the owner of an asset to a new owner.
 func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface, assetType, id string, newOwner string) error {
-	asset, err := s.ReadAsset(ctx, assetType, id, true)
+	// Read asset (which internally checks access if it is free to modified)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -485,22 +453,13 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 
-	// If the asset is locked, only the lock recipient can update the Owner field
-	if isBondAssetLocked(s, ctx, asset) {
-		return fmt.Errorf("Illegal update: cannot change ownership of locked asset %s in this transaction\n", asset.ID)
-	} else {
-		// If asset is not locked, only the owner can update the Owner field
-		if !isCallerAssetOwner(ctx, asset) {
-			return fmt.Errorf("Illegal update: caller is not owner of asset %s\n", asset.ID)
-		}
-	}
-
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
 // UpdateMaturityDate sets the maturity date of the asset to an updated date as passed in the parameters.
 func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInterface, assetType, id string, newMaturityDate time.Time) error {
-	asset, err := s.ReadAsset(ctx, assetType, id, false)
+	// Read asset (which internally checks access if it is free to modified)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -511,17 +470,13 @@ func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInt
 		return err
 	}
 
-	// Ensure that the asset is free to be modified
-	if !checkAccessToAsset(s, ctx, assetJSON) {
-		return fmt.Errorf("Cannot update maturity date of asset %s", id)
-	}
-
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
 // UpdateFaceValue sets the face value of an asset to the new value passed.
 func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterface, assetType, id string, newFaceValue int) error {
-	asset, err := s.ReadAsset(ctx, assetType, id, false)
+	// Read asset (which internally checks access if it is free to modified)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -532,20 +487,11 @@ func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterf
 		return err
 	}
 
-	// Ensure that the asset is free to be modified
-	if !checkAccessToAsset(s, ctx, assetJSON) {
-		return fmt.Errorf("Cannot update face value of asset %s", id)
-	}
-
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
 // GetMyAssets returns the assets owner by the caller
 func (s *SmartContract) GetMyAssets(ctx contractapi.TransactionContextInterface) ([]*BondAsset, error) {
-	owner, err := getECertOfTxCreatorBase64(ctx)
-	if err != nil {
-		return nil, err
-	}
 	assets, err := s.GetAllAssets(ctx)
 	if err != nil {
 		return nil, err
@@ -554,7 +500,7 @@ func (s *SmartContract) GetMyAssets(ctx contractapi.TransactionContextInterface)
 	var myassets []*BondAsset
 
 	for _, asset := range assets {
-		if asset.Owner == owner {
+		if checkAccessToAsset(s, ctx, asset) {
 			myassets = append(myassets, asset)
 		}
 	}
