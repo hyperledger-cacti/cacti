@@ -78,7 +78,7 @@ run the following steps:
 We will demonstrate asset exchange of a bond in Fabric `network1` with tokens on `Corda_Network`.
 For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda commands, run from `samples/corda/corda-simple-application` folder. Here `Alice` and `Bob` in Fabric `network1` correspond to `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` respectively. Following are the step-by-step asset exchange process:
 
-(_Note: the hash pair used in following steps can be replaced by any valid `sha256` hash pair_)
+(_Note: the hash used in following steps can be replaced by any valid `sha256` hash_)
 
 - Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
  ```bash
@@ -138,7 +138,7 @@ In addition to the above commands, following are the extra options:
 
 We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on `Corda_Network2`. Here `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` correspond to `PartyA` (`CORDA_PORT=30006`) and `PartyB` (`CORDA_PORT=30009`) in `Corda_Network2` respectively. Following are the step-by-step asset exchange process:
 
-  (_Note: the hash pair used in following steps can be replaced by any valid `sha256` hash pair_)
+  (_Note: the hash used in following steps can be replaced by any valid `sha256` hash_)
 - Navigate to `samples/corda/corda-simple-application` folder. 
 - Run the following to verify the status of the tokens owned by `PartyA` and `PartyB` in the `Corda_Network` and `Corda_Network2`:
   ```bash
