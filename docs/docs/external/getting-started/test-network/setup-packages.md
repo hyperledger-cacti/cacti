@@ -193,7 +193,7 @@ Using the sequence of instructions below, you can start a Corda network and run 
 
 ### Corda Network
 
-The Corda network code lies in the `tests/network-setups/corda` folder. You can launch two corda networks (`Corda_Network` and `Corda_Network2`). This networks use `samples/corda/corda-simple-application` by default, which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
+The Corda network code lies in the `tests/network-setups/corda` folder. You can launch two Corda networks (`Corda_Network` and `Corda_Network2`). These networks use `samples/corda/corda-simple-application` by default, which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 Following steps will build above cordapp and a corda-client as well in `samples/corda/client`.
 
 #### Running with Interoperation Cordapp from Github Packages
@@ -202,7 +202,7 @@ Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
 - Create a copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
-- To spin up the Corda networks with the interoperation Cordapp:
+- To spin up the Corda networks with the Interoperation Cordapps:
   - Each consisting of 1 node and a notary (for data-transfer), run:
     ```bash
     make start
@@ -233,7 +233,7 @@ The relay was built earlier, so you just need to use a different configuration f
 
 Run a relay in host as follows:
 - Navigate to the `core/relay` folder.
-- Run the following, to start relay for `Corda_Network`:
+- Run the following to start relay for `Corda_Network`:
   ```bash
   RELAY_CONFIG=config/Corda_Relay.toml cargo run --bin server
   ```
@@ -244,7 +244,7 @@ Run a relay in host as follows:
   Relay Name: "Corda_Relay"
   RelayServer listening on [::1]:9081
   ```
-- Run the following, to start relay for `Corda_Network2`:
+- Run the following to start relay for `Corda_Network2`:
   ```bash
   RELAY_CONFIG=config/Corda_Relay2.toml cargo run --bin server
   ```
@@ -275,7 +275,7 @@ Build the Corda driver module as follows:
 
 Run a Corda driver as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
-- Run the following, to start corda driver for `Corda_Network`:
+- Run the following to start Corda driver for `Corda_Network`:
   ```bash
   ./build/install/corda-driver/bin/corda-driver
   ```
@@ -283,7 +283,7 @@ Run a Corda driver as follows:
   ```
   Corda driver gRPC server started. Listening on port 9099
   ```
-- Run the following, to start corda driver for `Corda_Network2`:
+- Run the following to start Corda driver for `Corda_Network2`:
   ```bash
   DRIVER_PORT=9098 ./build/install/corda-driver/bin/corda-driver
   ```

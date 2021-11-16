@@ -11,7 +11,7 @@ title: Data Sharing
 
 This document lists sample ways in which you can exercise the data-sharing interoperation protocol on the test network [launched earlier](../test-network/overview).
 
-Once the networks, relays, and drivers have been launched, and the ledgers bootstrapped, you can trigger three different interoperation flows corresponding to distinct data-sharing combinations as follows:
+Once the networks, relays, and drivers have been launched, and the ledgers bootstrapped, you can trigger four different interoperation flows corresponding to distinct data-sharing combinations as follows:
 1. **Corda to Corda**: Either Corda network requests state and proof from another Corda network
 2. **Corda to Fabric**: The Corda network requests state and proof from either Fabric network
 3. **Fabric to Corda**: Either Fabric network requests state and proof from the Corda network
@@ -31,11 +31,11 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
     ```bash
     NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
     ```
-  * If Relays and Drivers are deployed in the Docker containers:
+  * If Relays and Drivers are deployed in Docker containers:
     ```bash
     NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
     ```
-- Query the value of the requested state, using key `H` in `Corda_Network` by running the following command:
+- Query the value of the requested state using key `H` in `Corda_Network` by running the following command:
   ```bash
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state H
   ```
@@ -93,7 +93,7 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state Arcturus
   ```
   
-**Note:** You can perform the same data transfer between `Corda_Network2` and either Fabric networks, by setting the env `CORDA_PORT=30006` (the `Corda_Network2` node's RPC port), `NETWORK_NAME=Corda_Network2`, and using `localhost:9082` (the local relay address) as the first argument.
+**Note:** You can perform the same data transfer between `Corda_Network2` and either Fabric networks, by setting the env `CORDA_PORT=30006` (the `Corda_Network2` node's RPC port), `NETWORK_NAME=Corda_Network2`, and using `localhost:9082` (the local relay address) as the argument following request-state.
 
 ## Fabric to Corda
 
