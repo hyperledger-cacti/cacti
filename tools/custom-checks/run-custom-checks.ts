@@ -1,12 +1,13 @@
 import esMain from "es-main";
 import { checkOpenApiJsonSpecs } from "./check-open-api-json-specs";
+import { checkSiblingDepVersionConsistency } from "./check-sibling-dep-version-consistency";
 
 export async function runCustomChecks(
   argv: string[],
   env: NodeJS.ProcessEnv,
   version: string,
 ): Promise<void> {
-  const TAG = "[tools/custom-checks/check-source-code.ts]";
+  const TAG = "[tools/custom-checks/run-custom-checks.ts]";
   let overallSuccess = true;
   let overallErrors: string[] = [];
 
@@ -19,6 +20,13 @@ export async function runCustomChecks(
 
   {
     const [success, errors] = await checkOpenApiJsonSpecs({ argv, env });
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
+
+  {
+    const req = { argv, env };
+    const [success, errors] = await checkSiblingDepVersionConsistency(req);
     overallErrors = overallErrors.concat(errors);
     overallSuccess = overallSuccess && success;
   }
