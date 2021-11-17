@@ -140,7 +140,7 @@ class AssetExchangeTxStateContract : Contract {
                 "There should be one output state." using (tx.outputs.size == 1)
                 "The output state should be of type AssetExchangeTxState." using (tx.outputs[0].data is AssetExchangeTxState)
                 
-                // Check if both locker and recipient are signers
+                // Check if locker is the signer
                 val participantKeys = tx.outputs[0].data.participants.map { it.owningKey }
                 "The required signers of the transaction must include locker." using (command.signers.containsAll(participantKeys))
             }
