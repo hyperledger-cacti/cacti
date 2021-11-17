@@ -1,39 +1,78 @@
 #!/bin/bash
 
 directory=$(dirname $0)
-cordaSimpleAppPath=$directory/../../../../samples/corda/corda-simple-application
-simpleAppVersion="0.4"
-weaverVersion="1.2.4-alpha.5"
+app=${1:-simple}
+local=$2
+weaverVersion="1.2.4-alpha.6"
 
-########## Corda Simple App ##############
+if [ "simple" = "$app" ]; then
+  cordappPath=$directory/../../../../samples/corda/corda-simple-application
+  simpleAppVersion="0.4"
 
-echo "Building Corda Simple App..."
-if [[ $1 == "local" ]]; then
-  if [[ ! -f $cordaSimpleAppPath/contracts-kotlin/build/libs/contracts-kotlin-$simpleAppVersion.jar ]]; then
-      echo "Please Build the corda simple application version $simpleAppVersion to use local components."
-  fi 
-  if [[ ! -f $cordaSimpleAppPath/workflows-kotlin/build/libs/workflows-kotlin-$simpleAppVersion.jar ]]; then
-      echo "Please Build the corda simple application version $simpleAppVersion to use local components."
-  fi 
-else
-  file="$directory/../github.properties"
-  if [ -f $file ]; then
-    cp $file $cordaSimpleAppPath/
-    cd $cordaSimpleAppPath
+  ########## Corda Simple App ##############
+
+  echo "Building Corda Simple App..."
+  if [[ $local == "local" ]]; then
+    if [[ ! -f $cordappPath/contracts-kotlin/build/libs/contracts-kotlin-$simpleAppVersion.jar ]]; then
+        echo "Please Build the corda simple application version $simpleAppVersion to use local components."
+    fi 
+    if [[ ! -f $cordappPath/workflows-kotlin/build/libs/workflows-kotlin-$simpleAppVersion.jar ]]; then
+        echo "Please Build the corda simple application version $simpleAppVersion to use local components."
+    fi 
+  else
+    file="$directory/../github.properties"
+    if [ -f $file ]; then
+      cp $file $cordappPath/
+      cd $cordappPath
+      make build || exit 1
+      cd -
+    else
+      echo Please copy the github.properties.template file as github.properties and replace placeholders with Github credentials.
+    fi
+  fi
+
+  echo "Copying Corda Simple App..."
+  cp $cordappPath/contracts-kotlin/build/libs/contracts-kotlin-$simpleAppVersion.jar $directory/../shared/artifacts
+  cp $cordappPath/workflows-kotlin/build/libs/workflows-kotlin-$simpleAppVersion.jar $directory/../shared/artifacts
+
+elif [ "house" = "$app" ]; then
+  cordappPath=$directory/../../../../samples/corda/fungible-house-token
+  houseTokenAppVersion="1.0"
+  tokenVersion="1.2"
+
+  ########## Fungible House Token App ##############
+
+  echo "Building Fungible House Token App..."
+  if [[ $local == "local" ]]; then
+    if [[ ! -f $cordappPath/source/contracts/build/libs/contracts-$houseTokenAppVersion.jar ]]; then
+        echo "Please Build the fungible house token version $houseTokenAppVersion to use local components."
+    fi 
+    if [[ ! -f $cordappPath/source/workflows/build/libs/workflows-$houseTokenAppVersion.jar ]]; then
+        echo "Please Build the fungible house token version $houseTokenAppVersion to use local components."
+    fi 
+  else
+    cd $cordappPath
     make build || exit 1
     cd -
-  else
-    echo Please copy the github.properties.template file as github.properties and replace placeholders with Github credentials.
   fi
-fi
 
-echo "Copying Corda Simple App..."
-cp $cordaSimpleAppPath/contracts-kotlin/build/libs/contracts-kotlin-$simpleAppVersion.jar $directory/../shared/artifacts
-cp $cordaSimpleAppPath/workflows-kotlin/build/libs/workflows-kotlin-$simpleAppVersion.jar $directory/../shared/artifacts
+  echo "Copying Fungible House Token App..."
+  cp $cordappPath/source/contracts/build/libs/contracts-$houseTokenAppVersion.jar $directory/../shared/artifacts
+  cp $cordappPath/source/workflows/build/libs/workflows-$houseTokenAppVersion.jar $directory/../shared/artifacts
+
+  ### Token SDK ###
+
+  (cd $directory/../shared/artifacts && curl -O https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/ci/ci-workflows/1.0/ci-workflows-1.0.jar) || exit 1
+  (cd $directory/../shared/artifacts && curl -O https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/tokens/tokens-contracts/$tokenVersion/tokens-contracts-$tokenVersion.jar) || exit 1
+  (cd $directory/../shared/artifacts && curl -O https://software.r3.com/artifactory/corda-lib/com/r3/corda/lib/tokens/tokens-workflows/$tokenVersion/tokens-workflows-$tokenVersion.jar) || exit 1
+
+else
+  echo "Cordapp not found" && exit 1
+fi
 
 ######### Corda Interop App ###########
 
-if [[ $1 == "local" ]]; then
+if [[ $local == "local" ]]; then
   if [[ ! -f $directory/../../../../common/protos-java-kt/build/libs/protos-java-kt-$weaverVersion.jar ]]; then
       echo "Please Build the weaver-protos-java-kt version $weaverVersion to use local components."
   fi  

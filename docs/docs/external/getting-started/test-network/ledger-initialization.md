@@ -1,6 +1,8 @@
 ---
 id: ledger-initialization
 title: Ledger Initialization
+pagination_prev: external/getting-started/test-network/overview
+pagination_next: external/getting-started/interop/overview
 ---
 
 <!--
@@ -147,6 +149,17 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 ```bash
 ./scripts/initAsset.sh
 ```
+
+### Initializing the Corda Networks
+
+Corda Network needs to be initialized with assets for asset-exchange to be performed:
+Bootstrap the Corda network and application states as follows:
+- Navigate to the `samples/corda/corda-simple-application` folder.
+- Run the following: 
+  - For `cordaSimpleApplication` app, run:
+    ```
+    ./scripts/initAsset.sh
+    ```
 
 ### Next Steps
 

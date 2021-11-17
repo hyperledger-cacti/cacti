@@ -17,10 +17,13 @@ import com.weaver.corda.app.interop.states.MembershipState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.node.ServiceHub
 import net.corda.core.node.services.queryBy
 import net.corda.core.transactions.TransactionBuilder
+import net.corda.core.transactions.SignedTransaction
+import net.corda.core.identity.Party
 import java.security.cert.X509Certificate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -30,8 +33,12 @@ import java.time.ZoneId
  *
  * @property membership The [MembershipState] provided by the Corda client to be stored in the vault.
  */
+@InitiatingFlow
 @StartableByRPC
-class CreateMembershipState(val membership: MembershipState) : FlowLogic<Either<Error, UniqueIdentifier>>() {
+class CreateMembershipState(
+    val membership: MembershipState,
+    val sharedParties: List<Party> = listOf<Party>()
+) : FlowLogic<Either<Error, UniqueIdentifier>>() {
     /**
      * The call() method captures the logic to create a new [MembershipState] state in the vault.
      *
@@ -46,7 +53,7 @@ class CreateMembershipState(val membership: MembershipState) : FlowLogic<Either<
             // If the flow produces an error, then the membership does not already exist.
 
             // Create the membership to store with our identity listed as a participant
-            val outputState = membership.copy(participants = listOf(ourIdentity))
+            val outputState = membership.copy(participants = listOf(ourIdentity) + sharedParties)
 
             // 2. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
@@ -57,9 +64,14 @@ class CreateMembershipState(val membership: MembershipState) : FlowLogic<Either<
 
             // 3. Verify and collect signatures on the transaction
             txBuilder.verify(serviceHub)
-            val stx = serviceHub.signInitialTransaction(txBuilder)
-            val sessions = listOf<FlowSession>()
-            val storedMembershipState = subFlow(FinalityFlow(stx, sessions)).tx.outputStates.first() as MembershipState
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+            var sessions = listOf<FlowSession>()
+            for (otherParty in sharedParties) {
+                val otherSession = initiateFlow(otherParty)
+                sessions += otherSession
+            }
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+            val storedMembershipState = subFlow(FinalityFlow(fullySignedTx, sessions)).tx.outputStates.first() as MembershipState
 
             // 4. Return the linearId of the state
             println("Successfully stored membership $storedMembershipState in the vault.\n")
@@ -74,6 +86,24 @@ class CreateMembershipState(val membership: MembershipState) : FlowLogic<Either<
         Left(Error("Failed to store state in ledger: ${e.message}"))
     }
 }
+@InitiatedBy(CreateMembershipState::class)
+class CreateMembershipStateResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
+    }
+}
 
 /**
  * The UpdateMembershipState flow is used to update an existing [MembershipState] in the Corda ledger.
@@ -81,6 +111,7 @@ class CreateMembershipState(val membership: MembershipState) : FlowLogic<Either<
  * @property membership The [MembershipState] provided by the Corda client to replace the
  * existing [MembershipState] for that network.
  */
+@InitiatingFlow
 @StartableByRPC
 class UpdateMembershipState(val membership: MembershipState) : FlowLogic<Either<Error, UniqueIdentifier>>() {
     /**
@@ -123,9 +154,18 @@ class UpdateMembershipState(val membership: MembershipState) : FlowLogic<Either<
 
         // 3. Verify and collect signatures on the transaction
         txBuilder.verify(serviceHub)
-        val tx = serviceHub.signInitialTransaction(txBuilder)
-        val sessions = listOf<FlowSession>()
-        val finalTx = subFlow(FinalityFlow(tx, sessions))
+        val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+        
+        var sessions = listOf<FlowSession>()
+        for (otherParty in outputState.participants) {
+            if (otherParty != ourIdentity) {
+                val otherSession = initiateFlow(otherParty)
+                sessions += otherSession
+            }
+        }
+        val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+        
+        val finalTx = subFlow(FinalityFlow(fullySignedTx, sessions))
         println("Successfully updated membership in the ledger: $finalTx\n")
 
         // 4. Return the linearId of the state
@@ -135,12 +175,31 @@ class UpdateMembershipState(val membership: MembershipState) : FlowLogic<Either<
         Left(Error("Failed to store state in ledger: ${e.message}"))
     }
 }
+@InitiatedBy(UpdateMembershipState::class)
+class UpdateMembershipStateResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
+    }
+}
 
 /**
  * The DeleteMembershipState flow is used to delete an existing [MembershipState] in the Corda ledger.
  *
  * @property securityDomain The identifier for the network for which the [MembershipState] is to be deleted.
  */
+@InitiatingFlow
 @StartableByRPC
 class DeleteMembershipState(val securityDomain: String) : FlowLogic<Either<Error, UniqueIdentifier>>() {
 
@@ -172,9 +231,18 @@ class DeleteMembershipState(val securityDomain: String) : FlowLogic<Either<Error
 
         // 3. Verify and collect signatures on the transaction
         txBuilder.verify(serviceHub)
-        val stx = serviceHub.signInitialTransaction(txBuilder)
-        val sessions = listOf<FlowSession>()
-        subFlow(FinalityFlow(stx, sessions))
+        val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+        
+        var sessions = listOf<FlowSession>()
+        for (otherParty in inputState.state.data.participants) {
+            if (otherParty != ourIdentity) {
+                val otherSession = initiateFlow(otherParty)
+                sessions += otherSession
+            }
+        }
+        val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+        
+        subFlow(FinalityFlow(fullySignedTx, sessions))
 
         // 4. Return the linearId of the state
         println("Successfully deleted membership from the ledger.\n")
@@ -182,6 +250,24 @@ class DeleteMembershipState(val securityDomain: String) : FlowLogic<Either<Error
     } catch (e: Exception) {
         println("Failed to delete membership from the ledger: ${e.message}.\n")
         Left(Error("Corda Network Error: Error deleting membership for securityDomain $securityDomain: ${e.message}"))
+    }
+}
+@InitiatedBy(DeleteMembershipState::class)
+class DeleteMembershipStateResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
     }
 }
 

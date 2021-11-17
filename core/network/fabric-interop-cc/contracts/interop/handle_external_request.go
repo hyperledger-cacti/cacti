@@ -104,16 +104,63 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 	// 4. Calls application chaincode
 	arr := append([]string{viewAddress.CCFunc}, viewAddress.Args...)
 	byteArgs := strArrToBytesArr(arr)
-	pbResp := ctx.GetStub().InvokeChaincode(viewAddress.Contract, byteArgs, viewAddress.Channel)
-	if pbResp.Status != shim.OK {
-		errorMessage := fmt.Sprintf("Application chaincode invoke error: %s", string(pbResp.GetMessage()))
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+	
+	localCCId, err := wutils.GetLocalChaincodeID(ctx.GetStub())
+	payload := []byte("")
+	if localCCId == viewAddress.Contract {
+		// Interop call to InteropCC itself.
+		resp := ""
+		if viewAddress.CCFunc == "GetHTLCHash" {
+			if len(viewAddress.Args) > 2 {
+				errorMessage := fmt.Sprintf("Recieved more arguments than required 2 argument.")
+				log.Error(errorMessage)
+				return "", errors.New(errorMessage)
+			}
+			resp, err = s.GetHTLCHash(ctx, viewAddress.Args[0], viewAddress.Args[1])
+		} else if viewAddress.CCFunc == "GetHTLCHashByContractId" {
+			if len(viewAddress.Args) > 1 {
+				errorMessage := fmt.Sprintf("Recieved more arguments than required 1 argument.")
+				log.Error(errorMessage)
+				return "", errors.New(errorMessage)
+			}
+			resp, err = s.GetHTLCHashByContractId(ctx, viewAddress.Args[0])
+		} else if viewAddress.CCFunc == "GetHTLCHashPreImage" {
+			if len(viewAddress.Args) > 2 {
+				errorMessage := fmt.Sprintf("Recieved more arguments than required 2 argument.")
+				log.Error(errorMessage)
+				return "", errors.New(errorMessage)
+			}
+			resp, err = s.GetHTLCHashPreImage(ctx, viewAddress.Args[0], viewAddress.Args[1])
+		} else if viewAddress.CCFunc == "GetHTLCHashPreImageByContractId" {
+			if len(viewAddress.Args) > 1 {
+				errorMessage := fmt.Sprintf("Recieved more arguments than required 1 argument.")
+				log.Error(errorMessage)
+				return "", errors.New(errorMessage)
+			}
+			resp, err = s.GetHTLCHashPreImageByContractId(ctx, viewAddress.Args[0])
+		} else {
+			errorMessage := fmt.Sprintf("Given function %s can not be invoked in Interop Chaincode.", viewAddress.CCFunc)
+			err = errors.New(errorMessage)
+		}
+		if err != nil {
+			log.Error(err)
+			return "", err
+		}
+		payload = []byte(resp)
+	} else {
+		// General Interop Call to AppCC
+		pbResp := ctx.GetStub().InvokeChaincode(viewAddress.Contract, byteArgs, viewAddress.Channel)
+		if pbResp.Status != shim.OK {
+			errorMessage := fmt.Sprintf("Application chaincode invoke error: %s", string(pbResp.GetMessage()))
+			log.Error(errorMessage)
+			return "", errors.New(errorMessage)
+		}
+		payload = pbResp.Payload
 	}
 
 	interopPayloadStruct := common.InteropPayload{
 		Address: query.Address,
-		Payload: pbResp.Payload,
+		Payload: payload,
 	}
 	interopPayloadBytes, err := protoV2.Marshal(&interopPayloadStruct)
 	if err != nil {
