@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package common.asset_locks;
+
+option java_package = "com.weaver.protos.common.asset_locks";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+enum LockMechanism {
+  HTLC = 0;
+}
+
+message AssetLock {
+  LockMechanism lockMechanism = 1;
+  bytes lockInfo = 2;
+}
+
+message AssetClaim {
+  LockMechanism lockMechanism = 1;
+  bytes claimInfo = 2;
+}
+
+message AssetLockHTLC {
+  bytes hashBase64 = 1;
+  uint64 expiryTimeSecs = 2;
+  enum TimeSpec {
+    EPOCH = 0;
+    DURATION = 1;
+  }
+  TimeSpec timeSpec = 3;
+}
+
+message AssetClaimHTLC {
+  bytes hashPreimageBase64 = 1;
+}
+
+message AssetExchangeAgreement {
+  string type = 1;
+  string id = 2;
+  string locker = 3;
+  string recipient = 4;
+}
+
+message FungibleAssetExchangeAgreement {
+  string type = 1;
+  uint64 numUnits = 2;
+  string locker = 3;
+  string recipient = 4;
+}
+
+message AssetContractHTLC {
+  string contractId = 1;
+  AssetExchangeAgreement agreement = 2;
+  AssetLockHTLC lock = 3;
+  AssetClaimHTLC claim = 4;
+}
+
+message FungibleAssetContractHTLC {
+  string contractId = 1;
+  FungibleAssetExchangeAgreement agreement = 2;
+  AssetLockHTLC lock = 3;
+  AssetClaimHTLC claim = 4;
+}

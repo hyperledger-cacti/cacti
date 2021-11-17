@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package common.access_control;
+
+option java_package = "com.weaver.protos.common.access_control";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+// AccessControlPolicy specifies a set of data that can be accessed by some
+// SecurityGroup
+message AccessControlPolicy {
+  string securityDomain = 1;
+  repeated Rule rules = 2;
+}
+
+// Rule represents a single data access rule for the AccessControlPolicy
+message Rule {
+  string principal = 1;
+  string principalType = 2;
+  string resource = 3;
+  bool read = 4;
+}
