@@ -11,6 +11,7 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strconv"
@@ -139,6 +140,55 @@ func generateAssetPledgeContractId(ctx contractapi.TransactionContextInterface, 
 	return contractId
 }
 
+func marshalAssetPledge(pledge *common.AssetPledge) (string, error) {
+	assetPledgeBytes, err := proto.Marshal(pledge)
+	if err != nil {
+		return "", err
+	}
+	assetPledgeBase64 := base64.StdEncoding.EncodeToString(assetPledgeBytes)
+	return assetPledgeBase64, nil	
+}
+func unmarshalAssetPledge(assetPledgeBase64 string) (*common.AssetPledge, error) {
+	pledge := &common.AssetPledge{}
+	assetPledgeSerialized, err := base64.StdEncoding.DecodeString(assetPledgeBase64)
+	if err != nil {
+		return pledge, err
+	}
+	if len(assetPledgeSerialized) == 0 {
+		return pledge, fmt.Errorf("empty asset pledge")
+	}
+	err = proto.Unmarshal([]byte(assetPledgeSerialized), pledge)
+    if err != nil {
+        return pledge, err
+    }
+	return pledge, nil
+}
+
+func marshalAssetClaimStatus(claimStatus *common.AssetClaimStatus) (string, error) {
+	claimStatusBytes, err := proto.Marshal(claimStatus)
+	if err != nil {
+		return "", err
+	}
+	claimStatusBase64 := base64.StdEncoding.EncodeToString(claimStatusBytes)
+	return claimStatusBase64, nil
+}
+func unmarshalAssetClaimStatus(claimStatusBase64 string) (*common.AssetClaimStatus, error) {
+	claimStatus := &common.AssetClaimStatus{}
+	claimStatusSerialized, err := base64.StdEncoding.DecodeString(claimStatusBase64)
+	if err != nil {
+		return claimStatus, err
+	}
+	if len(claimStatusSerialized) == 0 {
+		return claimStatus, fmt.Errorf("empty asset claim status")
+	}
+	err = proto.Unmarshal([]byte(claimStatusSerialized), claimStatus)
+	if err != nil {
+		return claimStatus, err
+	}
+	return claimStatus, nil
+	
+}
+
 // PledgeAsset locks an asset for transfer to a different ledger/network.
 func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, id string, numUnits uint64, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) (string, error) {
 	if id == "" && numUnits == 0 {
@@ -200,9 +250,8 @@ func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, 
 }
 
 // ClaimRemoteAsset gets ownership of an asset transferred from a different ledger/network.
-func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, assetType, id, owner, remoteNetworkId string, pledgeBytes []byte, claimer string) ([]byte, error) {
-	pledge := &common.AssetPledge{}
-	err := proto.Unmarshal(pledgeBytes, pledge)
+func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, assetType, id, owner, remoteNetworkId, pledgeBytes64, claimer string) ([]byte, error) {
+	pledge, err := unmarshalAssetPledge(pledgeBytes64)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +296,7 @@ func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, assetType, id
 }
 
 // ReclaimAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
-func ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId string, claimStatusBytes []byte) ([]byte, []byte, error) {
+func ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId, claimStatusBytes64 string) ([]byte, []byte, error) {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	pledgeKey := getAssetPledgeKey(assetType, id)
@@ -273,8 +322,7 @@ func ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, re
 	}
 
 	// Make sure the asset has not been claimed within the given time
-	claimStatus := &common.AssetClaimStatus{}
-	err = proto.Unmarshal(claimStatusBytes, claimStatus)
+	claimStatus, err := unmarshalAssetClaimStatus(claimStatusBytes64)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -319,7 +367,7 @@ func ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, re
 }
 
 // GetAssetPledgeStatus returns the asset pledge status.
-func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientNetworkId, recipientCert string, blankAssetJSON []byte) ([]byte, []byte, []byte, error) {
+func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientNetworkId, recipientCert string, blankAssetJSON []byte) ([]byte, string, string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
 	pledge := &common.AssetPledge{
@@ -329,35 +377,40 @@ func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType
 		Recipient: "",
 		ExpiryTimeSecs: 0,
 	}
-	pledgeBytes, err := proto.Marshal(pledge)
+	pledgeBytes64, err := marshalAssetPledge(pledge)
 	if err != nil {
-		return nil, []byte(""), []byte(""), err
+		return nil, "", "", err
 	}
 
 	pledgeKey := getAssetPledgeKey(assetType, id)
 	lookupPledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
-		return nil, pledgeBytes, pledgeBytes, fmt.Errorf("failed to read asset pledge status from world state: %v", err)
+		return nil, pledgeBytes64, pledgeBytes64, fmt.Errorf("failed to read asset pledge status from world state: %v", err)
 	}
 	if lookupPledgeBytes == nil {
-		return nil, pledgeBytes, pledgeBytes, nil      // Return blank
+		return nil, pledgeBytes64, pledgeBytes64, nil      // Return blank
 	}
 	lookupPledge := &common.AssetPledge{}
 	err = proto.Unmarshal(lookupPledgeBytes, lookupPledge)
 	if err != nil {
-		return nil, pledgeBytes, pledgeBytes, err
+		return nil, pledgeBytes64, pledgeBytes64, err
 	}
 
 	// Match pledge with request parameters
 	if lookupPledge.Recipient != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId {
-		return nil, pledgeBytes, pledgeBytes, nil      // Return blank
+		return nil, pledgeBytes64, pledgeBytes64, nil      // Return blank
 	}
-
-	return lookupPledge.AssetDetails, lookupPledgeBytes, pledgeBytes, nil
+	
+	lookupPledgeBytes64, err := marshalAssetPledge(lookupPledge)
+	if err != nil {
+		return nil, pledgeBytes64, pledgeBytes64, err
+	}
+	
+	return lookupPledge.AssetDetails, lookupPledgeBytes64, pledgeBytes64, nil
 }
 
 // GetAssetClaimStatus returns the asset claim status and present time (of invocation).
-func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) ([]byte, []byte, []byte, error) {
+func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) ([]byte, string, string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
 	claimStatus := &common.AssetClaimStatus{
@@ -369,36 +422,36 @@ func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType,
 		ExpiryTimeSecs: pledgeExpiryTimeSecs,
 		ExpirationStatus: (uint64(time.Now().Unix()) >= pledgeExpiryTimeSecs),
 	}
-	claimStatusBytes, err := proto.Marshal(claimStatus)
+	claimStatusBytes64, err := marshalAssetClaimStatus(claimStatus)
 	if err != nil {
-		return nil, []byte(""), []byte(""), err
+		return nil, "", "", err
 	}
 
 	// Lookup claim record
 	claimKey := getAssetClaimKey(assetType, id)
 	lookupClaimBytes, err := ctx.GetStub().GetState(claimKey)
 	if err != nil {
-		return nil, claimStatusBytes, claimStatusBytes, fmt.Errorf("failed to read asset claim status from world state: %v", err)
+		return nil, claimStatusBytes64, claimStatusBytes64, fmt.Errorf("failed to read asset claim status from world state: %v", err)
 	}
 	if lookupClaimBytes == nil {
-		return nil, claimStatusBytes, claimStatusBytes, nil      // Return blank
+		return nil, claimStatusBytes64, claimStatusBytes64, nil      // Return blank
 	}
 	lookupClaim := &common.AssetClaimStatus{}
 	err = proto.Unmarshal(lookupClaimBytes, lookupClaim)
 	if err != nil {
-		return nil, claimStatusBytes, claimStatusBytes, err
+		return nil, claimStatusBytes64, claimStatusBytes64, err
 	}
 
 	// Match claim with request parameters
 	if lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.Recipient != recipientCert {
-		return nil, claimStatusBytes, claimStatusBytes, nil      // Return blank
+		return nil, claimStatusBytes64, claimStatusBytes64, nil      // Return blank
 	}
 	lookupClaim.ExpiryTimeSecs = claimStatus.ExpiryTimeSecs
 	lookupClaim.ExpirationStatus = claimStatus.ExpirationStatus
-	lookupClaimBytes, err = proto.Marshal(lookupClaim)
+	lookupClaimBytes64, err := marshalAssetClaimStatus(lookupClaim)
 	if err != nil {
-		return nil, claimStatusBytes, claimStatusBytes, err
+		return nil, claimStatusBytes64, claimStatusBytes64, err
 	}
 
-	return lookupClaim.AssetDetails, lookupClaimBytes, claimStatusBytes, nil
+	return lookupClaim.AssetDetails, lookupClaimBytes64, claimStatusBytes64, nil
 }
