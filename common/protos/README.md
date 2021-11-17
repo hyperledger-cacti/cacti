@@ -3,6 +3,6 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-## protos
+## Weaver Protos
 
-This repository contains the grpc service and protocol buffer definitions for the relay, drivers and other interop modules.  protos
+This repository contains the gRPC service and protocol buffer definitions for the relay, drivers, other interoperation modules, and common structures used by several Weaver components.

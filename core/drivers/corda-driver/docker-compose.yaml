@@ -13,8 +13,15 @@ services:
       - DRIVER_PORT=${DRIVER_PORT}
       - DRIVER_RPC_USERNAME=${DRIVER_RPC_USERNAME}
       - DRIVER_RPC_PASSWORD=${DRIVER_RPC_PASSWORD}
+      - RELAY_TLS=${RELAY_TLS}
+      - RELAY_TLSCA_CERT_PATHS=${RELAY_TLSCA_CERT_PATHS}
+      - DRIVER_TLS=${DRIVER_TLS}
+      - DRIVER_TLS_CERT_PATH=${DRIVER_TLS_CERT_PATH}
+      - DRIVER_TLS_KEY_PATH=${DRIVER_TLS_KEY_PATH}
     ports:
       - "${DRIVER_PORT}:${DRIVER_PORT}"
+    volumes:
+      - ../../relay/credentials:/corda-driver/credentials
     command: sh -c "./bin/corda-driver"
 
 networks:

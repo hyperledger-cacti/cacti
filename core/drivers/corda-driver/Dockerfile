@@ -21,7 +21,7 @@ FROM builder-${BUILD_TAG} as builder
 RUN echo "Builder ${BUILD_TAG}"
 
 # Deployment Image 
-FROM openjdk:8-jre-alpine
+FROM openjdk:8-jre
 
 COPY --from=builder /corda-driver/build/install/corda-driver /corda-driver/
 
