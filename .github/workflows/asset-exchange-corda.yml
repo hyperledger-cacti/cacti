@@ -277,7 +277,11 @@ jobs:
           docker logs corda_partyc_1
         working-directory: tests/network-setups/corda
         
-      # FABRIC CLI
+      # CORDA CLI
+      - name: Build CLI
+        run: make build-cli
+        working-directory: samples/corda/corda-simple-application
+        
       - name: Setup Corda CLI init
         run: ./scripts/initHouseToken.sh 1
         working-directory: samples/corda/corda-simple-application
