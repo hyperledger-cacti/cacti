@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
@@ -220,16 +221,16 @@ func (s *SmartContract) PledgeTokenAsset(ctx contractapi.TransactionContextInter
 	}
 
 	// Pledge the asset using common (library) logic
-	if contractId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, "", numUnits, owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
+	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, strconv.Itoa(int(numUnits)), owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
 		// Deduce asset balance using app-specific logic
-		return contractId, s.DeleteTokenAssets(ctx, assetType, numUnits)
+		return pledgeId, s.DeleteTokenAssets(ctx, assetType, numUnits)
 	} else {
 		return "", err
 	}
 }
 
 // ClaimRemoteTokenAsset gets ownership of an asset transferred from a different ledger/network.
-func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContextInterface, assetType, id string, numUnits uint64, owner, remoteNetworkId, pledgeBytes64 string) error {
+func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContextInterface, pledgeId, assetType string, numUnits uint64, owner, remoteNetworkId, pledgeBytes64 string) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	// Claim the asset using common (library) logic
@@ -237,7 +238,7 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 	if err != nil {
 		return err
 	}
-	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, assetType, id, owner, remoteNetworkId, pledgeBytes64, claimer)
+	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, pledgeId, claimer, remoteNetworkId, pledgeBytes64)
 	if err != nil {
 		return err
 	}
@@ -249,16 +250,16 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 		return err
 	}
 	if asset.NumUnits == 0 {
-		return fmt.Errorf("cannot claim asset %s as it has not been pledged in %s", id, remoteNetworkId)
+		return fmt.Errorf("cannot claim %d %s tokens as it has not been pledged in %s", numUnits, assetType, remoteNetworkId)
 	}
 	if asset.Type != assetType {
-		return fmt.Errorf("cannot claim asset %s as its type doesn't match the pledge", id)
+		return fmt.Errorf("cannot claim %d %s tokens as its type doesn't match the pledge", numUnits, assetType)
 	}
 	if asset.NumUnits != numUnits {
-		return fmt.Errorf("cannot claim asset %s as its ID doesn't match the pledge", id)
+		return fmt.Errorf("cannot claim %d %s tokens as its ID doesn't match the pledge", numUnits, assetType)
 	}
 	if asset.Owner != owner {
-		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given owner", id)
+		return fmt.Errorf("cannot claim %d %s tokens as it has not been pledged by the given owner", numUnits, assetType)
 	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic: make the recipient the owner of the asset
@@ -266,11 +267,11 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 }
 
 // ReclaimTokenAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
-func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId, claimStatusBytes64 string) error {
+func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64 string) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	// Reclaim the asset using common (library) logic
-	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, assetType, id, recipientCert, remoteNetworkId, claimStatusBytes64)
+	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
 	if err != nil {
 		return err
 	}
@@ -285,8 +286,8 @@ func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInte
 		claimAsset.NumUnits != 0 &&
 		claimAsset.Owner != "") {
 		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
-		if !matchClaimWithAssetPledge(pledgeAssetDetails, claimAssetDetails) {
-			return fmt.Errorf("claim info for asset %s does not match pledged asset details on ledger: %s", id, pledgeAssetDetails)
+		if !matchClaimWithTokenAssetPledge(pledgeAssetDetails, claimAssetDetails) {
+			return fmt.Errorf("claim info for asset with pledge id %s does not match pledged asset details on ledger: %s", pledgeId, pledgeAssetDetails)
 		}
 	}
 
@@ -295,11 +296,11 @@ func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInte
 	if err != nil {
 		return err
 	}
-	return s.IssueTokenAssets(ctx, assetType, pledgeAsset.NumUnits, pledgeAsset.Owner)
+	return s.IssueTokenAssets(ctx, pledgeAsset.Type, pledgeAsset.NumUnits, pledgeAsset.Owner)
 }
 
 // GetTokenAssetPledgeStatus returns the asset pledge status.
-func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, owner, recipientNetworkId, recipientCert string) (string, error) {
+func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionContextInterface, pledgeId, owner, recipientNetworkId, recipientCert string) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
 	// Create blank asset details using app-specific-logic
@@ -314,7 +315,7 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 	}
 
 	// Fetch asset pledge details using common (library) logic
-	pledgeAssetDetails, pledgeBytes64, blankPledgeBytes64, err := wutils.GetAssetPledgeStatus(ctx, assetType, id, recipientNetworkId, recipientCert, blankAssetJSON)
+	pledgeAssetDetails, pledgeBytes64, blankPledgeBytes64, err := wutils.GetAssetPledgeStatus(ctx, pledgeId, recipientNetworkId, recipientCert, blankAssetJSON)
 	if err != nil {
 		return blankPledgeBytes64, err
 	}
@@ -336,7 +337,7 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 }
 
 // GetTokenAssetClaimStatus returns the asset claim status and present time (of invocation).
-func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
+func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, assetType string, numUnits uint64, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
 	// Create blank asset details using app-specific-logic
@@ -351,7 +352,7 @@ func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionCont
 	}
 
 	// Fetch asset claim details using common (library) logic
-	claimAssetDetails, claimBytes64, blankClaimBytes64, err := wutils.GetAssetClaimStatus(ctx, assetType, id, recipientCert, pledger, pledgerNetworkId, pledgeExpiryTimeSecs, blankAssetJSON)
+	claimAssetDetails, claimBytes64, blankClaimBytes64, err := wutils.GetAssetClaimStatus(ctx, pledgeId, recipientCert, pledger, pledgerNetworkId, pledgeExpiryTimeSecs, blankAssetJSON)
 	if err != nil {
 		return blankClaimBytes64, err
 	}
@@ -384,6 +385,9 @@ func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionCont
 	balance, err := s.GetBalance(ctx, assetType, recipientCert)
 	if err != nil {
 		return blankClaimBytes64, err
+	} 
+	if lookupClaimAsset.NumUnits == numUnits {
+		return blankClaimBytes64, fmt.Errorf("given number of units %d of type %s was not claimed", numUnits, assetType)
 	}
 	if balance < lookupClaimAsset.NumUnits {
 		return blankClaimBytes64, fmt.Errorf("the token asset type %s does not have enough balance", assetType)
