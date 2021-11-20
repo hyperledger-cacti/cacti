@@ -17,10 +17,13 @@ import com.weaver.corda.app.interop.states.VerificationPolicyState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.node.ServiceHub
 import net.corda.core.node.services.queryBy
 import net.corda.core.transactions.TransactionBuilder
+import net.corda.core.transactions.SignedTransaction
+import net.corda.core.identity.Party
 
 /**
  * The CreateVerificationPolicyState flow is used to store a [VerificationPolicyState] in the Corda ledger.
@@ -30,8 +33,14 @@ import net.corda.core.transactions.TransactionBuilder
  *
  * @property verificationPolicy The [VerificationPolicyState] provided by the Corda client to be stored in the vault.
  */
+@InitiatingFlow
 @StartableByRPC
-class CreateVerificationPolicyState(val verificationPolicy: VerificationPolicyState) : FlowLogic<Either<Error, UniqueIdentifier>>() {
+class CreateVerificationPolicyState
+@JvmOverloads
+constructor(
+    val verificationPolicy: VerificationPolicyState,
+    val sharedParties: List<Party> = listOf<Party>()
+) : FlowLogic<Either<Error, UniqueIdentifier>>() {
     /**
      * The call() method captures the logic to create a new [VerificationPolicyState] state in the vault.
      *
@@ -49,7 +58,7 @@ class CreateVerificationPolicyState(val verificationPolicy: VerificationPolicySt
             // If the flow produces an error, then the verification policy does not already exist.
 
             // Create the verification policy to store with our identity listed as a participant
-            val outputState = verificationPolicy.copy(participants = listOf(ourIdentity))
+            val outputState = verificationPolicy.copy(participants = listOf(ourIdentity) + sharedParties)
 
             // 2. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
@@ -60,9 +69,15 @@ class CreateVerificationPolicyState(val verificationPolicy: VerificationPolicySt
 
             // 3. Verify and collect signatures on the transaction
             txBuilder.verify(serviceHub)
-            val stx = serviceHub.signInitialTransaction(txBuilder)
-            val sessions = listOf<FlowSession>()
-            val storedVerificationPolicyState = subFlow(FinalityFlow(stx, sessions)).tx.outputStates.first() as VerificationPolicyState
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+            
+            var sessions = listOf<FlowSession>()
+            for (otherParty in sharedParties) {
+                val otherSession = initiateFlow(otherParty)
+                sessions += otherSession
+            }
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+            val storedVerificationPolicyState = subFlow(FinalityFlow(fullySignedTx, sessions)).tx.outputStates.first() as VerificationPolicyState
 
             // 4. Return the linearId of the state
             println("Successfully stored verification policy $storedVerificationPolicyState in the vault.\n")
@@ -77,6 +92,24 @@ class CreateVerificationPolicyState(val verificationPolicy: VerificationPolicySt
         Left(Error("Failed to store state in ledger: ${e.message}"))
     }
 }
+@InitiatedBy(CreateVerificationPolicyState::class)
+class CreateVerificationPolicyStateResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
+    }
+}
 
 /**
  * The UpdateVerificationPolicyState flow is used to update an existing [VerificationPolicyState] in the Corda ledger.
@@ -84,6 +117,7 @@ class CreateVerificationPolicyState(val verificationPolicy: VerificationPolicySt
  * @property verificationPolicy The [VerificationPolicyState] provided by the Corda client to replace the
  * existing [VerificationPolicyState] for that network.
  */
+@InitiatingFlow
 @StartableByRPC
 class UpdateVerificationPolicyState(val verificationPolicy: VerificationPolicyState) : FlowLogic<Either<Error, UniqueIdentifier>>() {
     /**
@@ -124,9 +158,18 @@ class UpdateVerificationPolicyState(val verificationPolicy: VerificationPolicySt
 
         // 3. Verify and collect signatures on the transaction
         txBuilder.verify(serviceHub)
-        val tx = serviceHub.signInitialTransaction(txBuilder)
-        val sessions = listOf<FlowSession>()
-        val finalTx = subFlow(FinalityFlow(tx, sessions))
+        val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+        
+        var sessions = listOf<FlowSession>()
+        for (otherParty in outputState.participants) {
+            if (otherParty != ourIdentity) {
+                val otherSession = initiateFlow(otherParty)
+                sessions += otherSession
+            }
+        }
+        val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+        
+        val finalTx = subFlow(FinalityFlow(fullySignedTx, sessions))
         println("Successfully updated verification policy in the ledger: $finalTx\n")
 
         // 4. Return the linearId of the state
@@ -136,12 +179,30 @@ class UpdateVerificationPolicyState(val verificationPolicy: VerificationPolicySt
         Left(Error("Failed to store state in ledger: ${e.message}"))
     }
 }
-
+@InitiatedBy(UpdateVerificationPolicyState::class)
+class UpdateVerificationPolicyStateResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
+    }
+}
 /**
  * The DeleteVerificationPolicyState flow is used to delete an existing [VerificationPolicyState] in the Corda ledger.
  *
  * @property securityDomain The identifier for the network for which the [VerificationPolicyState] is to be deleted.
  */
+@InitiatingFlow
 @StartableByRPC
 class DeleteVerificationPolicyState(val securityDomain: String) : FlowLogic<Either<Error, UniqueIdentifier>>() {
 
@@ -173,9 +234,18 @@ class DeleteVerificationPolicyState(val securityDomain: String) : FlowLogic<Eith
 
             // 3. Verify and collect signatures on the transaction
             txBuilder.verify(serviceHub)
-            val stx = serviceHub.signInitialTransaction(txBuilder)
-            val sessions = listOf<FlowSession>()
-            subFlow(FinalityFlow(stx, sessions))
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+            
+            var sessions = listOf<FlowSession>()
+            for (otherParty in inputState.state.data.participants) {
+                if (otherParty != ourIdentity) {
+                    val otherSession = initiateFlow(otherParty)
+                    sessions += otherSession
+                }
+            }
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+            
+            subFlow(FinalityFlow(fullySignedTx, sessions))
 
             // 4. Return the linearId of the state
             println("Successfully deleted verification policy from the ledger.\n")
@@ -184,6 +254,25 @@ class DeleteVerificationPolicyState(val securityDomain: String) : FlowLogic<Eith
     } catch (e: Exception) {
         println("Failed to delete verification policy from the ledger: ${e.message}.\n")
         Left(Error("Corda Network Error: Error deleting Verification Policy for securityDomain $securityDomain: ${e.message}"))
+    }
+}
+
+@InitiatedBy(DeleteVerificationPolicyState::class)
+class DeleteVerificationPolicyStateResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
     }
 }
 

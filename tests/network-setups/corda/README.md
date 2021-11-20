@@ -37,17 +37,20 @@ Necessary information includes:
 
 ## Requirements
 
+**Docker-Compose: Version 1.28.2 or above**
+
 The simple state and interoperation CorDapps can be sourced either from the
 local file system or from Github Packages.
 
 For local versions, the `get-cordapps` script assumes that _a)_ the repositories
 for these are at the same directory level as the `networks-setup` repository,
 and _b)_ that the cordapp executables have been built in those repos. The
-required CorDapps are in
-[corda-simple-application](../../../samples/corda/corda-simple-application) and
-[corda-interop-app](../../../core/network/corda-interop-app)
-and the instructions for building these projects can be found in their
-respective repos.
+required CorDapps are in:
+* [corda-interop-app](../../../core/network/corda-interop-app)
+* [corda-simple-application](../../../samples/corda/corda-simple-application)
+* [fungible-house-token](../../../samples/corda/fungible-house-token)
+
+The instructions for building these projects can be found in their respective folders.
 
 To get the CorDapps from Github Packages you will need to have permission to do so:
 
@@ -56,69 +59,47 @@ To get the CorDapps from Github Packages you will need to have permission to do 
 3) Replace <GITHUB Email> with your email id for github.
 4) Replace <GITHUB Personal Access Token> with your personal access token.
 
-## Running Corda Simple Application with Make
+## Deploying Corda Testnet
 
-If you are happy with the default configuration, you can use the following make
-targets.
-
--   `make start` builds the required node folder structure for the nodes to run,
-    gets the CorDapps from Github Packages, then starts the Corda nodes.
--   `make start-local` is the same as `make start` except it gets the cordapps
-    from locally built jars from the `corda-simple-app` and `corda-interop-app`
-    repositories (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages).
-    * _Prerequisites_: Before you run this command, build the following in sequence:
-      **Protobufs**
-      ```
-      cd ../../../common/protos-java-kt
-      make build
-      ```
-      **Interoperation CorDapp**
-      ```
-      cd ../../../core/network/corda-interop-app
-      make build-local
-      ```
-      **CLI Client and CorDapp**
-      ```
-      cd ../../../samples/corda/corda-simple-application
-      make build-local
-      ```
--   `make restart-with-new-interop-app` can be used to restart an already running
-    Corda network with new local versions of the `corda-interop-app` CorDapp.
--   `make stop` stops the nodes.
+- To start the corda networks (`Corda_Network`, and `Corda_Network2`), using CorDapps from Github Packages, refer to the following command:
+  ```bash
+  make start APP_NAME=<simple/house> PROFILE=<1-node/2-nodes/3-nodes>
+  ```
+  Here `simple` refers to `cordaSimpleApplication` and `house` refers to the `fungible-house-token` app.
+  `PROFILE` defines the number of nodes to be started. You need only `1-node` for data transfer, either `2-nodes` or `3-nodes` for asset-exchange or asset-transfer.
+- To start the corda networks (`Corda_Network`, and `Corda_Network2`), using CorDapps from locally built jars, refer to the following command:
+  ```bash
+  make start-local APP_NAME=<simple/house> PROFILE=<1-node/2-nodes/3-nodes>
+  ```
+  * _Prerequisites_: Before you run this command, build the following in sequence:
+    **Protobufs**
+    ```bash
+    cd ../../../common/protos-java-kt
+    make build
+    ```
+    **Interoperation CorDapp**
+    ```bash
+    cd ../../../core/network/corda-interop-app
+    make build-local
+    ```
+    **Weaver Corda SDK**
+    ```bash
+    cd ../../../sdks/corda
+    rm github.properties    # Make sure no github.properties is present.
+    make build
+    ```
+    **CLI Client and CorDapp**
+    ```bash
+    cd ../../../samples/corda/corda-simple-application
+    rm github.properties    # Make sure no github.properties is present.
+    make build-local
+    ```
+-   `make stop` stops the nodes from both networks.
 -   `make clean` stops the nodes and deletes the build artifacts.
+- There are `start-network1`, `start-network2`, `start-network1-local`, `start-network2-local`, and correspondingly `stop` and `clean` targets as well, for one network specific commands.
 
-## Running Fungible House Token with Make
 
-If you are happy with the default configuration, you can use the following make
-targets.
 
--   `make start-house` builds the required node folder structure for the nodes to run,
-    gets the CorDapps from Github Packages, then starts the Corda nodes.
--   `make start-house-local` is the same as `make start-house` except it gets the cordapps
-    from locally built jars from the `corda-interop-app`. (delete `github.properties` if present, else it will try to fetch dependencies from Github Packages).
-    * _Prerequisites_: Before you run this command, build the following in sequence:
-      **Protobufs**
-      ```
-      cd ../../../common/protos-java-kt
-      make build
-      ```
-      **Interoperation CorDapp**
-      ```
-      cd ../../../core/network/corda-interop-app
-      make build-local
-      ```
-      **Fungible House Token CorDapp**
-      ```
-      cd ../../../samples/corda/fungible-house-token
-      make build
-      ```
-      **CLI Client and CorDapp**
-      ```
-      cd ../../../samples/corda/corda-simple-application
-      make build-local
-      ```
--   `make stop` stops the nodes.
--   `make clean` stops the nodes and deletes the build artifacts.
 
 ## Interacting with the nodes
 
@@ -132,20 +113,20 @@ on how to use it.
 If the nodes need to be restarted with new versions of the CorDapps, the nodes
 need to first be brought down with:
 
-```
+```bash
 make stop
 ```
 
 To copy the local CorDapps into the `artifacts` directory, run:
 
-```
-./scripts/get-cordapps.sh local
+```bash
+./scripts/get-cordapps.sh <simple/house> local
 ```
 
 Start the nodes with:
 
-```
-./scripts/start-nodes.sh
+```bash
+./scripts/start-nodes.sh <simple/house> <1-node/2-nodes/3-nodes> <network-name>
 ```
 
 This script copies the interoperation and simple state CorDapps

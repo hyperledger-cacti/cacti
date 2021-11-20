@@ -31,8 +31,8 @@ A set of RPC calls to EthSigner and the Besu network are made to test the setup 
 make test
 ```
 NOTE: 
-	* Starting the network on a slow server might require you to wait longer after the command to deploy the network before the testing script is called. 
-	* If the server is extremely slow for Node-1 to take more than 10 seconds to start, the sleep time before starting Node-2 in the setup script (scripts/setupNetwork.sh) should be increased. The latter can be detected going inside the tmux session of Nodes 2, 3 or 4.
+- Starting the network on a slow server might require you to wait longer after the command to deploy the network before the testing script is called. 
+- If the server is extremely slow for Node-1 to take more than 10 seconds to start, the sleep time before starting Node-2 in the setup script (scripts/setupNetwork.sh) should be increased. The latter can be detected going inside the tmux session of Nodes 2, 3 or 4.
 
 ## Clean
 To stop the network and to clean up the network data, run

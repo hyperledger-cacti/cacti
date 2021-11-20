@@ -104,11 +104,11 @@ fun verifyCertificateChain(
             Right(Unit)
         } else {
             // If the certificate chain is not empty, check the certificate is issued by the head of the list
-            getCertificateFromString(certificateChain.first()).flatMap {issuingCertificate ->
+            getCertificateFromString(certificateChain.last()).flatMap {issuingCertificate ->
                 // Check the issuing cert is within its expiry
                 isCertificateWithinExpiry(issuingCertificate).flatMap {
                     certificate.verify(issuingCertificate.publicKey)
-                    verifyCertificateChain(issuingCertificate, certificateChain.drop(1))
+                    verifyCertificateChain(issuingCertificate, certificateChain.dropLast(1))
                 }
             }
         }

@@ -8,6 +8,7 @@ package com.weaver.corda.app.interop.contracts
 
 import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
 import com.weaver.corda.app.interop.states.AssetClaimHTLCData
+import com.weaver.corda.app.interop.states.AssetExchangeTxState
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand
@@ -122,3 +123,31 @@ class AssetExchangeHTLCStateContract : Contract {
         class Claim(val assetClaimHTLC: AssetClaimHTLCData) : Commands
     }
 }
+/**
+ * AssetExchangeTxStateContract defines the rules for managing a [AssetExchangeTxState].
+ *
+ */
+class AssetExchangeTxStateContract : Contract {
+    companion object {
+        // Used to identify our contract when building a transaction.
+        const val ID = "com.weaver.corda.app.interop.contracts.AssetExchangeTxStateContract"
+    }
+    override fun verify(tx: LedgerTransaction) {
+        val command = tx.commands.requireSingleCommand<Commands>()
+        when (command.value) {
+            is Commands.SaveClaimTx -> requireThat {
+                "There should be 0 input state." using (tx.inputs.size == 0)
+                "There should be one output state." using (tx.outputs.size == 1)
+                "The output state should be of type AssetExchangeTxState." using (tx.outputs[0].data is AssetExchangeTxState)
+                
+                // Check if locker is the signer
+                val participantKeys = tx.outputs[0].data.participants.map { it.owningKey }
+                "The required signers of the transaction must include locker." using (command.signers.containsAll(participantKeys))
+            }
+        }
+    }
+    interface Commands : CommandData {
+        class SaveClaimTx : Commands
+    }
+}
+

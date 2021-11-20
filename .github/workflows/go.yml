@@ -203,23 +203,23 @@ jobs:
       run: go test -v ./...
       working-directory: samples/fabric/simpleassetandinterop
 
-  #test_simpleassettransfer_github:
-    #runs-on: ubuntu-latest
-    #steps:
-    #- uses: actions/checkout@v2
+  test_simpleassettransfer_github:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
 
-    #- name: Set up Go
-      #uses: actions/setup-go@v2
-      #with:
-        #go-version: 1.16
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
 
-    #- name: Build
-      #run: go build -v ./...
-      #working-directory: samples/fabric/simpleassettransfer
+    - name: Build
+      run: go build -v ./...
+      working-directory: samples/fabric/simpleassettransfer
 
-    #- name: Test
-      #run: go test -v ./...
-      #working-directory: samples/fabric/simpleassettransfer
+    - name: Test
+      run: go test -v ./...
+      working-directory: samples/fabric/simpleassettransfer
 
   test_simpleassettransfer_local:
     runs-on: ubuntu-latest

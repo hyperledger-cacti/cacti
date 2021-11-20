@@ -245,3 +245,67 @@ class GetLockStateCommand : CliktCommand(help = "Fetch HTLC State associated wit
         }
     }
 }
+
+/**
+ * Query lock hash of an HTLC.
+ */
+class GetHTLCHashCommand : CliktCommand(name = "get-htlc-hash",
+    help = "Query lock hash of a locked asset using HTLC, given contractId.")
+{
+    val config by requireObject<Map<String, String>>()
+    val contractId: String? by option("-cid", "--contract-id", help="Contract/Linear Id for HTLC State")
+    override fun run() = runBlocking {
+        if (contractId == null) {
+            println("Arguments required: --contract-id.")
+        } else {        
+            val rpc = NodeRPCConnection(
+                    host = config["CORDA_HOST"]!!,
+                    username = "clientUser1",
+                    password = "test",
+                    rpcPort = config["CORDA_PORT"]!!.toInt())
+            try {
+                val res = AssetManager.getHTLCHashById(
+                    rpc.proxy, 
+                    contractId!!
+                )
+                println("GetHTLCHash Response: ${res}")
+            } catch (e: Exception) {
+              println("Error: ${e.toString()}")
+            } finally {
+                rpc.close()
+            }
+        }
+    }
+}
+
+/**
+ * Query claim hash preimage of an HTLC.
+ */
+class GetHTLCPreImageCommand : CliktCommand(name = "get-htlc-preimage",
+    help = "Query hash preimage of a claimed asset using HTLC, given contractId.")
+{
+    val config by requireObject<Map<String, String>>()
+    val contractId: String? by option("-cid", "--contract-id", help="Contract/Linear Id for HTLC State")
+    override fun run() = runBlocking {
+        if (contractId == null) {
+            println("Arguments required: --contract-id.")
+        } else {        
+            val rpc = NodeRPCConnection(
+                    host = config["CORDA_HOST"]!!,
+                    username = "clientUser1",
+                    password = "test",
+                    rpcPort = config["CORDA_PORT"]!!.toInt())
+            try {
+                val res = AssetManager.getHTLCHashPreImageById(
+                    rpc.proxy, 
+                    contractId!!
+                )
+                println("GetHTLCPreImage Response: ${res}")
+            } catch (e: Exception) {
+              println("Error: ${e.toString()}")
+            } finally {
+                rpc.close()
+            }
+        }
+    }
+}

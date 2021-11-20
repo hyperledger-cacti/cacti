@@ -9,35 +9,43 @@ package com.cordaSimpleApplication.client
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.option
 import kotlinx.coroutines.runBlocking
 import com.google.protobuf.util.JsonFormat
 import java.io.File
 import java.lang.Exception
 import java.util.*
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.stream.Collectors
+import net.corda.core.identity.Party
 
 import com.weaver.corda.sdk.CredentialsCreator
 
+class ConfigureCommand : CliktCommand(help ="Configure Command") {
+    override fun run() {
+    }
+}
+
+
 /**
  * TODO: Documentation
  */
-class ConfigureAllCommand : CliktCommand(
+class ConfigureAllCommand : CliktCommand(name="all",
         help = "Creates an Access Control Policy, Membership, and Verification Policy for an external network. ") {
     val config by requireObject<Map<String, String>>()
-    val networks: String by argument()
     override fun run() = runBlocking {
         configureCreateAllHelper()
         configDataHelper(config)
-        for (network in networks.split(",")) {
-            configNetworkHelper(network, config)
-        }
+        configNetworkHelper(config)
     }
 }
 
 /**
  * TODO: Documentation
  */
-class ConfigureDataCommand : CliktCommand(
-        help = "Creates an Access Control Policy, Membership, and Verification Policy for an external network. ") {
+class ConfigureDataCommand : CliktCommand(name="data",
+        help = "Creates SimpleStates in network. ") {
     val config by requireObject<Map<String, String>>()
     override fun run() = runBlocking {
         configDataHelper(config)
@@ -47,19 +55,19 @@ class ConfigureDataCommand : CliktCommand(
 /**
  * TODO: Documentation
  */
-class ConfigureNetworkCommand : CliktCommand(
+class ConfigureNetworkCommand : CliktCommand(name="network",
         help = "Creates an Access Control Policy, Membership, and Verification Policy for an external network. ") {
     val config by requireObject<Map<String, String>>()
-    val network: String by argument()
+    val sharedPartiesNames by option("-p", "--parties", help="List of parties separated by \";\"")
     override fun run() = runBlocking {
-        configNetworkHelper(network, config)
+        configNetworkHelper(config, sharedPartiesNames)
     }
 }
 
 /**
  * TODO: Documentation
  */
-class ConfigureCreateAllCommand : CliktCommand(
+class ConfigureCreateAllCommand : CliktCommand(name="create-all",
         help = "Generate Access Control Policy, Membership, and Verification Policy for this network and stores in folder.") {
     val config by requireObject<Map<String, String>>()
     override fun run() = runBlocking {
@@ -78,10 +86,23 @@ fun configDataHelper(config: Map<String, String>) {
 /**
  * Helper function used by ConfigureNetworkCommand
  */
-fun configNetworkHelper(network: String, config: Map<String, String>) {
-    createMembershipFromFile(network, config)
-    createAccessControlPolicyFromFile(network, config)
-    createVerificationPolicyFromFile(network, config)
+fun configNetworkHelper(config: Map<String, String>, sharedPartiesNames: String? = null) {
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
+    val myNetworkName = System.getenv("NETWORK_NAME") ?: "Corda_Network"
+    val networkNames: Set<String> = Files.list(Paths.get(credentialPath))
+        .filter { file -> Files.isDirectory(file) }
+        .map { it -> it.fileName }
+        .map { it -> it.toString() }
+        .collect(Collectors.toSet());
+    println("All network credentials found: ${networkNames}")
+    for (networkName in networkNames) {
+        if (networkName != myNetworkName) {
+            println("Network ${networkName}")
+            createMembershipFromFile(networkName, config, sharedPartiesNames)
+            createAccessControlPolicyFromFile(networkName, config, sharedPartiesNames)
+            createVerificationPolicyFromFile(networkName, config, sharedPartiesNames)
+        }
+    }
 }
 
 /**
@@ -89,15 +110,28 @@ fun configNetworkHelper(network: String, config: Map<String, String>) {
  */
 fun configureCreateAllHelper() {
     // Some variables specific to network
-    val baseNodesPath = System.getenv("BASE_NODE_PATH") ?: "../../../tests/network-setups/corda/build/nodes/"
     val networkName = System.getenv("NETWORK_NAME") ?: "Corda_Network"
+    val baseNodesPath = System.getenv("BASE_NODE_PATH") ?: "../../../tests/network-setups/corda/dev/" + networkName + "/build/nodes/"
     val nodesList = System.getenv("NODES_LIST") ?: "PartyA"
-    val remoteFlow = System.getenv("REMOTE_FLOW") ?: "mychannel:simplestate:Read:*"
-    val locFlow = System.getenv("LOCAL_FLOW") ?: "localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*"
+
+    val partyHost = System.getenv("CORDA_HOST") ?: "localhost"
+    val partyPort = System.getenv("CORDA_PORT") ?: "10006"
+    val defaultCordaFlow = partyHost + ":" + partyPort + "#com.cordaSimpleApplication.flow.GetStateByKey:*"
+
+    val remoteFlow = System.getenv("REMOTE_FLOW") ?: "mychannel:simplestate:Read:*" 
+    val locFlow = System.getenv("LOCAL_FLOW") ?: defaultCordaFlow
     
-    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config"
+    val credentialPath = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val destPath = "${credentialPath}/${networkName}/"
     val jsonPrinter = JsonFormat.printer().includingDefaultValueFields()
+
+    println("Base node path: ${baseNodesPath}")
+    println("Flow: ${locFlow}")
+
+    val destPathObj = File(destPath);
+    if (!destPathObj.exists()){
+        destPathObj.mkdir()
+    }
     
     val credentialsCreator = CredentialsCreator(
         baseNodesPath, 

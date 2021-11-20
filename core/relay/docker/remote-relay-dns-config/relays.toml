@@ -15,3 +15,9 @@ hostname="relay-corda"
 port="9081"
 tls=false
 tlsca_cert_path=""
+
+[relays.relay-corda2]
+hostname="relay-corda2"
+port="9082"
+tls=false
+tlsca_cert_path=""

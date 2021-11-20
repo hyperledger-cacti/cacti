@@ -1,0 +1,29 @@
+{
+  "securityDomain": "",
+  "rules": [
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simpleasset:GetHTLCHash:*",
+      "read": true
+    },
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simpleasset:GetHTLCHashByContractId:*",
+      "read": true
+    },
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simpleasset:GetHTLCHashPreImage:*",
+      "read": true
+    },
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simpleasset:GetHTLCHashPreImageByContractId:*",
+      "read": true
+    }
+  ]
+}

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.identity.Party
 
 import com.weaver.corda.app.interop.states.MembershipState
 import com.weaver.corda.app.interop.states.Member
@@ -32,15 +33,16 @@ class MembershipManager {
          * Function to create an membership state in Vault
          */
         @JvmStatic
-        fun createMembershipState(
+        @JvmOverloads fun createMembershipState(
             proxy: CordaRPCOps,
-            membershipProto: MembershipOuterClass.Membership
+            membershipProto: MembershipOuterClass.Membership,
+            sharedParties: List<Party> = listOf<Party>()
         ): Either<Error, String> {
             val membershipState = protoToState(membershipProto)
             logger.debug("Writing MembershipState: ${membershipState}")
             return try {
                 runCatching {
-                    proxy.startFlow(::CreateMembershipState, membershipState)
+                    proxy.startFlow(::CreateMembershipState, membershipState, sharedParties)
                             .returnValue.get()
                 }.fold({
                     it.flatMap {
