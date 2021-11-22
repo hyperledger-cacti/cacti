@@ -27,6 +27,7 @@ class GrpcServer(private val port: Int) {
 
     init {
         if (useTlsForDriver) {
+            println("Starting Corda driver gRPC server with TLS")
             server = ServerBuilder
                 .forPort(port)
                 .useTransportSecurity(File(System.getenv("DRIVER_TLS_CERT_PATH")?.toString() ?: ""), File(System.getenv("DRIVER_TLS_KEY_PATH")?.toString() ?: ""))

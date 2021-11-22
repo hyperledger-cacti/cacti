@@ -69,16 +69,20 @@ If the relay expects a TLS connection over gRPC, you need to specify the followi
     - `RELAY_TLSCA_CERT_PATHS`: colon-separated list of CA certificate file paths
 If you wish to run the driver service with TLS enabled, you need to specify the following environment variables in the `corda-driver` command:
 - `DRIVER_TLS`: should be set to `true`
-- `DRIVER_CERT_PATH`: driver's TLS certificate file path
-- `DRIVER_KEY_PATH`: driver's TLS private key file path
+- `DRIVER_TLS_CERT_PATH`: driver's TLS certificate file path
+- `DRIVER_TLS_KEY_PATH`: driver's TLS private key file path
 - Example: both relay and driver are TLS-enabled, and a trust store is used as a certificate repository:
   ```bash
-  RELAY_TLS=true RELAY_TLSCA_TRUST_STORE_PASSWORD=password RELAY_TLSCA_TRUST_STORE=trust_store.jks DRIVER_TLS=true DRIVER_CERT_PATH=cert.pem DRIVER_KEY_PATH=key.pem ./build/install/corda-driver/bin/corda-driver
+  RELAY_TLS=true RELAY_TLSCA_TRUST_STORE_PASSWORD=password RELAY_TLSCA_TRUST_STORE=trust_store.jks DRIVER_TLS=true DRIVER_TLS_CERT_PATH=cert.pem DRIVER_TLS_KEY_PATH=key.pem ./build/install/corda-driver/bin/corda-driver
   ```
 - Example: only relay is TLS-enabled, and the driver's trusted certificates are in separate files in the filesystem:
   ```bash
   RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=ca_cert1.pem:ca_cert2.pem ./build/install/corda-driver/bin/corda-driver
   ```
+
+If the driver is deployed within a Docker container, set the same variables as above in the appropriate `.env` file. The following sample files in [./docker-testnet-envs/](./docker-testnet-envs) can be used and tweaked for Fabric drivers associated with particular testnets:
+- Corda `Corda_Network`: `.env.corda` (non-TLS) and `.env.corda.tls` (TLS)
+- Corda `Corda_Network2`: `.env.corda2` (non-TLS) and `.env.corda2.tls` (TLS)
 
 ## Driver configuration
 
@@ -119,6 +123,13 @@ To push image to github container registry:
     - `DOCKER_TAG`: Refer here for the image tags available: [weaver-corda-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-corda-driver)
     - `COMPOSE_PROJECT_NAME`: Docker project name for the Corda network to which this driver is supposed to attach. By default, the folder name of the Corda network's `docker-compose.yml`, is the project name.
     - `COMPOSE_PROJECT_NETWORK`: Docker project network name for the Corda network to which this driver is supposed to attach. By default, `default` is the project network name.
+    - `RELAY_TLS`: Boolean flag indicating whether or not the local relay requires TLS connections
+    - `RELAY_TLSCA_TRUST_STORE`: Path to JKS file (truststore) containing TLS CA certificates
+    - `RELAY_TLSCA_TRUST_STORE_PASSWORD`: Password used to create the above JKS file
+    - `RELAY_TLSCA_CERT_PATHS`: Colon-separated TLS certificate paths for local relay
+    - `DRIVER_TLS`: Boolean flag indicating whether or not the driver requires TLS connections
+    - `DRIVER_TLS_CERT_PATH`: Driver's TLS certificate path
+    - `DRIVER_TLS_KEY_PATH`: Driver's TLS private key path
 * Create a Personal Access Token with read packages access in github. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 * Run `docker login ghcr.io` and use your github username and personal access token as password.
 * Run: `make deploy`.

@@ -5,6 +5,7 @@ The sample certificates and private keys in this folder were generated for relay
 - Single root CA for all components:
   * _Certificate_: `ca-cert.pem`
   * _Private key_: `ca-key.pem`
+  * _Truststore_: `relay_drivers_trust_store.jks` (password is `trelay`)
 - Fabric `network1` relay:
   * _Certificate_: `relay-network1-cert.pem`
   * _Private key_: `relay-network1-key.pem`
@@ -20,9 +21,12 @@ The sample certificates and private keys in this folder were generated for relay
 - Fabric `network2` driver:
   * _Certificate_: `fabric-driver-network2-cert.pem`
   * _Private key_: `fabric-driver-network2-cert.pem`
-- Corda network driver:
+- Corda `Corda_Network` driver:
   * _Certificate_: `corda-driver-cert.pem`
   * _Private key_: `corda-driver-key.pem`
+- Corda `Corda_Network2` driver:
+  * _Certificate_: `corda2-driver-cert.pem`
+  * _Private key_: `corda2-driver-key.pem`
 
 ## Useful commands
 
@@ -37,6 +41,11 @@ You can generate other certificates and keys for root CAs and the various compon
   The sample CA cert and key were generated thie following way:
   ```bash
   openssl req -x509 -newkey rsa:4096 -keyout ca-key.pem -out ca-cert.pem -sha256 -days 365 -nodes -addext "subjectAltName = DNS:localhost,IP:127.0.0.1"
+  ```
+
+- The truststore in the folder was created the following way:
+  ```bash
+  keytool -import -file ca-cert.pem -alias relayCA -keystore relay_drivers_trust_store.jks
   ```
 
 - To create a private key and CSR for a subject, run:
@@ -56,16 +65,20 @@ You can generate other certificates and keys for root CAs and the various compon
   ```bash
   openssl x509 -req -in <subject-csr-file-path> -out <subject-cert-file-path> -sha256 -days 365 -CA <CA-cert-file-path> -CAkey <CA-key-file-path> -CAcreateserial -extfile v3.ext
   ```
-  _Example_: the sample `v3.ext` used for the Corda driver contained the following (note the reference to the Docker container service name):
+  _Example_: the sample `v3.ext` used for the Corda `Corda_Network` driver contained the following (note the reference to the Docker container service name):
   ```
   subjectAltName = DNS:corda-driver-Corda_Network,DNS:localhost,IP:127.0.0.1
   ```
-  The command to generate the Corda driver's certificate was as follows:
+  The command to generate the Corda `Corda_Network` driver's certificate was as follows:
   ```bash
   openssl x509 -req -in corda-driver-csr.pem -out corda-driver-cert.pem -sha256 -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -extfile v3.ext
   ```
 
-- Tp examine the contents of a certificate, run:
+- To examine the contents of a certificate, run:
+  ```bash
+  openssl x509 -in <subject-cert-file-path> -noout -text
+  ```
+  _Example_: to view the contents of the certificate of the Fabric `network2` driver, run:
   ```bash
   openssl x509 -in fabric-driver-network2-cert.pem -noout -text
   ```

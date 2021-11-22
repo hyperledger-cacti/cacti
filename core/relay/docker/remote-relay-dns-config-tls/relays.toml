@@ -15,3 +15,9 @@ hostname="relay-corda"
 port="9081"
 tls=true
 tlsca_cert_path="/opt/relay/credentials/docker/ca-cert.pem"
+
+[relays.relay-corda2]
+hostname="relay-corda2"
+port="9082"
+tls=true
+tlsca_cert_path="/opt/relay/credentials/docker/ca-cert.pem"
