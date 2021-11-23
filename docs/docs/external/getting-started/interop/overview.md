@@ -1,8 +1,8 @@
 ---
 id: overview
-title: Testing Interoperaton Modes Overview
+title: Testing Interoperation Modes Overview
 sidebar_label: Overview
-pagination_label: Testing Interoperaton Modes
+pagination_label: Testing Interoperation Modes
 pagination_prev: external/getting-started/test-network/ledger-initialization
 ---
 
@@ -12,7 +12,7 @@ pagination_prev: external/getting-started/test-network/ledger-initialization
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-Following are the available Interoperaton Modes supported in Weaver. Click each of them to see more.
+To test any of the interoperability modes supported by Weaver in test networks that have already been launched and bootstrapped, follow the appropriate link below.
 
 * [Data Sharing](./data-sharing.md)
 * [Asset Exchange](./asset-exchange.md)

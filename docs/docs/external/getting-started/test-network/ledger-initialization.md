@@ -76,6 +76,10 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 ```bash
 ./bin/fabric-cli configure all network1 network2
 ```
+Instead, if you launched only one of the two Fabric networks, run the following after replacing `<network-id>` with either `network1` or `network2`:
+```bash
+./bin/fabric-cli configure all <network-id>
+```
 
 ### Initializing the Corda Network
 

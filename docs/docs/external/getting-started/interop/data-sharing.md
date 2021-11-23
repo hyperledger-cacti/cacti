@@ -1,6 +1,7 @@
 ---
 id: data-sharing
 title: Data Sharing
+pagination_next: external/getting-started/enabling-weaver-network/overview
 ---
 
 <!--
@@ -166,13 +167,21 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
   "args": ["Arcturus", ""]
   ```
 - Run the following:
-  * If Relays and Drivers are deployed in the host machine:
+  * If Relays and Drivers are deployed in the host machine without TLS:
     ```bash
     ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus
     ```
-  * If Relays and Drivers are deployed in the Docker containers:
+    (Instead) with TLS:
+    ```bash
+    ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=../../../core/relay/credentials/fabric_ca_cert.pem localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+    ```
+  * If Relays and Drivers are deployed in the Docker containers without TLS:
     ```bash
     ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
+    ```
+    (Instead) with TLS:
+    ```bash
+    ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=../../../core/relay/credentials/docker/ca-cert.pem relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
     ```
 - Query the value of the requested state (key) `Arcturus` in `network1` using the following:
   ```bash
@@ -185,13 +194,21 @@ To test the scenario where `network2` requests the value of the state (key) `a` 
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - (There is no need to edit `chaincode.json` to change the key as the default argument `"a"` is what we intend to use in this data sharing use scenario.)
 - Run the following:
-  * If Relays and Drivers are deployed in the host machine:
+  * If Relays and Drivers are deployed in the host machine without TLS:
     ```bash
     ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a
     ```
-  * If Relays and Drivers are deployed in the Docker containers:
+    (Instead) with TLS:
+    ```bash
+    ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=../../../core/relay/credentials/fabric_ca_cert.pem localhost:9080/network1/mychannel:simplestate:Read:a
+    ```
+  * If Relays and Drivers are deployed in the Docker containers without TLS:
     ```bash
     ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a
+    ```
+    (Instead) with TLS:
+    ```bash
+    ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=../../../core/relay/credentials/docker/ca-cert.pem relay-network1:9080/network1/mychannel:simplestate:Read:a:173
     ```
 - Query the value of the requested state (key) `a` in `network2` using the following:
   ```bash
