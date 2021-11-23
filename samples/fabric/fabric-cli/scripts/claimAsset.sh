@@ -17,14 +17,17 @@ cd scripts
 USER_CERT_BASE64=$(node getAssetTransferViewAddress.js getusercert $2 alice)
 sed "s/<alice>/$USER_CERT_BASE64/g" ../chaincode.json.template > ../chaincode.json
 sed -i "s/<assettype>/$4/g" ../chaincode.json
-sed -i "s/<assetid>/$5/g" ../chaincode.json
-if [ "$3" == "token" ]
+if [ "$3" == "bond" ]
 then
-	sed -i "s/<numunits>/$6/g" ../chaincode.json
+	sed -i "s/<assetid>/$5/g" ../chaincode.json
+elif [ "$3" == "token" ]
+then
+	sed -i "s/<numunits>/$5/g" ../chaincode.json
 fi
+sed -i "s/<pledge-id>/$6/g" ../chaincode.json
 
 # Get view address by running JS code
-VIEW_ADDRESS=$(node getAssetTransferViewAddress.js claim $3 $2 alice $1 bob $4 $5)
+VIEW_ADDRESS=$(node getAssetTransferViewAddress.js claim $3 $2 alice $1 bob $6)
 
 cd ..
 

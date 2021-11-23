@@ -295,6 +295,18 @@ func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, cla
 	}
 
 	claimKey := getAssetClaimKey(pledgeId)
+	lookupClaimBytes, err := ctx.GetStub().GetState(claimKey)
+	if err != nil {								// No Record of claim
+		return pledge.AssetDetails, ctx.GetStub().PutState(claimKey, claimBytes)
+	}
+	
+	lookupClaimStatus := &common.AssetClaimStatus{}
+	err = proto.Unmarshal(lookupClaimBytes, lookupClaimStatus)
+	if lookupClaimStatus.ClaimStatus {			// Previous claim was successful
+		return nil, fmt.Errorf("asset has already been claimed")
+	}
+	
+	// Else proceed to claim
 	return pledge.AssetDetails, ctx.GetStub().PutState(claimKey, claimBytes)
 }
 
@@ -337,6 +349,11 @@ func ReclaimAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipie
 		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as the pledge has not yet expired", pledgeId)
 	}
 	if claimStatus.ClaimStatus {
+		pledgeKey := getAssetPledgeKey(pledgeId)
+		err := ctx.GetStub().DelState(pledgeKey)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to delete asset pledge from world state: %v", err)
+		}
 		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as it has already been claimed", pledgeId)
 	}
 	if (claimStatus.LocalNetworkID != "" &&

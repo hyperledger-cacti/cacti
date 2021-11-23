@@ -16,11 +16,10 @@ cd scripts
 # Create a chaincode.json from the template file after replacing user IDs with certificates
 USER_CERT_BASE64=$(node getAssetTransferViewAddress.js getusercert $2 bob)
 sed "s/<bob>/$USER_CERT_BASE64/g" ../chaincode.json.template > ../chaincode.json
-sed -i "s/<assettype>/$4/g" ../chaincode.json
-sed -i "s/<assetid>/$5/g" ../chaincode.json
+sed -i "s/<pledge-id>/$4/g" ../chaincode.json
 
 # Get view address by running JS code
-VIEW_ADDRESS=$(node getAssetTransferViewAddress.js reclaim $3 $1 alice $2 bob $4 $5)
+VIEW_ADDRESS=$(node getAssetTransferViewAddress.js reclaim $3 $1 alice $2 bob $4 $5 $6)
 
 cd ..
 

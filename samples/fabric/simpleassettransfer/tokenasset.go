@@ -385,8 +385,8 @@ func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionCont
 	balance, err := s.GetBalance(ctx, assetType, recipientCert)
 	if err != nil {
 		return blankClaimBytes64, err
-	} 
-	if lookupClaimAsset.NumUnits == numUnits {
+	}
+	if lookupClaimAsset.NumUnits != numUnits {
 		return blankClaimBytes64, fmt.Errorf("given number of units %d of type %s was not claimed", numUnits, assetType)
 	}
 	if balance < lookupClaimAsset.NumUnits {

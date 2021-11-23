@@ -164,17 +164,16 @@ func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface,
 	return ctx.GetStub().DelState(getBondAssetKey(asset.Type, asset.ID))
 }
 
-func CreateBondAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, pledgeId, assetType, id string) error {
-	key := generateSHA256HashInHexForm(assetType + id)
-	return ctx.GetStub().PutState(key, pledgeId)
-}
-func GetBondAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, assetType, id string) (string, error) {
-	key := generateSHA256HashInHexForm(assetType + id)
-	return ctx.GetStub().GetState(key)
-}
-
 // PledgeAsset locks an asset for transfer to a different ledger/network.
 func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface, assetType, id, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) (string, error) {
+	// Check if asset is pledged already
+	bondAssetPledgeMap, err := getAssetPledgeIdMap(ctx, assetType, id)
+	if (err == nil) && (bondAssetPledgeMap.RemoteNetworkID == remoteNetworkId) && (bondAssetPledgeMap.Recipient == recipientCert) {
+		return bondAssetPledgeMap.PledgeID, nil
+	} else if (err == nil) {
+		return bondAssetPledgeMap.PledgeID, fmt.Errorf("asset %s is already pledged with pledgeId %s for different recipient", id, bondAssetPledgeMap.PledgeID)
+	}
+	
 	// Read the asset (which internally checks access)
 	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
@@ -190,12 +189,12 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 	// Pledge the asset using common (library) logic
 	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, id, asset.Owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
 		// Delete asset state using app-specific logic
-		err = s.DeleteAsset(ctx, assetType, id)
+		return pledgeId, s.DeleteAsset(ctx, assetType, id)
 		if err != nil {
 			return pledgeId, err
 		}
-		
-		return pledgeId, nil
+		err = createAssetPledgeIdMap(ctx, pledgeId, assetType, id, remoteNetworkId, recipientCert)
+		return pledgeId, err
 	} else {
 		return "", err
 	}
@@ -270,7 +269,11 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic
-	return ctx.GetStub().PutState(getBondAssetKey(pledgeAsset.Type, pledgeAsset.ID), pledgeAssetDetails)
+	err = ctx.GetStub().PutState(getBondAssetKey(pledgeAsset.Type, pledgeAsset.ID), pledgeAssetDetails)
+	if err != nil {
+		return err
+	}
+	return delAssetPledgeIdMap(ctx, pledgeAsset.Type, pledgeAsset.ID)
 }
 
 // GetAssetPledgeStatus returns the asset pledge status.

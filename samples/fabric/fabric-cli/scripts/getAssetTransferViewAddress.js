@@ -9,7 +9,7 @@ function getECertBase64(networkId, userId) {
     return Buffer.from(userIdJSON.credentials.certificate).toString('base64');
 }
 
-function getClaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwork, recipient, assetType, assetId) {
+function getClaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwork, recipient, pledgeId) {
     let address = 'localhost:';
 
     if (sourceNetwork === 'network1') {
@@ -29,7 +29,7 @@ function getClaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwork,
         console.log('Unecognized asset category:', assetCategory);
         process.exit(1);
     }
-    address = address + ':' + assetType + ':' + assetId + ':';
+    address = address + ':' + pledgeId + ':';
     const pledgerCert = getECertBase64(sourceNetwork, pledger);
     address = address + pledgerCert + ':' + destNetwork + ':';
     const recipientCert = getECertBase64(destNetwork, recipient);
@@ -38,7 +38,7 @@ function getClaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwork,
     return address;
 }
 
-function getReclaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwork, recipient, assetType, assetId) {
+function getReclaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwork, recipient, assetType, assetIdOrQuantity, pledgeId) {
     let address = 'localhost:';
 
     if (destNetwork === 'network1') {
@@ -58,7 +58,7 @@ function getReclaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwor
         console.log('Unecognized asset category:', assetCategory);
         process.exit(1);
     }
-    address = address + ':' + assetType + ':' + assetId + ':';
+    address = address + ':' + pledgeId + ':' + assetType + ':' + assetIdOrQuantity + ':';
     const recipientCert = getECertBase64(destNetwork, recipient);
     address = address + recipientCert + ':';
     const pledgerCert = getECertBase64(sourceNetwork, pledger);
@@ -67,16 +67,17 @@ function getReclaimViewAddress(assetCategory, sourceNetwork, pledger, destNetwor
     return address;
 }
 
-if (process.argv.length != 5 && process.argv.length != 10) {
-    console.log('Usage: node getAssetTransferViewAddress.js claim|reclaim bond|token <source-network-id> <pledger-id> <dest-network-id> <recipient-id> <asset-type> <asset-id>');
+if (process.argv.length != 5 && process.argv.length != 9 && process.argv.length != 11) {
+    console.log('Usage: node getAssetTransferViewAddress.js claim bond|token <source-network-id> <pledger-id> <dest-network-id> <recipient-id> <pledge-id>');
+    console.log('Usage: node getAssetTransferViewAddress.js reclaim bond|token <source-network-id> <pledger-id> <dest-network-id> <recipient-id> <asset-type> <asset-id-or-quantity> <pledge-id>');
     console.log('Usage: node getAssetTransferViewAddress.js getusercert <network-id> <user-id>');
     process.exit(1);
 }
 
 if (process.argv[2] === 'claim') {
-    console.log(getClaimViewAddress(process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8], process.argv[9]));
+    console.log(getClaimViewAddress(process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8]));
 } else if (process.argv[2] === 'reclaim') {
-    console.log(getReclaimViewAddress(process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8], process.argv[9]));
+    console.log(getReclaimViewAddress(process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8], process.argv[9], process.argv[10]));
 } else if (process.argv[2] === 'getusercert') {
     console.log(getECertBase64(process.argv[3], process.argv[4]));
 } else {
