@@ -262,7 +262,7 @@ docker run \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"instanceId": "some-unique-fabric-connector-instance-id", "dockerBinary": "usr/local/bin/docker","cliContainerEnv": {
+  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"instanceId": "some-unique-fabric-connector-instance-id", "dockerBinary": "usr/local/bin/docker","cliContainerEnv": {
     "CORE_PEER_LOCALMSPID": "Org1MSP",
     "CORE_PEER_ADDRESS": "peer0.org1.example.com:7051",
     "CORE_PEER_MSPCONFIGPATH":
@@ -288,7 +288,7 @@ docker run \
    --publish 4000:4000 \
   cplcb \
     ./node_modules/.bin/cactusapi \
-    --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"instanceId": "some-unique-fabric-connector-instance-id", "dockerBinary": "usr/local/bin/docker","cliContainerEnv": {
+    --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"instanceId": "some-unique-fabric-connector-instance-id", "dockerBinary": "usr/local/bin/docker","cliContainerEnv": {
     "CORE_PEER_LOCALMSPID": "Org1MSP",
     "CORE_PEER_ADDRESS": "peer0.org1.example.com:7051",
     "CORE_PEER_MSPCONFIGPATH":
@@ -308,7 +308,7 @@ docker run \
 Launch container with **configuration file** mounted from host machine:
 ```sh
 
-echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"instanceId": "some-unique-fabric-connector-instance-id", "dockerBinary": "usr/local/bin/docker","cliContainerEnv": {
+echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"instanceId": "some-unique-fabric-connector-instance-id", "dockerBinary": "usr/local/bin/docker","cliContainerEnv": {
     "CORE_PEER_LOCALMSPID": "Org1MSP",
     "CORE_PEER_ADDRESS": "peer0.org1.example.com:7051",
     "CORE_PEER_MSPCONFIGPATH":
@@ -350,7 +350,7 @@ docker run \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"instanceId": "some-unique-fabric-connector-instance-id", "dockerBinary": "usr/local/bin/docker","cliContainerEnv": {
+  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"instanceId": "some-unique-fabric-connector-instance-id", "dockerBinary": "usr/local/bin/docker","cliContainerEnv": {
     "CORE_PEER_LOCALMSPID": "Org1MSP",
     "CORE_PEER_ADDRESS": "peer0.org1.example.com:7051",
     "CORE_PEER_MSPCONFIGPATH":
