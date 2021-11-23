@@ -3850,10 +3850,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.3.3.tgz#dfd8ac012fd7f53ece4b31b736fcab09565a2615"
   integrity sha512-2ELsJkBQ0xirVQnx0utl3N+/iTPF+S0r3j0IVQIMG0HgAWreFXumY+yhGcwSV5JZ/yNNAXWR4mjIYRH/FEgu2Q==
 
-"@openzeppelin/contracts@4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.2.0.tgz#260d921d99356e48013d9d760caaa6cea35dc642"
-  integrity sha512-LD4NnkKpHHSMo5z9MvFsG4g1xxZUDqV3A3Futu3nvyfs4wPwXxqOgMaxOoa2PeyGL2VNeSlbxT54enbQzGcgJQ==
+"@openzeppelin/contracts@4.3.3":
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.3.tgz#ff6ee919fc2a1abaf72b22814bfb72ed129ec137"
+  integrity sha512-tDBopO1c98Yk7Cv/PZlHqrvtVjlgK5R4J6jxLwoO7qxK4xqOiZG+zSkIvGFpPZ0ikc3QOED3plgdqjgNTnBc7g==
 
 "@panva/asn1.js@^1.0.0":
   version "1.0.0"
