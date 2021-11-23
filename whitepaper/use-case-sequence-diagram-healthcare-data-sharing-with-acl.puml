@@ -1,0 +1,46 @@
+@startuml Sequence Diagram - Healthcare Data Sharing with Access Control Lists
+
+skinparam ArrowFontStyle italic
+
+title Hyperledger Cactus\nSequence Diagram - Healthcare Data Sharing with Access Control Lists
+
+actor User_A as a <<patient>>
+actor User_B as b <<healthcare provider>>
+
+box Cactus #WhiteSmoke
+entity "API" as api
+entity "Validator(s)" as v
+end box
+
+box "Ledgers" #WhiteSmoke
+database Fabric_Ledger as d1
+database Besu_Ledger as d2
+end box
+
+autoactivate on
+
+b -> api: Request Data Access
+
+  api -> a: Prompt for Data Access
+  return Grant Permission
+
+  api -> d2: Get Asset\n<<healthcare data>>
+  return Asset\n<<healthcare data>>
+
+  autoactivate off
+  api -> v: Verify Asset\n<<healthcare data>>
+  critical Signatures Valid
+    v -> api: <color:green>Proceed
+  else Signatures Invalid
+    v -> api: <color:red>Abort
+  end
+  autoactivate on
+
+  api -> v: Create Asset\n<<healthcare data>>
+    v -> d1: Create Asset\n<<healthcare data>>
+    return Asset Created OK\n<<healthcare data>>
+  return Asset Created OK\n<<healthcare data>>
+
+return Data Access Granted
+
+@enduml

@@ -1,0 +1,169 @@
+@startuml
+title Ethereum to Quorum Asset Transfer
+
+participant "Application user" as user
+
+box "Routing Interface" #LightGray
+entity "Routing Interface" as routing_if
+end box
+box "Business Logic Plugin" #Aquamarine
+entity "Business Logic Plugin" as business_lp
+end box
+box "Ledger Plugin (for Ledger1)" #Lavender
+entity "Verifier 1" as verifier_1
+entity "Validator 1" as validator_1
+end box
+box "Ledger Plugin (for Ledger 2)" #Lavender
+entity "Verifier 2" as verifier_2
+entity "Validator 2" as validator_2
+end box
+
+box "Ledgers" #LightCyan
+database "Ethereum Ledger" as ledger_1
+database "Quorum Ledger" as ledger_2
+end box
+
+user -> routing_if: "Request asset transfer \nfrom Ethereum to Quorum"
+activate routing_if
+routing_if -> business_lp: "Request asset transfer \nfrom Ethereum to Quorum"
+activate business_lp
+
+== Escrow Ethereum asset until Quorum asset transfer is completed ==
+
+/'** From: Business_lp, To: Ledger_1, Act: Escrow transaction **'/ 
+business_lp -> routing_if: "Request to invoke smart contract\n to transfer asset"
+routing_if -> verifier_1: "Request to invoke smart contract\n to transfer asset"
+activate verifier_1
+verifier_1 -> validator_1: "Request to invoke smart contract\n to transfer asset"
+activate validator_1
+validator_1 -> ledger_1: "Invoke smart contract\n to transfer asset"
+activate ledger_1
+ledger_1 -> ledger_1: "Send an escrow transaction\n (from: source account,\n to: escrow account)"
+deactivate ledger_1
+validator_1 -->> verifier_1: "Request posted"
+deactivate validator_1
+verifier_1 -->> routing_if: "Request posted"
+deactivate verifier_1
+routing_if -->> business_lp: "Request posted"
+deactivate business_lp
+routing_if -->> user: "Request accepted"
+deactivate routing_if
+
+/'** From: Ledger_1, To: Business_lp, Act: Notification(Escrow) **'/ 
+activate ledger_1
+ledger_1 -> ledger_1: "Consensus completed"
+validator_1 <- ledger_1: "Notify new block data"
+deactivate ledger_1
+activate validator_1
+validator_1 -> validator_1: "Validate transactions"
+validator_1 -> validator_1: "digital sign on \nvalid transaction"
+validator_1 -> verifier_1: "Request to update\n transaction status"
+activate verifier_1
+verifier_1 -> verifier_1: "Validate digital signs"
+verifier_1 -> routing_if: "Request to update\n transaction status"
+activate routing_if
+routing_if -> business_lp: "Request to update\n transaction status"
+activate business_lp
+business_lp -> business_lp: "Update transaction \nstatus(asset is escrowed)"
+business_lp -->> routing_if: "transaction update\n accepted"
+routing_if -->> verifier_1: "transaction update\n accepted"
+deactivate routing_if
+verifier_1 -->> validator_1: "transaction update\n accepted"
+deactivate verifier_1
+deactivate validator_1
+
+business_lp -> business_lp: "determine \nnext operation\n(transfer Quorum asset)"
+
+== Transfer Quorum asset ==
+
+/'** From: Business_lp, To: Ledger_2, Act: Transfer transaction **'/ 
+business_lp -> routing_if: "Request to \ntransfer Quorum asset"
+activate routing_if
+routing_if -> verifier_2: "Request to \ntransfer Quorum asset"
+activate verifier_2
+verifier_2 -> validator_2: "Request to \ntransfer Quorum asset"
+activate validator_2
+validator_2 -> ledger_2: "Invoke smart contract\n to transfer asset"
+activate ledger_2
+ledger_2 -> ledger_2: "Send a transfer transaction\n (from: exchanger account,\n to: destination account)"
+deactivate ledger_2
+validator_2 -->> verifier_2: "Request posted"
+deactivate validator_2
+verifier_2 -->> routing_if: "Request posted"
+deactivate verifier_2
+routing_if -->> business_lp: "Request posted"
+deactivate routing_if
+deactivate business_lp
+
+/'** From: Ledger_2, To: Business_lp, Act: Notification(Transfer) **'/ 
+activate ledger_2
+ledger_2 -> ledger_2: "Consensus completed"
+validator_2 <- ledger_2: "Notify new block data"
+deactivate ledger_2
+activate validator_2
+validator_2 -> validator_2: "Validate transactions"
+validator_2 -> validator_2: "digital sign on \nvalid transaction"
+validator_2 -> verifier_2: "Request to update\n transaction status"
+activate verifier_2
+verifier_2 -> verifier_2: "Validate digital signs"
+verifier_2 -> routing_if: "Request to update\n transaction status"
+activate routing_if
+routing_if -> business_lp: "Request to update\n transaction status"
+activate business_lp
+business_lp -> business_lp: "Update transaction \nstatus(asset is escrowed)"
+business_lp -->> routing_if: "transaction update\n accepted"
+routing_if -->> verifier_2: "transaction update\n accepted"
+deactivate routing_if
+verifier_2 -->> validator_2: "transaction update\n accepted"
+deactivate verifier_2
+deactivate validator_2
+
+business_lp -> business_lp: "determine \nnext operation\n(Settle transfered \nEthereum asset)"
+
+== Settle transfered Ethereum asset ==
+
+/'** From: Business_lp, To: Ledger_1, Act: Settling escrowed transaction **'/ 
+business_lp -> routing_if: "Request to invoke smart contract\n to settle escrowed asset"
+activate routing_if
+routing_if -> verifier_1: "Request to invoke smart contract\n to settle escrowed asset"
+activate verifier_1
+verifier_1 -> validator_1: "Request to invoke smart contract\n to settle escrowed asset"
+activate validator_1
+validator_1 -> ledger_1: "Invoke smart contract\n to settle escrowed asset"
+activate ledger_1
+ledger_1 -> ledger_1: "Send an settling escrowed transaction\n (from: escrow account,\n to: exchanger account)"
+deactivate ledger_1
+validator_1 -->> verifier_1: "Request posted"
+deactivate validator_1
+verifier_1 -->> routing_if: "Request posted"
+deactivate verifier_1
+routing_if -->> business_lp: "Request posted"
+deactivate business_lp
+deactivate routing_if
+
+/'** From: Ledger_1, To: Business_lp, Act: Notification(Settle escrowed) **'/ 
+activate ledger_1
+ledger_1 -> ledger_1: "Consensus completed"
+validator_1 <- ledger_1: "Notify new block data"
+deactivate ledger_1
+activate validator_1
+validator_1 -> validator_1: "Validate transactions"
+validator_1 -> validator_1: "digital sign on \nvalid transaction"
+validator_1 -> verifier_1: "Request to update\n transaction status"
+activate verifier_1
+verifier_1 -> verifier_1: "Validate digital signs"
+verifier_1 -> routing_if: "Request to update\n transaction status"
+activate routing_if
+routing_if -> business_lp: "Request to update\n transaction status"
+activate business_lp
+business_lp -> business_lp: "Update transaction \nstatus(asset is escrowed)"
+business_lp -->> routing_if: "transaction update\n accepted"
+routing_if -->> verifier_1: "transaction update\n accepted"
+deactivate routing_if
+verifier_1 -->> validator_1: "transaction update\n accepted"
+deactivate verifier_1
+deactivate validator_1
+
+business_lp -> business_lp: "determine \nnext operation\n(no more operation)"
+
+@enduml

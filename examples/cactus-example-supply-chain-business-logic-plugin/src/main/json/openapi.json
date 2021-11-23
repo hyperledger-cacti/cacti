@@ -1,0 +1,418 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Example - Supply Chain App",
+        "description": "Demonstrates how a business use case can be satisfied with Cactus when multiple distinct ledgers are involved.",
+        "version": "0.2.0",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "Shipment": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "bookshelfId"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024
+                    },
+                    "bookshelfId": {
+                        "description": "The foreign key ID referencing the bookshelfId that will go in the shipment.",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "Bookshelf": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "shelfCount",
+                    "bambooHarvestId"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024
+                    },
+                    "shelfCount": {
+                        "description": "The number of shelves the bookshelf comes with.",
+                        "type": "number",
+                        "nullable": false,
+                        "minimum": 1,
+                        "maximum": 255
+                    },
+                    "bambooHarvestId": {
+                        "description": "The foreign key ID referencing the bamboo harvest that yielded the wood material for the construction of the bookshelf.",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "BambooHarvest": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "location",
+                    "startedAt",
+                    "endedAt",
+                    "harvester"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024
+                    },
+                    "location": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024
+                    },
+                    "startedAt": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024
+                    },
+                    "endedAt": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024
+                    },
+                    "harvester": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024
+                    }
+                }
+            },
+            "InsertBambooHarvestRequest": {
+                "type": "object",
+                "required": [
+                    "bambooHarvest"
+                ],
+                "properties": {
+                    "bambooHarvest": {
+                        "$ref": "#/components/schemas/BambooHarvest"
+                    }
+                }
+            },
+            "InsertBambooHarvestResponse": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                    "callOutput": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "transactionReceipt": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            },
+            "ListBambooHarvestResponse": {
+                "type": "object",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "nullable": false,
+                        "default": [],
+                        "items": {
+                            "$ref": "#/components/schemas/BambooHarvest",
+                            "minItems": 0,
+                            "maxItems": 65535
+                        }
+                    }
+                }
+            },
+            "InsertBookshelfRequest": {
+                "type": "object",
+                "required": [
+                    "bookshelf"
+                ],
+                "properties": {
+                    "bookshelf": {
+                        "$ref": "#/components/schemas/Bookshelf"
+                    }
+                }
+            },
+            "InsertBookshelfResponse": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                    "callOutput": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "transactionReceipt": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            },
+            "ListBookshelfResponse": {
+                "type": "object",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "nullable": false,
+                        "default": [],
+                        "items": {
+                            "$ref": "#/components/schemas/Bookshelf",
+                            "minItems": 0,
+                            "maxItems": 65535
+                        }
+                    }
+                }
+            },
+            "InsertShipmentRequest": {
+                "type": "object",
+                "required": [
+                    "shipment"
+                ],
+                "properties": {
+                    "shipment": {
+                        "$ref": "#/components/schemas/Shipment"
+                    }
+                }
+            },
+            "InsertShipmentResponse": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                    "callOutput": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "transactionReceipt": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            },
+            "ListShipmentResponse": {
+                "type": "object",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "nullable": false,
+                        "default": [],
+                        "items": {
+                            "$ref": "#/components/schemas/Shipment",
+                            "minItems": 0,
+                            "maxItems": 65535
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf": {
+            "post": {
+                "operationId": "insertBookshelfV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"
+                    }
+                },
+                "summary": "Inserts the provided Bookshelf entity to the ledger.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InsertBookshelfRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "CREATED",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InsertBookshelfResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf": {
+            "get": {
+                "operationId": "listBookshelfV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"
+                    }
+                },
+                "summary": "Lists all the Bookshelf entities stored on the ledger.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListBookshelfResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment"
+                    }
+                },
+                "operationId": "insertShipmentV1",
+                "summary": "Inserts the provided Shipment entity to the ledger.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InsertShipmentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "CREATED",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InsertShipmentResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
+                    }
+                },
+                "operationId": "listShipmentV1",
+                "summary": "Lists all the Shipments entities stored on the ledger.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListShipmentResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest": {
+            "post": {
+                "operationId": "insertBambooHarvestV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
+                    }
+                },
+                "summary": "Inserts the provided BambooHarvest entity to the ledger.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InsertBambooHarvestRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "CREATED",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InsertBambooHarvestResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest": {
+            "get": {
+                "operationId": "listBambooHarvestV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest"
+                    }
+                },
+                "summary": "Lists all the BambooHarvest entities stored on the ledger.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListBambooHarvestResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

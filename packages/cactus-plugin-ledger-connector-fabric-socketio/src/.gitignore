@@ -1,0 +1,9 @@
+core/node_modules/
+core/package-lock.json
+dependent/node_modules/
+dependent/package-lock.json
+core/npm-debug.log
+dependent/wallet/
+core/wallet/
+wallet/
+dependent/ValidatorAuthentication.ts

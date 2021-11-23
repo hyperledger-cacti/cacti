@@ -1,0 +1,1167 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Connector Fabric",
+        "description": "Can perform basic tasks on a fabric ledger",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "TransactReceiptTransactionEndorsement":{
+                "type":"object",
+                "properties": {
+                    "mspid":{
+                        "type":"string"
+                    },
+                    "endorserID":{
+                        "type":"string"
+                    },
+                    "signature":{
+                        "type":"string"
+                    }
+                }
+            },
+            "TransactReceiptTransactionCreator":{
+                "type":"object",
+                "properties": {
+                    "mspid":{
+                        "type":"string"
+                    },
+                    "creatorID":{
+                        "type":"string"
+                    }
+                }
+            },
+            "TransactReceiptBlockMetaData":{
+                "type":"object",
+                "properties": {
+                    "mspid":{
+                        "type":"string"
+                    },
+                    "blockCreatorID":{
+                        "type":"string"
+                    },
+                    "signature":{
+                        "type":"string"
+                    }
+                }
+            },
+            "VaultTransitKey" : {
+                "type": "object",
+                "nullable": false,
+                "required": [
+                    "keyName",
+                    "token"
+                ],
+                "properties": {
+                    "keyName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false,
+                        "description": "label of private key"
+                    },
+                    "token": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false,
+                        "description": "token for accessing private key"
+                    }
+                },
+                "description": "vault key details for signing fabric message with private key stored with transit engine."
+            },
+            "WebSocketKey" : {
+                "type": "object",
+                "nullable": false,
+                "required": [
+                    "sessionId",
+                    "signature"
+                ],
+                "properties": {
+                    "sessionId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false,
+                        "description": "session Id to access client"
+                    },
+                    "signature": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false,
+                        "description": "signature of the session ID"
+                    }
+                },
+                "description": "web-socket key details for signing fabric message with private key stored with external client"
+            },
+            "FabricSigningCredentialType" : {
+                "type": "string",
+                "enum": [
+                    "X.509",
+                    "Vault-X.509",
+                    "WS-X.509"
+                ],
+                "nullable": false,
+                "description": "different type of identity provider for singing fabric messages supported by this package"
+            },
+            "FabricSigningCredential": {
+                "type": "object",
+                "required": [
+                    "keychainId",
+                    "keychainRef"
+                ],
+                "properties": {
+                    "keychainId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "keychainRef": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "type" : {
+                        "$ref" : "#/components/schemas/FabricSigningCredentialType",
+                        "description" : "singing identity type to be used for signing fabric message , by by default default is supported"
+                    },
+                    "vaultTransitKey" : {
+                        "$ref" : "#/components/schemas/VaultTransitKey",
+                        "properties" : "vault key details , if Vault-X.509 identity provider to be used for singing fabric messages"
+                    },
+                    "webSocketKey" : {
+                        "$ref" : "#/components/schemas/WebSocketKey",
+                        "properties" : "web-socket key details , if WS-X.509 identity provider to be used for singing fabric messages"
+                    }
+                }
+            },
+            "ChainCodeLifeCycleCommandResponses": {
+                "type": "object",
+                "required": [
+                    "queryInstalledList",
+                    "approveForMyOrgList",
+                    "installList"
+                ],
+                "properties": {
+                    "packaging": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    },
+                    "installList": {
+                        "items": {
+                            "$ref": "#/components/schemas/SSHExecCommandResponse"
+                        },
+                        "minItems": 1
+                    },
+                    "queryInstalledList": {
+                        "items": {
+                            "$ref": "#/components/schemas/SSHExecCommandResponse"
+                        },
+                        "minItems": 1
+                    },
+                    "approveForMyOrgList": {
+                        "items": {
+                            "$ref": "#/components/schemas/SSHExecCommandResponse"
+                        },
+                        "minItems": 1
+                    },
+                    "commit": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    },
+                    "queryCommitted": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    },
+                    "init": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    }
+                }
+            },
+            "ChainCodeProgrammingLanguage": {
+                "type": "string",
+                "description": "Enumerates the supported source code programming languages of Hyperledger Fabric",
+                "enum": [
+                    "golang",
+                    "javascript",
+                    "typescript",
+                    "java"
+                ]
+            },
+            "ChainCodeLanguageRuntime": {
+                "type": "string",
+                "description": "Enumerates the supported programming language runtimes of Hyperledger Fabric",
+                "enum": [
+                    "golang",
+                    "node",
+                    "java"
+                ]
+            },
+            "ConnectionProfile": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "version",
+                    "organizations",
+                    "peers"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "basic-network",
+                        "minLength": 1,
+                        "maxLength": 1024
+                    },
+                    "x-type": {
+                        "type": "string",
+                        "minLength": 1,
+                        "example": "hlfv1"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "The basic network"
+                    },
+                    "version": {
+                        "type": "string",
+                        "example": "1.0"
+                    },
+                    "client": {
+                        "type": "object",
+                        "properties": {
+                            "organization": {
+                                "type": "string",
+                                "example": "Org1"
+                            }
+                        }
+                    },
+                    "channels": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "organizations": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "orderers": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "peers": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "certificateAuthorities": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            },
+            "GatewayDiscoveryOptions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "asLocalhost": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "enabled": {
+                        "type": "boolean",
+                        "nullable": false
+                    }
+                }
+            },
+            "GatewayOptions": {
+                "type": "object",
+                "required": ["identity", "wallet"],
+                "properties": {
+                    "connectionProfile": {
+                        "$ref": "#/components/schemas/ConnectionProfile"
+                    },
+                    "discovery": {
+                        "$ref": "#/components/schemas/GatewayDiscoveryOptions",
+                        "nullable": false
+                    },
+                    "eventHandlerOptions": {
+                        "$ref": "#/components/schemas/GatewayEventHandlerOptions",
+                        "nullable": false
+                    },
+                    "identity": {
+                        "type": "string"
+                    },
+                    "wallet": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 1,
+                        "properties": {
+                            "keychain": {
+                                "$ref": "#/components/schemas/FabricSigningCredential"
+                            },
+                            "json": {
+                                "type": "string",
+                                "nullable": false,
+                                "minLength": 1,
+                                "maxLength": 65535
+                            }
+                        }
+                    }
+                }
+            },
+            "DefaultEventHandlerStrategy": {
+                "type": "string",
+                "enum": [
+                    "MSPID_SCOPE_ALLFORTX",
+                    "MSPID_SCOPE_ANYFORTX",
+                    "NETWORK_SCOPE_ALLFORTX",
+                    "NETWORK_SCOPE_ANYFORTX"
+                ]
+            },
+            "GatewayEventHandlerOptions": {
+                "type": "object",
+                "required": [
+                    "strategy"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "commitTimeout": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "endorseTimeout": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "strategy": {
+                        "description": "The name of the strategy to be used when looking up the TxEventHandlerFactory to pass in to the Fabric Gateway as the strategy property of the discovery options.",
+                        "$ref": "#/components/schemas/DefaultEventHandlerStrategy"
+                    }
+                }
+            },
+            "FileBase64": {
+                "description": "Represents a file-system file that has a name and a body which holds the file contents as a Base64 encoded string",
+                "type": "object",
+                "required": [
+                    "body",
+                    "filename"
+                ],
+                "properties": {
+                    "body": {
+                        "description": "The file's contents encoded as a Base64 string.",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 104857600
+                    },
+                    "filename": {
+                        "description": "The name as referred to on a file system",
+                        "example": "my-cool-file-full-of-wonders-and-fun-stuff.go",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "filepath": {
+                        "description": "The relative path of the file, if it should be placed in a sub-directory",
+                        "example": "./my/sub-folder/structure/",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 512
+                    }
+                }
+            },
+            "FabricContractInvocationType": {
+                "type": "string",
+                "enum": [
+                    "FabricContractInvocationType.SEND",
+                    "FabricContractInvocationType.CALL",
+                    "FabricContractInvocationType.SENDPRIVATE"
+                ]
+            },
+            "SSHExecCommandResponse": {
+                "type": "object",
+                "required": [
+                    "stdout",
+                    "stderr",
+                    "code",
+                    "signal"
+                ],
+                "properties": {
+                    "stdout": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "stderr": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "code": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "signal": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            },
+            "RunTransactionRequest": {
+                "type": "object",
+                "required": [
+                    "signingCredential",
+                    "channelName",
+                    "contractName",
+                    "invocationType",
+                    "methodName",
+                    "params"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "endorsingPeers": {
+                        "description": "An array of MSP IDs to set as the list of endorsing peers for the transaction.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 4096,
+                            "nullable": false
+                        }
+                    },
+                    "transientData": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "gatewayOptions": {
+                        "$ref": "#/components/schemas/GatewayOptions",
+                        "nullable": false
+                    },
+                    "signingCredential": {
+                        "$ref": "#/components/schemas/FabricSigningCredential",
+                        "nullable": false
+                    },
+                    "channelName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "contractName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "invocationType": {
+                        "$ref": "#/components/schemas/FabricContractInvocationType",
+                        "nullable": false,
+                        "description": "Indicates if it is a CALL or a SEND type of invocation where only SEND ends up creating an actual transaction on the ledger."
+                    },
+                    "methodName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "params": {
+                        "type": "array",
+                        "nullable": false,
+                        "default": [],
+                        "items": {
+                            "type": "string",
+                            "nullable": true
+                        }
+                    },
+                    "endorsingParties": {
+                        "type": "array",
+                        "nullable": false,
+                        "default": [],
+                        "items": {
+                            "type": "string",
+                            "nullable": true
+                        }
+                    }
+                }
+            },
+            "RunTransactionResponse": {
+                "type": "object",
+                "required": [
+                    "functionOutput",
+                    "success",
+                    "transactionId"
+                ],
+                "properties": {
+                    "functionOutput": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "transactionId":{
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "GetTransactionReceiptResponse": {
+                "type": "object",
+                "properties": {
+                   "blockNumber":{
+                       "type":"string"
+                   },
+                   "channelID":{
+                       "type": "string"
+                   },
+                   "transactionCreator":{
+                    "$ref": "#/components/schemas/TransactReceiptTransactionCreator"
+                   },
+                   "transactionEndorsement":{
+                       "type":"array",
+                       "items":{
+                        "$ref": "#/components/schemas/TransactReceiptTransactionEndorsement"
+                        }
+                   },
+                   "blockMetaData":{
+                     "$ref": "#/components/schemas/TransactReceiptBlockMetaData"
+                    },
+                   "chainCodeName":{
+                       "type":"string"
+                   },
+                   "chainCodeVersion":{
+                       "type":"string"
+                   },
+                   "responseStatus":{
+                       "type":"string"
+                   },
+                   "rwsetKey":{
+                       "type":"string"
+                   },
+                   "rwsetWriteData":{
+                       "type": "string"
+                   }
+                }
+            },
+            "DeploymentTargetOrganization": {
+                "type": "object",
+                "required": [
+                    "CORE_PEER_LOCALMSPID",
+                    "CORE_PEER_ADDRESS",
+                    "CORE_PEER_MSPCONFIGPATH",
+                    "CORE_PEER_TLS_ROOTCERT_FILE",
+                    "ORDERER_TLS_ROOTCERT_FILE"
+                ],
+                "properties": {
+                    "CORE_PEER_LOCALMSPID": {
+                        "type": "string",
+                        "example": "Org1MSP",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_ADDRESS": {
+                        "type": "string",
+                        "example": "peer0.org1.example.com:7051",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_MSPCONFIGPATH": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_TLS_ROOTCERT_FILE": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "ORDERER_TLS_ROOTCERT_FILE": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    }
+                }
+            },
+            "DeploymentTargetOrgFabric2x": {
+                "type": "object",
+                "required": [
+                    "CORE_PEER_LOCALMSPID",
+                    "CORE_PEER_ADDRESS",
+                    "CORE_PEER_MSPCONFIGPATH",
+                    "CORE_PEER_TLS_ROOTCERT_FILE",
+                    "ORDERER_TLS_ROOTCERT_FILE"
+                ],
+                "properties": {
+                    "transient": {
+                        "type": "string",
+                        "description": "Transient map of arguments in JSON encoding",
+                        "example": "orderer.example.com:7050",
+                        "minLength": 1,
+                        "maxLength": 1073741824
+                    },
+                    "CORE_PEER_LOCALMSPID": {
+                        "type": "string",
+                        "example": "Org1MSP",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_ADDRESS": {
+                        "type": "string",
+                        "example": "peer0.org1.example.com:7051",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_MSPCONFIGPATH": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "CORE_PEER_TLS_ROOTCERT_FILE": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    },
+                    "ORDERER_TLS_ROOTCERT_FILE": {
+                        "type": "string",
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "description": "Mapped to environment variables of the Fabric CLI container."
+                    }
+                }
+            },
+            "DeployContractGoSourceV1Request": {
+                "type": "object",
+                "required": [
+                    "goSource",
+                    "targetOrganizations",
+                    "chainCodeVersion",
+                    "channelId",
+                    "policyDslSource",
+                    "targetPeerAddresses",
+                    "tlsRootCertFiles"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "policyDslSource": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false,
+                        "example": "AND('Org1MSP.member','Org2MSP.member')"
+                    },
+                    "tlsRootCertFiles": {
+                        "type": "string",
+                        "description": "The TLS root cert files that will be passed to the chaincode instantiation command.",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false,
+                        "example": "/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt"
+                    },
+                    "channelId": {
+                        "type": "string",
+                        "description": "The name of the Fabric channel where the contract will get instantiated.",
+                        "example": "mychannel",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "targetOrganizations": {
+                        "type": "array",
+                        "minItems": 1,
+                        "nullable": false,
+                        "maxItems": 1024,
+                        "items": {
+                            "$ref": "#/components/schemas/DeploymentTargetOrganization"
+                        }
+                    },
+                    "targetPeerAddresses": {
+                        "type": "array",
+                        "description": "An array of peer addresses where the contract will be instantiated. Note that at present only the first item from this array will be used which is the behavior taken from the official Fabric samples repository and therefore it is assumed to be correct usage.",
+                        "example": [
+                            "peer0.org1.example.com:7051"
+                        ],
+                        "minItems": 1,
+                        "maxItems": 2048,
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 4096
+                        }
+                    },
+                    "constructorArgs": {
+                        "type": "object",
+                        "example": "{} - An empty object literal can be sufficient if your contract does not have parameters.",
+                        "nullable": false,
+                        "properties": {
+                            "Args": {
+                                "type": "array",
+                                "minLength": 0,
+                                "maxLength": 2048,
+                                "items": {}
+                            }
+                        }
+                    },
+                    "chainCodeVersion": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "example": "1.0.0",
+                        "nullable": false
+                    },
+                    "goSource": {
+                        "description": "The your-smart-contract.go file where the functionality of your contract is implemented.",
+                        "$ref": "#/components/schemas/FileBase64",
+                        "nullable": false
+                    },
+                    "goMod": {
+                        "description": "The go.mod file that declares the dependencies of the chaincode go contract that is being deployed as part of this request.",
+                        "$ref": "#/components/schemas/FileBase64",
+                        "nullable": false
+                    },
+                    "moduleName": {
+                        "description": "The go module name that will be used for the go compilation process.",
+                        "example": "hello-world-contract",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "pinnedDeps": {
+                        "type": "array",
+                        "minItems": 0,
+                        "maxItems": 1024,
+                        "items": {
+                            "type": "string",
+                            "nullable": false,
+                            "example": "github.com/hyperledger/fabric@v1.4.8"
+                        }
+                    },
+                    "modTidyOnly": {
+                        "description": "Indicates to the go chaincode compiler of Cactus if it should do an actual go compilation with the contact source or if it should just execute the go mod tidy command.",
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                }
+            },
+            "DeployContractGoSourceV1Response": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "installationCommandResponses",
+                    "instantiationCommandResponse"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "installationCommandResponses": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SSHExecCommandResponse"
+                        }
+                    },
+                    "instantiationCommandResponse": {
+                        "$ref": "#/components/schemas/SSHExecCommandResponse"
+                    }
+                }
+            },
+            "DeployContractV1Request": {
+                "type": "object",
+                "required": [
+                    "caFile",
+                    "sourceFiles",
+                    "targetOrganizations",
+                    "ccName",
+                    "ccLabel",
+                    "ccVersion",
+                    "ccSequence",
+                    "channelId",
+                    "ccLang",
+                    "orderer",
+                    "ordererTLSHostnameOverride"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "ccLang": {
+                        "$ref": "#/components/schemas/ChainCodeProgrammingLanguage"
+                    },
+                    "caFile": {
+                        "type": "string",
+                        "description": "File-system path pointing at the CA file.",
+                        "example": "${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem",
+                        "minLength": 1,
+                        "maxLength": 4096
+                    },
+                    "orderer": {
+                        "type": "string",
+                        "description": "Ordering service endpoint specified as <hostname or IP address>:<port>",
+                        "example": "orderer.example.com:7050",
+                        "minLength": 1,
+                        "maxLength": 65535
+                    },
+                    "ordererTLSHostnameOverride": {
+                        "type": "string",
+                        "description": "The hostname override to use when validating the TLS connection to the orderer",
+                        "example": "orderer.example.com:7050",
+                        "minLength": 1,
+                        "maxLength": 65535
+                    },
+                    "connTimeout": {
+                        "type": "integer",
+                        "description": "Timeout for client to connect (default 3s)",
+                        "nullable": false
+                    },
+                    "signaturePolicy": {
+                        "type": "string",
+                        "description": "Passed in to the peer via the --signature-policy argument on the command line. See also: https://hyperledger-fabric.readthedocs.io/en/release-2.2/endorsement-policies.html#setting-chaincode-level-endorsement-policies",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false,
+                        "example": "AND('Org1MSP.member','Org2MSP.member')"
+                    },
+                    "collectionsConfigFile": {
+                        "type": "string",
+                        "description": "Name of the collections config file as present in the sourceFiles array of the request.",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "channelId": {
+                        "type": "string",
+                        "description": "The name of the Fabric channel where the contract will get instantiated.",
+                        "example": "mychannel",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "targetOrganizations": {
+                        "type": "array",
+                        "minItems": 1,
+                        "nullable": false,
+                        "maxItems": 1024,
+                        "items": {
+                            "$ref": "#/components/schemas/DeploymentTargetOrganization"
+                        }
+                    },
+                    "constructorArgs": {
+                        "type": "object",
+                        "example": "{} - An empty object literal can be sufficient if your contract does not have parameters.",
+                        "nullable": false,
+                        "properties": {
+                            "Args": {
+                                "type": "array",
+                                "minLength": 0,
+                                "maxLength": 2048,
+                                "items": {}
+                            }
+                        }
+                    },
+                    "ccSequence": {
+                        "type": "number",
+                        "example": 1,
+                        "nullable": false
+                    },
+                    "ccVersion": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "example": "1.0.0",
+                        "nullable": false
+                    },
+                    "ccName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "example": "my-hello-world-contract",
+                        "nullable": false
+                    },
+                    "ccLabel": {
+                        "description": "Human readable label to uniquely identify the contract. Recommended to include in this at least the contract name and the exact version in order to make it easily distinguishable from other deployments of the same contract.",
+                        "example": "hello-world-contract",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "sourceFiles": {
+                        "description": "The your-smart-contract.go file where the functionality of your contract is implemented.",
+                        "items": {
+                            "$ref": "#/components/schemas/FileBase64"
+                        },
+                        "minItems": 1,
+                        "maxItems": 65535,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeployContractV1Response": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "packageIds",
+                    "lifecycle"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "packageIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "f8c8e06bfc27771028c4bbc3564341887881e29b92a844c66c30bac0ff83966e",
+                            "minLength": 1,
+                            "maxLength": 4096,
+                            "nullable": false
+                        }
+                    },
+                    "lifecycle": {
+                        "$ref": "#/components/schemas/ChainCodeLifeCycleCommandResponses"
+                    }
+                }
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction"
+                    }
+                },
+                "operationId": "runTransactionV1",
+                "summary": "Runs a transaction on a Fabric ledger.",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid"
+                    }
+                },
+                "operationId": "getTransactionReceiptByTxIDV1",
+                "summary": "get a transaction receipt by tx id on a Fabric ledger.",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetTransactionReceiptResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source": {
+            "post": {
+                "operationId": "deployContractGoSourceV1",
+                "summary": "Deploys a chaincode contract in the form of a go sources.",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source"
+                    }
+                },
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractGoSourceV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractGoSourceV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "501": {
+                        "description": "Not implemented",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "nullable": false,
+                                            "minLength": 1,
+                                            "maxLength": 2048
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract": {
+            "post": {
+                "operationId": "deployContractV1",
+                "summary": "Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The 'v1' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract"
+                    }
+                },
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "501": {
+                        "description": "Not implemented",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "nullable": false,
+                                            "minLength": 1,
+                                            "maxLength": 2048
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

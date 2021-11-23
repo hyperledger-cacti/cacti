@@ -1,0 +1,18 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+repository:
+  name: cactus
+  description: Hyperledger Cactus is a new approach to the blockchain interoperability problem
+  homepage: https://wiki.hyperledger.org/display/cactus
+  default_branch: main
+  has_downloads: false
+  has_issues: true
+  has_projects: true
+  has_wiki: true
+  archived: false
+  private: false
+  allow_squash_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: true

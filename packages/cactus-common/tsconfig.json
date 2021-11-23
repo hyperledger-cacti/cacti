@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-common.tsbuildinfo"
+  },
+  "include": [
+    "./src"
+  ],
+  "references": []
+}

@@ -1,0 +1,53 @@
+@startuml Food Traceability Integration
+
+title Hyperledger Cactus\nFood Traceability Integration
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam maxmessagesize 30
+skinparam sequenceParticipant underline
+
+top to bottom direction
+
+actor "Retailer Customer" as rc
+
+frame "Company A\n<<organization>>" as ca #LightGray {
+  node "Food Traceability Solution A\n<<software>>" as ftsa #LightYellow {
+  }
+}
+
+frame "Company B\n<<organization>>" as cb #LightGray {
+  node "Food Traceability Solution B\n<<software>>" as ftsb #LightYellow {
+  }
+}
+
+frame "Food Retailer\n<<organization>>" as re #LightGray {
+  node "Food Traceability Solution B\n<<software deployment/subscription>>" as lftsb #LightGreen {
+  }
+  node "Integration for End to End Food Traceability\n<<software deployment/subscription>>" as ifeteft #LightSkyBlue {
+  }
+}
+
+frame "Food Manufacturer\n<<organization>>" as fm #LightGray {
+  node "Food Traceability Solution A\n<<software deployment/subscription>>" as lftsa #LightGreen {
+  }
+}
+
+frame "System Integrator Company\n<<organization>>" as sic #LightGray {
+  node "System Integration\n<<IT service>>" as ssi {
+  }
+}
+
+frame "Hyperledger\n<<organization>>" as hl #LightGray {
+  node "Hyperledger Cactus\n<<software>>" as cactus #LightYellow  {
+  }
+}
+
+fm ==> ca #Green: Purchase Food Traceability Solution A
+re ==> fm: Source food from manufacturer
+re ==> cb #Green: Purchase Food Traceability Solution B
+re ==> sic: Purchase System Integration Project
+rc ==> ifeteft: Traces food origins
+sic ==> hl: Builds integration on top of Hyperledger Cactus
+
+@enduml

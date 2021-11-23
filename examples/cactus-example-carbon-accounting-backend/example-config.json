@@ -1,0 +1,82 @@
+{
+    "configFile": ".config.json",
+    "authorizationConfigJson" : {},
+    "cactusNodeId": "972b1aec-a027-4dfb-bf0f-3811ad8d15e4",
+    "consortiumId": "fb3edae7-46db-4e84-837e-c66f6f2bc78e",
+    "logLevel": "debug",
+    "minNodeVersion": "12.0.0",
+    "tlsDefaultMaxVersion": "TLSv1.3",
+    "authorizationProtocol": "NONE",
+    "apiHost": "127.0.0.1",
+    "apiPort": 4000,
+    "apiCorsDomainCsv": "",
+    "apiMtlsEnabled": false,
+    "cockpitApiProxyRejectUnauthorized": true,
+    "apiTlsEnabled": true,
+    "apiTlsCertPem": "-----BEGIN CERTIFICATE-----\r\nMIIGjjCCBHagAwIBAgIKDv1M8Cl8RNkaBDANBgkqhkiG9w0BAQ0FADCBrzESMBAG\r\nA1UEAxMJbG9jYWxob3N0MREwDwYDVQQGEwhVbml2ZXJzZTESMBAGA1UECBMJTWls\r\na3kgV2F5MRUwEwYDVQQHEwxQbGFuZXQgRWFydGgxFDASBgNVBAoTC0h5cGVybGVk\r\nZ2VyMQ8wDQYDVQQLEwZDYWN0dXMxNDAyBgkqhkiG9w0BCQITJUNhY3R1cyBEdW1t\r\neSBTZWxmIFNpZ25lZCBDZXJ0aWZpY2F0ZXMwHhcNMjEwNDE0MDYwOTU2WhcNMjIw\r\nNDE0MDYwOTU2WjCBrzESMBAGA1UEAxMJbG9jYWxob3N0MREwDwYDVQQGEwhVbml2\r\nZXJzZTESMBAGA1UECBMJTWlsa3kgV2F5MRUwEwYDVQQHEwxQbGFuZXQgRWFydGgx\r\nFDASBgNVBAoTC0h5cGVybGVkZ2VyMQ8wDQYDVQQLEwZDYWN0dXMxNDAyBgkqhkiG\r\n9w0BCQITJUNhY3R1cyBEdW1teSBTZWxmIFNpZ25lZCBDZXJ0aWZpY2F0ZXMwggIi\r\nMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCyV5sVXZm5J/8Sx8MhoCPeybfw\r\nJ7Iqxsi1rl1cawbAPRLfxXixU5ByzXlXxFh6vMMc8P4jPV2SEhU7sT1Ms97GuEdu\r\nLTRaCr5LBRxDNF3XrCWTFZ4r5z4tF4SLLx7833mApShu0lfpzoX4zkEg7Jlm6P4p\r\nV7DCFEP1wVsI6uK8IDNXtkA3adosR/8TeS6KY84E5rkhjGMongLXC4xdpYY0mn2R\r\nLBtgVuWpykTJ/QiE9gmmwIwarDAxeZJavkwTrxhApD/au+/y53s4pXPypLAmsVqy\r\nd2hS2VnhrP58xEy1UFTALXGrhI7trl+KJySVpnZnb6ghwaNHuYZMtaA9ylC0Lwie\r\nc/jl24X4H5D4/QK4O3C5Jrn9kV4zinxLaDTXCJoBTBZYDoG54oJaFhz8/k3WLHFs\r\nJijyFpvGJ/b/IP0bZs1LQmUu5PEujy4gmrqd35j3Iaxf6fHbMuOyHo7ALcyI3aNS\r\n/Cp/7gHlrdwRdER+4GVg6i2iDg6ZbU3g3xg2V/wEn4CXNU2P8Ua1paIcC7dAb2f7\r\nRgRu567B8TPmgk59koJ53nlw4Q2jTdux6v7GIhpAYWXqtlvgvv5mTynjmyCCRlCt\r\ndnQx0gZ+P1dDTXKZr31kvNBvherH0vCYGpR7rsebtMBEExD7SfafV5iVnhEIkb5g\r\nX0d8qkyncS6JRfOcjwIDAQABo4GpMIGmMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQD\r\nAgL0MDsGA1UdJQQ0MDIGCCsGAQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwMGCCsG\r\nAQUFBwMEBggrBgEFBQcDCDARBglghkgBhvhCAQEEBAMCAPcwGgYDVR0RBBMwEYYJ\r\nbG9jYWxob3N0hwR/AAABMB0GA1UdDgQWBBSNc0D8/jL/P6n9mRr9mAp/Vu2csjAN\r\nBgkqhkiG9w0BAQ0FAAOCAgEAnQXIYTnZ1ZFmU+KZDwyttVk3StCMiECmZTlxOf6d\r\na5y3wH+OyJsTPoXBWQaWfqtUnQ2SOvwEDejvFqiDTIcOjYm6vI3iGqXQ7zxGmsh0\r\n/+YBu8awa8f1HP3ZTAp68+FH1NlatjfXJdrrw1afkNUQGOwg6SNZhsOvZV8VjC1g\r\nCuCdVwNk/9vA+u6NPIB2G1JCS3qRdXiK9MO14QYyvxhQWztLRpoilkYyBJvjMXxI\r\nsP7JatcbgkzgXvH2aZo1QD59ZONvM3eWJ7ychFUxC98uCNSaCE1h6fPNVodcSQtC\r\n2wuVEVVc4331yf9P6moNe0dwbDcOUyP9yjV1hyCFNygyND4YafHSU4FSDM8MGRl4\r\n7UoqT3hX3SXCzmLLeyvcguRcK1JqRpX4jDchSJln75Qdb+wk4cLQPsTiFm4BLdRr\r\nyvYugmrz3REtRiT5X5lLmti+tqRaq6JkvDiBd9DirXIklq42evOP2UBVTvYO9nR4\r\n8U1VbT3fb3PwzWnBEmLvp6TO0gXa3UkcJ62dX+V8lV/SQ4WGkXuC33QyoN3Q/ozX\r\nPf2rp9o9qnPLrx0hx0rHgFRozxNbzoQ46CODVkyrE0qUv/Y0HjiYVKfCHpbe7vyX\r\nIXnGMPk+K7ijX7+htrIg8oREKKeMlW9SPuqyJaXmLheW4ovvrMT+Aod5AS1ikD6Q\r\nCJ8=\r\n-----END CERTIFICATE-----\r\n",
+    "apiTlsKeyPem": "-----BEGIN RSA PRIVATE KEY-----\r\n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\r\n-----END RSA PRIVATE KEY-----\r\n",
+    "apiTlsClientCaPem": "-",
+    "cockpitHost": "127.0.0.1",
+    "cockpitPort": 3000,
+    "cockpitWwwRoot": "packages/cactus-cmd-api-server/node_modules/@hyperledger/cactus-cockpit/www/",
+    "cockpitCorsDomainCsv": "",
+    "cockpitMtlsEnabled": false,
+    "cockpitTlsEnabled": true,
+    "cockpitTlsCertPem": "-----BEGIN CERTIFICATE-----\r\nMIIGjjCCBHagAwIBAgIKDv1M8Cl8RNkaBDANBgkqhkiG9w0BAQ0FADCBrzESMBAG\r\nA1UEAxMJbG9jYWxob3N0MREwDwYDVQQGEwhVbml2ZXJzZTESMBAGA1UECBMJTWls\r\na3kgV2F5MRUwEwYDVQQHEwxQbGFuZXQgRWFydGgxFDASBgNVBAoTC0h5cGVybGVk\r\nZ2VyMQ8wDQYDVQQLEwZDYWN0dXMxNDAyBgkqhkiG9w0BCQITJUNhY3R1cyBEdW1t\r\neSBTZWxmIFNpZ25lZCBDZXJ0aWZpY2F0ZXMwHhcNMjEwNDE0MDYwOTU2WhcNMjIw\r\nNDE0MDYwOTU2WjCBrzESMBAGA1UEAxMJbG9jYWxob3N0MREwDwYDVQQGEwhVbml2\r\nZXJzZTESMBAGA1UECBMJTWlsa3kgV2F5MRUwEwYDVQQHEwxQbGFuZXQgRWFydGgx\r\nFDASBgNVBAoTC0h5cGVybGVkZ2VyMQ8wDQYDVQQLEwZDYWN0dXMxNDAyBgkqhkiG\r\n9w0BCQITJUNhY3R1cyBEdW1teSBTZWxmIFNpZ25lZCBDZXJ0aWZpY2F0ZXMwggIi\r\nMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCyV5sVXZm5J/8Sx8MhoCPeybfw\r\nJ7Iqxsi1rl1cawbAPRLfxXixU5ByzXlXxFh6vMMc8P4jPV2SEhU7sT1Ms97GuEdu\r\nLTRaCr5LBRxDNF3XrCWTFZ4r5z4tF4SLLx7833mApShu0lfpzoX4zkEg7Jlm6P4p\r\nV7DCFEP1wVsI6uK8IDNXtkA3adosR/8TeS6KY84E5rkhjGMongLXC4xdpYY0mn2R\r\nLBtgVuWpykTJ/QiE9gmmwIwarDAxeZJavkwTrxhApD/au+/y53s4pXPypLAmsVqy\r\nd2hS2VnhrP58xEy1UFTALXGrhI7trl+KJySVpnZnb6ghwaNHuYZMtaA9ylC0Lwie\r\nc/jl24X4H5D4/QK4O3C5Jrn9kV4zinxLaDTXCJoBTBZYDoG54oJaFhz8/k3WLHFs\r\nJijyFpvGJ/b/IP0bZs1LQmUu5PEujy4gmrqd35j3Iaxf6fHbMuOyHo7ALcyI3aNS\r\n/Cp/7gHlrdwRdER+4GVg6i2iDg6ZbU3g3xg2V/wEn4CXNU2P8Ua1paIcC7dAb2f7\r\nRgRu567B8TPmgk59koJ53nlw4Q2jTdux6v7GIhpAYWXqtlvgvv5mTynjmyCCRlCt\r\ndnQx0gZ+P1dDTXKZr31kvNBvherH0vCYGpR7rsebtMBEExD7SfafV5iVnhEIkb5g\r\nX0d8qkyncS6JRfOcjwIDAQABo4GpMIGmMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQD\r\nAgL0MDsGA1UdJQQ0MDIGCCsGAQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwMGCCsG\r\nAQUFBwMEBggrBgEFBQcDCDARBglghkgBhvhCAQEEBAMCAPcwGgYDVR0RBBMwEYYJ\r\nbG9jYWxob3N0hwR/AAABMB0GA1UdDgQWBBSNc0D8/jL/P6n9mRr9mAp/Vu2csjAN\r\nBgkqhkiG9w0BAQ0FAAOCAgEAnQXIYTnZ1ZFmU+KZDwyttVk3StCMiECmZTlxOf6d\r\na5y3wH+OyJsTPoXBWQaWfqtUnQ2SOvwEDejvFqiDTIcOjYm6vI3iGqXQ7zxGmsh0\r\n/+YBu8awa8f1HP3ZTAp68+FH1NlatjfXJdrrw1afkNUQGOwg6SNZhsOvZV8VjC1g\r\nCuCdVwNk/9vA+u6NPIB2G1JCS3qRdXiK9MO14QYyvxhQWztLRpoilkYyBJvjMXxI\r\nsP7JatcbgkzgXvH2aZo1QD59ZONvM3eWJ7ychFUxC98uCNSaCE1h6fPNVodcSQtC\r\n2wuVEVVc4331yf9P6moNe0dwbDcOUyP9yjV1hyCFNygyND4YafHSU4FSDM8MGRl4\r\n7UoqT3hX3SXCzmLLeyvcguRcK1JqRpX4jDchSJln75Qdb+wk4cLQPsTiFm4BLdRr\r\nyvYugmrz3REtRiT5X5lLmti+tqRaq6JkvDiBd9DirXIklq42evOP2UBVTvYO9nR4\r\n8U1VbT3fb3PwzWnBEmLvp6TO0gXa3UkcJ62dX+V8lV/SQ4WGkXuC33QyoN3Q/ozX\r\nPf2rp9o9qnPLrx0hx0rHgFRozxNbzoQ46CODVkyrE0qUv/Y0HjiYVKfCHpbe7vyX\r\nIXnGMPk+K7ijX7+htrIg8oREKKeMlW9SPuqyJaXmLheW4ovvrMT+Aod5AS1ikD6Q\r\nCJ8=\r\n-----END CERTIFICATE-----\r\n",
+    "cockpitTlsKeyPem": "-----BEGIN RSA PRIVATE KEY-----\r\n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\r\n-----END RSA PRIVATE KEY-----\r\n",
+    "cockpitTlsClientCaPem": "-",
+    "keyPairPem": "-----BEGIN PRIVATE KEY-----\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgHy0hDxj3Uhz16F8aLiWq\nhf6bcqRU3fqAv2u2YvYdSF+hRANCAAQpvM3dbCigeGLDKs0JUTi0yf5UHGC2eSRD\nd3Dk1WpBjbJDLKGdSGVGE0h1Zys8o3Den3Xag8Y1EcTxDHDInMEc\n-----END PRIVATE KEY-----\n",
+    "keychainSuffixKeyPairPem": "CACTUS_NODE_KEY_PAIR_PEM",
+    "plugins": [
+        {
+            "packageName": "@hyperledger/cactus-plugin-keychain-memory",
+            "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
+            "options": {
+                "instanceId": "3ea23ac8-cf20-460a-99db-d56713c9c74e",
+                "keychainId": "046c1903-22f3-4fa5-962d-e981f49a66d1"
+            }
+        },
+        {
+            "packageName": "@hyperledger/cactus-plugin-consortium-manual",
+            "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
+            "options": {
+                "instanceId": "0b8c0ade-03d1-4cb6-a9dd-440633c4ca2a",
+                "keyPairPem": "-----BEGIN PRIVATE KEY-----\nMIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgHy0hDxj3Uhz16F8aLiWq\nhf6bcqRU3fqAv2u2YvYdSF+hRANCAAQpvM3dbCigeGLDKs0JUTi0yf5UHGC2eSRD\nd3Dk1WpBjbJDLKGdSGVGE0h1Zys8o3Den3Xag8Y1EcTxDHDInMEc\n-----END PRIVATE KEY-----\n",
+                "consortiumDatabase": {
+                    "cactusNode": [
+                        {
+                            "consortiumId": "Cactus_Example_Consortium",
+                            "id": "Cactus_Example_Consortium_Node_1",
+                            "ledgerIds": [],
+                            "memberId": "Cactus_Example_Consortium_Member_1",
+                            "pluginInstanceIds": [],
+                            "nodeApiHost": "https://127.0.0.1:4000",
+                            "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEKbzN3WwooHhiwyrNCVE4tMn+VBxgtnkk\nQ3dw5NVqQY2yQyyhnUhlRhNIdWcrPKNw3p912oPGNRHE8QxwyJzBHA==\n-----END PUBLIC KEY-----\n"
+                        }
+                    ],
+                    "consortiumMember": [
+                        {
+                            "id": "Cactus_Example_Consortium_Member_1",
+                            "name": "Example Cactus Consortium Member 1",
+                            "nodeIds": [
+                                "Cactus_Example_Consortium_Node_1"
+                            ]
+                        }
+                    ],
+                    "ledger": [],
+                    "pluginInstance": [],
+                    "consortium": [
+                        {
+                            "name": "Example Cactus Consortium",
+                            "id": "d40a9893-15b4-4d77-8129-6eccc65903a3",
+                            "mainApiHost": "https://127.0.0.1:4000",
+                            "memberIds": [
+                                "Cactus_Example_Consortium_Member_1"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

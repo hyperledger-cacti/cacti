@@ -1,0 +1,54 @@
+#
+# This is the config file used for the docker images.
+# It allows all users to do anything, so don't use it on production systems.
+#
+# Do not configure host and port under `listen` in this file
+# as it will be ignored when using docker.
+# see https://github.com/verdaccio/verdaccio/blob/verdaccio%406.0.0-6-next.24/website/docs/docker.md
+#
+
+# The only reason why we need a custom built docker image is because there is
+# no way to configure the existing container images to have a max body size
+# higher than the default 10 MB without mounting a volume with a config file
+max_body_size: 1000mb
+
+# path to a directory with all packages
+storage: /verdaccio/storage
+
+# a list of other known repositories we can talk to
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+
+packages:
+  '@scope/*':
+    # scoped packages
+    access: $all
+    publish: $all
+    proxy: npmjs
+  '@*/*':
+    # scoped packages
+    access: $all
+    publish: $all
+    proxy: npmjs
+  '**':
+    # allow all users (including non-authenticated users) to read and
+    # publish all packages
+    #
+    # you can specify usernames/groupnames (depending on your auth plugin)
+    # and three keywords: "$all", "$anonymous", "$authenticated"
+    access: $all
+
+    # allow anyone to publish packages so there is no need to register a user
+    publish: $all
+
+    # if package is not available locally, proxy requests to 'npmjs' registry
+    proxy: npmjs
+
+# log settings
+logs:
+  - { type: stdout, format: pretty, level: trace }
+  #- {type: file, path: verdaccio.log, level: info}
+
+listen:
+  - 0.0.0.0:4873

@@ -1,0 +1,71 @@
+version: '3'
+
+services: 
+  indy_pool:
+    container_name: indy_pool
+    image: indy_pool
+    build:
+      context: ./indy_pool
+      dockerfile: indy-pool.dockerfile
+    ports: 
+    - "9701:9701"
+    - "9702:9702"
+    - "9703:9703"
+    - "9704:9704"
+    - "9705:9705"
+    - "9706:9706"
+    - "9707:9707"
+    - "9708:9708"
+    networks:
+      indy_net:
+        ipv4_address: 172.16.0.2
+    volumes:
+    - ./indy_pool/sandbox:/var/lib/indy/sandbox/
+
+  nginx:
+    container_name: nginx
+    # build:
+    #   context: ./nginx
+    #   dockerfile: custom-nginx.dockerfile
+    image: nginx:stable-alpine
+    volumes:
+      - type: bind
+        source: "./nginx/nginx.conf"
+        target: "/etc/nginx/nginx.conf"
+    ports: 
+      - "10080:80"
+    networks:
+      indy_net:
+        ipv4_address: 172.16.0.3
+
+  clientbase:
+    container_name: immediately_exits
+    image: clientbase
+    build:
+      context: ./clientbase/
+      dockerfile: Dockerfile
+
+  validator:
+    container_name:  validator
+    image: validator
+    environment:
+    - TEST_POOL_IP=172.16.0.2
+    depends_on:
+      - clientbase
+    build:
+      context: ./validator
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      indy_net:
+        ipv4_address: 172.16.0.4
+
+networks:
+  indy_net:
+    name: indy_net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24

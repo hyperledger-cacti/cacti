@@ -1,0 +1,67 @@
+---
+version: '3.8'
+
+services:
+  besu-aio:
+    image: ghcr.io/hyperledger/cactus-besu-all-in-one:2021-01-08-7a055c3
+    environment:
+      - LOG4J_CONFIGURATION_FILE=/config/log-config.xml
+      - BESU_PUBLIC_KEY_DIRECTORY=/opt/besu/public-keys/
+    ports:
+      - 8545:8545/tcp # besu RPC - HTTP
+      - 8546:8546/tcp # besu RPC - WebSocket
+      - 8888:8888/tcp # orion - HTTP
+      - 9001:9001/tcp # supervisord - HTTP
+      - 9545:9545/tcp # besu metrics
+
+  cactus-api-server:
+    image: ghcr.io/hyperledger/cactus-cmd-api-server:2021-08-15--refactor-1222
+    environment:
+      CACTUS_NODE_ID: "-"
+      CONSORTIUM_ID: "-"
+      KEY_PAIR_PEM: "-"
+      COCKPIT_WWW_ROOT: ${APP}node_modules/@hyperledger/cactus-cockpit/www/
+      COCKPIT_TLS_ENABLED: "false"
+      COCKPIT_CORS_DOMAIN_CSV: \*
+      COCKPIT_MTLS_ENABLED: "false"
+      COCKPIT_TLS_CERT_PEM: "-"
+      COCKPIT_TLS_KEY_PEM: "-"
+      COCKPIT_TLS_CLIENT_CA_PEM: "-"
+      COCKPIT_HOST: 0.0.0.0
+      COCKPIT_PORT: 3000
+      API_MTLS_ENABLED: "false"
+      API_TLS_ENABLED: "false"
+      API_CORS_DOMAIN_CSV: \*
+      API_TLS_CERT_PEM: "-"
+      API_TLS_CLIENT_CA_PEM: "-"
+      API_TLS_KEY_PEM: "-"
+      API_HOST: 0.0.0.0
+      API_PORT: 4000
+      LOG_LEVEL: TRACE
+      AUTHORIZATION_PROTOCOL: NONE
+      AUTHORIZATION_CONFIG_JSON: "{}"
+      PLUGINS: >-
+        [
+            {
+                "packageName": "@hyperledger/cactus-plugin-keychain-memory",
+                "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
+                "options": {
+                    "keychainId": "some-unique-keychain-id",
+                    "instanceId": "some-unique-instance-id"
+                }
+            },
+            {
+                "packageName": "@hyperledger/cactus-plugin-ledger-connector-besu",
+                "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", 
+                "options": {
+                    "rpcApiHttpHost": "http://besu-aio:8545",
+                    "rpcApiWsHost": "http://besu-aio:8546",
+                    "instanceId": "some-unique-besu-connector-instance-id"
+                }
+            }
+        ]
+
+    ports:
+      - 3000:3000/tcp # HTTP
+      - 4000:4000/tcp # WebSocket (SocketIO)
+      - 5000:5000/tcp # gRPC

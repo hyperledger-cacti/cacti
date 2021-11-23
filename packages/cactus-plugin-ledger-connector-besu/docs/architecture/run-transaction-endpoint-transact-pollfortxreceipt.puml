@@ -1,0 +1,35 @@
+@startuml Sequence Diagram - transact method
+
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\npollForTxReceipt() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 100
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "pollForTxReceipt()" as pftr
+participant "web3.eth.getTransactionReceipt" as wegt
+
+caller -> pftr: txHash, consistencyStrategy
+activate caller
+group #Orange 
+    activate pftr
+    pftr -> wegt: 
+    activate wegt
+    loop #LightGreen until confirmationCount >= \n consistencyStrategy.blockConfirmations
+        wegt --> pftr: txReceipt
+        deactivate wegt
+    end loop
+
+    group #LightGreen if defined: txReceipt
+        pftr --> caller: txReceipt
+    else #LightCoral
+        pftr --> caller: Timed out
+        deactivate pftr
+    end
+end
+deactivate caller
+
+
+@enduml

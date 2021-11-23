@@ -1,0 +1,74 @@
+@startuml Authentication, Authorization for Permissioned Chains
+
+title Hyperledger Cactus\nAuthentication, Authorization for Permissioned Chains
+
+left to right direction
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam maxmessagesize 30
+skinparam sequenceParticipant underline
+
+frame "End User Application" as eu {
+  actor "<<identity owner>>" as io
+  node "Identity Proof 1\n<<RSA Key Pair>>" as ppkp1 #PaleVioletRed {
+  }
+  node "Identity Proof 2\n<<ECDSA Key Pair>>" as ppkp2 #PaleVioletRed {
+  }
+  node "Identity Proof 3\n<<Password>>" as password #PaleVioletRed {
+  }
+  node "Identity Proof 4\n<<OIDC Token>>" as authtoken #PaleVioletRed {
+  }
+}
+
+
+frame "Company A\n<<organization>>" as ca #LightGray {
+  node "Hyperledger Cactus\n<<software deployment>>" as Hyperledger Cactus #LightYellow {
+    node "REST API\n<<web service>>" as cactusrestapi #LightGreen {
+    }
+    together {
+      node "Network A\n<<identity plugin>>" as cactusidpluginnetworka #LightGreen {
+      }
+      node "Network B\n<<identity plugin>>" as cactusidpluginnetworkb #LightGreen {
+      }
+      node "Network A\n<<connector plugin>>" as cactusconnectorpluginnetworka #LightGreen {
+      }
+      node "Network B\n<<connector plugin>>" as cactusconnectorpluginnetworkb #LightGreen {
+      }
+    }
+  }
+}
+
+frame "Network A\n<<permissioned ledger>>" as na #LightGray {
+  node "Wallet 1 of End User\n<<address>>" as weua #LightYellow {
+  }
+}
+
+frame "Network B\n<<permissioned ledger>>" as nb #LightGray {
+  node "Wallet 2 of End User\n<<address>>" as weub #LightYellow {
+  }
+}
+
+io ..> cactusrestapi: Request transactions
+note on link
+  Uses one or more of the
+  identity proofs for each
+  request that Hyperledger Cactus
+  verifies/passes along
+  via the appropriate plugins
+  before instructing the
+  participating ledgers
+  to execute transactions:
+  1. Export data
+  2. Transfer coins
+  3. Manage permissions
+  4. etc.
+end note
+cactusrestapi <..> cactusconnectorpluginnetworka
+cactusrestapi <..> cactusconnectorpluginnetworkb
+cactusrestapi <..> cactusidpluginnetworka
+cactusrestapi <..> cactusidpluginnetworkb
+cactusconnectorpluginnetworka ..> na: Execute transactions
+cactusconnectorpluginnetworkb ..> nb: Execute transactions
+
+@enduml

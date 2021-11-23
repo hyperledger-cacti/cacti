@@ -1,0 +1,927 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Connector Corda",
+        "description": "Can perform basic tasks on a Corda ledger",
+        "version": "0.3.0",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "SHA256": {
+                "description": "SHA-256 is part of the SHA-2 hash function family. Generated hash is fixed size, 256-bits (32-bytes).",
+                "externalDocs": {
+                    "description": "Official Corda documentation of the SHA256 class.",
+                    "url": "https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.crypto/-secure-hash/-s-h-a256/index.html"
+                },
+                "type": "object",
+                "required": [
+                    "bytes",
+                    "offset",
+                    "size"
+                ],
+                "properties": {
+                    "bytes": {
+                        "type": "string",
+                        "example": "Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc="
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "size": {
+                        "type": "integer",
+                        "example": 32
+                    }
+                }
+            },
+            "CordappInfo": {
+                "type": "object",
+                "externalDocs": {
+                    "description": "Official Corda Documentation of the class CordappInfo",
+                    "url": "https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.cordapp/-cordapp-info/index.html"
+                },
+                "description": "A CordappInfo describes a single CorDapp currently installed on the node",
+                "required": [
+                    "jarHash",
+                    "licence",
+                    "minimumPlatformVersion",
+                    "name",
+                    "shortName",
+                    "targetPlatformVersion",
+                    "type",
+                    "vendor",
+                    "version"
+                ],
+                "properties": {
+                    "jarHash": {
+                        "type": "object",
+                        "format": "SHA256",
+                        "description": "The hash of the JAR file that defines this CorDapp",
+                        "$ref": "#/components/schemas/SHA256"
+                    },
+                    "licence": {
+                        "type": "string",
+                        "description": "The name of the licence this CorDapp is released under"
+                    },
+                    "minimumPlatformVersion": {
+                        "type": "integer",
+                        "description": "The minimum platform version the node must be at for the CorDapp to run"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the JAR file that defines the CorDapp"
+                    },
+                    "shortName": {
+                        "type": "string",
+                        "description": "The name of the CorDapp"
+                    },
+                    "targetPlatformVersion": {
+                        "type": "integer",
+                        "description": "The target platform version this CorDapp has been tested against"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "A description of what sort of CorDapp this is - either a contract, workflow, or a combination."
+                    },
+                    "vendor": {
+                        "type": "string",
+                        "description": "The vendor of this CorDapp"
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "The version of this CorDapp"
+                    }
+                }
+            },
+            "NodeDiagnosticInfo": {
+                "type": "object",
+                "externalDocs": {
+                    "description": "Official Corda Documentation of the class NodeDiagnosticInfo",
+                    "url": "https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.node/-node-diagnostic-info/index.html"
+                },
+                "description": "A NodeDiagnosticInfo holds information about the current node version.",
+                "required": [
+                    "cordapps",
+                    "platformVersion",
+                    "revision",
+                    "vendor",
+                    "version"
+                ],
+                "properties": {
+                    "cordapps": {
+                        "type": "array",
+                        "description": "A list of CorDapps currently installed on this node",
+                        "items": {
+                            "$ref": "#/components/schemas/CordappInfo"
+                        },
+                        "minItems": 0,
+                        "maxItems": 4096
+                    },
+                    "platformVersion": {
+                        "type": "integer",
+                        "description": "The platform version of this node. This number represents a released API version, and should be used to make functionality decisions (e.g. enabling an app feature only if an underlying platform feature exists)"
+                    },
+                    "revision": {
+                        "type": "string",
+                        "description": "The git commit hash this node was built from"
+                    },
+                    "vendor": {
+                        "type": "string",
+                        "description": "The vendor of this node"
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "The current node version string, e.g. 4.3, 4.4-SNAPSHOT. Note that this string is effectively freeform, and so should only be used for providing diagnostic information. It should not be used to make functionality decisions (the platformVersion is a better fit for this)."
+                    }
+                }
+            },
+            "FlowInvocationType": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                    "TRACKED_FLOW_DYNAMIC",
+                    "FLOW_DYNAMIC"
+                ],
+                "description": "Determines which flow starting method will be used on the back-end when invoking the flow. Based on the value here the plugin back-end might invoke the rpc.startFlowDynamic() method or the rpc.startTrackedFlowDynamic() method. Streamed responses are aggregated and returned in a single response to HTTP callers who are not equipped to handle streams like WebSocket/gRPC/etc. do."
+            },
+            "JarFile": {
+                "type": "object",
+                "required": [
+                    "filename",
+                    "contentBase64",
+                    "hasDbMigrations"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                    "filename": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "hasDbMigrations": {
+                        "description": "Indicates whether the cordapp jar in question contains any embedded migrations that Cactus can/should execute between copying the jar into the cordapp directory and starting the node back up.",
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "contentBase64": {
+                        "type": "string",
+                        "format": "base64",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 1073741824
+                    }
+                }
+            },
+            "JvmType": {
+                "type": "object",
+                "description": "Represents a reference to a JVM type (such as a Java class)",
+                "required": [
+                    "fqClassName"
+                ],
+                "properties": {
+                    "fqClassName": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 65535
+                    },
+                    "constructorName": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "This parameter is used to specify that the function used to construct this JvmType is not a constructor function but instead is a factory function. Setting this parameter will cause the plugin to look up methods of the class denoted by fqClassName instead of its constructors.",
+                        "minLength": 1,
+                        "maxLength": 65535
+                    },
+                    "invocationTarget": {
+                        "$ref": "#/components/schemas/JvmObject"
+                    }
+                }
+            },
+            "JvmTypeKind": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                    "PRIMITIVE",
+                    "REFERENCE"
+                ]
+            },
+            "JvmObject": {
+                "description": "Can represent JVM primitive and reference types as well. The jvmTypeKind field indicates which one is being stored. If the jvmTypeKind field is set to REFERENCE then the jvmCtorArgs array is expected to be filled, otherwise (e.g. PRIMITIVE jvmTypeKind) it is expected that the primitiveValue property is filled with a primitive data type supported by the JSON standard such as strings, booleans, numbers, etc.",
+                "type": "object",
+                "required": [
+                    "jvmType",
+                    "jvmTypeKind"
+                ],
+                "properties": {
+                    "jvmTypeKind": {
+                        "$ref": "#/components/schemas/JvmTypeKind"
+                    },
+                    "primitiveValue": {
+                        "type": "object"
+                    },
+                    "jvmCtorArgs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/JvmObject",
+                            "nullable": false
+                        },
+                        "minLength": 0,
+                        "maxLength": 1024,
+                        "nullable": false,
+                        "default": []
+                    },
+                    "jvmType": {
+                        "$ref": "#/components/schemas/JvmType"
+                    }
+                }
+            },
+            "CordappDeploymentConfig": {
+                "type": "object",
+                "required": ["sshCredentials", "rpcCredentials", "cordappDir", "cordaNodeStartCmd", "cordaJarPath", "nodeBaseDirPath"],
+                "properties": {
+                    "sshCredentials": {
+                        "$ref": "#/components/schemas/CordaNodeSshCredentials"
+                    },
+                    "rpcCredentials": {
+                        "$ref": "#/components/schemas/CordaRpcCredentials"
+                    },
+                    "cordaNodeStartCmd": {
+                        "type": "string",
+                        "description": "The shell command to execute in order to start back up a Corda node after having placed new jars in the cordapp directory of said node.",
+                        "example": "./build/nodes/runNodes",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false
+                    },
+                    "cordappDir": {
+                        "type": "string",
+                        "description": "The absolute file system path where the Corda Node is expecting deployed Cordapp jar files to be placed.",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "cordaJarPath": {
+                        "type": "string",
+                        "description": "The absolute file system path where the corda.jar file of the node can be found. This is used to execute database schema migrations where applicable (H2 database in use in development environments).",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "nodeBaseDirPath": {
+                        "type": "string",
+                        "description": "The absolute file system path where the base directory of the Corda node can be found. This is used to pass in to corda.jar when being invoked for certain tasks such as executing database schema migrations for a deployed contract.",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    }
+                }
+            },
+            "CordaRpcCredentials": {
+                "type": "object",
+                "required": ["hostname", "port", "username", "password"],
+                "properties": {
+                    "hostname": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false
+                    },
+                    "port": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 65535,
+                        "nullable": false
+                    },
+                    "username": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false
+                    }
+                }
+            },
+            "CordaNodeSshCredentials": {
+                "type": "object",
+                "required": ["username", "password", "hostname", "port", "hostKeyEntry"],
+                "properties": {
+                    "hostKeyEntry": {
+                        "type": "string",
+                        "example": "localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false
+                    },
+                    "username": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32,
+                        "nullable": false
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "nullable": false
+                    },
+                    "hostname": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "nullable": false
+                    },
+                    "port": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 65535,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeployContractJarsV1Request": {
+                "type": "object",
+                "required": [
+                    "jarFiles",
+                    "cordappDeploymentConfigs"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "cordappDeploymentConfigs": {
+                        "type": "array",
+                        "description": "The list of deployment configurations pointing to the nodes where the provided cordapp jar files are to be deployed .",
+                        "minLength": 0,
+                        "maxLength": 1024,
+                        "default": [],
+                        "items": {
+                            "$ref": "#/components/schemas/CordappDeploymentConfig"
+                        }
+                    },
+                    "jarFiles": {
+                        "type": "array",
+                        "nullable": false,
+                        "items": {
+                            "minLength": 1,
+                            "maxLength": 1024,
+                            "$ref": "#/components/schemas/JarFile"
+                        }
+                    }
+                }
+            },
+            "DeployContractJarsSuccessV1Response": {
+                "type": "object",
+                "required": [
+                    "deployedJarFiles"
+                ],
+                "properties": {
+                    "deployedJarFiles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minItems": 1,
+                            "nullable": false
+                        }
+                    }
+                }
+            },
+            "DeployContractJarsBadRequestV1Response": {
+                "type": "object",
+                "required": [
+                    "errors"
+                ],
+                "properties": {
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 65535,
+                            "minItems": 1,
+                            "maxItems": 2048
+                        }
+                    }
+                }
+            },
+            "InvokeContractV1Request": {
+                "type": "object",
+                "required": [
+                    "flowFullClassName",
+                    "flowInvocationType",
+                    "params",
+                    "signingCredential"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "flowFullClassName": {
+                        "description": "The fully qualified name of the Corda flow to invoke",
+                        "example": "net.corda.samples.obligation.flows.IOUIssueFlow",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "flowInvocationType": {
+                        "$ref": "#/components/schemas/FlowInvocationType"
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass in to the contract method being invoked.",
+                        "type": "array",
+                        "default": [],
+                        "items": {
+                            "$ref": "#/components/schemas/JvmObject",
+                            "nullable": false
+                        },
+                        "nullable": false
+                    },
+                    "timeoutMs": {
+                        "type": "integer",
+                        "description": "The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing.",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    }
+                }
+            },
+            "InvokeContractV1Response": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "transactionId",
+                    "callOutput"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "callOutput": {
+                        "type": "object"
+                    },
+                    "transactionId": {
+                        "type": "string",
+                        "description": "The net.corda.core.flows.StateMachineRunId value returned by the flow execution.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "progress": {
+                        "type": "array",
+                        "description": "An array of strings representing the aggregated stream of progress updates provided by a *tracked* flow invocation. If the flow invocation was not tracked, this array is still returned, but as empty.",
+                        "items": {
+                            "type": "string",
+                            "minItems": 0,
+                            "maxItems": 10e6
+                        },
+                        "default": []
+                    }
+                }
+            },
+            "ListFlowsV1Request": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "filter": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ListFlowsV1Response": {
+                "type": "object",
+                "required": [
+                    "flowNames"
+                ],
+                "properties": {
+                    "flowNames": {
+                        "type": "array",
+                        "description": "An array of strings storing the names of the flows as returned by the flowList Corda RPC.",
+                        "example": [
+                            "net.corda.core.flows.ContractUpgradeFlow$Authorise",
+                            "net.corda.core.flows.ContractUpgradeFlow$Deauthorise",
+                            "net.corda.core.flows.ContractUpgradeFlow$Initiate",
+                            "net.corda.finance.flows.CashExitFlow",
+                            "net.corda.finance.flows.CashIssueAndPaymentFlow",
+                            "net.corda.finance.flows.CashIssueFlow",
+                            "net.corda.finance.flows.CashPaymentFlow",
+                            "net.corda.finance.internal.CashConfigDataFlow",
+                            "net.corda.samples.obligation.flows.IOUIssueFlow",
+                            "net.corda.samples.obligation.flows.IOUSettleFlow",
+                            "net.corda.samples.obligation.flows.IOUTransferFlow",
+                            "net.corda.samples.obligation.flows.SelfIssueCashFlow"
+                        ],
+                        "items": {
+                            "type": "string",
+                            "minItems": 0,
+                            "maxItems": 10e6
+                        },
+                        "default": []
+                    }
+                }
+            },
+            "NetworkHostAndPort": {
+                "type": "object",
+                "required": [
+                    "host",
+                    "port"
+                ],
+                "properties": {
+                    "host": {
+                        "type": "string"
+                    },
+                    "port": {
+                        "type": "number"
+                    }
+                }
+            },
+            "PartyAndCertificate": {
+                "type": "object"
+            },
+            "PublicKey": {
+                "type": "object",
+                "description": "An instance of a java.security.PublicKey (which is an interface) implementation such as org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl",
+                "required": [
+                    "algorithm",
+                    "format",
+                    "encoded"
+                ],
+                "properties": {
+                    "algorithm": {
+                        "type": "string",
+                        "example": "EdDSA"
+                    },
+                    "format": {
+                        "type": "string",
+                        "example": "X.509"
+                    },
+                    "encoded": {
+                        "type": "string",
+                        "example": "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+                    }
+                }
+            },
+            "X500Principal": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "encoded"
+                ],
+                "properties": {
+                    "name": {
+                        "example": "O=PartyA,L=London,C=GB",
+                        "type": "string"
+                    },
+                    "encoded": {
+                        "type": "string",
+                        "description": "Base64 encoded public key",
+                        "example": "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+                    }
+                }
+            },
+            "CordaX500Name": {
+                "type": "object",
+                "required": [
+                    "organisation",
+                    "locality",
+                    "country",
+                    "x500Principal"
+                ],
+                "properties": {
+                    "commonName": {
+                        "type": "string"
+                    },
+                    "organisationUnit": {
+                        "type": "string"
+                    },
+                    "organisation": {
+                        "type": "string",
+                        "example": "PartyA"
+                    },
+                    "locality": {
+                        "type": "string",
+                        "example": "London"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "GB"
+                    },
+                    "x500Principal": {
+                        "$ref": "#/components/schemas/X500Principal"
+                    }
+                }
+            },
+            "Party": {
+                "type": "object",
+                "required": [
+                    "owningKey",
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/CordaX500Name"
+                    },
+                    "owningKey": {
+                        "$ref": "#/components/schemas/PublicKey"
+                    }
+                }
+            },
+            "NodeInfo": {
+                "type": "object",
+                "required": [
+                    "addresses",
+                    "legalIdentitiesAndCerts",
+                    "platformVersion",
+                    "serial",
+                    "legalIdentities"
+                ],
+                "properties": {
+                    "addresses": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/NetworkHostAndPort"
+                        }
+                    },
+                    "platformVersion": {
+                        "type": "integer"
+                    },
+                    "serial": {
+                        "type": "number"
+                    },
+                    "legalIdentities": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Party"
+                        }
+                    },
+                    "legalIdentitiesAndCerts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PartyAndCertificate"
+                        }
+                    }
+                }
+            },
+            "NetworkMapV1Request": {
+                "type": "object"
+            },
+            "NetworkMapV1Response": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 2048,
+                "nullable": false,
+                "items": {
+                    "$ref": "#/components/schemas/NodeInfo"
+                }
+            },
+            "DiagnoseNodeV1Request": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "nodeIds": {
+                        "type": "array",
+                        "description": "Optional property specifying which Corda Node should be the one being diagnosed in case the Connector has multiple connections established for different nodes (which is not yet a supported feature, but we want to keep this possibility open for the future).",
+                        "minItems": 0,
+                        "maxItems": 1024,
+                        "default": [],
+                        "items": {
+                            "type": "string",
+                            "nullable": false
+                        }
+                    }
+                }
+            },
+            "DiagnoseNodeV1Response": {
+                "type": "object",
+                "required": [
+                    "nodeDiagnosticInfo"
+                ],
+                "properties": {
+                    "nodeDiagnosticInfo": {
+                        "$ref": "#/components/schemas/NodeDiagnosticInfo"
+                    }
+                }
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars": {
+            "post": {
+                "operationId": "deployContractJarsV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "summary": "Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractJarsV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractJarsSuccessV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractJarsBadRequestV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract": {
+            "post": {
+                "operationId": "invokeContractV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "summary": "Invokes a contract on a Corda ledger (e.g. a flow)",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeContractV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map": {
+            "post": {
+                "operationId": "networkMapV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "description": "Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List<NodeInfo>",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NetworkMapV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NetworkMapV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows": {
+            "post": {
+                "operationId": "listFlowsV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "description": "Responds with a list of the flows on the Corda node.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ListFlowsV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListFlowsV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node": {
+            "post": {
+                "operationId": "diagnoseNodeV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "description": "Responds with diagnostic information about the Corda node",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DiagnoseNodeV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DiagnoseNodeV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

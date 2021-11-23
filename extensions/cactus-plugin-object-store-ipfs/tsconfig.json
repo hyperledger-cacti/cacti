@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-object-store-ipfs.tsbuildinfo",
+    "skipLibCheck": true
+  },
+  "include": [
+    "./src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../../packages/cactus-test-tooling/tsconfig.json"
+    }
+  ]
+}

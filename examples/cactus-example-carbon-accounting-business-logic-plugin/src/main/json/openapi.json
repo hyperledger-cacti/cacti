@@ -1,0 +1,263 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Example - Carbon Accounting App",
+        "description": "Demonstrates how a business use case can be satisfied with Cactus when multiple distinct ledgers are involved.",
+        "version": "0.2.0",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "AuthzScope": {
+                "type": "string",
+                "enum": [
+                    "group:admin",
+                    "group:user"
+                ],
+                "x-enum-descriptions": [
+                    "Identities with the group:admin scope are administrators of the system.",
+                    "Identities with the group:user scope are end users of the system who only have authorization to perform a limited set of actions."
+                ],
+                "x-enum-varnames": [
+                    "GroupAdmin",
+                    "GroupUser"
+                ]
+            },
+            "AuthzJwtClaim": {
+                "description": "Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1",
+                "type": "string",
+                "enum": [
+                    "Hyperledger Labs - Carbon Accounting Tool"
+                ],
+                "x-enum-descriptions": [
+                    "The \"iss\" (issuer) claim identifies the principal that issued the JWT.  The processing of this claim is generally application specific. The \"iss\" value is a case-sensitive string containing a StringOrURI value.  Use of this claim is OPTIONAL."
+                ],
+                "x-enum-varnames": [
+                    "iss"
+                ]
+            },
+            "Checkpoint": {
+                "required": [
+                    "fromBlock",
+                    "votes"
+                ],
+                "properties": {
+                    "fromBlock": {
+                        "type": "integer",
+                        "format": "uint32",
+                        "nullable": false
+                    },
+                    "votes": {
+                        "type": "string",
+                        "nullable": false,
+                        "format": "uint96"
+                    }
+                }
+            },
+            "EnrollAdminInfo": {
+                "type": "string",
+                "enum": [
+                    "Successfully enrolled admin user and imported it into the wallet",
+                    "ORG ADMIN REGISTERED"
+                ],
+                "x-enum-varnames": [
+                    "SUCCESSFULLY_ENROLLED_ADMIN",
+                    "ORG_ADMIN_REGISTERED"
+                ]
+            },
+            "EnrollAdminV1Request": {
+                "type": "object",
+                "required": [
+                    "orgName"
+                ],
+                "properties": {
+                    "orgName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                    }
+                }
+            },
+            "EnrollAdminV1Response": {
+                "type": "object",
+                "required": [
+                    "info",
+                    "orgName",
+                    "msp",
+                    "caName"
+                ],
+                "properties": {
+                    "info": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "orgName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "msp": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "caName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "identityId": {
+                        "description": "The key under which the identity created will be persisted to the keychain for later retrieval.",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    }
+                }
+            },
+            "DaoTokenGetAllowanceRequest": {
+                "type": "object",
+                "required": [
+                    "account",
+                    "spender"
+                ],
+                "properties": {
+                    "account": {
+                        "description": "The address of the account holding the funds",
+                        "type": "string",
+                        "minLength": 40,
+                        "maxLength": 42
+                    },
+                    "spender": {
+                        "description": "The address of the account spending the funds",
+                        "type": "string",
+                        "minLength": 40,
+                        "maxLength": 42
+                    }
+                }
+            },
+            "DaoTokenGetAllowanceResponse": {
+                "type": "object",
+                "required": [
+                    "allowance"
+                ],
+                "properties": {
+                    "allowance": {
+                        "type": "integer",
+                        "nullable": false,
+                        "description": "The number of tokens approved"
+                    }
+                }
+            },
+            "DaoTokenGetAllowanceNotFoundResponse": {
+                "type": "object",
+                "required": [
+                    "accountFound",
+                    "spenderFound"
+                ],
+                "properties": {
+                    "accountFound": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "Indicates whether the account was found or not."
+                    },
+                    "spenderFound": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "Indicates whether the spender was found or not."
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/utilityemissionchannel/registerEnroll/admin": {
+            "post": {
+                "operationId": "enrollAdminV1",
+                "summary": "Registers an admin account within the Fabric organization specified.",
+                "x-hyperledger-cactus": {
+                    "authz": {
+                        "isProtected": true,
+                        "requiredRoles": ["group:admin"]
+                    },
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/utilityemissionchannel/registerEnroll/admin"
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EnrollAdminV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EnrollAdminV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance": {
+            "post": {
+                "operationId": "daoTokenGetAllowanceV1",
+                "summary": "Get the number of tokens `spender` is approved to spend on behalf of `account`",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DaoTokenGetAllowanceRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "404": {
+                        "description": "NOT_FOUND",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DaoTokenGetAllowanceNotFoundResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DaoTokenGetAllowanceResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

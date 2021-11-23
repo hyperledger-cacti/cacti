@@ -1,0 +1,42 @@
+@startuml
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\enroll() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 300
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "PluginLedgerConnectorFabric" as t << (C,#ADD1B2) class >>
+
+autoactivate on
+
+activate caller
+caller -> t : enroll(signer: FabricSigningCredential,\nreq: FabricEnrollmentRequest)
+t->t: {\n\tenrollmentID: string,\n\tenrollmentSecret: string,\n\tcaId: string,\n\tmspId: string\n}
+
+alt #LightBlue this.activatedSinger.includes(singer.type) === false
+    t-->caller: throw Error(`singer.type not activated`)
+end
+
+t->t : ca = this.createCaClient(caId)
+t->t : enrollmentRequest = {enrollmentID,enrollmentSecret}
+
+group #LightBlue if singer.type == FabricSigningCredentialType.DeafultX509
+else #LightYellow if singer.type == FabricSigningCredentialType.VaulttX509
+    t->t : enrollmentRequest.csr = await (this.activatedSinger[VaulttX509] as VaultX509Provider)\n\t.getKey(singer.vaultTransitKey)\n\t.generateCSR(enrollmentID)
+else #LightCoral default
+    t -> caller: throw Error('unknown SingerType')
+end
+
+t->t: resp = await ca.enroll(enrollmentRequest)
+t->t: certData = {singer.type,mspId,certificate} 
+
+alt if resp.key !== undefined
+    t->t: resp.credentials.privateKey = resp.key.toBytes();
+end
+
+t->t : await certDatastore.put(singer.keychainref,certData)
+
+deactivate caller  
+@enduml

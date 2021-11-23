@@ -1,0 +1,32 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "tsBuildInfoFile": "../../.build-cache/cactus-cmd-api-server.tsbuildinfo"
+  },
+  "include": [
+    "./src",
+    "src/**/*.json"
+  ],
+  "references": [
+    {
+      "path": "../cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-keychain-vault/tsconfig.json"
+    },
+    {
+      "path": "../cactus-test-tooling/tsconfig.json"
+    }
+  ]
+}

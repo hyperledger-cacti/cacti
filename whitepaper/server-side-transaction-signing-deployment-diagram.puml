@@ -1,0 +1,36 @@
+
+@startuml Server Side Transaction Signing
+
+!include <tupadr3/common>
+!include <tupadr3/font-awesome/mobile>
+!include <tupadr3/font-awesome/database>
+!include <tupadr3/font-awesome/key>
+!include <tupadr3/font-awesome/server>
+
+title Hyperledger Cactus\nServer Side Transaction Signing
+
+left to right direction
+' allow_mixing
+skinparam DefaultTextAlignment center
+skinparam Linetype ortho
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam maxmessagesize 30
+skinparam sequenceParticipant underline
+
+actor "Application User" as actor1 <<identity owner>>
+
+FA_MOBILE(mobiledevice,"Mobile Device")
+
+FA_SERVER(cactusserverside,"Hyperledger Cactus Server Side\n<size:30><&key></size>")
+note bottom of cactusserverside #LightSkyBlue
+  <size:20><&key></size> <b>Private key of user resides on Hyperledger Cactus server side</b>
+end note
+
+FA_DATABASE(dlt,"Distributed Ledger")
+
+actor1 ..|> mobiledevice: Decides to execute transaction
+mobiledevice ..|> cactusserverside: Send unsigned transaction data
+cactusserverside ..|> dlt: Send signed transaction data
+
+@enduml

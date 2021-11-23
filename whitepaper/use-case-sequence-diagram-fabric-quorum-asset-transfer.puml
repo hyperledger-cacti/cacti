@@ -1,0 +1,69 @@
+@startuml Sequence Diagram - Fabric Quorum Asset Transfer
+
+title Hyperledger Cactus\nSequence Diagram - Fabric Quorum Asset Transfer
+
+actor User_A as a
+
+box "Hyperledger Cactus" #LightGray
+entity "API Server" as apis
+entity "Validator" as v
+end box
+
+box "Ledgers"
+entity Cactus_Contract_Fabric as c1
+entity Cactus_Contract_Quorum as c2
+database Fabric_Ledger as d1
+database Quorum_Ledger as d2
+end box
+
+autoactivate on
+
+== Authenticate ==
+
+a -> apis: Authenticate
+return Auth. Token
+
+== Lock Fabric Asset ==
+
+a -> apis: Lock Fabric Asset
+
+  apis -> v: Lock Fabric Asset
+    v -> c1: Invoke Contract: Lock Fabric Asset
+      c1 -> d1: Write to Ledger State \n(Asset.locked=true)
+      return Ledger Updated OK
+    return Locked Fabric Asset
+  return Locked Fabric Asset
+return Locked Fabric Asset
+
+autoactivate off
+a -> a: Verify Signatures\nof Hyperledger Cactus Validators
+opt Signatures Valid
+  a -> a: <color green>Proceed with Execution</color>
+else Signatures Invalid
+  a -> a: <color red>Abort Process,\n<color red>possible MITM\n<color red>attack in progress
+end
+autoactivate on
+
+== Create Quorum Asset ==
+
+a -> apis: Create Quorum Asset
+
+  apis -> v: Create Quorum Asset
+
+    autoactivate off
+    v -> v: Verify Signatures\nof Hyperledger Cactus Validators
+    critical Signatures Valid
+      v -> v: <color green>Continue
+    else Signatures Invalid
+      v -> v: <color red>Abort
+    end
+    autoactivate on
+
+    v -> c2: Invoke Contract: Create Asset
+      c2 -> d2: Write Asset to Ledger State
+      return Ledger Updated OK
+    return Quorum Asset, Metadata
+  return Quorum Asset, Metadata
+return Quorum Asset, Metadata
+
+@enduml

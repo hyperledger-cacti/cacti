@@ -1,0 +1,194 @@
+# Copyright 2019 Fujitsu Laboratories Ltd.
+# SPDX-License-Identifier: Apache-2.0
+version: '2'
+networks:
+  ccnet:
+    external: true
+services:
+  ca.example.com:
+    image: hyperledger/fabric-ca:x86_64-1.0.4
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.example.com
+#    ports:
+#      - "7054:7054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY -b admin:adminpw -d'
+    volumes:
+      - ../crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca.example.com
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+  orderer.example.com:
+    container_name: orderer.example.com
+    image: hyperledger/fabric-orderer:x86_64-1.0.4
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ../crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/:/var/hyperledger/orderer/tls
+#    ports:
+#      - 7050:7050
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "500m"
+        max-file: "3"
+  peer0.org1.example.com:
+    container_name: peer0.org1.example.com
+    extends:
+      file: ../../../base/cc_env/yaml-files/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.org1.example.com
+      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls:/etc/hyperledger/fabric/tls
+#    ports:
+#      - 7051:7051
+#      - 7053:7053
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - orderer.example.com
+  peer1.org1.example.com:
+    container_name: peer1.org1.example.com
+    extends:
+      file: ../../../base/cc_env/yaml-files/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.org1.example.com
+      - CORE_PEER_ADDRESS=peer1.org1.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.example.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls:/etc/hyperledger/fabric/tls
+#    ports:
+#      - 8051:7051
+#      - 8053:7053
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - orderer.example.com
+      - peer0.org1.example.com
+  peer2.org1.example.com:
+    container_name: peer2.org1.example.com
+    extends:
+      file: ../../../base/cc_env/yaml-files/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer2.org1.example.com
+      - CORE_PEER_ADDRESS=peer2.org1.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2.org1.example.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer2.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/tls:/etc/hyperledger/fabric/tls
+#    ports:
+#      - 9051:7051
+#      - 9053:7053
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - orderer.example.com
+      - peer0.org1.example.com
+      - peer1.org1.example.com
+  peer3.org1.example.com:
+    container_name: peer3.org1.example.com
+    extends:
+      file: ../../../base/cc_env/yaml-files/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer3.org1.example.com
+      - CORE_PEER_ADDRESS=peer3.org1.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer3.org1.example.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer3.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/org1.example.com/peers/peer3.org1.example.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/org1.example.com/peers/peer3.org1.example.com/tls:/etc/hyperledger/fabric/tls
+#    ports:
+#      - 10051:7051
+#      - 10053:7053
+    networks:
+      - ccnet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - orderer.example.com
+      - peer0.org1.example.com
+      - peer1.org1.example.com
+      - peer2.org1.example.com
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:x86_64-1.0.4
+    tty: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash -c './scripts/deploy_script.sh ${CHANNEL_NAME} ${DELAY} ${MODE}; sleep $TIMEOUT'
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+      - ../channel-artifacts/:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/
+      - ../../../base/cc_env/chaincode/naming_service/:/opt/gopath/src/github.com/hyperledger/fabric/work/chaincode/naming_service/
+      - ../../../base/cc_env/chaincode/endchain_information/:/opt/gopath/src/github.com/hyperledger/fabric/work/chaincode/endchain_information/
+      - ../chaincode/transfer_information/:/opt/gopath/src/github.com/hyperledger/fabric/work/chaincode/transfer_information/
+      - ../chaincode/deploy_script.sh:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/deploy_script.sh
+    depends_on:
+      - orderer.example.com
+      - peer0.org1.example.com
+      - peer1.org1.example.com
+      - peer2.org1.example.com
+      - peer3.org1.example.com
+    networks:
+      - ccnet

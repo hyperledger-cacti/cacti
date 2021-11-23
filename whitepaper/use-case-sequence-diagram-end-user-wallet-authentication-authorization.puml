@@ -1,0 +1,78 @@
+@startuml Sequence Diagram - End User Wallet Authentication Authorization
+
+skinparam ArrowFontStyle italic
+
+title Hyperledger Cactus\nSequence Diagram - End User Wallet Authentication Authorization
+
+actor User_A as a <<end-user>>
+
+box Cactus #White
+entity "API" as api
+entity "Validator(s)" as v
+database "Keychain" as k
+end box
+
+box "Ledgers" #White
+database LedgerOne as d1
+database LedgerTwo as d2
+end box
+
+autoactivate on
+autonumber
+
+== Register with Hyperledger Cactus ==
+
+a -> api: Register User Account
+return Bearer Token
+
+== Import PKI ==
+
+a -> api: Import **LedgerOne** keypair
+  api -> k: Store **LedgerOne** keypair\nencrypted at rest
+  return Keychain Update Done
+return Import Keypair Done
+
+a -> api: Import **LedgerTwo** keypair
+  api -> k: Store **LedgerTwo** keypair\nencrypted at rest
+  return Keychain Update Done
+return Import Keypair Done
+
+== Transact on Ledgers ==
+
+a -> api: Execute Transaction\non **LedgerOne**
+note right
+**User A** only need to present
+**Bearer Token** from step
+2 and Hyperledger Cactus will be able to
+impersonate **User A**
+on LedgerOne
+end note
+  api -> v: Execute Transaction\non **LedgerOne**
+
+    v -> k: Fetch LedgerOne\nPrivate Key of User_A
+    return Private Key
+
+    v -> d1: Execute Transaction\non **LedgerOne**\nas **User_A**
+    return Transaction Executed
+  return Transaction Executed
+return Transaction Executed
+
+a -> api: Execute Transaction\non **LedgerTwo**
+note right
+**User A** only need to present
+**Bearer Token** from step
+2 and Hyperledger Cactus will be able to
+impersonate **User A**
+on LedgerTwo
+end note
+  api -> v: Execute Transaction\non **LedgerTwo**
+
+    v -> k: Fetch LedgerTwo\nPrivate Key of User_A
+    return Private Key
+
+    v -> d2: Execute Transaction\non **LedgerTwo**\nas **User_A**
+    return Transaction Executed
+  return Transaction Executed
+return Transaction Executed
+
+@enduml

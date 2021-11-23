@@ -1,0 +1,47 @@
+
+@startuml Plugin Architecture
+
+!include <tupadr3/common>
+!include <tupadr3/font-awesome/mobile>
+!include <tupadr3/font-awesome/database>
+!include <tupadr3/font-awesome/key>
+!include <tupadr3/font-awesome/server>
+
+title Hyperledger Cactus\nPlugin Architecture
+
+' left to right direction
+' allow_mixing
+skinparam DefaultTextAlignment center
+skinparam Linetype ortho
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam maxmessagesize 30
+skinparam sequenceParticipant underline
+
+' actor "Application User" as actor1 <<identity owner>>
+' FA_MOBILE(mobiledevice,"Mobile Device")
+
+box "End Users" #LightBlue
+	actor Bob
+end box
+
+box "Hyperledger Cactus Deployment" #LightGrey
+  collections "API Server Node(s)" as ApiServer
+  participant FabricConnectorPlugin
+end box
+
+box "Ledger Deployments" #LightSalmon
+  database "Fabric Network" as FabricNetwork
+end box
+
+Bob -> ApiServer : Request Transaction Execution
+activate ApiServer
+ApiServer -> FabricConnectorPlugin: Call Transaction Execution Plugin
+activate FabricConnectorPlugin
+FabricConnectorPlugin -> FabricNetwork: Request Transaction Execution
+activate FabricNetwork
+return Transaction Results
+return Transaction Results
+return Transaction Results
+
+@enduml

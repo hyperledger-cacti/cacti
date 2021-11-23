@@ -1,0 +1,132 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cactus - Keychain API",
+    "description": "Contains/describes the Keychain API types/paths for Hyperledger Cactus.",
+    "version": "0.3.0",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "schemas": {
+    }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/get-keychain-entry": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/get-keychain-entry",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "getKeychainEntryV1",
+        "summary": "Retrieves the contents of a keychain entry from the backend.",
+        "parameters": [],
+        "requestBody": {
+          "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/requestBodies/keychain_get_entry_request_body"
+        },
+        "responses": {
+          "200": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_get_entry_200"
+          },
+          "400": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_get_entry_400"
+          },
+          "401": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_get_entry_401"
+          },
+          "404": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_get_entry_404"
+          },
+          "500": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_get_entry_500"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/set-keychain-entry": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/set-keychain-entry",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "setKeychainEntryV1",
+        "summary": "Sets a value under a key on the keychain backend.",
+        "parameters": [],
+        "requestBody": {
+          "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/requestBodies/keychain_set_entry_request_body"
+        },
+        "responses": {
+          "200": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_set_entry_200"
+          },
+          "400": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_set_entry_400"
+          },
+          "401": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_set_entry_401"
+          },
+          "500": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_set_entry_500"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/delete-keychain-entry": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/delete-keychain-entry",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "deleteKeychainEntryV1",
+        "summary": "Deletes an entry under a key on the keychain backend.",
+        "parameters": [],
+        "requestBody": {
+          "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/requestBodies/keychain_delete_entry_request_body"
+        },
+        "responses": {
+          "200": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_delete_entry_200"
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/has-keychain-entry": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/has-keychain-entry",
+            "verbLowerCase": "post"
+          }
+        },
+        "operationId": "hasKeychainEntryV1",
+        "summary": "Checks that an entry exists under a key on the keychain backend.",
+        "parameters": [],
+        "requestBody": {
+          "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/requestBodies/keychain_has_entry_request_body"
+        },
+        "responses": {
+          "200": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_has_entry_200"
+          },
+          "400": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_has_entry_400"
+          },
+          "401": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_has_entry_401"
+          },
+          "500": {
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v1.0.0-rc.1/packages/cactus-core-api/src/main/json/openapi.json#/components/responses/keychain_has_entry_500"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest: Current TS Test File",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "${relativeFile}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "TAP: Current TS Test File",
+      "type": "node",
+      "request": "launch",
+      "protocol": "inspector",
+      "env": {
+        "TS_NODE_PROJECT": "tsconfig.json"
+      },
+      "args": [
+        "${relativeFile}"
+      ],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}"
+    },
+    {
+      "name": "Example: Supply Chain App",
+      "type": "node",
+      "request": "launch",
+      "protocol": "inspector",
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json"
+      },
+      "args": [
+        "../cactus-example-supply-chain-backend/src/main/typescript/supply-chain-app-cli.ts",
+        "dotenv_config_path=process.env"
+      ],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register",
+        "-r",
+        "dotenv/config"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "cwd": "${workspaceFolder}/examples/supply-chain-app/"
+    }
+  ]
+}

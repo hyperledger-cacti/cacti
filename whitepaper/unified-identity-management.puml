@@ -1,0 +1,58 @@
+@startuml Unified Identity Management
+title Hyperledger Cactus\nUnified Identity Management
+
+' left to right direction
+
+' skinparam Linetype ortho
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam maxmessagesize 30
+skinparam sequenceParticipant underline
+
+allow_mixing
+
+package "Hyperledger Cactus Identity" as cactusidentity #LightGray {
+  object "DLT Identity 1" as dlti1 <<credential>>
+  object "DLT Identity 2" as dlti2 <<credential>>
+  object "DLT Identity N" as dltin <<credential>>
+}
+
+actor "Application User" as actor1 <<identity owner>>
+
+frame "Hyperledger Cactus" <<software deployment>> #LightCyan {
+
+  package "pkg-cmd-api-server" as pkgcmdapiserver #LightGreen {
+    component "/api/v1/identity/authenticate\n<<REST API Endpoint>>" as authenticateendpoint
+    component "/api/v1/identity/add-credential\n<<REST API Endpoint>>" as addcredentialendpoint
+  }
+
+  package "pkg-identity" as pkgidentity #LightGreen {
+    component "IdentityService\n<<class>>" as identityservice
+  }
+
+  package "pkg-sql-storage" as pkgsqlstorage #LightGreen {
+    component "SqlStorageService\n<<class>>" as sqlstorageservice
+  }
+
+  package "pkg-keychain" as pkgkeychain #LightGreen {
+    component "KeychainService\n<<class>>" as keychainservice
+  }
+}
+
+actor1 .down. dlti1
+actor1 .down. dlti2
+actor1 .down. dltin
+
+actor1 .right.> addcredentialendpoint
+note on link: Associate DLT\nIdentity to Hyperledger Cactus\nidentity
+
+addcredentialendpoint ..> pkgidentity
+note on link: Store identity credentials
+
+pkgidentity ..> pkgkeychain
+note on link: Store identity credentials
+
+addcredentialendpoint ..> pkgsqlstorage
+note on link: Store Hyperledger Cactus/DLT identity relationships
+
+@enduml

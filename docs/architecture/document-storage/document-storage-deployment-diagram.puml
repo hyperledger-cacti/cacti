@@ -1,0 +1,67 @@
+@startuml Document Storage Deployment Diagram
+
+title Hyperledger Cactus\nDocument Storage Deployment Diagram
+
+' skinparam Linetype ortho
+skinparam sequenceArrowThickness 3
+skinparam roundcorner 5
+skinparam maxmessagesize 30
+skinparam sequenceParticipant underline
+!include <tupadr3/common>
+!include <tupadr3/font-awesome/database>
+
+frame "Hyperledger Cactus" <<software deployment>> #LightCyan {
+
+  package "pkg-cmd-api-server" as pkgcmdapiserver #LightGreen {
+    component "/api/v1/identity/add-credential\n<<REST API Endpoint>>" as addcredentialendpoint
+    component "/api/v1/document-storage/ingest\n<<REST API Endpoint>>" as ingestendpoint
+  }
+
+  package "pkg-identity" as pkgidentity #LightGreen {
+    component "IdentityService\n<<class>>" as identityservice
+  }
+
+  package "pkg-keychain" as pkgkeychain #LightGreen {
+    component "KeychainService\n<<class>>" as keychainservice
+  }
+
+  together {
+    package "pkg-tracing" as pkgtracing #LightGreen {
+      component "CactusTracer\n<<class>>" as cactustracer
+    }
+
+    package "pkg-audit" as pkgaudit #LightGreen {
+      component "CactusAuditLogger\n<<class>>" as cactusauditlogger
+    }
+  }
+  package "pkg-document-storage" as pkgdocumentstorage #LightGreen {
+    component "IngestServiceV1\n<<class>>" as ingestservicev1
+    component "OpenDistroESPlugin\n<<class>>" as opendistroesplugin
+  }
+}
+
+frame "Document Storage Backend" <<software deployment>> as dsb #LightCyan {
+  node "Open Distro for\nElasticSearch" as odfes #LightGray {
+    FA_DATABASE(db1,"",database,white) #RoyalBlue
+  }
+}
+
+note bottom of ingestservicev1
+API server uses
+endpoint logic
+of document-store
+end note
+
+ingestendpoint .up.> ingestservicev1
+ingestservicev1 .down.> opendistroesplugin
+opendistroesplugin .down.> dsb
+
+addcredentialendpoint .down.> pkgidentity
+identityservice .down.> pkgkeychain
+keychainservice ..down.> pkgaudit
+keychainservice ..down.> pkgtracing
+
+cactustracer .up.> ingestendpoint #RoyalBlue
+cactusauditlogger .up.> ingestendpoint #RoyalBlue
+
+@enduml

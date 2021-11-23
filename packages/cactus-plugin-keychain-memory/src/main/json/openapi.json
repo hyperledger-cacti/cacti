@@ -1,0 +1,192 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Keychain Memory ",
+        "description": "Contains/describes the Hyperledger Cactus Keychain Memory plugin.",
+        "version": "0.2.0",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "GetKeychainEntryRequest": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to get from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "GetKeychainEntryResponse": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to retrieve the value from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value associated with the requested key on the keychain.",
+                        "minLength": 0,
+                        "maxLength": 10485760,
+                        "nullable": false
+                    }
+                }
+            },
+            "SetKeychainEntryRequest": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to set on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value that will be associated with the key on the keychain.",
+                        "minLength": 0,
+                        "maxLength": 10485760,
+                        "nullable": false
+                    }
+                }
+            },
+            "SetKeychainEntryResponse": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to set the value on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            }
+        },
+        "requestBodies": {
+            "keychain_get_entry_request_body": {
+                "description": "Request body to obtain a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/GetKeychainEntryRequest"
+                        }
+                    }
+                }
+            },
+            "keychain_set_entry_request_body": {
+                "description": "Request body to write/update a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/SetKeychainEntryRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "responses": {
+            "keychain_get_entry_200": {
+                "description": "OK",
+                "content": {
+                   "application/json": {
+                      "schema": {
+                         "$ref": "#/components/schemas/GetKeychainEntryResponse"
+                      }
+                   }
+                }
+             },
+            "keychain_get_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_get_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_get_entry_404": {
+                "description": "A keychain item with the specified key was not found."
+            },
+            "keychain_get_entry_500": {
+                "description": "Unexpected error."
+            },
+            "keychain_set_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                       "schema": {
+                          "$ref": "#/components/schemas/SetKeychainEntryResponse"
+                       }
+                    }
+                 }
+            },
+            "keychain_set_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_set_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_set_entry_500": {
+                "description": "Unexpected error."
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

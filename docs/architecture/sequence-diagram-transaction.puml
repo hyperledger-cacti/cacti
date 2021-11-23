@@ -1,0 +1,34 @@
+@startuml Sequence Diagram - Transaction
+
+title Hyperledger Cactus\nSequence Diagram - Transaction
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 60
+skinparam sequenceParticipant underline
+
+box "Identities" #LightBlue
+actor IdentityA as a
+actor IdentityB as b
+end box
+
+box "Hyperledger Cactus" #LightGray
+entity "API Server" as apis
+entity "Validator" as v
+end box
+
+box "Ledgers" #LightGreen
+database DLT1 as d1
+database DLT2 as d2
+end box
+
+== Transaction Handshake ==
+
+b --> apis: Propose Transaction
+apis --> a: Present Transaction
+a --> apis: Accept/Reject
+
+== Transaction Execution ==
+
+
+@enduml

@@ -1,0 +1,18 @@
+config:
+  target: "{{ $processEnvironment.apiHost }}"
+  phases:
+    - duration: 3
+      arrivalRate: 5
+      name: Warm up
+    - duration: 10
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 60
+      arrivalRate: 50
+      name: Sustained load
+scenarios:
+  - flow:
+    - get:
+        url: "/api/v1/api-server/get-prometheus-exporter-metrics"
+

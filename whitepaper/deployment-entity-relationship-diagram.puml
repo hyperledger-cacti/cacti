@@ -1,0 +1,78 @@
+@startuml deployment-entity-relationship-diagram
+
+!include <material/common>
+' To import the sprite file you DON'T need to place a prefix!
+!include <material/cellphone>
+!include <material/laptop_chromebook>
+!include <material/database>
+
+title Deployment Entity Relationship Diagram\n\nHyperledger Cactus
+
+
+namespace Physical_Deplyoment_Elements {
+
+  entity CactusNode <<object>> {
+    * id: string
+    --
+    * nodeApiHost: string
+    * consortiumId: string
+    * memberId: string
+    * publicKeyPem: string
+    * plugins: Array<Plugin>
+    * ledgers: Array<Ledger>
+  }
+
+  entity APIServer <<OS process>> {
+    * plugins: Array<PluginInstance>
+  }
+
+  interface "ICactusPlugin" <<interface>> {
+    * getInstanceId(): string
+    --
+    * getPackageName(): string
+  }
+
+  entity "PluginInstance" <<object>> implements ICactusPlugin {
+    + instanceId: string
+    + packageName: string
+  }
+}
+
+entity "CactusConsortium" <<object>> {
+  * id: string
+  --
+  * mainApiHost: string
+  * members: Array<ConsortiumMember>
+}
+
+entity "ConsortiumMember" <<object>> {
+  * id: string
+  --
+  * nodes: Array<CactusNode>
+}
+
+enum LedgerType <<enum>> {
+  - BESU_1X
+  - BESU_2X
+  - BURROW_0X
+  - CORDA_4X
+  - FABRIC_14X
+  - FABRIC_2
+  - QUORUM_2X
+  - SAWTOOTH_1X
+  - ...
+}
+
+entity Ledger <<object>> {
+  * id: string
+  --
+  * ledgerType: LedgerType
+}
+
+CactusNode }|-- ConsortiumMember
+ConsortiumMember }|-- CactusConsortium
+APIServer }|-- CactusNode
+PluginInstance }|-- APIServer
+Ledger .. LedgerType
+
+@enduml

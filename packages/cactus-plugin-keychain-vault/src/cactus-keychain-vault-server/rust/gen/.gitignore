@@ -1,0 +1,4 @@
+target
+
+# We do not ignore Cargo.lock because this is an application, not a library.
+# https://github.com/rust-lang/cargo/issues/315#issuecomment-51075730

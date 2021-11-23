@@ -1,0 +1,25 @@
+<app-page-heading pageTitle="Bamboo Harvest List"></app-page-heading>
+
+<ion-content>
+
+    <ion-list>
+      <ion-item *ngFor="let bambooHarvest of bambooHarvests"
+      button
+      (click)="clickShowDetail(bambooHarvest)"
+      detail
+      class="ion-text-wrap">
+
+      <ion-text color="primary">
+        Bamboo Harvest #{{bambooHarvest.id}}
+      </ion-text>
+      </ion-item>
+    </ion-list>
+
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button>
+        <ion-icon (click)="clickAddNew()" name="add">
+        </ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+
+</ion-content>

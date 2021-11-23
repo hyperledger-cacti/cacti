@@ -1,0 +1,155 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Consortium Web Service",
+        "description": "Manage a Cactus consortium through the APIs. Needs administrative privileges.",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "GetNodeJwsResponse": {
+                "type": "object",
+                "required": [
+                    "jws"
+                ],
+                "properties": {
+                    "jws": {
+                        "description": "The JSON Web Signature of the Cactus node.",
+                        "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v0.8.0/packages/cactus-core-api/src/main/json/openapi.json#/components/schemas/JWSGeneral",
+                        "nullable": false
+                    }
+                }
+            },
+            "GetConsortiumJwsResponse": {
+                "type": "object",
+                "required": [
+                    "jws"
+                ],
+                "properties": {
+                    "jws": {
+                        "description": "The JSON Web Signature of the Cactus consortium.",
+                        "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v0.8.0/packages/cactus-core-api/src/main/json/openapi.json#/components/schemas/JWSGeneral",
+                        "nullable": false,
+                        "format": "The general format which is a JSON object, not a string."
+                    }
+                }
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            },
+            "GetNodeJwsRequest": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                }
+            },
+            "GetConsortiumJwsRequest": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
+                    }
+                },
+                "operationId": "getConsortiumJwsV1",
+                "summary": "Retrieves a consortium JWS",
+                "description": "The JWS asserting the consortium metadata (pub keys and hosts of nodes)",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/GetConsortiumJwsRequest"
+                        }
+                      }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetConsortiumJwsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"
+                    }
+                },
+                "operationId": "getNodeJwsV1",
+                "summary": "Retrieves the JWT of a Cactus Node",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/GetNodeJwsRequest"
+                        }
+                      }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetNodeJwsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

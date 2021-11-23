@@ -1,0 +1,866 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Core API",
+        "description": "Contains/describes the core API types for Cactus. Does not describe actual endpoints on its own as this is left to the implementing plugins who can import and re-use commonly needed type definitions from this specification. One example of said commonly used type definitions would be the types related to consortium management, cactus nodes, ledgers, etc..",
+        "version": "0.2.0",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "Constants": {
+                "type": "string",
+                "enum": [
+                    "/api/v1/async/socket-io/connect"
+                ],
+                "x-enum-varnames": [
+                    "SocketIoConnectionPathV1"
+                ]
+            },
+            "PluginImport": {
+                "type": "object",
+                "required": [
+                    "packageName",
+                    "type"
+                ],
+                "properties": {
+                    "packageName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "type": {
+                        "nullable": false,
+                        "description": "",
+                        "$ref": "#/components/schemas/PluginImportType"
+                    },
+                    "options": {}
+                }
+            },
+            "PluginImportType": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.plugin_import_type.LOCAL",
+                    "org.hyperledger.cactus.plugin_import_type.REMOTE"
+                ]
+            },
+            "ConsensusAlgorithmFamily": {
+                "type": "string",
+                "description": "Enumerates a list of consensus algorithm families in existence. Does not intend to be an exhaustive list, just a practical one, meaning that we only include items here that are relevant to Hyperledger Cactus in fulfilling its own duties. This can be extended later as more sophisticated features of Cactus get implemented. This enum is meant to be first and foremost a useful abstraction for achieving practical tasks, not an encyclopedia and therefore we ask of everyone that this to be extended only in ways that serve a practical purpose for the runtime behavior of Cactus or Cactus plugins in general. The bottom line is that we can accept this enum being not 100% accurate as long as it 100% satisfies what it was designed to do.",
+                "enum": [
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY",
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE",
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
+                ]
+            },
+            "ConsensusAlgorithmFamiliesWithTxFinality": {
+                "type": "string",
+                "description": "Enumerates a list of consensus algorithm families that provide immediate finality",
+                "enum": [
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY",
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"
+                ]
+            },
+            "ConsensusAlgorithmFamiliesWithOutTxFinality": {
+                "description": "Enumerates a list of consensus algorithm families that do not provide immediate finality",
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
+                ],
+                "x-enum-varnames": [
+                    "WORK"
+                ]
+            },
+            "PrimaryKey": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "nullable": false
+            },
+            "ConsortiumMemberId": {
+                "$ref": "#/components/schemas/PrimaryKey",
+                "description": "ID of Consortium member who operates the ledger (if any). Defined as an optional property in case the ledger is a permissionless and/or public one such as the Bitcoin or Ethereum mainnets."
+            },
+            "CactusNodeId": {
+                "$ref": "#/components/schemas/PrimaryKey",
+                "description": "ID of a Cactus node that must uniquely distinguish it from all other Cactus nodes within a Consortium. Note that API server instances do not have their own identity the way a node does."
+            },
+            "ConsortiumId": {
+                "$ref": "#/components/schemas/PrimaryKey"
+            },
+            "LedgerId": {
+                "description": "String that uniquely identifies a ledger within a Cactus consortium so that transactions can be routed to the correct ledger.",
+                "$ref": "#/components/schemas/PrimaryKey"
+            },
+            "PluginInstanceId": {
+                "description": "String that uniquely identifies a plugin instance within a Cactus consortium so that requests can be addressed/routed  directly to individual plugins when necessary.",
+                "$ref": "#/components/schemas/PrimaryKey"
+            },
+            "ConsortiumDatabase": {
+                "required": [
+                    "consortium",
+                    "ledger",
+                    "consortiumMember",
+                    "cactusNode",
+                    "pluginInstance"
+                ],
+                "properties": {
+                    "consortium": {
+                        "description": "A collection of Consortium entities. In practice this should only ever contain a single consortium, but we defined it as an array to keep the convention up with the rest of the collections defined in the Consortium data in general. Also, if we ever decide to somehow have some sort of consortium to consortium integration (which does not make much sense in the current frame of mind of the author in the year 2020) then having this as an array will have proven itself to be an excellent long term compatibility/extensibility decision indeed.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Consortium"
+                        },
+                        "default": [],
+                        "minItems": 0,
+                        "maxItems": 2048
+                    },
+                    "ledger": {
+                        "description": "The complete collection of all ledger entities in existence within the consortium.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Ledger"
+                        },
+                        "default": [],
+                        "minItems": 0,
+                        "maxItems": 2048
+                    },
+                    "consortiumMember": {
+                        "description": "The complete collection of all consortium member entities in existence within the consortium.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConsortiumMember"
+                        },
+                        "default": [],
+                        "minItems": 0,
+                        "maxItems": 2048
+                    },
+                    "cactusNode": {
+                        "description": "The complete collection of all cactus nodes entities in existence within the consortium.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CactusNode"
+                        },
+                        "default": [],
+                        "minItems": 0,
+                        "maxItems": 2048
+                    },
+                    "pluginInstance": {
+                        "description": "The complete collection of all plugin instance entities in existence within the consortium.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PluginInstance"
+                        },
+                        "default": [],
+                        "minItems": 0,
+                        "maxItems": 2048
+                    }
+                }
+            },
+            "Ledger": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "ledgerType"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/LedgerId"
+                    },
+                    "ledgerType": {
+                        "$ref": "#/components/schemas/LedgerType",
+                        "nullable": false
+                    },
+                    "consortiumMemberId": {
+                        "$ref": "#/components/schemas/ConsortiumMemberId"
+                    }
+                }
+            },
+            "LedgerType": {
+                "description": "Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.",
+                "type": "string",
+                "enum": [
+                    "BESU_1X",
+                    "BESU_2X",
+                    "BURROW_0X",
+                    "CORDA_4X",
+                    "FABRIC_14X",
+                    "FABRIC_2",
+                    "QUORUM_2X",
+                    "SAWTOOTH_1X"
+                ]
+            },
+            "Consortium": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "mainApiHost",
+                    "memberIds"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ConsortiumId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "mainApiHost": {
+                        "type": "string"
+                    },
+                    "memberIds": {
+                        "description": "The collection (array) of primary keys of consortium member entities that belong to this Consortium.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConsortiumMemberId"
+                        },
+                        "default": [],
+                        "minItems": 1,
+                        "maxItems": 2048,
+                        "nullable": false
+                    }
+                }
+            },
+            "ConsortiumMember": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "nodeIds"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ConsortiumMemberId"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The human readable name a Consortium member can be referred to while making it easy for humans to distinguish this particular consortium member entity from any other ones.",
+                        "minLength": 1,
+                        "maxLength": 2048,
+                        "nullable": false
+                    },
+                    "nodeIds": {
+                        "type": "array",
+                        "default": [],
+                        "nullable": false,
+                        "minItems": 1,
+                        "maxItems": 2048,
+                        "items": {
+                            "$ref": "#/components/schemas/CactusNodeId"
+                        }
+                    }
+                }
+            },
+            "CactusNodeMeta": {
+                "description": "A Cactus node meta information",
+                "type": "object",
+                "required": [
+                    "nodeApiHost",
+                    "publicKeyPem"
+                ],
+                "properties": {
+                    "nodeApiHost": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "publicKeyPem": {
+                        "description": "The PEM encoded public key that was used to generate the JWS included in the response (the jws property)",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 65535,
+                        "nullable": false,
+                        "format": "Must only contain the public key, never include here  the PEM that also contains a private key. See PEM format: https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail"
+                    }
+                }
+            },
+            "CactusNode": {
+                "description": "A Cactus node can be a single server, or a set of servers behind a load balancer acting as one.",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/CactusNodeMeta"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "consortiumId",
+                            "nodeApiHost",
+                            "memberId",
+                            "publicKeyPem",
+                            "pluginInstanceIds",
+                            "ledgerIds"
+                        ],
+                        "properties": {
+                            "id": {
+                                "$ref": "#/components/schemas/CactusNodeId",
+                                "example": "809a76ba-cfb8-4045-a5c6-ed70a7314c25"
+                            },
+                            "consortiumId": {
+                                "$ref": "#/components/schemas/ConsortiumId",
+                                "description": "ID of the Cactus Consortium this node is in.",
+                                "example": "3e2670d9-2d14-45bd-96f5-33e2c4b4e3fb"
+                            },
+                            "memberId": {
+                                "$ref": "#/components/schemas/ConsortiumMemberId",
+                                "example": "b3674a28-e442-4feb-b1f3-8cbe46c20e5e"
+                            },
+                            "ledgerIds": {
+                                "description": "Stores an array of Ledger entity IDs that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions.",
+                                "type": "array",
+                                "nullable": false,
+                                "minItems": 0,
+                                "maxItems": 2048,
+                                "default": [],
+                                "items": {
+                                    "$ref": "#/components/schemas/LedgerId"
+                                }
+                            },
+                            "pluginInstanceIds": {
+                                "type": "array",
+                                "nullable": false,
+                                "minItems": 0,
+                                "maxItems": 2048,
+                                "default": [],
+                                "items": {
+                                    "$ref": "#/components/schemas/PluginInstanceId"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "PluginInstance": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "packageName"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/PluginInstanceId"
+                    },
+                    "packageName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "nullable": false
+                    }
+                }
+            },
+            "JWSCompact": {
+                "description": "A JSON Web Signature. See: https://tools.ietf.org/html/rfc7515 for info about standard.",
+                "type": "string",
+                "minLength": 5,
+                "maxLength": 65535,
+                "pattern": "/^[a-zA-Z0-9-_]+?.[a-zA-Z0-9-_]+?.([a-zA-Z0-9-_]+)?$/",
+                "example": "eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.DOCNCqEMN7CQ_z-RMndiyldljXOk6WFIZxRzNF5Ylg4"
+            },
+            "JWSRecipient": {
+                "description": "A JSON Web Signature. See: https://tools.ietf.org/html/rfc7515 for info about standard.",
+                "type": "object",
+                "required": [
+                    "signature"
+                ],
+                "properties": {
+                    "signature": {
+                        "type": "string"
+                    },
+                    "protected": {
+                        "type": "string"
+                    },
+                    "header": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            },
+            "JWSGeneral": {
+                "type": "object",
+                "required": [
+                    "payload",
+                    "signatures"
+                ],
+                "properties": {
+                    "payload": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 65535
+                    },
+                    "signatures": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/JWSRecipient"
+                        }
+                    }
+                }
+            },
+            "GetObjectRequestV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to get from the object store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "GetObjectResponseV1": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to retrieve the value from the object store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value associated with the requested key in the object store as a string.",
+                        "minLength": 0,
+                        "maxLength": 10485760,
+                        "nullable": false
+                    }
+                }
+            },
+            "HasObjectRequestV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key to check for presence in the object store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "HasObjectResponseV1": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "isPresent",
+                    "checkedAt"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to check the presence of the value in the object store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "checkedAt": {
+                        "type": "string",
+                        "description": "Date and time encoded as JSON when the presence check was performed by the plugin backend.",
+                        "nullable": false
+                    },
+                    "isPresent": {
+                        "type": "boolean",
+                        "description": "The boolean true or false indicating the presence or absence of an object under 'key'.",
+                        "nullable": false
+                    }
+                }
+            },
+            "SetObjectRequestV1": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to set in the object store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value that will be associated with the key in the object store.",
+                        "minLength": 0,
+                        "maxLength": 10485760,
+                        "nullable": false
+                    }
+                }
+            },
+            "SetObjectResponseV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to set the value in the object store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "GetKeychainEntryRequestV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to get from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "GetKeychainEntryResponseV1": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to retrieve the value from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value associated with the requested key on the keychain.",
+                        "minLength": 0,
+                        "maxLength": 10485760,
+                        "nullable": false
+                    }
+                }
+            },
+            "SetKeychainEntryRequestV1": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to set on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value that will be associated with the key on the keychain.",
+                        "minLength": 0,
+                        "maxLength": 10485760,
+                        "nullable": false
+                    }
+                }
+            },
+            "SetKeychainEntryResponseV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to set the value on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeleteKeychainEntryRequestV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to check the presence of on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeleteKeychainEntryResponseV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was deleted from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "HasKeychainEntryRequestV1": {
+                "type": "object",
+                "required": [
+                    "key"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key to check for presence in the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "HasKeychainEntryResponseV1": {
+              "type": "object",
+              "required": ["key", "isPresent", "checkedAt"],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "The key that was used to check the presence of the value in the entry store.",
+                  "minLength": 1,
+                  "maxLength": 1024,
+                  "nullable": false
+                },
+                "checkedAt": {
+                  "type": "string",
+                  "description": "Date and time encoded as JSON when the presence check was performed by the plugin backend.",
+                  "nullable": false
+                },
+                "isPresent": {
+                  "type": "boolean",
+                  "description": "The boolean true or false indicating the presence or absence of an entry under 'key'.",
+                  "nullable": false
+                }
+              }
+            }
+        },
+        "requestBodies": {
+            "object_store_get_object_v1_request_body": {
+                "description": "Request body to obtain an object via its key.",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/GetObjectRequestV1"
+                        }
+                    }
+                }
+            },
+            "object_store_set_object_v1_request_body": {
+                "description": "Request body to set an object under a key.",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/SetObjectRequestV1"
+                        }
+                    }
+                }
+            },
+            "object_store_has_object_v1_request_body": {
+                "description": "Request body to check presence of an object under a key.",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/HasObjectRequestV1"
+                        }
+                    }
+                }
+            },
+            "keychain_get_entry_request_body": {
+                "description": "Request body to obtain a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/GetKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            },
+            "keychain_set_entry_request_body": {
+                "description": "Request body to write/update a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/SetKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            },
+            "keychain_has_entry_request_body": {
+                "description": "Request body for checking a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/HasKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            },
+            "keychain_delete_entry_request_body": {
+                "description": "Request body to delete a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/DeleteKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            }
+        },
+        "responses": {
+            "object_store_get_object_v1_response_body": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/GetObjectResponseV1"
+                        }
+                    }
+                }
+            },
+            "object_store_set_object_v1_response_body": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/SetObjectResponseV1"
+                        }
+                    }
+                }
+            },
+            "object_store_has_object_v1_response_body": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/HasObjectResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_get_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/GetKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_get_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_get_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_get_entry_404": {
+                "description": "A keychain item with the specified key was not found."
+            },
+            "keychain_get_entry_500": {
+                "description": "Unexpected error."
+            },
+            "keychain_set_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/SetKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_set_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_set_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_set_entry_500": {
+                "description": "Unexpected error."
+            },
+            "keychain_has_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/HasKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_has_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_has_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_has_entry_500": {
+                "description": "Unexpected error."
+            },
+            "keychain_delete_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/DeleteKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_delete_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_delete_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_delete_entry_500": {
+                "description": "Unexpected error."
+            }
+        }
+    },
+    "paths": {}
+}

@@ -1,0 +1,25 @@
+
+# !packages/cactus-*/**
+# !examples/cactus-*/**
+
+# examples/cartrade/
+# packages/business-logic-plugin/
+# packages/ledger-plugin/
+# packages/routing-interface/
+# packages/config/
+
+**/dist/**
+# **/node_modules/**
+# **/build/**
+# **/coverage/**
+
+# typings/**
+
+**/src/main/typescript/generated/proto/**
+**/src/main/typescript/generated/wasm-pack/**
+packages/cactus-verifier/src/main/typescript/
+
+packages/cactus-cmd-socketio-server/**
+packages/cactus-plugin-ledger-connector-sawtooth-socketio/**
+packages/cactus-plugin-ledger-connector-go-ethereum-socketio/**
+packages/cactus-plugin-ledger-connector-*-socketio/**

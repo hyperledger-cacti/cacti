@@ -1,0 +1,55 @@
+{
+  "name": "@hyperledger/cactus-example-supply-chain-backend-app",
+  "version": "0.2.0",
+  "description": "An example project demonstrating how Cactus can be used for cross-chain dapp development.",
+  "scripts": {
+    "start": "node -r dotenv/config node_modules/@hyperledger/cactus-example-supply-chain-backend/dist/lib/main/typescript/supply-chain-app-cli.js dotenv_config_path=process.env",
+    "start-direct": "node ./node_modules/@hyperledger/cactus-example-supply-chain-backend/dist/lib/main/typescript/supply-chain-app-cli.js"
+  },
+  "private": true,
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Blockchain Integration",
+    "Distributed Ledger Technology"
+  ],
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "dependencies": {
+    "@hyperledger/cactus-example-supply-chain-backend": "file:../cactus-example-supply-chain-backend",
+    "@hyperledger/cactus-example-supply-chain-frontend": "file:../cactus-example-supply-chain-frontend",
+    "dotenv": "8.2.0"
+  },
+  "devDependencies": {}
+}

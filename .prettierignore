@@ -1,0 +1,10 @@
+*.d.ts
+**/dist/
+**/bin/
+**/.nyc_output/
+**/www/
+**/generated/
+packages/core
+packages/connection-chain
+contribs/
+**/src/main/typescript/generated/**

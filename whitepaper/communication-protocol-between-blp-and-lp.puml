@@ -1,0 +1,167 @@
+@startuml
+title The communication protocol between Business Logic Plugin and Ledger Plugin
+
+actor "End User" as euser
+actor "Administrator" as admin
+
+box "Routing Interface" #LightGray
+entity "Routing Interface" as rif
+end box
+
+database "BLP registory" as blp_registry
+
+box "Business Logic Plugin" #Aquamarine
+entity "Business Logic Plugin" as blp
+end box
+box "Ledger Plugin" #Lavender
+entity "Verifier" as verifier
+entity "Validator" as validator
+end box
+database "ledger" as ledger
+
+== Initialize connecting with a ledger ==
+admin -> rif: startService()\nrequest
+activate rif
+rif -> blp_registry: getLedgerPluginInfoList()
+activate blp_registry
+blp_registry --> rif: list of LedgerPluignInfo
+deactivate 
+rif -> verifier: connect()\n (with ValidatorInfo)
+activate verifier
+verifier -> validator: open socket.io\n connection
+activate validator
+validator -> validator: authenticate Verifier
+validator -> ledger: setup parameters \nto call a ledger node
+activate ledger
+ledger --> validator: calling successed
+deactivate ledger
+validator --> verifier: connection\n established
+deactivate validator
+verifier --> rif: connect() OK
+deactivate verifier
+rif -> blp_registry: update LedgerPluginInfo\n as activated
+activate blp_registry
+blp_registry --> rif: update OK
+deactivate blp_registry
+rif -> verifier: startMonitor()
+activate verifier
+verifier -> validator: startMonitor()\nover socket.io
+activate validator
+validator -> validator: start monitoring
+validator --> verifier: startMonitor() OK
+deactivate validator
+verifier --> rif: startMonitor() OK
+deactivate verifier
+rif --> admin: startService() OK
+deactivate rif
+...
+
+== Send a ledger operation request ==
+
+euser -> rif: POST /api/v1/bl/trades/\n(request of creating a trade)
+activate rif
+rif -> rif: assign tradeID
+rif -> blp: startBL(businessLogicID)
+activate blp
+blp -> blp: event triggered\n (startBL)
+blp -> blp: load scenario\n to determine next operation
+blp -> blp: load message template\n of transaction request
+blp -> blp: make a signedTransaction
+blp -> rif: sendSignedTransaction(signedTransaction)
+activate rif
+rif -> rif: register TxID\n with associated tradeID
+rif -> verifier: sendSignedTransaction(signedTransaction)
+activate verifier
+verifier -> validator: sendSignedTransaction(signedTransaction)\nover socket.io
+activate validator
+validator -> ledger: submit transaction
+activate ledger
+ledger --> validator: submit transaction OK
+deactivate ledger
+deactivate validator
+verifier --> rif: sendSignedTransaction()\nrequest OK
+deactivate verifier
+rif --> blp: sendSignedTransaction()\n request OK
+deactivate rif
+blp -> blp: event triggered\n (state of trade changed)
+blp --> rif: startBL() OK
+deactivate blp
+rif --> euser: POST /api/v1/bl/trades/ OK\n with tradeID
+deactivate rif
+deactivate validator
+...
+
+== Send a event notification ==
+
+ledger -> ledger: new block data\n is generated
+activate ledger
+ledger -> validator: notify block data
+activate validator
+validator --> ledger: return OK
+deactivate ledger
+validator -> validator: disasmble into transactions \nand validate each
+validator -> validator: create LedgerEvent message \nfrom disambled transactions
+validator -> validator: add signature\n on LedgerEvent message
+validator -> verifier: send a signed \nLedgerEvent\n message
+deactivate validator
+activate verifier
+verifier -> verifier: verify signature\n on an LedgerEvent\n message
+verifier -> rif: notify LedgerEvent message
+activate rif
+rif --> verifier: notify LedgerEvent\n message OK
+deactivate verifier
+rif -> rif: parse LedgerEvent message \nto determine which tradeID \nand business logic is associated
+rif -> blp: notify LedgerEvent \nto associated business logic 
+activate blp
+blp -> blp: event triggered\n (state of the trade changed)
+blp -> blp: load scenario\n to determine next operation
+
+blp -> blp: (If there is a next operation,\nthe following processing continues \nas the same as the sequence of\n"Send a ledger operation request")
+blp -> blp: load message template\n of transaction request
+blp -> blp: make a signedTransaction
+blp -> rif: sendSignedTransaction(signedTransaction)
+activate rif
+rif -> rif: register TxID\n with associated tradeID
+rif -> verifier: sendSignedTransaction(signedTransaction)
+activate verifier
+verifier -> validator: sendSignedTransaction(signedTransaction)\n over socket.io
+activate validator
+validator -> ledger: submit transaction
+activate ledger
+ledger --> validator: submit transaction OK
+deactivate ledger
+deactivate validator
+verifier --> rif: sendSignedTransaction()\nrequest OK
+deactivate verifier
+rif --> blp: sendSignedTransaction()\nrequest OK
+deactivate rif
+blp -> blp: event triggered (state of trade changed)
+blp --> rif: notify LedgerEvent OK
+deactivate blp
+deactivate verifier
+rif -> rif: update 'last observed block#'
+deactivate rif
+...
+
+== shutdown a connection ==
+admin -> rif: stopServer() request
+activate rif
+rif -> rif: shutdown operation is invoked
+rif -> rif: enumerate active ledgers
+rif -> verifier: stopMonitor()
+activate verifier
+verifier -> validator: send a message\n over socket.io
+activate validator
+validator -> validator: stopMonitor()
+verifier --> rif: stopMonitor() OK
+deactivate validator
+deactivate verifier
+rif -> verifier: disconnect()
+activate verifier
+verifier -> verifier: close socket.io\n connection
+verifier --> rif: disconnect() OK
+deactivate verifier
+rif --> admin: stopServer() OK
+deactivate rif
+
+@enduml

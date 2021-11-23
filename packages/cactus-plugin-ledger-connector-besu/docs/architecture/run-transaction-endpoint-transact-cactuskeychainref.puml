@@ -1,0 +1,33 @@
+@startuml
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransactCactusKeychainReference() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "transactCactusKeychainReference()" as tckr
+participant "transactPrivateKey()" as tpk
+participant "web3.eth.accounts.signTransaction()" as weas
+
+caller-> tckr: req
+activate caller
+group #LightBlue if web3SigningCredential == CACTUSKEYCHAINREF
+    activate tckr
+    tckr -> tpk: [transactionConfig, web3SigningCredential]
+    activate tpk
+    tpk -> weas: [transactionConfig, secret]
+    activate weas
+    weas --> tpk: return [signedTx]
+    deactivate weas
+    group #LightGray if defined: signedTx.rawTransaction
+        tpk --> tckr: return [req with rawTransaction]
+        tckr --> caller : return {transactionConfig, web3SigningCredential, consistencyStrategy} as resBody
+        deactivate tckr
+    else #LightCoral
+        tpk --> tckr: throw Error: Failed to sign eth transaction. signedTransaction.rawTransaction is blank after .signTransaction()
+    end
+    deactivate tpk
+end
+@enduml

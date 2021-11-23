@@ -1,0 +1,45 @@
+{
+  "name": "@hyperledger/cactus-cmd-socket-server",
+  "version": "1.0.0-rc.2",
+  "private": true,
+  "scripts": {
+    "build": "npm run build-ts && npm run copy-static-assets",
+    "build-ts": "tsc",
+    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@types/node": "^14.0.24",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ethereumjs-common": "^1.5.1",
+    "ethereumjs-tx": "^2.1.2",
+    "express": "~4.16.1",
+    "fabric-ca-client": "~1.4.0",
+    "fabric-network": "~1.4.0",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "jsonwebtoken": "^8.5.1",
+    "log4js": "^3.0.6",
+    "morgan": "~1.9.1",
+    "shelljs": "^0.8.4",
+    "socket.io": "^2.0.4",
+    "ts-node": "8.9.1",
+    "web3": "^1.2.9",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.19",
+    "@typescript-eslint/eslint-plugin": "^4.31.1",
+    "@typescript-eslint/parser": "^4.31.1",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^26.6.3",
+    "prettier": "^2.4.0",
+    "ts-jest": "^26.4.4",
+    "tslint": "6.0.0",
+    "typescript": "^3.9.10"
+  }
+}

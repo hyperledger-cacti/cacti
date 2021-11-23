@@ -1,0 +1,1 @@
+docker cp ./tools/create_batch/create_batch3.py sawtooth-shell-default:/usr/lib/python3/dist-packages/sawtooth_intkey/client_cli/create_batch.py

@@ -1,0 +1,122 @@
+@startuml
+skinparam ArrowFontStyle italic
+
+title Hyperledger Cactus\nSequence Diagram - Blockchain Migration
+
+actor Consortium_Member_A as a
+actor Consortium_Member_B as b
+
+box Cactus
+entity "API" as api
+entity "Validator(s)" as v
+end box
+
+box "Ledgers"
+database Ledger1 as d1
+database Ledger2 as d2
+end box
+
+autoactivate on
+== Agreement Phase ==
+a -> b: Propose Blockchain Migration
+Note right
+Off-chain procedure
+end note
+    return Send Endorsement
+
+a -> api: Sign Transaction to Endorse Blockchain Migration
+return Request Confirmed
+
+
+b -> api: Sign Transaction to Endorse Blockchain Migration
+return Request Confirmed
+
+
+autoactivate off
+api -> a: Ready to Proceed
+api -> b: Ready to Proceed
+autoactivate on
+
+== Initialization Phase ==
+a -> api: Sign Transaction to Initialize Blockchain Migration
+    api -> v: Deploy Interoperability Support Data\n(smart contracts and configuration files) on Ledger1
+        v -> d1: Deploy Support Data as Consortium_Member_A
+        return Data Deployed
+    return Data Deployed
+return Ready to Initiate Migration
+
+b -> api: Sign Transaction to Initialize Blockchain Migration
+    api -> v: Deploy Interoperability Support Data on Ledger1
+        v -> d1: Deploy Support Data as Consortium_Member_B
+        return Data Deployed
+    return Data Deployed
+return Ready to Initiate Migration
+
+a -> api: Initialize Blockchain Migration
+    api -> v: Initialize Consortium_Member_A's view\non exisitng assets and data
+        v -> d1: Query Ledger 1 as Consortium_Member_A
+        return Return Results
+     return Return results
+ return Initialize Blockchain Migration Success
+ autoactivate off
+     api -> api: **processes query and builds Consortium_Member_A's**\n**view on existing assets and data**
+    return
+api -> a: Send Consortium_Member_A's view on L1
+a -> api: Confirm  View
+return OK
+autoactivate on
+
+b -> api: Initialize Blockchain Migration
+    api -> v: Initialize Consortium_Member_B's view\non exisitng assets and data
+        v -> d1: Query Ledger 1 as Consortium_Member_B
+        return Return Results
+     return Return results
+ return Initialize Blockchain Migration Success
+ autoactivate off
+     api -> api: **processes query and builds Consortium_Member_B's**\n**view on existing assets and data**
+    return
+api -> b: Send Consortium_Member_B's view on L1
+b -> api: Confirm  View
+return OK
+
+
+
+
+api -> api: Merge views
+Note right
+Optional: This process merges the views of 
+Consortium_Member_A and Consortium_Member_B
+into a consolidated view
+end note
+return
+autoactivate on
+api -> a: Merged View
+return Accept merge
+
+api -> b: Merged View
+return Accept merge
+
+
+== Migration Phase ==
+a -> api: initiate Blockchain Migration
+    api -> v: Execute Migration to Ledger 2
+        v -> d2: Execute transactions\non Ledger 2 as Consortium_Member_A
+        return Transactions Successfully Executed
+    return Success
+return Success
+
+
+
+b -> api: initiate Blockchain Migration
+    api -> v: Execute Migration to Ledger 2
+        v -> d2: Execute transactions\non Ledger 2 as Consortium_Member_B
+        return Transactions Successfully Executed
+    return Success
+return Success
+
+
+autoactivate off
+api -> api: **Perform final adjustments, e.g., submit**\n**missing transactions**
+api -> a: Migration Process Completed
+api -> b: Migration Process Completed
+@enduml

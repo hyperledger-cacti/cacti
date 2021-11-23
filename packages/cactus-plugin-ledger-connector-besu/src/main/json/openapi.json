@@ -1,0 +1,1352 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Connector Besu",
+        "description": "Can perform basic tasks on a Besu ledger",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "GetBalanceV1Response": {
+                "type": "object",
+                "required": [
+                    "balance"                    
+                ],
+                "properties": {
+                    "balance": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GetBalanceV1Request": {
+                "type": "object",
+                "required":[
+                    "address"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "address": {
+                        "type":"string"
+                    },
+                    "defaultBlock": {
+                    }
+                }
+            },
+            "EvmBlock":{
+                "type":"object",
+                "properties":{
+                    "number":{
+                        "type":"number"
+                    },
+                    "hash":{
+                        "type":"string"
+                    },
+                    "parentHash":{
+                        "type":"string"
+                    },
+                    "nonce":{
+                        "type":"string"
+                    },
+                    "sha3Uncles":{
+                        "type":"string"
+                    },
+                    "logsBloom":{
+                        "type":"string"
+                    },
+                    "transactionsRoot":{
+                        "type":"string"
+                    },
+                    "stateRoot":{
+                        "type":"string"
+                    },
+                    "miner":{
+                        "type":"string"
+                    },
+                    "difficulty":{
+                        "type":"number"
+                    },
+                    "totalDifficulty":{
+                        "type":"number"
+                    },
+                    "extraData":{
+                        "type":"string"
+                    },
+                    "size":{
+                        "type":"number"
+                    },
+                    "gasLimit":{
+                        "type":"number"
+                    },
+                    "gasUsed":{
+                        "type":"number"
+                    },
+                    "timestamp":{
+                    },
+                    "transactions":{
+                        "type":"array",
+                        "items":{}
+                    },
+                    "uncles":{
+                        "type":"array",
+                        "items":{}
+                    }
+                }
+            },
+            "GetBlockV1Response": {
+                "type": "object",
+                "required": [
+                    "block"                    
+                ],
+                "properties": {
+                    "block": {
+                        "$ref":"#/components/schemas/EvmBlock"
+                    }
+
+                }
+            },
+            "EvmTransaction":{
+                "type":"object",
+                "properties":{
+                    "hash":{
+                        "type":"string"
+                    },
+                    "nonce":{
+                        "type":"number"
+                    },
+                    "blockHash":{
+                    },
+                    "blockNumber":{
+                    },
+                    "transactionIndex":{
+                    },
+                    "from":{
+                        "type":"string"
+                    },
+                    "to":{
+                    },
+                    "value":{
+                        "type":"string"
+                    },
+                    "gasPrice":{
+                        "type":"string"
+                    },
+                    "gas":{
+                        "type":"number"
+                    },
+                    "input":{
+                        "type":"string"
+                    }
+                }
+            },
+            "GetTransactionV1Response": {
+                "type": "object",
+                "required": [
+                    "transaction"                    
+                ],
+                "properties": {
+                    "transaction": {
+                        "$ref":"#/components/schemas/EvmTransaction"
+                    }
+                }
+            },
+            "GetTransactionV1Request": {
+                "type": "object",
+                "required": ["transactionHash"],
+                "additionalProperties": false,
+                "properties": {
+                    "transactionHash":{
+                        "type": "string"
+                    }
+                }
+            },       
+            "GetPastLogsV1Response": {
+                "type": "object",
+                "required": [
+                    "logs"                    
+                ],
+                "properties": {
+                    "logs": {
+                        "type": "array", 
+                        "items":{
+                            "$ref": "#/components/schemas/EvmLog"
+                        }
+                    }
+                   
+                }
+            },
+            "GetPastLogsV1Request": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "toBlock": {
+                    },
+                    "fromBlock": {
+                    
+                    },
+                    "address": {
+                    },
+                    "topics": {
+                        "type" : "array",
+                        "items":{
+
+                        }
+                    }
+
+                }
+            },
+            "EvmLog":{
+                "type" : "object",
+                "required": [
+                  "address",
+                  "data",
+                  "blockHash",
+                  "transactionHash",
+                  "topics",
+                  "logIndex",
+                  "transactionIndex",
+                  "blockNumber"
+                ],
+                "properties": {
+                  "address":{
+                    "type": "string"
+                  },
+                  "data":{
+                    "type": "string"
+                  },
+                  "blockHash":{
+                    "type": "string"
+                  },
+                  "transactionHash":{
+                    "type": "string"
+                  },
+                  "topics":{
+                    "type": "array",
+                    "items":{
+                      "type" :"string" 
+                      
+                    }
+                  },
+                  "logIndex":{
+                    "type": "number"
+                  },
+                  "transactionIndex":{
+                    "type": "number"
+                  },
+                  "blockNumber":{
+                    "type": "number"
+                  }
+              }
+            },
+            "GetBlockV1Request": {
+                "required": ["blockHashOrBlockNumber"],
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                    "blockHashOrBlockNumber": {
+                }
+                }
+            },
+            "WatchBlocksV1": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Next",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Error",
+                    "org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "Web3BlockHeader": {
+                "type": "object",
+                "required": [
+                    "number",
+                    "hash",
+                    "parentHash",
+                    "nonce",
+                    "sha3Uncles",
+                    "logsBloom",
+                    "transactionRoot",
+                    "stateRoot",
+                    "receiptRoot",
+                    "miner",
+                    "extraData",
+                    "gasLimit",
+                    "gasUsed",
+                    "timestamp"
+                ],
+                "properties": {
+                    "number": {
+                        "type": "number"
+                    },
+                    "hash": {
+                        "type": "string"
+                    },
+                    "parentHash": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "sha3Uncles": {
+                        "type": "string"
+                    },
+                    "logsBloom": {
+                        "type": "string"
+                    },
+                    "transactionRoot": {
+                        "type": "string"
+                    },
+                    "stateRoot": {
+                        "type": "string"
+                    },
+                    "receiptRoot": {
+                        "type": "string"
+                    },
+                    "miner": {
+                        "type": "string"
+                    },
+                    "extraData": {
+                        "type": "string"
+                    },
+                    "gasLimit": {
+                        "type": "integer"
+                    },
+                    "gasUsed": {
+                        "type": "integer"
+                    },
+                    "timestamp": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    }
+                }
+            },
+            "WatchBlocksV1Progress": {
+                "type": "object",
+                "required": ["blockHeader"],
+                "properties": {
+                    "blockHeader": {
+                        "$ref": "#/components/schemas/Web3BlockHeader"
+                    } 
+                }
+            },
+            "ReceiptType": {
+                "description": "Enumerates the possible types of receipts that can be waited for by someone or something that has requested the execution of a transaction on a ledger.",
+                "type": "string",
+                "enum": [
+                    "NODE_TX_POOL_ACK",
+                    "LEDGER_BLOCK_ACK"
+                ]
+            },
+            "ConsistencyStrategy": {
+                "type": "object",
+                "required": ["receiptType", "blockConfirmations"],
+                "properties": {
+                    "receiptType": {
+                        "$ref": "#/components/schemas/ReceiptType"
+                    },
+                    "timeoutMs": {
+                        "type": "integer",
+                        "description": "The amount of milliseconds to wait for the receipt to arrive to the connector. Defaults to 0 which means to wait for an unlimited amount of time. Note that this wait may be interrupted still by other parts of the infrastructure such as load balancers cutting of HTTP requests after some time even if they are the type that is supposed to be kept alive. The question of re-entrance is a broader topic not in scope to discuss here, but it is important to mention it.",
+                        "minimum": 0
+                    },
+                    "blockConfirmations": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "description": "The number of blocks to wait to be confirmed in addition to the block containing the transaction in question. Note that if the receipt type is set to only wait for node transaction pool ACK and this parameter is set to anything, but zero then the API will not accept the request due to conflicting parameters."
+                    }
+                }
+            },
+            "Web3SigningCredential": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "discriminator": {
+                    "propertyName": "type"
+                },
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialNone"
+                    }
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    }
+                }
+            },
+            "Web3SigningCredentialCactusKeychainRef": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "ethAccount",
+                    "keychainId",
+                    "keychainEntryKey"
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "ethAccount": {
+                        "type": "string",
+                        "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "nullable": false
+                    },
+                    "keychainEntryKey": {
+                        "type": "string",
+                        "description": "The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.",
+                        "minLength": 0,
+                        "maxLength": 1024
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.",
+                        "minLength": 0,
+                        "maxLength": 1024
+                    }
+                }
+            },
+            "Web3SigningCredentialPrivateKeyHex": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "ethAccount",
+                    "secret"
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "ethAccount": {
+                        "type": "string",
+                        "description": "The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.",
+                        "minLength": 64,
+                        "maxLength": 64,
+                        "nullable": false
+                    },
+                    "secret": {
+                        "type": "string",
+                        "description": "The HEX encoded private key of an eth account.",
+                        "minLength": 0,
+                        "maxLength": 65535
+                    }
+                }
+            },
+            "Web3SigningCredentialNone": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "description": "Using this denotes that there is no signing required because the transaction is pre-signed.",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    }
+                }
+            },
+            "Web3SigningCredentialType": {
+                "type": "string",
+                "enum": [
+                    "CACTUS_KEYCHAIN_REF",
+                    "GETH_KEYCHAIN_PASSWORD",
+                    "PRIVATE_KEY_HEX",
+                    "NONE"
+                ]
+            },
+            "EthContractInvocationType": {
+                "type": "string",
+                "enum": [
+                    "SEND",
+                    "CALL"
+                ]
+            },
+            "SolidityContractJsonArtifact": {
+                "type": "object",
+                "required": [
+                    "contractName"
+                ],
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "metadata": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "deployedBytecode": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "sourceMap": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "deployedSourceMap": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "sourcePath": {
+                        "type": "string"
+                    },
+                    "compiler": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "version": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "functionHashes": {
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "gasEstimates": {
+                        "properties": {
+                            "creation": {
+                                "type": "object",
+                                "properties": {
+                                    "codeDepositCost": {
+                                        "type": "string"
+                                    },
+                                    "executionCost": {
+                                        "type": "string"
+                                    },
+                                    "totalCost": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "external": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            },
+            "BesuTransactionConfig": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                    "rawTransaction": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "from": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "to": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gas": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gasPrice": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "nonce": {
+                        "type": "number"
+                    },
+                    "data": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    }
+                }
+            },
+            "BesuPrivateTransactionConfig" : {
+                "type": "object",
+                "required" : [
+                    "privateFrom",
+                    "privateFor"
+                ],
+                "properties" : {
+                    "privateFrom": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "privateFor": {
+                        "type": "array",
+                        "default": [],
+                        "items": {},
+                        "nullable": false
+                    }
+
+                }
+            },
+            "Web3TransactionReceipt": {
+                "type": "object",
+                "required": [
+                    "blockHash",
+                    "blockNumber",
+                    "transactionHash",
+                    "transactionIndex",
+                    "status",
+                    "from",
+                    "to",
+                    "gasUsed"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                    "status": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "transactionHash": {
+                        "type": "string",
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
+                    },
+                    "transactionIndex": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "blockHash": {
+                        "type": "string",
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
+                    },
+                    "blockNumber": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasUsed": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "from": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "to": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "RunTransactionRequest": {
+                "type": "object",
+                "required": [
+                    "web3SigningCredential",
+                    "transactionConfig",
+                    "consistencyStrategy"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "transactionConfig": {
+                        "$ref": "#/components/schemas/BesuTransactionConfig",
+                        "nullable": false
+                    },
+                    "consistencyStrategy": {
+                        "$ref": "#/components/schemas/ConsistencyStrategy"
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/BesuPrivateTransactionConfig"
+                    }
+                }
+            },
+            "RunTransactionResponse": {
+                "type": "object",
+                "required": [
+                    "transactionReceipt"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
+            "DeployContractSolidityBytecodeV1Request": {
+                "type": "object",
+                "required": [
+                    "contractName",
+                    "contractAbi",
+                    "bytecode",
+                    "web3SigningCredential",
+                    "keychainId",
+                    "constructorArgs"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "description": "The contract name for retrieve the contracts json on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "contractAbi": {
+                        "description": "The application binary interface of the solidity contract",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "constructorArgs": {
+                        "type": "array",
+                        "items": {},
+                        "default": []
+                    },
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 24576,
+                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychainId for retrieve the contracts json.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "gas": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasPrice": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/BesuPrivateTransactionConfig"
+                    }
+                }
+            },
+            "DeployContractSolidityBytecodeV1Response": {
+                "type": "object",
+                "required": [
+                    "transactionReceipt"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
+            "InvokeContractV1Request": {
+                "type": "object",
+                "required": [
+                    "contractName",
+                    "signingCredential",
+                    "invocationType",
+                    "methodName",
+                    "params"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "signingCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "invocationType": {
+                        "$ref": "#/components/schemas/EthContractInvocationType",
+                        "nullable": false,
+                        "description": "Indicates wether it is a CALL or a SEND type of  invocation where only SEND ends up creating an actual transaction on the ledger."
+                    },
+                    "methodName": {
+                        "description": "The name of the contract method to invoke.",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 2048
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass in to the contract method being invoked.",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    },
+                    "contractAbi": {
+                        "description": "The application binary interface of the solidity contract, optional parameter",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "description": "Address of the solidity contract, optional parameter",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gas": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "gasPrice": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "nonce": {
+                        "type": "number"
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychainId for retrieve the contracts json.",
+                        "minLength": 1,
+                        "maxLength": 100
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/BesuPrivateTransactionConfig"
+                    }
+                }
+            },
+            "InvokeContractV1Response": {
+                "type": "object",
+                "required": [
+                    "success"
+                ],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    },
+                    "callOutput": {},
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    }
+                }
+            },
+            "SignTransactionRequest": {
+                "type": "object",
+                "required": [
+                    "transactionHash",
+                    "keychainId",
+                    "keychainRef"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "keychainId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "keychainRef": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "transactionHash": {
+                        "description": "The transaction hash of ledger will be used to fetch the contain.",
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 2048,
+                        "nullable": false
+                    }
+                }
+            },
+            "SignTransactionResponse": {
+                "type": "object",
+                "required": [
+                    "signature"
+                ],
+                "properties": {
+                    "signature": {
+                        "description": "The signatures of ledger from the corresponding transaction hash.",
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 2048,
+                        "nullable": false
+                    }
+                }
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            },
+            "GetBesuRecordV1Request":{
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "invokeCall": {
+                        "$ref": "#/components/schemas/InvokeContractV1Request"
+                    },
+                    "transactionHash": {
+                        "type": "string",
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
+                    }
+                }
+            },
+            "GetBesuRecordV1Response":{
+                "type": "object",
+                "properties": {
+                    "ledgerId":{
+                        "type":"string"
+                    },
+                    "stateContract":{
+                        "type":"string"
+                    },
+                    "transactionInputData":{},
+                    "callOutput":{}
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode"
+                    }
+                },
+                "operationId": "deployContractSolBytecodeV1",
+                "summary": "Deploys the bytecode of a Solidity contract.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractSolidityBytecodeV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractSolidityBytecodeV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance": {
+            "post": {
+                "x-hyperledger-cactus": { 
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance"
+                    }
+                },
+                "operationId": "getBalanceV1",
+                "summary": "Return balance of an address of a given block",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetBalanceV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetBalanceV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block"
+                    }
+                },
+                "operationId": "getBlockV1",
+                "summary": "Returns a block matching the block",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetBlockV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetBlockV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction"
+                    }
+                },
+                "operationId": "runTransactionV1",
+                "summary": "Executes a transaction on a besu ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction"
+                    }
+                },
+                "operationId": "getTransactionV1",
+                "summary": "Executes a transaction on a besu ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetTransactionV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetTransactionV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs"
+                    }
+                },
+                "operationId": "getPastLogsV1",
+                "summary": "Gets past logs, matching the given options.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetPastLogsV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+
+                                    "$ref": "#/components/schemas/GetPastLogsV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract"
+                    }
+                },
+                "operationId": "invokeContractV1",
+                "summary": "Invokes a contract on a besu ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeContractV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"
+                    }
+                },
+                "operationId": "signTransactionV1",
+                "summary": "Obtain signatures of ledger from the corresponding transaction hash.",
+                "description": "Obtain signatures of ledger from the corresponding transaction hash.",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SignTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SignTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not able to find the corresponding tranaction from the transaction hash"
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record"
+                    }
+                },
+                "operationId": "getBesuRecordV1",
+                "summary": "Retrieves an arbitrary record (any piece of information) from the ledger. Ledger records can be call outputs, transaction input, etc.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetBesuRecordV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetBesuRecordV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

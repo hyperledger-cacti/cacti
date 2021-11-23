@@ -1,0 +1,111 @@
+{
+  "name": "@hyperledger/cactus-test-tooling",
+  "version": "1.0.0-rc.2",
+  "description": "Swiss army knife for test development. Main goal is to make pulling up test/dummy ledgers on the fly for tests easy, especially for test cases that are about simulating clean ledger state or wiped ledger state, etc.",
+  "main": "dist/lib/main/typescript/index.js",
+  "mainMinified": "dist/cactus-test-tooling.node.umd.min.js",
+  "browser": "dist/cactus-test-tooling.web.umd.js",
+  "browserMinified": "dist/cactus-test-tooling.web.umd.min.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js"
+  },
+  "watch": {},
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Catarina Pedreira",
+      "email": "catarina.pedreira@tecnico.ulisboa.pt",
+      "url": "https://github.com/CatarinaPedreira"
+    },
+    {
+      "name": "Rafael Belchior",
+      "email": "rafael.belchior@tecnico.ulisboa.pt",
+      "url": "https://rafaelapb.github.io/"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "dependencies": {
+    "@hyperledger/cactus-common": "1.0.0-rc.2",
+    "axios": "0.21.4",
+    "compare-versions": "3.6.0",
+    "dockerode": "3.3.0",
+    "elliptic": "6.5.4",
+    "execa": "5.1.1",
+    "fabric-ca-client": "2.2.8",
+    "fabric-network": "2.2.8",
+    "fs-extra": "10.0.0",
+    "internal-ip": "6.2.0",
+    "is-port-reachable": "3.0.0",
+    "joi": "17.4.2",
+    "js-yaml": "4.1.0",
+    "keycloak-admin": "1.14.21",
+    "lodash": "4.17.21",
+    "node-ssh": "12.0.0",
+    "p-retry": "4.6.1",
+    "run-time-error": "1.4.0",
+    "tar-stream": "2.2.0",
+    "temp": "0.9.4",
+    "typescript-optional": "2.0.1",
+    "web3": "1.5.2",
+    "web3-core": "1.5.2"
+  },
+  "devDependencies": {
+    "@types/dockerode": "3.2.7",
+    "@types/js-yaml": "4.0.3",
+    "@types/esm": "3.2.0",
+    "@types/fs-extra": "9.0.12",
+    "@types/lodash": "4.14.172",
+    "@types/node-ssh": "7.0.1",
+    "@types/ssh2": "0.5.47",
+    "@types/ssh2-streams": "0.1.9",
+    "@types/tar-stream": "2.2.1",
+    "@types/temp": "0.9.1",
+    "esm": "3.2.25",
+    "temp": "0.9.4"
+  }
+}

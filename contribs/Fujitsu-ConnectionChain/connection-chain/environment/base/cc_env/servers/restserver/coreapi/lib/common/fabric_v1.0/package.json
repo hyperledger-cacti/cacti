@@ -1,0 +1,12 @@
+{
+  "name": "fabric_v1.0",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "fabric-client": "1.0.2",
+    "fabric-ca-client": "1.0.2",
+    "grpc": "1.4.1"
+  }
+}

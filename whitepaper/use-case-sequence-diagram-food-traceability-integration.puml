@@ -1,0 +1,100 @@
+@startuml Sequence Diagram - Food Traceability Integration
+
+skinparam ArrowFontStyle italic
+
+title Hyperledger Cactus\nSequence Diagram - Food Traceability Integration
+
+actor User_A as a <<consumer>>
+actor User_B as b <<organiazation A staff>>
+actor User_C as c <<organiazation B staff>>
+
+box Application #White
+entity "Frontend" as frontend
+entity "Backend" as backend
+end box
+
+box Cactus #White
+entity "API" as api
+entity "Validator(s)" as v
+end box
+
+box "Ledgers" #White
+database Food_Ledger_1 as d1
+database Food_Ledger_2 as d2
+end box
+
+autoactivate on
+
+== Record Data ==
+
+b -> frontend: Append Food Data Record
+  frontend -> backend: Append Food Data Record
+    backend -> api: Append Food Data Record
+      api -> d1: Append Food Data Record
+      return Food Data Record Appended
+    return Food Data Record Appended
+  return Food Data Record Appended
+return Food Data Record Appended
+
+c -> frontend: Append Food Data Record
+  frontend -> backend: Append Food Data Record
+    backend -> api: Append Food Data Record
+      api -> d2: Append Food Data Record
+      return Food Data Record Appended
+    return Food Data Record Appended
+  return Food Data Record Appended
+return Food Data Record Appended
+
+== Merge Data ==
+
+loop Polling/Triggered
+  backend -> api: Query Ledger 1
+    api -> d1: Query Ledger 1
+    return Food Record on Ledger 1
+  return Food Record on Ledger 1
+
+  backend -> api: Query Ledger 2
+    api -> d2: Query Ledger 2
+    return Food Record on Ledger 2
+  return Food Record on Ledger 2
+
+  backend -> backend: Compute Data Diff Ledger 1
+  return Data Diff Ledger 1
+  backend -> api: Append Missing Data to Ledger 1
+    api -> d1: Append Missing Data to Ledger 1
+    return Ledger 1 Updated
+  return Ledger 1 Updated
+
+  backend -> backend: Compute Data Diff Ledger 2
+  return Data Diff Ledger 2
+    backend -> api: Append Missing Data to Ledger 2
+    api -> d2: Append Missing Data to Ledger 2
+    return Ledger 2 Updated
+  return Ledger 2 Updated
+
+end loop
+
+== Trace Food Origins ==
+
+a -> frontend: Query Food Merged Record
+  frontend -> backend: Query Food Merged Record
+    backend -> api: Query Food Merged Record
+      api -> d1: Query Food Merged Record
+      return Merged Food Data Records
+      note left
+      At this point the data on
+      Food Ledger 1 and 2 should
+      be equivalent and therefore
+      any one of them can be
+      queried by Hyperledger Fabric
+      to obtain the complete food
+      trace records.
+      end note
+    return Merged Food Data Records
+  return Merged Food Data Records
+return Merged Food Data Records
+
+a -> a: <color:green>Make well informed\n<color:green>purchasing decision\n<color:green>based on food origins.
+
+
+@enduml

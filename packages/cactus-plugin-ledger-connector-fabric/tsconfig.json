@@ -1,0 +1,36 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-fabric.tsbuildinfo"
+  },
+  "include": [
+    "./src",
+    "src/**/*.json"
+  ],
+  "exclude": [
+    "./src/test/typescript/fixtures/go/basic-asset-transfer/chaincode-typescript/**/*.ts",
+    "./src/test/typescript/fixtures/go/lock-asset/chaincode-typescript/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../cactus-core/tsconfig.json"
+    },
+    {
+      "path": "../cactus-core-api/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-keychain-memory/tsconfig.json"
+    },
+    {
+      "path": "../cactus-test-tooling/tsconfig.json"
+    }
+  ]
+}

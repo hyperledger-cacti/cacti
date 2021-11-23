@@ -1,0 +1,30 @@
+blpRegistry:
+  - 
+    businessLogicID: guks32pf
+    validatorID: [84jUisrs, r9IS4dDf]
+  - 
+    businessLogicID: h40Q9eMD
+    validatorID: [sUr7d10R, 84jUisrs]
+
+logLevel: debug
+
+applicationHostInfo:
+  hostName: http://aaa.bbb.ccc.ddd # please change hostName to your IP address
+  hostPort: 5034
+
+socketOptions:
+  rejectUnauthorized: false
+  reconnection: false
+  timeout: 20000
+
+verifier:
+  maxCounterRequestID: 100
+  syncFunctionTimeoutMillisecond: 5000
+
+appRouters:
+  - 
+    path: /api/v1/bl/electricity-trade/
+    routerJs: ../../../../../../examples/electricity-trade/electricity-trade.js
+  -
+    path: /api/v1/bl/balance/
+    routerJs: ../../../../../../examples/electricity-trade/balance.js

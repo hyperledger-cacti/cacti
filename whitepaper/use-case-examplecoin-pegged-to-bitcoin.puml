@@ -1,0 +1,29 @@
+@startuml ExampleCoin Pegged to Bitcoin
+
+title Hyperledger Cactus\nExampleCoin Pegged to Bitcoin
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 60
+skinparam sequenceParticipant underline
+
+frame "Total ExampleCoin Inventory" as teci #LightGray {
+  node "A) ExampleCoin Wallets" as ecw #LightGreen {
+  }
+}
+
+frame "Total Bitcoin Inventory" as tbi #LightGray {
+  node "All other Bitcoin Wallets" as aobw #LightYellow {
+  }
+  node "B) ExampleCoin Peg Reserves Wallet" as ecprw #LightGreen {
+  }
+}
+
+ecw <...> ecprw #Green
+note on link
+A and B equal in value because
+B is backing the value of A so long
+as the wallet holder is a trusted entity.
+end note
+
+@enduml

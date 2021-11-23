@@ -1,0 +1,224 @@
+name: Cactus_CI
+
+# Triggers the workflow on push or pull request events
+on:
+  push:
+    branches: [main, dev]
+
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  DCI-Lint:
+    runs-on: ubuntu-20.04
+    name: DCI-Lint
+    steps:
+    - name: Lint Git Repo
+      id: lint-git-repo
+      uses: petermetz/gh-action-dci-lint@v0.6.1
+      with:
+        lint-git-repo-request: '{"cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git", "fetchArgs": ["--update-head-ok", "--no-tags", "--prune", "--progress", "--no-recurse-submodules", "--depth=1", "origin" ,"+${{ github.sha }}:${{ github.ref }}"], "checkoutArgs": [ "${{ github.ref }}"], "targetPhrasePatterns": [], "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json" }'
+    - name: Get the output response
+      run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
+
+  build-node-14:
+    runs-on: ubuntu-20.04
+    continue-on-error: false
+
+    steps:
+    - name: Get Timestamp
+      id: timestamp
+      run: echo "::set-output name=timestamp::$(timestamp +%s)"
+
+    - name: Restore the previous run result
+      uses: actions/cache@v2
+      with:
+        path: |
+          run_result
+        key: ${{ github.run_id }}-${{ github.job }}-${{ steps.timestamp.outputs.timestamp }}
+        restore-keys: |
+          ${{ github.run_id }}-${{ github.job }}
+
+    - name: Get the previous run result
+      id: run_result
+      run: cat run_result 2>/dev/null || echo 'default'
+
+    - name: Set Swap Space to 10GB
+      if: steps.run_result.outputs.run_result != 'success'
+      uses: pierotofy/set-swap-space@v1.0
+      with:
+        swap-size-gb: 10
+
+    - name: Use Node.js v14.17.6
+      if: steps.run_result.outputs.run_result != 'success'
+      uses: actions/setup-node@v2.1.2
+      with:
+        node-version: v14.17.6
+
+
+    - uses: actions/checkout@v2.3.4
+      if: steps.run_result.outputs.run_result != 'success'
+
+    - if: steps.run_result.outputs.run_result != 'success'
+      run: ./tools/ci.sh
+
+    - run: echo "::set-output name=run_result::success" > run_result
+
+  build-node-16:
+    runs-on: ubuntu-20.04
+    continue-on-error: false
+
+    steps:
+    - name: Get Timestamp
+      id: timestamp
+      run: echo "::set-output name=timestamp::$(timestamp +%s)"
+
+    - name: Restore the previous run result
+      uses: actions/cache@v2
+      with:
+        path: |
+          run_result
+        key: ${{ github.run_id }}-${{ github.job }}-${{ steps.timestamp.outputs.timestamp }}
+        restore-keys: |
+          ${{ github.run_id }}-${{ github.job }}
+
+    - name: Get the previous run result
+      id: run_result
+      run: cat run_result 2>/dev/null || echo 'default'
+
+    - name: Set Swap Space to 10GB
+      if: steps.run_result.outputs.run_result != 'success'
+      uses: pierotofy/set-swap-space@v1.0
+      with:
+        swap-size-gb: 10
+
+    - name: Use Node.js v16.9.1
+      if: steps.run_result.outputs.run_result != 'success'
+      uses: actions/setup-node@v2.1.2
+      with:
+        node-version: v16.9.1
+
+    - uses: actions/checkout@v2.3.4
+      if: steps.run_result.outputs.run_result != 'success'
+
+    - if: steps.run_result.outputs.run_result != 'success'
+      run: ./tools/ci.sh
+
+    - run: echo "::set-output name=run_result::success" > run_result
+
+  build-containers:
+    runs-on: ubuntu-20.04
+    continue-on-error: true
+
+    steps:
+
+    - uses: actions/checkout@v2.3.4
+      name: Check out code
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-dev-container-vscode
+      run: DOCKER_BUILDKIT=1 docker build ./.devcontainer/ -f ./.devcontainer/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
+      run: DOCKER_BUILDKIT=1 docker build . -f ./examples/supply-chain-app/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-example-carbon-accounting
+      run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-cmd-api-server
+      run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-cmd-api-server/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-keychain-vault-server
+      run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-connector-corda-server
+      run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-connector-fabric
+      run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric/ -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-connector-besu
+      run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-besu/ -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-besu-all-in-one
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-corda-all-in-one
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    # Skipping this one for now because it keeps making the CI fail most likely due to DockerHub rate limits.
+    # TODO: Recommend the Fabric maintainers that they publish their images to ghcr.io as well or ask how can the
+    # image registry be overridden in Fabric samples.
+    # - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
+    #   run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
+
+    # - name: Print Disk Usage Reports
+    #   run: df ; echo "" ; docker system df
+
+    # - name: ghcr.io/hyperledger/cactus-fabric-all-in-one
+    #   run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x
+
+    # - name: Print Disk Usage Reports
+    #   run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-iroha-all-in-one
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/iroha-all-in-one/ -f ./tools/docker/iroha-all-in-one/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-quorum-all-in-one
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-rust-compiler
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/rust-compiler/ -f ./tools/docker/rust-compiler/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-rust-compiler
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/test-npm-registry/ -f ./tools/docker/test-npm-registry/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-whitepaper
+      run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df

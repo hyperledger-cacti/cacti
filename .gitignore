@@ -1,0 +1,63 @@
+.config.json
+.nyc_output/
+dist/
+.DS_Store
+node_modules/
+docs/main
+logs/
+jspm_packages/
+generated-sources/
+coverage/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# next.js build output
+.next
+
+# vscode files
+.vscode/*
+!.vscode/template.launch.json
+!.vscode/extensions.json
+
+# Introperability App specifics
+examples/simple-asset-transfer/fabric/**/hfc-key-store/
+
+bin/
+.tmp/
+lerna-debug.log
+cactus-openapi-spec.json
+cactus-openapi-spec-*.json
+.npmrc
+*.log
+build/
+.gradle/
+site/
+
+.build-cache/*.tsbuildinfo
+
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+!packages/cactus-plugin-verifier-cc/src/main/typescript/ledger-plugin/*/validator/src/build
+!packages/cactus-plugin-verifier-cc/src/main/typescript/ledger-plugin/*/validator/src/core/bin
+
+tools/docker/geth-testnet/data-geth1/
+examples/cactus-example-verifier-cc-cartrade/src/main/typescript/impl/script-test-getFunctions/fabric/wallet/

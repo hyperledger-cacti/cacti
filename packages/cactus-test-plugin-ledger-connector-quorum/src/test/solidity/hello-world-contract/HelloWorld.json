@@ -1,0 +1,418 @@
+{
+    "contractName": "HelloWorld",
+    "abi": [
+        {
+            "inputs": [],
+            "name": "getName",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "sayHello",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "newName",
+                    "type": "string"
+                }
+            ],
+            "name": "setName",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }
+    ],
+    "metadata": "{\"compiler\":{\"version\":\"0.7.2+commit.51b20bc0\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getName\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sayHello\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"newName\",\"type\":\"string\"}],\"name\":\"setName\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-test-plugin-ledger-connector-quorum/src/test/solidity/hello-world-contract/HelloWorld.sol\":\"HelloWorld\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-test-plugin-ledger-connector-quorum/src/test/solidity/hello-world-contract/HelloWorld.sol\":{\"keccak256\":\"0x0b78fa11f33f7936a80da194c49f04198e38947e3f98f3a7b765b4adb4c455c1\",\"urls\":[\"bzz-raw://12697aa12341c70ed7a411a27a17398dcb2d4336a14dac51845e2123acf174c7\",\"dweb:/ipfs/QmPhH1UbHtUeeen9W2qMDwEVVWAtVJSMN29Nch5q8Gax1D\"]}},\"version\":1}",
+    "bytecode": "60c0604052600d60808190526c4361707461696e43616374757360981b60a090815261002e9160009190610041565b5034801561003b57600080fd5b506100d4565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061008257805160ff19168380011785556100af565b828001600101855582156100af579182015b828111156100af578251825591602001919060010190610094565b506100bb9291506100bf565b5090565b5b808211156100bb57600081556001016100c0565b61030f806100e36000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c806317d7de7c14610046578063c47f0027146100c3578063ef5fb05b1461016b575b600080fd5b61004e610173565b6040805160208082528351818301528351919283929083019185019080838360005b83811015610088578181015183820152602001610070565b50505050905090810190601f1680156100b55780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b610169600480360360208110156100d957600080fd5b8101906020810181356401000000008111156100f457600080fd5b82018360208201111561010657600080fd5b8035906020019184600183028401116401000000008311171561012857600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610209945050505050565b005b61004e610220565b60008054604080516020601f60026000196101006001881615020190951694909404938401819004810282018101909252828152606093909290918301828280156101ff5780601f106101d4576101008083540402835291602001916101ff565b820191906000526020600020905b8154815290600101906020018083116101e257829003601f168201915b5050505050905090565b805161021c906000906020840190610246565b5050565b60408051808201909152600c81526b48656c6c6f20576f726c642160a01b602082015290565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061028757805160ff19168380011785556102b4565b828001600101855582156102b4579182015b828111156102b4578251825591602001919060010190610299565b506102c09291506102c4565b5090565b5b808211156102c057600081556001016102c556fea2646970667358221220b72c0e77fdf429e47051940ba62646ae01296865473f15795ffca6619fe80f9964736f6c63430007020033",
+    "deployedBytecode": "608060405234801561001057600080fd5b50600436106100415760003560e01c806317d7de7c14610046578063c47f0027146100c3578063ef5fb05b1461016b575b600080fd5b61004e610173565b6040805160208082528351818301528351919283929083019185019080838360005b83811015610088578181015183820152602001610070565b50505050905090810190601f1680156100b55780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b610169600480360360208110156100d957600080fd5b8101906020810181356401000000008111156100f457600080fd5b82018360208201111561010657600080fd5b8035906020019184600183028401116401000000008311171561012857600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610209945050505050565b005b61004e610220565b60008054604080516020601f60026000196101006001881615020190951694909404938401819004810282018101909252828152606093909290918301828280156101ff5780601f106101d4576101008083540402835291602001916101ff565b820191906000526020600020905b8154815290600101906020018083116101e257829003601f168201915b5050505050905090565b805161021c906000906020840190610246565b5050565b60408051808201909152600c81526b48656c6c6f20576f726c642160a01b602082015290565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061028757805160ff19168380011785556102b4565b828001600101855582156102b4579182015b828111156102b4578251825591602001919060010190610299565b506102c09291506102c4565b5090565b5b808211156102c057600081556001016102c556fea2646970667358221220b72c0e77fdf429e47051940ba62646ae01296865473f15795ffca6619fe80f9964736f6c63430007020033",
+    "sourceMap": "463:37:0:-:0;439:322;463:37;;439:322;463:37;;;-1:-1:-1;;;463:37:0;;;;;;-1:-1:-1;;463:37:0;;:::i;:::-;;439:322;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;439:322:0;;;-1:-1:-1;439:322:0;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;",
+    "deployedSourceMap": "439:322:0:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;598:81;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;683:76;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;683:76:0;;-1:-1:-1;683:76:0;;-1:-1:-1;;;;;683:76:0:i;:::-;;505:89;;;:::i;598:81::-;670:4;663:11;;;;;;;;-1:-1:-1;;663:11:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;638:13;;663:11;;670:4;;663:11;;670:4;663:11;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;598:81;:::o;683:76::-;740:14;;;;:4;;:14;;;;;:::i;:::-;;683:76;:::o;505:89::-;568:21;;;;;;;;;;;;-1:-1:-1;;;568:21:0;;;;505:89;:::o;-1:-1:-1:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;",
+    "sourcePath": "/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-test-plugin-ledger-connector-quorum/src/test/solidity/hello-world-contract/HelloWorld.sol",
+    "compiler": {
+        "name": "solc",
+        "version": "0.7.2+commit.51b20bc0"
+    },
+    "networks":{},
+    "ast": {
+        "absolutePath": "/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-test-plugin-ledger-connector-quorum/src/test/solidity/hello-world-contract/HelloWorld.sol",
+        "exportedSymbols": {
+            "HelloWorld": [
+                31
+            ]
+        },
+        "id": 32,
+        "nodeType": "SourceUnit",
+        "nodes": [
+            {
+                "id": 1,
+                "literals": [
+                    "solidity",
+                    ">=",
+                    "0.7",
+                    ".0"
+                ],
+                "nodeType": "PragmaDirective",
+                "src": "413:24:0"
+            },
+            {
+                "abstract": false,
+                "baseContracts": [],
+                "contractDependencies": [],
+                "contractKind": "contract",
+                "fullyImplemented": true,
+                "id": 31,
+                "linearizedBaseContracts": [
+                    31
+                ],
+                "name": "HelloWorld",
+                "nodeType": "ContractDefinition",
+                "nodes": [
+                    {
+                        "constant": false,
+                        "id": 4,
+                        "mutability": "mutable",
+                        "name": "name",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 31,
+                        "src": "463:37:0",
+                        "stateVariable": true,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_string_storage",
+                            "typeString": "string"
+                        },
+                        "typeName": {
+                            "id": 2,
+                            "name": "string",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "463:6:0",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_string_storage_ptr",
+                                "typeString": "string"
+                            }
+                        },
+                        "value": {
+                            "hexValue": "4361707461696e436163747573",
+                            "id": 3,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "kind": "string",
+                            "lValueRequested": false,
+                            "nodeType": "Literal",
+                            "src": "485:15:0",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_stringliteral_bdd2f21877c99489ddcc32737686677f40d460368c7982ce22ce4f72b41b0312",
+                                "typeString": "literal_string \"CaptainCactus\""
+                            },
+                            "value": "CaptainCactus"
+                        },
+                        "visibility": "private"
+                    },
+                    {
+                        "body": {
+                            "id": 11,
+                            "nodeType": "Block",
+                            "src": "562:32:0",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "hexValue": "48656c6c6f20576f726c6421",
+                                        "id": 9,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": true,
+                                        "kind": "string",
+                                        "lValueRequested": false,
+                                        "nodeType": "Literal",
+                                        "src": "575:14:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_stringliteral_3ea2f1d0abf3fc66cf29eebb70cbd4e7fe762ef8a09bcc06c8edf641230afec0",
+                                            "typeString": "literal_string \"Hello World!\""
+                                        },
+                                        "value": "Hello World!"
+                                    },
+                                    "functionReturnParameters": 8,
+                                    "id": 10,
+                                    "nodeType": "Return",
+                                    "src": "568:21:0"
+                                }
+                            ]
+                        },
+                        "functionSelector": "ef5fb05b",
+                        "id": 12,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "sayHello",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 5,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "523:2:0"
+                        },
+                        "returnParameters": {
+                            "id": 8,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 7,
+                                    "mutability": "mutable",
+                                    "name": "",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 12,
+                                    "src": "547:13:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_string_memory_ptr",
+                                        "typeString": "string"
+                                    },
+                                    "typeName": {
+                                        "id": 6,
+                                        "name": "string",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "547:6:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage_ptr",
+                                            "typeString": "string"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "546:15:0"
+                        },
+                        "scope": 31,
+                        "src": "505:89:0",
+                        "stateMutability": "pure",
+                        "virtual": false,
+                        "visibility": "public"
+                    },
+                    {
+                        "body": {
+                            "id": 19,
+                            "nodeType": "Block",
+                            "src": "655:24:0",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "id": 17,
+                                        "name": "name",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 4,
+                                        "src": "670:4:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage",
+                                            "typeString": "string storage ref"
+                                        }
+                                    },
+                                    "functionReturnParameters": 16,
+                                    "id": 18,
+                                    "nodeType": "Return",
+                                    "src": "663:11:0"
+                                }
+                            ]
+                        },
+                        "functionSelector": "17d7de7c",
+                        "id": 20,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "getName",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 13,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "614:2:0"
+                        },
+                        "returnParameters": {
+                            "id": 16,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 15,
+                                    "mutability": "mutable",
+                                    "name": "",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 20,
+                                    "src": "638:13:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_string_memory_ptr",
+                                        "typeString": "string"
+                                    },
+                                    "typeName": {
+                                        "id": 14,
+                                        "name": "string",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "638:6:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage_ptr",
+                                            "typeString": "string"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "637:15:0"
+                        },
+                        "scope": 31,
+                        "src": "598:81:0",
+                        "stateMutability": "view",
+                        "virtual": false,
+                        "visibility": "public"
+                    },
+                    {
+                        "body": {
+                            "id": 29,
+                            "nodeType": "Block",
+                            "src": "732:27:0",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "id": 27,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": false,
+                                        "lValueRequested": false,
+                                        "leftHandSide": {
+                                            "id": 25,
+                                            "name": "name",
+                                            "nodeType": "Identifier",
+                                            "overloadedDeclarations": [],
+                                            "referencedDeclaration": 4,
+                                            "src": "740:4:0",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_string_storage",
+                                                "typeString": "string storage ref"
+                                            }
+                                        },
+                                        "nodeType": "Assignment",
+                                        "operator": "=",
+                                        "rightHandSide": {
+                                            "id": 26,
+                                            "name": "newName",
+                                            "nodeType": "Identifier",
+                                            "overloadedDeclarations": [],
+                                            "referencedDeclaration": 22,
+                                            "src": "747:7:0",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_string_memory_ptr",
+                                                "typeString": "string memory"
+                                            }
+                                        },
+                                        "src": "740:14:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage",
+                                            "typeString": "string storage ref"
+                                        }
+                                    },
+                                    "id": 28,
+                                    "nodeType": "ExpressionStatement",
+                                    "src": "740:14:0"
+                                }
+                            ]
+                        },
+                        "functionSelector": "c47f0027",
+                        "id": 30,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "setName",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 23,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 22,
+                                    "mutability": "mutable",
+                                    "name": "newName",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 30,
+                                    "src": "700:21:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_string_memory_ptr",
+                                        "typeString": "string"
+                                    },
+                                    "typeName": {
+                                        "id": 21,
+                                        "name": "string",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "700:6:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_string_storage_ptr",
+                                            "typeString": "string"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "699:23:0"
+                        },
+                        "returnParameters": {
+                            "id": 24,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "732:0:0"
+                        },
+                        "scope": 31,
+                        "src": "683:76:0",
+                        "stateMutability": "nonpayable",
+                        "virtual": false,
+                        "visibility": "public"
+                    }
+                ],
+                "scope": 32,
+                "src": "439:322:0"
+            }
+        ],
+        "src": "413:349:0"
+    },
+    "functionHashes": {
+        "getName()": "17d7de7c",
+        "sayHello()": "ef5fb05b",
+        "setName(string)": "c47f0027"
+    },
+    "gasEstimates": {
+        "creation": {
+            "codeDepositCost": "156600",
+            "executionCost": "infinite",
+            "totalCost": "infinite"
+        },
+        "external": {
+            "getName()": "infinite",
+            "sayHello()": "infinite",
+            "setName(string)": "infinite"
+        }
+    }
+}

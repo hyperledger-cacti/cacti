@@ -1,0 +1,314 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - HTLC Coordinator",
+        "description": "Can exchange assets between networks",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://www.cactus.stream/{basePath}",
+            "description": "Public test instance",
+            "variables": {
+                "basePath": {
+                    "default": ""
+                }
+            }
+        },
+        {
+            "url": "http://localhost:4000/{basePath}",
+            "description": "Local test instance",
+            "variables": {
+                "basePath": {
+                    "default": ""
+                }
+            }
+        }
+    ],
+    "components": {
+        "schemas": {
+            "OwnHTLCRequest": {
+                "type": "object",
+                "required": [
+                    "htlcPackage",
+                    "connectorInstanceId",
+                    "keychainId",
+                    "constructorArgs",
+                    "web3SigningCredential",
+                    "inputAmount",
+                    "outputAmount",
+                    "expiration",
+                    "hashLock",
+                    "tokenAddress",
+                    "receiver",
+                    "outputNetwork",
+                    "outputAddress"
+                ],
+                "properties": {
+                    "htlcPackage": {
+                        "$ref": "#/components/schemas/HtlcPackage"
+                    },
+                    "connectorInstanceId": {
+                        "description": "connector Instance Id for the connector plugin",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "keychainId": {
+                        "description": "keychainId for the keychain plugin",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "constructorArgs": {
+                        "type": "array",
+                        "items": {},
+                        "default": []
+                    },
+                    "web3SigningCredential": {
+                        "description": "Web3SigningCredential",
+                        "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v0.8.0/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "inputAmount": {
+                        "description": "Input amount to lock",
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "outputAmount": {
+                        "description": "Output amount to lock",
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "expiration": {
+                        "description": "Timestamp to expire the contract",
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "hashLock": {
+                        "description": "Hashlock needed to refund the amount",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "tokenAddress": {
+                        "description": "The token address",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "receiver": {
+                        "description": "The receiver address",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "outputNetwork": {
+                        "description": "The output network id",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "outputAddress": {
+                        "description": "The output addreess to receive the tokens",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "gas": {
+                        "type": "number"
+                    }
+                }
+            },
+            "CounterpartyHTLCRequest": {
+                "type": "object",
+                "required": [
+                    "htlcPackage",
+                    "connectorInstanceId",
+                    "keychainId",
+                    "htlcId",
+                    "web3SigningCredential"
+                ],
+                "properties": {
+                    "htlcPackage": {
+                        "$ref": "#/components/schemas/HtlcPackage"
+                    },
+                    "connectorInstanceId": {
+                        "description": "connector Instance Id for the connector plugin",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "keychainId": {
+                        "description": "keychainId for the keychain plugin",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "htlcId": {
+                        "description": "Id for the HTLC",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "web3SigningCredential": {
+                        "description": "Web3SigningCredential",
+                        "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v0.8.0/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "gas": {
+                        "type": "number"
+                    }
+                }
+            },
+            "WithdrawCounterpartyRequest": {
+                "type": "object",
+                "required": [
+                    "htlcPackage",
+                    "connectorInstanceId",
+                    "keychainId",
+                    "web3SigningCredential",
+                    "htlcId",
+                    "secret"
+                ],
+                "properties": {
+                    "htlcPackage": {
+                        "$ref": "#/components/schemas/HtlcPackage"
+                    },
+                    "connectorInstanceId": {
+                        "description": "connector Instance Id for the connector plugin",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "keychainId": {
+                        "description": "keychainId for the keychain plugin",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "contractId": {
+                        "description": "contractId for the contract",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "web3SigningCredential": {
+                        "description": "Web3SigningCredential",
+                        "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v0.8.0/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+                        "nullable": false
+                    },
+                    "htlcId": {
+                        "description": "Id for the HTLC",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "secret": {
+                        "description": "Counterparty HTLC secret",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "gas": {
+                        "type": "number"
+                    }
+                }
+            },
+            "HtlcPackage": {
+                "type": "string",
+                "enum": [
+                    "BESU",
+                    "BESU_ERC20"
+                ]
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc"
+                    }
+                },
+                "operationId": "ownHtlcV1",
+                "summary": "Create an instance to interact with the own HTLC.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OwnHTLCRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/counterparty-htlc": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/counterparty-htlc"
+                    }
+                },
+                "operationId": "counterpartyHtlcV1",
+                "summary": "Create an instance to interact with the counterparty HTLC",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CounterpartyHTLCRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty"
+                    }
+                },
+                "operationId": "withdrawCounterpartyV1",
+                "summary": "Withdraw funds of the counterparty HTLC",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WithdrawCounterpartyRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

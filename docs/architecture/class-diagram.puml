@@ -1,0 +1,84 @@
+@startuml
+
+title Hyperledger Cactus\nClass Diagram
+
+entity "ConsensusAlgorithm" as calg {
+  * name: text
+  * transactionFinality: boolean
+}
+
+abstract "DLT" as dlt {
+  * name
+  * supportedConsensusAlgorithms: Array<ConsensusAlgorithm>
+  * smartContracts: Array<SmartContract>
+  * wallets: Array<Wallet>
+  * blocks: Array<Block>
+}
+
+entity "DLT_Deployment" as dltd {
+  * usedConcensusAlgorithm: ConsensusAlgorithm
+}
+
+entity "Wallet" as w {
+  * address: text
+}
+
+entity "SmartContract" as sc {
+  * address: text
+}
+
+interface "EscrowProvider" as ep {
+}
+
+interface "StorageProvider" as sp {
+}
+
+interface "ProtocolHandshakeRequest" as txhsreq {
+  acceptableEscrowProviders: Array<EscrowProvider>
+}
+
+interface "ProtocolHandshakeResponse" as txhsres {
+  selectedEscrowProvider: EscrowProvider
+}
+
+class "Transaction" as tx {
+}
+
+class "Block" as block {
+
+}
+
+
+dlt o-- dltd: <<aggregate>>
+
+
+dlt }o--|{ calg
+' note as n1
+'   A DLT can support 1 or more algorithms.
+'   An algorithm can be supported by any
+'   number of (zero to many) DLTs.
+' end note
+' (dlt, calg) .. n1
+
+dltd }|-- calg
+' note as n2
+'   A DLT_Deployment uses exactly 1 algorithm.
+'   An algorithm can be used by any
+'   number of (zero to many) DLT_Deployments.
+' end note
+' (dlt, calg) .. n2
+
+dltd *-- sc: <<composition>>
+dltd *-- w: <<composition>>
+dltd *-- block: <<composition>>
+dltd *-- sp: <<composition>>
+
+block "1" ||..o{ "1..*" tx
+
+tx ... txhsreq
+tx ... txhsres
+tx "0..1" -- "0..*" ep
+txhsreq "1..*" *-- "0..*" ep
+txhsres "1      " ||-- "0..*" ep
+
+@enduml

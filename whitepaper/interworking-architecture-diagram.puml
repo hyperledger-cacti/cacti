@@ -1,0 +1,55 @@
+@startuml interworking-architecture-diagram
+
+!include <material/common>
+' To import the sprite file you DON'T need to place a prefix!
+
+title Interworking architecture diagram
+
+node "Hyperledger Cactus Web application or Smart contract on a blockchain" as web_app {
+	rectangle "TX submitter / TX verifier" as txverifier1 {
+	}
+	rectangle "TX submitter / TX verifier" as txverifier2 {
+	}
+}
+
+node "API server-1" as api_server1 {
+	rectangle "API server-plugin1" as api_server_plugin1 {
+	}
+}
+
+node "API server-2" as api_server2 {
+	rectangle "API server-plugin2" as api_server_plugin2 {
+	}
+}
+
+rectangle "Ledger-1" as ledger1 {
+	node "Node" as ledger1_node1 {
+	}
+	node "Node" as ledger1_node2 {
+	}
+	node "Node" as ledger1_node3 {
+	}
+	node "Node" as ledger1_node4 {
+	}
+}
+
+rectangle "Ledger-2" as ledger2 {
+	node "Node" as ledger2_node1 {
+	}
+	node "Node" as ledger2_node2 {
+	}
+	node "Node" as ledger2_node3 {
+	}
+	node "Node" as ledger2_node4 {
+	}
+}
+
+actor "Application User" as app_user
+
+txverifier1 <===> api_server_plugin1: secure bi-directional channel
+txverifier2 <===> api_server_plugin2: secure bi-directional channel
+api_server_plugin1 <===> ledger1
+api_server_plugin2 <===> ledger2
+app_user ..> web_app: API call
+
+@enduml

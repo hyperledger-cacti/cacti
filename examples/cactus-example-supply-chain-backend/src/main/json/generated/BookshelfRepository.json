@@ -1,0 +1,475 @@
+{
+    "contractName": "BookshelfRepository",
+    "abi": [
+        {
+            "inputs": [],
+            "name": "getAllRecords",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "id",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint8",
+                            "name": "shelfCount",
+                            "type": "uint8"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "bambooHarvestId",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct SupplyChainAppDataModelLib.BookshelfEntity[]",
+                    "name": "",
+                    "type": "tuple[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "id",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint8",
+                            "name": "shelfCount",
+                            "type": "uint8"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "bambooHarvestId",
+                            "type": "string"
+                        }
+                    ],
+                    "internalType": "struct SupplyChainAppDataModelLib.BookshelfEntity",
+                    "name": "record",
+                    "type": "tuple"
+                }
+            ],
+            "name": "insertRecord",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "success",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }
+    ],
+    "metadata": "{\"compiler\":{\"version\":\"0.7.2+commit.51b20bc0\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getAllRecords\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"id\",\"type\":\"string\"},{\"internalType\":\"uint8\",\"name\":\"shelfCount\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"bambooHarvestId\",\"type\":\"string\"}],\"internalType\":\"struct SupplyChainAppDataModelLib.BookshelfEntity[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"id\",\"type\":\"string\"},{\"internalType\":\"uint8\",\"name\":\"shelfCount\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"bambooHarvestId\",\"type\":\"string\"}],\"internalType\":\"struct SupplyChainAppDataModelLib.BookshelfEntity\",\"name\":\"record\",\"type\":\"tuple\"}],\"name\":\"insertRecord\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/peter/a/blockchain/cactus/packages/cactus-example-supply-chain-backend/src/main/solidity/BookshelfRepository .sol\":\"BookshelfRepository\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/peter/a/blockchain/cactus/packages/cactus-example-supply-chain-backend/src/main/solidity/BookshelfRepository .sol\":{\"keccak256\":\"0x248c47dc1db0d699c7eb74570b5635041b98865923a3224ce02eabc89ec9dfb7\",\"license\":\"Apache-2.0\",\"urls\":[\"bzz-raw://6ebcebbc47972173f07a3c5333994d5f5ee42ba29073c775d5a4de152cc447da\",\"dweb:/ipfs/Qmdq6NRhvYHKZbrxN2cmjjmAXC1QRFbWVxh6NKfYrNufCN\"]},\"/home/peter/a/blockchain/cactus/packages/cactus-example-supply-chain-backend/src/main/solidity/SupplyChainAppDataModel.sol\":{\"keccak256\":\"0x3b81c53307c147314b6383d426ca1eca6c7101d58c2cda5a7c1ec968001ed085\",\"license\":\"Apache-2.0\",\"urls\":[\"bzz-raw://a380e2a234fbcd6886d9c06246514c0481a376789f81575ebe43c7b193e939cd\",\"dweb:/ipfs/QmVZdUSp7HJGbfrh5vouCmCkfqdk53Zkv6K3Bn1E3xCtte\"]}},\"version\":1}",
+    "bytecode": "608060405234801561001057600080fd5b5061056f806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80634735f16c1461003b578063a7f9fe7214610064575b600080fd5b61004e61004936600461039e565b610079565b60405161005b919061052e565b60405180910390f35b61006c6100ff565b60405161005b919061049d565b600080546001810182558180528251805184926003027f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e56301916100c191839160200190610291565b5060208281015160018301805460ff191660ff909216919091179055604083015180516100f49260028501920190610291565b506001949350505050565b60606000805480602002602001604051908101604052809291908181526020016000905b828210156102885760008481526020908190206040805160038602909201805460026001821615610100026000190190911604601f81018590049094028301608090810190925260608301848152929390928492909184918401828280156101cc5780601f106101a1576101008083540402835291602001916101cc565b820191906000526020600020905b8154815290600101906020018083116101af57829003601f168201915b505050918352505060018281015460ff16602080840191909152600280850180546040805161010096831615969096026000190190911692909204601f810184900484028501840183528085529190940193918301828280156102705780601f1061024557610100808354040283529160200191610270565b820191906000526020600020905b81548152906001019060200180831161025357829003601f168201915b50505050508152505081526020019060010190610123565b50505050905090565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106102d257805160ff19168380011785556102ff565b828001600101855582156102ff579182015b828111156102ff5782518255916020019190600101906102e4565b5061030b92915061030f565b5090565b5b8082111561030b5760008155600101610310565b600082601f830112610334578081fd5b813567ffffffffffffffff8082111561034957fe5b604051601f8301601f19168101602001828111828210171561036757fe5b60405282815292508284830160200186101561038257600080fd5b8260208601602083013760006020848301015250505092915050565b6000602082840312156103af578081fd5b813567ffffffffffffffff808211156103c6578283fd5b90830190606082860312156103d9578283fd5b6040516060810181811083821117156103ee57fe5b6040528235828111156103ff578485fd5b61040b87828601610324565b825250602083013560ff81168114610421578485fd5b6020820152604083013582811115610437578485fd5b61044387828601610324565b60408301525095945050505050565b60008151808452815b818110156104775760208185018101518683018201520161045b565b818111156104885782602083870101525b50601f01601f19169290920160200192915050565b60208082528251828201819052600091906040908185019080840286018301878501865b8381101561052057603f198984030185528151606081518186526104e782870182610452565b91505060ff8983015116898601528782015191508481038886015261050c8183610452565b9689019694505050908601906001016104c1565b509098975050505050505050565b90151581526020019056fea26469706673582212205c6598bb40d1b52a4bc44e7f613cad73fff720e28de9803d0a1a5ee91ea0dffa64736f6c63430007020033",
+    "deployedBytecode": "608060405234801561001057600080fd5b50600436106100365760003560e01c80634735f16c1461003b578063a7f9fe7214610064575b600080fd5b61004e61004936600461039e565b610079565b60405161005b919061052e565b60405180910390f35b61006c6100ff565b60405161005b919061049d565b600080546001810182558180528251805184926003027f290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e56301916100c191839160200190610291565b5060208281015160018301805460ff191660ff909216919091179055604083015180516100f49260028501920190610291565b506001949350505050565b60606000805480602002602001604051908101604052809291908181526020016000905b828210156102885760008481526020908190206040805160038602909201805460026001821615610100026000190190911604601f81018590049094028301608090810190925260608301848152929390928492909184918401828280156101cc5780601f106101a1576101008083540402835291602001916101cc565b820191906000526020600020905b8154815290600101906020018083116101af57829003601f168201915b505050918352505060018281015460ff16602080840191909152600280850180546040805161010096831615969096026000190190911692909204601f810184900484028501840183528085529190940193918301828280156102705780601f1061024557610100808354040283529160200191610270565b820191906000526020600020905b81548152906001019060200180831161025357829003601f168201915b50505050508152505081526020019060010190610123565b50505050905090565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106102d257805160ff19168380011785556102ff565b828001600101855582156102ff579182015b828111156102ff5782518255916020019190600101906102e4565b5061030b92915061030f565b5090565b5b8082111561030b5760008155600101610310565b600082601f830112610334578081fd5b813567ffffffffffffffff8082111561034957fe5b604051601f8301601f19168101602001828111828210171561036757fe5b60405282815292508284830160200186101561038257600080fd5b8260208601602083013760006020848301015250505092915050565b6000602082840312156103af578081fd5b813567ffffffffffffffff808211156103c6578283fd5b90830190606082860312156103d9578283fd5b6040516060810181811083821117156103ee57fe5b6040528235828111156103ff578485fd5b61040b87828601610324565b825250602083013560ff81168114610421578485fd5b6020820152604083013582811115610437578485fd5b61044387828601610324565b60408301525095945050505050565b60008151808452815b818110156104775760208185018101518683018201520161045b565b818111156104885782602083870101525b50601f01601f19169290920160200192915050565b60208082528251828201819052600091906040908185019080840286018301878501865b8381101561052057603f198984030185528151606081518186526104e782870182610452565b91505060ff8983015116898601528782015191508481038886015261050c8183610452565b9689019694505050908601906001016104c1565b509098975050505050505050565b90151581526020019056fea26469706673582212205c6598bb40d1b52a4bc44e7f613cad73fff720e28de9803d0a1a5ee91ea0dffa64736f6c63430007020033",
+    "sourceMap": "185:374:0:-:0;;;;;;;;;;;;;;;;;;;",
+    "deployedSourceMap": "185:374:0:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;377:180;;;;;;:::i;:::-;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;259:112;;;:::i;:::-;;;;;;;:::i;377:180::-;481:12;509:20;;;;;;;;;;;;;;522:6;;509:20;;;;;;;;;;;;;:::i;:::-;-1:-1:-1;509:20:0;;;;;;;;;;-1:-1:-1;;509:20:0;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;-1:-1:-1;546:4:0;;377:180;-1:-1:-1;;;;377:180:0:o;259:112::-;304:30;357:7;350:14;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;350:14:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;350:14:0;;;-1:-1:-1;;350:14:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;350:14:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;259:112;:::o;-1:-1:-1:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;14:711:2;;112:3;105:4;97:6;93:17;89:27;79:2;;134:5;127;120:20;79:2;178:6;165:20;204:18;245:2;237:6;234:14;231:2;;;251:9;231:2;291;285:9;364:2;341:17;;-1:-1:-1;;337:31:2;325:44;;371:4;321:55;391:18;;;411:22;;;388:46;385:2;;;437:9;385:2;464;457:22;512;;;497:6;-1:-1:-1;497:6:2;553:19;;;574:4;549:30;546:39;-1:-1:-1;543:2:2;;;598:1;595;588:12;543:2;662:6;655:4;647:6;643:17;636:4;628:6;624:17;611:58;717:1;710:4;701:6;693;689:19;685:30;678:41;;;;69:656;;;;:::o;730:1140::-;;873:2;861:9;852:7;848:23;844:32;841:2;;;894:6;886;879:22;841:2;939:9;926:23;968:18;1009:2;1001:6;998:14;995:2;;;1030:6;1022;1015:22;995:2;1058:22;;;;1114:4;1096:16;;;1092:27;1089:2;;;1137:6;1129;1122:22;1089:2;1175;1169:9;1217:4;1209:6;1205:17;1272:6;1260:10;1257:22;1252:2;1240:10;1237:18;1234:46;1231:2;;;1283:9;1231:2;1310;1303:22;1350:16;;1378;;;1375:2;;;1412:6;1404;1397:22;1375:2;1445:47;1484:7;1473:8;1469:2;1465:17;1445:47;:::i;:::-;1437:6;1430:63;;1536:2;1532;1528:11;1515:25;1580:4;1573:5;1569:16;1562:5;1559:27;1549:2;;1605:6;1597;1590:22;1549:2;1642;1630:15;;1623:30;1699:2;1691:11;;1678:25;1715:16;;;1712:2;;;1749:6;1741;1734:22;1712:2;1791:47;1830:7;1819:8;1815:2;1811:17;1791:47;:::i;:::-;1786:2;1774:15;;1767:72;-1:-1:-1;1778:6:2;831:1039;-1:-1:-1;;;;;831:1039:2:o;1875:478::-;;1957:5;1951:12;1984:6;1979:3;1972:19;2009:3;2021:162;2035:6;2032:1;2029:13;2021:162;;;2097:4;2153:13;;;2149:22;;2143:29;2125:11;;;2121:20;;2114:59;2050:12;2021:162;;;2201:6;2198:1;2195:13;2192:2;;;2267:3;2260:4;2251:6;2246:3;2242:16;2238:27;2231:40;2192:2;-1:-1:-1;2335:2:2;2314:15;-1:-1:-1;;2310:29:2;2301:39;;;;2342:4;2297:50;;1927:426;-1:-1:-1;;1927:426:2:o;2358:1263::-;2591:2;2643:21;;;2713:13;;2616:18;;;2735:22;;;2358:1263;;2591:2;2776;;2794:18;;;;2854:15;;;2839:31;;2835:40;;2898:15;;;2358:1263;2944:648;2958:6;2955:1;2952:13;2944:648;;;3051:2;3047:7;3035:9;3027:6;3023:22;3019:36;3014:3;3007:49;3085:6;3079:13;3115:4;3158:2;3152:9;3189:2;3181:6;3174:18;3219:50;3265:2;3257:6;3253:15;3239:12;3219:50;:::i;:::-;3205:64;;;3330:4;3324:2;3320;3316:11;3310:18;3306:29;3301:2;3293:6;3289:15;3282:54;3385:2;3381;3377:11;3371:18;3349:40;;3438:6;3430;3426:19;3421:2;3413:6;3409:15;3402:44;3469:43;3505:6;3489:14;3469:43;:::i;:::-;3570:12;;;;3459:53;-1:-1:-1;;;3535:15:2;;;;2980:1;2973:9;2944:648;;;-1:-1:-1;3609:6:2;;2571:1050;-1:-1:-1;;;;;;;;2571:1050:2:o;3626:187::-;3791:14;;3784:22;3766:41;;3754:2;3739:18;;3721:92::o",
+    "sourcePath": "/home/peter/a/blockchain/cactus/packages/cactus-example-supply-chain-backend/src/main/solidity/BookshelfRepository .sol",
+    "compiler": {
+        "name": "solc",
+        "version": "0.7.2+commit.51b20bc0"
+    },
+    "networks": {},
+    "ast": {
+        "absolutePath": "/home/peter/a/blockchain/cactus/packages/cactus-example-supply-chain-backend/src/main/solidity/BookshelfRepository .sol",
+        "exportedSymbols": {
+            "BookshelfRepository": [
+                33
+            ],
+            "model": [
+                54
+            ]
+        },
+        "id": 34,
+        "license": "Apache-2.0",
+        "nodeType": "SourceUnit",
+        "nodes": [
+            {
+                "id": 1,
+                "literals": [
+                    "solidity",
+                    "^",
+                    "0.7",
+                    ".0"
+                ],
+                "nodeType": "PragmaDirective",
+                "src": "40:23:0"
+            },
+            {
+                "id": 2,
+                "literals": [
+                    "experimental",
+                    "ABIEncoderV2"
+                ],
+                "nodeType": "PragmaDirective",
+                "src": "64:33:0"
+            },
+            {
+                "absolutePath": "/home/peter/a/blockchain/cactus/packages/cactus-example-supply-chain-backend/src/main/solidity/SupplyChainAppDataModel.sol",
+                "file": "./SupplyChainAppDataModel.sol",
+                "id": 4,
+                "nodeType": "ImportDirective",
+                "scope": 34,
+                "sourceUnit": 55,
+                "src": "99:84:0",
+                "symbolAliases": [
+                    {
+                        "foreign": {
+                            "id": 3,
+                            "name": "SupplyChainAppDataModelLib",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "src": "108:26:0",
+                            "typeDescriptions": {}
+                        },
+                        "local": "model"
+                    }
+                ],
+                "unitAlias": ""
+            },
+            {
+                "abstract": false,
+                "baseContracts": [],
+                "contractDependencies": [],
+                "contractKind": "contract",
+                "fullyImplemented": true,
+                "id": 33,
+                "linearizedBaseContracts": [
+                    33
+                ],
+                "name": "BookshelfRepository",
+                "nodeType": "ContractDefinition",
+                "nodes": [
+                    {
+                        "constant": false,
+                        "id": 7,
+                        "mutability": "mutable",
+                        "name": "records",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 33,
+                        "src": "221:31:0",
+                        "stateVariable": true,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_array$_t_struct$_BookshelfEntity_$53_storage_$dyn_storage",
+                            "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity[]"
+                        },
+                        "typeName": {
+                            "baseType": {
+                                "id": 5,
+                                "name": "model.BookshelfEntity",
+                                "nodeType": "UserDefinedTypeName",
+                                "referencedDeclaration": 53,
+                                "src": "221:21:0",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_BookshelfEntity_$53_storage_ptr",
+                                    "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity"
+                                }
+                            },
+                            "id": 6,
+                            "nodeType": "ArrayTypeName",
+                            "src": "221:23:0",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_struct$_BookshelfEntity_$53_storage_$dyn_storage_ptr",
+                                "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity[]"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "body": {
+                            "id": 15,
+                            "nodeType": "Block",
+                            "src": "340:31:0",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "id": 13,
+                                        "name": "records",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 7,
+                                        "src": "357:7:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_array$_t_struct$_BookshelfEntity_$53_storage_$dyn_storage",
+                                            "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity storage ref[] storage ref"
+                                        }
+                                    },
+                                    "functionReturnParameters": 12,
+                                    "id": 14,
+                                    "nodeType": "Return",
+                                    "src": "350:14:0"
+                                }
+                            ]
+                        },
+                        "functionSelector": "a7f9fe72",
+                        "id": 16,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "getAllRecords",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 8,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "281:2:0"
+                        },
+                        "returnParameters": {
+                            "id": 12,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 11,
+                                    "mutability": "mutable",
+                                    "name": "",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 16,
+                                    "src": "304:30:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_array$_t_struct$_BookshelfEntity_$53_memory_ptr_$dyn_memory_ptr",
+                                        "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity[]"
+                                    },
+                                    "typeName": {
+                                        "baseType": {
+                                            "id": 9,
+                                            "name": "model.BookshelfEntity",
+                                            "nodeType": "UserDefinedTypeName",
+                                            "referencedDeclaration": 53,
+                                            "src": "304:21:0",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_struct$_BookshelfEntity_$53_storage_ptr",
+                                                "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity"
+                                            }
+                                        },
+                                        "id": 10,
+                                        "nodeType": "ArrayTypeName",
+                                        "src": "304:23:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_array$_t_struct$_BookshelfEntity_$53_storage_$dyn_storage_ptr",
+                                            "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity[]"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "303:32:0"
+                        },
+                        "scope": 33,
+                        "src": "259:112:0",
+                        "stateMutability": "view",
+                        "virtual": false,
+                        "visibility": "public"
+                    },
+                    {
+                        "body": {
+                            "id": 31,
+                            "nodeType": "Block",
+                            "src": "499:58:0",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "arguments": [
+                                            {
+                                                "id": 26,
+                                                "name": "record",
+                                                "nodeType": "Identifier",
+                                                "overloadedDeclarations": [],
+                                                "referencedDeclaration": 18,
+                                                "src": "522:6:0",
+                                                "typeDescriptions": {
+                                                    "typeIdentifier": "t_struct$_BookshelfEntity_$53_memory_ptr",
+                                                    "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity memory"
+                                                }
+                                            }
+                                        ],
+                                        "expression": {
+                                            "argumentTypes": [
+                                                {
+                                                    "typeIdentifier": "t_struct$_BookshelfEntity_$53_memory_ptr",
+                                                    "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity memory"
+                                                }
+                                            ],
+                                            "expression": {
+                                                "id": 23,
+                                                "name": "records",
+                                                "nodeType": "Identifier",
+                                                "overloadedDeclarations": [],
+                                                "referencedDeclaration": 7,
+                                                "src": "509:7:0",
+                                                "typeDescriptions": {
+                                                    "typeIdentifier": "t_array$_t_struct$_BookshelfEntity_$53_storage_$dyn_storage",
+                                                    "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity storage ref[] storage ref"
+                                                }
+                                            },
+                                            "id": 25,
+                                            "isConstant": false,
+                                            "isLValue": false,
+                                            "isPure": false,
+                                            "lValueRequested": false,
+                                            "memberName": "push",
+                                            "nodeType": "MemberAccess",
+                                            "src": "509:12:0",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_function_arraypush_nonpayable$_t_struct$_BookshelfEntity_$53_storage_$returns$__$",
+                                                "typeString": "function (struct SupplyChainAppDataModelLib.BookshelfEntity storage ref)"
+                                            }
+                                        },
+                                        "id": 27,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": false,
+                                        "kind": "functionCall",
+                                        "lValueRequested": false,
+                                        "names": [],
+                                        "nodeType": "FunctionCall",
+                                        "src": "509:20:0",
+                                        "tryCall": false,
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_tuple$__$",
+                                            "typeString": "tuple()"
+                                        }
+                                    },
+                                    "id": 28,
+                                    "nodeType": "ExpressionStatement",
+                                    "src": "509:20:0"
+                                },
+                                {
+                                    "expression": {
+                                        "hexValue": "74727565",
+                                        "id": 29,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": true,
+                                        "kind": "bool",
+                                        "lValueRequested": false,
+                                        "nodeType": "Literal",
+                                        "src": "546:4:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_bool",
+                                            "typeString": "bool"
+                                        },
+                                        "value": "true"
+                                    },
+                                    "functionReturnParameters": 22,
+                                    "id": 30,
+                                    "nodeType": "Return",
+                                    "src": "539:11:0"
+                                }
+                            ]
+                        },
+                        "functionSelector": "4735f16c",
+                        "id": 32,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "insertRecord",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 19,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 18,
+                                    "mutability": "mutable",
+                                    "name": "record",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 32,
+                                    "src": "408:35:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "memory",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_struct$_BookshelfEntity_$53_memory_ptr",
+                                        "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity"
+                                    },
+                                    "typeName": {
+                                        "id": 17,
+                                        "name": "model.BookshelfEntity",
+                                        "nodeType": "UserDefinedTypeName",
+                                        "referencedDeclaration": 53,
+                                        "src": "408:21:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_struct$_BookshelfEntity_$53_storage_ptr",
+                                            "typeString": "struct SupplyChainAppDataModelLib.BookshelfEntity"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "398:51:0"
+                        },
+                        "returnParameters": {
+                            "id": 22,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 21,
+                                    "mutability": "mutable",
+                                    "name": "success",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 32,
+                                    "src": "481:12:0",
+                                    "stateVariable": false,
+                                    "storageLocation": "default",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_bool",
+                                        "typeString": "bool"
+                                    },
+                                    "typeName": {
+                                        "id": 20,
+                                        "name": "bool",
+                                        "nodeType": "ElementaryTypeName",
+                                        "src": "481:4:0",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_bool",
+                                            "typeString": "bool"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "480:14:0"
+                        },
+                        "scope": 33,
+                        "src": "377:180:0",
+                        "stateMutability": "nonpayable",
+                        "virtual": false,
+                        "visibility": "public"
+                    }
+                ],
+                "scope": 34,
+                "src": "185:374:0"
+            }
+        ],
+        "src": "40:520:0"
+    },
+    "functionHashes": {
+        "getAllRecords()": "a7f9fe72",
+        "insertRecord((string,uint8,string))": "4735f16c"
+    },
+    "gasEstimates": {
+        "creation": {
+            "codeDepositCost": "278200",
+            "executionCost": "318",
+            "totalCost": "278518"
+        },
+        "external": {
+            "getAllRecords()": "infinite",
+            "insertRecord((string,uint8,string))": "infinite"
+        }
+    }
+}

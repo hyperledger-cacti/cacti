@@ -1,0 +1,39 @@
+@startuml Sequence Diagram - Escrowed Sale of Data for Coins
+
+skinparam ArrowFontStyle italic
+
+title Hyperledger Cactus\nSequence Diagram - Escrowed Sale of Data for Coins
+
+actor User_A as a
+actor User_B as b
+
+box Cactus
+entity "API" as api
+end box
+
+box "Ledgers"
+database Fabric_Ledger as d1
+database Besu_Ledger as d2
+end box
+
+autoactivate on
+
+a -> api: Propose Transaction
+return Transaction Proposal Created
+
+a -> api: Sign Transaction to Escrow Funds
+  api -> d2: Send Funds to Escrow
+  return Escrow Transaction Confirmed
+return Escrow Transaction Confirmed
+
+b -> api: Sign Transaction to Escrow Data
+  api -> d1: Send Data to Escrow
+  return Escrow Transaction Confirmed
+return Escrow Transaction Confirmed
+
+autoactivate off
+api -> api: **Release funds and data**\n**to receiving parties**\n**User A and B respectively**
+api -> a: Transaction Completed
+api -> b: Transaction Completed
+
+@enduml

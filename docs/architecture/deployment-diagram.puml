@@ -1,0 +1,83 @@
+@startuml Deployment Diagram Hyperledger Cactus
+
+
+!include <material/common>
+' To import the sprite file you DON'T need to place a prefix!
+!include <material/cellphone>
+!include <material/laptop_chromebook>
+!include <material/database>
+
+title Deployment Diagram\nHyperledger Cactus
+
+
+frame "Hyperledger Cactus Deployment" as cactus {
+
+  rectangle "Storage Provider" as sp1 {
+    MA_DATABASE(Gray, 1, cactusdb, rectangle, "Backing Data Store") {
+    }
+  }
+
+  rectangle "Validator Node Cluster" as vnc {
+    rectangle "Validator Load Balancer" as vlb {
+    }
+
+    rectangle "Validator 1..N" as vn {
+      rectangle "Connector\n DLT 1" as vn_dlt1_c {
+      }
+      rectangle "Connector\n DLT 2" as vn_dlt2_c {
+      }
+    }
+  }
+
+  rectangle "API Server Cluster" as apisc {
+    rectangle "API Server Load Balancer" as apisrvlb {
+    }
+
+    rectangle "API Server 1..N" as apisrvn {
+    }
+  }
+}
+
+cloud "Public Internet" as net {
+}
+
+frame "Identities" as identities {
+  rectangle "Transacting Identity A" as tia {
+    actor End_User_A as eua
+    MA_CELLPHONE(Gray, 1, cellphone, rectangle, "Mobile Device") {
+    }
+  }
+
+  rectangle "Transacting Identity B" as tib {
+    actor End_User_B as eub
+    MA_LAPTOP_CHROMEBOOK(Gray, 1, laptop, rectangle, "Desktop_Browser") {
+    }
+  }
+}
+
+frame "Distributed Ledgers" as dlts {
+  rectangle "Transacting DLT 1" as tdlt1 {
+    MA_DATABASE(Gray, 1, dltdb1, rectangle, "Distributed Ledger 1") {
+    }
+  }
+
+  rectangle "Transacting DLT 2" as tdlt2 {
+    MA_DATABASE(Gray, 1, dltdb2, rectangle, "Distributed Ledger 2") {
+    }
+  }
+}
+
+
+sp1 <...> apisc
+vnc <...> apisc
+vnc <...> sp1
+
+net <===> identities
+net <===> dlts
+net <===> cactus
+
+eua --> cellphone
+eub --> laptop
+
+
+@enduml

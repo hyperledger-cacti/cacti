@@ -1,0 +1,133 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus API",
+        "description": "Interact with a Cactus deployment through HTTP.",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "WatchHealthcheckV1": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Next",
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Error",
+                    "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "MemoryUsage": {
+                "type": "object",
+                "properties": {
+                    "rss": {
+                        "title": "Resident Set Size",
+                        "type": "number"
+                    },
+                    "heapTotal": {
+                        "title": "V8 memory usage - heap total",
+                        "type": "number"
+                    },
+                    "heapUsed": {
+                        "title": "V8 memory usage - heap used",
+                        "type": "number"
+                    },
+                    "external": {
+                        "title": "Memory usage of C++ objects bound to JavaScript objects managed by V8",
+                        "type": "number"
+                    },
+                    "arrayBuffers": {
+                        "title": "Memory allocated for ArrayBuffers and SharedArrayBuffers, including all Node.js Buffers",
+                        "type": "number"
+                    }
+                }
+            },
+            "HealthCheckResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "memoryUsage": {
+                        "$ref": "#/components/schemas/MemoryUsage"
+                    }
+                },
+                "required": [
+                    "createdAt",
+                    "memoryUsage"
+                ]
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/api-server/healthcheck": {
+            "get": {
+                "summary": "Can be used to verify liveness of an API server instance",
+                "description": "Returns the current timestamp of the API server as proof of health/liveness",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/api-server/healthcheck"
+                    }
+                },
+                "operationId": "getHealthCheckV1",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthCheckResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/api-server/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/api-server/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,71 @@
+@startuml Sequence Diagram - Transaction
+
+title Hyperledger Cactus\nSequence Diagram - Transaction
+
+left to right direction
+
+frame "Hyperledger Cactus" as 1cactus {
+  package "Core" as 2core <<package>> #LightSlateGray {
+    interface "IStoragePlugin" as 3istorageplugin <<interface>> {
+    }
+    interface "Connector" as 3connector <<abstract class>> {
+    }
+    interface "LedgerResolver" as 3ledgerresolver <<abstract class>> {
+    }
+    interface "IdentityPlugin" as 3identityplugin <<abstract class>> {
+    }
+  }
+
+  package "Persistence" as 2persistence <<package>> #LightGreen {
+    class "TransactionLogger" as 3transactionlogger <<class>> {
+    }
+  }
+
+  package "Validator" as 2validator <<package>> {
+    class "ValidatorNode" as 3validatornode <<class>> {
+    }
+  }
+
+  frame Connectors {
+    package "ConnectorFabric" as 2connectorfabric <<package>> {
+      ConnectorFabric ..> 3connector : <<implements>>
+    }
+
+    package "ConnectorQuorum" as 2connectorquorum <<package>> {
+      ConnectorQuorum ..> 3connector: <<implements>>
+    }
+
+    package "ConnectorCorda" as 2connectorcorda <<package>> {
+      ConnectorCorda ..> 3connector : <<implements>>
+    }
+
+    package "ConnectorBesu" as 2connectorbesu <<package>> {
+      ConnectorBesu ..> 3connector : <<implements>>
+    }
+  }
+
+  package "API Server" as 2apiserver <<package>> #LightCyan {
+    class "RequestValidator" as 3requestvalidator <<class>> {
+    }
+    class "ExchangeProposal<T>" as 3exchangeproposal <<abstract class>> {
+    }
+  }
+
+  package "StoragePluginFabric" as 2storagepluginfabric <<package>> #LightPink {
+    StoragePluginFabric ..> 3istorageplugin : <<implements>>
+  }
+
+  frame "Identity" {
+    package "IdentityPluginIndy" as 2identitypluginindy <<package>> #LightPink {
+      IdentityPluginIndy ..> 3identityplugin: <<implements>>
+    }
+    package "IdentityPluginWeb" as 2identitypluginweb <<package>> #LightPink {
+      IdentityPluginWeb ..> 3identityplugin: <<implements>>
+    }
+    package "IdentityPluginOAuth" as 2identitypluginoauth <<package>> #LightPink {
+      IdentityPluginOAuth ..> 3identityplugin: <<implements>>
+    }
+  }
+}
+
+@enduml

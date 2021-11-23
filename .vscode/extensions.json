@@ -1,0 +1,17 @@
+{
+    "recommendations": [
+      "bierner.markdown-mermaid",
+      "mhutchie.git-graph",
+      "alefragnani.bookmarks",
+      "yzhang.markdown-all-in-one",
+      "trabpukcip.vscode-npm-scripts",
+      "jebbs.plantuml",
+      "ms-vscode-remote.vscode-remote-extensionpack",
+      "juanblanco.solidity",
+      "dbaeumer.vscode-eslint",
+      "42crunch.vscode-openapi",
+      "esbenp.prettier-vscode",
+      "eamodio.gitlens",
+      "streetsidesoftware.code-spell-checker"
+    ]
+  }

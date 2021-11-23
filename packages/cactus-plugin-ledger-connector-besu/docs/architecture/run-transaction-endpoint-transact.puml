@@ -1,0 +1,40 @@
+@startuml
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransact() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "PluginLedgerConnectorBesu" as t << (C,#ADD1B2) class >>
+
+autoactivate on
+
+activate caller
+caller -> t: transact(RunTransactionRequest)
+
+alt #LightBlue web3SigningCredential == CACTUSKEYCHAINREF
+    t -> t: transactCactusKeychainRef(RunTransactionRequest)
+    return RunTransactionResponse
+    t --> caller: return RunTransactionResponse
+else #LightGreen web3SigningCredential == PRIVATEKEYHEX
+    group #LightGray if defined: signedTx.rawTransaction
+        t -> t: transactPrivateKey(RunTransactionRequest)
+        return RunTransactionResponse
+        t --> caller: return RunTransactionResponse
+    else #LightCoral
+        t --> caller: throw Error: Failed to sign eth transaction. signedTransaction.rawTransaction is blank after .signTransaction()
+    end
+else #e6e632 web3SigningCredential == NONE
+    group #LightGray if defined: req.transactionConfig.rawTransaction
+      t -> t: transactSigned(RunTransactionRequest)
+      return RunTransactionResponse
+      t --> caller: return RunTransactionResponse
+    else #LightCoral
+      t --> caller: throw Error: Expected pre-signed raw transaction
+    end
+else #LightCoral default
+  t --> caller: throw Error: Unrecognized Web3SigningCredentialType
+end
+@enduml

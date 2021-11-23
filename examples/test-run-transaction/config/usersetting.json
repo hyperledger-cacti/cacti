@@ -1,0 +1,19 @@
+{
+    "blpRegistry": [
+        {
+            "businessLogicID": "j71S9gLN",
+            "validatorID": ["vIdO32CF"]
+        }
+    ],
+    "logLevel": "debug",
+    "applicationHostInfo": {
+        "hostName": "http://aaa.bbb.ccc.ddd",
+        "hostPort": 5034
+    },
+    "appRouters": [
+        {
+            "path": "/api/v1/bl/test-run-transaction/",
+            "routerJs": "../../examples/test-run-transaction/test-run-transaction.js"
+        }
+    ]
+}

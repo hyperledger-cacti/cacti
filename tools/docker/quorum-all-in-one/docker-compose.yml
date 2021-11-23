@@ -1,0 +1,13 @@
+---
+version: '3.6'
+
+services:
+  quorum-aio:
+    image: "hyperledger/cactus-quorum-all-in-one:latest"
+    ports:
+      - 8545:8545/tcp # RPC - HTTP
+      - 8546:8546/tcp # RPC - WebSocket
+      - 9001:9001/tcp # supervisord - HTTP
+      - 30303:30303/tcp # quorum
+      - 30303:30303/udp # quorum
+      - 30301:30301/udp # quorum
