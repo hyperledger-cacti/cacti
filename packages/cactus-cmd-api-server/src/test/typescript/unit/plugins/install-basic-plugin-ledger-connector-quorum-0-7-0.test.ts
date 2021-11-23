@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
-import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
+import {
+  Configuration,
+  PluginImportAction,
+  PluginImportType,
+} from "@hyperledger/cactus-core-api";
 
 import {
   ApiServer,
@@ -48,6 +52,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-ledger-connector-quorum",
       type: PluginImportType.Local,
+      action: PluginImportAction.Install,
       options: {
         instanceId: uuidv4(),
         logLevel,

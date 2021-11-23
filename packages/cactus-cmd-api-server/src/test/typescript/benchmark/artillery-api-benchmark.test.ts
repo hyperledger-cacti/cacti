@@ -13,6 +13,7 @@ import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   PluginImportType,
   ConsortiumDatabase,
+  PluginImportAction,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -71,6 +72,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
       type: PluginImportType.Local,
+      action: PluginImportAction.Install,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),
@@ -80,6 +82,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-consortium-manual",
       type: PluginImportType.Local,
+      action: PluginImportAction.Install,
       options: {
         instanceId: uuidv4(),
         keyPairPem: keyPairPem,

@@ -15,6 +15,7 @@ import {
   Constants,
   PluginImport,
   PluginImportType,
+  PluginImportAction,
 } from "@hyperledger/cactus-core-api";
 
 import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
@@ -468,10 +469,12 @@ export class ConfigService {
 
   public newExampleConfigConvict(
     cactusApiServerOptions?: ICactusApiServerOptions,
+    overrides?: boolean,
   ): Config<ICactusApiServerOptions> {
     cactusApiServerOptions = cactusApiServerOptions || this.newExampleConfig();
     const env = this.newExampleConfigEnv(cactusApiServerOptions);
-    return this.getOrCreate({ env });
+    const conf = overrides ? this.create({ env }) : this.getOrCreate({ env });
+    return conf;
   }
 
   public newExampleConfig(): ICactusApiServerOptions {
@@ -532,6 +535,7 @@ export class ConfigService {
       {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
+        action: PluginImportAction.Install,
         options: {
           instanceId: uuidV4(),
           keychainId: uuidV4(),
@@ -540,6 +544,7 @@ export class ConfigService {
       {
         packageName: "@hyperledger/cactus-plugin-consortium-manual",
         type: PluginImportType.Local,
+        action: PluginImportAction.Install,
         options: {
           instanceId: uuidV4(),
           keyPairPem,
@@ -610,23 +615,31 @@ export class ConfigService {
     args?: string[];
   }): Config<ICactusApiServerOptions> {
     if (!ConfigService.config) {
-      const schema: Schema<ICactusApiServerOptions> = ConfigService.getConfigSchema();
-      ConfigService.config = (convict as any)(schema, options);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      if (ConfigService.config.get("configFile")) {
-        const configFilePath = ConfigService.config.get("configFile");
-        ConfigService.config.loadFile(configFilePath);
-      }
-      ConfigService.config.validate();
-      this.validateKeyPairMatch();
-      const level = ConfigService.config.get("logLevel");
-      const logger: Logger = LoggerProvider.getOrCreate({
-        label: "config-service",
-        level,
-      });
-      logger.info("Configuration validation OK.");
+      this.create(options);
     }
+    return ConfigService.config;
+  }
+
+  create(options?: {
+    env?: NodeJS.ProcessEnv;
+    args?: string[];
+  }): Config<ICactusApiServerOptions> {
+    const schema: Schema<ICactusApiServerOptions> = ConfigService.getConfigSchema();
+    ConfigService.config = (convict as any)(schema, options);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    if (ConfigService.config.get("configFile")) {
+      const configFilePath = ConfigService.config.get("configFile");
+      ConfigService.config.loadFile(configFilePath);
+    }
+    ConfigService.config.validate();
+    this.validateKeyPairMatch();
+    const level = ConfigService.config.get("logLevel");
+    const logger: Logger = LoggerProvider.getOrCreate({
+      label: "config-service",
+      level,
+    });
+    logger.info("Configuration validation OK.");
     return ConfigService.config;
   }
 
