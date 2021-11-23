@@ -170,6 +170,8 @@ module.exports = {
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-unprotected-endpoint-authz.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-endpoint-authorization.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-unprotected-endpoint-authz-ops-confirm.test.ts`,
+    `./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts`,
+    `./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-keychain-memory.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-quorum-0-7-0.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts`,

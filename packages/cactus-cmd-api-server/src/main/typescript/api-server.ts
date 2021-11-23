@@ -33,6 +33,7 @@ import {
   PluginFactoryFactory,
   PluginImport,
   Constants,
+  PluginImportAction,
 } from "@hyperledger/cactus-core-api";
 
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -279,19 +280,26 @@ export class ApiServer {
   }
 
   public async getOrInitPluginRegistry(): Promise<PluginRegistry> {
-    if (!this.pluginRegistry) {
-      if (!this.options.pluginRegistry) {
-        this.log.info(`getOrInitPluginRegistry() initializing a new one...`);
-        this.pluginRegistry = await this.initPluginRegistry();
-      } else {
-        this.log.info(`getOrInitPluginRegistry() re-using injected one...`);
-        this.pluginRegistry = this.options.pluginRegistry;
+    try {
+      if (!this.pluginRegistry) {
+        if (!this.options.pluginRegistry) {
+          this.log.info(`getOrInitPluginRegistry() initializing a new one...`);
+          this.pluginRegistry = await this.initPluginRegistry();
+        } else {
+          this.log.info(`getOrInitPluginRegistry() re-using injected one...`);
+          this.pluginRegistry = this.options.pluginRegistry;
+        }
       }
+      await this.prometheusExporter.setTotalPluginImports(
+        await this.getPluginImportsCount(),
+      );
+      return this.pluginRegistry;
+    } catch (e) {
+      this.pluginRegistry = new PluginRegistry({ plugins: [] });
+      const errorMessage = `Failed init PluginRegistry: ${e.stack}`;
+      this.log.error(errorMessage);
+      throw new Error(errorMessage);
     }
-    await this.prometheusExporter.setTotalPluginImports(
-      await this.getPluginImportsCount(),
-    );
-    return this.pluginRegistry;
   }
 
   public async initPluginRegistry(): Promise<PluginRegistry> {
@@ -311,43 +319,44 @@ export class ApiServer {
     pluginImport: PluginImport,
     registry: PluginRegistry,
   ): Promise<ICactusPlugin> {
+    const fnTag = `${this.className}#instantiatePlugin`;
     const { logLevel } = this.options.config;
     const { packageName, options } = pluginImport;
     this.log.info(`Creating plugin from package: ${packageName}`, options);
     const pluginOptions = { ...options, logLevel, pluginRegistry: registry };
 
-    await this.installPluginPackage(pluginImport);
-
-    const packagePath = path.join(
-      this.pluginsPath,
-      options.instanceId,
-      "node_modules",
-      packageName,
-    );
-    this.log.debug("Package path: %o", packagePath);
-
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const pluginPackage = require(/* webpackIgnore: true */ packagePath);
-    const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
-
-    const pluginFactoryOptions: IPluginFactoryOptions = {
-      pluginImportType: pluginImport.type,
-    };
-
-    const pluginFactory = await createPluginFactory(pluginFactoryOptions);
-
-    const plugin = await pluginFactory.create(pluginOptions);
-
-    // need to invoke the i-cactus-plugin onPluginInit functionality here before plugin registry can be used further
     try {
+      if (pluginImport.action == PluginImportAction.Install) {
+        await this.installPluginPackage(pluginImport);
+      } else {
+        this.log.info(
+          `The installation of the plugin package ${packageName} was skipped due to the configuration flag action`,
+        );
+      }
+
+      const packagePath = path.join(
+        this.pluginsPath,
+        options.instanceId,
+        "node_modules",
+        packageName,
+      );
+      this.log.debug("Package path: %o", packagePath);
+
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const pluginPackage = require(/* webpackIgnore: true */ packagePath);
+      const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
+      const pluginFactoryOptions: IPluginFactoryOptions = {
+        pluginImportType: pluginImport.type,
+      };
+      const pluginFactory = await createPluginFactory(pluginFactoryOptions);
+      const plugin = await pluginFactory.create(pluginOptions);
+
+      // need to invoke the i-cactus-plugin onPluginInit functionality here before plugin registry can be used further
       await plugin.onPluginInit();
+
+      return plugin;
     } catch (error) {
-      const fnTag = `${this.className}#instantiatePlugin`;
-      const packageName = plugin.getPackageName();
-      const instanceId = plugin.getInstanceId();
-
-      const errorMessage = `${fnTag} failed calling onPluginInit() on the plugin '${packageName}' with the instanceId '${instanceId}'`;
-
+      const errorMessage = `${fnTag} failed instantiating plugin '${packageName}' with the instanceId '${options.instanceId}'`;
       this.log.error(errorMessage, error);
 
       if (error instanceof Error) {
@@ -356,15 +365,15 @@ export class ApiServer {
         throw new RuntimeError(errorMessage, JSON.stringify(error));
       }
     }
-
-    return plugin;
   }
 
   private async installPluginPackage(
     pluginImport: PluginImport,
   ): Promise<void> {
     const fnTag = `ApiServer#installPluginPackage()`;
-    const { packageName: pkgName } = pluginImport;
+    const pkgName = pluginImport.options.packageSrc
+      ? pluginImport.options.packageSrc
+      : pluginImport.packageName;
 
     const instanceId = pluginImport.options.instanceId;
     const pluginPackageDir = path.join(this.pluginsPath, instanceId);
@@ -401,7 +410,14 @@ export class ApiServer {
       }
       this.log.info(`Installed ${pkgName} OK`);
     } catch (ex) {
-      throw new RuntimeError(`${fnTag} plugin install fail: ${pkgName}`, ex);
+      const errorMessage = `${fnTag} failed installing plugin '${pkgName}`;
+      this.log.error(errorMessage, ex);
+
+      if (ex instanceof Error) {
+        throw new RuntimeError(errorMessage, ex);
+      } else {
+        throw new RuntimeError(errorMessage, JSON.stringify(ex));
+      }
     }
   }
 
@@ -653,9 +669,6 @@ export class ApiServer {
       app.use(authorizer);
       this.log.info(`Authorization request handler configured OK.`);
     }
-
-    // const openApiValidator = this.createOpenApiValidator();
-    // await openApiValidator.install(app);
 
     this.getOrCreateWebServices(app); // The API server's own endpoints
 
