@@ -3845,10 +3845,10 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-1.0.3.tgz#13a12ae9e05c2a782f7b5e84c3cbfda4225eaf80"
   integrity sha512-puWxACExDe9nxbBB3lOymQFrLYml2dVOrd7USiVRnSbgXE+KwBu+HxFvxrzfqsiSda9IWsXJG1ef7C1O2/GmKQ==
 
-"@openzeppelin/contracts-upgradeable@4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.2.0.tgz#3b12d6fe9d51e563c8a6ae39c96c1d32c5d0fa4a"
-  integrity sha512-vn0hoUqQzgOLzLZwFgh+w/D5hzJHX8F7X/7t/gZdSQYIEXMyGpXUwkr5A3eoAeoc42f/n7yDhwusvBmNknM41Q==
+"@openzeppelin/contracts-upgradeable@4.3.3":
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.3.3.tgz#dfd8ac012fd7f53ece4b31b736fcab09565a2615"
+  integrity sha512-2ELsJkBQ0xirVQnx0utl3N+/iTPF+S0r3j0IVQIMG0HgAWreFXumY+yhGcwSV5JZ/yNNAXWR4mjIYRH/FEgu2Q==
 
 "@openzeppelin/contracts@4.2.0":
   version "4.2.0"
