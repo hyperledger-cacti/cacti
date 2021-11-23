@@ -152,7 +152,7 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 
 ### Initializing the Corda Networks
 
-Corda Networks needs to be initialized with assets for asset-exchange to be performed:
+Corda Network needs to be initialized with assets for asset-exchange to be performed:
 Bootstrap the Corda network and application states as follows:
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following: 
