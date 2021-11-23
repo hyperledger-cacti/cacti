@@ -572,21 +572,21 @@ const generateViewAddress = async (
       ccFunc = 'GetTokenAssetClaimStatus'
     }
     const addressParts = viewAddress.substring(viewAddress.indexOf(ccFunc) + ccFunc.length + 1).split(':')
-    if (addressParts.length != 5) {
-      throw new Error(`Expected 5 arguments for ${ccFunc}; found ${addressParts.length}`)
+    if (addressParts.length != 6) {
+      throw new Error(`Expected 6 arguments for ${ccFunc}; found ${addressParts.length}`)
     }
     if (addressParts[4] != sourceNetwork) {
-      throw new Error(`Passed source network ID ${sourceNetwork} does not match last chaincode argument in view address ${addressParts[4]}`)
+      throw new Error(`Passed source network ID ${sourceNetwork} does not match last chaincode argument in view address ${addressParts[5]}`)
     }
     const pledgeDetails = await getAssetPledgeDetails({
-      sourceNetworkName: addressParts[4],
+      sourceNetworkName: addressParts[5],
       pledger: '',
-      pledgerCert: addressParts[3],
+      pledgerCert: addressParts[4],
       destNetworkName: destNetwork,
       recipient: '',
-      recipientCert: addressParts[2],
-      assetType: addressParts[0],
-      assetRef: addressParts[1],
+      recipientCert: addressParts[3],
+      assetType: addressParts[1],
+      assetRef: addressParts[2],
       logger: logger
     });
     return viewAddress + ':' + JSON.parse(pledgeDetails).expirytimesecs;
