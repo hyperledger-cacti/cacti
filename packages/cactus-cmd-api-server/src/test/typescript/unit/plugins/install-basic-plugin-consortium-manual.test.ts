@@ -11,6 +11,7 @@ import {
   ICactusPlugin,
   Configuration,
   IPluginConsortium,
+  PluginImportAction,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -65,6 +66,7 @@ test("can install plugin-consortium-manual", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
       type: PluginImportType.Local,
+      action: PluginImportAction.Install,
       options: {
         instanceId: uuidv4(),
         keychainId,
@@ -74,6 +76,7 @@ test("can install plugin-consortium-manual", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-consortium-manual",
       type: PluginImportType.Local,
+      action: PluginImportAction.Install,
       options: {
         instanceId: consortiumPluginInstanceId,
         keyPairPem: keyPairPem,
