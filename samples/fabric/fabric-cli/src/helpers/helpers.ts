@@ -233,8 +233,7 @@ const getAssetPledgeDetails = async ({
   query,
   mspId = global.__DEFAULT_MSPID__,
   ccFunc,
-  assetType,
-  assetRef,
+  pledgeId,
   logger
 }: {
   sourceNetworkName: string
@@ -246,8 +245,7 @@ const getAssetPledgeDetails = async ({
   query?: Query
   mspId?: string
   ccFunc?: string
-  assetType: string
-  assetRef: string
+  pledgeId: string
   logger?: any
 }): Promise<any> => {
   const netConfig = getNetworkConfig(sourceNetworkName)
@@ -282,7 +280,7 @@ const getAssetPledgeDetails = async ({
   }
 
   currentQuery.ccFunc = 'GetAssetPledgeStatus'
-  currentQuery.args = [...currentQuery.args, assetType, assetRef, pledgerCert, destNetworkName, recipientCert]
+  currentQuery.args = [...currentQuery.args, pledgeId, pledgerCert, destNetworkName, recipientCert]
   console.log(currentQuery)
   try {
     const read = await contract.evaluateTransaction(currentQuery.ccFunc, ...currentQuery.args)
@@ -575,7 +573,7 @@ const generateViewAddress = async (
     if (addressParts.length != 6) {
       throw new Error(`Expected 6 arguments for ${ccFunc}; found ${addressParts.length}`)
     }
-    if (addressParts[4] != sourceNetwork) {
+    if (addressParts[5] != sourceNetwork) {
       throw new Error(`Passed source network ID ${sourceNetwork} does not match last chaincode argument in view address ${addressParts[5]}`)
     }
     const pledgeDetails = await getAssetPledgeDetails({
@@ -585,8 +583,7 @@ const generateViewAddress = async (
       destNetworkName: destNetwork,
       recipient: '',
       recipientCert: addressParts[3],
-      assetType: addressParts[1],
-      assetRef: addressParts[2],
+      pledgeId: addressParts[0],
       logger: logger
     });
     return viewAddress + ':' + JSON.parse(pledgeDetails).expirytimesecs;
