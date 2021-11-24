@@ -45,6 +45,10 @@ Create a personal access token with `read:packages` access in github in order to
 
 Clone the [weaver-dlt-interoperability](https://github.com/hyperledger-labs/weaver-dlt-interoperability) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
+## Securing Components
+
+_Note_: The relays and drivers corresponding to the different test networks you will encounter below can be run with or without TLS enabled. But the default files used in the demonstrations assume that either all relays and drivers are TLS-enabled or none are. Therefore, you should determine at the outset whether or not you wish to run the entire set of components in TLS-enabled mode, and select appropriate commands in the provided instructions.
+
 ## Hyperledger Fabric Components
 
 Using the sequence of instructions below, you can start two separate Fabric networks, each with a single channel and application contract (chaincode). You can also start an interoperation contract, a relay, and a _driver_ acting on behalf of each network. You can build a Fabric CLI tool with which you can initialize both networks' ledgers with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample key-value pairs that can be shared during subsequent interoperation flows.
@@ -127,14 +131,86 @@ An instance or a relay can be run using a suitable configuration file. Samples a
 
 Run a relay for `network1` as follows:
 - Navigate to the `core/relay` folder.
-- Run the following:
+- To launch the server without TLS, leave the configuration file `config/Fabric_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  ```
+  .
+  .
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=true
+  .
+  .
+  [relays]
+  [relays.Corda_Relay]
+  hostname="localhost"
+  port="9081"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Corda_Relay2]
+  hostname="localhost"
+  port="9082"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Fabric_Relay2]
+  hostname="localhost"
+  port="9083"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  [drivers]
+  [drivers.Fabric]
+  hostname="localhost"
+  port="9090"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  ```
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Fabric_Relay.toml cargo run --bin server
   ```
 
-Run a relay for `network2` as follows (_do this only if you wish to test interoperation between the two Fabric networks `network1` and `network2`_)
+Run a relay for `network2` as follows (_do this only if you have launched both Fabric networks `network1` and `network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
-- Run the following:
+- To launch the server without TLS, leave the configuration file `config/Fabric_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  ```
+  .
+  .
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=true
+  .
+  .
+  [relays]
+  [relays.Corda_Relay]
+  hostname="localhost"
+  port="9081"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Corda_Relay2]
+  hostname="localhost"
+  port="9082"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Fabric_Relay]
+  hostname="localhost"
+  port="9080"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  [drivers]
+  [drivers.Fabric]
+  hostname="localhost"
+  port="9095"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  ```
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server
   ```
@@ -157,6 +233,22 @@ Configure `fabric-driver` for `network1` as follows:
   * The `CONNECTION_PROFILE` should point to the absolute path of the connection profile for `network1`.
     - For this exercise, specify the path `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json` (_you must specify the full absolute path here_).
     - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
+  * If you wish to start the driver without TLS, set the following parameter values:
+    ```
+    RELAY_TLS=false
+    RELAY_TLSCA_CERT_PATH=
+    DRIVER_TLS=false
+    DRIVER_TLS_CERT_PATH=
+    DRIVER_TLS_KEY_PATH=
+    ```
+    Otherwise, if you wish to start the driver with TLS enabled, set the following parameter values (replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder):
+    ```
+    RELAY_TLS=true
+    RELAY_TLSCA_CERT_PATH=<PATH-TO-WEAVER>/core/relay/credentials/fabric_ca_cert.pem
+    DRIVER_TLS=true
+    DRIVER_TLS_CERT_PATH=<PATH-TO-WEAVER>/core/relay/credentials/fabric_cert.pem
+    DRIVER_TLS_KEY_PATH=<PATH-TO-WEAVER>/core/relay/credentials/fabric_key
+    ```
   * Leave the default values unchanged for the other parameters. The relay and driver endpoints as well as the network name are already specified.
 
 #### Building

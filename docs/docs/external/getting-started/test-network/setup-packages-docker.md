@@ -42,6 +42,10 @@ Run `docker login ghcr.io`,  and provide github email id as username and persona
 
 Clone the [weaver-dlt-interoperability](https://github.com/hyperledger-labs/weaver-dlt-interoperability) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
+## Securing Components
+
+_Note_: The relays and drivers corresponding to the different test networks you will encounter below can be run with or without TLS enabled. But the default files used in the demonstrations assume that either all relays and drivers are TLS-enabled or none are. Therefore, you should determine at the outset whether or not you wish to run the entire set of components in TLS-enabled mode, and select appropriate commands in the provided instructions.
+
 ## Hyperledger Fabric Components
 
 Using the sequence of instructions below, you can start two separate Fabric networks, each with a single channel and application contract (chaincode). You can also start an interoperation contract, a relay and a _driver_ acting on behalf of each network. You can build a Fabric CLI tool with which you can initialize both networks' ledgers with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample key-value pairs that can be shared during subsequent interoperation flows.
@@ -86,14 +90,31 @@ The code for this lies in the `core/relay` folder.
 
 Navigate to the `core/relay` folder and run a relay as follows:
 
-* Run: `make convert-compose-method2` to uncomment and comment some lines in `docker-compose.yaml`.
-* For `network1`, there's `.env.n1` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
+* The `docker-compose.yaml` in this folder is minimally configured with default values. To modify it for use with the Fabric testnets, run:
+  ```bash
+  make convert-compose-method2
+  ```
+* (The `.env.n1` and `.env.n1.tls` files in the `docker/testnet-envs` directory contain environment variables used by the `network1` relay at startup and runtime.)
+* (The `.env.n2` and `.env.n2.tls` files in the `docker/testnet-envs` directory contain environment variables used by the `network2` relay at startup and runtime.)
+* To deploy the relay server for `network1` without TLS, run:
   ```bash
   make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
   ```
-* For `network2`, there's `.env.n2` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. To deploy, run:
+  Instead, to deploy the relay server with TLS, run:
+  ```bash
+  make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1.tls'
+  ```
+* To deploy the relay server for `network2` without TLS, run:
   ```bash
   make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
+  ```
+  Instead, to deploy the relay server with TLS, run:
+  ```bash
+  make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2.tls'
+  ```
+* After launching the relay(s), you can revert the `docker-compose.yaml` changes by running:
+  ```bash
+  make convert-compose-method1
   ```
 
 For more information, see the [relay-docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/relay/relay-docker.md).
@@ -103,17 +124,26 @@ For more information, see the [relay-docker README](https://github.com/hyperledg
 A driver is a DLT-specific plugin invoked by the relay while channelling external data queries to the local peer network and collecting a response with proofs. The Fabric driver is built as a Fabric client application on the `fabric-network` NPM package.
 The code for this lies in the `core/drivers/fabric-driver` folder.
 
-Following steps demonstrate how to run a fabric driver in docker container (_replace `<PATH-TO-WEAVER>` with location of the clone of your weaver_).
+Use the following steps to run Fabric drivers in Docker containers:
 - Navigate to the `core/drivers/fabric-driver` folder.
-- For `network1`, there's `.env.n1` file in `docker-testnet-envs` directory, that will be used to start a fabric driver in docker. Edit that file and replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder.
-- Repeat above step for `.env.n2` file in `docker-testnet-envs` directory, that will be used to start fabric driver for `network2` in docker.
-- To deploy fabric driver for `network1`, run:
+* The `.env.n1` and `.env.n1.tls` files in the `docker-testnet-envs` directory contain environment variables used by the `network1` driver at startup and runtime. Edit either of these files (depending on whether you wish to start the relay with or without TLS) as follows:
+  - Replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder.
+* Repeat the above step for `.env.n2` or `.env.n2.tls` in `docker-testnet-envs` directory, which contain environment variables for the `network2` driver.
+* To deploy the Fabric driver for `network1` without TLS, run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
   ```
-- To deploy fabric driver for `network2`, run:
+  Instead, to deploy the driver with TLS, run:
+  ```bash
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1.tls'
+  ```
+* To deploy the Fabric driver for `network2` without TLS, run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
+  ```
+  Instead, to deploy the driver with TLS, run:
+  ```bash
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2.tls'
   ```
  
 ### Fabric Client (Application)

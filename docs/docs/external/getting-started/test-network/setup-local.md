@@ -219,12 +219,12 @@ Run a relay for `network1` as follows:
   .
   .
   ```
-  To launch the server, simply run the following:
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Fabric_Relay.toml cargo run --bin server
   ```
 
-Run a relay for `network2` as follows (_do this only if you wish to test interoperation between the two Fabric networks `network1` and `network2`_)
+Run a relay for `network2` as follows (_do this only if you have launched both Fabric networks `network1` and `network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
   ```
@@ -262,7 +262,7 @@ Run a relay for `network2` as follows (_do this only if you wish to test interop
   .
   .
   ```
-- Run the following:
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server
   ```
