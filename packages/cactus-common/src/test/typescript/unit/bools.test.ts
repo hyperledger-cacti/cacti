@@ -1,5 +1,4 @@
 import "jest-extended";
-
 import { Bools } from "../../../main/typescript/public-api";
 
 describe("Bools", () => {
