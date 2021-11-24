@@ -9,6 +9,9 @@
     "test": "jest"
   },
   "workspaces": {
+    "packages": [
+      "src/*"
+    ],
     "nohoist": [
       "@types/socket.io",
       "@types/socket.io-client"
