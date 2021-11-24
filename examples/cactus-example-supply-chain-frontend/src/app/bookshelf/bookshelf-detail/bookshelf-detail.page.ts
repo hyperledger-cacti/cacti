@@ -79,7 +79,7 @@ export class BookshelfDetailPage implements OnInit {
     this.log.debug(`BambooHarvest IDs: %o`, this.bambooHarvestIds);
   }
 
-  onClickFormSubmit(value: any): void {
+  onClickFormSubmit(value: Bookshelf): void {
     this.log.debug("form submitted", value);
     this.bookshelf = value;
     this.modalController.dismiss(this.bookshelf);
