@@ -102,7 +102,6 @@ module.exports = {
     `./packages/cactus-common/src/test/typescript/unit/servers.test.ts`,
     `./packages/cactus-common/src/test/typescript/unit/key-converter.test.ts`,
     `./packages/cactus-common/src/test/typescript/unit/strings/replace-all.test.ts`,
-    `./packages/cactus-common/src/test/typescript/unit/strings/drop-non-printable.test.ts`,
     `./packages/cactus-common/src/test/typescript/unit/strings/is-string.test.ts`,
     `./packages/cactus-common/src/test/typescript/unit/logging/logger.test.ts`,
     `./packages/cactus-common/src/test/typescript/unit/js-object-signer.test.ts`,
