@@ -1,9 +1,8 @@
-import http, { Server } from "http";
-import "jest-extended";
+import http from "http";
 import type { AddressInfo } from "net";
+import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 import express from "express";
-import type { Express } from "express";
 import bodyParser from "body-parser";
 import {
   DefaultApi as BesuApi,
@@ -21,8 +20,11 @@ import {
   Web3SigningCredentialType,
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
-import { IListenOptions } from "@hyperledger/cactus-common";
+import {
+  LogLevelDesc,
+  IListenOptions,
+  Servers,
+} from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import {
@@ -36,57 +38,64 @@ import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc2
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
-const logLevel: LogLevelDesc = "INFO";
-const estimatedGas = 6721975;
-const expiration = 2147483648;
-const besuTestLedger = new BesuTestLedger({
-  logLevel,
-  envVars: [...BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars, "BESU_LOGGING=ALL"],
-});
-const secret =
-  "0x3853485acd2bfc3c632026ee365279743af107a30492e3ceaa7aefc30c2a048a";
-const receiver = besuTestLedger.getGenesisAccountPubKey();
-const hashLock =
-  "0x3c335ba7f06a8b01d0596589f73c19069e21c81e5013b91f408165d1bf623d32";
-const firstHighNetWorthAccount = "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1";
-const privateKey =
-  "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d";
-const connectorId = uuidv4();
-const web3SigningCredential: Web3SigningCredential = {
-  ethAccount: firstHighNetWorthAccount,
-  secret: privateKey,
-  type: Web3SigningCredentialType.PrivateKeyHex,
-} as Web3SigningCredential;
+const testCase = "Test invalid withdraw with invalid id";
 
-const testCase = "Test withdraw endpoint";
 describe(testCase, () => {
+  const logLevel: LogLevelDesc = "INFO";
+  const estimatedGas = 6721975;
+  const expiration = 2147483648;
+  const secret =
+    "0x3853485acd2bfc3c632026ee365279743af107a30492e3ceaa7aefc30c2a048a";
+  const besuTestLedger = new BesuTestLedger({
+    logLevel,
+    envVars: [...BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars, "BESU_LOGGING=ALL"],
+  });
+  const receiver = besuTestLedger.getGenesisAccountPubKey();
+  const hashLock =
+    "0x3c335ba7f06a8b01d0596589f73c19069e21c81e5013b91f408165d1bf623d32";
+  const firstHighNetWorthAccount = "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1";
+  const privateKey =
+    "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d";
+  const connectorId = uuidv4();
+  const web3SigningCredential: Web3SigningCredential = {
+    ethAccount: firstHighNetWorthAccount,
+    secret: privateKey,
+    type: Web3SigningCredentialType.PrivateKeyHex,
+  } as Web3SigningCredential;
+
+  const keychainId = uuidv4();
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
   let addressInfo,
     address: string,
     port: number,
-    apiHost: string,
-    server: Server,
-    expressApp: Express,
+    apiHost,
+    configuration,
     api: BesuApi;
+
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
+  });
+
   afterAll(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
   });
 
-  afterAll(async () => await Servers.shutdown(server));
-
-  beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
-    await expect(pruning).resolves.toBeTruthy();
+  afterAll(async () => {
+    await Servers.shutdown(server);
   });
 
   afterAll(async () => {
     const pruning = pruneDockerAllIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
+
   beforeAll(async () => {
-    expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    server = http.createServer(expressApp);
+    await besuTestLedger.start();
+
     const listenOptions: IListenOptions = {
       hostname: "0.0.0.0",
       port: 0,
@@ -95,15 +104,13 @@ describe(testCase, () => {
     addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
     ({ address, port } = addressInfo);
     apiHost = `http://${address}:${port}`;
-    const configuration = new Configuration({ basePath: apiHost });
+    configuration = new Configuration({ basePath: apiHost });
     api = new BesuApi(configuration);
   });
 
   test(testCase, async () => {
-    await besuTestLedger.start();
     const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
     const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
-    const keychainId = uuidv4();
     const keychainPlugin = new PluginKeychainMemory({
       instanceId: uuidv4(),
       keychainId,
@@ -123,6 +130,7 @@ describe(testCase, () => {
       HashTimeLockJSON.contractName,
       JSON.stringify(HashTimeLockJSON),
     );
+
     const factory = new PluginFactoryLedgerConnector({
       pluginImportType: PluginImportType.Local,
     });
@@ -162,7 +170,6 @@ describe(testCase, () => {
     expect(deployOut).toBeTruthy();
     expect(deployOut.transactionReceipt).toBeTruthy();
     expect(deployOut.transactionReceipt.contractAddress).toBeTruthy();
-
     const hashTimeLockAddress = deployOut.transactionReceipt
       .contractAddress as string;
 
@@ -181,18 +188,6 @@ describe(testCase, () => {
     const tokenAddress = deployOutToken.transactionReceipt
       .contractAddress as string;
 
-    const deployOutDemo = await connector.deployContract({
-      contractName: DemoHelperJSON.contractName,
-      contractAbi: DemoHelperJSON.abi,
-      bytecode: DemoHelperJSON.bytecode,
-      web3SigningCredential,
-      keychainId,
-      constructorArgs: [],
-      gas: estimatedGas,
-    });
-    expect(deployOutDemo).toBeTruthy();
-    expect(deployOutDemo.transactionReceipt).toBeTruthy();
-    expect(deployOutDemo.transactionReceipt.contractAddress).toBeTruthy();
     const { success } = await connector.invokeContract({
       contractName: TestTokenJSON.contractName,
       keychainId,
@@ -242,42 +237,20 @@ describe(testCase, () => {
     const res = await api.newContractV1(request);
     expect(res.status).toEqual(200);
 
-    const responseTxId = await connector.invokeContract({
-      contractName: DemoHelperJSON.contractName,
-      keychainId,
-      signingCredential: web3SigningCredential,
-      invocationType: EthContractInvocationType.Call,
-      methodName: "getTxId",
-      params: [
-        firstHighNetWorthAccount,
-        receiver,
-        10,
-        hashLock,
-        expiration,
-        tokenAddress,
-      ],
-    });
-    expect(responseTxId.callOutput).toBeTruthy();
-    const id = responseTxId.callOutput as string;
-
-    const withdrawRequest: WithdrawRequest = {
-      id,
-      secret,
-      web3SigningCredential,
-      connectorId,
-      keychainId,
-    };
-    const resWithdraw = await api.withdrawV1(withdrawRequest);
-    expect(resWithdraw.status).toEqual(200);
-
-    const resStatus = await api.getSingleStatusV1({
-      id,
-      web3SigningCredential,
-      connectorId,
-      keychainId,
-    });
-    expect(resStatus.status).toEqual(200);
-    expect(resStatus.data).toEqual(3);
+    try {
+      const fakeId = "0x66616b654964";
+      const withdrawRequest: WithdrawRequest = {
+        id: fakeId,
+        secret,
+        web3SigningCredential,
+        connectorId,
+        keychainId,
+      };
+      const resWithdraw = await api.withdrawV1(withdrawRequest);
+      expect(resWithdraw.status).toEqual(400);
+    } catch (error: any) {
+      expect(error.response.status).toEqual(400);
+    }
 
     const responseFinalBalance = await connector.invokeContract({
       contractName: TestTokenJSON.contractName,
@@ -287,6 +260,6 @@ describe(testCase, () => {
       methodName: "balanceOf",
       params: [receiver],
     });
-    expect(responseFinalBalance.callOutput).toEqual("10");
+    expect(responseFinalBalance.callOutput).toEqual("0");
   });
 });
