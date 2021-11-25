@@ -20,51 +20,53 @@ Assuming that the `simpleassettransfer` chaincode has been deployed in both netw
 
 1. Verify that `alice` owns bonds with ids `a03` and `a04` as follows:
    ```bash
-   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a03","true"]' --local-network=network1
-   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a04","true"]' --local-network=network1
+   ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network1
+   ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network1
    ```
    You should see a JSON structure corresponding to the bond being logged on the console in each case.
 2. Get `alice` in `network1` to pledge bond `a03` to `bob` in `network2` as follows (with a 1 hour timeout):
    ```bash
-   ./bin/fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assetsForTransfer.json
+   ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assetsForTransfer.json
    ```
+   You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 3. Get `bob` in `network2` to claim this bond asset as follows:
    ```bash
-   ./scripts/claimAsset.sh network2 network1 bond bond01 a03
+   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond --pledge-id=<pledge-id> --param=bond01:a03
    ```
 4. Verify that `alice` in `network1` does not own this asset as follows:
    ```bash
-   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a03","true"]' --local-network=network1
+   ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network1
    ```
    You should see an error message like `Error: the asset a03 does not exist`.
 5. Verify that `bob` in `network2` now owns this asset as follows:
    ```bash
-   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a03","true"]' --local-network=network2
+   ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network2
    ```
 6. Now get `alice` in `network1` to pledge bond `a04` to `bob` in `network2` as follows (with a 1 minute timeout):
    ```bash
-   ./bin/fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=60 --type=bond --ref=a04 --data-file=src/data/assetsForTransfer.json
+   ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=60 --type=bond --ref=a04 --data-file=src/data/assetsForTransfer.json
    ```
    Wait for a minute as follows:
    ```bash
    sleep 60
    ```
+   You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 7. Now get `bob` in `network2` to claim this bond asset as follows:
    ```bash
-   ./scripts/claimAsset.sh network2 network1 bond bond01 a04
+   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond --pledge-id=<pledge-id> --param=bond01:a04
    ```
    This should fail as the pledge has already expired.
 8. Now get `alice` in `network1` to reclaim the asset as follows:
    ```bash
-   ./scripts/reclaimAsset.sh network1 network2 bond bond01 a04
+   ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=bond --pledge-id=<pledge-id> --param=bond01:a04
    ```
 9. Verify that `alice` in `network1` owns this asset as follows:
    ```bash
-   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a04","true"]' --local-network=network1
+   ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network1
    ```
 10. Verify that `bob` in `network2` does not own this asset as follows:
    ```bash
-   ./bin/fabric-cli chaincode query mychannel simpleassettransfer ReadAsset '["bond01","a04","true"]' --local-network=network2
+   ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network2
    ```
    You should see an error message like `Error: the asset a04 does not exist`.
 
@@ -81,12 +83,12 @@ Assuming that the `simpleassettransfer` chaincode has been deployed in both netw
    You should see an error message like `Error: owner does not have a wallet`.
 3. Get `alice` in `network1` to pledge 50 tokens to `bob` in `network2` as follows (with a 1 hour timeout):
    ```bash
-   ./bin/fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=token --units=50 --owner=alice --data-file=src/data/tokensForTransfer.json
+   ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=token --units=50 --owner=alice --data-file=src/data/tokensForTransfer.json
    ```
    You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 4. Get `bob` in `network2` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
    ```bash
-   ./scripts/claimAsset.sh network2 network1 token token1 <pledge-id> 50
+   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token --pledge-id=<pledge-id> --param=token1:50
    ```
 5. Verify that `alice` in `network1` owns `9950` tokens (after losing `50`) as follows:
    ```bash
@@ -98,7 +100,7 @@ Assuming that the `simpleassettransfer` chaincode has been deployed in both netw
    ```
 7. Now get `alice` in `network1` to pledge 100 tokens to `bob` in `network2` as follows (with a 1 minute timeout):
    ```bash
-   ./bin/fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=60 --type=token --units=100 --owner=alice --data-file=src/data/tokensForTransfer.json
+   ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=60 --type=token --units=100 --owner=alice --data-file=src/data/tokensForTransfer.json
    ```
    Wait for a minute as follows:
    ```bash
@@ -107,12 +109,12 @@ Assuming that the `simpleassettransfer` chaincode has been deployed in both netw
    You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 8. Now get `bob` in `network2` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
    ```bash
-   ./scripts/claimAsset.sh network2 network1 token token1 <pledge-id> 100
+   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token --pledge-id=<pledge-id> --param=token1:100
    ```
    This should fail as the pledge has already expired.
 9. Now get `alice` in `network1` to reclaim these tokens as follows:
    ```bash
-   ./scripts/reclaimAsset.sh network1 network2 token token1 <pledge-id>
+   ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=token --pledge-id=<pledge-id> --param=token1:100
    ```
 10. Verify that `alice` in `network1` still owns `9950` tokens (after losing `50`) as follows:
    ```bash
