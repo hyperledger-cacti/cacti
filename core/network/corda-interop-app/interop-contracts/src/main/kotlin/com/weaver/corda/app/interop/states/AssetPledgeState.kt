@@ -13,8 +13,6 @@ import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
-import net.corda.core.serialization.CordaSerializable
-import net.corda.core.utilities.OpaqueBytes
 import java.time.Instant
 import net.corda.core.contracts.StaticPointer
 
@@ -28,6 +26,8 @@ import net.corda.core.contracts.StaticPointer
  * @property locker The owner of asset before transfer.
  * @property recipient The owner of asset after transfer.
  * @property expiryTime The future time in seconds till when the pledge on the asset holds good.
+ * @property localNetworkId The id of the network in which the pledge is made.
+ * @property remoteNetworkId The id of the network into which the pledged asset will be claimed.
  * @property linearId The unique identifier for the state.
  */
 @BelongsToContract(AssetTransferContract::class)

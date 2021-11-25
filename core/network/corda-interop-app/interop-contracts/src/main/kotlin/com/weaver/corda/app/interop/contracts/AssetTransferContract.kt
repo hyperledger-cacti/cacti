@@ -88,15 +88,15 @@ class AssetTransferContract : Contract {
 
     /**
      * Commands are used to indicate the intent of a transaction.
-     * Commands for [AssetExchangeHTLCStateContract] are:
-     * - Lock
-     * - Unlock
-     * - Claim (preImage)
+     * Commands for [AssetTransferContract] are:
+     * - Pledge
+     * - ReclaimPledgedAsset
+     * - ClaimRemoteAsset
      */
     interface Commands : CommandData {
         class Pledge : Commands
         class ReclaimPledgedAsset : Commands
         // class ClaimPledgedAsset(val assetClaimHTLC: AssetClaimHTLCData) : Commands
-        //class ReclaimPledgedAsset : Commands
+        class ClaimPledgedAsset : Commands
     }
 }
