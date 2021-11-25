@@ -7,6 +7,7 @@
 package com.weaver.corda.app.interop.contracts
 
 import com.weaver.corda.app.interop.states.AssetPledgeState
+import com.weaver.corda.app.interop.states.NetworkIdState
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand
@@ -55,6 +56,12 @@ class AssetTransferContract : Contract {
                 // Check if the locker is a signer
                 val requiredSigners = pledgeState.participants.map { it.owningKey }
                 "The required signers of the transaction must include the locker." using (command.signers.containsAll(requiredSigners))
+
+                val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
+                "There should be a single reference input network id." using (inReferences.size == 1)
+                val validNetworkIdState = inReferences.get(0).state.data
+
+                "LocalNetwokId must match with the networkId of current network." using (pledgeState.localNetworkId.equals(validNetworkIdState.networkId))
             }
             is Commands.ReclaimPledgedAsset -> requireThat {
                 "There should be one input state." using (tx.inputs.size == 1)

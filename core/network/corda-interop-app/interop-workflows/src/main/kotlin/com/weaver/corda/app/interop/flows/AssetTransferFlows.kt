@@ -10,6 +10,7 @@ import arrow.core.*
 import co.paralleluniverse.fibers.Suspendable
 import com.weaver.corda.app.interop.contracts.AssetTransferContract
 import com.weaver.corda.app.interop.states.AssetPledgeState
+import com.weaver.corda.app.interop.states.NetworkIdState
 
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.CommandData
@@ -17,6 +18,7 @@ import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.TimeWindow
 import net.corda.core.contracts.StateAndRef
+import net.corda.core.contracts.ReferencedStateAndRef
 import net.corda.core.contracts.requireThat
 import net.corda.core.contracts.StaticPointer
 
@@ -67,6 +69,8 @@ object AssetTransferPledge {
         val assetStateRef: StateAndRef<ContractState>,
         val assetStateDeleteCommand: CommandData,
         val recipient: String,
+        val localNetworkId: String,
+        val remoteNetworkId: String,
         val issuer: Party,
         val observers: List<Party> = listOf<Party>()
     ) : FlowLogic<Either<Error, UniqueIdentifier>>() {
@@ -86,7 +90,9 @@ object AssetTransferPledge {
                 StaticPointer(assetStateRef.ref, assetStateRef.state.data.javaClass), //Get the state pointer from StateAndRef
                 ourIdentity,
                 recipient,
-                expiryTime
+                expiryTime,
+                localNetworkId,
+                remoteNetworkId
             )
             println("Creating asset pledge state ${assetPledgeState}")
 
@@ -103,10 +109,26 @@ object AssetTransferPledge {
                     issuer.owningKey
                 ).toList()
             )
+
+            val networkIdStates = serviceHub.vaultService.queryBy<NetworkIdState>().states
+            var fetchedNetworkIdState: StateAndRef<NetworkIdState>? = null
+
+            if (networkIdStates.isNotEmpty()) {
+                // consider that there will be only one such state ideally
+                fetchedNetworkIdState = networkIdStates.first()
+                println("Network id for local Corda newtork is: $fetchedNetworkIdState\n")
+            } else {
+                println("Not able to fetch network id for local Corda network\n")
+            }
+
             val txBuilder = TransactionBuilder(notary)
                 .addInputState(assetStateRef)
                 .addOutputState(assetPledgeState, AssetTransferContract.ID)
-                .addCommand(pledgeCmd)
+                .addCommand(pledgeCmd).apply {
+                    fetchedNetworkIdState?.let {
+                        this.addReferenceState(ReferencedStateAndRef(fetchedNetworkIdState))
+                    }
+                }
                 .addCommand(assetDeleteCmd)
 
             // 3. Verify and collect signatures on the transaction

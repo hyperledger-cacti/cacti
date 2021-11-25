@@ -102,11 +102,21 @@ constructor(
                 Left(Error("Error: Receipient party cannot be empty: ${recipient}."))
             }
 
+            var networkIds = listOf<String>()
+            // locker consists of concatination of local and remote network ids
+            println("Network ids are ${agreement.locker}")
+            val networks = agreement.locker.split(";").toTypedArray();
+            networks.forEach {
+                networkIds += it
+            }
+
             subFlow(AssetTransferPledge.Initiator(
                 expiryTime,
                 assetRef!!,
                 assetStateDeleteCommand,
                 recipient,
+                networkIds.get(0),
+                networkIds.get(1),
                 issuer,
                 observers
             ))
@@ -186,11 +196,21 @@ constructor(
                 Left(Error("Error: Receipient party cannot be empty: ${recipient}."))
             }
 
+            var networkIds = listOf<String>()
+            // locker consists of concatination of local and remote network ids
+            println("Network ids are ${agreement.locker}")
+            val networks = agreement.locker.split(";").toTypedArray();
+            networks.forEach {
+                networkIds += it
+            }
+
             subFlow(AssetTransferPledge.Initiator(
                 expiryTime,
                 assetRef!!,
                 assetStateDeleteCommand,
                 recipient,
+                networkIds.get(0),
+                networkIds.get(1),
                 issuer,
                 observers
             ))

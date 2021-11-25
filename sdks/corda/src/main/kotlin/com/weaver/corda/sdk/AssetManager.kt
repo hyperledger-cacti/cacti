@@ -120,7 +120,7 @@ class AssetManager {
             return try {
                 AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
                 val contractId = runCatching {
-                    val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, recipientParty, "")
+                    val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, recipientParty, "1234567;891011121314")
                     proxy.startFlow(::PledgeFungibleAsset, assetAgreement, expiryTimeSecs, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
                         .returnValue.get()
                 }.fold({
