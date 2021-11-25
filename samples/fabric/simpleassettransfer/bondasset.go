@@ -316,6 +316,32 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 	return pledgeBytes64, nil
 }
 
+// GetAssetPledgeDetails returns the asset pledge details.
+func (s *SmartContract) GetAssetPledgeDetails(ctx contractapi.TransactionContextInterface, pledgeId string) (string, error) {
+	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
+
+	// Fetch asset pledge details using common (library) logic
+	pledgeAssetDetails, pledgeBytes64, err := wutils.GetAssetPledgeDetails(ctx, pledgeId)
+	if err != nil {
+		return "", err
+	}
+	if pledgeAssetDetails == nil {
+		return "", err
+	}
+
+	// Validate returned asset details using app-specific-logic
+	var lookupPledgeAsset BondAsset
+	err = json.Unmarshal(pledgeAssetDetails, &lookupPledgeAsset)
+	if err != nil {
+		return "", err
+	}
+	if !isCallerAssetOwner(ctx, &lookupPledgeAsset) {
+		return "", fmt.Errorf("caller is not the owner of the pledged asset: %s %s", lookupPledgeAsset.Type, lookupPledgeAsset.ID)
+	}
+
+	return pledgeBytes64, nil
+}
+
 // GetAssetClaimStatus returns the asset claim status and present time (of invocation).
 func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
@@ -425,7 +451,7 @@ func isBondAssetLockedForMe(s *SmartContract, ctx contractapi.TransactionContext
 func checkAccessToAsset(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	// Ensure that the client is the owner of the asset
 	if !isCallerAssetOwner(ctx, asset) {
-		fmt.Printf("Illegal update: caller is not owner of asset %s\n", asset.ID)
+		fmt.Printf("Illegal access: caller is not owner of asset %s\n", asset.ID)
 		return false
 	}
 

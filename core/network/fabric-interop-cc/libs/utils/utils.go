@@ -429,6 +429,32 @@ func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, pledgeId,
 	return lookupPledge.AssetDetails, lookupPledgeBytes64, pledgeBytes64, nil
 }
 
+// GetAssetPledgeDetails returns the asset pledge details for local network.
+func GetAssetPledgeDetails(ctx contractapi.TransactionContextInterface, pledgeId string) ([]byte, string, error) {
+	// (Optional) Ensure that this function is NOT being called by the relay or the Fabric Interop CC
+
+	pledgeKey := getAssetPledgeKey(pledgeId)
+	lookupPledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to read asset pledge status from world state: %v", err)
+	}
+	if lookupPledgeBytes == nil {
+		return nil, "", fmt.Errorf("pledge with given pledgeId %s doesn't exist", pledgeId)
+	}
+	lookupPledge := &common.AssetPledge{}
+	err = proto.Unmarshal(lookupPledgeBytes, lookupPledge)
+	if err != nil {
+		return nil, "", err
+	}
+
+	lookupPledgeBytes64, err := marshalAssetPledge(lookupPledge)
+	if err != nil {
+		return nil, "", err
+	}
+	
+	return lookupPledge.AssetDetails, lookupPledgeBytes64, nil
+}
+
 // GetAssetClaimStatus returns the asset claim status and present time (of invocation).
 func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) ([]byte, string, string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC

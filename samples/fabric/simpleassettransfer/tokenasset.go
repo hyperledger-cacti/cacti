@@ -336,6 +336,36 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 	return pledgeBytes64, nil
 }
 
+// GetAssetPledgeDetails returns the asset pledge details.
+func (s *SmartContract) GetTokenAssetPledgeDetails(ctx contractapi.TransactionContextInterface, pledgeId string) (string, error) {
+	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
+
+	// Fetch asset pledge details using common (library) logic
+	pledgeAssetDetails, pledgeBytes64, err := wutils.GetAssetPledgeDetails(ctx, pledgeId)
+	if err != nil {
+		return "", err
+	}
+	if pledgeAssetDetails == nil {
+		return "", err
+	}
+
+	// Validate returned asset details using app-specific-logic
+	var lookupPledgeAsset TokenAsset
+	err = json.Unmarshal(pledgeAssetDetails, &lookupPledgeAsset)
+	if err != nil {
+		return "", err
+	}
+	caller, err := getECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return "", err
+	}
+	if lookupPledgeAsset.Owner != caller {
+		return "", fmt.Errorf("caller is not the owner of the pledged token assets: %s %d", lookupPledgeAsset.Type, lookupPledgeAsset.NumUnits)
+	}
+
+	return pledgeBytes64, nil
+}
+
 // GetTokenAssetClaimStatus returns the asset claim status and present time (of invocation).
 func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, assetType string, numUnits uint64, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64) (string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
