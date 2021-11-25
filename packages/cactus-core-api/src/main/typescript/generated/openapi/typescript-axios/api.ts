@@ -534,11 +534,28 @@ export interface PluginImport {
     type: PluginImportType;
     /**
      * 
+     * @type {PluginImportAction}
+     * @memberof PluginImport
+     */
+    action: PluginImportAction;
+    /**
+     * 
      * @type {any}
      * @memberof PluginImport
      */
     options?: any | null;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export enum PluginImportAction {
+    Instantiate = 'org.hyperledger.cactus.plugin_import_action.INSTANTIATE',
+    Install = 'org.hyperledger.cactus.plugin_import_action.INSTALL'
+}
+
 /**
  * 
  * @export

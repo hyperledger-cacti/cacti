@@ -109,7 +109,7 @@ test("Tests are passing on the JVM side", async (t: Test) => {
   const connector = new CordaConnectorContainer({
     logLevel,
     imageName: "ghcr.io/hyperledger/cactus-connector-corda-server",
-    imageVersion: "2021-03-25-feat-622",
+    imageVersion: "2021-11-11",
     envVars: [envVarSpringAppJson],
   });
   t.ok(CordaConnectorContainer, "CordaConnectorContainer instantiated OK");
@@ -158,11 +158,6 @@ test("Tests are passing on the JVM side", async (t: Test) => {
 
   await plugin.getOrCreateWebServices();
   await plugin.registerWebServices(expressApp);
-
-  //   const apiUrl = await connector.getApiLocalhostUrl();
-
-  //   const config = new Configuration({ basePath: apiUrl });
-  //   const apiClient = new CordaApi(config);
 
   const flowsRes1 = await apiClient.listFlowsV1();
   t.ok(flowsRes1.status === 200, "flowsRes1.status === 200 OK");

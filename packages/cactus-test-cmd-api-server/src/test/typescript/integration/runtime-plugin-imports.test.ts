@@ -9,7 +9,10 @@ import {
   AuthorizationProtocol,
   ConfigService,
 } from "@hyperledger/cactus-cmd-api-server";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+import {
+  PluginImportAction,
+  PluginImportType,
+} from "@hyperledger/cactus-core-api";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -36,6 +39,7 @@ test("can import plugins at runtime (CLI)", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
       type: PluginImportType.Local,
+      action: PluginImportAction.Install,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),
