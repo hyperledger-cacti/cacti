@@ -213,24 +213,6 @@ jobs:
       with:
         go-version: 1.16
 
-    - name: Build
-      run: go build -v ./...
-      working-directory: samples/fabric/simpleassettransfer
-
-    - name: Test
-      run: go test -v ./...
-      working-directory: samples/fabric/simpleassettransfer
-
-  test_simpleassettransfer_local:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-
     - name: Setup
       run: |
         GOMODCACHE=`go env GOMODCACHE`
@@ -263,5 +245,23 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+      working-directory: samples/fabric/simpleassettransfer
+
+  test_simpleassettransfer_local:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Build
+      run: make build-local
+      working-directory: samples/fabric/simpleassettransfer
+
+    - name: Test
+      run: make test-local
       working-directory: samples/fabric/simpleassettransfer
 
