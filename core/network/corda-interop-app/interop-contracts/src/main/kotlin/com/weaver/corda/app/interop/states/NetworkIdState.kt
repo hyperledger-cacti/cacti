@@ -9,14 +9,9 @@ package com.weaver.corda.app.interop.states
 import com.weaver.corda.app.interop.contracts.NetworkIdStateContract
 import net.corda.core.contracts.BelongsToContract
 import net.corda.core.contracts.LinearState
-import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
-import net.corda.core.serialization.CordaSerializable
-import net.corda.core.utilities.OpaqueBytes
-import java.time.Instant
-import net.corda.core.contracts.StaticPointer
 
 /**
  * The NetworkIdState stores the corda network id, and this state is accessible to all the members of this network.
