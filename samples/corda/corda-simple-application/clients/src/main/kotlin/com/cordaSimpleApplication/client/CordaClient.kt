@@ -110,6 +110,8 @@ fun main(args: Array<String>) = App()
                     PledgeHouseTokenCommand(),
                     IsHouseTokenPledgedCommand(),
                     GetHouseTokenPledgeStateCommand()
-                )
+                ),
+                CreateNetworkIdStateCommand(),
+                RetrieveNetworkIdStateAndRefCommand()
                 )
         .main(args)

@@ -36,6 +36,8 @@ data class AssetPledgeState(
     val locker: Party,
     val recipient: String,
     val expiryTime: Instant,
+    val localNetworkId: String,
+    val remoteNetworkId: String,
     override val linearId: UniqueIdentifier = UniqueIdentifier(assetStatePointer.hashCode().toString())
 ) : LinearState {
     override val participants: List<AbstractParty> get() = listOf(locker)
