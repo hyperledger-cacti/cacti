@@ -7,7 +7,8 @@
 import { GluegunCommand } from 'gluegun'
 import { Toolbox } from 'gluegun/build/types/domain/toolbox'
 import { GluegunPrint } from 'gluegun/build/types/toolbox/print-types'
-import { fabricHelper, invoke, Query } from './fabric-functions'
+import { fabricHelper, invoke, query, Query } from './fabric-functions'
+import { AssetPledge } from "@hyperledger-labs/weaver-protos-js/common/asset_transfer_pb"
 import * as crypto from 'crypto'
 import { promisify } from 'util'
 import * as fs from 'fs'
@@ -115,6 +116,7 @@ const addAssets = ({
     }
   })
 }
+
 
 // Basic function to pledge an asset in one network to another, it assumes function is PledgeAsset
 // TODO: Pass function name as parameter
@@ -298,6 +300,61 @@ const getAssetPledgeDetails = async ({
     console.error(`Failed to submit transaction: ${error}`)
     throw new Error(error)
   }
+}
+
+// Basic function to query asset pledge details from a network, it assumes function is GetAssetPledgeDetails
+// TODO: Pass function name as parameter
+const getLocalAssetPledgeDetails = async ({
+    sourceNetworkName,
+    pledgeId,
+    caller,
+    ccType,
+    ccFunc,
+    logger
+}: {
+    sourceNetworkName: string
+    pledgeId: string
+    caller: string
+    ccType?: string
+    ccFunc?: string
+    logger?: any
+}): Promise<any> => {
+    const netConfig = getNetworkConfig(sourceNetworkName)
+
+    const currentQuery = {
+        channel: netConfig.channelName,
+        contractName: netConfig.chaincode
+            ? netConfig.chaincode
+            : 'simpleasset',
+        ccFunc: '',
+        args: []
+    }
+
+    if (ccFunc) {
+        currentQuery.ccFunc = ccFunc
+    } else if (ccType && ccType == 'token') {
+        currentQuery.ccFunc = 'GetTokenAssetPledgeDetails'
+    } else {
+        currentQuery.ccFunc = 'GetAssetPledgeDetails'
+    }
+    currentQuery.args = [...currentQuery.args, pledgeId]
+    console.log(currentQuery)
+    try {
+        const pledgeDetails = await query(currentQuery, 
+            netConfig.connProfilePath, 
+            sourceNetworkName, 
+            netConfig.mspId, 
+            logger, 
+            caller, 
+            false
+        )
+        const pledgeDetailBytes = Buffer.from(pledgeDetails, 'base64')
+        const pledgeDetailsProto = AssetPledge.deserializeBinary(pledgeDetailBytes)
+        return pledgeDetailsProto
+    } catch (error) {
+        console.error(`Failed to get pledge details: ${error}`)
+        throw new Error(error)
+    }
 }
 
 // Basic function to add data to network, it assumes function is Create
@@ -586,10 +643,16 @@ const generateViewAddress = async (
       pledgeId: addressParts[0],
       logger: logger
     });
-    return viewAddress + ':' + JSON.parse(pledgeDetails).expirytimesecs;
+    return viewAddress + ':' + deserializeAssetPledge(pledgeDetails).getExpirytimesecs();
   } else {
     return viewAddress
   }
+}
+
+function deserializeAssetPledge(pledgeDetails) {
+    const pledgeDetailBytes = Buffer.from(pledgeDetails, 'base64')
+    const pledgeDetailsProto = AssetPledge.deserializeBinary(pledgeDetailBytes)
+    return pledgeDetailsProto
 }
 
 export {
@@ -607,5 +670,6 @@ export {
   addAssets,
   pledgeAsset,
   getAssetPledgeDetails,
+  getLocalAssetPledgeDetails,
   generateViewAddress
 }

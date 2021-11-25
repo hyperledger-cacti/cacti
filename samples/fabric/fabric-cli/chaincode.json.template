@@ -11,20 +11,20 @@
   },
   "simpleassettransfer": {
     "ClaimRemoteAsset": {
-      "args": ["<pledge-id">, "<assettype>", "<assetid>", "<alice>", "network1", ""],
+      "args": ["<pledge-id>", "<assettype>", "<assetid>", "<alice>", "network1", ""],
       "replaceIndices": [5]
     },
     "ReclaimAsset": {
-      "args": ["<pledge-id">, "<bob>", "network2", ""],
-      "replaceIndices": [5]
+      "args": ["<pledge-id>", "<bob>", "network2", ""],
+      "replaceIndices": [3]
     },
     "ClaimRemoteTokenAsset": {
-      "args": ["<pledge-id">, "<assettype>", "<numunits>", "<alice>", "network1", ""],
+      "args": ["<pledge-id>", "<assettype>", "<numunits>", "<alice>", "network1", ""],
       "replaceIndices": [5]
     },
     "ReclaimTokenAsset": {
-      "args": ["<pledge-id">, "<bob>", "network2", ""],
-      "replaceIndices": [5]
+      "args": ["<pledge-id>", "<bob>", "network2", ""],
+      "replaceIndices": [3]
     }
   }
 }
