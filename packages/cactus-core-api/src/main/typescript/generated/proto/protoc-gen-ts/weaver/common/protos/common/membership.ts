@@ -37,6 +37,21 @@ export namespace common.membership {
         set members(value: Map<string, Member>) {
             pb_1.Message.setField(this, 2, value as any);
         }
+        static fromObject(data: {
+            securityDomain?: string;
+            members?: {
+                [key: string]: ReturnType<typeof Member.prototype.toObject>;
+            };
+        }) {
+            const message = new Membership({});
+            if (data.securityDomain != null) {
+                message.securityDomain = data.securityDomain;
+            }
+            if (typeof data.members == "object") {
+                message.members = new Map(Object.entries(data.members).map(([key, value]) => [key, Member.fromObject(value)]));
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 securityDomain?: string;
@@ -77,7 +92,7 @@ export namespace common.membership {
                         message.securityDomain = reader.readString();
                         break;
                     case 2:
-                        reader.readMessage(message, () => (pb_1.Map as any).deserializeBinary(message.members, reader, reader.readString, () => {
+                        reader.readMessage(message, () => pb_1.Map.deserializeBinary(message.members as any, reader, reader.readString, () => {
                             let value;
                             reader.readMessage(message, () => value = Member.deserialize(reader))
                             return value;
@@ -132,6 +147,23 @@ export namespace common.membership {
         }
         set chain(value: string[]) {
             pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            value?: string;
+            type?: string;
+            chain?: string[];
+        }) {
+            const message = new Member({});
+            if (data.value != null) {
+                message.value = data.value;
+            }
+            if (data.type != null) {
+                message.type = data.type;
+            }
+            if (data.chain != null) {
+                message.chain = data.chain;
+            }
+            return message;
         }
         toObject() {
             const data: {

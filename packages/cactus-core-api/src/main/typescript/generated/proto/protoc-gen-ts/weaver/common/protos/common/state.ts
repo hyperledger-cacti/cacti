@@ -55,6 +55,27 @@ export namespace common.state {
         set serialization_format(value: string) {
             pb_1.Message.setField(this, 4, value);
         }
+        static fromObject(data: {
+            protocol?: Meta.Protocol;
+            timestamp?: string;
+            proof_type?: string;
+            serialization_format?: string;
+        }) {
+            const message = new Meta({});
+            if (data.protocol != null) {
+                message.protocol = data.protocol;
+            }
+            if (data.timestamp != null) {
+                message.timestamp = data.timestamp;
+            }
+            if (data.proof_type != null) {
+                message.proof_type = data.proof_type;
+            }
+            if (data.serialization_format != null) {
+                message.serialization_format = data.serialization_format;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 protocol?: Meta.Protocol;
@@ -157,6 +178,19 @@ export namespace common.state {
         set data(value: Uint8Array) {
             pb_1.Message.setField(this, 2, value);
         }
+        static fromObject(data: {
+            meta?: ReturnType<typeof Meta.prototype.toObject>;
+            data?: Uint8Array;
+        }) {
+            const message = new View({});
+            if (data.meta != null) {
+                message.meta = Meta.fromObject(data.meta);
+            }
+            if (data.data != null) {
+                message.data = data.data;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 meta?: ReturnType<typeof Meta.prototype.toObject>;
@@ -256,6 +290,23 @@ export namespace common.state {
                 3: "error"
             };
             return cases[pb_1.Message.computeOneofCase(this, [2, 3])];
+        }
+        static fromObject(data: {
+            request_id?: string;
+            view?: ReturnType<typeof View.prototype.toObject>;
+            error?: string;
+        }) {
+            const message = new ViewPayload({});
+            if (data.request_id != null) {
+                message.request_id = data.request_id;
+            }
+            if (data.view != null) {
+                message.view = View.fromObject(data.view);
+            }
+            if (data.error != null) {
+                message.error = data.error;
+            }
+            return message;
         }
         toObject() {
             const data: {
@@ -375,6 +426,27 @@ export namespace common.state {
                 4: "error"
             };
             return cases[pb_1.Message.computeOneofCase(this, [3, 4])];
+        }
+        static fromObject(data: {
+            request_id?: string;
+            status?: RequestState.STATUS;
+            view?: ReturnType<typeof View.prototype.toObject>;
+            error?: string;
+        }) {
+            const message = new RequestState({});
+            if (data.request_id != null) {
+                message.request_id = data.request_id;
+            }
+            if (data.status != null) {
+                message.status = data.status;
+            }
+            if (data.view != null) {
+                message.view = View.fromObject(data.view);
+            }
+            if (data.error != null) {
+                message.error = data.error;
+            }
+            return message;
         }
         toObject() {
             const data: {

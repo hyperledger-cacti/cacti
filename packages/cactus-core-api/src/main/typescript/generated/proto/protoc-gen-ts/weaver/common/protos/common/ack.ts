@@ -45,6 +45,23 @@ export namespace common.ack {
         set message(value: string) {
             pb_1.Message.setField(this, 4, value);
         }
+        static fromObject(data: {
+            status?: Ack.STATUS;
+            request_id?: string;
+            message?: string;
+        }) {
+            const message = new Ack({});
+            if (data.status != null) {
+                message.status = data.status;
+            }
+            if (data.request_id != null) {
+                message.request_id = data.request_id;
+            }
+            if (data.message != null) {
+                message.message = data.message;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 status?: Ack.STATUS;
