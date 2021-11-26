@@ -158,12 +158,11 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
-          # sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
+          sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
           ./bin/fabric-cli env set-file ./.env
           ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           ./bin/fabric-cli env set DEFAULT_APPLICATION_CHAINCODE simpleassettransfer
-          ./bin/fabric-cli env set CHAINCODE_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/chaincode.json
           cat .env
           cp chaincode.json.template chaincode.json
         working-directory: samples/fabric/fabric-cli
@@ -524,12 +523,11 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
-          # sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
+          sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
           ./bin/fabric-cli env set-file ./.env
           ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           ./bin/fabric-cli env set DEFAULT_APPLICATION_CHAINCODE simpleassettransfer
-          ./bin/fabric-cli env set CHAINCODE_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/chaincode.json
           cat .env
           cp chaincode.json.template chaincode.json
         working-directory: samples/fabric/fabric-cli

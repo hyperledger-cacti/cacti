@@ -203,8 +203,14 @@ const command: GluegunCommand = {
     const spinner = print.spin(`Starting Interop Query for PledgeStatus in source network`)
     const appChaincodeId = netConfig.chaincode
     const applicationFunction = (assetCategory === 'token') ? 'ClaimRemoteTokenAsset' : 'ClaimRemoteAsset'
-    const { replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
-    const args = [options['pledge-id'], assetType, `${assetIdOrQuantity}`, ownerCert, options['source-network'], ""]
+    var { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
+    args[args.indexOf('<pledge-id>')] = options['pledge-id']
+    args[args.indexOf('<assettype>')] = assetType
+    args[args.indexOf('<pledger>')] = ownerCert
+    args[args.indexOf('network1')] = options['source-network']
+    connst assetIdOrQuantityIndex = (applicationFunction == 'ClaimRemoteTokenAsset') ? args.indexOf('<numunits>') : args.indexOf('<assetid>')
+    args[assetIdOrQuantityIndex] = `${assetIdOrQuantity}`
+    
     let relayTlsCAFiles = []
     if (options['relay-tls-ca-files']) {
       relayTlsCAFiles = options['relay-tls-ca-files'].split(':')
