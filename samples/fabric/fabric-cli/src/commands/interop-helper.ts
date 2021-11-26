@@ -7,17 +7,16 @@
 import { GluegunCommand } from 'gluegun'
 import * as fs from 'fs'
 import {
-  fabricHelper,
-  getKeyAndCertForRemoteRequestbyUserName
+  fabricHelper
 } from '../helpers/fabric-functions'
 import {
   commandHelp,
   getNetworkConfig,
   getChaincodeConfig,
   generateViewAddress,
-  handlePromise
+  handlePromise,
+  interopHelper
 } from '../helpers/helpers'
-import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import { v4 as uuidv4 } from 'uuid'
 
 import logger from '../helpers/logger'
@@ -93,6 +92,9 @@ const command: GluegunCommand = {
       logger.level = 'debug'
       logger.debug('Debugging is enabled')
     }
+    if (!options['user']) {
+      options['user'] = `user1`     //Default user
+    }
     // TEST: fabric-cli interop --local-network=network1 localhost:9081/Nick_Network/test
     // Making Interop Call using gRPC calls.
     print.info('Making Interop Call using gRPC calls.')
@@ -104,82 +106,31 @@ const command: GluegunCommand = {
       )
       return
     }
-    const networkName = options['local-network']
-    const channel = process.env.DEFAULT_CHANNEL
-      ? process.env.DEFAULT_CHANNEL
-      : 'mychannel'
-    const contractName = process.env.DEFAULT_CHAINCODE
-      ? process.env.DEFAULT_CHAINCODE
-      : 'interop'
-    const username = options['user'] || `user1`
-    const { wallet, contract } = await fabricHelper({
-      channel,
-      contractName,
-      connProfilePath: relayEnv.connProfilePath,
-      networkName,
-      mspId: options.mspId,
-      logger,
-      discoveryEnabled: true,
-      userString: username
-    })
-    const [keyCert, keyCertError] = await handlePromise(
-      getKeyAndCertForRemoteRequestbyUserName(wallet, username)
-    )
-    if (keyCertError) {
-      print.error(`Error getting key and cert ${keyCertError}`)
-      return
-    }
-    const spinner = print.spin(`Starting interop flow`)
-    const appChaincodeId = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
-    const applicationFunction = process.env.DEFAULT_APPLICATION_FUNC ? process.env.DEFAULT_APPLICATION_FUNC : 'Create'
-    const { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
-    let relayTlsCAFiles = []
-    if (options['relay-tls-ca-files']) {
-      relayTlsCAFiles = options['relay-tls-ca-files'].split(':')
-    }
+    
     try {
-      const invokeObject = {
-        channel,
-        ccFunc: applicationFunction,
-        ccArgs: args,
-        contractName: appChaincodeId
-      }
-      const interopFlowResponse = await InteroperableHelper.interopFlow(
-        //@ts-ignore this comment can be removed after using published version of interop-sdk
-        contract,
-        networkName,
-        invokeObject,
-        options['requesting-org'] || '',
-        relayEnv.relayEndpoint,
+      const appChaincodeId = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
+      const applicationFunction = process.env.DEFAULT_APPLICATION_FUNC ? process.env.DEFAULT_APPLICATION_FUNC : 'Create'
+      const { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
+      
+      interopHelper(
+        options['local-network'],
+        await generateViewAddress(           // Typically a noop, but for some functions, we may want to do some extra processing
+          array[0],
+          options['local-network'],
+          options['remote-network'],
+          logger
+          ),
+        appChaincodeId,
+        applicationFunction,
+        args,
         replaceIndices,
-        [{
-          address: await generateViewAddress(           // Typically a noop, but for some functions, we may want to do some extra processing
-                            array[0],
-                            options['local-network'],
-                            options['remote-network'],
-                            logger
-                            ),
-          Sign: true
-        }],
-        keyCert,
-        false,
-        options['relay-tls'] === 'true',
-        relayTlsCAFiles
+        options,
+        print
       )
-      logger.info(
-        `View from remote network: ${JSON.stringify(
-          interopFlowResponse.views[0].toObject()
-        )}. Interop Flow result: ${interopFlowResponse.result || 'successful'}`
-      )
-      const remoteValue = InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
-      spinner.succeed(
-        `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue}`
-      )
-    } catch (e) {
-      spinner.fail(`Error verifying and storing state`)
-      logger.error(`Error verifying and storing state: ${e}`)
+      process.exit()
+    } catch (error) {
+      print.error(`Error Asset Transfer Claim: ${error}`)
     }
-    process.exit()
   }
 }
 

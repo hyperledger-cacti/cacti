@@ -12,13 +12,14 @@ import {
     getNetworkConfig,
     getLocalAssetPledgeDetails,
     getChaincodeConfig,
-    handlePromise
+    handlePromise,
+    generateViewAddressFromRemoteConfig,
+    interopHelper
 } from '../../../helpers/helpers'
 import {
     fabricHelper,
-    getKeyAndCertForRemoteRequestbyUserName
+    getUserCertBase64
 } from '../../../helpers/fabric-functions'
-import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 
 import logger from '../../../helpers/logger'
 import * as dotenv from 'dotenv'
@@ -134,110 +135,50 @@ const command: GluegunCommand = {
     
     const assetIdOrQuantity = (assetCategory === 'token') ? parseInt(params[1]) : params[1]
     
-    const networkName = options['source-network']
-    const netConfig = getNetworkConfig(networkName)
+    const netConfig = getNetworkConfig(options['source-network'])
     if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
         print.error(
             `Please use a valid --source-network. No valid environment found for ${options['source-network']} `
         )
         return
     }
-    const channel = netConfig.channelName
-    const contractName = process.env.DEFAULT_CHAINCODE
-      ? process.env.DEFAULT_CHAINCODE
-      : 'interop'
-    const username = options['user']
-    const { wallet, contract } = await fabricHelper({
-        channel,
-        contractName,
-        connProfilePath: netConfig.connProfilePath,
-        networkName,
-        mspId: netConfig.mspId,
-        logger,
-        discoveryEnabled: true,
-        userString: username
-    })
     
-    const userId = await wallet.get(username)
-    const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
-
-    const pledgeAssetDetails = await getLocalAssetPledgeDetails({
-        sourceNetworkName: networkName,
+    try {
+      const userCert = await getUserCertBase64(options['dest-network'], options['user'])
+      const pledgeAssetDetails = await getLocalAssetPledgeDetails({
+        sourceNetworkName: options['source-network'],
         pledgeId: options['pledge-id'],
-        caller: username,
+        caller: options['user'],
         ccType: assetCategory,
         logger: logger
-    })
-    
-    const viewAddress = getReclaimViewAddress(assetCategory, assetType, assetIdOrQuantity,
-        options['pledge-id'], userCert, networkName, pledgeAssetDetails.getRecipient(),
+      })
+      
+      const viewAddress = getReclaimViewAddress(assetCategory, assetType, assetIdOrQuantity,
+        options['pledge-id'], userCert, options['source-network'], pledgeAssetDetails.getRecipient(),
         pledgeAssetDetails.getRemotenetworkid(), pledgeAssetDetails.getExpirytimesecs()
-    )
-    if (viewAddress == "") {
-        print.error(
-            `Please use a valid --dest-network. No valid environment found for ${options['dest-network']} `
-        )
-        return
-    }
-    
-    const [keyCert, keyCertError] = await handlePromise(
-      getKeyAndCertForRemoteRequestbyUserName(wallet, username)
-    )
-    if (keyCertError) {
-      print.error(`Error getting key and cert ${keyCertError}`)
-      return
-    }
-    const spinner = print.spin(`Starting Interop Query for ClaimStatus in destination network`)
-    const appChaincodeId = netConfig.chaincode
-    const applicationFunction = (assetCategory === 'token') ? 'ReclaimTokenAsset' : 'ReclaimAsset'
-    var { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
-    args[args.indexOf('<pledge-id>')] = options['pledge-id']
-    args[args.indexOf('<recipient>')] = pledgeAssetDetails.getRecipient()
-    args[args.indexOf('network2')] = pledgeAssetDetails.getRemotenetworkid()
-    
-    let relayTlsCAFiles = []
-    if (options['relay-tls-ca-files']) {
-      relayTlsCAFiles = options['relay-tls-ca-files'].split(':')
-    }
-    try {
-      const invokeObject = {
-        channel,
-        ccFunc: applicationFunction,
-        ccArgs: args,
-        contractName: appChaincodeId
-      }
-      console.log(invokeObject)
-      const interopFlowResponse = await InteroperableHelper.interopFlow(
-        //@ts-ignore this comment can be removed after using published version of interop-sdk
-        contract,
-        networkName,
-        invokeObject,
-        netConfig.mspId,
-        netConfig.relayEndpoint,
+      )
+
+      const appChaincodeId = netConfig.chaincode
+      const applicationFunction = (assetCategory === 'token') ? 'ReclaimTokenAsset' : 'ReclaimAsset'
+      var { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
+      args[args.indexOf('<pledge-id>')] = options['pledge-id']
+      args[args.indexOf('<recipient>')] = pledgeAssetDetails.getRecipient()
+      args[args.indexOf('network2')] = pledgeAssetDetails.getRemotenetworkid()
+      
+      interopHelper(
+        options['source-network'],
+        viewAddress,
+        netConfig.chaincode,
+        applicationFunction,
+        args,
         replaceIndices,
-        [{
-          address: viewAddress,
-          Sign: true
-        }],
-        keyCert,
-        false,
-        options['relay-tls'] === 'true',
-        relayTlsCAFiles
+        options,
+        print        
       )
-      logger.info(
-        `View from remote network: ${JSON.stringify(
-          interopFlowResponse.views[0].toObject()
-        )}. Interop Flow result: ${interopFlowResponse.result || 'successful'}`
-      )
-      const remoteValue = InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
-      spinner.succeed(
-        `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue}`
-      )
-    } catch (e) {
-      spinner.fail(`Error verifying and storing state`)
-      logger.error(`Error verifying and storing state: ${e}`)
+      process.exit()
+    } catch (error) {
+      print.error(`Error Asset Transfer ReClaim: ${error}`)
     }
-    process.exit()
   }
 }
 
@@ -246,25 +187,24 @@ function getReclaimViewAddress(assetCategory, assetType, assetIdOrQuantity,
     pledgeId, pledgerCert, sourceNetwork, recipientCert,
     destNetwork, pledgeExpiryTimeSecs
 ) {
-    const destNetConfig = getNetworkConfig(destNetwork)
-    if (!destNetConfig.connProfilePath || !destNetConfig.channelName || !destNetConfig.chaincode) {
-        return ""
-    }
-    let address = destNetConfig.relayEndpoint + '/' + destNetwork + '/' +
-        destNetConfig.channelName + ':' + destNetConfig.chaincode + ':';
-
-    if (assetCategory === 'bond') {
-        address = address + 'GetAssetClaimStatus';
-    } else if (assetCategory === 'token') {
-        address = address + 'GetTokenAssetClaimStatus';
+    let funcName = "", funcArgs = []
+    if (assetCategory == "cordaAsset") {
+        funcName = "GetAssetClaimStatus";
+        funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
+            pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
+    } else if (assetCategory === "bond") {
+        funcName = "GetAssetClaimStatus";
+        funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
+            pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
+    } else if (assetCategory === "token") {
+        funcName = "GetTokenAssetClaimStatus";
+        funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
+            pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
     } else {
-        console.log('Unecognized asset category:', assetCategory);
-        process.exit(1);
+        throw new Error(`Unecognized asset category: ${assetCategory}`);
     }
-    address = address + ':' + pledgeId + ':' + assetType + ':' + assetIdOrQuantity + ':' +
-        recipientCert + ':' + pledgerCert + ':' + sourceNetwork + ':' + pledgeExpiryTimeSecs;
-
-    return address;
+    
+    return generateViewAddressFromRemoteConfig(destNetwork, funcName, funcArgs);
 }
 
 module.exports = command

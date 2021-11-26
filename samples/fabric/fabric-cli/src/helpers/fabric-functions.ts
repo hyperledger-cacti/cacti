@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Gateway, Wallets, Contract } from 'fabric-network'
+import { Gateway, Wallets, Contract, X509Identity } from 'fabric-network'
 import { handlePromise } from './helpers'
 import * as FabricCAServices from 'fabric-ca-client'
 import { Certificate } from '@fidm/x509'
@@ -19,6 +19,21 @@ export type Query = {
   channel: string
   args: string[]
   ccFunc: string
+}
+
+const getUserCertBase64 = async (
+  networkName: string,
+  username: string
+) => {
+  const walletPath = process.env.WALLET_PATH
+    ? process.env.WALLET_PATH
+    : path.join(__dirname, '../', `wallet-${networkName}`)
+  const wallet = await Wallets.newFileSystemWallet(walletPath)
+  const userId = await wallet.get(username)
+  if (!userId) {
+    throw new Error(`User ${username} not present in wallet of ${networkName}.`)
+  }
+  return Buffer.from((userId as X509Identity).credentials.certificate).toString('base64')
 }
 
 const walletSetup = async (
@@ -564,6 +579,7 @@ const getKeyAndCertForRemoteRequestbyUserName = async (
 
 
 export {
+  getUserCertBase64,
   walletSetup,
   invoke,
   query,

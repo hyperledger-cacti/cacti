@@ -152,6 +152,13 @@ jobs:
           sed -i "16s#certificate#ca#g" config.json
           sed -i "7s#simpleasset#simpleassettransfer#g" config.json
           sed -i "15s#simpleasset#simpleassettransfer#g" config.json
+          cp chaincode.json.template chaincode.json
+          cp remote-network-config.json.template remote-network-config.json
+          sed -i "s#localhost:9080#relay-network1:9080#g" remote-network-config.json
+          sed -i "s#localhost:9081#relay-corda:9081#g" remote-network-config.json
+          sed -i "s#localhost:9082#relay-corda2:9082#g" remote-network-config.json
+          sed -i "s#localhost:9083#relay-network2:9083#g" remote-network-config.json
+          sed -i "s#localhost:10006#corda_partya_1:10003#g" remote-network-config.json
         working-directory: samples/fabric/fabric-cli
         
       - name: Setup Fabric CLI ENV
@@ -160,11 +167,10 @@ jobs:
           cp .env.template .env
           sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
           ./bin/fabric-cli env set-file ./.env
-          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials
+          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials_docker
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           ./bin/fabric-cli env set DEFAULT_APPLICATION_CHAINCODE simpleassettransfer
           cat .env
-          cp chaincode.json.template chaincode.json
         working-directory: samples/fabric/fabric-cli
   
       - name: Fabric CLI Init
@@ -252,7 +258,7 @@ jobs:
           cat tmp.out
 
           ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network1 &> tmp.out
-          tail -n 1 tmp.out | grep "Error: the asset a03 does not exist" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 2 tmp.out | grep "Error: the asset a03 does not exist" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network2 &> tmp.out
@@ -517,6 +523,8 @@ jobs:
           sed -i "16s#certificate#ca#g" config.json
           sed -i "7s#simpleasset#simpleassettransfer#g" config.json
           sed -i "15s#simpleasset#simpleassettransfer#g" config.json
+          cp chaincode.json.template chaincode.json
+          cp remote-network-config.json.template remote-network-config.json
         working-directory: samples/fabric/fabric-cli
         
       - name: Setup Fabric CLI ENV
@@ -529,7 +537,6 @@ jobs:
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
           ./bin/fabric-cli env set DEFAULT_APPLICATION_CHAINCODE simpleassettransfer
           cat .env
-          cp chaincode.json.template chaincode.json
         working-directory: samples/fabric/fabric-cli
         
       - name: Fabric CLI Init
@@ -617,7 +624,7 @@ jobs:
           cat tmp.out
 
           ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network1 &> tmp.out
-          tail -n 1 tmp.out | grep "Error: the asset a03 does not exist" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 2 tmp.out | grep "Error: the asset a03 does not exist" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network2 &> tmp.out

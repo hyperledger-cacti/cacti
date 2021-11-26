@@ -7,8 +7,9 @@
 import { GluegunCommand } from 'gluegun'
 import { Toolbox } from 'gluegun/build/types/domain/toolbox'
 import { GluegunPrint } from 'gluegun/build/types/toolbox/print-types'
-import { fabricHelper, invoke, query, Query } from './fabric-functions'
+import { getKeyAndCertForRemoteRequestbyUserName, fabricHelper, invoke, query, Query } from './fabric-functions'
 import { AssetPledge } from "@hyperledger-labs/weaver-protos-js/common/asset_transfer_pb"
+import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import * as crypto from 'crypto'
 import { promisify } from 'util'
 import * as fs from 'fs'
@@ -17,6 +18,8 @@ import * as dotenv from 'dotenv'
 import logger from './logger'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
+
+// UPDATE Following if new env variable or config variable is added.
 // Valid keys for .env
 const validKeys = [
   'DEFAULT_CHANNEL',
@@ -24,10 +27,12 @@ const validKeys = [
   'MEMBER_CREDENTIAL_FOLDER',
   'LOCAL',
   'DEFAULT_APPLICATION_CHAINCODE',
-  'CONFIG_PATH'
+  'CONFIG_PATH',
+  'REMOTE_CONFIG_PATH',
+  'CHAINCODE_PATH'
 ]
 // Valid keys for config
-const configKeys = ['connProfilePath', 'relayEndpoint']
+const configKeys = ['connProfilePath', 'relayEndpoint', 'mspId', 'channelName', 'chaincode', 'aclPolicyPrincipalType']
 
 const signMessage = (message, privateKey) => {
   const sign = crypto.createSign('sha256')
@@ -655,6 +660,129 @@ function deserializeAssetPledge(pledgeDetails) {
     return pledgeDetailsProto
 }
 
+// Used for creating view address for interop call using remote-network-config.json
+const generateViewAddressFromRemoteConfig = (
+  networkId: string,
+  funcName: string,
+  funcArgs: Array<string>
+): any => {
+  const configPath = process.env.REMOTE_CONFIG_PATH
+    ? path.join(process.env.REMOTE_CONFIG_PATH)
+    : path.join(__dirname, '../../remote-network-config.json')
+  try {
+    const configJSON = JSON.parse(fs.readFileSync(configPath).toString())
+    if (!configJSON[networkId]) {
+      logger.error(
+        `Network: ${networkId} does not exist in the remote-network-config.json file`
+      )
+      return ''
+    }
+    
+    const remoteNetConfig = configJSON[networkId]
+    let address = remoteNetConfig.relayEndpoint + '/' + networkId
+    if (remoteNetConfig.type == "fabric") {
+        address = address + '/' + remoteNetConfig.channelName + ':' +
+            remoteNetConfig.chaincode + ':' + funcName + ':' + funcArgs.join(':');
+    } else if (remoteNetConfig.type == "corda") {
+        address = address + '/' + remoteNetConfig.PartyAEndPoint + '#' +
+            remoteNetConfig.flowPackage + "." + funcName + ":" + funcArgs.join(':');
+    } else {
+        logger.error(`Error: remote network ${remoteNetConfig.type} not supported.`)
+        return ''
+    }
+    
+    return address
+  } catch (err) {
+    logger.error(`Network: ${networkId} does not exist in the remote-network-config.json file`)
+    return ''
+  }
+}
+
+
+// Used for creating view address for interop call using remote-network-config.json
+const interopHelper = async (
+  networkName: string,
+  viewAddress: string,
+  appChaincodeId: string,
+  applicationFunction: string,
+  applicationArgs: Array<string>,
+  replaceIndices: Array<number>,
+  options: any,                         // For TLS
+  print: any                            // For logging
+): Promise<any> => {
+  const netConfig = getNetworkConfig(networkName)
+  if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
+      throw new Error(`No valid config entry found for ${networkName}`)
+  }
+  
+  const { gateway, wallet, contract } = await fabricHelper({
+      channel: netConfig.channelName,
+      contractName: process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
+      connProfilePath: netConfig.connProfilePath,
+      networkName,
+      mspId: netConfig.mspId,
+      logger,
+      discoveryEnabled: true,
+      userString: options['user']
+  })
+  
+  const [keyCert, keyCertError] = await handlePromise(
+    getKeyAndCertForRemoteRequestbyUserName(wallet, options['user'])
+  )
+  if (keyCertError) {
+    throw new Error(`Error getting key and cert ${keyCertError}`)
+  }
+  const spinner = print.spin(`Starting Interop Query`)
+  
+  let relayTlsCAFiles = []
+  if (options['relay-tls-ca-files']) {
+    relayTlsCAFiles = options['relay-tls-ca-files'].split(':')
+  }
+  try {
+    const invokeObject = {
+      channel: netConfig.channelName,
+      ccFunc: applicationFunction,
+      ccArgs: applicationArgs,
+      contractName: appChaincodeId
+    }
+    console.log(invokeObject)
+    const interopFlowResponse = await InteroperableHelper.interopFlow(
+      //@ts-ignore this comment can be removed after using published version of interop-sdk
+      contract,
+      networkName,
+      invokeObject,
+      netConfig.mspId,
+      netConfig.relayEndpoint,
+      replaceIndices,
+      [{
+        address: viewAddress,
+        Sign: true
+      }],
+      keyCert,
+      false,
+      options['relay-tls'] === 'true',
+      relayTlsCAFiles
+    )
+    logger.info(
+      `View from remote network: ${JSON.stringify(
+        interopFlowResponse.views[0].toObject()
+      )}. Interop Flow result: ${interopFlowResponse.result || 'successful'}`
+    )
+    const remoteValue = InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
+    spinner.succeed(
+      `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue}`
+    )
+    await gateway.disconnect()
+    return remoteValue
+  } catch (e) {
+    spinner.fail(`Error verifying and storing state`)
+    logger.error(`Error verifying and storing state: ${e}`)
+    return ""
+  }
+}
+
+
+
 export {
   commandHelp,
   customHelp,
@@ -671,5 +799,7 @@ export {
   pledgeAsset,
   getAssetPledgeDetails,
   getLocalAssetPledgeDetails,
-  generateViewAddress
+  generateViewAddress,
+  generateViewAddressFromRemoteConfig,
+  interopHelper
 }
