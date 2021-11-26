@@ -708,7 +708,7 @@ const interopHelper = async (
   applicationArgs: Array<string>,
   replaceIndices: Array<number>,
   options: any,                         // For TLS
-  print: any                            // For logging
+  print: GluegunPrint                   // For logging
 ): Promise<any> => {
   const netConfig = getNetworkConfig(networkName)
   if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {

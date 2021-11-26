@@ -165,7 +165,7 @@ const command: GluegunCommand = {
       args[args.indexOf('<recipient>')] = pledgeAssetDetails.getRecipient()
       args[args.indexOf('network2')] = pledgeAssetDetails.getRemotenetworkid()
       
-      interopHelper(
+      await interopHelper(
         options['source-network'],
         viewAddress,
         netConfig.chaincode,

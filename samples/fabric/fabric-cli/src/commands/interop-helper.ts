@@ -112,7 +112,7 @@ const command: GluegunCommand = {
       const applicationFunction = process.env.DEFAULT_APPLICATION_FUNC ? process.env.DEFAULT_APPLICATION_FUNC : 'Create'
       const { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
       
-      interopHelper(
+      await interopHelper(
         options['local-network'],
         await generateViewAddress(           // Typically a noop, but for some functions, we may want to do some extra processing
           array[0],
@@ -129,7 +129,7 @@ const command: GluegunCommand = {
       )
       process.exit()
     } catch (error) {
-      print.error(`Error Asset Transfer Claim: ${error}`)
+      print.error(`Error Interop Call: ${error}`)
     }
   }
 }

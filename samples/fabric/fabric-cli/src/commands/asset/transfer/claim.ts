@@ -164,7 +164,7 @@ const command: GluegunCommand = {
     }
     
     try {
-      const userCert = await getUserCertBase64(options['dest-network'], options['owner'])
+      const userCert = await getUserCertBase64(options['dest-network'], options['user'])
       const { viewAddress, ownerCert } = await getClaimViewAddress(assetCategory, options['pledge-id'],
         options['owner'], options['source-network'], userCert, options['dest-network']
       )
@@ -178,7 +178,7 @@ const command: GluegunCommand = {
       const assetIdOrQuantityIndex = (applicationFunction == 'ClaimRemoteTokenAsset') ? args.indexOf('<numunits>') : args.indexOf('<assetid>')
       args[assetIdOrQuantityIndex] = `${assetIdOrQuantity}`
       
-      interopHelper(
+      await interopHelper(
         options['dest-network'],
         viewAddress,
         netConfig.chaincode,
