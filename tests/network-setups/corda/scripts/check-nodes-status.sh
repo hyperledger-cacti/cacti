@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROFILE=$1
-NW=${3:-Corda_Network}
+NW=${2:-Corda_Network}
 
 if [ "$NW" = "Corda_Network" ]; then
     echo "Waiting for network $NW node services to start"
@@ -18,7 +18,7 @@ if [ "$NW" = "Corda_Network" ]; then
                 break
             fi
     done
-    echo "PartyA node services started"
+    echo "PartyA node services started for network "$NW
     fi
 
     if [ "$PROFILE" = "2-nodes" ] || [ "$PROFILE" = "3-nodes" ]; then
@@ -33,7 +33,7 @@ if [ "$NW" = "Corda_Network" ]; then
                 break
             fi
         done
-        echo "PartyB node services started"
+        echo "PartyB node services started for network "$NW
     fi
     
     # Wait for Notary services in container to start
@@ -46,7 +46,7 @@ if [ "$NW" = "Corda_Network" ]; then
             break
         fi
     done
-    echo "Notary node services started"
+    echo "Notary node services started for network "$NW
     
 elif [ "$NW" = "Corda_Network2" ]; then
     
@@ -64,7 +64,7 @@ elif [ "$NW" = "Corda_Network2" ]; then
                 break
             fi
     done
-    echo "PartyA node services started"
+    echo "PartyA node services started for network "$NW
     fi
 
     if [ "$PROFILE" = "2-nodes" ] || [ "$PROFILE" = "3-nodes" ]; then
@@ -79,7 +79,7 @@ elif [ "$NW" = "Corda_Network2" ]; then
                 break
             fi
         done
-        echo "PartyB node services started"
+        echo "PartyB node services started for network "$NW
     fi
     
     # Wait for Notary services in container to start
@@ -92,7 +92,7 @@ elif [ "$NW" = "Corda_Network2" ]; then
             break
         fi
     done
-    echo "Notary node services started"
+    echo "Notary node services started for network "$NW
   
 else
     echo "Network $NW not found."

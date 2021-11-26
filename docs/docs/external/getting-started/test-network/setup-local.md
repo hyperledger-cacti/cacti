@@ -131,7 +131,7 @@ Follow the instructions below to build and launch the networks:
   ```bash
   make start-interop-local CHAINCODE_NAME=<chaincode-name>
   ```
-- (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to install only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1-local`, and for `network2`, run `make start-interop-network2-local`.)
+- (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1-local`, and for `network2`, run `make start-interop-network2-local`.)
 
 For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/fabric/dev).
 
@@ -277,7 +277,7 @@ The code for this lies in the `core/drivers/fabric-driver` folder.
 
 #### Configuring
 
-In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
+In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the Fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
 
 Configure `fabric-driver` for `network1` as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
@@ -327,17 +327,17 @@ Run a Fabric driver for `network2` as follows (_do this only if you wish to test
   ```bash
   CONNECTION_PROFILE=<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev
   ```
-_Note_: the variables we specified earlier in the `.env` are now passed in the command line. Alternatively, you can make a copy of the `fabric-driver` folder with a different  name and create a separate `.env` file within it that contains links to the connection profile, relay, and driver for `network2`.
+_Note_: the variables we specified earlier in the `.env` for `network1` are now passed in the command line. Alternatively, you can make a copy of the `fabric-driver` folder with a different  name and create a separate `.env` file within it that contains links to the connection profile, relay, and driver for `network2`.
 
 ## Corda Components
 
-Using the sequence of instructions below, you can start a Corda network and run an application Cordapp on it. You can also run an interoperation Cordapp, a relay and a _driver_ acting on behalf of the network. You can initialize the network's vault with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample state values that can be shared during subsequent interoperation flows.
+Using the sequence of instructions below, you can start a Corda network and run an application CorDapp on it. You can also run an interoperation CorDapp, a relay and a _driver_ acting on behalf of the network. You can initialize the network's vault with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample state values that can be shared during subsequent interoperation flows.
 
-### Interoperation Cordapp
+### Interoperation CorDapp
 
-The interoperation Cordapp is deployed to run as part of any Corda application flow that involves cross-network interoperation.
+The interoperation CorDapp is deployed to run as part of any Corda application flow that involves cross-network interoperation.
 
-Build the interoperation Cordapp as follows:
+Build the interoperation CorDapp as follows:
 - Navigate to the `core/network/corda-interop-app` folder.
 - Run the following to create the JAR files on which other Corda network components will depend on:
   ```bash
@@ -357,10 +357,10 @@ To build the library, do the following:
 
 ### Corda Simple Application and Client (Application)
 
-This is a simple Cordapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
+This is a simple CorDapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 The code for this lies in the `samples/corda/corda-simple-application` folder.
 
-Build the `corda-simple-application` Cordapp as follows:
+Build the `corda-simple-application` CorDapp as follows:
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following:
   ```bash
@@ -369,11 +369,11 @@ Build the `corda-simple-application` Cordapp as follows:
 
 ### Corda Network
 
-The Corda network code lies in the `tests/network-setups/corda` folder. You can launch two Corda networks (`Corda_Network` and `Corda_Network2`). These networks use `samples/corda/corda-simple-application` by default, which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
+The Corda networks' code lies in the `tests/network-setups/corda` folder. You can launch two separate Corda networks, namely `Corda_Network` and `Corda_Network2`. Each network runs the `samples/corda/corda-simple-application` CorDapp by default, which maintains a state named `SimpleState` containing a set of key-value pairs (of strings).
 
-Follow the instructions below to build and launch the network:
+Follow the instructions below to build and launch both networks:
 - Navigate to the `tests/network-setups/corda` folder.
-- To spin up the Corda networks with the Interoperation Cordapps:
+- To spin up the Corda networks with the Interoperation CorDapps:
   - Each consisting of 1 node and a notary (for data-transfer), run:
     ```bash
     make start-local
@@ -386,26 +386,64 @@ Follow the instructions below to build and launch the network:
     ```bash
     make start-local PROFILE="3-nodes"
     ```
+- (_Note_: If you do not wish to test Corda-Corda interoperation, you can choose to launch only one of the two networks along with its interoperation CorDapp. For `Corda_Network`, run `make start-network1-local`, and for `Corda_Network2`, run `make start-network2-local`.)
 
 You should see the following message in the terminal:
 ```
 Waiting for network node services to start
 ```
-The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following:
+The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following for each network, though the number of node entries will depend on the profile you used to start the network with (replace `<network-name>` with `Corda_Network` or `Corda_Network2`):
 ```bash
-PartyA node services started
-PartyB node services started
-Notary node services started
+PartyA node services started for network <network-name>
+PartyB node services started for network <network-name>
+PartyC node services started for network <network-name>
+Notary node services started for network <network-name>
 ```
 
 ### Corda Relay
 
 The relay was built earlier, so you just need to use a different configuration file to start a relay for the Corda network.
 
-Run a relay in host as follows:
+Run a relay for `Corda_Network` as follows:
 - Navigate to the `core/relay` folder.
 - (Make sure you've already built the relay by running `make`.)
-- Run the following to start relay for `Corda_Network`:
+- To launch the server without TLS, leave the configuration file `config/Corda_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  ```
+  .
+  .
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=true
+  .
+  .
+  [relays]
+  [relays.Fabric_Relay]
+  hostname="localhost"
+  port="9080"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Fabric_Relay2]
+  hostname="localhost"
+  port="9083"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Corda_Relay2]
+  hostname="localhost"
+  port="9082"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  [drivers]
+  [drivers.Corda]
+  hostname="localhost"
+  port="9099"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  ```
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Corda_Relay.toml cargo run --bin server
   ```
@@ -416,7 +454,46 @@ Run a relay in host as follows:
   Relay Name: "Corda_Relay"
   RelayServer listening on [::1]:9081
   ```
-- Run the following to start relay for `Corda_Network2`:
+
+Run a relay for `Corda_Network2` as follows (_do this only if you have launched both Corda networks `Corda_Network` and `Corda_Network2` and wish to test interoperation between them_)
+- Navigate to the `core/relay` folder.
+- To launch the server without TLS, leave the configuration file `config/Corda_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  ```
+  .
+  .
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=true
+  .
+  .
+  [relays]
+  [relays.Fabric_Relay]
+  hostname="localhost"
+  port="9080"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Fabric_Relay2]
+  hostname="localhost"
+  port="9083"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Corda_Relay]
+  hostname="localhost"
+  port="9081"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  [drivers]
+  [drivers.Corda]
+  hostname="localhost"
+  port="9098"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  ```
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Corda_Relay2.toml cargo run --bin server
   ```
@@ -439,6 +516,25 @@ Build the Corda driver module as follows:
 - Run the following:
   ```bash
   make build-local
+  ```
+
+#### Configuring
+
+Configure the drivers as follows (you can skip this if you wish to run the drivers without TLS):
+- Navigate to the `core/drivers/corda-driver` folder and create a `.env` file.
+- To run the drivers without TLS, set the following default values:
+  ```
+  RELAY_TLS=false
+  RELAY_TLSCA_TRUST_STORE=
+  RELAY_TLSCA_TRUST_STORE_PASSWORD=
+  RELAY_TLSCA_CERT_PATHS=
+  ```
+- To run the drivers with TLS, set the following values (replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder):
+  ```
+  RELAY_TLS=true
+  RELAY_TLSCA_TRUST_STORE=<PATH-TO-WEAVER>/core/relay/credentials/fabric_trust_store.jks
+  RELAY_TLSCA_TRUST_STORE_PASSWORD=trelay
+  RELAY_TLSCA_CERT_PATHS=<PATH-TO-WEAVER>/core/relay/credentials/fabric_ca_cert.pem
   ```
 
 #### Running

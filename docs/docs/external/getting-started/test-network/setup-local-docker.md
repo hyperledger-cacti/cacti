@@ -125,7 +125,7 @@ Follow the instructions below to build and launch the networks:
   ```bash
   make start-interop-local CHAINCODE_NAME=<chaincode-name>
   ```
-- (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to install only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1-local`, and for `network2`, run `make start-interop-network2-local`.)
+- (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1-local`, and for `network2`, run `make start-interop-network2-local`.)
 
 For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/fabric/dev).
 
@@ -242,13 +242,13 @@ You can install `fabric-cli` as follows (for both the Node.js and Golang version
 
 ## Corda Components
 
-Using the sequence of instructions below, you can start a Corda network and run an application Cordapp on it. You can also run an interoperation Cordapp, a relay and a _driver_ acting on behalf of the network. You can initialize the network's vault with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample state values that can be shared during subsequent interoperation flows.
+Using the sequence of instructions below, you can start a Corda network and run an application CorDapp on it. You can also run an interoperation CorDapp, a relay and a _driver_ acting on behalf of the network. You can initialize the network's vault with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample state values that can be shared during subsequent interoperation flows.
 
-### Interoperation Cordapp
+### Interoperation CorDapp
 
-The interoperation Cordapp is deployed to run as part of any Corda application flow that involves cross-network interoperation.
+The interoperation CorDapp is deployed to run as part of any Corda application flow that involves cross-network interoperation.
 
-Build the interoperation Cordapp as follows:
+Build the interoperation CorDapp as follows:
 - Navigate to the `core/network/corda-interop-app` folder.
 - Run the following to create the JAR files on which other Corda network components will depend on:
   ```bash
@@ -268,10 +268,10 @@ To build the library, do the following:
 
 ### Corda Simple Application and Client (Application)
 
-This is a simple Cordapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
+This is a simple CorDapp that maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
 The code for this lies in the `samples/corda/corda-simple-application` folder.
 
-Build the `corda-simple-application` Cordapp as follows:
+Build the `corda-simple-application` CorDapp as follows:
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following:
   ```bash
@@ -281,11 +281,11 @@ Build the `corda-simple-application` Cordapp as follows:
 
 ### Corda Network
 
-The Corda network code lies in the `tests/network-setups/corda` folder. You can launch two Corda networks (`Corda_Network` and `Corda_Network2`). The networks use `samples/corda/corda-simple-application` by default, which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
+The Corda networks' code lies in the `tests/network-setups/corda` folder. You can launch two separate Corda networks, namely `Corda_Network` and `Corda_Network2`. Each network runs the `samples/corda/corda-simple-application` CorDapp by default, which maintains a state named `SimpleState` containing a set of key-value pairs (of strings).
 
-Follow the instructions below to build and launch the network:
+Follow the instructions below to build and launch both networks:
 - Navigate to the `tests/network-setups/corda` folder.
-- To spin up the Corda networks with the Interoperation Cordapps:
+- To spin up the Corda networks with the Interoperation CorDapps:
   - Each consisting of 1 node and a notary (for data-transfer), run:
     ```bash
     make start-local
@@ -298,34 +298,52 @@ Follow the instructions below to build and launch the network:
     ```bash
     make start-local PROFILE="3-nodes"
     ```
+- (_Note_: If you do not wish to test Corda-Corda interoperation, you can choose to launch only one of the two networks along with its interoperation CorDapp. For `Corda_Network`, run `make start-network1-local`, and for `Corda_Network2`, run `make start-network2-local`.)
 
 You should see the following message in the terminal:
 ```
 Waiting for network node services to start
 ```
-The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following:
+The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following for each network, though the number of node entries will depend on the profile you used to start the network with (replace `<network-name>` with `Corda_Network` or `Corda_Network2`):
 ```bash
-PartyA node services started
-PartyB node services started
-Notary node services started
+PartyA node services started for network <network-name>
+PartyB node services started for network <network-name>
+PartyC node services started for network <network-name>
+Notary node services started for network <network-name>
 ```
 
 ### Corda Relay
 
-Navigate to the `core/relay` folder. Refer [here](#building-relay-image) to build the relay image if not already built. Now run a relay for `Corda_Network` in docker as follows:
+Navigate to the `core/relay` folder. Refer [here](#building-relay-image) to build the relay image if not already built. Now run a relay for `Corda_Network` and/or `Corda_Network2` in Docker container as follows:
 
-* Run: `make convert-compose-method2` to uncomment and comment some lines in `docker-compose.yaml`.
-* There's `.env.corda` file in `docker/testnet-envs` directory, that will be used to start a relay server in docker. Edit the file, and modify following values:
+* The `docker-compose.yaml` in this folder is minimally configured with default values. To modify it for use with the Fabric testnets, run:
+  ```bash
+  make convert-compose-method2
+  ```
+* The `.env.corda` and `.env.corda.tls` files in the `docker/testnet-envs` directory contain environment variables used by the `Corda_Network` relay at startup and runtime. Edit either of these files (depending on whether you wish to start the relay with or without TLS), and update the following value:
   ```
   DOCKER_IMAGE_NAME=weaver-relay-server
   ```
-* To deploy relay for `Corda_Network`, run:
+* Repeat the above step for `.env.corda2` or `.env.corda2.tls` in `docker/testnet-envs` directory, which contain environment variables for the `Corda_Network2` relay.
+* To deploy the relay server for `Corda_Network` without TLS, run:
   ```bash
   make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
   ```
-* To deploy relay for `Corda_Network2`, run:
+  Instead, to deploy the relay server with TLS, run:
+  ```bash
+  make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda.tls'
+  ```
+* To deploy the relay server for `Corda_Network2` without TLS, run:
   ```bash
   make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda2'
+  ```
+  Instead, to deploy the relay server with TLS, run:
+  ```bash
+  make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda2.tls'
+  ```
+* After launching the relay(s), you can revert the `docker-compose.yaml` changes by running:
+  ```bash
+  make convert-compose-method1
   ```
 
 ### Corda Driver
@@ -341,24 +359,36 @@ make image-local
 
 #### Deployment
 
-Run a Corda driver as follows:
-- There's a `.env.corda` file in `docker-testnet-envs` directory, that will be used to start a corda driver in docker. Edit the file and update the following value:
+Use the following steps to run Corda drivers in Docker containers:
+* The `.env.corda` and `.env.corda.tls` files in the `docker-testnet-envs` directory contain environment variables used by the `Corda_Network` driver at startup and runtime. Edit either of these files (depending on whether you wish to start the relay with or without TLS) to update the following value:
   ```
   DOCKER_IMAGE_NAME=weaver-corda-driver
   ```
-- To deploy Corda driver for `Corda_Network`, run:
+* Repeat the above steps for `.env.corda2` or `.env.corda2.tls` in `docker-testnet-envs` directory, which contain environment variables for the `Corda_Network2` driver.
+- To deploy the Corda driver for `Corda_Network` without TLS, run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
   ```
-- To deploy Corda driver for `Corda_Network2`, run:
+  Instead, to deploy the driver with TLS, run:
+  ```bash
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda.tls'
+  ```
+  If the driver starts successfully, it should log the following message when you run `docker logs corda-driver-Corda_Network`:
+  ```
+  Corda driver gRPC server started. Listening on port 9099
+  ```
+- To deploy the Corda driver for `Corda_Network2` without TLS, run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
   ```
-
-If the driver starts successfully, it should log the following message, when you run `docker logs corda-driver-Corda_Network`:
-```
-Corda driver gRPC server started. Listening on port 9099
-```
+  Instead, to deploy the driver with TLS, run:
+  ```bash
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2.tls'
+  ```
+  If the driver starts successfully, it should log the following message when you run `docker logs corda-driver-Corda_Network2`:
+  ```
+  Corda driver gRPC server started. Listening on port 9098
+  ```
 
 
 ## Tear Down the Setup
