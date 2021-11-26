@@ -673,9 +673,9 @@ const generateViewAddressFromRemoteConfig = (
     const configJSON = JSON.parse(fs.readFileSync(configPath).toString())
     if (!configJSON[networkId]) {
       logger.error(
-        `Network: ${networkId} does not exist in the remote-network-config.json file`
+        `Error: ${networkId} does not exist in the remote-network-config.json file`
       )
-      return ''
+      throw new Error(`Error: ${networkId} does not exist in the remote-network-config.json file`)
     }
     
     const remoteNetConfig = configJSON[networkId]
@@ -688,13 +688,13 @@ const generateViewAddressFromRemoteConfig = (
             remoteNetConfig.flowPackage + "." + funcName + ":" + funcArgs.join(':');
     } else {
         logger.error(`Error: remote network ${remoteNetConfig.type} not supported.`)
-        return ''
+        throw new Error(`Error: remote network ${remoteNetConfig.type} not supported.`)
     }
     
     return address
   } catch (err) {
-    logger.error(`Network: ${networkId} does not exist in the remote-network-config.json file`)
-    return ''
+    logger.error(`Error: ${err}`)
+    throw new Error(err)
   }
 }
 
