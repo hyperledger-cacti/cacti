@@ -208,7 +208,7 @@ const command: GluegunCommand = {
     args[args.indexOf('<assettype>')] = assetType
     args[args.indexOf('<pledger>')] = ownerCert
     args[args.indexOf('network1')] = options['source-network']
-    connst assetIdOrQuantityIndex = (applicationFunction == 'ClaimRemoteTokenAsset') ? args.indexOf('<numunits>') : args.indexOf('<assetid>')
+    const assetIdOrQuantityIndex = (applicationFunction == 'ClaimRemoteTokenAsset') ? args.indexOf('<numunits>') : args.indexOf('<assetid>')
     args[assetIdOrQuantityIndex] = `${assetIdOrQuantity}`
     
     let relayTlsCAFiles = []
