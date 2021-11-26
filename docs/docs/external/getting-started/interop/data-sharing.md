@@ -29,13 +29,23 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
-    ```bash
-    NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
-    ```
+    - Without TLS:
+      ```bash
+      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
+      ```
+    - With TLS:
+      ```bash
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
+      ```
   * If Relays and Drivers are deployed in Docker containers:
-    ```bash
-    NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
-    ```
+    - Without TLS:
+      ```bash
+      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
+      ```
+    - With TLS:
+      ```bash
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
+      ```
 - Query the value of the requested state using key `H` in `Corda_Network` by running the following command:
   ```bash
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state H
@@ -46,13 +56,23 @@ To test the scenario where `Corda_Network2` requests the value of the state (key
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
-    ```bash
-    NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C
-    ```
+    - Without TLS:
+      ```bash
+      NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C
+      ```
+    - With TLS:
+      ```bash
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C
+      ```
   * If Relays and Drivers are deployed in Docker containers:
-    ```bash
-    NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C
-    ```
+    - Without TLS:
+      ```bash
+      NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C
+      ```
+    - With TLS:
+      ```bash
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C
+      ```
 - Query the value of the requested state, using the key `C` in `Corda_Network` by running the following command:
   ```bash
   NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients get-state C

@@ -24,11 +24,11 @@ build-refresh-dependencies: github.properties
 	
 .PHONY: image-local
 image-local: build-local
-	docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
+	docker build -f Dockerfile.local -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
 
 .PHONY: image
 image: github.properties
-	docker build --build-arg BUILD_TAG="remote" --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
+	docker build --build-arg GIT_URL=$(GIT_URL) -f Dockerfile.remote -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
 
 .PHONY: push-image	
 push-image: image
