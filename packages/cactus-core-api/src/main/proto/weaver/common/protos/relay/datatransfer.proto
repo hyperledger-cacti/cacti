@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package relay.datatransfer;
+
+import "common/ack.proto";
+import "common/state.proto";
+import "common/query.proto";
+
+option java_package = "com.weaver.protos.relay.datatransfer";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/relay";
+
+// definitions of all messages used in the datatransfer protocol
+service DataTransfer {
+  // the requesting relay sends a RequestState request to the remote relay with a
+  // query defining the data it wants to receive
+  rpc RequestState(common.query.Query) returns (common.ack.Ack) {}
+  // the remote relay asynchronously sends back the requested data with
+  // SendState
+  rpc SendState(common.state.ViewPayload) returns (common.ack.Ack) {}
+  // Handling state sent from the driver.
+  rpc SendDriverState(common.state.ViewPayload) returns (common.ack.Ack){}
+}
+
+
+// TODO: Update DataTransferState to be a enum including possible error in ACK fromat.

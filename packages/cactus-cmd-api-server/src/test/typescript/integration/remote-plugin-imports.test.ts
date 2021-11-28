@@ -16,7 +16,11 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 
 import { DefaultApi } from "@hyperledger/cactus-plugin-keychain-vault";
-import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
+import {
+  Configuration,
+  PluginImportAction,
+  PluginImportType,
+} from "@hyperledger/cactus-core-api";
 import path from "path";
 
 test("NodeJS API server + Rust plugin work together", async (t: Test) => {
@@ -80,6 +84,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-keychain-vault",
       type: PluginImportType.Remote,
+      action: PluginImportAction.Install,
       options: {
         keychainId: "_keychainId_",
         instanceId: "_instanceId_",

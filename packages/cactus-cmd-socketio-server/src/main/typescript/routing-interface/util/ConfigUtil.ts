@@ -33,17 +33,15 @@ export class ConfigUtil {
    * @return {object} Merged objects
    */
   private static mergeObjects(target: object, source: object): object {
-    const isObject = (obj) =>
+    const isObject = (obj: unknown) =>
       obj && typeof obj === "object" && !Array.isArray(obj);
     const mergeObject = Object.assign({}, target);
     if (isObject(target) && isObject(source)) {
       for (const [sourceKey, sourceValue] of Object.entries(source)) {
-        const targetValue = target[sourceKey];
+        const targetValue = (target as { [key: string]: any })[sourceKey];
         if (isObject(sourceValue) && target.hasOwnProperty(sourceKey)) {
-          mergeObject[sourceKey] = ConfigUtil.mergeObjects(
-            targetValue,
-            sourceValue
-          );
+          (mergeObject as { [key: string]: any })[sourceKey] =
+            ConfigUtil.mergeObjects(targetValue, sourceValue);
         } else {
           Object.assign(mergeObject, { [sourceKey]: sourceValue });
         }

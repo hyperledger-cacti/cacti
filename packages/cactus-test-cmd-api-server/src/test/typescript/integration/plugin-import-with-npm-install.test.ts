@@ -8,6 +8,7 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   PluginImportType,
   ConsortiumDatabase,
+  PluginImportAction,
 } from "@hyperledger/cactus-core-api";
 
 import {
@@ -53,6 +54,7 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-keychain-memory",
       type: PluginImportType.Local,
+      action: PluginImportAction.Install,
       options: {
         instanceId: uuidv4(),
         keychainId: uuidv4(),
@@ -62,6 +64,7 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
     {
       packageName: "@hyperledger/cactus-plugin-consortium-manual",
       type: PluginImportType.Local,
+      action: PluginImportAction.Install,
       options: {
         instanceId: uuidv4(),
         keyPairPem: keyPairPem,
