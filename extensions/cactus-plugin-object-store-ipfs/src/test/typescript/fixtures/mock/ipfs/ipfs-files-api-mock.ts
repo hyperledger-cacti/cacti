@@ -1,4 +1,8 @@
+// Needed to disable the no-unused-vars check here because the file is full
+// of unused method parameters given how this is a mock which doesn't do
+// anything for the most part and that's by design.
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { CID } from "multiformats/cid";
 import {
   API as FilesAPI,
   ChmodOptions,
@@ -140,7 +144,7 @@ export class FilesApiMock implements FilesAPI {
   public async flush(
     ipfsPath: string,
     options?: AbortOptions | undefined,
-  ): Promise<any> {
+  ): Promise<CID> {
     throw new RuntimeError("Method flush() not implemented");
   }
 
