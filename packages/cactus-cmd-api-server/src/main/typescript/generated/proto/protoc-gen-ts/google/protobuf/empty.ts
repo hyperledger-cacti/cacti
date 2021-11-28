@@ -13,6 +13,10 @@ export namespace google.protobuf {
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], []);
             if (!Array.isArray(data) && typeof data == "object") { }
         }
+        static fromObject(data: {}) {
+            const message = new Empty({});
+            return message;
+        }
         toObject() {
             const data: {} = {};
             return data;

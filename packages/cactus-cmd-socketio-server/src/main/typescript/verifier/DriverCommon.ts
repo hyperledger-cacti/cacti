@@ -45,7 +45,7 @@ export function makeApiInfoList(targetApiInfo: any): ApiInfo[] {
 }
 
 // store on socket
-const socketArray = [];
+const socketArray: any[] = [];
 
 // Returns the index of socketArray as a return value
 export function addSocket(socket: any): number {

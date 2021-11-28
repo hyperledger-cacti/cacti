@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package driver.driver;
+
+import "common/ack.proto";
+import "common/query.proto";
+
+option java_package = "com.weaver.protos.driver.driver";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/driver";
+
+service DriverCommunication {
+  // the remote relay sends a RequestDriverState request to its driver with a
+  // query defining the data it wants to receive
+  rpc RequestDriverState(common.query.Query) returns (common.ack.Ack) {}
+}

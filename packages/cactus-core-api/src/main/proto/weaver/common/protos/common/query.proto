@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package common.query;
+option java_package = "com.weaver.protos.common.query";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+// the payload to define the data that is being requested
+message Query {
+  repeated string policy = 1;
+  string address = 2;
+  string requesting_relay = 3;
+  string requesting_network = 4;
+  string certificate = 5;
+  string requestor_signature = 6;
+  string nonce = 7;
+  string request_id = 8;
+  string requesting_org = 9;
+}

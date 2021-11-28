@@ -46,7 +46,6 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         // FIXME: do not recreate the mapper for every service implementation instance that we create...
         val mapper: ObjectMapper = jacksonObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
 
         val writer: ObjectWriter = mapper.writer()

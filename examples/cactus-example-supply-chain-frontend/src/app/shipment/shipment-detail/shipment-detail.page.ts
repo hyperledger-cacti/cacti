@@ -77,7 +77,7 @@ export class ShipmentDetailPage implements OnInit {
     this.log.debug(`BambooHarvest IDs: %o`, this.bookshelfIds);
   }
 
-  onClickFormSubmit(value: any): void {
+  onClickFormSubmit(value: Shipment): void {
     this.log.debug("form submitted", value);
     this.shipment = value;
     this.modalController.dismiss(this.shipment);
