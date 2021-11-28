@@ -38,6 +38,19 @@ export namespace common.asset_locks {
         set lockInfo(value: Uint8Array) {
             pb_1.Message.setField(this, 2, value);
         }
+        static fromObject(data: {
+            lockMechanism?: LockMechanism;
+            lockInfo?: Uint8Array;
+        }) {
+            const message = new AssetLock({});
+            if (data.lockMechanism != null) {
+                message.lockMechanism = data.lockMechanism;
+            }
+            if (data.lockInfo != null) {
+                message.lockInfo = data.lockInfo;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 lockMechanism?: LockMechanism;
@@ -113,6 +126,19 @@ export namespace common.asset_locks {
         }
         set claimInfo(value: Uint8Array) {
             pb_1.Message.setField(this, 2, value);
+        }
+        static fromObject(data: {
+            lockMechanism?: LockMechanism;
+            claimInfo?: Uint8Array;
+        }) {
+            const message = new AssetClaim({});
+            if (data.lockMechanism != null) {
+                message.lockMechanism = data.lockMechanism;
+            }
+            if (data.claimInfo != null) {
+                message.claimInfo = data.claimInfo;
+            }
+            return message;
         }
         toObject() {
             const data: {
@@ -200,6 +226,23 @@ export namespace common.asset_locks {
         set timeSpec(value: AssetLockHTLC.TimeSpec) {
             pb_1.Message.setField(this, 3, value);
         }
+        static fromObject(data: {
+            hashBase64?: Uint8Array;
+            expiryTimeSecs?: number;
+            timeSpec?: AssetLockHTLC.TimeSpec;
+        }) {
+            const message = new AssetLockHTLC({});
+            if (data.hashBase64 != null) {
+                message.hashBase64 = data.hashBase64;
+            }
+            if (data.expiryTimeSecs != null) {
+                message.expiryTimeSecs = data.expiryTimeSecs;
+            }
+            if (data.timeSpec != null) {
+                message.timeSpec = data.timeSpec;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 hashBase64?: Uint8Array;
@@ -280,6 +323,15 @@ export namespace common.asset_locks {
         }
         set hashPreimageBase64(value: Uint8Array) {
             pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            hashPreimageBase64?: Uint8Array;
+        }) {
+            const message = new AssetClaimHTLC({});
+            if (data.hashPreimageBase64 != null) {
+                message.hashPreimageBase64 = data.hashPreimageBase64;
+            }
+            return message;
         }
         toObject() {
             const data: {
@@ -367,6 +419,27 @@ export namespace common.asset_locks {
         }
         set recipient(value: string) {
             pb_1.Message.setField(this, 4, value);
+        }
+        static fromObject(data: {
+            type?: string;
+            id?: string;
+            locker?: string;
+            recipient?: string;
+        }) {
+            const message = new AssetExchangeAgreement({});
+            if (data.type != null) {
+                message.type = data.type;
+            }
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.locker != null) {
+                message.locker = data.locker;
+            }
+            if (data.recipient != null) {
+                message.recipient = data.recipient;
+            }
+            return message;
         }
         toObject() {
             const data: {
@@ -482,6 +555,27 @@ export namespace common.asset_locks {
         set recipient(value: string) {
             pb_1.Message.setField(this, 4, value);
         }
+        static fromObject(data: {
+            type?: string;
+            numUnits?: number;
+            locker?: string;
+            recipient?: string;
+        }) {
+            const message = new FungibleAssetExchangeAgreement({});
+            if (data.type != null) {
+                message.type = data.type;
+            }
+            if (data.numUnits != null) {
+                message.numUnits = data.numUnits;
+            }
+            if (data.locker != null) {
+                message.locker = data.locker;
+            }
+            if (data.recipient != null) {
+                message.recipient = data.recipient;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 type?: string;
@@ -596,6 +690,27 @@ export namespace common.asset_locks {
         set claim(value: AssetClaimHTLC) {
             pb_1.Message.setWrapperField(this, 4, value);
         }
+        static fromObject(data: {
+            contractId?: string;
+            agreement?: ReturnType<typeof AssetExchangeAgreement.prototype.toObject>;
+            lock?: ReturnType<typeof AssetLockHTLC.prototype.toObject>;
+            claim?: ReturnType<typeof AssetClaimHTLC.prototype.toObject>;
+        }) {
+            const message = new AssetContractHTLC({});
+            if (data.contractId != null) {
+                message.contractId = data.contractId;
+            }
+            if (data.agreement != null) {
+                message.agreement = AssetExchangeAgreement.fromObject(data.agreement);
+            }
+            if (data.lock != null) {
+                message.lock = AssetLockHTLC.fromObject(data.lock);
+            }
+            if (data.claim != null) {
+                message.claim = AssetClaimHTLC.fromObject(data.claim);
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 contractId?: string;
@@ -709,6 +824,27 @@ export namespace common.asset_locks {
         }
         set claim(value: AssetClaimHTLC) {
             pb_1.Message.setWrapperField(this, 4, value);
+        }
+        static fromObject(data: {
+            contractId?: string;
+            agreement?: ReturnType<typeof FungibleAssetExchangeAgreement.prototype.toObject>;
+            lock?: ReturnType<typeof AssetLockHTLC.prototype.toObject>;
+            claim?: ReturnType<typeof AssetClaimHTLC.prototype.toObject>;
+        }) {
+            const message = new FungibleAssetContractHTLC({});
+            if (data.contractId != null) {
+                message.contractId = data.contractId;
+            }
+            if (data.agreement != null) {
+                message.agreement = FungibleAssetExchangeAgreement.fromObject(data.agreement);
+            }
+            if (data.lock != null) {
+                message.lock = AssetLockHTLC.fromObject(data.lock);
+            }
+            if (data.claim != null) {
+                message.claim = AssetClaimHTLC.fromObject(data.claim);
+            }
+            return message;
         }
         toObject() {
             const data: {
