@@ -24,7 +24,8 @@
                 "type": "object",
                 "required": [
                     "packageName",
-                    "type"
+                    "type",
+                    "action"
                 ],
                 "properties": {
                     "packageName": {
@@ -38,6 +39,11 @@
                         "description": "",
                         "$ref": "#/components/schemas/PluginImportType"
                     },
+                    "action": {
+                        "nullable": false,
+                        "description": "",
+                        "$ref": "#/components/schemas/PluginImportAction"
+                    },
                     "options": {}
                 }
             },
@@ -46,6 +52,13 @@
                 "enum": [
                     "org.hyperledger.cactus.plugin_import_type.LOCAL",
                     "org.hyperledger.cactus.plugin_import_type.REMOTE"
+                ]
+            },
+            "PluginImportAction": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.plugin_import_action.INSTANTIATE",
+                    "org.hyperledger.cactus.plugin_import_action.INSTALL"
                 ]
             },
             "ConsensusAlgorithmFamily": {

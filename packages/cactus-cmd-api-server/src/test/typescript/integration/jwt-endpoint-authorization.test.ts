@@ -14,6 +14,7 @@ import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   Configuration,
   ConsortiumDatabase,
+  PluginImportAction,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
@@ -88,6 +89,7 @@ test(testCase, async (t: Test) => {
       {
         packageName: "@hyperledger/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
+        action: PluginImportAction.Install,
         options: {
           instanceId: uuidv4(),
           keychainId: uuidv4(),
@@ -97,6 +99,7 @@ test(testCase, async (t: Test) => {
       {
         packageName: "@hyperledger/cactus-plugin-consortium-manual",
         type: PluginImportType.Local,
+        action: PluginImportAction.Install,
         options: {
           instanceId: uuidv4(),
           keyPairPem: keyPairPem,

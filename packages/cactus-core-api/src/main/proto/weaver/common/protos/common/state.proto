@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package common.state;
+option java_package = "com.weaver.protos.common.state";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+// Metadata for a View
+message Meta {
+    enum Protocol {
+        BITCOIN = 0;
+        ETHEREUM = 1;
+        FABRIC = 3;
+        CORDA = 4;
+    }
+    // Underlying distributed ledger protocol.
+    Protocol protocol = 1; 
+    // What notion of time? 
+    // If the observer and network are synchronizing on a global clock
+    // there won't be a need to distinguish between static and dynamic views.
+    string timestamp = 2; 
+    // Notorization, SPV, ZKP, etc. Possibly enum
+    string proof_type = 3; 
+    // The data field's serialization format (e.g. JSON, XML, Protobuf)
+    string serialization_format = 4;
+}
+
+message View {
+  Meta meta = 1;
+  // Represents the data playload of this view. 
+  // The representation of Fabric, Corda etc will be captured elsewhere.
+  // For some protocols, like Bitcoin, the structure of an SPV proof is well known.
+  bytes data = 2;
+}
+
+// View represents the response from a remote network
+message ViewPayload {
+  string request_id = 1;
+  oneof state {
+    View view = 2;
+    string error = 3;
+  };
+}
+
+// the payload that is used for the communication between the requesting relay
+// and its network
+message RequestState {
+  enum STATUS {
+    // pending ACK from remote relay
+    PENDING_ACK = 0;
+    // Received ACK, waiting for data to be sent from remote relay
+    PENDING = 1;
+    ERROR = 2;
+    COMPLETED = 3;
+  };
+  string request_id = 1;
+  STATUS status = 2;
+  oneof state {
+    View view = 3;
+    string error = 4;
+  };
+}
+
