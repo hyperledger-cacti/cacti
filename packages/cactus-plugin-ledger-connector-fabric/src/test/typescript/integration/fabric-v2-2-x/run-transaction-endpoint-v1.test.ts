@@ -1,7 +1,7 @@
 import http from "http";
 import { AddressInfo } from "net";
+import "jest-extended";
 
-import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 
 import bodyParser from "body-parser";
@@ -46,261 +46,261 @@ import { Configuration } from "@hyperledger/cactus-core-api";
  */
 
 const testCase = "runs tx on a Fabric v2.2.0 ledger";
-const logLevel: LogLevelDesc = "TRACE";
 
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
-});
-
-test(testCase, async (t: Test) => {
+describe(testCase, () => {
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
   const logLevel: LogLevelDesc = "TRACE";
   const level = "INFO";
   const label = "fabric run transaction test";
   const log = LoggerProvider.getOrCreate({ level, label });
-
-  test.onFailure(async () => {
-    await Containers.logDiagnostics({ logLevel });
-  });
-
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
     logLevel,
     imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
+    imageVersion: "2021-09-02--fix-876-supervisord-retries",
     envVars: new Map([
       ["FABRIC_VERSION", "2.2.0"],
       ["CA_VERSION", "1.4.9"],
     ]),
   });
-  t.ok(ledger, "ledger (FabricTestLedgerV1) truthy OK");
-
-  const tearDownLedger = async () => {
-    await ledger.stop();
-    await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
-  };
-
-  test.onFinish(tearDownLedger);
-
-  await ledger.start();
-
-  const enrollAdminOut = await ledger.enrollAdmin();
-  const adminWallet = enrollAdminOut[1];
-  const [userIdentity] = await ledger.enrollUser(adminWallet);
-
-  const connectionProfile = await ledger.getConnectionProfileOrg1();
-
-  const sshConfig = await ledger.getSshConfig();
-
-  const keychainInstanceId = uuidv4();
-  const keychainId = uuidv4();
-  const keychainEntryKey = "user2";
-  const keychainEntryValue = JSON.stringify(userIdentity);
-
-  const keychainPlugin = new PluginKeychainMemory({
-    instanceId: keychainInstanceId,
-    keychainId,
-    logLevel,
-    backend: new Map([
-      [keychainEntryKey, keychainEntryValue],
-      ["some-other-entry-key", "some-other-entry-value"],
-    ]),
+  let addressInfo,
+    address: string,
+    port: number,
+    apiHost,
+    apiConfig,
+    apiClient: FabricApi;
+  expect(ledger).toBeTruthy();
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
   });
 
-  const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
+  afterAll(async () => {
+    await ledger.stop();
+    await ledger.destroy();
+  });
+  afterAll(async () => await Servers.shutdown(server));
 
-  const discoveryOptions: DiscoveryOptions = {
-    enabled: true,
-    asLocalhost: true,
-  };
+  afterAll(async () => {
+    await Containers.logDiagnostics({ logLevel });
+  });
+  afterAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
+  });
 
-  const pluginOptions: IPluginLedgerConnectorFabricOptions = {
-    instanceId: uuidv4(),
-    pluginRegistry,
-    sshConfig,
-    cliContainerEnv: {},
-    peerBinary: "/fabric-samples/bin/peer",
-    logLevel,
-    connectionProfile,
-    discoveryOptions,
-    eventHandlerOptions: {
-      strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
-      commitTimeout: 300,
-    },
-  };
-  const plugin = new PluginLedgerConnectorFabric(pluginOptions);
+  beforeAll(async () => {
+    await ledger.start();
 
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "localhost",
-    port: 0,
-    server,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
-  const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
-  t.comment(
-    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`,
-  );
+    const listenOptions: IListenOptions = {
+      hostname: "localhost",
+      port: 0,
+      server,
+    };
+    addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    ({ address, port } = addressInfo);
+    apiHost = `http://${address}:${port}`;
 
-  const apiConfig = new Configuration({ basePath: apiHost });
-  const apiClient = new FabricApi(apiConfig);
+    apiConfig = new Configuration({ basePath: apiHost });
+    apiClient = new FabricApi(apiConfig);
+  });
 
-  await plugin.getOrCreateWebServices();
-  await plugin.registerWebServices(expressApp);
+  test(testCase, async () => {
+    const enrollAdminOut = await ledger.enrollAdmin();
+    const adminWallet = enrollAdminOut[1];
+    const [userIdentity] = await ledger.enrollUser(adminWallet);
 
-  const assetId = "asset277";
-  const assetOwner = uuidv4();
+    const connectionProfile = await ledger.getConnectionProfileOrg1();
 
-  const channelName = "mychannel";
-  const contractName = "basic";
-  const signingCredential: FabricSigningCredential = {
-    keychainId,
-    keychainRef: keychainEntryKey,
-  };
-  {
-    const res = await apiClient.runTransactionV1({
-      signingCredential,
-      channelName,
-      contractName,
-      invocationType: FabricContractInvocationType.Call,
-      methodName: "GetAllAssets",
-      params: [],
-    } as RunTransactionRequest);
-    t.ok(res);
-    t.ok(res.data);
-    t.equal(res.status, 200);
-    t.doesNotThrow(() => JSON.parse(res.data.functionOutput));
-  }
-  {
-    const req: RunTransactionRequest = {
-      signingCredential,
-      channelName,
-      invocationType: FabricContractInvocationType.Send,
-      contractName,
-      methodName: "CreateAsset",
-      params: [assetId, "yellow", "11", assetOwner, "199"],
+    const sshConfig = await ledger.getSshConfig();
+
+    const keychainInstanceId = uuidv4();
+    const keychainId = uuidv4();
+    const keychainEntryKey = "user2";
+    const keychainEntryValue = JSON.stringify(userIdentity);
+
+    const keychainPlugin = new PluginKeychainMemory({
+      instanceId: keychainInstanceId,
+      keychainId,
+      logLevel,
+      backend: new Map([
+        [keychainEntryKey, keychainEntryValue],
+        ["some-other-entry-key", "some-other-entry-value"],
+      ]),
+    });
+
+    const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
+
+    const discoveryOptions: DiscoveryOptions = {
+      enabled: true,
+      asLocalhost: true,
     };
 
-    const res = await apiClient.runTransactionV1(req);
-    t.ok(res);
-    t.ok(res.data);
-    t.ok(res.data.transactionId);
-    t.equal(res.status, 200);
-    const res2 = await apiClient.getTransactionReceiptByTxIDV1({
-      signingCredential,
-      channelName,
-      contractName: "qscc",
-      invocationType: FabricContractInvocationType.Call,
-      methodName: "GetBlockByTxID",
-      params: [channelName, res.data.transactionId],
-    } as RunTransactionRequest);
-    t.ok(res2);
-    log.info(res2.data);
-  }
-
-  {
-    const res = await apiClient.runTransactionV1({
-      signingCredential,
-      channelName,
-      contractName,
-      invocationType: FabricContractInvocationType.Call,
-      methodName: "GetAllAssets",
-      params: [],
-    } as RunTransactionRequest);
-    t.ok(res);
-    t.ok(res.data);
-    t.equal(res.status, 200);
-    const assets = JSON.parse(res.data.functionOutput);
-    const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
-    t.ok(asset277, "Located Asset record by its ID OK");
-    t.ok(asset277.owner, `Asset object has "owner" property OK`);
-    t.equal(asset277.owner, assetOwner, `Asset has expected owner OK`);
-  }
-
-  {
-    const res = await apiClient.getPrometheusMetricsV1();
-    const promMetricsOutput =
-      "# HELP " +
-      K_CACTUS_FABRIC_TOTAL_TX_COUNT +
-      " Total transactions executed\n" +
-      "# TYPE " +
-      K_CACTUS_FABRIC_TOTAL_TX_COUNT +
-      " gauge\n" +
-      K_CACTUS_FABRIC_TOTAL_TX_COUNT +
-      '{type="' +
-      K_CACTUS_FABRIC_TOTAL_TX_COUNT +
-      '"} 3';
-    t.comment(promMetricsOutput);
-    t.ok(res);
-    t.ok(res.data);
-    t.comment(res.data);
-    t.equal(res.status, 200);
-    t.true(
-      res.data.includes(promMetricsOutput),
-      "Total Transaction Count of 4 recorded as expected. RESULT OK",
-    );
-  }
-
-  {
-    const req: RunTransactionRequest = {
-      signingCredential,
-      gatewayOptions: {
-        identity: keychainEntryKey,
-        wallet: {
-          json: keychainEntryValue,
-        },
+    const pluginOptions: IPluginLedgerConnectorFabricOptions = {
+      instanceId: uuidv4(),
+      pluginRegistry,
+      sshConfig,
+      cliContainerEnv: {},
+      peerBinary: "/fabric-samples/bin/peer",
+      logLevel,
+      connectionProfile,
+      discoveryOptions,
+      eventHandlerOptions: {
+        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+        commitTimeout: 300,
       },
-      channelName,
-      invocationType: FabricContractInvocationType.Send,
-      contractName,
-      methodName: "CreateAsset",
-      params: ["asset388", "green", "111", assetOwner, "299"],
-      endorsingPeers: ["org1.example.com", "Org2MSP"],
     };
+    const plugin = new PluginLedgerConnectorFabric(pluginOptions);
 
-    const res = await apiClient.runTransactionV1(req);
-    t.ok(res, "Create green asset response truthy OK");
-    t.ok(res.data, "Create green asset response.data truthy OK");
-    t.equal(res.status, 200, "Create green asset response.status=200 OK");
-  }
+    await plugin.getOrCreateWebServices();
+    await plugin.registerWebServices(expressApp);
 
-  {
-    const res = await apiClient.runTransactionV1({
-      gatewayOptions: {
-        connectionProfile,
-        discovery: discoveryOptions,
-        eventHandlerOptions: {
-          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
-          commitTimeout: 300,
-          endorseTimeout: 300,
+    const assetId = "asset277";
+    const assetOwner = uuidv4();
+
+    const channelName = "mychannel";
+    const contractName = "basic";
+    const signingCredential: FabricSigningCredential = {
+      keychainId,
+      keychainRef: keychainEntryKey,
+    };
+    {
+      const res = await apiClient.runTransactionV1({
+        signingCredential,
+        channelName,
+        contractName,
+        invocationType: FabricContractInvocationType.Call,
+        methodName: "GetAllAssets",
+        params: [],
+      } as RunTransactionRequest);
+      expect(res).toBeTruthy();
+      expect(res.data).toBeTruthy();
+      expect(res.status).toEqual(200);
+      expect(() => JSON.parse(res.data.functionOutput)).not.toThrow();
+    }
+    {
+      const req: RunTransactionRequest = {
+        signingCredential,
+        channelName,
+        invocationType: FabricContractInvocationType.Send,
+        contractName,
+        methodName: "CreateAsset",
+        params: [assetId, "yellow", "11", assetOwner, "199"],
+      };
+
+      const res = await apiClient.runTransactionV1(req);
+      expect(res.data.transactionId).toBeTruthy();
+      expect(res).toBeTruthy();
+      expect(res.data).toBeTruthy();
+      expect(res.status).toEqual(200);
+
+      const res2 = await apiClient.getTransactionReceiptByTxIDV1({
+        signingCredential,
+        channelName,
+        contractName: "qscc",
+        invocationType: FabricContractInvocationType.Call,
+        methodName: "GetBlockByTxID",
+        params: [channelName, res.data.transactionId],
+      } as RunTransactionRequest);
+
+      expect(res2).toBeTruthy();
+      log.info(res2.data);
+    }
+
+    {
+      const res = await apiClient.runTransactionV1({
+        signingCredential,
+        channelName,
+        contractName,
+        invocationType: FabricContractInvocationType.Call,
+        methodName: "GetAllAssets",
+        params: [],
+      } as RunTransactionRequest);
+      expect(res).toBeTruthy();
+      expect(res.data).toBeTruthy();
+      expect(res.status).toEqual(200);
+      const assets = JSON.parse(res.data.functionOutput);
+      const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
+      expect(asset277).toBeTruthy();
+      expect(asset277.owner).toBeTruthy();
+      expect(asset277.owner).toEqual(assetOwner);
+    }
+
+    {
+      const res = await apiClient.getPrometheusMetricsV1();
+      const promMetricsOutput =
+        "# HELP " +
+        K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+        " Total transactions executed\n" +
+        "# TYPE " +
+        K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+        " gauge\n" +
+        K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+        '{type="' +
+        K_CACTUS_FABRIC_TOTAL_TX_COUNT +
+        '"} 3';
+      expect(res).toBeTruthy();
+      expect(res.data).toBeTruthy();
+      expect(res.status).toEqual(200);
+      expect(res.data.includes(promMetricsOutput)).toBeTrue();
+    }
+
+    {
+      const req: RunTransactionRequest = {
+        signingCredential,
+        gatewayOptions: {
+          identity: keychainEntryKey,
+          wallet: {
+            json: keychainEntryValue,
+          },
         },
-        identity: keychainEntryKey,
-        wallet: {
-          json: keychainEntryValue,
-        },
-      },
-      signingCredential,
-      channelName,
-      contractName,
-      invocationType: FabricContractInvocationType.Call,
-      methodName: "GetAllAssets",
-      params: [],
-    } as RunTransactionRequest);
-    t.ok(res);
-    t.ok(res.data);
-    t.equal(res.status, 200);
-    const assets = JSON.parse(res.data.functionOutput);
-    const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
-    t.ok(asset277, "Located Asset record by its ID OK");
-    t.ok(asset277.owner, `Asset object has "owner" property OK`);
-    t.equal(asset277.owner, assetOwner, `Asset has expected owner OK`);
-  }
+        channelName,
+        invocationType: FabricContractInvocationType.Send,
+        contractName,
+        methodName: "CreateAsset",
+        params: ["asset388", "green", "111", assetOwner, "299"],
+        endorsingPeers: ["org1.example.com", "Org2MSP"],
+      };
 
-  t.end();
+      const res = await apiClient.runTransactionV1(req);
+      expect(res).toBeTruthy();
+      expect(res.data).toBeTruthy();
+      expect(res.status).toEqual(200);
+    }
+
+    {
+      const res = await apiClient.runTransactionV1({
+        gatewayOptions: {
+          connectionProfile,
+          discovery: discoveryOptions,
+          eventHandlerOptions: {
+            strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+            commitTimeout: 300,
+            endorseTimeout: 300,
+          },
+          identity: keychainEntryKey,
+          wallet: {
+            json: keychainEntryValue,
+          },
+        },
+        signingCredential,
+        channelName,
+        contractName,
+        invocationType: FabricContractInvocationType.Call,
+        methodName: "GetAllAssets",
+        params: [],
+      } as RunTransactionRequest);
+      expect(res).toBeTruthy();
+      expect(res.data).toBeTruthy();
+      expect(res.status).toEqual(200);
+      const assets = JSON.parse(res.data.functionOutput);
+      const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
+      expect(asset277).toBeTruthy();
+      expect(asset277.owner).toBeTruthy();
+      expect(asset277.owner).toEqual(assetOwner);
+    }
+  });
 });
