@@ -1,4 +1,5 @@
-import test, { Test } from "tape";
+import "jest-extended";
+
 import { randomBytes } from "crypto";
 import secp256k1 from "secp256k1";
 import { OdapGateway } from "../../../../main/typescript/gateway/odap-gateway";
@@ -6,7 +7,7 @@ import { TransferCompleteV1Request } from "../../../../main/typescript/generated
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
 
-test("dummy test for transfer complete flow", async (t: Test) => {
+test("dummy test for transfer complete flow", async () => {
   const odapConstructor = {
     name: "cactus-plugin#odapGateway",
     dltIDs: ["dummy"],
@@ -44,8 +45,7 @@ test("dummy test for transfer complete flow", async (t: Test) => {
     JSON.stringify(transferCompleteReq),
     dummyPrivKeyStr,
   );
-  t.doesNotThrow(
+  await expect(
     async () => await odapGateWay.TransferComplete(transferCompleteReq),
-    "does not throw if lock evidence proccessed",
-  );
+  ).not.toThrow();
 });
