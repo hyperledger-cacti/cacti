@@ -126,7 +126,7 @@ docker run \
   --publish 3000:3000 \
   --publish 4000:4000 \
   --publish 5000:5000 \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' \
+  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' \
   cplcb
 ```
 
@@ -139,13 +139,13 @@ docker run \
   --publish 5000:5000 \
   cplcb \
     ./node_modules/.bin/cactusapi \
-    --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]'
+    --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]'
 ```
 
 Launch container with **configuration file** mounted from host machine:
 ```sh
 
-echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' > cactus.json
+echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL", "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' > cactus.json
 
 docker run \
   --rm \
@@ -175,7 +175,7 @@ docker run \
   --publish 3000:3000 \
   --publish 4000:4000 \
   --publish 5000:5000 \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' \
+  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL", "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' \
   cplcb
 ```
 

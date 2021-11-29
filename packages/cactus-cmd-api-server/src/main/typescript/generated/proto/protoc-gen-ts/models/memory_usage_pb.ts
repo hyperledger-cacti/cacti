@@ -65,6 +65,31 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         set arrayBuffers(value: number) {
             pb_1.Message.setField(this, 116952168, value);
         }
+        static fromObject(data: {
+            rss?: number;
+            heapTotal?: number;
+            heapUsed?: number;
+            external?: number;
+            arrayBuffers?: number;
+        }) {
+            const message = new MemoryUsagePB({});
+            if (data.rss != null) {
+                message.rss = data.rss;
+            }
+            if (data.heapTotal != null) {
+                message.heapTotal = data.heapTotal;
+            }
+            if (data.heapUsed != null) {
+                message.heapUsed = data.heapUsed;
+            }
+            if (data.external != null) {
+                message.external = data.external;
+            }
+            if (data.arrayBuffers != null) {
+                message.arrayBuffers = data.arrayBuffers;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 rss?: number;
