@@ -15,18 +15,13 @@ const command: GluegunCommand = {
 			commandHelp(
 				print,
 				toolbox,
-				`besu-cli asset is-locked -network=network1 --interop_contract='path/to/interopcontract.json' --lock_contract_id=lockContractID`,
-				'besu-cli asset is-locked --network=<network1|network2> --interop_contract=<path-to-interopContract.json> --lock_contract_id=<lockContractID>',
+				`besu-cli asset is-locked -network=network1 --lock_contract_id=lockContractID`,
+				'besu-cli asset is-locked --network=<network1|network2> --lock_contract_id=<lockContractID>',
 				[
 					{
 						name: '--network',
 						description:
 							'network for command. <network1|network2>'
-					},
-					{
-						name: '--interop_contract',
-						description:
-							'Path to the json file corresponding to the interop contract compiled with Truffle.'
 					},
 					{
 						name: '--lock-contract-id',
@@ -44,7 +39,7 @@ const command: GluegunCommand = {
 		console.log(networkConfig)
 
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
-		const interopContract = await getContractInstance(provider, options.interop_contract)
+		const interopContract = await getContractInstance(provider, networkConfig.interopContract)
 
 		var isLocked = interopContract.isFungibleAssetLocked(options.lock_contract_id)
 		console.log(`Is there an asset locked in ${options.lock_conntract_id} in Network ${options.network}: ${isLocked}`)

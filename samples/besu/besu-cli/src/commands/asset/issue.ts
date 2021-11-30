@@ -15,18 +15,13 @@ const command: GluegunCommand = {
 			commandHelp(
 				print,
 				toolbox,
-				`besu-cli asset issue --network=network1 --contract=path/to/contracts/tokenContract.json --account=1 --amount=10`,
-				'besu-cli asset issue --network=<network1|network2> --contract=<path-to-tokencontract-json>--account=<account-index> --amount=<issue-ammount>',
+				`besu-cli asset issue --network=network1 --account=1 --amount=10`,
+				'besu-cli asset issue --network=<network1|network2> --account=<account-index> --amount=<issue-ammount>',
 				[
 					{
 						name: '--network',
 						description:
 							'network for command. <network1|network2>'
-					},
-					{
-						name: '--contract',
-						description:
-							'Path to the json file corresponding to the token contract compiled with Truffle.'
 					},
 					{
 						name: '--account',
@@ -50,7 +45,7 @@ const command: GluegunCommand = {
 	
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const web3N = new Web3(provider)
-		const tokenContract = await getContractInstance(provider, options.contract).catch(function () {
+		const tokenContract = await getContractInstance(provider, networkConfig.tokenContract).catch(function () {
 			console.log("Failed getting tokenContract!");
 		})
 		const accounts = await web3N.eth.getAccounts()

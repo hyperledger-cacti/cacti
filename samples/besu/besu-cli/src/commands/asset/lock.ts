@@ -16,23 +16,13 @@ const command: GluegunCommand = {
 			commandHelp(
 				print,
 				toolbox,
-				`besu-cli asset lock --network=network1 --token_contract='path/to/tokenContract.json' --interop_contract='path/to/interopcontract.json' --sender_account=1 --recipient_account=2 --amount=5 --timeout=10`,
-				'besu-cli asset lock --network=<network1|network2> --token_contract=<path-to-tokenContract.json> --interop_contract=<path-to-interopContract.json> --sender_account=<1|2> --recipient_account=<2|1> --amount=<lock-amount> --timeout=<lock-duration-seconds> --hash=<hashLock-optional-parameter>',
+				`besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=5 --timeout=10`,
+				'besu-cli asset lock --network=<network1|network2> --sender_account=<1|2> --recipient_account=<2|1> --amount=<lock-amount> --timeout=<lock-duration-seconds> --hash=<hashLock-optional-parameter>',
 				[
 					{
 						name: '--network',
 						description:
 							'network for command. <network1|network2>'
-					},
-					{
-						name: '--token_contract',
-						description:
-							'Path to the json file corresponding to the token contract compiled with Truffle.'
-					},
-					{
-						name: '--interop_contract',
-						description:
-							'Path to the json file corresponding to the interop contract compiled with Truffle.'
 					},
 					{
 						name: '--sender_account',
@@ -68,8 +58,6 @@ const command: GluegunCommand = {
 		print.info('Lock assets (fungible assets for now)')
 		const networkConfig = getNetworkConfig(options.network)
 		console.log(networkConfig)
-		console.log('Token contract', options.token_contract)
-		console.log('Interop contract', options.interop_contract)
 		console.log('Sender', options.sender_account)
 		console.log('Receiver', options.recipient_account)
 		console.log('Amount', options.amount)
@@ -78,10 +66,10 @@ const command: GluegunCommand = {
 
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const web3N = new Web3(provider)
-		const interopContract = await getContractInstance(provider, options.interop_contract).catch(function () {
+		const interopContract = await getContractInstance(provider, networkConfig.interopContract).catch(function () {
 			console.log("Failed getting interopContract!");
 		})
-		const tokenContract = await getContractInstance(provider, options.token_contract).catch(function () {
+		const tokenContract = await getContractInstance(provider, networkConfig.tokenContract).catch(function () {
 			console.log("Failed getting tokenContract!");
 		})
 		const accounts = await web3N.eth.getAccounts()
