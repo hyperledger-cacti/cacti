@@ -35,6 +35,19 @@ export namespace common.interop_payload {
         set address(value: string) {
             pb_1.Message.setField(this, 2, value);
         }
+        static fromObject(data: {
+            payload?: Uint8Array;
+            address?: string;
+        }) {
+            const message = new InteropPayload({});
+            if (data.payload != null) {
+                message.payload = data.payload;
+            }
+            if (data.address != null) {
+                message.address = data.address;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 payload?: Uint8Array;

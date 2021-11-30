@@ -35,6 +35,19 @@ export namespace common.access_control {
         set rules(value: Rule[]) {
             pb_1.Message.setRepeatedWrapperField(this, 2, value);
         }
+        static fromObject(data: {
+            securityDomain?: string;
+            rules?: ReturnType<typeof Rule.prototype.toObject>[];
+        }) {
+            const message = new AccessControlPolicy({});
+            if (data.securityDomain != null) {
+                message.securityDomain = data.securityDomain;
+            }
+            if (data.rules != null) {
+                message.rules = data.rules.map(item => Rule.fromObject(item));
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 securityDomain?: string;
@@ -130,6 +143,27 @@ export namespace common.access_control {
         }
         set read(value: boolean) {
             pb_1.Message.setField(this, 4, value);
+        }
+        static fromObject(data: {
+            principal?: string;
+            principalType?: string;
+            resource?: string;
+            read?: boolean;
+        }) {
+            const message = new Rule({});
+            if (data.principal != null) {
+                message.principal = data.principal;
+            }
+            if (data.principalType != null) {
+                message.principalType = data.principalType;
+            }
+            if (data.resource != null) {
+                message.resource = data.resource;
+            }
+            if (data.read != null) {
+                message.read = data.read;
+            }
+            return message;
         }
         toObject() {
             const data: {

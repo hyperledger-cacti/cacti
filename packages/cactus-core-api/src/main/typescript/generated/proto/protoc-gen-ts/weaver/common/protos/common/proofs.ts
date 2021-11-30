@@ -35,6 +35,19 @@ export namespace common.proofs {
         set certificate(value: string) {
             pb_1.Message.setField(this, 2, value);
         }
+        static fromObject(data: {
+            signature?: string;
+            certificate?: string;
+        }) {
+            const message = new Proof({});
+            if (data.signature != null) {
+                message.signature = data.signature;
+            }
+            if (data.certificate != null) {
+                message.certificate = data.certificate;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 signature?: string;
@@ -100,6 +113,15 @@ export namespace common.proofs {
         }
         set proofs(value: Proof[]) {
             pb_1.Message.setRepeatedWrapperField(this, 1, value);
+        }
+        static fromObject(data: {
+            proofs?: ReturnType<typeof Proof.prototype.toObject>[];
+        }) {
+            const message = new Proofs({});
+            if (data.proofs != null) {
+                message.proofs = data.proofs.map(item => Proof.fromObject(item));
+            }
+            return message;
         }
         toObject() {
             const data: {

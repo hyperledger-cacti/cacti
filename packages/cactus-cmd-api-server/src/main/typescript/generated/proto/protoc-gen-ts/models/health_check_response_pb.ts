@@ -46,6 +46,23 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         set memoryUsage(value: dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB) {
             pb_1.Message.setWrapperField(this, 335792418, value);
         }
+        static fromObject(data: {
+            success?: boolean;
+            createdAt?: string;
+            memoryUsage?: ReturnType<typeof dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.prototype.toObject>;
+        }) {
+            const message = new HealthCheckResponsePB({});
+            if (data.success != null) {
+                message.success = data.success;
+            }
+            if (data.createdAt != null) {
+                message.createdAt = data.createdAt;
+            }
+            if (data.memoryUsage != null) {
+                message.memoryUsage = dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.fromObject(data.memoryUsage);
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 success?: boolean;
