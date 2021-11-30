@@ -36,11 +36,13 @@ const command: GluegunCommand = {
 
     print.info('Reading config.json file')
     const configPath = path.resolve(
-      process.env.CONFIG_PATH ? process.env.CONFIG_PATH : __dirname,
-      '..',
-      '..',
-      '..',
-      'config.json'
+      process.env.CONFIG_PATH ? process.env.CONFIG_PATH : path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'config.json'
+      )
     )
     !fs.existsSync(configPath) &&
       fs.writeFileSync(configPath, '', { flag: 'wx' })
