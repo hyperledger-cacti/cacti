@@ -193,11 +193,14 @@ jobs:
     # - name: Print Disk Usage Reports
     #   run: df ; echo "" ; docker system df
 
-    - name: ghcr.io/hyperledger/cactus-iroha-all-in-one
-      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/iroha-all-in-one/ -f ./tools/docker/iroha-all-in-one/Dockerfile
+    # Disabled this build step until we fix: #1566
+    # https://github.com/hyperledger/cactus/issues/1566
+    #
+    # - name: ghcr.io/hyperledger/cactus-iroha-all-in-one
+    #   run: DOCKER_BUILDKIT=1 docker build ./tools/docker/iroha-all-in-one/ -f ./tools/docker/iroha-all-in-one/Dockerfile
 
-    - name: Print Disk Usage Reports
-      run: df ; echo "" ; docker system df
+    # - name: Print Disk Usage Reports
+    #   run: df ; echo "" ; docker system df
 
     - name: ghcr.io/hyperledger/cactus-quorum-all-in-one
       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile
