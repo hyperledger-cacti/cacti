@@ -53,7 +53,7 @@ export class ShipmentListPage implements OnInit {
     this.log.debug(`Fetched Shipment data: %o`, shipments);
   }
 
-  async clickShowDetail(shipment: Shipment) {
+  async clickShowDetail(shipment: Shipment): Promise<void> {
     this.log.debug("clickShowDetail()", shipment);
 
     const modal = await this.modalController.create({
@@ -73,7 +73,7 @@ export class ShipmentListPage implements OnInit {
     }
   }
 
-  async clickAddNew() {
+  async clickAddNew(): Promise<void> {
     this.log.debug(`clickAddNew()`);
     const modal = await this.modalController.create({
       component: ShipmentDetailPage,
