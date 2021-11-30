@@ -388,7 +388,7 @@ export class PluginLedgerConnectorFabric
       }
 
       log.debug(`SCP from/to %o => %o`, tmpDirPath, remoteDirPath);
-      await ssh.putDirectory(tmpDirPath, remoteDirPath);
+      await ssh.putDirectory(tmpDirPath, remoteDirPath, { concurrency: 1 });
       log.debug(`SCP OK %o`, remoteDirPath);
 
       if (ccLang === ChainCodeProgrammingLanguage.Golang) {

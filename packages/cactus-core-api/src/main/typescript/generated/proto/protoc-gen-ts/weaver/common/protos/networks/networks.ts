@@ -28,6 +28,15 @@ export namespace networks.networks {
         set name(value: string) {
             pb_1.Message.setField(this, 1, value);
         }
+        static fromObject(data: {
+            name?: string;
+        }) {
+            const message = new DbName({});
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 name?: string;
@@ -87,6 +96,17 @@ export namespace networks.networks {
         set pairs(value: Map<string, string>) {
             pb_1.Message.setField(this, 1, value as any);
         }
+        static fromObject(data: {
+            pairs?: {
+                [key: string]: string;
+            };
+        }) {
+            const message = new RelayDatabase({});
+            if (typeof data.pairs == "object") {
+                message.pairs = new Map(Object.entries(data.pairs));
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 pairs?: {
@@ -118,7 +138,7 @@ export namespace networks.networks {
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message, () => (pb_1.Map as any).deserializeBinary(message.pairs, reader, reader.readString, reader.readString));
+                        reader.readMessage(message, () => pb_1.Map.deserializeBinary(message.pairs as any, reader, reader.readString, reader.readString));
                         break;
                     default: reader.skipField();
                 }
@@ -149,6 +169,15 @@ export namespace networks.networks {
         }
         set request_id(value: string) {
             pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            request_id?: string;
+        }) {
+            const message = new GetStateMessage({});
+            if (data.request_id != null) {
+                message.request_id = data.request_id;
+            }
+            return message;
         }
         toObject() {
             const data: {
@@ -276,6 +305,43 @@ export namespace networks.networks {
         }
         set requesting_org(value: string) {
             pb_1.Message.setField(this, 8, value);
+        }
+        static fromObject(data: {
+            policy?: string[];
+            address?: string;
+            requesting_relay?: string;
+            requesting_network?: string;
+            certificate?: string;
+            requestor_signature?: string;
+            nonce?: string;
+            requesting_org?: string;
+        }) {
+            const message = new NetworkQuery({});
+            if (data.policy != null) {
+                message.policy = data.policy;
+            }
+            if (data.address != null) {
+                message.address = data.address;
+            }
+            if (data.requesting_relay != null) {
+                message.requesting_relay = data.requesting_relay;
+            }
+            if (data.requesting_network != null) {
+                message.requesting_network = data.requesting_network;
+            }
+            if (data.certificate != null) {
+                message.certificate = data.certificate;
+            }
+            if (data.requestor_signature != null) {
+                message.requestor_signature = data.requestor_signature;
+            }
+            if (data.nonce != null) {
+                message.nonce = data.nonce;
+            }
+            if (data.requesting_org != null) {
+                message.requesting_org = data.requesting_org;
+            }
+            return message;
         }
         toObject() {
             const data: {

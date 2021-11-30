@@ -35,6 +35,19 @@ export namespace corda {
         set payload(value: Uint8Array) {
             pb_1.Message.setField(this, 2, value);
         }
+        static fromObject(data: {
+            notarizations?: ReturnType<typeof ViewData.Notarization.prototype.toObject>[];
+            payload?: Uint8Array;
+        }) {
+            const message = new ViewData({});
+            if (data.notarizations != null) {
+                message.notarizations = data.notarizations.map(item => ViewData.Notarization.fromObject(item));
+            }
+            if (data.payload != null) {
+                message.payload = data.payload;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 notarizations?: ReturnType<typeof ViewData.Notarization.prototype.toObject>[];
@@ -121,6 +134,23 @@ export namespace corda {
             }
             set id(value: string) {
                 pb_1.Message.setField(this, 3, value);
+            }
+            static fromObject(data: {
+                signature?: string;
+                certificate?: string;
+                id?: string;
+            }) {
+                const message = new Notarization({});
+                if (data.signature != null) {
+                    message.signature = data.signature;
+                }
+                if (data.certificate != null) {
+                    message.certificate = data.certificate;
+                }
+                if (data.id != null) {
+                    message.id = data.id;
+                }
+                return message;
             }
             toObject() {
                 const data: {

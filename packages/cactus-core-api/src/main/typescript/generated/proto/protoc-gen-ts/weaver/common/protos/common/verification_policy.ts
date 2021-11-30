@@ -35,6 +35,19 @@ export namespace common.verification_policy {
         set identifiers(value: Identifier[]) {
             pb_1.Message.setRepeatedWrapperField(this, 2, value);
         }
+        static fromObject(data: {
+            securityDomain?: string;
+            identifiers?: ReturnType<typeof Identifier.prototype.toObject>[];
+        }) {
+            const message = new VerificationPolicy({});
+            if (data.securityDomain != null) {
+                message.securityDomain = data.securityDomain;
+            }
+            if (data.identifiers != null) {
+                message.identifiers = data.identifiers.map(item => Identifier.fromObject(item));
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 securityDomain?: string;
@@ -111,6 +124,19 @@ export namespace common.verification_policy {
         set criteria(value: string[]) {
             pb_1.Message.setField(this, 2, value);
         }
+        static fromObject(data: {
+            type?: string;
+            criteria?: string[];
+        }) {
+            const message = new Policy({});
+            if (data.type != null) {
+                message.type = data.type;
+            }
+            if (data.criteria != null) {
+                message.criteria = data.criteria;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 type?: string;
@@ -186,6 +212,19 @@ export namespace common.verification_policy {
         }
         set policy(value: Policy) {
             pb_1.Message.setWrapperField(this, 2, value);
+        }
+        static fromObject(data: {
+            pattern?: string;
+            policy?: ReturnType<typeof Policy.prototype.toObject>;
+        }) {
+            const message = new Identifier({});
+            if (data.pattern != null) {
+                message.pattern = data.pattern;
+            }
+            if (data.policy != null) {
+                message.policy = Policy.fromObject(data.policy);
+            }
+            return message;
         }
         toObject() {
             const data: {
