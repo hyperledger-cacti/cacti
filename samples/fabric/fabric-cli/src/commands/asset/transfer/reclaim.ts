@@ -144,7 +144,7 @@ const command: GluegunCommand = {
     }
     
     try {
-      const userCert = await getUserCertBase64(options['dest-network'], options['user'])
+      const userCert = await getUserCertBase64(options['source-network'], options['user'])
       const pledgeAssetDetails = await getLocalAssetPledgeDetails({
         sourceNetworkName: options['source-network'],
         pledgeId: options['pledge-id'],
