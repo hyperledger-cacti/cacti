@@ -1,13 +1,12 @@
-import test, { Test } from "tape";
 import { Strings } from "../../../../main/typescript/strings";
+import "jest-extended";
 
-test("Strings#dropNonPrintable()", async (assert: Test) => {
+test("Strings#dropNonPrintable()", async () => {
   const thisIsAString = "This is a phrase.";
 
   const nonDrop = Strings.dropNonPrintable(thisIsAString);
   const drop = Strings.dropNonPrintable("");
 
-  assert.equal(nonDrop, thisIsAString);
-  assert.equal(drop, "");
-  assert.end();
+  expect(nonDrop).toEqual(thisIsAString);
+  expect(drop).toEqual("");
 });
