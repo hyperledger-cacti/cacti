@@ -343,7 +343,7 @@ jobs:
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer GetMyWallet '[]' --local-network=network2 &> tmp.out
-          tail -n 2 tmp.out | grep ""Result from network query: token1=\"50\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"50\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
           # RESULT
@@ -711,7 +711,7 @@ jobs:
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer GetMyWallet '[]' --local-network=network2 &> tmp.out
-          tail -n 2 tmp.out | grep ""Result from network query: token1=\"50\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"50\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
           # RESULT
