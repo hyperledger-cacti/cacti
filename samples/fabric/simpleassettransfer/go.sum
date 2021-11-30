@@ -81,7 +81,7 @@ github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-inte
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.2.2/go.mod h1:qtWhvrNroyYbxPiBxvEpLDOa0RLjMLKByAJuIkpKdTI=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20211117075003-d4cef34c8832 h1:9nENncgnW8sKG2b+H+oEdtLhGzF4mVDgh8Jlm+QQCcw=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20211117075003-d4cef34c8832/go.mod h1:Nke1cGAeCHSgK8x/+tjzojTAT5L/V6e7ERxPUSbnA/8=
-github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils v1.2.5 h1:auVCB76c5lZOLixe/2n+Y9UKY+OPMp3VJ2fD6FcJpww=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils v1.2.5 h1:AHmFq5jF6FLdcidiySJIjMI/N88r/S2ayu6Tu73X+oI=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils v1.2.5/go.mod h1:2zEz9uyUOwY7la57IXG0vraxTwtLEnYHgi46O+VB7K8=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20200424173110-d7076418f212/go.mod h1:N7H3sA7Tx4k/YzFq7U0EPdqJtqvM4Kild0JoCc7C0Dc=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20210718160520-38d29fabecb9 h1:1cAZHHrBYFrX3bwQGhOZtOB4sCM9QWVppd81O8vsPXs=
