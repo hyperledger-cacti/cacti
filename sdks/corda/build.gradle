@@ -38,7 +38,7 @@ sourceSets {
 Properties constants = new Properties()
 
 repositories {
-    jcenter()
+    maven { url 'https://repo1.maven.org/maven2' }
     maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
     if (file("$projectDir/./github.properties").exists()) {
         file("$projectDir/github.properties").withInputStream { constants.load(it) }

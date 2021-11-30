@@ -32,9 +32,9 @@ Properties constants = new Properties()
 
 repositories {
     google()
-    jcenter()
     mavenCentral()
     mavenLocal()
+    maven { url 'https://repo1.maven.org/maven2' }
     maven { url 'https://software.r3.com/artifactory/corda' }
     if (file("$projectDir/./github.properties").exists()) {
         file("$projectDir/github.properties").withInputStream { constants.load(it) }
