@@ -11,7 +11,6 @@ module.exports = {
   // Ignore the tests that are still using tap/tape for as their test runner
   testPathIgnorePatterns: [
     `./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
-    `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/transfer-initiation.test.ts`,
     `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/transfer-complete.test.ts`,
     `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/transfer-commence.test.ts`,
     `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/odap-api-call.test.ts`,
