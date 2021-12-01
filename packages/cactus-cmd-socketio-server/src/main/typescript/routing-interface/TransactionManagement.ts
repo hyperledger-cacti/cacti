@@ -23,7 +23,7 @@ const moduleName = "TransactionManagement";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
-export class TransactionManagement {
+export class TransactionManagement implements VerifierEventListener {
   private blpRegistry: BLPRegistry = null; // Verifier information used in business logic
   //    private connectInfo: LPInfoHolder = null;                   // connection information
   //    private verifierArray: [] = [];                             // Verifier
@@ -56,7 +56,7 @@ export class TransactionManagement {
       const blp = getTargetBLPInstance(businessLogicID);
       if (blp === null) {
         logger.warn(
-          `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`
+          `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`,
         );
         return;
       }
@@ -95,7 +95,7 @@ export class TransactionManagement {
     const businessLogicID = this.getBusinessLoginIDByTradeID(tradeID);
     if (businessLogicID === null) {
       logger.warn(
-        `##getOperationStatus(): not found BusinessLogicPlugin. tradeID: ${tradeID}`
+        `##getOperationStatus(): not found BusinessLogicPlugin. tradeID: ${tradeID}`,
       );
       return;
     }
@@ -103,7 +103,7 @@ export class TransactionManagement {
     const blp = getTargetBLPInstance(businessLogicID);
     if (blp === null) {
       logger.warn(
-        `##getOperationStatus(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`
+        `##getOperationStatus(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`,
       );
       return;
     }
@@ -125,7 +125,7 @@ export class TransactionManagement {
       const blp = getTargetBLPInstance(businessLogicID);
       if (blp === null) {
         logger.warn(
-          `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`
+          `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`,
         );
         return;
       }
@@ -174,7 +174,7 @@ export class TransactionManagement {
     const eventNum = this.getEventNum(ledgerEvent);
     if (eventNum === 0) {
       logger.warn(
-        `onEvent(): invalid event, event num is zero., ledgerEvent.verifierId: ${ledgerEvent.verifierId}`
+        `onEvent(): invalid event, event num is zero., ledgerEvent.verifierId: ${ledgerEvent.verifierId}`,
       );
       return;
     }
@@ -195,7 +195,7 @@ export class TransactionManagement {
       const blp = getTargetBLPInstance(businessLogicID);
       if (blp === null) {
         logger.warn(
-          `getEventNum(): not found, businessLogicID: ${businessLogicID}`
+          `getEventNum(): not found, businessLogicID: ${businessLogicID}`,
         );
         continue;
       }
@@ -203,7 +203,7 @@ export class TransactionManagement {
       const eventNum = blp.getEventDataNum(ledgerEvent);
       if (eventNum !== 0) {
         logger.debug(
-          `##getEventNum: target businessLogicID: ${businessLogicID}`
+          `##getEventNum: target businessLogicID: ${businessLogicID}`,
         );
         return eventNum;
       }
@@ -211,14 +211,14 @@ export class TransactionManagement {
 
     // not found.
     logger.warn(
-      `getEventNum(): not found(The corresponding BLP does not exist.)`
+      `getEventNum(): not found(The corresponding BLP does not exist.)`,
     );
     return 0;
   }
 
   private getBLPInstanceFromEvent(
     ledgerEvent: LedgerEvent,
-    targetIndex: number
+    targetIndex: number,
   ): BusinessLogicPlugin | null {
     const txID = this.getTxIDFromEvent(ledgerEvent, targetIndex);
     if (txID === null) {
@@ -232,17 +232,17 @@ export class TransactionManagement {
 
   private getTxIDFromEvent(
     ledgerEvent: LedgerEvent,
-    targetIndex: number
+    targetIndex: number,
   ): string | null {
     //        logger.debug(`##getTxIDFromEvent: event: ${ledgerEvent}`);
     for (const businessLogicID of this.blpRegistry.getBusinessLogicIDList()) {
       logger.debug(
-        `####getTxIDFromEvent(): businessLogicID: ${businessLogicID}`
+        `####getTxIDFromEvent(): businessLogicID: ${businessLogicID}`,
       );
       const blp = getTargetBLPInstance(businessLogicID);
       if (blp === null) {
         logger.warn(
-          `getTxIDFromEvent(): not found, businessLogicID: ${businessLogicID}`
+          `getTxIDFromEvent(): not found, businessLogicID: ${businessLogicID}`,
         );
         continue;
       }
@@ -256,7 +256,7 @@ export class TransactionManagement {
 
     // not found.
     logger.warn(
-      `getTxIDFromEvent(): not found(The corresponding BLP does not exist.)`
+      `getTxIDFromEvent(): not found(The corresponding BLP does not exist.)`,
     );
     return null;
   }
@@ -265,19 +265,19 @@ export class TransactionManagement {
     logger.debug(`##getBLPInstanceFromTxID: txID: ${txID}`);
     for (const businessLogicID of this.blpRegistry.getBusinessLogicIDList()) {
       logger.debug(
-        `####getBLPInstanceFromTxID(): businessLogicID: ${businessLogicID}`
+        `####getBLPInstanceFromTxID(): businessLogicID: ${businessLogicID}`,
       );
       const blp = getTargetBLPInstance(businessLogicID);
       if (blp === null) {
         logger.warn(
-          `getBLPInstanceFromTxID(): not found, businessLogicID: ${businessLogicID}`
+          `getBLPInstanceFromTxID(): not found, businessLogicID: ${businessLogicID}`,
         );
         continue;
       }
 
       //            if (blp.hasTxIDInTransactions(txID)) {
       logger.debug(
-        `####getBLPInstanceFromTxID(): found!, businessLogicID: ${businessLogicID}`
+        `####getBLPInstanceFromTxID(): found!, businessLogicID: ${businessLogicID}`,
       );
       return blp;
       //            }
@@ -285,7 +285,7 @@ export class TransactionManagement {
 
     // not found.
     logger.warn(
-      `getBLPInstanceFromTxID(): not found(The corresponding BLP does not exist.)`
+      `getBLPInstanceFromTxID(): not found(The corresponding BLP does not exist.)`,
     );
     return null;
   }

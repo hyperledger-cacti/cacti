@@ -5,31 +5,31 @@
  * VerifierFactory.ts
  */
 
-import { transactionManagement } from "../routing-interface/routes/index";
 import { Verifier } from "./Verifier";
 import { LPInfoHolder } from "../routing-interface/util/LPInfoHolder";
 import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
+import { VerifierEventListener } from "./LedgerPlugin";
 const moduleName = "VerifierFactory";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 export class VerifierFactory {
-  private connectInfo: LPInfoHolder = null; // connection information
   static verifierHash: { [key: string]: Verifier } = {}; // Verifier
 
-  constructor() {
-    this.connectInfo = new LPInfoHolder();
-  }
+  constructor(
+    private eventListener: VerifierEventListener,
+    private connectInfo = new LPInfoHolder(),
+  ) {}
 
   // Get Verifier
   getVerifier(
     validatorId: string,
     appId = "",
     monitorOptions: {} = {},
-    monitorMode = true
+    monitorMode = true,
   ): Verifier {
     // Return Verifier
     // If you have already made it, please reply. If you haven't made it yet, make it and reply.
@@ -40,7 +40,7 @@ export class VerifierFactory {
         this.connectInfo.getLegerPluginInfo(validatorId);
       // TODO: I want to manage an instance using the validatorId as a key instead of a dedicated member variable
       VerifierFactory.verifierHash[validatorId] = new Verifier(
-        ledgerPluginInfo
+        ledgerPluginInfo,
       );
       logger.debug("##startMonitor");
       logger.debug(`##getVerifier validatorId :${validatorId}`);
@@ -52,7 +52,7 @@ export class VerifierFactory {
         VerifierFactory.verifierHash[validatorId].startMonitor(
           appId,
           monitorOptions,
-          transactionManagement
+          this.eventListener,
         );
       }
       return VerifierFactory.verifierHash[validatorId];

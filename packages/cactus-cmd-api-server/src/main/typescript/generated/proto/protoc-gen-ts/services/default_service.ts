@@ -28,6 +28,15 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         set data(value: string) {
             pb_1.Message.setField(this, 1, value);
         }
+        static fromObject(data: {
+            data?: string;
+        }) {
+            const message = new GetPrometheusMetricsV1Response({});
+            if (data.data != null) {
+                message.data = data.data;
+            }
+            return message;
+        }
         toObject() {
             const data: {
                 data?: string;

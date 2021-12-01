@@ -89,7 +89,7 @@ test(testCase, async (t: Test) => {
   const connector = new CordaConnectorContainer({
     logLevel,
     imageName: "ghcr.io/hyperledger/cactus-connector-corda-server",
-    imageVersion: "2021-03-25-feat-622",
+    imageVersion: "2021-11-11",
     // imageName: "cccs",
     // imageVersion: "latest",
     envVars: [envVarSpringAppJson],

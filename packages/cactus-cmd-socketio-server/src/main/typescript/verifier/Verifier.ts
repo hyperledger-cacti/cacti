@@ -11,20 +11,15 @@ import {
   LedgerEvent,
   VerifierEventListener,
 } from "./LedgerPlugin";
-import { makeApiInfoList } from "./DriverCommon";
-import {
-  json2str,
-  addSocket,
-  getStoredSocket,
-  deleteAndDisconnectSocke,
-} from "./DriverCommon";
+import { json2str } from "./DriverCommon";
 import { LedgerOperation } from "../business-logic-plugin/LedgerOperation";
-import { Socket } from "dgram";
+import { LedgerPluginInfo } from "./validator-registry";
 import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 import { VerifierAuthentication } from "./VerifierAuthentication";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-const io = require("socket.io-client");
+import io from "socket.io-client";
+import { Socket } from "socket.io-client";
 
 const fs = require("fs");
 const path = require("path");
@@ -49,19 +44,21 @@ export class Verifier implements IVerifier {
   validatorType = "";
   validatorUrl = "";
   validatorKeyPath = "";
-  apiInfo: {} = null;
+  apiInfo: Array<ApiInfo> = [];
   counterReqID = 1;
   eventListenerHash: { [key: string]: VerifierEventListener } = {}; // Listeners for events from Ledger
-  static mapUrlSocket: Map<string, Socket> = new Map();
+  static mapUrlSocket: Map<string, SocketIOClient.Socket> = new Map();
+  checkValidator: (key: string, data: string) => Promise<any> =
+    VerifierAuthentication.verify;
 
   constructor(ledgerInfo: string) {
     // TODO: Configure the Verifier based on the connection information
-    const ledgerInfoObj: {} = JSON.parse(ledgerInfo);
-    this.validatorID = ledgerInfoObj["validatorID"];
-    this.validatorType = ledgerInfoObj["validatorType"];
-    this.validatorUrl = ledgerInfoObj["validatorURL"];
-    this.validatorKeyPath = ledgerInfoObj["validatorKeyPath"];
-    this.apiInfo = ledgerInfoObj["apiInfo"];
+    const ledgerInfoObj = JSON.parse(ledgerInfo) as LedgerPluginInfo;
+    this.validatorID = ledgerInfoObj.validatorID;
+    this.validatorType = ledgerInfoObj.validatorType;
+    this.validatorUrl = ledgerInfoObj.validatorURL;
+    this.validatorKeyPath = ledgerInfoObj.validatorKeyPath;
+    this.apiInfo = ledgerInfoObj.apiInfo;
 
     if (VALIDATOR_TYPE.SOCKET === this.validatorType) {
       // create socket instance assosiated with validatorUrl if it has not created yet
@@ -74,7 +71,7 @@ export class Verifier implements IVerifier {
         logger.debug(`socketOptions = ${JSON.stringify(socketOptions)}`);
         Verifier.mapUrlSocket.set(
           this.validatorID,
-          io(this.validatorUrl, socketOptions)
+          io(this.validatorUrl, socketOptions),
         );
       }
     }
@@ -83,14 +80,14 @@ export class Verifier implements IVerifier {
   // NOTE: asynchronous command
   public sendAsyncRequest(
     contract: object,
-    method: object,
-    args: object
+    method: { command: string },
+    args: any,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       logger.debug(
         `call: sendAsyncRequest, contract = ${JSON.stringify(
-          contract
-        )}, method = ${JSON.stringify(method)}, args = ${args}`
+          contract,
+        )}, method = ${JSON.stringify(method)}, args = ${args}`,
       );
       try {
         // verifier comunicate with socket
@@ -99,7 +96,11 @@ export class Verifier implements IVerifier {
           resolve();
           // verifier comunicate with http
         } else if (VALIDATOR_TYPE.OPENAPI === this.validatorType) {
-          this.requestLedgerOperationHttp(contract, method, args)
+          this.requestLedgerOperationHttp(
+            contract,
+            method,
+            args as { args: any },
+          )
             .then(() => {
               resolve();
             })
@@ -130,11 +131,14 @@ export class Verifier implements IVerifier {
   private requestLedgerOperationNeo(
     contract: object,
     method: object,
-    args: object
+    args: object,
   ): void {
     logger.debug("call : requestLedgerOperation");
     try {
       const socket = Verifier.mapUrlSocket.get(this.validatorID);
+      if (socket === undefined) {
+        throw Error(`No socket for validator with ID ${this.validatorID}`);
+      }
 
       const requestData: {} = {
         contract: contract,
@@ -153,17 +157,18 @@ export class Verifier implements IVerifier {
   public sendSyncRequest(
     contract: object,
     method: object,
-    args: object
+    args: object,
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       logger.debug("call : sendSyncRequest");
       try {
         logger.debug(
-          `##in sendSyncRequest, contract = ${JSON.stringify(
-            contract
-          )}, method = ${JSON.stringify(method)}, args = ${JSON.stringify(
-            args
-          )}, `
+          "##in sendSyncRequest, contract:",
+          contract,
+          "method:",
+          method,
+          "args:",
+          args,
         );
         let responseFlag = false;
 
@@ -173,6 +178,10 @@ export class Verifier implements IVerifier {
 
         // Preparing socket
         const socket = Verifier.mapUrlSocket.get(this.validatorID);
+        if (socket === undefined) {
+          throw Error(`No socket for validator with ID ${this.validatorID}`);
+        }
+
         socket.on("connect_error", (err: object) => {
           logger.error("##connect_error:", err);
           // end communication
@@ -191,24 +200,22 @@ export class Verifier implements IVerifier {
           reject(err);
         });
         socket.on("response", (result: any) => {
-          logger.debug(`#[recv]response, res: ${result}`);
+          logger.debug("#[recv]response, res:", result);
           if (reqID === result.id) {
             responseFlag = true;
 
-            VerifierAuthentication.verify(
-              this.validatorKeyPath,
-              result.resObj.data
-            )
+            this.checkValidator(this.validatorKeyPath, result.resObj.data)
               .then((decodedData) => {
                 const resultObj = {
                   status: result.resObj.status,
                   data: decodedData.result,
                 };
-                logger.debug(`resultObj = ${resultObj}`);
+                logger.debug("resultObj =", resultObj);
                 // Result reply
                 resolve(resultObj);
               })
               .catch((err) => {
+                responseFlag = false;
                 logger.error(err);
               });
           }
@@ -221,19 +228,19 @@ export class Verifier implements IVerifier {
           args: args,
           reqID: reqID,
         };
-        logger.debug(`requestData : ${requestData}`);
+        logger.debug("requestData:", requestData);
         socket.emit("request2", requestData);
         logger.debug("set timeout");
 
         // Time-out setting
         setTimeout(() => {
           if (responseFlag === false) {
-            logger.debug("requestTimeout reqID : " + reqID);
+            logger.debug("requestTimeout reqID:", reqID);
             resolve({ status: 504, amount: 0 });
           }
         }, config.verifier.syncFunctionTimeoutMillisecond);
       } catch (err) {
-        logger.error(`##Error: sendSyncRequest, ${err}`);
+        logger.error("##Error: sendSyncRequest:", err);
         reject(err);
       }
     });
@@ -241,17 +248,17 @@ export class Verifier implements IVerifier {
 
   private requestLedgerOperationHttp(
     contract: object,
-    method: object,
-    args: object
+    method: { command: string },
+    args: { args: any },
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
         logger.debug(
           `##in requestLedgerOperationHttp, contract = ${JSON.stringify(
-            contract
+            contract,
           )}, method = ${JSON.stringify(method)}, args = ${JSON.stringify(
-            args
-          )}`
+            args,
+          )}`,
         );
         const eventListenerHash = this.eventListenerHash;
         const validatorID = this.validatorID;
@@ -273,15 +280,15 @@ export class Verifier implements IVerifier {
               for (const key in eventListenerHash) {
                 logger.debug(
                   `key : ${key}, eventListenerHash[key] : ${JSON.stringify(
-                    eventListenerHash[key]
-                  )}`
+                    eventListenerHash[key],
+                  )}`,
                 );
                 eventListener = eventListenerHash[key];
                 eventListener.onEvent(event);
               }
             } else {
               logger.debug(
-                `##requestLedgerOperationHttp eventListener does not exist`
+                `##requestLedgerOperationHttp eventListener does not exist`,
               );
             }
             logger.debug(`##after onEvent()`);
@@ -289,7 +296,7 @@ export class Verifier implements IVerifier {
             // resolve(responseObj);
           } catch (err) {
             logger.error(
-              `##Error: requestLedgerOperationHttp#httpReq.onload, ${err}`
+              `##Error: requestLedgerOperationHttp#httpReq.onload, ${err}`,
             );
           }
         };
@@ -298,12 +305,12 @@ export class Verifier implements IVerifier {
         };
 
         logger.debug(`validatorUrl: ${this.validatorUrl}`);
-        httpReq.open("POST", this.validatorUrl + method["command"]);
+        httpReq.open("POST", this.validatorUrl + method.command);
         // httpReq.setRequestHeader('content-type', 'application/json');
         httpReq.setRequestHeader("Content-Type", "application/json");
         // httpReq.send(args['args']);
-        logger.debug(`args['args']: ${JSON.stringify(args["args"])}`);
-        httpReq.send(JSON.stringify(args["args"]));
+        logger.debug(`args['args']: ${JSON.stringify(args.args)}`);
+        httpReq.send(JSON.stringify(args.args));
 
         resolve();
       } catch (err) {
@@ -328,7 +335,7 @@ export class Verifier implements IVerifier {
   public startMonitor(
     id: string,
     options: Object,
-    eventListener: VerifierEventListener
+    eventListener: VerifierEventListener,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       logger.debug("call : startMonitor");
@@ -337,10 +344,13 @@ export class Verifier implements IVerifier {
 
         if (Object.keys(this.eventListenerHash).length > 0) {
           logger.debug(
-            `##in startMonitor, validatorUrl = ${this.validatorUrl}`
+            `##in startMonitor, validatorUrl = ${this.validatorUrl}`,
           );
 
           const socket = Verifier.mapUrlSocket.get(this.validatorID);
+          if (socket === undefined) {
+            throw Error(`No socket for validator with ID ${this.validatorID}`);
+          }
 
           socket.on("connect_error", (err: object) => {
             logger.error("##connect_error:", err);
@@ -368,19 +378,16 @@ export class Verifier implements IVerifier {
             logger.debug(
               `##eventReceived Object.keys(this.eventListenerHash).length : ${
                 Object.keys(this.eventListenerHash).length
-              }`
+              }`,
             );
             if (Object.keys(this.eventListenerHash).length > 0) {
-              VerifierAuthentication.verify(
-                this.validatorKeyPath,
-                res.blockData
-              )
+              this.checkValidator(this.validatorKeyPath, res.blockData)
                 .then((decodedData) => {
                   const resultObj = {
                     status: res.status,
                     blockData: decodedData.blockData,
                   };
-                  logger.debug(`resultObj = ${resultObj}`);
+                  logger.debug("resultObj =", resultObj);
                   const event = new LedgerEvent();
                   event.verifierId = this.validatorID;
                   logger.debug(`##event.verifierId: ${event.verifierId}`);
@@ -389,7 +396,7 @@ export class Verifier implements IVerifier {
                     const eventListener = this.eventListenerHash[key];
                     if (eventListener != null) {
                       logger.debug(
-                        `##set eventListener: ${eventListener}, ${this.constructor.name}, ${this.validatorID}`
+                        `##set eventListener: ${eventListener}, ${this.constructor.name}, ${this.validatorID}`,
                       );
                       eventListener.onEvent(event);
                     } else {
@@ -438,7 +445,10 @@ export class Verifier implements IVerifier {
       }
       if (Object.keys(this.eventListenerHash).length === 0) {
         const socket = Verifier.mapUrlSocket.get(this.validatorID);
-        logger.debug("##emit: startMonitor");
+        if (socket === undefined) {
+          throw Error(`No socket for validator with ID ${this.validatorID}`);
+        }
+        logger.debug("##emit: stopMonitor");
         socket.emit("stopMonitor");
       }
     } catch (err) {
@@ -448,10 +458,12 @@ export class Verifier implements IVerifier {
 
   private setEventListener(
     appId: string,
-    eventListener: VerifierEventListener | null
+    eventListener: VerifierEventListener | null,
   ): void {
     logger.debug(`##call : setEventListener`);
-    this.eventListenerHash[appId] = eventListener;
+    if (eventListener) {
+      this.eventListenerHash[appId] = eventListener;
+    }
     return;
   }
 

@@ -1086,7 +1086,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       log.debug(`SCP OK %o`, remoteDirPath);
 
       log.debug(`SCP from/to %o => %o`, tmpDirPath, remoteDirPath);
-      await ssh.putDirectory(tmpDirPath, remoteDirPath);
+      await ssh.putDirectory(tmpDirPath, remoteDirPath, { concurrency: 1 });
       log.debug(`SCP OK %o`, remoteDirPath);
 
       log.debug(`Initializing docker commands`);

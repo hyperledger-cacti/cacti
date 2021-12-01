@@ -24,18 +24,23 @@ export class VerifierAuthentication {
         algorithms: "ES256",
       };
 
-      jwt.verify(targetData, publicKey, option, function (err, decoded) {
-        if (err) {
-          // Authentication NG
-          logger.debug(`Authentication NG : error = ${err}`);
-          reject(err);
-        } else {
-          // Authentication OK
-          // logger.debug(`Authentication OK : decoded = ${JSON.stringify(decoded)}`);
-          logger.debug(`Authentication OK`);
-          resolve(decoded);
-        }
-      });
+      jwt.verify(
+        targetData,
+        publicKey,
+        option,
+        function (err: any, decoded: any) {
+          if (err) {
+            // Authentication NG
+            logger.debug(`Authentication NG : error = ${err}`);
+            reject(err);
+          } else {
+            // Authentication OK
+            // logger.debug(`Authentication OK : decoded = ${JSON.stringify(decoded)}`);
+            logger.debug(`Authentication OK`);
+            resolve(decoded);
+          }
+        },
+      );
     });
   }
 }
