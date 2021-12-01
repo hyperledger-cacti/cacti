@@ -2,34 +2,6 @@
   "name": "@hyperledger/cactus-test-api-client",
   "version": "1.0.0-rc.3",
   "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
-  "main": "dist/lib/main/typescript/index.js",
-  "mainMinified": "dist/cactus-test-api-client.node.umd.min.js",
-  "browser": "dist/cactus-test-api-client.web.umd.js",
-  "browserMinified": "dist/cactus-test-api-client.web.umd.min.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js"
-  },
-  "watch": {},
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=10",
-    "npm": ">=6"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
-  },
   "keywords": [
     "Hyperledger",
     "Cactus",
@@ -37,6 +9,15 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
@@ -54,11 +35,20 @@
       "url": "https://accenture.com"
     }
   ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-test-api-client.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
-  "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "@hyperledger/cactus-api-client": "1.0.0-rc.3",
     "@hyperledger/cactus-cmd-api-server": "1.0.0-rc.3",

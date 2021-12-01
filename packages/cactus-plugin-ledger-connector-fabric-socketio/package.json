@@ -3,14 +3,14 @@
   "version": "1.0.0-rc.3",
   "private": true,
   "scripts": {
-    "start": "cd ./dist && node common/core/bin/www.js",
-    "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
     "build": "npm run copy-utility-assets && npm run build-ts && npm run copy-static-assets",
     "build-ts": "tsc",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "copy-utility-assets": "ts-node copyUtilityAssets.ts",
     "copy-static-assets": "ts-node copyStaticAssets.ts",
-    "init-fabric": "ln -s ../node_modules ./dist/node_modules"
+    "copy-utility-assets": "ts-node copyUtilityAssets.ts",
+    "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
+    "init-fabric": "ln -s ../node_modules ./dist/node_modules",
+    "start": "cd ./dist && node common/core/bin/www.js",
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
     "@types/node": "^14.14.5",

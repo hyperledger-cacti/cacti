@@ -1,7 +1,7 @@
 {
   "name": "@hyperledger/cactus",
-  "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
   "private": true,
+  "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
   "workspaces": {
     "packages": [
       "packages/cactus-*",
@@ -13,12 +13,14 @@
     ]
   },
   "scripts": {
+    "sort-json": "npx sort-package-json 'packages/*/package.json' 'package.json' 'examples/cactus-*/package.json' 'extensions/*/package.json' && yarn run sort-json-check",
+    "sort-json-check": "npx sort-package-json 'packages/*/package.json' 'package.json' 'examples/cactus-*/package.json' 'extensions/*/package.json' --check",
     "run-ci": "./tools/ci.sh",
     "reset:node-modules": "del-cli '**/node_modules'",
     "reset:git": "git clean -f -X",
     "reset:yarn-lock": "del-cli yarn.lock && yarn install --update-checksums --force",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
-    "configure": "yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend",
+    "configure": "yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend && yarn run sort-json",
     "install-yarn": "npm install --global yarn@1.18.0",
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
     "tools:validate-bundle-names": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/validate-bundle-names.js",
@@ -56,11 +58,11 @@
     "test:jest:all": "jest",
     "test:tap:all": "tap",
     "test:all": "yarn test:jest:all && yarn test:tap:all",
+    "posttest:all": "tap --no-check-coverage --coverage-report=lcov && codecov",
     "test:unit": "tap --ts --node-arg=--max-old-space-size=4096 --timeout=600 --no-check-coverage \"packages/cactus-*/src/test/typescript/unit/\"",
     "test:benchmark": "tap --ts --jobs=1 --no-timeout --no-check-coverage \"packages/cactus-*/src/test/typescript/benchmark/\"",
     "test:browser": "karma start karma.conf.js",
     "test:integration": "tap --ts --node-arg=--max-old-space-size=4096 --jobs=1 --timeout=3600 --no-check-coverage \"packages/cactus-*/src/test/typescript/integration/\"",
-    "posttest:all": "tap --no-check-coverage --coverage-report=lcov && codecov",
     "changelog": "conventional-changelog --infile CHANGELOG.md --outfile CHANGELOG.md && git add CHANGELOG.md",
     "commit": "git-cz --signoff",
     "prettier": "prettier --write --config .prettierrc.json \"./**/*.{ts,js}\"",

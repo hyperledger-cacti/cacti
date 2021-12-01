@@ -2,6 +2,19 @@
   "name": "@hyperledger/cactus-plugin-odap-hermes",
   "version": "1.0.0-rc.3",
   "description": "proof of concept of odap",
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "ISC",
+  "author": "Tzu-Shen, Wang",
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/lib/main/typescript/index.d.ts",
@@ -9,9 +22,9 @@
     "dist/*"
   ],
   "scripts": {
-    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
-    "codegen:openapi": "npm run generate-sdk",
     "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch"
