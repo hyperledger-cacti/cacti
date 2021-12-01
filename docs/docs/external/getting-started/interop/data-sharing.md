@@ -1,6 +1,7 @@
 ---
 id: data-sharing
 title: Data Sharing
+pagination_prev: external/getting-started/interop/overview
 pagination_next: external/getting-started/enabling-weaver-network/overview
 ---
 

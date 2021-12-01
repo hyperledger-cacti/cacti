@@ -56,9 +56,9 @@ services:
     #
     - RELAY_PORT=${RELAY_PORT}
     - RELAY_NAME=${RELAY_NAME}
-    - RELAY_TLS=${RELAY_TLS}
-    - RELAY_TLS_CERT_PATH=${RELAY_TLS_CERT_PATH}
-    - RELAY_TLS_KEY_PATH=${RELAY_TLS_KEY_PATH}
+    # - RELAY_TLS=${RELAY_TLS}
+    # - RELAY_TLS_CERT_PATH=${RELAY_TLS_CERT_PATH}
+    # - RELAY_TLS_KEY_PATH=${RELAY_TLS_KEY_PATH}
     # Driver configuration: this section provides the details of the
     # driver the relay is connected to. We need to supply the port,
     # hostname, and name of the driver. The current configuration

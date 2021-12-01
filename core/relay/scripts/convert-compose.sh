@@ -24,12 +24,14 @@ uncomment() {
 
 if [ $1 -eq 2 ]
 then
+    uncomment 59,61 docker-compose.yaml
     uncomment 69,73 docker-compose.yaml
     uncomment 79,80 docker-compose.yaml
     uncomment 89 docker-compose.yaml
     uncomment 110 docker-compose.yaml
     comment 109 docker-compose.yaml
 else
+    comment 59,61 docker-compose.yaml
     comment 69,73 docker-compose.yaml
     comment 79,80 docker-compose.yaml
     comment 89 docker-compose.yaml
