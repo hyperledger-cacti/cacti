@@ -13,7 +13,6 @@ module.exports = {
     `./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
     `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/transfer-initiation.test.ts`,
     `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/transfer-complete.test.ts`,
-    `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/transfer-commence.test.ts`,
     `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/odap-api-call.test.ts`,
     `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/odap-api-call-with-ledger-connector.test.ts`,
     `./packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/lock-evidence.test.ts`,
