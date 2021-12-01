@@ -37,6 +37,10 @@ DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver
 - `path_to_tls_cert_pem_for_driver` should be set to driver's TLS certificate file path
 - `path_to_tls_key_pem_for_driver` should be set to driver's TLS private key file path
 
+If the driver is deployed within a Docker container, set the same variables as above in the appropriate `.env` file. The following sample files in [./docker-testnet-envs/](./docker-testnet-envs) can be used and tweaked for Fabric drivers associated with particular testnets:
+- Fabric `network1`: `.env.n1` (non-TLS) and `.env.n1.tls` (TLS)
+- Fabric `network2`: `.env.n2` (non-TLS) and `.env.n2.tls` (TLS)
+
 ### Running
 
 To do a full build run then `make build-local`. This update/clones protos, generates js protos and compiles TypeScript.

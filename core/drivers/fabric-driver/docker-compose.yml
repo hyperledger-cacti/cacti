@@ -17,10 +17,16 @@ services:
       - DRIVER_CONFIG=/fabric-driver/config.json
       - INTEROP_CHAINCODE=${INTEROP_CHAINCODE}
       - local=false
+      - RELAY_TLS=${RELAY_TLS}
+      - RELAY_TLSCA_CERT_PATH=${RELAY_TLSCA_CERT_PATH}
+      - DRIVER_TLS=${DRIVER_TLS}
+      - DRIVER_TLS_CERT_PATH=${DRIVER_TLS_CERT_PATH}
+      - DRIVER_TLS_KEY_PATH=${DRIVER_TLS_KEY_PATH}
     volumes:
       - ${CONNECTION_PROFILE}:/fabric-driver/ccp.json
       - ${DRIVER_CONFIG}:/fabric-driver/config.json
       - ./wallet-${NETWORK_NAME}:/fabric-driver/wallet-${NETWORK_NAME}
+      - ../../relay/credentials:/fabric-driver/credentials
     ports:
       - "${DRIVER_PORT}:${DRIVER_PORT}"
     command: sh -c "npm run dev"

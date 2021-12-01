@@ -34,7 +34,7 @@ start-network1: github.properties
 	./scripts/start-nodes.sh $(APP_NAME) $(PROFILE)
 	./scripts/check-nodes-status.sh $(PROFILE)
 
-.PHONY: start-netowrk1-local
+.PHONY: start-network1-local
 start-network1-local:
 	./scripts/generate.sh
 	./scripts/get-cordapps.sh $(APP_NAME) local
@@ -48,7 +48,7 @@ start-network2: github.properties
 	./scripts/start-nodes.sh $(APP_NAME) $(PROFILE) Corda_Network2
 	./scripts/check-nodes-status.sh $(PROFILE) Corda_Network2
 
-.PHONY: start-netowrk2-local
+.PHONY: start-network2-local
 start-network2-local:
 	./scripts/generate.sh Corda_Network2
 	./scripts/get-cordapps.sh $(APP_NAME) local
