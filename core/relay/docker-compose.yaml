@@ -56,6 +56,9 @@ services:
     #
     - RELAY_PORT=${RELAY_PORT}
     - RELAY_NAME=${RELAY_NAME}
+    # - RELAY_TLS=${RELAY_TLS}
+    # - RELAY_TLS_CERT_PATH=${RELAY_TLS_CERT_PATH}
+    # - RELAY_TLS_KEY_PATH=${RELAY_TLS_KEY_PATH}
     # Driver configuration: this section provides the details of the
     # driver the relay is connected to. We need to supply the port,
     # hostname, and name of the driver. The current configuration
@@ -66,6 +69,8 @@ services:
     # - DRIVER_NAME=${DRIVER_NAME}
     # - DRIVER_PORT=${DRIVER_PORT}
     # - DRIVER_HOST=${DRIVER_HOST}
+    # - DRIVER_TLS=${DRIVER_TLS}
+    # - DRIVER_TLSCA_CERT_PATH=${DRIVER_TLSCA_CERT_PATH}
     # Network configuration: this section provides the information
     # associated to the network. This value is only relevant if we
     # use the default configuration template which references this
@@ -104,6 +109,7 @@ services:
     - ${PATH_TO_CONFIG}:/opt/relay/config/server.toml
     # - ${PATH_TO_REMOTE_RELAYS_DEFINITIONS}:/opt/relay/config/relays
     # - <path/to/custom-configuration-template>:/opt/relay/config/server.template.toml
+    - ./credentials/docker:/opt/relay/credentials/docker
     # Uncomment this to expose ports internally and externally from the container
     ports:
     - "${RELAY_PORT}:${RELAY_PORT}"

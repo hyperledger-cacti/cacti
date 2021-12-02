@@ -76,15 +76,19 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 ```bash
 ./bin/fabric-cli configure all network1 network2
 ```
+Instead, if you launched only one of the two Fabric networks, run the following after replacing `<network-id>` with either `network1` or `network2`:
+```bash
+./bin/fabric-cli configure all <network-id>
+```
 
-### Initializing the Corda Network
+### Initializing the Corda Networks
 
-Once the Corda network is launched, the client application (built earlier) needs to be exercised to generate network (ledger) state in preparation to test interoperation flows.
+Once the Corda networks are launched, the client applications (built earlier) needs to be exercised to generate network (ledger) state in preparation to test interoperation flows.
 
-#### Bootstrapping Network and Application State
+#### Bootstrapping Networks and Application States
 Just as we did for either Fabric network, the Corda network ledger (or _vault_ on each node) must be initialized with access control policies, verification policies, and security group information for the two Fabric networks. Further, sample key-value pairs need to be recorded so we can later share them with a Fabric network via an interoperation flow.
 
-Bootstrap the Corda network and application states as follows:
+Bootstrap the Corda networks and application states as follows (_the following instructions will initialize either or both Corda networks, depending on which of those are up and running_):
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following: 
   * If Relays and Drivers are deployed in the host machine:

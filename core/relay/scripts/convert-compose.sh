@@ -24,17 +24,19 @@ uncomment() {
 
 if [ $1 -eq 2 ]
 then
-    uncomment 66,68 docker-compose.yaml
-    uncomment 74,75 docker-compose.yaml
-    uncomment 84 docker-compose.yaml
-    uncomment 105 docker-compose.yaml
-    comment 104 docker-compose.yaml
+    uncomment 59,61 docker-compose.yaml
+    uncomment 69,73 docker-compose.yaml
+    uncomment 79,80 docker-compose.yaml
+    uncomment 89 docker-compose.yaml
+    uncomment 110 docker-compose.yaml
+    comment 109 docker-compose.yaml
 else
-    comment 66,68 docker-compose.yaml
-    comment 74,75 docker-compose.yaml
-    comment 84 docker-compose.yaml
-    comment 105 docker-compose.yaml
-    uncomment 104 docker-compose.yaml
+    comment 59,61 docker-compose.yaml
+    comment 69,73 docker-compose.yaml
+    comment 79,80 docker-compose.yaml
+    comment 89 docker-compose.yaml
+    comment 110 docker-compose.yaml
+    uncomment 109 docker-compose.yaml
 fi
 
-rm -rf docker-compose.yaml.scriptbak
+rm -f docker-compose.yaml.scriptbak
