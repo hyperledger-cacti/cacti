@@ -28,7 +28,7 @@ func (s *SmartContract) BondAssetSpecificChecks(ctx contractapi.TransactionConte
 		return logThenErrorf("unmarshal error: %+v", err)
 	}
 	// ReadAsset should check both the existence and ownership of the asset for the locker
-	bond, err := s.ReadAsset(ctx, assetType, id, false)
+	bond, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return logThenErrorf("failed reading the bond asset: %+v", err)
 	}
@@ -144,7 +144,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
-		asset, err := s.ReadAsset(ctx, assetAgreement.Type, assetAgreement.Id, true)
+		asset, err := getBondAsset(ctx, assetAgreement.Type, assetAgreement.Id)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -187,7 +187,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 			return false, logThenErrorf(err.Error())
 		}
 
-		asset, err := s.ReadAsset(ctx, assetType, assetId, true)
+		asset, err := getBondAsset(ctx, assetType, assetId)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}

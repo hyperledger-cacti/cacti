@@ -78,16 +78,16 @@ func TestReadAsset(t *testing.T) {
 	require.NoError(t, err)
 
 	chaincodeStub.GetStateReturns(bytes, nil)
-	asset, err := simpleAsset.ReadAsset(transactionContext, "", "", false)
+	asset, err := simpleAsset.ReadAsset(transactionContext, "", "")
 	require.NoError(t, err)
 	require.Equal(t, expectedAsset, asset)
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	_, err = simpleAsset.ReadAsset(transactionContext, "", "", false)
+	_, err = simpleAsset.ReadAsset(transactionContext, "", "")
 	require.EqualError(t, err, "failed to read asset record from world state: unable to retrieve asset")
 
 	chaincodeStub.GetStateReturns(nil, nil)
-	asset, err = simpleAsset.ReadAsset(transactionContext, "", "asset1", false)
+	asset, err = simpleAsset.ReadAsset(transactionContext, "", "asset1")
 	require.EqualError(t, err, "the asset asset1 does not exist")
 	require.Nil(t, asset)
 }
@@ -152,7 +152,7 @@ func TestDeleteAsset(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, nil)
 	err = simpleAsset.DeleteAsset(transactionContext, "", "asset1")
-	require.EqualError(t, err, "the bond asset of type " + "" + " and id " + "asset1" + " does not exist")
+	require.EqualError(t, err, "the asset asset1 does not exist")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	err = simpleAsset.DeleteAsset(transactionContext, "", "")

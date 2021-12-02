@@ -198,12 +198,21 @@ Prepare `fabric-cli` for configuration suitably as follows.
     - Set the `chaincode` attribute in each network to `simpleassettransfer`.
     - Set the `aclPolicyPrincipalType` attribute in `network2` to `ca`.
     - Otherwise, leave the default values unchanged.
+- Create `remote-network-config.json` file by copying `remote-network-config.json.template`. Use default values if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
+  * Update value for `relayEndpoint` for `network1` as `relay-network1:9080`.
+  * Update value for `relayEndpoint` for `network2` as `relay-network2:9083`.
+  * Update value for `relayEndpoint` for `Corda_Network` as `relay-corda:9081`.
+  * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
+  * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
+  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
+- Create `chaincode.json` file by copying `chaincode.json.template`. Keep the default values unchanged.
 - Create a `.env` file by copying `.env.template` and setting the following parameter values:
   * If Relays and Drivers are deployed in the host machine:
     ```
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials
     DEFAULT_APPLICATION_CHAINCODE=simpleassettransfer
     CONFIG_PATH=./config.json
+    REMOTE_CONFIG_PATH=./remote-network-config.json
     CHAINCODE_PATH=./chaincode.json
     ```
   * If Relays and Drivers are deployed in the Docker containers:
@@ -211,6 +220,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials_docker
     DEFAULT_APPLICATION_CHAINCODE=simpleassettransfer
     CONFIG_PATH=./config.json
+    REMOTE_CONFIG_PATH=./remote-network-config.json
     CHAINCODE_PATH=./chaincode.json
     ```
   * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.

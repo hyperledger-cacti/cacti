@@ -6,12 +6,12 @@
 
 import { GluegunCommand } from 'gluegun'
 import * as path from 'path'
-import { commandHelp, pledgeAsset, getNetworkConfig } from '../../helpers/helpers'
-import { fabricHelper } from '../../helpers/fabric-functions'
+import { commandHelp, pledgeAsset, getNetworkConfig } from '../../../helpers/helpers'
+import { fabricHelper } from '../../../helpers/fabric-functions'
 
-import logger from '../../helpers/logger'
+import logger from '../../../helpers/logger'
 import * as dotenv from 'dotenv'
-dotenv.config({ path: path.resolve(__dirname, '../../.env') })
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') })
 
 const delay = ms => new Promise(res => setTimeout(res, ms))
 
@@ -28,8 +28,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assets.json\r\nfabric-cli asset pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=token --owner=alice --units=50 --data-file=src/data/assets.json',
-        'fabric-cli asset pledge --source-network=<source-network-name> --dest-network=<dest-network-name> --recipient=<recipient-id> --expiry-secs=<expiry-in-seconds> --type=<bond|token> [--owner=<owner-id>] [--ref=<asset-id>] [--units=<number-of-units>] --data-file=<path-to-data-file>>',
+        'fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assets.json\r\nfabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=token --owner=alice --units=50 --data-file=src/data/assets.json',
+        'fabric-cli asset transfer pledge --source-network=<source-network-name> --dest-network=<dest-network-name> --recipient=<recipient-id> --expiry-secs=<expiry-in-seconds> --type=<bond|token> [--owner=<owner-id>] [--ref=<asset-id>] [--units=<number-of-units>] --data-file=<path-to-data-file>>',
         [
           {
             name: '--debug',
@@ -83,7 +83,7 @@ const command: GluegunCommand = {
           }
         ],
         command,
-        ['asset', 'pledge']
+        ['asset', 'transfer', 'pledge']
       )
       return
     }

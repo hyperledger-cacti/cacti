@@ -25,6 +25,23 @@ func getBondAssetKey(assetType string, assetId string) string {
 	return assetType + assetId
 }
 
+func getBondAsset(ctx contractapi.TransactionContextInterface, assetType, id string) (*BondAsset, error) {
+	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read asset record from world state: %v", err)
+	}
+	if assetJSON == nil {
+		return nil, fmt.Errorf("the asset %s does not exist", id)
+	}
+
+	var asset BondAsset
+	err = json.Unmarshal(assetJSON, &asset)
+	if err != nil {
+		return nil, err
+	}
+	return &asset, nil
+}
+
 // InitBondAssetLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextInterface) error {
 	assets := []BondAsset{
@@ -95,51 +112,28 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 
 // ReadAsset returns the asset stored in the world state with given id.
 // This function is called with the parameter inUpdateOwnerContext value as false, except in the update-owner context
-func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, assetType, id string, isUpdateOwnerContext bool) (*BondAsset, error) {
-	assetJSON, err := ctx.GetStub().GetState(getBondAssetKey(assetType, id))
-	if err != nil {
-		return nil, fmt.Errorf("failed to read asset record from world state: %v", err)
-	}
-	if assetJSON == nil {
-		return nil, fmt.Errorf("the asset %s does not exist", id)
-	}
-
-	var asset BondAsset
-	err = json.Unmarshal(assetJSON, &asset)
+func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, assetType, id string) (*BondAsset, error) {
+	asset, err := getBondAsset(ctx, assetType, id)
 	if err != nil {
 		return nil, err
 	}
-	// In the update owner context, the TxCreator will be the newOwner. Hence don't check if the TxCreator is the current owner.
-	if !isUpdateOwnerContext {
-		owner, err := getECertOfTxCreatorBase64(ctx)
-		if err != nil {
-			return nil, err
-		}
-		if asset.Owner != owner {
-			return nil, fmt.Errorf("access not allowed to asset of type %s with id %s", assetType, id)
-		}
+	if !checkAccessToAsset(s, ctx, asset) {
+		return nil, fmt.Errorf("cannot access Bond Asset %s", id)
 	}
-
-	return &asset, nil
+	return asset, nil
 }
 
 // DeleteAsset deletes an given asset from the world state.
 func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, assetType, id string) error {
-	assetKey := getBondAssetKey(assetType, id)
-	assetJSON, err := ctx.GetStub().GetState(assetKey)
+	
+	// Read the asset (which internally check access)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
-		return fmt.Errorf("failed to read asset record from world state: %v", err)
+		return err
 	}
-	if assetJSON == nil {
-		return fmt.Errorf("the bond asset of type %s and id %s does not exist", assetType, id)
-	}
-	// Ensure that the client is the owner of the asset
-	if !checkAccessToAsset(s, ctx, assetJSON) {
-		return fmt.Errorf("Cannot delete asset %s", id)
-	}
-
-	return ctx.GetStub().DelState(assetKey)
+	return ctx.GetStub().DelState(getBondAssetKey(asset.Type, asset.ID))
 }
+
 
 // isCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
 func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
@@ -196,22 +190,15 @@ func isBondAssetLockedForMe(s *SmartContract, ctx contractapi.TransactionContext
 }
 
 // checkAccessToAsset checks several conditions under which an asset can be put on hold (i.e., not available for regular business operation)
-func checkAccessToAsset(s *SmartContract, ctx contractapi.TransactionContextInterface, assetJSON []byte) bool {
-	var asset BondAsset
-	err := json.Unmarshal(assetJSON, &asset)
-	if err != nil {
-		fmt.Println(err.Error())
-		return false
-	}
-
+func checkAccessToAsset(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	// Ensure that the client is the owner of the asset
-	if !isCallerAssetOwner(ctx, &asset) {
+	if !isCallerAssetOwner(ctx, asset) {
 		fmt.Printf("Illegal update: caller is not owner of asset %s\n", asset.ID)
 		return false
 	}
 
 	// Ensure that the asset is not locked
-	if isBondAssetLocked(s, ctx, &asset) {
+	if isBondAssetLocked(s, ctx, asset) {
 		fmt.Printf("Cannot update attributes of locked asset %s\n", asset.ID)
 		return false
 	}
@@ -228,9 +215,10 @@ func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface,
 
 	return assetJSON != nil, nil
 }
+
 // IsAssetReleased returns true if asset maturity date elapses
 func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterface, assetType, id string) (bool, error) {
-	asset, err := s.ReadAsset(ctx, assetType, id, false)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return false, err
 	}
@@ -244,7 +232,8 @@ func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterf
 
 // UpdateOwner sets the owner of an asset to a new owner.
 func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface, assetType, id string, newOwner string) error {
-	asset, err := s.ReadAsset(ctx, assetType, id, true)
+	// Read asset (which internally checks access if it is free to modified)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -255,22 +244,13 @@ func (s *SmartContract) UpdateOwner(ctx contractapi.TransactionContextInterface,
 		return err
 	}
 
-	// If the asset is locked, only the lock recipient can update the Owner field
-	if isBondAssetLocked(s, ctx, asset) {
-		return fmt.Errorf("Illegal update: cannot change ownership of locked asset %s in this transaction\n", asset.ID)
-	} else {
-		// If asset is not locked, only the owner can update the Owner field
-		if !isCallerAssetOwner(ctx, asset) {
-			return fmt.Errorf("Illegal update: caller is not owner of asset %s\n", asset.ID)
-		}
-	}
-
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
 // UpdateMaturityDate sets the maturity date of the asset to an updated date as passed in the parameters.
 func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInterface, assetType, id string, newMaturityDate time.Time) error {
-	asset, err := s.ReadAsset(ctx, assetType, id, false)
+	// Read asset (which internally checks access if it is free to modified)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -280,18 +260,14 @@ func (s *SmartContract) UpdateMaturityDate(ctx contractapi.TransactionContextInt
 	if err != nil {
 		return err
 	}
-
-	// Ensure that the asset is free to be modified
-	if !checkAccessToAsset(s, ctx, assetJSON) {
-		return fmt.Errorf("Cannot update maturity date of asset %s", id)
-	}
-
+	
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
 // UpdateFaceValue sets the face value of an asset to the new value passed.
 func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterface, assetType, id string, newFaceValue int) error {
-	asset, err := s.ReadAsset(ctx, assetType, id, false)
+	// Read asset (which internally checks access if it is free to modified)
+	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
 		return err
 	}
@@ -302,20 +278,11 @@ func (s *SmartContract) UpdateFaceValue(ctx contractapi.TransactionContextInterf
 		return err
 	}
 
-	// Ensure that the asset is free to be modified
-	if !checkAccessToAsset(s, ctx, assetJSON) {
-		return fmt.Errorf("Cannot update face value of asset %s", id)
-	}
-
 	return ctx.GetStub().PutState(getBondAssetKey(assetType, id), assetJSON)
 }
 
 // GetMyAssets returns the assets owner by the caller
 func (s *SmartContract) GetMyAssets(ctx contractapi.TransactionContextInterface) ([]*BondAsset, error) {
-	owner, err := getECertOfTxCreatorBase64(ctx)
-	if err != nil {
-		return nil, err
-	}
 	assets, err := s.GetAllAssets(ctx)
 	if err != nil {
 		return nil, err
@@ -324,7 +291,7 @@ func (s *SmartContract) GetMyAssets(ctx contractapi.TransactionContextInterface)
 	var myassets []*BondAsset
 
 	for _, asset := range assets {
-		if asset.Owner == owner {
+		if checkAccessToAsset(s, ctx, asset) {
 			myassets = append(myassets, asset)
 		}
 	}

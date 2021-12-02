@@ -12,6 +12,8 @@ import (
 	"errors"
 	"encoding/base64"
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
@@ -50,4 +52,12 @@ func createKeyValuePairs(m map[string]uint64) string {
 		fmt.Fprintf(b, "%s=\"%d\"\n", key, value)
 	}
 	return b.String()
+}
+
+func generateSHA256HashInHexForm(preimage string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(preimage))
+	shaHash := hasher.Sum(nil)
+	shaHashHex := hex.EncodeToString(shaHash)
+	return shaHashHex
 }

@@ -23,7 +23,7 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
+        maven { url 'https://repo1.maven.org/maven2' }
         maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
     }
 
@@ -50,9 +50,8 @@ allprojects {
 
     repositories {
         mavenLocal()
-        jcenter()
         mavenCentral()
-        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
+        maven { url 'https://repo1.maven.org/maven2' }
         maven { url 'https://software.r3.com/artifactory/corda' }
         maven { url 'https://jitpack.io' }
         if (file("$projectDir/./github.properties").exists()) {
