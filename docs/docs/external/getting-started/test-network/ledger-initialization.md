@@ -205,6 +205,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
   * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
   * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
   * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
+- Create `chaincode.json` file by copying `chaincode.json.template`. Keep the default values for asset transfer scenario.
 - Create a `.env` file by copying `.env.template` and setting the following parameter values:
   * If Relays and Drivers are deployed in the host machine:
     ```
