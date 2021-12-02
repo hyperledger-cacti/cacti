@@ -1,5 +1,5 @@
 DOCKER_IMAGE_NAME ?= weaver-corda-driver
-DOCKER_TAG ?= 1.2.4-alpha.5
+DOCKER_TAG ?= 1.2.4-alpha.6
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/corda-driver
 COMPOSE_ARG ?=
@@ -24,11 +24,11 @@ build-refresh-dependencies: github.properties
 	
 .PHONY: image-local
 image-local: build-local
-	docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
+	docker build -f Dockerfile.local -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
 
 .PHONY: image
 image: github.properties
-	docker build --build-arg BUILD_TAG="remote" --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
+	docker build --build-arg GIT_URL=$(GIT_URL) -f Dockerfile.remote -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
 
 .PHONY: push-image	
 push-image: image

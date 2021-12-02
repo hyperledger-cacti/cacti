@@ -5,6 +5,9 @@
 name="${RELAY_NAME}"
 hostname="${RELAY_HOST}"
 port="${RELAY_PORT}"
+cert_path="${RELAY_TLS_CERT_PATH}"
+key_path="${RELAY_TLS_KEY_PATH}"
+tls="${RELAY_TLS}"
 
 
 # This section contains information about the
@@ -22,3 +25,5 @@ network="${NETWORK_NAME}"
 [drivers.Dummy]
 hostname="${DRIVER_HOST}"
 port="${DRIVER_PORT}"
+tls="${DRIVER_TLS}"
+tlsca_cert_path="${DRIVER_TLSCA_CERT_PATH}"
