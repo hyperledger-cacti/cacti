@@ -6,7 +6,8 @@ const crypto = require('crypto')
 
 const command: GluegunCommand = {
 	name: 'exchange',
-  
+	description: 'Cross-network exchange of assets (fungible assets for now)',
+
 	run: async toolbox => {
 		const {
 			print,
@@ -17,7 +18,7 @@ const command: GluegunCommand = {
 				print,
 				toolbox,
 				`besu-cli asset exchange --local-network=network1 mychannel interop  Create '["test", "teststate"]'`,
-				'fabric-cli chaincode invoke --local-network=<network1|network2> --user=<user-id> <channel-name> <contract-name> <function-name> <args>',
+				'besu-cli asset exchange --local-network=<network1|network2> --user=<user-id> <channel-name> <contract-name> <function-name> <args>',
 				[
 					{
 						name: '--network1',
@@ -51,6 +52,26 @@ const command: GluegunCommand = {
 			return
 		}
 		print.info('Cross-network exchange of assets (fungible assets for now)')
+
+		// Checking the receipt of inputs
+		if(!options.network1){
+			print.error('Network1 ID not provided.')
+			return
+		}
+		if(!options.network2){
+			print.error('Network2 ID not provided.')
+			return
+		}
+		if(!options.amount){
+			print.error('Amount not provided.')
+			return
+		}
+		if(!options.timeout){
+			print.error('Timeout not provided.')
+			return
+		}
+
+		// Retrieving networkConfigs
 		const network1Config = getNetworkConfig(options.network1)
 		console.log(network1Config)
 		const network2Config = getNetworkConfig(options.network2)

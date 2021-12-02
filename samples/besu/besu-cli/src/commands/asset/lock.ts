@@ -6,7 +6,8 @@ const crypto = require('crypto')
 
 const command: GluegunCommand = {
 	name: 'lock',
-  
+ 	description: 'Lock assets (fungible assets for now)',
+
 	run: async toolbox => {
 		const {
 			print,
@@ -56,14 +57,13 @@ const command: GluegunCommand = {
 			return
 		}
 		print.info('Lock assets (fungible assets for now)')
+
+		// Retrieving networkConfig
+		if(!options.network){
+			print.error('Network ID not provided.')
+			return
+		}
 		const networkConfig = getNetworkConfig(options.network)
-		console.log(networkConfig)
-		console.log('Sender', options.sender_account)
-		console.log('Receiver', options.recipient_account)
-		console.log('Amount', options.amount)
-		console.log('Timeout', options.timeout)
-
-
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const web3N = new Web3(provider)
 		const interopContract = await getContractInstance(provider, networkConfig.interopContract).catch(function () {
@@ -75,20 +75,51 @@ const command: GluegunCommand = {
 		const accounts = await web3N.eth.getAccounts()
 
 		// Receving the input parameters
+		if(!options.amount){
+			print.error('Amount not provided.')
+			return
+		}
 		const amount = options.amount
-		const sender = accounts[options.sender_account]
-		const recipient = accounts[options.recipient_account]
+		var sender
+		if(options.sender_account){
+			sender = accounts[options.sender_account]
+		}
+		else{
+			print.info('Sender account index not provided. Taking from networkConfig..')
+			sender = accounts[networkConfig.senderAccountIndex]
+		}
+		var recipient
+		if(options.recipient_account){
+			recipient = accounts[options.recipient_account]
+		}
+		else{
+			print.info('Recipient account index not provided. Taking from networkConfig..')
+			recipient = accounts[networkConfig.recipientAccountIndex]
+		}
+		if(!options.timeout){
+			print.error('Timeout not provided.')
+			return
+		}
 		const timeLock = Math.floor(Date.now() / 1000) + options.timeout
-		var hash = options.hash
+		var hash
 		var preimage
-
-		if(!hash){
+		if(options.hash){
+			hash = options.hash
+		}
+		else{
 			// Generate a hash pair if not provided as an input parameter
 			preimage = crypto.randomBytes(32)
 			hash = crypto.createHash('sha256').update(preimage).digest()
 		}
-		console.log('Preimage: ', preimage)
+		
+		console.log('Parameters:')
+		console.log('networkConfig', networkConfig)
+		console.log('Sender', sender)
+		console.log('Receiver', recipient)
+		console.log('Amount', options.amount)
+		console.log('Timeout', timeLock)
 		console.log('Hash: ', hash)
+		console.log('Preimage: ', preimage)
 
 		// Balances of sender and receiver before locking
 		console.log(`Account balances before locking`)

@@ -5,7 +5,7 @@ const Web3 = require ("web3")
 
 const command: GluegunCommand = {
 	name: 'issue',
-
+	description: 'Issuance of tokens',
 	run: async toolbox => {
 		const {
  			print,
@@ -40,8 +40,12 @@ const command: GluegunCommand = {
 			return
 		}
 		print.info('Issuance of tokens')
+		if(!options.network){
+			print.error('Network ID not provided.')
+			return
+		}
 		const networkConfig = getNetworkConfig(options.network)
-		console.log(networkConfig)
+		console.log('networkConfig', networkConfig)
 	
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const web3N = new Web3(provider)
@@ -50,10 +54,21 @@ const command: GluegunCommand = {
 		})
 		const accounts = await web3N.eth.getAccounts()
 
+		var accountIndex
 		const contractOwner = accounts[0]
+		if(options.account){
+			accountIndex = options.account
+		}
+		else{
+			accountIndex = networkConfig.senderAccountIndex
+		}
+		if(!options.amount){
+			print.error('Amount not provided')
+			return
+		}
 	
 		// Transfer from the contract owner to the account specified
-		await tokenContract.transfer(accounts[options.account], options.amount, {from: contractOwner}).catch(function () {
+		await tokenContract.transfer(accounts[accountIndex], options.amount, {from: contractOwner}).catch(function () {
 			console.log("tokenContract transfer threw an error; Probably the token supply is used up!");
 		})
 

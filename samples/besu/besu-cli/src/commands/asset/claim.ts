@@ -5,7 +5,8 @@ const Web3 = require ("web3")
 
 const command: GluegunCommand = {
 	name: 'claim',
-  
+	description: 'Claim assets (fungible assets for now)',
+
 	run: async toolbox => {
 		const {
 			print,
@@ -45,12 +46,13 @@ const command: GluegunCommand = {
 			return
 		}
 		print.info('Claim assets (fungible assets for now)')
-		const networkConfig = getNetworkConfig(options.network)
-		console.log(networkConfig)
-		console.log('Receiver', options.recipient_account)
-		console.log('Lock Contract ID', options.lock_contract_id)
-		console.log('Preimage', options.preimage)
 
+		// Retrieving networkConfig
+		if(!options.network){
+			print.error('Network ID not provided.')
+			return
+		}
+		const networkConfig = getNetworkConfig(options.network)
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const web3N = new Web3(provider)
 		const interopContract = await getContractInstance(provider, networkConfig.interopContract).catch(function () {
@@ -62,14 +64,36 @@ const command: GluegunCommand = {
 		const accounts = await web3N.eth.getAccounts()
 
 		// Receiving the input parameters
-		const recipient = accounts[options.recipient_account]
+		var recipient
+		if(options.recipient_account){
+			recipient = accounts[options.recipient_account]
+		}
+		else{
+			print.info('Recipient account index not provided. Taking from networkConfig..')
+			recipient = accounts[networkConfig.recipientAccountIndex]
+		}
+		if(!options.lock_contract_id){
+			print.error('Lock contract ID not provided.')
+			return
+		}
 		const lockContractId = options.lock_contract_id
+		if(!options.preimage){
+			print.error('Preimage not provided.')
+			return
+		}
+		const preimage = options.preimage
+
+		console.log('Parameters')
+		console.log('networkConfig', networkConfig)
+		console.log('Receiver', recipient)
+		console.log('Lock Contract ID', lockContractId)
+		console.log('Preimage', preimage)
 
 		// Balance of the recipient before claiming
 		var recipientBalance = await tokenContract.balanceOf(recipient)
 		console.log(`Account balance of the recipient in Network ${options.network} before claiming: ${recipientBalance.toString()}`)
 
-		await interopContract.claimFungibleAsset(lockContractId, options.preimage, {
+		await interopContract.claimFungibleAsset(lockContractId, preimage, {
 			from: recipient,
 		}).catch(function () {
 			console.log("claimFungibleAsset threw an error");

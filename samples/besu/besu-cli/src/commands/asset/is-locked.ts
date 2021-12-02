@@ -5,7 +5,8 @@ const Web3 = require ("web3")
 
 const command: GluegunCommand = {
 	name: 'is-locked',
-  
+ 	description: 'Check if a contract exists, which also checks if an asset is locked',
+
 	run: async toolbox => {
 		const {
 			print,
@@ -36,7 +37,14 @@ const command: GluegunCommand = {
 		}
 		print.info('Check if a contract exists, which also checks if an asset is locked')
 		const networkConfig = getNetworkConfig(options.network)
-		console.log(networkConfig)
+		if(!options.lock_contract_id){
+			print.error('Lock contract ID not provided.')
+			return
+		}
+
+		console.log('Parameters')
+		console.log('networkConfig', networkConfig)
+		console.log('Lock Contract ID', options.lock_contract_id)
 
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const interopContract = await getContractInstance(provider, networkConfig.interopContract)

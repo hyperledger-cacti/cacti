@@ -5,6 +5,7 @@ const Web3 = require ("web3")
 
 const command: GluegunCommand = {
 	name: 'unlock',
+	description: 'Unlock and reclaim assets after timeout (fungible assets for now)',
 
 	run: async toolbox => {
 		const {
@@ -15,23 +16,13 @@ const command: GluegunCommand = {
 			commandHelp(
 				print,
 				toolbox,
-				`besu-cli asset unlock -network=network1 --token_contract='path/to/tokenContract.json' --interop_contract='path/to/interopcontract.json' --lock_contract_id=lockContractID --sender_account=1`,
-				'besu-cli asset unlock --network=<network1|network2> --token_contract=<path-to-tokenContract.json> --interop_contract=<path-to-interopContract.json> --lock_contract_id=<lockContractID> --sender_account=<1|2>',
+				`besu-cli asset unlock -network=network1 --lock_contract_id=lockContractID --sender_account=1`,
+				'besu-cli asset unlock --network=<network1|network2> --lock_contract_id=<lockContractID> --sender_account=<1|2>',
 				[
 					{
 						name: '--network',
 						description:
 							'network for command. <network1|network2>'
-					},
-					{
-						name: '--token_contract',
-						description:
-							'Path to the json file corresponding to the token contract compiled with Truffle.'
-					},
-					{
-						name: '--interop_contract',
-						description:
-							'Path to the json file corresponding to the interop contract compiled with Truffle.'
 					},
 					{
 						name: '--lock_contract_id',
@@ -49,27 +40,43 @@ const command: GluegunCommand = {
 			)
 			return
 		}
-		print.info('Claim assets (fungible assets for now)')
-		const networkConfig = getNetworkConfig(options.network)
-		console.log(networkConfig)
-		console.log('Token contract', options.token_contract)
-		console.log('Interop contract', options.interop_contract)
-		console.log('Sender', options.sender_account)
-		console.log('Lock Contract ID', options.lock_contract_id)
+		print.info('Unlock and reclaim assets after timeout (fungible assets for now)')
 
+		// Retrieving networkConfig
+		if(!options.network){
+			print.error('Network ID not provided.')
+			return
+		}
+		const networkConfig = getNetworkConfig(options.network)
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const web3N = new Web3(provider)
-		const interopContract = await getContractInstance(provider, options.interop_contract).catch(function () {
+		const interopContract = await getContractInstance(provider, networkConfig.interopContract).catch(function () {
 			console.log("Failed getting interopContract!");
 		})
-		const tokenContract = await getContractInstance(provider, options.token_contract).catch(function () {
+		const tokenContract = await getContractInstance(provider, networkConfig.tokenContract).catch(function () {
 			console.log("Failed getting tokenContract!");
 		})
 		const accounts = await web3N.eth.getAccounts()
 
 		// Receiving the input parameters
-		const sender = accounts[options.sender_account]
+		var sender
+		if(options.sender_account){
+			sender = accounts[options.sender_account]
+		}
+		else{
+			print.info('Sender account index not provided. Taking from networkConfig..')
+			sender = accounts[networkConfig.senderAccountIndex]
+		}
+		if(!options.lock_contract_id){
+			print.error('Lock contract ID not provided.')
+			return
+		}
 		const lockContractId = options.lock_contract_id
+
+		console.log('Paramters')
+		console.log('networkConfig', networkConfig)
+		console.log('Sender', sender)
+		console.log('Lock Contract ID', lockContractId)
 
 		// Balance of the recipient before claiming
 		var senderBalance = await tokenContract.balanceOf(sender)

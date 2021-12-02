@@ -5,7 +5,8 @@ const Web3 = require ("web3")
 
 const command: GluegunCommand = {
 	name: 'get-balance',
-  
+	description: 'Get account balance of tokens',
+
 	run: async toolbox => {
 		const {
 			print,
@@ -36,8 +37,6 @@ const command: GluegunCommand = {
 		}
 		print.info('Get account balance of tokens')
 		const networkConfig = getNetworkConfig(options.network)
-		console.log(networkConfig)
-
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const web3N = new Web3(provider)
 		const accounts = await web3N.eth.getAccounts()
@@ -45,8 +44,17 @@ const command: GluegunCommand = {
 		const tokenContract = await getContractInstance(provider, networkConfig.tokenContract).catch(function () {
 			console.log("Failed getting tokenContract!");
 		})
+	
+		if(!options.account){
+			print.error('Account index not provided')
+			return
+		}
+		const accountAddress = accounts[options.account]
 
-		var balance = await tokenContract.balanceOf(accounts[options.account])
+		console.log('Parameters')
+		console.log('networkConfig', networkConfig)
+		console.log('Account', accountAddress)
+		var balance = await tokenContract.balanceOf(accountAddress)
 		console.log(`Account balance of accounts[${options.account}] in Network ${options.network}: ${balance.toString()}`)
 	}
 }
