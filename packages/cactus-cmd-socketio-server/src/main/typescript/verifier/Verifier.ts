@@ -11,14 +11,9 @@ import {
   LedgerEvent,
   VerifierEventListener,
 } from "./LedgerPlugin";
-import { makeApiInfoList } from "./DriverCommon";
-import {
-  json2str,
-  addSocket,
-  getStoredSocket,
-  deleteAndDisconnectSocke,
-} from "./DriverCommon";
+import { json2str } from "./DriverCommon";
 import { LedgerOperation } from "../business-logic-plugin/LedgerOperation";
+import { LedgerPluginInfo } from "./validator-registry";
 import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 import { VerifierAuthentication } from "./VerifierAuthentication";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -44,20 +39,12 @@ type VALIDATOR_TYPE = typeof VALIDATOR_TYPE[keyof typeof VALIDATOR_TYPE]; // 'so
 // abolish template-trade
 // const validatorRregistryConf: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/validator-registry.yaml", 'utf8'));
 
-type TLedgerInfo = {
-  validatorID: string;
-  validatorType: string;
-  validatorURL: string;
-  validatorKeyPath: string;
-  apiInfo: object;
-};
-
 export class Verifier implements IVerifier {
   validatorID = "";
   validatorType = "";
   validatorUrl = "";
   validatorKeyPath = "";
-  apiInfo: object = {};
+  apiInfo: Array<ApiInfo> = [];
   counterReqID = 1;
   eventListenerHash: { [key: string]: VerifierEventListener } = {}; // Listeners for events from Ledger
   static mapUrlSocket: Map<string, SocketIOClient.Socket> = new Map();
@@ -66,7 +53,7 @@ export class Verifier implements IVerifier {
 
   constructor(ledgerInfo: string) {
     // TODO: Configure the Verifier based on the connection information
-    const ledgerInfoObj = JSON.parse(ledgerInfo) as TLedgerInfo;
+    const ledgerInfoObj = JSON.parse(ledgerInfo) as LedgerPluginInfo;
     this.validatorID = ledgerInfoObj.validatorID;
     this.validatorType = ledgerInfoObj.validatorType;
     this.validatorUrl = ledgerInfoObj.validatorURL;

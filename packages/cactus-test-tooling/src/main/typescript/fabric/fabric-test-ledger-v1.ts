@@ -32,6 +32,7 @@ import {
 import path from "path";
 import fs from "fs";
 import yaml from "js-yaml";
+import { envMapToDocker } from "../common/env-map-to-docker";
 
 export interface organizationDefinitionFabricV2 {
   path: string;
@@ -1204,9 +1205,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
   public async start(ops?: LedgerStartOptions): Promise<Container> {
     const containerNameAndTag = this.getContainerImageName();
-    const dockerEnvVars: string[] = new Array(...this.envVars).map(
-      (pairs) => `${pairs[0]}=${pairs[1]}`,
-    );
+    const dockerEnvVars = envMapToDocker(this.envVars);
 
     if (this.container) {
       await this.container.stop();
