@@ -155,7 +155,6 @@ func (s *SmartContract) ReadAsset(ctx contractapi.TransactionContextInterface, a
 
 // DeleteAsset deletes an given asset from the world state.
 func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, assetType, id string) error {
-	
 	// Read the asset (which internally check access)
 	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
@@ -179,7 +178,6 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 	if err != nil {
 		return "", err
 	}
-	
 	// Create JSON of asset to be used by wutils.PledgeAsset
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
@@ -378,7 +376,7 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 	}
 	if asset.Owner != recipientCert {
 		return blankClaimBytes64, nil      // Return blank
-	}	
+	}
 
 	// Match pledger identity in claim with request parameters
 	var lookupClaimAsset BondAsset

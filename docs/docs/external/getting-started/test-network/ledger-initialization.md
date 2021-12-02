@@ -198,7 +198,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
     - Set the `chaincode` attribute in each network to `simpleassettransfer`.
     - Set the `aclPolicyPrincipalType` attribute in `network2` to `ca`.
     - Otherwise, leave the default values unchanged.
-- Create `remote-network-config.json` file by copying `remote-network-config.json.template`. Use default values if Relays and Drivers are deployed in the host machines; else if they are deployed in docker, update as follows:
+- Create `remote-network-config.json` file by copying `remote-network-config.json.template`. Use default values if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
   * Update value for `relayEndpoint` for `network1` as `relay-network1:9080`.
   * Update value for `relayEndpoint` for `network2` as `relay-network2:9083`.
   * Update value for `relayEndpoint` for `Corda_Network` as `relay-corda:9081`.
@@ -211,16 +211,16 @@ Prepare `fabric-cli` for configuration suitably as follows.
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials
     DEFAULT_APPLICATION_CHAINCODE=simpleassettransfer
     CONFIG_PATH=./config.json
-    CHAINCODE_PATH=./chaincode.json
     REMOTE_CONFIG_PATH=./remote-network-config.json
+    CHAINCODE_PATH=./chaincode.json
     ```
   * If Relays and Drivers are deployed in the Docker containers:
     ```
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials_docker
     DEFAULT_APPLICATION_CHAINCODE=simpleassettransfer
     CONFIG_PATH=./config.json
-    CHAINCODE_PATH=./chaincode.json
     REMOTE_CONFIG_PATH=./remote-network-config.json
+    CHAINCODE_PATH=./chaincode.json
     ```
   * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.
   * Leave the default values unchanged for the other parameters.

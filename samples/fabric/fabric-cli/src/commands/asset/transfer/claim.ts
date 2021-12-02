@@ -202,22 +202,22 @@ async function getClaimViewAddress(assetCategory, pledgeId, owner, sourceNetwork
     let ownerCert = "", funcName = "", funcArgs = []
     
     if (assetCategory == "cordaAsset") {
-        funcName = "GetAssetPledgeStatus";
+        funcName = "GetAssetPledgeStatus"
         ownerCert = "TODO" // TODO: Fetch Corda owner cert
         funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
     } else if (assetCategory === "bond") {
-        funcName = "GetAssetPledgeStatus";
+        funcName = "GetAssetPledgeStatus"
         ownerCert = await getUserCertBase64(sourceNetwork, owner)
         funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
     } else if (assetCategory === "token") {
-        funcName = "GetTokenAssetPledgeStatus";
+        funcName = "GetTokenAssetPledgeStatus"
         ownerCert = await getUserCertBase64(sourceNetwork, owner)
         funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
     } else {
         throw new Error(`Unecognized asset category: ${assetCategory}`)
     }
 
-    const viewAddress = generateViewAddressFromRemoteConfig(sourceNetwork, funcName, funcArgs);
+    const viewAddress = generateViewAddressFromRemoteConfig(sourceNetwork, funcName, funcArgs)
 
     return { viewAddress: viewAddress, ownerCert: ownerCert }
 }

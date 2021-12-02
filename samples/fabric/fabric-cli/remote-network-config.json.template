@@ -14,7 +14,7 @@
   "Corda_Network": {
     "type": "corda",
     "relayEndpoint": "localhost:9081",
-    "PartyAEndPoint": "localhost:10006",
+    "partyEndPoint": "localhost:10006",
     "flowPackage": "com.cordaSimpleApplication.flow"
   },
   "Corda_Network2": {

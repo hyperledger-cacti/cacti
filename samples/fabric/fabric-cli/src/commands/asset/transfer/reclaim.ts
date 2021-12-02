@@ -189,22 +189,22 @@ function getReclaimViewAddress(assetCategory, assetType, assetIdOrQuantity,
 ) {
     let funcName = "", funcArgs = []
     if (assetCategory == "cordaAsset") {
-        funcName = "GetAssetClaimStatus";
+        funcName = "GetAssetClaimStatus"
         funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
             pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
     } else if (assetCategory === "bond") {
-        funcName = "GetAssetClaimStatus";
+        funcName = "GetAssetClaimStatus"
         funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
             pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
     } else if (assetCategory === "token") {
-        funcName = "GetTokenAssetClaimStatus";
+        funcName = "GetTokenAssetClaimStatus"
         funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
             pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
     } else {
-        throw new Error(`Unecognized asset category: ${assetCategory}`);
+        throw new Error(`Unecognized asset category: ${assetCategory}`)
     }
     
-    return generateViewAddressFromRemoteConfig(destNetwork, funcName, funcArgs);
+    return generateViewAddressFromRemoteConfig(destNetwork, funcName, funcArgs)
 }
 
 module.exports = command

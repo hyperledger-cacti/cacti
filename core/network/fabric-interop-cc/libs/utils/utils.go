@@ -162,9 +162,9 @@ func unmarshalAssetPledge(assetPledgeBase64 string) (*common.AssetPledge, error)
 		return pledge, fmt.Errorf("empty asset pledge")
 	}
 	err = proto.Unmarshal([]byte(assetPledgeSerialized), pledge)
-    if err != nil {
-        return pledge, err
-    }
+  if err != nil {
+    return pledge, err
+  }
 	return pledge, nil
 }
 
@@ -215,7 +215,7 @@ func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, 
 		if (pledge.RemoteNetworkID == remoteNetworkId && pledge.Recipient == recipientCert && pledge.ExpiryTimeSecs == expiryTimeSecs) {
 			return pledgeId, nil
 		} else {
-			return "", fmt.Errorf("the asset %s %s has already been pledged", assetType, assetIdOrQuantity)
+			return "", fmt.Errorf("the asset %s with id %s has already been pledged", assetType, assetIdOrQuantity)
 		}
 	}
 

@@ -647,8 +647,8 @@ const generateViewAddress = async (
       recipientCert: addressParts[3],
       pledgeId: addressParts[0],
       logger: logger
-    });
-    return viewAddress + ':' + deserializeAssetPledge(pledgeDetails).getExpirytimesecs();
+    })
+    return viewAddress + ':' + deserializeAssetPledge(pledgeDetails).getExpirytimesecs()
   } else {
     return viewAddress
   }
@@ -682,10 +682,10 @@ const generateViewAddressFromRemoteConfig = (
     let address = remoteNetConfig.relayEndpoint + '/' + networkId
     if (remoteNetConfig.type == "fabric") {
         address = address + '/' + remoteNetConfig.channelName + ':' +
-            remoteNetConfig.chaincode + ':' + funcName + ':' + funcArgs.join(':');
+            remoteNetConfig.chaincode + ':' + funcName + ':' + funcArgs.join(':')
     } else if (remoteNetConfig.type == "corda") {
         address = address + '/' + remoteNetConfig.PartyAEndPoint + '#' +
-            remoteNetConfig.flowPackage + "." + funcName + ":" + funcArgs.join(':');
+            remoteNetConfig.flowPackage + "." + funcName + ":" + funcArgs.join(':')
     } else {
         logger.error(`Error: remote network ${remoteNetConfig.type} not supported.`)
         throw new Error(`Error: remote network ${remoteNetConfig.type} not supported.`)
