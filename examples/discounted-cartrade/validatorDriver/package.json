@@ -23,7 +23,7 @@
     "ethereumjs-common": "^1.5.1",
     "ethereumjs-tx": "^2.1.2",
     "web3": "^1.2.9",
-    "fabric-ca-client": "~1.4.0",
-    "fabric-network": "~1.4.0"
+    "fabric-ca-client": "2.2.10",
+    "fabric-network": "2.2.10"
   }
 }
