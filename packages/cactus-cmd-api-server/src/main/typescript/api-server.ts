@@ -109,8 +109,10 @@ export class ApiServer {
       throw new Error(`ApiServer#ctor options.config was falsy`);
     }
 
-    this.enableShutdownHook = Bools.isBooleanStrict(options.enableShutdownHook)
-      ? (options.enableShutdownHook as boolean)
+    this.enableShutdownHook = Bools.isBooleanStrict(
+      options.config.enableShutdownHook,
+    )
+      ? (options.config.enableShutdownHook as boolean)
       : true;
 
     if (this.enableShutdownHook) {
