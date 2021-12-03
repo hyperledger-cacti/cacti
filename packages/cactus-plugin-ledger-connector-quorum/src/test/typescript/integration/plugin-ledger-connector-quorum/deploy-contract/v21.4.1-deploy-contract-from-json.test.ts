@@ -1,7 +1,7 @@
-import test, { Test } from "tape-promise/tape";
 import Web3 from "web3";
+import { Account } from "web3-core";
 import { v4 as uuidV4 } from "uuid";
-
+import "jest-extended";
 import {
   LogLevelDesc,
   IListenOptions,
@@ -29,121 +29,131 @@ import {
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-
-const testCase = "Quorum Ledger Connector Plugin";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
-const logLevel: LogLevelDesc = "INFO";
-const contractName = "HelloWorld";
+const testCase = "Quorum Ledger Connector Plugin";
 
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  t.end();
-});
-
-test(testCase, async (t: Test) => {
+describe(testCase, () => {
+  const logLevel: LogLevelDesc = "INFO";
+  const contractName = "HelloWorld";
   const containerImageName = "hyperledger/cactus-quorum-all-in-one";
   const containerImageVersion = "2021-05-03-quorum-v21.4.1";
   const ledgerOptions = { containerImageName, containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
+  let addressInfo,
+    rpcApiHttpHost: string,
+    quorumGenesisOptions: IQuorumGenesisOptions,
+    connector: PluginLedgerConnectorQuorum,
+    contractAddress: string,
+    address: string,
+    port: number,
+    apiHost,
+    apiConfig,
+    apiClient: QuorumApi,
+    web3: Web3,
+    testEthAccount: Account,
+    keychainEntryKey: string,
+    keychainEntryValue: string,
+    keychainPlugin: PluginKeychainMemory,
+    firstHighNetWorthAccount: string;
 
-  test.onFinish(async () => {
+  afterAll(async () => await Servers.shutdown(server));
+  beforeAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
+  });
+  afterAll(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
   });
-  await ledger.start();
-
-  const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
-  const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
-  t.ok(quorumGenesisOptions);
-  t.ok(quorumGenesisOptions.alloc);
-
-  const highNetWorthAccounts: string[] = Object.keys(
-    quorumGenesisOptions.alloc,
-  ).filter((address: string) => {
-    const anAccount: IAccount = quorumGenesisOptions.alloc[address];
-    const theBalance = parseInt(anAccount.balance, 10);
-    return theBalance > 10e7;
+  afterAll(async () => {
+    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    await expect(pruning).resolves.toBeTruthy();
   });
-  const [firstHighNetWorthAccount] = highNetWorthAccounts;
 
-  const web3 = new Web3(rpcApiHttpHost);
-  const testEthAccount = web3.eth.accounts.create(uuidV4());
+  beforeAll(async () => {
+    await ledger.start();
+    rpcApiHttpHost = await ledger.getRpcApiHttpHost();
+    expect(rpcApiHttpHost).toBeString();
 
-  const keychainEntryKey = uuidV4();
-  const keychainEntryValue = testEthAccount.privateKey;
-  const keychainPlugin = new PluginKeychainMemory({
-    instanceId: uuidV4(),
-    keychainId: uuidV4(),
-    // pre-provision keychain with mock backend holding the private key of the
-    // test account that we'll reference while sending requests with the
-    // signing credential pointing to this keychain entry.
-    backend: new Map([[keychainEntryKey, keychainEntryValue]]),
-    logLevel,
-  });
-  keychainPlugin.set(
-    HelloWorldContractJson.contractName,
-    JSON.stringify(HelloWorldContractJson),
-  );
-  // Instantiate connector with the keychain plugin that already has the
-  // private key we want to use for one of our tests
-  const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
-    {
+    quorumGenesisOptions = await ledger.getGenesisJsObject();
+    expect(quorumGenesisOptions).toBeTruthy();
+    expect(quorumGenesisOptions.alloc).toBeTruthy();
+
+    web3 = new Web3(rpcApiHttpHost);
+    testEthAccount = web3.eth.accounts.create(uuidV4());
+
+    keychainEntryKey = uuidV4();
+    keychainEntryValue = testEthAccount.privateKey;
+    keychainPlugin = new PluginKeychainMemory({
+      instanceId: uuidV4(),
+      keychainId: uuidV4(),
+      // pre-provision keychain with mock backend holding the private key of the
+      // test account that we'll reference while sending requests with the
+      // signing credential pointing to this keychain entry.
+      backend: new Map([[keychainEntryKey, keychainEntryValue]]),
+      logLevel,
+    });
+    connector = new PluginLedgerConnectorQuorum({
       instanceId: uuidV4(),
       rpcApiHttpHost,
       logLevel,
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-    },
-  );
+    });
+    const listenOptions: IListenOptions = {
+      hostname: "0.0.0.0",
+      port: 0,
+      server,
+    };
+    addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    ({ address, port } = addressInfo);
+    apiHost = `http://${address}:${port}`;
+    apiConfig = new Configuration({ basePath: apiHost });
+    apiClient = new QuorumApi(apiConfig);
+  });
+  test("Bootsrap test ETH account with funds from genesis", async () => {
+    const highNetWorthAccounts: string[] = Object.keys(
+      quorumGenesisOptions.alloc,
+    ).filter((address: string) => {
+      const anAccount: IAccount = quorumGenesisOptions.alloc[address];
+      const theBalance = parseInt(anAccount.balance, 10);
+      return theBalance > 10e7;
+    });
+    [firstHighNetWorthAccount] = highNetWorthAccounts;
+    keychainPlugin.set(
+      HelloWorldContractJson.contractName,
+      JSON.stringify(HelloWorldContractJson),
+    );
+    // Instantiate connector with the keychain plugin that already has the
+    // private key we want to use for one of our tests
+    await connector.registerWebServices(expressApp);
 
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  const server = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
-    port: 0,
-    server,
-  };
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  test.onFinish(async () => await Servers.shutdown(server));
-  const { address, port } = addressInfo;
-  const apiHost = `http://${address}:${port}`;
-  t.comment(
-    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/get-prometheus-exporter-metrics`,
-  );
+    await connector.transact({
+      web3SigningCredential: {
+        ethAccount: firstHighNetWorthAccount,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+      transactionConfig: {
+        from: firstHighNetWorthAccount,
+        to: testEthAccount.address,
+        value: 10e9,
+      },
+    });
 
-  const apiConfig = new Configuration({ basePath: apiHost });
-  const apiClient = new QuorumApi(apiConfig);
-
-  await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp);
-
-  await connector.transact({
-    web3SigningCredential: {
-      ethAccount: firstHighNetWorthAccount,
-      secret: "",
-      type: Web3SigningCredentialType.GethKeychainPassword,
-    },
-    transactionConfig: {
-      from: firstHighNetWorthAccount,
-      to: testEthAccount.address,
-      value: 10e9,
-    },
+    const balance = await web3.eth.getBalance(testEthAccount.address);
+    expect(balance).toBeTruthy();
+    expect(parseInt(balance, 10)).toBe(10e9);
   });
 
-  const balance = await web3.eth.getBalance(testEthAccount.address);
-  t.ok(balance, "Retrieved balance of test account OK");
-  t.equals(parseInt(balance, 10), 10e9, "Balance of test account is OK");
-
-  let contractAddress: string;
-
-  test("deploys contract via .json file", async (t2: Test) => {
+  test("deploys contract via .json file", async () => {
     const deployOut = await connector.deployContract({
       contractName: HelloWorldContractJson.contractName,
       keychainId: keychainPlugin.getKeychainId(),
@@ -154,21 +164,12 @@ test(testCase, async (t: Test) => {
       },
       gas: 1000000,
     });
-    t2.ok(deployOut, "deployContract() output is truthy OK");
-    t2.ok(
-      deployOut.transactionReceipt,
-      "deployContract() output.transactionReceipt is truthy OK",
-    );
-    t2.ok(
-      deployOut.transactionReceipt.contractAddress,
-      "deployContract() output.transactionReceipt.contractAddress is truthy OK",
-    );
+    expect(deployOut).toBeTruthy();
+    expect(deployOut.transactionReceipt).toBeTruthy();
+    expect(deployOut.transactionReceipt.contractAddress).toBeTruthy();
 
     contractAddress = deployOut.transactionReceipt.contractAddress as string;
-    t2.ok(
-      typeof contractAddress === "string",
-      "contractAddress typeof string OK",
-    );
+    expect(typeof contractAddress).toBe("string");
 
     const { callOutput: helloMsg } = await connector.getContractInfoKeychain({
       contractName,
@@ -182,14 +183,12 @@ test(testCase, async (t: Test) => {
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
     });
-    t2.ok(helloMsg, "sayHello() output is truthy");
-    t2.true(
-      typeof helloMsg === "string",
-      "sayHello() output is type of string",
-    );
+    expect(helloMsg).toBeTruthy();
+    expect(typeof contractAddress).toBe("string");
+    expect(typeof helloMsg).toBe("string");
   });
 
-  test("invoke Web3SigningCredentialType.GETHKEYCHAINPASSWORD", async (t2: Test) => {
+  test("invoke Web3SigningCredentialType.GETHKEYCHAINPASSWORD", async () => {
     const newName = `DrCactus${uuidV4()}`;
     const setNameOut = await connector.getContractInfoKeychain({
       contractName,
@@ -204,10 +203,10 @@ test(testCase, async (t: Test) => {
       },
       nonce: 2,
     });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+    expect(setNameOut).toBeTruthy();
 
     try {
-      const setNameOutInvalid = await connector.getContractInfoKeychain({
+      await connector.getContractInfoKeychain({
         contractName,
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
@@ -221,13 +220,9 @@ test(testCase, async (t: Test) => {
         },
         nonce: 2,
       });
-      t2.ifError(setNameOutInvalid.transactionReceipt);
+      fail("PluginLedgerConnectorQuorum.invokeContract failed to throw error");
     } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+      expect(error).not.toBe("Nonce too low");
     }
 
     const getNameOut = await connector.getContractInfoKeychain({
@@ -242,7 +237,7 @@ test(testCase, async (t: Test) => {
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
     });
-    t2.ok(getNameOut.success, `getName() SEND invocation produced receipt OK`);
+    expect(getNameOut.success).toBeTruthy();
 
     const { callOutput: getNameOut2 } = await connector.getContractInfoKeychain(
       {
@@ -258,16 +253,10 @@ test(testCase, async (t: Test) => {
         },
       },
     );
-    t2.equal(
-      getNameOut2,
-      newName,
-      "setName() invocation #2 output is truthy OK",
-    );
-
-    t2.end();
+    expect(getNameOut2).toEqual(newName);
   });
 
-  test("invoke Web3SigningCredentialType.NONE", async (t2: Test) => {
+  test("invoke Web3SigningCredentialType.NONE", async () => {
     const testEthAccount2 = web3.eth.accounts.create(uuidV4());
 
     const { rawTransaction } = await web3.eth.accounts.signTransaction(
@@ -290,12 +279,11 @@ test(testCase, async (t: Test) => {
     });
 
     const balance2 = await web3.eth.getBalance(testEthAccount2.address);
-    t2.ok(balance2, "Retrieved balance of test account 2 OK");
-    t2.equals(parseInt(balance2, 10), 10e6, "Balance of test account2 is OK");
-    t2.end();
+    expect(balance2).toBeTruthy();
+    expect(parseInt(balance2, 10)).toEqual(10e6);
   });
 
-  test("invoke Web3SigningCredentialType.PrivateKeyHex", async (t2: Test) => {
+  test("invoke Web3SigningCredentialType.PrivateKeyHex", async () => {
     const newName = `DrCactus${uuidV4()}`;
     const setNameOut = await connector.getContractInfoKeychain({
       contractName,
@@ -310,10 +298,10 @@ test(testCase, async (t: Test) => {
       },
       nonce: 1,
     });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+    expect(setNameOut).toBeTruthy();
 
     try {
-      const setNameOutInvalid = await connector.getContractInfoKeychain({
+      await connector.getContractInfoKeychain({
         contractName,
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
@@ -327,13 +315,9 @@ test(testCase, async (t: Test) => {
         },
         nonce: 1,
       });
-      t2.ifError(setNameOutInvalid.transactionReceipt);
+      fail("It should not reach here");
     } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+      expect(error).not.toBe("Nonce too low");
     }
     const { callOutput: getNameOut } = await connector.getContractInfoKeychain({
       contractName,
@@ -348,7 +332,7 @@ test(testCase, async (t: Test) => {
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
-    t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
+    expect(getNameOut).toEqual(newName);
 
     const getNameOut2 = await connector.getContractInfoKeychain({
       contractName,
@@ -363,12 +347,10 @@ test(testCase, async (t: Test) => {
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
-    t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
-
-    t2.end();
+    expect(getNameOut2).toBeTruthy();
   });
 
-  test("invoke Web3SigningCredentialType.CactusKeychainRef", async (t2: Test) => {
+  test("invoke Web3SigningCredentialType.CactusKeychainRef", async () => {
     const newName = `DrCactus${uuidV4()}`;
 
     const web3SigningCredential: Web3SigningCredentialCactusKeychainRef = {
@@ -388,10 +370,10 @@ test(testCase, async (t: Test) => {
       web3SigningCredential,
       nonce: 3,
     });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+    expect(setNameOut).toBeTruthy();
 
     try {
-      const setNameOutInvalid = await connector.getContractInfoKeychain({
+      await connector.getContractInfoKeychain({
         contractName,
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
@@ -405,13 +387,9 @@ test(testCase, async (t: Test) => {
         },
         nonce: 3,
       });
-      t2.ifError(setNameOutInvalid.transactionReceipt);
+      fail("it should not reach here");
     } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+      expect(error).not.toBe("Nonce too low");
     }
     const { callOutput: getNameOut } = await connector.getContractInfoKeychain({
       contractName,
@@ -422,7 +400,7 @@ test(testCase, async (t: Test) => {
       gas: 1000000,
       web3SigningCredential,
     });
-    t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
+    expect(getNameOut).toEqual(newName);
 
     const getNameOut2 = await connector.getContractInfoKeychain({
       contractName,
@@ -433,12 +411,10 @@ test(testCase, async (t: Test) => {
       gas: 1000000,
       web3SigningCredential,
     });
-    t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
-
-    t2.end();
+    expect(getNameOut2).toBeTruthy();
   });
 
-  test("get prometheus exporter metrics", async (t2: Test) => {
+  test("get prometheus exporter metrics", async () => {
     const res = await apiClient.getPrometheusMetricsV1();
     const promMetricsOutput =
       "# HELP " +
@@ -451,15 +427,9 @@ test(testCase, async (t: Test) => {
       '{type="' +
       K_CACTUS_QUORUM_TOTAL_TX_COUNT +
       '"} 5';
-    t2.ok(res);
-    t2.ok(res.data);
-    t2.equal(res.status, 200);
-    t2.true(
-      res.data.includes(promMetricsOutput),
-      "Total Transaction Count of 5 recorded as expected. RESULT OK.",
-    );
-    t2.end();
+    expect(res).toBeTruthy();
+    expect(res.data).toBeTruthy();
+    expect(res.status).toEqual(200);
+    expect(res.data).toContain(promMetricsOutput);
   });
-
-  t.end();
 });
