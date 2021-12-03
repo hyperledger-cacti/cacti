@@ -13,8 +13,8 @@
     "config": "^1.26.1",
     "socket.io": "^2.0.4",
     "ts-node": "^9.0.0",
-    "fabric-ca-client": "~1.4.0",
-    "fabric-network": "~1.4.0",
+    "fabric-ca-client": "2.2.10",
+    "fabric-network": "2.2.10",
     "shelljs": "^0.8.4"
   },
   "devDependencies": {

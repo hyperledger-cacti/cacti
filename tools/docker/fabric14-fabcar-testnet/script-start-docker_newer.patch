@@ -1,0 +1,43 @@
+--- script-start-docker.sh	2021-11-20 07:21:21.843519314 +0900
++++ script-start-docker-new.sh	2021-11-20 07:23:43.523522170 +0900
+@@ -1,7 +1,10 @@
+ # Copyright 2020-2021 Hyperledger Cactus Contributors
+ # SPDX-License-Identifier: Apache-2.0
+ echo "[process] start docker environment for Fabric testnet"
+-curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.1 1.4.1 0.4.22
++curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.12 1.4.9 0.4.22
++
++echo "dockerlize fabric-samples"
++patch -p0 < fabric-samples_dockerize.patch
+ 
+ if [ -d fabric-samples/fabcar/javascript/wallet ]; then
+   rm -r fabric-samples/fabcar/javascript/wallet
+@@ -16,9 +19,25 @@ fi
+ #cp -a wallet ../../../examples/cartrade/script-test-getFunctions/fabric
+ cd fabric-samples/fabcar
+ ./startFabric.sh
++
+#+echo "set proxy for npm in validator container"
+#+docker exec -it -w /app/fabcar/javascript validator \
+#+  npm config set proxy $http_proxy
+#+docker exec -it -w /app/fabcar/javascript validator \
+#+  npm config set https-proxy $https_proxy
+#+docker exec -it -w /app/fabcar/javascript validator \
+#+  npm config set no-proxy $no_proxy
++
++echo "npm install in validator container"
++docker exec -it -w /app/fabcar/javascript validator npm install
++
++echo "exec fabcar from validator container"
++docker exec -it -w /app/fabcar/javascript validator node enrollAdmin
++docker exec -it -w /app/fabcar/javascript validator node registerUser
++docker exec -it -w /app/fabcar/javascript validator node query
++docker exec -it -w /app/fabcar/javascript validator node invoke
++docker exec -it -w /app/fabcar/javascript validator node query
++
+ cd javascript
+-npm install
+-node enrollAdmin.js
+-node registerUser.js
+ cp -a wallet ../../../../../../packages/cactus-plugin-ledger-connector-fabric-socketio
+ cp -a wallet ../../../../../../examples/cartrade/script-test-getFunctions/fabric/wallet
