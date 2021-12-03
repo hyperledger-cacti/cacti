@@ -493,6 +493,7 @@ export class SupplyChainApp {
     properties.configFile = "";
     properties.apiPort = addressInfoApi.port;
     properties.apiHost = addressInfoApi.address;
+    properties.cockpitEnabled = true;
     properties.cockpitHost = addressInfoCockpit.address;
     properties.cockpitPort = addressInfoCockpit.port;
     properties.grpcPort = 0; // TODO - make this configurable as well
