@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "fabric-client": "1.0.2",
-    "fabric-ca-client": "1.0.2",
+    "fabric-ca-client": "2.2.10",
     "grpc": "1.4.1"
   }
 }
