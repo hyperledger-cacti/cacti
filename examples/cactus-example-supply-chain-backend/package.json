@@ -76,7 +76,7 @@
     "async-exit-hook": "2.0.1",
     "axios": "0.21.4",
     "express": "4.17.1",
-    "fabric-network": "2.2.8",
+    "fabric-network": "2.2.10",
     "jose": "1.28.1",
     "openapi-types": "9.1.0",
     "solc": "0.8.6",

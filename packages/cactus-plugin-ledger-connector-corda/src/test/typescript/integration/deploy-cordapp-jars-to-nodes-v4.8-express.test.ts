@@ -35,7 +35,9 @@ import { K_CACTUS_CORDA_TOTAL_TX_COUNT } from "../../../main/typescript/promethe
 
 const logLevel: LogLevelDesc = "TRACE";
 
-test("Tests are passing on the JVM side", async (t: Test) => {
+// Skipping this until we figure out how to make the test case stable
+// https://github.com/hyperledger/cactus/issues/1598
+test.skip("Tests are passing on the JVM side", async (t: Test) => {
   test.onFailure(async () => {
     await Containers.logDiagnostics({ logLevel });
   });

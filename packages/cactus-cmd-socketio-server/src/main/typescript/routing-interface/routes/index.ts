@@ -12,7 +12,9 @@ import { VerifierFactory } from "../../verifier/VerifierFactory";
 const router: Router = Router();
 export const transactionManagement: TransactionManagement =
   new TransactionManagement();
-export const verifierFactory: VerifierFactory = new VerifierFactory();
+export const verifierFactory: VerifierFactory = new VerifierFactory(
+  transactionManagement,
+);
 
 /* GET home page. */
 router.get("/", (req: Request, res: Response, next: NextFunction) => {

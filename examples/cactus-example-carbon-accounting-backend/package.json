@@ -82,7 +82,7 @@
     "@openzeppelin/contracts": "4.3.3",
     "@openzeppelin/contracts-upgradeable": "4.3.3",
     "async-exit-hook": "2.0.1",
-    "fabric-network": "2.2.8",
+    "fabric-network": "2.2.10",
     "fs-extra": "10.0.0",
     "openapi-types": "9.1.0",
     "typescript-optional": "2.0.1",
