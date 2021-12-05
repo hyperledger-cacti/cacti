@@ -24,6 +24,7 @@ export interface IQuorumTestLedgerConstructorOptions {
   rpcApiHttpPort?: number;
   logLevel?: LogLevelDesc;
   emitContainerLogs?: boolean;
+  readonly envVars?: string[];
 }
 
 export const QUORUM_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
@@ -54,6 +55,7 @@ export class QuorumTestLedger implements ITestLedger {
   private readonly log: Logger;
   private container: Container | undefined;
   private containerId: string | undefined;
+  private readonly envVars: string[];
 
   constructor(
     public readonly options: IQuorumTestLedgerConstructorOptions = {},
@@ -70,6 +72,8 @@ export class QuorumTestLedger implements ITestLedger {
     this.rpcApiHttpPort =
       options.rpcApiHttpPort ||
       QUORUM_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
+
+    this.envVars = options.envVars || [];
 
     this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
       ? (options.emitContainerLogs as boolean)
@@ -211,9 +215,7 @@ export class QuorumTestLedger implements ITestLedger {
         [],
         [],
         {
-          // Env: [
-          // 'PRIVATE_CONFIG=ignore'// FIXME make it possible to have privacy configured programmatically for quorum
-          // ],
+          Env: this.envVars,
           ExposedPorts: {
             [`${this.rpcApiHttpPort}/tcp`]: {}, // quorum RPC - HTTP
             "8546/tcp": {}, // quorum RPC - WebSocket
