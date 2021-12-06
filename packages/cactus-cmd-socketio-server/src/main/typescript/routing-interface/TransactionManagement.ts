@@ -51,7 +51,8 @@ export class TransactionManagement implements VerifierEventListener {
     if (
       businessLogicID === "guks32pf" ||
       businessLogicID === "h40Q9eMD" ||
-      businessLogicID === "j71S9gLN"
+      businessLogicID === "j71S9gLN" ||
+      businessLogicID === "jLn76rgB"
     ) {
       const blp = getTargetBLPInstance(businessLogicID);
       if (blp === null) {

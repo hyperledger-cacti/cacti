@@ -1,0 +1,6 @@
+checkEthereumValidator:
+  connector:
+    validatorID: 84jUisrs
+    chainName: geth1
+
+logLevel: debug
