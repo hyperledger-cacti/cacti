@@ -1,7 +1,7 @@
 import path from "path";
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { JWK, JWT } from "jose";
+import { generateKeyPair, exportPKCS8, SignJWT } from "jose";
 import expressJwt from "express-jwt";
 
 import {
@@ -11,12 +11,7 @@ import {
 } from "../../../main/typescript/public-api";
 import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-import {
-  Configuration,
-  ConsortiumDatabase,
-  PluginImportAction,
-  PluginImportType,
-} from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger/cactus-core-api";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config";
 
@@ -29,40 +24,31 @@ const log = LoggerProvider.getOrCreate({
 
 test(testCase, async (t: Test) => {
   try {
-    const keyPair = await JWK.generate("EC", "secp256k1", { use: "sig" }, true);
-    const keyPairPem = keyPair.toPEM(true);
-    const db: ConsortiumDatabase = {
-      cactusNode: [],
-      consortium: [],
-      consortiumMember: [],
-      ledger: [],
-      pluginInstance: [],
-    };
-
-    const jwtKeyPair = await JWK.generate("RSA", 4096);
-    const jwtPublicKey = jwtKeyPair.toPEM(false);
+    const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
+    const jwtPrivateKeyPem = await exportPKCS8(jwtKeyPair.privateKey);
     const expressJwtOptions: expressJwt.Options = {
       algorithms: ["RS256"],
-      secret: jwtPublicKey,
+      secret: jwtPrivateKeyPem,
       audience: uuidv4(),
       issuer: uuidv4(),
     };
     t.ok(expressJwtOptions, "Express JWT config truthy OK");
 
     const jwtPayload = { name: "Peter", location: "London" };
-    const jwtSignOptions: JWT.SignOptions = {
-      algorithm: "RS256",
-      issuer: expressJwtOptions.issuer,
-      audience: expressJwtOptions.audience,
-    };
-    const tokenGood = JWT.sign(jwtPayload, jwtKeyPair, jwtSignOptions);
+    const tokenGood = await new SignJWT(jwtPayload)
+      .setProtectedHeader({
+        alg: "RS256",
+      })
+      .setIssuer(expressJwtOptions.issuer)
+      .setAudience(expressJwtOptions.audience)
+      .sign(jwtKeyPair.privateKey);
     // const tokenBad = JWT.sign(jwtPayload, jwtKeyPair);
 
     const authorizationConfig: IAuthorizationConfig = {
       unprotectedEndpointExemptions: [],
       expressJwtOptions,
       socketIoJwtOptions: {
-        secret: jwtPublicKey,
+        secret: jwtPrivateKeyPem,
       },
     };
 
@@ -75,7 +61,7 @@ test(testCase, async (t: Test) => {
     const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
     const configService = new ConfigService();
-    const apiSrvOpts = configService.newExampleConfig();
+    const apiSrvOpts = await configService.newExampleConfig();
     apiSrvOpts.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
     apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
     apiSrvOpts.authorizationConfigJson = authorizationConfig;
@@ -85,29 +71,8 @@ test(testCase, async (t: Test) => {
     apiSrvOpts.cockpitPort = 0;
     apiSrvOpts.grpcPort = 0;
     apiSrvOpts.apiTlsEnabled = false;
-    apiSrvOpts.plugins = [
-      {
-        packageName: "@hyperledger/cactus-plugin-keychain-memory",
-        type: PluginImportType.Local,
-        action: PluginImportAction.Install,
-        options: {
-          instanceId: uuidv4(),
-          keychainId: uuidv4(),
-          logLevel,
-        },
-      },
-      {
-        packageName: "@hyperledger/cactus-plugin-consortium-manual",
-        type: PluginImportType.Local,
-        action: PluginImportAction.Install,
-        options: {
-          instanceId: uuidv4(),
-          keyPairPem: keyPairPem,
-          consortiumDatabase: db,
-        },
-      },
-    ];
-    const config = configService.newExampleConfigConvict(apiSrvOpts);
+    apiSrvOpts.plugins = [];
+    const config = await configService.newExampleConfigConvict(apiSrvOpts);
 
     const apiServer = new ApiServer({
       config: config.getProperties(),

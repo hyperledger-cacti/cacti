@@ -2,7 +2,7 @@ import { AddressInfo } from "net";
 
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidV4 } from "uuid";
-import { JWK } from "jose";
+import { generateKeyPair, exportSPKI, exportPKCS8 } from "jose";
 import Web3 from "web3";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
@@ -70,11 +70,11 @@ test(testCase, async (t: Test) => {
   const testAccount2 = new Web3().eth.accounts.create(uuidV4());
   let initialFundsAccount2: string;
 
-  const keyPair1 = await JWK.generate("EC", "secp256k1");
-  const pubKeyPem1 = keyPair1.toPEM(false);
+  const keyPair1 = await generateKeyPair("ES256K");
+  const pubKeyPem1 = await exportSPKI(keyPair1.publicKey);
 
-  const keyPair2 = await JWK.generate("EC", "secp256k1");
-  const pubKeyPem2 = keyPair2.toPEM(false);
+  const keyPair2 = await generateKeyPair("ES256K");
+  const pubKeyPem2 = await exportSPKI(keyPair2.publicKey);
 
   const consortiumId = uuidV4();
   const consortiumName = "Example Corp. & Friends Crypto Consortium";
@@ -168,17 +168,18 @@ test(testCase, async (t: Test) => {
         pluginRegistry: new PluginRegistry(),
       });
 
+      const keyPairPem = await exportPKCS8(keyPair1.privateKey);
       const options: IPluginConsortiumManualOptions = {
         instanceId: uuidV4(),
         pluginRegistry,
-        keyPairPem: keyPair1.toPEM(true),
+        keyPairPem: keyPairPem,
         consortiumDatabase,
         logLevel,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
 
       const configService = new ConfigService();
-      const apiServerOptions = configService.newExampleConfig();
+      const apiServerOptions = await configService.newExampleConfig();
       apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
       apiServerOptions.configFile = "";
       apiServerOptions.apiCorsDomainCsv = "*";
@@ -186,7 +187,9 @@ test(testCase, async (t: Test) => {
       apiServerOptions.cockpitPort = 0;
       apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
-      const config = configService.newExampleConfigConvict(apiServerOptions);
+      const config = await configService.newExampleConfigConvict(
+        apiServerOptions,
+      );
 
       pluginRegistry.add(pluginConsortiumManual);
       pluginRegistry.add(pluginQuorumConnector);
@@ -211,17 +214,18 @@ test(testCase, async (t: Test) => {
         pluginRegistry: new PluginRegistry(),
       });
 
+      const keyPairPem = await exportPKCS8(keyPair2.privateKey);
       const options: IPluginConsortiumManualOptions = {
         instanceId: uuidV4(),
         pluginRegistry,
-        keyPairPem: keyPair2.toPEM(true),
+        keyPairPem: keyPairPem,
         consortiumDatabase,
         logLevel,
       };
       const pluginConsortiumManual = new PluginConsortiumManual(options);
 
       const configService = new ConfigService();
-      const apiServerOptions = configService.newExampleConfig();
+      const apiServerOptions = await configService.newExampleConfig();
       apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
       apiServerOptions.configFile = "";
       apiServerOptions.apiCorsDomainCsv = "*";
@@ -229,7 +233,9 @@ test(testCase, async (t: Test) => {
       apiServerOptions.cockpitPort = 0;
       apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
-      const config = configService.newExampleConfigConvict(apiServerOptions);
+      const config = await configService.newExampleConfigConvict(
+        apiServerOptions,
+      );
 
       pluginRegistry.add(pluginConsortiumManual);
       pluginRegistry.add(pluginQuorumConnector);

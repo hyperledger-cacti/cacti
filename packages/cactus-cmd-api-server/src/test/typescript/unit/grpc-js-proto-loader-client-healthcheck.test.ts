@@ -19,7 +19,7 @@ const logLevel: LogLevelDesc = "TRACE";
 
 test(testCase, async (t: Test) => {
   const configService = new ConfigService();
-  const apiSrvOpts = configService.newExampleConfig();
+  const apiSrvOpts = await configService.newExampleConfig();
   apiSrvOpts.authorizationProtocol = AuthorizationProtocol.NONE;
   apiSrvOpts.configFile = "";
   apiSrvOpts.logLevel = logLevel;
@@ -30,7 +30,7 @@ test(testCase, async (t: Test) => {
   apiSrvOpts.grpcMtlsEnabled = false;
   apiSrvOpts.apiTlsEnabled = false;
   apiSrvOpts.plugins = [];
-  const config = configService.newExampleConfigConvict(apiSrvOpts);
+  const config = await configService.newExampleConfigConvict(apiSrvOpts);
 
   const apiServer = new ApiServer({
     config: config.getProperties(),

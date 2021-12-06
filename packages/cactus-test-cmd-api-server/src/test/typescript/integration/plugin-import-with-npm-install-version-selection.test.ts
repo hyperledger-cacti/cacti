@@ -25,7 +25,7 @@ test("can install plugins at runtime with specified version based on imports", a
 
   const configService = new ConfigService();
 
-  const apiServerOptions = configService.newExampleConfig();
+  const apiServerOptions = await configService.newExampleConfig();
   apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
@@ -47,7 +47,7 @@ test("can install plugins at runtime with specified version based on imports", a
       },
     },
   ];
-  const config = configService.newExampleConfigConvict(apiServerOptions);
+  const config = await configService.newExampleConfigConvict(apiServerOptions);
 
   const apiServer = new ApiServer({
     config: config.getProperties(),

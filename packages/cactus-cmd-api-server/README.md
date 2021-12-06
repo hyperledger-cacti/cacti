@@ -67,7 +67,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 
 const main = async () => {
   const configService = new ConfigService();
-  const config = configService.getOrCreate();
+  const config = await configService.getOrCreate();
   const serverOptions = config.getProperties();
 
   LoggerProvider.setLogLevel(serverOptions.logLevel);
@@ -110,7 +110,7 @@ import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 const main = async () => {
 
   const configService = new ConfigService();
-  const apiServerOptions = configService.newExampleConfig();
+  const apiServerOptions = await configService.newExampleConfig();
   // If there is no configuration file on the file system, just set it to empty string
   apiServerOptions.configFile = "";
   // Enable CORS for
@@ -142,7 +142,7 @@ const main = async () => {
       },
     },
   ];
-  const config = configService.newExampleConfigConvict(apiServerOptions);
+  const config = await configService.newExampleConfigConvict(apiServerOptions);
 
   const apiServer = new ApiServer({
     config: config.getProperties(),

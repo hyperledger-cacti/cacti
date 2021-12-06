@@ -3,8 +3,15 @@ import { AddressInfo } from "net";
 import test, { Test } from "tape-promise/tape";
 import expressJwt from "express-jwt";
 import { v4 as uuidv4 } from "uuid";
-import { JWK, JWT } from "jose";
+import {
+  generateKeyPair,
+  exportSPKI,
+  GeneralSign,
+  generalVerify,
+  SignJWT,
+} from "jose";
 import { StatusCodes } from "http-status-codes";
+import jsonStableStringify from "json-stable-stringify";
 
 import {
   AuthorizationProtocol,
@@ -47,8 +54,8 @@ test("BEFORE " + testCase, async (t: Test) => {
 // FIXME: Restore this once Fabric fixed their typescript definitions:
 // https://github.com/hyperledger/fabric-chaincode-node/issues/292
 test.skip(testCase, async (t: Test) => {
-  const jwtKeyPair = await JWK.generate("RSA", 4096);
-  const jwtPublicKey = jwtKeyPair.toPEM(false);
+  const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
+  const jwtPublicKey = await exportSPKI(jwtKeyPair.publicKey);
   const expressJwtOptions: expressJwt.Options = {
     algorithms: ["RS256"],
     secret: jwtPublicKey,
@@ -76,7 +83,7 @@ test.skip(testCase, async (t: Test) => {
   };
 
   const configService = new ConfigService();
-  const apiSrvOpts = configService.newExampleConfig();
+  const apiSrvOpts = await configService.newExampleConfig();
   apiSrvOpts.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
   apiSrvOpts.authorizationConfigJson = authorizationConfig;
   apiSrvOpts.configFile = "";
@@ -86,7 +93,7 @@ test.skip(testCase, async (t: Test) => {
   apiSrvOpts.grpcPort = 0;
   apiSrvOpts.apiTlsEnabled = false;
   apiSrvOpts.plugins = [];
-  const convictConfig = configService.newExampleConfigConvict(apiSrvOpts);
+  const convictConfig = await configService.newExampleConfigConvict(apiSrvOpts);
   const apiServerOptions = convictConfig.getProperties();
 
   const appOptions: ICarbonAccountingAppOptions = {
@@ -114,13 +121,25 @@ test.skip(testCase, async (t: Test) => {
     name: "Peter",
     scope: [AuthzScope.GroupAdmin],
   };
-  const jwtSignOptions: JWT.SignOptions = {
-    algorithm: "RS256",
+  const jwtPayloadString = jsonStableStringify(jwtPayload);
+  const encoder = new TextEncoder();
+  const sign = new GeneralSign(encoder.encode(jwtPayloadString));
+  sign.addSignature(jwtKeyPair.privateKey).setProtectedHeader({
+    alg: "RS256",
+    issuer: expressJwtOptions.issuer,
+    audience: expressJwtOptions.audience,
+  });
+  const tokenWithScope = await sign.sign();
+  const jwtSignOptions = {
+    algorithms: ["RS256"],
     issuer: expressJwtOptions.issuer,
     audience: expressJwtOptions.audience,
   };
-  const tokenWithScope = JWT.sign(jwtPayload, jwtKeyPair, jwtSignOptions);
-  const verification = JWT.verify(tokenWithScope, jwtKeyPair, jwtSignOptions);
+  const verification = await generalVerify(
+    tokenWithScope,
+    jwtKeyPair.publicKey,
+    jwtSignOptions,
+  );
   t.ok(verification, "JWT with scope verification truthy OK");
 
   const configTokenWithScope = new Configuration({
@@ -141,7 +160,11 @@ test.skip(testCase, async (t: Test) => {
   t.true(res.status >= 200, "enrollAdminV1 status >= 200 OK");
   t.true(res.status < 300, "enrollAdminV1 status < 300 200 OK");
 
-  const tokenNoScope = JWT.sign({ scope: [] }, jwtKeyPair, jwtSignOptions);
+  const tokenNoScope = await new SignJWT({ scope: [] })
+    .setProtectedHeader({ alg: "RS256" })
+    .setIssuer(jwtSignOptions.issuer)
+    .setAudience(jwtSignOptions.audience)
+    .sign(jwtKeyPair.privateKey);
 
   const configTokenWithoutScope = new Configuration({
     basePath: apiBaseUrl,

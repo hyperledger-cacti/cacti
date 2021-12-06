@@ -1,6 +1,6 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { JWK, JWT } from "jose";
+import { generateKeyPair, exportSPKI, SignJWT } from "jose";
 import type { Options as ExpressJwtOptions } from "express-jwt";
 import type { AuthorizeOptions as SocketIoJwtOptions } from "@thream/socketio-jwt";
 
@@ -26,8 +26,8 @@ const log = LoggerProvider.getOrCreate({
 
 test(testCase, async (t: Test) => {
   try {
-    const jwtKeyPair = await JWK.generate("RSA", 4096);
-    const jwtPublicKey = jwtKeyPair.toPEM(false);
+    const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
+    const jwtPublicKey = await exportSPKI(jwtKeyPair.publicKey);
     const expressJwtOptions: ExpressJwtOptions = {
       algorithms: ["RS256"],
       secret: jwtPublicKey,
@@ -48,7 +48,7 @@ test(testCase, async (t: Test) => {
     };
 
     const configService = new ConfigService();
-    const apiSrvOpts = configService.newExampleConfig();
+    const apiSrvOpts = await configService.newExampleConfig();
     apiSrvOpts.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
     apiSrvOpts.authorizationConfigJson = authorizationConfig;
     apiSrvOpts.configFile = "";
@@ -58,7 +58,7 @@ test(testCase, async (t: Test) => {
     apiSrvOpts.grpcPort = 0;
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [];
-    const config = configService.newExampleConfigConvict(apiSrvOpts);
+    const config = await configService.newExampleConfigConvict(apiSrvOpts);
 
     const apiServer = new ApiServer({
       config: config.getProperties(),
@@ -75,12 +75,11 @@ test(testCase, async (t: Test) => {
     const apiHost = `${protocol}://${address}:${port}`;
 
     const jwtPayload = { name: "Peter", location: "Albertirsa" };
-    const jwtSignOptions: JWT.SignOptions = {
-      algorithm: "RS256",
-      issuer: expressJwtOptions.issuer,
-      audience: expressJwtOptions.audience,
-    };
-    const validJwt = JWT.sign(jwtPayload, jwtKeyPair, jwtSignOptions);
+    const validJwt = await new SignJWT(jwtPayload)
+      .setProtectedHeader({ alg: "RS256" })
+      .setIssuer(expressJwtOptions.issuer)
+      .setAudience(expressJwtOptions.audience)
+      .sign(jwtKeyPair.privateKey);
     t.ok(validJwt, "JWT signed truthy OK");
 
     const validBearerToken = `Bearer ${validJwt}`;

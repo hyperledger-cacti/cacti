@@ -1,7 +1,7 @@
 import path from "path";
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { JWK } from "jose";
+import { generateKeyPair, exportPKCS8 } from "jose";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
@@ -21,8 +21,8 @@ const logLevel: LogLevelDesc = "TRACE";
 
 test("can instal plugins at runtime based on imports", async (t: Test) => {
   // Adding a new plugin to update the prometheus metric K_CACTUS_API_SERVER_TOTAL_PLUGIN_IMPORTS
-  const keyPair = await JWK.generate("EC", "secp256k1", { use: "sig" }, true);
-  const keyPairPem = keyPair.toPEM(true);
+  const keyPair = await generateKeyPair("ES256K");
+  const keyPairPem = await exportPKCS8(keyPair.privateKey);
   const db: ConsortiumDatabase = {
     cactusNode: [],
     consortium: [],
@@ -41,7 +41,7 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
 
   const configService = new ConfigService();
 
-  const apiServerOptions = configService.newExampleConfig();
+  const apiServerOptions = await configService.newExampleConfig();
   apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
@@ -72,7 +72,7 @@ test("can instal plugins at runtime based on imports", async (t: Test) => {
       },
     },
   ];
-  const config = configService.newExampleConfigConvict(apiServerOptions);
+  const config = await configService.newExampleConfigConvict(apiServerOptions);
 
   const apiServer = new ApiServer({
     config: config.getProperties(),
