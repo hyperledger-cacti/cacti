@@ -1,0 +1,20 @@
+{
+  "name": "check-connection-ethereum-validator",
+  "version": "1.0.0-rc.3",
+  "private": true,
+  "scripts": {
+    "start": "node ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
+    "debug": "nodemon --inspect ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
+    "build": "npm run build-ts && npm run copy-static-assets && npm run copy-blp-config && npm run replace-blp-config-path",
+    "build-ts": "tsc -p ./tsconfig.json",
+    "tslint": "tslint -c tslint.json -p tsconfig.json './*.ts'",
+    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "copy-blp-config": "ts-node copyBLPConfig.ts",
+    "replace-blp-config-path": "ts-node replaceBLPConfigPath.ts",
+    "init-check-connection-ethereum-validator": "ln -s ../examples/cactus-check-connection-ethereum-validator/node_modules ../../dist/node_modules"
+  },
+  "dependencies": {
+    "@types/node": "15.14.7",
+    "socket.io": "4.1.3"
+  }
+}
