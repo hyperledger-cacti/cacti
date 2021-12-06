@@ -21,8 +21,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli config set MEMBER_CREDENTIAL_FOLDER path/dlt-interoperability/fabric-testnet/organizations`,
-        `fabric-cli config set <${configKeys.join('|')}> <value>`,
+        `fabric-cli config set network1 relayEndpoint localhost:9080`,
+        `fabric-cli config set <network1|network2> <${configKeys.join('|')}> <value>`,
         [],
         command,
         ['config', 'set']
@@ -34,21 +34,24 @@ const command: GluegunCommand = {
       return
     }
     if (!configKeys.includes(array[1])) {
-      print.error('Invalid env key')
-      print.info(`Valid keys:  ${configKeys}`)
+      print.error('Invalid config key')
+      print.info(`Valid keys:  ${configKeys.join(', ')}`)
       return
     }
 
     print.info('Reading config.json file')
     const configPath = path.resolve(
-      process.env.CONFIG_PATH ? process.env.CONFIG_PATH : __dirname,
-      '..',
-      '..',
-      '..',
-      'config.json'
+      process.env.CONFIG_PATH ? process.env.CONFIG_PATH : path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'config.json'
+      )
     )
     !fs.existsSync(configPath) &&
       fs.writeFileSync(configPath, '', { flag: 'wx' })
+    print.info(`Config path: ${configPath}`)
     const file = JSON.parse(fs.readFileSync(configPath).toString())
     if (file[array[0]]) {
       file[array[0]][array[1]] = array[2]
@@ -59,8 +62,9 @@ const command: GluegunCommand = {
         }
       }
     }
-    fs.writeFileSync(configPath, JSON.stringify(file))
-    print.info(`Updated File:\n${JSON.stringify(file)}`)
+    const outFile = JSON.stringify(file, null, 2)
+    fs.writeFileSync(configPath, outFile)
+    print.info(`Updated File:\n${outFile}`)
   }
 }
 

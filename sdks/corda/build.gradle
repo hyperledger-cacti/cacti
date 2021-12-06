@@ -13,8 +13,8 @@ buildscript {
     ext.corda_gradle_plugins_version = "5.0.12"
     ext.log4j_version = "2.11.2"
     ext.slf4j_version = "1.7.25"
-    ext.weaver_version = "1.2.4-alpha.5"
- 
+    ext.weaver_version = "1.2.4-alpha.6"
+    
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -38,7 +38,7 @@ sourceSets {
 Properties constants = new Properties()
 
 repositories {
-    jcenter()
+    maven { url 'https://repo1.maven.org/maven2' }
     maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
     if (file("$projectDir/./github.properties").exists()) {
         file("$projectDir/github.properties").withInputStream { constants.load(it) }

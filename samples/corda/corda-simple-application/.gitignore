@@ -80,3 +80,4 @@ docs/virtualenv/
 
 # Authentication properties for Github
 github.properties
+.env

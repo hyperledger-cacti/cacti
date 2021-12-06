@@ -1,6 +1,8 @@
 ---
 id: ledger-initialization
 title: Ledger Initialization
+pagination_prev: external/getting-started/test-network/overview
+pagination_next: external/getting-started/interop/overview
 ---
 
 <!--
@@ -74,15 +76,19 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 ```bash
 ./bin/fabric-cli configure all network1 network2
 ```
+Instead, if you launched only one of the two Fabric networks, run the following after replacing `<network-id>` with either `network1` or `network2`:
+```bash
+./bin/fabric-cli configure all <network-id>
+```
 
-### Initializing the Corda Network
+### Initializing the Corda Networks
 
-Once the Corda network is launched, the client application (built earlier) needs to be exercised to generate network (ledger) state in preparation to test interoperation flows.
+Once the Corda networks are launched, the client applications (built earlier) needs to be exercised to generate network (ledger) state in preparation to test interoperation flows.
 
-#### Bootstrapping Network and Application State
+#### Bootstrapping Networks and Application States
 Just as we did for either Fabric network, the Corda network ledger (or _vault_ on each node) must be initialized with access control policies, verification policies, and security group information for the two Fabric networks. Further, sample key-value pairs need to be recorded so we can later share them with a Fabric network via an interoperation flow.
 
-Bootstrap the Corda network and application states as follows:
+Bootstrap the Corda networks and application states as follows (_the following instructions will initialize either or both Corda networks, depending on which of those are up and running_):
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following: 
   * If Relays and Drivers are deployed in the host machine:
@@ -148,6 +154,17 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 ./scripts/initAsset.sh
 ```
 
+### Initializing the Corda Networks
+
+Corda Network needs to be initialized with assets for asset-exchange to be performed:
+Bootstrap the Corda network and application states as follows:
+- Navigate to the `samples/corda/corda-simple-application` folder.
+- Run the following: 
+  - For `cordaSimpleApplication` app, run:
+    ```
+    ./scripts/initAsset.sh
+    ```
+
 ### Next Steps
 
 The test networks are now configured and their ledgers are initialized. You can now run the [asset exchange flows](../interop/asset-exchange.md).
@@ -181,12 +198,21 @@ Prepare `fabric-cli` for configuration suitably as follows.
     - Set the `chaincode` attribute in each network to `simpleassettransfer`.
     - Set the `aclPolicyPrincipalType` attribute in `network2` to `ca`.
     - Otherwise, leave the default values unchanged.
+- Create `remote-network-config.json` file by copying `remote-network-config.json.template`. Use default values if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
+  * Update value for `relayEndpoint` for `network1` as `relay-network1:9080`.
+  * Update value for `relayEndpoint` for `network2` as `relay-network2:9083`.
+  * Update value for `relayEndpoint` for `Corda_Network` as `relay-corda:9081`.
+  * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
+  * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
+  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
+- Create `chaincode.json` file by copying `chaincode.json.template`. Keep the default values unchanged.
 - Create a `.env` file by copying `.env.template` and setting the following parameter values:
   * If Relays and Drivers are deployed in the host machine:
     ```
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials
     DEFAULT_APPLICATION_CHAINCODE=simpleassettransfer
     CONFIG_PATH=./config.json
+    REMOTE_CONFIG_PATH=./remote-network-config.json
     CHAINCODE_PATH=./chaincode.json
     ```
   * If Relays and Drivers are deployed in the Docker containers:
@@ -194,6 +220,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials_docker
     DEFAULT_APPLICATION_CHAINCODE=simpleassettransfer
     CONFIG_PATH=./config.json
+    REMOTE_CONFIG_PATH=./remote-network-config.json
     CHAINCODE_PATH=./chaincode.json
     ```
   * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.

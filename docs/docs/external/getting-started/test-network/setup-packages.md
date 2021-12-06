@@ -1,6 +1,8 @@
 ---
 id: setup-packages
 title: Setup with Imported Weaver Components
+pagination_prev: external/getting-started/test-network/overview
+pagination_next: external/getting-started/test-network/ledger-initialization
 ---
 
 <!--
@@ -22,7 +24,7 @@ Before starting, make sure you have the following software installed on your hos
 - Curl: _install using package manager, like `apt` on Debian/Ubuntu Linux_
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
-- Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Latest version)
+- Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 1.28.2 or above)
 - Golang: [sample instructions](https://golang.org/dl/) (Version 1.15 or above)
 - Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
 - Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 supported)
@@ -43,6 +45,10 @@ Create a personal access token with `read:packages` access in github in order to
 
 Clone the [weaver-dlt-interoperability](https://github.com/hyperledger-labs/weaver-dlt-interoperability) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
+## Securing Components
+
+_Note_: The relays and drivers corresponding to the different test networks you will encounter below can be run with or without TLS enabled. But the default files used in the demonstrations assume that either all relays and drivers are TLS-enabled or none are. Therefore, you should determine at the outset whether or not you wish to run the entire set of components in TLS-enabled mode, and select appropriate commands in the provided instructions.
+
 ## Hyperledger Fabric Components
 
 Using the sequence of instructions below, you can start two separate Fabric networks, each with a single channel and application contract (chaincode). You can also start an interoperation contract, a relay, and a _driver_ acting on behalf of each network. You can build a Fabric CLI tool with which you can initialize both networks' ledgers with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample key-value pairs that can be shared during subsequent interoperation flows.
@@ -58,7 +64,7 @@ This folder contains code to create and launch networks `network1` and `network2
   * `simplestate` ([Data Sharing](../interop/data-sharing.md)): supports simple transactions (`Create`, `Read`, `Update`, `Delete`) involving storage and lookup of <key, value> pairs.
   * `simplestatewithacl` ([Data Sharing](../interop/data-sharing.md)): identical to `simplestate` but with extra security features to ensure that the Weaver infrastructure cannot be bypassed by a malicious client of the network.
   * `simpleasset` ([Asset Exchange](../interop/asset-exchange.md)): supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple bonds and tokens (examples of non-fungible and fungible assets respectively).
-  * `simpleassetandinterop` ([Asset Exchange](../interop/asset-exchange.md)): identical to `simpleasset` but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperaton Chaincode (a Weaver component).
+  * `simpleassetandinterop` ([Asset Exchange](../interop/asset-exchange.md)): identical to `simpleasset` but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperation Chaincode (a Weaver component).
   * `simpleassettransfer` ([Asset Exchange](../interop/asset-exchange.md) or [Asset Transfer](../interop/asset-transfer.md)): augmentation of `simpleasset` with asset pledging, claiming, and reclaiming features for cross-network transfers.
 
 _Note_: for new users, we recommend testing the Data Sharing feature first with the `simplestate` contract. To test the other modes, you can simply [tear down](#tear-down-the-setup) the Fabric networks and restart them with the appropriate chaincodes installed.
@@ -73,7 +79,7 @@ Follow the instructions below to build and launch the networks:
   ```bash
   make start-interop CHAINCODE_NAME=<chaincode-name>
   ```
-- (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to install only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2`.)
+- (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2`.)
 
 For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/fabric/dev).
 
@@ -125,14 +131,86 @@ An instance or a relay can be run using a suitable configuration file. Samples a
 
 Run a relay for `network1` as follows:
 - Navigate to the `core/relay` folder.
-- Run the following:
+- To launch the server without TLS, leave the configuration file `config/Fabric_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  ```
+  .
+  .
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=true
+  .
+  .
+  [relays]
+  [relays.Corda_Relay]
+  hostname="localhost"
+  port="9081"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Corda_Relay2]
+  hostname="localhost"
+  port="9082"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Fabric_Relay2]
+  hostname="localhost"
+  port="9083"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  [drivers]
+  [drivers.Fabric]
+  hostname="localhost"
+  port="9090"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  ```
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Fabric_Relay.toml cargo run --bin server
   ```
 
-Run a relay for `network2` as follows (_do this only if you wish to test interoperation between the two Fabric networks `network1` and `network2`_)
+Run a relay for `network2` as follows (_do this only if you have launched both Fabric networks `network1` and `network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
-- Run the following:
+- To launch the server without TLS, leave the configuration file `config/Fabric_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  ```
+  .
+  .
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=true
+  .
+  .
+  [relays]
+  [relays.Corda_Relay]
+  hostname="localhost"
+  port="9081"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Corda_Relay2]
+  hostname="localhost"
+  port="9082"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Fabric_Relay]
+  hostname="localhost"
+  port="9080"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  [drivers]
+  [drivers.Fabric]
+  hostname="localhost"
+  port="9095"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  ```
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server
   ```
@@ -147,7 +225,7 @@ The code for this lies in the `core/drivers/fabric-driver` folder.
 
 #### Configuring
 
-In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
+In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the Fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
 
 Configure `fabric-driver` for `network1` as follows:
 - Navigate to the `core/drivers/fabric-driver` folder.
@@ -155,6 +233,22 @@ Configure `fabric-driver` for `network1` as follows:
   * The `CONNECTION_PROFILE` should point to the absolute path of the connection profile for `network1`.
     - For this exercise, specify the path `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json` (_you must specify the full absolute path here_).
     - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
+  * If you wish to start the driver without TLS, set the following parameter values:
+    ```
+    RELAY_TLS=false
+    RELAY_TLSCA_CERT_PATH=
+    DRIVER_TLS=false
+    DRIVER_TLS_CERT_PATH=
+    DRIVER_TLS_KEY_PATH=
+    ```
+    Otherwise, if you wish to start the driver with TLS enabled, set the following parameter values (replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder):
+    ```
+    RELAY_TLS=true
+    RELAY_TLSCA_CERT_PATH=<PATH-TO-WEAVER>/core/relay/credentials/fabric_ca_cert.pem
+    DRIVER_TLS=true
+    DRIVER_TLS_CERT_PATH=<PATH-TO-WEAVER>/core/relay/credentials/fabric_cert.pem
+    DRIVER_TLS_KEY_PATH=<PATH-TO-WEAVER>/core/relay/credentials/fabric_key
+    ```
   * Leave the default values unchanged for the other parameters. The relay and driver endpoints as well as the network name are already specified.
 
 #### Building
@@ -182,59 +276,156 @@ Run a Fabric driver for `network2` as follows (_do this only if you wish to test
   ```bash
   CONNECTION_PROFILE=<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev
   ```
-_Note_: the variables we specified earlier in the `.env` are now passed in the command line. Alternatively, you can make a copy of the `fabric-driver` folder with a different  name and create a separate `.env` file within it that contains links to the connection profile, relay, and driver for `network2`.
+_Note_: the variables we specified earlier in the `.env` for `network1` are now passed in the command line. Alternatively, you can make a copy of the `fabric-driver` folder with a different  name and create a separate `.env` file within it that contains links to the connection profile, relay, and driver for `network2`.
 
 ## Corda Components
 
-Using the sequence of instructions below, you can start a Corda network and run an application Cordapp on it. You can also run an interoperation Cordapp, a relay and a _driver_ acting on behalf of the network. You can initialize the network's vault with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample state values that can be shared during subsequent interoperation flows.
+Using the sequence of instructions below, you can start a Corda network and run an application CorDapp on it. You can also run an interoperation CorDapp, a relay and a _driver_ acting on behalf of the network. You can initialize the network's vault with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample state values that can be shared during subsequent interoperation flows.
 
 
 ### Corda Network
 
-The Corda network code lies in the `tests/network-setups/corda` folder. You can launch a network consisting of one node (`PartyA`) and one notary. This network uses `samples/corda/corda-simple-application` which maintains a state of type `SimpleState`, which is a set of key-value pairs (of strings).
-Following steps will build above cordapp and a corda-client as well in `samples/corda/client`.
+The Corda networks' code lies in the `tests/network-setups/corda` folder. You can launch two separate Corda networks, namely `Corda_Network` and `Corda_Network2`. Each network runs the `samples/corda/corda-simple-application` CorDapp by default, which maintains a state named `SimpleState` containing a set of key-value pairs (of strings).
 
-#### Running with Interoperation Cordapp from Github Packages
+The following steps will, in addition to launching the network, build the CorDapp and a Corda client in `samples/corda/corda-simple-application/client`.
+
+#### Running with Interoperation CorDapp from Github Packages
 
 Follow the instructions below to build and launch the network:
 - Navigate to the `tests/network-setups/corda` folder.
 - Create a copy of `github.properties.template` as `github.properties`.
 - Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
-- To spin up the Corda network with the interoperation Cordapp, run:
-  ```bash
-  make start
-  ```
+- To spin up the Corda networks with the Interoperation CorDapps:
+  - Each consisting of 1 node and a notary (for data-transfer), run:
+    ```bash
+    make start
+    ```
+  - Each consisting of 2 nodes and a notary (for asset-exchange/transfer), run:
+    ```bash
+    make start PROFILE="2-nodes"
+    ```
+  - Each consisting of 3 nodes and a notary (for asset-exchange/transfer), run:
+    ```bash
+    make start PROFILE="3-nodes"
+    ```
 
 You should see the following message in the terminal:
 ```
 Waiting for network node services to start
 ```
-The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following:
+The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following for each network, though the number of node entries will depend on the profile you used to start the network with (replace `<network-name>` with `Corda_Network` or `Corda_Network2`):
 ```bash
-PartyA node services started
-PartyB node services started
-Notary node services started
+PartyA node services started for network <network-name>
+PartyB node services started for network <network-name>
+PartyC node services started for network <network-name>
+Notary node services started for network <network-name>
 ```
 
 ### Corda Relay
 
 The relay was built earlier, so you just need to use a different configuration file to start a relay for the Corda network.
 
-Run a relay in host as follows:
+Run a relay for `Corda_Network` as follows:
 - Navigate to the `core/relay` folder.
 - (Make sure you've already built the relay by running `make`.)
-- Run the following:
+- To launch the server without TLS, leave the configuration file `config/Corda_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  ```
+  .
+  .
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=true
+  .
+  .
+  [relays]
+  [relays.Fabric_Relay]
+  hostname="localhost"
+  port="9080"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Fabric_Relay2]
+  hostname="localhost"
+  port="9083"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Corda_Relay2]
+  hostname="localhost"
+  port="9082"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  [drivers]
+  [drivers.Corda]
+  hostname="localhost"
+  port="9099"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  ```
+- To launch the server, simply run the following:
   ```bash
   RELAY_CONFIG=config/Corda_Relay.toml cargo run --bin server
   ```
 
-If the relay starts up successfully, the following will be logged on your terminal:
+  If the relay starts up successfully, the following will be logged on your terminal:
 
-```
-Relay Name: "Corda_Relay"
-RelayServer listening on [::1]:9081
-```
+  ```
+  Relay Name: "Corda_Relay"
+  RelayServer listening on [::1]:9081
+  ```
 
+Run a relay for `Corda_Network2` as follows (_do this only if you have launched both Corda networks `Corda_Network` and `Corda_Network2` and wish to test interoperation between them_)
+- Navigate to the `core/relay` folder.
+- To launch the server without TLS, leave the configuration file `config/Corda_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  ```
+  .
+  .
+  cert_path="credentials/fabric_cert.pem"
+  key_path="credentials/fabric_key"
+  tls=true
+  .
+  .
+  [relays]
+  [relays.Fabric_Relay]
+  hostname="localhost"
+  port="9080"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Fabric_Relay2]
+  hostname="localhost"
+  port="9083"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  [relays.Corda_Relay]
+  hostname="localhost"
+  port="9081"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  [drivers]
+  [drivers.Corda]
+  hostname="localhost"
+  port="9098"
+  tls=true
+  tlsca_cert_path="credentials/fabric_ca_cert.pem"
+  .
+  .
+  ```
+- To launch the server, simply run the following:
+  ```bash
+  RELAY_CONFIG=config/Corda_Relay2.toml cargo run --bin server
+  ```
+
+  If the relay starts up successfully, the following will be logged on your terminal:
+
+  ```
+  Relay Name: "Corda2_Relay"
+  RelayServer listening on [::1]:9082
+  ```
+  
 ### Corda Driver
 
 The code for this lies in the `core/drivers/corda-driver` folder.
@@ -250,24 +441,45 @@ Build the Corda driver module as follows:
   make build
   ```
 
+#### Configuring
+
+Configure the drivers as follows (you can skip this if you wish to run the drivers without TLS):
+- Navigate to the `core/drivers/corda-driver` folder and create a `.env` file.
+- To run the drivers without TLS, set the following default values:
+  ```
+  RELAY_TLS=false
+  RELAY_TLSCA_TRUST_STORE=
+  RELAY_TLSCA_TRUST_STORE_PASSWORD=
+  RELAY_TLSCA_CERT_PATHS=
+  ```
+- To run the drivers with TLS, set the following values (replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder):
+  ```
+  RELAY_TLS=true
+  RELAY_TLSCA_TRUST_STORE=<PATH-TO-WEAVER>/core/relay/credentials/fabric_trust_store.jks
+  RELAY_TLSCA_TRUST_STORE_PASSWORD=trelay
+  RELAY_TLSCA_CERT_PATHS=<PATH-TO-WEAVER>/core/relay/credentials/fabric_ca_cert.pem
+  ```
+
 #### Running
 
 Run a Corda driver as follows:
 - Navigate to the `core/drivers/corda-driver` folder.
-- Run the following:
+- Run the following to start Corda driver for `Corda_Network`:
   ```bash
   ./build/install/corda-driver/bin/corda-driver
   ```
-
-If the driver starts successfully, it should log the following message on your terminal:
-```
-Corda driver gRPC server started. Listening on port 9099
-```
-
-## Next Steps
-
-The test networks are up and running. Next, you must [configure the networks and initialize the ledgers](./ledger-initialization.md) before running interoperation flows.
-
+  If the driver starts successfully, it should log the following message on your terminal:
+  ```
+  Corda driver gRPC server started. Listening on port 9099
+  ```
+- Run the following to start Corda driver for `Corda_Network2`:
+  ```bash
+  DRIVER_PORT=9098 ./build/install/corda-driver/bin/corda-driver
+  ```
+  If the driver starts successfully, it should log the following message on your terminal:
+  ```
+  Corda driver gRPC server started. Listening on port 9098
+  ```
 
 ## Tear Down the Setup
 

@@ -11,13 +11,14 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -112,34 +113,16 @@ func CheckAccessIfRelayClient(stub shim.ChaincodeStubInterface) (bool, error) {
 //////        ASSET TRANSFER FUNCTIONS         ////////
 ///////////////////////////////////////////////////////
 
-type AssetPledge struct {
-	AssetDetails        []byte      `json:"assetdetails"`
-	LocalNetworkID      string      `json:"localnetworkid"`
-	RemoteNetworkID     string      `json:"remotenetworkid"`
-	RecipientCert       string      `json:"recipientcert"`
-	ExpiryTimeSecs      uint64      `json:"expirytimesecs"`
-}
-
-type AssetClaimStatus struct {
-	AssetDetails        []byte      `json:"assetdetails"`
-	LocalNetworkID      string      `json:"localnetworkid"`
-	RemoteNetworkID     string      `json:"remotenetworkid"`
-	RecipientCert       string      `json:"recipientcert"`
-	ClaimStatus         bool        `json:"claimstatus"`
-	ExpiryTimeSecs      uint64      `json:"expirytimesecs"`
-	ExpirationStatus    bool        `json:"expirationstatus"`
-}
-
 func GetLocalNetworkIDKey() string {
 	return "localNetworkID"
 }
 
-func getAssetPledgeKey(assetType string, assetId string) string {
-	return "Pledged_" + assetType + assetId
+func getAssetPledgeKey(pledgeId string) string {
+	return "Pledged_" + pledgeId
 }
 
-func getAssetClaimKey(assetType string, assetId string) string {
-	return "Claimed_" + assetType + assetId
+func getAssetClaimKey(pledgeId string) string {
+	return "Claimed_" + pledgeId
 }
 
 // function to generate a "SHA256" hash in hex format for a given preimage
@@ -151,40 +134,88 @@ func generateSHA256HashInHexForm(preimage string) string {
 	return shaHashHex
 }
 
-func generateAssetPledgeContractId(ctx contractapi.TransactionContextInterface, assetType string, numUnits uint64, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) string {
-	preimage := assetType + strconv.Itoa(int(numUnits)) + owner + remoteNetworkId + recipientCert + strconv.Itoa(int(expiryTimeSecs)) + ctx.GetStub().GetTxID()
+func generatePledgeId(ctx contractapi.TransactionContextInterface, assetType, assetIdOrQuantity, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) string {
+	// tmp := assetId
+	// if tmp == "" {
+	// 	tmp = strconv.Itoa(int(numUnits))
+	// }
+	preimage := assetType + assetIdOrQuantity + owner + remoteNetworkId + recipientCert + strconv.Itoa(int(expiryTimeSecs)) + ctx.GetStub().GetTxID()
 	contractId := generateSHA256HashInHexForm(preimage)
 	return contractId
 }
 
+func marshalAssetPledge(pledge *common.AssetPledge) (string, error) {
+	assetPledgeBytes, err := proto.Marshal(pledge)
+	if err != nil {
+		return "", err
+	}
+	assetPledgeBase64 := base64.StdEncoding.EncodeToString(assetPledgeBytes)
+	return assetPledgeBase64, nil	
+}
+func unmarshalAssetPledge(assetPledgeBase64 string) (*common.AssetPledge, error) {
+	pledge := &common.AssetPledge{}
+	assetPledgeSerialized, err := base64.StdEncoding.DecodeString(assetPledgeBase64)
+	if err != nil {
+		return pledge, err
+	}
+	if len(assetPledgeSerialized) == 0 {
+		return pledge, fmt.Errorf("empty asset pledge")
+	}
+	err = proto.Unmarshal([]byte(assetPledgeSerialized), pledge)
+  if err != nil {
+    return pledge, err
+  }
+	return pledge, nil
+}
+
+func marshalAssetClaimStatus(claimStatus *common.AssetClaimStatus) (string, error) {
+	claimStatusBytes, err := proto.Marshal(claimStatus)
+	if err != nil {
+		return "", err
+	}
+	claimStatusBase64 := base64.StdEncoding.EncodeToString(claimStatusBytes)
+	return claimStatusBase64, nil
+}
+func unmarshalAssetClaimStatus(claimStatusBase64 string) (*common.AssetClaimStatus, error) {
+	claimStatus := &common.AssetClaimStatus{}
+	claimStatusSerialized, err := base64.StdEncoding.DecodeString(claimStatusBase64)
+	if err != nil {
+		return claimStatus, err
+	}
+	if len(claimStatusSerialized) == 0 {
+		return claimStatus, fmt.Errorf("empty asset claim status")
+	}
+	err = proto.Unmarshal([]byte(claimStatusSerialized), claimStatus)
+	if err != nil {
+		return claimStatus, err
+	}
+	return claimStatus, nil
+	
+}
+
 // PledgeAsset locks an asset for transfer to a different ledger/network.
-func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, id string, numUnits uint64, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) (string, error) {
-	if id == "" && numUnits == 0 {
+func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, assetIdOrQuantity, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) (string, error) {
+	if assetIdOrQuantity == "" {
 		return "", fmt.Errorf("no asset ID or unit count provided")
 	}
-	if id != "" && numUnits > 0 {
-        return "", fmt.Errorf("ambiguous pledge instruction: both asset ID and unit count provided")
-	}
-	assetId := id           // Non-fungible asset
-	if assetId == "" {      // Fungible asset
-		assetId = generateAssetPledgeContractId(ctx, assetType, numUnits, owner, remoteNetworkId, recipientCert, expiryTimeSecs)
-	}
-
-	pledgeKey := getAssetPledgeKey(assetType, assetId)
-	pledgeJSON, err := ctx.GetStub().GetState(pledgeKey)
+	
+	pledgeId := generatePledgeId(ctx, assetType, assetIdOrQuantity, owner, remoteNetworkId, recipientCert, expiryTimeSecs)
+	
+	pledgeKey := getAssetPledgeKey(pledgeId)
+	pledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to read asset pledge status from world state: %v", err)
 	}
-	var pledge AssetPledge
-	if pledgeJSON != nil {
-		err = json.Unmarshal(pledgeJSON, &pledge)
+	pledge := &common.AssetPledge{}
+	if pledgeBytes != nil {
+		err = proto.Unmarshal(pledgeBytes, pledge)
 		if err != nil {
 			return "", err
 		}
-		if (pledge.RemoteNetworkID == remoteNetworkId && pledge.RecipientCert == recipientCert && pledge.ExpiryTimeSecs == expiryTimeSecs) {
-			return assetId, nil
+		if (pledge.RemoteNetworkID == remoteNetworkId && pledge.Recipient == recipientCert && pledge.ExpiryTimeSecs == expiryTimeSecs) {
+			return pledgeId, nil
 		} else {
-			return "", fmt.Errorf("the asset %s has already been pledged", id)
+			return "", fmt.Errorf("the asset %s with id %s has already been pledged", assetType, assetIdOrQuantity)
 		}
 	}
 
@@ -198,29 +229,32 @@ func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, 
 	if err != nil {
 		return "", err
 	}
-	pledge = AssetPledge{
+	pledge = &common.AssetPledge{
 		AssetDetails: assetJSON,
 		LocalNetworkID: string(localNetworkId),
 		RemoteNetworkID: remoteNetworkId,
-		RecipientCert: recipientCert,
+		Recipient: recipientCert,
 		ExpiryTimeSecs: expiryTimeSecs,
 	}
-	pledgeJSON, err = json.Marshal(pledge)
+	pledgeBytes, err = proto.Marshal(pledge)
 	if err != nil {
 		return "", err
 	}
 
-	err = ctx.GetStub().PutState(pledgeKey, pledgeJSON)
+	err = ctx.GetStub().PutState(pledgeKey, pledgeBytes)
 	if err != nil {
 		return "", err
 	}
-	return assetId, nil
+	return pledgeId, nil
 }
 
 // ClaimRemoteAsset gets ownership of an asset transferred from a different ledger/network.
-func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, assetType, id, owner, remoteNetworkId, pledgeJSON, claimer string) ([]byte, error) {
-	var pledge AssetPledge
-	err := json.Unmarshal([]byte(pledgeJSON), &pledge)
+func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, claimer, remoteNetworkId, pledgeBytes64 string) ([]byte, error) {
+	if pledgeId == "" {
+		return nil, fmt.Errorf("pledgeId can not be empty")
+	}
+	
+	pledge, err := unmarshalAssetPledge(pledgeBytes64)
 	if err != nil {
 		return nil, err
 	}
@@ -228,100 +262,116 @@ func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, assetType, id
 	// Make sure the pledge has not expired (we assume the expiry timestamp set by the remote network)
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= pledge.ExpiryTimeSecs {
-		return nil, fmt.Errorf("cannot claim asset %s as the expiry time has elapsed", id)
+		return nil, fmt.Errorf("cannot claim asset with pledgeId %s as the expiry time has elapsed", pledgeId)
 	}
 	// Match the pledge recipient with the client
-	if pledge.RecipientCert != claimer {
-		return nil, fmt.Errorf("cannot claim asset %s as it has not been pledged to the claimer", id)
+	if pledge.Recipient != claimer {
+		return nil, fmt.Errorf("cannot claim asset with pledgeId %s as it has not been pledged to the claimer", pledgeId)
 	}
 	if pledge.LocalNetworkID != remoteNetworkId {
-		return nil, fmt.Errorf("cannot claim asset %s as it has not been pledged by the given network", id)
+		return nil, fmt.Errorf("cannot claim asset with pledgeId %s as it has not been pledged by the given network", pledgeId)
 	}
 	localNetworkId, err := ctx.GetStub().GetState(GetLocalNetworkIDKey())
 	if err != nil {
 		return nil, err
 	}
 	if pledge.RemoteNetworkID != string(localNetworkId) {
-		return nil, fmt.Errorf("cannot claim asset %s as it has not been pledged to a claimer in this network", id)
+		return nil, fmt.Errorf("cannot claim asset with pledgeId %s as it has not been pledged to a claimer in this network", pledgeId)
 	}
 
 	// Record claim on the ledger for later verification by a foreign network
-	claimStatus := AssetClaimStatus{
+	claimStatus := &common.AssetClaimStatus{
 		AssetDetails: pledge.AssetDetails,
 		LocalNetworkID: string(localNetworkId),
 		RemoteNetworkID: remoteNetworkId,
-		RecipientCert: claimer,
+		Recipient: claimer,
 		ClaimStatus: true,
 		ExpiryTimeSecs: pledge.ExpiryTimeSecs,
 		ExpirationStatus: false,
 	}
-	claimJSON, err := json.Marshal(claimStatus)
+	claimBytes, err := proto.Marshal(claimStatus)
 	if err != nil {
 		return nil, err
 	}
 
-	claimKey := getAssetClaimKey(assetType, id)
-	return pledge.AssetDetails, ctx.GetStub().PutState(claimKey, claimJSON)
+	claimKey := getAssetClaimKey(pledgeId)
+	lookupClaimBytes, err := ctx.GetStub().GetState(claimKey)
+	if err != nil {								// No Record of claim
+		return pledge.AssetDetails, ctx.GetStub().PutState(claimKey, claimBytes)
+	}
+	
+	lookupClaimStatus := &common.AssetClaimStatus{}
+	err = proto.Unmarshal(lookupClaimBytes, lookupClaimStatus)
+	if lookupClaimStatus.ClaimStatus {			// Previous claim was successful
+		return nil, fmt.Errorf("asset has already been claimed")
+	}
+	
+	// Else proceed to claim
+	return pledge.AssetDetails, ctx.GetStub().PutState(claimKey, claimBytes)
 }
 
 // ReclaimAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
-func ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, remoteNetworkId, claimStatusJSON string) ([]byte, []byte, error) {
+func ReclaimAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64 string) ([]byte, []byte, error) {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
-	pledgeKey := getAssetPledgeKey(assetType, id)
-	pledgeJSON, err := ctx.GetStub().GetState(pledgeKey)
+	pledgeKey := getAssetPledgeKey(pledgeId)
+	pledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read asset pledge status from world state: %v", err)
 	}
-	if pledgeJSON == nil {
-		return nil, nil, fmt.Errorf("the asset %s has not been pledged", id)
+	if pledgeBytes == nil {
+		return nil, nil, fmt.Errorf("the asset with pledgeId %s has not been pledged", pledgeId)
 	}
 
 	// At this point, a pledge has been recorded, which means the asset isn't on the ledger; so we don't need to check the asset's presence
 
 	// Make sure the pledge has expired
-	var pledge AssetPledge
-	err = json.Unmarshal(pledgeJSON, &pledge)
+	pledge := &common.AssetPledge{}
+	err = proto.Unmarshal(pledgeBytes, pledge)
 	if err != nil {
 		return nil, nil, err
 	}
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs < pledge.ExpiryTimeSecs {
-		return nil, nil, fmt.Errorf("cannot reclaim asset %s as the expiry time is not yet elapsed", id)
+		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as the expiry time is not yet elapsed", pledgeId)
 	}
 
 	// Make sure the asset has not been claimed within the given time
-	var claimStatus AssetClaimStatus
-	err = json.Unmarshal([]byte(claimStatusJSON), &claimStatus)
+	claimStatus, err := unmarshalAssetClaimStatus(claimStatusBytes64)
 	if err != nil {
 		return nil, nil, err
 	}
 	// We first match the expiration timestamps to ensure that the view address for the claim status was accurate
 	if claimStatus.ExpiryTimeSecs != pledge.ExpiryTimeSecs {
-		return nil, nil, fmt.Errorf("cannot reclaim asset %s as the expiration timestamps in the pledge and the claim don't match", id)
+		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as the expiration timestamps in the pledge and the claim don't match", pledgeId)
 	}
 	if !claimStatus.ExpirationStatus {
-		return nil, nil, fmt.Errorf("cannot reclaim asset %s as the pledge has not yet expired", id)
+		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as the pledge has not yet expired", pledgeId)
 	}
 	if claimStatus.ClaimStatus {
-		return nil, nil, fmt.Errorf("cannot reclaim asset %s as it has already been claimed", id)
+		pledgeKey := getAssetPledgeKey(pledgeId)
+		err := ctx.GetStub().DelState(pledgeKey)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to delete asset pledge from world state: %v", err)
+		}
+		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as it has already been claimed", pledgeId)
 	}
 	if (claimStatus.LocalNetworkID != "" &&
 		claimStatus.RemoteNetworkID != "" &&
-		claimStatus.RecipientCert != "") {
+		claimStatus.Recipient != "") {
 		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
 		if claimStatus.LocalNetworkID != remoteNetworkId {
-			return nil, nil, fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given network", id)
+			return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as it has not been pledged to the given network", pledgeId)
 		}
-		if claimStatus.RecipientCert != recipientCert {
-			return nil, nil, fmt.Errorf("cannot reclaim asset %s as it has not been pledged to the given recipient", id)
+		if claimStatus.Recipient != recipientCert {
+			return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as it has not been pledged to the given recipient", pledgeId)
 		}
 		localNetworkId, err := ctx.GetStub().GetState(GetLocalNetworkIDKey())
 		if err != nil {
 			return nil, nil, err
 		}
 		if claimStatus.RemoteNetworkID != string(localNetworkId) {
-			return nil, nil, fmt.Errorf("cannot reclaim asset %s as it has not been pledged by a claimer in this network", id)
+			return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as it has not been pledged by a claimer in this network", pledgeId)
 		}
 	}
 
@@ -337,86 +387,117 @@ func ReclaimAsset(ctx contractapi.TransactionContextInterface, assetType, id, re
 }
 
 // GetAssetPledgeStatus returns the asset pledge status.
-func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientNetworkId, recipientCert string, blankAssetJSON []byte) ([]byte, string, string, error) {
+func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, pledgeId, recipientNetworkId, recipientCert string, blankAssetJSON []byte) ([]byte, string, string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
-	pledge := &AssetPledge{
+	pledge := &common.AssetPledge{
 		AssetDetails: blankAssetJSON,
 		LocalNetworkID: "",
 		RemoteNetworkID: "",
-		RecipientCert: "",
+		Recipient: "",
 		ExpiryTimeSecs: 0,
 	}
-	pledgeJSON, err := json.Marshal(pledge)
+	pledgeBytes64, err := marshalAssetPledge(pledge)
 	if err != nil {
 		return nil, "", "", err
 	}
 
-	pledgeKey := getAssetPledgeKey(assetType, id)
-	lookupPledgeJSON, err := ctx.GetStub().GetState(pledgeKey)
+	pledgeKey := getAssetPledgeKey(pledgeId)
+	lookupPledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
-		return nil, string(pledgeJSON), string(pledgeJSON), fmt.Errorf("failed to read asset pledge status from world state: %v", err)
+		return nil, pledgeBytes64, pledgeBytes64, fmt.Errorf("failed to read asset pledge status from world state: %v", err)
 	}
-	if lookupPledgeJSON == nil {
-		return nil, string(pledgeJSON), string(pledgeJSON), nil      // Return blank
+	if lookupPledgeBytes == nil {
+		return nil, pledgeBytes64, pledgeBytes64, nil      // Return blank
 	}
-	var lookupPledge AssetPledge
-	err = json.Unmarshal(lookupPledgeJSON, &lookupPledge)
+	lookupPledge := &common.AssetPledge{}
+	err = proto.Unmarshal(lookupPledgeBytes, lookupPledge)
 	if err != nil {
-		return nil, string(pledgeJSON), string(pledgeJSON), err
+		return nil, pledgeBytes64, pledgeBytes64, err
 	}
 
 	// Match pledge with request parameters
-	if lookupPledge.RecipientCert != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId {
-		return nil, string(pledgeJSON), string(pledgeJSON), nil      // Return blank
+	if lookupPledge.Recipient != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId {
+		return nil, pledgeBytes64, pledgeBytes64, nil      // Return blank
+	}
+	
+	lookupPledgeBytes64, err := marshalAssetPledge(lookupPledge)
+	if err != nil {
+		return nil, pledgeBytes64, pledgeBytes64, err
+	}
+	
+	return lookupPledge.AssetDetails, lookupPledgeBytes64, pledgeBytes64, nil
+}
+
+// GetAssetPledgeDetails returns the asset pledge details for local network.
+func GetAssetPledgeDetails(ctx contractapi.TransactionContextInterface, pledgeId string) ([]byte, string, error) {
+	// (Optional) Ensure that this function is NOT being called by the relay or the Fabric Interop CC
+
+	pledgeKey := getAssetPledgeKey(pledgeId)
+	lookupPledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to read asset pledge status from world state: %v", err)
+	}
+	if lookupPledgeBytes == nil {
+		return nil, "", fmt.Errorf("pledge with given pledgeId %s doesn't exist", pledgeId)
+	}
+	lookupPledge := &common.AssetPledge{}
+	err = proto.Unmarshal(lookupPledgeBytes, lookupPledge)
+	if err != nil {
+		return nil, "", err
 	}
 
-	return lookupPledge.AssetDetails, string(lookupPledgeJSON), string(pledgeJSON), nil
+	lookupPledgeBytes64, err := marshalAssetPledge(lookupPledge)
+	if err != nil {
+		return nil, "", err
+	}
+	
+	return lookupPledge.AssetDetails, lookupPledgeBytes64, nil
 }
 
 // GetAssetClaimStatus returns the asset claim status and present time (of invocation).
-func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, assetType, id, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) ([]byte, string, string, error) {
+func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) ([]byte, string, string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
-	claimStatus := &AssetClaimStatus{
+	claimStatus := &common.AssetClaimStatus{
 		AssetDetails: blankAssetJSON,
 		LocalNetworkID: "",
 		RemoteNetworkID: "",
-		RecipientCert: "",
+		Recipient: "",
 		ClaimStatus: false,
 		ExpiryTimeSecs: pledgeExpiryTimeSecs,
 		ExpirationStatus: (uint64(time.Now().Unix()) >= pledgeExpiryTimeSecs),
 	}
-	claimStatusJSON, err := json.Marshal(claimStatus)
+	claimStatusBytes64, err := marshalAssetClaimStatus(claimStatus)
 	if err != nil {
 		return nil, "", "", err
 	}
 
 	// Lookup claim record
-	claimKey := getAssetClaimKey(assetType, id)
-	lookupClaimJSON, err := ctx.GetStub().GetState(claimKey)
+	claimKey := getAssetClaimKey(pledgeId)
+	lookupClaimBytes, err := ctx.GetStub().GetState(claimKey)
 	if err != nil {
-		return nil, string(claimStatusJSON), string(claimStatusJSON), fmt.Errorf("failed to read asset claim status from world state: %v", err)
+		return nil, claimStatusBytes64, claimStatusBytes64, fmt.Errorf("failed to read asset claim status from world state: %v", err)
 	}
-	if lookupClaimJSON == nil {
-		return nil, string(claimStatusJSON), string(claimStatusJSON), nil      // Return blank
+	if lookupClaimBytes == nil {
+		return nil, claimStatusBytes64, claimStatusBytes64, nil      // Return blank
 	}
-	var lookupClaim AssetClaimStatus
-	err = json.Unmarshal(lookupClaimJSON, &lookupClaim)
+	lookupClaim := &common.AssetClaimStatus{}
+	err = proto.Unmarshal(lookupClaimBytes, lookupClaim)
 	if err != nil {
-		return nil, string(claimStatusJSON), string(claimStatusJSON), err
+		return nil, claimStatusBytes64, claimStatusBytes64, err
 	}
 
 	// Match claim with request parameters
-	if lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.RecipientCert != recipientCert {
-		return nil, string(claimStatusJSON), string(claimStatusJSON), nil      // Return blank
+	if lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.Recipient != recipientCert {
+		return nil, claimStatusBytes64, claimStatusBytes64, nil      // Return blank
 	}
 	lookupClaim.ExpiryTimeSecs = claimStatus.ExpiryTimeSecs
 	lookupClaim.ExpirationStatus = claimStatus.ExpirationStatus
-	lookupClaimJSON, err = json.Marshal(lookupClaim)
+	lookupClaimBytes64, err := marshalAssetClaimStatus(lookupClaim)
 	if err != nil {
-		return nil, string(claimStatusJSON), string(claimStatusJSON), err
+		return nil, claimStatusBytes64, claimStatusBytes64, err
 	}
 
-	return lookupClaim.AssetDetails, string(lookupClaimJSON), string(claimStatusJSON), nil
+	return lookupClaim.AssetDetails, lookupClaimBytes64, claimStatusBytes64, nil
 }

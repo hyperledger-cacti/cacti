@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.identity.Party
 
 import com.weaver.corda.app.interop.states.AccessControlPolicyState
 import com.weaver.corda.app.interop.states.Rule
@@ -32,15 +33,16 @@ class AccessControlPolicyManager {
          * Function to create an access control policy state in Vault
          */
         @JvmStatic
-        fun createAccessControlPolicyState(
+        @JvmOverloads fun createAccessControlPolicyState(
             proxy: CordaRPCOps,
-            accessControlPolicyProto: AccessControl.AccessControlPolicy
+            accessControlPolicyProto: AccessControl.AccessControlPolicy,
+            sharedParties: List<Party> = listOf<Party>()
         ): Either<Error, String> {
             val accessControlPolicyState = protoToState(accessControlPolicyProto)
             logger.debug("Writing AccessControlPolicyState: ${accessControlPolicyState}")
             return try {
                 runCatching {
-                    proxy.startFlow(::CreateAccessControlPolicy, accessControlPolicyState)
+                    proxy.startFlow(::CreateAccessControlPolicy, accessControlPolicyState, sharedParties)
                             .returnValue.get()
                 }.fold({
                     it.flatMap {

@@ -72,10 +72,6 @@ fun main(args: Array<String>) = App()
                 DeleteMembershipCommand(),
                 GetMembershipCommand(),
                 GetMembershipsCommand(),
-                ConfigureDataCommand(),
-                ConfigureNetworkCommand(),
-                ConfigureAllCommand(),
-                ConfigureCreateAllCommand(),
                 GetExternalStateCommand(),
                 IssueAssetStateCommand(),
                 GetAssetStateByLinearIdCommand(),
@@ -92,6 +88,14 @@ fun main(args: Array<String>) = App()
                 UnlockAssetCommand(),
                 IsAssetLockedCommand(),
                 GetLockStateCommand(),
+                GetHTLCHashCommand(),
+                GetHTLCPreImageCommand(),
+                ConfigureCommand().subcommands(
+                  ConfigureDataCommand(),
+                  ConfigureNetworkCommand(),
+                  ConfigureAllCommand(),
+                  ConfigureCreateAllCommand()
+                ),
                 HouseTokenCommand().subcommands(
                     InitHouseCommand(),
                     IssueHouseCommand(),

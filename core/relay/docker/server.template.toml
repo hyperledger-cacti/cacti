@@ -6,9 +6,12 @@
 #
 name = "${RELAY_NAME}"
 port="${RELAY_PORT}"
-host="0.0.0.0"
+hostname="0.0.0.0"
 db_path="db/${RELAY_NAME}/requests"
 remote_db_path="db/${RELAY_NAME}/remote_request"
+cert_path="${RELAY_TLS_CERT_PATH}"
+key_path="${RELAY_TLS_KEY_PATH}"
+tls="${RELAY_TLS}"
 
 # This section contains information about the
 # network that is being exposed by the relay.
@@ -29,6 +32,8 @@ network="${NETWORK_TYPE}"
 [drivers.${NETWORK_TYPE}]
 hostname="${DRIVER_HOST}"
 port="${DRIVER_PORT}"
+tls="${DRIVER_TLS}"
+tlsca_cert_path="${DRIVER_TLSCA_CERT_PATH}"
 
 # Here additional configuration about
 # the relay services that the current
@@ -37,7 +42,7 @@ port="${DRIVER_PORT}"
 [relays]
 
 # Here is an example of the content of the
-# files that are added as reloy entries.
+# files that are added as relay entries.
 #
 # [relays.Fabric_Relay]
 # hostname="fabric-relay.dlt-interop.net"

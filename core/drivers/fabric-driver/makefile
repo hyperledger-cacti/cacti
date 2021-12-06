@@ -40,7 +40,7 @@ build-image-local:
 		cp -r ../../../common/protos-js/package.json ./protos-js/
 	cp package.json package-remote.json
 	cp package-local.json package.json
-	docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f fabricDriver.dockerfile .
+	docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f fabricDriver.dockerfile.local .
 	mv package-remote.json package.json
 	rm -rf protos-js
 

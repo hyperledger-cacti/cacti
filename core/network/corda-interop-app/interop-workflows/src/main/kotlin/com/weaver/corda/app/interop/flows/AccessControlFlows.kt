@@ -17,9 +17,12 @@ import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.node.services.queryBy
+import net.corda.core.contracts.requireThat
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.node.ServiceHub
 import net.corda.core.transactions.TransactionBuilder
+import net.corda.core.transactions.SignedTransaction
+import net.corda.core.identity.Party
 
 /**
  * The CreateAccessControlPolicy flow is used to store an [AccessControlPolicyState] in the Corda ledger.
@@ -36,9 +39,13 @@ import net.corda.core.transactions.TransactionBuilder
  *
  * @property accessControlPolicy The [AccessControlPolicyState] provided by the Corda client to be stored in the vault.
  */
+@InitiatingFlow
 @StartableByRPC
-class CreateAccessControlPolicy(
-        val accessControlPolicy: AccessControlPolicyState
+class CreateAccessControlPolicy
+@JvmOverloads
+constructor(
+        val accessControlPolicy: AccessControlPolicyState,
+        val sharedParties: List<Party> = listOf<Party>()
 ) : FlowLogic<Either<Error, UniqueIdentifier>>() {
     /**
      * The call() method captures the logic to create a new [AccessControlPolicyState] state in the vault.
@@ -57,7 +64,7 @@ class CreateAccessControlPolicy(
             // If the flow produces an error, then the access control policy does not already exist.
             
             // Create the access control to store with our identity listed as a participant
-            val outputState = accessControlPolicy.copy(participants = listOf(ourIdentity))
+            val outputState = accessControlPolicy.copy(participants = listOf(ourIdentity) + sharedParties)
 
             // 2. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
@@ -68,9 +75,15 @@ class CreateAccessControlPolicy(
 
             // 3. Verify and collect signatures on the transaction
             txBuilder.verify(serviceHub)
-            val stx = serviceHub.signInitialTransaction(txBuilder)
-            val sessions = listOf<FlowSession>()
-            val storedAccessControlPolicyState = subFlow(FinalityFlow(stx, sessions)).tx.outputStates.first() as AccessControlPolicyState
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+            
+            var sessions = listOf<FlowSession>()
+            for (otherParty in sharedParties) {
+                val otherSession = initiateFlow(otherParty)
+                sessions += otherSession
+            }
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+            val storedAccessControlPolicyState = subFlow(FinalityFlow(fullySignedTx, sessions)).tx.outputStates.first() as AccessControlPolicyState
 
             // 4. Return the linearId of the state
             println("Successfully stored access control policy $storedAccessControlPolicyState in the vault.\n")
@@ -86,12 +99,32 @@ class CreateAccessControlPolicy(
     }
 }
 
+@InitiatedBy(CreateAccessControlPolicy::class)
+class CreateAccessControlPolicyResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
+    }
+}
+
 /**
 * The UpdateAccessControlPolicyState flow is used to update an existing [AccessControlPolicyState] in the Corda ledger.
 *
 * @property AccessControlPolicyState The [AccessControlPolicyState] provided by the Corda client to replace the
  * existing [AccessControlPolicyState] for that network.
 */
+@InitiatingFlow
 @StartableByRPC
 class UpdateAccessControlPolicyState(val accessControlPolicyState: AccessControlPolicyState) : FlowLogic<Either<Error, UniqueIdentifier>>() {
 
@@ -138,9 +171,18 @@ class UpdateAccessControlPolicyState(val accessControlPolicyState: AccessControl
 
             // 3. Verify and collect signatures on the transaction
             txBuilder.verify(serviceHub)
-            val tx = serviceHub.signInitialTransaction(txBuilder)
-            val sessions = listOf<FlowSession>()
-            val finalTx = subFlow(FinalityFlow(tx, sessions))
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+            
+            var sessions = listOf<FlowSession>()
+            for (otherParty in outputState.participants) {
+                if (otherParty != ourIdentity) {
+                    val otherSession = initiateFlow(otherParty)
+                    sessions += otherSession
+                }
+            }
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+            
+            val finalTx = subFlow(FinalityFlow(fullySignedTx, sessions))
             println("Successfully updated access control policy in the ledger: $finalTx\n")
 
             // 4. Return the linearId of the state
@@ -152,11 +194,31 @@ class UpdateAccessControlPolicyState(val accessControlPolicyState: AccessControl
     }
 }
 
+@InitiatedBy(UpdateAccessControlPolicyState::class)
+class UpdateAccessControlPolicyStateResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
+    }
+}
+
 /**
  * The DeleteAccessControlPolicyState flow is used to delete an existing [AccessControlPolicyState] in the Corda ledger.
  *
  * @property securityDomain The identifier for the network for which the [AccessControlPolicyState] is to be deleted.
  */
+@InitiatingFlow
 @StartableByRPC
 class DeleteAccessControlPolicyState(val securityDomain: String) : FlowLogic<Either<Error, UniqueIdentifier>>() {
 
@@ -187,9 +249,18 @@ class DeleteAccessControlPolicyState(val securityDomain: String) : FlowLogic<Eit
 
             // 3. Verify and collect signatures on the transaction
             txBuilder.verify(serviceHub)
-            val stx = serviceHub.signInitialTransaction(txBuilder)
-            val sessions = listOf<FlowSession>()
-            subFlow(FinalityFlow(stx, sessions))
+            val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+            
+            var sessions = listOf<FlowSession>()
+            for (otherParty in inputState.state.data.participants) {
+                if (otherParty != ourIdentity) {
+                    val otherSession = initiateFlow(otherParty)
+                    sessions += otherSession
+                }
+            }
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+            
+            subFlow(FinalityFlow(fullySignedTx, sessions))
 
             // 4. Return the linearId of the state
             println("Successfully deleted access control policy from the ledger.\n")
@@ -198,6 +269,25 @@ class DeleteAccessControlPolicyState(val securityDomain: String) : FlowLogic<Eit
     } catch (e: Exception) {
         println("Failed to delete access control policy from the ledger: ${e.message}.\n")
         Left(Error("Corda Network Error: Error deleting Access Control Policy for security domain $securityDomain: ${e.message}"))
+    }
+}
+
+@InitiatedBy(DeleteAccessControlPolicyState::class)
+class DeleteAccessControlPolicyStateResponder(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("${ourIdentity} signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
     }
 }
 

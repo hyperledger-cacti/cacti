@@ -37,7 +37,7 @@ tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [relays.Corda_Relay2]
 hostname="localhost"
-port="9089"
+port="9082"
 tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"
 
