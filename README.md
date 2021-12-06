@@ -5,9 +5,10 @@
  -->
 # Weaver: DLT Interoperability
 
-![Data Transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/data-transfer.yml/badge.svg?event=push)
-![Fabric Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/asset-exchange-fabric.yml/badge.svg?event=push)
-![Corda Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/asset-exchange-corda.yml/badge.svg?event=push)
+![Data Transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_data-transfer.yml/badge.svg?event=push)
+![Fabric Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)
+![Corda Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)
+![Asset Transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)
 
 ## Short Description
 A framework, with a family of protocols, to enable interoperation for data sharing and asset movements between independent networks built on heterogeneous DLTs in a manner that preserves the core blockchain tenets of decentralization and security.
