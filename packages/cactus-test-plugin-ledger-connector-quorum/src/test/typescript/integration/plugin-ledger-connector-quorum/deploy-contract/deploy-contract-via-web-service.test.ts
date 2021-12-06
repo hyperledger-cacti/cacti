@@ -1,5 +1,6 @@
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
+import convict from "convict";
 import "jest-extended";
 import {
   QuorumTestLedger,
@@ -42,18 +43,13 @@ describe(testCase, () => {
   });
   const ledger = new QuorumTestLedger();
 
-  const configService = new ConfigService();
-  const cactusApiServerOptions: ICactusApiServerOptions = configService.newExampleConfig();
-  cactusApiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-  cactusApiServerOptions.configFile = "";
-  cactusApiServerOptions.apiCorsDomainCsv = "*";
-  cactusApiServerOptions.apiTlsEnabled = false;
-  cactusApiServerOptions.apiPort = 0;
-  const config = configService.newExampleConfigConvict(cactusApiServerOptions);
   const plugins: ICactusPlugin[] = [];
   const pluginRegistry = new PluginRegistry({ plugins });
   const contractName = "HelloWorld";
   let addressInfo: AddressInfo,
+    configService: ConfigService,
+    cactusApiServerOptions: ICactusApiServerOptions,
+    config: convict.Config<ICactusApiServerOptions>,
     apiServer: ApiServer,
     protocol,
     basePath: string,
@@ -87,6 +83,16 @@ describe(testCase, () => {
   });
 
   beforeAll(async () => {
+    configService = new ConfigService();
+    cactusApiServerOptions = await configService.newExampleConfig();
+    cactusApiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+    cactusApiServerOptions.configFile = "";
+    cactusApiServerOptions.apiCorsDomainCsv = "*";
+    cactusApiServerOptions.apiTlsEnabled = false;
+    cactusApiServerOptions.apiPort = 0;
+    config = await configService.newExampleConfigConvict(
+      cactusApiServerOptions,
+    );
     await ledger.start();
     rpcApiHttpHost = await ledger.getRpcApiHttpHost();
 

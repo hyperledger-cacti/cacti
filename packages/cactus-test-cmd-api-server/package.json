@@ -66,7 +66,7 @@
     "@hyperledger/cactus-core-api": "1.0.0-rc.2",
     "@hyperledger/cactus-plugin-keychain-vault": "1.0.0-rc.2",
     "express-jwt-authz": "2.4.1",
-    "jose": "1.28.1"
+    "jose": "4.1.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "1.0.0-rc.2"

@@ -11,7 +11,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 
 const main = async () => {
   const configService = new ConfigService();
-  const config = configService.getOrCreate();
+  const config = await configService.getOrCreate();
   const serverOptions = config.getProperties();
 
   LoggerProvider.setLogLevel(serverOptions.logLevel);

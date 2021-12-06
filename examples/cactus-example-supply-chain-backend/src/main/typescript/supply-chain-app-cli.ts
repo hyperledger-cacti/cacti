@@ -9,7 +9,7 @@ export async function launchApp(
   args?: string[],
 ): Promise<void> {
   const configService = new ConfigService();
-  const config = configService.getOrCreate({ args, env });
+  const config = await configService.getOrCreate({ args, env });
   const serverOptions = config.getProperties();
   LoggerProvider.setLogLevel(serverOptions.logLevel);
 

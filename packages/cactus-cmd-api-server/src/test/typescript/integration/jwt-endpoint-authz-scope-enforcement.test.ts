@@ -1,6 +1,6 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { JWK, JWT } from "jose";
+import { generateKeyPair, exportSPKI, SignJWT } from "jose";
 import expressJwt from "express-jwt";
 import axios, { Method } from "axios";
 import { StatusCodes } from "http-status-codes";
@@ -30,8 +30,8 @@ const log = LoggerProvider.getOrCreate({
 
 test(testCase, async (t: Test) => {
   try {
-    const jwtKeyPair = await JWK.generate("RSA", 4096);
-    const jwtPublicKey = jwtKeyPair.toPEM(false);
+    const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
+    const jwtPublicKey = await exportSPKI(jwtKeyPair.publicKey);
     const expressJwtOptions: expressJwt.Options = {
       algorithms: ["RS256"],
       secret: jwtPublicKey,
@@ -60,7 +60,7 @@ test(testCase, async (t: Test) => {
     pluginRegistry.add(plugin);
 
     const configService = new ConfigService();
-    const apiSrvOpts = configService.newExampleConfig();
+    const apiSrvOpts = await configService.newExampleConfig();
     apiSrvOpts.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
     apiSrvOpts.authorizationConfigJson = authorizationConfig;
     apiSrvOpts.configFile = "";
@@ -70,7 +70,7 @@ test(testCase, async (t: Test) => {
     apiSrvOpts.grpcPort = 0;
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [];
-    const config = configService.newExampleConfigConvict(apiSrvOpts);
+    const config = await configService.newExampleConfigConvict(apiSrvOpts);
 
     const apiServer = new ApiServer({
       config: config.getProperties(),
@@ -95,12 +95,14 @@ test(testCase, async (t: Test) => {
       location: "London",
       scope: [...RunTransactionEndpoint.OAUTH2_SCOPES],
     };
-    const jwtSignOptions: JWT.SignOptions = {
-      algorithm: "RS256",
-      issuer: expressJwtOptions.issuer,
-      audience: expressJwtOptions.audience,
-    };
-    const token = JWT.sign(jwtPayload, jwtKeyPair, jwtSignOptions);
+
+    const token = await new SignJWT(jwtPayload)
+      .setProtectedHeader({
+        alg: "RS256",
+      })
+      .setIssuer(expressJwtOptions.issuer)
+      .setAudience(expressJwtOptions.audience)
+      .sign(jwtKeyPair.privateKey);
 
     const runTxEp = new RunTransactionEndpoint({
       connector: {} as PluginLedgerConnectorStub,

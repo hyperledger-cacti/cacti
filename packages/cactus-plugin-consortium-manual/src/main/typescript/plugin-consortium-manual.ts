@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { JWS, JWK } from "jose";
+import { importPKCS8, GeneralSign } from "jose";
 import jsonStableStringify from "json-stable-stringify";
 import { v4 as uuidv4 } from "uuid";
 
@@ -196,7 +196,7 @@ export class PluginConsortiumManual
     const { keyPairPem } = this.options;
 
     this.updateMetricNodeCount();
-    const keyPair = JWK.asKey(keyPairPem);
+    const keyPair = await importPKCS8(keyPairPem, "ES256K");
     const payloadObject = { consortiumDatabase: this.repo.consortiumDatabase };
     const payloadJson = jsonStableStringify(payloadObject);
     const _protected = {
@@ -205,7 +205,13 @@ export class PluginConsortiumManual
       iss: "Hyperledger Cactus",
     };
     // TODO: double check if this casting is safe (it is supposed to be)
-    return JWS.sign.general(payloadJson, keyPair, _protected) as JWSGeneral;
+    const encoder = new TextEncoder();
+    const sign = new GeneralSign(encoder.encode(payloadJson));
+    sign
+      .addSignature(keyPair)
+      .setProtectedHeader({ alg: "ES256K", _protected });
+    const jwsGeneral = await sign.sign();
+    return jwsGeneral as JWSGeneral;
   }
 
   public async getConsortiumJws(): Promise<JWSGeneral> {
