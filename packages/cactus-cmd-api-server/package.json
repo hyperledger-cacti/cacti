@@ -92,7 +92,7 @@
     "express-openapi-validator": "4.12.12",
     "fs-extra": "10.0.0",
     "google-protobuf": "3.18.0-rc.2",
-    "jose": "1.28.1",
+    "jose": "4.1.0",
     "lmify": "0.3.0",
     "node-forge": "0.10.0",
     "prom-client": "13.2.0",
