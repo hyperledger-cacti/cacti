@@ -9,6 +9,17 @@ on:
     branches: [main, dev]
 
 jobs:
+  # check-package-json:
+  #   name: check-package-json
+  #   runs-on: ubuntu-20.04
+
+  #   steps:
+  #     - name: Checkout code 
+  #       uses: actions/checkout@v2.3.4
+
+  #     - name: Check sorted package json
+  #       run: yarn run sort-json-check
+
   DCI-Lint:
     runs-on: ubuntu-20.04
     name: DCI-Lint
@@ -20,14 +31,6 @@ jobs:
         lint-git-repo-request: '{"cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git", "fetchArgs": ["--update-head-ok", "--no-tags", "--prune", "--progress", "--no-recurse-submodules", "--depth=1", "origin" ,"+${{ github.sha }}:${{ github.ref }}"], "checkoutArgs": [ "${{ github.ref }}"], "targetPhrasePatterns": [], "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json" }'
     - name: Get the output response
       run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
-
-  check-package-json:
-    runs-on: ubuntu-20.04 
-    name: check-package-json
-    continue-on-error: true
-    steps: 
-      - name: checks if the root package json and their child package json files are sorted
-        run: yarn run sort-json-check
 
   build-node-14:
     runs-on: ubuntu-20.04
