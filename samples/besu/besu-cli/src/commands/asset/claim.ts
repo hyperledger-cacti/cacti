@@ -35,9 +35,9 @@ const command: GluegunCommand = {
 							'The index of the account of the recipient of the asset from the list obtained through web3.eth.getAccounts(). For example, we can set Alice as accounts[1] and hence value of this parameter for Alice can be 1.'
 					},
 					{
-						name: '--preimage',
+						name: '--preimage_base64',
 						description:
-							'The preimage of hash with which the asset was locked with.'
+							'The preimage of hash with which the asset was locked with. Input format supported: base64.'
 					}
 				],
 				command,
@@ -77,11 +77,13 @@ const command: GluegunCommand = {
 			return
 		}
 		const lockContractId = options.lock_contract_id
-		if(!options.preimage){
+		if(!options.preimage_base64){
 			print.error('Preimage not provided.')
 			return
 		}
-		const preimage = options.preimage
+		const preimage_base64 = options.preimage_base64
+		const preimage = Buffer.from(preimage_base64, 'base64')
+		console.log('Length of preimage:', preimage.length)	
 
 		console.log('Parameters')
 		console.log('networkConfig', networkConfig)
@@ -95,8 +97,8 @@ const command: GluegunCommand = {
 
 		await interopContract.claimFungibleAsset(lockContractId, preimage, {
 			from: recipient,
-		}).catch(function () {
-			console.log("claimFungibleAsset threw an error");
+		}).catch((error) => {
+			console.log("claimFungibleAsset threw an error:", error);
 		})
 
 		// Balance of the recipient after claiming

@@ -36,7 +36,7 @@ const command: GluegunCommand = {
 					}
 				],
 				command,
-				['asset', 'claim']
+				['asset', 'unlock']
 			)
 			return
 		}
@@ -80,7 +80,7 @@ const command: GluegunCommand = {
 
 		// Balance of the recipient before claiming
 		var senderBalance = await tokenContract.balanceOf(sender)
-		console.log(`Account balance of the sender in Network ${options.network} before claiming: ${senderBalance.toString()}`)
+		console.log(`Account balance of the sender in Network ${options.network} before unlocking: ${senderBalance.toString()}`)
 
 		await interopContract.unlockFungibleAsset(lockContractId, {
 			from: sender
@@ -90,7 +90,7 @@ const command: GluegunCommand = {
 
 		// Balance of the recipient after claiming
 		var senderBalance = await tokenContract.balanceOf(sender)
-		console.log(`Account balance of the sender in Network ${options.network} after claiming: ${senderBalance.toString()}`)
+		console.log(`Account balance of the sender in Network ${options.network} after unlocking: ${senderBalance.toString()}`)
 	}
 }
 

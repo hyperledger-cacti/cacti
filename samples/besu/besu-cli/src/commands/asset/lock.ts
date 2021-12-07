@@ -46,7 +46,7 @@ const command: GluegunCommand = {
 							'Time in seconds for which the asset will be locked. The asset will be locked till Date.now() + the timeout provided'
 					},
 					{
-						name: '--hash',
+						name: '--hash_base64',
 						description:
 							'The hash value with which the asset will be locked i.e., providing its pre-image will enable unlocking the asset. This is an optional parameter. If not provided, we will generate a fresh hash pair with a randomly generated pre-image and output the corresponding pre-image.'
 					}
@@ -101,16 +101,21 @@ const command: GluegunCommand = {
 			return
 		}
 		const timeLock = Math.floor(Date.now() / 1000) + options.timeout
+		// The hash input has to be dealt with care. The smart contracts take in bytes as input. But the cli takes in strings as input. So to handle that, we take in the hash in its base64 version as input and then obtain the byte array from this. If a hash is not provided, we generate a base 64 encoding and then generate its corresponding byte array from it. This byte array will be input to generate the hash. 
 		var hash
 		var preimage
-		if(options.hash){
-			hash = options.hash
+		var hash_base64
+		var preimage_base64
+		if(options.hash_base64){
+			hash_base64 = options.hash_base64
 		}
 		else{
 			// Generate a hash pair if not provided as an input parameter
-			preimage = crypto.randomBytes(32)
-			hash = crypto.createHash('sha256').update(preimage).digest()
+			preimage_base64 = crypto.randomBytes(32).toString('base64')
+			preimage = Buffer.from(preimage_base64, 'base64')
+			hash_base64 = crypto.createHash('sha256').update(preimage).digest('base64')
 		}
+		hash = Buffer.from(hash_base64, 'base64')
 		
 		console.log('Parameters:')
 		console.log('networkConfig', networkConfig)
@@ -118,8 +123,8 @@ const command: GluegunCommand = {
 		console.log('Receiver', recipient)
 		console.log('Amount', options.amount)
 		console.log('Timeout', timeLock)
-		console.log('Hash: ', hash)
-		console.log('Preimage: ', preimage)
+		console.log('Hash (base64): ', hash_base64)
+		console.log('Preimage (base64): ', preimage_base64)
 
 		// Balances of sender and receiver before locking
 		console.log(`Account balances before locking`)
