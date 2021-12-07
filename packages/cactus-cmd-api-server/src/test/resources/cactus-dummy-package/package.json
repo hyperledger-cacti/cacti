@@ -1,6 +1,6 @@
 {
     "name": "@hyperledger/cactus-dummy-package",
-    "version": "1.0.0-rc.2",
+    "version": "1.0.0-rc.3",
     "description": "Dummy package for testing.",
     "main": "index.js"
   }
