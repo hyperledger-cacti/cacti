@@ -1,8 +1,8 @@
 import { createServer } from "http";
 import { AddressInfo } from "net";
 
-import test, { Test } from "tape";
-import { JWK, JWS } from "jose";
+import test, { Test } from "tape-promise/tape";
+import { generateKeyPair, exportSPKI, exportPKCS8, generalVerify } from "jose";
 import { v4 as uuidV4 } from "uuid";
 
 import {
@@ -43,8 +43,8 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
   const node1Host = `http://${addressInfo1.address}:${addressInfo1.port}`;
   t.comment(`Cactus Node 1 Host: ${node1Host}`);
 
-  const keyPair1 = await JWK.generate("EC", "secp256k1");
-  const pubKeyPem1 = keyPair1.toPEM(false);
+  const keyPair1 = await generateKeyPair("ES256K");
+  const pubKeyPem1 = await exportSPKI(keyPair1.publicKey);
   t.comment(`Cactus Node 1 Public Key PEM: ${pubKeyPem1}`);
 
   const httpServer2 = createServer();
@@ -57,8 +57,8 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
   t.comment(`HttpServer2 AddressInfo: ${JSON.stringify(addressInfo2)}`);
   const node2Host = `http://${addressInfo2.address}:${addressInfo2.port}`;
 
-  const keyPair2 = await JWK.generate("EC", "secp256k1");
-  const pubKeyPem2 = keyPair2.toPEM(false);
+  const keyPair2 = await generateKeyPair("ES256K");
+  const pubKeyPem2 = await exportSPKI(keyPair2.publicKey);
   t.comment(`Cactus Node 2 Public Key PEM: ${pubKeyPem2}`);
 
   const httpServer3 = createServer();
@@ -71,8 +71,8 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
   t.comment(`HttpServer3 AddressInfo: ${JSON.stringify(addressInfo3)}`);
   const node3Host = `http://${addressInfo3.address}:${addressInfo3.port}`;
 
-  const keyPair3 = await JWK.generate("EC", "secp256k1");
-  const pubKeyPem3 = keyPair3.toPEM(false);
+  const keyPair3 = await generateKeyPair("ES256K");
+  const pubKeyPem3 = await exportSPKI(keyPair3.publicKey);
   t.comment(`Cactus Node 3 Public Key PEM: ${pubKeyPem3}`);
 
   const node1: CactusNode = {
@@ -144,10 +144,11 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     const pluginRegistry = new PluginRegistry({ plugins: [] });
 
     // 3. Instantiate the web service consortium plugin
+    const keyPairPem = await exportPKCS8(keyPair1.privateKey);
     const options: IPluginConsortiumManualOptions = {
       instanceId: uuidV4(),
       pluginRegistry,
-      keyPairPem: keyPair1.toPEM(true),
+      keyPairPem: keyPairPem,
       consortiumDatabase,
       logLevel: "trace",
     };
@@ -155,7 +156,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
     // 4. Create the API Server object that we embed in this test
     const configService = new ConfigService();
-    const apiServerOptions = configService.newExampleConfig();
+    const apiServerOptions = await configService.newExampleConfig();
     apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
     apiServerOptions.apiCorsDomainCsv = "*";
@@ -163,7 +164,9 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     apiServerOptions.cockpitPort = 0;
     apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
-    const config = configService.newExampleConfigConvict(apiServerOptions);
+    const config = await configService.newExampleConfigConvict(
+      apiServerOptions,
+    );
 
     pluginRegistry.add(pluginConsortiumManual);
 
@@ -189,7 +192,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     t.equal(res.status, 200, "Node JWS response status code is 200");
     t.ok(res.data, "Node JWS response.body is truthy");
     t.ok(res.data.jws, "Node JWS response.body.jws is truthy");
-    const payload = JWS.verify(res.data.jws, keyPair1.toPEM(false));
+    const payload = await generalVerify(res.data.jws, keyPair1.publicKey);
     t.ok(payload, "Verified Node JWS payload is truthy");
     t.comment(`Node1 JWS Payload: ${JSON.stringify(payload)}`);
   }
@@ -199,10 +202,11 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
   {
     const pluginRegistry = new PluginRegistry({ plugins: [] });
 
+    const keyPairPem = await exportPKCS8(keyPair2.privateKey);
     const options: IPluginConsortiumManualOptions = {
       instanceId: uuidV4(),
       pluginRegistry,
-      keyPairPem: keyPair2.toPEM(true),
+      keyPairPem: keyPairPem,
       consortiumDatabase,
       logLevel: "TRACE",
     };
@@ -210,7 +214,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
     // 4. Create the API Server object that we embed in this test
     const configService = new ConfigService();
-    const apiServerOptions = configService.newExampleConfig();
+    const apiServerOptions = await configService.newExampleConfig();
     apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
     apiServerOptions.apiCorsDomainCsv = "*";
@@ -218,7 +222,9 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     apiServerOptions.cockpitPort = 0;
     apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
-    const config = configService.newExampleConfigConvict(apiServerOptions);
+    const config = await configService.newExampleConfigConvict(
+      apiServerOptions,
+    );
 
     pluginRegistry.add(pluginConsortiumManual);
 
@@ -243,7 +249,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     t.equal(res.status, 200, "Node JWS response status code is 200");
     t.ok(res.data, "Node2 JWS response.body is truthy");
     t.ok(res.data.jws, "Node JWS response.body.jws is truthy");
-    const payload = JWS.verify(res.data.jws, keyPair2.toPEM(false));
+    const payload = await generalVerify(res.data.jws, keyPair2.publicKey);
     t.ok(payload, "Verified Node JWS payload is truthy");
     t.comment(`Node2 JWS Payload: ${JSON.stringify(payload)}`);
   }
@@ -255,10 +261,11 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     const pluginRegistry = new PluginRegistry({ plugins: [] });
 
     // 3. Instantiate the web service consortium plugin
+    const keyPairPem = await exportPKCS8(keyPair3.privateKey);
     const options: IPluginConsortiumManualOptions = {
       instanceId: uuidV4(),
       pluginRegistry,
-      keyPairPem: keyPair3.toPEM(true),
+      keyPairPem: keyPairPem,
       consortiumDatabase,
       logLevel: "TRACE",
     };
@@ -266,7 +273,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
 
     // 4. Create the API Server object that we embed in this test
     const configService = new ConfigService();
-    const apiServerOptions = configService.newExampleConfig();
+    const apiServerOptions = await configService.newExampleConfig();
     apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
     apiServerOptions.apiCorsDomainCsv = "*";
@@ -274,7 +281,9 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     apiServerOptions.cockpitPort = 0;
     apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
-    const config = configService.newExampleConfigConvict(apiServerOptions);
+    const config = await configService.newExampleConfigConvict(
+      apiServerOptions,
+    );
 
     pluginRegistry.add(pluginConsortiumManual);
 
@@ -300,7 +309,7 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     t.equal(res.status, 200, "Node JWS response status code is 200");
     t.ok(res.data, "Node3 JWS response.body is truthy");
     t.ok(res.data.jws, "Node3 JWS response.body.jws is truthy");
-    const payload = JWS.verify(res.data.jws, keyPair3.toPEM(false));
+    const payload = await generalVerify(res.data.jws, keyPair3.publicKey);
     t.ok(payload, "Verified Node3 JWS payload is truthy");
     t.comment(`Node3 JWS Payload: ${JSON.stringify(payload)}`);
   }
@@ -314,15 +323,15 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     const getConsortiumJwsResponse = res.data;
     const consortiumJws = getConsortiumJwsResponse.jws;
     t.comment(`Consortium JWS: ${JSON.stringify(consortiumJws, null, 4)}`);
-    const payload1 = JWS.verify(consortiumJws, keyPair1.toPEM(false));
-    const payload2 = JWS.verify(consortiumJws, keyPair2.toPEM(false));
-    const payload3 = JWS.verify(consortiumJws, keyPair3.toPEM(false));
+    const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
+    const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
+    const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
     t.ok(payload1, "Verified Consortium JWS payload1 is truthy");
     t.ok(payload2, "Verified Consortium JWS payload2 is truthy");
     t.ok(payload3, "Verified Consortium JWS payload3 is truthy");
 
-    const wrongKey = await JWK.generate("EC", "secp256k1");
-    t.throws(() => JWS.verify(consortiumJws, wrongKey));
+    const wrongKey = await generateKeyPair("ES256K");
+    await t.rejects(generalVerify(consortiumJws, wrongKey.publicKey));
   }
 
   {
@@ -333,15 +342,15 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     const getConsortiumJwsResponse = res.data;
     const consortiumJws = getConsortiumJwsResponse.jws;
     t.comment(`Consortium JWS: ${JSON.stringify(consortiumJws, null, 4)}`);
-    const payload1 = JWS.verify(consortiumJws, keyPair1.toPEM(false));
-    const payload2 = JWS.verify(consortiumJws, keyPair2.toPEM(false));
-    const payload3 = JWS.verify(consortiumJws, keyPair3.toPEM(false));
+    const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
+    const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
+    const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
     t.ok(payload1, "Verified Consortium JWS payload1 is truthy");
     t.ok(payload2, "Verified Consortium JWS payload2 is truthy");
     t.ok(payload3, "Verified Consortium JWS payload3 is truthy");
 
-    const wrongKey = await JWK.generate("EC", "secp256k1");
-    t.throws(() => JWS.verify(consortiumJws, wrongKey));
+    const wrongKey = await generateKeyPair("ES256K");
+    await t.rejects(generalVerify(consortiumJws, wrongKey.publicKey));
   }
 
   {
@@ -352,15 +361,15 @@ test("member node public keys and hosts are pre-shared", async (t: Test) => {
     const getConsortiumJwsResponse = res.data;
     const consortiumJws = getConsortiumJwsResponse.jws;
     t.comment(`Consortium JWS: ${JSON.stringify(consortiumJws, null, 4)}`);
-    const payload1 = JWS.verify(consortiumJws, keyPair1.toPEM(false));
-    const payload2 = JWS.verify(consortiumJws, keyPair2.toPEM(false));
-    const payload3 = JWS.verify(consortiumJws, keyPair3.toPEM(false));
+    const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
+    const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
+    const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
     t.ok(payload1, "Verified Consortium JWS payload1 is truthy");
     t.ok(payload2, "Verified Consortium JWS payload2 is truthy");
     t.ok(payload3, "Verified Consortium JWS payload3 is truthy");
 
-    const wrongKey = await JWK.generate("EC", "secp256k1");
-    t.throws(() => JWS.verify(consortiumJws, wrongKey));
+    const wrongKey = await generateKeyPair("ES256K");
+    await t.rejects(generalVerify(consortiumJws, wrongKey.publicKey));
     t.comment(JSON.stringify(payload1));
   }
 

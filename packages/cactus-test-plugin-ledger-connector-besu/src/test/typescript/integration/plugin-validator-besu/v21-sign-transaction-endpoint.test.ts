@@ -112,14 +112,14 @@ test(testCase, async (t: Test) => {
 
   // 4. Create the API Server object that we embed in this test
   const configService = new ConfigService();
-  const apiServerOptions = configService.newExampleConfig();
+  const apiServerOptions = await configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
   apiServerOptions.apiPort = addressInfo1.port;
   apiServerOptions.cockpitPort = 0;
   apiServerOptions.apiTlsEnabled = false;
-  const config = configService.newExampleConfigConvict(apiServerOptions);
+  const config = await configService.newExampleConfigConvict(apiServerOptions);
 
   pluginRegistry.add(pluginValidatorBesu);
 

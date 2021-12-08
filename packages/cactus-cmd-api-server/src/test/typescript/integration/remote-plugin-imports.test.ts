@@ -71,7 +71,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
   const configService = new ConfigService();
-  const apiServerOptions = configService.newExampleConfig();
+  const apiServerOptions = await configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.configFile = "";
@@ -92,7 +92,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
       },
     },
   ];
-  const config = configService.newExampleConfigConvict(apiServerOptions);
+  const config = await configService.newExampleConfigConvict(apiServerOptions);
 
   const apiServer = new ApiServer({
     config: config.getProperties(),

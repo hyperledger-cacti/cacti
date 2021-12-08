@@ -1,7 +1,7 @@
 import { AddressInfo } from "net";
 import { Server } from "http";
 
-import { JWK } from "jose";
+import { exportPKCS8, generateKeyPair, KeyLike, exportSPKI } from "jose";
 import { v4 as uuidv4 } from "uuid";
 import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
 
@@ -182,22 +182,22 @@ export class SupplyChainApp {
     const quorumApiClient = new QuorumApi(quorumConfig);
     const fabricApiClient = new FabricApi(fabricConfig);
 
-    const keyPairA = await JWK.generate("EC", "secp256k1");
-    const keyPairPemA = keyPairA.toPEM(true);
+    const keyPairA = await generateKeyPair("ES256K");
+    const keyPairPemA = await exportPKCS8(keyPairA.privateKey);
 
-    const keyPairB = await JWK.generate("EC", "secp256k1");
-    const keyPairPemB = keyPairB.toPEM(true);
+    const keyPairB = await generateKeyPair("ES256K");
+    const keyPairPemB = await exportPKCS8(keyPairB.privateKey);
 
-    const keyPairC = await JWK.generate("EC", "secp256k1");
-    const keyPairPemC = keyPairC.toPEM(true);
+    const keyPairC = await generateKeyPair("ES256K");
+    const keyPairPemC = await exportPKCS8(keyPairC.privateKey);
 
-    const consortiumDatabase = this.createConsortium(
+    const consortiumDatabase = await this.createConsortium(
       httpApiA,
       httpApiB,
       httpApiC,
-      keyPairA,
-      keyPairB,
-      keyPairC,
+      keyPairA.publicKey,
+      keyPairB.publicKey,
+      keyPairC.publicKey,
     );
     const consortiumPrettyJson = JSON.stringify(consortiumDatabase, null, 4);
     this.log.info(`Created Consortium definition: %o`, consortiumPrettyJson);
@@ -362,14 +362,14 @@ export class SupplyChainApp {
     this.shutdownHooks.push(hook);
   }
 
-  public createConsortium(
+  public async createConsortium(
     serverA: Server,
     serverB: Server,
     serverC: Server,
-    keyPairA: JWK.ECKey,
-    keyPairB: JWK.ECKey,
-    keyPairC: JWK.ECKey,
-  ): ConsortiumDatabase {
+    keyPairA: KeyLike,
+    keyPairB: KeyLike,
+    keyPairC: KeyLike,
+  ): Promise<ConsortiumDatabase> {
     const consortiumName = "Example Supply Chain Consortium";
     const consortiumId = uuidv4();
 
@@ -378,10 +378,11 @@ export class SupplyChainApp {
     const addressInfoA = serverA.address() as AddressInfo;
     const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
 
+    const publickKeyPemA = await exportSPKI(keyPairA);
     const cactusNodeA: CactusNode = {
       nodeApiHost: nodeApiHostA,
       memberId: memberIdA,
-      publicKeyPem: keyPairA.toPEM(false),
+      publicKeyPem: publickKeyPemA,
       consortiumId,
       id: nodeIdA,
       pluginInstanceIds: [],
@@ -405,10 +406,11 @@ export class SupplyChainApp {
     const addressInfoB = serverB.address() as AddressInfo;
     const nodeApiHostB = `http://localhost:${addressInfoB.port}`;
 
+    const publickKeyPemB = await exportSPKI(keyPairB);
     const cactusNodeB: CactusNode = {
       nodeApiHost: nodeApiHostB,
       memberId: memberIdB,
-      publicKeyPem: keyPairB.toPEM(false),
+      publicKeyPem: publickKeyPemB,
       consortiumId,
       id: nodeIdB,
       pluginInstanceIds: [],
@@ -433,10 +435,11 @@ export class SupplyChainApp {
     const addressInfoC = serverC.address() as AddressInfo;
     const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
 
+    const publickKeyPemC = await exportSPKI(keyPairC);
     const cactusNodeC: CactusNode = {
       nodeApiHost: nodeApiHostC,
       memberId: memberIdC,
-      publicKeyPem: keyPairC.toPEM(false),
+      publicKeyPem: publickKeyPemC,
       consortiumId,
       id: nodeIdC,
       pluginInstanceIds: [],
@@ -483,13 +486,14 @@ export class SupplyChainApp {
     const addressInfoCockpit = httpServerCockpit.address() as AddressInfo;
 
     const configService = new ConfigService();
-    const config = configService.getOrCreate();
+    const config = await configService.getOrCreate();
     const properties = config.getProperties();
 
     properties.plugins = [];
     properties.configFile = "";
     properties.apiPort = addressInfoApi.port;
     properties.apiHost = addressInfoApi.address;
+    properties.cockpitEnabled = true;
     properties.cockpitHost = addressInfoCockpit.address;
     properties.cockpitPort = addressInfoCockpit.port;
     properties.grpcPort = 0; // TODO - make this configurable as well

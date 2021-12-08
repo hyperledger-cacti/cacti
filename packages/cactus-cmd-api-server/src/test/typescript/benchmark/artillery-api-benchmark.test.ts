@@ -6,7 +6,7 @@ import path from "path";
 
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { JWK } from "jose";
+import { generateKeyPair, exportPKCS8 } from "jose";
 
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 
@@ -37,8 +37,8 @@ const artilleryScriptLocation =
 const logLevel: LogLevelDesc = "INFO";
 
 test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
-  const keyPair = await JWK.generate("EC", "secp256k1", { use: "sig" }, true);
-  const keyPairPem = keyPair.toPEM(true);
+  const keyPair = await generateKeyPair("ES256K");
+  const keyPairPem = await exportPKCS8(keyPair.privateKey);
   const db: ConsortiumDatabase = {
     cactusNode: [],
     consortium: [],
@@ -58,7 +58,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
   const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
   const configService = new ConfigService();
-  const apiServerOptions = configService.newExampleConfig();
+  const apiServerOptions = await configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
   apiServerOptions.configFile = "";
@@ -91,7 +91,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
     },
   ];
 
-  const config = configService.newExampleConfigConvict(apiServerOptions);
+  const config = await configService.newExampleConfigConvict(apiServerOptions);
 
   log.info("Creating API Server...");
   const apiServer = new ApiServer({
