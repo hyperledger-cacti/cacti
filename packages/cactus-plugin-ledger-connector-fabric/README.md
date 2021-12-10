@@ -1,75 +1,118 @@
-# `@hyperledger/cactus-plugin-ledger-connector-fabric`
+# `@hyperledger/cactus-plugin-ledger-connector-fabric` <!-- omit in toc -->
 
-This plugin provides `Cactus` a way to interact with Fabric networks. Using this we can perform:
-* Deploy Golang chaincodes.
-* Make transactions.
-* Invoke chaincodes functions that we have deployed on the network.
+## Table of Contents <!-- omit in toc -->
 
-## Summary
+- [1. Usage](#1-usage)
+  - [1.1. Installation](#11-installation)
+  - [1.2. Using as a Library](#12-using-as-a-library)
+  - [1.3. Using Via The API Client](#13-using-via-the-api-client)
+  - [1.4. Signing Credentials with Hashicorp Vault](#14-signing-credentials-with-hashicorp-vault)
+    - [1.4.1. Identity Providers](#141-identity-providers)
+    - [1.4.2. Setting up a WS-X.509 provider](#142-setting-up-a-ws-x509-provider)
+    - [1.4.3. Building the ws-identity docker image](#143-building-the-ws-identity-docker-image)
+- [2. Architecture](#2-architecture)
+  - [2.1. run-transaction-endpoint](#21-run-transaction-endpoint)
+- [3. Containerization](#3-containerization)
+  - [3.1. Building/running the container image locally](#31-buildingrunning-the-container-image-locally)
+  - [3.2. Running the container](#32-running-the-container)
+  - [3.3. Testing API calls with the container](#33-testing-api-calls-with-the-container)
+- [4. Prometheus Exporter](#4-prometheus-exporter)
+  - [4.1. Usage Prometheus](#41-usage-prometheus)
+  - [4.2. Prometheus Integration](#42-prometheus-integration)
+  - [4.3. Helper code](#43-helper-code)
+    - [4.3.1. response.type.ts](#431-responsetypets)
+    - [4.3.2. data-fetcher.ts](#432-data-fetcherts)
+    - [4.3.3. metrics.ts](#433-metricsts)
+- [5. Contributing](#5-contributing)
+- [6. License](#6-license)
+- [7. Acknowledgments](#7-acknowledgments)
 
-  - [Getting Started](#getting-started)
-  - [Architecture](#architecture)
-  - [Usage](#usage)
-  - [Identity Providers](#identity-providers)
-  - [Runing the tests](#running-the-tests)
-  - [Built With](#built-with)
-  - [Prometheus Exporter](#prometheus-exporter)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Acknowledgments](#acknowledgments)
+## 1. Usage
 
-## Getting Started
+This plugin provides a way to interact with Fabric networks. 
+Using this one can perform:
+* Deploy smart contracts (chaincode).
+* Execute transactions on the ledger.
+* Invoke chaincode functions.
 
-Clone the git repository on your local machine. Follow these instructions that will get you a copy of the project up and running on
-your local machine for development and testing purposes.
+The above functionality can either be accessed by importing the plugin directly as a library (embedding) or by hosting it as a REST API through the [Cactus API server](https://www.npmjs.com/package/@hyperledger/cactus-cmd-api-server)
 
-### Prerequisites
+We also publish the [Cactus API server as a container image](https://github.com/hyperledger/cactus/pkgs/container/cactus-cmd-api-server) to the GitHub Container Registry that you can run easily with a one liner.
+The API server is also embeddable in your own NodeJS project if you choose to do so.
 
-In the root of the project to install the dependencies execute the command:
+### 1.1. Installation
+
+**npm**
+
 ```sh
-npm run comfigure
+npm install @hyperledger/cactus-plugin-ledger-connector-fabric
 ```
-### Compiling
 
-In the project root folder, run this command to compile the plugin and create the dist directory:
+**yarn**
+
 ```sh
-npm run tsc
+yarn add @hyperledger/cactus-plugin-ledger-connector-fabric
 ```
-### Architecture
-The sequence diagrams for various endpoints are mentioned below
 
-#### run-transaction-endpoint
-![run-transaction-endpoint sequence diagram](docs/architecture/images/run-transaction-endpoint.png)
-The above diagram shows the sequence diagram of run-transaction-endpoint. User A (One of the many Users) interacts with the API Client which in turn, calls the API server. API server then executes transact() method which is explained in detailed in the subsequent diagram.
-![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
-The above diagram shows the sequence diagraom of transact() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the invocationType (FabricContractInvocationType.CALL, FabricCOntractInvocationType.SEND), corresponding responses are send back to the caller.
+### 1.2. Using as a Library
 
-![run-transaction-endpoint-enroll](docs/architecture/images/run-transaction-endpoint-enroll.png)
-
-The above diagram shows the sequence diagraom of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509, FabricSigningCredentialType.WsX509), corresponding identity is enrolled and stored inside keychain. 
-
-## Usage
-
-To use this import public-api and create new **PluginLedgerConnectorFabric** and **ChainCodeCompiler**.
 ```typescript
-  const connector: PluginLedgerConnectorFabric = new PluginLedgerConnectorFabric(pluginOptions);
-  const compiler = new ChainCodeCompiler({ logLevel });
-```
-For compile the chaincodes:
-```typescript
-  const opts: ICompilationOptions = {
-    fileName: "hello-world-contract.go",
-    moduleName: "hello-world-contract",
-    pinnedDeps: [
-      "github.com/hyperledger/fabric@v1.4.8",
-      "golang.org/x/net@v0.0.0-20210503060351-7fd8e65b6420",
-    ],
-    modTidyOnly: true, // we just need the go.mod file so tidy only is enough
-    sourceCode: HELLO_WORLD_CONTRACT_GO_SOURCE,
-  };
+import {
+  PluginLedgerConnectorFabric,
+  DefaultEventHandlerStrategy,
+} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
-  const result = await compiler.compile(opts);
+const plugin = new PluginLedgerConnectorFabric({
+  // See test cases for exact details on what parameters are needed
+});
+
+const req: RunTransactionRequest = {
+  // See tests for specific examples on request properties
+};
+
+try {
+  const res = await plugin.transact(req);
+} catch (ex: Error) {
+  // Make sure to handle errors gracefully (which is dependent on your use-case)
+  console.error(ex);
+  throw ex;
+}
 ```
+
+### 1.3. Using Via The API Client
+
+**Prerequisites** 
+- A running Fabric ledger (network)
+- You have a running Cactus API server on `$HOST:$PORT` with the Fabric connector plugin installed on it (and the latter configured to have access to the Fabric ledger from point 1)
+
+```typescript
+import {
+  PluginLedgerConnectorFabric,
+  DefaultApi as FabricApi,
+  DefaultEventHandlerStrategy,
+} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+
+// Step zero is to deploy your Fabric ledger and the Cactus API server
+const apiUrl = `https://${HOST}:${PORT}`;
+
+const config = new Configuration({ basePath: apiUrl });
+
+const apiClient = new FabricApi(config);
+
+const req: RunTransactionRequest = {
+  // See tests for specific examples on request properties
+};
+
+try {
+  const res = await apiClient.runTransactionV1(req);
+} catch (ex: Error) {
+  // Make sure to handle errors gracefully (which is dependent on your use-case)
+  console.error(ex);
+  throw ex;
+}
+```
+
+### 1.4. Signing Credentials with Hashicorp Vault
 
 To support signing of message with multiple identity types
 ```typescript
@@ -201,7 +244,8 @@ await connector.rotateKey(
 ```
 
 > Extensive documentation and examples in the [readthedocs](https://readthedocs.org/projects/hyperledger-cactus/) (WIP)
-## Identity Providers
+
+#### 1.4.1. Identity Providers
 
 Identity providers allows client to manage their private more effectively and securely. Cactus Fabric Connector support multiple type of providers. Each provider differ based upon where the private are stored. On High level certificate credential are stored as
 
@@ -223,24 +267,37 @@ Currently Cactus Fabric Connector supports following Identity Providers
 - Vault-X.509 : Secure provider wherein `private` key is stored with vault's transit transit engine and certificate in `certDatastore`. Rather then bringing the key to the connector, message digest are sent to the vault server which returns the `signature`.
 - WS-X.509 : Secure provider wherein `private` key is stored with `client` and certificate in `certDatastore`. To get the fabric messages signed, message digest is sent to the client via `webSocket` connection opened by the client in the beginning (as described above)
 
-### setting up a WS-X.509 provider
+#### 1.4.2. Setting up a WS-X.509 provider
 The following packages are used to access private keys (via web-socket)  stored on a clients external device (e.g., browser, mobile app, or an IoT device...).
   -[ws-identity](https://github.com/brioux/ws-identity): web-socket server that issues new ws-session tickets, authenticates incoming connections, and sends signature requests
   -[ws-identity-client](https://github.com/brioux/ws-identity-client): backend connector to send requests from fabric application to ws-identity
   -[ws-wallet](https://github.com/brioux/ws-wallet): external clients crypto key tool: create new key pair, request session ticket and open web-socket connection with ws-identity
 
-### Building the ws-identity docker image
+#### 1.4.3. Building the ws-identity docker image
+
+TBD
+
+## 2. Architecture
+The sequence diagrams for various endpoints are mentioned below
+
+### 2.1. run-transaction-endpoint
+
+![run-transaction-endpoint sequence diagram](docs/architecture/images/run-transaction-endpoint.png)
+
+The above diagram shows the sequence diagram of run-transaction-endpoint. User A (One of the many Users) interacts with the API Client which in turn, calls the API server. API server then executes transact() method which is explained in detailed in the subsequent diagram.
+
+![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
+
+The above diagram shows the sequence diagraom of transact() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the invocationType (FabricContractInvocationType.CALL, FabricCOntractInvocationType.SEND), corresponding responses are send back to the caller.
+
+![run-transaction-endpoint-enroll](docs/architecture/images/run-transaction-endpoint-enroll.png)
+
+The above diagram shows the sequence diagraom of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509, FabricSigningCredentialType.WsX509), corresponding identity is enrolled and stored inside keychain. 
 
 
-## Running the tests
 
-To check that all has been installed correctly and that the pugin has no errors, run the tests:
-
-* Run this command at the project's root:
-```sh
-npm run test:plugin-ledger-connector-fabric
-```
-### Building/running the container image locally
+## 3. Containerization
+### 3.1. Building/running the container image locally
 
 In the Cactus project root say:
 
@@ -253,8 +310,7 @@ Build with a specific version of the npm package:
 DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=0.4.1 -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile . -t cplcb
 ```
 
-
-#### Running the container
+### 3.2. Running the container
 
 Launch container with plugin configuration as an **environment variable**:
 ```sh
@@ -334,7 +390,7 @@ docker run \
     --config-file=/cactus.json
 ```
 
-#### Testing API calls with the container
+### 3.3. Testing API calls with the container
 
 Don't have a fabric network on hand to test with? Test or develop against our fabric All-In-One container!
 
@@ -406,18 +462,18 @@ The above should produce a response that looks similar to this:
 
 
 
-## Prometheus Exporter
+## 4. Prometheus Exporter
 
 This class creates a prometheus exporter, which scraps the transactions (total transaction count) for the use cases incorporating the use of Fabric connector plugin.
 
 
-### Usage Prometheus
+### 4.1. Usage Prometheus
 The prometheus exporter object is initialized in the `PluginLedgerConnectorFabric` class constructor itself, so instantiating the object of the `PluginLedgerConnectorFabric` class, gives access to the exporter object.
 You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginLedgerConnectorFabricOptions` interface for `PluginLedgerConnectoFabric` constructor.
 
 `getPrometheusExporterMetricsEndpointV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime the `transact()` method of the `PluginLedgerConnectorFabric` class is called.
 
-### Prometheus Integration
+### 4.2. Prometheus Integration
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
 Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
 
@@ -435,24 +491,25 @@ Here the `host:port` is where the prometheus exporter metrics are exposed. The t
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
 On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus_fabric_total_tx_count** and click **execute**
 
-### Helper code
+### 4.3. Helper code
 
-###### response.type.ts
+#### 4.3.1. response.type.ts
 This file contains the various responses of the metrics.
 
-###### data-fetcher.ts
+#### 4.3.2. data-fetcher.ts
 This file contains functions encasing the logic to process the data points
 
-###### metrics.ts
+#### 4.3.3. metrics.ts
 This file lists all the prometheus metrics and what they are used for.
-## Contributing
+
+## 5. Contributing
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
 Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## License
+## 6. License
 
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
 
-## Acknowledgments
+## 7. Acknowledgments

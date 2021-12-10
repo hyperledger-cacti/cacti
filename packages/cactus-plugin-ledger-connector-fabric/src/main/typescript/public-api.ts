@@ -16,12 +16,5 @@ export async function createPluginFactory(
   return new PluginFactoryLedgerConnector(pluginFactoryOptions);
 }
 
-export {
-  ChainCodeCompiler,
-  IChainCodeCompilerOptions,
-  ICompilationOptions,
-  ICompilationResult,
-} from "./chain-code-compiler";
-
 export { IVaultConfig, IWebSocketConfig } from "./identity/identity-provider";
 export { IIdentityData } from "./identity/internal/cert-datastore";
