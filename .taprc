@@ -113,7 +113,6 @@ files:
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/run-transaction-endpoint-v1.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/deploy-cc-from-golang-source.test.ts
-  - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-golang-source-private-data.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-golang-source.test.ts
