@@ -1,5 +1,5 @@
-import test, { Test } from "tape";
-import { JWS, JWK } from "jose";
+import test, { Test } from "tape-promise/tape";
+import { generateKeyPair, exportPKCS8, generalVerify } from "jose";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
@@ -29,8 +29,8 @@ import { K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT } from "../../../../main/ty
 test("Can provide JWS", async (t: Test) => {
   t.ok(GetNodeJwsEndpoint);
 
-  const keyPair = await JWK.generate("EC", "secp256k1", { use: "sig" }, true);
-  const keyPairPem = keyPair.toPEM(true);
+  const keyPair = await generateKeyPair("ES256K");
+  const keyPairPem = await exportPKCS8(keyPair.privateKey);
 
   const db: ConsortiumDatabase = {
     cactusNode: [],
@@ -75,23 +75,29 @@ test("Can provide JWS", async (t: Test) => {
   await pluginConsortiumManual.getOrCreateWebServices();
   await pluginConsortiumManual.registerWebServices(expressApp);
 
-  const pubKeyPem = keyPair.toPEM(false);
-
   const jws = await pluginConsortiumManual.getNodeJws();
   t.ok(jws, "created JWS is truthy");
   t.ok(typeof jws === "object", "created JWS is an object");
+  await t.doesNotReject(generalVerify(jws, keyPair.publicKey));
+  await t.doesNotReject(generalVerify(jws, keyPair.privateKey));
 
-  t.doesNotThrow(() => JWS.verify(jws, pubKeyPem), "JWS verified OK");
-  t.doesNotThrow(() => JWS.verify(jws, keyPair), "JWS verified OK");
-
-  const payload = JWS.verify(jws, pubKeyPem) as {
+  const { payload, protectedHeader } = await generalVerify(
+    jws,
+    keyPair.publicKey,
+  );
+  const decoder = new TextDecoder();
+  const payloadDecoded = JSON.parse(decoder.decode(payload)) as {
     consortiumDatabase: ConsortiumDatabase;
   };
-  t.ok(payload, "JWS verified payload truthy");
-  if (typeof payload === "string") {
+  t.ok(payloadDecoded, "JWS verified payload truthy");
+  if (typeof payloadDecoded === "string") {
     t.fail(`JWS Verification result: ${payload}`);
   } else {
-    t.ok(payload.consortiumDatabase, "JWS payload.consortiumDatabase truthy");
+    t.ok(protectedHeader, "Protected Header OK");
+    t.ok(
+      payloadDecoded.consortiumDatabase,
+      "JWS payloadDecoded.consortiumDatabase truthy",
+    );
   }
 
   {

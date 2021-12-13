@@ -223,7 +223,7 @@ export class CarbonAccountingApp {
       config = this.options.apiServerOptions;
     } else {
       const configService = new ConfigService();
-      const convictConfig = configService.getOrCreate();
+      const convictConfig = await configService.getOrCreate();
       config = convictConfig.getProperties();
       config.plugins = [];
       config.configFile = "";

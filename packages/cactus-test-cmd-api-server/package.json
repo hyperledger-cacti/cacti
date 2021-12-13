@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-cmd-api-server",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-test-cmd-api-server.node.umd.min.js",
@@ -60,15 +60,15 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "1.0.0-rc.2",
-    "@hyperledger/cactus-common": "1.0.0-rc.2",
-    "@hyperledger/cactus-core": "1.0.0-rc.2",
-    "@hyperledger/cactus-core-api": "1.0.0-rc.2",
-    "@hyperledger/cactus-plugin-keychain-vault": "1.0.0-rc.2",
+    "@hyperledger/cactus-cmd-api-server": "1.0.0-rc.3",
+    "@hyperledger/cactus-common": "1.0.0-rc.3",
+    "@hyperledger/cactus-core": "1.0.0-rc.3",
+    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
+    "@hyperledger/cactus-plugin-keychain-vault": "1.0.0-rc.3",
     "express-jwt-authz": "2.4.1",
-    "jose": "1.28.1"
+    "jose": "4.1.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "1.0.0-rc.2"
+    "@hyperledger/cactus-test-tooling": "1.0.0-rc.3"
   }
 }

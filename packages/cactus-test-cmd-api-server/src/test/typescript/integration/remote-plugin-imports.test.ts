@@ -67,7 +67,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   const apiClient = new DefaultApi(configuration);
 
   const configService = new ConfigService();
-  const apiServerOptions = configService.newExampleConfig();
+  const apiServerOptions = await configService.newExampleConfig();
   apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
   apiServerOptions.configFile = "";
   apiServerOptions.apiCorsDomainCsv = "*";
@@ -76,7 +76,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   apiServerOptions.grpcPort = 0;
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [];
-  const config = configService.newExampleConfigConvict(apiServerOptions);
+  const config = await configService.newExampleConfigConvict(apiServerOptions);
 
   const factory = new PluginFactoryKeychain({
     pluginImportType: PluginImportType.Remote,

@@ -153,3 +153,6 @@ export { isRunningInGithubAction } from "./github-actions/is-running-in-github-a
 export { pruneDockerAllIfGithubAction } from "./github-actions/prune-docker-all-if-github-action";
 export { IDockerPullProgress } from "./common/i-docker-pull-progress";
 export { IDockerPullProgressDetail } from "./common/i-docker-pull-progress";
+export { envNodeToDocker } from "./common/env-node-to-docker";
+export { envMapToDocker } from "./common/env-map-to-docker";
+export { envNodeToMap } from "./common/env-node-to-map";

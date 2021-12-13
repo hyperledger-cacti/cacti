@@ -27,7 +27,7 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
   const configService = new ConfigService();
   t.ok(configService, "Instantiated ConfigService truthy OK");
 
-  const exampleConfig = configService.newExampleConfig();
+  const exampleConfig = await configService.newExampleConfig();
   t.ok(exampleConfig, "configService.newExampleConfig() truthy OK");
 
   // TODO: Investigate the explanation for this when we have more time, for
@@ -45,12 +45,16 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
   ) as unknown) as IAuthorizationConfig;
   exampleConfig.authorizationProtocol = AuthorizationProtocol.NONE;
 
-  const convictConfig = configService.newExampleConfigConvict(exampleConfig);
+  const convictConfig = await configService.newExampleConfigConvict(
+    exampleConfig,
+  );
   t.ok(convictConfig, "configService.newExampleConfigConvict() truthy OK");
 
-  const env = configService.newExampleConfigEnv(convictConfig.getProperties());
+  const env = await configService.newExampleConfigEnv(
+    convictConfig.getProperties(),
+  );
 
-  const config = configService.getOrCreate({ env });
+  const config = await configService.getOrCreate({ env });
   const apiSrvOpts = config.getProperties();
   const { logLevel } = apiSrvOpts;
 

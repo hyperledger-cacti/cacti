@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-rc.3](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2021-12-07)
+
+
+### Bug Fixes
+
+* endpoints implementation in corda plugin ([21a22b5](https://github.com/hyperledger/cactus/commit/21a22b574fb2e08c8c69106a6b3ecf1cb252c654)), closes [#1346](https://github.com/hyperledger/cactus/issues/1346)
+* openapi validation for corda server endpoints ([21fc5ba](https://github.com/hyperledger/cactus/commit/21fc5ba874e0d1974a7e9524aff5103bb8af4b53))
+
+
+
+
+
 # [1.0.0-rc.2](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2021-11-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-ledger-connector-corda

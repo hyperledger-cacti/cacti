@@ -28,7 +28,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
 
     const configService = new ConfigService();
 
-    const apiServerOptions = configService.newExampleConfig();
+    const apiServerOptions = await configService.newExampleConfig();
     apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
     apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
@@ -54,7 +54,9 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
 
     apiServerOptions.plugins = [plugin];
 
-    const config = configService.newExampleConfigConvict(apiServerOptions);
+    const config = await configService.newExampleConfigConvict(
+      apiServerOptions,
+    );
 
     const apiServer = new ApiServer({
       config: config.getProperties(),
@@ -76,7 +78,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
 
     const configService = new ConfigService();
 
-    const apiServerOptions = configService.newExampleConfig();
+    const apiServerOptions = await configService.newExampleConfig();
     apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
     apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
@@ -121,7 +123,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
     ]);
     t2.equal(out.exitCode, 0, "Plugin installed correctly");
 
-    const config = configService.newExampleConfigConvict(
+    const config = await configService.newExampleConfigConvict(
       apiServerOptions,
       true,
     );
@@ -172,7 +174,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
 
     const configService = new ConfigService();
 
-    const apiServerOptions = configService.newExampleConfig();
+    const apiServerOptions = await configService.newExampleConfig();
     apiServerOptions.pluginManagerOptionsJson = pluginManagerOptionsJson;
     apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
     apiServerOptions.configFile = "";
@@ -196,7 +198,7 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
       },
     ];
 
-    const config = configService.newExampleConfigConvict(
+    const config = await configService.newExampleConfigConvict(
       apiServerOptions,
       true,
     );
