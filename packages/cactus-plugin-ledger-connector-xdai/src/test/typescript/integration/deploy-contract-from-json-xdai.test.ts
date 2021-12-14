@@ -151,14 +151,13 @@ describe(testCase, () => {
     const deployOut = await connector.deployContract({
       keychainId: keychainPlugin.getKeychainId(),
       contractName: HelloWorldContractJson.contractName,
-      contractAbi: HelloWorldContractJson.abi,
+      // contractAbi: HelloWorldContractJson.abi,
       constructorArgs: [],
       web3SigningCredential: {
         ethAccount: whalePubKey,
         secret: whalePrivKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
-      bytecode: HelloWorldContractJson.bytecode,
       gas: 1000000,
     });
     expect(deployOut).toBeTruthy();
@@ -174,7 +173,7 @@ describe(testCase, () => {
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: whalePubKey,
         secret: whalePrivKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -224,7 +223,7 @@ describe(testCase, () => {
       invocationType: EthContractInvocationType.Send,
       methodName: "setName",
       params: [newName],
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -241,7 +240,7 @@ describe(testCase, () => {
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: testEthAccount.address,
           secret: testEthAccount.privateKey,
           type: Web3SigningCredentialType.PrivateKeyHex,
@@ -259,7 +258,7 @@ describe(testCase, () => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -274,7 +273,7 @@ describe(testCase, () => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -289,7 +288,7 @@ describe(testCase, () => {
       methodName: "deposit",
       params: [],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -305,7 +304,7 @@ describe(testCase, () => {
       methodName: "getNameByIndex",
       params: [0],
       gas: 1000000,
-      signingCredential: {
+      web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -317,7 +316,7 @@ describe(testCase, () => {
   test("invoke Web3SigningCredentialType.CACTUSKEYCHAINREF", async () => {
     const newName = `DrCactus${uuidv4()}`;
 
-    const signingCredential: Web3SigningCredentialCactusKeychainRef = {
+    const web3SigningCredential: Web3SigningCredentialCactusKeychainRef = {
       ethAccount: testEthAccount.address,
       keychainEntryKey,
       keychainId: keychainPlugin.getKeychainId(),
@@ -331,7 +330,7 @@ describe(testCase, () => {
       methodName: "setName",
       params: [newName],
       gas: 1000000,
-      signingCredential,
+      web3SigningCredential,
       nonce: 4,
     });
     expect(setNameOut).toBeTruthy();
@@ -344,7 +343,7 @@ describe(testCase, () => {
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        signingCredential,
+        web3SigningCredential,
         nonce: 4,
       });
       fail("It should not reach here");
@@ -359,7 +358,7 @@ describe(testCase, () => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential,
+      web3SigningCredential,
     });
     expect(getNameOut).toEqual(newName);
 
@@ -370,7 +369,7 @@ describe(testCase, () => {
       methodName: "getName",
       params: [],
       gas: 1000000,
-      signingCredential,
+      web3SigningCredential,
     });
     expect(getNameOut2).toBeTruthy();
 
@@ -381,7 +380,7 @@ describe(testCase, () => {
       methodName: "deposit",
       params: [],
       gas: 1000000,
-      signingCredential,
+      web3SigningCredential,
       value: 10,
     });
     expect(response).toBeTruthy();
@@ -393,7 +392,7 @@ describe(testCase, () => {
       methodName: "getNameByIndex",
       params: [1],
       gas: 1000000,
-      signingCredential,
+      web3SigningCredential,
     });
     expect(callOutput).toEqual(newName);
   });

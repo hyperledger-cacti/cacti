@@ -5,12 +5,9 @@ import {
   Web3SigningCredentialType,
   PluginLedgerConnectorXdai,
   DefaultApi as XdaiApi,
-  ReceiptType,
-  DeployContractV1Request,
-  InvokeContractV1Request,
-  RunTransactionV1Request,
+  DeployContractJsonObjectV1Request,
+  InvokeContractJsonObjectV1Request,
 } from "../../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   Containers,
   K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
@@ -63,36 +60,12 @@ test(testCase, async (t: Test) => {
   const whalePubKey = K_DEV_WHALE_ACCOUNT_PUBLIC_KEY;
   const whalePrivKey = K_DEV_WHALE_ACCOUNT_PRIVATE_KEY;
 
-  // create an ethereum account
-  const testEthAccount = await xdaiTestLedger.createEthTestAccount();
-
-  // create a keychain for this account
-  const keychainId = uuidv4();
-  const keychainEntryKey = uuidv4();
-  const keychainEntryValue = testEthAccount.privateKey;
-  const keychainPlugin = new PluginKeychainMemory({
-    instanceId: uuidv4(),
-    keychainId,
-    // pre-provision keychain with mock backend holding the private key of the
-    // test account that we'll reference while sending requests with the
-    // signing credential pointing to this keychain entry.
-    backend: new Map([[keychainEntryKey, keychainEntryValue]]),
-    logLevel,
-  });
-  keychainPlugin.set(
-    HelloWorldContractJson.contractName,
-    JSON.stringify(HelloWorldContractJson),
-  );
-
-  // add keychain plugin to plugin registry
-  const pluginRegistry = new PluginRegistry({ plugins: [keychainPlugin] });
-
   // create the connector
   const connector: PluginLedgerConnectorXdai = new PluginLedgerConnectorXdai({
     instanceId: uuidv4(),
     rpcApiHttpHost,
     logLevel,
-    pluginRegistry,
+    pluginRegistry: new PluginRegistry(),
   });
 
   const expressApp = express();
@@ -119,17 +92,16 @@ test(testCase, async (t: Test) => {
   await connector.getOrCreateWebServices();
   await connector.registerWebServices(expressApp);
 
-  const fDeploy = "deployContractV1";
+  const fDeploy = "deployContractJsonObjectV1";
   const fInvoke = "invokeContractV1";
-  const fRun = "runTransactionV1";
   const cOk = "without bad request error";
   const cWithoutParams = "not sending all required parameters";
   const cInvalidParams = "sending invalid parameters";
 
+  let contractAddress: string;
+
   test(`${testCase} - ${fDeploy} - ${cOk}`, async (t2: Test) => {
     const parameters = {
-      keychainId: keychainPlugin.getKeychainId(),
-      contractName: HelloWorldContractJson.contractName,
       constructorArgs: [],
       web3SigningCredential: {
         ethAccount: whalePubKey,
@@ -137,8 +109,11 @@ test(testCase, async (t: Test) => {
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
       gas: 1000000,
+      contractJSON: HelloWorldContractJson,
     };
-    const res = await apiClient.deployContractV1(parameters);
+    const res = await apiClient.deployContractJsonObjectV1(
+      parameters as DeployContractJsonObjectV1Request,
+    );
     t2.ok(res, "Contract deployed successfully");
     t2.ok(res.data);
     t2.equal(
@@ -147,13 +122,14 @@ test(testCase, async (t: Test) => {
       `Endpoint ${fDeploy}: response.status === 200 OK`,
     );
 
+    contractAddress = res.data.transactionReceipt.contractAddress as string;
+
     t2.end();
   });
 
   test(`${testCase} - ${fDeploy} - ${cWithoutParams}`, async (t2: Test) => {
     try {
       const parameters = {
-        contractName: HelloWorldContractJson.contractName,
         constructorArgs: [],
         web3SigningCredential: {
           ethAccount: whalePubKey,
@@ -162,21 +138,21 @@ test(testCase, async (t: Test) => {
         },
         gas: 1000000,
       };
-      await apiClient.deployContractV1(
-        (parameters as any) as DeployContractV1Request,
+      await apiClient.deployContractJsonObjectV1(
+        (parameters as any) as DeployContractJsonObjectV1Request,
       );
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
-        `Endpoint ${fDeploy} without required keychainId: response.status === 400 OK`,
+        `Endpoint ${fDeploy} without required contractJSON: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
-        fields.includes("keychainId"),
-        "Rejected because keychainId is required",
+        fields.includes("contractJSON"),
+        "Rejected because contractJSON is required",
       );
     }
 
@@ -186,8 +162,6 @@ test(testCase, async (t: Test) => {
   test(`${testCase} - ${fDeploy} - ${cInvalidParams}`, async (t2: Test) => {
     try {
       const parameters = {
-        keychainId: keychainPlugin.getKeychainId(),
-        contractName: HelloWorldContractJson.contractName,
         constructorArgs: [],
         web3SigningCredential: {
           ethAccount: whalePubKey,
@@ -195,10 +169,11 @@ test(testCase, async (t: Test) => {
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
         gas: 1000000,
+        contractJSON: HelloWorldContractJson,
         fake: 4,
       };
-      await apiClient.deployContractV1(
-        (parameters as any) as DeployContractV1Request,
+      await apiClient.deployContractJsonObjectV1(
+        (parameters as any) as DeployContractJsonObjectV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -220,8 +195,7 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fInvoke} - ${cOk}`, async (t2: Test) => {
     const parameters = {
-      contractName: HelloWorldContractJson.contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contractAddress,
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
@@ -231,8 +205,9 @@ test(testCase, async (t: Test) => {
         secret: whalePrivKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
+      contractJSON: HelloWorldContractJson,
     };
-    const res = await apiClient.invokeContractV1(parameters);
+    const res = await apiClient.invokeContractJsonObject(parameters);
     t2.ok(res, "Contract invoked successfully");
     t2.ok(res.data);
     t2.equal(
@@ -247,32 +222,32 @@ test(testCase, async (t: Test) => {
   test(`${testCase} - ${fInvoke} - ${cWithoutParams}`, async (t2: Test) => {
     try {
       const parameters = {
-        keychainId: keychainPlugin.getKeychainId(),
+        contractAddress,
         invocationType: EthContractInvocationType.Call,
         methodName: "sayHello",
         params: [],
         gas: 1000000,
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: whalePubKey,
           secret: whalePrivKey,
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
       };
-      await apiClient.invokeContractV1(
-        (parameters as any) as InvokeContractV1Request,
+      await apiClient.invokeContractJsonObject(
+        (parameters as any) as InvokeContractJsonObjectV1Request,
       );
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
-        `Endpoint ${fInvoke} without required contractName: response.status === 400 OK`,
+        `Endpoint ${fInvoke} without required contractJSON: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
-        fields.includes("contractName"),
-        "Rejected because contractName is required",
+        fields.includes("contractJSON"),
+        "Rejected because contractJSON is required",
       );
     }
 
@@ -282,132 +257,27 @@ test(testCase, async (t: Test) => {
   test(`${testCase} - ${fInvoke} - ${cInvalidParams}`, async (t2: Test) => {
     try {
       const parameters = {
-        contractName: HelloWorldContractJson.contractName,
-        keychainId: keychainPlugin.getKeychainId(),
+        contractAddress,
         invocationType: EthContractInvocationType.Call,
         methodName: "sayHello",
         params: [],
         gas: 1000000,
-        signingCredential: {
+        web3SigningCredential: {
           ethAccount: whalePubKey,
           secret: whalePrivKey,
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
+        contractJSON: HelloWorldContractJson,
         fake: 4,
       };
-      await apiClient.invokeContractV1(
-        (parameters as any) as InvokeContractV1Request,
+      await apiClient.invokeContractJsonObject(
+        (parameters as any) as InvokeContractJsonObjectV1Request,
       );
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
-    }
-
-    t2.end();
-  });
-
-  test(`${testCase} - ${fRun} - ${cOk}`, async (t2: Test) => {
-    const parameters = {
-      web3SigningCredential: {
-        ethAccount: whalePubKey,
-        secret: whalePrivKey,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-      },
-      transactionConfig: {
-        from: whalePubKey,
-        to: testEthAccount.address,
-        value: 10e7,
-        gas: 1000000,
-      },
-      consistencyStrategy: {
-        blockConfirmations: 0,
-        receiptType: ReceiptType.NodeTxPoolAck,
-        timeoutMs: 60000,
-      },
-    };
-    const res = await apiClient.runTransactionV1(parameters);
-    t2.ok(res, "Transaction ran successfully");
-    t2.ok(res.data);
-    t2.equal(res.status, 200, `Endpoint ${fRun}: response.status === 200 OK`);
-
-    t2.end();
-  });
-
-  test(`${testCase} - ${fRun} - ${cWithoutParams}`, async (t2: Test) => {
-    try {
-      const parameters = {
-        web3SigningCredential: {
-          ethAccount: whalePubKey,
-          secret: whalePrivKey,
-          type: Web3SigningCredentialType.PrivateKeyHex,
-        },
-        transactionConfig: {
-          from: whalePubKey,
-          to: testEthAccount.address,
-          value: 10e7,
-          gas: 22000,
-        },
-      };
-      await apiClient.runTransactionV1(
-        (parameters as any) as RunTransactionV1Request,
-      );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fRun} without required consistencyStrategy: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("consistencyStrategy"),
-        "Rejected because consistencyStrategy is required",
-      );
-    }
-
-    t2.end();
-  });
-
-  test(`${testCase} - ${fRun} - ${cInvalidParams}`, async (t2: Test) => {
-    try {
-      const parameters = {
-        web3SigningCredential: {
-          ethAccount: whalePubKey,
-          secret: whalePrivKey,
-          type: Web3SigningCredentialType.PrivateKeyHex,
-        },
-        transactionConfig: {
-          from: whalePubKey,
-          to: testEthAccount.address,
-          value: 10e7,
-          gas: 22000,
-        },
-        consistencyStrategy: {
-          blockConfirmations: 0,
-          receiptType: ReceiptType.NodeTxPoolAck,
-          timeoutMs: 60000,
-        },
-        fake: 4,
-      };
-      await apiClient.runTransactionV1(
-        (parameters as any) as RunTransactionV1Request,
-      );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
         param.path.replace(".body.", ""),
