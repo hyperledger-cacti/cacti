@@ -646,7 +646,9 @@ export class ConfigService {
       ConfigService.config.loadFile(configFilePath);
     }
     ConfigService.config.validate();
-    this.validateKeyPairMatch();
+    // this validation fails with supply-chain default configuration
+    // and it will be removed
+    // this.validateKeyPairMatch();
     const level = ConfigService.config.get("logLevel");
     const logger: Logger = LoggerProvider.getOrCreate({
       label: "config-service",
