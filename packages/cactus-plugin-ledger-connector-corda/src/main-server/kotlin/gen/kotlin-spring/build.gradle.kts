@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val corda_release_group = "net.corda"
 val corda_core_release_group =  "net.corda"
-val corda_release_version = "4.5"
-val corda_core_release_version = "4.5"
+val corda_release_version = "4.6"
+val corda_core_release_version = "4.6"
 val corda_platform_version = 5
 
 tasks.named<Test>("test") {
