@@ -1,5 +1,5 @@
 DOCKER_IMAGE_NAME ?= weaver-corda-driver
-DOCKER_TAG ?= 1.2.4-alpha.6
+DOCKER_TAG ?= 1.2.4-alpha.7
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/corda-driver
 COMPOSE_ARG ?=

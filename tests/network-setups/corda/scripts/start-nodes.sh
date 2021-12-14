@@ -9,7 +9,7 @@ simpleAppVersion="0.4"
 houseTokenAppVersion="1.0"
 tokenVersion="1.2"
 
-weaverVersion="1.2.4-alpha.6"
+weaverVersion="1.2.4-alpha.7"
 
 parties="Notary PartyA PartyB PartyC"
 
