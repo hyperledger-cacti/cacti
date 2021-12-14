@@ -455,8 +455,8 @@
                 "type": "object",
                 "required": [
                     "success",
-                    "transactionId",
-                    "callOutput"
+                    "callOutput",
+                    "flowId"                    
                 ],
                 "properties": {
                     "success": {
@@ -464,7 +464,8 @@
                         "nullable": false
                     },
                     "callOutput": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Data returned from the JVM when no transaction is running"
                     },
                     "transactionId": {
                         "type": "string",
@@ -482,6 +483,10 @@
                             "maxItems": 10e6
                         },
                         "default": []
+                    },
+                    "flowId": {
+                        "type": "string",
+                        "description": "The id for the flow handle"
                     }
                 }
             },
