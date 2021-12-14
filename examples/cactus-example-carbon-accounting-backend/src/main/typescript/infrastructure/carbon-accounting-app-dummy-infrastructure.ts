@@ -374,14 +374,12 @@ export class CarbonAccountingAppDummyInfrastructure {
     this._xdaiAccount = await this.xdai.createEthTestAccount(10000000);
 
     {
-      const { contractName, bytecode, abi: contractAbi } = DaoTokenContract;
+      const { contractName } = DaoTokenContract;
       this.log.info(`Deploying ${contractName}...`);
 
       const res = await besuPlugin.deployContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
-        bytecode,
-        contractAbi,
         constructorArgs: [this.xdaiAccount.get().address],
         gas: 8000000,
         web3SigningCredential: {
@@ -405,7 +403,7 @@ export class CarbonAccountingAppDummyInfrastructure {
     }
 
     {
-      const { contractName, bytecode, abi: contractAbi } = GovernorContract;
+      const { contractName } = GovernorContract;
       this.log.info(`Deploying ${contractName}...`);
 
       const timelockAccount = await this.xdai.createEthTestAccount(2000000);
@@ -414,8 +412,6 @@ export class CarbonAccountingAppDummyInfrastructure {
       const res = await besuPlugin.deployContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
-        bytecode,
-        contractAbi,
         // address timelock_, address dclm8_, address guardian_
         constructorArgs: [
           timelockAccount.address,
@@ -444,7 +440,7 @@ export class CarbonAccountingAppDummyInfrastructure {
     }
 
     {
-      const { contractName, bytecode, abi: contractAbi } = TimelockContract;
+      const { contractName } = TimelockContract;
       this.log.info(`Deploying ${contractName}...`);
 
       const adminAccount = await this.xdai.createEthTestAccount(2000000);
@@ -452,8 +448,6 @@ export class CarbonAccountingAppDummyInfrastructure {
       const res = await besuPlugin.deployContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
-        bytecode,
-        contractAbi,
         constructorArgs: [adminAccount.address, delay],
         gas: 8000000,
         web3SigningCredential: {
@@ -477,19 +471,13 @@ export class CarbonAccountingAppDummyInfrastructure {
     }
 
     {
-      const {
-        contractName,
-        bytecode,
-        abi: contractAbi,
-      } = NetEmissionsTokenNetworkContract;
+      const { contractName } = NetEmissionsTokenNetworkContract;
 
       this.log.info(`Deploying ${contractName}...`);
       const adminAccount = await this.xdai.createEthTestAccount(2000000);
       const res = await besuPlugin.deployContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
-        bytecode,
-        contractAbi,
         constructorArgs: [adminAccount.address],
         gas: 8000000,
         web3SigningCredential: {
