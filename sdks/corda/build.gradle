@@ -7,13 +7,13 @@ buildscript {
     ext.grpc_kotlin_version = "0.1.3" // CURRENT_GRPC_KOTLIN_VERSION
     ext.corda_release_group = "net.corda"
     ext.corda_core_release_group = "net.corda"
-    ext.corda_version = "4.8"
-    ext.corda_core_version = "4.8"
+    ext.corda_version = "4.8.4"
+    ext.corda_core_version = "4.8.4"
     ext.arrow_version = "0.10.4"
     ext.corda_gradle_plugins_version = "5.0.12"
-    ext.log4j_version = "2.11.2"
+    ext.log4j_version = "2.16.0"
     ext.slf4j_version = "1.7.25"
-    ext.weaver_version = "1.2.4-alpha.6"
+    ext.weaver_version = "1.2.4-alpha.7"
     
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
