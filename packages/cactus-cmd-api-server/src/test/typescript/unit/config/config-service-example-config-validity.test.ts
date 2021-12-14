@@ -19,7 +19,7 @@ test("Generates valid example config for the API server", async (t: Test) => {
   const configService = new ConfigService();
   t.ok(configService, "Instantiated ConfigService truthy OK");
 
-  const exampleConfig = configService.newExampleConfig();
+  const exampleConfig = await configService.newExampleConfig();
   t.ok(exampleConfig, "configService.newExampleConfig() truthy OK");
 
   exampleConfig.pluginManagerOptionsJson = pluginManagerOptionsJson;
@@ -34,7 +34,9 @@ test("Generates valid example config for the API server", async (t: Test) => {
   exampleConfig.apiPort = 0;
   exampleConfig.cockpitPort = 0;
 
-  const convictConfig = configService.newExampleConfigConvict(exampleConfig);
+  const convictConfig = await configService.newExampleConfigConvict(
+    exampleConfig,
+  );
   t.ok(convictConfig, "configService.newExampleConfigConvict() truthy OK");
 
   const config = convictConfig.getProperties();

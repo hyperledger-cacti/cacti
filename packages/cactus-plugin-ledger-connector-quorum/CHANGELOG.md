@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-rc.3](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2021-12-07)
+
+
+### Bug Fixes
+
+* **connector-quorum:** transaction with different credentials [#1098](https://github.com/hyperledger/cactus/issues/1098) ([af6c240](https://github.com/hyperledger/cactus/commit/af6c24045f3696b3a64d64182afbd610c6409b17))
+
+
+
+
+
 # [1.0.0-rc.2](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2021-11-01)
 
 

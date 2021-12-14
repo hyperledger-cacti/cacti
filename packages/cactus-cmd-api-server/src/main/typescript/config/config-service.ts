@@ -3,8 +3,16 @@ import { existsSync, readFileSync } from "fs";
 import convict, { Schema, Config, SchemaObj } from "convict";
 import { ipaddress } from "convict-format-with-validator";
 import { v4 as uuidV4 } from "uuid";
-import { JWK, JWS } from "jose";
+import {
+  generateKeyPair,
+  exportPKCS8,
+  exportSPKI,
+  importPKCS8,
+  GeneralSign,
+  generalVerify,
+} from "jose";
 import type { Options as ExpressJwtOptions } from "express-jwt";
+import jsonStableStringify from "json-stable-stringify";
 import {
   LoggerProvider,
   Logger,
@@ -452,10 +460,11 @@ export class ConfigService {
    * }
    * ```
    */
-  public newExampleConfigEnv(
+  public async newExampleConfigEnv(
     cactusApiServerOptions?: ICactusApiServerOptions,
-  ): { [key: string]: string } {
-    cactusApiServerOptions = cactusApiServerOptions || this.newExampleConfig();
+  ): Promise<{ [key: string]: string }> {
+    cactusApiServerOptions =
+      cactusApiServerOptions || (await this.newExampleConfig());
     const configSchema: any = ConfigService.getConfigSchema();
     return Object.entries(cactusApiServerOptions).reduce(
       (acc: any, [key, value]) => {
@@ -467,17 +476,18 @@ export class ConfigService {
     );
   }
 
-  public newExampleConfigConvict(
+  public async newExampleConfigConvict(
     cactusApiServerOptions?: ICactusApiServerOptions,
     overrides?: boolean,
-  ): Config<ICactusApiServerOptions> {
-    cactusApiServerOptions = cactusApiServerOptions || this.newExampleConfig();
-    const env = this.newExampleConfigEnv(cactusApiServerOptions);
+  ): Promise<Config<ICactusApiServerOptions>> {
+    cactusApiServerOptions =
+      cactusApiServerOptions || (await this.newExampleConfig());
+    const env = await this.newExampleConfigEnv(cactusApiServerOptions);
     const conf = overrides ? this.create({ env }) : this.getOrCreate({ env });
     return conf;
   }
 
-  public newExampleConfig(): ICactusApiServerOptions {
+  public async newExampleConfig(): Promise<ICactusApiServerOptions> {
     const schema = ConfigService.getConfigSchema();
 
     const apiTlsEnabled: boolean = (schema.apiTlsEnabled as SchemaObj).default;
@@ -489,8 +499,9 @@ export class ConfigService {
     const grpcMtlsEnabled = (schema.grpcMtlsEnabled as SchemaObj).default;
     const enableShutdownHook = (schema.enableShutdownHook as SchemaObj).default;
 
-    const keyPair = JWK.generateSync("EC", "secp256k1", { use: "sig" }, true);
-    const keyPairPem = keyPair.toPEM(true);
+    const keyPair = await generateKeyPair("ES256K");
+    const keyPairPem = await exportPKCS8(keyPair.privateKey);
+    const publicKeyPem = await exportSPKI(keyPair.publicKey);
     const memberId1 = "Cactus_Example_Consortium_Member_1";
     const nodeId1 = "Cactus_Example_Consortium_Node_1";
     const consortiumDatabase: ConsortiumDatabase = {
@@ -502,7 +513,7 @@ export class ConfigService {
           memberId: memberId1,
           pluginInstanceIds: [],
           nodeApiHost: apiBaseUrl,
-          publicKeyPem: keyPair.toPEM(false),
+          publicKeyPem: publicKeyPem,
         },
       ],
       consortiumMember: [
@@ -610,10 +621,10 @@ export class ConfigService {
     };
   }
 
-  getOrCreate(options?: {
+  async getOrCreate(options?: {
     env?: NodeJS.ProcessEnv;
     args?: string[];
-  }): Config<ICactusApiServerOptions> {
+  }): Promise<Config<ICactusApiServerOptions>> {
     if (!ConfigService.config) {
       this.create(options);
     }
@@ -649,15 +660,20 @@ export class ConfigService {
    *
    * @throws If a dummy sign+verification operation fails for any reason.
    */
-  validateKeyPairMatch(): void {
+  async validateKeyPairMatch(): Promise<void> {
     const fnTag = "ConfigService#validateKeyPairMatch()";
     // FIXME most of this lowever level crypto code should be in a commons package that's universal
     const keyPairPem = ConfigService.config.get("keyPairPem");
-    const keyPair = JWK.asKey(keyPairPem);
+    const keyPair = await importPKCS8(keyPairPem, "ES256K");
 
-    const jws = JWS.sign({ hello: "world" }, keyPair);
+    const payloadJson = jsonStableStringify({ hello: "world" });
+    const encoder = new TextEncoder();
+    const sign = new GeneralSign(encoder.encode(payloadJson));
+    sign.addSignature(keyPair).setProtectedHeader({ alg: "ES256K" });
+    const jws = await sign.sign();
+
     try {
-      JWS.verify(jws, keyPair);
+      await generalVerify(jws, keyPair);
     } catch (ex) {
       throw new Error(`${fnTag} Invalid key pair PEM: ${ex && ex.stack}`);
     }

@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-cmd-socket-server",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "private": true,
   "scripts": {
     "build": "npm run build-ts && npm run copy-static-assets",
@@ -22,8 +22,8 @@
     "ethereumjs-common": "^1.5.1",
     "ethereumjs-tx": "^2.1.2",
     "express": "~4.16.1",
-    "fabric-ca-client": "~1.4.0",
-    "fabric-network": "~1.4.0",
+    "fabric-ca-client": "2.2.10",
+    "fabric-network": "2.2.10",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "jsonwebtoken": "^8.5.1",
@@ -37,10 +37,10 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",
-    "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.1",
     "@types/socket.io": "^2.0.4",
     "@types/socket.io-client": "^1.4.36",
+    "@typescript-eslint/eslint-plugin": "^4.31.1",
+    "@typescript-eslint/parser": "^4.31.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",

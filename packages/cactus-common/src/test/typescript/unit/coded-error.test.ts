@@ -2,7 +2,7 @@ import { CodedError } from "../../../main/typescript/coded-error";
 import "jest-extended";
 
 test("Error test", async () => {
-  const oneMessage = "This is a error...";
+  const oneMessage = "This is an error...";
   const oneCode = 1;
 
   const err = (message: string, code: string): boolean => {

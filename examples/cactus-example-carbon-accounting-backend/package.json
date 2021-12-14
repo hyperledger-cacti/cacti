@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-carbon-accounting-backend",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "description": "An example application showing how to use Cactus when implementing a Carbon Accounting Application where two or more blockchains are sharing data with each other to achieve a certain business outcome beneficial to multiple parties (business organizations).",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-example-carbon-accounting-backend.node.umd.min.js",
@@ -69,20 +69,20 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-api-client": "1.0.0-rc.2",
-    "@hyperledger/cactus-cmd-api-server": "1.0.0-rc.2",
-    "@hyperledger/cactus-common": "1.0.0-rc.2",
-    "@hyperledger/cactus-core": "1.0.0-rc.2",
-    "@hyperledger/cactus-core-api": "1.0.0-rc.2",
-    "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin": "1.0.0-rc.2",
-    "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.2",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "1.0.0-rc.2",
-    "@hyperledger/cactus-plugin-ledger-connector-xdai": "1.0.0-rc.2",
-    "@hyperledger/cactus-test-tooling": "1.0.0-rc.2",
+    "@hyperledger/cactus-api-client": "1.0.0-rc.3",
+    "@hyperledger/cactus-cmd-api-server": "1.0.0-rc.3",
+    "@hyperledger/cactus-common": "1.0.0-rc.3",
+    "@hyperledger/cactus-core": "1.0.0-rc.3",
+    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
+    "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin": "1.0.0-rc.3",
+    "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.3",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "1.0.0-rc.3",
+    "@hyperledger/cactus-plugin-ledger-connector-xdai": "1.0.0-rc.3",
+    "@hyperledger/cactus-test-tooling": "1.0.0-rc.3",
     "@openzeppelin/contracts": "4.3.3",
     "@openzeppelin/contracts-upgradeable": "4.3.3",
     "async-exit-hook": "2.0.1",
-    "fabric-network": "2.2.8",
+    "fabric-network": "2.2.10",
     "fs-extra": "10.0.0",
     "openapi-types": "9.1.0",
     "typescript-optional": "2.0.1",
@@ -97,6 +97,6 @@
     "@types/uuid": "8.3.1",
     "hardhat": "2.6.0",
     "http-status-codes": "2.1.4",
-    "jose": "1.28.1"
+    "jose": "4.1.0"
   }
 }
