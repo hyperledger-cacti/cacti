@@ -135,7 +135,7 @@ task deployNodes(type: net.corda.plugins.Cordform) {
 }
 
 task prepareDockerNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
-    dockerImage = "corda/corda-zulu-java1.8-4.8"
+    dockerImage = "corda/corda-zulu-java1.8-$corda_release_version"
     nodeDefaults {
         projectCordapp {
             deploy = false
