@@ -1,7 +1,7 @@
-import test, { Test } from "tape";
 import { Objects } from "../../../../main/typescript/public-api";
+import "jest-extended";
 
-test("tests for get the properties of object", async (assert: Test) => {
+test("tests for get the properties of object", async () => {
   const student = {
     name: "Jack",
     last_name: "Santos",
@@ -21,16 +21,9 @@ test("tests for get the properties of object", async (assert: Test) => {
     "course",
   ];
 
-  assert.ok(Array.isArray(fieldNames), "expect an array of strings returned");
-  assert.ok(
-    fieldNames.length === arrayResultExpected.length,
-    "Arrays have same length",
-  );
-  assert.ok(
-    Object.prototype.hasOwnProperty.call(student, "course"),
-    '"course" property present in object',
-  );
-  assert.ok(fieldNames.includes("course"), '"course" element present in array');
-  assert.deepEqual(fieldNames, arrayResultExpected);
-  assert.end();
+  expect(Array.isArray(fieldNames)).toBeTruthy();
+  expect(fieldNames.length).toBe(arrayResultExpected.length);
+  expect(Object.prototype.hasOwnProperty.call(student, "course")).toBeTruthy();
+  expect(fieldNames.includes("course")).toBeTruthy();
+  expect(fieldNames).toStrictEqual(arrayResultExpected);
 });
