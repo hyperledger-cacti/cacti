@@ -16,7 +16,7 @@ const command: GluegunCommand = {
 			commandHelp(
 				print,
 				toolbox,
-				`besu-cli asset get-balance -network=network1 --account=1`,
+				`besu-cli asset get-balance --network=network1 --account=1`,
 				'besu-cli asset get-balance --network=<network1|network2> --account=<1|2>',
 				[
 					{

@@ -28,14 +28,34 @@ $ npm publish
 ```
 
 # Commands
-- asset init
-- asset get-balance
-- asset lock
-- asset claim
-- asset unlock
-- asset is-locked
-- asset exchange
-
+Here are the list of commands supported by the besu-cli. We also provide a sample for each command.
+- asset issue: Issuance of tokens
+```
+besu-cli asset issue --network=network1 --account=1 --amount=10
+```
+- asset get-balance: Get account balance of tokens
+```
+besu-cli asset get-balance --network=network1 --account=1
+```
+- asset lock: Lock assets (fungible assets for now)
+```
+besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=5 --timeout=1000
+```
+A random preimage and its corresponding hash will be generated and the preimage will be output, along with the lockContractID, to be used during Claim.
+- asset claim: Claim assets (fungible assets for now)
+```
+besu-cli asset claim --network=network1 --lock_contract_id=lockContractID --recipient_account=2 --preimage_base64=preimage
+```
+- asset unlock: Unlock and reclaim assets after timeout (fungible assets for now)
+```
+besu-cli asset unlock --network=network1 --lock_contract_id=lockContractID --sender_account=1
+```
+- asset is-locked: Check if a contract exists, which also checks if an asset is locked
+```
+besu-cli asset is-locked --network=network1 --lock_contract_id=lockContractID
+```
+- asset exchange: A complete cross-network exchange of assets (fungible assets for now)
+besu-cli asset exchange --network1=network1 --network2=network2 --amount=5 --timeout=20
 
 # License
 

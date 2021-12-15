@@ -17,7 +17,7 @@ const command: GluegunCommand = {
 			commandHelp(
 				print,
 				toolbox,
-				`besu-cli asset exchange --local-network=network1 mychannel interop  Create '["test", "teststate"]'`,
+				`besu-cli asset exchange --network1=network1 --network2=network2 --amount=5 --timeout=20`,
 				'besu-cli asset exchange --local-network=<network1|network2> --user=<user-id> <channel-name> <contract-name> <function-name> <args>',
 				[
 					{

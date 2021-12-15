@@ -16,8 +16,8 @@ const command: GluegunCommand = {
 			commandHelp(
 				print,
 				toolbox,
-				`besu-cli asset claim -network=network1 --lock_contract_id=lockContractID --recipient_account=2 --preimage=preimage`,
-				'besu-cli asset claim --network=<network1|network2> --lock_contract_id=<lockContractID> --recipient_account=<2|1> --preimage=<preimage>',
+				`besu-cli asset claim --network=network1 --lock_contract_id=lockContractID --recipient_account=2 --preimage_base64=preimage`,
+				'besu-cli asset claim --network=<network1|network2> --lock_contract_id=<lockContractID> --recipient_account=<2|1> --preimage_base64=<preimage>',
 				[
 					{
 						name: '--network',
