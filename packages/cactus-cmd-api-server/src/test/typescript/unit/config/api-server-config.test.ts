@@ -12,6 +12,8 @@ describe("api-server shutdown-hook configuration tests", () => {
   it("enables the shutdown hook based on schema-default", async () => {
     const expectedResult = true;
     const apiServerOptions = await configService.newExampleConfig();
+    apiServerOptions.configFile = "";
+
     const config = await configService.newExampleConfigConvict(
       apiServerOptions,
     );
@@ -36,6 +38,7 @@ describe("api-server shutdown-hook configuration tests", () => {
 
     // disable shutdown hook
     apiServerOptions.enableShutdownHook = false;
+    apiServerOptions.configFile = "";
 
     const config = await configService.newExampleConfigConvict(
       apiServerOptions,
@@ -62,6 +65,7 @@ describe("api-server shutdown-hook configuration tests", () => {
 
     // disable shutdown hook
     apiServerOptions.enableShutdownHook = true;
+    apiServerOptions.configFile = "";
 
     const config = await configService.newExampleConfigConvict(
       apiServerOptions,
