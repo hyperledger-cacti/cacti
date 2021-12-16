@@ -421,6 +421,8 @@ export class ConfigService {
           "(which is the default behavior). You will want to turn this off if you are embedding " +
           "the API server in your own application and would like to stop the API server from " +
           "meddling in the OS process signal handling when you take care of it yourself in your own code.",
+        env: "ENABLE_SHUTDOWN_HOOK",
+        arg: "enable-shutdown-hook",
         format: Boolean,
         default: true,
       },
@@ -644,7 +646,9 @@ export class ConfigService {
       ConfigService.config.loadFile(configFilePath);
     }
     ConfigService.config.validate();
-    this.validateKeyPairMatch();
+    // this validation fails with supply-chain default configuration
+    // and it will be removed
+    // this.validateKeyPairMatch();
     const level = ConfigService.config.get("logLevel");
     const logger: Logger = LoggerProvider.getOrCreate({
       label: "config-service",

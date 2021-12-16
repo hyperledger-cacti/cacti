@@ -76,7 +76,7 @@
     "secp256k1": "4.0.2",
     "socket.io": "4.1.3",
     "typescript-optional": "2.0.1",
-    "web3": "1.2.7",
-    "web3-utils": "1.2.7"
+    "web3": "1.5.2",
+    "web3-utils": "1.5.2"
   }
 }
