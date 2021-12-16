@@ -16,6 +16,11 @@ const logLevel: LogLevelDesc = "TRACE";
 const testCase = "can import plugins at runtime (CLI)";
 describe(testCase, () => {
   let apiServer: ApiServer;
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test(testCase, async () => {
     const pluginsPath = path.join(
       __dirname, // start at the current file's path
@@ -67,5 +72,7 @@ describe(testCase, () => {
     ];
     await expect(apiServer.start()).not.toReject();
   });
-  afterAll(async () => await apiServer.shutdown());
+  afterAll(async () => {
+    await apiServer.shutdown();
+  });
 });
