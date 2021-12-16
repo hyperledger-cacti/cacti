@@ -1,7 +1,7 @@
-import test, { Test } from "tape";
 import { Strings } from "../../../../main/typescript/strings";
+import "jest-extended";
 
-test("Strings#isString()", async (assert: Test) => {
+test("Strings#isString()", async () => {
   const thisIsAString = "This is a original string for a test";
   const thisIsANumber = 10;
   const thisIsABool = true;
@@ -10,9 +10,7 @@ test("Strings#isString()", async (assert: Test) => {
   const testForNotString1 = Strings.isString(thisIsANumber);
   const testForNotString2 = Strings.isString(thisIsABool);
 
-  assert.true(testForString);
-  assert.false(testForNotString1);
-  assert.false(testForNotString2);
-
-  assert.end();
+  expect(testForString).toBe(true);
+  expect(testForNotString1).not.toBe(true);
+  expect(testForNotString2).not.toBe(true);
 });
