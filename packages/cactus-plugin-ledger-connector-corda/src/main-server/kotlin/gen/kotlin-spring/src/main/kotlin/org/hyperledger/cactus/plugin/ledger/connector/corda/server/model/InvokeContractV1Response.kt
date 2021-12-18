@@ -14,7 +14,8 @@ import javax.validation.Valid
 /**
  * 
  * @param success 
- * @param callOutput 
+ * @param callOutput Data returned from the JVM when no transaction is running
+ * @param flowId The id for the flow handle
  * @param transactionId The net.corda.core.flows.StateMachineRunId value returned by the flow execution.
  * @param progress An array of strings representing the aggregated stream of progress updates provided by a *tracked* flow invocation. If the flow invocation was not tracked, this array is still returned, but as empty.
  */
@@ -25,8 +26,10 @@ data class InvokeContractV1Response(
     @field:Valid
     @field:JsonProperty("callOutput", required = true) val callOutput: kotlin.Any,
 
+    @field:JsonProperty("flowId", required = true) val flowId: kotlin.String,
+
     @get:Size(min=1,max=1024)
-    @field:JsonProperty("transactionId", required = true) val transactionId: kotlin.String,
+    @field:JsonProperty("transactionId") val transactionId: kotlin.String? = null,
 
     @field:JsonProperty("progress") val progress: kotlin.collections.List<kotlin.String>? = null
 ) {

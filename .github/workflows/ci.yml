@@ -178,6 +178,18 @@ jobs:
     - name: Print Disk Usage Reports
       run: df ; echo "" ; docker system df
 
+    - name: ghcr.io/hyperledger/cactus-corda-all-in-one-obligation
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
+    - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
+
+    - name: Print Disk Usage Reports
+      run: df ; echo "" ; docker system df
+
     # Skipping this one for now because it keeps making the CI fail most likely due to DockerHub rate limits.
     # TODO: Recommend the Fabric maintainers that they publish their images to ghcr.io as well or ask how can the
     # image registry be overridden in Fabric samples.

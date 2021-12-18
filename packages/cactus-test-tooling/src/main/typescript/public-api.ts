@@ -130,7 +130,7 @@ export {
 } from "./go-ipfs/go-ipfs-test-container";
 
 export {
-  SAMPLE_CORDAPP_ROOT_DIRS,
+  SAMPLE_CORDAPP_DATA,
   SampleCordappEnum,
 } from "./corda/sample-cordapp-enum";
 
