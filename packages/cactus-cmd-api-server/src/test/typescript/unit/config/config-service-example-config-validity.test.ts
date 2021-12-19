@@ -1,50 +1,61 @@
 import path from "path";
-import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
+import "jest-extended";
+
 import { LoggerProvider } from "@hyperledger/cactus-common";
 
-import { IAuthorizationConfig } from "../../../../main/typescript/public-api";
+import {
+  IAuthorizationConfig,
+  ICactusApiServerOptions,
+} from "../../../../main/typescript/public-api";
 import { ApiServer } from "../../../../main/typescript/public-api";
 import { ConfigService } from "../../../../main/typescript/public-api";
 
-test("Generates valid example config for the API server", async (t: Test) => {
-  const pluginsPath = path.join(
-    __dirname,
-    "../../../../../../", // walk back up to the project root
-    ".tmp/test/test-cmd-api-server/config-service-example-config-validity_test/", // the dir path from the root
-    uuidv4(), // then a random directory to ensure proper isolation
-  );
-  const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
+const testcase = "";
 
+describe(testcase, () => {
   const configService = new ConfigService();
-  t.ok(configService, "Instantiated ConfigService truthy OK");
+  let apiServer: ApiServer,
+    exampleConfig: ICactusApiServerOptions,
+    convictConfig: any,
+    config: any;
 
-  const exampleConfig = await configService.newExampleConfig();
-  t.ok(exampleConfig, "configService.newExampleConfig() truthy OK");
+  beforeAll(async () => {
+    exampleConfig = await configService.newExampleConfig();
+    const pluginsPath = path.join(
+      __dirname,
+      "../../../../../../", // walk back up to the project root
+      ".tmp/test/test-cmd-api-server/config-service-example-config-validity_test/", // the dir path from the root
+      uuidv4(), // then a random directory to ensure proper isolation
+    );
+    const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
-  exampleConfig.pluginManagerOptionsJson = pluginManagerOptionsJson;
+    exampleConfig.pluginManagerOptionsJson = pluginManagerOptionsJson;
 
-  // FIXME - this hack should not be necessary, we need to re-think how we
-  // do configuration parsing. The convict library may not be the path forward.
-  exampleConfig.authorizationConfigJson = (JSON.stringify(
-    exampleConfig.authorizationConfigJson,
-  ) as unknown) as IAuthorizationConfig;
+    // FIXME - this hack should not be necessary, we need to re-think how we
+    // do configuration parsing. The convict library may not be the path forward.
+    exampleConfig.authorizationConfigJson = (JSON.stringify(
+      exampleConfig.authorizationConfigJson,
+    ) as unknown) as IAuthorizationConfig;
 
-  exampleConfig.configFile = "";
-  exampleConfig.apiPort = 0;
-  exampleConfig.cockpitPort = 0;
+    exampleConfig.configFile = "";
+    exampleConfig.apiPort = 0;
+    exampleConfig.cockpitPort = 0;
+    convictConfig = await configService.newExampleConfigConvict(exampleConfig);
+    config = convictConfig.getProperties();
+    apiServer = new ApiServer({ config });
+  });
 
-  const convictConfig = await configService.newExampleConfigConvict(
-    exampleConfig,
-  );
-  t.ok(convictConfig, "configService.newExampleConfigConvict() truthy OK");
+  afterAll(() => apiServer.shutdown());
 
-  const config = convictConfig.getProperties();
-  t.ok(config, "convictConfig.getProperties() truthy OK");
+  test("Generates valid example config for the API server", async () => {
+    expect(configService).toBeTruthy();
+    expect(exampleConfig).toBeTruthy();
+    expect(convictConfig).toBeTruthy();
 
-  LoggerProvider.setLogLevel(config.logLevel);
-  const apiServer = new ApiServer({ config });
-  await apiServer.start();
-  test.onFinish(() => apiServer.shutdown());
-  t.end();
+    expect(config).toBeTruthy();
+
+    LoggerProvider.setLogLevel(config.logLevel);
+    await apiServer.start();
+  });
 });
