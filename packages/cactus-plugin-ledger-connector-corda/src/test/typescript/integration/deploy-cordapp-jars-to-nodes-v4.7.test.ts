@@ -106,7 +106,7 @@ test.skip("Tests are passing on the JVM side", async (t: Test) => {
   const connector = new CordaConnectorContainer({
     logLevel,
     imageName: "ghcr.io/hyperledger/cactus-connector-corda-server",
-    imageVersion: "2021-11-11",
+    imageVersion: "2021-11-23--feat-1493",
     envVars: [envVarSpringAppJson],
   });
   t.ok(CordaConnectorContainer, "CordaConnectorContainer instantiated OK");

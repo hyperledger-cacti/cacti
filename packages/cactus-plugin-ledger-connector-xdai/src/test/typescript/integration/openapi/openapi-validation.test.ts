@@ -119,9 +119,9 @@ test(testCase, async (t: Test) => {
   await connector.getOrCreateWebServices();
   await connector.registerWebServices(expressApp);
 
-  const fDeploy = "apiV1QuorumDeployContractSolidityBytecode";
-  const fInvoke = "apiV1QuorumInvokeContract";
-  const fRun = "apiV1QuorumRunTransaction";
+  const fDeploy = "deployContractV1";
+  const fInvoke = "invokeContractV1";
+  const fRun = "runTransactionV1";
   const cOk = "without bad request error";
   const cWithoutParams = "not sending all required parameters";
   const cInvalidParams = "sending invalid parameters";
@@ -130,14 +130,12 @@ test(testCase, async (t: Test) => {
     const parameters = {
       keychainId: keychainPlugin.getKeychainId(),
       contractName: HelloWorldContractJson.contractName,
-      contractAbi: HelloWorldContractJson.abi,
       constructorArgs: [],
       web3SigningCredential: {
         ethAccount: whalePubKey,
         secret: whalePrivKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
-      bytecode: HelloWorldContractJson.bytecode,
       gas: 1000000,
     };
     const res = await apiClient.deployContractV1(parameters);
@@ -156,14 +154,12 @@ test(testCase, async (t: Test) => {
     try {
       const parameters = {
         contractName: HelloWorldContractJson.contractName,
-        contractAbi: HelloWorldContractJson.abi,
         constructorArgs: [],
         web3SigningCredential: {
           ethAccount: whalePubKey,
           secret: whalePrivKey,
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
-        bytecode: HelloWorldContractJson.bytecode,
         gas: 1000000,
       };
       await apiClient.deployContractV1(
@@ -192,14 +188,12 @@ test(testCase, async (t: Test) => {
       const parameters = {
         keychainId: keychainPlugin.getKeychainId(),
         contractName: HelloWorldContractJson.contractName,
-        contractAbi: HelloWorldContractJson.abi,
         constructorArgs: [],
         web3SigningCredential: {
           ethAccount: whalePubKey,
           secret: whalePrivKey,
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
-        bytecode: HelloWorldContractJson.bytecode,
         gas: 1000000,
         fake: 4,
       };
@@ -231,7 +225,8 @@ test(testCase, async (t: Test) => {
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
       params: [],
-      signingCredential: {
+      gas: 1000000,
+      web3SigningCredential: {
         ethAccount: whalePubKey,
         secret: whalePrivKey,
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -256,6 +251,7 @@ test(testCase, async (t: Test) => {
         invocationType: EthContractInvocationType.Call,
         methodName: "sayHello",
         params: [],
+        gas: 1000000,
         signingCredential: {
           ethAccount: whalePubKey,
           secret: whalePrivKey,
@@ -291,6 +287,7 @@ test(testCase, async (t: Test) => {
         invocationType: EthContractInvocationType.Call,
         methodName: "sayHello",
         params: [],
+        gas: 1000000,
         signingCredential: {
           ethAccount: whalePubKey,
           secret: whalePrivKey,
@@ -330,7 +327,7 @@ test(testCase, async (t: Test) => {
         from: whalePubKey,
         to: testEthAccount.address,
         value: 10e7,
-        gas: 22000,
+        gas: 1000000,
       },
       consistencyStrategy: {
         blockConfirmations: 0,

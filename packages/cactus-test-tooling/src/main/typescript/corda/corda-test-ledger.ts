@@ -16,10 +16,7 @@ import {
   Bools,
 } from "@hyperledger/cactus-common";
 
-import {
-  SampleCordappEnum,
-  SAMPLE_CORDAPP_ROOT_DIRS,
-} from "./sample-cordapp-enum";
+import { SampleCordappEnum, SAMPLE_CORDAPP_DATA } from "./sample-cordapp-enum";
 import { ICordappJarFile } from "./cordapp-jar-file";
 
 /*
@@ -255,34 +252,26 @@ export class CordaTestLedger implements ITestLedger {
     Checks.truthy(sampleCordapp, `${fnTag}:sampleCordapp`);
     await this.buildCordapp(sampleCordapp);
     const container = this.getContainer();
-    const cordappRootDir = SAMPLE_CORDAPP_ROOT_DIRS[sampleCordapp];
+    // const cordappRootDir = SAMPLE_CORDAPP_ROOT_DIRS[sampleCordapp];
+    // const cordaRelativePaths = SAMPLE_CORDAPP_JAR_RELATIVE_PATHS[sampleCordapp];
+    const cordappData = SAMPLE_CORDAPP_DATA[sampleCordapp];
 
     const jars: ICordappJarFile[] = [];
 
-    {
-      const jarRelativePath = "contracts/build/libs/contracts-1.0.jar";
-      const jarPath = path.join(cordappRootDir, jarRelativePath);
+    for (const jarFile of cordappData.jars) {
+      const jarPath = path.join(cordappData.rootDir, jarFile.jarRelativePath);
       this.log.debug(`Pulling jar file from container at: %o`, jarPath);
       const jar = await Containers.pullBinaryFile(container, jarPath);
       jars.push({
         contentBase64: jar.toString("base64"),
-        filename: `${sampleCordapp}_contracts-1.0.jar`,
-        hasDbMigrations: false,
+        filename: `${sampleCordapp}${jarFile.fileName}`,
+        hasDbMigrations: true,
       });
       this.log.debug(`Pulled jar (%o bytes) %o`, jarPath, jar.length);
     }
 
-    {
-      const jarRelativePath = "workflows/build/libs/workflows-1.0.jar";
-      const jarPath = path.join(cordappRootDir, jarRelativePath);
-      this.log.debug(`Pulling jar file from container at: %o`, jarPath);
-      const jar = await Containers.pullBinaryFile(container, jarPath);
-      jars.push({
-        contentBase64: jar.toString("base64"),
-        filename: `${sampleCordapp}_workflows-1.0.jar`,
-        hasDbMigrations: true,
-      });
-      this.log.debug(`Pulled jar (%o bytes) %o`, jarPath, jar.length);
+    if (jars.length == 0) {
+      throw new Error(`${fnTag} no jars found for this SampleCordappEnum.`);
     }
 
     return jars;
@@ -300,7 +289,7 @@ export class CordaTestLedger implements ITestLedger {
       throw ex;
     }
 
-    const cwd = SAMPLE_CORDAPP_ROOT_DIRS[sampleCordapp];
+    const cwd = SAMPLE_CORDAPP_DATA[sampleCordapp].rootDir;
 
     try {
       const cmd = `./gradlew build -x test`;

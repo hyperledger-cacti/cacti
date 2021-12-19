@@ -2,7 +2,7 @@
 import type { Server } from "http";
 import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
-import { Express } from "express";
+import type { Express } from "express";
 import OAS from "../../json/openapi.json";
 import {
   Secp256k1Keys,

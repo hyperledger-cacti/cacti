@@ -1,4 +1,3 @@
-import test, { Test } from "tape";
 import { randomBytes } from "crypto";
 import secp256k1 from "secp256k1";
 import { v4 as uuidV4 } from "uuid";
@@ -7,7 +6,7 @@ import {
   TransferInitializationV1Request,
   AssetProfile,
 } from "../../../../main/typescript/public-api";
-test("dummy test for transfer initiation flow", async (t: Test) => {
+test("dummy test for transfer initiation flow", async () => {
   const odapConstructor = {
     name: "cactus-plugin#odapGateway",
     dltIDs: ["dummy"],
@@ -42,9 +41,8 @@ test("dummy test for transfer initiation flow", async (t: Test) => {
     JSON.stringify(initializationRequestMessage),
     dummyPrivKeyStr,
   );
-  t.doesNotThrow(
+  expect(
     async () =>
       await odapGateWay.initiateTransfer(initializationRequestMessage),
-    "does not throw if initial transfer proccessed",
-  );
+  ).not.toThrow();
 });
