@@ -83,6 +83,6 @@
     "@types/express": "4.17.13",
     "express": "4.17.1",
     "ipfs-core-types": "0.6.1",
-    "multiformats": "9.4.9"
+    "multiformats": "9.5.4"
   }
 }
