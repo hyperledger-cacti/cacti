@@ -122,6 +122,14 @@ export class IpfsHttpClientMock implements IIpfsHttpClient {
     this.files = new FilesApiMock({
       logLevel: this.options.logLevel,
     }) as FilesAPI;
+    // this.files = new FilesApiMock({
+    //   logLevel: this.options.logLevel,
+    // }) as FilesAPI;
+
+    /*
+      this.files = new FilesApiMock(({ logLevel: this.options.logLevel,}) as unknown) as FilesAPI;
+    */
+
     this.key = {} as KeyAPI;
     this.log = {} as LogAPI;
     this.name = {} as NameAPI;
