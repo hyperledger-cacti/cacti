@@ -78,6 +78,49 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         val returnValue = flowHandle.returnValue.get(timeoutMs, TimeUnit.MILLISECONDS)
         val id = flowHandle.id
 
+        // allow returnValue to be something different to SignedTransaction
+        var callOutput: kotlin.Any = ""
+        var transactionId: kotlin.String? = null
+
+        if (returnValue is SignedTransaction) {
+            logger.trace("returnValue is SignedTransaction - using returnValue.id.toString() ...");
+            transactionId = returnValue.id.toString();
+
+            callOutput = mapOf(
+                "tx" to mapOf(
+                    "id" to returnValue.tx.id,
+                    "notary" to returnValue.tx.notary,
+                    "requiredSigningKeys" to returnValue.tx.requiredSigningKeys,
+                    "merkleTree" to returnValue.tx.merkleTree,
+                    "privacySalt" to returnValue.tx.privacySalt,
+                    "attachments" to returnValue.tx.attachments,
+                    "commands" to returnValue.tx.commands,
+                    // "digestService" to returnValue.tx.digestService,
+                    "inputs" to returnValue.tx.inputs,
+                    "networkParametersHash" to returnValue.tx.networkParametersHash,
+                    "references" to returnValue.tx.references,
+                    "timeWindow" to returnValue.tx.timeWindow
+                ),
+                "id" to returnValue.id,
+                "inputs" to returnValue.inputs,
+                "networkParametersHash" to returnValue.networkParametersHash,
+                "notary" to returnValue.notary,
+                "references" to returnValue.references,
+                "requiredSigningKeys" to returnValue.requiredSigningKeys,
+                "sigs" to returnValue.sigs
+            );
+          
+        } else if (returnValue != null) {
+            callOutput = try {
+                val returnValueJson = writer.writeValueAsString(returnValue);
+                logger.trace("returnValue JSON serialized OK, using returnValue ...");
+                returnValueJson;
+            } catch (ex: Exception) {
+                logger.trace("returnValue JSON serialized failed, using returnValue.toString() ...");
+                returnValue.toString();
+            }
+        }
+
         logger.info("Progress(${progress.size})={}", progress)
         logger.info("ReturnValue={}", returnValue)
         logger.info("Id=$id")
@@ -96,7 +139,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
         // org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Response["returnValue"]->
         // net.corda.client.jackson.internal.StxJson["wire"]->net.corda.client.jackson.internal.WireTransactionJson["outputs"])]
         // with root cause
-        return InvokeContractV1Response(true, id.toString(), (returnValue as SignedTransaction).id.toString(), progress)
+        return InvokeContractV1Response(true, callOutput, id.toString(), transactionId, progress)
     }
 
     // FIXME - make it clear in the documentation that this deployment endpoint is not recommended for production
