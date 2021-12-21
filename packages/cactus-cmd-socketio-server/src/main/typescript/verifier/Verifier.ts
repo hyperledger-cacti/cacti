@@ -80,7 +80,7 @@ export class Verifier implements IVerifier {
   // NOTE: asynchronous command
   public sendAsyncRequest(
     contract: object,
-    method: { command: string },
+    method: object,
     args: any,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -248,7 +248,7 @@ export class Verifier implements IVerifier {
 
   private requestLedgerOperationHttp(
     contract: object,
-    method: { command: string },
+    method: object,
     args: { args: any },
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -305,7 +305,7 @@ export class Verifier implements IVerifier {
         };
 
         logger.debug(`validatorUrl: ${this.validatorUrl}`);
-        httpReq.open("POST", this.validatorUrl + method.command);
+        httpReq.open("POST", this.validatorUrl + (method as any).command);
         // httpReq.setRequestHeader('content-type', 'application/json');
         httpReq.setRequestHeader("Content-Type", "application/json");
         // httpReq.send(args['args']);
