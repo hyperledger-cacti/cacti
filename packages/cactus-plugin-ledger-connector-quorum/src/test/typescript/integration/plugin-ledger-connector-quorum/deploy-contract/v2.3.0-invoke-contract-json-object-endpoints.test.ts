@@ -29,6 +29,8 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { Configuration } from "@hyperledger/cactus-core-api";
+import { RuntimeError } from "run-time-error";
+import axios from "axios";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -193,12 +195,20 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         contractJSON: HelloWorldContractJson,
       });
       t2.ifError(setNameOutInvalid.data.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (!error) {
+        const errorMessage = "output is falsy";
+        throw new RuntimeError(errorMessage);
+      }
+      if (axios.isAxiosError(error)) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
 
     const getNameOut = await apiClient.invokeContractV1NoKeychain({

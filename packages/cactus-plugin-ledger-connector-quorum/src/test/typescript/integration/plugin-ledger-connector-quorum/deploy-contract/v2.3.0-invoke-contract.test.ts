@@ -22,6 +22,8 @@ import {
   IAccount,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 const logLevel: LogLevelDesc = "INFO";
 const contractName = "HelloWorld";
