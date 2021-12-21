@@ -1,16 +1,17 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-sawtooth-socketio",
   "version": "1.0.0-rc.3",
-  "private": true,
+  "license": "Apache-2.0",
   "scripts": {
     "start": "cd ./dist && node common/core/bin/www.js",
     "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
-    "build": "npm run copy-utility-assets && npm run build-ts && npm run copy-static-assets",
+    "build": "npm run codegen && npm run build-ts && npm run build:dev:backend:postbuild",
+    "codegen": "npm run copy-utility-assets",
     "build-ts": "tsc",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "build:dev:backend:postbuild": "npm run copy-static-assets && npm run init-sawtooth",
     "copy-utility-assets": "ts-node copyUtilityAssets.ts",
     "copy-static-assets": "ts-node copyStaticAssets.ts",
-    "init-sawtooth": "ln -s ../node_modules ./dist/node_modules"
+    "init-sawtooth": "cp -af ../../yarn.lock ./dist/yarn.lock"
   },
   "dependencies": {
     "@types/node": "^14.14.5",
@@ -26,16 +27,6 @@
     "serve-favicon": "~2.4.2",
     "shelljs": "^0.8.4",
     "socket.io": "^2.0.4",
-    "ts-node": "^9.0.0",
     "xmlhttprequest": "^1.8.0"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.1",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.0",
-    "typescript": "^3.9.10"
   }
 }
