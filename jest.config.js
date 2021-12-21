@@ -56,7 +56,6 @@ module.exports = {
     `./packages/cactus-test-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts`,
     `./packages/cactus-test-cmd-api-server/src/test/typescript/integration/plugin-import-with-npm-install.test.ts`,
     `./packages/cactus-test-cmd-api-server/src/test/typescript/integration/plugin-import-with-npm-install-version-selection.test.ts`,
-    `./packages/cactus-test-cmd-api-server/src/test/typescript/integration/runtime-plugin-imports.test.ts`,
     `./packages/cactus-cmd-socketio-server/`,
     `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
     `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.7.test.ts`,
