@@ -18,7 +18,7 @@ const command: GluegunCommand = {
 				print,
 				toolbox,
 				`besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=5 --timeout=1000`,
-				'besu-cli asset lock --network=<network1|network2> --sender_account=<1|2> --recipient_account=<2|1> --amount=<lock-amount> --timeout=<lock-duration-seconds> --hash=<hashLock-optional-parameter>',
+				'besu-cli asset lock --network=<network1|network2> --sender_account=<1|2> --recipient_account=<2|1> --amount=<lock-amount> --timeout=<lock-duration-seconds> --hash_base64=<hashLock-optional-parameter>',
 				[
 					{
 						name: '--network',
@@ -105,15 +105,16 @@ const command: GluegunCommand = {
 		var hash
 		var preimage
 		var hash_base64
-		var preimage_base64
+		var preimage_bytes
 		if(options.hash_base64){
 			hash_base64 = options.hash_base64
 		}
 		else{
 			// Generate a hash pair if not provided as an input parameter
-			preimage_base64 = crypto.randomBytes(32).toString('base64')
-			preimage = Buffer.from(preimage_base64, 'base64')
+			preimage = crypto.randomBytes(22).toString('base64')
 			hash_base64 = crypto.createHash('sha256').update(preimage).digest('base64')
+			preimage_bytes = Buffer.from(preimage)
+			console.log('Length of preimage byte array', preimage_bytes.length)
 		}
 		hash = Buffer.from(hash_base64, 'base64')
 		
@@ -124,7 +125,7 @@ const command: GluegunCommand = {
 		console.log('Amount', options.amount)
 		console.log('Timeout', timeLock)
 		console.log('Hash (base64): ', hash_base64)
-		console.log('Preimage (base64): ', preimage_base64)
+		console.log('Preimage: ', preimage)
 
 		// Balances of sender and receiver before locking
 		console.log(`Account balances before locking`)
