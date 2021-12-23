@@ -57,7 +57,6 @@ import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-
 import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service";
 import { GrpcServerApiServer } from "./web-services/grpc/grpc-server-api-server";
 import { determineAddressFamily } from "./common/determine-address-family";
-import axios from "axios";
 
 export interface IApiServerConstructorOptions {
   readonly pluginManagerOptions?: { pluginsPath: string };
@@ -241,26 +240,19 @@ export class ApiServer {
       }
 
       return { addressInfoCockpit, addressInfoApi, addressInfoGrpc };
-    } catch (ex: unknown) {
-      if (axios.isAxiosError(ex)) {
-        const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
-        this.log.error(errorMessage);
-        this.log.error(`Attempting shutdown...`);
-        try {
-          await this.shutdown();
-          this.log.info(`Server shut down after crash OK`);
-        } catch (ex: unknown) {
-          this.log.error(ApiServer.E_POST_CRASH_SHUTDOWN, ex);
-        }
-        throw new Error(errorMessage);
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
-      } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
-        );
+    } catch (ex) {
+      const errorMessage = `Failed to start ApiServer: ${
+        (ex as any).stack as unknown
+      }`;
+      this.log.error(errorMessage);
+      this.log.error(`Attempting shutdown...`);
+      try {
+        await this.shutdown();
+        this.log.info(`Server shut down after crash OK`);
+      } catch (ex) {
+        this.log.error(ApiServer.E_POST_CRASH_SHUTDOWN, ex);
       }
+      throw new Error(errorMessage);
     }
   }
 
@@ -306,19 +298,13 @@ export class ApiServer {
         await this.getPluginImportsCount(),
       );
       return this.pluginRegistry;
-    } catch (e: unknown) {
-      const errorMessage = `Failed init PluginRegistry: ${JSON.stringify(e)}`;
-      if (axios.isAxiosError(e)) {
-        this.pluginRegistry = new PluginRegistry({ plugins: [] });
-        this.log.error(errorMessage);
-        throw new Error(errorMessage);
-      } else if (e instanceof Error) {
-        this.log.error(errorMessage);
-        throw new Error(errorMessage);
-      } else {
-        this.log.error(errorMessage);
-        throw new Error(errorMessage);
-      }
+    } catch (e) {
+      this.pluginRegistry = new PluginRegistry({ plugins: [] });
+      const errorMessage = `Failed init PluginRegistry: ${
+        (e as any).stack as unknown
+      }`;
+      this.log.error(errorMessage);
+      throw new Error(errorMessage);
     }
   }
 
@@ -375,18 +361,14 @@ export class ApiServer {
       await plugin.onPluginInit();
 
       return plugin;
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage = `${fnTag} failed instantiating plugin '${packageName}' with the instanceId '${options.instanceId}'`;
-        this.log.error(errorMessage, error);
-      }
+    } catch (error) {
+      const errorMessage = `${fnTag} failed instantiating plugin '${packageName}' with the instanceId '${options.instanceId}'`;
+      this.log.error(errorMessage, error);
+
       if (error instanceof Error) {
-        throw new RuntimeError("unexpected exception", error);
+        throw new RuntimeError(errorMessage, error);
       } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(error),
-        );
+        throw new RuntimeError(errorMessage, JSON.stringify(error));
       }
     }
   }
@@ -408,19 +390,10 @@ export class ApiServer {
     try {
       await fs.mkdirp(pluginPackageDir);
       this.log.debug(`${pkgName} plugin package dir: %o`, pluginPackageDir);
-    } catch (ex: unknown) {
-      if (axios.isAxiosError(ex)) {
-        const errorMessage =
-          "Could not create plugin installation directory, check the file-system permissions.";
-        throw new RuntimeError(errorMessage, ex);
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
-      } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
-        );
-      }
+    } catch (ex) {
+      const errorMessage =
+        "Could not create plugin installation directory, check the file-system permissions.";
+      throw new RuntimeError(errorMessage, JSON.stringify(ex));
     }
     try {
       lmify.setPackageManager("npm");
@@ -442,11 +415,11 @@ export class ApiServer {
         throw new RuntimeError("Non-zero exit code: ", JSON.stringify(out));
       }
       this.log.info(`Installed ${pkgName} OK`);
-    } catch (ex: unknown) {
+    } catch (ex) {
       const errorMessage = `${fnTag} failed installing plugin '${pkgName}`;
-      if (axios.isAxiosError(ex)) {
-        this.log.error(errorMessage, ex);
-      } else if (ex instanceof Error) {
+      this.log.error(errorMessage, ex);
+
+      if (ex instanceof Error) {
         throw new RuntimeError(errorMessage, ex);
       } else {
         throw new RuntimeError(errorMessage, JSON.stringify(ex));
@@ -461,7 +434,9 @@ export class ApiServer {
 
     const webServicesShutdown = registry
       .getPlugins()
-      .filter((pluginInstance) => isIPluginWebService(pluginInstance))
+      .filter((pluginInstance: ICactusPlugin) =>
+        isIPluginWebService(pluginInstance),
+      )
       .map((pluginInstance: ICactusPlugin) => {
         return (pluginInstance as IPluginWebService).shutdown();
       });
@@ -709,7 +684,9 @@ export class ApiServer {
 
     const webServicesInstalled = pluginRegistry
       .getPlugins()
-      .filter((pluginInstance) => isIPluginWebService(pluginInstance))
+      .filter((pluginInstance: ICactusPlugin) =>
+        isIPluginWebService(pluginInstance),
+      )
       .map(async (plugin: ICactusPlugin) => {
         const p = plugin as IPluginWebService;
         await p.getOrCreateWebServices();
@@ -723,8 +700,13 @@ export class ApiServer {
     const endpoints2D = await Promise.all(webServicesInstalled);
     this.log.info(`Installed ${webServicesInstalled.length} web service(s) OK`);
 
-    const endpoints = endpoints2D.reduce((acc, val) => acc.concat(val), []);
-    endpoints.forEach((ep) => this.log.info(`Endpoint={path=${ep.getPath()}}`));
+    const endpoints = endpoints2D.reduce(
+      (acc: any, val: any) => acc.concat(val),
+      [],
+    );
+    endpoints.forEach((ep: any) =>
+      this.log.info(`Endpoint={path=${ep.getPath()}}`),
+    );
 
     const apiPort: number = this.options.config.apiPort;
     const apiHost: string = this.options.config.apiHost;
