@@ -13,6 +13,8 @@
     ]
   },
   "scripts": {
+    "sort-json": "npx sort-package-json 'packages/*/package.json' 'package.json' 'examples/cactus-*/package.json' 'extensions/*/package.json' && yarn run sort-json-check",
+    "sort-json-check": "npx sort-package-json 'packages/*/package.json' 'package.json' 'examples/cactus-*/package.json' 'extensions/*/package.json' --check",
     "run-ci": "./tools/ci.sh",
     "reset:node-modules": "del-cli '**/node_modules'",
     "reset:git": "git clean -f -X",
