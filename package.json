@@ -13,8 +13,6 @@
     ]
   },
   "scripts": {
-    "sort-json": "npx sort-package-json 'packages/*/package.json' 'package.json' 'examples/cactus-*/package.json' 'extensions/*/package.json' && yarn run sort-json-check",
-    "sort-json-check": "npx sort-package-json 'packages/*/package.json' 'package.json' 'examples/cactus-*/package.json' 'extensions/*/package.json' --check",
     "run-ci": "./tools/ci.sh",
     "reset:node-modules": "del-cli '**/node_modules'",
     "reset:git": "git clean -f -X",
@@ -25,6 +23,8 @@
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
     "tools:validate-bundle-names": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/validate-bundle-names.js",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
+    "sort-json": "npx sort-package-json 'packages/*/package.json' 'package.json' 'examples/cactus-*/package.json' 'extensions/*/package.json' && yarn run sort-json-check",
+    "sort-json-check": "npx sort-package-json 'packages/*/package.json' 'package.json' 'examples/cactus-*/package.json' 'extensions/*/package.json' --check",
     "sync-ts-config": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --loader ts-node/esm ./tools/sync-npm-deps-to-tsc-projects.ts",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
     "start:example-supply-chain": "yarn build:dev && cd ./examples/supply-chain-app/ && yarn --no-lockfile && yarn start",
