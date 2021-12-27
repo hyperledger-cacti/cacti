@@ -1,6 +1,5 @@
-import test, { Test } from "tape-promise/tape";
-
 import express from "express";
+import "jest-extended";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
@@ -18,99 +17,95 @@ import { K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT } from "../../../main/typescri
 import { DefaultApi as KeychainMemoryApi } from "../../../main/typescript/public-api";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
-test("PluginKeychainMemory", (t1: Test) => {
-  t1.doesNotThrow(
-    () => new PluginKeychainMemory({ instanceId: "a", keychainId: "a" }),
-  );
+const testcase = "PluginKeychainMemory";
+describe(testcase, () => {
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
+  const listenOptions: IListenOptions = {
+    hostname: "localhost",
+    port: 0,
+    server,
+  };
+  afterAll(async () => await Servers.shutdown(server));
 
-  test("Validates constructor arg instanceId", (t: Test) => {
-    t.throws(
+  expect(
+    () => new PluginKeychainMemory({ instanceId: "a", keychainId: "a" }),
+  ).not.toThrow();
+
+  test("Validates constructor arg instanceId", () => {
+    expect(
       () =>
         new PluginKeychainMemory({
           instanceId: null as any,
           keychainId: "valid-value",
         }),
-    );
-    t.throws(
+    ).toThrow();
+    expect(
       () =>
         new PluginKeychainMemory({
           instanceId: "",
           keychainId: "valid-value",
         }),
-    );
-    t.end();
+    ).toThrow();
   });
 
-  test("Validates constructor arg keychainId", (t: Test) => {
-    t.throws(
+  test("Validates constructor arg keychainId", () => {
+    expect(
       () =>
         new PluginKeychainMemory({
           instanceId: "valid-value",
           keychainId: null as any,
         }),
-    );
-    t.throws(
+    ).toThrow();
+    expect(
       () =>
         new PluginKeychainMemory({
           instanceId: "valid-value",
           keychainId: "",
         }),
-    );
-    t.end();
+    ).toThrow();
   });
 
-  test("get,set,has,delete alters state as expected", async (t: Test) => {
+  test("get,set,has,delete alters state as expected", async () => {
     const options: IPluginKeychainMemoryOptions = {
       instanceId: uuidv4(),
       keychainId: uuidv4(),
     };
     const plugin = new PluginKeychainMemory(options);
 
-    const expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    const server = http.createServer(expressApp);
-    const listenOptions: IListenOptions = {
-      hostname: "localhost",
-      port: 0,
-      server,
-    };
     const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    test.onFinish(async () => await Servers.shutdown(server));
     const { address, port } = addressInfo;
     const apiHost = `http://${address}:${port}`;
-    t.comment(
-      `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics`,
-    );
-
     const config = new Configuration({ basePath: apiHost });
     const apiClient = new KeychainMemoryApi(config);
 
     await plugin.getOrCreateWebServices(expressApp);
 
-    t.equal(plugin.getKeychainId(), options.keychainId, "Keychain ID set OK");
-    t.equal(plugin.getInstanceId(), options.instanceId, "Instance ID set OK");
+    expect(plugin.getKeychainId()).toBe(options.keychainId);
+    expect(plugin.getInstanceId()).toBe(options.instanceId);
 
     const key1 = uuidv4();
     const value1 = uuidv4();
 
     const hasPrior = await plugin.has(key1);
-    t.false(hasPrior, "hasPrior === false OK");
+    expect(hasPrior).toBe(false);
 
     await plugin.set(key1, value1);
 
     const hasAfter1 = await plugin.has(key1);
-    t.true(hasAfter1, "hasAfter === true OK");
+    expect(hasAfter1).toBe(true);
 
     const valueAfter1 = await plugin.get(key1);
-    t.ok(valueAfter1, "valueAfter truthy OK");
-    t.equal(valueAfter1, value1, "valueAfter === value OK");
+    expect(valueAfter1).toBeTruthy();
+    expect(valueAfter1).toBe(value1);
 
     await plugin.delete(key1);
 
     const hasAfterDelete1 = await plugin.has(key1);
-    t.false(hasAfterDelete1, "hasAfterDelete === false OK");
+    expect(hasAfterDelete1).not.toBeTruthy();
+    await expect(plugin.get(key1)).not.toResolve();
 
-    await t.rejects(plugin.get(key1), key1);
     {
       const res = await apiClient.getPrometheusMetricsV1();
       const promMetricsOutput =
@@ -124,13 +119,10 @@ test("PluginKeychainMemory", (t1: Test) => {
         '{type="' +
         K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT +
         '"} 0';
-      t.ok(res);
-      t.ok(res.data);
-      t.equal(res.status, 200);
-      t.true(
-        res.data.includes(promMetricsOutput),
-        "Total Key Count 0 recorded as expected. RESULT OK",
-      );
+      expect(res);
+      expect(res.data);
+      expect(res.status).toEqual(200);
+      expect(res.data.includes(promMetricsOutput)).toBe(true);
     }
 
     const key2 = uuidv4();
@@ -139,11 +131,11 @@ test("PluginKeychainMemory", (t1: Test) => {
     await plugin.set(key2, value2);
 
     const hasAfter = await plugin.has(key2);
-    t.true(hasAfter, "hasAfter === true OK");
+    expect(hasAfter).toBe(true);
 
     const valueAfter2 = await plugin.get(key2);
-    t.ok(valueAfter2, "valueAfter truthy OK");
-    t.equal(valueAfter2, value2, "valueAfter === value OK");
+    expect(valueAfter2).toBeTruthy();
+    expect(valueAfter2).toEqual(value2);
     {
       const res = await apiClient.getPrometheusMetricsV1();
       const promMetricsOutput =
@@ -157,17 +149,10 @@ test("PluginKeychainMemory", (t1: Test) => {
         '{type="' +
         K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT +
         '"} 1';
-      t.ok(res);
-      t.ok(res.data);
-      t.equal(res.status, 200);
-      t.true(
-        res.data.includes(promMetricsOutput),
-        "Total Key Count 1 recorded as expected. RESULT OK",
-      );
+      expect(res);
+      expect(res.data);
+      expect(res.status).toEqual(200);
+      expect(res.data.includes(promMetricsOutput)).toBe(true);
     }
-
-    t.end();
   });
-
-  t1.end();
 });
