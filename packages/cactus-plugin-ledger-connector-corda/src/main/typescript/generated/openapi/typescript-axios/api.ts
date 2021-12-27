@@ -368,7 +368,7 @@ export interface InvokeContractV1Response {
      */
     success: boolean;
     /**
-     * 
+     * Data returned from the JVM when no transaction is running
      * @type {object}
      * @memberof InvokeContractV1Response
      */
@@ -378,13 +378,19 @@ export interface InvokeContractV1Response {
      * @type {string}
      * @memberof InvokeContractV1Response
      */
-    transactionId: string;
+    transactionId?: string;
     /**
      * An array of strings representing the aggregated stream of progress updates provided by a *tracked* flow invocation. If the flow invocation was not tracked, this array is still returned, but as empty.
      * @type {Array<string>}
      * @memberof InvokeContractV1Response
      */
     progress?: Array<string>;
+    /**
+     * The id for the flow handle
+     * @type {string}
+     * @memberof InvokeContractV1Response
+     */
+    flowId: string;
 }
 /**
  * 
