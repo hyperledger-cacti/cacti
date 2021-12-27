@@ -131,7 +131,6 @@ files:
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-endpoint-authz-scope-enforcement.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-unprotected-endpoint-authz.test.ts
-  - ./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-endpoint-authorization.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-unprotected-endpoint-authz-ops-confirm.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts
