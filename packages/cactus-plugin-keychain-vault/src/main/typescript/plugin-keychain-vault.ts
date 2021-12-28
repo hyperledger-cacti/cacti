@@ -27,7 +27,7 @@ import { GetKeychainEntryEndpointV1 } from "./web-services/get-keychain-entry-en
 import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-endpoint-v1";
 import { HasKeychainEntryEndpointV1 } from "./web-services/has-keychain-entry-endpoint-v1";
 import { DeleteKeychainEntryEndpointV1 } from "./web-services/delete-keychain-entry-endpoint-v1";
-import axios from "axios";
+
 export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   keychainId: string;
@@ -227,22 +227,13 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
           `${fnTag}: Invalid response received from Vault. Expected "response.data.data.value" property chain to be truthy`,
         );
       }
-    } catch (ex: unknown) {
-      if (axios.isAxiosError(ex)) {
-        // FIXME: Throw if not found, detect it in the endpoint code, status=404
-        if (ex?.response?.status === HttpStatus.NOT_FOUND) {
-          return (null as unknown) as string;
-        } else {
-          this.log.error(`Retrieval of "${key}" crashed:`, ex);
-          throw ex;
-        }
+    } catch (ex) {
+      // FIXME: Throw if not found, detect it in the endpoint code, status=404
+      if ((ex as any).response?.statusCode === HttpStatus.NOT_FOUND) {
+        return (null as unknown) as string;
       } else {
-        if ((ex as any).response?.status === HttpStatus.NOT_FOUND) {
-          return (null as unknown) as string;
-        } else {
-          this.log.error(`Retrieval of "${key}" crashed:`, ex);
-          throw ex;
-        }
+        this.log.error(`Retrieval of "${key}" crashed:`, ex);
+        throw ex;
       }
     }
   }
@@ -258,27 +249,18 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     try {
       const res = await this.backend.read(path);
       return res;
-    } catch (ex: unknown) {
-      if (axios.isAxiosError(ex)) {
-        // We have to make sure that the exception is either an expected
-        // or an unexpected one where the expected exception is what we
-        // get when the key is not present in the keychain and anything
-        // else being an unexpected exception that we do not want to
-        // handle nor suppress under any circumstances since doing so
-        // would lead to silent failures or worse.
-        if (ex?.response?.status === HttpStatus.NOT_FOUND) {
-          return false;
-        } else {
-          this.log.error(`Presence check of "${key}" crashed:`, ex);
-          throw ex;
-        }
+    } catch (ex) {
+      // We have to make sure that the exception is either an expected
+      // or an unexpected one where the expected exception is what we
+      // get when the key is not present in the keychain and anything
+      // else being an unexpected exception that we do not want to
+      // handle nor suppress under any circumstances since doing so
+      // would lead to silent failures or worse.
+      if ((ex as any).response?.statusCode === HttpStatus.NOT_FOUND) {
+        return false;
       } else {
-        if ((ex as any).response?.status === HttpStatus.NOT_FOUND) {
-          return false;
-        } else {
-          this.log.error(`Presence check of "${key}" crashed:`, ex);
-          throw ex;
-        }
+        this.log.error(`Presence check of "${key}" crashed:`, ex);
+        throw ex;
       }
     }
   }

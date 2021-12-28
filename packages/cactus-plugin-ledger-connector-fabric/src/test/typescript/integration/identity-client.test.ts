@@ -272,6 +272,10 @@ test("identity-clients", async (t: Test) => {
             t.true(
               error.message.includes(`keyName = ${testNotFoundKey} not found`),
             );
+          } else if (error instanceof Error) {
+            t.true(
+              error.message?.includes(`keyName = ${testNotFoundKey} not found`),
+            );
           } else {
             t.fail("expected an axios error, got something else");
           }

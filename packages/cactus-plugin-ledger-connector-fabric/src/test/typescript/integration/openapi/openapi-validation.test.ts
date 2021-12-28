@@ -328,6 +328,19 @@ test(testCase, async (t: Test) => {
           fields.includes("channelId"),
           "Rejected because channelId is required",
         );
+      } else if (e instanceof Error) {
+        t2.equal(
+          (e as any).response?.status,
+          400,
+          `Endpoint ${fDeploy} without required channelId: response.status === 400 OK`,
+        );
+        const fields = (e as any).response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("channelId"),
+          "Rejected because channelId is required",
+        );
       } else {
         t2.fail("expected an axios error, got something else");
       }
@@ -365,6 +378,19 @@ test(testCase, async (t: Test) => {
           `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
         );
         const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("fake"),
+          "Rejected because fake is not a valid parameter",
+        );
+      } else if (e instanceof Error) {
+        t2.equal(
+          (e as any).response?.status,
+          400,
+          `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
+        );
+        const fields = (e as any).response?.data.map((param: any) =>
           param.path.replace(".body.", ""),
         );
         t2.ok(
@@ -437,11 +463,23 @@ test(testCase, async (t: Test) => {
           fields.includes("contractName"),
           "Rejected because contractName is required",
         );
+      } else if (e instanceof Error) {
+        t2.equal(
+          (e as any).response?.status,
+          400,
+          `Endpoint ${fRun} without required contractName: response.status === 400 OK`,
+        );
+        const fields = (e as any).response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("contractName"),
+          "Rejected because contractName is required",
+        );
       } else {
         t2.fail("expected an axios error, got something else");
       }
     }
-
     t2.end();
   });
 
@@ -474,6 +512,19 @@ test(testCase, async (t: Test) => {
           `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
         );
         const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("fake"),
+          "Rejected because fake is not a valid parameter",
+        );
+      } else if (e instanceof Error) {
+        t2.equal(
+          (e as any).response?.status,
+          400,
+          `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
+        );
+        const fields = (e as any).response?.data.map((param: any) =>
           param.path.replace(".body.", ""),
         );
         t2.ok(

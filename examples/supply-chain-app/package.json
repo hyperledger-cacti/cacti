@@ -49,7 +49,8 @@
   "dependencies": {
     "@hyperledger/cactus-example-supply-chain-backend": "file:../cactus-example-supply-chain-backend",
     "@hyperledger/cactus-example-supply-chain-frontend": "file:../cactus-example-supply-chain-frontend",
-    "dotenv": "8.2.0"
+    "dotenv": "8.2.0",
+    "yarn": "^1.22.17"
   },
   "devDependencies": {}
 }
