@@ -119,7 +119,7 @@ export class ConfigService {
           const accepted = Object.values(AuthorizationProtocol);
           const acceptedCsv = accepted.join(",");
           if (!accepted.includes(value)) {
-            const m = `Accepted authz protocols: ${acceptedCsv} Got: ${value}`;
+            const m = `Accepted auth protocols: ${acceptedCsv} Got: ${value}`;
             throw new Error(m);
           }
         },
@@ -141,10 +141,34 @@ export class ConfigService {
         env: "PLUGINS",
         arg: "plugins",
         pluginSchema: {
-          packageName: "*",
+          action: {
+            format: (value: PluginImportAction) => {
+              ConfigService.formatNonBlankString(value);
+              const accepted = Object.values(PluginImportAction);
+              const acceptedCsv = accepted.join(",");
+              if (!accepted.includes(value)) {
+                const m = `Accepted plugin import actions: ${acceptedCsv} Got: ${value}`;
+                throw new Error(m);
+              }
+            },
+            default: PluginImportAction.Install,
+          },
           options: {
             format: Object,
             default: {},
+          },
+          packageName: "*",
+          type: {
+            format: (value: PluginImportType) => {
+              ConfigService.formatNonBlankString(value);
+              const accepted = Object.values(PluginImportType);
+              const acceptedCsv = accepted.join(",");
+              if (!accepted.includes(value)) {
+                const m = `Accepted plugin import types: ${acceptedCsv} Got: ${value}`;
+                throw new Error(m);
+              }
+            },
+            default: PluginImportType.Local,
           },
         },
       } as SchemaObj<PluginImport[]>,
