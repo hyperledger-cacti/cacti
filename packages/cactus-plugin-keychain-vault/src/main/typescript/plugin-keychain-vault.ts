@@ -28,8 +28,6 @@ import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-en
 import { HasKeychainEntryEndpointV1 } from "./web-services/has-keychain-entry-endpoint-v1";
 import { DeleteKeychainEntryEndpointV1 } from "./web-services/delete-keychain-entry-endpoint-v1";
 import axios from "axios";
-import { RuntimeError } from "run-time-error";
-
 export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   keychainId: string;
@@ -238,13 +236,13 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
           this.log.error(`Retrieval of "${key}" crashed:`, ex);
           throw ex;
         }
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
       } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
-        );
+        if ((ex as any).response?.status === HttpStatus.NOT_FOUND) {
+          return (null as unknown) as string;
+        } else {
+          this.log.error(`Retrieval of "${key}" crashed:`, ex);
+          throw ex;
+        }
       }
     }
   }
@@ -274,10 +272,13 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
           this.log.error(`Presence check of "${key}" crashed:`, ex);
           throw ex;
         }
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
       } else {
-        throw new RuntimeError("unexpected exception with incorrect type");
+        if ((ex as any).response?.status === HttpStatus.NOT_FOUND) {
+          return false;
+        } else {
+          this.log.error(`Presence check of "${key}" crashed:`, ex);
+          throw ex;
+        }
       }
     }
   }

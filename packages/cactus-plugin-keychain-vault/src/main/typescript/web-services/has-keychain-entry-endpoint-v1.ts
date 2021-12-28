@@ -17,7 +17,8 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import OAS from "../../json/openapi.json";
 import { PluginKeychainVault } from "../plugin-keychain-vault";
 import { HasKeychainEntryResponseV1 } from "../generated/openapi/typescript-axios";
-
+import { RuntimeError } from "run-time-error";
+import axios from "axios";
 export interface IHasKeychainEntryEndpointV1Options {
   logLevel?: LogLevelDesc;
   plugin: PluginKeychainVault;
@@ -103,7 +104,13 @@ export class HasKeychainEntryEndpointV1 implements IWebServiceEndpoint {
       res.json(resBody);
     } catch (ex: unknown) {
       this.log.debug(`${tag} Failed to serve request:`, ex);
-      if (ex instanceof Error) {
+      if (!ex) {
+        const errorMessage = "out is falsy";
+        throw new RuntimeError(errorMessage);
+      } else if (axios.isAxiosError(ex)) {
+        res.status(500);
+        res.json({ error: JSON.stringify(ex) });
+      } else if (ex instanceof Error) {
         res.status(500);
         res.json({ error: ex.stack });
       } else {

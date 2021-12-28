@@ -30,7 +30,6 @@ import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-end
 import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1";
 import { HasKeychainEntryV1Endpoint } from "./webservices/has-keychain-entry-endpoint-v1";
 import axios from "axios";
-import { RuntimeError } from "run-time-error";
 
 export enum AwsCredentialType {
   LocalFile = "LOCAL_FILE",
@@ -231,24 +230,20 @@ export class PluginKeychainAwsSm
         );
       }
     } catch (ex: unknown) {
+      const errorStatus = (ex as Error).message.includes(
+        SECRETMANAGER_STATUS_KEY_NOT_FOUND,
+      );
+      if (errorStatus) {
+        // FIXME: Throw if the value was not present instead of returning null
+        //return (null as unknown) as string;
+        throw new Error(`${key} secret not found`);
+      }
       if (axios.isAxiosError(ex)) {
-        const errorStatus = (ex as Error).message.includes(
-          SECRETMANAGER_STATUS_KEY_NOT_FOUND,
-        );
-        if (errorStatus) {
-          // FIXME: Throw if the value was not present instead of returning null
-          return (null as unknown) as string;
-        } else {
-          this.log.error(`Error retriving secret value for the key "${key}"`);
-          throw ex;
-        }
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
+        this.log.error(`Error retriving secret value for the key "${key}"`);
+        throw ex;
       } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
-        );
+        this.log.error(`Error retriving secret value for the key "${key}"`);
+        throw ex;
       }
     }
   }
@@ -263,24 +258,15 @@ export class PluginKeychainAwsSm
         })
         .promise();
       return true;
-    } catch (ex: unknown) {
-      if (axios.isAxiosError(ex)) {
-        const errorStatus = (ex as Error).message.includes(
-          SECRETMANAGER_STATUS_KEY_NOT_FOUND,
-        );
-        if (errorStatus) {
-          return false;
-        } else {
-          this.log.error(`${fnTag}: Presence check of "${key}" crashed:`, ex);
-          throw ex;
-        }
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
+    } catch (ex) {
+      const errorStatus = (ex as Error).message.includes(
+        SECRETMANAGER_STATUS_KEY_NOT_FOUND,
+      );
+      if (errorStatus) {
+        return false;
       } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
-        );
+        this.log.error(`${fnTag}: Presence check of "${key}" crashed:`, ex);
+        throw ex;
       }
     }
   }
@@ -295,18 +281,9 @@ export class PluginKeychainAwsSm
           SecretString: value,
         })
         .promise();
-    } catch (ex: unknown) {
-      if (axios.isAxiosError(ex)) {
-        this.log.error(` ${fnTag}: Error writing secret "${key}"`);
-        throw ex;
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
-      } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
-        );
-      }
+    } catch (ex) {
+      this.log.error(` ${fnTag}: Error writing secret "${key}"`);
+      throw ex;
     }
   }
 
@@ -320,18 +297,9 @@ export class PluginKeychainAwsSm
           ForceDeleteWithoutRecovery: true,
         })
         .promise();
-    } catch (ex: unknown) {
-      if (axios.isAxiosError(ex)) {
-        this.log.error(`${fnTag} Error deleting secret "${key}"`);
-        throw ex;
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
-      } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
-        );
-      }
+    } catch (ex) {
+      this.log.error(`${fnTag} Error deleting secret "${key}"`);
+      throw ex;
     }
   }
 }
