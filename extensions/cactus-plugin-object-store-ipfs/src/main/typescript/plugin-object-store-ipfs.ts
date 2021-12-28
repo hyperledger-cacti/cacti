@@ -168,13 +168,19 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
             ex,
           );
         }
-      } else if (ex instanceof Error) {
-        throw new RuntimeError(`unexpected exception`, ex);
       } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type ",
-          JSON.stringify(ex),
-        );
+        if (
+          (ex as any).stack?.includes(K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST)
+        ) {
+          const msg = `Stat ${req.key} failed with error message containing phrase "${K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST}" Returning isPresent=false ...`;
+          this.log.debug(msg);
+          return { key: req.key, checkedAt, isPresent: false };
+        } else {
+          throw new RuntimeError(
+            `Checking presence of ${req.key} crashed:`,
+            JSON.stringify(ex),
+          );
+        }
       }
     }
   }

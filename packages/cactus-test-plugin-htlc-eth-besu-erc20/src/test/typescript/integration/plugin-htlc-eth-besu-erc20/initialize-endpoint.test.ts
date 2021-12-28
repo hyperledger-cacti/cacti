@@ -31,7 +31,6 @@ import {
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
-import axios from "axios";
 
 const logLevel: LogLevelDesc = "INFO";
 const estimatedGas = 6721975;

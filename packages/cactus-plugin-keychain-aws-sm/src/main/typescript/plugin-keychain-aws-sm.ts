@@ -240,11 +240,13 @@ export class PluginKeychainAwsSm
         throw new Error(`${key} secret not found`);
       }
       if (axios.isAxiosError(ex)) {
-        this.log.error(`Error retriving secret value for the key "${key}"`);
+        this.log.error(
+          `an axios error, error retriving secret value for the key "${key}"`,
+        );
         throw ex;
       } else {
         throw new RuntimeError(
-          "unexpected exception with incorrect type",
+          "not an axios error, got something else",
           JSON.stringify(ex),
         );
       }
@@ -262,23 +264,29 @@ export class PluginKeychainAwsSm
         .promise();
       return true;
     } catch (ex: unknown) {
+      const errorStatus = (ex as Error).message.includes(
+        SECRETMANAGER_STATUS_KEY_NOT_FOUND,
+      );
       if (axios.isAxiosError(ex)) {
-        const errorStatus = (ex as Error).message.includes(
-          SECRETMANAGER_STATUS_KEY_NOT_FOUND,
-        );
         if (errorStatus) {
           return false;
         } else {
-          this.log.error(`${fnTag}: Presence check of "${key}" crashed:`, ex);
+          this.log.error(
+            `${fnTag}: an axios error, presence check of "${key}" crashed:`,
+            ex,
+          );
           throw ex;
         }
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
       } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
-        );
+        if (errorStatus) {
+          return false;
+        } else {
+          this.log.error(
+            `${fnTag}: not an axios error, got something else; presence check of "${key}" crashed:`,
+            ex,
+          );
+          throw ex;
+        }
       }
     }
   }
@@ -295,15 +303,15 @@ export class PluginKeychainAwsSm
         .promise();
     } catch (ex: unknown) {
       if (axios.isAxiosError(ex)) {
-        this.log.error(` ${fnTag}: Error writing secret "${key}"`);
-        throw ex;
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
-      } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
+        this.log.error(
+          ` ${fnTag}: an axios error, error writing secret "${key}"`,
         );
+        throw ex;
+      } else {
+        this.log.error(
+          ` ${fnTag}: not an axios error, got something else; error writing secret "${key}"`,
+        );
+        throw ex;
       }
     }
   }
@@ -320,15 +328,15 @@ export class PluginKeychainAwsSm
         .promise();
     } catch (ex: unknown) {
       if (axios.isAxiosError(ex)) {
-        this.log.error(`${fnTag} Error deleting secret "${key}"`);
-        throw ex;
-      } else if (ex instanceof Error) {
-        throw new RuntimeError("unexpected exception", ex);
-      } else {
-        throw new RuntimeError(
-          "unexpected exception with incorrect type",
-          JSON.stringify(ex),
+        this.log.error(
+          `${fnTag} an axios error, error deleting secret "${key}"`,
         );
+        throw ex;
+      } else {
+        this.log.error(
+          `${fnTag} not an axios error, got something else; error deleting secret "${key}"`,
+        );
+        throw ex;
       }
     }
   }

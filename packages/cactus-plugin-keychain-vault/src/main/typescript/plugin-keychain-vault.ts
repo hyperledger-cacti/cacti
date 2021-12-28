@@ -27,7 +27,7 @@ import { GetKeychainEntryEndpointV1 } from "./web-services/get-keychain-entry-en
 import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-endpoint-v1";
 import { HasKeychainEntryEndpointV1 } from "./web-services/has-keychain-entry-endpoint-v1";
 import { DeleteKeychainEntryEndpointV1 } from "./web-services/delete-keychain-entry-endpoint-v1";
-import axios from "axios";
+
 export interface IPluginKeychainVaultOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   keychainId: string;
@@ -232,12 +232,8 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
       if ((ex as any).response?.statusCode === HttpStatus.NOT_FOUND) {
         return (null as unknown) as string;
       } else {
-        if ((ex as any).response?.status === HttpStatus.NOT_FOUND) {
-          return (null as unknown) as string;
-        } else {
-          this.log.error(`Retrieval of "${key}" crashed:`, ex);
-          throw ex;
-        }
+        this.log.error(`Retrieval of "${key}" crashed:`, ex);
+        throw ex;
       }
     }
   }
@@ -263,12 +259,8 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
       if ((ex as any).response?.statusCode === HttpStatus.NOT_FOUND) {
         return false;
       } else {
-        if ((ex as any).response?.status === HttpStatus.NOT_FOUND) {
-          return false;
-        } else {
-          this.log.error(`Presence check of "${key}" crashed:`, ex);
-          throw ex;
-        }
+        this.log.error(`Presence check of "${key}" crashed:`, ex);
+        throw ex;
       }
     }
   }

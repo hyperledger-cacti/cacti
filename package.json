@@ -50,7 +50,10 @@
     "test:plugin-ledger-connector-iroha": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*-iroha/src/test/typescript/{unit,integration}/\"",
     "test:plugin-htlc-besu": "tap --jobs=1 --timeout=600 \"packages/*htlc-eth-besu/src/test/typescript/{integration}/\"",
     "test:plugin-ledger-connector-corda": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*-corda/src/test/typescript/{unit,integration}/\"",      
-    "webpack": "lerna run webpack:dev",
+    
+      "test:cactus-plugin-ledger-connector-besu": "tap --jobs=1 --timeout=600 \"packages/cactus-plugin-ledger-connector-besu/src/test/typescript/{unit,integration}/\"",
+
+      "webpack": "lerna run webpack:dev",
     "webpack:dev:web": "lerna run webpack:dev:web",
     "webpack:dev:node": "lerna run webpack:dev:node",
     "test:jest:all": "jest",
