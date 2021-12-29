@@ -5,6 +5,7 @@ export * from "./generated/openapi/typescript-axios/index";
 export * from "./generated/openapi/typescript-axios/base";
 
 export { IPluginLedgerConnector } from "./plugin/ledger-connector/i-plugin-ledger-connector";
+export { ISocketApiClient } from "./plugin/ledger-connector/i-socket-api-client";
 export { IPluginConsortium } from "./plugin/consortium/i-plugin-consortium";
 export { IPluginKeychain } from "./plugin/keychain/i-plugin-keychain";
 export { isIPluginKeychain } from "./plugin/keychain/is-i-plugin-keychain";
