@@ -237,3 +237,15 @@ jobs:
 
     - name: Print Disk Usage Reports
       run: df ; echo "" ; docker system df
+  
+  check-package-json:
+    name: check-package-json
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code 
+        uses: actions/checkout@v2.3.4
+
+      - name: Check sorted package json
+        run: yarn run sort-json-check
+
