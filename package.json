@@ -1,7 +1,7 @@
 {
   "name": "@hyperledger/cactus",
-  "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
   "private": true,
+  "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
   "workspaces": {
     "packages": [
       "packages/cactus-*",
@@ -58,11 +58,11 @@
     "test:jest:all": "jest",
     "test:tap:all": "tap",
     "test:all": "yarn test:jest:all && yarn test:tap:all",
+    "posttest:all": "tap --no-check-coverage --coverage-report=lcov && codecov",
     "test:unit": "tap --ts --node-arg=--max-old-space-size=4096 --timeout=600 --no-check-coverage \"packages/cactus-*/src/test/typescript/unit/\"",
     "test:benchmark": "tap --ts --jobs=1 --no-timeout --no-check-coverage \"packages/cactus-*/src/test/typescript/benchmark/\"",
     "test:browser": "karma start karma.conf.js",
     "test:integration": "tap --ts --node-arg=--max-old-space-size=4096 --jobs=1 --timeout=3600 --no-check-coverage \"packages/cactus-*/src/test/typescript/integration/\"",
-    "posttest:all": "tap --no-check-coverage --coverage-report=lcov && codecov",
     "changelog": "conventional-changelog --infile CHANGELOG.md --outfile CHANGELOG.md && git add CHANGELOG.md",
     "commit": "git-cz --signoff",
     "prettier": "prettier --write --config .prettierrc.json \"./**/*.{ts,js}\"",
