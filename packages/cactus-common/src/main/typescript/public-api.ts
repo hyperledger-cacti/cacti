@@ -1,4 +1,5 @@
 export { LoggerProvider } from "./logging/logger-provider";
+export { LogHelper } from "./logging/log-helper";
 export { Logger, ILoggerOptions } from "./logging/logger";
 export { LogLevelDesc } from "loglevel";
 export { Objects } from "./objects";
