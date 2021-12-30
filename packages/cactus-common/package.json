@@ -52,6 +52,11 @@
       "name": "Peter Somogyvari",
       "email": "peter.somogyvari@accenture.com",
       "url": "https://accenture.com"
+    },
+    {
+      "name": "Michael Courtin",
+      "email": "michael.courtin@accenture.com",
+      "url": "https://accenture.com"
     }
   ],
   "license": "Apache-2.0",
@@ -60,6 +65,7 @@
   },
   "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
+    "fast-safe-stringify": "2.1.1",
     "json-stable-stringify": "1.0.1",
     "key-encoder": "2.0.3",
     "loglevel": "1.7.1",
