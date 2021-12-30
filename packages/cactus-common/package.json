@@ -33,6 +33,11 @@
       "name": "Peter Somogyvari",
       "email": "peter.somogyvari@accenture.com",
       "url": "https://accenture.com"
+    },
+    {
+      "name": "Michael Courtin",
+      "email": "michael.courtin@accenture.com",
+      "url": "https://accenture.com"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",

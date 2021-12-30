@@ -48,6 +48,7 @@ import {
   Bools,
   Logger,
   LoggerProvider,
+  newRex,
   Servers,
 } from "@hyperledger/cactus-common";
 
@@ -248,17 +249,17 @@ export class ApiServer {
       }
 
       return { addressInfoCockpit, addressInfoApi, addressInfoGrpc };
-    } catch (ex) {
-      const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
-      this.log.error(errorMessage);
+    } catch (ex1: unknown) {
+      const context = "Failed to start ApiServer";
+      this.log.error(context, ex1);
       this.log.error(`Attempting shutdown...`);
       try {
         await this.shutdown();
         this.log.info(`Server shut down after crash OK`);
-      } catch (ex) {
-        this.log.error(ApiServer.E_POST_CRASH_SHUTDOWN, ex);
+      } catch (ex2: unknown) {
+        this.log.error(ApiServer.E_POST_CRASH_SHUTDOWN, ex2);
       }
-      throw new Error(errorMessage);
+      throw newRex(context, ex1);
     }
   }
 
@@ -304,11 +305,11 @@ export class ApiServer {
         await this.getPluginImportsCount(),
       );
       return this.pluginRegistry;
-    } catch (e) {
+    } catch (ex: unknown) {
       this.pluginRegistry = new PluginRegistry({ plugins: [] });
-      const errorMessage = `Failed init PluginRegistry: ${e.stack}`;
-      this.log.error(errorMessage);
-      throw new Error(errorMessage);
+      const context = "Failed to init PluginRegistry";
+      this.log.debug(context, ex);
+      throw newRex(context, ex);
     }
   }
 
@@ -368,15 +369,10 @@ export class ApiServer {
       await plugin.onPluginInit();
 
       return plugin;
-    } catch (error) {
-      const errorMessage = `${fnTag} failed instantiating plugin '${packageName}' with the instanceId '${options.instanceId}'`;
-      this.log.error(errorMessage, error);
-
-      if (error instanceof Error) {
-        throw new RuntimeError(errorMessage, error);
-      } else {
-        throw new RuntimeError(errorMessage, JSON.stringify(error));
-      }
+    } catch (ex: unknown) {
+      const context = `${fnTag} failed instantiating plugin '${packageName}' with the instanceId '${options.instanceId}'`;
+      this.log.debug(context, ex);
+      throw newRex(context, ex);
     }
   }
 
@@ -397,10 +393,10 @@ export class ApiServer {
     try {
       await fs.mkdirp(pluginPackageDir);
       this.log.debug(`${pkgName} plugin package dir: %o`, pluginPackageDir);
-    } catch (ex) {
-      const errorMessage =
+    } catch (ex: unknown) {
+      const context =
         "Could not create plugin installation directory, check the file-system permissions.";
-      throw new RuntimeError(errorMessage, ex);
+      throw newRex(context, ex);
     }
     try {
       lmify.setPackageManager("npm");
@@ -418,19 +414,15 @@ export class ApiServer {
         // "--ignore-workspace-root-check",
       ]);
       this.log.debug("%o install result: %o", pkgName, out);
-      if (out.exitCode !== 0) {
-        throw new RuntimeError("Non-zero exit code: ", JSON.stringify(out));
+      if (out?.exitCode && out.exitCode !== 0) {
+        const eMsg = "Non-zero exit code returned by lmify.install() indicating that the underlying npm install OS process had encountered a problem:";
+        throw newRex(eMsg, out);
       }
       this.log.info(`Installed ${pkgName} OK`);
-    } catch (ex) {
-      const errorMessage = `${fnTag} failed installing plugin '${pkgName}`;
-      this.log.error(errorMessage, ex);
-
-      if (ex instanceof Error) {
-        throw new RuntimeError(errorMessage, ex);
-      } else {
-        throw new RuntimeError(errorMessage, JSON.stringify(ex));
-      }
+    } catch (ex: unknown) {
+      const context = `${fnTag} failed installing plugin '${pkgName}`;
+      this.log.debug(ex, context);
+      throw newRex(context, ex);
     }
   }
 
@@ -451,24 +443,25 @@ export class ApiServer {
     this.log.info(`Stopped ${webServicesShutdown.length} WS plugin(s) OK`);
 
     if (this.httpServerApi?.listening) {
-      this.log.info(`Closing HTTP server of the API...`);
+      this.log.info(`Closing Cacti HTTP server of the API...`);
       await Servers.shutdown(this.httpServerApi);
       this.log.info(`Close HTTP server of the API OK`);
     }
 
     if (this.httpServerCockpit?.listening) {
-      this.log.info(`Closing HTTP server of the cockpit ...`);
+      this.log.info(`Closing Cacti HTTP server of the cockpit ...`);
       await Servers.shutdown(this.httpServerCockpit);
       this.log.info(`Close HTTP server of the cockpit OK`);
     }
 
     if (this.grpcServer) {
-      this.log.info(`Closing gRPC server ...`);
+      this.log.info(`Closing Cacti gRPC server ...`);
       await new Promise<void>((resolve, reject) => {
         this.grpcServer.tryShutdown((ex?: Error) => {
           if (ex) {
-            this.log.error("Failed to shut down gRPC server: ", ex);
-            reject(ex);
+            const eMsg = "Failed to shut down gRPC server of the Cacti API server.";
+            this.log.debug(eMsg, ex);
+            reject(newRex(eMsg, ex));
           } else {
             resolve();
           }
