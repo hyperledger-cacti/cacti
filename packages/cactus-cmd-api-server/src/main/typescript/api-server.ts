@@ -43,6 +43,7 @@ import {
   Bools,
   Logger,
   LoggerProvider,
+  LogHelper,
   Servers,
 } from "@hyperledger/cactus-common";
 
@@ -241,7 +242,8 @@ export class ApiServer {
 
       return { addressInfoCockpit, addressInfoApi, addressInfoGrpc };
     } catch (ex) {
-      const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
+      const stack = LogHelper.getExceptionStack(ex);
+      const errorMessage = `Failed to start ApiServer: ${stack}`;
       this.log.error(errorMessage);
       this.log.error(`Attempting shutdown...`);
       try {
@@ -296,9 +298,10 @@ export class ApiServer {
         await this.getPluginImportsCount(),
       );
       return this.pluginRegistry;
-    } catch (e) {
+    } catch (ex) {
       this.pluginRegistry = new PluginRegistry({ plugins: [] });
-      const errorMessage = `Failed init PluginRegistry: ${e.stack}`;
+      const stack = LogHelper.getExceptionStack(ex);
+      const errorMessage = `Failed init PluginRegistry: ${stack}`;
       this.log.error(errorMessage);
       throw new Error(errorMessage);
     }
