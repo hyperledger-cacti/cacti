@@ -29,8 +29,8 @@ const testcase = "";
 
 describe(testcase, () => {
   const containerImageVersion = "2021-01-08-7a055c3"; // Quorum v2.3.0, Tessera v0.10.0
-  const containerImageName = "hyperledger/cactus-quorum-all-in-one";
-  const ledgerOptions = { containerImageName, containerImageVersion };
+
+  const ledgerOptions = { containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
   const keychainEntryKey = uuidV4();
 

@@ -49,11 +49,11 @@ jobs:
       with:
         swap-size-gb: 10
 
-    - name: Use Node.js v14.17.6
+    - name: Use Node.js v14.18.2
       if: steps.run_result.outputs.run_result != 'success'
       uses: actions/setup-node@v2.1.2
       with:
-        node-version: v14.17.6
+        node-version: v14.18.2
 
 
     - uses: actions/checkout@v2.3.4
@@ -92,11 +92,11 @@ jobs:
       with:
         swap-size-gb: 10
 
-    - name: Use Node.js v16.9.1
+    - name: Use Node.js v16.11.1
       if: steps.run_result.outputs.run_result != 'success'
       uses: actions/setup-node@v2.1.2
       with:
-        node-version: v16.9.1
+        node-version: v16.11.1
 
     - uses: actions/checkout@v2.3.4
       if: steps.run_result.outputs.run_result != 'success'
