@@ -14,7 +14,7 @@ we had to increase it to a higher limit via the configuration file `config.yaml`
 
 1. Start the container and publish it's port `4873` to the host machine:
     ```sh
-    docker run -it --rm --publish 4873:4873 petermetz/cactus-test-npm-registry:1.0.0
+    docker run -it --rm --publish 4873:4873 ghcr.io/hyperledger/cactus-test-npm-registry:2021-12-20-81fd36c7
     ```
 2. Verify a canary publish with this container instead of using npmjs.com
 by specifying the registry URL as http://localhost:4873 such as

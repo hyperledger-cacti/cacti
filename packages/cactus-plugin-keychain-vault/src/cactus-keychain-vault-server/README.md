@@ -54,7 +54,7 @@ cargo run --example client -- --help
 
 ```sh
 docker run --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID=myroot' -p 8200:8200 vault
-docker build . -t ckvs
+docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -t ckvs
 docker run --net="host" --rm -e VAULT_TOKEN=myroot -p 8080:8080 ckvs
 
 export THE_SECRET=$(uuidgen)
