@@ -5,9 +5,10 @@
  * transferNumericAsset.ts
  */
 
+import { io } from "socket.io-client";
+
 {
   // Validator test program.(socket.io client)
-  const io = require("socket.io-client");
   const config = require("config");
 
   // Specify the server (Validator) of the communication destination
@@ -32,7 +33,7 @@
   }
 
   console.log(
-    `execution parameter : fromAddress = ${process.argv[2]}, toAddress = ${process.argv[3]}, amount = ${process.argv[4]}`
+    `execution parameter : fromAddress = ${process.argv[2]}, toAddress = ${process.argv[3]}, amount = ${process.argv[4]}`,
   );
 
   const fromAddress = process.argv[2];
