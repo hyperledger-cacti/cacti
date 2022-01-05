@@ -1,11 +1,10 @@
 {
-	"name": "validatorDriver",
-	"version": "0.0.0",
-	"private": true,
-	"dependencies": {
-		"config": "^1.26.1",
-		"socket.io": "^2.0.4",
-		"fabric-ca-client": "2.2.10",
-		"fabric-network": "2.2.10"
-	}
+  "name": "validatorDriver",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "config": "^1.26.1",
+    "fabric-ca-client": "2.2.10",
+    "fabric-network": "2.2.10"
+  }
 }
