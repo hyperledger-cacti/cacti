@@ -19,7 +19,7 @@ import {
   deleteAndDisconnectSocke,
 } from "./driver-common";
 
-const io = require("socket.io-client");
+import { io } from "socket.io-client";
 
 const targetValidatorUrl = "https://localhost:5050";
 

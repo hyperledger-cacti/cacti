@@ -78,7 +78,7 @@ test("Static method sign encrypts payload using private key", () => {
   log.debug("decryptedMessage:", decryptedMessage);
   expect(decryptedMessage).toMatchObject(message);
 
-  const decryptedJwt = decryptedMessage as jwt.JwtPayload;
+  const decryptedJwt = decryptedMessage as { iat: number; exp: number };
 
   // Assert issue at
   expect(decryptedJwt.iat).toBeNumber();
