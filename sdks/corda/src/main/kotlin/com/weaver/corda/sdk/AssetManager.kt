@@ -21,6 +21,7 @@ import java.util.*
 import com.google.protobuf.ByteString
 import com.weaver.corda.app.interop.flows.*
 import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
+import com.weaver.corda.app.interop.states.AssetPledgeState
 
 import com.weaver.protos.common.asset_locks.AssetLocks
 
@@ -101,6 +102,72 @@ class AssetManager {
             } catch (e: Exception) {
                 AssetManager.logger.error("Error locking fungible asset in Corda network: ${e.message}\n")
                 Left(Error("Error locking fungible asset in Corda network: ${e.message}"))
+            }
+        }
+
+        @JvmStatic
+        @JvmOverloads fun createFungibleAssetPledge(
+            proxy: CordaRPCOps,
+            tokenType: String,
+            numUnits: Long,
+            recipientParty: String,
+            expiryTimeSecs: Long,
+            getAssetStateAndRefFlow: String,
+            deleteAssetStateCommand: CommandData,
+            issuer: Party,
+            observers: List<Party> = listOf<Party>()
+        ): Either<Error, String> {
+            return try {
+                AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
+                val contractId = runCatching {
+                    val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, recipientParty, "1234567;891011121314")
+                    proxy.startFlow(::PledgeFungibleAsset, assetAgreement, expiryTimeSecs, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
+                        .returnValue.get()
+                }.fold({
+                    it.map { linearId ->
+                        AssetManager.logger.debug("Pledge of fungible asset was successful and the state was stored with linearId $linearId.\n")
+                        linearId.toString()
+                    }
+                }, {
+                        Left(Error("Corda Network Error: Error running PledgeFungibleAsset flow: ${it.message}\n"))
+                })
+                contractId
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error pledging fungible asset in Corda network: ${e.message}\n")
+                Left(Error("Error pledging fungible asset in Corda network: ${e.message}"))
+            }
+        }
+
+        @JvmStatic
+        @JvmOverloads fun createAssetPledge(
+            proxy: CordaRPCOps,
+            assetType: String,
+            assetId: String,
+            recipientParty: String,
+            expiryTimeSecs: Long,
+            getAssetStateAndRefFlow: String,
+            deleteAssetStateCommand: CommandData,
+            issuer: Party,
+            observers: List<Party> = listOf<Party>()
+        ): Either<Error, String> {
+            return try {
+                AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
+                val contractId = runCatching {
+                    val assetAgreement = createAssetExchangeAgreement(assetType, assetId, recipientParty, "")
+                    proxy.startFlow(::PledgeAsset, assetAgreement, expiryTimeSecs, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
+                        .returnValue.get()
+                }.fold({
+                    it.map { linearId ->
+                        AssetManager.logger.debug("Pledge of fungible asset was successful and the state was stored with linearId $linearId.\n")
+                        linearId.toString()
+                    }
+                }, {
+                    Left(Error("Corda Network Error: Error running PledgeFungibleAsset flow: ${it.message}\n"))
+                })
+                contractId
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error pledging fungible asset in Corda network: ${e.message}\n")
+                Left(Error("Error pledging fungible asset in Corda network: ${e.message}"))
             }
         }
 
@@ -241,6 +308,48 @@ class AssetManager {
                 return null
             }
         }
+
+        @JvmStatic
+        fun isAssetPledgedForTransfer(
+            proxy: CordaRPCOps,
+            contractId: String
+        ): Boolean {
+            return try {
+                AssetManager.logger.debug("Querying if asset is pledged in Corda as part of asset-transfer.\n")
+                val isAssetPledged = proxy.startFlow(::IsAssetPledged, contractId)
+                    .returnValue.get()
+                isAssetPledged
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error querying asset pledge state for transfer in Corda network: ${e.message}\n")
+                false
+            }
+        }
+
+        @JvmStatic
+        fun readPledgeStateByContractId(
+            proxy: CordaRPCOps,
+            contractId: String
+        ): Either<Error, StateAndRef<AssetPledgeState>> {
+            return try {
+                AssetManager.logger.debug("Querying asset pledge state for transfer from Corda as part of asset-transfer.\n")
+                val obj = runCatching {
+                    proxy.startFlow(::GetAssetPledgeStateById, contractId)
+                        .returnValue.get()
+                }.fold({
+                    it.map { retObj ->
+                    AssetManager.logger.debug("Querying asset pledge state was successful.\n")
+                    retObj
+                    }
+                }, {
+                    Left(Error("Corda Network Error: Error in GetAssetPledgeStateById flow: ${it.message}\n"))
+                })
+                obj
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error querying asset pledge state from Corda network: ${e.message}\n")
+                Left(Error("Error querying asset pledge state from Corda network: ${e.message}"))
+            }
+        }
+
 
         fun createAssetExchangeAgreement(
             assetType: String,
