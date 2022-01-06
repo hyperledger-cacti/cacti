@@ -222,7 +222,7 @@ class AssetManager {
                         .returnValue.get()
                 }.fold({
                     it.map { retSignedTx ->
-                        AssetManager.logger.debug("Claim asset was successful.\n")
+                        AssetManager.logger.debug("Unlock asset was successful.\n")
                         retSignedTx
                     }
                 }, {
@@ -232,6 +232,35 @@ class AssetManager {
             } catch (e: Exception) {
                 AssetManager.logger.error("Error unlocking asset in Corda network: ${e.message}\n")
                 Left(Error("Error unlocking asset in Corda network: ${e.message}"))
+            }
+        }
+
+        @JvmStatic
+        fun reclaimPledgedAsset(
+            proxy: CordaRPCOps,
+            contractId: String,
+            createAssetStateCommand: CommandData,
+            issuer: Party,
+            observers: List<Party> = listOf<Party>()
+        ): Either<Error, SignedTransaction> {
+            return try {
+                AssetManager.logger.debug("Sending asset-reclaim request to Corda as part of asset-transfer.\n")
+                val signedTx = runCatching {
+
+                    proxy.startFlow(::ReclaimAsset, contractId, createAssetStateCommand, issuer, observers)
+                        .returnValue.get()
+                }.fold({
+                    it.map { retSignedTx ->
+                        AssetManager.logger.debug("Reclaim of pledged asset was successful.\n")
+                        retSignedTx
+                    }
+                }, {
+                    Left(Error("Corda Network Error: Error running ReclaimAsset flow: ${it.message}\n"))
+                })
+                signedTx
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error reclaiming asset in Corda network: ${e.message}\n")
+                Left(Error("Error reclaiming asset in Corda network: ${e.message}"))
             }
         }
 

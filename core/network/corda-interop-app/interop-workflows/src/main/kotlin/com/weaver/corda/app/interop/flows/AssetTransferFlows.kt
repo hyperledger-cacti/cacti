@@ -263,3 +263,152 @@ class GetAssetPledgeStateById(
         Left(Error("Error fetching state from the vault: ${e.message}"))
     }
 }
+
+/**
+ * The ReclaimPledgedAsset flow is used to reclaim an asset that is pledged already in the same local corda network.
+ *
+ * @property contractId The unique identifier for an AssetPledgeState.
+ */
+object ReclaimPledgedAsset {
+    @InitiatingFlow
+    @StartableByRPC
+    class Initiator
+    @JvmOverloads
+    constructor(
+        val contractId: String,
+        val assetStateCreateCommand: CommandData,
+        val issuer: Party,
+        val observers: List<Party> = listOf<Party>()
+    ) : FlowLogic<Either<Error, SignedTransaction>>() {
+        /**
+         * The call() method captures the logic to reclaim an asset.
+         *
+         * @return Returns SignedTransaction.
+         */
+        @Suspendable
+        override fun call(): Either<Error, SignedTransaction> = try {
+            val linearId = getLinearIdFromString(contractId)
+            subFlow(GetAssetPledgeStateById(contractId)).fold({
+                println("AssetPledgeState for Id: ${linearId} not found.")
+                Left(Error("AssetPledgeState for Id: ${linearId} not found."))
+            }, {
+                val assetPledgeState = it.state.data
+                println("Party: ${ourIdentity} ReclaimPledgeState: ${assetPledgeState}")
+                val notary = it.state.notary
+                val reclaimCmd = Command(AssetTransferContract.Commands.ReclaimPledgedAsset(),
+                    listOf(
+                        assetPledgeState.locker.owningKey
+                    )
+                )
+                val assetCreateCmd = Command(assetStateCreateCommand,
+                    setOf(
+                        assetPledgeState.locker.owningKey,
+                        issuer.owningKey
+                    ).toList()
+                )
+
+                val reclaimAssetStateAndRef = assetPledgeState.assetStatePointer.resolve(serviceHub)
+                val reclaimAssetState = reclaimAssetStateAndRef.state.data
+                val assetStateContractId = reclaimAssetStateAndRef.state.contract
+
+                val networkIdStates = serviceHub.vaultService.queryBy<NetworkIdState>().states
+                var fetchedNetworkIdState: StateAndRef<NetworkIdState>? = null
+
+                if (networkIdStates.isNotEmpty()) {
+                    // consider that there will be only one such state ideally
+                    fetchedNetworkIdState = networkIdStates.first()
+                    println("Network id for local Corda newtork is: $fetchedNetworkIdState\n")
+                } else {
+                    println("Not able to fetch network id for local Corda network\n")
+                }
+
+                val txBuilder = TransactionBuilder(notary)
+                    .addInputState(it)
+                    .addOutputState(reclaimAssetState, assetStateContractId)
+                    .addCommand(reclaimCmd).apply {
+                        fetchedNetworkIdState?.let {
+                            this.addReferenceState(ReferencedStateAndRef(fetchedNetworkIdState))
+                        }
+                    }
+                    .addCommand(assetCreateCmd)
+                    .setTimeWindow(TimeWindow.fromOnly(assetPledgeState.expiryTime.plusNanos(1)))
+
+                // Verify and collect signatures on the transaction
+                txBuilder.verify(serviceHub)
+                var partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+                println("${ourIdentity} signed transaction.")
+
+                var sessions = listOf<FlowSession>()
+
+                if (!ourIdentity.equals(issuer)) {
+                    val issuerSession = initiateFlow(issuer)
+                    issuerSession.send(AssetTransferResponderRole.ISSUER)
+                    sessions += issuerSession
+                }
+                if (!ourIdentity.equals(assetPledgeState.locker)) {
+                    val lockerSession = initiateFlow(assetPledgeState.locker)
+                    lockerSession.send(AssetTransferResponderRole.LOCKER)
+                    sessions += lockerSession
+                }
+                val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
+
+                var observerSessions = listOf<FlowSession>()
+                for (obs in observers) {
+                    val obsSession = initiateFlow(obs)
+                    obsSession.send(AssetTransferResponderRole.OBSERVER)
+                    observerSessions += obsSession
+                }
+                Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
+            })
+        } catch (e: Exception) {
+            println("Error unlocking: ${e.message}\n")
+            Left(Error("Failed to unlock: ${e.message}"))
+        }
+    }
+
+    @InitiatedBy(Initiator::class)
+    class Acceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+        @Suspendable
+        override fun call(): SignedTransaction {
+            val role = session.receive<AssetTransferResponderRole>().unwrap { it }
+            if (role == AssetTransferResponderRole.ISSUER) {
+                val signTransactionFlow = object : SignTransactionFlow(session) {
+                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                    }
+                }
+                try {
+                    val txId = subFlow(signTransactionFlow).id
+                    println("Issuer signed transaction.")
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                } catch (e: Exception) {
+                    println("Error signing unlock asset transaction by Issuer: ${e.message}\n")
+                    return subFlow(ReceiveFinalityFlow(session))
+                }
+            } else if (role == AssetTransferResponderRole.LOCKER) {
+                val signTransactionFlow = object : SignTransactionFlow(session) {
+                    override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                        val lTx = stx.tx.toLedgerTransaction(serviceHub)
+                        "The input State must be AssetPledgeState" using (lTx.inputs[0].state.data is AssetPledgeState)
+                        val pledgedState = lTx.inputs.single().state.data as AssetPledgeState
+                        "I must be the locker" using (pledgedState.locker == ourIdentity)
+                    }
+                }
+                try {
+                    val txId = subFlow(signTransactionFlow).id
+                    println("Locker signed transaction.")
+                    return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+                } catch (e: Exception) {
+                    println("Error signing unlock asset transaction by Locker: ${e.message}\n")
+                    return subFlow(ReceiveFinalityFlow(session))
+                }
+            } else if (role == AssetTransferResponderRole.OBSERVER) {
+                val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
+                println("Received Tx: ${sTx}")
+                return sTx
+            } else {
+                println("Incorrect Responder Role.")
+                throw IllegalStateException("Incorrect Responder Role.")
+            }
+        }
+    }
+}

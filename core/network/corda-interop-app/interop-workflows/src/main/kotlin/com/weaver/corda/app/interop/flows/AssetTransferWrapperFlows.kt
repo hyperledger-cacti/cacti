@@ -36,7 +36,7 @@ import java.util.Base64
 import com.weaver.protos.common.asset_locks.AssetLocks
 
 /**
- * The AssetTransferPledge flow is used to create a pledge for a fungible asset.
+ * The PledgeFungibleAsset flow is used to create a pledge for a fungible asset.
  *
  * @property agreement The details of the fungible asset being pledged for transfer to remote network.
  *                          AssetType, numUnits & recipient are captured by the "agreement" structure.
@@ -129,7 +129,7 @@ constructor(
 
 
 /**
- * The AssetTransferPledge flow is used to create a pledge for a non-fungible asset.
+ * The PledgeAsset flow is used to create a pledge for a non-fungible asset.
  *
  * @property agreement The details of the non-fungible asset being pledged for transfer to remote network.
  *                          AssetType, AssetId & recipient are captured by the "agreement" structure.
@@ -156,13 +156,13 @@ constructor(
     val observers: List<Party> = listOf<Party>()
 ) : FlowLogic<Either<Error, UniqueIdentifier>>() {
     /**
-     * The call() method captures the logic to create a new [AssetExchangeHTLCState] state in the vault.
+     * The call() method captures the logic to create a new [AssetPledgeState] state in the vault.
      *
-     * It first creates a new AssetExchangeHTLCState. It then builds
+     * It first creates a new AssetPledgeState. It then builds
      * and verifies the transaction, collects the required signatures,
      * and stores the state in the vault.
      *
-     * @return Returns the contractId of the newly created [AssetExchangeHTLCState].
+     * @return Returns the contractId of the newly created [AssetPledgeState].
      */
     @Suspendable
     override fun call(): Either<Error, UniqueIdentifier> = try {
@@ -218,5 +218,43 @@ constructor(
     } catch (e: Exception) {
         println("Error pledging non-fungible asset: ${e.message}\n")
         Left(Error("Failed to pledge non-fungible asset: ${e.message}"))
+    }
+}
+
+/**
+ * The ReclaimAsset flow is used to reclaim an already pledged asset in the same local corda network.
+ *
+ * @property contractId The unique identifier for an AssetExchangeHTLCState.
+ * @property assetStateCreateCommand The name of the command used to create an asset that's pledged earlier.
+ * @property issuer The issuing authority of the pledged fungible asset.
+ * @property observers The parties who are not transaction participants but only observers.
+ */
+
+@InitiatingFlow
+@StartableByRPC
+class ReclaimAsset
+@JvmOverloads
+constructor(
+    val contractId: String,
+    val assetStateCreateCommand: CommandData,
+    val issuer: Party,
+    val observers: List<Party> = listOf<Party>()
+) : FlowLogic<Either<Error, SignedTransaction>>() {
+    /**
+     * The call() method captures the logic to reclaim an asset that is pledged earlier.
+     *
+     * @return Returns SignedTransaction.
+     */
+    @Suspendable
+    override fun call(): Either<Error, SignedTransaction> = try {
+        subFlow(ReclaimPledgedAsset.Initiator(
+            contractId,
+            assetStateCreateCommand,
+            issuer,
+            observers
+        ))
+    } catch (e: Exception) {
+        println("Error reclaiming: ${e.message}\n")
+        Left(Error("Failed to reclaim: ${e.message}"))
     }
 }

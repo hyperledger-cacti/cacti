@@ -112,6 +112,47 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
 }
 
 /**
+ * Command to reclaim a pledged asset after timeout.
+ */
+class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help = "Reclaims a pledged asset after timeout.") {
+    val config by requireObject<Map<String, String>>()
+    val contractId: String? by option("-cid", "--contract-id", help="Contract/Linear Id for Asset Transfer Pledge State")
+    val observer: String? by option("-o", "--observer", help="Party Name for Observer")
+    override fun run() = runBlocking {
+        if (contractId == null) {
+            println("Arguments required: --contract-id.")
+        } else {
+            val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+            try {
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
+                println("TokenType: $issuedTokenType")
+                var obs = listOf<Party>()
+                if (observer != null)   {
+                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
+                }
+                val res = AssetManager.reclaimPledgedAsset(
+                    rpc.proxy,
+                    contractId!!,
+                    IssueTokenCommand(issuedTokenType, listOf(0)),
+                    issuer,
+                    obs
+                )
+                println("Pledged Asset Reclaim Response: ${res}")
+            } catch (e: Exception) {
+                println("Error: ${e.toString()}")
+            } finally {
+                rpc.close()
+            }
+        }
+    }
+}
+
+/**
  * Query pledge status of an asset for asset-transfer.
  */
 class IsHouseTokenPledgedCommand : CliktCommand(name="is-pledged", help = "Query pledge status of an asset, given contractId.") {

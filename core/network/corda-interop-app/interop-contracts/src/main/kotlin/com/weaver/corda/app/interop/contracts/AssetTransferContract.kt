@@ -82,6 +82,12 @@ class AssetTransferContract : Contract {
                 // Verify if locker is the signer
                 val requiredSigners = listOf(pledgeState.locker.owningKey)
                 "The required signers of the transaction must include the locker." using (command.signers.containsAll(requiredSigners))
+
+                val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
+                "There should be a single reference input network id." using (inReferences.size == 1)
+                val validNetworkIdState = inReferences.get(0).state.data
+
+                "LocalNetwokId must match with the networkId of current network." using (pledgeState.localNetworkId.equals(validNetworkIdState.networkId))
             }
         }
     }
