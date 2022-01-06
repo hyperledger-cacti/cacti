@@ -591,8 +591,9 @@ object UnlockAssetHTLC {
             } else if (role == ResponderRole.LOCKER) {
               val signTransactionFlow = object : SignTransactionFlow(session) {
                   override fun checkTransaction(stx: SignedTransaction) = requireThat {
-                      "The output State must be AssetExchangeHTLCState" using (stx.tx.outputs.single().data is AssetExchangeHTLCState)
-                      val htlcState = stx.tx.outputs.single().data as AssetExchangeHTLCState
+                      val lTx = stx.tx.toLedgerTransaction(serviceHub)
+                      "The input State must be AssetExchangeHTLCState" using (lTx.inputs[0].state.data is AssetExchangeHTLCState)
+                      val htlcState = lTx.inputs.single().state.data as AssetExchangeHTLCState
                       "I must be the locker" using (htlcState.locker == ourIdentity)
                   }
               }
