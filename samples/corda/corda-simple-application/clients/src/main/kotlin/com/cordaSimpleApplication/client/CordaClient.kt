@@ -109,7 +109,8 @@ fun main(args: Array<String>) = App()
                     GetHouseTokenLockStateCommand(),
                     PledgeHouseTokenCommand(),
                     IsHouseTokenPledgedCommand(),
-                    GetHouseTokenPledgeStateCommand()
+                    GetHouseTokenPledgeStateCommand(),
+                    ReclaimHouseTokenCommand()
                 ),
                 CreateNetworkIdStateCommand(),
                 RetrieveNetworkIdStateAndRefCommand()
