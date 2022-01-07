@@ -44,8 +44,8 @@ test("BEFORE " + testCase, async (t: Test) => {
 test(testCase, async (t: Test) => {
   // create the test quorumTestLedger
   const containerImageVersion = "2021-01-08-7a055c3"; // Quorum v2.3.0, Tessera v0.10.0
-  const containerImageName = "hyperledger/cactus-quorum-all-in-one";
-  const ledgerOptions = { containerImageName, containerImageVersion };
+
+  const ledgerOptions = { containerImageVersion };
   const quorumTestLedger = new QuorumTestLedger(ledgerOptions);
   test.onFinish(async () => {
     await quorumTestLedger.stop();
