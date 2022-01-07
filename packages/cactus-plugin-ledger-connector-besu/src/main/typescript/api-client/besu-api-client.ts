@@ -3,7 +3,7 @@ import { finalize } from "rxjs/operators";
 import { Socket, io } from "socket.io-client";
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { Constants } from "@hyperledger/cactus-core-api";
+import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi,
   WatchBlocksV1,
@@ -17,7 +17,9 @@ export class BesuApiClientOptions extends Configuration {
   readonly wsApiPath?: string;
 }
 
-export class BesuApiClient extends DefaultApi {
+export class BesuApiClient
+  extends DefaultApi
+  implements ISocketApiClient<WatchBlocksV1Progress> {
   public static readonly CLASS_NAME = "BesuApiClient";
 
   private readonly log: Logger;
@@ -45,7 +47,7 @@ export class BesuApiClient extends DefaultApi {
     this.log.debug(`basePath=${this.options.basePath}`);
   }
 
-  public async watchBlocksV1(): Promise<Observable<WatchBlocksV1Progress>> {
+  public watchBlocksV1(): Observable<WatchBlocksV1Progress> {
     const socket: Socket = io(this.wsApiHost, { path: this.wsApiPath });
     const subject = new ReplaySubject<WatchBlocksV1Progress>(0);
 

@@ -1,7 +1,7 @@
 <!--
  Copyright 2021 Hyperledger Cactus Contributors
  SPDX-License-Identifier: Apache-2.0
- 
+
  README.md
 -->
 # `@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio`
@@ -33,36 +33,30 @@ This plugin provides `Cactus` a way to interact with Go-Ethereum networks. Using
   - if this port is already used, please change the setting on `docker-compose.yaml`
 
 ### Boot methods
+#### 1. Run configure command from the project root directory:
+```
+npm run configure
+```
 
-#### 1. Build the modules
-- Install npm packages and build them
-	```
-	cd cactus/packages/cactus-plugin-ledger-connector-go-ethereum-socketio
-	npm install
-	npm run build
-	```
-- Create symbolic link to node_modules
-	- NOTE: This command is enough to execute only once.
-	```
-	npm run init-ethereum
-	```
+#### 2. Go to the go-ethereum connector package directory:
+```
+cd cactus/packages/cactus-plugin-ledger-connector-go-ethereum-socketio
+```
 
-#### 2. Create the docker image
-- Create the docker image
-	```
-	docker-compose -f docker-compose.yaml build
-	```
+#### 3. Create the docker image
+```
+docker-compose -f docker-compose.yaml build
+```
 
-#### 3. Launch the container
-- Launce the container
-	```
-	docker-compose -f docker-compose.yaml up
-	```
+#### 4. Launch the container
+```
+docker-compose -f docker-compose.yaml up
+```
 
 ## Usage samples
 - To confirm the operation of this package, please refer to the following business-logic sample applications:
-	- [electricity-trade](../../examples/electricity-trade)
-	- [car-trade](../../examples/cartrade)
+    - [electricity-trade](../../examples/electricity-trade)
+    - [car-trade](../../examples/cartrade)
 
 ## Contributing
 
@@ -74,4 +68,4 @@ Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
 
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
 
-## Acknowledgments 
+## Acknowledgments
