@@ -21,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 import net.corda.core.messaging.startFlow
 import com.google.protobuf.util.JsonFormat
 import java.util.Base64
+import java.util.Calendar
 import net.corda.core.utilities.OpaqueBytes
 import net.corda.core.crypto.sha256
 import java.time.Instant
@@ -61,6 +62,10 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
             } else {
                 nTimeout = timeout!!.toLong()
             }
+            println("nTimeout: $nTimeout")
+            val calendar = Calendar.getInstance()
+            nTimeout += calendar.timeInMillis / 1000
+            println("nTimeout: $nTimeout")
             val rpc = NodeRPCConnection(
                     host = config["CORDA_HOST"]!!,
                     username = "clientUser1",
@@ -78,7 +83,9 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                 }
                 if (fungible) {
                     id = AssetManager.createFungibleAssetPledge(
-                        rpc.proxy, 
+                        rpc.proxy,
+                        "1234567",
+                        "891011121314",
                         params[0],          // Type
                         params[1].toLong(), // Quantity
                         recipient!!, 
@@ -90,7 +97,9 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                     )
                 } else {
                     id = AssetManager.createAssetPledge(
-                        rpc.proxy, 
+                        rpc.proxy,
+                        "1234567",
+                        "891011121314",
                         params[0],      // Type
                         params[1],      // ID
                         recipient!!, 

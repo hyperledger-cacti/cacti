@@ -24,6 +24,7 @@ import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
 import com.weaver.corda.app.interop.states.AssetPledgeState
 
 import com.weaver.protos.common.asset_locks.AssetLocks
+import com.weaver.protos.common.asset_transfer.AssetTransfer
 
 class AssetManager {
     companion object {
@@ -108,6 +109,8 @@ class AssetManager {
         @JvmStatic
         @JvmOverloads fun createFungibleAssetPledge(
             proxy: CordaRPCOps,
+            localNetworkID: String,
+            remoteNetworkID: String,
             tokenType: String,
             numUnits: Long,
             recipientParty: String,
@@ -120,8 +123,9 @@ class AssetManager {
             return try {
                 AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
                 val contractId = runCatching {
-                    val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, recipientParty, "1234567;891011121314")
-                    proxy.startFlow(::PledgeFungibleAsset, assetAgreement, expiryTimeSecs, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
+                    val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, "", "")
+                    val assetPledge = createAssetTransferAgreement(com.google.protobuf.ByteString.EMPTY, localNetworkID, remoteNetworkID, recipientParty, expiryTimeSecs)
+                    proxy.startFlow(::PledgeFungibleAsset, assetAgreement, assetPledge, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
                         .returnValue.get()
                 }.fold({
                     it.map { linearId ->
@@ -141,6 +145,8 @@ class AssetManager {
         @JvmStatic
         @JvmOverloads fun createAssetPledge(
             proxy: CordaRPCOps,
+            localNetworkID: String,
+            remoteNetworkID: String,
             assetType: String,
             assetId: String,
             recipientParty: String,
@@ -153,8 +159,9 @@ class AssetManager {
             return try {
                 AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
                 val contractId = runCatching {
-                    val assetAgreement = createAssetExchangeAgreement(assetType, assetId, recipientParty, "")
-                    proxy.startFlow(::PledgeAsset, assetAgreement, expiryTimeSecs, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
+                    val assetAgreement = createAssetExchangeAgreement(assetType, assetId, "", "")
+                    val assetPledge = createAssetTransferAgreement(com.google.protobuf.ByteString.EMPTY, localNetworkID, remoteNetworkID, recipientParty, expiryTimeSecs)
+                    proxy.startFlow(::PledgeAsset, assetAgreement, assetPledge, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
                         .returnValue.get()
                 }.fold({
                     it.map { linearId ->
@@ -411,6 +418,25 @@ class AssetManager {
 
                 return assetAgreement
         }
+
+        fun createAssetTransferAgreement(
+            assetDetails: ByteString,
+            localNetworkID: String,
+            remoteNetworkID: String,
+            recipient: String,
+            expiryTimeSecs: Long): AssetTransfer.AssetPledge {
+
+                val assetPledge = AssetTransfer.AssetPledge.newBuilder()
+                    .setAssetDetails(assetDetails)
+                    .setLocalNetworkID(localNetworkID)
+                    .setRemoteNetworkID(remoteNetworkID)
+                    .setRecipient(recipient)
+                    .setExpiryTimeSecs(expiryTimeSecs)
+                    .build()
+
+                return assetPledge
+        }
+        
 
         fun createAssetLockInfo(
             hashBase64: String,
