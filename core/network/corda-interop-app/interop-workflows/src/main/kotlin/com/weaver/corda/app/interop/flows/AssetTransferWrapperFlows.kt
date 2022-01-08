@@ -34,6 +34,7 @@ import java.time.Instant
 import java.util.Base64
 
 import com.weaver.protos.common.asset_locks.AssetLocks
+import com.weaver.protos.common.asset_transfer.AssetTransfer
 
 /**
  * The PledgeFungibleAsset flow is used to create a pledge for a fungible asset.
@@ -55,7 +56,7 @@ class PledgeFungibleAsset
 @JvmOverloads
 constructor(
         val agreement: AssetLocks.FungibleAssetExchangeAgreement,
-        val expiryTimeSecs: Long,
+        val assetPledge: AssetTransfer.AssetPledge,
         val getAssetFlowName: String,
         val assetStateDeleteCommand: CommandData,
         val issuer: Party,
@@ -75,9 +76,9 @@ constructor(
 
         val assetType = agreement.type
         val numUnits = agreement.numUnits
-        val recipient = agreement.recipient
+        val recipient = assetPledge.recipient
 
-        val expiryTime: Instant = Instant.ofEpochSecond(expiryTimeSecs)
+        val expiryTime: Instant = Instant.ofEpochSecond(assetPledge.expiryTimeSecs)
         if (expiryTime.isBefore(Instant.now())) {
             Left(Error("Invalid Expiry Time for fungible asset pledge."))
         }
@@ -102,21 +103,15 @@ constructor(
                 Left(Error("Error: Receipient party cannot be empty: ${recipient}."))
             }
 
-            var networkIds = listOf<String>()
-            // locker consists of concatination of local and remote network ids
-            println("Network ids are ${agreement.locker}")
-            val networks = agreement.locker.split(";").toTypedArray();
-            networks.forEach {
-                networkIds += it
-            }
+            println("Local network id is ${assetPledge.localNetworkID} and remote network id is ${assetPledge.remoteNetworkID}")
 
             subFlow(AssetTransferPledge.Initiator(
                 expiryTime,
                 assetRef!!,
                 assetStateDeleteCommand,
                 recipient,
-                networkIds.get(0),
-                networkIds.get(1),
+                assetPledge.localNetworkID,
+                assetPledge.remoteNetworkID,
                 issuer,
                 observers
             ))
@@ -149,7 +144,7 @@ class PledgeAsset
 @JvmOverloads
 constructor(
     val agreement: AssetLocks.AssetExchangeAgreement,
-    val expiryTimeSecs: Long,
+    val assetPledge: AssetTransfer.AssetPledge,
     val getAssetFlowName: String,
     val assetStateDeleteCommand: CommandData,
     val issuer: Party,
@@ -169,9 +164,9 @@ constructor(
 
         val assetType = agreement.type
         val assetId = agreement.id
-        val recipient = agreement.recipient
+        val recipient = assetPledge.recipient
 
-        val expiryTime: Instant = Instant.ofEpochSecond(expiryTimeSecs)
+        val expiryTime: Instant = Instant.ofEpochSecond(assetPledge.expiryTimeSecs)
         if (expiryTime.isBefore(Instant.now())) {
             Left(Error("Invalid Expiry Time."))
         }
@@ -196,21 +191,15 @@ constructor(
                 Left(Error("Error: Receipient party cannot be empty: ${recipient}."))
             }
 
-            var networkIds = listOf<String>()
-            // locker consists of concatination of local and remote network ids
-            println("Network ids are ${agreement.locker}")
-            val networks = agreement.locker.split(";").toTypedArray();
-            networks.forEach {
-                networkIds += it
-            }
+            println("Local network id is ${assetPledge.localNetworkID} and remote network id is ${assetPledge.remoteNetworkID}")
 
             subFlow(AssetTransferPledge.Initiator(
                 expiryTime,
                 assetRef!!,
                 assetStateDeleteCommand,
                 recipient,
-                networkIds.get(0),
-                networkIds.get(1),
+                assetPledge.localNetworkID,
+                assetPledge.remoteNetworkID,
                 issuer,
                 observers
             ))
