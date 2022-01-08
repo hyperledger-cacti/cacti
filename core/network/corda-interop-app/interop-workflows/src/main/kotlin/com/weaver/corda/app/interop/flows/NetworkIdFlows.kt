@@ -167,3 +167,28 @@ class RetrieveNetworkIdStateAndRef() : FlowLogic<StateAndRef<NetworkIdState>?>()
         return fetchedState
     }
 }
+
+/**
+ * The RetrieveNetworkId flow is used to retrieve the value [NetworkIdState].networkId from the vault.
+ */
+@InitiatingFlow
+@StartableByRPC
+class RetrieveNetworkId() : FlowLogic<String?>() {
+
+    override fun call(): String? {
+
+        val states = serviceHub.vaultService.queryBy<NetworkIdState>().states
+        var fetchedState: NetworkIdState? = null
+
+        if (states.isNotEmpty()) {
+            // consider that there will be only one such state ideally
+            //fetchedState = states.first().state.data as NetworkIdState
+            fetchedState = states.first().state.data
+            println("Network id for local Corda newtork is: $fetchedState\n")
+        } else {
+            println("Not able to fetch network id for local Corda network\n")
+        }
+
+        return fetchedState!!.networkId
+    }
+}

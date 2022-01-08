@@ -35,6 +35,7 @@ import com.r3.corda.lib.tokens.contracts.commands.IssueTokenCommand
 import net.corda.samples.tokenizedhouse.flows.RetrieveStateAndRef
 import net.corda.samples.tokenizedhouse.flows.GetIssuedTokenType
 import com.r3.corda.lib.tokens.contracts.FungibleTokenContract
+import com.weaver.corda.app.interop.flows.RetrieveNetworkId
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 
@@ -62,10 +63,10 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
             } else {
                 nTimeout = timeout!!.toLong()
             }
-            println("nTimeout: $nTimeout")
             val calendar = Calendar.getInstance()
             nTimeout += calendar.timeInMillis / 1000
             println("nTimeout: $nTimeout")
+
             val rpc = NodeRPCConnection(
                     host = config["CORDA_HOST"]!!,
                     username = "clientUser1",
@@ -77,6 +78,11 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                 val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
                 val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
                 println("TokenType: $issuedTokenType")
+
+                val localNetworkId = rpc.proxy.startFlow(::RetrieveNetworkId).returnValue.get()
+                println("localNetworkId: ${localNetworkId}")
+                val remoteNetworkId = "891011121314"
+
                 var obs = listOf<Party>()
                 if (observer != null)   {
                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
@@ -84,8 +90,8 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                 if (fungible) {
                     id = AssetManager.createFungibleAssetPledge(
                         rpc.proxy,
-                        "1234567",
-                        "891011121314",
+                        localNetworkId!!,
+                        remoteNetworkId,
                         params[0],          // Type
                         params[1].toLong(), // Quantity
                         recipient!!, 
@@ -98,8 +104,8 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                 } else {
                     id = AssetManager.createAssetPledge(
                         rpc.proxy,
-                        "1234567",
-                        "891011121314",
+                        localNetworkId!!,
+                        remoteNetworkId,
                         params[0],      // Type
                         params[1],      // ID
                         recipient!!, 
