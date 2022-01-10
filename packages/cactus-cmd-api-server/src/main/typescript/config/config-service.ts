@@ -1,6 +1,7 @@
 import { SecureVersion } from "tls";
 import { existsSync, readFileSync } from "fs";
 import convict, { Schema, Config, SchemaObj } from "convict";
+//import yargs, { Schema, SchemaObj, Configuration } from "yargs";
 import { ipaddress } from "convict-format-with-validator";
 import { v4 as uuidV4 } from "uuid";
 import {
@@ -27,12 +28,15 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
+//import { FORMAT_PLUGIN_ARRAY } from "./yargs-plugin-array-format";
 import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
 import { AuthorizationProtocol } from "./authorization-protocol";
 import { IAuthorizationConfig } from "../authzn/i-authorization-config";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);
+
+//yargs.addFormat(FORMAT_PLUGIN_ARRAY);
 
 export interface ICactusApiServerOptions {
   pluginManagerOptionsJson: string;
