@@ -14,30 +14,34 @@
 export const SplugConfig = {
   fabric: {
     mspid: "Org1MSP",
-    keystore: "./wallet/admin",
+    keystore: "./wallet",
     connUserName: "user1",
     contractName: "fabcar",
     peers: [
       {
         name: "peer0.org1.example.com",
-        requests: "grpc://localhost:7051",
+        requests: "grpcs://localhost:7051",
+        // WARNING - REMEMBER TO UPADATE THE PATH
+        tlsca:
+          "../../../examples/discounted-cartrade/crypto-config/tlsca.org1.example.com-cert.pem",
       },
     ],
-
     orderer: {
       name: "orderer.example.com",
-      url: "grpc://localhost:7050",
+      url: "grpcs://localhost:7050",
+      // WARNING - REMEMBER TO UPADATE THE PATH
+      tlsca:
+        "../../../examples/discounted-cartrade/crypto-config/tlsca.example.com-cert.pem",
     },
     ca: {
-      name: "ca.example.com",
-      url: "http://localhost:7054",
+      name: "ca-org1",
+      url: "https://localhost:7054",
     },
     submitter: {
       name: "admin",
       secret: "adminpw",
     },
     channelName: "mychannel",
-    //"chaincodeId":"easy_sample_ec1"
     chaincodeId: "fabcar",
   },
 };
