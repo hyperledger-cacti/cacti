@@ -34,6 +34,7 @@ import {
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu/src/main/solidity/contracts/HashTimeLock.json";
+import axios from "axios";
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
@@ -180,8 +181,12 @@ describe(testCase, () => {
       const resp = await api.newContractV1(bodyObj);
       expect(resp).toBeTruthy();
       expect(resp.status).toEqual(200);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(500);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        expect(error.response?.status).toEqual(500);
+      } else {
+        fail("expected an axios error, got something else");
+      }
     }
   });
 });

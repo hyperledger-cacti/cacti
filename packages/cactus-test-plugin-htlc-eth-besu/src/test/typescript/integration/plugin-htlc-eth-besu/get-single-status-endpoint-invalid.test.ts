@@ -34,6 +34,8 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
@@ -204,8 +206,12 @@ describe(testCase, () => {
         keychainId: "",
       });
       expect(res.status).toEqual(500);
-    } catch (e: any) {
-      expect(e.response.status).toEqual(500);
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        expect(e.response?.status).toEqual(500);
+      } else {
+        throw new RuntimeError("expected an axios error, got something else");
+      }
     }
   });
 });

@@ -35,6 +35,8 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu/src/main/solidity/contracts/HashTimeLock.json";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
@@ -219,8 +221,12 @@ describe(testCase, () => {
       };
       const refundResponse = await api.refundV1(refundRequest);
       expect(refundResponse.status).toEqual(200);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(500);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        expect(error.response?.status).toEqual(500);
+      } else {
+        throw new RuntimeError("expected an axios error, got something else");
+      }
     }
   });
 });
