@@ -33,6 +33,9 @@ import {
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
 import TestTokenJSON from "../../../solidity/token-erc20-contract/Test_Token.json";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
+
 const testCase = "Test new valid contract";
 
 describe(testCase, () => {
@@ -330,8 +333,12 @@ describe(testCase, () => {
       };
       const res = await api.newContractV1(request);
       expect(res.status).toEqual(400);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(400);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        expect(error.response?.status).toEqual(400);
+      } else {
+        throw new RuntimeError("expected an axios error, got something else");
+      }
     }
   });
 });
