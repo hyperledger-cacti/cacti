@@ -21,9 +21,6 @@ function main()
   tar -cC '/etc/hyperledger/fabric/fabric-ccenv/' . | docker load
   tar -cC '/etc/hyperledger/fabric/fabric-tools/' . | docker load
   tar -cC '/etc/hyperledger/fabric/fabric-ca/' . | docker load
-  tar -cC '/etc/hyperledger/fabric/fabric-couchdb/' . | docker load
-  tar -cC '/etc/couchdb/' . | docker load
-
 
   echo "[FabricAIO] >>> Parsed MAJOR version of Fabric as ${MAJOR}"
 
@@ -34,7 +31,9 @@ function main()
     # as well when we detect that we are running Fabric 2.x not 1.x
     tar -cC '/etc/hyperledger/fabric/fabric-nodeenv/' . | docker load
     tar -cC '/etc/hyperledger/fabric/fabric-baseos/' . | docker load
-  
+    tar -cC '/etc/hyperledger/fabric/fabric-couchdb/' . | docker load
+    tar -cC '/etc/couchdb/' . | docker load
+
     /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -b -s
 
     cd /fabric-samples/test-network/
