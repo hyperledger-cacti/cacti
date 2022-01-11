@@ -2,4 +2,4 @@
 # SPDX-License-Identifier: Apache-2.0
 ## Start a validator for Ethereum
 echo "[process] Start a validator for Ethereum"
-npm run start
+docker-compose -f docker-compose.yaml up
