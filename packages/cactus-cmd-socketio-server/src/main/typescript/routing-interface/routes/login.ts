@@ -9,6 +9,7 @@ import { Router, NextFunction, Request, Response } from "express";
 import { RIFUtil } from "../util/RIFUtil";
 import { ConfigUtil } from "../util/ConfigUtil";
 import { RIFError, BadRequestError, InternalServerError } from "../RIFError";
+import { LogHelper } from "@hyperledger/cactus-common"
 
 const fs = require("fs");
 const path = require("path");
@@ -47,11 +48,12 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
     res.send(respData);
   } catch (err) {
     logger.error(`##err name: ${err.constructor.name}`);
-
+    const message = LogHelper.getExceptionMessage(err);
+    const errorMessage = `Failed to start ApiServer: ${message}`
     if (err instanceof RIFError) {
-      logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
+      logger.debug(`##catch RIFError, ${err.statusCode}, ${errorMessage}`);
       res.status(err.statusCode);
-      res.send(err.message);
+      res.send(errorMessage);
       return;
     }
 
