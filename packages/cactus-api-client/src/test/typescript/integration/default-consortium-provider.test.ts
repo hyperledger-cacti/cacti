@@ -3,9 +3,10 @@ import { AddressInfo } from "net";
 import test, { Test } from "tape";
 
 import { DefaultApi as ConsortiumManualApi } from "@hyperledger/cactus-plugin-consortium-manual";
-import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
+import { LogLevelDesc, Servers, LogHelper } from "@hyperledger/cactus-common";
 import { DefaultConsortiumProvider } from "../../../main/typescript";
 import { Configuration } from "@hyperledger/cactus-core-api";
+import axios from "axios";
 
 test("Reports failures with meaningful information", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -31,15 +32,21 @@ test("Reports failures with meaningful information", async (t: Test) => {
     try {
       await provider.get();
       t2.fail("Provider.get() did not throw despite API errors.");
-    } catch (ex) {
-      t2.ok(ex, "Thrown error truthy OK");
-      t2.ok(ex.message, "Thrown error.message truthy OK");
-      t2.equal(
-        typeof ex.message,
-        "string",
-        "Thrown error.message type string OK",
-      );
-      t2.true(ex.message.includes("timeout"), "Has timeout in msg OK");
+    } catch (ex: unknown) {
+      const message = LogHelper.getExceptionMessage(ex);
+      const errorMessage = `Failed to start ApiServer: ${message}`;
+      if (axios.isAxiosError(ex)) {
+        t2.ok(ex, "Thrown error truthy OK");
+        t2.ok(errorMessage, "Thrown error.message truthy OK");
+        t2.equal(
+          typeof errorMessage,
+          "string",
+          "Thrown error.message type string OK",
+        );
+        t2.true(errorMessage.includes("timeout"), "Has timeout in msg OK");
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     t2.end();
   });
@@ -56,18 +63,22 @@ test("Reports failures with meaningful information", async (t: Test) => {
     try {
       await provider.get();
       t2.fail("Provider.get() did not throw despite API errors.");
-    } catch (ex) {
-      t2.ok(ex, "Thrown error truthy OK");
-      t2.ok(ex.message, "Thrown error.message truthy OK");
-      t2.equal(
-        typeof ex.message,
-        "string",
-        "Thrown error.message type string OK",
-      );
-      t2.true(
-        ex.message.includes("status code 404"),
-        "Has Status Code in msg OK",
-      );
+    } catch (ex: unknown) {
+      const message = LogHelper.getExceptionMessage(ex);
+      const errorMessage = `Failed to start ApiServer: ${message}`;
+      if (axios.isAxiosError(ex)) {
+        t2.ok(ex, "Thrown error truthy OK");
+        t2.ok(errorMessage, "Thrown error.message truthy OK");
+        t2.equal(
+          typeof errorMessage,
+          "string",
+          "Thrown error.message type string OK",
+        );
+        t2.true(
+          errorMessage.includes("status code 404"),
+          "Has Status Code in msg OK",
+        );
+      }
     }
     t2.end();
   });
