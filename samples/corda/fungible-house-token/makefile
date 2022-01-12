@@ -7,6 +7,8 @@ source:
 .PHONY: build
 build: source
 	cp extension-flows/*.kt source/workflows/src/main/kotlin/net/corda/samples/tokenizedhouse/flows/
+	cp extension-states/*.kt source/contracts/src/main/kotlin/net/corda/samples/tokenizedhouse/states/
+	cp build.gradle source/build.gradle
 	cd source && ./gradlew clean jar
 
 .PHONY: clean
