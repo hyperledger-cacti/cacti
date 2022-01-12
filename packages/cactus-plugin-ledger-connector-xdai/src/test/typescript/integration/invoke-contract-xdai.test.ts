@@ -20,6 +20,7 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
+import axios from "axios";
 
 const logLevel: LogLevelDesc = "TRACE";
 let xdaiTestLedger: OpenEthereumTestLedger;
@@ -204,8 +205,12 @@ describe(testCase, () => {
         nonce: 1,
       });
       fail("invalid nonce should have thrown");
-    } catch (error: any) {
-      expect(error.message).toContain("Transaction nonce is too low.");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        expect(error.message).toContain("Transaction nonce is too low.");
+      } else {
+        fail("expected an axios error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
@@ -302,10 +307,14 @@ describe(testCase, () => {
         nonce: 4,
       });
       fail("invalid nonce should have thrown");
-    } catch (error: any) {
-      expect(error.message).toContain(
-        "Transaction with the same hash was already imported",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        expect(error.message).toContain(
+          "Transaction with the same hash was already imported",
+        );
+      } else {
+        fail("expected an axios error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,

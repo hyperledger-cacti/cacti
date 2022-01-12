@@ -32,6 +32,7 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { K_CACTUS_XDAI_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
+import axios from "axios";
 
 const testCase = "deploys contract via .json file";
 describe(testCase, () => {
@@ -248,8 +249,12 @@ describe(testCase, () => {
         nonce: 1,
       });
       fail("It should not reach here");
-    } catch (error) {
-      expect(error).not.toBe("Nonce too low");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        expect(error).not.toBe("Nonce too low");
+      } else {
+        fail("expected an axios error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
@@ -347,8 +352,12 @@ describe(testCase, () => {
         nonce: 4,
       });
       fail("It should not reach here");
-    } catch (error) {
-      expect(error).not.toBe("Nonce too low");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        expect(error).not.toBe("Nonce too low");
+      } else {
+        fail("expected an axios error, got something else");
+      }
     }
 
     const { callOutput: getNameOut } = await connector.invokeContract({

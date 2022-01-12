@@ -19,6 +19,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai";
 import { DeployContractJsonObjectV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
+import { LogHelper } from "@hyperledger/cactus-common";
 
 export interface IDeployContractSolidityBytecodeJsonObjectOptions {
   logLevel?: LogLevelDesc;
@@ -96,12 +97,21 @@ export class DeployContractSolidityBytecodeJsonObjectEndpoint
         reqBody,
       );
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
+      const stack = LogHelper.getExceptionStack(ex);
+      const messages = LogHelper.getExceptionMessage(ex);
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: stack || messages,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: stack || messages,
+        });
+      }
     }
   }
 }

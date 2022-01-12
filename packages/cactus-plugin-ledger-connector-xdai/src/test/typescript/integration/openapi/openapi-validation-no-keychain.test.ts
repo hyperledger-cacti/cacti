@@ -30,6 +30,7 @@ import {
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
+import axios from "axios";
 
 const testCase = "xDai API";
 const logLevel: LogLevelDesc = "TRACE";
@@ -141,19 +142,23 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractJsonObjectV1(
         (parameters as any) as DeployContractJsonObjectV1Request,
       );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDeploy} without required contractJSON: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("contractJSON"),
-        "Rejected because contractJSON is required",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fDeploy} without required contractJSON: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("contractJSON"),
+          "Rejected because contractJSON is required",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
 
     t2.end();
@@ -175,19 +180,23 @@ test(testCase, async (t: Test) => {
       await apiClient.deployContractJsonObjectV1(
         (parameters as any) as DeployContractJsonObjectV1Request,
       );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("fake"),
+          "Rejected because fake is not a valid parameter",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
 
     t2.end();
@@ -236,19 +245,23 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractJsonObject(
         (parameters as any) as InvokeContractJsonObjectV1Request,
       );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fInvoke} without required contractJSON: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("contractJSON"),
-        "Rejected because contractJSON is required",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fInvoke} without required contractJSON: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("contractJSON"),
+          "Rejected because contractJSON is required",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
 
     t2.end();
@@ -273,19 +286,23 @@ test(testCase, async (t: Test) => {
       await apiClient.invokeContractJsonObject(
         (parameters as any) as InvokeContractJsonObjectV1Request,
       );
-    } catch (e) {
-      t2.equal(
-        e.response.status,
-        400,
-        `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
-      );
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
-      );
-      t2.ok(
-        fields.includes("fake"),
-        "Rejected because fake is not a valid parameter",
-      );
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        t2.equal(
+          e.response?.status,
+          400,
+          `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
+        );
+        const fields = e.response?.data.map((param: any) =>
+          param.path.replace(".body.", ""),
+        );
+        t2.ok(
+          fields.includes("fake"),
+          "Rejected because fake is not a valid parameter",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
 
     t2.end();

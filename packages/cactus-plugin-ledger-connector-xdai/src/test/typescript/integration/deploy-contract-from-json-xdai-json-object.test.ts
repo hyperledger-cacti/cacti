@@ -29,6 +29,7 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { K_CACTUS_XDAI_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
+import axios from "axios";
 
 const testCase = "deploys contract via .json file";
 const logLevel: LogLevelDesc = "TRACE";
@@ -227,12 +228,16 @@ test(testCase, async (t: Test) => {
         contractJSON: HelloWorldContractJson,
       });
       t2.ifError(setNameOutInvalid);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContractJsonObject(
       {

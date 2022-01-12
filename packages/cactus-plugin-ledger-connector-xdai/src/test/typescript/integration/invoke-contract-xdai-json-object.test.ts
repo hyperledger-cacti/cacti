@@ -18,6 +18,7 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
+import axios from "axios";
 
 test("deploys contract via .json file", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -196,12 +197,16 @@ test("deploys contract via .json file", async (t: Test) => {
         contractJSON: HelloWorldContractJson,
       });
       t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContractJsonObject(
       {
