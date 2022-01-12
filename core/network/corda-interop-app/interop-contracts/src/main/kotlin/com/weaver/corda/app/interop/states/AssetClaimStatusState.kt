@@ -27,6 +27,7 @@ import net.corda.core.contracts.StaticPointer
  * @property localNetworkId The id of the network from which the asset is transferred.
  * @property remoteNetworkId The id of the network into which the asset is transferred and claimed.
  * @property recipient The owner of asset after transfer.
+ * @property recipientCert The certificate of the owner of asset after transfer.
  * @property claimStatus Boolean value to convey if asset is claimed in the remote/importing network or not.
  * @property expiryTimeSecs The future time in seconds before which the asset claim in the remote/importing network is to be performed.
  * @property expirationStatus Boolean variable to convey if the time in the remote/importing network is past expiryTimeSecs or not.
@@ -35,9 +36,10 @@ import net.corda.core.contracts.StaticPointer
 @BelongsToContract(AssetTransferContract::class)
 data class AssetClaimStatusState(
     val assetDetails: ByteArray,
-    val localNetworkId: String,
-    val remoteNetworkId: String,
+    val localNetworkID: String,
+    val remoteNetworkID: String,
     val recipient: Party,
+    val recipientCert: String,
     val claimStatus: Boolean,
     val expiryTimeSecs: Long,
     val expirationStatus: Boolean,

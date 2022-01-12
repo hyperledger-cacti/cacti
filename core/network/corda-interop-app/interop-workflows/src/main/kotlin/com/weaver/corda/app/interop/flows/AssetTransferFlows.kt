@@ -12,6 +12,8 @@ import com.weaver.corda.app.interop.contracts.AssetTransferContract
 import com.weaver.corda.app.interop.states.AssetPledgeState
 import com.weaver.corda.app.interop.states.AssetClaimStatusState
 import com.weaver.corda.app.interop.states.NetworkIdState
+import com.weaver.protos.common.asset_transfer.AssetTransfer
+import com.google.protobuf.ByteString
 
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.CommandData
@@ -269,24 +271,24 @@ class GetAssetPledgeStateById(
 /**
  * The GetAssetClaimStatusState flow is used to fetch an existing AssetClaimStatusState.
  *
- * @property contractId The unique identifier for an AssetClaimStatusState.
+ * @property pledgeId The unique identifier for an AssetClaimStatusState.
  */
 @StartableByRPC
 class GetAssetClaimStatusState(
-    val contractId: String,
+    val pledgeId: String,
     val pledgeExpiryTimeSecs: Long,
     val blankAssetJSON: ByteArray
-) : FlowLogic<Either<Error, String>>() {
+) : FlowLogic<AssetClaimStatusState>() {
     /**
      * The call() method captures the logic to fetch the AssetClaimStatusState.
-     * If the state is not found for a given contractId/linearId, then it returns an empty state.
+     * If the state is not found for a given pledgeId, then it returns an empty state.
      *
-     * @return Returns Either<Error, AssetClaimStatusState>
+     * @return Returns AssetClaimStatusState
      */
     @Suspendable
-    override fun call(): Either<Error, String> = try {
-        val linearId = getLinearIdFromString(contractId)
-        println("Getting AssetClaimStatusState for contractId $linearId.")
+    override fun call(): AssetClaimStatusState {
+        val linearId = getLinearIdFromString(pledgeId)
+        println("Getting AssetClaimStatusState for pledgeId $linearId.")
         val states = serviceHub.vaultService.queryBy<AssetClaimStatusState>(
             QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
         ).states
@@ -307,7 +309,7 @@ class GetAssetClaimStatusState(
             val expirationStatus: Boolean
             val calendar = Calendar.getInstance()
             nTimeout = calendar.timeInMillis / 1000
-            if (nTimeout < pledgeExpiryTimeSecs) {
+            if (nTimeout <= pledgeExpiryTimeSecs) {
                 expirationStatus = false
             } else {
                 expirationStatus = true
@@ -318,19 +320,46 @@ class GetAssetClaimStatusState(
                 "",
                 fetchedNetworkIdState!!.networkId,
                 ourIdentity,
+                "",
                 false,
                 pledgeExpiryTimeSecs,
                 expirationStatus
             )
             println("Creating AssetClaimStatusState ${assetClaimStatusState}")
-            Right(assetClaimStatusState.toString())
+            return assetClaimStatusState
         } else {
             println("Got AssetClaimStatusState: ${states.first().state.data}")
-            Right(states.first().toString())
+            return states.first().state.data
         }
-    } catch (e: Exception) {
-        println("Error fetching state from the vault: ${e.message}\n")
-        Left(Error("Error fetching state from the vault: ${e.message}"))
+    }
+}
+
+/**
+ * The AssetClaimStatusStateToProtoBytes flow is used to convert the input state to bytes.
+ *
+ * @property assetClaimStatusState Asset claim status state in the vault.
+ */
+@StartableByRPC
+class AssetClaimStatusStateToProtoBytes(
+    val assetClaimStatusState: AssetClaimStatusState
+) : FlowLogic<ByteArray>() {
+    /**
+     * The call() method captures the logic to convert the AssetClaimStatusState to Byte Array.
+     *
+     * @return Returns ByteArray
+     */
+    @Suspendable
+    override fun call(): ByteArray {
+        val claimStatus = AssetTransfer.AssetClaimStatus.newBuilder()
+            .setAssetDetails(ByteString.copyFrom(assetClaimStatusState.assetDetails))
+            .setLocalNetworkID(assetClaimStatusState.localNetworkID)
+            .setRemoteNetworkID(assetClaimStatusState.remoteNetworkID)
+            .setRecipient(assetClaimStatusState.recipientCert)
+            .setClaimStatus(assetClaimStatusState.claimStatus)
+            .setExpiryTimeSecs(assetClaimStatusState.expiryTimeSecs)
+            .setExpirationStatus(assetClaimStatusState.expirationStatus)
+            .build()
+        return claimStatus.toByteArray()
     }
 }
 
