@@ -11,6 +11,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  LogHelper,
 } from "@hyperledger/cactus-common";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
@@ -93,12 +94,21 @@ export class CommitFinalEndpointV1 implements IWebServiceEndpoint {
     try {
       const resBody = await this.options.gateway.CommitFinal(reqBody);
       res.json(resBody);
-    } catch (ex) {
-      this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+    } catch (ex: unknown) {
+      const stack = LogHelper.getExceptionStack(ex);
+      const messages = LogHelper.getExceptionMessage(ex);
+      if (ex instanceof Error) {
+        this.log.error(`Crash while serving ${reqTag}`, ex);
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: stack || messages,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: stack || messages,
+        });
+      }
     }
   }
 }

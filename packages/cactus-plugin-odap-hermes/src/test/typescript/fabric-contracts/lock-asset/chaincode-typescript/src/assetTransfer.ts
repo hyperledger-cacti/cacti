@@ -10,6 +10,7 @@ import {
   Transaction,
 } from "fabric-contract-api";
 import { Asset } from "./asset";
+import { RuntimeError } from "run-time-error";
 
 @Info({
   title: "AssetTransfer",
@@ -141,9 +142,15 @@ export class AssetTransferContract extends Contract {
       let record;
       try {
         record = JSON.parse(strValue);
-      } catch (err) {
-        console.log(err);
-        record = strValue;
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.log(err);
+          record = strValue;
+        } else {
+          throw new RuntimeError(
+            "expected an instanceof Error, got something else",
+          );
+        }
       }
       allResults.push({ Key: result.value.key, Record: record });
       result = await iterator.next();
