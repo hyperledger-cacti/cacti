@@ -10,6 +10,7 @@ import arrow.core.*
 import co.paralleluniverse.fibers.Suspendable
 import com.weaver.corda.app.interop.contracts.AssetTransferContract
 import com.weaver.corda.app.interop.states.AssetPledgeState
+import com.weaver.corda.app.interop.states.AssetClaimStatusState
 import com.weaver.corda.app.interop.states.NetworkIdState
 
 import net.corda.core.contracts.ContractState
@@ -37,6 +38,7 @@ import net.corda.core.utilities.unwrap
 import net.corda.core.serialization.CordaSerializable
 import java.time.Instant
 import java.util.Base64
+import java.util.Calendar
 
 /**
  * Enum for communicating the role of the responder from initiator flow to
@@ -257,6 +259,74 @@ class GetAssetPledgeStateById(
         } else {
             println("Got AssetPledgeState: ${states.first().state.data}")
             Right(states.first())
+        }
+    } catch (e: Exception) {
+        println("Error fetching state from the vault: ${e.message}\n")
+        Left(Error("Error fetching state from the vault: ${e.message}"))
+    }
+}
+
+/**
+ * The GetAssetClaimStatusState flow is used to fetch an existing AssetClaimStatusState.
+ *
+ * @property contractId The unique identifier for an AssetClaimStatusState.
+ */
+@StartableByRPC
+class GetAssetClaimStatusState(
+    val contractId: String,
+    val pledgeExpiryTimeSecs: Long,
+    val blankAssetJSON: ByteArray
+) : FlowLogic<Either<Error, String>>() {
+    /**
+     * The call() method captures the logic to fetch the AssetClaimStatusState.
+     * If the state is not found for a given contractId/linearId, then it returns an empty state.
+     *
+     * @return Returns Either<Error, AssetClaimStatusState>
+     */
+    @Suspendable
+    override fun call(): Either<Error, String> = try {
+        val linearId = getLinearIdFromString(contractId)
+        println("Getting AssetClaimStatusState for contractId $linearId.")
+        val states = serviceHub.vaultService.queryBy<AssetClaimStatusState>(
+            QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+        ).states
+        if (states.isEmpty()) {
+
+            val networkIdStates = serviceHub.vaultService.queryBy<NetworkIdState>().states
+            var fetchedNetworkIdState: NetworkIdState? = null
+
+            if (networkIdStates.isNotEmpty()) {
+                // consider that there will be only one such state ideally
+                fetchedNetworkIdState = networkIdStates.first().state.data
+                println("Network id for local Corda newtork is: $fetchedNetworkIdState\n")
+            } else {
+                println("Not able to fetch network id for local Corda network\n")
+            }
+
+            var nTimeout: Long
+            val expirationStatus: Boolean
+            val calendar = Calendar.getInstance()
+            nTimeout = calendar.timeInMillis / 1000
+            if (nTimeout < pledgeExpiryTimeSecs) {
+                expirationStatus = false
+            } else {
+                expirationStatus = true
+            }
+
+            val assetClaimStatusState = AssetClaimStatusState(
+                blankAssetJSON,
+                "",
+                fetchedNetworkIdState!!.networkId,
+                ourIdentity,
+                false,
+                pledgeExpiryTimeSecs,
+                expirationStatus
+            )
+            println("Creating AssetClaimStatusState ${assetClaimStatusState}")
+            Right(assetClaimStatusState.toString())
+        } else {
+            println("Got AssetClaimStatusState: ${states.first().state.data}")
+            Right(states.first().toString())
         }
     } catch (e: Exception) {
         println("Error fetching state from the vault: ${e.message}\n")

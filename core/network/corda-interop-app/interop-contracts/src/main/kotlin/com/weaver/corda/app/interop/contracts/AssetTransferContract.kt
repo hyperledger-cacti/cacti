@@ -103,6 +103,6 @@ class AssetTransferContract : Contract {
         class Pledge : Commands
         class ReclaimPledgedAsset : Commands
         // class ClaimPledgedAsset(val assetClaimHTLC: AssetClaimHTLCData) : Commands
-        class ClaimPledgedAsset : Commands
+        class ClaimRemoteAsset : Commands
     }
 }
