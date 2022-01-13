@@ -30,6 +30,7 @@ import {
   Checks,
   Logger,
   LoggerProvider,
+  LogHelper,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
@@ -62,6 +63,8 @@ import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+import axios from "axios";
+import { RuntimeError } from "run-time-error";
 
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
@@ -415,11 +418,16 @@ export class PluginLedgerConnectorQuorum
       const txHash = await sendTransaction(transactionConfig, secret);
       const transactionReceipt = await this.pollForTxReceipt(txHash);
       return { transactionReceipt };
-    } catch (ex) {
-      throw new Error(
-        `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `InnerException: ${ex.stack}`,
-      );
+    } catch (ex: unknown) {
+      const stack = LogHelper.getExceptionStack(ex);
+      if (axios.isAxiosError(ex)) {
+        throw new Error(
+          `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
+            `InnerException: ${stack}`,
+        );
+      } else {
+        throw new RuntimeError("expected an axios error, got something else");
+      }
     }
   }
 

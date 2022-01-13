@@ -36,6 +36,7 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { Configuration } from "@hyperledger/cactus-core-api";
+import axios from "axios";
 
 const logLevel: LogLevelDesc = "INFO";
 const contractName = "HelloWorld";
@@ -222,12 +223,16 @@ test(testCase, async (t: Test) => {
         nonce: 2,
       });
       t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
 
     const getNameOut = await connector.getContractInfoKeychain({
@@ -328,12 +333,16 @@ test(testCase, async (t: Test) => {
         nonce: 1,
       });
       t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.getContractInfoKeychain({
       contractName,
@@ -406,12 +415,16 @@ test(testCase, async (t: Test) => {
         nonce: 3,
       });
       t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.getContractInfoKeychain({
       contractName,

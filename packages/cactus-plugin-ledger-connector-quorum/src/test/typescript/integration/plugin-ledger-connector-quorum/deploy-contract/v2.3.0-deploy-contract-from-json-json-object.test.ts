@@ -33,6 +33,7 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 import { Configuration } from "@hyperledger/cactus-core-api";
+import axios from "axios";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -205,12 +206,16 @@ test(testCase, async (t: Test) => {
         contractJSON: HelloWorldContractJson,
       });
       t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
 
     const getNameOut = await connector.getContractInfo({
@@ -309,12 +314,16 @@ test(testCase, async (t: Test) => {
         contractJSON: HelloWorldContractJson,
       });
       t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an axios error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.getContractInfo({
       contractAddress,
