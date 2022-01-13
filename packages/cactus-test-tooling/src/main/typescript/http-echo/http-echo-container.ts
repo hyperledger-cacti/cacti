@@ -208,7 +208,7 @@ export class HttpEchoContainer implements ITestLedger {
     }
   }
 
-  private pullContainerImage(containerNameAndTag: string): Promise<string[]> {
+  private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
       docker.pull(containerNameAndTag, (pullError: unknown, stream: Stream) => {
@@ -217,7 +217,7 @@ export class HttpEchoContainer implements ITestLedger {
         } else {
           docker.modem.followProgress(
             stream,
-            (progressError: unknown, output: string[]) => {
+            (progressError: unknown, output: unknown[]) => {
               if (progressError) {
                 reject(progressError);
               } else {
