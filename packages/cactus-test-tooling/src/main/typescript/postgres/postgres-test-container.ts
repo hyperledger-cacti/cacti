@@ -11,6 +11,7 @@ import {
 import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { Containers } from "../common/containers";
+import { Stream } from "stream";
 
 /*
  * Contains options for Postgres container
@@ -104,14 +105,14 @@ export class PostgresTestContainer implements ITestLedger {
   }
 
   public async getFileContents(filePath: string): Promise<string> {
-    const response: any = await this.getContainer().getArchive({
+    const response = await this.getContainer().getArchive({
       path: filePath,
     });
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
       let fileContents = "";
-      extract.on("entry", async (header: any, stream, next) => {
+      extract.on("entry", async (header: unknown, stream, next) => {
         stream.on("error", (err: Error) => {
           reject(err);
         });
@@ -284,16 +285,16 @@ export class PostgresTestContainer implements ITestLedger {
     }
   }
 
-  private pullContainerImage(containerNameAndTag: string): Promise<any[]> {
+  private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: any, stream: any) => {
+      docker.pull(containerNameAndTag, (pullError: unknown, stream: Stream) => {
         if (pullError) {
           reject(pullError);
         } else {
           docker.modem.followProgress(
             stream,
-            (progressError: any, output: any[]) => {
+            (progressError: unknown, output: unknown[]) => {
               if (progressError) {
                 reject(progressError);
               } else {
