@@ -5,6 +5,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  LogHelper,
   IAsyncProvider,
   Http405NotAllowedError,
 } from "@hyperledger/cactus-common";
@@ -91,7 +92,9 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
     try {
       const resBody = await this.options.connector.transact(reqBody);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
+      const stack = LogHelper.getExceptionStack(ex);
+      const messages = LogHelper.getExceptionMessage(ex);
       if (ex instanceof Http405NotAllowedError) {
         this.log.debug("Sending back HTTP405 Method Not Allowed error.");
         res.status(405);
@@ -103,7 +106,7 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
        * "Error: Error: Command response error: expected=COMMITTED, actual=REJECTED"
        * @see https://iroha.readthedocs.io/en/main/develop/api/commands.html?highlight=CallEngine#id18
        */
-      if (ex.message.includes("Error: Command response error")) {
+      if ((ex as any).message.includes("Error: Command response error")) {
         this.log.debug("Sending back HTTP400 Bad Request error.");
         res.status(400);
         res.json(ex);
@@ -112,7 +115,7 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({
         message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
+        error: stack || messages,
       });
     }
   }
