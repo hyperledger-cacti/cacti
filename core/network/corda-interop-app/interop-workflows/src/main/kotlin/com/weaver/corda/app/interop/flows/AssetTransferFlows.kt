@@ -13,6 +13,7 @@ import com.weaver.corda.app.interop.states.AssetPledgeState
 import com.weaver.corda.app.interop.states.AssetClaimStatusState
 import com.weaver.corda.app.interop.states.NetworkIdState
 import com.weaver.protos.common.asset_transfer.AssetTransfer
+import com.weaver.protos.corda.ViewDataOuterClass
 import com.google.protobuf.ByteString
 
 import net.corda.core.contracts.ContractState
@@ -366,7 +367,7 @@ class AssetClaimStatusStateToProtoBytes(
 /**
  * The ReclaimPledgedAsset flow is used to reclaim an asset that is pledged already in the same local corda network.
  *
- * @property contractId The unique identifier for an AssetPledgeState.
+ * @property pledgeId The unique identifier for an AssetPledgeState.
  */
 object ReclaimPledgedAsset {
     @InitiatingFlow
@@ -374,8 +375,9 @@ object ReclaimPledgedAsset {
     class Initiator
     @JvmOverloads
     constructor(
-        val contractId: String,
+        val pledgeId: String,
         val assetStateCreateCommand: CommandData,
+        val claimStatusLinearId: String,
         val issuer: Party,
         val observers: List<Party> = listOf<Party>()
     ) : FlowLogic<Either<Error, SignedTransaction>>() {
@@ -386,8 +388,19 @@ object ReclaimPledgedAsset {
          */
         @Suspendable
         override fun call(): Either<Error, SignedTransaction> = try {
-            val linearId = getLinearIdFromString(contractId)
-            subFlow(GetAssetPledgeStateById(contractId)).fold({
+            val linearId = getLinearIdFromString(pledgeId)
+
+            val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearId))
+            val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
+            val assetCliamStatus = AssetTransfer.AssetClaimStatus.parseFrom(externalStateView.payload.toByteArray())
+            println("Available assetCliamStatus: ${assetCliamStatus}")
+
+            if (assetCliamStatus.claimStatus) {
+                println("Cannot perform reclaim for pledgeId ${pledgeId} as the asset was claimed in remote network.")
+                Left(Error("Cannot perform eclaim for pledged ${pledgeId} as the asset was claimed in remote network."))
+            }
+
+            subFlow(GetAssetPledgeStateById(pledgeId)).fold({
                 println("AssetPledgeState for Id: ${linearId} not found.")
                 Left(Error("AssetPledgeState for Id: ${linearId} not found."))
             }, {

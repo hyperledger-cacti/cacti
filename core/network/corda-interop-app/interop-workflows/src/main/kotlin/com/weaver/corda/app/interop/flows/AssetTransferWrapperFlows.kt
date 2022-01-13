@@ -226,6 +226,7 @@ class ReclaimAsset
 constructor(
     val contractId: String,
     val assetStateCreateCommand: CommandData,
+    val claimStatusLinearId: String,
     val issuer: Party,
     val observers: List<Party> = listOf<Party>()
 ) : FlowLogic<Either<Error, SignedTransaction>>() {
@@ -239,6 +240,7 @@ constructor(
         subFlow(ReclaimPledgedAsset.Initiator(
             contractId,
             assetStateCreateCommand,
+            claimStatusLinearId,
             issuer,
             observers
         ))

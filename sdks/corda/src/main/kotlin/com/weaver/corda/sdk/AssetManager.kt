@@ -247,6 +247,7 @@ class AssetManager {
             proxy: CordaRPCOps,
             contractId: String,
             createAssetStateCommand: CommandData,
+            claimStatusLinearId: String,
             issuer: Party,
             observers: List<Party> = listOf<Party>()
         ): Either<Error, SignedTransaction> {
@@ -254,7 +255,7 @@ class AssetManager {
                 AssetManager.logger.debug("Sending asset-reclaim request to Corda as part of asset-transfer.\n")
                 val signedTx = runCatching {
 
-                    proxy.startFlow(::ReclaimAsset, contractId, createAssetStateCommand, issuer, observers)
+                    proxy.startFlow(::ReclaimAsset, contractId, createAssetStateCommand, claimStatusLinearId, issuer, observers)
                         .returnValue.get()
                 }.fold({
                     it.map { retSignedTx ->

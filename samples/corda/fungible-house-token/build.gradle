@@ -51,24 +51,23 @@ allprojects {
         maven { url 'https://software.r3.com/artifactory/corda-lib' }
         //Gradle Plugins
         maven { url 'https://repo.gradle.org/gradle/libs-releases' }
-	if (file("$projectDir/../github.properties").exists()) {
-       		file("$projectDir/../github.properties").withInputStream { constants.load(it) }
-     		maven {
-            	  url constants.url
-          	  credentials {
-             		  username constants.username
-              		  password constants.password
-           	  }
-           }
-      }
-    else {
-        flatDir {
-            dirs '../../../../core/network/corda-interop-app/interop-contracts/build/libs'
-            dirs '../../../../core/network/corda-interop-app/interop-workflows/build/libs'
-            dirs '../../../../../core/network/corda-interop-app/interop-contracts/build/libs'
-            dirs '../../../../../core/network/corda-interop-app/interop-workflows/build/libs'
+        if (file("$projectDir/../github.properties").exists()) {
+            file("$projectDir/../github.properties").withInputStream { constants.load(it) }
+            maven {
+                url constants.url
+                credentials {
+                    username constants.username
+                    password constants.password
+                }
+            }
+        } else {
+            flatDir {
+                dirs '../../../../core/network/corda-interop-app/interop-contracts/build/libs'
+                dirs '../../../../core/network/corda-interop-app/interop-workflows/build/libs'
+                dirs '../../../../../core/network/corda-interop-app/interop-contracts/build/libs'
+                dirs '../../../../../core/network/corda-interop-app/interop-workflows/build/libs'
+            }
         }
-    }
     }
 
 dependencies {
