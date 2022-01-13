@@ -24,6 +24,9 @@ import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 const Web3 = require("web3");
 
+import axios from "axios";
+import RunTimeError, { RuntimeError } from "run-time-error";
+
 /*
  * ServerPlugin
  * Class definition for server plugins
@@ -106,21 +109,25 @@ export class ServerPlugin {
         }
         logger.debug(`##getNumericBalance: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
-      } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
-        retObj = {
-          resObj: {
-            status: 504,
-            errorDetail: emsg,
-          },
-        };
-        logger.debug("##getNumericBalance: add reqID");
-        if (reqID !== undefined) {
-          retObj["id"] = reqID;
+      } catch (e: unknown) {
+        if (axios.isAxiosError(e)) {
+          const emsg = e.toString().replace(/Error: /g, "");
+          logger.error(emsg);
+          retObj = {
+            resObj: {
+              status: 504,
+              errorDetail: emsg,
+            },
+          };
+          logger.debug("##getNumericBalance: add reqID");
+          if (reqID !== undefined) {
+            retObj["id"] = reqID;
+          }
+          logger.debug(`##getNumericBalance: retObj: ${JSON.stringify(retObj)}`);
+          return reject(retObj); 
+        } else {
+          throw new RuntimeError("expected an axios error, got something else");
         }
-        logger.debug(`##getNumericBalance: retObj: ${JSON.stringify(retObj)}`);
-        return reject(retObj);
       }
     });
   }
@@ -197,23 +204,28 @@ export class ServerPlugin {
           `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`
         );
         return resolve(retObj);
-      } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
-        retObj = {
-          resObj: {
-            status: 504,
-            errorDetail: emsg,
-          },
-        };
-        logger.debug("##transferNumericAsset: add reqID");
-        if (reqID !== undefined) {
-          retObj["reqID"] = reqID;
+      } catch (e: unknown) {
+        if (axios.isAxiosError(e)) {
+          const emsg = e.toString().replace(/Error: /g, "");
+          logger.error(emsg);
+          retObj = {
+            resObj: {
+              status: 504,
+              errorDetail: emsg,
+            },
+          };
+          logger.debug("##transferNumericAsset: add reqID");
+          if (reqID !== undefined) {
+            retObj["reqID"] = reqID;
+          }
+          logger.debug(
+            `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`
+          );
+          return reject(retObj);
+        } else {
+          throw new RuntimeError("expected an axios error, got something else");
         }
-        logger.debug(
-          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`
-        );
-        return reject(retObj);
+        
       }
     });
   }
@@ -261,14 +273,18 @@ export class ServerPlugin {
           txid: res,
         };
         return resolve(retObj);
-      } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
-        retObj = {
-          status: 504,
-          errorDetail: emsg,
-        };
-        return reject(retObj);
+      } catch (e: unknown) {
+        if (axios.isAxiosError(e)) {
+          const emsg = e.toString().replace(/Error: /g, "");
+          logger.error(emsg);
+          retObj = {
+            status: 504,
+            errorDetail: emsg,
+          };
+          return reject(retObj);
+        } else {
+          throw new RuntimeError("expected an axios error, got something else");
+        }
       }
     });
   }
@@ -319,21 +335,25 @@ export class ServerPlugin {
         }
         logger.debug(`##web3Eth: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
-      } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
-        retObj = {
-          resObj: {
-            status: 504,
-            errorDetail: emsg,
-          },
-        };
-        logger.debug("##web3Eth: add reqID");
-        if (reqID !== undefined) {
-          retObj["id"] = reqID;
+      } catch (e: unknown) {
+        if (axios.isAxiosError(e)) {
+          const emsg = e.toString().replace(/Error: /g, "");
+          logger.error(emsg);
+          retObj = {
+            resObj: {
+              status: 504,
+              errorDetail: emsg,
+            },
+          };
+          logger.debug("##web3Eth: add reqID");
+          if (reqID !== undefined) {
+            retObj["id"] = reqID;
+          }
+          logger.debug(`##web3Eth: retObj: ${JSON.stringify(retObj)}`);
+          return reject(retObj);
+        } else {
+          throw new RuntimeError("expected an axios error, got something else");
         }
-        logger.debug(`##web3Eth: retObj: ${JSON.stringify(retObj)}`);
-        return reject(retObj);
       }
     });
   }
@@ -413,21 +433,25 @@ export class ServerPlugin {
         }
         logger.debug(`##contract: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
-      } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
-        retObj = {
-          resObj: {
-            status: 504,
-            errorDetail: emsg,
-          },
-        };
-        logger.debug("##contract: add reqID");
-        if (reqID !== undefined) {
-          retObj["id"] = reqID;
+      } catch (e: unknown) {
+        if (axios.isAxiosError(e)) {
+          const emsg = e.toString().replace(/Error: /g, "");
+          logger.error(emsg);
+          retObj = {
+            resObj: {
+              status: 504,
+              errorDetail: emsg,
+            },
+          };
+          logger.debug("##contract: add reqID");
+          if (reqID !== undefined) {
+            retObj["id"] = reqID;
+          }
+          logger.debug(`##contract: retObj: ${JSON.stringify(retObj)}`);
+          return reject(retObj);
+        } else {
+          throw new RuntimeError("expected an axios error, got something else");
         }
-        logger.debug(`##contract: retObj: ${JSON.stringify(retObj)}`);
-        return reject(retObj);
       }
     });
   }
