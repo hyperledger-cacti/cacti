@@ -1,9 +1,12 @@
+import axios from "axios";
 import { KEYUTIL, KJUR } from "jsrsasign";
 import test, { Test } from "tape";
 import {
   CryptoUtil,
   ECCurveType,
 } from "../../../main/typescript/identity/internal/crypto-util";
+import { LogHelper } from "@hyperledger/cactus-common";
+
 const KJ = KJUR as any;
 test("cryptoUtil", (t: Test) => {
   t.test("encodeASN1Sig", (t: Test) => {
@@ -38,11 +41,13 @@ test("cryptoUtil", (t: Test) => {
           Buffer.from(asn1Sig, "base64"),
           "invalidCrv" as ECCurveType,
         );
-      } catch (error) {
-        t.equal(
-          "CryptoUtil#encodeASN1Sig invalid ec curve type",
-          (error as Error).message,
-        );
+      } catch (error: unknown) {
+        const messages = LogHelper.getExceptionMessage(error);
+        if (axios.isAxiosError(error)) {
+          t.equal("CryptoUtil#encodeASN1Sig invalid ec curve type", messages);
+        } else {
+          t.fail("expected an axios error, got something else");
+        }
       }
     }
     t.end();

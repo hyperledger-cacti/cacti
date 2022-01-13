@@ -4,6 +4,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
+  LogHelper,
   Checks,
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
@@ -90,11 +91,19 @@ export class GetPrometheusExporterMetricsEndpointV1
       const resBody = await this.opts.connector.getPrometheusExporterMetrics();
       res.status(200);
       res.send(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
+      const stack = LogHelper.getExceptionStack(ex);
+      const messages = LogHelper.getExceptionMessage(ex);
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.statusMessage = messages;
+        res.json({ error: stack });
+      } else {
+        res.status(500);
+        res.statusMessage = messages;
+        res.json({ error: stack });
+      }
     }
   }
 }

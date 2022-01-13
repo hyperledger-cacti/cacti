@@ -11,7 +11,7 @@ import test, { Test } from "tape-promise/tape";
 import { InternalIdentityClient } from "../../../main/typescript/identity/internal/client";
 import { VaultTransitClient } from "../../../main/typescript/identity/vault-client";
 import { WebSocketClient } from "../../../main/typescript/identity/web-socket-client";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LogHelper } from "@hyperledger/cactus-common";
 import { createHash } from "crypto";
 import { ECCurveType } from "../../../main/typescript/identity/internal/crypto-util";
 import { KJUR } from "jsrsasign";
@@ -267,12 +267,13 @@ test("identity-clients", async (t: Test) => {
         try {
           await client.getPub(testNotFoundKey);
           t.fail("Should not get here");
-        } catch (error) {
-          t.true(
-            (error as Error).message.includes(
-              `keyName = ${testNotFoundKey} not found`,
-            ),
-          );
+        } catch (error: unknown) {
+          const messages = LogHelper.getExceptionMessage(error);
+          if (axios.isAxiosError(error)) {
+            t.true(messages.includes(`keyName = ${testNotFoundKey} not found`));
+          } else {
+            t.fail("expected an axios error, got something else");
+          }
         }
       }
       t.end();
