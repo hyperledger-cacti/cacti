@@ -131,7 +131,8 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
  */
 class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help = "Reclaims a pledged asset after timeout.") {
     val config by requireObject<Map<String, String>>()
-    val contractId: String? by option("-cid", "--contract-id", help="Contract/Linear Id for Asset Transfer Pledge State")
+    val contractId: String? by option("-pid", "--pledge-id", help="Pledge/Linear Id for Asset Transfer Pledge State")
+    val claimStatusLinearId: String? by option("-cid", "--claim-status-id", help="Linear Id for interop-query external state")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer")
     override fun run() = runBlocking {
         if (contractId == null) {
@@ -154,6 +155,7 @@ class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help
                     rpc.proxy,
                     contractId!!,
                     IssueTokenCommand(issuedTokenType, listOf(0)),
+                    claimStatusLinearId!!,
                     issuer,
                     obs
                 )
