@@ -287,12 +287,16 @@ test(testCase, async (t: Test) => {
         nonce: 1,
       });
       t2.ifError(setNameOutInvalid);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an instanceof Error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName: HelloWorldContractJson.contractName,
@@ -402,12 +406,16 @@ test(testCase, async (t: Test) => {
         nonce: 4,
       });
       t2.ifError(setNameOutInvalid);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an instanceof Error, got something else");
+      }
     }
 
     const { callOutput: getNameOut } = await connector.invokeContract({

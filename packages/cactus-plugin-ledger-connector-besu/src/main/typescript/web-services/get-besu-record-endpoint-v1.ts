@@ -6,6 +6,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  LogHelper,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
@@ -91,12 +92,21 @@ export class GetBesuRecordEndpointV1 implements IWebServiceEndpoint {
       const reqBody: GetBesuRecordV1Request = req.body as GetBesuRecordV1Request;
       const resBody = await this.options.connector.getBesuRecord(reqBody);
       res.json(resBody);
-    } catch (ex) {
+    } catch (ex: unknown) {
+      const stack = LogHelper.getExceptionStack(ex);
+      const messages = LogHelper.getExceptionMessage(ex);
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      if (ex instanceof Error) {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: stack || messages,
+        });
+      } else {
+        res.status(500).json({
+          message: "Internal Server Error",
+          error: stack || messages,
+        });
+      }
     }
   }
 }

@@ -210,12 +210,16 @@ test("deploys contract via .json file", async (t: Test) => {
         nonce: 1,
       });
       t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an instanceof Error, got something else");
+      }
     }
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
@@ -318,12 +322,16 @@ test("deploys contract via .json file", async (t: Test) => {
         nonce: 4,
       });
       t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        t2.notStrictEqual(
+          error,
+          "Nonce too low",
+          "setName() invocation with invalid nonce",
+        );
+      } else {
+        t2.fail("expected an instanceof Error, got something else");
+      }
     }
 
     const { callOutput: getNameOut } = await connector.invokeContract({

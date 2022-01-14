@@ -14,6 +14,7 @@ import {
   LoggerProvider,
   Checks,
   IAsyncProvider,
+  LogHelper,
 } from "@hyperledger/cactus-common";
 
 import { SignTransactionRequest } from "../generated/openapi/typescript-axios/api";
@@ -97,11 +98,19 @@ export class BesuSignTransactionEndpointV1 implements IWebServiceEndpoint {
         res.statusMessage = "Transaction not found";
         res.json({ error: "Transaction not found" });
       }
-    } catch (ex) {
+    } catch (ex: unknown) {
+      const stack = LogHelper.getExceptionStack(ex);
+      const messages = LogHelper.getExceptionMessage(ex);
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.statusMessage = messages;
+        res.json({ error: stack });
+      } else {
+        res.status(500);
+        res.statusMessage = messages;
+        res.json({ error: stack });
+      }
     }
   }
 }
