@@ -82,6 +82,7 @@ export class ApiClient extends BaseAPI {
   public async ofLedger<T>(
     ledgerOrId: string | Ledger,
     ctor: new (configuration?: Configuration) => T,
+    ctorArgs: Record<string, unknown>,
   ): Promise<ApiClient & T>;
   /**
    * Constructs a new `ApiClient` object that is tied to whichever Cactus node
@@ -103,6 +104,7 @@ export class ApiClient extends BaseAPI {
   public async ofLedger<T extends any>(
     ledgerOrId: string | Ledger,
     ctor: new (configuration?: Configuration) => T,
+    ctorArgs: Record<string, unknown>,
     consortiumDbProvider?: IAsyncProvider<ConsortiumDatabase>,
   ): Promise<ApiClient & T> {
     const fnTags = "ApiClient#forLedgerId()";
@@ -127,12 +129,13 @@ export class ApiClient extends BaseAPI {
     // pick a random element from the array of nodes that have a connection to
     // the target ledger (based on the ledger ID)
     const randomIdx = Math.floor(Math.random() * nodes.length);
-
     const randomNode = nodes[randomIdx];
 
-    const configuration = new Configuration({
-      basePath: randomNode.nodeApiHost,
-    });
+    // overwrite basePath with randomNode api host
+    ctorArgs.basePath = randomNode.nodeApiHost;
+
+    // create the ApiClient configuration object
+    const configuration = new Configuration(ctorArgs);
 
     return new ApiClient(configuration).extendWith(ctor);
   }
