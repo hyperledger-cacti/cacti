@@ -17,6 +17,7 @@ import {
   IAsyncProvider,
   Logger,
   LoggerProvider,
+  LogHelper,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
@@ -131,14 +132,25 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
       const body = await this.callInternalContainer(req.body);
       res.status(200);
       res.json(body);
-    } catch (ex) {
+    } catch (ex: unknown) {
+      const stack = LogHelper.getExceptionStack(ex);
+      const messages = LogHelper.getExceptionMessage(ex);
       this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.json({
-        error: ex?.message,
-        // FIXME do not include stack trace
-        errorStack: ex?.stack,
-      });
+      if (ex instanceof Error) {
+        res.status(500);
+        res.json({
+          error: messages,
+          // FIXME do not include stack trace
+          errorStack: stack,
+        });
+      } else {
+        res.status(500);
+        res.json({
+          error: messages,
+          // FIXME do not include stack trace
+          errorStack: stack,
+        });
+      }
     }
   }
 
