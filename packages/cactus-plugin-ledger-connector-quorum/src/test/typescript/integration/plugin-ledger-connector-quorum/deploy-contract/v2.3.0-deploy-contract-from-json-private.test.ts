@@ -68,7 +68,7 @@ import { PluginImportType } from "@hyperledger/cactus-core-api";
 const logLevel: LogLevelDesc = "INFO";
 
 describe("PluginLedgerConnectorQuorum", () => {
-  const preWarmedLedger = true; //process.env.CACTUS_TEST_PRE_WARMED_LEDGER === "true";
+  const preWarmedLedger = process.env.CACTUS_TEST_PRE_WARMED_LEDGER === "true";
   const keychainId1 = "keychain1_" + uuidV4();
   const keychainId2 = "keychain2_" + uuidV4();
 
