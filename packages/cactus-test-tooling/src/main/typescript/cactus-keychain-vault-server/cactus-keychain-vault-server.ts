@@ -109,8 +109,8 @@ export class CactusKeychainVaultServer {
     });
   }
 
-  public async stop(): Promise<any> {
-    await Containers.stop(this.container as any);
+  public async stop(): Promise<void> {
+    await Containers.stop(this.container as Container);
   }
 
   public destroy(): Promise<unknown> {
