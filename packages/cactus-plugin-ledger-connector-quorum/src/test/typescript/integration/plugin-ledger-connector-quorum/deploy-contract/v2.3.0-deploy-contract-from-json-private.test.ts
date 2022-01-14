@@ -68,7 +68,7 @@ import { PluginImportType } from "@hyperledger/cactus-core-api";
 const logLevel: LogLevelDesc = "INFO";
 
 describe("PluginLedgerConnectorQuorum", () => {
-  const preWarmedLedger = process.env.CACTUS_TEST_PRE_WARMED_LEDGER === "true";
+  const preWarmedLedger = true; //process.env.CACTUS_TEST_PRE_WARMED_LEDGER === "true";
   const keychainId1 = "keychain1_" + uuidV4();
   const keychainId2 = "keychain2_" + uuidV4();
 
@@ -83,7 +83,9 @@ describe("PluginLedgerConnectorQuorum", () => {
   let connector3: PluginLedgerConnectorQuorum;
 
   afterAll(async () => {
-    await ledger.stop();
+    if (!preWarmedLedger) {
+      await ledger.stop();
+    }
   });
 
   afterAll(async () => {
@@ -197,7 +199,7 @@ describe("PluginLedgerConnectorQuorum", () => {
     connector1 = await pluginFactoryLedgerConnector.create({
       instanceId: connectorInstanceId1,
       pluginRegistry: pluginRegistry1,
-      rpcApiHttpHost: rpcApiHttpHostMember1,
+      rpcApiHttpHost: "http://localhost:8545",
       privateUrl: keys.quorum.member1.privateUrl,
       logLevel,
     });
@@ -247,9 +249,9 @@ describe("PluginLedgerConnectorQuorum", () => {
       signingAccount = webQJsMember1.eth.accounts.decrypt(accountKey, "");
     }
 
-    const accountAddress = keys.quorum.member1.accountAddress;
+    // const accountAddress = keys.quorum.member1.accountAddress;
     const txCount = await webQJsMember1.eth.getTransactionCount(
-      `0x${accountAddress}`,
+      `0x13a52aab892e1322e8b52506276363d4754c122e`,
     );
 
     const deployRes = await connector1.deployContract({
@@ -260,6 +262,10 @@ describe("PluginLedgerConnectorQuorum", () => {
           keys.tessera.member1.publicKey,
           keys.tessera.member2.publicKey,
         ],
+        isPrivate: true,
+        gasLimit: 10000000,
+        gasPrice: 0,
+        privacyFlag: 0,
       },
       web3SigningCredential: {
         secret: keys.quorum.member1.privateKey,

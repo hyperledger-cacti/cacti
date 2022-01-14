@@ -7,11 +7,11 @@ declare module "web3js-quorum" {
      * @param enclaveOptions Must contain either `ipcPath` or `privateUrl`
      * @param isQuorum Defaults to `false`
      */
-    export default function Web3JsQuorum(web3: IWeb3Instance, enclaveOptions: IEnclaveOptions, isQuorum?: boolean): IWeb3InstanceExtended;
+    export default function Web3JsQuorum(web3: Web3, enclaveOptions: IEnclaveOptions, isQuorum?: boolean): IWeb3InstanceExtended;
 
     export interface IWeb3Instance {
-        currentProvider: any;
-        extend: (...args: any[]) => any;
+        currentProvider: unknown;
+        extend: <T>(...args: unknown[]) => T & IWeb3Instance;
     }
 
     export interface IEeaWeb3Extension {

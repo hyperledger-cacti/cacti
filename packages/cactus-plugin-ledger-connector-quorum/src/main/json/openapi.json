@@ -307,6 +307,24 @@
                         "default": [],
                         "items": {},
                         "nullable": false
+                    },
+                    "isPrivate": {
+                        "type": "boolean",
+                        "default": false,
+                        "nullable": false
+                    },
+                    "privacyFlag": {
+                        "type": "number",
+                        "nullable": false,
+                        "description": "See: https://consensys.net/docs/goquorum//en/latest/concepts/privacy/privacy-enhancements/"
+                    },
+                    "gasPrice": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasLimit": {
+                        "type": "number",
+                        "nullable": false
                     }
 
                 }

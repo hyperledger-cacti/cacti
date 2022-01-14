@@ -443,6 +443,30 @@ export interface QuorumPrivateTransactionConfig {
      * @memberof QuorumPrivateTransactionConfig
      */
     privateFor: Array<any>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    isPrivate?: boolean;
+    /**
+     * See: https://consensys.net/docs/goquorum//en/latest/concepts/privacy/privacy-enhancements/
+     * @type {number}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privacyFlag?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    gasPrice?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    gasLimit?: number;
 }
 /**
  * 
