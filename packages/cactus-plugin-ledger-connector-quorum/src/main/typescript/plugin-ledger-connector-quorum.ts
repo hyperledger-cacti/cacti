@@ -621,16 +621,20 @@ export class PluginLedgerConnectorQuorum
       const privacyGroupId =
         req.privateTransactionConfig.privacyGroupId ||
         this.web3JsQ.utils.generatePrivacyGroup(req.privateTransactionConfig);
+      this.log.info("privacyGroupId=%o", privacyGroupId);
 
-      const txCount1 = await this.web3JsQ.eth.getTransactionCount();
-      this.log.info("txCount1=%o", txCount1);
+      // const txCount1 = await this.web3JsQ.eth.getTransactionCount();
+      // this.log.info("txCount1=%o", txCount1);
 
-      const txCount =
-        req.nonce ||
-        (await this.web3JsQ.priv.getTransactionCount(
-          req.privateTransactionConfig.privateFrom,
-          privacyGroupId,
-        ));
+      // const txCount =
+      //   req.nonce ||
+      //   (await this.web3JsQ.priv.getTransactionCount(
+      //     req.privateTransactionConfig.privateFrom,
+      //     privacyGroupId,
+      //   ));
+
+      const txCount = 0; // FIXME this is the part
+      // that is not working the second time around
 
       const tx = {
         value: 0,
