@@ -42,6 +42,7 @@ export class BambooHarvestListPage implements OnInit {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.quorumLedgerId,
       SupplyChainApi,
+      {},
     );
     await this.loadData();
   }
