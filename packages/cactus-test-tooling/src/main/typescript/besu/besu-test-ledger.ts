@@ -15,6 +15,7 @@ import { ITestLedger } from "../i-test-ledger";
 import { Streams } from "../common/streams";
 import { IKeyPair } from "../i-key-pair";
 import { Containers } from "../common/containers";
+import { RuntimeError } from "run-time-error";
 
 export interface IBesuTestLedgerConstructorOptions {
   containerImageVersion?: string;
@@ -278,8 +279,15 @@ export class BesuTestLedger implements ITestLedger {
           await this.waitForHealthCheck();
           this.log.debug(`Healthcheck passing OK.`);
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (ex instanceof Error) {
+            reject(ex);
+          } else {
+            throw new RuntimeError(
+              "expected an instanceof Error, got something else",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

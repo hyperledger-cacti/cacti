@@ -14,6 +14,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  LogHelper,
   Strings,
   ILoggerOptions,
   Logger,
@@ -105,7 +106,10 @@ export class Containers {
       return response;
     } catch (ex) {
       log.error("Failed to get diagnostics of Docker daemon", ex);
-      throw new RuntimeError("Failed to get diagnostics of Docker daemon", ex);
+      throw new RuntimeError(
+        "Failed to get diagnostics of Docker daemon",
+        JSON.stringify(ex),
+      );
     }
   }
   /**
@@ -522,18 +526,23 @@ export class Containers {
       try {
         const { Status } = await Containers.getById(containerId);
         reachable = Status.endsWith(" (healthy)");
-      } catch (ex) {
-        // FIXME: if the container is slow to start this might trip with a
-        // false positive because there is no container YET in the beginning.
-        // if (ex.stack.includes(`no container by ID"${containerId}"`)) {
-        //   throw new Error(
-        //     `${fnTag} container crashed while awaiting healthheck -> ${ex.stack}`,
-        //   );
-        // }
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
+      } catch (ex: unknown) {
+        if (ex instanceof Error) {
+          const stack = LogHelper.getExceptionStack(ex);
+          // FIXME: if the container is slow to start this might trip with a
+          // false positive because there is no container YET in the beginning.
+          // if (ex.stack.includes(`no container by ID"${containerId}"`)) {
+          //   throw new Error(
+          //     `${fnTag} container crashed while awaiting healthheck -> ${ex.stack}`,
+          //   );
+          // }
+          if (Date.now() >= startedAt + timeoutMs) {
+            throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${stack}`);
+          }
+          reachable = false;
+        } else {
+          throw new Error("expected an instanceof Error, got something else");
         }
-        reachable = false;
       }
       await new Promise((resolve2) => setTimeout(resolve2, 1000));
     } while (!reachable);

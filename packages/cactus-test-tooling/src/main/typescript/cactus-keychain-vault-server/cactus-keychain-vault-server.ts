@@ -10,6 +10,7 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { Containers } from "../common/containers";
+import { RuntimeError } from "run-time-error";
 
 export interface ICactusKeychainVaultServerOptions {
   envVars?: string[];
@@ -102,8 +103,16 @@ export class CactusKeychainVaultServer {
         try {
           await Containers.waitForHealthCheck(this.containerId);
           resolve(container);
-        } catch (ex) {
-          reject(ex);
+        } catch (ex: unknown) {
+          if (ex instanceof Error) {
+            reject(ex);
+          } else {
+            reject(ex);
+            throw new RuntimeError(
+              "expected an instanceof Error, got something else",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });

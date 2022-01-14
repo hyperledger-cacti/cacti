@@ -512,7 +512,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       return ccp;
     } catch (error) {
       this.log.debug(`error on get connection profile`);
-      throw new Error(error as string);
+      throw new Error(JSON.stringify(error));
     }
   }
 

@@ -10,6 +10,7 @@ import {
   Bools,
   Logger,
   LoggerProvider,
+  LogHelper,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import { ITestLedger } from "../i-test-ledger";
@@ -272,10 +273,15 @@ export class QuorumTestLedger implements ITestLedger {
       try {
         const res = await axios.get(httpUrl);
         reachable = res.status > 199 && res.status < 300;
-      } catch (ex) {
-        reachable = false;
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
+      } catch (ex: unknown) {
+        if (ex instanceof Error) {
+          const stack = LogHelper.getExceptionStack(ex);
+          reachable = false;
+          if (Date.now() >= startedAt + timeoutMs) {
+            throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${stack}`);
+          }
+        } else {
+          throw new Error("expected an instanceof Error, got something else");
         }
       }
       await new Promise((resolve2) => setTimeout(resolve2, 100));

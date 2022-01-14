@@ -160,9 +160,17 @@ export class BesuMpTestLedger {
         try {
           await Containers.waitForHealthCheck(this.containerId.get());
           resolve(container);
-        } catch (ex) {
-          this.log.error(ex);
-          reject(ex);
+        } catch (ex: unknown) {
+          if (ex instanceof Error) {
+            this.log.error(ex);
+            reject(ex);
+          } else {
+            reject(ex);
+            throw new RuntimeError(
+              "expected an instanceof Error, but got something else",
+              JSON.stringify(ex),
+            );
+          }
         }
       });
     });
