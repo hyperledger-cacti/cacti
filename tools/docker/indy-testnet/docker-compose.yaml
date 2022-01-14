@@ -1,13 +1,13 @@
-version: '3'
+version: '3.2'
 
-services: 
+services:
   indy_pool:
     container_name: indy_pool
     image: indy_pool
     build:
       context: ./indy_pool
       dockerfile: indy-pool.dockerfile
-    ports: 
+    ports:
     - "9701:9701"
     - "9702:9702"
     - "9703:9703"
@@ -32,7 +32,7 @@ services:
       - type: bind
         source: "./nginx/nginx.conf"
         target: "/etc/nginx/nginx.conf"
-    ports: 
+    ports:
       - "10080:80"
     networks:
       indy_net:
@@ -63,7 +63,6 @@ services:
 
 networks:
   indy_net:
-    name: indy_net
     driver: bridge
     ipam:
       driver: default

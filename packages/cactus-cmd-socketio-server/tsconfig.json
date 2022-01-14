@@ -16,5 +16,13 @@
   "exclude": [
     "copyStaticAssets.ts",
     "./src/main/typescript/verifier/ValidatorAuthentication.ts"
+  ],
+  "references": [
+    {
+      "path": "../cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../cactus-test-tooling/tsconfig.json"
+    }
   ]
 }
