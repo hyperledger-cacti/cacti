@@ -16,10 +16,10 @@ One bridge network and three containers will be started by `docker-compse up` co
 - Containers
   - nginx container
     - proxies requests from verifiers to the validator in the python container
-      - NOTE:  At the moment, this container does nothing. 
+      - NOTE:  At the moment, this container does nothing.
       - TODO: Configure to proxy requests. Enable uWSGI (towards the python container).
     - IP address: 172.16.0.3 on indy_net
-    - port 10080 is open to the world 
+    - port 10080 is open to the world
   - clientbase
     - this is a temporary container based on template image for indy client (used by validator/Dockerfile)
     - immediately exits when you docker-compose up
@@ -48,7 +48,7 @@ HTTP_PROXY=http://<proxy_host>:<proxy_port>
 NO_PROXY=<local addresses>
 ```
 
-Set `HTTP_PROXY` and `NO_PROXY` if your network requires HTTP proxy access to reach the internet.  
+Set `HTTP_PROXY` and `NO_PROXY` if your network requires HTTP proxy access to reach the internet.
 
 
 ### How to build docker images
@@ -63,7 +63,7 @@ docker-compose build
 Use this command to start containers.
 
 ```
-docker-compse up 
+docker-compose up
 ```
 
 Press CTRL-C to stop the containers.
