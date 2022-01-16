@@ -344,8 +344,6 @@ function sendRequest() {
     .then((returnvalue) => {
       //console.log('success : ' + json2str(returnvalue));
 
-      ////socket.emit('request', returnvalue);
-
       // call WebAPI
       console.log("##call WebAPI");
       var param = {
