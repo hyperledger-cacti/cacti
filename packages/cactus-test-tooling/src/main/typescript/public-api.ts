@@ -156,3 +156,4 @@ export { IDockerPullProgressDetail } from "./common/i-docker-pull-progress";
 export { envNodeToDocker } from "./common/env-node-to-docker";
 export { envMapToDocker } from "./common/env-map-to-docker";
 export { envNodeToMap } from "./common/env-node-to-map";
+export * as SocketIOTestSetupHelpers from "./socketio-test-setup-helpers/socketio-test-setup-helpers";

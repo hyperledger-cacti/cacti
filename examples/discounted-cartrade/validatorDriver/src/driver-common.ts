@@ -22,10 +22,6 @@ export function json2str(jsonObj: object) {
   }
 }
 
-// Validator test program.(socket.io client)
-const io = require("socket.io-client");
-//var config = require('config');
-
 export function makeApiInfoList(targetApiInfo: any): Array<ApiInfo> {
   const retApiInfoList: Array<ApiInfo> = [];
   for (const item of targetApiInfo) {

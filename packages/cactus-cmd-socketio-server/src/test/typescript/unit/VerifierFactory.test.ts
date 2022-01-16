@@ -26,6 +26,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 });
 
 // Mock ledger data
+jest.mock("fs");
 import { LPInfoHolder } from "../../../main/typescript/routing-interface/util/LPInfoHolder";
 jest.mock("../../../main/typescript/routing-interface/util/LPInfoHolder");
 const mockLedgerData = "{mockLedgerData}"

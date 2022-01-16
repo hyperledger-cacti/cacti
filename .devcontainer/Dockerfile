@@ -64,5 +64,9 @@ RUN gvm use go1.16.5 --default
 # Installing Node Version Manager (nvm)
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 RUN source /home/vscode/.bashrc && nvm install 16.3.0
+
+# Install Rust toolchain (rustup, rustc, cargo, etc.)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --verbose --default-toolchain=1.57.0
+
 SHELL ["/bin/bash", "--login", "-c"]
 USER root

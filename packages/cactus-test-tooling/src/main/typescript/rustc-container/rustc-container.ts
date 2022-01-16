@@ -89,7 +89,7 @@ export class RustcContainer {
     this.hostSourceDir = Optional.ofNullable(opts.hostSourceDir);
     this.imageName =
       opts.imageName || "ghcr.io/hyperledger/cactus-rust-compiler";
-    this.imageTag = opts.imageTag || "1.0.3";
+    this.imageTag = opts.imageTag || "2022-01-12-15d4793c---fix-1646";
     this.imageFqn = `${this.imageName}:${this.imageTag}`;
     this.envVars = opts.envVars || new Map();
     this.emitContainerLogs = Bools.isBooleanStrict(opts.emitContainerLogs)
