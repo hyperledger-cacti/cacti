@@ -24,9 +24,9 @@ const configContract: any = yaml.safeLoad(
 );
 
 export class DBAccess {
-  ledgerPluginInfo: LedgerPluginInfo[];
-  contractInfo: [];
-  blpRegistryInfo: [];
+  ledgerPluginInfo: LedgerPluginInfo[] = [];
+  contractInfo: [] = [];
+  blpRegistryInfo: [] = [];
 
   constructor() {
     // TODO: DB Access Initialization
