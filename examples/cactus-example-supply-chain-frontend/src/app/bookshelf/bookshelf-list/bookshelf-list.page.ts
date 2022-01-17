@@ -42,6 +42,7 @@ export class BookshelfListPage implements OnInit {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.ledgerId,
       SupplyChainApi,
+      {},
     );
     await this.loadData();
   }
