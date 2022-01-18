@@ -3,4 +3,5 @@
 
 ## Start a validator for Fabric
 echo "[process] Start a validator for Fabric"
+rm -fr ./dist/wallet
 npm run start

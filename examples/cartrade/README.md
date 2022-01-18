@@ -45,17 +45,6 @@ Cactus **car-trade** is a sample application where users can exchange car owners
     ./script-start-ledgers.sh
     ```
     - (NOTICE: Before executing the above, your account needs to be added to the docker group (`usermod -a -G docker YourAccount` from root user))
-    - If the following containers are started when displaying the container list with the docker ps command, it will be fine.
-        ```
-        CONTAINER ID        IMAGE                                                                                                    COMMAND                  CREATED              STATUS              PORTS                                                    NAMES
-        14b98ba40b66        dev-peer0.org1.example.com-fabcar-1.0-5c906e402ed29f20260ae42283216aa75549c571e2e380f3615826365d8269ba   "chaincode -peer.add…"   42 seconds ago       Up 40 seconds                                                                dev-peer0.org1.example.com-fabcar-1.0
-        d0efd7479bdd        hyperledger/fabric-tools                                                                                 "/bin/bash"              About a minute ago   Up 56 seconds                                                                cli
-        c9bd7ddfde7e        hyperledger/fabric-peer                                                                                  "peer node start"        About a minute ago   Up About a minute   0.0.0.0:7051->7051/tcp, 0.0.0.0:7053->7053/tcp           peer0.org1.example.com
-        d4f2b1a76626        hyperledger/fabric-couchdb                                                                               "tini -- /docker-ent…"   About a minute ago   Up About a minute   4369/tcp, 9100/tcp, 0.0.0.0:5984->5984/tcp               couchdb
-        53a79780f564        hyperledger/fabric-ca                                                                                    "sh -c 'fabric-ca-se…"   About a minute ago   Up About a minute   0.0.0.0:7054->7054/tcp                                   ca.example.com
-        aceb0e52e9c7        hyperledger/fabric-orderer                                                                               "orderer"                About a minute ago   Up About a minute   0.0.0.0:7050->7050/tcp                                   orderer.example.com
-        ec57c9f78d0d        ethereum/client-go:v1.8.27                                                                               "geth --rpc --networ…"   2 minutes ago        Up 2 minutes        8546/tcp, 0.0.0.0:8545->8545/tcp, 30303/tcp, 30303/udp   geth1
-        ```
 
 1. Please prepare the three consoles on your machine as the following:
     - **console 1**: console for launching `cactus-plugin-ledger-connector-go-ethereum-socketio`
