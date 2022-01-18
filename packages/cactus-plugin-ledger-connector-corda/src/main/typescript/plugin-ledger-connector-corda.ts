@@ -45,6 +45,8 @@ import {
   DiagnoseNodeEndpointV1,
 } from "./web-services/diagnose-node-endpoint-v1";
 
+import fs from "fs";
+
 export interface IPluginLedgerConnectorCordaOptions
   extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -54,6 +56,13 @@ export interface IPluginLedgerConnectorCordaOptions
   cordaStartCmd?: string;
   cordaStopCmd?: string;
   apiUrl?: string;
+  /**
+   * Path to the file where the private key for the ssh configuration is located
+   * This property is optional. Its use is not recommended for most cases, it will override the privateKey property of the sshConfigAdminShell.
+   * @type {string}
+   * @memberof IPluginLedgerConnectorCordaOptions
+   */
+  sshPrivateKeyPath?: string;
 }
 
 export class PluginLedgerConnectorCorda
@@ -91,6 +100,8 @@ export class PluginLedgerConnectorCorda
       `${fnTag} options.prometheusExporter`,
     );
     this.prometheusExporter.startMetricsCollection();
+    // if privateKeyPath exists, overwrite privateKey in sshConfigAdminShell
+    this.readSshPrivateKeyFromFile();
   }
 
   public getOpenApiSpec(): unknown {
@@ -144,6 +155,16 @@ export class PluginLedgerConnectorCorda
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
     // await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
     return webServices;
+  }
+
+  private readSshPrivateKeyFromFile(): void {
+    const { sshPrivateKeyPath } = this.options;
+    if (sshPrivateKeyPath) {
+      const fileContent = fs
+        .readFileSync(sshPrivateKeyPath, "utf-8")
+        .toString();
+      this.options.sshConfigAdminShell.privateKey = fileContent;
+    }
   }
 
   public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
