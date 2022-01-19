@@ -18,8 +18,7 @@ import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 import { VerifierAuthentication } from "./VerifierAuthentication";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-import io from "socket.io-client";
-import { Socket } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 
 const fs = require("fs");
 const path = require("path");
@@ -47,7 +46,7 @@ export class Verifier implements IVerifier {
   apiInfo: Array<ApiInfo> = [];
   counterReqID = 1;
   eventListenerHash: { [key: string]: VerifierEventListener } = {}; // Listeners for events from Ledger
-  static mapUrlSocket: Map<string, SocketIOClient.Socket> = new Map();
+  static mapUrlSocket: Map<string, Socket> = new Map();
   checkValidator: (key: string, data: string) => Promise<any> =
     VerifierAuthentication.verify;
 
@@ -354,6 +353,13 @@ export class Verifier implements IVerifier {
 
           socket.on("connect_error", (err: object) => {
             logger.error("##connect_error:", err);
+            // end communication
+            socket.disconnect();
+            reject(err);
+          });
+
+          socket.on("monitor_error", (err: object) => {
+            logger.error("##monitor_error:", err);
             // end communication
             socket.disconnect();
             reject(err);

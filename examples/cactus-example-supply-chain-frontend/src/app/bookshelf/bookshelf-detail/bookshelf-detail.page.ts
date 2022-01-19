@@ -52,6 +52,7 @@ export class BookshelfDetailPage implements OnInit {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.quorumLedgerId,
       SupplyChainApi,
+      {},
     );
 
     if (!this.bookshelf) {
