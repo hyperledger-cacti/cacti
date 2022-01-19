@@ -48,6 +48,9 @@ Once the last command has finished executing, open link printed on the console w
 
 - The guidance is [here](./examples/electricity-trade/README.md).
 
+### Connector Example 
+
+- The guidance is [here](./examples/connector-example/README.md).
 
 ## Documentation
 
