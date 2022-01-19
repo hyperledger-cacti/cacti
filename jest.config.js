@@ -154,5 +154,6 @@ module.exports = {
     `./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-backend-api-calls.test.ts`,
     `./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-cli-via-npm-script.test.ts`,
     `./examples/cactus-check-connection-ethereum-validator/src/test/typescript/integration/check-connection-to-ledger.test.ts`,
+    `./examples/cactus-check-connection-ethereum-validator/src/test/typescript/integration/check-config-files.test.ts`,
   ],
 };

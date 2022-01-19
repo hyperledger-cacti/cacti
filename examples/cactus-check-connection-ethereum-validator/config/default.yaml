@@ -4,3 +4,5 @@ checkEthereumValidator:
     chainName: geth1
 
 logLevel: debug
+
+monitorMode: true
