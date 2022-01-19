@@ -23,15 +23,22 @@ import {
   InvokeContractV1Request,
   InvokeContractV1Response,
 } from "../generated/openapi/typescript-axios";
+import {
+  PluginLedgerConnectorCorda,
+  CordaVersion,
+} from "../plugin-ledger-connector-corda";
 
 export interface IInvokeContractEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
+  connector: PluginLedgerConnectorCorda;
 }
 
 export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
   private readonly log: Logger;
   private readonly apiUrl?: string;
+  private readonly cordaVersion?: CordaVersion;
 
   constructor(public readonly opts: IInvokeContractEndpointV1Options) {
     const fnTag = "InvokeContractEndpointV1#constructor()";
@@ -44,6 +51,7 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
     });
 
     this.apiUrl = opts.apiUrl;
+    this.cordaVersion = opts.cordaVersion;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -90,16 +98,32 @@ export class InvokeContractEndpointV1 implements IWebServiceEndpoint {
     const verbUpper = this.getVerbLowerCase().toUpperCase();
     this.log.debug(`${verbUpper} ${this.getPath()}`);
 
-    try {
-      if (this.apiUrl === undefined) throw "apiUrl option is necessary";
-      const resBody = await this.callInternalContainer(req.body);
-      res.status(200);
-      res.send(resBody);
-    } catch (ex) {
-      this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+    if (this.cordaVersion === CordaVersion.CORDA_V5) {
+      try {
+        const reqBody = req.body as InvokeContractV1Request;
+        const resBody = await this.opts.connector.invokeContract(reqBody);
+        res.status(200);
+        res.json(resBody);
+      } catch (ex) {
+        this.log.error(`${fnTag} failed to serve request`, ex);
+        res.status(500);
+        res.json({
+          error: ex?.message,
+          errorStack: ex?.stack,
+        });
+      }
+    } else {
+      try {
+        if (this.apiUrl === undefined) throw "apiUrl option is necessary";
+        const resBody = await this.callInternalContainer(req.body);
+        res.status(200);
+        res.send(resBody);
+      } catch (ex) {
+        this.log.error(`${fnTag} failed to serve request`, ex);
+        res.status(500);
+        res.statusMessage = ex.message;
+        res.json({ error: ex.stack });
+      }
     }
   }
 

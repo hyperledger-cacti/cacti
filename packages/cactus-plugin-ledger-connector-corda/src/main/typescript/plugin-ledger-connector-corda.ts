@@ -46,7 +46,16 @@ import {
 } from "./web-services/diagnose-node-endpoint-v1";
 
 import fs from "fs";
+import {
+  InvokeContractV1Request,
+  InvokeContractV1Response,
+} from "./generated/openapi/typescript-axios/index";
+import axios from "axios";
 
+export enum CordaVersion {
+  CORDA_V4X = "CORDA_V4X",
+  CORDA_V5 = "CORDA_V5",
+}
 export interface IPluginLedgerConnectorCordaOptions
   extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -56,6 +65,7 @@ export interface IPluginLedgerConnectorCordaOptions
   cordaStartCmd?: string;
   cordaStopCmd?: string;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
   /**
    * Path to the file where the private key for the ssh configuration is located
    * This property is optional. Its use is not recommended for most cases, it will override the privateKey property of the sshConfigAdminShell.
@@ -142,7 +152,7 @@ export class PluginLedgerConnectorCorda
   }
 
   public deployContract(): Promise<any> {
-    throw new Error("Method not implemented.");
+    throw new Error("Method not implemented for Corda 5.");
   }
 
   public async transact(): Promise<any> {
@@ -182,6 +192,8 @@ export class PluginLedgerConnectorCorda
         cordaStartCmd: this.options.cordaStartCmd,
         cordaStopCmd: this.options.cordaStopCmd,
         apiUrl: this.options.apiUrl,
+        cordaVersion: this.options.cordaVersion,
+        connector: this,
       });
 
       endpoints.push(endpoint);
@@ -191,6 +203,8 @@ export class PluginLedgerConnectorCorda
       const opts: IInvokeContractEndpointV1Options = {
         apiUrl: this.options.apiUrl,
         logLevel: this.options.logLevel,
+        cordaVersion: this.options.cordaVersion,
+        connector: this,
       };
       const endpoint = new InvokeContractEndpointV1(opts);
       endpoints.push(endpoint);
@@ -209,6 +223,8 @@ export class PluginLedgerConnectorCorda
       const opts: IListFlowsEndpointV1Options = {
         apiUrl: this.options.apiUrl,
         logLevel: this.options.logLevel,
+        cordaVersion: this.options.cordaVersion,
+        connector: this,
       };
       const endpoint = new ListFlowsEndpointV1(opts);
       endpoints.push(endpoint);
@@ -218,6 +234,8 @@ export class PluginLedgerConnectorCorda
       const opts: INetworkMapEndpointV1Options = {
         apiUrl: this.options.apiUrl,
         logLevel: this.options.logLevel,
+        cordaVersion: this.options.cordaVersion,
+        connector: this,
       };
       const endpoint = new NetworkMapEndpointV1(opts);
       endpoints.push(endpoint);
@@ -227,6 +245,8 @@ export class PluginLedgerConnectorCorda
       const opts: IDiagnoseNodeEndpointV1Options = {
         apiUrl: this.options.apiUrl,
         logLevel: this.options.logLevel,
+        cordaVersion: this.options.cordaVersion,
+        connector: this,
       };
       const endpoint = new DiagnoseNodeEndpointV1(opts);
       endpoints.push(endpoint);
@@ -242,5 +262,34 @@ export class PluginLedgerConnectorCorda
 
   public async getFlowList(): Promise<string[]> {
     return ["getFlowList()_NOT_IMPLEMENTED"];
+  }
+
+  public async invokeContract(
+    req: InvokeContractV1Request,
+  ): Promise<InvokeContractV1Response> {
+    const {
+      //  flowFullClassName,
+      //  flowInvocationType,
+      params,
+      //  signingCredential,
+    } = req;
+    const instance = axios.create({
+      baseURL: "https://localhost:12112/api/v1/",
+      timeout: 1000,
+      auth: {
+        username: "earthling",
+        password: "password",
+      },
+      responseType: "json",
+    });
+
+    const response = await instance.post("/flowstarter/startflow", params[1]);
+
+    const res: InvokeContractV1Response = {
+      success: true,
+      callOutput: response,
+      flowId: "1",
+    };
+    return res;
   }
 }

@@ -23,10 +23,15 @@ import {
   DiagnoseNodeV1Request,
   DiagnoseNodeV1Response,
 } from "../generated/openapi/typescript-axios";
-
+import {
+  PluginLedgerConnectorCorda,
+  CordaVersion,
+} from "../plugin-ledger-connector-corda";
 export interface IDiagnoseNodeEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
+  connector: PluginLedgerConnectorCorda;
 }
 
 export class DiagnoseNodeEndpointV1 implements IWebServiceEndpoint {

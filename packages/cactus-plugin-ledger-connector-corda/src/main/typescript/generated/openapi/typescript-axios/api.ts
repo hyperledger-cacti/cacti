@@ -344,10 +344,10 @@ export interface InvokeContractV1Request {
     flowInvocationType: FlowInvocationType;
     /**
      * The list of arguments to pass in to the contract method being invoked.
-     * @type {Array<JvmObject>}
+     * @type {Array<JvmObject | RpcStartFlowRequest>}
      * @memberof InvokeContractV1Request
      */
-    params: Array<JvmObject>;
+    params: Array<JvmObject | RpcStartFlowRequest>;
     /**
      * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing.
      * @type {number}
@@ -648,6 +648,44 @@ export interface PublicKey {
      * @memberof PublicKey
      */
     encoded: string;
+}
+/**
+ * Parameter used in Corda 5
+ * @export
+ * @interface RpcStartFlowRequest
+ */
+export interface RpcStartFlowRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RpcStartFlowRequest
+     */
+    clientId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RpcStartFlowRequest
+     */
+    flowName?: string;
+    /**
+     * 
+     * @type {RpcStartFlowRequestParameters}
+     * @memberof RpcStartFlowRequest
+     */
+    parameters: RpcStartFlowRequestParameters;
+}
+/**
+ * 
+ * @export
+ * @interface RpcStartFlowRequestParameters
+ */
+export interface RpcStartFlowRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof RpcStartFlowRequestParameters
+     */
+    parametersInJson: string;
 }
 /**
  * SHA-256 is part of the SHA-2 hash function family. Generated hash is fixed size, 256-bits (32-bytes).

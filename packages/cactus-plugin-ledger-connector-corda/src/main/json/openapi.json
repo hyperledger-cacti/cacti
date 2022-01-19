@@ -240,6 +240,32 @@
                     }
                 }
             },
+            "RpcStartFlowRequest": {
+                "description": "Parameter used in Corda 5",
+                "type": "object",
+                "required": [
+                    "clientId",
+                    "parameters"
+                ],
+                "properties": {
+                    "clientId": {
+                        "type": "string"
+                    },
+                    "flowName": {
+                        "type": "string"
+                    },
+                    "parameters": {
+                        "type": "object",
+                        "required": ["parametersInJson"],
+                        "properties": {
+                            "parametersInJson": {
+                                "example": "{\"message\": \"Hello Mars\", \"target\": \"C=GB, L=FOURTH, O=MARS, OU=PLANET\", \"planetaryOnly\":\"true\"}",
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "CordappDeploymentConfig": {
                 "type": "object",
                 "required": ["sshCredentials", "rpcCredentials", "cordappDir", "cordaNodeStartCmd", "cordaJarPath", "nodeBaseDirPath"],
@@ -437,8 +463,12 @@
                         "type": "array",
                         "default": [],
                         "items": {
-                            "$ref": "#/components/schemas/JvmObject",
+                            "oneOf": [
+                                {"$ref": "#/components/schemas/JvmObject"},
+                                {"$ref": "#/components/schemas/RpcStartFlowRequest"}
+                            ],
                             "nullable": false
+
                         },
                         "nullable": false
                     },

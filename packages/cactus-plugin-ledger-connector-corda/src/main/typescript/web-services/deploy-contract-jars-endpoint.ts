@@ -29,6 +29,10 @@ import {
 } from "../generated/openapi/typescript-axios/api";
 
 import OAS from "../../json/openapi.json";
+import {
+  PluginLedgerConnectorCorda,
+  CordaVersion,
+} from "../plugin-ledger-connector-corda";
 
 export interface IDeployContractEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -38,6 +42,8 @@ export interface IDeployContractEndpointOptions {
   cordaStopCmd?: string;
   authorizationOptionsProvider?: AuthorizationOptionsProvider;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
+  connector: PluginLedgerConnectorCorda;
 }
 
 const K_DEFAULT_AUTHORIZATION_OPTIONS: IEndpointAuthzOptions = {
@@ -51,6 +57,7 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
   private readonly log: Logger;
   private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
   private readonly apiUrl?: string;
+  private readonly cordaVersion?: CordaVersion;
 
   public get className(): string {
     return DeployContractJarsEndpoint.CLASS_NAME;
@@ -72,6 +79,7 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
 
     this.log.debug(`Instantiated ${this.className} OK`);
     this.apiUrl = options.apiUrl;
+    this.cordaVersion = options.cordaVersion;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -126,19 +134,34 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
     const thePath = this.getPath();
     this.log.debug(`${verb} ${thePath} handleRequest()`);
 
-    try {
-      if (this.apiUrl === undefined) throw "apiUrl option is necessary";
-      const body = await this.callInternalContainer(req.body);
-      res.status(200);
-      res.json(body);
-    } catch (ex) {
-      this.log.error(`${fnTag} failed to serve request`, ex);
-      res.status(500);
-      res.json({
-        error: ex?.message,
-        // FIXME do not include stack trace
-        errorStack: ex?.stack,
-      });
+    if (this.cordaVersion === CordaVersion.CORDA_V5) {
+      try {
+        const resBody = await this.options.connector.deployContract();
+        res.status(200);
+        res.json(resBody);
+      } catch (ex) {
+        this.log.error(`${fnTag} failed to serve request`, ex);
+        res.status(500);
+        res.json({
+          error: ex?.message,
+          errorStack: ex?.stack,
+        });
+      }
+    } else {
+      try {
+        if (this.apiUrl === undefined) throw "apiUrl option is necessary";
+        const body = await this.callInternalContainer(req.body);
+        res.status(200);
+        res.json(body);
+      } catch (ex) {
+        this.log.error(`${fnTag} failed to serve request`, ex);
+        res.status(500);
+        res.json({
+          error: ex?.message,
+          // FIXME do not include stack trace
+          errorStack: ex?.stack,
+        });
+      }
     }
   }
 

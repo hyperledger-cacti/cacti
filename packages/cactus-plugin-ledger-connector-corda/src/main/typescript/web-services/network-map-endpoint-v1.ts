@@ -19,10 +19,15 @@ import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { DefaultApi, NodeInfo } from "../generated/openapi/typescript-axios";
-
+import {
+  PluginLedgerConnectorCorda,
+  CordaVersion,
+} from "../plugin-ledger-connector-corda";
 export interface INetworkMapEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
+  connector: PluginLedgerConnectorCorda;
 }
 
 export class NetworkMapEndpointV1 implements IWebServiceEndpoint {

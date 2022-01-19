@@ -29,6 +29,13 @@ export {
 
 export { ICordappJarFile } from "./corda/cordapp-jar-file";
 
+export {
+  CordaV5TestLedger,
+  ICordaV5TestLedgerConstructorOptions,
+  CORDA_V5_TEST_LEDGER_DEFAULT_OPTIONS,
+  CORDA_V5_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
+} from "./corda/corda-v5-test-ledger";
+
 export * from "./quorum/i-quorum-genesis-options";
 export {
   Containers,
