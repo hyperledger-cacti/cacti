@@ -4,7 +4,7 @@ import { Server as SecureServer } from "https";
 import { Express } from "express";
 import Web3 from "web3";
 
-import { Contract, ContractSendMethod } from "web3-eth-contract";
+import { Contract } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
 
 import OAS from "../json/openapi.json";
@@ -251,10 +251,10 @@ export class PluginLedgerConnectorXdai
     const methodRef = contractInstance.methods[req.methodName];
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
 
-    const method: ContractSendMethod = methodRef(...req.params);
+    const method = methodRef(...req.params);
     if (req.invocationType === EthContractInvocationType.Call) {
       contractInstance.methods[req.methodName];
-      const callOutput = await (method as any).call();
+      const callOutput = await method.call();
       const success = true;
       return { success, callOutput };
     } else if (req.invocationType === EthContractInvocationType.Send) {
@@ -264,7 +264,7 @@ export class PluginLedgerConnectorXdai
       const web3SigningCredential = req.web3SigningCredential as
         | Web3SigningCredentialPrivateKeyHex
         | Web3SigningCredentialCactusKeychainRef;
-      const payload = (method.send as any).request();
+      const payload = method.send.request();
       const { params } = payload;
       const [transactionConfig] = params;
       if (!req.gas) {
