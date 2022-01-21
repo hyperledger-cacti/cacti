@@ -26,35 +26,36 @@ This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks
 - node.js v12 (recommend: v12.20.2 or greater)
 
 ### Prerequisites
-- Please ensure that the destination ledger (default: [fabric14-fabcar-testnet](../../tools/docker/fabric14-fabcar-testnet)) is already launched
+- Please ensure that the destination ledger (default for samples: [fabric-all-in-one](../../tools/docker/fabric-all-in-one/)) is already launched.
 - Available port:
     - `5040` (for the port of `@hyperledger/cactus-plugin-ledger-connector-fabric-socketio`)
-    - if this port is already used, please change the setting on `docker-compose.yaml`
+    - if this port is already used, you can specify custom one when starting the container.
 
-### Boot methods
-#### 1. Run configure command from the project root directory:
+## Boot methods
+1. Always run configure command first, from the project root directory:
+    ```
+    pushd ../..
+    npm run configure
+    popd
+    ```
+
+1. Setup the wallet
+    ```
+    mkdir -p /etc/cactus/fabric/wallet/
+    rm -r /etc/cactus/fabric/wallet/
+    # Optionally copy existing fabric wallet to that location
+    ```
+
+### Docker
 ```
-npm run configure
+# Build
+docker build . -t cactus-plugin-ledger-connector-fabric-socketio
+
+# Run
+docker run -v/etc/cactus/:/etc/cactus -p 5040:5040 cactus-plugin-ledger-connector-fabric-socketio
 ```
 
-#### 2. Go to the fabric connector package directory:
-```
-cd cactus/packages/cactus-plugin-ledger-connector-fabric-socketio
-```
-
-#### 3. Create symbolic link to node_modules
-- NOTE: This command is enough to execute only once.
-```
-npm run init-fabric
-```
-
-#### 4. Setup the wallet
-```
-rm -r ./dist/connector/wallet
-cp -a wallet ./dist/connector/wallet
-```
-
-#### 5. Launch the connector
+### Manual
 ```
 npm run start
 ```

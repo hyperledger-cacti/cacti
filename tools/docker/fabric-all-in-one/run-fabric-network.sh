@@ -49,9 +49,16 @@ function main()
     /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -b -s
     # Major version is 1.x or earlier (assumption is 1.4.x only)
     cd /fabric-samples/fabcar/
+
+    if [ -n "$CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP" ]; then
+      # This will change endorsment policy on fabcar chaincode.
+      # cartrade sample supports only single peer endorsment at the moment.
+      echo "[FabricAIO] >>> PATCH - Changing to loose endorsment policy."
+      sed -i "s/AND('Org1MSP.member','Org2MSP.member')/OR('Org1MSP.member','Org2MSP.member')/g" ./startFabric.sh
+    fi
+
     ./startFabric.sh
   fi
-
 }
 
 main

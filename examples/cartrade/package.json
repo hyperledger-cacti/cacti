@@ -4,13 +4,10 @@
   "scripts": {
     "start": "node ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
     "debug": "nodemon --inspect ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
-    "build": "npm run build-ts && npm run copy-static-assets && npm run copy-blp-config && npm run replace-blp-config-path && npm run init-cartrade",
+    "build": "npm run build-ts && npm run prepare-docker-build",
     "build-ts": "tsc -p ./tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json './*.ts'",
-    "copy-static-assets": "ts-node copyStaticAssets.ts",
-    "copy-blp-config": "ts-node copyBLPConfig.ts",
-    "replace-blp-config-path": "ts-node replaceBLPConfigPath.ts",
-    "init-cartrade": "ln -fs ../examples/cartrade/node_modules ../../dist/node_modules"
+    "prepare-docker-build": "cp -f ../../yarn.lock ./dist/"
   },
   "dependencies": {
     "@types/node": "^14.0.24",

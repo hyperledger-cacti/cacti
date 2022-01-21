@@ -6,26 +6,26 @@
  */
 
 import { Request } from "express";
-import { RequestInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RequestInfo";
-import { TradeInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo";
+import { RequestInfo } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/RequestInfo";
+import { TradeInfo } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/TradeInfo";
 import { TransactionInfoManagement } from "./TransactionInfoManagement";
 import { TransactionInfo } from "./TransactionInfo";
 import { TransactionData } from "./TransactionData";
 import { BusinessLogicInquireCartradeStatus } from "./BusinessLogicInquireCartradeStatus";
 import { TxInfoData } from "./TxInfoData";
-import { transactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { verifierFactory } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { LedgerOperation } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/LedgerOperation";
-import { BusinessLogicBase } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
+import { transactionManagement } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/routes/index";
+import { verifierFactory } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/routes/index";
+import { LedgerOperation } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/business-logic-plugin/LedgerOperation";
+import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
 import { makeRawTransaction } from "./TransactionEthereum";
 import { makeSignedProposal } from "./TransactionFabric";
 import {
   ApiInfo,
   LedgerEvent,
-} from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin";
-import { json2str } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon";
+} from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/verifier/LedgerPlugin";
+import { json2str } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/verifier/DriverCommon";
 import { CartradeStatus } from "./define";
-import { RIFUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/RIFUtil";
+import { RIFUtil } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/RIFUtil";
 
 const fs = require("fs");
 const path = require("path");

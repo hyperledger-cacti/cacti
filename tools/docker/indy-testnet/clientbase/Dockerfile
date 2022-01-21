@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -6,9 +6,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y software-properti
 
 # indy libraries and tool
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88
-RUN add-apt-repository "deb https://repo.sovrin.org/sdk/deb xenial stable"
+RUN add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable"
 RUN apt-get update
-RUN apt-get install -y libindy libnullpay libvcx indy-cli 
+RUN apt-get install -y libindy libnullpay libvcx indy-cli
 
 # Python 3.9 (indy-sdk requires 3.6 and later)
 RUN add-apt-repository -y ppa:deadsnakes/ppa

@@ -25,7 +25,8 @@ async function main() {
         'An identity for the user "user1" does not exist in the wallet',
       );
       console.log("Run the registerUser.js application before retrying");
-      return;
+      // EDIT - Return error code when identity is missing
+      process.exit(2);
     }
 
     // Create a new gateway for connecting to our peer node.

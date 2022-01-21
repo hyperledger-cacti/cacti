@@ -5,7 +5,7 @@
 # Exit on error
 set -e
 
-FABRIC_CONTAINER_NAME=fabcar14_sample_setup
+FABRIC_CONTAINER_NAME=${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME:-cartrade_faio14x_testnet}
 
 if ! [ "$(docker inspect -f '{{.State.Running}}' ${FABRIC_CONTAINER_NAME})" == "true" ]
 then
@@ -18,6 +18,15 @@ echo "*********************************"
 rm -fr ./connection.json
 docker cp ${FABRIC_CONTAINER_NAME}:/fabric-samples/first-network/connection-org1.json ./connection.json
 echo "Done!"
+
+if node ./query.js &> /dev/null
+then
+    echo "Query already works - use current wallet"
+    exit 0
+fi
+
+echo "Could not query the ledger with current wallet - clear it"
+rm -rf ./wallet/*
 
 echo -e "\nEnroll admin and user1"
 echo "*********************************"

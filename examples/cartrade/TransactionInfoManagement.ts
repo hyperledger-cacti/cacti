@@ -8,7 +8,7 @@
 import { TransactionInfo } from "./TransactionInfo";
 import { TransactionData } from "./TransactionData";
 import { TxInfoData } from "./TxInfoData";
-import { TradeInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo";
+import { TradeInfo } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/TradeInfo";
 import { CartradeStatus } from "./define";
 
 const fs = require("fs");

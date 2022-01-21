@@ -13,6 +13,9 @@ import * as shell from "shelljs";
 shell.cp(
   "-R",
   "./src/main/typescript/verifier/validatorKey/",
-  "../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/verifier/"
+  "./dist/src/main/typescript/verifier/",
 );
+
 shell.cp("-R", "../../etc/cactus/*.yaml", "/etc/cactus/");
+
+shell.cp("../../yarn.lock", "./dist");

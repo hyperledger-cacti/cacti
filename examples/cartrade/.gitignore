@@ -1,10 +1,7 @@
 
-# Fabric TLSCA local dir
-crypto-config/
-
 # BLP artifacts
 TransactionInfo.json
-wallet/
+etc/
 
 # don't commit package-lock
 package-lock.json

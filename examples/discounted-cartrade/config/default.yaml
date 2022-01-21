@@ -2,7 +2,7 @@ cartradeInfo:
   fabric:
     validatorID: r9IS4dDf
     mspID: Org1MSP
-    keystore: "./wallet"
+    keystore: "/etc/cactus/fabric/wallet"
     connUserName: user1
     contractName: fabcar
     peers:
