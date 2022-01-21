@@ -10,6 +10,9 @@
 // TEST CONSTANTS
 /////////////////////////
 
+const testTimeout = 1000 * 5; // 5 second timeout per test
+const setupTimeout = 1000 * 60; // 1 minute timeout for setup
+
 const defaultConfig = {
   socketOptions: {
     rejectUnauthorized: false,
@@ -79,7 +82,7 @@ import { SocketIOTestSetupHelpers } from "@hyperledger/cactus-test-tooling";
 // TEST TIMEOUT
 //////////////////////////////
 
-jest.setTimeout(3000);
+jest.setTimeout(testTimeout);
 
 //////////////////////////////
 // CONSTRUCTOR TESTS
@@ -90,11 +93,11 @@ describe("Construction Tests", () => {
 
   beforeEach(() => {
     testLedgerData = cloneDeep(defaultLedgerData);
-  });
+  }, setupTimeout);
 
   afterEach(() => {
     Verifier.mapUrlSocket.clear();
-  });
+  }, setupTimeout);
 
   test("Fields set from passed ledger info", () => {
     const sut = new Verifier(JSON.stringify(testLedgerData));
@@ -171,14 +174,14 @@ describe("SocketIO Validator Tests", function () {
   beforeAll(async () => {
     [testServer, testServerPort] =
       await SocketIOTestSetupHelpers.createListeningMockServer();
-  });
+  }, setupTimeout);
 
   afterAll((done) => {
     testServer.close(() => {
       log.debug("Test server closed");
       done();
     });
-  });
+  }, setupTimeout);
 
   beforeEach(async () => {
     clientSocket = SocketIOTestSetupHelpers.createClientSocket(testServerPort);
@@ -186,7 +189,7 @@ describe("SocketIO Validator Tests", function () {
     // Mock client socket in verifier
     sut = new Verifier(JSON.stringify(defaultLedgerData));
     Verifier.mapUrlSocket.set(defaultLedgerData.validatorID, clientSocket);
-  });
+  }, setupTimeout);
 
   afterEach(() => {
     if (clientSocket) {
@@ -200,7 +203,7 @@ describe("SocketIO Validator Tests", function () {
     testServer.sockets.removeAllListeners();
 
     Verifier.mapUrlSocket.clear();
-  });
+  }, setupTimeout);
 
   //////////////////////////////
   // SYNC REQUEST
@@ -217,7 +220,7 @@ describe("SocketIO Validator Tests", function () {
       await SocketIOTestSetupHelpers.connectTestClient(clientSocket);
       expect(clientSocket.connected).toBeTrue();
       expect(serverSocket.connected).toBeTrue();
-    });
+    }, setupTimeout);
 
     test("Returns 504 on request timeout", async () => {
       const reqPromise = sut.sendSyncRequest(reqContract, reqMethod, reqArgs);
@@ -536,7 +539,7 @@ describe("SocketIO Validator Tests", function () {
       await SocketIOTestSetupHelpers.connectTestClient(clientSocket);
       expect(clientSocket.connected).toBeTrue();
       expect(serverSocket.connected).toBeTrue();
-    });
+    }, setupTimeout);
 
     test("Sends request2 with valid args for socketio verifier", () => {
       let reqReceived = new Promise<any>((resolve) => {
@@ -605,12 +608,12 @@ describe("OpenAPI Async Request Tests", function () {
     (XMLHttpRequest.XMLHttpRequest as jest.Mock).mockImplementation(
       () => XMLReqMock,
     );
-  });
+  }, setupTimeout);
 
   beforeEach(async () => {
     sut = new Verifier(JSON.stringify(defaultLedgerData));
     sut.validatorType = "openapi";
-  });
+  }, setupTimeout);
 
   test("Sends valid HTTP request for openapi verifier", async () => {
     sut.validatorUrl = "https://example:1234/"; // TODO - bug - fails when URL without trailing backslash
