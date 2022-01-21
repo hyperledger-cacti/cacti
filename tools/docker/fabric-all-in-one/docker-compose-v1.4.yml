@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  fabric-all-in-one-testnet-14:
+    container_name: ${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME:-fabric_all_in_one_testnet_14}
+    image: ${CACTUS_FABRIC_ALL_IN_ONE_IMAGE_NAME:-faio14x}
+    privileged: true
+    build:
+      context: ./
+      dockerfile: Dockerfile_v1.4.x
+    ports:
+      - "4022:22"   # SSH
+      - "7051:7051" # peer0.org1.example.com
+      - "8051:8051" # peer1.org1.example.com
+      - "7054:7054" # ca.org1.example.com
+      - "7050:7050" # orderer.example.com
+    environment:
+      - FABRIC_VERSION=${CACTUS_FABRIC_ALL_IN_ONE_VERSION:-1.4.8}
+      - CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP
+    networks:
+       - testnet-14
+
+networks:
+  testnet-14:
+    driver: bridge

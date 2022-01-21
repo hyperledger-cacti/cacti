@@ -14,28 +14,26 @@
 export const SplugConfig = {
   fabric: {
     mspid: "Org1MSP",
-    keystore: "./wallet",
+    keystore: "/etc/cactus/fabric/wallet",
     connUserName: "user1",
     contractName: "fabcar",
     peers: [
       {
         name: "peer0.org1.example.com",
-        requests: "grpcs://localhost:7051",
-        // WARNING - REMEMBER TO UPADATE THE PATH
+        requests: "grpcs://cartrade_faio14x_testnet:7051",
         tlsca:
-          "../../../examples/discounted-cartrade/crypto-config/tlsca.org1.example.com-cert.pem",
+          "/etc/cactus/fabric/crypto-config/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem",
       },
     ],
     orderer: {
       name: "orderer.example.com",
-      url: "grpcs://localhost:7050",
-      // WARNING - REMEMBER TO UPADATE THE PATH
+      url: "grpcs://cartrade_faio14x_testnet:7050",
       tlsca:
-        "../../../examples/discounted-cartrade/crypto-config/tlsca.example.com-cert.pem",
+        "/etc/cactus/fabric/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem",
     },
     ca: {
       name: "ca-org1",
-      url: "https://localhost:7054",
+      url: "https://cartrade_faio14x_testnet:7054",
     },
     submitter: {
       name: "admin",

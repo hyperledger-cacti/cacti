@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2020-2021 Hyperledger Cactus Contributors
+# Copyright 2020-2022 Hyperledger Cactus Contributors
 # SPDX-License-Identifier: Apache-2.0
 
 cd ../..
@@ -16,6 +16,7 @@ cd ../..
 
 # Build Indy testnet
 cd ./tools/docker/indy-testnet
+./run-before-build.sh
 docker-compose build
 cd ../../..
 

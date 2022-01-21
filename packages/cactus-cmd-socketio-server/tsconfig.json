@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "outDir": "../../dist/packages/cactus-cmd-socketio-server/",
+    "outDir": "./dist/",
     "tsBuildInfoFile": "../../.build-cache/cactus-cmd-socketio-server.tsbuildinfo",
     "strict": false // TODO - Change to true, fix warnings, enable jest tests in global config
   },

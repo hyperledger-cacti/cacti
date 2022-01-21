@@ -6,13 +6,13 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { RIFUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/RIFUtil";
-import { ConfigUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil";
+import { RIFUtil } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/RIFUtil";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/ConfigUtil";
 import {
   RIFError,
   BadRequestError,
   InternalServerError,
-} from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
+} from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/RIFError";
 import { AssetManagement } from "./AssetManagement";
 
 const fs = require("fs");

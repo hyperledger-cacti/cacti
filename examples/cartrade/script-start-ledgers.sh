@@ -1,36 +1,80 @@
 #!/usr/bin/env bash
-# Copyright 2020-2021 Hyperledger Cactus Contributors
+# Copyright 2020-2022 Hyperledger Cactus Contributors
 # SPDX-License-Identifier: Apache-2.0
 
-# Exit on error
 set -e
 
-FABRIC_CONTAINER_NAME=fabcar14_sample_setup
+ROOT_DIR="../.." # Path to cactus root dir
+WAIT_TIME=30 # How often to check container status
+CONFIG_VOLUME_PATH="./etc/cactus" # Docker volume with shared configuration
 
-pushd ../..
+# Fabric Env Variables
+export CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME="cartrade_faio14x_testnet"
+export CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP=1 # Loose membership check required for cartrade
 
-## Run Go-Ethereum Ledger
-pushd ./tools/docker/geth-testnet
-./script-start-docker.sh
-popd
+function start_fabric_testnet() {
+    echo ">> start_fabric_testnet()"
+    pushd "${ROOT_DIR}/tools/docker/fabric-all-in-one"
 
-## RunFabric Ledger
-pushd ./tools/docker/fabric-all-in-one
-./script-run-docker-1.4.sh
-popd
+    echo ">> Start Fabric 1.4 FabCar..."
+    docker-compose -f ./docker-compose-v1.4.yml up -d
+    sleep 1
 
-popd
+    # Wait for fabric cotnainer to become healthy
+    health_status="$(docker inspect -f '{{.State.Health.Status}}' ${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME})"
+    while ! [ "${health_status}" == "healthy" ]
+    do
+        echo "Waiting for fabric container... current status => ${health_status}"
+        sleep $WAIT_TIME
+        health_status="$(docker inspect -f '{{.State.Health.Status}}' ${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME})"
+    done
+    echo ">> Fabric 1.4 FabCar started."
 
-# Copy TLSCAs to connect peer and orderer
-mkdir -p ./crypto-config/
-rm -fr ./crypto-config/*
-docker cp ${FABRIC_CONTAINER_NAME}:/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem ./crypto-config/
-docker cp ${FABRIC_CONTAINER_NAME}:/fabric-samples/first-network/crypto-config/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem ./crypto-config/
+    echo ">> Register admin and user1..."
+    pushd fabcar-cli-1.4
+    ./setup.sh
+    popd
+    echo ">> Register done."
 
-# Enroll users and copy wallet
-pushd ../../tools/docker/fabric-all-in-one/fabcar-cli-1.4
-./setup.sh
-popd
-cp -ar ../../tools/docker/fabric-all-in-one/fabcar-cli-1.4/wallet .
+    echo ">> start_fabric_testnet() done."
+    popd
+}
 
+function copy_fabric_tlsca() {
+    echo ">> copy_fabric_tlsca()"
+    mkdir -p "${CONFIG_VOLUME_PATH}/fabric"
+    docker cp "${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME}:/fabric-samples/first-network/crypto-config/" "${CONFIG_VOLUME_PATH}/fabric/"
+    echo ">> copy_fabric_tlsca() done."
+}
+
+function copy_fabric_wallet() {
+    echo ">> copy_fabric_wallet()"
+    cp -fr "../../tools/docker/fabric-all-in-one/fabcar-cli-1.4/wallet" "${CONFIG_VOLUME_PATH}/fabric/"
+    echo ">> copy_fabric_wallet() done."
+}
+
+function start_ethereum_testnet() {
+    pushd "../../tools/docker/geth-testnet"
+    ./script-start-docker.sh
+    popd
+}
+
+function start_ledgers() {
+    # Clear ./etc/cactus
+    mkdir -p "${CONFIG_VOLUME_PATH}/"
+    rm -fr "${CONFIG_VOLUME_PATH}/*"
+
+    # Copy cmd-socketio-config
+    cp -f ./config/*.yaml "${CONFIG_VOLUME_PATH}/"
+
+    # Start Fabric
+    start_fabric_testnet
+    copy_fabric_tlsca
+    copy_fabric_wallet
+
+    # Start Ethereum
+    start_ethereum_testnet
+}
+
+start_ledgers
 echo "All Done."

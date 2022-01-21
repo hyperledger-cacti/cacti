@@ -15,8 +15,8 @@
  * In this case, it is used only when transferring assets.
  */
 
-import { TransactionSigner } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/util/TransactionSigner";
-import { Verifier } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier";
+import { TransactionSigner } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/util/TransactionSigner";
+import { Verifier } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/verifier/Verifier";
 
 const fs = require("fs");
 const path = require("path");

@@ -4,12 +4,15 @@
   "scripts": {
     "start": "node ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
     "debug": "nodemon --inspect ../../dist//packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
-    "build": "npm run build-ts && npm run copy-static-assets && npm run copy-blp-config && npm run replace-blp-config-path && npm run init-discounted-cartrade",
+    "build": "npm run init-socketio-server && npm run build-ts && npm run copy-static-assets && npm run copy-blp-config && npm run replace-blp-config-path && npm run init-discounted-cartrade",
     "build-ts": "tsc -p ./tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json './*.ts'",
     "copy-static-assets": "ts-node copyStaticAssets.ts",
     "copy-blp-config": "ts-node copyBLPConfig.ts",
     "replace-blp-config-path": "ts-node replaceBLPConfigPath.ts",
+    "create-bin-structure": "rm -rf ../../dist/* && mkdir -p ../../dist/packages/cactus-cmd-socketio-server/",
+    "copy-socketio-server-bins": "cp -afr ../../packages/cactus-cmd-socketio-server/dist/src/ ../../dist/packages/cactus-cmd-socketio-server/",
+    "init-socketio-server": "npm run create-bin-structure && npm run copy-socketio-server-bins",
     "init-discounted-cartrade": "ln -fs ../examples/discounted-cartrade/node_modules ../../dist/node_modules"
   },
   "dependencies": {

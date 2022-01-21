@@ -1,12 +1,12 @@
 blpRegistry:
-  - 
+  -
     businessLogicID: guks32pf
     validatorID: [84jUisrs, r9IS4dDf]
 
 logLevel: debug
 
 applicationHostInfo:
-  hostName: http://aaa.bbb.ccc.ddd # please change hostName to your IP address
+  hostName: http://localhost # please change hostName to your IP address
   hostPort: 5034
 
 socketOptions:
@@ -19,20 +19,15 @@ verifier:
   syncFunctionTimeoutMillisecond: 5000
 
 appRouters:
-  - 
+  -
     path: /api/v1/bl/trades/
-    routerJs: ../../../../../../examples/cartrade/trades.js
-  - 
+    routerJs: /root/cactus/dist/trades.js
+  -
     path: /api/v1/bl/asset/
-    routerJs: ../../../../../../examples/cartrade/asset.js
-  - 
+    routerJs: /root/cactus/dist/asset.js
+  -
     path: /api/v1/bl/balance/
-    routerJs: ../../../../../../examples/cartrade/balance.js
-  - 
+    routerJs: /root/cactus/dist/balance.js
+  -
     path: /api/v1/bl/cars/
-    routerJs: ../../../../../../examples/cartrade/cars.js
-  # abolish template-trade
-  # - 
-    # path: /api/v1/bl/template-trade/
-    # routerJs: ../../../../../../examples/cartrade/template-trade.js
-
+    routerJs: /root/cactus/dist/cars.js

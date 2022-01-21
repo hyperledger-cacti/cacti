@@ -123,7 +123,6 @@ export async function getClientAndChannel(
         "ssl-target-name-override": SplugConfig.fabric.orderer.name,
       });
       channel.addOrderer(orderer);
-      logger.error(process.cwd()); // TODO - REMOVE
       // EP settings
       for (let i = 0; i < SplugConfig.fabric.peers.length; i++) {
         const peerCA = fs.readFileSync(

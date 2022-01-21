@@ -1,0 +1,21 @@
+version: "3.4"
+
+# Start the ledgers first
+# /etc/cactus should already exist and contain cactus node configs
+
+services:
+  fabric-socketio-validator:
+    container_name: cartrade-fabric-socketio-validator
+    image: cactus-plugin-ledger-connector-fabric-socketio
+    build:
+      context: .
+    ports:
+      - "5040:5040"
+    volumes:
+      - /etc/cactus:/etc/cactus
+    networks:
+      - fabric-all-in-one_testnet-14
+
+networks:
+  fabric-all-in-one_testnet-14:
+    external: true
