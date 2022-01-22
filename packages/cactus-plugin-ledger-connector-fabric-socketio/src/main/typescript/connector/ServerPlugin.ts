@@ -22,10 +22,10 @@ logger.level = config.logLevel;
 const SplugUtil = require("./PluginUtil.js");
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Read the library, SDK, etc. according to EC specifications as needed
-const fabric = require("./fabricaccess.js");
 
-const FabricClient = require("fabric-client");
-const copService = require("fabric-ca-client");
+import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess.js";
+import { ProposalRequest } from "fabric-client";
+
 const path = require("path");
 const { FileSystemWallet, Gateway } = require("fabric-network");
 const fs = require("fs");
@@ -126,7 +126,7 @@ export class ServerPlugin {
             logger.debug(`##evaluateTransaction(B3), returnvalue: undefined`);
           } else if (returnvalue == "") {
             logger.debug(
-              `##evaluateTransaction(B4), returnvalue: empty string`
+              `##evaluateTransaction(B4), returnvalue: empty string`,
             );
           }
           if (returnvalue != null) {
@@ -242,8 +242,8 @@ export class ServerPlugin {
    *         "args":[
    *             {
    *                 "transactionProposalReq":<transactionProposalReq>,
-   *                 "certPem":<certPem>,
-   *                 "privateKeyPem":<privateKeyPem>
+   *                 "certPem"?:<certPem>,
+   *                 "privateKeyPem"?:<privateKeyPem>
    *             }
    *         ]
    *     },
@@ -271,7 +271,7 @@ export class ServerPlugin {
         channelName,
         transactionProposalReq,
         certPem,
-        privateKeyPem
+        privateKeyPem,
       )
         .then((signedTx) => {
           if (signedTx != null) {
@@ -356,7 +356,7 @@ async function Invoke(reqBody) {
 
     // Submit the specified transaction.
     logger.info(
-      `##fablicaccess: Invoke Params: fcn=${fcn}, args0=${args[0]}, args1=${args[1]}`
+      `##fablicaccess: Invoke Params: fcn=${fcn}, args0=${args[0]}, args1=${args[1]}`,
     );
     const transaction = contract.createTransaction(fcn);
 
@@ -429,7 +429,7 @@ async function InvokeSync(reqBody) {
       // Submit the specified transaction.
       // logger.debug(`##InvokeSync(G)`);
       logger.info(
-        `##fablicaccess: InvokeSync Params: type=${type}, fcn=${fcn}, args0=${args[0]}, args1=${args[1]}, args2=${args[2]}`
+        `##fablicaccess: InvokeSync Params: type=${type}, fcn=${fcn}, args0=${args[0]}, args1=${args[1]}, args2=${args[2]}`,
       );
       // const transaction = contract.createTransaction(fcn);
       let result: any = null;
@@ -472,7 +472,7 @@ async function InvokeSync(reqBody) {
               fcn,
               args[0],
               args[1],
-              args[2]
+              args[2],
             );
           } else {
             logger.debug(`##InvokeSync(G1): call submitTransaction`);
@@ -480,7 +480,7 @@ async function InvokeSync(reqBody) {
               fcn,
               args[0],
               args[1],
-              args[2]
+              args[2],
             );
           }
           break;
@@ -524,7 +524,7 @@ function preventMalleability(sig, curveParams) {
   if (!halfOrder) {
     throw new Error(
       'Can not find the half order needed to calculate "s" value for immalleable signatures. Unsupported curve name: ' +
-        curveParams.name
+        curveParams.name,
     );
   }
 
@@ -573,60 +573,6 @@ function signProposal(proposalBytes, paramPrivateKeyPem) {
 // END Signature process=========================================================================================
 
 /**
- * setup TLS for this client
- * @param {*} client
- * @param {*} enrollmentID
- * @param {*} secret
- */
-async function TLSSetup(client, enrollmentID, secret) {
-  const tlsOptions = {
-    trustedRoots: [],
-    verify: false,
-  };
-  logger.info("tlssetup start");
-  const caService = new copService(
-    SplugConfig.fabric.ca.url,
-    tlsOptions,
-    SplugConfig.fabric.ca.name
-  );
-  const req = {
-    enrollmentID: enrollmentID,
-    enrollmentSecret: secret,
-    profile: "tls",
-  };
-  const enrollment = await caService.enroll(req);
-  client.setTlsClientCertAndKey(
-    enrollment.certificate,
-    enrollment.key.toBytes()
-  );
-}
-
-/**
- * Creating a channel object
- * @param {string} channelName
- */
-async function setupChannel(channelName) {
-  logger.info("setupChannel start");
-  const client = new FabricClient();
-  await TLSSetup(
-    client,
-    SplugConfig.fabric.submitter.name,
-    SplugConfig.fabric.submitter.secret
-  );
-  const channel = client.newChannel(channelName);
-
-  for (let i = 0; i < SplugConfig.fabric.peers.length; i++) {
-    const peer = client.newPeer(SplugConfig.fabric.peers[i].requests);
-    channel.addPeer(peer);
-  }
-
-  const orderer = client.newOrderer(SplugConfig.fabric.orderer.url);
-  channel.addOrderer(orderer);
-  logger.info("setupChannel end");
-  return channel;
-}
-
-/**
  * Function for InvokeSendSignedTransaction
  * @param reqBody   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
  * @return [string] Success: Chain code execution result
@@ -637,18 +583,16 @@ async function InvokeSendSignedTransaction(reqBody) {
     logger.info("InvokeSendSignedTransaction start");
 
     let invokeResponse1; // Return value from chain code
-    let channel1; // Channel
 
     try {
       //channel object generation
-      if (channel1 == undefined) {
-        channel1 = await setupChannel(reqBody.channelName);
-      }
+      let { client, channel } = await getClientAndChannel(reqBody.channelName);
+      await getSubmitterAndEnroll(client);
 
       // logger.debug(`##InvokeSendSignedTransaction: reqBody.signedCommitProposal: ${JSON.stringify(reqBody.signedCommitProposal)}`);
       // logger.debug(`##InvokeSendSignedTransaction: reqBody.commitReq: ${JSON.stringify(reqBody.commitReq)}`);
       // logger.debug(`##InvokeSendSignedTransaction: (A)`);
-      const response = await channel1.sendSignedTransaction({
+      const response = await channel.sendSignedTransaction({
         signedProposal: reqBody.signedCommitProposal,
         request: reqBody.commitReq,
       });
@@ -662,7 +606,7 @@ async function InvokeSendSignedTransaction(reqBody) {
       } else {
         logger.debug(`##InvokeSendSignedTransaction: (D)`);
         throw new Error(
-          "Failed to order the transaction. Error code: " + response.status
+          "Failed to order the transaction. Error code: " + response.status,
         );
       }
     } catch (e) {
@@ -675,45 +619,59 @@ async function InvokeSendSignedTransaction(reqBody) {
 /**
  * Function for InvokeSendSignedProposal
  * @param transactionProposalReq   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
- * @param certPem   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
- * @param privateKeyPem   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
+ * @param certPem?   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
+ * @param privateKeyPem?   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
  * @return [string] signed transaction.
  */
 async function InvokeSendSignedProposal(
   channelName: string,
-  transactionProposalReq: object,
-  certPem: string,
-  privateKeyPem: string
+  transactionProposalReq: ProposalRequest,
+  certPem?: string,
+  privateKeyPem?: string,
 ) {
   logger.debug(`InvokeSendSignedProposal start`);
 
   let invokeResponse2; // Return value from chain code
-  let channel2; // Channel
+  let { client, channel } = await getClientAndChannel(channelName);
+  let user = await getSubmitterAndEnroll(client);
 
-  //channel object generation
-  if (channel2 == undefined) {
-    channel2 = await setupChannel(channelName);
+  // Low-level access to local-store cert and private key of submitter (in case request is missing those)
+  if (!certPem || !privateKeyPem) {
+    const wallet = new FileSystemWallet(SplugConfig.fabric.keystore);
+    logger.debug(`Wallet path: ${path.resolve(SplugConfig.fabric.keystore)}`);
+
+    const submitterName = user.getName();
+    const submitterExists = await wallet.exists(submitterName);
+    if (submitterExists) {
+      const submitterIdentity = await wallet.export(submitterName);
+      certPem = (submitterIdentity as any).certificate;
+      privateKeyPem = (submitterIdentity as any).privateKey;
+    } else {
+      throw new Error(
+        `No cert/key provided and submitter ${submitterName} is missing in validator wallet!`,
+      );
+    }
   }
 
-  const { proposal, txId } = channel2.generateUnsignedProposal(
+  const { proposal, txId } = channel.generateUnsignedProposal(
     transactionProposalReq,
     SplugConfig.fabric.mspid,
-    certPem
+    certPem,
   );
-  logger.debug("proposal end");
   logger.debug(`##InvokeSendSignedProposal; txId: ${txId.getTransactionID()}`);
   const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
 
   const targets = [];
   for (const peerInfo of SplugConfig.fabric.peers) {
-    const peer = channel2.getPeer(peerInfo.requests.split("//")[1]);
+    const peer = channel.getPeer(peerInfo.requests.split("//")[1]);
     targets.push(peer);
   }
-  const sendSignedProposalReq = { signedProposal, targets };
-  const proposalResponses = await channel2.sendSignedProposal(
-    sendSignedProposalReq
+  const sendSignedProposalReq = { signedProposal, targets } as unknown;
+  const proposalResponses = await channel.sendSignedProposal(
+    sendSignedProposalReq,
   );
   logger.debug("##InvokeSendSignedProposal: successfully send signedProposal");
+
   let allGood = true;
   for (const proposalResponse of proposalResponses) {
     let oneGood = false;
@@ -734,10 +692,12 @@ async function InvokeSendSignedProposal(
     }
     allGood = allGood && oneGood;
   }
+
   // If the return value of invoke is an empty string, store txID
   if (invokeResponse2 === "") {
     invokeResponse2 = txId.getTransactionID();
   }
+
   // Error if all peers do not return status 200
   if (!allGood) {
     const errMsg =
@@ -754,15 +714,16 @@ async function InvokeSendSignedProposal(
     proposalResponses,
     proposal,
   };
-  const commitProposal = channel2.generateUnsignedTransaction(commitReq);
+
+  const commitProposal = channel.generateUnsignedTransaction(commitReq);
   logger.debug(
-    `##InvokeSendSignedProposal: Successfully build commit transaction proposal`
+    `##InvokeSendSignedProposal: Successfully build commit transaction proposal`,
   );
 
   // sign this commit proposal at local
   const signedCommitProposal = signProposal(
     commitProposal.toBuffer(),
-    privateKeyPem
+    privateKeyPem,
   );
 
   const signedTx = {
@@ -774,6 +735,6 @@ async function InvokeSendSignedProposal(
   // logger.debug(`##InvokeSendSignedProposal: signature: ${signedCommitProposal.signature}`);
   // logger.debug(`##InvokeSendSignedProposal: proposal_bytes: ${signedCommitProposal.proposal_bytes}`);
   // logger.debug(`##InvokeSendSignedProposal: signedTx: ${JSON.stringify(signedTx)}`);
-  logger.debug(`##InvokeSendSignedProposal: signedTx: ${signedTx}`);
+  logger.debug("##InvokeSendSignedProposal: signedTx:", signedTx);
   return signedTx;
 }
