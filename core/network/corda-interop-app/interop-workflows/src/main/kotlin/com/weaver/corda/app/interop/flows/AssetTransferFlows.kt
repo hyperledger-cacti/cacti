@@ -289,7 +289,6 @@ class GetAssetClaimStatusState(
     @Suspendable
     override fun call(): ByteArray {
         val linearId = getLinearIdFromString(pledgeId)
-        //val linearId = UniqueIdentifier.fromString(pledgeId)
 
         val pledgeExpiryTimeSecs = pledgeExpiryTimeSecsString.toLong()
         println("Getting AssetClaimStatusState for pledgeId $linearId.")
@@ -404,7 +403,7 @@ object ReclaimPledgedAsset {
                 Left(Error("Cannot perform eclaim for pledged ${pledgeId} as the asset was claimed in remote network."))
             }
 
-            subFlow(GetAssetPledgeStateById(linearId)).fold({
+            subFlow(GetAssetPledgeStateById(pledgeId)).fold({
                 println("AssetPledgeState for Id: ${linearId} not found.")
                 Left(Error("AssetPledgeState for Id: ${linearId} not found."))
             }, {
