@@ -32,6 +32,9 @@ import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.contract.AssetContract
 
 import net.corda.samples.tokenizedhouse.flows.GetAssetClaimStatusByPledgeId
+import net.corda.samples.tokenizedhouse.states.FungibleHouseTokenJson
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 
 import com.r3.corda.lib.tokens.contracts.commands.RedeemTokenCommand
 import com.r3.corda.lib.tokens.contracts.commands.IssueTokenCommand
@@ -287,15 +290,20 @@ class GetAssetClaimStatusStateCommand : CliktCommand(name="get-claim-status-stat
                 rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
                 val proxy = rpc.proxy
-                val blankAsset = ""
-                println("Inside the command")
-                val retBytes = proxy.startFlow(::GetAssetClaimStatusState, pledgeId!!, expiryTimeSecs!!, blankAsset)
+                val blankAssetJson = FungibleHouseTokenJson(
+                    tokenType = "",
+                    numUnits = 0L,
+                    owner = ""
+                )
+                println("Created empty house token asset ${blankAssetJson}\n")
+                val gson = GsonBuilder().create();
+                var blankAssetJsonBytes = gson.toJson(blankAssetJson, FungibleHouseTokenJson::class.java)
+                val assetClaimStatusStateBytes = proxy.startFlow(::GetAssetClaimStatusState, pledgeId!!, expiryTimeSecs!!, blankAssetJsonBytes)
                     .returnValue.get()
-                println("Done with the flow")
-                println("retBytes: ${retBytes}")
+                println("assetClaimStatusStateBytes: ${assetClaimStatusStateBytes}")
                 val charset = Charsets.UTF_8
-                println("assetClaimStatusState: ${retBytes.toString(charset)}")
-                println("assetClaimStatusState: ${retBytes.contentToString()}")
+                println("assetClaimStatusState: ${assetClaimStatusStateBytes.toString(charset)}")
+                println("assetClaimStatusState: ${assetClaimStatusStateBytes.contentToString()}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
             } finally {
