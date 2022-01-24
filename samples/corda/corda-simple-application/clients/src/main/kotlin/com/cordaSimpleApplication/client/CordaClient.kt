@@ -110,7 +110,9 @@ fun main(args: Array<String>) = App()
                     PledgeHouseTokenCommand(),
                     IsHouseTokenPledgedCommand(),
                     GetHouseTokenPledgeStateCommand(),
-                    ReclaimHouseTokenCommand()
+                    ReclaimHouseTokenCommand(),
+                    GetAssetClaimStatusByPledgeIdCommand(),
+                    GetAssetClaimStatusStateCommand()
                 ),
                 CreateNetworkIdStateCommand(),
                 RetrieveNetworkIdStateAndRefCommand()
