@@ -94,7 +94,7 @@
     "google-protobuf": "3.18.0-rc.2",
     "jose": "4.1.0",
     "lmify": "0.3.0",
-    "node-forge": "0.10.0",
+    "node-forge": "1.0.0",
     "prom-client": "13.2.0",
     "run-time-error": "1.4.0",
     "rxjs": "7.3.0",
