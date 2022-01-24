@@ -369,15 +369,6 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 
 	// Validate returned asset details using app-specific-logic
 
-	// The asset should be recorded if it has been claimed, so we should look that up first
-	asset, err := getBondAsset(ctx, assetType, id)
-	if err != nil {
-		return blankClaimBytes64, fmt.Errorf("failed to read asset record from world state: %v", err)
-	}
-	if asset.Owner != recipientCert {
-		return blankClaimBytes64, nil      // Return blank
-	}
-
 	// Match pledger identity in claim with request parameters
 	var lookupClaimAsset BondAsset
 	err = json.Unmarshal(claimAssetDetails, &lookupClaimAsset)
@@ -385,6 +376,15 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 		return blankClaimBytes64, err
 	}
 	if lookupClaimAsset.Owner != pledger {
+		return blankClaimBytes64, nil      // Return blank
+	}
+
+	// The asset should be recorded if it has been claimed, so we should look that up first
+	asset, err := getBondAsset(ctx, lookupClaimAsset.Type, lookupClaimAsset.ID)
+	if err != nil {
+		return blankClaimBytes64, fmt.Errorf("failed to read asset record from world state: %v", err)
+	}
+	if asset.Owner != recipientCert {
 		return blankClaimBytes64, nil      // Return blank
 	}
 
