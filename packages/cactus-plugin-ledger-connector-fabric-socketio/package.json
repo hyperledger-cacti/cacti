@@ -6,12 +6,11 @@
     "start": "cd ./dist && node common/core/bin/www.js",
     "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
     "build": "npm run codegen && npm run build-ts && npm run build:dev:backend:postbuild",
-    "codegen": "npm run copy-utility-assets",
+    "codegen": "npm run copy-utility-assets && rm -fr ./dist/wallet",
     "build-ts": "tsc",
     "build:dev:backend:postbuild": "npm run copy-static-assets",
     "copy-utility-assets": "ts-node copyUtilityAssets.ts",
-    "copy-static-assets": "ts-node copyStaticAssets.ts",
-    "init-fabric": "ln -s ../node_modules ./dist/node_modules"
+    "copy-static-assets": "ts-node copyStaticAssets.ts"
   },
   "dependencies": {
     "@types/node": "^14.14.5",
@@ -20,9 +19,9 @@
     "cookie-parser": "~1.4.3",
     "debug": "~4.1.1",
     "express": "~4.15.2",
-    "fabric-ca-client": "2.2.10",
-    "fabric-client": "^1.4.0",
-    "fabric-network": "2.2.10",
+    "fabric-ca-client": "~1.4.0",
+    "fabric-client": "~1.4.0",
+    "fabric-network": "~1.4.0",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^3.0.6",
     "morgan": "~1.8.1",

@@ -1,0 +1,13 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# Connection data
+connection.json
+
+# npm
+package-lock.json
+
+# Wallet
+wallet
+!wallet/.gitkeep

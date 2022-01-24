@@ -2,11 +2,11 @@ cartradeInfo:
   fabric:
     validatorID: r9IS4dDf
     mspID: Org1MSP
-    keystore: "./wallet/admin"
+    keystore: "./wallet"
     connUserName: user1
     contractName: fabcar
     peers:
-      - 
+      -
         name: peer0.org1.example.com
         requests: grpc://localhost:7051
         orderer:
@@ -19,9 +19,6 @@ cartradeInfo:
 
     submitter:
       name: admin
-      secret: adminpw
-      certificate: "-----BEGIN CERTIFICATE-----\nMIICATCCAaigAwIBAgIUPku4qKIQbtGFDlnZnOT4wuprCrowCgYIKoZIzj0EAwIw\nczELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh\nbiBGcmFuY2lzY28xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMT\nE2NhLm9yZzEuZXhhbXBsZS5jb20wHhcNMjEwNzMwMDUwMjAwWhcNMjIwNzMwMDUw\nNzAwWjAhMQ8wDQYDVQQLEwZjbGllbnQxDjAMBgNVBAMTBWFkbWluMFkwEwYHKoZI\nzj0CAQYIKoZIzj0DAQcDQgAEcsvU2r+Td7dtCuZbzW5i6g9YZ5I99/PsbhBajl81\nP6Q7LUp0yG4KPP+RM1QP7Vq17rxTT/8jfdQGHBmyjNCGZKNsMGowDgYDVR0PAQH/\nBAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFBgBGL/ubLTHr5xcQNQtQ2X/\nrxEeMCsGA1UdIwQkMCKAIEI5qg3NdtruuLoM2nAYUdFFBNMarRst3dusalc2Xkl8\nMAoGCCqGSM49BAMCA0cAMEQCIC2DR+8I1YzjtpVZartsZIvzkcUBTEkWPHu8lPoS\nXlOMAiBawCF3lIBzs/mi9kCL58M6SkddfKievhfi0/obf0sGEw==\n-----END CERTIFICATE-----\n"
-      pkey: "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgMNMJbHDw6+FcclPa\nzGWYItb0g+VnXAAVMCv1RFILciOhRANCAARyy9Tav5N3t20K5lvNbmLqD1hnkj33\n8+xuEFqOXzU/pDstSnTIbgo8/5EzVA/tWrXuvFNP/yN91AYcGbKM0IZk\n-----END PRIVATE KEY-----\n"
 
     channelName: mychannel
     chaincodeID: fabcar
