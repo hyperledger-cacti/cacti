@@ -277,18 +277,21 @@ class GetAssetPledgeStateById(
 @StartableByRPC
 class GetAssetClaimStatusState(
     val pledgeId: String,
-    val pledgeExpiryTimeSecs: Long,
-    val blankAssetJSON: ByteArray
-) : FlowLogic<AssetClaimStatusState>() {
+    val pledgeExpiryTimeSecsString: String,
+    val blankAssetJSON: String
+) : FlowLogic<ByteArray>() {
     /**
      * The call() method captures the logic to fetch the AssetClaimStatusState.
      * If the state is not found for a given pledgeId, then it returns an empty state.
      *
-     * @return Returns AssetClaimStatusState
+     * @return Returns ByteArray
      */
     @Suspendable
-    override fun call(): AssetClaimStatusState {
+    override fun call(): ByteArray {
         val linearId = getLinearIdFromString(pledgeId)
+        //val linearId = UniqueIdentifier.fromString(pledgeId)
+
+        val pledgeExpiryTimeSecs = pledgeExpiryTimeSecsString.toLong()
         println("Getting AssetClaimStatusState for pledgeId $linearId.")
         val states = serviceHub.vaultService.queryBy<AssetClaimStatusState>(
             QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
@@ -317,7 +320,7 @@ class GetAssetClaimStatusState(
             }
 
             val assetClaimStatusState = AssetClaimStatusState(
-                blankAssetJSON,
+                blankAssetJSON.toByteArray(),
                 "",
                 fetchedNetworkIdState!!.networkId,
                 ourIdentity,
@@ -327,10 +330,10 @@ class GetAssetClaimStatusState(
                 expirationStatus
             )
             println("Creating AssetClaimStatusState ${assetClaimStatusState}")
-            return assetClaimStatusState
+            return subFlow(AssetClaimStatusStateToProtoBytes(assetClaimStatusState))
         } else {
             println("Got AssetClaimStatusState: ${states.first().state.data}")
-            return states.first().state.data
+            return subFlow(AssetClaimStatusStateToProtoBytes(states.first().state.data))
         }
     }
 }
@@ -351,6 +354,7 @@ class AssetClaimStatusStateToProtoBytes(
      */
     @Suspendable
     override fun call(): ByteArray {
+        println("Going to covert to the state to Byte Array.")
         val claimStatus = AssetTransfer.AssetClaimStatus.newBuilder()
             .setAssetDetails(ByteString.copyFrom(assetClaimStatusState.assetDetails))
             .setLocalNetworkID(assetClaimStatusState.localNetworkID)
@@ -400,7 +404,7 @@ object ReclaimPledgedAsset {
                 Left(Error("Cannot perform eclaim for pledged ${pledgeId} as the asset was claimed in remote network."))
             }
 
-            subFlow(GetAssetPledgeStateById(pledgeId)).fold({
+            subFlow(GetAssetPledgeStateById(linearId)).fold({
                 println("AssetPledgeState for Id: ${linearId} not found.")
                 Left(Error("AssetPledgeState for Id: ${linearId} not found."))
             }, {

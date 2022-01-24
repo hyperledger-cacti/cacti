@@ -11,10 +11,16 @@ import co.paralleluniverse.fibers.Suspendable
 
 @InitiatingFlow
 @StartableByRPC
-class GetAssetClaimStatusByPledgeId(val pledgeId: String, val pledgeExpiryTimeSecs: Long) : FlowLogic<ByteArray>() {
+class GetAssetClaimStatusByPledgeId(
+    val pledgeId: String,
+    val expiryTimeSecs: String
+) : FlowLogic<ByteArray>() {
     @Suspendable
     override fun call(): ByteArray {
 
+        val pledgeExpiryTimeSecs: Long
+        pledgeExpiryTimeSecs = expiryTimeSecs.toLong()
+        println("pledgeId: ${pledgeId} and pledgeExpiryTimeSecs: ${pledgeExpiryTimeSecs}\n")
         val blankAssetJson = FungibleHouseTokenJson(
             tokenType = "",
             numUnits = 0L,
@@ -22,9 +28,8 @@ class GetAssetClaimStatusByPledgeId(val pledgeId: String, val pledgeExpiryTimeSe
         )
         println("Created empty house token asset ${blankAssetJson}\n")
         val gson = GsonBuilder().create();
-        var blankAssetJsonBytes = gson.toJson(blankAssetJson, FungibleHouseTokenJson::class.java).toByteArray()
-        val assetClaimStatusState: AssetClaimStatusState = subFlow(GetAssetClaimStatusState(pledgeId, pledgeExpiryTimeSecs, blankAssetJsonBytes))
-
-        return subFlow(AssetClaimStatusStateToProtoBytes(assetClaimStatusState))
+        var blankAssetJsonBytes = gson.toJson(blankAssetJson, FungibleHouseTokenJson::class.java)
+        println("Before calling the interop flow: ${blankAssetJsonBytes}\n")
+        return subFlow(GetAssetClaimStatusState(pledgeId, expiryTimeSecs, blankAssetJsonBytes))
     }
 }
