@@ -1,5 +1,5 @@
 ledgerPluginInfo:
-  - 
+  -
     validatorID: 84jUisrs
     validatorType: socketio
     validatorURL: https://localhost:5050
@@ -7,32 +7,32 @@ ledgerPluginInfo:
     ledgerInfo:
       ledgerAbstract: Go-Ethereum Ledger
     apiInfo:
-      - 
+      -
         apiType: getNumericBalance
         requestedData:
-          - 
+          -
             dataName: referedAddress
             dataType: string
-      - 
+      -
         apiType: transferNumericAsset
         requestedData:
-          - 
+          -
             dataName: fromAddress
             dataType: string
-          - 
+          -
             dataName: toAddress
             dataType: string
-          - 
+          -
             dataName: amount
             dataType: number
-      - 
+      -
         apiType: sendRawTransaction
         requestedData:
-          - 
+          -
             dataName: serializedTx
             dataType: string
 
-  - 
+  -
     validatorID: r9IS4dDf
     validatorType: socketio
     validatorURL: https://localhost:5040
@@ -40,26 +40,26 @@ ledgerPluginInfo:
     ledgerInfo:
        ledgerAbstract: Fabric Ledger
     apiInfo:
-      - 
+      -
         apiType: changeCarOwner
         requestedData:
-          - 
+          -
             dataName: carId
             dataType: string
-          - 
+          -
             dataName: newOwner
             dataType: string
-      - 
+      -
         apiType: sendSignedProposal
         requestedData:
-          - 
+          -
             dataName: signedCommitProposal
             dataType: string
-          - 
+          -
             dataName: commitReq
             dataType: string
 
-  - 
+  -
     validatorID: sUr7d10R
     validatorType: socketio
     validatorURL: https://localhost:5140
@@ -68,16 +68,16 @@ ledgerPluginInfo:
       ledgerAbstract: Sawtooth Ledger
     apiInfo: []
 
-  - 
+  -
     validatorID: 3PfTJw8g
     validatorType: socketio
-    validatorURL: http://172.16.0.4:8000
+    validatorURL: http://localhost:10080
     validatorKeyPath: ./validatorKey/3PfTJw8g/3PfTJw8g.crt
     ledgerInfo:
       ledgerAbstract: "Indy Ledger"
     apiInfo: []
 
-  - 
+  -
     validatorID: vIdO32CB
     validatorType: openapi
     validatorURL: http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/
@@ -86,7 +86,7 @@ ledgerPluginInfo:
       ledgerAbstract: "Cactus Besu Ledger via http connection"
     apiInfo: []
 
-  - 
+  -
     validatorID: vIdO32CF
     validatorType: openapi
     validatorURL: http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/
@@ -95,7 +95,7 @@ ledgerPluginInfo:
       ledgerAbstract: "Cactus Fabric Ledger via http connection"
     apiInfo: []
 
-  - 
+  -
     validatorID: vIdO32CQ
     validatorType: openapi
     validatorURL: http://localhost:5053/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/
@@ -115,7 +115,7 @@ signTxInfo:
   fabric:
     mspID: Org1MSP
     peers:
-      - 
+      -
         name: peer0.org1.example.com
         requests: grpc://localhost:7051
     orderer:

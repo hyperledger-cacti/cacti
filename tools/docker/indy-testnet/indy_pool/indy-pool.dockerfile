@@ -1,3 +1,7 @@
+# Runs indy pool for testing purpose
+# Original source - https://github.com/hyperledger/indy-sdk/blob/master/ci/indy-pool.dockerfile
+# Changes marked with `EDIT`
+
 FROM ubuntu:16.04
 
 ARG uid=1000
@@ -34,7 +38,7 @@ ARG python3_orderedset_ver=2.0
 ARG python3_psutil_ver=5.4.3
 ARG python3_pympler_ver=0.5
 
-RUN apt-get update -y && apt-get install -y --allow-unauthenticated \
+RUN apt-get update -y && apt-get install -y \
         python3-pyzmq=${python3_pyzmq_ver} \
         indy-plenum=${indy_plenum_ver} \
         indy-node=${indy_node_ver} \
@@ -92,26 +96,11 @@ USER indy
 RUN awk '{if (index($1, "NETWORK_NAME") != 0) {print("NETWORK_NAME = \"sandbox\"")} else print($0)}' /etc/indy/indy_config.py> /tmp/indy_config.py
 RUN mv /tmp/indy_config.py /etc/indy/indy_config.py
 
+# EDIT - Use different default pool IP
 ARG pool_ip=172.16.0.2
-
-# sudo to indy after initialization
-USER root
-RUN apt-get install -y sudo
-RUN sudo usermod -aG sudo indy
-RUN echo "#!/bin/bash\n\
-\n\
-sudo chown indy:indy /var/lib/indy/sandbox\n\
-\n\
-if [ ! -e '/var/lib/indy/sandbox/pool_transactions_genesis' ]; then\n\
-  generate_indy_pool_transactions --nodes 4 --clients 5 --nodeNum 1 2 3 4 --ips="$pool_ip,$pool_ip,$pool_ip,$pool_ip" \n\
-fi\n\
-\n\
-/usr/bin/supervisord\n\
-" >> /usr/bin/pool_init_if_necessary
-
-RUN chmod +x /usr/bin/pool_init_if_necessary
-
+ENV POOL_IP=$pool_ip
 EXPOSE 9701 9702 9703 9704 9705 9706 9707 9708
 
-USER indy
-CMD ["sudo", "-u", "indy", "-g", "indy", "/usr/bin/pool_init_if_necessary"]
+# EDIT - Use different entry script- generate indy pool just once
+COPY --chown=indy 'startup.sh' '/usr/bin/'
+CMD [ "/usr/bin/startup.sh" ]

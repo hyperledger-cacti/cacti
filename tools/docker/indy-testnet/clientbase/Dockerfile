@@ -1,36 +1,58 @@
+# Indy-SDK CLI Image
+# Contains node and python environments and indy SDK, can be used as base for indy development.
+
 FROM ubuntu:bionic
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND 'noninteractive'
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y software-properties-common apt-transport-https supervisor
+RUN apt-get update \
+    && apt-get install -y \
+        gnupg \
+        software-properties-common \
+        python3-apt \
+        curl \
+        dirmngr \
+        apt-transport-https \
+        lsb-release ca-certificates \
+        gcc \
+        g++ \
+        make \
+    && rm -rf /var/lib/apt/lists/*
 
-# indy libraries and tool
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88
-RUN add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable"
-RUN apt-get update
-RUN apt-get install -y libindy libnullpay libvcx indy-cli
+# NodeJS and indy-sdk
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
+    && add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
+    && apt-get update && apt-get install -y \
+        nodejs \
+        libindy \
+        libnullpay \
+        libvcx \
+        indy-cli \
+    && npm install indy-sdk \
+    && npm cache clean --force \
+    && rm -rf /var/lib/apt/lists/*
 
-# Python 3.9 (indy-sdk requires 3.6 and later)
-RUN add-apt-repository -y ppa:deadsnakes/ppa
-RUN apt-get update && apt-get install -y python3.9 python3.9-dev python3.9-venv python3.9-distutils python3.9-venv python3-venv
+# Python 3.8
+# WARNING
+#  update-alternatives here is convinient, but can cause troubles with some missing os packages (like python3-apt)
+#  in case of any errors, remove it and use explicit python3.8
+RUN apt-get update \
+    && apt-get install -y python3.8 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2 \
+    && apt-get install -y python3-pip \
+    && pip3 install --upgrade pip \
+    && pip3 install \
+        python3-indy \
+        requests \
+    && rm -rf /var/lib/apt/lists/*
 
-# Node.js v12 (Cactus requres v12)
-RUN apt-get install -y nodejs npm curl
-RUN npm install n -g
-RUN n 12
-RUN apt purge -y nodejs npm
-RUN npm install indy-sdk
-
-# user should run their scripts as indy (home: /home/indy)
-RUN groupadd indy
-RUN useradd -m indy -g indy
+RUN groupadd indy && useradd -m indy -g indy
 
 COPY --chown=indy:indy from-indy-sdk /home/indy/from-indy-sdk
 
-WORKDIR /home/indy
+# User should run their scripts as indy
 USER indy
-RUN python3.9 -m venv .venv
-RUN . .venv/bin/activate && pip install python3-indy requests
+WORKDIR /home/indy
 
-
-# immediately exits
+CMD [ "/bin/bash" ]
