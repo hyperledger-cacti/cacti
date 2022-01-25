@@ -2,6 +2,7 @@ package net.corda.samples.tokenizedhouse.flows
 
 import com.weaver.corda.app.interop.states.AssetClaimStatusState
 import com.weaver.corda.app.interop.flows.GetAssetClaimStatusState
+import com.weaver.corda.app.interop.flows.GetAssetPledgeStatus
 import com.weaver.corda.app.interop.flows.AssetClaimStatusStateToProtoBytes
 import net.corda.samples.tokenizedhouse.states.FungibleHouseTokenJson
 import com.google.gson.Gson
@@ -29,7 +30,29 @@ class GetAssetClaimStatusByPledgeId(
         println("Created empty house token asset ${blankAssetJson}\n")
         val gson = GsonBuilder().create();
         var blankAssetJsonBytes = gson.toJson(blankAssetJson, FungibleHouseTokenJson::class.java)
-        println("Before calling the interop flow: ${blankAssetJsonBytes}\n")
+        println("Before calling the asset-claim-status interop flow: ${blankAssetJsonBytes}\n")
         return subFlow(GetAssetClaimStatusState(pledgeId, expiryTimeSecs, blankAssetJsonBytes))
+    }
+}
+
+@InitiatingFlow
+@StartableByRPC
+class GetAssetPledgeStatusByPledgeId(
+    val pledgeId: String,
+    val recipientNetworkId: String
+) : FlowLogic<ByteArray>() {
+    @Suspendable
+    override fun call(): ByteArray {
+
+        val blankAssetJson = FungibleHouseTokenJson(
+            tokenType = "",
+            numUnits = 0L,
+            owner = ""
+        )
+        println("Created empty house token asset ${blankAssetJson}\n")
+        val gson = GsonBuilder().create();
+        var blankAssetJsonBytes = gson.toJson(blankAssetJson, FungibleHouseTokenJson::class.java)
+        println("Before calling the asset-pledge-status interop flow: ${blankAssetJsonBytes}\n")
+        return subFlow(GetAssetPledgeStatus(pledgeId, recipientNetworkId, blankAssetJsonBytes))
     }
 }

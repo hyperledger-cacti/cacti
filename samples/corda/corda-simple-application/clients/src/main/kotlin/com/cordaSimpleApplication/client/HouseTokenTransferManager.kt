@@ -32,6 +32,7 @@ import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.contract.AssetContract
 
 import net.corda.samples.tokenizedhouse.flows.GetAssetClaimStatusByPledgeId
+import net.corda.samples.tokenizedhouse.flows.GetAssetPledgeStatusByPledgeId
 import net.corda.samples.tokenizedhouse.states.FungibleHouseTokenJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -241,7 +242,7 @@ class GetHouseTokenPledgeStateCommand : CliktCommand(name="get-pledge-state", he
  */
 class GetAssetClaimStatusByPledgeIdCommand : CliktCommand(name="get-claim-status-by-pledge-id", help = "Fetch asset Claim State associated with pledgeId.") {
     val config by requireObject<Map<String, String>>()
-    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge Id for Pledge State")
+    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge Id for AssetClaimStatus State")
     val expiryTimeSecs: String? by option ("-t", "--expiry-time", help="Expiry Time in Epoch Secs for Pledge State")
     override fun run() = runBlocking {
         if (pledgeId == null) {
@@ -304,6 +305,40 @@ class GetAssetClaimStatusStateCommand : CliktCommand(name="get-claim-status-stat
                 val charset = Charsets.UTF_8
                 println("assetClaimStatusState: ${assetClaimStatusStateBytes.toString(charset)}")
                 println("assetClaimStatusState: ${assetClaimStatusStateBytes.contentToString()}")
+            } catch (e: Exception) {
+                println("Error: ${e.toString()}")
+            } finally {
+                rpc.close()
+            }
+        }
+    }
+}
+
+/**
+ * Fetch Asset Pledge State for Transfer associated with contractId/pledgeId.
+ */
+class GetAssetPledgeStatusByPledgeIdCommand : CliktCommand(name="get-pledge-status-by-pledge-id", help = "Fetch asset pledge state associated with pledgeId.") {
+    val config by requireObject<Map<String, String>>()
+    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge Id for Pledge State")
+    val recipientNetworkId: String? by option ("-rnid", "--recipient-network-id", help="Importing network id of pledged asset for asset transfer")
+    override fun run() = runBlocking {
+        if (pledgeId == null) {
+            println("Arguments required: --pledge-id.")
+        } else if (recipientNetworkId == null) {
+            println("Arguments required: --recipient-network-id.")
+        } else {
+            val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+            try {
+                val proxy = rpc.proxy
+                val assetPledgeStatusBytes = proxy.startFlow(::GetAssetPledgeStatusByPledgeId, pledgeId!!, recipientNetworkId!!)
+                    .returnValue.get()
+                val charset = Charsets.UTF_8
+                println("assetPledgeStatus: ${assetPledgeStatusBytes.toString(charset)}")
+                println("assetPledgeStatus: ${assetPledgeStatusBytes.contentToString()}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
             } finally {
