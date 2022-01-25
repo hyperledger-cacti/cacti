@@ -73,6 +73,7 @@ object AssetTransferPledge {
         val expiryTime: Instant,
         val assetStateRef: StateAndRef<ContractState>,
         val assetStateDeleteCommand: CommandData,
+        val assetJSON: ByteArray,
         val recipient: String,
         val localNetworkId: String,
         val remoteNetworkId: String,
@@ -93,9 +94,11 @@ object AssetTransferPledge {
             // 1. Create the asset pledge state
             val assetPledgeState = AssetPledgeState(
                 StaticPointer(assetStateRef.ref, assetStateRef.state.data.javaClass), //Get the state pointer from StateAndRef
+                assetJSON,
                 ourIdentity,
                 recipient,
                 expiryTime,
+                expiryTime.getEpochSecond(),
                 localNetworkId,
                 remoteNetworkId
             )
@@ -270,7 +273,7 @@ class GetAssetPledgeStateById(
 }
 
 /**
- * The GetAssetClaimStatusState flow is used to fetch an existing AssetClaimStatusState.
+ * The GetAssetClaimStatusState flow is used to fetch an existing AssetClaimStatusState by a remote network.
  *
  * @property pledgeId The unique identifier for an AssetClaimStatusState.
  */
@@ -353,7 +356,7 @@ class AssetClaimStatusStateToProtoBytes(
      */
     @Suspendable
     override fun call(): ByteArray {
-        println("Going to covert to the state to Byte Array.")
+        println("Going to covert the asset claim status state to Byte Array.")
         val claimStatus = AssetTransfer.AssetClaimStatus.newBuilder()
             .setAssetDetails(ByteString.copyFrom(assetClaimStatusState.assetDetails))
             .setLocalNetworkID(assetClaimStatusState.localNetworkID)
@@ -364,6 +367,100 @@ class AssetClaimStatusStateToProtoBytes(
             .setExpirationStatus(assetClaimStatusState.expirationStatus)
             .build()
         return claimStatus.toByteArray()
+    }
+}
+
+/**
+ * The GetAssetPledgeStatus flow is used to fetch an existing AssetPledgeState by a remote network.
+ *
+ * @property pledgeId The unique identifier for an AssetPledgeState.
+ */
+@StartableByRPC
+class GetAssetPledgeStatus(
+    val pledgeId: String,
+    val recipientNetworkId: String,
+    val blankAssetJSON: String
+) : FlowLogic<ByteArray>() {
+    /**
+     * The call() method captures the logic to fetch the AssetPledgeState.
+     * If the state is not found for a given pledgeId, then it returns an empty state.
+     *
+     * @return Returns ByteArray
+     */
+    @Suspendable
+    override fun call(): ByteArray {
+        val linearId = getLinearIdFromString(pledgeId)
+
+        println("Getting AssetPledgeState for pledgeId $linearId.")
+        val states = serviceHub.vaultService.queryBy<AssetPledgeState>(
+            QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+        ).states
+        if (states.isEmpty()) {
+
+            val networkIdStates = serviceHub.vaultService.queryBy<NetworkIdState>().states
+            var fetchedNetworkIdState: NetworkIdState? = null
+
+            if (networkIdStates.isNotEmpty()) {
+                // consider that there will be only one such state ideally
+                fetchedNetworkIdState = networkIdStates.first().state.data
+                println("Network id for local Corda newtork is: $fetchedNetworkIdState\n")
+            } else {
+                println("Not able to fetch network id for local Corda network\n")
+            }
+
+            val emptyStatePointer: StaticPointer<ContractState>? = null
+            val noParty: Party? = null
+            val assetPledgeState = AssetPledgeState(
+                emptyStatePointer!!,
+                blankAssetJSON.toByteArray(),
+                noParty!!,
+                "",
+                java.time.Instant.now(),
+                0,
+                fetchedNetworkIdState!!.networkId,
+                ""
+            )
+            println("Creating AssetClaimStatusState ${assetPledgeState}")
+            return subFlow(AssetPledgeStateToProtoBytes(assetPledgeState))
+        } else {
+            println("Got AssetPledgeState: ${states.first().state.data}")
+            val assetPledgeState = states.first().state.data
+            if (assetPledgeState.remoteNetworkId != recipientNetworkId) {
+                println("Value of recipientNetworkId(${recipientNetworkId}) didn't match with " +
+                        "AssetPledgeState.remoteNetworkId(${assetPledgeState.remoteNetworkId}).")
+                throw IllegalStateException("Value of recipientNetworkId(${recipientNetworkId}) didn't match with " +
+                        "AssetPledgeState.remoteNetworkId(${assetPledgeState.remoteNetworkId}).")
+            }
+            return subFlow(AssetPledgeStateToProtoBytes(states.first().state.data))
+        }
+    }
+}
+
+/**
+ * The AssetPledgeStateToProtoBytes flow is used to convert the input state to bytes.
+ *
+ * @property assetPledgeState Asset pledge status state in the vault.
+ */
+@StartableByRPC
+class AssetPledgeStateToProtoBytes(
+    val assetPledgeState: AssetPledgeState
+) : FlowLogic<ByteArray>() {
+    /**
+     * The call() method captures the logic to convert the AssetPledgeState to Byte Array.
+     *
+     * @return Returns ByteArray
+     */
+    @Suspendable
+    override fun call(): ByteArray {
+        println("Going to covert the asset pledge state to Byte Array.")
+        val pledgeState = AssetTransfer.AssetPledge.newBuilder()
+            .setAssetDetails(ByteString.copyFrom(assetPledgeState.assetDetails))
+            .setLocalNetworkID(assetPledgeState.localNetworkId)
+            .setRemoteNetworkID(assetPledgeState.remoteNetworkId)
+            .setRecipient(assetPledgeState.recipient)
+            .setExpiryTimeSecs(assetPledgeState.expiryTimeSecs)
+            .build()
+        return pledgeState.toByteArray()
     }
 }
 

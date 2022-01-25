@@ -112,7 +112,8 @@ fun main(args: Array<String>) = App()
                     GetHouseTokenPledgeStateCommand(),
                     ReclaimHouseTokenCommand(),
                     GetAssetClaimStatusByPledgeIdCommand(),
-                    GetAssetClaimStatusStateCommand()
+                    GetAssetClaimStatusStateCommand(),
+                    GetAssetPledgeStatusByPledgeIdCommand()
                 ),
                 CreateNetworkIdStateCommand(),
                 RetrieveNetworkIdStateAndRefCommand()
