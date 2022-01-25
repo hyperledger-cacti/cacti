@@ -8,7 +8,7 @@ import logging
 import argparse
 import sys
 from ctypes import *
-from os.path import dirname
+from os.path import dirname, isfile
 
 from indy.error import ErrorCode, IndyError
 
@@ -39,7 +39,7 @@ http_req_params = {
     "authParams": ["<<company name>>"]
 }
 
-file_name = "myproof.json"
+proof_file_path = "/etc/cactus/indy-validator/myproof.json"
 
 #parser = argparse.ArgumentParser(description='Run python getting-started scenario (Alice/Faber)')
 parser = argparse.ArgumentParser(description='Run python getting-started scenario (Alice/Acme/Thrift)')
@@ -48,7 +48,8 @@ parser.add_argument('-l', '--library', help='dynamic library to load for plug-in
 parser.add_argument('-e', '--entrypoint', help='entry point for dynamic library')
 parser.add_argument('-c', '--config', help='entry point for dynamic library')
 parser.add_argument('-s', '--creds', help='entry point for dynamic library')
-parser.add_argument('-m', '--mode', help='mode of send http request')
+parser.add_argument('-p', '--proof_only', help="create only the proof, don't start the cartrade", action='store_true')
+parser.add_argument('-f', '--force', help="force recreate the proof (even if already exists)", action='store_true')
 
 args = parser.parse_args()
 
@@ -82,7 +83,7 @@ if args.storage_type:
 async def run():
     logger.info("Getting started -> started")
 
-    if not(args.mode == "http"):
+    if (not isfile(proof_file_path)) or args.force or args.proof_only:
         pool_ = {
             'name': 'pool1'
         }
@@ -426,14 +427,16 @@ async def run():
             ##request_json = { "proof_request": json.dumps(alice['apply_loan_proof_request']), "proof": json.dumps(alice['apply_loan_proof'])}
             request_json = { "proof_request": alice['apply_loan_proof_request'], "proof": alice['apply_loan_proof']}
             logger.info(json.dumps(request_json))
-            
-            # create_user_proof_file(file_name, json.dumps(request_str))
-            create_user_proof_file(file_name, json.dumps(request_json))
+
+            # create_user_proof_file(proof_file_path, json.dumps(request_str))
+            create_user_proof_file(proof_file_path, json.dumps(request_json))
 
         await apply_loan_basic()
 
-    request_discounted_cartrade(file_name)
+    if not args.proof_only:
+        request_discounted_cartrade(proof_file_path)
 
+    print("Done.")
 
 def wallet_config(operation, wallet_config_str):
     if not args.storage_type:
@@ -616,6 +619,7 @@ def create_user_proof_file(json_file, user_proof):
     logger.info(f"called create_user_proof_file()")
     with open(json_file, 'w') as file:
         file.write(user_proof)
+    logger.info(f"Saved proof to {json_file}")
 
 def request_discounted_cartrade(json_file):
     # read json file
@@ -626,7 +630,7 @@ def request_discounted_cartrade(json_file):
 
     # append data of json file to http req param
     http_req_params["tradeParams"].append(json_str)
-    
+
     # logger.info(f"http_params: url: {http_req_params['url']}")
     # logger.info(f"http_params: businessLogicID: {http_req_params['businessLogicID']}")
     # logger.info(f"http_params: tradeParams: {http_req_params['tradeParams']}")
@@ -641,7 +645,7 @@ def request_discounted_cartrade(json_file):
                     'authParams':  http_req_params["authParams"]}
 
     logger.info(f"req_body: {req_body}")
-    
+
 
     # response = requests.post(
     #     http_req_params["url"],

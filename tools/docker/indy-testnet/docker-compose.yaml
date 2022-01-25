@@ -27,7 +27,7 @@ services:
     # build:
     #   context: ./nginx
     #   dockerfile: custom-nginx.dockerfile
-    image: nginx:stable-alpine
+    image: nginx:1.20-alpine
     volumes:
       - type: bind
         source: "./nginx/nginx.conf"
