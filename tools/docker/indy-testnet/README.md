@@ -20,7 +20,7 @@ One bridge network and three containers will be started by `docker-compse up` co
       - TODO: Configure to proxy requests. Enable uWSGI (towards the python container).
     - IP address: 172.16.0.3 on indy_net
     - port 10080 is open to the world
-  - clientbase
+  - indy-sdk-cli
     - this is a temporary container based on template image for indy client (used by validator/Dockerfile)
     - immediately exits when you docker-compose up
   - validator container
@@ -103,7 +103,7 @@ Copy python script from example directory
 
     ```bash
     cd ../../..
-    docker run -it -v $(pwd)/indycli:/tmp/indycli --user indy --name indycli --network indy_net --add-host host.docker.internal:host-gateway clientbase /bin/bash
+    docker run -it -v $(pwd)/indycli:/tmp/indycli --user indy --name indycli --network indy_net --add-host host.docker.internal:host-gateway indy-sdk-cli /bin/bash
     ```
 
 1. Run the initialization script

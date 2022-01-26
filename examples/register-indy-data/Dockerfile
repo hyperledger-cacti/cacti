@@ -1,13 +1,13 @@
 # Simple tool for setup and sending requests to discounted-cartrade sample app
 # Run as part of docker-compose or remember to use host network
 
-FROM clientbase
+FROM indy-sdk-cli
 
 # Default IP for test indy pool on localhost
 ENV TEST_POOL_IP 172.16.0.2
 
 USER root
-RUN mkdir -p "/etc/cactus/indy-validator/"  && chown -R indy "/etc/cactus/"
+RUN mkdir -p "/etc/cactus/"  && chown -R indy "/etc/cactus/"
 VOLUME [ "/etc/cactus/" ]
 
 USER indy

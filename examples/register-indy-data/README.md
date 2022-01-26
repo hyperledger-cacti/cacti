@@ -4,7 +4,7 @@ Simple tool for setup and sending requests to discounted-cartrade sample app
 
 # How to use
 - Setup discounted-cartrade first
-- Build clientbase from `tools/docker/indy-testnet/clientbase`
+- Build indy-sdk-cli from `tools/docker/indy-testnet/indy-sdk-cli`
 - Build this container `docker build . -t req_discounted_cartrade`
 - `mkdir -p /etc/cactus/indy-validator/`
 

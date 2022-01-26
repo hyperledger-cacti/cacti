@@ -145,7 +145,7 @@ Alice will use credentials and other Indy formats such as schema and definition 
     mkdir -p /tmp/scriptdir/src
     cd /tmp/scriptdir/src
     touch __init__.py
-    cp /tmp/work/cactus/tools/docker/indy-testnet/clientbase/from-indy-sdk/utils.py  .
+    cp /tmp/work/cactus/tools/docker/indy-testnet/indy-sdk-cli/from-indy-sdk/utils.py  .
     cp /tmp/work/cactus/examples/register-indy-data/req_discounted_cartrade.py .
     cd ..
     python3 -m venv .venv
