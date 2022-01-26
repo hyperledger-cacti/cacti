@@ -49,6 +49,7 @@ RUN apt-get update \
 
 RUN groupadd indy && useradd -m indy -g indy
 
+# TODO - utils.py as part of validator / separate python package
 COPY --chown=indy:indy from-indy-sdk /home/indy/from-indy-sdk
 
 # User should run their scripts as indy
