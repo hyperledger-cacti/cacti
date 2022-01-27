@@ -162,26 +162,21 @@ describe(testCase, () => {
     expect(deployOutDemo.transactionReceipt).toBeTruthy();
     expect(deployOutDemo.transactionReceipt.contractAddress).toBeTruthy();
 
-    try {
-      const bodyObj: NewContractObj = {
-        contractAddress: hashTimeLockAddress,
-        inputAmount: 10,
-        outputAmount: 0x04,
-        expiration: DataTest.expiration,
-        hashLock: DataTest.hashLock,
-        receiver: DataTest.receiver,
-        outputNetwork: "BTC",
-        outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
-        connectorId: connectorId,
-        web3SigningCredential,
-        keychainId: "",
-        gas: DataTest.estimated_gas,
-      };
-      const resp = await api.newContractV1(bodyObj);
-      expect(resp).toBeTruthy();
-      expect(resp.status).toEqual(200);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(500);
-    }
+    const bodyObj: NewContractObj = {
+      contractAddress: hashTimeLockAddress,
+      inputAmount: 10,
+      outputAmount: 0x04,
+      expiration: DataTest.expiration,
+      hashLock: DataTest.hashLock,
+      receiver: DataTest.receiver,
+      outputNetwork: "BTC",
+      outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
+      connectorId: connectorId,
+      web3SigningCredential,
+      keychainId: "",
+      gas: DataTest.estimated_gas,
+    };
+    const apiCall = api.newContractV1(bodyObj);
+    await expect(apiCall).rejects.toHaveProperty(["response", "status"], 500);
   });
 });

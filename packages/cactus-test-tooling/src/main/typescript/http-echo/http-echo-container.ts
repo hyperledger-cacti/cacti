@@ -3,6 +3,7 @@ import isPortReachable from "is-port-reachable";
 import Joi from "joi";
 import { EventEmitter } from "events";
 import { ITestLedger } from "../i-test-ledger";
+import { Stream } from "stream";
 
 const OPTS_SCHEMA: Joi.Schema = Joi.object().keys({
   imageVersion: Joi.string().min(5).required(),
@@ -90,7 +91,7 @@ export class HttpEchoContainer implements ITestLedger {
           PublishAllPorts: true,
         },
         {},
-        (err: any) => {
+        (err: unknown) => {
           if (err) {
             reject(err);
           }
@@ -116,10 +117,10 @@ export class HttpEchoContainer implements ITestLedger {
     });
   }
 
-  public stop(): Promise<any> {
+  public stop(): Promise<Container> {
     return new Promise((resolve, reject) => {
       if (this.container) {
-        this.container.stop({}, (err: any, result: any) => {
+        this.container.stop({}, (err: unknown, result: Container) => {
           if (err) {
             reject(err);
           } else {
@@ -136,7 +137,7 @@ export class HttpEchoContainer implements ITestLedger {
     });
   }
 
-  public destroy(): Promise<any> {
+  public destroy(): Promise<Container> {
     if (this.container) {
       return this.container.remove();
     } else {
@@ -207,16 +208,16 @@ export class HttpEchoContainer implements ITestLedger {
     }
   }
 
-  private pullContainerImage(containerNameAndTag: string): Promise<any[]> {
+  private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
       const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: any, stream: any) => {
+      docker.pull(containerNameAndTag, (pullError: unknown, stream: Stream) => {
         if (pullError) {
           reject(pullError);
         } else {
           docker.modem.followProgress(
             stream,
-            (progressError: any, output: any[]) => {
+            (progressError: unknown, output: unknown[]) => {
               if (progressError) {
                 reject(progressError);
               } else {
