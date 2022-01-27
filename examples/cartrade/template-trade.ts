@@ -6,13 +6,8 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { RIFUtil } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/RIFUtil";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/ConfigUtil";
-import {
-  RIFError,
-  BadRequestError,
-  InternalServerError,
-} from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/RIFError";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { RIFError } from "@hyperledger/cactus-cmd-socket-server";
 import { TemplateTradeManagement } from "./TemplateTradeManagement";
 
 const fs = require("fs");

@@ -5,10 +5,10 @@
  * AssetManagement.ts
  */
 
-import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/LPInfoHolder";
-import { Verifier } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/verifier/Verifier";
-import { ContractInfoHolder } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/ContractInfoHolder";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/ConfigUtil";
+import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
+import { Verifier } from "@hyperledger/cactus-cmd-socket-server";
+import { ContractInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 
 const fs = require("fs");
 const path = require("path");

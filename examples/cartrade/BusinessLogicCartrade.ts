@@ -6,33 +6,29 @@
  */
 
 import { Request } from "express";
-import { RequestInfo } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/RequestInfo";
-import { TradeInfo } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/TradeInfo";
+import { RequestInfo } from "@hyperledger/cactus-cmd-socket-server";
+import { TradeInfo } from "@hyperledger/cactus-cmd-socket-server";
 import { TransactionInfoManagement } from "./TransactionInfoManagement";
 import { TransactionInfo } from "./TransactionInfo";
 import { TransactionData } from "./TransactionData";
-import { BusinessLogicInquireCartradeStatus } from "./BusinessLogicInquireCartradeStatus";
 import { TxInfoData } from "./TxInfoData";
-import { transactionManagement } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/routes/index";
-import { verifierFactory } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/routes/index";
-import { LedgerOperation } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/business-logic-plugin/LedgerOperation";
-import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
+import { routesTransactionManagement } from "@hyperledger/cactus-cmd-socket-server";
+import { routesVerifierFactory } from "@hyperledger/cactus-cmd-socket-server";
+import { LedgerOperation } from "@hyperledger/cactus-cmd-socket-server";
+import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socket-server";
 import { makeRawTransaction } from "./TransactionEthereum";
 import { makeSignedProposal } from "./TransactionFabric";
-import {
-  ApiInfo,
-  LedgerEvent,
-} from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/verifier/LedgerPlugin";
-import { json2str } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/verifier/DriverCommon";
+import { LedgerEvent } from "@hyperledger/cactus-cmd-socket-server";
+import { json2str } from "@hyperledger/cactus-cmd-socket-server";
 import { CartradeStatus } from "./define";
-import { RIFUtil } from "@hyperledger/cactus-cmd-socket-server/src/main/typescript/routing-interface/util/RIFUtil";
+import { BusinessLogicInquireCartradeStatus } from "./BusinessLogicInquireCartradeStatus";
 
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
+  fs.readFileSync("/etc/cactus/default.yaml", "utf8"),
 );
 import { getLogger } from "log4js";
 const moduleName = "BusinessLogicCartrade";
@@ -73,17 +69,17 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     // Create trade information
     const tradeInfo: TradeInfo = new TradeInfo(
       requestInfo.businessLogicID,
-      requestInfo.tradeID
+      requestInfo.tradeID,
     );
 
     // trade status update
     this.transactionInfoManagement.setStatus(
       tradeInfo,
-      CartradeStatus.UnderEscrow
+      CartradeStatus.UnderEscrow,
     );
 
     // Get varidator information
-    // this.useValidator = JSON.parse(transactionManagement.getValidatorToUse(requestInfo.businessLogicID));
+    // this.useValidator = JSON.parse(routesTransactionManagement.getValidatorToUse(requestInfo.businessLogicID));
 
     // this.dummyTransaction(requestInfo, tradeInfo);
     this.firstTransaction(requestInfo, tradeInfo);
@@ -95,38 +91,38 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     let transactionData: TransactionData = new TransactionData(
       "escrow",
       "ledger001",
-      "tid001"
+      "tid001",
     );
     this.transactionInfoManagement.setTransactionData(
       tradeInfo,
-      transactionData
+      transactionData,
     );
 
     this.transactionInfoManagement.setStatus(
       tradeInfo,
-      CartradeStatus.UnderTransfer
+      CartradeStatus.UnderTransfer,
     );
 
     transactionData = new TransactionData("transfer", "ledger002", "tid002");
     this.transactionInfoManagement.setTransactionData(
       tradeInfo,
-      transactionData
+      transactionData,
     );
 
     this.transactionInfoManagement.setStatus(
       tradeInfo,
-      CartradeStatus.UnderSettlement
+      CartradeStatus.UnderSettlement,
     );
 
     transactionData = new TransactionData("settlement", "ledger003", "tid003");
     this.transactionInfoManagement.setTransactionData(
       tradeInfo,
-      transactionData
+      transactionData,
     );
 
     this.transactionInfoManagement.setStatus(
       tradeInfo,
-      CartradeStatus.Completed
+      CartradeStatus.Completed,
     );
   }
 
@@ -137,21 +133,21 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
     // Get Verifier Instance
     logger.debug(
-      `##firstTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##firstTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
-    //        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
-    const verifierEthereum = verifierFactory.getVerifier(
+    //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][0]);
+    const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
-      "BusinessLogicCartrade"
+      "BusinessLogicCartrade",
     );
     logger.debug("getVerifierEthereum");
 
     // TODO: get private key from
     logger.debug(
-      `####fromAddress: ${requestInfo.tradeInfo.ethereumAccountFrom}`
+      `####fromAddress: ${requestInfo.tradeInfo.ethereumAccountFrom}`,
     );
     const fromAddressPkey =
       config.cartradeInfo.ethereum[
@@ -184,11 +180,11 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         const transactionData: TransactionData = new TransactionData(
           "escrow",
           "ledger001",
-          result.txId
+          result.txId,
         );
         this.transactionInfoManagement.setTransactionData(
           tradeInfo,
-          transactionData
+          transactionData,
         );
 
         // Set Parameter
@@ -218,7 +214,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
   secondTransaction(
     carID: string,
     fabricAccountTo: string,
-    tradeInfo: TradeInfo
+    tradeInfo: TradeInfo,
   ) {
     logger.debug("called secondTransaction");
 
@@ -226,15 +222,15 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
     // Get Verifier Instance
     logger.debug(
-      `##secondTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##secondTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
-    //        const verifierFabric = transactionManagement.getVerifier(useValidator['validatorID'][1]);
-    const verifierFabric = verifierFactory.getVerifier(
+    //        const verifierFabric = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
+    const verifierFabric = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][1],
-      "BusinessLogicCartrade"
+      "BusinessLogicCartrade",
     );
     logger.debug("getVerifierFabric");
 
@@ -254,20 +250,20 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         const transactionData: TransactionData = new TransactionData(
           "transfer",
           "ledger002",
-          result.txId
+          result.txId,
         );
         this.transactionInfoManagement.setTransactionData(
           tradeInfo,
-          transactionData
+          transactionData,
         );
 
         // NOTE: Convert properties to binary.
         //       If you do not convert the following, you will get an error.
         result.data["signedCommitProposal"].signature = Buffer.from(
-          result.data["signedCommitProposal"].signature
+          result.data["signedCommitProposal"].signature,
         );
         result.data["signedCommitProposal"].proposal_bytes = Buffer.from(
-          result.data["signedCommitProposal"].proposal_bytes
+          result.data["signedCommitProposal"].proposal_bytes,
         );
 
         // Set Parameter
@@ -295,21 +291,21 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
   thirdTransaction(
     ethereumAccountTo: string,
     tradingValue: string,
-    tradeInfo: TradeInfo
+    tradeInfo: TradeInfo,
   ) {
     logger.debug("called thirdTransaction");
 
     // Get Verifier Instance
     logger.debug(
-      `##thirdTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##thirdTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
-    //        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
-    const verifierEthereum = verifierFactory.getVerifier(
+    //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][0]);
+    const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
-      "BusinessLogicCartrade"
+      "BusinessLogicCartrade",
     );
     logger.debug("getVerifierEthereum");
 
@@ -340,11 +336,11 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         const transactionData: TransactionData = new TransactionData(
           "settlement",
           "ledger003",
-          result.txId
+          result.txId,
         );
         this.transactionInfoManagement.setTransactionData(
           tradeInfo,
-          transactionData
+          transactionData,
         );
 
         // Set LedgerOperation
@@ -352,7 +348,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         const ledgerOperation: LedgerOperation = new LedgerOperation(
           "sendRawTransaction",
           "",
-          result.data
+          result.data,
         );
 
         // Run Verifier (Ethereum)
@@ -386,10 +382,10 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     logger.debug("called completedTransaction");
 
     logger.debug(
-      `##completedTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##completedTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
     const validatorId = useValidator["validatorID"][0];
   }
@@ -411,7 +407,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         break;
       default:
         logger.error(
-          `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`
+          `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`,
         );
         return;
     }
@@ -433,7 +429,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
       if (status !== 200) {
         logger.error(
-          `##onEvenEtherem(): error event, status: ${status}, txId: ${txId}`
+          `##onEvenEtherem(): error event, status: ${status}, txId: ${txId}`,
         );
         return;
       }
@@ -447,17 +443,17 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
   getTransactionFromEthereumEvent(
     event: object,
-    targetIndex: number
+    targetIndex: number,
   ): object | null {
     try {
       const retTransaction = event["blockData"]["transactions"][targetIndex];
       logger.debug(
-        `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`
+        `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`,
       );
       return retTransaction;
     } catch (err) {
       logger.error(
-        `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`
+        `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`,
       );
     }
   }
@@ -478,7 +474,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
       if (status !== 200) {
         logger.error(
-          `##onEvenFabric(): error event, status: ${status}, txId: ${txId}`
+          `##onEvenFabric(): error event, status: ${status}, txId: ${txId}`,
         );
         return;
       }
@@ -487,7 +483,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       this.executeNextTransaction(tx, txId);
     } catch (err) {
       logger.error(
-        `##onEvenFabric(): onEvent, err: ${err}, event: ${json2str(event)}`
+        `##onEvenFabric(): onEvent, err: ${err}, event: ${json2str(event)}`,
       );
     }
   }
@@ -496,12 +492,12 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     try {
       const retTransaction = event["blockData"][targetIndex];
       logger.debug(
-        `##getTransactionFromFabricEvent(): retTransaction: ${retTransaction}`
+        `##getTransactionFromFabricEvent(): retTransaction: ${retTransaction}`,
       );
       return retTransaction;
     } catch (err) {
       logger.error(
-        `##getTransactionFromFabricEvent(): invalid even, err:${err}, event:${event}`
+        `##getTransactionFromFabricEvent(): invalid even, err:${err}, event:${event}`,
       );
     }
   }
@@ -514,7 +510,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         this.transactionInfoManagement.getTransactionInfoByTxId(txId);
       if (transactionInfo != null) {
         logger.debug(
-          `##onEvent(A), transactionInfo: ${json2str(transactionInfo)}`
+          `##onEvent(A), transactionInfo: ${json2str(transactionInfo)}`,
         );
       } else {
         logger.warn(`##onEvent(B), not found transactionInfo, txId: ${txId}`);
@@ -532,17 +528,17 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
           // underEscrow -> underTransfer
           logger.info(
-            `##INFO: underEscrow -> underTransfer, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`
+            `##INFO: underEscrow -> underTransfer, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`,
           );
           // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
           this.transactionInfoManagement.setStatus(
             tradeInfo,
-            CartradeStatus.UnderTransfer
+            CartradeStatus.UnderTransfer,
           );
           this.secondTransaction(
             transactionInfo.carID,
             transactionInfo.fabricAccountTo,
-            tradeInfo
+            tradeInfo,
           );
           break;
         case CartradeStatus.UnderTransfer:
@@ -552,17 +548,17 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
           // underTransfer -> underSettlement
           logger.info(
-            `##INFO: underTransfer -> underSettlement, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`
+            `##INFO: underTransfer -> underSettlement, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`,
           );
           // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
           this.transactionInfoManagement.setStatus(
             tradeInfo,
-            CartradeStatus.UnderSettlement
+            CartradeStatus.UnderSettlement,
           );
           this.thirdTransaction(
             transactionInfo.ethereumAccountTo,
             transactionInfo.tradingValue,
-            tradeInfo
+            tradeInfo,
           );
           break;
         case CartradeStatus.UnderSettlement:
@@ -574,16 +570,16 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
           // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
           this.transactionInfoManagement.setStatus(
             tradeInfo,
-            CartradeStatus.Completed
+            CartradeStatus.Completed,
           );
           logger.info(
-            `##INFO: completed cartrade, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`
+            `##INFO: completed cartrade, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`,
           );
           this.completedTransaction(tradeInfo);
           break;
         case CartradeStatus.Completed:
           logger.warn(
-            `##WARN: already completed, txinfo: ${json2str(transactionInfo)}`
+            `##WARN: already completed, txinfo: ${json2str(transactionInfo)}`,
           );
           return;
         default:
@@ -593,8 +589,8 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     } catch (err) {
       logger.error(
         `##ERR: executeNextTransaction(), err: ${err}, tx: ${json2str(
-          transactionInfo
-        )}`
+          transactionInfo,
+        )}`,
       );
     }
   }
@@ -620,7 +616,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
   getTxIDFromEvent(
     ledgerEvent: LedgerEvent,
-    targetIndex: number
+    targetIndex: number,
   ): string | null {
     logger.debug(`##in getTxIDFromEvent`);
     logger.debug(`##event: ${json2str(ledgerEvent)}`);
@@ -632,7 +628,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         return this.getTxIDFromEventFabric(ledgerEvent.data, targetIndex);
       default:
         logger.error(
-          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`
+          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
         );
     }
     return null;
@@ -652,8 +648,8 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       if (typeof txId !== "string") {
         logger.warn(
           `#getTxIDFromEventEtherem(): skip(invalid block, not found txId.), event: ${json2str(
-            event
-          )}`
+            event,
+          )}`,
         );
         return null;
       }
@@ -662,7 +658,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`
+        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`,
       );
       return null;
     }
@@ -682,8 +678,8 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       if (typeof txId !== "string") {
         logger.warn(
           `#getTxIDFromEventFabric(): skip(invalid block, not found txId.), event: ${json2str(
-            event
-          )}`
+            event,
+          )}`,
         );
         return null;
       }
@@ -692,7 +688,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventFabric(): err: ${err}, event: ${json2str(event)}`
+        `##getTxIDFromEventFabric(): err: ${err}, event: ${json2str(event)}`,
       );
       return null;
     }
@@ -708,7 +704,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
 
   getEventDataNum(ledgerEvent: LedgerEvent): number {
     logger.debug(
-      `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`
+      `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`,
     );
     const event = ledgerEvent.data;
     let retEventNum = 0;
@@ -723,17 +719,17 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
           break;
         default:
           logger.error(
-            `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`
+            `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`,
           );
           break;
       }
       logger.debug(
-        `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`
+        `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`,
       );
       return retEventNum;
     } catch (err) {
       logger.error(
-        `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`
+        `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`,
       );
       return 0;
     }

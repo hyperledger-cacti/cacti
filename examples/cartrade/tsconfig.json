@@ -70,11 +70,15 @@
   },
   "include": [
     "./*.ts",
-    "./config/*.ts"
   ],
   "exclude": [
     "copyStaticAssets.ts",
     "copyBLPConfig.ts",
     "replaceBLPConfigPath.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/cactus-cmd-socketio-server/tsconfig.json"
+    },
   ]
 }
