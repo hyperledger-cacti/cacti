@@ -7,8 +7,17 @@
 
 import { BusinessLogicPlugin } from "./BusinessLogicPlugin";
 
+let _blp: BusinessLogicPlugin | null = null;
+
 export function getTargetBLPInstance(
-  businessLogicID: string
+  businessLogicID: string,
 ): BusinessLogicPlugin | null {
-  return null;
+  return _blp;
+}
+
+export function setTargetBLPInstance(
+  businessLogicID: string,
+  blp: BusinessLogicPlugin,
+) {
+  _blp = blp;
 }

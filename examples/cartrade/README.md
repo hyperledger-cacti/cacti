@@ -65,12 +65,13 @@ Cactus **car-trade** is a sample application where users can exchange car owners
     cmd-socketio-build-dummy     | OK - Exit
     cmd-socketio-build-dummy exited with code 0
     cartrade-fabric-socketio-validator | listening on *:5040
+    cartrade_blp                 | [2022-01-27T14:27:26.610] [INFO] www - Using BLP with id = guks32pf
     cartrade_blp                 | start Dynamic loading.
     cartrade_blp                 | path: /api/v1/bl/trades/, routerJs: /root/cactus/dist/trades.js
     cartrade_blp                 | path: /api/v1/bl/asset/, routerJs: /root/cactus/dist/asset.js
     cartrade_blp                 | path: /api/v1/bl/balance/, routerJs: /root/cactus/dist/balance.js
     cartrade_blp                 | path: /api/v1/bl/cars/, routerJs: /root/cactus/dist/cars.js
-    cartrade_blp                 | [2022-01-20T14:31:49.680] [INFO] www - listening on *: 5034
+    cartrade_blp                 | [2022-01-27T14:27:27.324] [INFO] www - listening on *: 5034
     ```
 
 ## How to use this application

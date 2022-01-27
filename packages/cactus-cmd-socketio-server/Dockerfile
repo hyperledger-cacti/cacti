@@ -1,8 +1,6 @@
 FROM node:14
 
 ENV CACTUS_CMD_SOCKETIO_PATH=/opt/cactus-cmd-socketio-server
-# Root dir must be src until cmd-socketio defines valid exports:
-ENV CACTUS_CMD_SOCKETIO_BLP_PATH=${CACTUS_CMD_SOCKETIO_PATH}/src/main/typescript/business-logic-plugin/
 
 WORKDIR ${CACTUS_CMD_SOCKETIO_PATH}
 
@@ -14,8 +12,7 @@ RUN yarn install --production --ignore-engines --non-interactive --cache-folder 
     rm -rf ./.yarnCache && \
     yarn link
 
-COPY ./dist ./
+COPY ./dist ./dist
 
 EXPOSE 5034
 VOLUME ["/etc/cactus/"]
-

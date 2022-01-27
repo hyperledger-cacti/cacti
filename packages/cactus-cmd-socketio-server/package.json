@@ -2,6 +2,9 @@
   "name": "@hyperledger/cactus-cmd-socket-server",
   "version": "1.0.0-rc.3",
   "license": "Apache-2.0",
+  "main": "dist/src/main/typescript/index.js",
+  "module": "dist/src/main/typescript/index.js",
+  "types": "dist/src/main/typescript/index.d.ts",
   "scripts": {
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",

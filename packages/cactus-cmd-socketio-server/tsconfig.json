@@ -9,6 +9,7 @@
   "include": [
     "./src/main/typescript/business-logic-plugin/*.ts",
     "./config/*.ts",
+    "./src/main/typescript/*.ts",
     "./src/main/typescript/verifier/*.ts",
     "./src/main/typescript/util/*.ts",
     "./src/main/typescript/routing-interface/**/*.ts"
