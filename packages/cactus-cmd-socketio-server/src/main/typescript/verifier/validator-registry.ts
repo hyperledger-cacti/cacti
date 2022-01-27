@@ -8,17 +8,17 @@
 const fs = require("fs");
 const yaml = require("js-yaml");
 
-class RequestedData {
+type RequestedData = {
   dataName: string;
   dataType: string;
-}
+};
 
-class ApiInfo {
+type ApiInfo = {
   apiType: string;
   requestedData: Array<RequestedData>;
-}
+};
 
-export class LedgerPluginInfo {
+export type LedgerPluginInfo = {
   validatorID: string;
   validatorType: string;
   validatorURL: string;
@@ -27,14 +27,14 @@ export class LedgerPluginInfo {
     ledgerAbstract: string;
   };
   apiInfo: Array<ApiInfo>;
-}
+};
 
-class Peer {
+type Peer = {
   name: string;
   requests: string;
-}
+};
 
-class SignTxInfo {
+type SignTxInfo = {
   ethereum: {
     chainName: string;
     networkID: string;
@@ -59,7 +59,7 @@ class SignTxInfo {
     channelName: string;
     chaincodeID: string;
   };
-}
+};
 
 export class ValidatorRegistry {
   ledgerPluginInfo: Array<LedgerPluginInfo>;

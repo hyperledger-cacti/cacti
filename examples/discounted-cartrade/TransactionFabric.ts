@@ -21,9 +21,11 @@ import { Verifier } from "../../packages/cactus-cmd-socketio-server/src/main/typ
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
+import { FileSystemWallet } from "fabric-network";
+
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
+  fs.readFileSync("/etc/cactus/default.yaml", "utf8"),
 );
 import { getLogger } from "log4js";
 const moduleName = "TransactionFabric";
@@ -33,7 +35,7 @@ logger.level = config.logLevel;
 export function makeSignedProposal(
   ccFncName: string,
   ccArgs: string[],
-  verifierFabric: Verifier
+  verifierFabric: Verifier,
 ): Promise<{ data: {}; txId: string }> {
   // exports.Invoke = async function(reqBody, isWait){
   // let eventhubs = []; // For the time being, give up the eventhub connection of multiple peers.
@@ -54,8 +56,18 @@ export function makeSignedProposal(
       logger.debug(transactionProposalReq);
 
       // Get certificate and key acquisition
-      const certPem = config.cartradeInfo.fabric.submitter.certificate;
-      const privateKeyPem = config.cartradeInfo.fabric.submitter.pkey;
+      let certPem = undefined;
+      let privateKeyPem = undefined;
+      const submitter = config.cartradeInfo.fabric.submitter.name;
+      const wallet = new FileSystemWallet(config.cartradeInfo.fabric.keystore);
+      logger.debug(`Wallet path: ${config.cartradeInfo.fabric.keystore}`);
+
+      const submitterExists = await wallet.exists(submitter);
+      if (submitterExists) {
+        const submitterIdentity = await wallet.export(submitter);
+        certPem = (submitterIdentity as any).certificate;
+        privateKeyPem = (submitterIdentity as any).privateKey;
+      }
 
       // const signedTx = await TransactionSigner.signTxFabric(transactionProposalReq, certPem, privateKeyPem);
       const contract = { channelName: config.cartradeInfo.fabric.channelName };

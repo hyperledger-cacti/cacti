@@ -254,7 +254,7 @@ test(testCase, async (t: Test) => {
   });
 
   test("ApiClient #1 Routes based on Ledger ID #1", async (t2: Test) => {
-    const apiClient1 = await mainApiClient.ofLedger(ledger1.id, QuorumApi);
+    const apiClient1 = await mainApiClient.ofLedger(ledger1.id, QuorumApi, {});
 
     // send money to the test account on ledger 1
     const res = await apiClient1.runTransactionV1({
@@ -278,7 +278,7 @@ test(testCase, async (t: Test) => {
   });
 
   test("ApiClient #1 Routes based on Ledger ID #2", async (t2: Test) => {
-    const apiClient2 = await mainApiClient.ofLedger(ledger2.id, QuorumApi);
+    const apiClient2 = await mainApiClient.ofLedger(ledger2.id, QuorumApi, {});
 
     // send money to the test account on ledger 1
     const res = await apiClient2.runTransactionV1({

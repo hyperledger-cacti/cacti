@@ -20,6 +20,7 @@ const debug = require("debug")("connector:server");
 import https = require("https");
 import { config } from "../config/default";
 import fs = require("fs");
+import { Server } from "socket.io"
 
 // Log settings
 import { getLogger } from "log4js";
@@ -52,7 +53,7 @@ const sslParam = {
  */
 
 const server = https.createServer(sslParam, app); // Start as an https server.
-const io = require("socket.io")(server);
+const io = new Server(server);
 
 /**
  * Listen on provided port, on all network interfaces.
