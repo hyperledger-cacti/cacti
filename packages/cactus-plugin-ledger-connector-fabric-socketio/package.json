@@ -1,16 +1,16 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-fabric-socketio",
   "version": "1.0.0-rc.3",
-  "private": true,
+  "license": "Apache-2.0",
   "scripts": {
     "start": "cd ./dist && node common/core/bin/www.js",
     "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
-    "build": "npm run copy-utility-assets && npm run build-ts && npm run copy-static-assets",
+    "build": "npm run codegen && npm run build-ts && npm run build:dev:backend:postbuild",
+    "codegen": "npm run copy-utility-assets && rm -fr ./dist/wallet",
     "build-ts": "tsc",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "build:dev:backend:postbuild": "npm run copy-static-assets",
     "copy-utility-assets": "ts-node copyUtilityAssets.ts",
-    "copy-static-assets": "ts-node copyStaticAssets.ts",
-    "init-fabric": "ln -s ../node_modules ./dist/node_modules"
+    "copy-static-assets": "ts-node copyStaticAssets.ts"
   },
   "dependencies": {
     "@types/node": "^14.14.5",
@@ -19,23 +19,15 @@
     "cookie-parser": "~1.4.3",
     "debug": "~4.1.1",
     "express": "~4.15.2",
-    "fabric-ca-client": "2.2.10",
-    "fabric-network": "2.2.10",
+    "fabric-ca-client": "~1.4.0",
+    "fabric-client": "~1.4.0",
+    "fabric-network": "~1.4.0",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^3.0.6",
     "morgan": "~1.8.1",
     "serve-favicon": "~2.4.2",
     "shelljs": "^0.8.4",
-    "socket.io": "^2.0.4",
+    "socket.io": "4.1.3",
     "ts-node": "^9.0.0"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.1",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.0",
-    "typescript": "^3.9.10"
   }
 }

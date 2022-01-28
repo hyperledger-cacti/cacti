@@ -18,8 +18,7 @@ import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 import { VerifierAuthentication } from "./VerifierAuthentication";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-import io from "socket.io-client";
-import { Socket } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 
 const fs = require("fs");
 const path = require("path");
@@ -47,7 +46,7 @@ export class Verifier implements IVerifier {
   apiInfo: Array<ApiInfo> = [];
   counterReqID = 1;
   eventListenerHash: { [key: string]: VerifierEventListener } = {}; // Listeners for events from Ledger
-  static mapUrlSocket: Map<string, SocketIOClient.Socket> = new Map();
+  static mapUrlSocket: Map<string, Socket> = new Map();
   checkValidator: (key: string, data: string) => Promise<any> =
     VerifierAuthentication.verify;
 
@@ -80,7 +79,7 @@ export class Verifier implements IVerifier {
   // NOTE: asynchronous command
   public sendAsyncRequest(
     contract: object,
-    method: { command: string },
+    method: object,
     args: any,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -248,7 +247,7 @@ export class Verifier implements IVerifier {
 
   private requestLedgerOperationHttp(
     contract: object,
-    method: { command: string },
+    method: object,
     args: { args: any },
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -305,7 +304,7 @@ export class Verifier implements IVerifier {
         };
 
         logger.debug(`validatorUrl: ${this.validatorUrl}`);
-        httpReq.open("POST", this.validatorUrl + method.command);
+        httpReq.open("POST", this.validatorUrl + (method as any).command);
         // httpReq.setRequestHeader('content-type', 'application/json');
         httpReq.setRequestHeader("Content-Type", "application/json");
         // httpReq.send(args['args']);
@@ -354,6 +353,13 @@ export class Verifier implements IVerifier {
 
           socket.on("connect_error", (err: object) => {
             logger.error("##connect_error:", err);
+            // end communication
+            socket.disconnect();
+            reject(err);
+          });
+
+          socket.on("monitor_error", (err: object) => {
+            logger.error("##monitor_error:", err);
             // end communication
             socket.disconnect();
             reject(err);

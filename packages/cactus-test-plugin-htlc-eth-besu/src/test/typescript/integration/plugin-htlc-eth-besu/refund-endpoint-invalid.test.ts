@@ -210,17 +210,17 @@ describe(testCase, () => {
     });
     expect(responseTxId.callOutput).toBeTruthy();
     const id = responseTxId.callOutput as string;
-    try {
-      const refundRequest: RefundReq = {
-        id,
-        web3SigningCredential,
-        connectorId,
-        keychainId,
-      };
-      const refundResponse = await api.refundV1(refundRequest);
-      expect(refundResponse.status).toEqual(200);
-    } catch (error: any) {
-      expect(error.response.status).toEqual(500);
-    }
+
+    const refundRequest: RefundReq = {
+      id,
+      web3SigningCredential,
+      connectorId,
+      keychainId,
+    };
+    const refundResponse = api.refundV1(refundRequest);
+    await expect(refundResponse).rejects.toHaveProperty(
+      ["response", "status"],
+      500,
+    );
   });
 });

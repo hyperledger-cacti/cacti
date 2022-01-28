@@ -14,9 +14,10 @@
 //
 ////////
 
+import { io } from "socket.io-client";
+
 {
   // Validator test program.(socket.io client)
-  const io = require("socket.io-client");
   const config = require("config");
 
   // Specify the server (Validator) of the communication destination

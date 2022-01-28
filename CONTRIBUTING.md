@@ -419,12 +419,12 @@ need to develop this yourself, but this is rarely the case so YMMV.
 
 To see an existing set of examples for `besu` and `quorum` images take a peek at
 the `tools/docker/besu-all-in-one` and `tools/docker/quorum-all-in-one` folders.
-These produce the `hyperledger/cactus-besu-all-in-one` and
-`hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are
+These produce the `ghcr.io/hyperledger/cactus-besu-all-in-one` and
+`ghcr.io/hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are
 used in the test cases that are written for the specific ledger connector
 plugins at:
 * `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
-* `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.ts`
+* `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts`
 
 The specific classes that utilize the `all-in-one` images can be found in the
 `test-tooling` package under these paths:

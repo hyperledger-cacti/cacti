@@ -48,6 +48,7 @@ export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
   prometheusExporter?: PrometheusExporter;
   pluginRegistry?: PluginRegistry;
   logLevel?: LogLevelDesc;
+  ctorArgs?: Record<string, unknown>;
 }
 
 export class PluginConsortiumManual
@@ -217,9 +218,16 @@ export class PluginConsortiumManual
   public async getConsortiumJws(): Promise<JWSGeneral> {
     const nodes = this.repo.allNodes;
 
+    const ctorArgs = this.options.ctorArgs || {};
+
     const requests = nodes
       .map((cnm) => cnm.nodeApiHost)
-      .map((host) => new Configuration({ basePath: host }))
+      .map(function (host) {
+        // overwrite basePath with node api host
+        ctorArgs.basePath = host;
+        // return the ApiClient configuration object
+        return new Configuration(ctorArgs);
+      })
       .map((configuration) => new DefaultApi(configuration))
       .map((apiClient) => apiClient.getNodeJwsV1());
 
