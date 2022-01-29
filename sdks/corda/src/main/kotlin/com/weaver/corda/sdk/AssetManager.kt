@@ -113,6 +113,7 @@ class AssetManager {
             remoteNetworkID: String,
             tokenType: String,
             numUnits: Long,
+            blankAssetJSON: String,
             recipientParty: String,
             expiryTimeSecs: Long,
             getAssetStateAndRefFlow: String,
@@ -124,7 +125,8 @@ class AssetManager {
                 AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
                 val contractId = runCatching {
                     val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, "", "")
-                    val assetPledge = createAssetTransferAgreement(com.google.protobuf.ByteString.EMPTY, localNetworkID, remoteNetworkID, recipientParty, expiryTimeSecs)
+                    //val assetPledge = createAssetTransferAgreement(com.google.protobuf.ByteString.EMPTY, localNetworkID, remoteNetworkID, recipientParty, expiryTimeSecs)
+                    val assetPledge = createAssetTransferAgreement(ByteString.copyFromUtf8(blankAssetJSON), localNetworkID, remoteNetworkID, recipientParty, expiryTimeSecs)
                     proxy.startFlow(::PledgeFungibleAsset, assetAgreement, assetPledge, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
                         .returnValue.get()
                 }.fold({
@@ -196,8 +198,6 @@ class AssetManager {
 
                     proxy.startFlow(::ClaimAsset, contractId, claimInfo, createAssetStateCommand, updateAssetStateOwnerFlow, issuer, observers)
                         .returnValue.get()
-                    //proxy.startFlow(::UnlockAsset, contractId, createAssetStateCommand, assetStateContractId, issuer, observers)
-                    //    .returnValue.get()
                 }.fold({
                     it.map { retSignedTx ->
                         AssetManager.logger.debug("Claim asset was successful.\n")
@@ -269,6 +269,41 @@ class AssetManager {
             } catch (e: Exception) {
                 AssetManager.logger.error("Error reclaiming asset in Corda network: ${e.message}\n")
                 Left(Error("Error reclaiming asset in Corda network: ${e.message}"))
+            }
+        }
+
+        @JvmStatic
+        fun claimPledgedFungibleAsset(
+            proxy: CordaRPCOps,
+            pledgeId: String,
+            pledgeStatusLinearId: String,
+            tokenType: String,
+            numUnits: Long,
+            getAssetStateAndRefFlow: String,
+            createAssetStateCommand: CommandData,
+            issuer: Party,
+            observers: List<Party> = listOf<Party>()
+        ): Either<Error, SignedTransaction> {
+            return try {
+                AssetManager.logger.debug("Sending asset-claim request to Corda as part of asset-transfer.\n")
+                val signedTx = runCatching {
+                    val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, "", "")
+                    // note that issuer is always present, and observers can be empty
+                    val issuerAndObservers = observers.plus(issuer)
+                    proxy.startFlow(::ClaimFungibleAsset, pledgeId, pledgeStatusLinearId, getAssetStateAndRefFlow, assetAgreement, createAssetStateCommand, issuerAndObservers)
+                        .returnValue.get()
+                }.fold({
+                    it.map { retSignedTx ->
+                        AssetManager.logger.debug("Claim of remote asset was successful.\n")
+                        retSignedTx
+                    }
+                }, {
+                    Left(Error("Corda Network Error: Error running ClaimRemoteAsset flow: ${it.message}\n"))
+                })
+                signedTx
+            } catch (e: Exception) {
+                AssetManager.logger.error("Error claiming remote asset in Corda network: ${e.message}\n")
+                Left(Error("Error claiming remote asset in Corda network: ${e.message}"))
             }
         }
 

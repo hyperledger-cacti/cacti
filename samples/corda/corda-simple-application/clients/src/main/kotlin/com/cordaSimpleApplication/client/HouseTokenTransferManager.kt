@@ -26,6 +26,7 @@ import net.corda.core.utilities.OpaqueBytes
 import net.corda.core.crypto.sha256
 import java.time.Instant
 import com.weaver.corda.app.interop.flows.GetAssetClaimStatusState
+import com.weaver.corda.app.interop.flows.GetAssetClaimStatusStateByExpiryTimeSecs
 
 import com.weaver.corda.sdk.AssetManager
 import com.cordaSimpleApplication.state.AssetState
@@ -90,6 +91,15 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                 println("localNetworkId: ${localNetworkId}")
                 val remoteNetworkId = "891011121314"
 
+                val assetJson = FungibleHouseTokenJson(
+                    tokenType = params[0],
+                    numUnits = params[1].toLong(),
+                    owner = ""
+                )
+                println("Created house token asset ${assetJson}\n")
+                val gson = GsonBuilder().create();
+                var assetJsonBytes = gson.toJson(assetJson, FungibleHouseTokenJson::class.java)
+
                 var obs = listOf<Party>()
                 if (observer != null)   {
                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
@@ -101,7 +111,8 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                         remoteNetworkId,
                         params[0],          // Type
                         params[1].toLong(), // Quantity
-                        recipient!!, 
+                        assetJsonBytes,
+                        recipient!!,
                         nTimeout,
                         "net.corda.samples.tokenizedhouse.flows.RetrieveStateAndRef",
                         RedeemTokenCommand(issuedTokenType, listOf(0), listOf()),
@@ -115,7 +126,7 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                         remoteNetworkId,
                         params[0],      // Type
                         params[1],      // ID
-                        recipient!!, 
+                        recipient!!,
                         nTimeout,
                         "com.cordaSimpleApplication.flow.RetrieveStateAndRef",
                         AssetContract.Commands.Delete(),
@@ -169,6 +180,59 @@ class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help
                     obs
                 )
                 println("Pledged Asset Reclaim Response: ${res}")
+            } catch (e: Exception) {
+                println("Error: ${e.toString()}")
+            } finally {
+                rpc.close()
+            }
+        }
+    }
+}
+
+/**
+ * Command to claim a remotely pledged asset by an importing network as part of asset-transfer.
+ */
+class ClaimRemoteHouseTokenCommand : CliktCommand(name="claim-remote-asset", help = "Claims a remotel pledged asset.") {
+    val config by requireObject<Map<String, String>>()
+    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge/Linear Id for Asset Transfer Pledge State")
+    val pledgeStatusLinearId: String? by option("-psld", "--pledge-status-linear-id", help="Linear Id for interop-query external state")
+    val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
+    val observer: String? by option("-o", "--observer", help="Party Name for Observer")
+    override fun run() = runBlocking {
+        println("Entered here..1")
+        if (pledgeId == null) {
+            println("Arguments required: --pledge-id.")
+        } else if (pledgeStatusLinearId == null) {
+            println("Arguments required: --pledge-status-linear-id.")
+        } else {
+            val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+            try {
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
+                println("TokenType: $issuedTokenType")
+                println("param: ${param}")
+                val params = param!!.split(":").toTypedArray()
+                println("params[0]: ${params[0]} and params[1]: ${params[1]}")
+                var obs = listOf<Party>()
+                if (observer != null)   {
+                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
+                }
+                val res = AssetManager.claimPledgedFungibleAsset(
+                    rpc.proxy,
+                    pledgeId!!,
+                    pledgeStatusLinearId!!,
+                    params[0],          // Type
+                    params[1].toLong(), // Quantity
+                    "net.corda.samples.tokenizedhouse.flows.GetTokenStateAndContractId",
+                    IssueTokenCommand(issuedTokenType, listOf(0)),
+                    issuer,
+                    obs
+                )
+                println("Pledged asset claim response: ${res}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
             } finally {
@@ -305,6 +369,35 @@ class GetAssetClaimStatusStateCommand : CliktCommand(name="get-claim-status-stat
                 val charset = Charsets.UTF_8
                 println("assetClaimStatusState: ${assetClaimStatusStateBytes.toString(charset)}")
                 println("assetClaimStatusState: ${assetClaimStatusStateBytes.contentToString()}")
+            } catch (e: Exception) {
+                println("Error: ${e.toString()}")
+            } finally {
+                rpc.close()
+            }
+        }
+    }
+}
+
+class GetAssetClaimStateWithExpiryTimeCommand : CliktCommand(name="get-claim-status-by-expirytime", help = "Fetch asset claim state with expirty time.") {
+    val config by requireObject<Map<String, String>>()
+    val expiryTimeSecs: String? by option ("-t", "--expiry-time", help="Expiry time in Epoch secs for claim state")
+    override fun run() = runBlocking {
+        if (expiryTimeSecs == null) {
+            println("Arguments required: --expiry-time")
+        } else {
+            val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+            try {
+                val proxy = rpc.proxy
+                val assetClaimStatusStateBytes = proxy.startFlow(::GetAssetClaimStatusStateByExpiryTimeSecs, expiryTimeSecs!!)
+                    .returnValue.get()
+                println("assetClaimStatusStateBytes: ${assetClaimStatusStateBytes}")
+                //val charset = Charsets.UTF_8
+                //println("assetClaimStatusState: ${assetClaimStatusStateBytes.toString(charset)}")
+                //println("assetClaimStatusState: ${assetClaimStatusStateBytes.contentToString()}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
             } finally {

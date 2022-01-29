@@ -77,7 +77,7 @@ constructor(
         val assetType = agreement.type
         val numUnits = agreement.numUnits
         val recipient = assetPledge.recipient
-        val assetJSON = assetPledge.assetDetails.toByteArray()
+        val assetJSON = assetPledge.assetDetails.toStringUtf8()
 
         val expiryTime: Instant = Instant.ofEpochSecond(assetPledge.expiryTimeSecs)
         if (expiryTime.isBefore(Instant.now())) {
@@ -107,7 +107,7 @@ constructor(
             println("Local network id is ${assetPledge.localNetworkID} and remote network id is ${assetPledge.remoteNetworkID}")
 
             subFlow(AssetTransferPledge.Initiator(
-                expiryTime,
+                assetPledge.expiryTimeSecs,
                 assetRef!!,
                 assetStateDeleteCommand,
                 assetJSON,
@@ -167,7 +167,7 @@ constructor(
         val assetType = agreement.type
         val assetId = agreement.id
         val recipient = assetPledge.recipient
-        val assetJSON = assetPledge.assetDetails.toByteArray()
+        val assetJSON = assetPledge.assetDetails.toStringUtf8()
 
         val expiryTime: Instant = Instant.ofEpochSecond(assetPledge.expiryTimeSecs)
         if (expiryTime.isBefore(Instant.now())) {
@@ -197,7 +197,7 @@ constructor(
             println("Local network id is ${assetPledge.localNetworkID} and remote network id is ${assetPledge.remoteNetworkID}")
 
             subFlow(AssetTransferPledge.Initiator(
-                expiryTime,
+                assetPledge.expiryTimeSecs,
                 assetRef!!,
                 assetStateDeleteCommand,
                 assetJSON,
@@ -217,7 +217,7 @@ constructor(
 /**
  * The ReclaimAsset flow is used to reclaim an already pledged asset in the same local corda network.
  *
- * @property contractId The unique identifier for an AssetExchangeHTLCState.
+ * @property pledgeId The unique identifier for the pledge of an asset for asset-transfer.
  * @property assetStateCreateCommand The name of the command used to create an asset that's pledged earlier.
  * @property issuer The issuing authority of the pledged fungible asset.
  * @property observers The parties who are not transaction participants but only observers.
@@ -228,7 +228,7 @@ constructor(
 class ReclaimAsset
 @JvmOverloads
 constructor(
-    val contractId: String,
+    val pledgeId: String,
     val assetStateCreateCommand: CommandData,
     val claimStatusLinearId: String,
     val issuer: Party,
@@ -242,7 +242,7 @@ constructor(
     @Suspendable
     override fun call(): Either<Error, SignedTransaction> = try {
         subFlow(ReclaimPledgedAsset.Initiator(
-            contractId,
+            pledgeId,
             assetStateCreateCommand,
             claimStatusLinearId,
             issuer,
@@ -251,5 +251,71 @@ constructor(
     } catch (e: Exception) {
         println("Error reclaiming: ${e.message}\n")
         Left(Error("Failed to reclaim: ${e.message}"))
+    }
+}
+
+/**
+ * The ClaimFungibleAsset flow is used to claim an asset that is pledged in a remote network.
+ *
+ * @property agreement The details of the fungible asset that is pledged in a remote network to be claimed as part of asset-transfer.
+ *                          AssetType, numUnits & recipient are captured by the "agreement" structure.
+ * assetType -- The type of the fungible asset to be pledged.
+ * numUnits -- The number of units of the fungible asset (e.g., tokens) to be pledged.
+ * recipient -- The party in the local network who will be the asset owner after transfer.
+ * @property pledgeId The unique identifier for the pledge of an asset for asset-transfer.
+ * @property pledgeStatusLinearId The unique identifier to fetch pledge status (which was earlier obtained via interop query).
+ * @property getAssetFlowName The name of the flow used to fetch the fungible asset from the vault.
+ * @property assetStateCreateCommand The name of the command used to create an asset that's pledged earlier.
+ * @property issuer The issuing authority of the pledged fungible asset.
+ * @property observers The parties who are not transaction participants but only observers.
+ */
+
+@InitiatingFlow
+@StartableByRPC
+class ClaimFungibleAsset
+@JvmOverloads
+constructor(
+    val pledgeId: String,
+    val pledgeStatusLinearId: String,
+    val getAssetAndContractIdFlowName: String,
+    val agreement: AssetLocks.FungibleAssetExchangeAgreement,
+    val assetStateCreateCommand: CommandData,
+    val issuerAndObservers: List<Party> = listOf<Party>()
+) : FlowLogic<Either<Error, SignedTransaction>>() {
+    /**
+     * The call() method captures the logic to claim an asset that is pledged in a remote network.
+     *
+     * @return Returns SignedTransaction.
+     */
+    @Suspendable
+    override fun call(): Either<Error, SignedTransaction> = try {
+        val assetType = agreement.type
+        val numUnits = agreement.numUnits
+        val recipient = agreement.recipient
+        // since issuer is always present, there is at least 1 element in issuerAndObservers
+        val issuer = issuerAndObservers.get(issuerAndObservers.size-1)
+        val observers = issuerAndObservers.dropLast(1)
+
+        /*
+        if (recipient == "") {
+            println("Error: recipient party cannot be empty: ${recipient}.")
+            Left(Error("Error: Receipient party cannot be empty: ${recipient}."))
+        }
+        */
+
+        subFlow(ClaimRemoteAsset.Initiator(
+            pledgeId,
+            pledgeStatusLinearId,
+            getAssetAndContractIdFlowName,
+            assetType,
+            numUnits,
+            assetStateCreateCommand,
+            recipient,
+            issuer,
+            observers
+        ))
+    } catch (e: Exception) {
+        println("Error claiming remote asset: ${e.message}\n")
+        Left(Error("Failed to claim remote asset: ${e.message}"))
     }
 }

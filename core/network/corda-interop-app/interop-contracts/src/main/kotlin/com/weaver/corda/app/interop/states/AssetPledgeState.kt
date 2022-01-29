@@ -13,6 +13,7 @@ import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
+import net.corda.core.serialization.CordaSerializable
 import java.time.Instant
 import net.corda.core.contracts.StaticPointer
 
@@ -33,10 +34,9 @@ import net.corda.core.contracts.StaticPointer
 @BelongsToContract(AssetTransferContract::class)
 data class AssetPledgeState(
     val assetStatePointer: StaticPointer<ContractState>,
-    val assetDetails: ByteArray,
+    val assetDetails: String,
     val locker: Party,
     val recipient: String,
-    val expiryTime: Instant,
     val expiryTimeSecs: Long,
     val localNetworkId: String,
     val remoteNetworkId: String,
