@@ -35,7 +35,7 @@ import net.corda.core.contracts.StaticPointer
  */
 @BelongsToContract(AssetTransferContract::class)
 data class AssetClaimStatusState(
-    val assetDetails: ByteArray,
+    val assetDetails: String,
     val localNetworkID: String,
     val remoteNetworkID: String,
     val recipient: Party,

@@ -239,7 +239,7 @@ class GetAssetExchangeHTLCStateById(
     /**
      * The call() method captures the logic to fetch the AssetExchangeHTLCState.
      *
-     * @return Returns Either<Error, AssetExchangeHTLCState>
+     * @return Returns Either<Error, StateAndRef<AssetExchangeHTLCState>>
      */
     @Suspendable
     override fun call(): Either<Error, StateAndRef<AssetExchangeHTLCState>> = try {
@@ -261,7 +261,7 @@ class GetAssetExchangeHTLCStateById(
 }
 
 /**
- * The GetAssetExchangeHTLCStateById flow is used to fetch an existing AssetExchangeHTLCState.
+ * The GetAssetExchangeHTLCHashById flow is used to fetch the base64 value (as byte array) of the hash used in asset exchange.
  *
  * @property linearId The unique identifier for an AssetExchangeHTLCState.
  */
@@ -270,9 +270,9 @@ class GetAssetExchangeHTLCHashById(
     val contractId: String
 ) : FlowLogic<ByteArray>() {
     /**
-     * The call() method captures the logic to fetch the AssetExchangeHTLCState.
+     * The call() method captures the logic to fetch the base64 value of hash used for asset exchange.
      *
-     * @return Returns Either<Error, AssetExchangeHTLCState>
+     * @return Returns ByteArray
      */
     @Suspendable
     override fun call(): ByteArray {
@@ -294,23 +294,23 @@ class GetAssetExchangeHTLCHashById(
 }
 
 /**
- * The GetAssetExchangeHTLCStateById flow is used to fetch an existing AssetExchangeHTLCState.
+ * The GetAssetExchangeHTLCHashPreImageById flow is used to fetch the hash preimage part of an asset exchange transaction.
  *
- * @property linearId The unique identifier for an AssetExchangeHTLCState.
+ * @property linearId The unique identifier for an AssetExchangeTxState.
  */
 @StartableByRPC
 class GetAssetExchangeHTLCHashPreImageById(
     val contractId: String
 ) : FlowLogic<ByteArray>() {
     /**
-     * The call() method captures the logic to fetch the AssetExchangeHTLCState.
+     * The call() method captures the logic to fetch the hash preimage used in an asset exchange transaction.
      *
-     * @return Returns Either<Error, AssetExchangeHTLCState>
+     * @return Returns ByteArray
      */
     @Suspendable
     override fun call(): ByteArray {
         val linearId = getLinearIdFromString(contractId)
-        println("Getting AssetExchangeHTLCState for linearId $linearId.")
+        println("Getting AssetExchangeTxState for linearId $linearId.")
         val states = serviceHub.vaultService.queryBy<AssetExchangeTxState>(
             QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
         ).states

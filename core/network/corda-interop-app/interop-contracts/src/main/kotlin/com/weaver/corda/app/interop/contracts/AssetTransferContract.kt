@@ -7,6 +7,7 @@
 package com.weaver.corda.app.interop.contracts
 
 import com.weaver.corda.app.interop.states.AssetPledgeState
+import com.weaver.corda.app.interop.states.AssetClaimStatusState
 import com.weaver.corda.app.interop.states.NetworkIdState
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
@@ -43,7 +44,8 @@ class AssetTransferContract : Contract {
                 val pledgeState = tx.outputs[0].data as AssetPledgeState
                 
                 // Check if timeout is beyond current time
-                "Timeout after current time" using (pledgeState.expiryTime > Instant.now())
+                val expiryTime = Instant.ofEpochSecond(pledgeState.expiryTimeSecs)
+                "Timeout after current time" using (expiryTime > Instant.now())
                 
                 // Check if the asset owner is the locker
                 val inputState = tx.inputs[0].state.data
@@ -63,6 +65,26 @@ class AssetTransferContract : Contract {
 
                 "LocalNetwokId must match with the networkId of current network." using (pledgeState.localNetworkId.equals(validNetworkIdState.networkId))
             }
+            is Commands.ClaimRemoteAsset -> requireThat {
+                "There should be no input state." using (tx.inputs.size == 0)
+                "There should be two output states." using (tx.outputs.size == 2)
+                "One of the output states should be of type AssetClaimStatusState." using (tx.outputsOfType<AssetClaimStatusState>().size == 1)
+
+                // Get the input asset pledge state
+                val claimState = tx.outputs[1].data as AssetClaimStatusState
+
+                val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
+                "There should be a single reference input network id." using (inReferences.size == 1)
+                val validNetworkIdState = inReferences.get(0).state.data
+
+                "AssetClaimStatusState.localNetwokID must match with the networkId of current network." using (claimState.localNetworkID.equals(validNetworkIdState.networkId))
+
+                // Check if timeWindow <= expiryTime
+                val untilTime = tx.timeWindow!!.untilTime!!
+                val expiryTime = Instant.ofEpochSecond(claimState.expiryTimeSecs)
+                "TimeWindow to claim pledged remote asset should be before expiry time." using
+                        (untilTime.isBefore(expiryTime) || untilTime.equals(expiryTime))
+            }
             is Commands.ReclaimPledgedAsset -> requireThat {
                 "There should be one input state." using (tx.inputs.size == 1)
                 "The input state should be of type AssetPledgeState." using (tx.inputs[0].state.data is AssetPledgeState)
@@ -73,7 +95,7 @@ class AssetTransferContract : Contract {
                 
                 // Check if timeWindow > expiryTime
                 val fromTime = tx.timeWindow!!.fromTime!!
-                "TimeWindow for reclaim pledged asset should be after expiry time." using (fromTime.isAfter(pledgeState.expiryTime))
+                "TimeWindow for reclaim pledged asset should be after expiry time." using (fromTime.isAfter(Instant.ofEpochSecond(pledgeState.expiryTimeSecs)))
                 
                 // Check if the asset owner is the locker
                 val outputState = tx.outputs[0].data
@@ -102,7 +124,6 @@ class AssetTransferContract : Contract {
     interface Commands : CommandData {
         class Pledge : Commands
         class ReclaimPledgedAsset : Commands
-        // class ClaimPledgedAsset(val assetClaimHTLC: AssetClaimHTLCData) : Commands
         class ClaimRemoteAsset : Commands
     }
 }
