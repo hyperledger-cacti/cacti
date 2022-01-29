@@ -1,6 +1,7 @@
 .config.json
 .nyc_output/
 dist/
+target/
 .DS_Store
 node_modules/
 docs/main
