@@ -114,7 +114,7 @@ class AssetManager {
             tokenType: String,
             numUnits: Long,
             blankAssetJSON: String,
-            recipientParty: String,
+            recipientCert: String,
             expiryTimeSecs: Long,
             getAssetStateAndRefFlow: String,
             deleteAssetStateCommand: CommandData,
@@ -125,8 +125,7 @@ class AssetManager {
                 AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
                 val contractId = runCatching {
                     val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, "", "")
-                    //val assetPledge = createAssetTransferAgreement(com.google.protobuf.ByteString.EMPTY, localNetworkID, remoteNetworkID, recipientParty, expiryTimeSecs)
-                    val assetPledge = createAssetTransferAgreement(ByteString.copyFromUtf8(blankAssetJSON), localNetworkID, remoteNetworkID, recipientParty, expiryTimeSecs)
+                    val assetPledge = createAssetTransferAgreement(ByteString.copyFromUtf8(blankAssetJSON), localNetworkID, remoteNetworkID, recipientCert, expiryTimeSecs)
                     proxy.startFlow(::PledgeFungibleAsset, assetAgreement, assetPledge, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
                         .returnValue.get()
                 }.fold({
@@ -151,7 +150,7 @@ class AssetManager {
             remoteNetworkID: String,
             assetType: String,
             assetId: String,
-            recipientParty: String,
+            recipientCert: String,
             expiryTimeSecs: Long,
             getAssetStateAndRefFlow: String,
             deleteAssetStateCommand: CommandData,
@@ -162,7 +161,7 @@ class AssetManager {
                 AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
                 val contractId = runCatching {
                     val assetAgreement = createAssetExchangeAgreement(assetType, assetId, "", "")
-                    val assetPledge = createAssetTransferAgreement(com.google.protobuf.ByteString.EMPTY, localNetworkID, remoteNetworkID, recipientParty, expiryTimeSecs)
+                    val assetPledge = createAssetTransferAgreement(com.google.protobuf.ByteString.EMPTY, localNetworkID, remoteNetworkID, recipientCert, expiryTimeSecs)
                     proxy.startFlow(::PledgeAsset, assetAgreement, assetPledge, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
                         .returnValue.get()
                 }.fold({
@@ -279,6 +278,8 @@ class AssetManager {
             pledgeStatusLinearId: String,
             tokenType: String,
             numUnits: Long,
+            lockerCert: String,
+            recipientCert: String,
             getAssetStateAndRefFlow: String,
             createAssetStateCommand: CommandData,
             issuer: Party,
@@ -287,7 +288,7 @@ class AssetManager {
             return try {
                 AssetManager.logger.debug("Sending asset-claim request to Corda as part of asset-transfer.\n")
                 val signedTx = runCatching {
-                    val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, "", "")
+                    val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, recipientCert, lockerCert)
                     // note that issuer is always present, and observers can be empty
                     val issuerAndObservers = observers.plus(issuer)
                     proxy.startFlow(::ClaimFungibleAsset, pledgeId, pledgeStatusLinearId, getAssetStateAndRefFlow, assetAgreement, createAssetStateCommand, issuerAndObservers)

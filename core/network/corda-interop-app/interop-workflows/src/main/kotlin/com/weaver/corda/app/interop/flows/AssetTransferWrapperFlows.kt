@@ -166,7 +166,7 @@ constructor(
 
         val assetType = agreement.type
         val assetId = agreement.id
-        val recipient = assetPledge.recipient
+        val recipientCert = assetPledge.recipient
         val assetJSON = assetPledge.assetDetails.toStringUtf8()
 
         val expiryTime: Instant = Instant.ofEpochSecond(assetPledge.expiryTimeSecs)
@@ -189,9 +189,9 @@ constructor(
                 Left(Error("Error: Unable to Get Asset StateAndRef for type: ${assetType} and id: ${assetId}."))
             }
 
-            if (recipient == "") {
-                println("Error: recipient party cannot be empty: ${recipient}.")
-                Left(Error("Error: Receipient party cannot be empty: ${recipient}."))
+            if (recipientCert == "") {
+                println("Error: recipient party cannot be empty: ${recipientCert}.")
+                Left(Error("Error: Receipient party cannot be empty: ${recipientCert}."))
             }
 
             println("Local network id is ${assetPledge.localNetworkID} and remote network id is ${assetPledge.remoteNetworkID}")
@@ -201,7 +201,7 @@ constructor(
                 assetRef!!,
                 assetStateDeleteCommand,
                 assetJSON,
-                recipient,
+                recipientCert,
                 assetPledge.localNetworkID,
                 assetPledge.remoteNetworkID,
                 issuer,
@@ -291,17 +291,16 @@ constructor(
     override fun call(): Either<Error, SignedTransaction> = try {
         val assetType = agreement.type
         val numUnits = agreement.numUnits
-        val recipient = agreement.recipient
+        val recipientCert = agreement.recipient
+        val lockerCert = agreement.locker
         // since issuer is always present, there is at least 1 element in issuerAndObservers
         val issuer = issuerAndObservers.get(issuerAndObservers.size-1)
         val observers = issuerAndObservers.dropLast(1)
 
-        /*
-        if (recipient == "") {
-            println("Error: recipient party cannot be empty: ${recipient}.")
-            Left(Error("Error: Receipient party cannot be empty: ${recipient}."))
+        if (recipientCert == "") {
+            println("Error: recipient party cannot be empty: ${recipientCert}.")
+            Left(Error("Error: Receipient party cannot be empty: ${recipientCert}."))
         }
-        */
 
         subFlow(ClaimRemoteAsset.Initiator(
             pledgeId,
@@ -310,7 +309,8 @@ constructor(
             assetType,
             numUnits,
             assetStateCreateCommand,
-            recipient,
+            lockerCert,
+            recipientCert,
             issuer,
             observers
         ))
