@@ -74,7 +74,7 @@ object AssetTransferPledge {
         val assetStateRef: StateAndRef<ContractState>,
         val assetStateDeleteCommand: CommandData,
         val assetJSON: String,
-        val recipient: String,
+        val recipientCert: String,
         val localNetworkId: String,
         val remoteNetworkId: String,
         val issuer: Party,
@@ -95,8 +95,9 @@ object AssetTransferPledge {
             val assetPledgeState = AssetPledgeState(
                 StaticPointer(assetStateRef.ref, assetStateRef.state.data.javaClass), //Get the state pointer from StateAndRef
                 assetJSON,
-                ourIdentity,
-                recipient,
+                ourIdentity, // party who is the pledging the asset
+                Base64.getEncoder().encodeToString(ourIdentityAndCert.certificate.toString().toByteArray()), // certificate of the party pledging
+                recipientCert, // certificate of the party in importing network that will claim
                 expiryTimeSecs,
                 localNetworkId,
                 remoteNetworkId
@@ -451,8 +452,9 @@ class GetAssetPledgeStatus(
             val assetPledgeState = AssetPledgeState(
                 emptyStatePointer!!,
                 blankAssetJSON,
-                noParty!!,
-                "",
+                noParty!!, // party who is the locker
+                "", // locker cert
+                "", // recipient cert
                 currentTimeSecs,
                 fetchedNetworkIdState!!.networkId,
                 ""
@@ -494,7 +496,7 @@ class AssetPledgeStateToProtoBytes(
             .setAssetDetails(ByteString.copyFromUtf8(assetPledgeState.assetDetails))
             .setLocalNetworkID(assetPledgeState.localNetworkId)
             .setRemoteNetworkID(assetPledgeState.remoteNetworkId)
-            .setRecipient(assetPledgeState.recipient)
+            .setRecipient(assetPledgeState.recipientCert)
             .setExpiryTimeSecs(assetPledgeState.expiryTimeSecs)
             .build()
         return pledgeState.toByteArray()
@@ -685,7 +687,8 @@ object ClaimRemoteAsset {
         val assetType: String,
         val numUnits: Long,
         val assetStateCreateCommand: CommandData,
-        val recipient: String,
+        val lockerCert: String,
+        val recipientCert: String,
         val issuer: Party,
         val observers: List<Party> = listOf<Party>()
     ) : FlowLogic<Either<Error, SignedTransaction>>() {
@@ -744,7 +747,7 @@ object ClaimRemoteAsset {
                 //assetPledgeStatus.localNetworkID,
                 assetPledgeStatus.localNetworkId,
                 ourIdentity, // party who is recipient
-                Base64.getEncoder().encodeToString(ourIdentityAndCert.certificate.toString().toByteArray()), // recipient cert
+                recipientCert, // recipient cert
                 true,
                 assetPledgeStatus.expiryTimeSecs,
                 false,
@@ -788,7 +791,7 @@ object ClaimRemoteAsset {
             //var assetContractId: String? = null
             resolveGetAssetStateAndContractIdFlow(getAssetAndContractIdFlowName,
                 //assetPledgeStatus.assetDetails.toByteArray(),
-                listOf(assetPledgeStatus.assetDetails, assetType, numUnits, ourIdentity)
+                listOf(assetPledgeStatus.assetDetails, assetType, numUnits, lockerCert, ourIdentity)
             ).fold({
                 println("Error: Unable to resolve GetAssetStateAndContractId flow.")
                 Left(Error("Error: Unable to resolve GetAssetStateAndContractId flow"))
