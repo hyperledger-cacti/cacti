@@ -1,12 +1,18 @@
 import path from "path";
-import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { generateKeyPair, exportPKCS8, SignJWT } from "jose";
+import {
+  generateKeyPair,
+  exportPKCS8,
+  SignJWT,
+  GenerateKeyPairResult,
+} from "jose";
 import expressJwt from "express-jwt";
+import "jest-extended";
 
 import {
   ApiServer,
   ConfigService,
+  ICactusApiServerOptions,
   isHealthcheckResponse,
 } from "../../../main/typescript/public-api";
 import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api";
@@ -22,28 +28,31 @@ const log = LoggerProvider.getOrCreate({
   label: __filename,
 });
 
-test(testCase, async (t: Test) => {
-  try {
-    const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
+describe(testCase, () => {
+  let apiServer: ApiServer,
+    expressJwtOptions: expressJwt.Options,
+    jwtKeyPair: GenerateKeyPairResult,
+    apiSrvOpts: ICactusApiServerOptions;
+
+  beforeAll(async () => {
+    const pluginsPath = path.join(
+      __dirname, // start at the current file's path
+      "../../../../../../", // walk back up to the project root
+      ".tmp/test/cmd-api-server/jwt-endpoint-authorization_test", // the dir path from the root
+      uuidv4(), // then a random directory to ensure proper isolation
+    );
+    jwtKeyPair = await generateKeyPair("RS256", {
+      modulusLength: 4096,
+    });
     const jwtPrivateKeyPem = await exportPKCS8(jwtKeyPair.privateKey);
-    const expressJwtOptions: expressJwt.Options = {
+    expressJwtOptions = {
       algorithms: ["RS256"],
       secret: jwtPrivateKeyPem,
       audience: uuidv4(),
       issuer: uuidv4(),
     };
-    t.ok(expressJwtOptions, "Express JWT config truthy OK");
 
-    const jwtPayload = { name: "Peter", location: "London" };
-    const tokenGood = await new SignJWT(jwtPayload)
-      .setProtectedHeader({
-        alg: "RS256",
-      })
-      .setIssuer(expressJwtOptions.issuer)
-      .setAudience(expressJwtOptions.audience)
-      .sign(jwtKeyPair.privateKey);
-    // const tokenBad = JWT.sign(jwtPayload, jwtKeyPair);
-
+    const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
     const authorizationConfig: IAuthorizationConfig = {
       unprotectedEndpointExemptions: [],
       expressJwtOptions,
@@ -51,17 +60,8 @@ test(testCase, async (t: Test) => {
         secret: jwtPrivateKeyPem,
       },
     };
-
-    const pluginsPath = path.join(
-      __dirname, // start at the current file's path
-      "../../../../../../", // walk back up to the project root
-      ".tmp/test/cmd-api-server/jwt-endpoint-authorization_test", // the dir path from the root
-      uuidv4(), // then a random directory to ensure proper isolation
-    );
-    const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
-
     const configService = new ConfigService();
-    const apiSrvOpts = await configService.newExampleConfig();
+    apiSrvOpts = await configService.newExampleConfig();
     apiSrvOpts.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
     apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
     apiSrvOpts.authorizationConfigJson = authorizationConfig;
@@ -74,39 +74,51 @@ test(testCase, async (t: Test) => {
     apiSrvOpts.plugins = [];
     const config = await configService.newExampleConfigConvict(apiSrvOpts);
 
-    const apiServer = new ApiServer({
+    apiServer = new ApiServer({
       config: config.getProperties(),
     });
-    test.onFinish(async () => await apiServer.shutdown());
+  });
+  afterAll(async () => await apiServer.shutdown());
 
-    const startResponse = apiServer.start();
-    await t.doesNotReject(
-      startResponse,
-      "failed to start API server with dynamic plugin imports configured for it...",
-    );
-    t.ok(startResponse, "startResponse truthy OK");
+  test(testCase, async () => {
+    try {
+      expect(expressJwtOptions).toBeTruthy();
 
-    const addressInfoApi = (await startResponse).addressInfoApi;
-    const protocol = apiSrvOpts.apiTlsEnabled ? "https" : "http";
-    const { address, port } = addressInfoApi;
-    const apiHost = `${protocol}://${address}:${port}`;
+      const jwtPayload = { name: "Peter", location: "London" };
+      const tokenGood = await new SignJWT(jwtPayload)
+        .setProtectedHeader({
+          alg: "RS256",
+        })
+        .setIssuer(expressJwtOptions.issuer)
+        .setAudience(expressJwtOptions.audience)
+        .sign(jwtKeyPair.privateKey);
+      // const tokenBad = JWT.sign(jwtPayload, jwtKeyPair);
 
-    const baseOptions = { headers: { Authorization: `Bearer ${tokenGood}` } };
-    const conf = new Configuration({ basePath: apiHost, baseOptions });
-    const apiClient = new ApiServerApi(conf);
-    const resHc = await apiClient.getHealthCheckV1();
-    t.ok(resHc, "healthcheck response truthy OK");
-    t.equal(resHc.status, 200, "healthcheck response status === 200 OK");
-    t.equal(typeof resHc.data, "object", "typeof resHc.data is 'object' OK");
-    t.ok(resHc.data.createdAt, "resHc.data.createdAt truthy OK");
-    t.ok(resHc.data.memoryUsage, "resHc.data.memoryUsage truthy OK");
-    t.ok(resHc.data.memoryUsage.rss, "resHc.data.memoryUsage.rss truthy OK");
-    t.ok(resHc.data.success, "resHc.data.success truthy OK");
-    t.true(isHealthcheckResponse(resHc.data), "isHealthcheckResponse OK");
-    t.end();
-  } catch (ex) {
-    log.error(ex);
-    t.fail("Exception thrown during test execution, see above for details!");
-    throw ex;
-  }
+      const startResponse = apiServer.start();
+      await expect(startResponse).not.toReject;
+      expect(startResponse).toBeTruthy();
+
+      const addressInfoApi = (await startResponse).addressInfoApi;
+      const protocol = apiSrvOpts.apiTlsEnabled ? "https" : "http";
+      const { address, port } = addressInfoApi;
+      const apiHost = `${protocol}://${address}:${port}`;
+
+      const baseOptions = { headers: { Authorization: `Bearer ${tokenGood}` } };
+      const conf = new Configuration({ basePath: apiHost, baseOptions });
+      const apiClient = new ApiServerApi(conf);
+      const resHc = await apiClient.getHealthCheckV1();
+      expect(resHc).toBeTruthy();
+      expect(resHc.status).toEqual(200);
+      expect(typeof resHc.data).toBeTruthy();
+      expect(resHc.data.createdAt).toBeTruthy();
+      expect(resHc.data.memoryUsage).toBeTruthy();
+      expect(resHc.data.memoryUsage.rss).toBeTruthy();
+      expect(resHc.data.success).toBeTruthy();
+      expect(isHealthcheckResponse(resHc.data)).toBe(true);
+    } catch (ex) {
+      log.error(ex);
+      fail("Exception thrown during test execution, see above for details!");
+      throw ex;
+    }
+  });
 });
