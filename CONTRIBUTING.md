@@ -358,13 +358,13 @@ for both them separately anyway:
   - An integration test:
 
       ```sh
-      npx tap --ts --timeout=600 packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/security-isolation-via-api-server-ports.ts
+      npx tap --ts --timeout=600 packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/get-consortium-jws-endpoint.test.ts
       ```
 
   - A unit test:
 
       ```sh
-      npx tap --ts --timeout=600 packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts
+      npx jest packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts
       ```
 
 #### Running all test cases (unit+integration)

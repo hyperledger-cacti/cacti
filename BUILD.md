@@ -89,11 +89,17 @@ The `npm run watch` script in action:
   * Windows Only
     * WSL2 or any virtual machine running Ubuntu 20.04 LTS
   * Git
-  * NodeJS 16, npm 7 (we recommend using the Node Version Manager (nvm) if available for your OS)
+  * NodeJS v16.13.1, npm v8.1.2 (we recommend using the Node Version Manager (nvm) if available for your OS)
+    ```
+    nvm install 16.13.1
+    nvm use 16.13.1
+    ```
   * Yarn 
     * `npm run install-yarn` (from within the project directory)
   * Docker Engine
   * Docker Compose
+  * OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
+    * `sudo apt install openjdk-8-jdk-headless`
 
 * Clone the repository
 
@@ -126,11 +132,11 @@ At this point you should have all packages built for development.
 You can start making your changes (use your own fork and a feature branch)
 or just run existing tests and debug them to see how things fit together.
 
-For example you can *run a ledger contract deployment test* via the
+For example you can *run a ledger single status endpoint test* via the
 REST API with this command:
 
 ```sh
-npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts
+npx tap --ts --timeout=600 packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts
 ```
 
 *You can also start the API server* and verify more complex scenarios with an
