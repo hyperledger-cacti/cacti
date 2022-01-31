@@ -325,25 +325,13 @@ class GetAssetClaimStatusState(
      */
     @Suspendable
     override fun call(): ByteArray {
-        val linearId = getLinearIdFromString(pledgeId)
-
         val pledgeExpiryTimeSecs = pledgeExpiryTimeSecsString.toLong()
-        println("Getting AssetClaimStatusState for pledgeId $linearId.")
-        val states = serviceHub.vaultService.queryBy<AssetClaimStatusState>(
-            QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
-        ).states
-        if (states.isEmpty()) {
+        println("Getting AssetClaimStatusState for pledgeId $pledgeId.")
+        val existingAssetClaimStatusState = subFlow(IsRemoteAssetClaimedEarlier(pledgeId))
+        if (existingAssetClaimStatusState == null) {
 
-            val networkIdStates = serviceHub.vaultService.queryBy<NetworkIdState>().states
-            var fetchedNetworkIdState: NetworkIdState? = null
-
-            if (networkIdStates.isNotEmpty()) {
-                // consider that there will be only one such state ideally
-                fetchedNetworkIdState = networkIdStates.first().state.data
-                println("Network id for local Corda newtork is: $fetchedNetworkIdState\n")
-            } else {
-                println("Not able to fetch network id for local Corda network\n")
-            }
+            val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
+            val fetchedNetworkIdState = networkIdStateRef!!.state.data
 
             var nTimeout: Long
             val expirationStatus: Boolean
@@ -356,9 +344,10 @@ class GetAssetClaimStatusState(
             }
 
             val assetClaimStatusState = AssetClaimStatusState(
+                pledgeId,
                 blankAssetJSON,
                 "",
-                fetchedNetworkIdState!!.networkId,
+                fetchedNetworkIdState.networkId,
                 ourIdentity,
                 "",
                 false,
@@ -368,8 +357,8 @@ class GetAssetClaimStatusState(
             println("Creating AssetClaimStatusState ${assetClaimStatusState}")
             return subFlow(AssetClaimStatusStateToProtoBytes(assetClaimStatusState))
         } else {
-            println("Got AssetClaimStatusState: ${states.first().state.data}")
-            return subFlow(AssetClaimStatusStateToProtoBytes(states.first().state.data))
+            println("Got AssetClaimStatusState: ${existingAssetClaimStatusState}")
+            return subFlow(AssetClaimStatusStateToProtoBytes(existingAssetClaimStatusState))
         }
     }
 }
@@ -665,6 +654,33 @@ object ReclaimPledgedAsset {
 }
 
 /**
+ * IsRemoteAssetClaimedEarlier flow checks if remote asset with pledgeId was already claimed,
+ * which is indicated by the existance of the AssetClaimStatusState on the ledger.
+ *
+ * @property pledgeId The unique identifier representing asset pledge contract id in the asset-transfer export network.
+ */
+@StartableByRPC
+class IsRemoteAssetClaimedEarlier(
+    val pledgeId: String
+) : FlowLogic<AssetClaimStatusState?>() {
+
+    @Suspendable
+    override fun call(): AssetClaimStatusState? {
+        println("Going to covert the asset pledge state to Byte Array.")
+
+        var retState: AssetClaimStatusState? = null
+        val states = serviceHub.vaultService.queryBy<AssetClaimStatusState>().states
+            .filter { it.state.data.pledgeId == pledgeId }
+            .map {it.state.data}
+        if (!states.isEmpty()) {
+            retState = states.first()
+        }
+
+        return retState
+    }
+}
+
+/**
  * The ClaimRemoteAsset flow is used to claim an asset which is pledged in a remote/exporting network.
  *
  * @property pledgeId The unique identifier for an AssetPledgeState.
@@ -741,6 +757,7 @@ object ClaimRemoteAsset {
 
             // Record claim on the ledger for later verification by a foreign network
             val assetClaimStatusState = AssetClaimStatusState(
+                pledgeId,
                 //assetPledgeStatus.assetDetails.toByteArray(),
                 assetPledgeStatus.assetDetails,
                 fetchedNetworkIdState.networkId,
@@ -750,19 +767,13 @@ object ClaimRemoteAsset {
                 recipientCert, // recipient cert
                 true,
                 assetPledgeStatus.expiryTimeSecs,
-                false,
-                linearId
+                false
             )
 
-            val states = serviceHub.vaultService.queryBy<AssetClaimStatusState>(
-                QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
-            ).states
-            if (!states.isEmpty()) {
-                val assetClaimStatus = states.first().state.data
-                if (assetClaimStatus.claimStatus) {
-                    println("Remote asset with pledgeId ${pledgeId} has already been claimed.")
-                    Left(Error("Remote asset with pledgeId ${pledgeId} has already been claimed."))
-                }
+            val existingAssetClaimStatusState = subFlow(IsRemoteAssetClaimedEarlier(pledgeId))
+            if (existingAssetClaimStatusState != null) {
+                println("Remote asset with pledgeId ${pledgeId} has already been claimed.")
+                Left(Error("Remote asset with pledgeId ${pledgeId} has already been claimed."))
             }
 
             // Obtain a reference from a notary we wish to use.
