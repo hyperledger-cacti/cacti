@@ -12,6 +12,7 @@ import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
+import com.google.gson.annotations.*
 
 /**
  * The state object recording ownership of fungible token assets by a party.
@@ -29,3 +30,15 @@ data class AssetState(val quantity: Long,
     /** The public keys of the involved parties. */
     override val participants: List<AbstractParty> get() = listOf(owner)
 }
+
+/**
+ * Below JSON is used to marshal the AssetState ledger object to external entities (e.g., Fabric network)
+ */
+data class AssetStateJSON(
+    @SerializedName("numunits")
+    val quantity: Long,
+    @SerializedName("type")
+    val tokenType: String,
+    @SerializedName("owner")
+    val ownerCert: String
+)

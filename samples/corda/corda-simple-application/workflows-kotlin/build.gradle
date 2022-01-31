@@ -40,6 +40,10 @@ configurations {
 }
 
 dependencies {
+    compile 'com.google.code.gson:gson:2.8.6'
+    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_version")
+    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_version")
+
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 

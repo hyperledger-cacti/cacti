@@ -90,6 +90,12 @@ fun main(args: Array<String>) = App()
             GetLockStateCommand(),
             GetHTLCHashCommand(),
             GetHTLCPreImageCommand(),
+            PledgeAssetCommand(),
+            IsAssetPledgedCommand(),
+            GetAssetPledgeStateCommand(),
+            ReclaimAssetCommand(),
+            ClaimRemoteAssetCommand(),
+            FetchCertBase64AssetCommand(),
             ConfigureCommand().subcommands(
                 ConfigureDataCommand(),
                 ConfigureNetworkCommand(),
