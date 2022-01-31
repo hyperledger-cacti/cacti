@@ -1,0 +1,30 @@
+[package]
+name = "relay"
+version = "0.0.1"
+authors = ["Antony Targett <atargett@au1.ibm.com>", "Nick Waywood <nwaywood@au1.ibm.com>"]
+edition = "2018"
+
+[lib]
+name = "pb"
+path = "src/main/rust/pb.rs"
+
+
+[dependencies]
+tonic = {version="0.2",  features = ["tls"]}
+prost = "0.6"
+tokio = { version = "0.2", features = ["macros", "fs"] }
+serde = {version="1.0.110", features = ["derive"]}
+
+# These upgraded versions compile fine as well, so we should upgrade them
+# in the future:
+# tonic = {version="0.6.2",  features = ["tls"]}
+# prost = "0.9"
+# tokio = { version = "1.15.0", features = ["macros", "fs"] }
+# serde = {version="1.0.110", features = ["derive"]}
+
+[build-dependencies]
+tonic-build = "0.2"
+
+
+
+

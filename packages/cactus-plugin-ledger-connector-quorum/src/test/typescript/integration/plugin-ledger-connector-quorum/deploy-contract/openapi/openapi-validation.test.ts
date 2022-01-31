@@ -365,7 +365,7 @@ test(testCase, async (t: Test) => {
         400,
         `Endpoint ${fRun} without required transactionConfig: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -400,7 +400,7 @@ test(testCase, async (t: Test) => {
         400,
         `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(

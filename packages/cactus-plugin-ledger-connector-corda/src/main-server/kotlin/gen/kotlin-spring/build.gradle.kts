@@ -12,7 +12,6 @@ tasks.named<Test>("test") {
 
 buildscript {
     repositories {
-        jcenter()
         maven { url = uri("https://repo1.maven.org/maven2") }
     }
     dependencies {
@@ -24,7 +23,6 @@ group = "org.hyperledger.cactus.plugin.ledger.connector.corda.server"
 version = "0.3.0"
 
 repositories {
-    jcenter()
     maven { url = uri("https://repo1.maven.org/maven2") }
 }
 
@@ -83,7 +81,6 @@ repositories {
 	maven { url = uri("https://repo.spring.io/milestone") }
 
     mavenLocal()
-    jcenter()
     mavenCentral()
     maven { url = uri("https://ci-artifactory.corda.r3cev.com/artifactory/corda") }
     // Can be removed post-release - used to get nightly snapshot build.
