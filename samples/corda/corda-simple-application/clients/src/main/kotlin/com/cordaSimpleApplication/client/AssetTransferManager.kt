@@ -31,6 +31,7 @@ import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.contract.AssetContract
 import java.util.Calendar
 import com.weaver.corda.app.interop.flows.RetrieveNetworkId
+import com.weaver.corda.app.interop.flows.IsRemoteAssetClaimedEarlier
 import com.cordaSimpleApplication.flow.MarshalFungibleToken
 import com.cordaSimpleApplication.flow.GetOurCertificateBase64
 import com.cordaSimpleApplication.flow.GetOurIdentity
@@ -313,6 +314,39 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
                     obs
                 )
                 println("Pledged asset claim response: ${res}")
+            } catch (e: Exception) {
+                println("Error: ${e.toString()}")
+            } finally {
+                rpc.close()
+            }
+        }
+    }
+}
+
+/**
+ * Fetch AssetClaimStatusState in the importing network as part of transfer of an asset with the input pledgeId.
+ */
+class GetSimpleAssetClaimStatusByPledgeIdCommand : CliktCommand(name="get-claim-status-by-pledge-id", help = "Fetch asset Claim State associated with pledgeId.") {
+    val config by requireObject<Map<String, String>>()
+    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge Id for AssetClaimStatusState on the ledger")
+    override fun run() = runBlocking {
+        if (pledgeId == null) {
+            println("Arguments required: --pledge-id.")
+        } else {
+            val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+            try {
+                val proxy = rpc.proxy
+                val assetClaimStatusState = proxy.startFlow(::IsRemoteAssetClaimedEarlier, pledgeId!!)
+                    .returnValue.get()
+                if (assetClaimStatusState == null) {
+                    println("Asset with pledgeId ${pledgeId} is not claimed yet.")
+                } else {
+                    println("Asset with pledgeId ${pledgeId} is claimed and assetClaimStatusState: ${assetClaimStatusState}")
+                }
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
             } finally {

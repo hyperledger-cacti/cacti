@@ -96,6 +96,7 @@ fun main(args: Array<String>) = App()
             ReclaimAssetCommand(),
             ClaimRemoteAssetCommand(),
             FetchCertBase64AssetCommand(),
+            GetSimpleAssetClaimStatusByPledgeIdCommand(),
             ConfigureCommand().subcommands(
                 ConfigureDataCommand(),
                 ConfigureNetworkCommand(),
