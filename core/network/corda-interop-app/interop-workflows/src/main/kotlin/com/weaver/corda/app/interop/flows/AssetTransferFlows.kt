@@ -118,23 +118,14 @@ object AssetTransferPledge {
                 ).toList()
             )
 
-            val networkIdStates = serviceHub.vaultService.queryBy<NetworkIdState>().states
-            var fetchedNetworkIdState: StateAndRef<NetworkIdState>? = null
-
-            if (networkIdStates.isNotEmpty()) {
-                // consider that there will be only one such state ideally
-                fetchedNetworkIdState = networkIdStates.first()
-                println("Network id for local Corda newtork is: $fetchedNetworkIdState\n")
-            } else {
-                println("Not able to fetch network id for local Corda network\n")
-            }
+            val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
 
             val txBuilder = TransactionBuilder(notary)
                 .addInputState(assetStateRef)
                 .addOutputState(assetPledgeState, AssetTransferContract.ID)
                 .addCommand(pledgeCmd).apply {
-                    fetchedNetworkIdState?.let {
-                        this.addReferenceState(ReferencedStateAndRef(fetchedNetworkIdState))
+                    networkIdStateRef!!.let {
+                        this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
                     }
                 }
                 .addCommand(assetDeleteCmd)
@@ -422,16 +413,8 @@ class GetAssetPledgeStatus(
         ).states
         if (states.isEmpty()) {
 
-            val networkIdStates = serviceHub.vaultService.queryBy<NetworkIdState>().states
-            var fetchedNetworkIdState: NetworkIdState? = null
-
-            if (networkIdStates.isNotEmpty()) {
-                // consider that there will be only one such state ideally
-                fetchedNetworkIdState = networkIdStates.first().state.data
-                println("Network id for local Corda newtork is: $fetchedNetworkIdState\n")
-            } else {
-                println("Not able to fetch network id for local Corda network\n")
-            }
+            val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
+            val fetchedNetworkIdState = networkIdStateRef!!.state.data
 
             val emptyStatePointer: StaticPointer<ContractState>? = null
             val noParty: Party? = null
@@ -445,7 +428,7 @@ class GetAssetPledgeStatus(
                 "", // locker cert
                 "", // recipient cert
                 currentTimeSecs,
-                fetchedNetworkIdState!!.networkId,
+                fetchedNetworkIdState.networkId,
                 ""
             )
             println("Creating AssetClaimStatusState ${assetPledgeState}")
@@ -551,23 +534,14 @@ object ReclaimPledgedAsset {
                 val reclaimAssetState = reclaimAssetStateAndRef.state.data
                 val assetStateContractId = reclaimAssetStateAndRef.state.contract
 
-                val networkIdStates = serviceHub.vaultService.queryBy<NetworkIdState>().states
-                var fetchedNetworkIdState: StateAndRef<NetworkIdState>? = null
-
-                if (networkIdStates.isNotEmpty()) {
-                    // consider that there will be only one such state ideally
-                    fetchedNetworkIdState = networkIdStates.first()
-                    println("Network id for local Corda newtork is: $fetchedNetworkIdState\n")
-                } else {
-                    println("Not able to fetch network id for local Corda network\n")
-                }
+                val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
 
                 val txBuilder = TransactionBuilder(notary)
                     .addInputState(it)
                     .addOutputState(reclaimAssetState, assetStateContractId)
                     .addCommand(reclaimCmd).apply {
-                        fetchedNetworkIdState?.let {
-                            this.addReferenceState(ReferencedStateAndRef(fetchedNetworkIdState))
+                        networkIdStateRef!!.let {
+                            this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
                         }
                     }
                     .addCommand(assetCreateCmd)
