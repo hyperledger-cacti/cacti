@@ -12,6 +12,8 @@
 
 const testLogLevel: LogLevelDesc = "info";
 const sutLogLevel: LogLevelDesc = "info";
+const testTimeout = 1000 * 5; // 5 second timeout per test
+const setupTimeout = 1000 * 60; // 1 minute timeout for setup
 
 import "jest-extended";
 import { cloneDeep } from "lodash";
@@ -72,7 +74,7 @@ import {
 // Test Timeout
 //////////////////////////////////
 
-jest.setTimeout(3000);
+jest.setTimeout(testTimeout);
 
 //////////////////////////////////
 // verifyValidatorJwt()
@@ -100,7 +102,7 @@ describe("verifyValidatorJwt tests", () => {
     );
     expect(signedMessage).toBeTruthy();
     log.debug("signedMessage:", signedMessage);
-  });
+  }, setupTimeout);
 
   test("Decrypts the payload from the validator using it's public key", async () => {
     // Verify (decrypt)
@@ -161,7 +163,7 @@ describe("Construction Tests", () => {
 
   beforeAll(async () => {
     sut = new SocketIOApiClient(defaultConfigOptions);
-  });
+  }, setupTimeout);
 
   test("Sets options field from constructor argument", () => {
     expect(sut.options).toEqual(defaultConfigOptions);
@@ -209,14 +211,14 @@ describe("SocketIOApiClient Tests", function () {
       testServer,
       testServerPort,
     ] = await SocketIOTestSetupHelpers.createListeningMockServer();
-  });
+  }, setupTimeout);
 
   afterAll((done) => {
     testServer.close(() => {
       log.debug("Test server closed");
       done();
     });
-  });
+  }, setupTimeout);
 
   beforeEach(async () => {
     clientSocket = SocketIOTestSetupHelpers.createClientSocket(testServerPort);
@@ -224,7 +226,7 @@ describe("SocketIOApiClient Tests", function () {
     // Mock client socket in verifier
     sut = new SocketIOApiClient(defaultConfigOptions);
     (sut as any)["socket"] = clientSocket;
-  });
+  }, setupTimeout);
 
   afterEach(() => {
     if (clientSocket) {
@@ -236,7 +238,7 @@ describe("SocketIOApiClient Tests", function () {
     }
 
     testServer.sockets.removeAllListeners();
-  });
+  }, setupTimeout);
 
   //////////////////////////////////
   // sendAsyncRequest()
@@ -253,7 +255,7 @@ describe("SocketIOApiClient Tests", function () {
       await SocketIOTestSetupHelpers.connectTestClient(clientSocket);
       expect(clientSocket.connected).toBeTrue();
       expect(serverSocket.connected).toBeTrue();
-    });
+    }, setupTimeout);
 
     test("Sends request2 with valid args for socketio verifier", () => {
       const reqReceived = new Promise<any>((resolve) => {
@@ -285,7 +287,7 @@ describe("SocketIOApiClient Tests", function () {
       await SocketIOTestSetupHelpers.connectTestClient(clientSocket);
       expect(clientSocket.connected).toBeTrue();
       expect(serverSocket.connected).toBeTrue();
-    });
+    }, setupTimeout);
 
     test("Returns 504 on request timeout", async () => {
       const reqPromise = sut.sendSyncRequest(reqContract, reqMethod, reqArgs);
