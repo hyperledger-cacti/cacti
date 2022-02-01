@@ -1,9 +1,11 @@
 package net.corda.samples.tokenizedhouse.flows
 
 import com.weaver.corda.app.interop.states.AssetClaimStatusState
+import com.weaver.corda.app.interop.states.AssetPledgeState
 import com.weaver.corda.app.interop.flows.GetAssetClaimStatusState
 import com.weaver.corda.app.interop.flows.GetAssetPledgeStatus
 import com.weaver.corda.app.interop.flows.AssetClaimStatusStateToProtoBytes
+import com.weaver.corda.app.interop.flows.AssetPledgeStateToProtoBytes
 import net.corda.samples.tokenizedhouse.states.FungibleHouseTokenJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -18,6 +20,8 @@ import net.corda.core.identity.CordaX500Name
 import com.r3.corda.lib.tokens.contracts.types.TokenPointer
 import com.r3.corda.lib.tokens.contracts.types.TokenType
 import net.corda.core.contracts.Amount
+import net.corda.core.contracts.ContractState
+import net.corda.core.contracts.StaticPointer
 import com.r3.corda.lib.tokens.contracts.FungibleTokenContract
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
 import net.corda.core.utilities.ProgressTracker
@@ -55,6 +59,30 @@ class GetAssetClaimStatusByPledgeId(
     }
 }
 
+@InitiatingFlow
+@StartableByRPC
+class GetHouseTokenJsonStringFromStatePointer(
+    val assetPledgeState: AssetPledgeState
+) : FlowLogic<AssetPledgeState>() {
+    @Suspendable
+    override fun call(): AssetPledgeState {
+
+        val assetStatePointer: StaticPointer<ContractState> = assetPledgeState.assetStatePointer
+        val assetState = assetStatePointer.resolve(serviceHub).state.data as FungibleToken
+
+        val assetJson = FungibleHouseTokenJson(
+            tokenType = assetState.amount.token.tokenType.tokenIdentifier,
+            numUnits = assetState.amount.quantity,
+            owner = assetPledgeState.lockerCert
+        )
+        println("Created simple asset from StatePointer: ${assetJson}\n")
+        val gson = GsonBuilder().create();
+        val assetJsonString = gson.toJson(assetJson, FungibleHouseTokenJson::class.java)
+
+        return assetPledgeState.copy(assetDetails = assetJsonString)
+    }
+}
+
 /**
  * The GetAssetPledgeStatusByPledgeId flow fetches the asset pledge status in the exporting network and returns as byte array.
  * It is called during the interop query by importing network before performing the claim on asset pledged in exporting network.
@@ -79,8 +107,12 @@ class GetAssetPledgeStatusByPledgeId(
         println("Created empty house token asset ${blankAssetJson}\n")
         val gson = GsonBuilder().create();
         var blankAssetJsonString = gson.toJson(blankAssetJson, FungibleHouseTokenJson::class.java)
-        println("Before calling the asset-pledge-status interop flow: ${blankAssetJsonString}\n")
-        return subFlow(GetAssetPledgeStatus(pledgeId, recipientNetworkId, blankAssetJsonString))
+
+        var assetPledgeState: AssetPledgeState = subFlow(GetAssetPledgeStatus(pledgeId, recipientNetworkId, blankAssetJsonString))
+        println("Got AssetPledgeState: ${assetPledgeState}\n.")
+        assetPledgeState = subFlow(GetHouseTokenJsonStringFromStatePointer(assetPledgeState))
+
+        return subFlow(AssetPledgeStateToProtoBytes(assetPledgeState))
     }
 }
 
@@ -165,7 +197,7 @@ class GetOurCertificateBase64() : FlowLogic<String>() {
 }
 
 /**
- * The MarshalFungibleToken flow is used to obtain the JSON ending of the fungible tokens of interest to the user.
+ * The MarshalFungibleToken flow is used to obtain the JSON encoding of the fungible tokens of interest to the user.
  * This function is typically called by the application client which may not know the full details of the token asset.
  *
  * @property type The fungible token type to be marshalled.

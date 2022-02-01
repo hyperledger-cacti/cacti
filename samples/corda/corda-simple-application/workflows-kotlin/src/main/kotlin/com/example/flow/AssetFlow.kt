@@ -12,6 +12,7 @@ import com.cordaSimpleApplication.state.AssetStateJSON
 import com.cordaSimpleApplication.contract.AssetContract
 import javassist.NotFoundException
 import net.corda.core.contracts.Command
+import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.identity.Party
 import net.corda.core.contracts.StaticPointer
@@ -30,7 +31,9 @@ import java.util.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.weaver.corda.app.interop.flows.GetAssetClaimStatusState
+import com.weaver.corda.app.interop.states.AssetPledgeState
 import com.weaver.corda.app.interop.flows.GetAssetPledgeStatus
+import com.weaver.corda.app.interop.flows.AssetPledgeStateToProtoBytes
 
 
 /**
@@ -630,6 +633,38 @@ class AcceptorOfTransfer(val otherPartySession: FlowSession) : FlowLogic<SignedT
 }
 
 /**
+ * The GetAssetJsonStringFromStatePointer flow fetches the asset state from its state pointer AssetPledgeState.assetStatePointer
+ * and creates marshalled JSON encoded object which is assigned to AssetPledgeState.assetDetails field.
+ * This function is called by the exporting nextwork in the context of interop-query from the importing network
+ * to the exporting nextwork before performing claim-remote-asset.
+ *
+ * @property assetStatePointer The state pointer to the asset that is pledged in the exporting network.
+ * @property assetPledgeState The (interop) state that represents the pledge details on the ledger.
+ */
+@InitiatingFlow
+@StartableByRPC
+class GetAssetJsonStringFromStatePointer(
+    val assetPledgeState: AssetPledgeState
+) : FlowLogic<AssetPledgeState>() {
+    @Suspendable
+    override fun call(): AssetPledgeState {
+
+        val assetStatePointer: StaticPointer<ContractState> = assetPledgeState.assetStatePointer
+        val assetState = assetStatePointer.resolve(serviceHub).state.data as AssetState
+        val assetJson = AssetStateJSON(
+            tokenType = assetState.tokenType,
+            quantity = assetState.quantity,
+            ownerCert = assetPledgeState.lockerCert
+        )
+        println("Created simple asset from StatePointer: ${assetJson}\n")
+        val gson = GsonBuilder().create();
+        val assetJsonString = gson.toJson(assetJson, AssetStateJSON::class.java)
+
+        return assetPledgeState.copy(assetDetails = assetJsonString)
+    }
+}
+
+/**
  * The GetAssetPledgeStatusByPledgeId flow fetches the asset pledge status in the exporting network and returns as byte array.
  * It is called during the interop query by importing network before performing the claim on asset pledged in exporting network.
  *
@@ -654,7 +689,12 @@ class GetAssetPledgeStatusByPledgeId(
         val gson = GsonBuilder().create();
         var blankAssetJsonString = gson.toJson(blankAssetJson, AssetStateJSON::class.java)
         println("Before calling the asset-pledge-status interop flow: ${blankAssetJsonString}\n")
-        return subFlow(GetAssetPledgeStatus(pledgeId, recipientNetworkId, blankAssetJsonString))
+
+        var assetPledgeState: AssetPledgeState = subFlow(GetAssetPledgeStatus(pledgeId, recipientNetworkId, blankAssetJsonString))
+        println("Got AssetPledgeState: ${assetPledgeState}\n.")
+        assetPledgeState = subFlow(GetAssetJsonStringFromStatePointer(assetPledgeState))
+
+        return subFlow(AssetPledgeStateToProtoBytes(assetPledgeState))
     }
 }
 
