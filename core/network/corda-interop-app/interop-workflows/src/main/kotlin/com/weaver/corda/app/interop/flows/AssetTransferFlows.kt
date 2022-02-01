@@ -231,38 +231,6 @@ class IsAssetPledged(
 }
 
 /**
- * The GetAssetClaimStatusStateByExpiryTimeSecs flow is used to fetch the AssetClaimStatusState state.
- *
- * @property expiryTimeSecs The epoch time in seconds to filter the state.
- */
-@StartableByRPC
-class GetAssetClaimStatusStateByExpiryTimeSecs(
-    val expiryTimeSecs: String
-) : FlowLogic<AssetClaimStatusState>() {
-    /**
-     * The call() method captures the logic to fetch the AssetClaimStatusState.
-     *
-     * @return Returns AssetClaimStatusState
-     */
-    @Suspendable
-    override fun call(): AssetClaimStatusState {
-        var retVal: AssetClaimStatusState? = null
-        println("Getting AssetClaimStatusState with expiryTimeSecs ${expiryTimeSecs}.")
-        val states = serviceHub.vaultService.queryBy<AssetClaimStatusState>().states
-            .filter { it.state.data.expiryTimeSecs == expiryTimeSecs.toLong()}
-            .map {it.state.data}
-        if (states.isEmpty()) {
-            println("No AssetClaimStatusState found with expirtyTimeSecs: ${expiryTimeSecs}")
-        } else {
-            println("Got AssetClaimStatusState: ${states.first()}")
-            retVal = states.first()
-        }
-
-        return retVal!!
-    }
-}
-
-/**
  * The GetAssetPledgeStateById flow is used to fetch an existing AssetPledgeState.
  *
  * @property linearId The unique identifier for an AssetPledgeState.
@@ -385,7 +353,7 @@ class AssetClaimStatusStateToProtoBytes(
 }
 
 /**
- * The GetAssetPledgeStatus flow is used to fetch an existing AssetPledgeState by a remote network.
+ * The GetAssetPledgeStatus flow is used to fetch an existing AssetPledgeState by a remote/importing network.
  *
  * @property pledgeId The unique identifier for an AssetPledgeState.
  * @property recipientNetworkId The network id for the importing network
@@ -396,7 +364,7 @@ class GetAssetPledgeStatus(
     val pledgeId: String,
     val recipientNetworkId: String,
     val blankAssetJSON: String
-) : FlowLogic<ByteArray>() {
+) : FlowLogic<AssetPledgeState>() {
     /**
      * The call() method captures the logic to fetch the AssetPledgeState.
      * If the state is not found for a given pledgeId, then it returns an empty state.
@@ -404,7 +372,7 @@ class GetAssetPledgeStatus(
      * @return Returns ByteArray
      */
     @Suspendable
-    override fun call(): ByteArray {
+    override fun call(): AssetPledgeState {
         val linearId = getLinearIdFromString(pledgeId)
 
         println("Getting AssetPledgeState for pledgeId $linearId.")
@@ -431,8 +399,8 @@ class GetAssetPledgeStatus(
                 fetchedNetworkIdState.networkId,
                 ""
             )
-            println("Creating AssetClaimStatusState ${assetPledgeState}")
-            return subFlow(AssetPledgeStateToProtoBytes(assetPledgeState))
+            println("Creating AssetPledgeState ${assetPledgeState}.")
+            return assetPledgeState
         } else {
             println("Got AssetPledgeState: ${states.first().state.data}")
             val assetPledgeState = states.first().state.data
@@ -442,7 +410,7 @@ class GetAssetPledgeStatus(
                 throw IllegalStateException("Value of recipientNetworkId(${recipientNetworkId}) didn't match with " +
                         "AssetPledgeState.remoteNetworkId(${assetPledgeState.remoteNetworkId}).")
             }
-            return subFlow(AssetPledgeStateToProtoBytes(states.first().state.data))
+            return states.first().state.data
         }
     }
 }

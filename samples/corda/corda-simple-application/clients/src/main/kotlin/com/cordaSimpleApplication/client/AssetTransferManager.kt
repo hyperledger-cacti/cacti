@@ -32,6 +32,7 @@ import com.cordaSimpleApplication.contract.AssetContract
 import java.util.Calendar
 import com.weaver.corda.app.interop.flows.RetrieveNetworkId
 import com.weaver.corda.app.interop.flows.IsRemoteAssetClaimedEarlier
+import com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId
 import com.cordaSimpleApplication.flow.MarshalFungibleToken
 import com.cordaSimpleApplication.flow.GetOurCertificateBase64
 import com.cordaSimpleApplication.flow.GetOurIdentity
@@ -347,6 +348,40 @@ class GetSimpleAssetClaimStatusByPledgeIdCommand : CliktCommand(name="get-claim-
                 } else {
                     println("Asset with pledgeId ${pledgeId} is claimed and assetClaimStatusState: ${assetClaimStatusState}")
                 }
+            } catch (e: Exception) {
+                println("Error: ${e.toString()}")
+            } finally {
+                rpc.close()
+            }
+        }
+    }
+}
+
+/**
+ * Fetch Asset Pledge State for Transfer associated with contractId/pledgeId.
+ */
+class GetSimpleAssetPledgeStatusByPledgeIdCommand : CliktCommand(name="get-pledge-status-by-pledge-id", help = "Fetch asset pledge state associated with pledgeId.") {
+    val config by requireObject<Map<String, String>>()
+    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge Id for Pledge State")
+    val recipientNetworkId: String? by option ("-rnid", "--recipient-network-id", help="Importing network id of pledged asset for asset transfer")
+    override fun run() = runBlocking {
+        if (pledgeId == null) {
+            println("Arguments required: --pledge-id.")
+        } else if (recipientNetworkId == null) {
+            println("Arguments required: --recipient-network-id.")
+        } else {
+            val rpc = NodeRPCConnection(
+                host = config["CORDA_HOST"]!!,
+                username = "clientUser1",
+                password = "test",
+                rpcPort = config["CORDA_PORT"]!!.toInt())
+            try {
+                val proxy = rpc.proxy
+                val assetPledgeStatusBytes = proxy.startFlow(::GetAssetPledgeStatusByPledgeId, pledgeId!!, recipientNetworkId!!)
+                    .returnValue.get()
+                val charset = Charsets.UTF_8
+                println("assetPledgeStatus: ${assetPledgeStatusBytes.toString(charset)}")
+                println("assetPledgeStatus: ${assetPledgeStatusBytes.contentToString()}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
             } finally {
