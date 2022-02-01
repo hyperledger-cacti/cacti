@@ -5,9 +5,8 @@
  * TransactionIndy.ts
  */
 
-import { LPInfoHolder } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/LPInfoHolder";
-import { Verifier } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier";
-import { TransactionSigner } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/util/TransactionSigner";
+import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
+import { Verifier } from "@hyperledger/cactus-cmd-socket-server";
 
 const libWeb3 = require("web3");
 

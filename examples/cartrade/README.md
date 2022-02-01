@@ -48,7 +48,7 @@ Cactus **car-trade** is a sample application where users can exchange car owners
 
 1. Launch cartrade and validators from local `docker-compose.yml` (use separate console for that, docker-compose will block your prompt):
     ```
-    docker-compose up
+    npm run start
     ```
     This will build and launch all needed containers, the final output should look like this:
     ```

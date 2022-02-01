@@ -1,0 +1,94 @@
+ledgerPluginInfo:
+  -
+    validatorID: 84jUisrs
+    validatorType: socketio
+    validatorURL: https://ethereum-validator:5050
+    validatorKeyPath: ./validatorKey/84jUisrs/key84jUisrs.crt
+    ledgerInfo:
+      ledgerAbstract: Go-Ethereum Ledger
+    apiInfo:
+      -
+        apiType: getNumericBalance
+        requestedData:
+          -
+            dataName: referedAddress
+            dataType: string
+      -
+        apiType: transferNumericAsset
+        requestedData:
+          -
+            dataName: fromAddress
+            dataType: string
+          -
+            dataName: toAddress
+            dataType: string
+          -
+            dataName: amount
+            dataType: number
+      -
+        apiType: sendRawTransaction
+        requestedData:
+          -
+            dataName: serializedTx
+            dataType: string
+
+  -
+    validatorID: r9IS4dDf
+    validatorType: socketio
+    validatorURL: https://fabric-socketio-validator:5040
+    validatorKeyPath: ./validatorKey/r9IS4dDf/keyr9IS4dDf.crt
+    ledgerInfo:
+       ledgerAbstract: Fabric Ledger
+    apiInfo:
+      -
+        apiType: changeCarOwner
+        requestedData:
+          -
+            dataName: carId
+            dataType: string
+          -
+            dataName: newOwner
+            dataType: string
+      -
+        apiType: sendSignedProposal
+        requestedData:
+          -
+            dataName: signedCommitProposal
+            dataType: string
+          -
+            dataName: commitReq
+            dataType: string
+
+  -
+    validatorID: 3PfTJw8g
+    validatorType: socketio
+    validatorURL: http://indy-validator-nginx:10080
+    validatorKeyPath: ./validatorKey/3PfTJw8g/3PfTJw8g.crt
+    ledgerInfo:
+      ledgerAbstract: "Indy Ledger"
+    apiInfo: []
+
+signTxInfo:
+  ethereum:
+    chainName: geth1
+    networkID: 10
+    chainID: 10
+    network: mainnet
+    hardfork: petersburg
+
+  fabric:
+    mspID: Org1MSP
+    peers:
+      -
+        name: peer0.org1.example.com
+        requests: grpc://localhost:7051
+    orderer:
+      URL: grpc://localhost:7050
+    ca:
+      name: ca.example.com
+      URL: http://localhost:7054
+    submitter:
+      name: admin
+      secret: adminpw
+    channelName: mychannel
+    chaincodeID: fabcar

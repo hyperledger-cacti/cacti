@@ -17,6 +17,7 @@ function start_fabric_testnet() {
     pushd "${ROOT_DIR}/tools/docker/fabric-all-in-one"
 
     echo ">> Start Fabric 1.4 FabCar..."
+    docker-compose -f ./docker-compose-v1.4.yml build
     docker-compose -f ./docker-compose-v1.4.yml up -d
     sleep 1
 

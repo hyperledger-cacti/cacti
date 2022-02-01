@@ -8,7 +8,7 @@
 import { TransactionInfo } from "./TransactionInfo";
 import { TransactionStatus } from "./TransactionStatus";
 import { ResultTransactionStatusData } from "./ResultTransactionStatusData";
-import { BusinessLogicBase } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
+import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socket-server";
 import fs = require("fs");
 
 export class BusinessLogicInquireCartradeStatus extends BusinessLogicBase {

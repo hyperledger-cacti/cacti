@@ -6,6 +6,7 @@ import json
 import logging
 
 import argparse
+import os
 import sys
 from ctypes import *
 from os.path import dirname, isfile
@@ -83,7 +84,10 @@ if args.storage_type:
 async def run():
     logger.info("Getting started -> started")
 
-    if (not isfile(proof_file_path)) or args.force or args.proof_only:
+    if (not isfile(proof_file_path)) or args.force:
+        # Create dir for proof if doesn't already exist
+        os.makedirs(dirname(proof_file_path), exist_ok=True)
+
         pool_ = {
             'name': 'pool1'
         }

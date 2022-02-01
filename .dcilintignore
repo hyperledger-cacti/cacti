@@ -11,7 +11,7 @@ docs/source/conf.py
 examples/register-indy-data/req_discounted_cartrade.py
 
 # Cannot be edited due to configuration schema of third party software
-tools/docker/indy-testnet/indy_pool/indy-pool.dockerfile
+tools/docker/indy-testnet/Dockerfile
 
 # Cannot be edited due to configuration schema of third party software
 packages/cactus-test-tooling/src/main/typescript/keycloak/keycloak-container.ts
