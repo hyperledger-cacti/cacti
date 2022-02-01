@@ -4,10 +4,29 @@
 
 set -e
 
-# Common logic with regular cartrade
-../cartrade/script-start-ledgers.sh
+ROOT_DIR="../.." # Path to cactus root dir
 
-# Copy to host /etc/cactus until containarized
-rm -fr /etc/cactus/*
-cp -fr ../../etc/cactus/* /etc/cactus
-cp -r ./etc/cactus/* /etc/cactus
+function start_cartrade_ledgers() {
+    # Will also copy the configs to ./etc/cactus
+    ../cartrade/script-start-ledgers.sh
+}
+
+function start_indy_testnet() {
+    echo ">> start_indy_testnet()"
+    pushd "${ROOT_DIR}/tools/docker/indy-testnet"
+    echo ">> Start Indy pool..."
+    docker-compose build
+    docker-compose up -d
+    popd
+}
+
+function start_ledgers() {
+    # Start Fabric and Ethereum
+    start_cartrade_ledgers
+
+    # Start Indy
+    start_indy_testnet
+}
+
+start_ledgers
+echo "All Done."

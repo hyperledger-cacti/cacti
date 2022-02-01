@@ -4,7 +4,7 @@
 
 ## Execute a getting app
 echo "[process] Execute an app for getting Balance on Ethereum"
-pushd script-test-getFunctions/go-ethereum
+pushd ../../tools/docker/geth-testnet/get-eth-balance
 node getBalance.js
 popd
 

@@ -4,7 +4,7 @@
 
 ## Build ethereum app
 echo "[process] Build an app for getting Balance on Ethereum"
-pushd script-test-getFunctions/go-ethereum
+pushd ../../tools/docker/geth-testnet/get-eth-balance
 npm install
 popd
 
@@ -13,3 +13,5 @@ echo "[process] Build an app for getting ownership on Fabcar"
 pushd ../../tools/docker/fabric-all-in-one/fabcar-cli-1.4
 npm install
 popd
+
+

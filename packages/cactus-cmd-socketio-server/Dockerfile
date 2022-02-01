@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:16
 
 ENV CACTUS_CMD_SOCKETIO_PATH=/opt/cactus-cmd-socketio-server
 

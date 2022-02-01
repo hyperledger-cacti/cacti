@@ -1,12 +1,11 @@
-version: '3.2'
+version: "3"
 
 services:
-  indy_pool:
-    container_name: indy_pool
-    image: indy_pool
+  indy-testnet-pool:
+    container_name: ${CACTUS_INDY_TESTNET_NAME:-indy-testnet-pool}
+    image: ${CACTUS_INDY_TESTNET_IMAGE_NAME:-indy-testnet-pool}
     build:
-      context: ./indy_pool
-      dockerfile: indy-pool.dockerfile
+      context: ./
     ports:
     - "9701:9701"
     - "9702:9702"
@@ -20,45 +19,7 @@ services:
       indy_net:
         ipv4_address: 172.16.0.2
     volumes:
-    - ./indy_pool/sandbox:/var/lib/indy/sandbox/
-
-  nginx:
-    container_name: nginx
-    image: nginx:1.20-alpine
-    volumes:
-      - type: bind
-        source: "./nginx/nginx.conf"
-        target: "/etc/nginx/nginx.conf"
-    depends_on:
-      - validator
-    ports:
-      - "10080:80"
-    networks:
-      indy_net:
-        ipv4_address: 172.16.0.3
-
-  indy-sdk-cli:
-    container_name: immediately_exits
-    image: indy-sdk-cli
-    build:
-      context: ../indy-sdk-cli
-      dockerfile: Dockerfile
-
-  validator:
-    container_name:  validator
-    image: validator
-    environment:
-    - TEST_POOL_IP=172.16.0.2
-    depends_on:
-      - indy-sdk-cli
-    build:
-      context: ../../../packages-python/cactus_validator_socketio_indy/
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    networks:
-      indy_net:
-        ipv4_address: 172.16.0.4
+    - ./sandbox:/var/lib/indy/sandbox/
 
 networks:
   indy_net:

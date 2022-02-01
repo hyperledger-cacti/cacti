@@ -3,7 +3,6 @@
   "private": true,
   "scripts": {
     "start": "docker-compose build && docker-compose up",
-    "debug": "nodemon --inspect ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
     "build": "npm run build-ts && npm run prepare-docker-build",
     "build-ts": "tsc -p ./tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json './*.ts'",
