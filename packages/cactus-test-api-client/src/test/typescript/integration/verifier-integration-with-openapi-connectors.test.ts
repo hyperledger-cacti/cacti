@@ -52,12 +52,6 @@ const log: Logger = LoggerProvider.getOrCreate({
 });
 log.info("Test started");
 
-//////////////////////////////////
-// Test Timeout (default)
-//////////////////////////////////
-
-jest.setTimeout(15 * 1000); // 10 seconds (per test)
-
 describe("Verifier integration with openapi connectors tests", () => {
   let besuTestLedger: BesuTestLedger;
   let server: http.Server;
@@ -146,17 +140,19 @@ describe("Verifier integration with openapi connectors tests", () => {
       basePath: apiHost,
     });
     apiClient = new BesuApiClient(besuApiClientOptions);
-  }, 60 * 1000); // 60s timeout
+  });
 
   afterAll(async () => {
     log.info("Shutdown the server...");
-    await Servers.shutdown(server);
+    if (server) {
+      await Servers.shutdown(server);
+    }
     log.info("Stop and destroy the test ledger...");
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
     log.info("Prune docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
-  }, 60 * 1000); // 60s timeout
+  });
 
   //////////////////////////////////
   // Functional Tests

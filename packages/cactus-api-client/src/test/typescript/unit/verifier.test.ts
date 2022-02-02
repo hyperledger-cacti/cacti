@@ -3,6 +3,8 @@
 
 const testLogLevel: LogLevelDesc = "info";
 const sutLogLevel: LogLevelDesc = "info";
+const testTimeout = 1000 * 5; // 5 second timeout per test
+const setupTimeout = 1000 * 60; // 1 minute timeout for setup
 
 import "jest-extended";
 import { Observable } from "rxjs";
@@ -27,7 +29,7 @@ import {
 // Test Timeout
 //////////////////////////////////
 
-jest.setTimeout(3000);
+jest.setTimeout(testTimeout);
 
 //////////////////////////////////
 // Mocks
@@ -66,7 +68,7 @@ describe("Monitoring Tests", () => {
     );
     sut = new Verifier(apiClientMock, sutLogLevel);
     eventListenerMock = new MockEventListener();
-  });
+  }, setupTimeout);
 
   test("Entry is added to runningMonitors for new monitoring requests", () => {
     const monitorOptions = { test: true };
