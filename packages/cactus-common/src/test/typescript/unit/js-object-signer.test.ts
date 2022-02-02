@@ -152,7 +152,7 @@ test("Test optional sign function", async () => {
   const outer2 = { outerProperty: "test", innerProperty: inner2 };
   const sign2 = jsObjectSigner.sign(outer2);
 
-  expect(sign1.toString).toEqual(sign2.toString);
+  expect(sign1.toString()).toEqual(sign2.toString());
 });
 
 test("Test optional verify sign function", async () => {
