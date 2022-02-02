@@ -242,7 +242,7 @@ class GetAssetPledgeStateById(
     /**
      * The call() method captures the logic to fetch the AssetPledgeState.
      *
-     * @return Returns Either<Error, AssetPledgeState>
+     * @return Returns Either<Error, StateAndRef<AssetPledgeState>>
      */
     @Suspendable
     override fun call(): Either<Error, StateAndRef<AssetPledgeState>> = try {
@@ -653,21 +653,14 @@ object ClaimRemoteAsset {
         /**
          * The call() method captures the logic to claim the asset by verifying the asset-pledge details.
          *
-         * @return Returns SignedTransaction.
+         * @return Returns Either<Error, SignedTransaction>.
          */
         @Suspendable
         override fun call(): Either<Error, SignedTransaction> = try {
-            val linearId = getLinearIdFromString(pledgeId)
 
-            /*val viewData = subFlow(GetExternalStateByLinearId(pledgeStatusLinearId))
+            val viewData = subFlow(GetExternalStateByLinearId(pledgeStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
             val assetPledgeStatus = AssetTransfer.AssetPledge.parseFrom(externalStateView.payload.toByteArray())
-            */
-
-            val pledgestates = serviceHub.vaultService.queryBy<AssetPledgeState>(
-                QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
-            ).states
-            val assetPledgeStatus = pledgestates.first().state.data
             println("Available assetPledgeStatus: ${assetPledgeStatus}")
 
             // Make sure the pledge has not expired (we assume the expiry timestamp set by the remote network)
@@ -675,10 +668,6 @@ object ClaimRemoteAsset {
             val calendar = Calendar.getInstance()
             currentTimeSecs = calendar.timeInMillis / 1000
             println("currentTimeSecs: ${currentTimeSecs}")
-            if (currentTimeSecs >= assetPledgeStatus.expiryTimeSecs) {
-                println("Cannot claim remote asset with pledgeId ${pledgeId} as the expiry time has elapsed.")
-                Left(Error("Cannot claim remote asset with pledged ${pledgeId} as the expiry time has elapsed."))
-            }
 
             /*
             //if (remoteNetworkId != assetPledgeStatus.localNetworkID) {
@@ -691,20 +680,14 @@ object ClaimRemoteAsset {
             val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
             val fetchedNetworkIdState = networkIdStateRef!!.state.data
 
-            //if (fetchedNetworkIdState.networkId != assetPledgeStatus.remoteNetworkID) {
-            if (fetchedNetworkIdState.networkId != assetPledgeStatus.remoteNetworkId) {
-                println("Cannot claim remote asset with pledgeId ${pledgeId} as it has not been pledged to a claimer in this network.")
-                Left(Error("Cannot claim remote asset with pledged ${pledgeId} as it has not been pledged to a claimer in this network."))
-            }
+            val existingAssetClaimStatusState = subFlow(IsRemoteAssetClaimedEarlier(pledgeId))
 
             // Record claim on the ledger for later verification by a foreign network
             val assetClaimStatusState = AssetClaimStatusState(
                 pledgeId,
-                //assetPledgeStatus.assetDetails.toByteArray(),
-                assetPledgeStatus.assetDetails,
+                assetPledgeStatus.assetDetails.toStringUtf8(),
                 fetchedNetworkIdState.networkId,
-                //assetPledgeStatus.localNetworkID,
-                assetPledgeStatus.localNetworkId,
+                assetPledgeStatus.localNetworkID,
                 ourIdentity, // party who is recipient
                 recipientCert, // recipient cert
                 true,
@@ -712,85 +695,87 @@ object ClaimRemoteAsset {
                 false
             )
 
-            val existingAssetClaimStatusState = subFlow(IsRemoteAssetClaimedEarlier(pledgeId))
-            if (existingAssetClaimStatusState != null) {
-                println("Remote asset with pledgeId ${pledgeId} has already been claimed.")
-                Left(Error("Remote asset with pledgeId ${pledgeId} has already been claimed."))
-            }
-
             // Obtain a reference from a notary we wish to use.
-            //val notary = serviceHub.networkMapCache.notaryIdentities.single()
+            // val notary = serviceHub.networkMapCache.notaryIdentities.single()
             val notary = networkIdStateRef.state.notary
 
             val claimCmd = Command(AssetTransferContract.Commands.ClaimRemoteAsset(),
                 listOf(
-                    // below needs to be updated to work from Fabric->Corda asset transfer
-                    //assetPledgeStatus.recipient.owningKey
                     ourIdentity.owningKey
                 )
             )
 
             val assetCreateCmd = Command(assetStateCreateCommand,
                 setOf(
-                    //assetPledgeStatus.recipient.owningKey,
                     ourIdentity.owningKey,
                     issuer.owningKey
                 ).toList()
             )
 
-            // Flow getAssetAndContractIdFlowName takes 4 parameters: assetDetailsBytes, assetType, numUnits, owner
-            // And returns SimpleAsset/FungibleToken(i.e., ContractState) state and its ContractId as a Pair
-            //var outputAssetState: ContractState? = null
-            //var assetContractId: String? = null
-            resolveGetAssetStateAndContractIdFlow(getAssetAndContractIdFlowName,
-                //assetPledgeStatus.assetDetails.toByteArray(),
-                listOf(assetPledgeStatus.assetDetails, assetType, numUnits, lockerCert, ourIdentity)
-            ).fold({
-                println("Error: Unable to resolve GetAssetStateAndContractId flow.")
-                Left(Error("Error: Unable to resolve GetAssetStateAndContractId flow"))
-            }, {
-                println("Resolved GetAssetStateAndContractId flow to ${it}")
-                val (contractId, assetState) = subFlow(it)
+            if (currentTimeSecs >= assetPledgeStatus.expiryTimeSecs) {
+                println("Cannot claim remote asset with pledgeId ${pledgeId} as the expiry time has elapsed.")
+                Left(Error("Cannot claim remote asset with pledged ${pledgeId} as the expiry time has elapsed."))
+            } else if (assetPledgeStatus.recipient != recipientCert) {
+                println("Cannot claim remote asset with pledgeId ${pledgeId} as it has not been pledged to the the recipient.")
+                Left(Error("Cannot claim remote asset with pledged ${pledgeId} as it has not been pledged to the recipient."))
+            } else if (fetchedNetworkIdState.networkId != assetPledgeStatus.remoteNetworkID) {
+                println("Cannot claim remote asset with pledgeId ${pledgeId} as it has not been pledged to a claimer in this network.")
+                Left(Error("Cannot claim remote asset with pledged ${pledgeId} as it has not been pledged to a claimer in this network."))
+            } else if (existingAssetClaimStatusState != null) {
+                println("Remote asset with pledgeId ${pledgeId} has already been claimed.")
+                Left(Error("Remote asset with pledgeId ${pledgeId} has already been claimed."))
+            } else {
+                // Flow getAssetAndContractIdFlowName takes 5 parameters: assetDetailsBytes, assetType, numUnits, locker, recipient
+                // And returns SimpleAsset/FungibleToken(i.e., ContractState) state and its ContractId as a Pair
+                resolveGetAssetStateAndContractIdFlow(getAssetAndContractIdFlowName,
+                    listOf(assetPledgeStatus.assetDetails.toStringUtf8(), assetType, numUnits, lockerCert, ourIdentity)
+                ).fold({
+                    println("Error: Unable to resolve GetAssetStateAndContractId flow.")
+                    Left(Error("Error: Unable to resolve GetAssetStateAndContractId flow"))
+                }, {
+                    println("Resolved GetAssetStateAndContractId flow to ${it}")
+                    val (contractId, assetState) = subFlow(it)
 
-                val outputAssetState = assetState
-                val assetContractId = contractId
-                println("assetContractId: ${assetContractId}")
+                    val outputAssetState = assetState
+                    val assetContractId = contractId
+                    println("assetContractId: ${assetContractId}")
 
-                val txBuilder = TransactionBuilder(notary)
-                    //.addOutputState(outputAssetState!!, assetContractId!!)
-                    .addOutputState(outputAssetState, assetContractId)
-                    .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
-                    .addCommand(claimCmd).apply {
-                        networkIdStateRef.let {
-                            this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                    val txBuilder = TransactionBuilder(notary)
+                        //.addOutputState(outputAssetState!!, assetContractId!!)
+                        .addOutputState(outputAssetState, assetContractId)
+                        .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
+                        .addCommand(claimCmd).apply {
+                            networkIdStateRef.let {
+                                this.addReferenceState(ReferencedStateAndRef(networkIdStateRef))
+                            }
                         }
+                        .addCommand(assetCreateCmd)
+                        .setTimeWindow(TimeWindow.untilOnly(Instant.ofEpochSecond(assetPledgeStatus.expiryTimeSecs)))
+
+                    // Verify and collect signatures on the transaction
+                    txBuilder.verify(serviceHub)
+                    val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
+                    println("Recipient signed transaction.")
+
+                    var sessions = listOf<FlowSession>()
+
+                    if (!ourIdentity.equals(issuer)) {
+                        val issuerSession = initiateFlow(issuer)
+                        issuerSession.send(AssetTransferResponderRole.ISSUER)
+                        sessions += issuerSession
                     }
-                    .addCommand(assetCreateCmd)
-                    .setTimeWindow(TimeWindow.untilOnly(Instant.ofEpochSecond(assetPledgeStatus.expiryTimeSecs)))
 
-                // Verify and collect signatures on the transaction
-                txBuilder.verify(serviceHub)
-                val partSignedTx = serviceHub.signInitialTransaction(txBuilder)
-                println("Recipient signed transaction.")
+                    val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
 
-                var sessions = listOf<FlowSession>()
-
-                if (!ourIdentity.equals(issuer)) {
-                    val issuerSession = initiateFlow(issuer)
-                    issuerSession.send(AssetTransferResponderRole.ISSUER)
-                    sessions += issuerSession
-                }
-
-                val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
-
-                var observerSessions = listOf<FlowSession>()
-                for (obs in observers) {
-                    val obsSession = initiateFlow(obs)
-                    obsSession.send(AssetTransferResponderRole.OBSERVER)
-                    observerSessions += obsSession
-                }
-                Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
-            })
+                    var observerSessions = listOf<FlowSession>()
+                    for (obs in observers) {
+                        val obsSession = initiateFlow(obs)
+                        obsSession.send(AssetTransferResponderRole.OBSERVER)
+                        observerSessions += obsSession
+                    }
+                    Right(subFlow(FinalityFlow(fullySignedTx, sessions + observerSessions)))
+                })
+            }
         } catch (e: Exception) {
             println("Error claiming: ${e.message}\n")
             Left(Error("Failed to claim: ${e.message}"))
