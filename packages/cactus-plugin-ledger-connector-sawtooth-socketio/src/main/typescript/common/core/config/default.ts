@@ -8,7 +8,6 @@
 export const config = {
   //module.exports = {
   // Defined value for the destination independent part. I don't think I can use it only at www, so I think I can write directly there.
-  // Destination dependent definition values should be in lib/PluginConfig.js.
   sslParam: {
     port: 5140,
     key: "./common/core/CA/connector.priv",

@@ -14,7 +14,6 @@
  */
 
 // configuration file
-import { SplugConfig } from "./PluginConfig";
 const SplugUtil = require("./PluginUtil");
 import { config } from "../common/core/config/default";
 // Log settings
@@ -154,22 +153,4 @@ export class ServerMonitorPlugin {
       //clearInterval(timerBlockMonitoring);
     }, config.blockMonitor.pollingInterval);
   }
-
-  /*
-   * stopMonitor
-   * monitoring stop
-   * @param {string} clientId: Client ID from which monitoring stop request was made
-   */
-  /*
-    stopMonitor(clientId) {
-        // Implement a process to end EC monitoring
-        var filter = this._filterTable[clientId];
-        if (filter) {
-            // Stop the filter & Remove it from table
-            logger.info('stop watching and remove filter.');
-            filter.stopWatching();
-            delete this._filterTable[clientId];
-        }
-    }
-*/
 }
