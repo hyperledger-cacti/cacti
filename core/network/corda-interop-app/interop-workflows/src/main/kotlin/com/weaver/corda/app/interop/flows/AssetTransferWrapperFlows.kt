@@ -77,7 +77,6 @@ constructor(
         val assetType = agreement.type
         val numUnits = agreement.numUnits
         val recipient = assetPledge.recipient
-        val assetJSON = assetPledge.assetDetails.toStringUtf8()
 
         val expiryTime: Instant = Instant.ofEpochSecond(assetPledge.expiryTimeSecs)
         if (expiryTime.isBefore(Instant.now())) {
@@ -110,7 +109,6 @@ constructor(
                 assetPledge.expiryTimeSecs,
                 assetRef!!,
                 assetStateDeleteCommand,
-                assetJSON,
                 recipient,
                 assetPledge.localNetworkID,
                 assetPledge.remoteNetworkID,
@@ -167,7 +165,6 @@ constructor(
         val assetType = agreement.type
         val assetId = agreement.id
         val recipientCert = assetPledge.recipient
-        val assetJSON = assetPledge.assetDetails.toStringUtf8()
 
         val expiryTime: Instant = Instant.ofEpochSecond(assetPledge.expiryTimeSecs)
         if (expiryTime.isBefore(Instant.now())) {
@@ -200,7 +197,6 @@ constructor(
                 assetPledge.expiryTimeSecs,
                 assetRef!!,
                 assetStateDeleteCommand,
-                assetJSON,
                 recipientCert,
                 assetPledge.localNetworkID,
                 assetPledge.remoteNetworkID,

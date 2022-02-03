@@ -42,18 +42,21 @@ class AssetTransferContract : Contract {
                 
                 // Get the Asset Pledge State
                 val pledgeState = tx.outputs[0].data as AssetPledgeState
+
+                // Check if output belong to this contract
+                "Output state should belong to this contract" using (tx.outputs[0].contract.equals(ID))
                 
                 // Check if timeout is beyond current time
                 val expiryTime = Instant.ofEpochSecond(pledgeState.expiryTimeSecs)
-                "Timeout after current time" using (expiryTime > Instant.now())
+                "AssetPledgeState.expiryTimeSecs is after current time." using (expiryTime.isAfter(Instant.now()))
                 
                 // Check if the asset owner is the locker
                 val inputState = tx.inputs[0].state.data
                 "Locker must be the owner of pledged asset" using inputState.participants.containsAll(listOf(pledgeState.locker))
                 
-                // Check if asset consumed in input is same as in HTLC State
+                // Check if asset consumed (input state) is the same used in pledge
                 val assetPointer = StaticPointer(tx.inputs[0].ref, tx.inputs[0].state.data.javaClass)
-                "Asset State match with input state" using (assetPointer.equals(pledgeState.assetStatePointer))
+                "Asset consumed should be the one used in pledge." using (assetPointer.equals(pledgeState.assetStatePointer))
                 
                 // Check if the locker is a signer
                 val requiredSigners = pledgeState.participants.map { it.owningKey }
@@ -61,9 +64,9 @@ class AssetTransferContract : Contract {
 
                 val inReferences = tx.referenceInputRefsOfType<NetworkIdState>()
                 "There should be a single reference input network id." using (inReferences.size == 1)
-                val validNetworkIdState = inReferences.get(0).state.data
 
-                "LocalNetwokId must match with the networkId of current network." using (pledgeState.localNetworkId.equals(validNetworkIdState.networkId))
+                val validNetworkIdState = inReferences.get(0).state.data
+                "AssetPledgeState.localNetwokId must match with the networkId of current network." using (pledgeState.localNetworkId.equals(validNetworkIdState.networkId))
             }
             is Commands.ClaimRemoteAsset -> requireThat {
                 "There should be no input state." using (tx.inputs.size == 0)
