@@ -23,6 +23,7 @@ const SplugUtil = require("./PluginUtil.js");
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 const Web3 = require("web3");
+import safeStringify from "fast-safe-stringify";
 
 /*
  * ServerPlugin
@@ -106,18 +107,19 @@ export class ServerPlugin {
         logger.debug(`##getNumericBalance: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##getNumericBalance: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });
@@ -195,20 +197,21 @@ export class ServerPlugin {
         );
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["reqID"] = reqID;
         }
         logger.debug(
           `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`
         );
+
         return reject(retObj);
       }
     });
@@ -279,18 +282,19 @@ export class ServerPlugin {
         logger.debug(`##getNonce: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##getNonce: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });
@@ -354,18 +358,19 @@ export class ServerPlugin {
         logger.debug(`##toHex: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##toHex: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });
@@ -415,12 +420,12 @@ export class ServerPlugin {
         };
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           status: 504,
-          errorDetail: emsg,
+          errorDetail: safeStringify(e),
         };
+        logger.error(retObj);
+
         return reject(retObj);
       }
     });
@@ -472,18 +477,19 @@ export class ServerPlugin {
         logger.debug(`##web3Eth: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##web3Eth: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });
@@ -564,18 +570,19 @@ export class ServerPlugin {
         logger.debug(`##contract: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##contract: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });

@@ -27,6 +27,7 @@ const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
 logger.level = config.logLevel;
 // utility
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
+import safeStringify from "fast-safe-stringify";
 
 /*
  * ServerMonitorPlugin
@@ -144,7 +145,7 @@ export class ServerMonitorPlugin {
           logger.error(err);
           const errObj = {
             status: 504,
-            errorDetail: err,
+            errorDetail: safeStringify(err),
           };
           cb(errObj);
         });

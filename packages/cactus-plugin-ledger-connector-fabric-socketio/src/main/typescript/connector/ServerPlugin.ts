@@ -25,6 +25,7 @@ import { ValidatorAuthentication } from "./ValidatorAuthentication";
 
 import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess.js";
 import { ProposalRequest } from "fabric-client";
+import safeStringify from "fast-safe-stringify";
 
 const path = require("path");
 const { FileSystemWallet, Gateway } = require("fabric-network");
@@ -154,14 +155,13 @@ export class ServerPlugin {
         })
         .catch((err) => {
           logger.debug(`##evaluateTransaction(D)`);
-          const emsg = err.toString().replace(/Error: /g, "");
-          logger.error(emsg);
           retObj = {
             resObj: {
               status: 504,
-              errorDetail: emsg,
+              errorDetail: safeStringify(err),
             },
           };
+          logger.error(err);
           return reject(retObj);
         });
     });
@@ -222,12 +222,11 @@ export class ServerPlugin {
           }
         })
         .catch((err) => {
-          const emsg = err.toString().replace(/Error: /g, "");
-          logger.error(emsg);
           retObj = {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(err),
           };
+          logger.error(err);
           return reject(retObj);
         });
     });
@@ -293,14 +292,13 @@ export class ServerPlugin {
           }
         })
         .catch((err) => {
-          const emsg = err.toString().replace(/Error: /g, "");
-          logger.error(emsg);
           retObj = {
             resObj: {
               status: 504,
-              errorDetail: emsg,
+              errorDetail: safeStringify(err),
             },
           };
+          logger.error(err);
           logger.info(`sendSignedProposal reject`);
           return reject(retObj);
         });
