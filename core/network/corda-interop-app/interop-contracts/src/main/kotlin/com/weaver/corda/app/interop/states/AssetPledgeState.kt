@@ -18,23 +18,23 @@ import java.time.Instant
 import net.corda.core.contracts.StaticPointer
 
 /**
- * The AssetPledgeState stores the details about the pledge of an asset in the source network for asset transfer.
+ * The AssetPledgeState stores the details about the pledge of an asset in the source/exporting network for asset transfer.
  *
  * The AssetPledgeState is generated while pledging an asset during asset transfer.
- * This state is used as the proof while claiming the asset in the remote network.
+ * This state is used to create proof about pledge (as part of interop query) for the importing network while claiming the asset.
  *
  * @property assetStatePointer Pointer to asset state pledged for asset-transfer.
- * @property locker The owner of asset before transfer.
- * @property recipient The owner of asset after transfer.
- * @property expiryTime The future time in seconds till when the pledge on the asset holds good.
+ * @property locker The owner of asset before transfer in the exporting network who is pledging the asset.
+ * @property lockerCert The certificate of the owner of asset in base64 form before transfer in the exporting network.
+ * @property recipientCert Certificate of the asset recipient (in base64 format) in the importing network.
+ * @property expiryTimeSecs The future time in epoch seconds till when the pledge on the asset holds good.
  * @property localNetworkId The id of the network in which the pledge is made.
- * @property remoteNetworkId The id of the network into which the pledged asset will be claimed.
- * @property linearId The unique identifier for the state.
+ * @property remoteNetworkId The id of the network in which the pledged asset will be claimed.
+ * @property linearId The unique identifier for this state object in the vault.
  */
 @BelongsToContract(AssetTransferContract::class)
 data class AssetPledgeState(
-    val assetStatePointer: StaticPointer<ContractState>,
-    val assetDetails: String,
+    val assetStatePointer: StaticPointer<ContractState>?,
     val locker: Party,
     val lockerCert: String,
     val recipientCert: String,
@@ -43,5 +43,6 @@ data class AssetPledgeState(
     val remoteNetworkId: String,
     override val linearId: UniqueIdentifier = UniqueIdentifier(assetStatePointer.hashCode().toString())
 ) : LinearState {
+    // recipient is not a participant as that party may not be part of the exporting network
     override val participants: List<AbstractParty> get() = listOf(locker)
 }

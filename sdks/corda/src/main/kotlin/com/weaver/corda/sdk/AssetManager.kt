@@ -8,6 +8,7 @@ package com.weaver.corda.sdk;
 
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.Right
 import org.slf4j.LoggerFactory
 
 import net.corda.core.messaging.CordaRPCOps
@@ -113,7 +114,6 @@ class AssetManager {
             remoteNetworkID: String,
             tokenType: String,
             numUnits: Long,
-            blankAssetJSON: String,
             recipientCert: String,
             expiryTimeSecs: Long,
             getAssetStateAndRefFlow: String,
@@ -125,7 +125,7 @@ class AssetManager {
                 AssetManager.logger.debug("Sending fungible asset pledge request to Corda as part of asset-transfer.\n")
                 val contractId = runCatching {
                     val assetAgreement = createFungibleAssetExchangeAgreement(tokenType, numUnits, "", "")
-                    val assetPledge = createAssetTransferAgreement(ByteString.copyFromUtf8(blankAssetJSON), localNetworkID, remoteNetworkID, recipientCert, expiryTimeSecs)
+                    val assetPledge = createAssetTransferAgreement(com.google.protobuf.ByteString.EMPTY, localNetworkID, remoteNetworkID, recipientCert, expiryTimeSecs)
                     proxy.startFlow(::PledgeFungibleAsset, assetAgreement, assetPledge, getAssetStateAndRefFlow, deleteAssetStateCommand, issuer, observers)
                         .returnValue.get()
                 }.fold({
@@ -405,18 +405,13 @@ class AssetManager {
         ): Either<Error, StateAndRef<AssetPledgeState>> {
             return try {
                 AssetManager.logger.debug("Querying asset pledge state for transfer from Corda as part of asset-transfer.\n")
-                val obj = runCatching {
-                    proxy.startFlow(::GetAssetPledgeStateById, contractId)
+                val obj = proxy.startFlow(::GetAssetPledgeStateById, contractId)
                         .returnValue.get()
-                }.fold({
-                    it.map { retObj ->
-                    AssetManager.logger.debug("Querying asset pledge state was successful.\n")
-                    retObj
-                    }
-                }, {
-                    Left(Error("Corda Network Error: Error in GetAssetPledgeStateById flow: ${it.message}\n"))
-                })
-                obj
+                if (obj == null) {
+                    Left(Error("Asset pledge state is not avalible on the Corda network."))
+                } else {
+                    Right(obj)
+                }
             } catch (e: Exception) {
                 AssetManager.logger.error("Error querying asset pledge state from Corda network: ${e.message}\n")
                 Left(Error("Error querying asset pledge state from Corda network: ${e.message}"))

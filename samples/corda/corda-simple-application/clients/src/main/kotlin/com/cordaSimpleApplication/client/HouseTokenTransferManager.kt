@@ -6,35 +6,24 @@
 
 package com.cordaSimpleApplication.client
 
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.default
-import java.io.File
 import java.lang.Exception
 import kotlinx.coroutines.runBlocking
 import net.corda.core.messaging.startFlow
-import com.google.protobuf.util.JsonFormat
 import java.util.Base64
 import java.util.Calendar
-import net.corda.core.utilities.OpaqueBytes
-import net.corda.core.crypto.sha256
-import java.time.Instant
-import com.weaver.corda.app.interop.flows.IsRemoteAssetClaimedEarlier
 import com.weaver.corda.app.interop.states.AssetClaimStatusState
 
 import com.weaver.corda.sdk.AssetManager
-import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.contract.AssetContract
 
 import net.corda.samples.tokenizedhouse.flows.GetAssetClaimStatusByPledgeId
 import net.corda.samples.tokenizedhouse.flows.GetAssetPledgeStatusByPledgeId
-import net.corda.samples.tokenizedhouse.flows.MarshalFungibleToken
 import net.corda.samples.tokenizedhouse.flows.GetOurCertificateBase64
 import net.corda.samples.tokenizedhouse.states.FungibleHouseTokenJson
 import com.google.gson.Gson
@@ -58,7 +47,7 @@ import net.corda.core.identity.Party
 class PledgeHouseTokenCommand : CliktCommand(name="pledge",
         help = "Locks an asset. $ ./clients house-token pledge --fungible --timeout=10 --recipient='<base64 certificate>' --param=type:amount") {
     val config by requireObject<Map<String, String>>()
-    val timeout: String? by option("-t", "--timeout", help="Timeout duration in seconds.")
+    val timeout: String? by option("-t", "--timeout", help="Pledge validity time duration in seconds.")
     val remoteNetworkId: String? by option("-rnid", "--remote-network-id", help="Importing network for asset transfer")
     val recipientCert: String? by option("-r", "--recipient", help="Recipient party certificate in base64 format")
     val fungible: Boolean by option("-f", "--fungible", help="Fungible Asset Pledge: True/False").flag(default = false)
@@ -74,7 +63,7 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
         } else {
             var nTimeout: Long
             if (timeout == null) {
-                nTimeout = 10L
+                nTimeout = 300L
             } else {
                 nTimeout = timeout!!.toLong()
             }
@@ -97,8 +86,6 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                 val localNetworkId = rpc.proxy.startFlow(::RetrieveNetworkId).returnValue.get()
                 println("localNetworkId: ${localNetworkId}")
 
-                var assetJsonBytes = rpc.proxy.startFlow(::MarshalFungibleToken, params[0], params[1].toLong()).returnValue.get()
-
                 var obs = listOf<Party>()
                 if (observer != null)   {
                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
@@ -110,7 +97,6 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                         remoteNetworkId!!,
                         params[0],          // Type
                         params[1].toLong(), // Quantity
-                        assetJsonBytes,
                         recipientCert!!,
                         nTimeout,
                         "net.corda.samples.tokenizedhouse.flows.RetrieveStateAndRef",
@@ -227,6 +213,8 @@ class ClaimRemoteHouseTokenCommand : CliktCommand(name="claim-remote-asset", hel
             println("Arguments required: --pledge-id.")
         } else if (pledgeStatusLinearId == null) {
             println("Arguments required: --pledge-status-linear-id.")
+        } else if (lockerCert == null) {
+            println("Arguments required: --locker-certificate.")
         } else {
             val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
@@ -328,14 +316,17 @@ class GetHouseTokenPledgeStateCommand : CliktCommand(name="get-pledge-state", he
 }
 
 /**
- * Fetch Asset Claim State for Transfer associated with contractId/pledgeId.
+ * Fetch asset claim status for transfer associated with pledgeId.
  */
 class GetAssetClaimStatusByPledgeIdCommand : CliktCommand(name="get-claim-status-by-pledge-id", help = "Fetch asset Claim State associated with pledgeId.") {
     val config by requireObject<Map<String, String>>()
     val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge Id for AssetClaimStatus State")
+    val expiryTimeSecs: String? by option("-t", "--expiry-time-secs", help="Pledge expiry time in epoch seconds.")
     override fun run() = runBlocking {
         if (pledgeId == null) {
             println("Arguments required: --pledge-id.")
+        } else if (expiryTimeSecs == null) {
+            println("Arguments required: --expiry-time-secs (-t).")
         } else {
             val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
@@ -344,9 +335,10 @@ class GetAssetClaimStatusByPledgeIdCommand : CliktCommand(name="get-claim-status
                 rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
                 val proxy = rpc.proxy
-                val assetClaimStatusStateBytes: AssetClaimStatusState? = proxy.startFlow(::IsRemoteAssetClaimedEarlier, pledgeId!!)
+                val assetClaimStatusBytes = proxy.startFlow(::GetAssetClaimStatusByPledgeId, pledgeId!!, expiryTimeSecs!!)
                     .returnValue.get()
-                println("assetClaimStatusState: ${assetClaimStatusStateBytes}")
+                println("assetClaimStatusBytes: ${assetClaimStatusBytes.toString(Charsets.UTF_8)}")
+                println("assetClaimStatusBytes: ${assetClaimStatusBytes.contentToString()}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
             } finally {
@@ -357,7 +349,7 @@ class GetAssetClaimStatusByPledgeIdCommand : CliktCommand(name="get-claim-status
 }
 
 /**
- * Fetch Asset Pledge State for Transfer associated with contractId/pledgeId.
+ * Fetch asset pledge status for transfer associated with pledgeId.
  */
 class GetAssetPledgeStatusByPledgeIdCommand : CliktCommand(name="get-pledge-status-by-pledge-id", help = "Fetch asset pledge state associated with pledgeId.") {
     val config by requireObject<Map<String, String>>()

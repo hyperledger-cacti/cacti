@@ -1,10 +1,8 @@
 package net.corda.samples.tokenizedhouse.flows
 
-import com.weaver.corda.app.interop.states.AssetClaimStatusState
 import com.weaver.corda.app.interop.states.AssetPledgeState
 import com.weaver.corda.app.interop.flows.GetAssetClaimStatusState
 import com.weaver.corda.app.interop.flows.GetAssetPledgeStatus
-import com.weaver.corda.app.interop.flows.AssetClaimStatusStateToProtoBytes
 import com.weaver.corda.app.interop.flows.AssetPledgeStateToProtoBytes
 import net.corda.samples.tokenizedhouse.states.FungibleHouseTokenJson
 import com.google.gson.Gson
@@ -24,14 +22,13 @@ import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StaticPointer
 import com.r3.corda.lib.tokens.contracts.FungibleTokenContract
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
-import net.corda.core.utilities.ProgressTracker
 import java.util.Base64
 
 /**
  * The GetAssetClaimStatusByPledgeId flow fetches the asset claim status in the importing network and returns as byte array.
  * It is called during the interop query by exporting network before performing the re-claim on asset pledged in exporting network.
  *
- * @property pledgeId The asset pledge id in the exporting network.
+ * @property pledgeId The unique identifier representing the pledge on an asset for transfer, in the exporting n/w.
  * @property expiryTimeSecs The time epoch seconds after which re-claim of the asset is allowed.
  */
 @InitiatingFlow
@@ -40,55 +37,71 @@ class GetAssetClaimStatusByPledgeId(
     val pledgeId: String,
     val expiryTimeSecs: String
 ) : FlowLogic<ByteArray>() {
+    /**
+     * The call() method captures the logic to fetch [AssetClaimStatusState] vault state from importing n/w.
+     *
+     * @return Returns ByteArray.
+     */
+
     @Suspendable
     override fun call(): ByteArray {
 
-        val pledgeExpiryTimeSecs: Long
-        pledgeExpiryTimeSecs = expiryTimeSecs.toLong()
-        println("pledgeId: ${pledgeId} and pledgeExpiryTimeSecs: ${pledgeExpiryTimeSecs}\n")
-        val blankAssetJson = FungibleHouseTokenJson(
-            tokenType = "",
-            numUnits = 0L,
-            owner = ""
-        )
-        println("Created empty house token asset ${blankAssetJson}\n")
-        val gson = GsonBuilder().create();
-        var blankAssetJsonString = gson.toJson(blankAssetJson, FungibleHouseTokenJson::class.java)
-        println("Before calling the asset-claim-status interop flow: ${blankAssetJsonString}\n")
-        return subFlow(GetAssetClaimStatusState(pledgeId, expiryTimeSecs, blankAssetJsonString))
-    }
-}
+        println("Inside GetAssetClaimStatusByPledgeId(), pledgeId: $pledgeId and expiryTimeSecs: $expiryTimeSecs.")
 
-@InitiatingFlow
-@StartableByRPC
-class GetHouseTokenJsonStringFromStatePointer(
-    val assetPledgeState: AssetPledgeState
-) : FlowLogic<AssetPledgeState>() {
-    @Suspendable
-    override fun call(): AssetPledgeState {
+        println("Creating empty fungible token asset JSON.")
+        var marshalledBlankAssetJson = subFlow(MarshalFungibleToken("dummy-token-type", 0L, "dummy-owner-cert"))
 
-        val assetStatePointer: StaticPointer<ContractState> = assetPledgeState.assetStatePointer
-        val assetState = assetStatePointer.resolve(serviceHub).state.data as FungibleToken
-
-        val assetJson = FungibleHouseTokenJson(
-            tokenType = assetState.amount.token.tokenType.tokenIdentifier,
-            numUnits = assetState.amount.quantity,
-            owner = assetPledgeState.lockerCert
-        )
-        println("Created simple asset from StatePointer: ${assetJson}\n")
-        val gson = GsonBuilder().create();
-        val assetJsonString = gson.toJson(assetJson, FungibleHouseTokenJson::class.java)
-
-        return assetPledgeState.copy(assetDetails = assetJsonString)
+        return subFlow(GetAssetClaimStatusState(pledgeId, expiryTimeSecs, marshalledBlankAssetJson))
     }
 }
 
 /**
- * The GetAssetPledgeStatusByPledgeId flow fetches the asset pledge status in the exporting network and returns as byte array.
- * It is called during the interop query by importing network before performing the claim on asset pledged in exporting network.
+ * The GetHouseTokenJsonStringFromStatePointer flow fetches the fungible token state from its state pointer [AssetPledgeState].assetStatePointer
+ * and creates marshalled JSON encoded object which is returned.
+ * This function is called by the exporting network in the context of interop-query from the importing network
+ * to the exporting network before performing claim on remote asset.
  *
- * @property pledgeId The asset pledge id in the exporting network.
- * @property recipientNetworkId The id of the network importing/reciving the asset.
+ * @property assetPledgeState The (interop) vault state that represents the pledge details on the ledger.
+ */
+@InitiatingFlow
+@StartableByRPC
+class GetHouseTokenJsonStringFromStatePointer(
+    val assetPledgeState: AssetPledgeState
+) : FlowLogic<String>() {
+    @Suspendable
+    override fun call(): String {
+
+        if (assetPledgeState.assetStatePointer == null) {
+            // Typically, [AssetPledgeState].assetStatePointer will be null only in the case of pledge details not
+            // being available for a given pledgeId. The flow GetAssetPledgeStatus in AssetTransferFlows sets this
+            // pointer to null if the pledge-state is not available in the context of the interop-query from the
+            // importing n/w to the exporting n/w. Hence return empty string, and this will not be passed to the
+            // JSON unmarshalling method GetTokenStateAndContractId since the expiryTime will be elapsed for the
+            // claim to happen (i.e., if assetStatePointer is null, then expiryTimeSecs will be set to past time).
+            return ""
+        }
+
+        val assetStatePointer: StaticPointer<ContractState> = assetPledgeState.assetStatePointer!!
+        val assetState = assetStatePointer.resolve(serviceHub).state.data as FungibleToken
+
+        @Suppress("UNCHECKED_CAST")
+        val fungibleHouseTokenPointer: TokenPointer<FungibleHouseTokenState> = assetState.amount.token.tokenType as TokenPointer<FungibleHouseTokenState>
+        val fungibleHouseTokenState = fungibleHouseTokenPointer.pointer.resolve(serviceHub).state.data
+
+        println("Creating fungible token asset JSON from StatePointer.")
+        var marshalledAssetJson =
+            subFlow(MarshalFungibleToken(fungibleHouseTokenState.symbol, assetState.amount.quantity, assetPledgeState.lockerCert))
+
+        return marshalledAssetJson
+    }
+}
+
+/**
+ * The GetAssetPledgeStatusByPledgeId flow fetches the fungible tokens pledge status in the exporting network and returns as byte array.
+ * It is called during the interop query by importing network before performing the claim on fungible tokens pledged in exporting network.
+ *
+ * @property pledgeId The unique identifier representing the pledge on fungible tokens for transfer, in the exporting n/w.
+ * @property recipientNetworkId The id of the network in which the pledged fungible tokens will be claimed.
  */
 @InitiatingFlow
 @StartableByRPC
@@ -99,32 +112,24 @@ class GetAssetPledgeStatusByPledgeId(
     @Suspendable
     override fun call(): ByteArray {
 
-        val blankAssetJson = FungibleHouseTokenJson(
-            tokenType = "",
-            numUnits = 0L,
-            owner = ""
-        )
-        println("Created empty house token asset ${blankAssetJson}\n")
-        val gson = GsonBuilder().create();
-        var blankAssetJsonString = gson.toJson(blankAssetJson, FungibleHouseTokenJson::class.java)
+        var assetPledgeState: AssetPledgeState = subFlow(GetAssetPledgeStatus(pledgeId, recipientNetworkId))
+        println("Obtained [AssetPledgeState] vault state: ${assetPledgeState}.\n")
+        val marshalledAssetJson = subFlow(GetHouseTokenJsonStringFromStatePointer(assetPledgeState))
 
-        var assetPledgeState: AssetPledgeState = subFlow(GetAssetPledgeStatus(pledgeId, recipientNetworkId, blankAssetJsonString))
-        println("Got AssetPledgeState: ${assetPledgeState}\n.")
-        assetPledgeState = subFlow(GetHouseTokenJsonStringFromStatePointer(assetPledgeState))
-
-        return subFlow(AssetPledgeStateToProtoBytes(assetPledgeState))
+        return subFlow(AssetPledgeStateToProtoBytes(assetPledgeState, marshalledAssetJson))
     }
 }
 
 /**
  * The GetTokenStateAndContractId flow first checks if the JSON encoded object corresponds to the specified token attribute values.
- * It first unmarshalls the passed JSON encoded object and verifies if the attribte values match with the input values.
+ * It first unmarshalls the passed JSON encoded object and verifies if the attribte values match with the input values. Then, it creates
+ * the fungible token state object corresponding to the JSON object passed as input.
  *
  * @property marshalledAsset The JSON encoded fungible token asset.
  * @property type The fungible token asset type (e.g., "house").
- * @property quantity The number units of the fungible token asset.
- * @property locker The owner (certificate in base64 of the exporting network) of the token asset before asset-transfer.
- * @property holder The owner (certificate in base64 of the importing network) of the token asset after asset-transfer.
+ * @property quantity The number of units of the fungible token asset.
+ * @property lockerCert The owner (certificate in base64 of the exporting network) of the token asset before asset-transfer.
+ * @property holder The party that owns the fungible tokens after asset-transfer.
  */
 @InitiatingFlow
 @StartableByRPC
@@ -132,18 +137,14 @@ class GetTokenStateAndContractId(
     val marshalledAsset: String,
     val type: String,
     val quantity: Long,
-    val locker: String,
+    val lockerCert: String,
     val holder: Party
 ): FlowLogic<Pair<String, FungibleToken>>() {
-
-    override val progressTracker = ProgressTracker()
-
     @Suspendable
     override fun call(): Pair<String, FungibleToken> {
 
-        println("GetTokenStateAndContractId() called")
+        println("Inside GetTokenStateAndContractId().")
 
-        //val pledgedFungibleToken = Gson().fromJson(tokenAsset.toByteArray().toString(Charsets.UTF_8), FungibleHouseTokenJson::class.java)
         val pledgedFungibleToken = Gson().fromJson(marshalledAsset, FungibleHouseTokenJson::class.java)
         println("Unmarshalled fungible token asset is: ${pledgedFungibleToken}")
 
@@ -153,9 +154,9 @@ class GetTokenStateAndContractId(
         } else if (pledgedFungibleToken.numUnits != quantity) {
             println("pledgedFungibleToken.numUnits(${pledgedFungibleToken.numUnits}) need to match with quantity(${quantity}).")
             throw Exception("pledgedFungibleToken.numUnits(${pledgedFungibleToken.numUnits}) need to match with quantity(${quantity}).")
-        } else if (pledgedFungibleToken.owner != locker) {
-            println("pledgedFungibleToken.owner(${pledgedFungibleToken.owner}) need to match with locker(${locker}).")
-            throw Exception("pledgedFungibleToken.owner(${pledgedFungibleToken.owner}) need to match with locker(${locker}).")
+        } else if (pledgedFungibleToken.owner != lockerCert) {
+            println("pledgedFungibleToken.owner(${pledgedFungibleToken.owner}) need to match with locker(${lockerCert}).")
+            throw Exception("pledgedFungibleToken.owner(${pledgedFungibleToken.owner}) need to match with locker(${lockerCert}).")
         }
 
         //get house states on ledger with uuid as input tokenId
@@ -200,14 +201,16 @@ class GetOurCertificateBase64() : FlowLogic<String>() {
  * The MarshalFungibleToken flow is used to obtain the JSON encoding of the fungible tokens of interest to the user.
  * This function is typically called by the application client which may not know the full details of the token asset.
  *
- * @property type The fungible token type to be marshalled.
- * @property quantity The number units of the fungible tokens to be marshalled.
+ * @property type type The fungible token asset type (e.g., "house").
+ * @property quantity The number of units of the fungible token asset.
+ * @property onwerCert The certificate of the owner of asset in base64 form
  */
 @InitiatingFlow
 @StartableByRPC
 class MarshalFungibleToken(
     val type: String,
-    val quantity: Long
+    val quantity: Long,
+    val ownerCert: String
 ) : FlowLogic<String>() {
     @Suspendable
     override fun call(): String {
@@ -215,13 +218,13 @@ class MarshalFungibleToken(
         val assetJson = FungibleHouseTokenJson(
             tokenType = type,
             numUnits = quantity,
-            owner = subFlow(GetOurCertificateBase64())
+            owner = ownerCert
         )
 
-        println("Created fungible token asset: ${assetJson}\n.")
+        println("Inside MarshalFungibleToken(), created fungible token asset: ${assetJson}\n.")
         val gson = GsonBuilder().create();
-        var assetJsonString = gson.toJson(assetJson, FungibleHouseTokenJson::class.java)
+        var marshalledAssetJson = gson.toJson(assetJson, FungibleHouseTokenJson::class.java)
 
-        return assetJsonString
+        return marshalledAssetJson
     }
 }

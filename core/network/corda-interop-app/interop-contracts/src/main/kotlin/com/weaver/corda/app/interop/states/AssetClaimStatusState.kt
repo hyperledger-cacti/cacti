@@ -23,15 +23,16 @@ import net.corda.core.contracts.StaticPointer
  * This state is queried by the local/exporting network to check if the asset is claimed in the remote/importing network. If the asset is
  * NOT claimed in the remote/importing network, then the asset will be reclaimed in the local/exporting network after the pledge timeout.
  *
- * @property assetDetails Byte array containing the details of the asset being transferred.
- * @property localNetworkId The id of the network from which the asset is transferred.
- * @property remoteNetworkId The id of the network into which the asset is transferred and claimed.
- * @property recipient The owner of asset after transfer.
- * @property recipientCert The certificate of the owner of asset after transfer.
+ * @property pledgeId The unique identifier representing the pledge on an asset for transfer, in the exporting n/w.
+ * @property assetDetails String containing the marshalled asset (using JSON encoding) being transferred.
+ * @property localNetworkID The id of the network into which the asset is claimed (i.e., importing n/w).
+ * @property remoteNetworkID The id of the network in which the asset is pledged (i.e., exporting n/w).
+ * @property recipient The owner of the asset after transfer.
+ * @property recipientCert Certificate of the asset recipient (in base64 format) in the importing network.
  * @property claimStatus Boolean value to convey if asset is claimed in the remote/importing network or not.
- * @property expiryTimeSecs The future time in seconds before which the asset claim in the remote/importing network is to be performed.
+ * @property expiryTimeSecs The future time in epoch seconds before which the asset claim in the remote/importing network is to be performed.
  * @property expirationStatus Boolean variable to convey if the time in the remote/importing network is past expiryTimeSecs or not.
- * @property linearId The unique identifier for the state.
+ * @property linearId The unique identifier for this state object in the vault.
  */
 @BelongsToContract(AssetTransferContract::class)
 data class AssetClaimStatusState(
@@ -50,5 +51,6 @@ data class AssetClaimStatusState(
     val expirationStatus: Boolean,
     override val linearId: UniqueIdentifier = UniqueIdentifier()
 ) : LinearState {
+    // locker/pledger is not a participant as that party may not be part of the importing network
     override val participants: List<AbstractParty> get() = listOf(recipient)
 }
