@@ -37,7 +37,7 @@ Observers differ from participants of a ledger, including those who don't run fu
   * Observers must be carefully vetted just like internal clients.
 * Internal clients exist to transact on the network, i.e. they are signatories of state concerning them.
 * State changes by observers are carried out by a participant, on behalf of the observer.
-* The distinction gets blury if networks are based entirely on an identity system such as SSI. 
+* The distinction gets blurry if networks are based entirely on an identity system such as SSI.
 
 
 ## "Destination" Networks are Observers

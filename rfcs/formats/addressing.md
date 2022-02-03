@@ -18,7 +18,7 @@
 
 ## Addresses
 
-An address is a globally unique identifier of a view on a distributed ledger. Addresses are composed of three segments. The first segment provides location information, the second segment identifies a unique ledger, while the third segment identifies a view on that ledger. View identifiers are declartive in nature, that is, they represent the *what* and not the *how*. 
+An address is a globally unique identifier of a view on a distributed ledger. Addresses are composed of three segments. The first segment provides location information, the second segment identifies a unique ledger, while the third segment identifies a view on that ledger. View identifiers are declarative in nature, that is, they represent the *what* and not the *how*.
 
 ### Syntax of an Address
 

@@ -37,7 +37,7 @@ Views are manifested using operators called _getters_. View operators are implem
 - An Ethereum view, manifested by sending a view transaction to a contract address with one or more input fields.
 - A Fabric view, manifested by querying a chaincode function using one or more arguments.
 
-The schematic representation of getters are dependent on the underlying distributed ledger protocol, but are conceptually abstrated away from clients consuming a view through the use of [_view addresses_](../formats/addressing.md). Although getters can be visible to external clients, their sematics and usage are transparent. This allows networks to use alternate representations for getters without requiring external clients to treat these in different ways. In otherwords, an exteranl client is free from the understanding the implementation of an operator - the client is interested in the _what_ not the _how_.
+The schematic representation of getters are dependent on the underlying distributed ledger protocol, but are conceptually abstrated away from clients consuming a view through the use of [_view addresses_](../formats/addressing.md). Although getters can be visible to external clients, their sematics and usage are transparent. This allows networks to use alternate representations for getters without requiring external clients to treat these in different ways. In other words, an external client is free from the understanding the implementation of an operator - the client is interested in the _what_ not the _how_.
 
 
 <img src="../resources/images/view-operator.png" width=65%>
