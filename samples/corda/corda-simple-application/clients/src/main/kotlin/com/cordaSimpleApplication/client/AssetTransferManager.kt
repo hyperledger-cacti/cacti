@@ -183,7 +183,7 @@ class GetAssetPledgeStateCommand : CliktCommand(name="get-asset-pledge-state", h
 /**
  * Command to fetch the certificate (in base64) of the party owning the node.
  */
-class FetchCertBase64AssetCommand : CliktCommand(name="get-cert-base64-asset", help = "Obtain the certificate of the party owning a node in base64 format.") {
+class FetchCertBase64AssetCommand : CliktCommand(name="get-cert-base64", help = "Obtain the certificate of the party owning a node in base64 format.") {
     val config by requireObject<Map<String, String>>()
     override fun run() = runBlocking {
 
@@ -212,13 +212,11 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
     val claimStatusLinearId: String? by option("-cid", "--claim-status-linear-id", help="Linear id for interop-query external state")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer (e.g., 'O=PartyA,L=London,C=GB')")
     override fun run() = runBlocking {
-        println("Came here..1")
         if (pledgeId == null) {
             println("Arguments required: --pledge-id.")
         } else if (claimStatusLinearId == null) {
             println("Arguments required: --claim-status-linear-id.")
         } else {
-            println("Came here..2")
             val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
                 username = "clientUser1",
@@ -234,7 +232,6 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
                 if (observer != null)   {
                     obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                 }
-                println("Came here..3")
                 val res = AssetManager.reclaimPledgedAsset(
                     rpc.proxy,
                     pledgeId!!,
@@ -264,7 +261,6 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer (e.g., 'O=PartyA,L=London,C=GB')")
     override fun run() = runBlocking {
-        println("Entered here..1")
         if (pledgeId == null) {
             println("Arguments required: --pledge-id.")
         } else if (pledgeStatusLinearId == null) {
@@ -284,7 +280,6 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
                  // the "Fungible house token" corDapps, we pass the Identity of the party submitting the claim here.
                 val thisParty = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(thisPartyName))!!
                 val recipientCert = rpc.proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
-                println("param: ${param}")
                 val params = param!!.split(":").toTypedArray()
                 println("params[0]: ${params[0]} and params[1]: ${params[1]}")
                 var obs = listOf<Party>()

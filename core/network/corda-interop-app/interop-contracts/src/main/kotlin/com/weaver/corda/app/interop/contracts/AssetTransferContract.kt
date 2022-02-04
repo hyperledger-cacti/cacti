@@ -73,6 +73,9 @@ class AssetTransferContract : Contract {
                 "There should be two output states." using (tx.outputs.size == 2)
                 "One of the output states should be of type AssetClaimStatusState." using (tx.outputsOfType<AssetClaimStatusState>().size == 1)
 
+                // Check if output state [AssetClaimStatusState] belongs to this contract
+                "Output state should belong to this contract" using (tx.outputs[1].contract.equals(ID))
+
                 // Get the input asset pledge state
                 val claimState = tx.outputs[1].data as AssetClaimStatusState
 
@@ -87,6 +90,14 @@ class AssetTransferContract : Contract {
                 val expiryTime = Instant.ofEpochSecond(claimState.expiryTimeSecs)
                 "TimeWindow to claim pledged remote asset should be before expiry time." using
                         (untilTime.isBefore(expiryTime) || untilTime.equals(expiryTime))
+
+                // Check if the owner of the asset in the importing network after asset claim is the recipient
+                val outputAssetState = tx.outputs[0].data
+                "Recipient must be the owner of claimed asset." using (outputAssetState.participants.containsAll(listOf(claimState.recipient)))
+
+                // Check if the recipient is a signer
+                val requiredSigners = claimState.participants.map { it.owningKey }
+                "The required signers of the transaction must include the recipient." using (command.signers.containsAll(requiredSigners))
             }
             is Commands.ReclaimPledgedAsset -> requireThat {
                 "There should be one input state." using (tx.inputs.size == 1)

@@ -120,10 +120,10 @@ fun main(args: Array<String>) = App()
                 ReclaimHouseTokenCommand(),
                 GetAssetClaimStatusByPledgeIdCommand(),
                 GetAssetPledgeStatusByPledgeIdCommand(),
-                ClaimRemoteHouseTokenCommand()
+                ClaimRemoteHouseTokenCommand(),
+                FetchCertBase64Command()
             ),
             CreateNetworkIdStateCommand(),
-            RetrieveNetworkIdStateAndRefCommand(),
-            FetchCertBase64Command()
+            RetrieveNetworkIdStateAndRefCommand()
         )
         .main(args)
