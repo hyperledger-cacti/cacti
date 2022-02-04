@@ -236,33 +236,6 @@ class IsAssetPledged(
  *
  * @property pledgeId The unique identifier representing the pledge on an asset for transfer, in the exporting n/w.
  */
-class GetAssetPledgeStateById2(
-    val pledgeId: String
-) : FlowLogic<Either<Error, StateAndRef<AssetPledgeState>>>() {
-    /**
-     * The call() method captures the logic to fetch the [AssetPledgeState] state associated with input pledgeId.
-     *
-     * @return Returns Either<Error, StateAndRef<AssetPledgeState>>
-     */
-    @Suspendable
-    override fun call(): Either<Error, StateAndRef<AssetPledgeState>> = try {
-        val linearId = getLinearIdFromString(pledgeId)
-        println("Getting [AssetPledgeState] for linearId: $linearId.")
-        val states = serviceHub.vaultService.queryBy<AssetPledgeState>(
-            QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
-        ).states
-        if (states.isEmpty()) {
-            Left(Error("No [AssetPledgeState] state found associated with pledgeId: $pledgeId."))
-        } else {
-            println("Obtained [AssetPledgeState] state: ${states.first().state.data}")
-            Right(states.first())
-        }
-    } catch (e: Exception) {
-        println("Error fetching [AssetPledgeState] state from the vault: ${e.message}\n")
-        Left(Error("Error fetching [AssetPledgeState] state from the vault: ${e.message}"))
-    }
-}
-
 class GetAssetPledgeStateById(
     val pledgeId: String
 ) : FlowLogic<StateAndRef<AssetPledgeState>?>() {
@@ -771,10 +744,8 @@ object ClaimRemoteAsset {
                     Left(Error("Error: Unable to resolve GetAssetStateAndContractId flow"))
                 }, {
                     println("Resolved GetAssetStateAndContractId flow to ${it}")
-                    val (contractId, assetState) = subFlow(it)
+                    val (assetContractId: String, outputAssetState: ContractState) = subFlow(it)
 
-                    val outputAssetState = assetState
-                    val assetContractId = contractId
                     println("assetContractId: ${assetContractId}")
 
                     val txBuilder = TransactionBuilder(notary)

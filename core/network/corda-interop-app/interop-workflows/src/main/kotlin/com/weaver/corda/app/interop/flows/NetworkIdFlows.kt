@@ -153,12 +153,12 @@ class RetrieveNetworkIdStateAndRef() : FlowLogic<StateAndRef<NetworkIdState>?>()
 
     override fun call(): StateAndRef<NetworkIdState>? {
 
-        val states = serviceHub.vaultService.queryBy<NetworkIdState>().states
+        val states: List<StateAndRef<NetworkIdState>> = serviceHub.vaultService.queryBy<NetworkIdState>().states
         var fetchedState: StateAndRef<NetworkIdState>? = null
 
         if (states.isNotEmpty()) {
-            // consider that there will be only one such state ideally
-            fetchedState = states.first()
+            // fetch the last state such that if the networkId is updated, we obtain the recent value
+            fetchedState = states.last()
             println("Network id for local Corda newtork is: $fetchedState\n")
         } else {
             println("Not able to fetch network id for local Corda network\n")
