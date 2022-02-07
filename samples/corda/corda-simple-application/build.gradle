@@ -50,6 +50,7 @@ allprojects {
         maven { url 'https://jitpack.io' }
 
 	if (file("$projectDir/github.properties").exists()) {
+            Properties constants = new Properties()
             file("$projectDir/github.properties").withInputStream { constants.load(it) }
             maven {
                 url constants.url

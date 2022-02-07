@@ -52,6 +52,7 @@ allprojects {
         //Gradle Plugins
         maven { url 'https://repo.gradle.org/gradle/libs-releases' }
         if (file("$projectDir/../github.properties").exists()) {
+            Properties constants = new Properties()
             file("$projectDir/../github.properties").withInputStream { constants.load(it) }
             maven {
                 url constants.url
