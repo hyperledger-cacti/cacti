@@ -255,7 +255,7 @@ jobs:
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
           
           cat github.properties
-		  cp github.properties ../../../samples/corda/corda-simple-application/
+          cp github.properties ../../../samples/corda/corda-simple-application/
         working-directory: tests/network-setups/corda
  
       - name: Generate github.properties (else)
@@ -266,7 +266,7 @@ jobs:
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
           echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.properties
           cat github.properties
-		  cp github.properties ../../../samples/corda/corda-simple-application/
+          cp github.properties ../../../samples/corda/corda-simple-application/
         working-directory: tests/network-setups/corda
           
       # CORDA NETWORK
