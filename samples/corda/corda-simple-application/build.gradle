@@ -59,6 +59,16 @@ allprojects {
                     password constants.password
                 }
             }
+	} else if (file("$projectDir/../github.properties").exists()) {
+            Properties constants = new Properties()
+            file("$projectDir/../github.properties").withInputStream { constants.load(it) }
+            maven {
+                url constants.url
+                credentials {
+                    username constants.username
+                    password constants.password
+                }
+            }
         } else {
             flatDir {
                 dirs '../../../core/network/corda-interop-app/interop-contracts/build/libs'
