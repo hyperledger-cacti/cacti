@@ -5,7 +5,7 @@
     "owner": "alice",
     "issuer": "treasury",
     "facevalue": "500",
-    "maturitydate": "01 Jan 22 00:00 MST"
+    "maturitydate": "01 Jan 45 00:00 MST"
   },
   "a04": {
     "assetType": "bond01",
@@ -13,6 +13,6 @@
     "owner": "alice",
     "issuer": "treasury",
     "facevalue": "700",
-    "maturitydate": "01 Jul 22 00:00 MST"
+    "maturitydate": "01 Jul 45 00:00 MST"
   }
 }
