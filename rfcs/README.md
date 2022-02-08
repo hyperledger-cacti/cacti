@@ -36,22 +36,22 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 01-006 | Identity                        | Model    | [Draft](./models/identity/decentralized-network-identity-discovery-management.md) |
 | 01-007 | Relays                          | Model    | [Draft](./models/infrastructure/relays.md)                    |
 | 01-008 | Security                        | Model    | [Draft](./models/security/security.md)                        |
-| 02-001 | Event Bus                       | Protocol | [Draft](./protocols/event-bus.md)                             |
+| 02-001 | Event Bus                       | Protocol | [Draft](./protocols/events/event-bus.md)                      |
 | 02-002 | Data Transfer                   | Protocol | [Draft](./protocols/data-transfer/readme.md)                  |
-| 02-003 | Asset Exchange - HTLC           | Protocol | [Draft](./protocols/asset-exchange-htlc.md)                   |
+| 02-003 | Asset Exchange - HTLC           | Protocol | [Draft](./protocols/asset-exchange/asset-exchange-htlc.md)    |
 | 02-004 | Asset Transfer                  | Protocol | -                                                             |
 | 02-005 | Discovery                       | Protocol | -                                                             |
 | 02-006 | Protocol Negotiation            | Protocol | -                                                             |
-| 03-001 | Address                         | Format   | [Proposed](./formats/addressing.md)                           |
-|        | View - Definition               | Format   | [Draft](./formats/view-definition.md)                         |
-|        | View - Fabric                   | Format   | [Draft](./formats/views-fabric.md)                            |
-|        | View - Corda                    | Format   | [Draft](./formats/views-corda.md)                             |
-|        | View - Ethereum                 | Format   | [Draft](./formats/views-ethereum.md)                          |
+| 03-001 | Address                         | Format   | [Proposed](./formats/views/addressing.md)                     |
+|        | View - Definition               | Format   | [Draft](./formats/views/view-definition.md)                   |
+|        | View - Fabric                   | Format   | [Draft](./formats/views/views-fabric.md)                      |
+|        | View - Corda                    | Format   | [Draft](./formats/views/views-corda.md)                       |
+|        | View - Ethereum                 | Format   | [Draft](./formats/views/views-ethereum.md)                    |
 |        | Attachments                     | Format   | -                                                             |
-|        | Policy - Access Control         | Format   | [Proposed](./formats/policy-access-control.md)                |
-|        | Policy - Proof Verification     | Format   | [Proposed](./formats/policy-proof-verification.md)            |
-|        | Policy - Verification DSL       | Format   | [Draft](./formats/policy-dsl.md)                              |
-|        | Memberships                     | Format   | [Proposed](./formats/memberships.md)                          |
+|        | Policy - Access Control         | Format   | [Proposed](./formats/policies/policy-access-control.md)       |
+|        | Policy - Proof Verification     | Format   | [Proposed](./formats/policies/policy-proof-verification.md)   |
+|        | Policy - Verification DSL       | Format   | [Draft](./formats/policies/policy-dsl.md)                     |
+|        | Memberships                     | Format   | [Proposed](./formats/network/memberships.md)                  |
 
 
 ## RFC Process
