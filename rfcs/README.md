@@ -36,7 +36,6 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 01-006 | Identity                        | Model    | [Draft](./models/identity/decentralized-network-identity-discovery-management.md) |
 | 01-007 | Relays                          | Model    | [Draft](./models/relays.md)                                   |
 | 01-008 | Security                        | Model    | [Draft](./models/security.md)                                 |
-|--------|---------------------------------|----------|---------------------------------------------------------------|
 | 02-001 | Event Bus                       | Protocol | [Draft](./protocols/event-bus.md)                             |
 | 02-002 | Data Transfer                   | Protocol | [Draft](./protocols/data-transfer/readme.md)                  |
 | 02-003 | Asset Exchange - HTLC           | Protocol | [Draft](./protocols/asset-exchange-htlc.md)                   |
