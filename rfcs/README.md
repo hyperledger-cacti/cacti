@@ -28,14 +28,14 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 
 | RFC #  | Title                           | Category | Status                                                        |
 |--------|---------------------------------|----------|---------------------------------------------------------------|
-| 01-001 | Verifiable Observation of State | Model    | [Draft](./models/observation-of-state.md)                     |
-| 01-002 | Cryptographic Proofs            | Model    | [Draft](./models/cryptographic-proofs.md)                     |
-| 01-003 | Views                           | Model    | [Proposed](./models/views.md)                                 |
-| 01-004 | Events                          | Model    | [Draft](./models/events.md)                                   |
-| 01-005 | Fair Exchange                   | Model    | [Draft](./models/fair-exchange.md)                            |
+| 01-001 | Verifiable Observation of State | Model    | [Draft](./models/ledger/observation-of-state.md)              |
+| 01-002 | Cryptographic Proofs            | Model    | [Draft](./models/ledger/cryptographic-proofs.md)              |
+| 01-003 | Views                           | Model    | [Proposed](./models/ledger/views.md)                          |
+| 01-004 | Events                          | Model    | [Draft](./models/ledger/events.md)                            |
+| 01-005 | Fair Exchange                   | Model    | [Draft](./models/ledger/fair-exchange.md)                     |
 | 01-006 | Identity                        | Model    | [Draft](./models/identity/decentralized-network-identity-discovery-management.md) |
-| 01-007 | Relays                          | Model    | [Draft](./models/relays.md)                                   |
-| 01-008 | Security                        | Model    | [Draft](./models/security.md)                                 |
+| 01-007 | Relays                          | Model    | [Draft](./models/infrastructure/relays.md)                    |
+| 01-008 | Security                        | Model    | [Draft](./models/security/security.md)                        |
 | 02-001 | Event Bus                       | Protocol | [Draft](./protocols/event-bus.md)                             |
 | 02-002 | Data Transfer                   | Protocol | [Draft](./protocols/data-transfer/readme.md)                  |
 | 02-003 | Asset Exchange - HTLC           | Protocol | [Draft](./protocols/asset-exchange-htlc.md)                   |
