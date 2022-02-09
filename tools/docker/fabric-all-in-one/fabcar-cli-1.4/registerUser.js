@@ -23,10 +23,10 @@ async function main() {
     console.log(`Wallet path: ${walletPath}`);
 
     // Check to see if we've already enrolled the user.
-    const userExists = await wallet.exists("user1");
+    const userExists = await wallet.exists("appUser");
     if (userExists) {
       console.log(
-        'An identity for the user "user1" already exists in the wallet',
+        'An identity for the user "appUser" already exists in the wallet',
       );
       return;
     }
@@ -57,13 +57,13 @@ async function main() {
     const secret = await ca.register(
       {
         affiliation: "org1.department1",
-        enrollmentID: "user1",
+        enrollmentID: "appUser",
         role: "client",
       },
       adminIdentity,
     );
     const enrollment = await ca.enroll({
-      enrollmentID: "user1",
+      enrollmentID: "appUser",
       enrollmentSecret: secret,
     });
     const userIdentity = X509WalletMixin.createIdentity(
@@ -71,12 +71,12 @@ async function main() {
       enrollment.certificate,
       enrollment.key.toBytes(),
     );
-    await wallet.import("user1", userIdentity);
+    await wallet.import("appUser", userIdentity);
     console.log(
-      'Successfully registered and enrolled admin user "user1" and imported it into the wallet',
+      'Successfully registered and enrolled admin user "appUser" and imported it into the wallet',
     );
   } catch (error) {
-    console.error(`Failed to register user "user1": ${error}`);
+    console.error(`Failed to register user "appUser": ${error}`);
     process.exit(1);
   }
 }

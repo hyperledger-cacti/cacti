@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  fabric-all-in-one-testnet-2x:
+    container_name: ${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME:-fabric_all_in_one_testnet_2x}
+    image: ${CACTUS_FABRIC_ALL_IN_ONE_IMAGE_NAME:-faio2x}
+    privileged: true
+    build:
+      context: ./
+      dockerfile: Dockerfile_v2.x
+    ports:
+        - "4022:22"   # SSH
+        - "7051:7051" # peer0.org1.example.com
+        - "8051:8051" # peer1.org1.example.com
+        - "7054:7054" # ca.org1.example.com
+        - "7050:7050" # orderer.example.com
+    environment:
+      - FABRIC_VERSION=${CACTUS_FABRIC_ALL_IN_ONE_VERSION:-2.2.0}
+      - FABRIC_CHAINCODE=${CACTUS_FABRIC_ALL_IN_ONE_CHAINCODE:-fabcar}
+      - CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP=1
+    networks:
+       - testnet-2x
+
+networks:
+  testnet-2x:
+    driver: bridge

@@ -39,7 +39,7 @@ Cactus **car-trade** is a sample application where users can exchange car owners
     - (NOTICE: Before executing the above, your account needs to be added to the docker group (`usermod -a -G docker YourAccount` from root user))
     - On success, this should start two containers:
         - `geth1`
-        - `cartrade_faio14x_testnet`
+        - `cartrade_faio2x_testnet`
 
 1. Build cartrade:
     ```
@@ -149,5 +149,5 @@ Cactus **car-trade** is a sample application where users can exchange car owners
     sudo rm -r ./etc/cactus/
     ```
 1. Stop the docker containers of Ethereum and Fabric
-    - `docker stop geth1 cartrade_faio14x_testnet`
-    - `docker rm geth1 cartrade_faio14x_testnet`
+    - `docker stop geth1 cartrade_faio2x_testnet`
+    - `docker rm geth1 cartrade_faio2x_testnet`

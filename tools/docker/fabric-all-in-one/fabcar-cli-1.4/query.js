@@ -19,10 +19,10 @@ async function main() {
     console.log(`Wallet path: ${walletPath}`);
 
     // Check to see if we've already enrolled the user.
-    const userExists = await wallet.exists("user1");
+    const userExists = await wallet.exists("appUser");
     if (!userExists) {
       console.log(
-        'An identity for the user "user1" does not exist in the wallet',
+        'An identity for the user "appUser" does not exist in the wallet',
       );
       console.log("Run the registerUser.js application before retrying");
       // EDIT - Return error code when identity is missing
@@ -33,7 +33,7 @@ async function main() {
     const gateway = new Gateway();
     await gateway.connect(ccpPath, {
       wallet,
-      identity: "user1",
+      identity: "appUser",
       discovery: { enabled: true, asLocalhost: true },
     });
 

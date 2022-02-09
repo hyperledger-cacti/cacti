@@ -2,6 +2,8 @@
 # Copyright 2020-2021 Hyperledger Cactus Contributors
 # SPDX-License-Identifier: Apache-2.0
 
+export CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME="cartrade_faio2x_testnet"
+
 ## Execute a getting app
 echo "[process] Execute an app for getting Balance on Ethereum"
 pushd ../../tools/docker/geth-testnet/get-eth-balance
