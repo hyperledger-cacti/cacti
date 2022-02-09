@@ -14,7 +14,7 @@ services:
     volumes:
       - ./etc/cactus:/etc/cactus
     networks:
-      - fabric-all-in-one_testnet-14
+      - fabric-all-in-one_testnet-2x
       - discounted-cartrade-net
 
   ethereum-validator:
@@ -113,7 +113,7 @@ services:
     command: [ "--proof_only" ]
 
 networks:
-  fabric-all-in-one_testnet-14:
+  fabric-all-in-one_testnet-2x:
     external: true
   geth1net:
     external: true

@@ -84,9 +84,9 @@ Alice will use credentials and other Indy formats such as schema and definition 
     ```
     - This script will start all ledger docker containers, networks, and will setup configuration needed to operate the sample app.
     - (NOTICE: Before executing the above, your account needs to be added to the docker group (`usermod -a -G docker YourAccount` from root user))
-    - On success, this should start two containers:
+    - On success, this should start three containers:
         - `geth1`
-        - `discounted_cartrade_faio14x_testnet`
+        - `discounted_cartrade_faio2x_testnet`
         - `indy-testnet-pool`
 
 1. Build cartrade:
@@ -200,8 +200,8 @@ Alice will use credentials and other Indy formats such as schema and definition 
     sudo rm -r ./etc/cactus/
     ```
 1. Stop the docker containers of Ethereum and Fabric
-    - `docker stop geth1 cartrade_faio14x_testnet`
-    - `docker rm geth1 cartrade_faio14x_testnet`
+    - `docker stop geth1 cartrade_faio2x_testnet`
+    - `docker rm geth1 cartrade_faio2x_testnet`
     - `docker rm geth1 indy-testnet-pool`
 
 1. Clear indy testnet sandbox
