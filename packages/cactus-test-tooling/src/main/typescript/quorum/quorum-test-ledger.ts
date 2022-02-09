@@ -302,7 +302,7 @@ export class QuorumTestLedger implements ITestLedger {
     });
   }
 
-  public destroy(): Promise<any> {
+  public destroy(): Promise<unknown> {
     if (this.container) {
       return this.container.remove();
     } else {
