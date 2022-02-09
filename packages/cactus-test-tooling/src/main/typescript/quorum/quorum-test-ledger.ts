@@ -230,7 +230,7 @@ export class QuorumTestLedger implements ITestLedger {
           PublishAllPorts: true,
         },
         {},
-        (err: any) => {
+        (err: unknown) => {
           if (err) {
             reject(err);
           }
