@@ -56,7 +56,7 @@ docker-compose -f docker-compose.yaml up
 ## Usage samples
 - To confirm the operation of this package, please refer to the following business-logic sample applications:
     - [electricity-trade](../../examples/electricity-trade)
-    - [car-trade](../../examples/cartrade)
+    - [discounted-cartrade](../../examples/discounted-cartrade)
 
 ## Contributing
 

@@ -15,6 +15,6 @@ cd ./packages/cactus-cmd-socketio-server
 ./script-build-packages.sh
 cd ../..
 
-## build cartrade apps
+## build electricity-trade apps
 cd ./examples/electricity-trade
 ./script-build-electricity-trade.sh

@@ -1,19 +1,4 @@
-
-# !packages/cactus-*/**
-# !examples/cactus-*/**
-
-# examples/cartrade/
-# packages/business-logic-plugin/
-# packages/ledger-plugin/
-# packages/routing-interface/
-# packages/config/
-
 **/dist/**
-# **/node_modules/**
-# **/build/**
-# **/coverage/**
-
-# typings/**
 
 **/src/main/typescript/generated/proto/**
 **/src/main/typescript/generated/wasm-pack/**
