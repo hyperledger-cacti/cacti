@@ -23,7 +23,7 @@
     "jsonwebtoken": "^8.5.1",
     "fast-safe-stringify": "2.1.1",
     "log4js": "^6.4.0",
-    "morgan": "~1.8.1",
+    "morgan": "1.10.0",
     "serve-favicon": "~2.4.2",
     "shelljs": "^0.8.4",
     "socket.io": "4.1.3",
