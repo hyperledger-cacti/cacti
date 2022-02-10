@@ -62,7 +62,7 @@ npm run start
 
 ## Usage samples
 - To confirm the operation of this package, please refer to the following business-logic sample application:
-    - [cartrade](../../examples/cartrade)
+    - [discounted-cartrade](../../examples/discounted-cartrade)
 
 ## Contributing
 

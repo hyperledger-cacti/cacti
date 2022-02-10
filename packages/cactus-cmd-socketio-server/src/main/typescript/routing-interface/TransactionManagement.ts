@@ -64,10 +64,9 @@ export class TransactionManagement implements VerifierEventListener {
 
       logger.debug("created instance");
 
-      // Start BusinessLogicCartrade
       this.setTradeIDMapInfo(tradeID, businessLogicID);
       blp.startTransaction(req, businessLogicID, tradeID);
-      logger.debug("start cartrade");
+      logger.debug("start BLP");
     }
 
     return tradeID;

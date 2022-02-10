@@ -7,7 +7,6 @@
 
 import { BusinessLogicPlugin } from "../../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicPlugin";
 import { BusinessLogicElectricityTrade } from "../BusinessLogicElectricityTrade";
-// import { BusinessLogicCartrade } from '../examples/cartrade/BusinessLogicXxxxTrade';
 
 export function getTargetBLPInstance(
   businessLogicID: string

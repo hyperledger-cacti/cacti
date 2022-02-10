@@ -40,9 +40,9 @@ As blockchain technology proliferates, blockchain integration will become an inc
 
 Once the last command has finished executing, open link printed on the console with a web browser of your choice
 
-### Car Trade Example
+### Discounted Car Trade Example
 
-- The guidance is [here](./examples/cartrade/README.md).
+- The guidance is [here](./examples/discounted-cartrade/README.md).
 
 ### Electricity Trade Example
 

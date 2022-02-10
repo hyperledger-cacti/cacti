@@ -61,4 +61,3 @@ site/
 !packages/cactus-plugin-verifier-cc/src/main/typescript/ledger-plugin/*/validator/src/core/bin
 
 tools/docker/geth-testnet/data-geth1/
-examples/cactus-example-verifier-cc-cartrade/src/main/typescript/impl/script-test-getFunctions/fabric/wallet/
