@@ -5,7 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp, getNetworkConfig } from '../../helpers/helpers'
+import { commandHelp, getNetworkConfig, saveUserCertToFile } from '../../helpers/helpers'
 import * as fs from 'fs'
 import * as path from 'path'
 import { walletSetup } from '../../helpers/fabric-functions'
@@ -68,6 +68,8 @@ const command: GluegunCommand = {
                     userPwd,
                     true
                   )
+
+    saveUserCertToFile(userName, options['target-network'])
     process.exit()
   }
 }

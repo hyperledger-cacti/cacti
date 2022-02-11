@@ -11,6 +11,7 @@ import {
     pledgeAsset,
     getNetworkConfig,
     getLocalAssetPledgeDetails,
+    getUserCertFromFile,
     getChaincodeConfig,
     handlePromise,
     generateViewAddressFromRemoteConfig,
@@ -207,7 +208,7 @@ async function getClaimViewAddress(assetCategory, pledgeId, owner, sourceNetwork
         funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
     } else if (assetCategory === "bond") {
         funcName = "GetAssetPledgeStatus"
-        ownerCert = await getUserCertBase64(sourceNetwork, owner)
+        ownerCert = await getUserCertFromFile(owner, sourceNetwork)
         funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
     } else if (assetCategory === "token") {
         funcName = "GetTokenAssetPledgeStatus"
