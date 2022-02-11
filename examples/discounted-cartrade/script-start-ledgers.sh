@@ -11,14 +11,13 @@ CONFIG_VOLUME_PATH="./etc/cactus" # Docker volume with shared configuration
 # Fabric Env Variables
 export CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME="cartrade_faio2x_testnet"
 export CACTUS_FABRIC_ALL_IN_ONE_VERSION="2.2.0"
-export CACTUS_FABRIC_ALL_IN_ONE_CHAINCODE="fabcar"
 export CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP=1
 
 function start_fabric_testnet() {
     echo ">> start_fabric_testnet()"
     pushd "${ROOT_DIR}/tools/docker/fabric-all-in-one"
 
-    echo ">> Start Fabric ${CACTUS_FABRIC_ALL_IN_ONE_VERSION} FabCar..."
+    echo ">> Start Fabric ${CACTUS_FABRIC_ALL_IN_ONE_VERSION}..."
     docker-compose -f ./docker-compose-v2.x.yml build
     docker-compose -f ./docker-compose-v2.x.yml up -d
     sleep 1
@@ -31,10 +30,11 @@ function start_fabric_testnet() {
         sleep $WAIT_TIME
         health_status="$(docker inspect -f '{{.State.Health.Status}}' ${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME})"
     done
-    echo ">> Fabric ${CACTUS_FABRIC_ALL_IN_ONE_VERSION} FabCar started."
+    echo ">> Fabric ${CACTUS_FABRIC_ALL_IN_ONE_VERSION} started."
 
     echo ">> Register admin and appUser..."
-    pushd fabcar-cli-1.4
+    pushd asset-transfer-basic-utils
+    npm install
     ./setup.sh
     popd
     echo ">> Register done."
@@ -52,7 +52,7 @@ function copy_fabric_tlsca() {
 
 function copy_fabric_wallet() {
     echo ">> copy_fabric_wallet()"
-    cp -fr "../../tools/docker/fabric-all-in-one/fabcar-cli-1.4/wallet" "${CONFIG_VOLUME_PATH}/fabric/"
+    cp -fr "../../tools/docker/fabric-all-in-one/asset-transfer-basic-utils/wallet" "${CONFIG_VOLUME_PATH}/fabric/"
     echo ">> copy_fabric_wallet() done."
 }
 

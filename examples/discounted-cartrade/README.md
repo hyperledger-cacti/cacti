@@ -3,7 +3,7 @@
 
 ## Abstract
 
-Cactus discounted-cartrade is a sample application that adds employee discounts to the original Cactus cartrade. In this application, when the users transfer the car ownership in the cactus cartrade, they present their employee proofs to the rent-a-car company to receive an employee discount. We implement the employee proofs by proofs on Hyperledger Indy. As with the original application, car ownership is represented by a Fabcar chaincodetoken on Hyperledger Fabric, which can be exchanged for ETH currency on a private Ethereum blockchain. This Business Logic Plugin (BLP) application controls a process from employee certification using Hyperledger Indy to payment using Ethereum.
+Cactus discounted-cartrade is a sample application that adds employee discounts to the original Cactus cartrade. In this application, when the users transfer the car ownership in the cactus cartrade, they present their employee proofs to the rent-a-car company to receive an employee discount. We implement the employee proofs by proofs on Hyperledger Indy. Car ownership is represented by a [asset-transfer-basic](https://github.com/hyperledger/fabric-samples/tree/release-2.2/asset-transfer-basic) chaincodetoken on Hyperledger Fabric, which can be exchanged for ETH currency on a private Ethereum blockchain. This Business Logic Plugin (BLP) application controls a process from employee certification using Hyperledger Indy to payment using Ethereum.
 
 ![discounted-cartrade image](./image/discounted-cartrade-image.png)
 
@@ -100,7 +100,9 @@ Alice will use credentials and other Indy formats such as schema and definition 
     # or
     npm run start
     ```
+
     This will build and launch all needed containers, the final output should look like this:
+
     ```
     discounted-cartrade-ethereum-validator | listening on *:5050
     ...
@@ -122,32 +124,36 @@ Alice will use credentials and other Indy formats such as schema and definition 
 
 ## How to use this application
 
-1. (Optional) Check the balance on Ethereum and the fabcar ownership on Fabric using the following script:
-    - `./script-build-get-app.sh` (only the first time)
-    - `./script-get-app.sh`
+1. (Optional) Check the balance on Ethereum and the car ownership on Fabric using the following script:
+    ```
+    node ./read-ledger-state.js
+    ```
 
     The result looks like the following (simplified output):
+
     ```
-    [process] Execute an app for getting Balance on Ethereum
-    ...
-    The balance of fromAccount:
-    BigNumber { s: 1, e: 4, c: [ 100000 ] }
-    The balance of toAccount:
-    BigNumber { s: 1, e: 1, c: [ 0 ] }
-    ...
-    [process] Execute an app for getting ownership on Fabcar
-    ...
-    Transaction has been evaluated, result is: [
+    # Ethereum fromAccount:
+    { status: 200, amount: 100000 }
+
+    # Ethereum toAccount:
+    { status: 200, amount: 0 }
+
+    # Fabric:
+    [
         {
             ...
         },
         {
-            Key: 'CAR1',
-            Record: { colour: 'red', make: 'Ford', model: 'Mustang', owner: 'Brad' }
+            ID: 'asset2',
+            color: 'red',
+            size: 5,
+            owner: 'Brad',
+            appraisedValue: 400
         },
         ...
     ]
     ```
+
 1. Run the transaction execution using the following script:
     ```
     ./script-post-discounted-cartrade-sample.sh
@@ -165,28 +171,31 @@ Alice will use credentials and other Indy formats such as schema and definition 
     [INFO] BusinessLogicCartrade - ##INFO: completed cartrade, businessLogicID: guks32pf, tradeID: *******-001
     ```
 
-1. (Optional) Check the balance on Ethereum and the fabcar ownership on Fabric using the following script
+1. (Optional) Check the balance on Ethereum and the car ownership on Fabric using the following script
     ```
-    ./script-get-app.sh
+    node ./read-ledger-state.js
     ```
+
     The result looks like the following (simplified output). In the following case, 50 coins from `fromAccount` was transferred to `toAccount`, and the car ownership ("owner") was transferred from Brad to Cathy.
+
     ```
-    [process] Execute an app for getting Balance on Ethereum
-    ...
-    The balance of fromAccount:
-    BigNumber { s: 1, e: 4, c: [ 99950 ] }
-    The balance of toAccount:
-    BigNumber { s: 1, e: 1, c: [ 50 ] }
-    ...
-    [process] Execute an app for getting ownership on Fabcar
-    ...
-    Transaction has been evaluated, result is: [
+    # Ethereum fromAccount:
+    { status: 200, amount: 99950 }
+
+    # Ethereum toAccount:
+    { status: 200, amount: 50 }
+
+    # Fabric:
+    [
         {
             ...
         },
         {
-            Key: 'CAR1',
-            Record: { colour: 'red', make: 'Ford', model: 'Mustang', owner: 'Cathy' }
+            ID: 'asset2',
+            color: 'red',
+            size: 5,
+            owner: 'Cathy',
+            appraisedValue: 400
         },
         ...
     ]
@@ -195,14 +204,20 @@ Alice will use credentials and other Indy formats such as schema and definition 
 ## How to stop the application and Docker containers
 
 1. Press `Ctrl+C` in `docker-compose` console to stop the application.
+1. Run cleanup script
+    ```
+    sudo ./script-cleanup.sh
+    ```
+
+#### Manual cleanup instructions
+
 1. Remove the config files on your machine
     ```
     sudo rm -r ./etc/cactus/
     ```
-1. Stop the docker containers of Ethereum and Fabric
-    - `docker stop geth1 cartrade_faio2x_testnet`
-    - `docker rm geth1 cartrade_faio2x_testnet`
-    - `docker rm geth1 indy-testnet-pool`
+1. Stop the docker containers of Ethereum, Fabric and Indy
+    - `docker stop geth1 cartrade_faio2x_testnet indy-testnet-pool`
+    - `docker rm geth1 cartrade_faio2x_testnet indy-testnet-pool`
 
 1. Clear indy testnet sandbox
     ```

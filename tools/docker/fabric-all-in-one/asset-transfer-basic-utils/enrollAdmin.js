@@ -10,7 +10,6 @@ const { FileSystemWallet, X509WalletMixin } = require("fabric-network");
 const fs = require("fs");
 const path = require("path");
 
-// EDIT - Changed config path
 const ccpPath = "./connection.json";
 const ccpJSON = fs.readFileSync(ccpPath, "utf8");
 const ccp = JSON.parse(ccpJSON);

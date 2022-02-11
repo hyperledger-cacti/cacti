@@ -1,7 +1,7 @@
 # fabric-cli-.14
 
-Helper CLI tools for interacting with FabCar fabric deployed in `fabric-all-in-one` image.
-Sources come from official fabric-samples 1.4.8 - https://github.com/hyperledger/fabric-samples/releases/tag/v1.4.8. Any modifications were marked with `// EDIT`' comment (for instance, changed location of connection info json to `./connection.json`).
+Helper CLI tools for interacting with `asset-transfer-basic` CC deployed in `fabric-all-in-one` image.
+Sources are based on official fabric-samples 1.4.8 - https://github.com/hyperledger/fabric-samples/releases/tag/v1.4.8.
 
 ## Usage
 
@@ -13,4 +13,4 @@ Sources come from official fabric-samples 1.4.8 - https://github.com/hyperledger
 ### Scripts
  - `enrollAdmin.js` - Will enrol `admin` and store it in the wallet.
  - `registerUser.js` - Will register `appUser` and store it in the wallet.
- - `query.js` - Will run `queryAllCars` on the fabric, all cars will be printed in verbose (formatted) way.
+ - `query.js` - Will run `GetAllAssets` on the fabric, all assets will be printed in verbose (formatted) way.

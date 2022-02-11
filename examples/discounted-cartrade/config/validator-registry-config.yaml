@@ -91,4 +91,4 @@ signTxInfo:
       name: admin
       secret: adminpw
     channelName: mychannel
-    chaincodeID: fabcar
+    chaincodeID: basic

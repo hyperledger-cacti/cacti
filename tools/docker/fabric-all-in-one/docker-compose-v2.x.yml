@@ -16,7 +16,6 @@ services:
         - "7050:7050" # orderer.example.com
     environment:
       - FABRIC_VERSION=${CACTUS_FABRIC_ALL_IN_ONE_VERSION:-2.2.0}
-      - FABRIC_CHAINCODE=${CACTUS_FABRIC_ALL_IN_ONE_CHAINCODE:-fabcar}
       - CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP=1
     networks:
        - testnet-2x

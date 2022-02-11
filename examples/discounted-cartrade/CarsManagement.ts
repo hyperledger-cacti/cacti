@@ -9,8 +9,6 @@ import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
 import { Verifier } from "@hyperledger/cactus-cmd-socket-server";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 
-const fs = require("fs");
-const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "CarsManagement";
@@ -34,9 +32,8 @@ export class CarsManagement {
         this.verifierFabric = new Verifier(ledgerPluginInfo);
       }
 
-      const contract = { channelName: "mychannel", contractName: "fabcar" };
-      const method = { type: "evaluateTransaction", command: "queryCar" };
-      const template = "default";
+      const contract = { channelName: "mychannel", contractName: "basic" };
+      const method = { type: "evaluateTransaction", command: "ReadAsset" };
       const args = { args: [carID] };
       // const method = "default";
       // const args = {"method": {type: "evaluateTransaction", command: "queryCar"},"args": {"args": [carID]}};
@@ -62,9 +59,8 @@ export class CarsManagement {
         this.verifierFabric = new Verifier(ledgerPluginInfo);
       }
 
-      const contract = { channelName: "mychannel", contractName: "fabcar" };
-      const method = { type: "evaluateTransaction", command: "queryAllCars" };
-      const template = "default";
+      const contract = { channelName: "mychannel", contractName: "basic" };
+      const method = { type: "evaluateTransaction", command: "GetAllAssets" };
       const args = { args: [] };
       // const method = "default";
       // const args = {"method": {type: "evaluateTransaction", command: "queryAllCars"}, "args": {"args": []}};

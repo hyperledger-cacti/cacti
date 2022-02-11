@@ -22,4 +22,4 @@ RUN yarn link "@hyperledger/cactus-cmd-socket-server" && \
 
 COPY ./dist ./dist/
 
-ENTRYPOINT ["node", "./dist/www.js"]
+CMD ["node", "./dist/www.js"]

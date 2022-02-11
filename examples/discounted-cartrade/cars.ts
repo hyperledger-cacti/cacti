@@ -10,8 +10,6 @@ import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 import { RIFError } from "@hyperledger/cactus-cmd-socket-server";
 import { CarsManagement } from "./CarsManagement";
 
-const fs = require("fs");
-const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "cars";
