@@ -190,6 +190,6 @@ ENV COUCH_VERSION=${COUCH_VERSION}
 ENTRYPOINT ["/usr/bin/supervisord"]
 CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]
 
-# We consider the container healthy once the default example fabcar contract has been deployed
+# We consider the container healthy once the default example asset-transfer contract has been deployed
 # and is responsive to queries as well
 HEALTHCHECK --interval=1s --timeout=5s --start-period=60s --retries=300 CMD ./healthcheck.sh

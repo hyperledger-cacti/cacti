@@ -53,6 +53,15 @@
       "console": "integratedTerminal",
       "sourceMaps": true,
       "cwd": "${workspaceFolder}/examples/supply-chain-app/"
+    },
+    {
+      "name": "Example: Discounted Cartrade BLP (Docker)",
+      "type": "node",
+      "request": "attach",
+      "protocol": "inspector",
+      "remoteRoot": "/root/cactus",
+      "localRoot": "${workspaceFolder}/examples/discounted-cartrade",
+      "port": 9034
     }
   ]
 }

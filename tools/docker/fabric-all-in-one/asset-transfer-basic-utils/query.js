@@ -8,7 +8,6 @@
 const { FileSystemWallet, Gateway } = require("fabric-network");
 const path = require("path");
 
-// EDIT - Changed config path
 const ccpPath = "./connection.json";
 
 async function main() {
@@ -25,7 +24,6 @@ async function main() {
         'An identity for the user "appUser" does not exist in the wallet',
       );
       console.log("Run the registerUser.js application before retrying");
-      // EDIT - Return error code when identity is missing
       process.exit(2);
     }
 
@@ -41,13 +39,12 @@ async function main() {
     const network = await gateway.getNetwork("mychannel");
 
     // Get the contract from the network.
-    const contract = network.getContract("fabcar");
+    const contract = network.getContract("basic");
 
     // Evaluate the specified transaction.
     // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
-    // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-    const result = await contract.evaluateTransaction("queryAllCars");
-    // EDIT - More verbose result print
+    // GetAllAssets transaction - requires no arguments, ex: ('GetAllAssets')
+    const result = await contract.evaluateTransaction("GetAllAssets");
     console.log(
       "Transaction has been evaluated, result is:",
       JSON.parse(result.toString()),

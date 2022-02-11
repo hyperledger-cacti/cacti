@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2020-2021 Hyperledger Cactus Contributors
+# Copyright 2020-2022 Hyperledger Cactus Contributors
 # SPDX-License-Identifier: Apache-2.0
 
 # Exit on error
@@ -13,7 +13,7 @@ then
     exit 1
 fi
 
-echo "Copy FabCar connection info from container to local storage"
+echo "Copy fabric connection info from container to local storage"
 echo "*********************************"
 rm -fr ./connection.json
 docker cp ${FABRIC_CONTAINER_NAME}:/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json ./connection.json

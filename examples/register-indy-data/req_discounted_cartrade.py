@@ -35,8 +35,8 @@ http_req_params = {
     "url": "http://localhost:5034/api/v1/bl/trades/",
     "businessLogicID": "guks32pf",
     "tradeParams": ["0xec709e1774f0ce4aba47b52a499f9abaaa159f71",
-                     "0x9d624f7995e8bd70251f8265f2f9f2b49f169c55",
-                    "fuser01", "fuser02", "CAR1"],
+                    "0x9d624f7995e8bd70251f8265f2f9f2b49f169c55",
+                    "Brad", "Cathy", "asset2"],
     "authParams": ["<<company name>>"]
 }
 

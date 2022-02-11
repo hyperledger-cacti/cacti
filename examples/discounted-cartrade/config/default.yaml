@@ -4,7 +4,7 @@ cartradeInfo:
     mspID: Org1MSP
     keystore: "/etc/cactus/fabric/wallet"
     connUserName: appUser
-    contractName: fabcar
+    contractName: basic
     peers:
       -
         name: peer0.org1.example.com
@@ -21,7 +21,7 @@ cartradeInfo:
       name: admin
 
     channelName: mychannel
-    chaincodeID: fabcar
+    chaincodeID: basic
 
   ethereum:
     validatorID: 84jUisrs

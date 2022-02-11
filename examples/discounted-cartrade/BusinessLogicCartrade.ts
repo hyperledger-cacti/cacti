@@ -380,8 +380,8 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     );
     logger.debug("getVerifierFabric");
 
-    // Generate parameters for sendSignedProposal(changeCarOwner)
-    const ccFncName = "changeCarOwner";
+    // Generate parameters for sendSignedProposal(TransferAsset)
+    const ccFncName = "TransferAsset";
 
     const ccArgs: string[] = [
       carID, // CarID

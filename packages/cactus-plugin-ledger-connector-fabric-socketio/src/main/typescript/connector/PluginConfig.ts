@@ -16,7 +16,7 @@ export const SplugConfig = {
     mspid: "Org1MSP",
     keystore: "/etc/cactus/fabric/wallet",
     connUserName: "appUser",
-    contractName: "fabcar",
+    contractName: "basic",
     peers: [
       {
         name: "peer0.org1.example.com",
@@ -40,6 +40,6 @@ export const SplugConfig = {
       secret: "adminpw",
     },
     channelName: "mychannel",
-    chaincodeId: "fabcar",
+    chaincodeId: "basic",
   },
 };

@@ -12,7 +12,6 @@ const {
 } = require("fabric-network");
 const path = require("path");
 
-// EDIT - Changed config path
 const ccpPath = "./connection.json";
 
 async function main() {
