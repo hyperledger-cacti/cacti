@@ -16,8 +16,6 @@ import debugModule = require("debug");
 import http = require("http");
 import { ConfigUtil } from "./util/ConfigUtil";
 
-const fs = require("fs");
-const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 import { BusinessLogicPlugin } from "../business-logic-plugin/BusinessLogicPlugin";
