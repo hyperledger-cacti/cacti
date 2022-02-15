@@ -1,40 +1,14 @@
-FROM ubuntu:xenial
+FROM cactus-cmd-socketio-server:latest
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y software-properties-common gnupg 
-#RUN gnupg1 gnupg2
+ENV APP_HOME=/root/cactus
 
-RUN apt-get install -y \
-      apt-utils \
-      apt-transport-https \
-      software-properties-common \
-      wget \
-      curl \
-      telnet \
-      sudo \
-      build-essential \
-      libffi-dev \
-      libssl-dev \
-      zlib1g-dev \
-      liblzma-dev \
-      libbz2-dev \
-      libreadline-dev \
-      libsqlite3-dev \
-      git \
-      gnupg
+WORKDIR ${APP_HOME}
 
-# install python 3.9.5
-#RUN apt-get install -y python3 python3-pip
-RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-RUN echo 'export PATH="$HOME"/.pyenv/bin:$PATH' >> ~/.rc
-RUN . ~/.rc && pyenv install 3.9.5
-RUN echo 'eval "$(pyenv init -)"' >> ~/.rc
-RUN echo 'eval "$(pyenv init --path)"' >> ~/.rc
-RUN cat ~/.rc >> ~/.bashrc
-RUN . ~/.rc && pyenv global 3.9.5
+COPY ./dist/yarn.lock ./package.json ./
+RUN yarn link "@hyperledger/cactus-cmd-socket-server" && \
+    yarn install --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
+    rm -rf ./.yarnCache
 
-RUN apt-get install -y nodejs npm
-RUN npm install n -g
-RUN n 12
-RUN apt purge -y nodejs npm
+COPY ./dist ./dist/
 
-CMD [ "tail", "-f", "/dev/null" ]
+ENTRYPOINT ["node", "./dist/www.js"]

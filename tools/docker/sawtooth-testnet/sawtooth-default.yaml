@@ -18,7 +18,7 @@ version: "2.1"
 services:
 
   settings-tp:
-    image: hyperledger/sawtooth-settings-tp:nightly
+    image: hyperledger/sawtooth-settings-tp:1.2.6
     container_name: sawtooth-settings-tp-default
     depends_on:
       - validator
@@ -27,7 +27,7 @@ services:
       - sawtooth_net
 
   intkey-tp-python:
-    image: hyperledger/sawtooth-intkey-tp-python:nightly
+    image: hyperledger/sawtooth-intkey-tp-python:1.2.3
     container_name: sawtooth-intkey-tp-python-default
     depends_on:
       - validator
@@ -36,7 +36,7 @@ services:
       - sawtooth_net
 
   xo-tp-python:
-    image: hyperledger/sawtooth-xo-tp-python:nightly
+    image: hyperledger/sawtooth-xo-tp-python:1.2.3
     container_name: sawtooth-xo-tp-python-default
     depends_on:
       - validator
@@ -45,7 +45,7 @@ services:
       - sawtooth_net
 
   validator:
-    image: hyperledger/sawtooth-validator:nightly
+    image: hyperledger/sawtooth-validator:1.2.6
     container_name: sawtooth-validator-default
     expose:
       - 4004
@@ -72,7 +72,7 @@ services:
       - sawtooth_net
 
   devmode-engine:
-    image: hyperledger/sawtooth-devmode-engine-rust:nightly
+    image: hyperledger/sawtooth-devmode-engine-rust:1.2.3
     container_name: sawtooth-devmode-engine-rust-default
     depends_on:
       - validator
@@ -81,7 +81,7 @@ services:
       - sawtooth_net
 
   rest-api:
-    image: hyperledger/sawtooth-rest-api:nightly
+    image: hyperledger/sawtooth-rest-api:1.2.6
     container_name: sawtooth-rest-api-default
     ports:
       - "8008:8008"
@@ -92,7 +92,7 @@ services:
       - sawtooth_net
 
   shell:
-    image: hyperledger/sawtooth-shell:nightly
+    image: hyperledger/sawtooth-shell:1.2.6
     container_name: sawtooth-shell-default
     depends_on:
       - rest-api

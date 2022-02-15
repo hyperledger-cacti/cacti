@@ -5,20 +5,17 @@
  * TransactionEthereum.ts
  */
 
-import { LPInfoHolder } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/LPInfoHolder";
-import { Verifier } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier";
-import { TransactionSigner } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/util/TransactionSigner";
-
-const ethJsCommon = require("ethereumjs-common").default;
-const ethJsTx = require("ethereumjs-tx").Transaction;
-const libWeb3 = require("web3");
+import {
+  LPInfoHolder,
+  Verifier,
+  TransactionSigner,
+} from "@hyperledger/cactus-cmd-socket-server";
 
 const fs = require("fs");
-const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
+  fs.readFileSync("/etc/cactus/default.yaml", "utf8"),
 );
 import { getLogger } from "log4js";
 const moduleName = "TransactionEthereum";
@@ -42,7 +39,7 @@ export function makeRawTransaction(txParam: {
 
       getNewNonce(txParam.fromAddress).then((result) => {
         logger.debug(
-          `##makeRawTransaction(A): result: ${JSON.stringify(result)}`
+          `##makeRawTransaction(A): result: ${JSON.stringify(result)}`,
         );
 
         const txnCountHex: string = result.txnCountHex;
@@ -55,12 +52,12 @@ export function makeRawTransaction(txParam: {
             gas: txParam.gas,
           };
         logger.debug(
-          `##makeRawTransaction(B), rawTx: ${JSON.stringify(rawTx)}`
+          `##makeRawTransaction(B), rawTx: ${JSON.stringify(rawTx)}`,
         );
 
         const signedTx = TransactionSigner.signTxEthereum(
           rawTx,
-          txParam.fromAddressPkey
+          txParam.fromAddressPkey,
         );
         const resp: { data: {}; txId: string } = {
           data: { serializedTx: signedTx["serializedTx"] },
@@ -113,7 +110,7 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
             // nonce correction
             txnCount = latestNonce + 1;
             logger.debug(
-              `##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`
+              `##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`,
             );
 
             const method = { type: "function", command: "toHex" };

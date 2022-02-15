@@ -28,7 +28,7 @@
     "start:example-supply-chain": "yarn build:dev && cd ./examples/supply-chain-app/ && yarn --no-lockfile && yarn start",
     "start:example-carbon-accounting": "CONFIG_FILE=examples/cactus-example-carbon-accounting-backend/example-config.json node examples/cactus-example-carbon-accounting-backend/dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "purge-build-cache": "del-cli .build-cache/*",
-    "clean": "npm run purge-build-cache && del-cli \"./{packages,examples,extensions}/cactus-*/{dist,.nyc_output,src/main/proto/generated/*,src/main/typescript/generated/proto/protoc-gen-ts/*,src/main/typescript/generated/openapi/typescript-axios/*,src/main-server/kotlin/gen/kotlin-spring/src/**/{model,api}/*}\" && del-cli \"./dist/*\"",
+    "clean": "npm run purge-build-cache && del-cli \"./{packages,examples,extensions}/cactus-*/{dist,.nyc_output,src/main/proto/generated/*,src/main/typescript/generated/proto/protoc-gen-ts/*,src/main/typescript/generated/openapi/typescript-axios/*,src/main-server/kotlin/gen/kotlin-spring/src/**/{model,api}/*}\"",
     "lint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
     "tsc": "tsc --build --verbose",
     "codegen": "lerna run codegen",

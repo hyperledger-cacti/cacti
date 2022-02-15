@@ -22,34 +22,33 @@ This plugin provides `Cactus` a way to interact with Hyperledger Sawtooth networ
 ### Required software components
 - OS: Linux (recommended Ubuntu20.04,18.04 or CentOS7)
 - Docker (recommend: v17.06.2-ce or greater)
-- Docker-compose (recommend: v1.14.0 or greater)
 - node.js v12 (recommend: v12.20.2 or greater)
 
 ### Prerequisites
-- Please ensure that the destination ledger (default: [sawtooth-testnet](../../tools/docker/sawtooth-testnet)) is already launched
-- Available port:
-    - `5140` (for the port of `@hyperledger/cactus-plugin-ledger-connector-sawtooth-socketio`)
-    - if this port is already used, please change the setting on `docker-compose.yaml`
+- Please ensure that the destination ledger (default: [sawtooth-testnet](../../tools/docker/sawtooth-testnet)) is already launched.
 
-### Boot methods
-#### 1. Run configure command from the project root directory:
-```
-npm run configure
-```
+## Boot methods
+1. Always run configure command first, from the project root directory:
+    ```
+    pushd ../..
+    npm run configure
+    popd
+    ```
 
-#### 2. Go to the go-ethereum connector package directory:
+### Docker
 ```
-cd cactus/packages/cactus-plugin-ledger-connector-sawtooth-socketio
-```
+# Build
+docker build . -t cactus-plugin-ledger-connector-sawtooth-socketio
 
-#### 3. Create the docker image
-```
-docker-compose -f docker-compose.yaml build
+# Run
+docker run -p 5140:5140 --net=sawtooth_net cactus-plugin-ledger-connector-sawtooth-socketio
 ```
 
-#### 4. Launch the container
+### Manual
+- Ensure ledger ports are exposed to the host first.
+
 ```
-docker-compose -f docker-compose.yaml up
+npm run start
 ```
 
 ## Usage samples

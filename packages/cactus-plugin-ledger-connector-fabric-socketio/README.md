@@ -23,13 +23,11 @@ This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks
 
 ### Required software components
 - OS: CentOS7
+- Docker (recommend: v17.06.2-ce or greater)
 - node.js v12 (recommend: v12.20.2 or greater)
 
 ### Prerequisites
 - Please ensure that the destination ledger (default for samples: [fabric-all-in-one](../../tools/docker/fabric-all-in-one/)) is already launched.
-- Available port:
-    - `5040` (for the port of `@hyperledger/cactus-plugin-ledger-connector-fabric-socketio`)
-    - if this port is already used, you can specify custom one when starting the container.
 
 ## Boot methods
 1. Always run configure command first, from the project root directory:
@@ -52,10 +50,12 @@ This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks
 docker build . -t cactus-plugin-ledger-connector-fabric-socketio
 
 # Run
-docker run -v/etc/cactus/:/etc/cactus -p 5040:5040 cactus-plugin-ledger-connector-fabric-socketio
+docker run -v/etc/cactus/:/etc/cactus -p 5040:5040 --net=fabric-all-in-one_testnet-14 cactus-plugin-ledger-connector-fabric-socketio
 ```
 
 ### Manual
+- Ensure ledger ports are exposed to the host first.
+
 ```
 npm run start
 ```

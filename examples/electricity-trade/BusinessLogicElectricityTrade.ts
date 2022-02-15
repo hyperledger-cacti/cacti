@@ -9,20 +9,21 @@ import { Request } from "express";
 import { RequestInfo } from "./RequestInfo";
 import { MeterManagement } from "./MeterManagement";
 import { MeterInfo } from "./MeterInfo";
-import { TradeInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo";
-import { transactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { verifierFactory } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { BusinessLogicBase } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
+import {
+  TradeInfo,
+  routesTransactionManagement,
+  routesVerifierFactory,
+  BusinessLogicBase,
+  LedgerEvent,
+  json2str,
+} from "@hyperledger/cactus-cmd-socket-server";
 import { makeRawTransaction } from "./TransactionEthereum";
-import { LedgerEvent } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin";
-import { json2str } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon";
 
 const fs = require("fs");
-const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
+  fs.readFileSync("/etc/cactus/default.yaml", "utf8"),
 );
 import { getLogger } from "log4js";
 const moduleName = "BusinessLogicElectricityTrade";
@@ -52,7 +53,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     // Create trade information
     const tradeInfo: TradeInfo = new TradeInfo(
       requestInfo.businessLogicID,
-      requestInfo.tradeID
+      requestInfo.tradeID,
     );
 
     this.startMonitor(tradeInfo);
@@ -61,22 +62,22 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   startMonitor(tradeInfo: TradeInfo) {
     // Get Verifier Instance
     logger.debug(
-      `##startMonitor(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##startMonitor(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
     logger.debug(
-      `filterKey: ${config.electricityTradeInfo.sawtooth.filterKey}`
+      `filterKey: ${config.electricityTradeInfo.sawtooth.filterKey}`,
     );
     const options = {
       filterKey: config.electricityTradeInfo.sawtooth.filterKey,
     };
     //        const verifierSawtooth = transactionManagement.getVerifier(useValidator['validatorID'][0], options);
-    const verifierSawtooth = verifierFactory.getVerifier(
+    const verifierSawtooth = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
       "BusinessLogicElectricityTrade",
-      options
+      options,
     );
     logger.debug("getVerifierSawtooth");
   }
@@ -84,8 +85,8 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   remittanceTransaction(transactionSubset: object) {
     logger.debug(
       `called remittanceTransaction(), accountInfo = ${json2str(
-        transactionSubset
-      )}`
+        transactionSubset,
+      )}`,
     );
 
     const accountInfo = this.getAccountInfo(transactionSubset);
@@ -111,15 +112,15 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
     // Get Verifier Instance
     logger.debug(
-      `##remittanceTransaction(): businessLogicID: ${this.businessLogicID}`
+      `##remittanceTransaction(): businessLogicID: ${this.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(this.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(this.businessLogicID),
     );
-    //        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][1]);
-    const verifierEthereum = verifierFactory.getVerifier(
+    //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
+    const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][1],
-      "BusinessLogicElectricityTrade"
+      "BusinessLogicElectricityTrade",
     );
     logger.debug("getVerifierEthereum");
 
@@ -153,7 +154,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   onEvent(ledgerEvent: LedgerEvent, targetIndex: number): void {
     logger.debug(`##in BLP:onEvent()`);
     logger.debug(
-      `##onEvent(): ${json2str(ledgerEvent["data"]["blockData"][targetIndex])}`
+      `##onEvent(): ${json2str(ledgerEvent["data"]["blockData"][targetIndex])}`,
     );
 
     switch (ledgerEvent.verifierId) {
@@ -165,7 +166,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         break;
       default:
         logger.error(
-          `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`
+          `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`,
         );
         return;
     }
@@ -193,24 +194,24 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       }
     } catch (err) {
       logger.error(
-        `##onEventSawtooth(): err: ${err}, event: ${json2str(event)}`
+        `##onEventSawtooth(): err: ${err}, event: ${json2str(event)}`,
       );
     }
   }
 
   getTransactionFromSawtoothEvent(
     event: object,
-    targetIndex: number
+    targetIndex: number,
   ): object | null {
     try {
       const retTransaction = event["blockData"][targetIndex];
       logger.debug(
-        `##getTransactionFromSawtoothEvent(), retTransaction: ${retTransaction}`
+        `##getTransactionFromSawtoothEvent(), retTransaction: ${retTransaction}`,
       );
       return retTransaction;
     } catch (err) {
       logger.error(
-        `##getTransactionFromSawtoothEvent(): invalid even, err:${err}, event:${event}`
+        `##getTransactionFromSawtoothEvent(): invalid even, err:${err}, event:${event}`,
       );
     }
   }
@@ -231,30 +232,30 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
       if (status !== 200) {
         logger.error(
-          `##onEventEthereum(): error event, status: ${status}, txId: ${txId}`
+          `##onEventEthereum(): error event, status: ${status}, txId: ${txId}`,
         );
         return;
       }
     } catch (err) {
       logger.error(
-        `##onEventEthereum(): err: ${err}, event: ${json2str(event)}`
+        `##onEventEthereum(): err: ${err}, event: ${json2str(event)}`,
       );
     }
   }
 
   getTransactionFromEthereumEvent(
     event: object,
-    targetIndex: number
+    targetIndex: number,
   ): object | null {
     try {
       const retTransaction = event["blockData"]["transactions"][targetIndex];
       logger.debug(
-        `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`
+        `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`,
       );
       return retTransaction;
     } catch (err) {
       logger.error(
-        `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`
+        `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`,
       );
     }
   }
@@ -266,7 +267,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
   getTxIDFromEvent(
     ledgerEvent: LedgerEvent,
-    targetIndex: number
+    targetIndex: number,
   ): string | null {
     logger.debug(`##in getTxIDFromEvent`);
     //        logger.debug(`##event: ${json2str(ledgerEvent)}`);
@@ -278,7 +279,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         return this.getTxIDFromEventEtherem(ledgerEvent.data, targetIndex);
       default:
         logger.error(
-          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`
+          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
         );
     }
     return null;
@@ -298,8 +299,8 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       if (typeof txId !== "string") {
         logger.warn(
           `#getTxIDFromEventSawtooth(): skip(invalid block, not found txId.), event: ${json2str(
-            event
-          )}`
+            event,
+          )}`,
         );
         return null;
       }
@@ -308,7 +309,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventSawtooth(): err: ${err}, event: ${json2str(event)}`
+        `##getTxIDFromEventSawtooth(): err: ${err}, event: ${json2str(event)}`,
       );
       return null;
     }
@@ -328,8 +329,8 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       if (typeof txId !== "string") {
         logger.warn(
           `#getTxIDFromEventEtherem(): skip(invalid block, not found txId.), event: ${json2str(
-            event
-          )}`
+            event,
+          )}`,
         );
         return null;
       }
@@ -338,7 +339,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`
+        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`,
       );
       return null;
     }
@@ -346,7 +347,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
   getEventDataNum(ledgerEvent: LedgerEvent): number {
     logger.debug(
-      `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`
+      `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`,
     );
     const event = ledgerEvent.data;
     let retEventNum = 0;
@@ -361,17 +362,17 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
           break;
         default:
           logger.error(
-            `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`
+            `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`,
           );
           break;
       }
       logger.debug(
-        `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`
+        `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`,
       );
       return retEventNum;
     } catch (err) {
       logger.error(
-        `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`
+        `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`,
       );
       return 0;
     }
@@ -382,7 +383,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
     // Get Meter Information.
     const meterInfo: MeterInfo | null = this.meterManagement.getMeterInfo(
-      transactionSubset["Name"]
+      transactionSubset["Name"],
     );
     if (meterInfo === null) {
       logger.debug(`Not registered. meterID = ${transactionSubset["Name"]}`);

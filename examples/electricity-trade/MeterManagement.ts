@@ -7,7 +7,6 @@
 
 import { MeterInfo } from "./MeterInfo";
 const fs = require("fs");
-const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = yaml.safeLoad(
