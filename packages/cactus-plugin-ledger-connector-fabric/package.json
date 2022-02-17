@@ -90,7 +90,7 @@
     "node-vault": "0.9.22",
     "openapi-types": "9.1.0",
     "prom-client": "13.2.0",
-    "secp256k1": "^4.0.2",
+    "secp256k1": "4.0.3",
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.2",
