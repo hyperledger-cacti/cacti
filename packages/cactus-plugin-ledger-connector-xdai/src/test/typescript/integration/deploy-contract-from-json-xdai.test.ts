@@ -102,7 +102,7 @@ describe(testCase, () => {
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
     })) as PluginLedgerConnectorXdai;
     const listenOptions: IListenOptions = {
-      hostname: "0.0.0.0",
+      hostname: "localhost",
       port: 0,
       server,
     };

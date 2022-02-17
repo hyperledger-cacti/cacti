@@ -48,7 +48,7 @@ test("Servers", async (tParent: Test) => {
 
   test("Servers#startOnPreferredPort()", async (t: Test) => {
     const prefPort = 4123;
-    const host = "0.0.0.0";
+    const host = "localhost";
     const portBlocker = createServer();
     test.onFinish(() => portBlocker.close());
     const listenOptionsBlocker = {
