@@ -131,7 +131,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
+    hostname: "localhost",
     port: 0,
     server,
   };
@@ -409,7 +409,7 @@ test("Test invalid refund with invalid time", async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
+    hostname: "localhost",
     port: 0,
     server,
   };
