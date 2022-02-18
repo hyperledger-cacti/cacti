@@ -26,8 +26,10 @@ export const transactionManagement: TransactionManagement =
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log("test-run-transaction()");
-    const tradeID: string = transactionManagement.startBusinessLogic(req);
-
+    const tradeID = transactionManagement.startBusinessLogic(req);
+    if (!tradeID) {
+      throw new RIFError(`Could not run BLP, tradeId = ${tradeID}`);
+    }
     const result = { tradeID: tradeID };
     res.status(200).json(result);
   } catch (err) {

@@ -7,24 +7,24 @@
 
 // transaction information
 class TradeInfo {
-  ethereumAccountFrom: string;
-  ethereumAccountTo: string;
-  fabricAccountFrom: string;
-  fabricAccountTo: string;
-  tradingValue: string;
-  carID: string;
-  proofJson: object;
+  ethereumAccountFrom: string = "";
+  ethereumAccountTo: string = "";
+  fabricAccountFrom: string = "";
+  fabricAccountTo: string = "";
+  tradingValue: string = "";
+  carID: string = "";
+  proofJson: object = {};
 }
 
 // authorization information
 class AuthInfo {
-  company: string;
+  company: string = "";
 }
 
 // request information
 export class RequestInfo {
-  businessLogicID: string;
-  tradeID: string;
+  businessLogicID: string = "";
+  tradeID: string = "";
   tradeInfo: TradeInfo;
   authInfo: AuthInfo;
   constructor() {

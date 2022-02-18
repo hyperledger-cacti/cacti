@@ -55,7 +55,7 @@ export function startCactusSocketIOServer(blp?: BLPConfig) {
    * Event listener for HTTP server "error" event.
    */
 
-  function onError(error): void {
+  function onError(error: any): void {
     if (error.syscall !== "listen") {
       throw error;
     }
@@ -83,9 +83,13 @@ export function startCactusSocketIOServer(blp?: BLPConfig) {
 
   function onListening(): void {
     const addr = server.address();
-    const bind =
-      typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-    debugModule("Listening on " + bind);
+    if (addr) {
+      const bind =
+        typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+      debugModule("Listening on " + bind);
+    } else {
+      throw new Error("Could not get server address!");
+    }
   }
 
   /**

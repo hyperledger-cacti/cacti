@@ -4,7 +4,6 @@
     "composite": true,
     "outDir": "./dist/",
     "tsBuildInfoFile": "../../.build-cache/cactus-cmd-socketio-server.tsbuildinfo",
-    "strict": false // TODO - Change to true, fix warnings, enable jest tests in global config
   },
   "include": [
     "./src/main/typescript/business-logic-plugin/*.ts",

@@ -49,15 +49,22 @@ export class BusinessLogicBase implements BusinessLogicPlugin {
   }
 
   getEventFilter(): object | null {
-    logger.debug(`##called getEventFilter: ${json2str(this.eventFilter)}`);
+    if (this.eventFilter) {
+      logger.debug(`##called getEventFilter: ${json2str(this.eventFilter)}`);
+    }
+
     return this.eventFilter;
   }
 
   setEventFilter(filter: object): void {
-    logger.debug(
-      `##called setEventFilter(before): ${json2str(this.eventFilter)}`
-    );
+    let eventFilterStr = "unset";
+    if (this.eventFilter) {
+      eventFilterStr = json2str(this.eventFilter) || "(could not be parsed)";
+    }
+    logger.debug("##called setEventFilter(before):", eventFilterStr);
+
     this.eventFilter = filter;
+
     logger.debug(
       `##called setEventFilter(after): ${json2str(this.eventFilter)}`
     );

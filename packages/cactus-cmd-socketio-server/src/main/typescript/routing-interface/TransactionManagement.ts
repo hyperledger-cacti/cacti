@@ -24,11 +24,11 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 export class TransactionManagement implements VerifierEventListener {
-  private blpRegistry: BLPRegistry = null; // Verifier information used in business logic
+  private blpRegistry: BLPRegistry; // Verifier information used in business logic
   //    private connectInfo: LPInfoHolder = null;                   // connection information
   //    private verifierArray: [] = [];                             // Verifier
   // private txIDMapInfo: Map<string, string> = null;
-  private tradeIDMapInfo: Map<string, string> = null;
+  private tradeIDMapInfo: Map<string, string>;
 
   constructor() {
     this.blpRegistry = new BLPRegistry();
@@ -39,7 +39,7 @@ export class TransactionManagement implements VerifierEventListener {
   }
 
   // Start business logic
-  startBusinessLogic(req: Request): string {
+  startBusinessLogic(req: Request): string | undefined {
     // businessLogicID
     const businessLogicID = req.body.businessLogicID;
     logger.info(`businessLogicID: ${businessLogicID}`);
@@ -59,7 +59,7 @@ export class TransactionManagement implements VerifierEventListener {
         logger.warn(
           `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`,
         );
-        return;
+        return undefined;
       }
 
       logger.debug("created instance");
@@ -91,13 +91,13 @@ export class TransactionManagement implements VerifierEventListener {
   }
 
   // Get state of operation
-  getOperationStatus(tradeID: string): object {
+  getOperationStatus(tradeID: string): object | undefined {
     const businessLogicID = this.getBusinessLoginIDByTradeID(tradeID);
-    if (businessLogicID === null) {
+    if (!businessLogicID) {
       logger.warn(
         `##getOperationStatus(): not found BusinessLogicPlugin. tradeID: ${tradeID}`,
       );
-      return;
+      return undefined;
     }
 
     const blp = getTargetBLPInstance(businessLogicID);
@@ -105,7 +105,7 @@ export class TransactionManagement implements VerifierEventListener {
       logger.warn(
         `##getOperationStatus(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`,
       );
-      return;
+      return undefined;
     }
 
     const transactionStatusData = blp.getOperationStatus(tradeID);
@@ -114,7 +114,7 @@ export class TransactionManagement implements VerifierEventListener {
   }
 
   // Set business logic config
-  setBusinessLogicConfig(req: Request): object {
+  setBusinessLogicConfig(req: Request): object | undefined {
     // businessLogicID
     const businessLogicID = req.body.businessLogicID;
     logger.info(`businessLogicID: ${businessLogicID}`);
@@ -127,7 +127,7 @@ export class TransactionManagement implements VerifierEventListener {
         logger.warn(
           `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`,
         );
-        return;
+        return undefined;
       }
 
       logger.debug("created instance");
@@ -223,7 +223,7 @@ export class TransactionManagement implements VerifierEventListener {
     const txID = this.getTxIDFromEvent(ledgerEvent, targetIndex);
     if (txID === null) {
       logger.warn(`getBLPInstanceFromEvent: not found txID`);
-      return;
+      return null;
     }
     logger.debug(`getBLPInstanceFromEvent: txID: ${txID}`);
 
@@ -294,10 +294,11 @@ export class TransactionManagement implements VerifierEventListener {
     this.tradeIDMapInfo.set(tradeID, businessLogicID);
   }
 
-  private getBusinessLoginIDByTradeID(tradeID: string): string | null {
+  private getBusinessLoginIDByTradeID(tradeID: string): string | undefined {
     if (this.tradeIDMapInfo.has(tradeID)) {
       return this.tradeIDMapInfo.get(tradeID);
     }
-    return null;
+
+    return undefined;
   }
 }
