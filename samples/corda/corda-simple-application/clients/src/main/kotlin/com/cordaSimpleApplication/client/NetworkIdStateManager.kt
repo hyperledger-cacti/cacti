@@ -21,13 +21,18 @@ import com.weaver.corda.app.interop.states.NetworkIdState
 import java.lang.Exception
 import net.corda.core.messaging.startFlow
 
+class NetworkIdCommand : CliktCommand(name = "network-id", help ="Manages the network id of corda network") {
+    override fun run() {
+    }
+}
+
 /**
  * The CLI command used to trigger a CreateNetworkIdState flow.
  *
  * @property networkId The networkId for the [NetworkIdState].
  * @property memberstring The ; delimeter string of network members for the [NetworkIdState].
  */
-class CreateNetworkIdStateCommand : CliktCommand(help = "Invokes the CreateNetworkIdState. Requires an id to be passed") {
+class CreateNetworkIdStateCommand : CliktCommand(name="create-state", help = "Invokes the CreateNetworkIdState. Requires an id to be passed") {
     private val networkId: String by argument()
     private val memberstring: String? by option("-m", "--networkmembers", help="Names of Parities that are network members")
     val config by requireObject<Map<String, String>>()
@@ -66,7 +71,7 @@ fun createNetworkIdStateHelper(networkId: String, memberstring: String, config: 
 /**
  * The CLI command used to trigger a RetrieveNetworkIdStateAndRef flow.
  */
-class RetrieveNetworkIdStateAndRefCommand : CliktCommand(help = "Invokes the RetrieveNetworkIdStateAndRef flow.") {
+class RetrieveNetworkIdStateAndRefCommand : CliktCommand(name="retrieve-state-and-ref", help = "Invokes the RetrieveNetworkIdStateAndRef flow.") {
     val config by requireObject<Map<String, String>>()
     override fun run() {
         println("RetrieveNetworkIdStateAndRef flow")

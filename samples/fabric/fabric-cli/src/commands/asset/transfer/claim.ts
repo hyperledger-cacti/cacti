@@ -203,9 +203,8 @@ async function getClaimViewAddress(assetCategory, pledgeId, owner, sourceNetwork
     let ownerCert = "", funcName = "", funcArgs = []
     
     if (assetCategory == "cordaAsset") {
-        funcName = "GetAssetPledgeStatus"
-        ownerCert = "TODO" // TODO: Fetch Corda owner cert
-        funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
+        funcName = "GetAssetPledgeStatusByPledgeId"
+        funcArgs = [pledgeId, destNetwork]
     } else if (assetCategory === "bond") {
         funcName = "GetAssetPledgeStatus"
         ownerCert = await getUserCertFromFile(owner, sourceNetwork)

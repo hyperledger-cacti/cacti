@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
 type TokenAssetType struct {
-	Issuer          string              `json:"issuer"`
-	Value           int                 `json:"value"`
+	Issuer string `json:"issuer"`
+	Value  int    `json:"value"`
 }
 type TokenWallet struct {
-	WalletMap       map[string]uint64   `json:"walletlist"`
+	WalletMap map[string]uint64 `json:"walletlist"`
 }
 type TokenAsset struct {
-	Type          string      `json:"type"`
-	NumUnits      uint64      `json:"numunits"`
-	Owner         string      `json:"owner"`
+	Type     string `json:"type"`
+	NumUnits uint64 `json:"numunits"`
+	Owner    string `json:"owner"`
 }
 
 func matchClaimWithTokenAssetPledge(pledgeAssetDetails, claimAssetDetails []byte) bool {
@@ -38,7 +38,6 @@ func matchClaimWithTokenAssetPledge(pledgeAssetDetails, claimAssetDetails []byte
 		pledgeAsset.Owner == claimAsset.Owner &&
 		pledgeAsset.NumUnits == claimAsset.NumUnits)
 }
-
 
 // InitTokenAssetLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitTokenAssetLedger(ctx contractapi.TransactionContextInterface) error {
@@ -64,7 +63,7 @@ func (s *SmartContract) CreateTokenAssetType(ctx contractapi.TransactionContextI
 
 	asset := TokenAssetType{
 		Issuer: issuer,
-		Value: value,
+		Value:  value,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
@@ -211,8 +210,8 @@ func (s *SmartContract) PledgeTokenAsset(ctx contractapi.TransactionContextInter
 	}
 
 	asset := TokenAsset{
-		Type: assetType,
-		Owner: owner,
+		Type:     assetType,
+		Owner:    owner,
 		NumUnits: numUnits,
 	}
 	assetJSON, err := json.Marshal(asset)
@@ -282,9 +281,9 @@ func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInte
 	if err != nil {
 		return err
 	}
-	if (claimAsset.Type != "" &&
+	if claimAsset.Type != "" &&
 		claimAsset.NumUnits != 0 &&
-		claimAsset.Owner != "") {
+		claimAsset.Owner != "" {
 		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
 		if !matchClaimWithTokenAssetPledge(pledgeAssetDetails, claimAssetDetails) {
 			return fmt.Errorf("claim info for asset with pledge id %s does not match pledged asset details on ledger: %s", pledgeId, pledgeAssetDetails)
@@ -305,8 +304,8 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 
 	// Create blank asset details using app-specific-logic
 	blankAsset := TokenAsset{
-		Type: "",
-		Owner: "",
+		Type:     "",
+		Owner:    "",
 		NumUnits: 0,
 	}
 	blankAssetJSON, err := json.Marshal(blankAsset)
@@ -330,7 +329,7 @@ func (s *SmartContract) GetTokenAssetPledgeStatus(ctx contractapi.TransactionCon
 		return blankPledgeBytes64, err
 	}
 	if lookupPledgeAsset.Owner != owner {
-		return blankPledgeBytes64, nil      // Return blank
+		return blankPledgeBytes64, nil // Return blank
 	}
 
 	return pledgeBytes64, nil
@@ -372,8 +371,8 @@ func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionCont
 
 	// Create blank asset details using app-specific-logic
 	blankAsset := TokenAsset{
-		Type: "",
-		Owner: "",
+		Type:     "",
+		Owner:    "",
 		NumUnits: 0,
 	}
 	blankAssetJSON, err := json.Marshal(blankAsset)
@@ -387,19 +386,12 @@ func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionCont
 		return blankClaimBytes64, err
 	}
 	if claimAssetDetails == nil {
-		return blankClaimBytes64, err
+		// represents the scenario that the asset was not claimed by the remote network
+		return blankClaimBytes64, nil
 	}
 
 	// Validate returned asset details using app-specific-logic
-
-	// The asset type should be recorded, so we should look that up first
-	exists, err := s.TokenAssetTypeExists(ctx, assetType)
-	if err != nil {
-		return blankClaimBytes64, err
-	}
-	if !exists {
-		return blankClaimBytes64, fmt.Errorf("the token asset type %s does not exist", assetType)
-	}
+	// It's not possible to check for the existance of the claimed asset on the ledger, since that asset might got spent already.
 
 	// Match pledger identity in claim with request parameters
 	var lookupClaimAsset TokenAsset
@@ -408,21 +400,14 @@ func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionCont
 		return blankClaimBytes64, err
 	}
 	if lookupClaimAsset.Owner != pledger {
-		return blankClaimBytes64, nil      // Return blank
+		return blankClaimBytes64, fmt.Errorf("asset was not pledged by %s", pledger)
+	} else if lookupClaimAsset.Type != assetType {
+		return blankClaimBytes64, fmt.Errorf("given asset type %s was not pledged", assetType)
+	} else if lookupClaimAsset.NumUnits != numUnits {
+		return blankClaimBytes64, fmt.Errorf("given number of units %d of asset tokens were not pledged", numUnits)
 	}
 
-	// Check if this token type has at least numUnits for this owner
-	balance, err := s.GetBalance(ctx, assetType, recipientCert)
-	if err != nil {
-		return blankClaimBytes64, err
-	}
-	if lookupClaimAsset.NumUnits != numUnits {
-		return blankClaimBytes64, fmt.Errorf("given number of units %d of type %s was not claimed", numUnits, assetType)
-	}
-	if balance < lookupClaimAsset.NumUnits {
-		return blankClaimBytes64, fmt.Errorf("the token asset type %s does not have enough balance", assetType)
-	}
-
+	// represents the scenario that the asset was claimed by the remote network
 	return claimBytes64, nil
 }
 

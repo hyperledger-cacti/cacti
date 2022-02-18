@@ -14,10 +14,14 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.default
 import java.lang.Exception
 import kotlinx.coroutines.runBlocking
+import kotlin.system.exitProcess
 import net.corda.core.messaging.startFlow
+import org.json.JSONObject
 import java.util.Base64
 import java.util.Calendar
 import com.weaver.corda.app.interop.states.AssetClaimStatusState
+import com.weaver.corda.app.interop.states.AssetPledgeState
+import com.weaver.corda.app.interop.flows.GetAssetPledgeStatus
 
 import com.weaver.corda.sdk.AssetManager
 import com.cordaSimpleApplication.contract.AssetContract
@@ -49,13 +53,13 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
     val config by requireObject<Map<String, String>>()
     val timeout: String? by option("-t", "--timeout", help="Pledge validity time duration in seconds.")
     val remoteNetworkId: String? by option("-rnid", "--remote-network-id", help="Importing network for asset transfer")
-    val recipientCert: String? by option("-r", "--recipient", help="Recipient party certificate in base64 format")
+    val recipient: String? by option("-r", "--recipient", help="Name of the recipient in the importing network")
     val fungible: Boolean by option("-f", "--fungible", help="Fungible Asset Pledge: True/False").flag(default = false)
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer")
     override fun run() = runBlocking {
-        if (recipientCert == null) {
-            println("Arguement -r (recipient certificate in base64) is required")
+        if (recipient == null) {
+            println("Arguement -r (name of the recipient in importing n/w) is required")
         } else if (param == null) {
             println("Arguement -p (asset details to be pledged) is required")
         } else if (remoteNetworkId == null) {
@@ -90,6 +94,10 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                 if (observer != null)   {
                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                 }
+
+                // Obtain the recipient certificate from the name of the recipient
+                val recipientCert: String = getUserCertFromFile(recipient!!, remoteNetworkId!!)
+
                 if (fungible) {
                     id = AssetManager.createFungibleAssetPledge(
                         rpc.proxy,
@@ -97,7 +105,7 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                         remoteNetworkId!!,
                         params[0],          // Type
                         params[1].toLong(), // Quantity
-                        recipientCert!!,
+                        recipientCert,
                         nTimeout,
                         "net.corda.samples.tokenizedhouse.flows.RetrieveStateAndRef",
                         RedeemTokenCommand(issuedTokenType, listOf(0), listOf()),
@@ -111,7 +119,7 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
                         remoteNetworkId!!,
                         params[0],      // Type
                         params[1],      // ID
-                        recipientCert!!,
+                        recipientCert,
                         nTimeout,
                         "com.cordaSimpleApplication.flow.RetrieveStateAndRef",
                         AssetContract.Commands.Delete(),
@@ -134,14 +142,22 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge",
  */
 class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help = "Reclaims a pledged asset after timeout.") {
     val config by requireObject<Map<String, String>>()
-    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge/Linear Id for Asset Transfer Pledge State")
-    val claimStatusLinearId: String? by option("-cid", "--claim-status-linear-id", help="Linear Id for interop-query external state")
+    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge id for asset transfer pledge state")
+    val transferCategory: String? by option("-tc", "--transfer-category", help="transferCategory is input in the format: 'asset_type.remote_network_type'."
+        + " 'asset_type' can be either 'bond', 'token' or 'house-token'."
+        + " 'remote_network_type' can be either 'fabric', 'corda' or 'besu'.")
+    val importNetworkId: String? by option ("-inid", "--import-network-id", help="Import network id of pledged asset for asset transfer")
+    val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer (e.g., 'O=PartyA,L=London,C=GB')")
     override fun run() = runBlocking {
         if (pledgeId == null) {
             println("Arguments required: --pledge-id.")
-        } else if (claimStatusLinearId == null) {
-            println("Arguments required: --claim-status-linear-id.")
+        } else if (transferCategory == null) {
+            println("Arguments required: --transfer-category.")
+        } else if (importNetworkId == null) {
+            println("Arguments required: --import-network-id.")
+        } else if (param == null) {
+            println("Arguments required: --param.")
         } else {
             val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
@@ -152,6 +168,29 @@ class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help
                 val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
                 val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
                 println("TokenType: $issuedTokenType")
+
+                val assetPledgeState = rpc.proxy.startFlow(::GetAssetPledgeStatus, pledgeId!!, importNetworkId!!).returnValue.get() as AssetPledgeState
+                if (assetPledgeState.lockerCert.equals("")) {
+                    println("Error: not a valid pledgeId $pledgeId")
+                    throw IllegalStateException("Error: not a valid pledgeId $pledgeId")
+                } else if (!assetPledgeState.remoteNetworkId.equals(importNetworkId)) {
+                    println("Invalid argument --import-network-id $importNetworkId")
+                    throw IllegalStateException("Invalid argument --import-network-id $importNetworkId")
+                }
+
+                val params = param!!.split(":").toTypedArray()
+                if (params.size != 2) {
+                    println("Invalid argument --param $param")
+                    throw IllegalStateException("Invalid argument --param $param")
+                }
+                var externalStateAddress: String = getReclaimViewAddress(transferCategory!!, params[0], params[1], pledgeId!!,
+                    assetPledgeState.lockerCert, assetPledgeState.localNetworkId, assetPledgeState.recipientCert,
+                    importNetworkId!!, assetPledgeState.expiryTimeSecs.toString())
+
+                val networkConfig: JSONObject = getRemoteNetworkConfig(assetPledgeState.localNetworkId)
+                val exportRelayAddress: String = networkConfig.getString("relayEndpoint")
+                val claimStatusLinearId: String = requestStateFromRemoteNetwork(exportRelayAddress, externalStateAddress, rpc.proxy, config)
+
                 var obs = listOf<Party>()
                 if (observer != null)   {
                     obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
@@ -160,13 +199,15 @@ class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help
                     rpc.proxy,
                     pledgeId!!,
                     IssueTokenCommand(issuedTokenType, listOf(0)),
-                    claimStatusLinearId!!,
+                    claimStatusLinearId,
                     issuer,
                     obs
                 )
                 println("Pledged Asset Reclaim Response: ${res}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
+                // exit the process throwing error code
+                exitProcess(1)
             } finally {
                 rpc.close()
             }
@@ -203,18 +244,23 @@ class FetchCertBase64Command : CliktCommand(name="get-cert-base64", help = "Obta
 class ClaimRemoteHouseTokenCommand : CliktCommand(name="claim-remote-asset", help = "Claims a remote pledged asset.") {
     val config by requireObject<Map<String, String>>()
     val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge/Linear Id for Asset Transfer Pledge State")
-    val pledgeStatusLinearId: String? by option("-psld", "--pledge-status-linear-id", help="Linear Id for interop-query external state")
-    val lockerCert: String? by option("-lc", "--locker-certificate", help="Certificate of the party in the exporting network owning the asset pledged")
+    val locker: String? by option("-l", "--locker", help="Name of the party in the exporting network owning the asset pledged")
+    val transferCategory: String? by option("-tc", "--transfer-category", help="transferCategory is input in the format: 'asset_type.remote_network_type'."
+        + " 'asset_type' can be either 'bond', 'token' or 'house-token'."
+        + " 'remote_network_type' can be either 'fabric', 'corda' or 'besu'.")
+    val exportNetworkId: String? by option ("-enid", "--export-network-id", help="Export network id of pledged asset for asset transfer")
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer")
     override fun run() = runBlocking {
         println("Entered here..1")
         if (pledgeId == null) {
             println("Arguments required: --pledge-id.")
-        } else if (pledgeStatusLinearId == null) {
-            println("Arguments required: --pledge-status-linear-id.")
-        } else if (lockerCert == null) {
-            println("Arguments required: --locker-certificate.")
+        } else if (locker == null) {
+            println("Arguments required: --locker.")
+        } else if (transferCategory == null) {
+            println("Arguments required: --transfer-category.")
+        } else if (exportNetworkId == null) {
+            println("Arguments required: --export-network-id.")
         } else {
             val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
@@ -222,24 +268,43 @@ class ClaimRemoteHouseTokenCommand : CliktCommand(name="claim-remote-asset", hel
                 password = "test",
                 rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
-                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuer: Party = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
                 val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
                 println("TokenType: $issuedTokenType")
-                val recipientCert = rpc.proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
+                val recipientCert: String = rpc.proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
                 println("param: ${param}")
                 val params = param!!.split(":").toTypedArray()
+                if (params.size != 2) {
+                    println("Invalid argument --param $param")
+                    throw IllegalStateException("Invalid argument --param $param")
+                }
                 println("params[0]: ${params[0]} and params[1]: ${params[1]}")
                 var obs = listOf<Party>()
                 if (observer != null)   {
                     obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                 }
+
+                // Obtain the locker certificate from the name of the locker
+                val lockerCert: String = getUserCertFromFile(locker!!, exportNetworkId!!)
+
+                val importNetworkId: String? = rpc.proxy.startFlow(::RetrieveNetworkId).returnValue.get()
+                var externalStateAddress: String = getClaimViewAddress(transferCategory!!, pledgeId!!, lockerCert, exportNetworkId!!, recipientCert, importNetworkId!!)
+
+                // 1. While exercising 'data transfer' initiated by a Corda network, the localRelayAddress is obtained directly from user.
+                // 2. While exercising 'asset transfer' initiated by a Fabric network, the localRelayAddress is obtained from config.json file
+                // 3. While exercising 'asset transfer' initiated by a Corda network (this case), the localRelayAddress is obtained
+                //    below from the remote-network-config.json file
+                val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
+                val importRelayAddress: String = networkConfig.getString("relayEndpoint")
+                val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(importRelayAddress, externalStateAddress, rpc.proxy, config)
+
                 val res = AssetManager.claimPledgedFungibleAsset(
                     rpc.proxy,
                     pledgeId!!,
-                    pledgeStatusLinearId!!,
+                    pledgeStatusLinearId,
                     params[0],          // Type
                     params[1].toLong(), // Quantity
-                    lockerCert!!,
+                    lockerCert,
                     recipientCert,
                     "net.corda.samples.tokenizedhouse.flows.GetTokenStateAndContractId",
                     IssueTokenCommand(issuedTokenType, listOf(0)),
@@ -249,6 +314,8 @@ class ClaimRemoteHouseTokenCommand : CliktCommand(name="claim-remote-asset", hel
                 println("Pledged asset claim response: ${res}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
+                // exit the process throwing error code
+                exitProcess(1)
             } finally {
                 rpc.close()
             }
