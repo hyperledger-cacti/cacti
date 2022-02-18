@@ -25,8 +25,10 @@ export const transactionManagement: TransactionManagement =
 // Request Execution of Trade
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tradeID: string = transactionManagement.startBusinessLogic(req);
-
+    const tradeID = transactionManagement.startBusinessLogic(req);
+    if (!tradeID) {
+      throw new RIFError(`Could not run BLP, tradeId = ${tradeID}`);
+    }
     const result = { tradeID: tradeID };
     res.status(200).json(result);
   } catch (err) {
@@ -45,7 +47,12 @@ router.post(
   "/meter/register/",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result: object = transactionManagement.setBusinessLogicConfig(req);
+      const result = transactionManagement.setBusinessLogicConfig(req);
+
+      if (!result) {
+        throw new RIFError("Error when running setBusinessLogicConfig");
+      }
+
       let status = 200;
       if (result["action"] === "add") {
         status = 201;

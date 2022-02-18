@@ -25,13 +25,16 @@ export const transactionManagement: TransactionManagement =
 // Request Execution of Trade
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tradeID: string = transactionManagement.startBusinessLogic(req);
+    const tradeID = transactionManagement.startBusinessLogic(req);
+    if (!tradeID) {
+      throw new RIFError(`Could not run BLP, tradeId = ${tradeID}`);
+    }
 
     const result = { tradeID: tradeID };
     res
       .status(201)
       .location(
-        config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID
+        config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID,
       )
       .json(result);
   } catch (err) {
@@ -49,7 +52,11 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
 router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = transactionManagement.getOperationStatus(req.params.id);
-    res.status(200).json(result);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      throw new RIFError("Could not get operation status");
+    }
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
