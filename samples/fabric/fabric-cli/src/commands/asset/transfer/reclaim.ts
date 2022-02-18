@@ -189,9 +189,8 @@ function getReclaimViewAddress(assetCategory, assetType, assetIdOrQuantity,
 ) {
     let funcName = "", funcArgs = []
     if (assetCategory == "cordaAsset") {
-        funcName = "GetAssetClaimStatus"
-        funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
-            pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
+        funcName = "GetAssetClaimStatusByPledgeId"
+        funcArgs = [pledgeId, pledgeExpiryTimeSecs]
     } else if (assetCategory === "bond") {
         funcName = "GetAssetClaimStatus"
         funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,

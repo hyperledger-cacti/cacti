@@ -35,13 +35,18 @@ import com.cordaSimpleApplication.flow.GetOurCertificateBase64
 import com.cordaSimpleApplication.flow.GetOurIdentity
 import net.corda.core.identity.Party
 
+class AssetTransferCommand : CliktCommand(name = "transfer", help ="Manages simple asset transfer") {
+    override fun run() {
+    }
+}
+
 /**
  * Command to pledge an asset.
- * pledge-asset --timeout=120 -rnid Corda_Network2 --recipient='<base64 certificate>' --param=type:id ----> non-fungible
- * pledge-asset --fungible --timeout=120 -rnid Corda_Network2 --recipient='<base64 certificate>' --param=type:amount ----> fungible
+ * transfer pledge-asset --timeout=120 -rnid 'Corda_Network2' -nrid 'Corda_Network2' --recipient='<name of the recipient>' --param=type:id ----> non-fungible
+ * transfer pledge-asset --fungible --timeout=120 -rnid Corda_Network2 --recipient='<name of the recipient>' --param=type:amount ----> fungible
  */
 class PledgeAssetCommand : CliktCommand(name="pledge-asset",
-        help = "Locks an asset. $ ./clients pledge-asset --fungible --timeout=10 --recipient='<base64 certificate>' --param=type:amount") {
+        help = "Locks an asset. $ ./clients transfer pledge-asset --fungible --timeout=10 -rnid 'Corda_Network2' --recipient='<name of recipient>' --param=type:amount") {
     val config by requireObject<Map<String, String>>()
     val timeout: String? by option("-t", "--timeout", help="Pledge validity time duration in seconds.")
     val remoteNetworkId: String? by option("-rnid", "--remote-network-id", help="Importing network for asset transfer")
@@ -164,9 +169,9 @@ class IsAssetPledgedCommand : CliktCommand(name="is-asset-pledged", help = "Quer
 /**
  * Fetch asset pledge state for transfer associated with pledgeId.
  */
-class GetAssetPledgeStateCommand : CliktCommand(name="get-asset-pledge-state", help = "Fetch asset pledge state associated with pledgeId.") {
+class GetAssetPledgeStateCommand : CliktCommand(name="get-pledge-state", help = "Fetch asset pledge state associated with pledgeId.") {
     val config by requireObject<Map<String, String>>()
-    val pledgeId: String? by option("-pid", "--pledge-id", help="Linear Id for asset pledge state")
+    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge id for asset pledge state")
     override fun run() = runBlocking {
         if (pledgeId == null) {
             println("Arguments required: --pledge-id.")
@@ -194,7 +199,7 @@ class GetAssetPledgeStateCommand : CliktCommand(name="get-asset-pledge-state", h
 /**
  * Command to fetch the certificate (in base64) of the party owning the node.
  */
-class FetchCertBase64AssetCommand : CliktCommand(name="get-cert-base64", help = "Obtain the certificate of the party owning a node in base64 format.") {
+class FetchCertBase64Command : CliktCommand(name="get-cert-base64", help = "Obtain the certificate of the party owning a node in base64 format.") {
     val config by requireObject<Map<String, String>>()
     override fun run() = runBlocking {
 
@@ -215,17 +220,49 @@ class FetchCertBase64AssetCommand : CliktCommand(name="get-cert-base64", help = 
 }
 
 /**
+ * Command to fetch the name of the party owning the node.
+ */
+class FetchPartyNameCommand : CliktCommand(name="get-party-name", help = "Obtain the name of the party owning a node in the Corda network.") {
+    val config by requireObject<Map<String, String>>()
+    override fun run() = runBlocking {
+
+        val rpc = NodeRPCConnection(
+            host = config["CORDA_HOST"]!!,
+            username = "clientUser1",
+            password = "test",
+            rpcPort = config["CORDA_PORT"]!!.toInt())
+        try {
+            val partyName = rpc.proxy.startFlow(::GetOurIdentity).returnValue.get()
+            println("Name of the party owning the Corda node: $partyName")
+        } catch (e: Exception) {
+            println("Error: ${e.toString()}")
+        } finally {
+            rpc.close()
+        }
+    }
+}
+
+/**
  * Command to reclaim a pledged asset after timeout.
  */
 class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "Reclaims a pledged asset after timeout.") {
     val config by requireObject<Map<String, String>>()
-    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge/Linear id for asset transfer pledge state")
+    val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge id for asset transfer pledge state")
+    val transferCategory: String? by option("-tc", "--transfer-category", help="transferCategory is input in the format: 'asset_type.remote_network_type'."
+        + " 'asset_type' can be either 'bond', 'token' or 'house-token'."
+        + " 'remote_network_type' can be either 'fabric', 'corda' or 'besu'.")
     val importNetworkId: String? by option ("-inid", "--import-network-id", help="Import network id of pledged asset for asset transfer")
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer (e.g., 'O=PartyA,L=London,C=GB')")
     override fun run() = runBlocking {
         if (pledgeId == null) {
             println("Arguments required: --pledge-id.")
+        } else if (transferCategory == null) {
+            println("Arguments required: --transfer-category.")
+        } else if (importNetworkId == null) {
+            println("Arguments required: --import-network-id.")
+        } else if (param == null) {
+            println("Arguments required: --param.")
         } else {
             val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
@@ -252,16 +289,15 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
                 println("Invalid argument --param $param")
                 throw IllegalStateException("Invalid argument --param $param")
             }
-            var externalStateAddress: String = getReclaimViewAddress("token", params[0], params[1], pledgeId!!,
+            var externalStateAddress: String = getReclaimViewAddress(transferCategory!!, params[0], params[1], pledgeId!!,
                 assetPledgeState.lockerCert, assetPledgeState.localNetworkId, assetPledgeState.recipientCert,
                 importNetworkId!!, assetPledgeState.expiryTimeSecs.toString())
 
-            val keys: List<String> = listOf("relayEndpoint")
-            val values: List<String> = getFromRemoteNetworkConfigFile(assetPledgeState.localNetworkId, keys)
-            val exportRelayAddress: String = values[0]
-            val claimStatusLinearId: String = requestStateFromRemoteNetwork(exportRelayAddress, externalStateAddress, rpc.proxy, config)
-
             try {
+                val networkConfig: JSONObject = getRemoteNetworkConfig(assetPledgeState.localNetworkId)
+                val exportRelayAddress: String = networkConfig.getString("relayEndpoint")
+                val claimStatusLinearId: String = requestStateFromRemoteNetwork(exportRelayAddress, externalStateAddress, rpc.proxy, config)
+
                 var obs = listOf<Party>()
                 if (observer != null)   {
                     obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
@@ -277,6 +313,8 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
                 println("Pledged Asset Reclaim Response: ${res}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
+                // exit the process throwing error code
+                exitProcess(1)
             } finally {
                 rpc.close()
             }
@@ -291,6 +329,9 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
     val config by requireObject<Map<String, String>>()
     val pledgeId: String? by option("-pid", "--pledge-id", help="Pledge/Linear id for asset transfer pledge state")
     val locker: String? by option("-l", "--locker", help="Name of the party in the exporting network owning the asset pledged")
+    val transferCategory: String? by option("-tc", "--transfer-category", help="transferCategory is input in the format: 'asset_type.remote_network_type'."
+        + " 'asset_type' can be either 'bond', 'token' or 'house-token'."
+        + " 'remote_network_type' can be either 'fabric', 'corda' or 'besu'.")
     val exportNetworkId: String? by option ("-enid", "--export-network-id", help="Export network id of pledged asset for asset transfer")
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer (e.g., 'O=PartyA,L=London,C=GB')")
@@ -299,6 +340,8 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
             println("Arguments required: --pledge-id.")
         } else if (locker == null) {
             println("Arguments required: --locker.")
+        } else if (transferCategory == null) {
+            println("Arguments required: --transfer-category.")
         } else if (exportNetworkId == null) {
             println("Arguments required: --export-network-id.")
         } else {
@@ -329,15 +372,14 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
                 val lockerCert: String = getUserCertFromFile(locker!!, exportNetworkId!!)
 
                 val importNetworkId: String? = rpc.proxy.startFlow(::RetrieveNetworkId).returnValue.get()
-                var externalStateAddress: String = getClaimViewAddress("token", pledgeId!!, lockerCert, exportNetworkId!!, recipientCert, importNetworkId!!)
+                var externalStateAddress: String = getClaimViewAddress(transferCategory!!, pledgeId!!, lockerCert, exportNetworkId!!, recipientCert, importNetworkId!!)
 
                 // 1. While exercising 'data transfer' initiated by a Corda network, the localRelayAddress is obtained directly from user.
                 // 2. While exercising 'asset transfer' initiated by a Fabric network, the localRelayAddress is obtained from config.json file
                 // 3. While exercising 'asset transfer' initiated by a Corda network (this case), the localRelayAddress is obtained
                 //    below from the remote-network-config.json file
-                val keys: List<String> = listOf("relayEndpoint")
-                val values: List<String> = getFromRemoteNetworkConfigFile(importNetworkId, keys)
-                val importRelayAddress: String = values[0]
+                val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
+                val importRelayAddress: String = networkConfig.getString("relayEndpoint")
                 val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(importRelayAddress, externalStateAddress, rpc.proxy, config)
 
                 val res = AssetManager.claimPledgedFungibleAsset(
@@ -356,6 +398,8 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
                 println("Pledged asset claim response: ${res}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
+                // exit the process throwing error code
+                exitProcess(1)
             } finally {
                 rpc.close()
             }
@@ -420,7 +464,6 @@ class GetSimpleAssetPledgeStatusByPledgeIdCommand : CliktCommand(name="get-pledg
                     .returnValue.get()
                 val charset = Charsets.UTF_8
                 println("assetPledgeStatus: ${assetPledgeStatusBytes.toString(charset)}")
-                println("assetPledgeStatus: ${assetPledgeStatusBytes.contentToString()}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
             } finally {
@@ -430,8 +473,8 @@ class GetSimpleAssetPledgeStatusByPledgeIdCommand : CliktCommand(name="get-pledg
     }
 }
 
-private fun getReclaimViewAddress(
-    assetCategory: String,
+fun getReclaimViewAddress(
+    transferCategory: String,
     assetType: String,
     assetIdOrQuantity: String,
     pledgeId: String,
@@ -445,15 +488,23 @@ private fun getReclaimViewAddress(
     var funcName: String? = null
     var funcArgs: List<String>? = null
 
-    if (assetCategory.equals("token")) {
-        if (importNetworkId.equals("Corda_Network") || importNetworkId.equals("Corda_Network2")) {
-            funcName = "GetAssetClaimStatusByPledgeId"
-            funcArgs = listOf(pledgeId, pledgeExpiryTimeSecs)
-        } else if (importNetworkId.equals("network1") || importNetworkId.equals("network2")) {
-            funcName = "GetTokenAssetClaimStatus"
-            funcArgs = listOf(pledgeId, assetType, assetIdOrQuantity, recipientCert, pledgerCert,
-                                exportNetworkId, pledgeExpiryTimeSecs)
-        }
+    // transferCategory is input in the format: "asset_type.remote_network_type"
+    // asset_type can be either bond, token or house-token
+    // remote_network_type can be either fabric, corda or besu
+    if (transferCategory.equals("token.corda")) {
+        funcName = "GetAssetClaimStatusByPledgeId"
+        funcArgs = listOf(pledgeId, pledgeExpiryTimeSecs)
+    } else if (transferCategory.equals("token.fabric")) {
+        funcName = "GetTokenAssetClaimStatus"
+        funcArgs = listOf(pledgeId, assetType, assetIdOrQuantity, recipientCert, pledgerCert,
+                        exportNetworkId, pledgeExpiryTimeSecs)
+    } else if (transferCategory.equals("bond.fabric")) {
+        funcName = "GetAssetClaimStatus"
+        funcArgs = listOf(pledgeId, assetType, assetIdOrQuantity, recipientCert, pledgerCert,
+                    exportNetworkId, pledgeExpiryTimeSecs)
+    } else if (transferCategory.equals("house-token.corda")) {
+        funcName = "GetAssetClaimStatusByPledgeId"
+        funcArgs = listOf(pledgeId, pledgeExpiryTimeSecs)
     }
     println("funcName: $funcName and funcArgs: $funcArgs")
 
@@ -462,8 +513,8 @@ private fun getReclaimViewAddress(
     return viewAddress
 }
 
-private fun getClaimViewAddress(
-    assetCategory: String,
+fun getClaimViewAddress(
+    transferCategory: String,
     pledgeId: String,
     pledgerCert: String,
     exportNetworkId: String,
@@ -474,14 +525,15 @@ private fun getClaimViewAddress(
     var funcName: String? = null
     var funcArgs: List<String>? = null
 
-    if (assetCategory.equals("token")) {
-        if (exportNetworkId.equals("Corda_Network") || exportNetworkId.equals("Corda_Network2")) {
-            funcName = "GetAssetPledgeStatusByPledgeId"
-            funcArgs = listOf(pledgeId, importNetworkId)
-        } else if (exportNetworkId.equals("network1") || exportNetworkId.equals("network2")) {
-            funcName = "GetTokenAssetPledgeStatus"
-            funcArgs = listOf(pledgeId, pledgerCert, importNetworkId, recipientCert)
-        }
+    if (transferCategory.equals("token.corda")) {
+        funcName = "GetAssetPledgeStatusByPledgeId"
+        funcArgs = listOf(pledgeId, importNetworkId)
+    } else if (transferCategory.equals("token.fabric")) {
+        funcName = "GetTokenAssetPledgeStatus"
+        funcArgs = listOf(pledgeId, pledgerCert, importNetworkId, recipientCert)
+    } else if (transferCategory.equals("house-token.corda")) {
+        funcName = "GetAssetPledgeStatusByPledgeId"
+        funcArgs = listOf(pledgeId, importNetworkId)
     }
     println("funcName: $funcName and funcArgs: $funcArgs")
 
@@ -491,45 +543,39 @@ private fun getClaimViewAddress(
 }
 
 /*
- * This function parses the file remote-network-config.json and fetches the values for keys of an input network.
- * If either the network is not found, or the key is not found, it throws an exception.
+ * This function parses the file remote-network-config.json and fetches the configuration of the input networkId.
+ * If either the configuration file not found, or the network is not found, it throws an exception.
  */
-private fun getFromRemoteNetworkConfigFile(networkID: String, keys: List<String>): List<String> {
-
-    var values: MutableList<String> = mutableListOf()
+fun getRemoteNetworkConfig(networkID: String): JSONObject {
 
     val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
     val filepath: String = credentialPath + "/remote-network-config.json"
 
     val networksConfigJSON: JSONObject
     val networksConfigFile: File
-    networksConfigFile = File(filepath)
-    if (!networksConfigFile.exists()) {
-        // if file doesn't exits, throw an exception
-        println("File $filepath doesn't exist to fetch the network configuration of networkID $networkID.")
-        throw IllegalStateException("File $filepath doesn't exist to fetch the network configuration of networkID $networkID.")
-    } else {
-        // if file exists, read the contents of the file
-        networksConfigJSON = JSONObject(networksConfigFile.readText(Charsets.UTF_8))
-    }
-
-    // throw exception if the networkID is not present in the file
-    if (!networksConfigJSON.has(networkID)) {
-        println("File $filepath doesn't contain the configuration of networkID $networkID.")
-        throw IllegalStateException("File $filepath doesn't contain the configuration of networkID $networkID.")
-    }
-
-    val networkConfigJSON: JSONObject = networksConfigJSON.getJSONObject(networkID)
-    for (key in keys) {
-        // throw exception if either of the keys are not present in the configuration
-        if (!networkConfigJSON.has(key)) {
-            println("File $filepath doesn't contain the key $key in the configuration of networkID $networkID.")
-            throw IllegalStateException("File $filepath doesn't contain the key $key in the configuration of networkID $networkID.")
+    try {
+        networksConfigFile = File(filepath)
+        if (!networksConfigFile.exists()) {
+            // if file doesn't exits, throw an exception
+            println("File $filepath doesn't exist to fetch the network configuration of networkID $networkID.")
+            throw IllegalStateException("File $filepath doesn't exist to fetch the network configuration of networkID $networkID.")
+        } else {
+            // if file exists, read the contents of the file
+            networksConfigJSON = JSONObject(networksConfigFile.readText(Charsets.UTF_8))
         }
-        values.add(networkConfigJSON.getString(key))
+
+        // throw exception if the networkID is not present in the file
+        if (!networksConfigJSON.has(networkID)) {
+            println("File $filepath doesn't contain the configuration of networkID $networkID.")
+            throw IllegalStateException("File $filepath doesn't contain the configuration of networkID $networkID.")
+        }
+    } catch (e: Exception) {
+        println("Error: ${e.toString()}")
+        // exit the process throwing error code
+        exitProcess(1)
     }
 
-    return values
+    return networksConfigJSON.getJSONObject(networkID)
 }
 
 /*
@@ -537,31 +583,30 @@ private fun getFromRemoteNetworkConfigFile(networkID: String, keys: List<String>
  * This is called both in the cases of Claim and Reclaim.
  * It generates the view addess based on the remote network being Corda or Fabric accordingly.
  */
-private fun generateViewAddressFromRemoteConfig(
+fun generateViewAddressFromRemoteConfig(
     networkId: String,
     funcName: String,
     funcArgs: List<String>) : String
 {
-    var address: String
-    if (networkId.equals("Corda_Network") || networkId.equals("Corda_Network2")) {
-        val keys: List<String> = listOf("relayEndpoint", "partyEndPoint", "flowPackage")
-        val values: List<String> = getFromRemoteNetworkConfigFile(networkId, keys)
-        val relayEndpoint: String = values[0]
-        val cordaHosts: List<String> = listOf(values[1])
-        val flowPackage: String = values[2]
+    var address: String = ""
+    var remoteNetworkConfig: JSONObject = getRemoteNetworkConfig(networkId)
 
-        address = InteroperableHelper.createCordaViewAddress(networkId, relayEndpoint, cordaHosts,
-                    flowPackage + "." + funcName, funcArgs.joinToString(separator=":") { it })
-    } else if (networkId.equals("network1") || networkId.equals("network2")) {
-        val keys: List<String> = listOf("relayEndpoint", "channelName", "chaincode")
-        val values: List<String> = getFromRemoteNetworkConfigFile(networkId, keys)
-        val relayEndpoint: String = values[0]
-        val channelName: String = values[1]
-        val chaincodeName: String = values[2]
-        address = InteroperableHelper.createFabricViewAddress(networkId, relayEndpoint, channelName,
-                    chaincodeName, funcName, funcArgs.joinToString(separator=":") { it })
-    } else {
-        println("Error: networkId $networkId is not valid to generate view address.")
+    try {
+        val relayEndpoint: String = remoteNetworkConfig.getString("relayEndpoint")
+        if (remoteNetworkConfig.getString("type").equals("corda")) {
+            val cordaHosts: List<String> = listOf(remoteNetworkConfig.getString("partyEndPoint"))
+            val flowPackage: String = remoteNetworkConfig.getString("flowPackage")
+
+            address = InteroperableHelper.createCordaViewAddress(networkId, relayEndpoint, cordaHosts,
+                        flowPackage + "." + funcName, funcArgs.joinToString(separator=":") { it })
+        } else if (remoteNetworkConfig.getString("type").equals("fabric")) {
+            val channelName: String = remoteNetworkConfig.getString("channelName")
+            val chaincodeName: String = remoteNetworkConfig.getString("chaincode")
+            address = InteroperableHelper.createFabricViewAddress(networkId, relayEndpoint, channelName,
+                        chaincodeName, funcName, funcArgs.joinToString(separator=":") { it })
+        }
+    } catch (e: Exception) {
+        println("Error: ${e.toString()}")
         // exit the process throwing error code
         exitProcess(1)
     }
@@ -576,7 +621,7 @@ private fun generateViewAddressFromRemoteConfig(
  * In case of Claim by a network, this is used to fetch the pledge-status in the export network.
  * In case of Reclaim by a network, this is used to fetch the claim-status in the import network.
  */
-private fun requestStateFromRemoteNetwork(
+fun requestStateFromRemoteNetwork(
     localRelayAddress: String,
     externalStateAddress: String,
     proxy: CordaRPCOps,
@@ -597,8 +642,6 @@ private fun requestStateFromRemoteNetwork(
             config["RELAY_TLSCA_CERT_PATHS"]!!
         ).fold({
             println("Error in Interop Flow: ${it.message}")
-            // exit the process throwing error code
-            //exitProcess(1)
         }, {
             linearId = it.toString()
             println("Interop flow successful and external-state was stored with linearId $linearId.\n")
@@ -616,12 +659,13 @@ private fun requestStateFromRemoteNetwork(
  * Fetches the certificate corresponding to an user from the file 'networkID'+'_UsersAndCerts.json'.
  * This is used during Pledge to get the recipientCert, and during Claim to get the pledgerCert.
  */
-private fun getUserCertFromFile(userID: String, networkID: String): String {
-    var certBase64: String = ""
+fun getUserCertFromFile(userID: String, networkID: String): String {
+    var certBase64: String
     try {
 
         val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
-        val filepath: String = "$credentialPath/$networkID" + "_UsersAndCerts.json"
+        val dirPath: String = "$credentialPath" + "/remoteNetworkUsers"
+        val filepath: String = "$dirPath/$networkID" + "_UsersAndCerts.json"
 
         var usersAndCertsJSON: JSONObject
         var usersAndCertsFile: File
@@ -644,6 +688,7 @@ private fun getUserCertFromFile(userID: String, networkID: String): String {
         certBase64 = usersAndCertsJSON.getString(userID)
     } catch (e: Exception) {
         println(e.toString())
+        exitProcess(1)
     }
     return certBase64
 }
@@ -678,8 +723,13 @@ class SaveUserCertToFileCommand : CliktCommand(name="save-cert", help = "Populat
             }
 
             val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
-            val filepath: String = "${credentialPath}/${networkID + "_UsersAndCerts.json"}"
+            val dirPath: String = "${credentialPath}/remoteNetworkUsers"
+            val filepath: String = "${dirPath}/${networkID + "_UsersAndCerts.json"}"
 
+            val folder: File = File(dirPath)
+            if (!folder.exists()) {
+                folder.mkdirs()
+            }
             var usersAndCertsJSON: JSONObject
             val usersAndCertsFile: File = File(filepath)
             if (!usersAndCertsFile.exists()) {

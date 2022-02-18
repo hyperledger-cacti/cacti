@@ -145,7 +145,7 @@ class GetTokenStateAndContractId(
 
         println("Inside GetTokenStateAndContractId().")
 
-        val pledgedFungibleToken = Gson().fromJson(marshalledAsset, FungibleHouseTokenJson::class.java)
+        val pledgedFungibleToken: FungibleHouseTokenJson = Gson().fromJson(marshalledAsset, FungibleHouseTokenJson::class.java)
         println("Unmarshalled fungible token asset is: ${pledgedFungibleToken}")
 
         if (pledgedFungibleToken.tokenType != type) {
@@ -164,13 +164,13 @@ class GetTokenStateAndContractId(
                 .states.filter { it.state.data.symbol.equals(type) }[0]
 
         //get the RealEstateEvolvableTokenType object
-        val evolvableTokenType = stateAndRef.state.data
+        val evolvableTokenType: FungibleHouseTokenState = stateAndRef.state.data
 
         //get the pointer pointer to the house
         val tokenPointer: TokenPointer<FungibleHouseTokenState> = evolvableTokenType.toPointer(evolvableTokenType.javaClass)
 
         val issuerName: CordaX500Name = CordaX500Name.parse("O=PartyA,L=London,C=GB")
-        val issuer = serviceHub.networkMapCache.getPeerByLegalName(issuerName)!!
+        val issuer: Party = serviceHub.networkMapCache.getPeerByLegalName(issuerName)!!
 
         //assign the issuer to the house type who will be issuing the tokens
         val issuedTokenType = tokenPointer issuedBy issuer

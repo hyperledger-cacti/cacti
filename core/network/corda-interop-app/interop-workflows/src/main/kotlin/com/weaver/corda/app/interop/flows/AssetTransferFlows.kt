@@ -236,6 +236,7 @@ class IsAssetPledged(
  *
  * @property pledgeId The unique identifier representing the pledge on an asset for transfer, in the exporting n/w.
  */
+@StartableByRPC
 class GetAssetPledgeStateById(
     val pledgeId: String
 ) : FlowLogic<StateAndRef<AssetPledgeState>?>() {

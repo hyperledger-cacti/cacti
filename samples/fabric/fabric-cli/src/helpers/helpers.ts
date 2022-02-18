@@ -238,7 +238,8 @@ const getUserCertFromFile = (
     ? path.resolve(__dirname, process.env.MEMBER_CREDENTIAL_FOLDER)
     : path.join(__dirname, '../data', 'credentials')
   try {
-    const filepath = path.resolve(credentialsPath, usersAndCertsFile)
+    const dirPath = path.resolve(credentialsPath, 'remoteNetworkUsers')
+    const filepath = path.resolve(dirPath, usersAndCertsFile)
     const usersAndCertsJSON = JSON.parse(fs.readFileSync(filepath).toString())
     logger.debug(`credentialsPath: ${credentialsPath} and usersAndCertsFile: ${usersAndCertsFile}`)
 
@@ -268,11 +269,17 @@ const saveUserCertToFile = (
     ? path.resolve(__dirname, process.env.MEMBER_CREDENTIAL_FOLDER)
     : path.join(__dirname, '../data', 'credentials')
   try {
-    const filepath = path.resolve(credentialsPath, usersAndCertsFile)
+    const dirPath = path.resolve(credentialsPath, 'remoteNetworkUsers')
+    const filepath = path.resolve(dirPath, usersAndCertsFile)
     logger.debug(`credentialsPath: ${credentialsPath} and usersAndCertsFile: ${usersAndCertsFile}`)
 
+    if (!fs.existsSync(dirPath)) {
+      logger.debug(`Creating directory ${dirPath}`)
+      fs.mkdirSync(dirPath, { recursive: true })
+    }
+
     if (fs.existsSync(filepath)) {
-      console.log(`Reading contents of the file ${filepath}`)
+      logger.debug(`Reading contents of the file ${filepath}`)
       usersAndCertsJSON = JSON.parse(fs.readFileSync(filepath).toString())
     }
 
@@ -745,12 +752,13 @@ const generateViewAddressFromRemoteConfig = (
         address = address + '/' + remoteNetConfig.channelName + ':' +
             remoteNetConfig.chaincode + ':' + funcName + ':' + funcArgs.join(':')
     } else if (remoteNetConfig.type == "corda") {
-        address = address + '/' + remoteNetConfig.PartyAEndPoint + '#' +
+        address = address + '/' + remoteNetConfig.partyEndPoint + '#' +
             remoteNetConfig.flowPackage + "." + funcName + ":" + funcArgs.join(':')
     } else {
         logger.error(`Error: remote network ${remoteNetConfig.type} not supported.`)
         throw new Error(`Error: remote network ${remoteNetConfig.type} not supported.`)
     }
+    console.log(`Interop query, funcName: ${funcName} \n funcArgs: ${funcArgs} \n and address: ${address}`)
     
     return address
   } catch (err) {

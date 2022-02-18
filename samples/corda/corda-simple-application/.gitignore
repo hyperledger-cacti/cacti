@@ -9,6 +9,9 @@ tags
 .settings
 .gradle
 
+# remote network user certificates needed for the asset-transfer context
+clients/src/main/resources/config/credentials/remoteNetworkUsers
+
 # General build files
 **/build/*
 !docs/build/*
