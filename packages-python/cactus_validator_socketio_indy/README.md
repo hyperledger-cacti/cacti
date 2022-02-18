@@ -21,11 +21,22 @@ docker build . -t indy-validator
 
     docker run --rm -ti -v/etc/cactus/:/etc/cactus/ --net="host" req_discounted_cartrade --proof_only
     ```
+1. Copy indy validator config
+    ```
+    mkdir -p /etc/cactus/validator_socketio_indy/
+    rm -r /etc/cactus/validator_socketio_indy/*
+    cp -rf ./config/* /etc/cactus/validator_socketio_indy/
+    ```
+1. Copy default validator CA
+    ```
+    rm -r /etc/cactus/validator_socketio_indy/CA
+    cp -rf ./sample-CA/ /etc/cactus/validator_socketio_indy/CA
+    ```
 1. Build and run validator container:
     ```
     docker build . -t indy-validator
 
-    docker run --rm --net="indy-testnet_indy_net" -p 10080:8000 indy-validator
+    docker run -v/etc/cactus/:/etc/cactus --rm --net="indy-testnet_indy_net" -p 10080:8000 indy-validator
     ```
 1. Open separate console, install dependencies and run the testing script:
     ```

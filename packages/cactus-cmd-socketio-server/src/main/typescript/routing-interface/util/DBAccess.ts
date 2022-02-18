@@ -15,7 +15,6 @@ const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 const configDefault: any = ConfigUtil.getConfig();
-// const configVerifier: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/validator-registry-config.yaml", 'utf8'));
 const configVerifier: ValidatorRegistry = new ValidatorRegistry(
   path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml")
 );

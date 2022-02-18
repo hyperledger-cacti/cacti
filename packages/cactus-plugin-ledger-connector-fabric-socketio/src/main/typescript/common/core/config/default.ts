@@ -10,10 +10,10 @@ export const config = {
   // Destination dependent definition values should be in lib/PluginConfig.js.
   sslParam: {
     port: 5040,
-    key: "./common/core/CA/connector.priv",
-    cert: "./common/core/CA/connector.crt",
+    key: "/etc/cactus/connector-fabric-socketio/CA/connector.priv",
+    cert: "/etc/cactus/connector-fabric-socketio/CA/connector.crt",
   },
-  validatorKeyPath: "../common/core/validatorKey/keyr9IS4dDf.priv",
+  validatorKeyPath: "/etc/cactus/connector-fabric-socketio/CA/connector.priv",
   // Log level (trace/debug/info/warn/error/fatal)
   logLevel: "debug",
 };

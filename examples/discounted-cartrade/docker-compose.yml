@@ -12,7 +12,9 @@ services:
     ports:
       - "5040:5040"
     volumes:
-      - ./etc/cactus:/etc/cactus
+        - type: bind
+          source: ./etc/cactus
+          target: /etc/cactus
     networks:
       - fabric-all-in-one_testnet-2x
       - discounted-cartrade-net
@@ -24,6 +26,10 @@ services:
       context: ../../packages/cactus-plugin-ledger-connector-go-ethereum-socketio/
     ports:
       - "5050:5050"
+    volumes:
+        - type: bind
+          source: ./etc/cactus
+          target: /etc/cactus
     networks:
      - geth1net
      - discounted-cartrade-net
@@ -48,6 +54,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+        - type: bind
+          source: ./etc/cactus
+          target: /etc/cactus
     networks:
       - indy-testnet_indy_net
 

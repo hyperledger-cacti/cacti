@@ -30,11 +30,20 @@ This plugin provides `Cactus` a way to interact with Go-Ethereum networks. Using
 - Please ensure that the destination ledger (default for samples: [geth-testnet](../../tools/docker/geth-testnet)) is already launched.
 
 ## Boot methods
+
+### Common setup
 1. Always run configure command first, from the project root directory:
     ```
     pushd ../..
     npm run configure
     popd
+    ```
+
+1. Copy default validator CA
+    ```
+    mkdir -p /etc/cactus/connector-go-ethereum-socketio/
+    rm -r /etc/cactus/connector-go-ethereum-socketio/CA
+    cp -rf ./src/main/typescript/common/core/sample-CA/ /etc/cactus/connector-go-ethereum-socketio/CA
     ```
 
 ### Docker
@@ -43,7 +52,7 @@ This plugin provides `Cactus` a way to interact with Go-Ethereum networks. Using
 docker build . -t cactus-plugin-ledger-connector-go-ethereum-socketio
 
 # Run
-docker run -p 5050:5050 --net=geth1net cactus-plugin-ledger-connector-go-ethereum-socketio
+docker run -v/etc/cactus/:/etc/cactus -p 5050:5050 --net=geth1net cactus-plugin-ledger-connector-go-ethereum-socketio
 ```
 
 ### Manual

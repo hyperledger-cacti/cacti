@@ -3,22 +3,22 @@ import yaml
 
 rootPath = "/"
 
-pathNodeSettings = rootPath + "etc/cactus/node-settings.yaml"
-pathNodeValidatorRegistry = rootPath + "etc/cactus/node-validator-registry.yaml"
-pathValidatorSettings = rootPath + "etc/cactus/validator-001-settings.yaml"
-pathValidatorSecrets = rootPath + "etc/cactus/validator-001-secrets.yaml"
+pathNodeSettings = rootPath + "/etc/cactus/validator_socketio_indy/node-settings.yaml"
+pathNodeValidatorRegistry = rootPath + "/etc/cactus/validator_socketio_indy/node-validator-registry.yaml"
+pathValidatorSettings = rootPath + "/etc/cactus/validator_socketio_indy/validator-001-settings.yaml"
+pathValidatorSecrets = rootPath + "/etc/cactus/validator_socketio_indy/validator-001-secrets.yaml"
 
 #dataclass for validator-<DLT id>-settings.yml
 #data members should be equal to yml
 @dataclasses.dataclass
-class NodeSettings: 
+class NodeSettings:
     port: int
     logging_dir: str
 
 #dataclass for validator-<DLT id>-settings.yml
 #data members should be equal to yml
 @dataclasses.dataclass
-class NodeValidatorRegistry: 
+class NodeValidatorRegistry:
     proto: str
     url: str
     publickey: str
@@ -26,13 +26,13 @@ class NodeValidatorRegistry:
 #dataclass for validator-<DLT id>-settings.yml
 #data members should be equal to yml
 @dataclasses.dataclass
-class ValidatorSettings: 
+class ValidatorSettings:
     port: int
 
 #dataclass for validator-<DLT id>-settings.yml
 #data members should be equal to yml
 @dataclasses.dataclass
-class ValidatorSecrets: 
+class ValidatorSecrets:
     sign_key: str
     auth_credential: str
 

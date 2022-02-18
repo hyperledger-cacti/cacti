@@ -8,16 +8,14 @@
 import { TransactionInfo } from "./TransactionInfo";
 import { TransactionData } from "./TransactionData";
 import { TxInfoData } from "./TxInfoData";
-import { TradeInfo } from "@hyperledger/cactus-cmd-socket-server";
+import { TradeInfo, ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 import { CartradeStatus } from "./define";
 
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
-);
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "TransactionInfoManagement";
 const logger = getLogger(`${moduleName}`);

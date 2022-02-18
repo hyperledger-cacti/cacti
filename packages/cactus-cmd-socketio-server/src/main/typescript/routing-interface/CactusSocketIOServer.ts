@@ -41,9 +41,14 @@ export function startCactusSocketIOServer(blp?: BLPConfig) {
    * Get port from environment and store in Express.
    */
   const port = normalizePort(
-    process.env.PORT || config.applicationHostInfo.hostPort,
+    process.env.CACTUS_PORT || config.applicationHostInfo.hostPort,
   );
-  logger.info(`listening on *: ${port}`);
+
+  const hostname: string =
+    process.env.CACTUS_HOSTNAME ||
+    config.applicationHostInfo.hostName ||
+    "127.0.0.1";
+  logger.info(`listening on ${hostname}:${port}`);
   app.set("port", port);
 
   /**
@@ -95,7 +100,7 @@ export function startCactusSocketIOServer(blp?: BLPConfig) {
   /**
    * Listen on provided port, on all network interfaces.
    */
-  server.listen(port);
+  server.listen(port as number, hostname);
   server.on("error", onError);
   server.on("listening", onListening);
 

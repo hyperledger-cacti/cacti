@@ -30,6 +30,8 @@ This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks
 - Please ensure that the destination ledger (default for samples: [fabric-all-in-one](../../tools/docker/fabric-all-in-one/)) is already launched.
 
 ## Boot methods
+
+### Common setup
 1. Always run configure command first, from the project root directory:
     ```
     pushd ../..
@@ -39,9 +41,15 @@ This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks
 
 1. Setup the wallet
     ```
-    mkdir -p /etc/cactus/fabric/wallet/
-    rm -r /etc/cactus/fabric/wallet/
+    mkdir -p /etc/cactus/connector-fabric-socketio/wallet/
+    rm -r /etc/cactus/connector-fabric-socketio/wallet/*
     # Optionally copy existing fabric wallet to that location
+    ```
+
+1. Copy default validator CA
+    ```
+    rm -r /etc/cactus/connector-fabric-socketio/CA
+    cp -rf ./src/main/typescript/common/core/sample-CA/ /etc/cactus/connector-fabric-socketio/CA
     ```
 
 ### Docker

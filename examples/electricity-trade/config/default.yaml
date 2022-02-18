@@ -1,15 +1,1 @@
-electricityTradeInfo:
-  sawtooth:
-    validatorID: sUr7d10R
-    filterKey: intkey
-  ethereum:
-    validatorID: 84jUisrs
-    gethURL: http://localhost:8545
-    chainName: geth1
-    networkID: 10
-    chainID: 10
-    network: mainnet
-    hardfork: petersburg
-    gas: 21000
-
-logLevel: debug
+../../../packages/cactus-cmd-socketio-server/config/default.yaml

@@ -8,8 +8,7 @@
   "scripts": {
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
-    "build:dev:backend:postbuild": "npm run copy-static-assets",
-    "copy-static-assets": "ts-node copyStaticAssets.ts"
+    "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
   },
   "dependencies": {
     "@hyperledger/cactus-common": "1.0.0-rc.3",

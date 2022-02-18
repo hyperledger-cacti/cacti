@@ -40,7 +40,7 @@ http_req_params = {
     "authParams": ["<<company name>>"]
 }
 
-proof_file_path = "/etc/cactus/indy-validator/myproof.json"
+proof_file_path = "/etc/cactus/validator_socketio_indy/myproof.json"
 
 #parser = argparse.ArgumentParser(description='Run python getting-started scenario (Alice/Faber)')
 parser = argparse.ArgumentParser(description='Run python getting-started scenario (Alice/Acme/Thrift)')
