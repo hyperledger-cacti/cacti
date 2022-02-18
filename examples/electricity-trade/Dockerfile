@@ -5,10 +5,9 @@ ENV APP_HOME=/root/cactus
 WORKDIR ${APP_HOME}
 
 COPY ./dist/yarn.lock ./package.json ./
-RUN yarn link "@hyperledger/cactus-cmd-socket-server" && \
-    yarn install --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
+RUN yarn add "${CACTUS_CMD_SOCKETIO_PATH}" --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
     rm -rf ./.yarnCache
 
 COPY ./dist ./dist/
 
-ENTRYPOINT ["node", "./dist/www.js"]
+CMD ["node", "./dist/www.js"]

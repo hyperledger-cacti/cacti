@@ -20,7 +20,7 @@ import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socket-server";
 import { makeRawTransaction } from "./TransactionEthereum";
 import { makeSignedProposal } from "./TransactionFabric";
 import { getDataFromIndy } from "./TransactionIndy";
-import { LedgerEvent } from "@hyperledger/cactus-cmd-socket-server";
+import { LedgerEvent, ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 import { json2str } from "@hyperledger/cactus-cmd-socket-server";
 import { CartradeStatus } from "./define";
 
@@ -28,9 +28,7 @@ const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
-);
+const config: any = ConfigUtil.getConfig();
 
 import { getLogger } from "log4js";
 const moduleName = "BusinessLogicCartrade";

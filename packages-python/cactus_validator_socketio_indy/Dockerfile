@@ -8,7 +8,7 @@ RUN apt-get update \
 USER indy
 WORKDIR /home/indy
 COPY --chown=indy:indy './validator-python' './validator-python'
-COPY --chown=indy:indy './etc/cactus' '/etc/cactus'
+COPY --chown=indy:indy './config' '/etc/cactus'
 COPY --chown=indy 'supervisord.conf' '/etc/'
 RUN cp 'from-indy-sdk/utils.py' './validator-python/validator_socketio_module/'
 

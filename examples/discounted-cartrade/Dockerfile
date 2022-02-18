@@ -16,8 +16,7 @@ RUN apt-get update \
 COPY --from=indy-sdk-cli:latest /usr/lib/libindy.so /usr/lib/
 
 COPY ./dist/yarn.lock ./package.json ./
-RUN yarn link "@hyperledger/cactus-cmd-socket-server" && \
-    yarn install --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
+RUN yarn add "${CACTUS_CMD_SOCKETIO_PATH}" --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
     rm -rf ./.yarnCache
 
 COPY ./dist ./dist/

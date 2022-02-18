@@ -10,8 +10,8 @@ export const config = {
   // Defined value for the destination independent part. I don't think I can use it only at www, so I think I can write directly there.
   sslParam: {
     port: 5140,
-    key: "./common/core/CA/connector.priv",
-    cert: "./common/core/CA/connector.crt",
+    key: "/etc/cactus/connector-sawtooth-socketio/CA/connector.priv",
+    cert: "/etc/cactus/connector-sawtooth-socketio/CA/connector.crt",
   },
   blockMonitor: {
     request: {
@@ -23,7 +23,7 @@ export const config = {
     },
     pollingInterval: 5000,
   },
-  validatorKeyPath: "../common/core/validatorKey/keysUr7d10R.priv",
+  validatorKeyPath: "/etc/cactus/connector-sawtooth-socketio/CA/connector.priv",
   // Log level (trace/debug/info/warn/error/fatal)
   logLevel: "debug",
 };

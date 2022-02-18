@@ -5,9 +5,13 @@
  * TransactionEthereum.ts
  */
 
-import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
-import { Verifier } from "@hyperledger/cactus-cmd-socket-server";
-import { TransactionSigner } from "@hyperledger/cactus-cmd-socket-server";
+
+import {
+  Verifier,
+  ConfigUtil,
+  LPInfoHolder,
+  TransactionSigner,
+} from "@hyperledger/cactus-cmd-socket-server";
 
 const ethJsCommon = require("ethereumjs-common").default;
 const ethJsTx = require("ethereumjs-tx").Transaction;
@@ -17,9 +21,7 @@ const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
-);
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "TransactionEthereum";
 const logger = getLogger(`${moduleName}`);

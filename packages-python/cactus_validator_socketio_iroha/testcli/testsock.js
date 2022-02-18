@@ -9,7 +9,7 @@ const socket = io(url, {
     //transports: [ 'websocket', 'polling']
 });
 
-const crtPath = "3PfTJw8g.crt";
+const crtPath = "connector.crt";
 const paramAlgorithm = "ES256";
 
 socket.on('connect', () => {
@@ -54,7 +54,7 @@ const verify = (signature) => new Promise(resolve => {
                 // Authentication OK
                 console.log(`Authentication OK`);
                 console.log(`decoded : ${JSON.stringify(decoded)}`);
-                
+
                 resolve(decoded);
             }
         });
@@ -76,14 +76,14 @@ const decodeFunc = async (signsignature) => {
 const requestStartMonitor = () => {
     console.log('##exec requestStartMonitor()');
     socket.emit('startMonitor');
-    
+
     setTimeout(requestStopMonitor,180000);
 }
 
 const requestStopMonitor = () => {
     console.log('##exec requestStopMonitor()');
     socket.emit('stopMonitor');
-    
+
     setTimeout(function(){
       // end communication
       socket.disconnect();

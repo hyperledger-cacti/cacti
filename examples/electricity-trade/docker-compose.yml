@@ -14,6 +14,10 @@ services:
     networks:
      - geth1net
      - electricity-trade-net
+    volumes:
+        - type: bind
+          source: ./etc/cactus
+          target: /etc/cactus
 
   sawtooth-validator:
     container_name: electricity-trade-sawtooth-validator
@@ -25,6 +29,10 @@ services:
     networks:
       - sawtooth_net
       - electricity-trade-net
+    volumes:
+        - type: bind
+          source: ./etc/cactus
+          target: /etc/cactus
 
   cmd-socketio-base-image:
     # Build base image and immediately exit

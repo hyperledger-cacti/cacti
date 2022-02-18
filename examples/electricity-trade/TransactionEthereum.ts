@@ -9,14 +9,13 @@ import {
   LPInfoHolder,
   Verifier,
   TransactionSigner,
+  ConfigUtil,
 } from "@hyperledger/cactus-cmd-socket-server";
 
 const fs = require("fs");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8"),
-);
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "TransactionEthereum";
 const logger = getLogger(`${moduleName}`);

@@ -28,11 +28,20 @@ This plugin provides `Cactus` a way to interact with Hyperledger Sawtooth networ
 - Please ensure that the destination ledger (default: [sawtooth-testnet](../../tools/docker/sawtooth-testnet)) is already launched.
 
 ## Boot methods
+
+### Common setup
 1. Always run configure command first, from the project root directory:
     ```
     pushd ../..
     npm run configure
     popd
+    ```
+
+1. Copy default validator CA
+    ```
+    mkdir -p /etc/cactus/connector-sawtooth-socketio/
+    rm -r /etc/cactus/connector-sawtooth-socketio/CA
+    cp -rf ./src/main/typescript/common/core/sample-CA/ /etc/cactus/connector-sawtooth-socketio/CA
     ```
 
 ### Docker
@@ -41,7 +50,7 @@ This plugin provides `Cactus` a way to interact with Hyperledger Sawtooth networ
 docker build . -t cactus-plugin-ledger-connector-sawtooth-socketio
 
 # Run
-docker run -p 5140:5140 --net=sawtooth_net cactus-plugin-ledger-connector-sawtooth-socketio
+docker run -v/etc/cactus/:/etc/cactus -p 5140:5140 --net=sawtooth_net cactus-plugin-ledger-connector-sawtooth-socketio
 ```
 
 ### Manual

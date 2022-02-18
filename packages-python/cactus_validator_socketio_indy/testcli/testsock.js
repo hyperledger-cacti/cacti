@@ -8,8 +8,8 @@ const socket = io(url, {
   //transports: [ 'websocket', 'polling']
 });
 
-const proofFilePath = "/etc/cactus/indy-validator/myproof.json";
-const crtPath = "3PfTJw8g.crt";
+const proofFilePath = "/etc/cactus/validator_socketio_indy/myproof.json";
+const crtPath = "connector.crt";
 const paramAlgorithm = "ES256";
 
 socket.on("connect", () => {

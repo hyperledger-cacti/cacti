@@ -11,7 +11,7 @@ class SocketIoValidator:
         self.moduleName = 'SocketIoValidator'
         # self.the_cb = None
         self.iroha_dic = {}
-        
+
         # load settings
         self.settings = Settings()
 
@@ -22,8 +22,8 @@ class SocketIoValidator:
         print(f'socket port: {self.settings.validatorSettings.port}')
 
         self.socketio = SocketIO(self.app, host='0.0.0.0', port=self.settings.validatorSettings.port, logger=True, engineio_logger=True)
-        
-        self.privateKeyFile = '3PfTJw8g.priv'
+
+        self.privateKeyFile = 'connector.priv'
         self.algorithm = 'ES256'
 
         self.emitType = "eventReceived"
@@ -74,7 +74,7 @@ class SocketIoValidator:
         def handle_execSyncFunction(requestData):
             print('received request2')
             print(f"##requestData:  {requestData}")
-            
+
             result = self.session_dict[request.sid].execSyncFunction(None, None, requestData)
 
             resp_obj = self.build_res_obj(200, requestData["reqID"], result)
