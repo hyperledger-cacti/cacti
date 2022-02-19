@@ -216,29 +216,6 @@ class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help
 }
 
 /**
- * Command to fetch the certificate (in base64) of the party owning the node.
- */
-class FetchCertBase64Command : CliktCommand(name="get-cert-base64", help = "Obtain the certificate of the party owning a node in base64 format.") {
-    val config by requireObject<Map<String, String>>()
-    override fun run() = runBlocking {
-
-        val rpc = NodeRPCConnection(
-            host = config["CORDA_HOST"]!!,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = config["CORDA_PORT"]!!.toInt())
-        try {
-            val certBase64 = rpc.proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
-            println("Certificate in base64: $certBase64")
-        } catch (e: Exception) {
-            println("Error: ${e.toString()}")
-        } finally {
-            rpc.close()
-        }
-    }
-}
-
-/**
  * Command to claim a remotely pledged asset by an importing network as part of asset-transfer.
  */
 class ClaimRemoteHouseTokenCommand : CliktCommand(name="claim-remote-asset", help = "Claims a remote pledged asset.") {

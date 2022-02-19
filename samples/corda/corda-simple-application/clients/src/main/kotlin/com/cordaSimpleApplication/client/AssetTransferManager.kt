@@ -252,6 +252,7 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
         + " 'asset_type' can be either 'bond', 'token' or 'house-token'."
         + " 'remote_network_type' can be either 'fabric', 'corda' or 'besu'.")
     val importNetworkId: String? by option ("-inid", "--import-network-id", help="Import network id of pledged asset for asset transfer")
+    val exportRelayAddress: String? by option ("-era", "--export-relay-address", help="Asset export network relay address")
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer (e.g., 'O=PartyA,L=London,C=GB')")
     override fun run() = runBlocking {
@@ -261,6 +262,8 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
             println("Arguments required: --transfer-category.")
         } else if (importNetworkId == null) {
             println("Arguments required: --import-network-id.")
+        } else if (exportRelayAddress == null) {
+            println("Arguments required: --export-relay-address.")
         } else if (param == null) {
             println("Arguments required: --param.")
         } else {
@@ -294,9 +297,9 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
                 importNetworkId!!, assetPledgeState.expiryTimeSecs.toString())
 
             try {
-                val networkConfig: JSONObject = getRemoteNetworkConfig(assetPledgeState.localNetworkId)
-                val exportRelayAddress: String = networkConfig.getString("relayEndpoint")
-                val claimStatusLinearId: String = requestStateFromRemoteNetwork(exportRelayAddress, externalStateAddress, rpc.proxy, config)
+                //val networkConfig: JSONObject = getRemoteNetworkConfig(assetPledgeState.localNetworkId)
+                //val exportRelayAddress: String = networkConfig.getString("relayEndpoint")
+                val claimStatusLinearId: String = requestStateFromRemoteNetwork(exportRelayAddress!!, externalStateAddress, rpc.proxy, config)
 
                 var obs = listOf<Party>()
                 if (observer != null)   {
@@ -333,6 +336,7 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
         + " 'asset_type' can be either 'bond', 'token' or 'house-token'."
         + " 'remote_network_type' can be either 'fabric', 'corda' or 'besu'.")
     val exportNetworkId: String? by option ("-enid", "--export-network-id", help="Export network id of pledged asset for asset transfer")
+    val importRelayAddress: String? by option ("-ira", "--import-relay-address", help="Import network relay address")
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer (e.g., 'O=PartyA,L=London,C=GB')")
     override fun run() = runBlocking {
@@ -344,6 +348,10 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
             println("Arguments required: --transfer-category.")
         } else if (exportNetworkId == null) {
             println("Arguments required: --export-network-id.")
+        } else if (importRelayAddress == null) {
+            println("Arguments required: --import-relay-address.")
+        } else if (param == null) {
+            println("Arguments required: --param.")
         } else {
             val rpc = NodeRPCConnection(
                 host = config["CORDA_HOST"]!!,
@@ -378,9 +386,9 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
                 // 2. While exercising 'asset transfer' initiated by a Fabric network, the localRelayAddress is obtained from config.json file
                 // 3. While exercising 'asset transfer' initiated by a Corda network (this case), the localRelayAddress is obtained
                 //    below from the remote-network-config.json file
-                val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
-                val importRelayAddress: String = networkConfig.getString("relayEndpoint")
-                val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(importRelayAddress, externalStateAddress, rpc.proxy, config)
+                //val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
+                //val importRelayAddress: String = networkConfig.getString("relayEndpoint")
+                val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(importRelayAddress!!, externalStateAddress, rpc.proxy, config)
 
                 val res = AssetManager.claimPledgedFungibleAsset(
                     rpc.proxy,
