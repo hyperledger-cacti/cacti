@@ -235,8 +235,8 @@ const getUserCertFromFile = (
 ) => {
   const usersAndCertsFile = remoteNetworkId + '_UsersAndCerts.json'
   const credentialsPath = process.env.MEMBER_CREDENTIAL_FOLDER
-    ? path.resolve(__dirname, process.env.MEMBER_CREDENTIAL_FOLDER)
-    : path.join(__dirname, '../data', 'credentials')
+    ? path.resolve(__dirname, process.env.MEMBER_CREDENTIAL_FOLDER, '..')
+    : path.join(__dirname, '../data', 'credentials', '..')
   try {
     const dirPath = path.resolve(credentialsPath, 'remoteNetworkUsers')
     const filepath = path.resolve(dirPath, usersAndCertsFile)
@@ -266,8 +266,10 @@ const saveUserCertToFile = (
   const usersAndCertsFile = remoteNetworkId + '_UsersAndCerts.json'
   let usersAndCertsJSON = {}
   const credentialsPath = process.env.MEMBER_CREDENTIAL_FOLDER
-    ? path.resolve(__dirname, process.env.MEMBER_CREDENTIAL_FOLDER)
-    : path.join(__dirname, '../data', 'credentials')
+    ? path.resolve(__dirname, process.env.MEMBER_CREDENTIAL_FOLDER, '..')
+    : path.join(__dirname, '../data', 'credentials', '..')
+    // Don't create the directory 'remoteNetworkUsers' inside 'data/credentials' since each entry there represents
+    // a network. Instead, create this directory inside 'data' itself.
   try {
     const dirPath = path.resolve(credentialsPath, 'remoteNetworkUsers')
     const filepath = path.resolve(dirPath, usersAndCertsFile)

@@ -739,7 +739,14 @@ object ClaimRemoteAsset {
                 // Flow getAssetAndContractIdFlowName takes 5 parameters: assetDetailsBytes, assetType, numUnits, locker, recipient
                 // And returns SimpleAsset/FungibleToken(i.e., ContractState) state and its ContractId as a Pair
                 resolveGetAssetStateAndContractIdFlow(getAssetAndContractIdFlowName,
-                    listOf(assetPledgeStatus.assetDetails.toStringUtf8(), assetType, numUnits, lockerCert, ourIdentity)
+                    listOf(
+                        // must have used copyFromUtf8() at the time of serialization of the protobuf @property assetDetails
+                        assetPledgeStatus.assetDetails.toStringUtf8(),
+                        assetType,
+                        numUnits,
+                        lockerCert,
+                        ourIdentity
+                    )
                 ).fold({
                     println("Error: Unable to resolve GetAssetStateAndContractId flow.")
                     Left(Error("Error: Unable to resolve GetAssetStateAndContractId flow"))

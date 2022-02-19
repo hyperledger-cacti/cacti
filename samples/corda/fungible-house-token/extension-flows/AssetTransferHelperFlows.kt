@@ -145,6 +145,7 @@ class GetTokenStateAndContractId(
 
         println("Inside GetTokenStateAndContractId().")
 
+        // must have used GsonBuilder().create().toJson() at the time of serialization of the JSON
         val pledgedFungibleToken: FungibleHouseTokenJson = Gson().fromJson(marshalledAsset, FungibleHouseTokenJson::class.java)
         println("Unmarshalled fungible token asset is: ${pledgedFungibleToken}")
 
@@ -223,6 +224,7 @@ class MarshalFungibleToken(
 
         println("Inside MarshalFungibleToken(), created fungible token asset: ${assetJson}\n.")
         val gson = GsonBuilder().create();
+        // must use Gson().fromJson() at the time of deserialization of the JSON
         var marshalledAssetJson = gson.toJson(assetJson, FungibleHouseTokenJson::class.java)
 
         return marshalledAssetJson

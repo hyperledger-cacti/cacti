@@ -97,7 +97,7 @@ fun main(args: Array<String>) = App()
                 ReclaimAssetCommand(),
                 ClaimRemoteAssetCommand(),
                 FetchPartyNameCommand(),
-                FetchCertBase64AssetCommand(),
+                FetchCertBase64Command(),
                 GetSimpleAssetPledgeStatusByPledgeIdCommand(),
                 GetSimpleAssetClaimStatusByPledgeIdCommand(),
                 SaveUserCertToFileCommand()
@@ -126,6 +126,7 @@ fun main(args: Array<String>) = App()
                 GetAssetClaimStatusByPledgeIdCommand(),
                 GetAssetPledgeStatusByPledgeIdCommand(),
                 ClaimRemoteHouseTokenCommand(),
+                FetchPartyNameCommand(),
                 FetchCertBase64Command()
             ),
             NetworkIdCommand().subcommands(
