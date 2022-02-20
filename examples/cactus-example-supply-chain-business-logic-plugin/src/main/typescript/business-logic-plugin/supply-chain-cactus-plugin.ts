@@ -15,6 +15,8 @@ import {
   DefaultApi as QuorumApi,
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
+import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { InsertBambooHarvestEndpoint } from "./web-services/insert-bamboo-harvest-endpoint";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
@@ -40,6 +42,7 @@ export interface ISupplyChainCactusPluginOptions {
   quorumApiClient: QuorumApi;
   besuApiClient: BesuApi;
   fabricApiClient: FabricApi;
+  cordaApiClient: CordaApi;
   web3SigningCredential?: Web3SigningCredential;
   fabricEnvironment?: NodeJS.ProcessEnv;
   contracts: ISupplyChainContractDeploymentInfo;

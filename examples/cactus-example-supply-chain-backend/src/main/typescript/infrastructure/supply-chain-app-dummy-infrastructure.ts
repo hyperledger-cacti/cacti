@@ -15,6 +15,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 import {
   BesuTestLedger,
+  CordaTestLedger,
   FabricTestLedgerV1,
   QuorumTestLedger,
 } from "@hyperledger/cactus-test-tooling";
@@ -68,11 +69,13 @@ export class SupplyChainAppDummyInfrastructure {
   public readonly besu: BesuTestLedger;
   public readonly quorum: QuorumTestLedger;
   public readonly fabric: FabricTestLedgerV1;
+  public readonly corda: CordaTestLedger;
   public readonly keychain: IPluginKeychain;
   private readonly log: Logger;
   private _quorumAccount?: Account;
   private _besuAccount?: Account;
 
+  //This is because they need a ETHaccount -- account needs to be deployed to use the contract
   public get quorumAccount(): Account {
     if (!this._quorumAccount) {
       throw new Error(`Must call deployContracts() first.`);
@@ -81,6 +84,7 @@ export class SupplyChainAppDummyInfrastructure {
     }
   }
 
+  //This is because they need a ETHaccount -- account needs to be deployed to use the contract
   public get besuAccount(): Account {
     if (!this._besuAccount) {
       throw new Error(`Must call deployContracts() first.`);
@@ -117,6 +121,10 @@ export class SupplyChainAppDummyInfrastructure {
       logLevel: level,
       emitContainerLogs: true,
     });
+    this.corda = new CordaTestLedger({
+      logLevel: level,
+      emitContainerLogs: true,
+    });
 
     if (this.options.keychain) {
       this.keychain = this.options.keychain;
@@ -139,6 +147,7 @@ export class SupplyChainAppDummyInfrastructure {
         this.besu.stop().then(() => this.besu.destroy()),
         this.quorum.stop().then(() => this.quorum.destroy()),
         this.fabric.stop().then(() => this.fabric.destroy()),
+        this.corda.stop().then(() => this.corda.destroy()),
       ]);
       this.log.info(`Stopped OK`);
     } catch (ex) {
@@ -153,6 +162,7 @@ export class SupplyChainAppDummyInfrastructure {
       await this.fabric.start();
       await this.besu.start();
       await this.quorum.start();
+      await this.corda.start();
       this.log.info(`Started dummy infrastructure OK`);
     } catch (ex) {
       this.log.error(`Starting of dummy infrastructure crashed: `, ex);

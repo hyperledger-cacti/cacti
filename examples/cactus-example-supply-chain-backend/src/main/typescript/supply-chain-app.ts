@@ -40,6 +40,12 @@ import {
   DefaultApi as BesuApi,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
+// added Corda Imports
+import {
+  PluginLedgerConnectorCorda,
+  DefaultApi as CordaApi,
+} from "@hyperledger/cactus-plugin-ledger-connector-corda";
+
 import {
   PluginLedgerConnectorFabric,
   DefaultApi as FabricApi,
@@ -56,7 +62,6 @@ import {
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { SupplyChainCactusPlugin } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { DiscoveryOptions } from "fabric-network";
-
 export interface ISupplyChainAppOptions {
   disableSignalHandlers?: true;
   logLevel?: LogLevelDesc;
@@ -73,6 +78,7 @@ export class SupplyChainApp {
   private _besuApiClient?: BesuApi;
   private _quorumApiClient?: QuorumApi;
   private _fabricApiClient?: FabricApi;
+  private _cordaApiClient?: CordaApi;
 
   public get besuApiClientOrThrow(): BesuApi {
     if (this._besuApiClient) {
@@ -93,6 +99,14 @@ export class SupplyChainApp {
   public get fabricApiClientOrThrow(): FabricApi {
     if (this._fabricApiClient) {
       return this._fabricApiClient;
+    } else {
+      throw new Error("Invalid state: ledgers were not started yet.");
+    }
+  }
+
+  public get cordaApiClientOrThrow(): CordaApi {
+    if (this._cordaApiClient) {
+      return this._cordaApiClient;
     } else {
       throw new Error("Invalid state: ledgers were not started yet.");
     }
@@ -161,9 +175,11 @@ export class SupplyChainApp {
     const httpApiA = await Servers.startOnPort(4000, "0.0.0.0");
     const httpApiB = await Servers.startOnPort(4100, "0.0.0.0");
     const httpApiC = await Servers.startOnPort(4200, "0.0.0.0");
+    const httpApiD = await Servers.startOnPort(4300, "0.0.0.0");
     const httpGuiA = await Servers.startOnPort(3000, "0.0.0.0");
     const httpGuiB = await Servers.startOnPort(3100, "0.0.0.0");
     const httpGuiC = await Servers.startOnPort(3200, "0.0.0.0");
+    const httpGuiD = await Servers.startOnPort(3300, "0.0.0.0");
 
     const addressInfoA = httpApiA.address() as AddressInfo;
     const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
@@ -174,13 +190,18 @@ export class SupplyChainApp {
     const addressInfoC = httpApiC.address() as AddressInfo;
     const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
 
+    const addressInfoD = httpApiD.address() as AddressInfo;
+    const nodeApiHostD = `http://localhost:${addressInfoD.port}`;
+
     const besuConfig = new Configuration({ basePath: nodeApiHostA });
     const quorumConfig = new Configuration({ basePath: nodeApiHostB });
     const fabricConfig = new Configuration({ basePath: nodeApiHostC });
+    const cordaConfig = new Configuration({ basePath: nodeApiHostD });
 
     const besuApiClient = new BesuApi(besuConfig);
     const quorumApiClient = new QuorumApi(quorumConfig);
     const fabricApiClient = new FabricApi(fabricConfig);
+    const cordaApiClient = new CordaApi(cordaConfig);
 
     const keyPairA = await generateKeyPair("ES256K");
     const keyPairPemA = await exportPKCS8(keyPairA.privateKey);
@@ -191,13 +212,18 @@ export class SupplyChainApp {
     const keyPairC = await generateKeyPair("ES256K");
     const keyPairPemC = await exportPKCS8(keyPairC.privateKey);
 
+    const keyPairD = await generateKeyPair("ES256K");
+    const keyPairPemD = await exportPKCS8(keyPairD.privateKey);
+
     const consortiumDatabase = await this.createConsortium(
       httpApiA,
       httpApiB,
       httpApiC,
+      httpApiD,
       keyPairA.publicKey,
       keyPairB.publicKey,
       keyPairC.publicKey,
+      keyPairD.publicKey,
     );
     const consortiumPrettyJson = JSON.stringify(consortiumDatabase, null, 4);
     this.log.info(`Created Consortium definition: %o`, consortiumPrettyJson);
@@ -206,6 +232,7 @@ export class SupplyChainApp {
     const rpcApiHostA = await this.ledgers.besu.getRpcApiHttpHost();
     const rpcApiWsHostA = await this.ledgers.besu.getRpcApiWsHost();
     const rpcApiHostB = await this.ledgers.quorum.getRpcApiHttpHost();
+    const corDappsDirPartyA = await this.ledgers.corda.getCorDappsDirPartyA();
 
     const connectionProfile = await this.ledgers.fabric.getConnectionProfileOrg1();
     const sshConfig = await this.ledgers.fabric.getSshConfig();
@@ -225,6 +252,7 @@ export class SupplyChainApp {
           besuApiClient,
           quorumApiClient,
           fabricApiClient,
+          cordaApiClient,
           web3SigningCredential: {
             keychainEntryKey: besuAccount.address,
             keychainId: this.keychain.getKeychainId(),
@@ -264,6 +292,7 @@ export class SupplyChainApp {
           besuApiClient,
           quorumApiClient,
           fabricApiClient,
+          cordaApiClient,
           web3SigningCredential: {
             keychainEntryKey: quorumAccount.address,
             keychainId: this.keychain.getKeychainId(),
@@ -302,6 +331,7 @@ export class SupplyChainApp {
           besuApiClient,
           quorumApiClient,
           fabricApiClient,
+          cordaApiClient,
           fabricEnvironment: org1Env,
         }),
         this.keychain,
@@ -333,13 +363,44 @@ export class SupplyChainApp {
 
     const apiServerC = await this.startNode(httpApiC, httpGuiC, registryC);
 
+    const registryD = new PluginRegistry({
+      plugins: [
+        new PluginConsortiumManual({
+          instanceId: "PluginConsortiumManual_D",
+          consortiumDatabase,
+          keyPairPem: keyPairPemD,
+          logLevel: this.options.logLevel,
+        }),
+        new SupplyChainCactusPlugin({
+          logLevel: this.options.logLevel,
+          contracts: contractsInfo,
+          instanceId: uuidv4(),
+          besuApiClient,
+          quorumApiClient,
+          fabricApiClient,
+          cordaApiClient,
+        }),
+      ],
+    });
+    const cordaConnector = new PluginLedgerConnectorCorda({
+      instanceId: "PluginLedgerConnectorCorda_D",
+      corDappsDir: corDappsDirPartyA,
+      sshConfigAdminShell: sshConfig,
+    });
+
+    registryD.add(cordaConnector);
+
+    const apiServerD = await this.startNode(httpApiD, httpGuiD, registryD);
+
     return {
       apiServerA,
       apiServerB,
       apiServerC,
+      apiServerD,
       besuApiClient,
       fabricApiClient,
       quorumApiClient,
+      cordaApiClient,
       supplyChainApiClientA: new SupplyChainApi(
         new Configuration({ basePath: nodeApiHostA }),
       ),
@@ -348,6 +409,9 @@ export class SupplyChainApp {
       ),
       supplyChainApiClientC: new SupplyChainApi(
         new Configuration({ basePath: nodeApiHostA }),
+      ),
+      supplyChainApiClientD: new SupplyChainApi(
+        new Configuration({ basePath: nodeApiHostD }),
       ),
     };
   }
@@ -366,9 +430,11 @@ export class SupplyChainApp {
     serverA: Server,
     serverB: Server,
     serverC: Server,
+    serverD: Server,
     keyPairA: KeyLike,
     keyPairB: KeyLike,
     keyPairC: KeyLike,
+    keyPairD: KeyLike,
   ): Promise<ConsortiumDatabase> {
     const consortiumName = "Example Supply Chain Consortium";
     const consortiumId = uuidv4();
@@ -459,18 +525,47 @@ export class SupplyChainApp {
 
     cactusNodeC.ledgerIds.push(ledger3.id);
 
+    const memberIdD = uuidv4();
+    const nodeIdD = uuidv4();
+    const addressInfoD = serverD.address() as AddressInfo;
+    const nodeApiHostD = `http://localhost:${addressInfoD.port}`;
+
+    const publickKeyPemD = await exportSPKI(keyPairD);
+    const cactusNodeD: CactusNode = {
+      nodeApiHost: nodeApiHostD,
+      memberId: memberIdD,
+      publicKeyPem: publickKeyPemD,
+      consortiumId,
+      id: nodeIdD,
+      pluginInstanceIds: [],
+      ledgerIds: [],
+    };
+
+    const memberD: ConsortiumMember = {
+      id: memberIdD,
+      nodeIds: [cactusNodeD.id],
+      name: "Example Transaction Corp",
+    };
+
+    const ledger4 = {
+      id: "CordaDemoLedger",
+      ledgerType: LedgerType.Corda4X,
+    };
+
+    cactusNodeD.ledgerIds.push(ledger4.id);
+
     const consortium: Consortium = {
       id: consortiumId,
       name: consortiumName,
       mainApiHost: nodeApiHostA,
-      memberIds: [memberA.id, memberB.id, memberC.id],
+      memberIds: [memberA.id, memberB.id, memberC.id, memberD.id],
     };
 
     const consortiumDatabase: ConsortiumDatabase = {
-      cactusNode: [cactusNodeA, cactusNodeB, cactusNodeC],
+      cactusNode: [cactusNodeA, cactusNodeB, cactusNodeC, cactusNodeD],
       consortium: [consortium],
-      consortiumMember: [memberA, memberB, memberC],
-      ledger: [ledger1, ledger2, ledger3],
+      consortiumMember: [memberA, memberB, memberC, memberD],
+      ledger: [ledger1, ledger2, ledger3, ledger4],
       pluginInstance: [],
     };
 
@@ -518,10 +613,13 @@ export interface IStartInfo {
   readonly apiServerA: ApiServer;
   readonly apiServerB: ApiServer;
   readonly apiServerC: ApiServer;
+  readonly apiServerD: ApiServer;
   readonly besuApiClient: BesuApi;
   readonly quorumApiClient: QuorumApi;
   readonly fabricApiClient: FabricApi;
+  readonly cordaApiClient: CordaApi;
   readonly supplyChainApiClientA: SupplyChainApi;
   readonly supplyChainApiClientB: SupplyChainApi;
   readonly supplyChainApiClientC: SupplyChainApi;
+  readonly supplyChainApiClientD: SupplyChainApi;
 }
