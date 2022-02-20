@@ -199,6 +199,20 @@ class GetOurCertificateBase64() : FlowLogic<String>() {
 }
 
 /**
+ * The GetOurIdentity flow is used to fetch the identity of the party owning the node.
+ */
+@InitiatingFlow
+@StartableByRPC
+class GetOurIdentity() : FlowLogic<String>() {
+    @Suspendable
+    override fun call(): String {
+
+        println("ourIdentity: ${ourIdentity}")
+        return ourIdentity.toString()
+    }
+}
+
+/**
  * The MarshalFungibleToken flow is used to obtain the JSON encoding of the fungible tokens of interest to the user.
  * This function is typically called by the application client which may not know the full details of the token asset.
  *

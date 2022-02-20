@@ -49,7 +49,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
         help = "Locks an asset. $ ./clients transfer pledge-asset --fungible --timeout=10 -rnid 'Corda_Network2' --recipient='<name of recipient>' --param=type:amount") {
     val config by requireObject<Map<String, String>>()
     val timeout: String? by option("-t", "--timeout", help="Pledge validity time duration in seconds.")
-    val remoteNetworkId: String? by option("-rnid", "--remote-network-id", help="Importing network for asset transfer")
+    val importNetworkId: String? by option("-inid", "--import-network-id", help="Importing network for asset transfer")
     val recipient: String? by option("-r", "--recipient", help="Name of the recipient in the importing network")
     val fungible: Boolean by option("-f", "--fungible", help="Fungible Asset Pledge: True/False").flag(default = false)
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
@@ -59,8 +59,8 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
             println("Arguement -r (name of the recipient in importing n/w) is required")
         } else if (param == null) {
             println("Arguement -p (asset details to be pledged) is required")
-        } else if (remoteNetworkId == null) {
-            println("Arguement -rnid (remote/importing network id) is required")
+        } else if (importNetworkId == null) {
+            println("Arguement -inid (importing/remote network id) is required")
         } else {
             var nTimeout: Long
             if (timeout == null) {
@@ -96,13 +96,13 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                 }
 
                 // Obtain the recipient certificate from the name of the recipient
-                val recipientCert: String = getUserCertFromFile(recipient!!, remoteNetworkId!!)
+                val recipientCert: String = getUserCertFromFile(recipient!!, importNetworkId!!)
 
                 if (fungible) {
                     id = AssetManager.createFungibleAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
-                        remoteNetworkId!!,
+                        importNetworkId!!,
                         params[0],          // Type
                         params[1].toLong(), // Quantity
                         recipientCert,
@@ -116,7 +116,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                     id = AssetManager.createAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
-                        remoteNetworkId!!,
+                        importNetworkId!!,
                         params[0],      // Type
                         params[1],      // ID
                         recipientCert,

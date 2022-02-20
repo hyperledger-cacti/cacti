@@ -172,7 +172,7 @@ The test networks are now configured and their ledgers are initialized. You can 
 
 ## Preparation for Asset Transfer
 
-Follow the below instructions to prepare your networks for asset exchange tests.
+Follow the below instructions to prepare your networks for asset transfer tests.
 
 ### Initializing the Fabric Networks
 
@@ -204,7 +204,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
   * Update value for `relayEndpoint` for `Corda_Network` as `relay-corda:9081`.
   * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
   * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
-  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
+  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:30003`.
 - Create `chaincode.json` file by copying `chaincode.json.template`. Keep the default values unchanged.
 - Create a `.env` file by copying `.env.template` and setting the following parameter values:
   * If Relays and Drivers are deployed in the host machine:
@@ -256,6 +256,36 @@ Initialize bond and token asset states and ownerships on the `network1` ledger b
 ./scripts/initAssetsForTransfer.sh
 ```
 
+### Initializing the Corda Networks
+
+Once the Corda networks (`Corda_Network` and `Corda_Network2`) are launched, the client applications (built earlier) needs to be exercised to generate ledger state in both exporting/source and importing/destination networks in preparation to test asset transfer interoperation flows.
+
+#### Bootstrapping Networks and Application States
+The Corda network ledger (or _vault_ on each node) must be initialized with access control policies, verification policies, and security group information for the other networks (two Fabric networks and other Corda network).
+
+Bootstrap the Corda networks and application states as follows (_the following instructions will initialize either or both Corda networks, depending on which of those are up and running_):
+- Navigate to the `samples/corda/corda-simple-application` folder.
+- Run the following:
+  * On the node owned by `PartyA` in `Corda_Network`:
+    ```bash
+    CORDA_PORT=10006 ./clients/build/install/clients/bin/clients configure network
+    CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer save-cert
+    ```
+  * On the node owned by `PartyB` in `Corda_Network2`:
+    ```bash
+    NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients configure network
+    CORDA_PORT=30006 ./clients/build/install/clients/bin/clients transfer save-cert
+    ```
+  The `save-cert` command above fetches the certificate of the party in base64 format and stores in the folder `clients/src/main/resources/config/credentials/remoteNetworkUsers`. This file is referred during pledge to fetch the certificate of the recipient of the transferred asset, and during claim to fetch the certificate of the pledger of the asset. This is because asset transfer doesn't require both the parties in either of the export or import networks.
+  * The user certificate files corresponding to the Fabric networks also need to be copied into this folder.
+- Create `remote-network-config.json` file by copying `remote-network-config.json.template`. Use default values if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
+  * Update value for `relayEndpoint` for `network1` as `relay-network1:9080`.
+  * Update value for `relayEndpoint` for `network2` as `relay-network2:9083`.
+  * Update value for `relayEndpoint` for `Corda_Network` as `relay-corda:9081`.
+  * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
+  * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
+  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:30003`.
+- The contents of `remote-network-config.json` are suitable if the corDapp `cordaSimpleApplication` was deployed on the networks. On the otherhand, if the corDapp `fungible-house-token` was deployed, then we need to update the value of the key `flowPackage` to `net.corda.samples.tokenizedhouse.flows` for both the networks `Corda_Network` and `Corda_Network2` in the file `remote-network-config.json`.
 ### Next Steps
 
 The test networks are now configured and their ledgers are initialized. You can now run the [asset transfer flows](../interop/asset-transfer.md).
