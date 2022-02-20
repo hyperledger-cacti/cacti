@@ -96,10 +96,10 @@ fun main(args: Array<String>) = App()
                 GetAssetPledgeStateCommand(),
                 ReclaimAssetCommand(),
                 ClaimRemoteAssetCommand(),
-                FetchPartyNameCommand(),
-                FetchCertBase64Command(),
                 GetSimpleAssetPledgeStatusByPledgeIdCommand(),
                 GetSimpleAssetClaimStatusByPledgeIdCommand(),
+                FetchPartyNameCommand(),
+                FetchCertBase64Command(),
                 SaveUserCertToFileCommand()
             ),
             ConfigureCommand().subcommands(
@@ -119,15 +119,18 @@ fun main(args: Array<String>) = App()
                 UnlockHouseTokenCommand(),
                 IsHouseTokenLockedCommand(),
                 GetHouseTokenLockStateCommand(),
-                PledgeHouseTokenCommand(),
-                IsHouseTokenPledgedCommand(),
-                GetHouseTokenPledgeStateCommand(),
-                ReclaimHouseTokenCommand(),
-                GetAssetClaimStatusByPledgeIdCommand(),
-                GetAssetPledgeStatusByPledgeIdCommand(),
-                ClaimRemoteHouseTokenCommand(),
-                FetchPartyNameCommand(),
-                FetchCertBase64Command()
+                HouseTokenTransferCommand().subcommands(
+                    PledgeHouseTokenCommand(),
+                    IsHouseTokenPledgedCommand(),
+                    GetHouseTokenPledgeStateCommand(),
+                    ReclaimHouseTokenCommand(),
+                    ClaimRemoteHouseTokenCommand(),
+                    GetAssetClaimStatusByPledgeIdCommand(),
+                    GetAssetPledgeStatusByPledgeIdCommand(),
+                    FetchPartyNameHouseCommand(),
+                    FetchCertBase64HouseCommand(),
+                    SaveUserCertToFileHouseCommand()
+                )
             ),
             NetworkIdCommand().subcommands(
                 CreateNetworkIdStateCommand(),
