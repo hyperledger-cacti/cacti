@@ -35,7 +35,7 @@ Assuming that the `simpleassettransfer` chaincode has been deployed in both netw
    You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 3. Get `bob` in `network2` to claim this bond asset as follows:
    ```bash
-   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond --pledge-id=<pledge-id> --param=bond01:a03
+   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type='bond.fabric' --pledge-id=<pledge-id> --param=bond01:a03
    ```
 4. Verify that `alice` in `network1` does not own this asset as follows:
    ```bash
@@ -57,12 +57,12 @@ Assuming that the `simpleassettransfer` chaincode has been deployed in both netw
    You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 7. Now get `bob` in `network2` to claim this bond asset as follows:
    ```bash
-   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond --pledge-id=<pledge-id> --param=bond01:a04
+   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type='bond.fabric' --pledge-id=<pledge-id> --param=bond01:a04
    ```
    This should fail as the pledge has already expired.
 8. Now get `alice` in `network1` to reclaim the asset as follows:
    ```bash
-   ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=bond --pledge-id=<pledge-id> --param=bond01:a04
+   ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type='bond.fabric' --pledge-id=<pledge-id> --param=bond01:a04
    ```
 9. Verify that `alice` in `network1` owns this asset as follows:
    ```bash
@@ -92,7 +92,7 @@ Assuming that the `simpleassettransfer` chaincode has been deployed in both netw
    You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 4. Get `bob` in `network2` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
    ```bash
-   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token --pledge-id=<pledge-id> --param=token1:50
+   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type='token.fabric' --pledge-id=<pledge-id> --param=token1:50
    ```
 5. Verify that `alice` in `network1` owns `9950` tokens (after losing `50`) as follows:
    ```bash
@@ -113,12 +113,12 @@ Assuming that the `simpleassettransfer` chaincode has been deployed in both netw
    You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
 8. Now get `bob` in `network2` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
    ```bash
-   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token --pledge-id=<pledge-id> --param=token1:100
+   ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type='token.fabric' --pledge-id=<pledge-id> --param=token1:100
    ```
    This should fail as the pledge has already expired.
 9. Now get `alice` in `network1` to reclaim these tokens as follows:
    ```bash
-   ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=token --pledge-id=<pledge-id> --param=token1:100
+   ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type='token.fabric' --pledge-id=<pledge-id> --param=token1:100
    ```
 10. Verify that `alice` in `network1` still owns `9950` tokens (after losing `50`) as follows:
    ```bash
@@ -192,7 +192,7 @@ Assuming that the corDapp `fungible-house-token` has been deployed in both netwo
   (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer get-pledge-state -pid <pledge-id>`; moreover, check the token balance for `PartyA` in `Corda_Network` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance` which should output 95 house tokens).
 - Let `PartyB` claim in `Corda_Network2` the tokens which are pledged in the network (claim issues the tokens in the destination/importing network):
   ```bash
-  NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients house-token transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='O=PartyA, L=London, C=GB' --transfer-category='house-token.corda' --export-network-id='Corda_Network' --param='house:5' --import-relay-address='localhost:9082'
+  NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='O=PartyA, L=London, C=GB' --transfer-category='house-token.corda' --export-network-id='Corda_Network' --param='house:5' --import-relay-address='localhost:9082'
   ```
   (check the token balance for `PartyB` in `Corda_Network2` by running the command `CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token get-balance` which should output `5` house tokens)
 

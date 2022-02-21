@@ -349,7 +349,7 @@ class AssetClaimStatusStateToProtoBytes(
             .setExpiryTimeSecs(assetClaimStatusState.expiryTimeSecs)
             .setExpirationStatus(assetClaimStatusState.expirationStatus)
             .build()
-        return claimStatus.toByteArray()
+        return Base64.getEncoder().encodeToString(claimStatus.toByteArray()).toByteArray()
     }
 }
 
@@ -436,7 +436,7 @@ class AssetPledgeStateToProtoBytes(
             .setRecipient(assetPledgeState.recipientCert)
             .setExpiryTimeSecs(assetPledgeState.expiryTimeSecs)
             .build()
-        return pledgeState.toByteArray()
+        return Base64.getEncoder().encodeToString(pledgeState.toByteArray()).toByteArray()
     }
 }
 
@@ -474,7 +474,8 @@ object ReclaimPledgedAsset {
 
             val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
-            val assetClaimStatus = AssetTransfer.AssetClaimStatus.parseFrom(externalStateView.payload.toByteArray())
+            val payloadDecoded = Base64.getDecoder().decode(externalStateView.payload.toByteArray())
+            val assetClaimStatus = AssetTransfer.AssetClaimStatus.parseFrom(payloadDecoded)
             println("Asset claim status details obtained via interop query: ${assetClaimStatus}")
 
             val assetPledgeStateAndRef = subFlow(GetAssetPledgeStateById(pledgeId))
@@ -679,7 +680,8 @@ object ClaimRemoteAsset {
             // get the asset pledge details fetched earlier via interop query from import to export n/w
             val viewData = subFlow(GetExternalStateByLinearId(pledgeStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
-            val assetPledgeStatus = AssetTransfer.AssetPledge.parseFrom(externalStateView.payload.toByteArray())
+            val payloadDecoded = Base64.getDecoder().decode(externalStateView.payload.toByteArray())
+            val assetPledgeStatus = AssetTransfer.AssetPledge.parseFrom(payloadDecoded)
             println("Asset pledge status details obtained via interop query: ${assetPledgeStatus}")
 
             var currentTimeSecs: Long
