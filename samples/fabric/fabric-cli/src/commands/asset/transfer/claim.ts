@@ -125,7 +125,7 @@ const command: GluegunCommand = {
     }
     if (!options['type'])
     {
-      print.error('--type of asset transfer needs to be specified in the format: \'asset_type.remote_network_type\'.' + 
+      print.error('--type of asset transfer needs to be specified in the format: \'asset_type.remote_network_type\'.' +
             ' \'asset_type\' can be either \'bond\', \'token\' or \'house-token\'.' +
             ' \'remote_network_type\' can be either \'fabric\', \'corda\' or \'besu\'.')
       return
@@ -202,18 +202,17 @@ const command: GluegunCommand = {
 async function getClaimViewAddress(transferCategory, pledgeId, owner, sourceNetwork,
     recipientCert, destNetwork
 ) {
-    let ownerCert = "", funcName = "", funcArgs = []
-    
+    let funcName = "", funcArgs = []
+    let ownerCert = await getUserCertFromFile(owner, sourceNetwork)
+
     if (transferCategory == "token.corda") {
         funcName = "GetAssetPledgeStatusByPledgeId"
         funcArgs = [pledgeId, destNetwork]
     } else if (transferCategory === "bond.fabric") {
         funcName = "GetAssetPledgeStatus"
-        ownerCert = await getUserCertFromFile(owner, sourceNetwork)
         funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
     } else if (transferCategory === "token.fabric") {
         funcName = "GetTokenAssetPledgeStatus"
-        ownerCert = await getUserCertBase64(sourceNetwork, owner)
         funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
     } else if (transferCategory.equals("house-token.corda")) {
         funcName = "GetAssetPledgeStatusByPledgeId"
