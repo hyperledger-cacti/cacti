@@ -150,9 +150,8 @@ Assuming that the corDapp `cordaSimpleApplication` has been deployed in both net
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --fungible --timeout="3600" --import-network-id='Corda_Network2' --recipient='O=PartyB, L=London, C=GB' --param='t1:5'
   ```
-  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>`
-  (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006  ./clients/build/install/clients/bin/clients transfer get-pledge-state -pid <pledge-id>`; moreover, check the token asset balance for `PartyA` in `Corda_Network` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type t1` which should not include the asset `t1:5` issued earlier).
-- Let `PartyB` claim in `Corda_Network2` the tokens which are pledged in the network (claim issues the tokens in the destination/importing network):
+  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006  ./clients/build/install/clients/bin/clients transfer get-pledge-state -pid <pledge-id>`; moreover, check the token asset balance for `PartyA` in `Corda_Network` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type t1` which should not include the asset `t1:5` issued earlier).
+- Let `PartyB` claim in `Corda_Network2` the tokens which are pledged in the Corda network `Corda_Network` by replacing `<pledge-id>` with the above hexadecimal value (claim issues the tokens in the destination/importing network):
   ```bash
   NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='O=PartyA, L=London, C=GB' --transfer-category='token.corda' --export-network-id='Corda_Network' --param='t1:5' --import-relay-address='localhost:9082'
   ```
@@ -188,9 +187,8 @@ Assuming that the corDapp `fungible-house-token` has been deployed in both netwo
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer pledge-asset --fungible --timeout="3600" --import-network-id='Corda_Network2' --recipient='O=PartyB, L=London, C=GB' --param='house:5'
   ```
-  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>`
-  (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer get-pledge-state -pid <pledge-id>`; moreover, check the token balance for `PartyA` in `Corda_Network` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance` which should output 95 house tokens).
-- Let `PartyB` claim in `Corda_Network2` the tokens which are pledged in the network (claim issues the tokens in the destination/importing network):
+  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer get-pledge-state -pid <pledge-id>`; moreover, check the token balance for `PartyA` in `Corda_Network` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance` which should output 95 house tokens).
+- Let `PartyB` claim in `Corda_Network2` the tokens which are pledged in the Corda network `Corda_Network` by replacing `<pledge-id>` with the above hexadecimal value (claim issues the tokens in the destination/importing network):
   ```bash
   NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='O=PartyA, L=London, C=GB' --transfer-category='house-token.corda' --export-network-id='Corda_Network' --param='house:5' --import-relay-address='localhost:9082'
   ```
@@ -201,4 +199,111 @@ The above steps complete a successful asset transfer from the Corda network `Cor
 - Let `PartyA` in `Corda_Network` try re-claim the token `house:5` asset, which will succeed only if the house-token asset was not claimed by `PartyB` and the pledge has expired:
   ```bash
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer reclaim-pledged-asset --pledge-id='<pledge-id>' --export-relay-address='localhost:9081' --transfer-category='house-token.corda' --import-network-id='Corda_Network2' --param='house:5'
+  ```
+
+## 3. Fabric with Corda
+A Fabric network transfers some tokens owned by `Alice` to `PartyA` (`CORDA_PORT=10006`) in a Corda network.
+
+### **Transfer or recover token (fungible) assets**
+
+Assuming that the `simpleassettransfer` chaincode has been deployed in Fabric network `network1`, run the following steps related to Fabric by navigating to the `samples/fabric/fabric-cli` folder (_the Go CLI doesn't support asset transfer yet_).
+
+Similarly, assuming that the corDapp `cordaSimpleApplication` has been deployed in the Corda network `Corda_Network`, run the following steps related to Corda by navigating to the `samples/corda/corda-simple-application` folder.
+- Create a `network-id` for the Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients transfer get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` to fetch the name of the parties `PartyA` or `PartyB` respectively).
+  ```bash
+  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
+  ```
+  The above assumes that `Corda_Network` was started earlier with `2-nodes` (network state created in `Corda_Network` can be cross checked by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref` or `CORDA_PORT=10009 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref`).
+- Verify that `alice` in `network1` owns `10000` tokens as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network1 alice
+   ```
+- Get `alice` in `network1` to pledge 50 tokens to `PartyA` in `Corda_Network` as follows (with a 1 hour timeout):
+   ```bash
+   ./bin/fabric-cli asset transfer pledge --source-network='network1' --dest-network='Corda_Network' --recipient='O=PartyA, L=London, C=GB' --expiry-secs=3600 --type='token' --units=50 --owner=alice --data-file=src/data/tokensForTransfer.json
+   ```
+   You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
+
+- Verify that `alice` in `network1` owns `9950` tokens (after losing `50`) as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network1 alice
+   ```
+- Let `PartyB` claim in `Corda_Network` the tokens which are pledged in the Fabric network `network1` by replacing `<pledge-id>` with the above hexadecimal value (claim issues the tokens in the destination/importing network):
+  ```bash
+  NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='alice' --transfer-category='token.fabric' --export-network-id='network1' --param='token1:50' --import-relay-address='localhost:9081'
+  ```
+  (the `linear-id`, which is displayed after successful execution of the above command, can be used to check the newly issued tokens for `PartyA` by running `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state-using-linear-id <linear-id>`; or simply check the token balance for `PartyA` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type token1` which should output `50` tokens of type `token1`)
+
+The above steps complete a successful asset transfer from the Fabric network `network1` to the Corda network `Corda_Network`. Below demostrates re-claim of the tokens pledged in the Fabric network after the pledge expiry.
+
+- Now get `alice` in `network1` to pledge 100 tokens to `PartyA` in `Corda_Network` as follows (with a 1 minute timeout):
+   ```bash
+   ./bin/fabric-cli asset transfer pledge --source-network='network1' --dest-network='Corda_Network' --recipient='O=PartyA, L=London, C=GB' --expiry-secs=60 --type=token --units=100 --owner=alice --data-file=src/data/tokensForTransfer.json
+   ```
+   You should see a message containing the unique ID of this pledge on the console as `Asset pledged with ID <pledge-id>` (`<pledge-id>` is a hexadecimal string).
+
+   Wait for a minute as follows:
+   ```bash
+   sleep 60
+   ```
+
+- Let `PartyB` claim in `Corda_Network` the tokens which are pledged in the Fabric network `network1` by replacing `<pledge-id>` with the above hexadecimal value (claim issues the tokens in the destination/importing network):
+   ```bash
+   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='alice' --transfer-category='token.fabric' --export-network-id='network1' --param='token1:100' --import-relay-address='localhost:9080'
+   ```
+   This should fail as the pledge has already expired.
+
+   (check the token balance for `PartyA` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type token1` which should still show `50` tokens of type `token1` but not `150`)
+- Now get `alice` in `network1` to reclaim these tokens as follows:
+   ```bash
+   ./bin/fabric-cli asset transfer reclaim --source-network='network1' --user='alice' --type='token.corda' --pledge-id=<pledge-id> --param=token1:100
+   ```
+- Verify that `alice` in `network1` still owns `9950` tokens (after losing `50`) as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network1 alice
+   ```
+
+## 4. Corda with Fabric
+A Corda network transfers some tokens owned by `PartyA` (`CORDA_PORT=10006`) to `Alice` in a Fabric network.
+
+### **Transfer or recover token (fungible) assets**
+
+Assuming that the corDapp `cordaSimpleApplication` has been deployed in the Corda network `Corda_Network`, run the following steps related to Corda by navigating to the `samples/corda/corda-simple-application` folder.
+
+Similarly, assume that the `simpleassettransfer` chaincode has been deployed in Fabric network `network1`, run the following steps related to Fabric by navigating to the `samples/fabric/fabric-cli` folder (_the Go CLI doesn't support asset transfer yet_).
+
+- Create a `network-id` for the Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients transfer get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` to fetch the name of the parties `PartyA` or `PartyB` respectively).
+  ```bash
+  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
+  ```
+  The above assumes that `Corda_Network` was started earlier with `2-nodes` (network state created in `Corda_Network` can be cross checked by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref` or `CORDA_PORT=10009 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref`).
+
+- Add `5` tokens of type `token1` to `PartyA` in `Corda_Network`:
+  ```bash
+  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients issue-asset-state 5 token1
+  ```
+  (check token balance for `PartyA` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type token1`)
+- Let `PartyA` pledge (with a 1 hour timeout) these tokens in `Corda_Network` to be transferred to `Alice` of Fabric network `network1` (pledge burns the tokens in the source/exporting network):
+  ```bash
+  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --fungible --timeout="3600" --import-network-id='network1' --recipient='alice' --param='token1:5'
+  ```
+  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006  ./clients/build/install/clients/bin/clients transfer get-pledge-state -pid <pledge-id>`; moreover, check the token asset balance for `PartyA` in `Corda_Network` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type token1` which should not include the asset `token1:5` issued earlier).
+- Verify that `alice` in `network1` owns `10000` tokens as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network1 alice
+   ```
+- Get `alice` in `network` to claim these tokens as follows (replace `<pledge-id>` with the above hexadecimal value):
+   ```bash
+   ./bin/fabric-cli asset transfer claim --source-network='Corda_Network' --dest-network=network1 --user='alice' --owner='O=PartyA, L=London, C=GB' --type='token.corda' --pledge-id=<pledge-id> --param=token1:5
+   ```
+- Verify that `alice` in `network` now owns `1050` tokens as follows:
+   ```bash
+   ./scripts/getTokenBalance.sh network alice
+   ```
+
+The above steps complete a successful asset transfer from the Corda network `Corda_Network` to the Fabric network `network1`. In addition to the above commands, following is an extra option.
+
+- Let `PartyA` in `Corda_Network` try re-claim the token `token1:5` asset, which will succeed only if the asset was not claimed by `alice` in Fabric network and the pledge has expired (replace `<pledge-id>` with the above hexadecimal value):
+  ```bash
+  NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer reclaim-pledged-asset --pledge-id=<pledge-id> --export-relay-address='localhost:9081' --transfer-category='token.fabric' --import-network-id='network1' --param='token1:5'
   ```

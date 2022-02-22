@@ -255,6 +255,8 @@ Initialize bond and token asset states and ownerships on the `network1` ledger b
 ```bash
 ./scripts/initAssetsForTransfer.sh
 ```
+The `initAssetsForTranser.sh` script above also fetches the certificate of the users in base64 format and stores in the folder `src/data/remoteNetworkUsers` with filename `network1_UsersAndCerts.json` and `network2_UsersAndCerts.json` corresponding to `network1` and `network2` respectively. These files are referred during pledge to fetch the certificate of the recipient of the transferred asset, and during claim to fetch the certificate of the pledger of the asset. *This is because, asset transfer doesn't require both the users being members of neither in the export nor in the import network. It's just sufficient that pledger is part of the asset export network and claimer is part of the asset import network*.
+  * The user certificate files corresponding to the Fabric networks also need to be copied into this folder.
 
 ### Initializing the Corda Networks
 
@@ -276,7 +278,7 @@ Bootstrap the Corda networks and application states as follows (_the following i
     NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients configure network
     CORDA_PORT=30006 ./clients/build/install/clients/bin/clients transfer save-cert
     ```
-  The `save-cert` command above fetches the certificate of the party in base64 format and stores in the folder `clients/src/main/resources/config/credentials/remoteNetworkUsers`. This file is referred during pledge to fetch the certificate of the recipient of the transferred asset, and during claim to fetch the certificate of the pledger of the asset. This is because asset transfer doesn't require both the parties in either of the export or import networks.
+  The `save-cert` command above fetches the certificate of the party in base64 format and stores in the folder `clients/src/main/resources/config/credentials/remoteNetworkUsers` with filename `Corda_Network_UsersAndCerts.json` and `Corda_Network2_UsersAndCerts.json` corresponding to `Corda_Network` and `Corda_Network2` respectively. These files are referred during pledge to fetch the certificate of the recipient of the transferred asset, and during claim to fetch the certificate of the pledger of the asset. *This is because, asset transfer doesn't require both the parties being members of neither in the export nor in the import network. It's just sufficient that pledger is part of the asset export network and claimer is part of the asset import network*.
   * The user certificate files corresponding to the Fabric networks also need to be copied into this folder.
 - Create `remote-network-config.json` file by copying `remote-network-config.json.template`. Use default values if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
   * Update value for `relayEndpoint` for `network1` as `relay-network1:9080`.

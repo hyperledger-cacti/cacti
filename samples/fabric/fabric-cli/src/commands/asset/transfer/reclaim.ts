@@ -104,7 +104,7 @@ const command: GluegunCommand = {
     }
     if (!options['type'])
     {
-      print.error('--type of asset transfer needs to be specified in the format: \'asset_type.remote_network_type\'.' + 
+      print.error('--type of asset transfer needs to be specified in the format: \'asset_type.remote_network_type\'.' +
             ' \'asset_type\' can be either \'bond\', \'token\' or \'house-token\'.' +
             ' \'remote_network_type\' can be either \'fabric\', \'corda\' or \'besu\'.')
       return
