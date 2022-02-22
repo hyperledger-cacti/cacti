@@ -29,7 +29,7 @@ class AssetTransferContract : Contract {
     }
 
     /**
-     * A transaction is valid if the verify() function of the contract of all the transaction's
+     * A transaction is valid if the verify() function of the contract for any of the transaction's
      * input and output states does not throw an exception.
      */
     override fun verify(tx: LedgerTransaction) {

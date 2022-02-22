@@ -653,6 +653,7 @@ fun resolveUpdateOwnerFlow(flowName: String, flowArgs: List<Any>): Either<Error,
 fun getLinearIdFromString(linearId: String): UniqueIdentifier {
     val id = linearId.split("_").toTypedArray()
     if (id.size != 2) {
+        // here the id[1] denotes an UUID and id[0] denotes its hash
         println("Invalid linearId: ${linearId}.\n")
         throw IllegalStateException("Invalid linearId: ${linearId}.\n")
     }
