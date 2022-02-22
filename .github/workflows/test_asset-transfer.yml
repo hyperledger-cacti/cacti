@@ -254,7 +254,7 @@ jobs:
           CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
 
           # FABRIC1 - FABRIC2
-          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond --pledge-id=$CID --param=bond01:a03 &> tmp.out
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a03 &> tmp.out
           tail -n 1 tmp.out | grep "Called Function ClaimRemoteAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -272,11 +272,11 @@ jobs:
           CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
           sleep 20
           
-          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond --pledge-id=$CID --param=bond01:a04 &> tmp.out
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a04 &> tmp.out
           tail -n 1 tmp.out | grep "cannot claim asset with pledgeId $CID as the expiry time has elapsed" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
-          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=bond --pledge-id=$CID --param=bond01:a04 &> tmp.out
+          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a04 &> tmp.out
           tail -n 1 tmp.out | grep "Called Function ReclaimAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
@@ -312,7 +312,7 @@ jobs:
           CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
 
           # FABRIC1 - FABRIC2
-          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token --pledge-id=$CID --param=token1:50 &> tmp.out
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token.fabric --pledge-id=$CID --param=token1:50 &> tmp.out
           tail -n 1 tmp.out | grep "Called Function ClaimRemoteTokenAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -330,11 +330,11 @@ jobs:
           CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
           sleep 20
           
-          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token --pledge-id=$CID --param=token1:100 &> tmp.out
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token.fabric --pledge-id=$CID --param=token1:100 &> tmp.out
           tail -n 1 tmp.out | grep "cannot claim asset with pledgeId $CID as the expiry time has elapsed" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
-          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=token --pledge-id=$CID --param=token1:100 &> tmp.out
+          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=token.fabric --pledge-id=$CID --param=token1:100 &> tmp.out
           tail -n 1 tmp.out | grep "Called Function ReclaimTokenAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
@@ -622,7 +622,7 @@ jobs:
           CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
 
           # FABRIC1 - FABRIC2
-          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond --pledge-id=$CID --param=bond01:a03 &> tmp.out
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a03 &> tmp.out
           tail -n 1 tmp.out | grep "Called Function ClaimRemoteAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -640,11 +640,11 @@ jobs:
           CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
           sleep 20
           
-          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond --pledge-id=$CID --param=bond01:a04 &> tmp.out
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a04 &> tmp.out
           tail -n 1 tmp.out | grep "cannot claim asset with pledgeId $CID as the expiry time has elapsed" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
-          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=bond --pledge-id=$CID --param=bond01:a04 &> tmp.out
+          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a04 &> tmp.out
           tail -n 1 tmp.out | grep "Called Function ReclaimAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
@@ -680,7 +680,7 @@ jobs:
           CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
 
           # FABRIC1 - FABRIC2
-          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token --pledge-id=$CID --param=token1:50 &> tmp.out
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token.fabric --pledge-id=$CID --param=token1:50 &> tmp.out
           tail -n 1 tmp.out | grep "Called Function ClaimRemoteTokenAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
@@ -698,11 +698,11 @@ jobs:
           CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
           sleep 20
           
-          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token --pledge-id=$CID --param=token1:100 &> tmp.out
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token.fabric --pledge-id=$CID --param=token1:100 &> tmp.out
           tail -n 1 tmp.out | grep "cannot claim asset with pledgeId $CID as the expiry time has elapsed" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
-          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=token --pledge-id=$CID --param=token1:100 &> tmp.out
+          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=token.fabric --pledge-id=$CID --param=token1:100 &> tmp.out
           tail -n 1 tmp.out | grep "Called Function ReclaimTokenAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
