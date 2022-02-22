@@ -214,7 +214,7 @@ async function getClaimViewAddress(transferCategory, pledgeId, owner, sourceNetw
     } else if (transferCategory === "token.fabric") {
         funcName = "GetTokenAssetPledgeStatus"
         funcArgs = [pledgeId, ownerCert, destNetwork, recipientCert]
-    } else if (transferCategory.equals("house-token.corda")) {
+    } else if (transferCategory.includes("house-token.corda")) {
         funcName = "GetAssetPledgeStatusByPledgeId"
         funcArgs = [pledgeId, destNetwork]
     } else {
