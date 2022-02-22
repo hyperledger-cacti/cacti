@@ -1366,7 +1366,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     } while (!reachable);
   }
 
-  public stop(): Promise<any> {
+  public stop(): Promise<unknown> {
     return Containers.stop(this.container as Container);
   }
 
