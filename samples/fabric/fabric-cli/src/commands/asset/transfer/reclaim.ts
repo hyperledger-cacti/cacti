@@ -201,7 +201,7 @@ function getReclaimViewAddress(transferCategory, assetType, assetIdOrQuantity,
         funcName = "GetTokenAssetClaimStatus"
         funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
             pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
-    } else if (transferCategory.equals("house-token.corda")) {
+    } else if (transferCategory.includes("house-token.corda")) {
         funcName = "GetAssetClaimStatusByPledgeId"
         funcArgs = [pledgeId, pledgeExpiryTimeSecs]
     } else {
