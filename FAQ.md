@@ -27,6 +27,10 @@
 - **A recommended** setup would be for a dev machine in my opinion is **16 GB RAM 4 CPU**
 **cores (8 threads)** and of course SSD for persistent storage.
 
+- **For Apple M1 (ARM-based system)** it is recommended to install `nvm` through a **Terminal using Rosetta** (and every tool that only supports Intel processors).
+The suggestion is to create a duplicate of your Terminal using Rosetta, open it and install `nvm`, and the other necessary development tools.
+Also, take a look into **VSCode Insiders** which might be handy in this situation.
+
 - Cool story/anecodte: Peter ran the tests on a VPS with 4 GB RAM in it once and the only
 tests that failed were the Corda ones because those are hungrier than the others.
 
