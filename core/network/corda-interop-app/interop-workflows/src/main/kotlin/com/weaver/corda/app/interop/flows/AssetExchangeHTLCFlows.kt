@@ -655,7 +655,7 @@ fun getLinearIdFromString(linearId: String): UniqueIdentifier {
     if (id.size != 2) {
         // here the id[1] denotes an UUID and id[0] denotes its hash
         println("Invalid linearId: ${linearId}.\n")
-        throw IllegalStateException("Invalid linearId: ${linearId}.\n")
+        throw IllegalStateException("Invalid linearId: ${linearId} as per HTLC or Asset-Transfer Corda protocol.\n")
     }
     return UniqueIdentifier(externalId=id[0], id = UniqueIdentifier.fromString(id[1]).id)
 }

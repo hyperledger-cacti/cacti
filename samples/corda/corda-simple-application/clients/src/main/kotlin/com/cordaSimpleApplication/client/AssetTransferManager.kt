@@ -127,7 +127,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                         obs
                     )
                 }
-                println("Asset Pledge State created with contract ID ${id}.")
+                println("Asset Pledge State created with pledge ID ${id}.")
             } catch (e: Exception) {
               println("Error: ${e.toString()}")
             } finally {
@@ -557,7 +557,7 @@ fun getClaimViewAddress(
 fun getRemoteNetworkConfig(networkID: String): JSONObject {
 
     val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
-    val filepath: String = credentialPath + "/remote-network-config.json"
+    val filepath: String = credentialPath + "/../remote-network-config.json"
 
     val networksConfigJSON: JSONObject
     val networksConfigFile: File
@@ -672,7 +672,7 @@ fun getUserCertFromFile(userID: String, networkID: String): String {
     try {
 
         val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
-        val dirPath: String = "$credentialPath" + "/remoteNetworkUsers"
+        val dirPath: String = "$credentialPath" + "/../remoteNetworkUsers"
         val filepath: String = "$dirPath/$networkID" + "_UsersAndCerts.json"
 
         var usersAndCertsJSON: JSONObject
@@ -731,7 +731,7 @@ class SaveUserCertToFileCommand : CliktCommand(name="save-cert", help = "Populat
             }
 
             val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
-            val dirPath: String = "${credentialPath}/remoteNetworkUsers"
+            val dirPath: String = "${credentialPath}/../remoteNetworkUsers"
             val filepath: String = "${dirPath}/${networkID + "_UsersAndCerts.json"}"
 
             val folder: File = File(dirPath)
