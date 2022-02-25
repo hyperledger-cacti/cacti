@@ -219,7 +219,7 @@ class SaveUserCertToFileHouseCommand : CliktCommand(name="save-cert", help = "Po
             }
 
             val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
-            val dirPath: String = "${credentialPath}/remoteNetworkUsers"
+            val dirPath: String = "${credentialPath}/../remoteNetworkUsers"
             val filepath: String = "${dirPath}/${networkID + "_UsersAndCerts.json"}"
 
             val folder: File = File(dirPath)

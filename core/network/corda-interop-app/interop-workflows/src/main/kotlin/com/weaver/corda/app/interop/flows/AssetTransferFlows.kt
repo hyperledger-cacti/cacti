@@ -48,11 +48,11 @@ import java.util.Calendar
  */
 @CordaSerializable
 enum class AssetTransferResponderRole {
-    LOCKER, ISSUER, OBSERVER
+    PLEDGER, ISSUER, OBSERVER
 }
 
 /**
- * The AssetTransferPledge flow is used to create a pledge on an asset ready for transfer to remote network.
+ * The PledgeAsset flow is used to create a pledge on an asset ready for transfer to remote network.
  *
  * @property expiryTimeSecs The future time in epoch seconds before which the asset claim in the remote/importing network is to be performed.
  * @property assetStateRef The state pointer to the asset in the vault that is being pledged for remote network transfer.
@@ -64,7 +64,7 @@ enum class AssetTransferResponderRole {
  *                      Otherwise this will be same as the party submitting the transaction.
  * @property observers The parties who are not transaction participants but only observers (can be empty list).
  */
-object AssetTransferPledge {
+object PledgeAsset {
     @InitiatingFlow
     @StartableByRPC
     class Initiator
@@ -542,7 +542,7 @@ object ReclaimPledgedAsset {
                     }
                     if (!ourIdentity.equals(assetPledgeState.locker)) {
                         val lockerSession = initiateFlow(assetPledgeState.locker)
-                        lockerSession.send(AssetTransferResponderRole.LOCKER)
+                        lockerSession.send(AssetTransferResponderRole.PLEDGER)
                         sessions += lockerSession
                     }
                     val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
@@ -580,7 +580,7 @@ object ReclaimPledgedAsset {
                     println("Error signing reclaim asset transaction by Issuer: ${e.message}\n")
                     return subFlow(ReceiveFinalityFlow(session))
                 }
-            } else if (role == AssetTransferResponderRole.LOCKER) {
+            } else if (role == AssetTransferResponderRole.PLEDGER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                         val lTx = stx.tx.toLedgerTransaction(serviceHub)
@@ -644,7 +644,7 @@ class IsRemoteAssetClaimedEarlier(
  * @property getAssetAndContractIdFlowName The flow name in the application corDapp that fetches the asset state and contract associated,
  *                                              for the input asset with <assetType, nunUnits>.
  * @property assetType Type of the asset that was pledged in the export n/w.
- * @property numUnits Quantity of the fungible asset that was pledged in the export n/w
+ * @property assetIdOrQuantity Quantity of the fungible asset / Id of the non-fungible asset that was pledged in the export n/w
  * @property assetStateCreateCommand The name of the contract command used to create the pledged asset in the importing network.
  * @property lockerCert The certificate of the owner of asset in base64 form before transfer in the exporting network.
  * @property recipientCert Certificate of the asset recipient (in base64 format) in the importing network.
@@ -662,8 +662,8 @@ object ClaimRemoteAsset {
         val pledgeStatusLinearId: String,
         val getAssetAndContractIdFlowName: String,
         val assetType: String,
-        val numUnits: Long,
-        val assetStateCreateCommand: CommandData,
+        val assetIdOrQuantity: String,
+        val createAssetStateCommand: CommandData,
         val lockerCert: String,
         val recipientCert: String,
         val issuer: Party,
@@ -683,6 +683,7 @@ object ClaimRemoteAsset {
             val payloadDecoded = Base64.getDecoder().decode(externalStateView.payload.toByteArray())
             val assetPledgeStatus = AssetTransfer.AssetPledge.parseFrom(payloadDecoded)
             println("Asset pledge status details obtained via interop query: ${assetPledgeStatus}")
+            println("getAssetAndContractIdFlowName: ${getAssetAndContractIdFlowName} assetIdOrQuantity: ${assetIdOrQuantity}")
 
             var currentTimeSecs: Long
             val calendar = Calendar.getInstance()
@@ -717,7 +718,7 @@ object ClaimRemoteAsset {
                 )
             )
 
-            val assetCreateCmd = Command(assetStateCreateCommand,
+            val assetCreateCmd = Command(createAssetStateCommand,
                 setOf(
                     ourIdentity.owningKey,
                     issuer.owningKey
@@ -738,14 +739,14 @@ object ClaimRemoteAsset {
                 println("Remote asset with pledgeId ${pledgeId} has already been claimed.")
                 Left(Error("Remote asset with pledgeId ${pledgeId} has already been claimed."))
             } else {
-                // Flow getAssetAndContractIdFlowName takes 5 parameters: assetDetailsBytes, assetType, numUnits, locker, recipient
-                // And returns SimpleAsset/FungibleToken(i.e., ContractState) state and its ContractId as a Pair
+                // Flow getAssetAndContractIdFlowName takes 5 parameters: assetDetailsBytes, assetType, assetIdOrQuantity, locker, recipient
+                // And returns SimpleAsset/SimpleBondAsset/FungibleHouseToken state (i.e., ContractState) and its ContractId as a Pair
                 resolveGetAssetStateAndContractIdFlow(getAssetAndContractIdFlowName,
                     listOf(
                         // must have used copyFromUtf8() at the time of serialization of the protobuf @property assetDetails
                         assetPledgeStatus.assetDetails.toStringUtf8(),
                         assetType,
-                        numUnits,
+                        assetIdOrQuantity,
                         lockerCert,
                         ourIdentity
                     )

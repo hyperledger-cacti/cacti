@@ -1,0 +1,26 @@
+{
+  "network1": {
+    "type": "fabric",
+    "relayEndpoint": "localhost:9080",
+    "channelName": "mychannel",
+    "chaincode": "simpleassettransfer"
+  },
+  "network2": {
+    "type": "fabric",
+    "relayEndpoint": "localhost:9083",
+    "channelName": "mychannel",
+    "chaincode": "simpleassettransfer"
+  },
+  "Corda_Network": {
+    "type": "corda",
+    "relayEndpoint": "localhost:9081",
+    "partyEndPoint": "localhost:10006",
+    "flowPackage": "com.cordaSimpleApplication.flow"
+  },
+  "Corda_Network2": {
+    "type": "corda",
+    "relayEndpoint": "localhost:9082",
+    "partyEndPoint": "localhost:30006",
+    "flowPackage": "com.cordaSimpleApplication.flow"
+  }
+}
