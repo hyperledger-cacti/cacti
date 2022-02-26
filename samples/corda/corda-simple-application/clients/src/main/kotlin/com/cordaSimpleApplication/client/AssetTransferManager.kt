@@ -6,14 +6,18 @@
 
 package com.cordaSimpleApplication.client
 
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.default
-import java.lang.Exception
 import java.io.File
+import java.lang.Exception
+import java.security.cert.X509Certificate
 import org.json.JSONObject
 import net.corda.core.messaging.CordaRPCOps
 import kotlinx.coroutines.runBlocking
@@ -21,8 +25,7 @@ import kotlin.system.exitProcess
 import net.corda.core.messaging.startFlow
 import java.util.Base64
 import net.corda.core.identity.CordaX500Name
-
-import com.weaver.corda.sdk.AssetManager
+import com.weaver.corda.sdk.AssetTransferSDK
 import com.weaver.corda.sdk.InteroperableHelper
 import com.cordaSimpleApplication.contract.AssetContract
 import java.util.Calendar
@@ -32,7 +35,6 @@ import com.weaver.corda.app.interop.states.AssetPledgeState
 import com.cordaSimpleApplication.flow.GetAssetClaimStatusByPledgeId
 import com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId
 import com.cordaSimpleApplication.flow.GetOurCertificateBase64
-import com.cordaSimpleApplication.flow.GetOurIdentity
 import net.corda.core.identity.Party
 
 class AssetTransferCommand : CliktCommand(name = "transfer", help ="Manages simple asset transfer") {
@@ -84,11 +86,10 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                 val localNetworkId = rpc.proxy.startFlow(::RetrieveNetworkId).returnValue.get()
                 println("localNetworkId: ${localNetworkId}")
 
-                val thisPartyName = rpc.proxy.startFlow(::GetOurIdentity).returnValue.get()
                  // "thisParty" is set to the token "issuer" in case fungible house token; since we are using the same
                  // SDK function claimPledgeFungibleAsset and Interop application for both the "Simple Asset" and
                  // the "Fungible house token" corDapps, we pass the Identity of the party submitting the claim here.
-                val thisParty = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(thisPartyName))!!
+                val thisParty: Party = rpc.proxy.nodeInfo().legalIdentities.get(0)
 
                 var obs = listOf<Party>()
                 if (observer != null)   {
@@ -99,7 +100,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                 val recipientCert: String = getUserCertFromFile(recipient!!, importNetworkId!!)
 
                 if (fungible) {
-                    id = AssetManager.createFungibleAssetPledge(
+                    id = AssetTransferSDK.createFungibleAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
                         importNetworkId!!,
@@ -113,7 +114,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                         obs
                     )
                 } else {
-                    id = AssetManager.createAssetPledge(
+                    id = AssetTransferSDK.createAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
                         importNetworkId!!,
@@ -153,7 +154,7 @@ class IsAssetPledgedCommand : CliktCommand(name="is-asset-pledged", help = "Quer
                     password = "test",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
-                val res = AssetManager.isAssetPledgedForTransfer(
+                val res = AssetTransferSDK.isAssetPledgedForTransfer(
                     rpc.proxy, 
                     pledgeId!!
                 )
@@ -182,7 +183,7 @@ class GetAssetPledgeStateCommand : CliktCommand(name="get-pledge-state", help = 
                     password = "test",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
-                val res = AssetManager.readPledgeStateByContractId(
+                val res = AssetTransferSDK.readPledgeStateByPledgeId(
                     rpc.proxy, 
                     pledgeId!!
                 )
@@ -211,6 +212,9 @@ class FetchCertBase64Command : CliktCommand(name="get-cert-base64", help = "Obta
         try {
             val certBase64 = rpc.proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
             println("Certificate in base64: $certBase64")
+            val certificate: X509Certificate = rpc.proxy.nodeInfo().legalIdentitiesAndCerts.get(0).certificate
+            val certBase64DoNotUse = Base64.getEncoder().encodeToString(certificate.toString().toByteArray())
+            println("certBase64DoNotUse: $certBase64DoNotUse rpc.proxy.nodeInfo().legalIdentitiesAndCerts.size: ${rpc.proxy.nodeInfo().legalIdentitiesAndCerts.size}")
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
         } finally {
@@ -232,8 +236,9 @@ class FetchPartyNameCommand : CliktCommand(name="get-party-name", help = "Obtain
             password = "test",
             rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
-            val partyName = rpc.proxy.startFlow(::GetOurIdentity).returnValue.get()
+            val partyName: String = rpc.proxy.nodeInfo().legalIdentities.get(0).name.toString()
             println("Name of the party owning the Corda node: $partyName")
+            println("rpc.proxy.nodeInfo().legalIdentities.size: ${rpc.proxy.nodeInfo().legalIdentities.size}")
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
         } finally {
@@ -272,31 +277,33 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
                 username = "clientUser1",
                 password = "test",
                 rpcPort = config["CORDA_PORT"]!!.toInt())
-            val thisPartyName = rpc.proxy.startFlow(::GetOurIdentity).returnValue.get()
             // "thisParty" is set to the token "issuer" in case fungible house token; since we are using the same
             // SDK function claimPledgeFungibleAsset and Interop application for both the "Simple Asset" and
             // the "Fungible house token" corDapps, we pass the Identity of the party submitting the claim here.
-            val thisParty = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(thisPartyName))!!
-
-            val assetPledgeState = rpc.proxy.startFlow(::GetAssetPledgeStatus, pledgeId!!, importNetworkId!!).returnValue.get() as AssetPledgeState
-            if (assetPledgeState.lockerCert.equals("")) {
-                println("Error: not a valid pledgeId $pledgeId")
-                throw IllegalStateException("Error: not a valid pledgeId $pledgeId")
-            } else if (!assetPledgeState.remoteNetworkId.equals(importNetworkId)) {
-                println("Invalid argument --import-network-id $importNetworkId")
-                throw IllegalStateException("Invalid argument --import-network-id $importNetworkId")
-            }
+            val thisParty: Party = rpc.proxy.nodeInfo().legalIdentities.get(0)
 
             val params = param!!.split(":").toTypedArray()
             if (params.size != 2) {
                 println("Invalid argument --param $param")
                 throw IllegalStateException("Invalid argument --param $param")
             }
-            var externalStateAddress: String = getReclaimViewAddress(transferCategory!!, params[0], params[1], pledgeId!!,
+
+            try {
+                var assetPledgeState: AssetPledgeState
+                when (val result: Either<Error, AssetPledgeState> = AssetTransferSDK.getAssetPledgeStatus(rpc.proxy, pledgeId!!, importNetworkId!!)) {
+                    is Either.Left -> {
+                        println("Corda Network Error: Error running GetAssetPledgeStatus flow: ${result.a.message}\n")
+                        throw IllegalStateException("Corda Network Error: Error running GetAssetPledgeStatus flow: ${result.a.message}\n")
+                    }
+                    is Either.Right -> {
+                        assetPledgeState = result.b
+                    }
+                }
+
+                var externalStateAddress: String = getReclaimViewAddress(transferCategory!!, params[0], params[1], pledgeId!!,
                 assetPledgeState.lockerCert, assetPledgeState.localNetworkId, assetPledgeState.recipientCert,
                 importNetworkId!!, assetPledgeState.expiryTimeSecs.toString())
 
-            try {
                 //val networkConfig: JSONObject = getRemoteNetworkConfig(assetPledgeState.localNetworkId)
                 //val exportRelayAddress: String = networkConfig.getString("relayEndpoint")
                 val claimStatusLinearId: String = requestStateFromRemoteNetwork(exportRelayAddress!!, externalStateAddress, rpc.proxy, config)
@@ -305,7 +312,7 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
                 if (observer != null)   {
                     obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                 }
-                val res = AssetManager.reclaimPledgedAsset(
+                val res = AssetTransferSDK.reclaimPledgedAsset(
                     rpc.proxy,
                     pledgeId!!,
                     AssetContract.Commands.Issue(),
@@ -359,11 +366,10 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
                 password = "test",
                 rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
-                val thisPartyName = rpc.proxy.startFlow(::GetOurIdentity).returnValue.get()
-                 // "thisParty" is set to the token "issuer" in case fungible house token; since we are using the same
-                 // SDK function claimPledgeFungibleAsset and Interop application for both the "Simple Asset" and
-                 // the "Fungible house token" corDapps, we pass the Identity of the party submitting the claim here.
-                val thisParty: Party = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(thisPartyName))!!
+                // "thisParty" is set to the token "issuer" in case fungible house token; since we are using the same
+                // SDK function claimPledgeFungibleAsset and Interop application for both the "Simple Asset" and
+                // the "Fungible house token" corDapps, we pass the Identity of the party submitting the claim here.
+                val thisParty: Party = rpc.proxy.nodeInfo().legalIdentities.get(0)
                 val recipientCert: String = rpc.proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
                 val params = param!!.split(":").toTypedArray()
                 if (params.size != 2) {
@@ -390,7 +396,7 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
                 //val importRelayAddress: String = networkConfig.getString("relayEndpoint")
                 val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(importRelayAddress!!, externalStateAddress, rpc.proxy, config)
 
-                val res = AssetManager.claimPledgedFungibleAsset(
+                val res = AssetTransferSDK.claimPledgedFungibleAsset(
                     rpc.proxy,
                     pledgeId!!,
                     pledgeStatusLinearId,
@@ -717,7 +723,7 @@ class SaveUserCertToFileCommand : CliktCommand(name="save-cert", help = "Populat
             rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
             val proxy = rpc.proxy
-            val userID: String = proxy.startFlow(::GetOurIdentity).returnValue.get()
+            val userID: String = rpc.proxy.nodeInfo().legalIdentities.get(0).name.toString()
             val certBase64: String = proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
             var networkID: String
             val cordaPort: Int = config["CORDA_PORT"]!!.toInt()
