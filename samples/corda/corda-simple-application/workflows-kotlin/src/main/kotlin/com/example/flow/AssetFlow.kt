@@ -17,6 +17,7 @@ import net.corda.core.contracts.StateAndRef
 import net.corda.core.identity.Party
 import net.corda.core.contracts.StaticPointer
 import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.node.ServiceHub
 import net.corda.core.flows.*
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.queryBy
@@ -633,40 +634,33 @@ class AcceptorOfTransfer(val otherPartySession: FlowSession) : FlowLogic<SignedT
 }
 
 /**
- * The GetAssetJsonStringFromStatePointer flow fetches the asset state from its state pointer [AssetPledgeState].assetStatePointer
+ * The getAssetJsonStringFromStatePointer function fetches the asset state from its state pointer [AssetPledgeState].assetStatePointer
  * and creates marshalled JSON encoded object which is returned.
  * This function is called by the exporting network in the context of interop-query from the importing network
  * to the exporting network before performing claim on remote asset.
  *
  * @property assetPledgeState The (interop) vault state that represents the pledge details on the ledger.
  */
-@InitiatingFlow
-@StartableByRPC
-class GetAssetJsonStringFromStatePointer(
-    val assetPledgeState: AssetPledgeState
-) : FlowLogic<String>() {
-    @Suspendable
-    override fun call(): String {
+fun getAssetJsonStringFromStatePointer(assetPledgeState: AssetPledgeState, serviceHub: ServiceHub) : String {
 
-        if (assetPledgeState.assetStatePointer == null) {
-            // Typically, [AssetPledgeState].assetStatePointer will be null only in the case of pledge details not
-            // being available for a given pledgeId. The flow GetAssetPledgeStatus in AssetTransferFlows sets this
-            // pointer to null if the pledge-state is not available in the context of the interop-query from the
-            // importing n/w to the exporting n/w. Hence return empty string, and this will not be passed to the
-            // JSON unmarshalling method GetTokenStateAndContractId since the expiryTime will be elapsed for the
-            // claim to happen (i.e., if assetStatePointer is null, then expiryTimeSecs will be set to past time).
-            return ""
-        }
-
-        val assetStatePointer: StaticPointer<ContractState> = assetPledgeState.assetStatePointer!!
-        val assetState = assetStatePointer.resolve(serviceHub).state.data as AssetState
-
-        println("Creating simple asset JSON from StatePointer.")
-        var marshalledAssetJson =
-            subFlow(MarshalFungibleAsset(assetState.tokenType, assetState.quantity, assetPledgeState.lockerCert))
-
-        return marshalledAssetJson
+    if (assetPledgeState.assetStatePointer == null) {
+        // Typically, [AssetPledgeState].assetStatePointer will be null only in the case of pledge details not
+        // being available for a given pledgeId. The flow GetAssetPledgeStatus in AssetTransferFlows sets this
+        // pointer to null if the pledge-state is not available in the context of the interop-query from the
+        // importing n/w to the exporting n/w. Hence return empty string, and this will not be passed to the
+        // JSON unmarshalling method GetTokenStateAndContractId since the expiryTime will be elapsed for the
+        // claim to happen (i.e., if assetStatePointer is null, then expiryTimeSecs will be set to past time).
+        return ""
     }
+
+    val assetStatePointer: StaticPointer<ContractState> = assetPledgeState.assetStatePointer!!
+    val assetState = assetStatePointer.resolve(serviceHub).state.data as AssetState
+
+    println("Creating simple asset JSON from StatePointer.")
+    var marshalledAssetJson =
+        marshalFungibleAsset(assetState.tokenType, assetState.quantity, assetPledgeState.lockerCert)
+
+    return marshalledAssetJson
 }
 
 /**
@@ -687,7 +681,7 @@ class GetAssetPledgeStatusByPledgeId(
 
         var assetPledgeState: AssetPledgeState = subFlow(GetAssetPledgeStatus(pledgeId, recipientNetworkId))
         println("Obtained [AssetPledgeState] vault state: ${assetPledgeState}.\n")
-        val marshalledAssetJson = subFlow(GetAssetJsonStringFromStatePointer(assetPledgeState))
+        val marshalledAssetJson = getAssetJsonStringFromStatePointer(assetPledgeState, serviceHub)
 
         return subFlow(AssetPledgeStateToProtoBytes(assetPledgeState, marshalledAssetJson))
     }
@@ -717,7 +711,7 @@ class GetAssetClaimStatusByPledgeId(
         println("Inside GetAssetClaimStatusByPledgeId(), pledgeId: $pledgeId and expiryTimeSecs: $expiryTimeSecs.")
 
         println("Creating empty simple asset JSON.")
-        var marshalledBlankAssetJson = subFlow(MarshalFungibleAsset("dummy-simple-asset", 0L, "dummy-owner-cert"))
+        var marshalledBlankAssetJson = marshalFungibleAsset("dummy-simple-asset", 0L, "dummy-owner-cert")
 
         return subFlow(GetAssetClaimStatusState(pledgeId, expiryTimeSecs, marshalledBlankAssetJson))
     }
@@ -728,9 +722,13 @@ class GetAssetClaimStatusByPledgeId(
  * It first unmarshalls the passed JSON encoded object and verifies if the attribte values match with the input values. Then, it creates
  * the asset state object corresponding to the JSON object passed as input.
  *
+ * Note: This function is passed as an argument to resolveGetAssetStateAndContractIdFlow() during reclaim-pledged asset transaction.
+ * This function has five arguements. A similar function is implemented for FungibleHouseToken and SimpleBondAsset with
+ * the "same number and type" of arguements. Based on the function name passed, <ContractId, State> will be fetched at runtime.
+ *
  * @property marshalledAsset The JSON encoded fungible simple asset.
  * @property type The fungible simple asset type.
- * @property quantity The number of units of the fungible simple asset.
+ * @property assetIdOrQuantity The number of units of the fungible simple asset, passed as String.
  * @property lockerCert The owner (certificate in base64 of the exporting network) of the fungible asset before asset-transfer.
  * @property holder The party that owns the fungible simple asset after asset-transfer.
  */
@@ -739,7 +737,7 @@ class GetAssetClaimStatusByPledgeId(
 class GetSimpleAssetStateAndContractId(
     val marshalledAsset: String,
     val type: String,
-    val quantity: Long,
+    val assetIdOrQuantity: String,
     val lockerCert: String,
     val holder: Party
 ): FlowLogic<Pair<String, AssetState>>() {
@@ -748,6 +746,7 @@ class GetSimpleAssetStateAndContractId(
 
         println("Inside GetTokenStateAndContractId().")
 
+        val quantity: Long = assetIdOrQuantity.toLong()
         // must have used GsonBuilder().create().toJson() at the time of serialization of the JSON
         val pledgedFungibleAsset = Gson().fromJson(marshalledAsset, AssetStateJSON::class.java)
         println("Unmarshalled fungible simple asset is: $pledgedFungibleAsset")
@@ -801,35 +800,26 @@ class GetOurIdentity() : FlowLogic<String>() {
 }
 
 /**
- * The MarshalFungibleAsset flow is used to obtain the JSON encoding of the fungible asset of interest to the user.
+ * The marshalFungibleAsset function is used to obtain the JSON encoding of the fungible asset of interest to the user.
  * This function is typically called by the application client which may not know the full details of the asset.
  *
  * @property type type The fungible asset type.
  * @property quantity The number of units of the fungible asset.
  * @property onwerCert The certificate of the owner of asset in base64 form
  */
-@InitiatingFlow
-@StartableByRPC
-class MarshalFungibleAsset(
-    val type: String,
-    val quantity: Long,
-    val ownerCert: String
-) : FlowLogic<String>() {
-    @Suspendable
-    override fun call(): String {
+fun marshalFungibleAsset(type: String, quantity: Long, ownerCert: String) : String {
 
-        val assetJson = AssetStateJSON(
-            tokenType = type,
-            quantity = quantity,
-            ownerCert = ownerCert
-        )
+    val assetJson = AssetStateJSON(
+        tokenType = type,
+        quantity = quantity,
+        ownerCert = ownerCert
+    )
 
-        println("Inside MarshalFungibleAsset(), created fungible asset: $assetJson\n.")
-        val gson = GsonBuilder().create();
-        // must use Gson().fromJson() at the time of deserialization of the JSON
-        var marshalledAssetJson = gson.toJson(assetJson, AssetStateJSON::class.java)
+    println("Inside marshalFungibleAsset(), created fungible asset: $assetJson\n.")
+    val gson = GsonBuilder().create();
+    // must use Gson().fromJson() at the time of deserialization of the JSON
+    var marshalledAssetJson = gson.toJson(assetJson, AssetStateJSON::class.java)
 
-        return marshalledAssetJson
-    }
+    return marshalledAssetJson
 }
 
