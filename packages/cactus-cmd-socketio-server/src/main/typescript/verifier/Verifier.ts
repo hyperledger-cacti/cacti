@@ -9,7 +9,7 @@ import {
   IVerifier,
   ApiInfo,
   LedgerEvent,
-  VerifierEventListener,
+  IVerifierEventListener,
 } from "./LedgerPlugin";
 import { json2str } from "./DriverCommon";
 import { LedgerOperation } from "../business-logic-plugin/LedgerOperation";
@@ -45,7 +45,7 @@ export class Verifier implements IVerifier {
   validatorKeyPath = "";
   apiInfo: Array<ApiInfo> = [];
   counterReqID = 1;
-  eventListenerHash: { [key: string]: VerifierEventListener } = {}; // Listeners for events from Ledger
+  eventListenerHash: { [key: string]: IVerifierEventListener } = {}; // Listeners for events from Ledger
   static mapUrlSocket: Map<string, Socket> = new Map();
   checkValidator: (key: string, data: string) => Promise<any> =
     VerifierAuthentication.verify;
@@ -322,11 +322,11 @@ export class Verifier implements IVerifier {
   static makeOpenApiEvent(resp: object, validatorID: string): LedgerEvent {
     logger.debug(`##in makeOpenApiEvent, resp = ${JSON.stringify(resp)}`);
 
-    const event = new LedgerEvent();
-    event.verifierId = validatorID;
-    // TODO: for debug
-    const txID = "openapi-txid-00001";
-    event.data = { txId: txID, blockData: [resp] };
+    const event: LedgerEvent = {
+      id: "",
+      verifierId: validatorID,
+      data: { txId: "openapi-txid-00001", blockData: [resp] },
+    };
     logger.debug(`##event: ${JSON.stringify(event)}`);
     return event;
   }
@@ -334,7 +334,7 @@ export class Verifier implements IVerifier {
   public startMonitor(
     id: string,
     options: Object,
-    eventListener: VerifierEventListener,
+    eventListener: IVerifierEventListener,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       logger.debug("call : startMonitor");
@@ -394,10 +394,12 @@ export class Verifier implements IVerifier {
                     blockData: decodedData.blockData,
                   };
                   logger.debug("resultObj =", resultObj);
-                  const event = new LedgerEvent();
-                  event.verifierId = this.validatorID;
+                  const event: LedgerEvent = {
+                    id: "",
+                    verifierId: this.validatorID,
+                    data: resultObj,
+                  };
                   logger.debug(`##event.verifierId: ${event.verifierId}`);
-                  event.data = resultObj;
                   for (const key in this.eventListenerHash) {
                     const eventListener = this.eventListenerHash[key];
                     if (eventListener != null) {
@@ -464,7 +466,7 @@ export class Verifier implements IVerifier {
 
   private setEventListener(
     appId: string,
-    eventListener: VerifierEventListener | null,
+    eventListener: IVerifierEventListener | null,
   ): void {
     logger.debug(`##call : setEventListener`);
     if (eventListener) {

@@ -1,0 +1,59 @@
+{
+  "name": "@hyperledger/cactus-verifier-client",
+  "version": "1.0.0-rc.3",
+  "description": "Verifier cactus client library to communicate with validators through socket.io",
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "dependencies": {
+    "@hyperledger/cactus-api-client": "1.0.0-rc.3",
+    "@hyperledger/cactus-common": "1.0.0-rc.3",
+    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "1.0.0-rc.3",
+    "jest-extended": "0.11.5",
+    "rxjs": "7.3.0"
+  }
+}

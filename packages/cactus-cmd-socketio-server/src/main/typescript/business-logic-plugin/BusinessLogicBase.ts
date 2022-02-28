@@ -7,7 +7,7 @@
 
 import { Request } from "express";
 import { BusinessLogicPlugin } from "./BusinessLogicPlugin";
-import { VerifierEventListener, LedgerEvent } from "../verifier/LedgerPlugin";
+import { LedgerEvent } from "../verifier/LedgerPlugin";
 import { json2str } from "../verifier/DriverCommon";
 import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 

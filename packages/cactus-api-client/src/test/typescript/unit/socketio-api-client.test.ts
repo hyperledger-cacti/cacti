@@ -533,21 +533,9 @@ describe("SocketIOApiClient Tests", function () {
       // Receive events from the validator
       sut.watchBlocksV1(options).subscribe({
         next(ev: SocketLedgerEvent) {
-          expect(ev.id).toEqual("");
-          expect(ev.verifierId).toEqual(defaultConfigOptions.validatorID);
-
-          if (!ev.data) {
-            done("Event data is empty or null!");
-          } else {
-            expect((ev.data as { [key: string]: number })["status"]).toEqual(
-              eventStatus,
-            );
-            expect((ev.data as { [key: string]: string })["blockData"]).toEqual(
-              decryptedBlockData,
-            );
-
-            done();
-          }
+          expect(ev.status).toEqual(eventStatus);
+          expect(ev.blockData).toEqual(decryptedBlockData);
+          done();
         },
         error(err) {
           done(err);
@@ -623,7 +611,7 @@ describe("SocketIOApiClient Tests", function () {
         (resolve, reject) => {
           blockObservable.subscribe({
             next(ev: SocketLedgerEvent) {
-              if (!ev.data) {
+              if (!ev.blockData) {
                 reject("First event data is empty or null!"); // todo - test negative
               } else {
                 log.info("First observer received event:", ev);
@@ -642,7 +630,7 @@ describe("SocketIOApiClient Tests", function () {
         (resolve, reject) => {
           blockObservable.subscribe({
             next(ev: SocketLedgerEvent) {
-              if (!ev.data) {
+              if (!ev.blockData) {
                 reject("Second event data is empty or null!");
               } else {
                 log.info("Second observer received event:", ev);
@@ -684,7 +672,7 @@ describe("SocketIOApiClient Tests", function () {
         (resolve, reject) => {
           const sub = sut.watchBlocksV1(options).subscribe({
             next(ev: SocketLedgerEvent) {
-              if (!ev.data) {
+              if (!ev.blockData) {
                 sub.unsubscribe();
                 reject("First event data is empty or null!"); // todo - test negative
               } else {
@@ -705,7 +693,7 @@ describe("SocketIOApiClient Tests", function () {
         (resolve, reject) => {
           const sub = sut.watchBlocksV1(options).subscribe({
             next(ev: SocketLedgerEvent) {
-              if (!ev.data) {
+              if (!ev.blockData) {
                 sub.unsubscribe();
                 reject("2nd event data is empty or null!"); // todo - test negative
               } else {

@@ -8,8 +8,12 @@
 const defaultMaxCounterRequestID = 100;
 const defaultSyncFunctionTimeoutMillisecond = 5 * 1000; // 5 seconds
 
-import { Logger, Checks } from "@hyperledger/cactus-common";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  Logger,
+  Checks,
+  LogLevelDesc,
+  LoggerProvider,
+} from "@hyperledger/cactus-common";
 import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 
 import { Socket, SocketOptions, ManagerOptions, io } from "socket.io-client";
@@ -77,11 +81,10 @@ export type SocketIOApiClientOptions = {
 /**
  * Type of the message emitted from ledger monitoring.
  */
-export class SocketLedgerEvent {
-  id = "";
-  verifierId = "";
-  data: Record<string, unknown> | null = null;
-}
+export type SocketLedgerEvent = {
+  status: number;
+  blockData: [Record<string, unknown>];
+};
 
 /**
  * Client for sending requests to some socketio ledger connectors (validators) using socketio protocol.
@@ -330,13 +333,9 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
                 status: res.status,
                 blockData: decodedData.blockData,
               };
-              this.log.debug("resultObj =", resultObj);
-              const event = new SocketLedgerEvent();
-              event.verifierId = this.options.validatorID;
-              this.log.debug(`##event.verifierId: ${event.verifierId}`);
-              event.data = resultObj;
+              this.log.debug("resultObj=", resultObj);
               if (this.monitorSubject) {
-                this.monitorSubject.next(event);
+                this.monitorSubject.next(resultObj);
               }
             })
             .catch((err) => {
@@ -391,5 +390,12 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
       this.counterReqID = 1;
     }
     return `${this.options.validatorID}_${this.counterReqID++}`;
+  }
+
+  /**
+   * Closes internal socket.io connection to the validator.
+   */
+  public close(): void {
+    this.socket.close();
   }
 }

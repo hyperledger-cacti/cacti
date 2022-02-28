@@ -42,8 +42,9 @@ import { AddressInfo } from "net";
 import { BesuApiClientOptions } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import {
   Verifier,
-  VerifierEventListener,
-} from "@hyperledger/cactus-api-client";
+  IVerifierEventListener,
+  LedgerEvent,
+} from "@hyperledger/cactus-verifier-client";
 
 // Unit Test logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -159,7 +160,7 @@ describe("Verifier integration with openapi connectors tests", () => {
   //////////////////////////////////
 
   test("Verifier is constructed on BesuApiClient", async () => {
-    const sut = new Verifier(apiClient, sutLogLevel);
+    const sut = new Verifier("BESU_2X", apiClient, sutLogLevel);
     expect(sut.ledgerApi).toBe(apiClient);
   });
 
@@ -202,19 +203,28 @@ describe("Verifier integration with openapi connectors tests", () => {
     return expect(newBlock).toResolve();
   });
 
-  test("Verifier works with BesuApiClient", async () => {
+  test("Verifier works with BesuApiClient", () => {
     const newBlock = new Promise<WatchBlocksV1Progress>((resolve, reject) => {
       const appId = "testMonitor";
-      const sut = new Verifier(apiClient, sutLogLevel);
+      const sut = new Verifier("BESU_2X", apiClient, sutLogLevel);
 
-      const monitor: VerifierEventListener<WatchBlocksV1Progress> = {
-        onEvent(ledgerEvent: WatchBlocksV1Progress): void {
-          log.info(
-            "Listener received ledgerEvent, block number",
-            ledgerEvent.blockHeader.number,
-          );
-          sut.stopMonitor(appId);
-          resolve(ledgerEvent);
+      const monitor: IVerifierEventListener<WatchBlocksV1Progress> = {
+        onEvent(ledgerEvent: LedgerEvent<WatchBlocksV1Progress>): void {
+          try {
+            log.info("Received event:", ledgerEvent);
+
+            if (!ledgerEvent.data) {
+              throw Error("No block data");
+            }
+            log.info(
+              "Listener received ledgerEvent, block number",
+              ledgerEvent.data.blockHeader.number,
+            );
+            sut.stopMonitor(appId);
+            resolve(ledgerEvent.data);
+          } catch (err) {
+            reject(err);
+          }
         },
         onError(err: any): void {
           log.error("Ledger monitoring error:", err);
@@ -222,10 +232,11 @@ describe("Verifier integration with openapi connectors tests", () => {
         },
       };
 
-      sut.startMonitor(appId, monitor);
+      sut.startMonitor(appId, {}, monitor);
     });
 
-    await sendTransactionOnBesuLedger();
-    return expect(newBlock).toResolve();
+    return sendTransactionOnBesuLedger().then(() =>
+      expect(newBlock).not.toReject(),
+    );
   });
 });

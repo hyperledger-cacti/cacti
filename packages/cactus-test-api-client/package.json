@@ -67,6 +67,7 @@
     "@hyperledger/cactus-core-api": "1.0.0-rc.3",
     "@hyperledger/cactus-plugin-consortium-manual": "1.0.0-rc.3",
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "1.0.0-rc.3",
+    "@hyperledger/cactus-verifier-client": "1.0.0-rc.3",
     "jose": "4.1.0",
     "web3": "1.5.2"
   },

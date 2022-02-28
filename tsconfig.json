@@ -71,6 +71,9 @@
       "path": "./packages/cactus-plugin-ledger-connector-xdai/tsconfig.json"
     },
     {
+      "path": "./packages/cactus-verifier-client/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-test-api-client/tsconfig.json"
     },
     {
