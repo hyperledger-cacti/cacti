@@ -28,11 +28,14 @@ import net.corda.core.identity.CordaX500Name
 import com.weaver.corda.sdk.AssetTransferSDK
 import com.weaver.corda.sdk.InteroperableHelper
 import com.cordaSimpleApplication.contract.AssetContract
+import com.cordaSimpleApplication.contract.BondAssetContract
 import java.util.Calendar
 import com.weaver.corda.app.interop.flows.RetrieveNetworkId
 import com.weaver.corda.app.interop.flows.GetAssetPledgeStatus
 import com.weaver.corda.app.interop.states.AssetPledgeState
 import com.cordaSimpleApplication.flow.GetAssetClaimStatusByPledgeId
+import com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId
+import com.cordaSimpleApplication.flow.GetBondAssetClaimStatusByPledgeId
 import com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId
 import com.cordaSimpleApplication.flow.GetOurCertificateBase64
 import net.corda.core.identity.Party
@@ -122,7 +125,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                         params[1],      // ID
                         recipientCert,
                         nTimeout,
-                        "com.cordaSimpleApplication.flow.RetrieveStateAndRef",
+                        "com.cordaSimpleApplication.flow.RetrieveBondStateAndRef",
                         AssetContract.Commands.Delete(),
                         thisParty,
                         obs
@@ -312,14 +315,28 @@ class ReclaimAssetCommand : CliktCommand(name="reclaim-pledged-asset", help = "R
                 if (observer != null)   {
                     obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                 }
-                val res = AssetTransferSDK.reclaimPledgedAsset(
-                    rpc.proxy,
-                    pledgeId!!,
-                    AssetContract.Commands.Issue(),
-                    claimStatusLinearId,
-                    thisParty,
-                    obs
-                )
+                var res: Any
+
+                if (transferCategory!!.contains("token.")) {
+                    res = AssetTransferSDK.reclaimPledgedAsset(
+                        rpc.proxy,
+                        pledgeId!!,
+                        AssetContract.Commands.Issue(),
+                        claimStatusLinearId,
+                        thisParty,
+                        obs
+                    )
+                } else {
+                    res = AssetTransferSDK.reclaimPledgedAsset(
+                        rpc.proxy,
+                        pledgeId!!,
+                        BondAssetContract.Commands.Issue(),
+                        claimStatusLinearId,
+                        thisParty,
+                        obs
+                    )
+                }
+
                 println("Pledged Asset Reclaim Response: ${res}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
@@ -396,19 +413,36 @@ class ClaimRemoteAssetCommand : CliktCommand(name="claim-remote-asset", help = "
                 //val importRelayAddress: String = networkConfig.getString("relayEndpoint")
                 val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(importRelayAddress!!, externalStateAddress, rpc.proxy, config)
 
-                val res = AssetTransferSDK.claimPledgedFungibleAsset(
-                    rpc.proxy,
-                    pledgeId!!,
-                    pledgeStatusLinearId,
-                    params[0],          // Type
-                    params[1].toLong(), // Quantity
-                    lockerCert,
-                    recipientCert,
-                    "com.cordaSimpleApplication.flow.GetSimpleAssetStateAndContractId",
-                    AssetContract.Commands.Issue(),
-                    thisParty,
-                    obs
-                )
+                var res: Any
+                if (transferCategory!!.contains("token.")) {
+                    res = AssetTransferSDK.claimPledgedFungibleAsset(
+                        rpc.proxy,
+                        pledgeId!!,
+                        pledgeStatusLinearId,
+                        params[0],          // Type
+                        params[1].toLong(), // Quantity
+                        lockerCert,
+                        recipientCert,
+                        "com.cordaSimpleApplication.flow.GetSimpleAssetStateAndContractId",
+                        AssetContract.Commands.Issue(),
+                        thisParty,
+                        obs
+                    )
+                } else {
+                    res = AssetTransferSDK.claimPledgedAsset(
+                        rpc.proxy,
+                        pledgeId!!,
+                        pledgeStatusLinearId,
+                        params[0], // Type
+                        params[1], // Id
+                        lockerCert,
+                        recipientCert,
+                        "com.cordaSimpleApplication.flow.GetSimpleBondAssetStateAndContractId",
+                        BondAssetContract.Commands.Issue(),
+                        thisParty,
+                        obs
+                    )
+                }
                 println("Pledged asset claim response: ${res}")
             } catch (e: Exception) {
                 println("Error: ${e.toString()}")
@@ -508,6 +542,9 @@ fun getReclaimViewAddress(
     if (transferCategory.equals("token.corda")) {
         funcName = "GetAssetClaimStatusByPledgeId"
         funcArgs = listOf(pledgeId, pledgeExpiryTimeSecs)
+    } else if (transferCategory.equals("bond.corda")) {
+        funcName = "GetBondAssetClaimStatusByPledgeId"
+        funcArgs = listOf(pledgeId, pledgeExpiryTimeSecs)
     } else if (transferCategory.equals("token.fabric")) {
         funcName = "GetTokenAssetClaimStatus"
         funcArgs = listOf(pledgeId, assetType, assetIdOrQuantity, recipientCert, pledgerCert,
@@ -542,8 +579,14 @@ fun getClaimViewAddress(
     if (transferCategory.equals("token.corda")) {
         funcName = "GetAssetPledgeStatusByPledgeId"
         funcArgs = listOf(pledgeId, importNetworkId)
+    } else if (transferCategory.equals("bond.corda")) {
+        funcName = "GetBondAssetPledgeStatusByPledgeId"
+        funcArgs = listOf(pledgeId, importNetworkId)
     } else if (transferCategory.equals("token.fabric")) {
         funcName = "GetTokenAssetPledgeStatus"
+        funcArgs = listOf(pledgeId, pledgerCert, importNetworkId, recipientCert)
+    } else if (transferCategory.equals("bond.fabric")) {
+        funcName = "GetAssetPledgeStatus"
         funcArgs = listOf(pledgeId, pledgerCert, importNetworkId, recipientCert)
     } else if (transferCategory.equals("house-token.corda")) {
         funcName = "GetAssetPledgeStatusByPledgeId"
