@@ -36,3 +36,9 @@ export {
 
 export { IPluginObjectStore } from "./plugin/object-store/i-plugin-object-store";
 export { isIPluginObjectStore } from "./plugin/object-store/is-i-plugin-object-store";
+
+export {
+  IVerifier,
+  LedgerEvent,
+  IVerifierEventListener,
+} from "./client/i-verifier";

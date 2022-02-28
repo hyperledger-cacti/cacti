@@ -1,7 +1,7 @@
 import { Verifier } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier";
 import { ConfigUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil";
 import { verifierFactory } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { VerifierEventListener } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin";
+import { IVerifierEventListener } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -32,14 +32,18 @@ export class TestEthereumVerifier {
       this.validatorId,
       this.appId,
       this.monitorOptions,
-      this.monitorMode
+      this.monitorMode,
     );
   }
 
-
-  sendAsyncRequest(contract: object, method: { type: string; command: string; }, args: object): Promise<any> {
+  sendAsyncRequest(
+    contract: object,
+    method: { type: string; command: string },
+    args: object,
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.verifierEthereum.sendAsyncRequest(contract, method, args)
+      this.verifierEthereum
+        .sendAsyncRequest(contract, method, args)
         .then(() => {
           logger.debug(`Successfully sent async request to: ${method.command}`);
           resolve(true);
@@ -51,7 +55,11 @@ export class TestEthereumVerifier {
     });
   }
 
-  sendSyncRequest(contract: object, method: { type: string; command: string; }, args: object): Promise<any> {
+  sendSyncRequest(
+    contract: object,
+    method: { type: string; command: string },
+    args: object,
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       this.verifierEthereum
         .sendSyncRequest(contract, method, args)
@@ -60,12 +68,12 @@ export class TestEthereumVerifier {
           if (method.command === "getBalance") {
             response = {
               status: result.status,
-              amount: parseFloat(result.data)
+              amount: parseFloat(result.data),
             };
           } else {
             response = {
               status: result.status,
-              data: result.data
+              data: result.data,
             };
           }
           resolve(response);
@@ -78,7 +86,6 @@ export class TestEthereumVerifier {
   }
 
   getBalance(account: string, requestType: string): any {
-
     this.createVerifierWithoutMonitoring();
 
     const contract = {};
@@ -93,8 +100,12 @@ export class TestEthereumVerifier {
     }
   }
 
-  transferAsset(srcAccount: string, destAccount: string, amount: string, requestType: string) {
-
+  transferAsset(
+    srcAccount: string,
+    destAccount: string,
+    amount: string,
+    requestType: string,
+  ) {
     this.createVerifierWithoutMonitoring();
 
     const contract = {};
@@ -119,18 +130,16 @@ export class TestEthereumVerifier {
   }
 
   stopMonitor() {
-
     logger.debug(`StartingMonitor`);
 
     this.createVerifierWithoutMonitoring();
     logger.debug(`Stopping Monitor`);
-    const blpMonitorModuleName = "BusinessLogicCheckEthereumValidator"
+    const blpMonitorModuleName = "BusinessLogicCheckEthereumValidator";
 
-    this.verifierEthereum.stopMonitor(blpMonitorModuleName)
+    this.verifierEthereum.stopMonitor(blpMonitorModuleName);
   }
 
   startMonitor() {
-
     logger.debug(`StartingMonitor`);
 
     const blpMonitorModuleName = "BusinessLogicCheckEthereumValidator";
@@ -138,9 +147,10 @@ export class TestEthereumVerifier {
       this.validatorId,
       blpMonitorModuleName,
       this.monitorOptions,
-      true)
-    let eventListener: VerifierEventListener
+      true,
+    );
+    let eventListener: IVerifierEventListener;
 
-    verifier.startMonitor(blpMonitorModuleName, {}, eventListener)
+    verifier.startMonitor(blpMonitorModuleName, {}, eventListener);
   }
 }

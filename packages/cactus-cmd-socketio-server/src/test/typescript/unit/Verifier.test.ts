@@ -73,7 +73,7 @@ import { Verifier } from "../../../main/typescript/verifier/Verifier";
 
 import {
   LedgerEvent,
-  VerifierEventListener,
+  IVerifierEventListener,
 } from "../../../main/typescript/verifier/LedgerPlugin";
 
 import { SocketIOTestSetupHelpers } from "@hyperledger/cactus-test-tooling";
@@ -172,8 +172,10 @@ describe("SocketIO Validator Tests", function () {
   let sut: Verifier;
 
   beforeAll(async () => {
-    [testServer, testServerPort] =
-      await SocketIOTestSetupHelpers.createListeningMockServer();
+    [
+      testServer,
+      testServerPort,
+    ] = await SocketIOTestSetupHelpers.createListeningMockServer();
   }, setupTimeout);
 
   afterAll((done) => {
@@ -358,7 +360,7 @@ describe("SocketIO Validator Tests", function () {
     const appId = "TestTrade";
     const options = { opt: "yes" };
     const onEventMock = jest.fn();
-    const listenerMock: VerifierEventListener = {
+    const listenerMock: IVerifierEventListener = {
       onEvent: onEventMock,
     };
 
@@ -405,12 +407,8 @@ describe("SocketIO Validator Tests", function () {
         if (!ev.data) {
           done("Event data is empty or null!");
         } else {
-          expect((ev.data as { [key: string]: number })["status"]).toEqual(
-            eventStatus,
-          );
-          expect((ev.data as { [key: string]: string })["blockData"]).toEqual(
-            decryptedBlockData,
-          );
+          expect(ev.data.status).toEqual(eventStatus);
+          expect(ev.data.blockData).toEqual(decryptedBlockData);
         }
 
         if (onEventCalledTimes === 2) {
@@ -419,8 +417,8 @@ describe("SocketIO Validator Tests", function () {
       };
 
       // Two listeners
-      const listenerMockFirst: VerifierEventListener = { onEvent: onEventMock };
-      const listenerMockSecond: VerifierEventListener = {
+      const listenerMockFirst: IVerifierEventListener = { onEvent: onEventMock };
+      const listenerMockSecond: IVerifierEventListener = {
         onEvent: onEventMock,
       };
 
@@ -576,15 +574,9 @@ test("makeOpenApiEvent creates valid ledger event", () => {
 
   expect(event.id).toEqual("");
   expect(event.verifierId).toEqual(validatorId);
-  expect(
-    (event.data as { [key: string]: string })["txId"].length,
-  ).toBeGreaterThan(0);
-  expect(
-    (event.data as { [key: string]: Array<object> })["blockData"].length,
-  ).toEqual(1);
-  expect(
-    (event.data as { [key: string]: Array<object> })["blockData"][0],
-  ).toEqual(response);
+  expect(event.data!.txId!.length).toBeGreaterThan(0);
+  expect(event.data!.blockData.length).toEqual(1);
+  expect(event.data!.blockData[0]).toEqual(response);
 });
 
 describe("OpenAPI Async Request Tests", function () {
@@ -633,7 +625,7 @@ describe("OpenAPI Async Request Tests", function () {
 
   test("Sends event from ledger to listeners for openapi verifier", async () => {
     const onEventMock = jest.fn();
-    const listenerMock: VerifierEventListener = {
+    const listenerMock: IVerifierEventListener = {
       onEvent: onEventMock,
     };
     sut.eventListenerHash["TestApp"] = listenerMock;

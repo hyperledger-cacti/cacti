@@ -1,8 +1,7 @@
-/* Base Class: packages/cactus-api-client/src/main/typescript/verifier.ts
- */
+// Base Class: packages/cactus-api-client/src/main/typescript/verifier.ts
 
-const testLogLevel: LogLevelDesc = "info";
-const sutLogLevel: LogLevelDesc = "info";
+const testLogLevel: LogLevelDesc = "debug";
+const sutLogLevel: LogLevelDesc = "debug";
 const testTimeout = 1000 * 5; // 5 second timeout per test
 const setupTimeout = 1000 * 60; // 1 minute timeout for setup
 
@@ -22,7 +21,8 @@ const log: Logger = LoggerProvider.getOrCreate({
 import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 import {
   Verifier,
-  VerifierEventListener,
+  IVerifierEventListener,
+  LedgerEvent,
 } from "../../../main/typescript/verifier";
 
 //////////////////////////////////
@@ -46,7 +46,7 @@ class MockApiClient<T> implements ISocketApiClient<T> {
   watchBlocksV1 = jest.fn().mockName("watchBlocksV1");
 }
 
-class MockEventListener<T> implements VerifierEventListener<T> {
+class MockEventListener<T> implements IVerifierEventListener<T> {
   onEvent = jest.fn().mockName("onEvent");
   onError = jest.fn().mockName("onError");
 }
@@ -54,6 +54,21 @@ class MockEventListener<T> implements VerifierEventListener<T> {
 //////////////////////////////
 // Monitoring Tests
 //////////////////////////////
+
+test("Using operation not implemented on the ledger throws error", () => {
+  class EmptyImpl implements ISocketApiClient<string> {}
+  const apiClient = new EmptyImpl();
+  const sut = new Verifier("test-id", apiClient, sutLogLevel);
+
+  // Monitoring
+  const eventListenerMock = new MockEventListener();
+  expect(sut.startMonitor("someId", {}, eventListenerMock)).toReject();
+  expect(() => sut.stopMonitor("someId")).toThrowError();
+
+  // Sending Requests
+  expect(sut.sendSyncRequest({}, {}, "")).toReject();
+  expect(sut.sendAsyncRequest({}, {}, "")).toReject();
+});
 
 describe("Monitoring Tests", () => {
   // Assume block data format is string
@@ -66,28 +81,22 @@ describe("Monitoring Tests", () => {
     apiClientMock.watchBlocksV1.mockReturnValue(
       new Observable(() => log.debug("Mock subscribe called")),
     );
-    sut = new Verifier(apiClientMock, sutLogLevel);
+    sut = new Verifier("test-id", apiClientMock, sutLogLevel);
     eventListenerMock = new MockEventListener();
   }, setupTimeout);
 
-  test("Entry is added to runningMonitors for new monitoring requests", () => {
+  test("Entry is added to runningMonitors for new monitoring requests", async () => {
     const monitorOptions = { test: true };
+
     expect(sut.runningMonitors.size).toEqual(0);
-    sut.startMonitor("someId", eventListenerMock, monitorOptions);
+    await sut.startMonitor("someId", monitorOptions, eventListenerMock);
     expect(sut.runningMonitors.size).toEqual(1);
     expect(apiClientMock.watchBlocksV1).toBeCalledWith(monitorOptions);
   });
 
-  // test("ApiClient is called without monitorOptions if monitor was already started", () => {
-  //   const monitorOptions = { test: true };
-  //   sut.startMonitor("someId", eventListenerMock, monitorOptions);
-  //   sut.startMonitor("anotherId", eventListenerMock, monitorOptions);
-  //   expect(apiClientMock.watchBlocksV1).lastCalledWith(undefined);
-  // });
-
   test("Running multiple monitors with same ID throws an Error", () => {
-    sut.startMonitor("someId", eventListenerMock);
-    expect(() => sut.startMonitor("someId", eventListenerMock)).toThrow();
+    expect(sut.startMonitor("someId", {}, eventListenerMock)).toResolve();
+    expect(sut.startMonitor("someId", {}, eventListenerMock)).toReject();
   });
 
   test("In case of ApiClient exception runningMonitors is not updated", () => {
@@ -95,10 +104,10 @@ describe("Monitoring Tests", () => {
     apiClientMock.watchBlocksV1.mockImplementation(() => {
       throw Error("Some mock error in watchBlocks");
     });
-    sut = new Verifier(apiClientMock, sutLogLevel);
+    sut = new Verifier("test-id", apiClientMock, sutLogLevel);
 
     expect(sut.runningMonitors.size).toEqual(0);
-    sut.startMonitor("someId", eventListenerMock);
+    expect(sut.startMonitor("someId", {}, eventListenerMock)).toResolve();
     expect(sut.runningMonitors.size).toEqual(0);
   });
 
@@ -116,16 +125,18 @@ describe("Monitoring Tests", () => {
         subscriber.next(mockBlockData);
       }),
     );
-    sut = new Verifier(apiClientMock, sutLogLevel);
+    sut = new Verifier("test-id", apiClientMock, sutLogLevel);
 
     eventListenerMock = new MockEventListener();
-    eventListenerMock.onEvent.mockImplementation((blockData: string) => {
-      log.debug("onEvent() called with blockData:", blockData);
-      expect(blockData).toEqual(mockBlockData);
-      done();
-    });
+    eventListenerMock.onEvent.mockImplementation(
+      (ledgerEvent: LedgerEvent<string>) => {
+        log.debug("onEvent() called with ledger event:", ledgerEvent);
+        expect(ledgerEvent.data).toEqual(mockBlockData);
+        done();
+      },
+    );
 
-    sut.startMonitor("someId", eventListenerMock);
+    sut.startMonitor("someId", {}, eventListenerMock);
   });
 
   test("onError callback is called in when monitoring failed", (done) => {
@@ -137,7 +148,7 @@ describe("Monitoring Tests", () => {
         subscriber.error(mockError);
       }),
     );
-    sut = new Verifier(apiClientMock, sutLogLevel);
+    sut = new Verifier("test-id", apiClientMock, sutLogLevel);
 
     eventListenerMock = new MockEventListener();
     eventListenerMock.onError.mockImplementation((err: any) => {
@@ -146,15 +157,15 @@ describe("Monitoring Tests", () => {
       done();
     });
 
-    sut.startMonitor("someId", eventListenerMock);
+    sut.startMonitor("someId", {}, eventListenerMock);
   });
 
-  test("stopMonitor unsubscribes and deletes entry from runningMonitors", () => {
+  test("stopMonitor unsubscribes and deletes entry from runningMonitors", async () => {
     const thisAppId = "someId";
 
     // Start monitor
     expect(sut.runningMonitors.size).toEqual(0);
-    sut.startMonitor(thisAppId, eventListenerMock);
+    await sut.startMonitor(thisAppId, {}, eventListenerMock);
     expect(sut.runningMonitors.size).toEqual(1);
 
     // Assert monitor is running
@@ -167,5 +178,45 @@ describe("Monitoring Tests", () => {
     // Assert monitor closed and removed from runningMonitors
     expect(sut.runningMonitors.size).toEqual(0);
     expect(mon?.closed).toBeTrue();
+  });
+});
+
+describe("Sending Requests Tests", () => {
+  let apiClientMock: MockApiClient<unknown>;
+  let sut: Verifier<MockApiClient<unknown>>;
+
+  beforeEach(() => {
+    apiClientMock = new MockApiClient();
+    apiClientMock.watchBlocksV1.mockReturnValue(
+      new Observable(() => log.debug("Mock subscribe called")),
+    );
+    sut = new Verifier("test-id", apiClientMock, sutLogLevel);
+  }, setupTimeout);
+
+  test("Send async request call proxied to the apiClient", async () => {
+    const inContract = { foo: "bar" };
+    const inMethod = { func: "a" };
+    const inArgs = 5;
+
+    await sut.sendAsyncRequest(inContract, inMethod, inArgs);
+
+    expect(apiClientMock.sendAsyncRequest).toBeCalledWith(
+      inContract,
+      inMethod,
+      inArgs,
+    );
+  });
+
+  test("Send sync request call proxied to the apiClient", async () => {
+    const inContract = { foo: "bar" };
+    const inMethod = { func: "a" };
+    const inArgs = 5;
+
+    await sut.sendSyncRequest(inContract, inMethod, inArgs);
+    expect(apiClientMock.sendSyncRequest).toBeCalledWith(
+      inContract,
+      inMethod,
+      inArgs,
+    );
   });
 });

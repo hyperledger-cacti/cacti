@@ -11,7 +11,7 @@ import { BLPRegistry } from "./util/BLPRegistry";
 import { LPInfoHolder } from "./util/LPInfoHolder";
 import { json2str } from "../verifier/DriverCommon";
 import { Verifier } from "../verifier/Verifier";
-import { VerifierEventListener, LedgerEvent } from "../verifier/LedgerPlugin";
+import { IVerifierEventListener, LedgerEvent } from "../verifier/LedgerPlugin";
 import { getTargetBLPInstance } from "../business-logic-plugin/BLP_config";
 import { ConfigUtil } from "./util/ConfigUtil";
 
@@ -23,7 +23,7 @@ const moduleName = "TransactionManagement";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
-export class TransactionManagement implements VerifierEventListener {
+export class TransactionManagement implements IVerifierEventListener {
   private blpRegistry: BLPRegistry; // Verifier information used in business logic
   //    private connectInfo: LPInfoHolder = null;                   // connection information
   //    private verifierArray: [] = [];                             // Verifier
@@ -164,7 +164,7 @@ export class TransactionManagement implements VerifierEventListener {
     return this.blpRegistry.getBLPRegistryInfo(businessLogicId);
   }
 
-  // interface VerifierEventListener
+  // interface IVerifierEventListener
   onEvent(ledgerEvent: LedgerEvent): void {
     //        logger.debug(`####in onEvent: event: ${json2str(ledgerEvent)}`);
     const eventNum = this.getEventNum(ledgerEvent);

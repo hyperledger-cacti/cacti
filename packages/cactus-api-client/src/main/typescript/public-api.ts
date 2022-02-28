@@ -5,4 +5,3 @@ export {
   SocketLedgerEvent,
   SocketIOApiClientOptions,
 } from "./socketio-api-client";
-export { Verifier, VerifierEventListener } from "./verifier";
