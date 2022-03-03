@@ -40,95 +40,18 @@ import com.weaver.protos.common.asset_locks.AssetLocks
 import com.weaver.protos.common.asset_transfer.AssetTransfer
 
 /**
- * The AssetTransferPledgeFungible flow is used to create a pledge for a fungible asset.
- *
- * @property pledgeArgs The details of the fungible asset being pledged for transfer to remote network.
- *                          Bleow properties are captured by this structure.
- * assetType -- The type of the fungible asset to be pledged.
- * assetIdOrQuantity -- The number of units of the fungible asset (e.g., tokens) to be pledged.
- * recipientCert -- The certificate of the party in the remote network who will be the asset owner after transfer.
- * expiryTimeSecs -- The time in epoch till which the pledge is valid.
- * getAssetStateAndRefFlow -- The name of the flow used to fetch the fungible asset's StateAndRef from the vault.
- * deleteAssetStateCommand -- The name of the command used to delete the pledged fungible asset.
- * issuer -- The issuing authority of the pledged fungible asset.
- * observers -- The parties who are not transaction participants but only observers.
- */
-@InitiatingFlow
-@StartableByRPC
-class AssetTransferPledgeFungible
-constructor(
-    val pledgeArgs: AssetPledgeParameters
-) : FlowLogic<Either<Error, UniqueIdentifier>>() {
-    /**
-     * The call() method captures the logic to create a new [AssetPledgeState] state in the vault.
-     *
-     * It first creates a new AssetPledgeState. It then builds
-     * and verifies the transaction, collects the required signatures,
-     * and stores the state in the vault.
-     *
-     * @return Returns the contractId of the newly created [AssetPledgeState].
-     */
-    @Suspendable
-    override fun call(): Either<Error, UniqueIdentifier> = try {   
-
-        val numUnits: Long = pledgeArgs.assetIdOrQuantity.toLong()
-        val expiryTime: Instant = Instant.ofEpochSecond(pledgeArgs.expiryTimeSecs)
-        if (expiryTime.isBefore(Instant.now())) {
-            Left(Error("Invalid Expiry Time for fungible asset pledge."))
-        }
-
-        // Get AssetStateAndRef
-        resolveStateAndRefFlow(pledgeArgs.getAssetStateAndRefFlow,
-            listOf(pledgeArgs.assetType, numUnits)
-        ).fold({
-            println("Error: Unable to resolve Get fungible Asset StateAndRef Flow.")
-            Left(Error("Error: Unable to resolve Get fungible Asset StateAndRef Flow"))
-        }, {
-            println("Resolved Get Asset flow to ${it}")
-            val assetRef: StateAndRef<ContractState>? = subFlow(it)
-
-            if (assetRef == null) {
-                println("Error: Unable to Get fungible Asset StateAndRef for type: ${pledgeArgs.assetType} and quantity: ${numUnits}.")
-                Left(Error("Error: Unable to Get fungible Asset StateAndRef for type: ${pledgeArgs.assetType} and quantity: ${numUnits}."))
-            }
-
-            if (pledgeArgs.recipientCert == "") {
-                println("Error: recipient party cannot be empty: ${pledgeArgs.recipientCert}.")
-                Left(Error("Error: Receipient party cannot be empty: ${pledgeArgs.recipientCert}."))
-            }
-
-            println("Local network id is ${pledgeArgs.localNetworkId} and remote network id is ${pledgeArgs.remoteNetworkId}")
-
-            subFlow(PledgeAsset.Initiator(
-                pledgeArgs.expiryTimeSecs,
-                assetRef!!,
-                pledgeArgs.deleteAssetStateCommand,
-                pledgeArgs.recipientCert,
-                pledgeArgs.localNetworkId,
-                pledgeArgs.remoteNetworkId,
-                pledgeArgs.issuer,
-                pledgeArgs.observers
-            ))
-        })
-    } catch (e: Exception) {
-        println("Error pledging fungible asset: ${e.message}\n")
-        Left(Error("Failed to pledge fungible asset: ${e.message}"))
-    }
-}
-
-
-/**
- * The AssetTransferPledge flow is used to create a pledge for a non-fungible/bond asset.
+ * The AssetTransferPledge flow is used to create a pledge for both fungible and non-fungible/bond assets.
  *
  * @property pledgeArgs The details of the non-fungible asset being pledged for transfer to remote network.
  *                          Bleow properties are captured by this structure.
- * assetType -- The type of the non-fungible/bond asset to be pledged.
- * assetIdOrQuantity -- The identifier of the non-fungible/bond asset to be pledged.
+ * assetType -- The type of the fungible or non-fungible/bond asset to be pledged.
+ * assetIdOrQuantity -- The identifier of the non-fungible/bond asset to be pledged;
+ *                      or the number of units of the fungible asset (e.g., tokens) to be pledged.
  * recipientCert -- The certificate of the party in the remote network who will be the asset owner after transfer.
  * expiryTimeSecs -- The time in epoch till which the pledge is valid.
- * getAssetStateAndRefFlow -- The name of the flow used to fetch the non-fungible/bond asset's StateAndRef from the vault.
- * deleteAssetStateCommand -- The name of the command used to delete the pledged non-fungible/bond asset.
- * issuer -- The issuing authority of the pledged non-fungible/bond asset.
+ * getAssetStateAndRefFlow -- The name of the flow used to fetch the fungible or non-fungible/bond asset's StateAndRef from the vault.
+ * deleteAssetStateCommand -- The name of the command used to delete the pledged fungible or non-fungible/bond asset.
+ * issuer -- The issuing authority of the pledged fungible or non-fungible/bond asset.
  * observers -- The parties who are not transaction participants but only observers.
  */
 @InitiatingFlow

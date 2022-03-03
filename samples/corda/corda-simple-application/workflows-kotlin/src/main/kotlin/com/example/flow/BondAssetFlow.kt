@@ -478,7 +478,7 @@ fun getBondAssetJsonStringFromStatePointer(assetPledgeState: AssetPledgeState, s
         // being available for a given pledgeId. The flow GetAssetPledgeStatus in AssetTransferFlows sets this
         // pointer to null if the pledge-state is not available in the context of the interop-query from the
         // importing n/w to the exporting n/w. Hence return empty string, and this will not be passed to the
-        // JSON unmarshalling method GetTokenStateAndContractId since the expiryTime will be elapsed for the
+        // JSON unmarshalling method GetSimpleBondAssetStateAndContractId since the expiryTime will be elapsed for the
         // claim to happen (i.e., if assetStatePointer is null, then expiryTimeSecs will be set to past time).
         return ""
     }
@@ -558,7 +558,7 @@ class GetBondAssetClaimStatusByPledgeId(
  *
  * @property marshalledAsset The JSON encoded non-fungible simple asset.
  * @property type The non-fungible simple asset type.
- * @property assetIdOrQuantity The identifier of the non-fungible simple asset, passed as String.
+ * @property assetId The identifier of the non-fungible simple asset, passed as String.
  * @property lockerCert The owner (certificate in base64 of the exporting network) of the non-fungible asset before asset-transfer.
  * @property holder The party that owns the non-fungible simple asset after asset-transfer.
  */
@@ -567,7 +567,7 @@ class GetBondAssetClaimStatusByPledgeId(
 class GetSimpleBondAssetStateAndContractId(
     val marshalledAsset: String,
     val type: String,
-    val assetIdOrQuantity: String,
+    val assetId: String,
     val lockerCert: String,
     val holder: Party
 ): FlowLogic<Pair<String, BondAssetState>>() {
@@ -576,7 +576,6 @@ class GetSimpleBondAssetStateAndContractId(
 
         println("Inside GetSimpleBondAssetStateAndContractId().")
 
-        val assetId: String = assetIdOrQuantity
         // must have used GsonBuilder().create().toJson() at the time of serialization of the JSON
         val pledgedBondAsset = Gson().fromJson(marshalledAsset, BondAssetStateJSON::class.java)
         println("Unmarshalled non-fungible simple asset is: $pledgedBondAsset")

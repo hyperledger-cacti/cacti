@@ -53,7 +53,7 @@ data class AssetPledgeState(
 @CordaSerializable
 data class AssetPledgeParameters(
     var assetType: String,
-    var assetIdOrQuantity: String,
+    var assetIdOrQuantity: Any,
     var localNetworkId: String,
     var remoteNetworkId: String,
     var recipientCert: String,
@@ -71,7 +71,7 @@ data class AssetClaimParameters(
     val pledgeStatusLinearId: String,
     val getAssetAndContractIdFlowName: String,
     val assetType: String,
-    val assetIdOrQuantity: String,
+    val assetIdOrQuantity: Any,
     val pledgerCert: String,
     val recipientCert: String,
     val issuer: Party,
