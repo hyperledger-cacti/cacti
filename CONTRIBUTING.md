@@ -367,6 +367,8 @@ for both them separately anyway:
       npx jest packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts
       ```
 
+      You can also run tests via the VS Code user interface. To do so, make sure you rename ``template.launch.json`` to ``launch.json`. Under the "Run and Debug" window of VS Code, select "JEST: Current TS file" to test the currently opened file.
+
 #### Running all test cases (unit+integration)
 
 ```sh

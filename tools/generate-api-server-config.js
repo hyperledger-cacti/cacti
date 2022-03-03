@@ -4,7 +4,7 @@ import { ConfigService } from "../packages/cactus-cmd-api-server/dist/lib/main/t
 
 const main = async () => {
   const configService = new ConfigService();
-  const config = configService.newExampleConfig();
+  const config = await configService.newExampleConfig();
   const configJson = JSON.stringify(config, null, 4).concat("\n");
 
   if (fs.existsSync(config.configFile)) {

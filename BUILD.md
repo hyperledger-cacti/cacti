@@ -96,8 +96,9 @@ The `npm run watch` script in action:
     ```
   * Yarn 
     * `npm run install-yarn` (from within the project directory)
-  * Docker Engine
-  * Docker Compose
+  * [Docker Engine](https://docs.docker.com/engine/install/ubuntu/). Make sure that Docker is working and running, for example, running ``docker ps -aq``  
+  * Docker Compose  
+
   * OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
     * `sudo apt install openjdk-8-jdk-headless`
 
@@ -124,7 +125,7 @@ cd cactus
 * Run the initial configuration script (can take a long time, 10+ minutes on a low-spec laptop)
 
 ```sh
-npm run configure
+yarn run configure
 ```
 
 At this point you should have all packages built for development.
@@ -212,7 +213,7 @@ the following decision tree (and keep in mind that we have `npm run watch` too)
 
 ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
 
-## Getting into the SSH connection
+## Configuring SSH to use upterm
 Upload your public key onto github if not done so already. A public key is necessary to join the ssh connection to use upterm. For a comprehensive guide, see the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
 Locate the `ci.yml` within `.github/workflows` and add to the `ci.yml` code listed below: 
