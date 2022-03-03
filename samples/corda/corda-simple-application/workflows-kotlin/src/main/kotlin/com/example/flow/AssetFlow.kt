@@ -647,7 +647,7 @@ fun getAssetJsonStringFromStatePointer(assetPledgeState: AssetPledgeState, servi
         // being available for a given pledgeId. The flow GetAssetPledgeStatus in AssetTransferFlows sets this
         // pointer to null if the pledge-state is not available in the context of the interop-query from the
         // importing n/w to the exporting n/w. Hence return empty string, and this will not be passed to the
-        // JSON unmarshalling method GetTokenStateAndContractId since the expiryTime will be elapsed for the
+        // JSON unmarshalling method GetSimpleAssetStateAndContractId since the expiryTime will be elapsed for the
         // claim to happen (i.e., if assetStatePointer is null, then expiryTimeSecs will be set to past time).
         return ""
     }
@@ -727,7 +727,7 @@ class GetAssetClaimStatusByPledgeId(
  *
  * @property marshalledAsset The JSON encoded fungible simple asset.
  * @property type The fungible simple asset type.
- * @property assetIdOrQuantity The number of units of the fungible simple asset, passed as String.
+ * @property quantity The number of units of the fungible simple asset, passed as String.
  * @property lockerCert The owner (certificate in base64 of the exporting network) of the fungible asset before asset-transfer.
  * @property holder The party that owns the fungible simple asset after asset-transfer.
  */
@@ -736,7 +736,7 @@ class GetAssetClaimStatusByPledgeId(
 class GetSimpleAssetStateAndContractId(
     val marshalledAsset: String,
     val type: String,
-    val assetIdOrQuantity: String,
+    val quantity: Long,
     val lockerCert: String,
     val holder: Party
 ): FlowLogic<Pair<String, AssetState>>() {
@@ -745,7 +745,6 @@ class GetSimpleAssetStateAndContractId(
 
         println("Inside GetSimpleAssetStateAndContractId().")
 
-        val quantity: Long = assetIdOrQuantity.toLong()
         // must have used GsonBuilder().create().toJson() at the time of serialization of the JSON
         val pledgedFungibleAsset = Gson().fromJson(marshalledAsset, AssetStateJSON::class.java)
         println("Unmarshalled fungible simple asset is: $pledgedFungibleAsset")

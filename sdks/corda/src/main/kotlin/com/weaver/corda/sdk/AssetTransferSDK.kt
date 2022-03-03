@@ -51,7 +51,7 @@ class AssetTransferSDK {
                 val pledgeId = runCatching {
                     val pledgeArgs: AssetPledgeParameters = AssetPledgeParameters(
                         tokenType, // @property assetType
-                        numUnits.toString(), // @property assetIdOrQuantity
+                        numUnits, // @property assetIdOrQuantity
                         localNetworkId, // @property localNetworkId
                         remoteNetworkId, // @property remoteNetworkId
                         recipientCert, // @property recipientCert
@@ -61,7 +61,7 @@ class AssetTransferSDK {
                         issuer, // @property issuer
                         observers // @property observers
                     )
-                    proxy.startFlow(::AssetTransferPledgeFungible, pledgeArgs).returnValue.get()
+                    proxy.startFlow(::AssetTransferPledge, pledgeArgs).returnValue.get()
                 }.fold({
                     it.map { linearId ->
                         AssetTransferSDK.logger.debug("Pledge of fungible asset was successful and the state was stored with linearId $linearId.\n")
@@ -205,7 +205,7 @@ class AssetTransferSDK {
                         pledgeStatusLinearId, // @property pledgeStatusLinearId
                         getAssetAndContractIdFlowName, // @property getAssetAndContractIdFlowName
                         tokenType, // @property assetType
-                        numUnits.toString(), // @property assetIdOrQuantity
+                        numUnits, // @property assetIdOrQuantity
                         pledgerCert, // @property pledgerCert
                         recipientCert, // @property recipientCert
                         issuer, // @property issuer

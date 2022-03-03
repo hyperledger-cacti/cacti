@@ -662,7 +662,7 @@ object ClaimRemoteAsset {
         val pledgeStatusLinearId: String,
         val getAssetAndContractIdFlowName: String,
         val assetType: String,
-        val assetIdOrQuantity: String,
+        val assetIdOrQuantity: Any,
         val createAssetStateCommand: CommandData,
         val lockerCert: String,
         val recipientCert: String,

@@ -125,7 +125,7 @@ class GetAssetPledgeStatusByPledgeId(
  *
  * @property marshalledAsset The JSON encoded fungible token asset.
  * @property type The fungible token asset type (e.g., "house").
- * @property assetIdOrQuantity The number of units of the fungible token asset, passed as String.
+ * @property quantity The number of units of the fungible token asset, passed as String.
  * @property lockerCert The owner (certificate in base64 of the exporting network) of the token asset before asset-transfer.
  * @property holder The party that owns the fungible tokens after asset-transfer.
  */
@@ -134,7 +134,7 @@ class GetAssetPledgeStatusByPledgeId(
 class GetTokenStateAndContractId(
     val marshalledAsset: String,
     val type: String,
-    val assetIdOrQuantity: String,
+    val quantity: Long,
     val lockerCert: String,
     val holder: Party
 ): FlowLogic<Pair<String, FungibleToken>>() {
@@ -143,7 +143,6 @@ class GetTokenStateAndContractId(
 
         println("Inside GetTokenStateAndContractId().")
 
-        val quantity: Long = assetIdOrQuantity.toLong()
         // must have used GsonBuilder().create().toJson() at the time of serialization of the JSON
         val pledgedFungibleToken: FungibleHouseTokenJson = Gson().fromJson(marshalledAsset, FungibleHouseTokenJson::class.java)
         println("Unmarshalled fungible token asset is: ${pledgedFungibleToken}")
