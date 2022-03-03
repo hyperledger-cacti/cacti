@@ -125,7 +125,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                         params[1],      // ID
                         recipientCert,
                         nTimeout,
-                        "com.cordaSimpleApplication.flow.RetrieveBondStateAndRef",
+                        "com.cordaSimpleApplication.flow.RetrieveBondAssetStateAndRef",
                         AssetContract.Commands.Delete(),
                         thisParty,
                         obs
@@ -200,6 +200,16 @@ class GetAssetPledgeStateCommand : CliktCommand(name="get-pledge-state", help = 
     }
 }
 
+fun X509CertToPem(cert: X509Certificate): String {
+    val cert_begin = "-----BEGIN CERTIFICATE-----\n";
+    val end_cert = "\n-----END CERTIFICATE-----";
+
+    val derCert = cert.getEncoded();
+    val pemCertPre = Base64.getEncoder().encodeToString(derCert).replace("(.{64})".toRegex(), "$1\n")
+    val pemCert = cert_begin + pemCertPre + end_cert;
+    return pemCert;
+}
+
 /**
  * Command to fetch the certificate (in base64) of the party owning the node.
  */
@@ -218,6 +228,10 @@ class FetchCertBase64Command : CliktCommand(name="get-cert-base64", help = "Obta
             val certificate: X509Certificate = rpc.proxy.nodeInfo().legalIdentitiesAndCerts.get(0).certificate
             val certBase64DoNotUse = Base64.getEncoder().encodeToString(certificate.toString().toByteArray())
             println("certBase64DoNotUse: $certBase64DoNotUse rpc.proxy.nodeInfo().legalIdentitiesAndCerts.size: ${rpc.proxy.nodeInfo().legalIdentitiesAndCerts.size}")
+
+            val cert = rpc.proxy.nodeInfo().identityAndCertFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB")).certificate
+            val certpem = X509CertToPem(cert)
+            println("\n Certificate in base64, certpem: $certpem")
         } catch (e: Exception) {
             println("Error: ${e.toString()}")
         } finally {

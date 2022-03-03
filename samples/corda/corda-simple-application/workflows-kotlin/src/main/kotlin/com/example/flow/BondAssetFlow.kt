@@ -79,7 +79,7 @@ class IssueBondAssetState(val assetId: String, val assetType: String) : FlowLogi
         // Stage 1.
         progressTracker.currentStep = GENERATING_TRANSACTION
         // Generate an unsigned transaction.
-        val assetState: BondAssetState = BondAssetState(assetId, assetType, serviceHub.myInfo.legalIdentities.first())
+        val assetState: BondAssetState = BondAssetState(assetType, assetId, serviceHub.myInfo.legalIdentities.first())
 
         val commandData: BondAssetContract.Commands.Issue = BondAssetContract.Commands.Issue()
         val txCommand: Command<BondAssetContract.Commands.Issue> = Command(commandData, assetState.participants.map { it.owningKey })
@@ -324,14 +324,14 @@ class IssueBondAssetStateFromStateRef(val linearId: String) : FlowLogic<SignedTr
 }
 
 /**
- * The RetrieveBondStateAndRef flow is used to retrieve an [BondAssetState] from the vault based on the assetType and assetId.
+ * The RetrieveBondAssetStateAndRef flow is used to retrieve an [BondAssetState] from the vault based on the assetType and assetId.
  *
  * @property assetType the filter for the [BondAssetState] list to be retrieved.
  * @property assetId the identifier of non-fungible asset to be part of the [BondAssetState] to be retrieved.
  */
 @InitiatingFlow
 @StartableByRPC
-class RetrieveBondStateAndRef(private val assetType: String, private val assetId: String) : FlowLogic<StateAndRef<BondAssetState>?>() {
+class RetrieveBondAssetStateAndRef(private val assetType: String, private val assetId: String) : FlowLogic<StateAndRef<BondAssetState>?>() {
 
     override fun call(): StateAndRef<BondAssetState>? {
 

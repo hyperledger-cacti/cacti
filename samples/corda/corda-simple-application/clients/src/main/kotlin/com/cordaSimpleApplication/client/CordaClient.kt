@@ -90,6 +90,15 @@ fun main(args: Array<String>) = App()
             GetLockStateCommand(),
             GetHTLCHashCommand(),
             GetHTLCPreImageCommand(),
+            BondAssetCommand().subcommands(
+                IssueBondAssetStateCommand(),
+                IssueBondAssetStateFromStateRefCommand(),
+                GetBondAssetStateByLinearIdCommand(),
+                GetBondAssetStatesByTypeCommand(),
+                RetrieveBondAssetStateAndRefCommand(),
+                TransferBondAssetStateCommand(),
+                DeleteBondAssetStateCommand()
+            ),
             AssetTransferCommand().subcommands(
                 PledgeAssetCommand(),
                 IsAssetPledgedCommand(),
