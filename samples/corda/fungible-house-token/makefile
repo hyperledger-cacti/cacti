@@ -13,4 +13,5 @@ build: source
 
 .PHONY: clean
 clean:
-	rm -rf source	
+	rm -rf source
+	rm -rf samples-kotlin
