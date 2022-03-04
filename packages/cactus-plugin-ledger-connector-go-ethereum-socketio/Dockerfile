@@ -10,4 +10,4 @@ COPY ./dist/yarn.lock ./package.json ./
 RUN yarn install --production --frozen-lockfile --non-interactive --cache-folder ./.yarnCache; rm -rf ./.yarnCache
 
 EXPOSE 5050
-ENTRYPOINT [ "npm", "run", "start" ]
+CMD [ "npm", "run", "start" ]

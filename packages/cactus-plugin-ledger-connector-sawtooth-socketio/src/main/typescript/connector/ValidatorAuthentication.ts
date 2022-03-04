@@ -8,13 +8,13 @@
 const fs = require("fs");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-import { config } from "../common/core/config/default";
+import * as config from "../common/core/config";
 import { getLogger } from "log4js";
 const logger = getLogger("ValidatorAuthentication[" + process.pid + "]");
-logger.level = config.logLevel;
+logger.level = config.read("logLevel", "info");
 
 const privateKey = fs.readFileSync(
-  path.resolve(__dirname, config.validatorKeyPath)
+  path.resolve(__dirname, config.read("sslParam.key")),
 );
 
 export class ValidatorAuthentication {

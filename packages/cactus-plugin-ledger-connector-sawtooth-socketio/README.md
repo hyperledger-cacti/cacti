@@ -37,11 +37,12 @@ This plugin provides `Cactus` a way to interact with Hyperledger Sawtooth networ
     popd
     ```
 
-1. Copy default validator CA
+1. Copy default configuration
+- **Remember to replace default CA and to adjust the `default.yaml` configuration on production deployments!**
     ```
     mkdir -p /etc/cactus/connector-sawtooth-socketio/
-    rm -r /etc/cactus/connector-sawtooth-socketio/CA
-    cp -rf ./src/main/typescript/common/core/sample-CA/ /etc/cactus/connector-sawtooth-socketio/CA
+    rm -r /etc/cactus/connector-sawtooth-socketio/*
+    cp -rf ./sample-config/* /etc/cactus/connector-sawtooth-socketio/
     ```
 
 ### Docker

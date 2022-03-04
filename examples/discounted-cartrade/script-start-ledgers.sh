@@ -50,17 +50,15 @@ function copy_fabric_tlsca() {
     echo ">> copy_fabric_tlsca() done."
 }
 
-function copy_fabric_wallet() {
+function copy_fabric_validator_config() {
+    echo ">> copy_fabric_validator_config()"
+    cp -fr ${ROOT_DIR}/packages/cactus-plugin-ledger-connector-fabric-socketio/sample-config/* \
+        "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/"
+    echo ">> copy_fabric_validator_config() done."
+
     echo ">> copy_fabric_wallet()"
     cp -fr "${ROOT_DIR}/tools/docker/fabric-all-in-one/asset-transfer-basic-utils/wallet" "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/"
     echo ">> copy_fabric_wallet() done."
-}
-
-function copy_fabric_validator_ca() {
-    echo ">> copy_fabric_validator_ca()"
-    cp -fr "${ROOT_DIR}/packages/cactus-plugin-ledger-connector-fabric-socketio/src/main/typescript/common/core/sample-CA" \
-        "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/CA"
-    echo ">> copy_fabric_validator_ca() done."
 }
 
 function start_ethereum_testnet() {
@@ -69,11 +67,11 @@ function start_ethereum_testnet() {
     popd
 }
 
-function copy_ethereum_validator_ca() {
-    echo ">> copy_ethereum_validator_ca()"
-    cp -fr "${ROOT_DIR}/packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/main/typescript/common/core/sample-CA/" \
-        "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio/CA"
-    echo ">> copy_ethereum_validator_ca() done."
+function copy_ethereum_validator_config() {
+    echo ">> copy_ethereum_validator_config()"
+    cp -fr ${ROOT_DIR}/packages/cactus-plugin-ledger-connector-go-ethereum-socketio/sample-config/* \
+        "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio/"
+    echo ">> copy_ethereum_validator_config() done."
 }
 
 function start_indy_testnet() {
@@ -109,13 +107,12 @@ function start_ledgers() {
     start_fabric_testnet
     mkdir -p "${CONFIG_VOLUME_PATH}/connector-fabric-socketio"
     copy_fabric_tlsca
-    copy_fabric_wallet
-    copy_fabric_validator_ca
+    copy_fabric_validator_config
 
     # Start Ethereum
     mkdir -p "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio"
     start_ethereum_testnet
-    copy_ethereum_validator_ca
+    copy_ethereum_validator_config
 
     # Start Indy
     mkdir -p "${CONFIG_VOLUME_PATH}/validator_socketio_indy"

@@ -18,14 +18,14 @@
 import app from "../app";
 const debug = require("debug")("connector:server");
 import https = require("https");
-import { config } from "../config/default";
+import * as config from "../config";
 import fs = require("fs");
 import { Server } from "socket.io"
 
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("connector_main[" + process.pid + "]");
-logger.level = config.logLevel;
+logger.level = config.read('logLevel', 'info');
 
 // destination dependency (MONITOR) implementation class
 import { ServerMonitorPlugin } from "../../../connector/ServerMonitorPlugin";
@@ -35,13 +35,13 @@ const Smonitor = new ServerMonitorPlugin();
  * Get port from environment and store in Express.
  */
 
-const sslport = normalizePort(process.env.PORT || config.sslParam.port);
+const sslport = normalizePort(process.env.PORT || config.read('sslParam.port'));
 app.set("port", sslport);
 
 // Specify private key and certificate
 const sslParam = {
-  key: fs.readFileSync(config.sslParam.key),
-  cert: fs.readFileSync(config.sslParam.cert),
+  key: fs.readFileSync(config.read('sslParam.key')),
+  cert: fs.readFileSync(config.read('sslParam.cert')),
 };
 
 /**
