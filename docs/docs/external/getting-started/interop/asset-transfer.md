@@ -135,7 +135,7 @@ One Corda network transfers either a bond or some tokens owned by `PartyA` (`COR
 ### Transfer or recover token (fungible) assets
 Assume that the corDapp `cordaSimpleApplication` has been deployed in both networks.
 - Navigate to `samples/corda/corda-simple-application` folder.
-- Create a `network-id` for each Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients transfer get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` or `CORDA_PORT=30006` or `CORDA_PORT=30009` to fetch the name of the parties `PartyA` in `Corda_Network` or `PartyB` in `Corda_Network` or `PartyA` in `Corda_Network2` or `PartyB` in `Corda_Network2` respectively).
+- Create a `network-id` for each Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients util get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` or `CORDA_PORT=30006` or `CORDA_PORT=30009` to fetch the name of the parties `PartyA` in `Corda_Network` or `PartyB` in `Corda_Network` or `PartyA` in `Corda_Network2` or `PartyB` in `Corda_Network2` respectively).
   ```bash
   NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
   NETWORK_NAME='Corda_Network2' CORDA_PORT=30009 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network2" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
@@ -167,7 +167,7 @@ The above steps complete a successful asset transfer from the Corda network `Cor
 ### Transfer or recover bond (non-fungible) assets
 Assume that the corDapp `cordaSimpleApplication` has been deployed in both networks.
 - Navigate to `samples/corda/corda-simple-application` folder.
-- Create a `network-id` for each Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients transfer get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` or `CORDA_PORT=30006` or `CORDA_PORT=30009` to fetch the name of the parties `PartyA` in `Corda_Network` or `PartyB` in `Corda_Network` or `PartyA` in `Corda_Network2` or `PartyB` in `Corda_Network2` respectively).
+- Create a `network-id` for each Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients util get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` or `CORDA_PORT=30006` or `CORDA_PORT=30009` to fetch the name of the parties `PartyA` in `Corda_Network` or `PartyB` in `Corda_Network` or `PartyA` in `Corda_Network2` or `PartyB` in `Corda_Network2` respectively).
   ```bash
   NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
   NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network2" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"

@@ -184,33 +184,6 @@ class GetTokenStateAndContractId(
 }
 
 /**
- * The GetOurCertificateBase64 flow is used to fetch the certificate of the party owning the node in base64 format.
- */
-@InitiatingFlow
-@StartableByRPC
-class GetOurCertificateBase64() : FlowLogic<String>() {
-    @Suspendable
-    override fun call(): String {
-
-        return Base64.getEncoder().encodeToString(ourIdentityAndCert.certificate.toString().toByteArray())
-    }
-}
-
-/**
- * The GetOurIdentity flow is used to fetch the identity of the party owning the node.
- */
-@InitiatingFlow
-@StartableByRPC
-class GetOurIdentity() : FlowLogic<String>() {
-    @Suspendable
-    override fun call(): String {
-
-        println("ourIdentity: ${ourIdentity}")
-        return ourIdentity.toString()
-    }
-}
-
-/**
  * The marshalFungibleToken function is used to obtain the JSON encoding of the fungible tokens of interest to the user.
  * This function is typically called by the application client which may not know the full details of the token asset.
  *

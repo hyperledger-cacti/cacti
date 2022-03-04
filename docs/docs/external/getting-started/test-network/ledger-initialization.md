@@ -276,7 +276,7 @@ Bootstrap the Corda networks and application states as follows (_the following i
   * On the node owned by `PartyB` in `Corda_Network2`:
     ```bash
     NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients configure network
-    NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients transfer save-cert
+    NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients util save-cert
     ```
   The `save-cert` command above fetches the certificate of the party in base64 format and stores in the folder `clients/src/main/resources/config/credentials/remoteNetworkUsers` with filename `Corda_Network_UsersAndCerts.json` and `Corda_Network2_UsersAndCerts.json` corresponding to `Corda_Network` and `Corda_Network2` respectively. These files are referred during pledge to fetch the certificate of the recipient of the transferred asset, and during claim to fetch the certificate of the pledger of the asset. *This is because, asset transfer doesn't require both the parties being members of neither in the export nor in the import network. It's just sufficient that pledger is part of the asset export network and claimer is part of the asset import network*.
   * The user certificate files corresponding to the Fabric networks also need to be copied into this folder.

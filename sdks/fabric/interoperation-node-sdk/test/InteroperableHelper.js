@@ -276,8 +276,8 @@ describe("InteroperableHelper", () => {
                 )
                 .resolves(true);
             const vpResult = JSON.stringify(vpJSON);
-            const interopccStub = sinon.stub(interopcc, "evaluateTransaction").resolves(vpResult);
-            interopccStub.withArgs("GetVerificationPolicyBySecurityDomain", "network1").resolves(vpResult);
+            const interopccStub2 = sinon.stub(interopcc, "evaluateTransaction").resolves(vpResult);
+            interopccStub2.withArgs("GetVerificationPolicyBySecurityDomain", "network1").resolves(vpResult);
         });
         it("works as a normal invoke", async () => {
             const invokeObject = {
