@@ -19,12 +19,11 @@ import FabricClient from "fabric-client";
 // IF declaration for fabric
 import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess.js";
 // config file
-import { SplugConfig } from "./PluginConfig";
-import { config } from "../common/core/config/default";
+import * as config from "../common/core/config";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
-logger.level = config.logLevel;
+logger.level = config.read<string>("logLevel", "info");
 // utility
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 import safeStringify from "fast-safe-stringify";
@@ -74,7 +73,9 @@ export class ServerMonitorPlugin {
               const txlist = [];
               logger.info("*** Block Event ***");
               console.log("##[HL-BC] Notify new block data(D2)");
-              logger.info("chain id :" + SplugConfig.fabric.channelName);
+              logger.info(
+                "chain id :" + config.read<string>("fabric.channelName"),
+              );
               logger.info("blocknumber : " + block.header.number);
               const len = block.data.data.length;
               logger.info("data.data.length :" + len);
@@ -96,7 +97,7 @@ export class ServerMonitorPlugin {
                   const ccid = invocationSpec.chaincode_spec.chaincode_id.name;
                   logger.info("chaincode id :" + ccid);
                   // Only notify transactions from the chaincode used in ServerPlugin
-                  if (ccid == SplugConfig.fabric.chaincodeId) {
+                  if (ccid == config.read<string>("fabric.chaincodeId")) {
                     const args = invocationSpec.chaincode_spec.input.args;
                     logger.info("args.length :" + args.length);
                     for (let j = 0; j < args.length; j++) {

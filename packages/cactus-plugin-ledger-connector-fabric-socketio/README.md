@@ -39,17 +39,13 @@ This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks
     popd
     ```
 
-1. Setup the wallet
+1. Copy default configuration
+- **Remember to replace default CA and to adjust the `default.yaml` configuration on production deployments!**
+- You can copy your wallet to `/etc/cactus/connector-fabric-socketio/wallet/`
     ```
-    mkdir -p /etc/cactus/connector-fabric-socketio/wallet/
-    rm -r /etc/cactus/connector-fabric-socketio/wallet/*
-    # Optionally copy existing fabric wallet to that location
-    ```
-
-1. Copy default validator CA
-    ```
-    rm -r /etc/cactus/connector-fabric-socketio/CA
-    cp -rf ./src/main/typescript/common/core/sample-CA/ /etc/cactus/connector-fabric-socketio/CA
+    mkdir -p /etc/cactus/connector-fabric-socketio/
+    rm -r /etc/cactus/connector-fabric-socketio/*
+    cp -rf ./sample-config/* /etc/cactus/connector-fabric-socketio/
     ```
 
 ### Docker
@@ -58,7 +54,7 @@ This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks
 docker build . -t cactus-plugin-ledger-connector-fabric-socketio
 
 # Run
-docker run -v/etc/cactus/:/etc/cactus -p 5040:5040 --net=fabric-all-in-one_testnet-14 cactus-plugin-ledger-connector-fabric-socketio
+docker run -v/etc/cactus/:/etc/cactus -p 5040:5040 --net=fabric-all-in-one_testnet-2x cactus-plugin-ledger-connector-fabric-socketio
 ```
 
 ### Manual

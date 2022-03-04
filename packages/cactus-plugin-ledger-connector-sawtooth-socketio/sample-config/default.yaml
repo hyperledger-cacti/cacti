@@ -1,0 +1,13 @@
+sslParam:
+  port: 5140
+  key: "/etc/cactus/connector-sawtooth-socketio/CA/connector.priv"
+  cert: "/etc/cactus/connector-sawtooth-socketio/CA/connector.crt"
+blockMonitor:
+  request:
+    method: "GET"
+    host: "http://rest-api:8008/"
+    getLatestBlockNumberCommand: "blocks?limit=1"
+    periodicMonitoringCommand1: "blocks?start="
+    periodicMonitoringCommand2: "&reverse"
+  pollingInterval: 5000
+logLevel: "debug"

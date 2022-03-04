@@ -12,14 +12,11 @@
  */
 
 // config file
-import { SplugConfig } from "./PluginConfig";
-import { config } from "../common/core/config/default";
+import * as config from "../common/core/config";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerPlugin[" + process.pid + "]");
-logger.level = config.logLevel;
-// utility
-const SplugUtil = require("./PluginUtil.js");
+logger.level = config.read<string>("logLevel", "info");
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Read the library, SDK, etc. according to EC specifications as needed
 
@@ -30,7 +27,7 @@ import safeStringify from "fast-safe-stringify";
 const path = require("path");
 const { FileSystemWallet, Gateway } = require("fabric-network");
 const fs = require("fs");
-const connUserName = SplugConfig.fabric.connUserName;
+const connUserName = config.read<string>("fabric.connUserName");
 
 // Cryptographic for fabric
 const hash = require("fabric-client/lib/hash");
@@ -321,8 +318,8 @@ async function Invoke(reqBody) {
     const args = reqBody.args;
 
     // Create a new file system based wallet for managing identities.
-    const wallet = new FileSystemWallet(SplugConfig.fabric.keystore);
-    console.log(`Wallet path: ${SplugConfig.fabric.keystore}`);
+    const wallet = new FileSystemWallet(config.read<string>("fabric.keystore"));
+    console.log(`Wallet path: ${config.read<string>("fabric.keystore")}`);
 
     // Check to see if we've already enrolled the user.
     const userExists = await wallet.exists(connUserName);
@@ -390,8 +387,8 @@ async function InvokeSync(reqBody) {
 
       // Create a new file system based wallet for managing identities.
       // logger.debug(`##InvokeSync(B)`);
-      const wallet = new FileSystemWallet(SplugConfig.fabric.keystore);
-      console.log(`Wallet path: ${SplugConfig.fabric.keystore}`);
+      const wallet = new FileSystemWallet(config.read<string>("fabric.keystore"));
+      console.log(`Wallet path: ${config.read<string>("fabric.keystore")}`);
 
       // Check to see if we've already enrolled the user.
       // logger.debug(`##InvokeSync(C)`);
@@ -636,8 +633,8 @@ async function InvokeSendSignedProposal(
 
   // Low-level access to local-store cert and private key of submitter (in case request is missing those)
   if (!certPem || !privateKeyPem) {
-    const wallet = new FileSystemWallet(SplugConfig.fabric.keystore);
-    logger.debug(`Wallet path: ${path.resolve(SplugConfig.fabric.keystore)}`);
+    const wallet = new FileSystemWallet(config.read<string>("fabric.keystore"));
+    logger.debug(`Wallet path: ${path.resolve(config.read<string>("fabric.keystore"))}`);
 
     const submitterName = user.getName();
     const submitterExists = await wallet.exists(submitterName);
@@ -654,14 +651,14 @@ async function InvokeSendSignedProposal(
 
   const { proposal, txId } = channel.generateUnsignedProposal(
     transactionProposalReq,
-    SplugConfig.fabric.mspid,
+    config.read<string>("fabric.mspid"),
     certPem,
   );
   logger.debug(`##InvokeSendSignedProposal; txId: ${txId.getTransactionID()}`);
   const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
 
   const targets = [];
-  for (const peerInfo of SplugConfig.fabric.peers) {
+  for (const peerInfo of config.read<any[]>("fabric.peers")) {
     const peer = channel.getPeer(peerInfo.requests.split("//")[1]);
     targets.push(peer);
   }

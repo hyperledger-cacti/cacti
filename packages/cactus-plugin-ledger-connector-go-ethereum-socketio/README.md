@@ -39,11 +39,12 @@ This plugin provides `Cactus` a way to interact with Go-Ethereum networks. Using
     popd
     ```
 
-1. Copy default validator CA
+1. Copy default configuration
+- **Remember to replace default CA and to adjust the `default.yaml` configuration on production deployments!**
     ```
     mkdir -p /etc/cactus/connector-go-ethereum-socketio/
-    rm -r /etc/cactus/connector-go-ethereum-socketio/CA
-    cp -rf ./src/main/typescript/common/core/sample-CA/ /etc/cactus/connector-go-ethereum-socketio/CA
+    rm -r /etc/cactus/connector-go-ethereum-socketio/*
+    cp -rf ./sample-config/* /etc/cactus/connector-go-ethereum-socketio/
     ```
 
 ### Docker

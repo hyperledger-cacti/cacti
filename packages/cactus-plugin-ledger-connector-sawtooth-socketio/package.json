@@ -5,22 +5,20 @@
   "scripts": {
     "start": "cd ./dist && node common/core/bin/www.js",
     "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
-    "build": "npm run codegen && npm run build-ts && npm run build:dev:backend:postbuild",
-    "codegen": "npm run copy-utility-assets",
+    "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
-    "build:dev:backend:postbuild": "npm run copy-static-assets && npm run init-sawtooth",
-    "copy-utility-assets": "ts-node copyUtilityAssets.ts",
-    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "build:dev:backend:postbuild": "npm run init-sawtooth",
     "init-sawtooth": "cp -af ../../yarn.lock ./dist/yarn.lock"
   },
   "dependencies": {
     "@types/node": "^14.14.5",
     "body-parser": "~1.17.1",
     "cbor": "^6.0.1",
-    "config": "^1.26.1",
+    "config": "3.3.7",
     "cookie-parser": "~1.4.3",
     "debug": "~4.1.1",
     "express": "~4.15.2",
+    "js-yaml": "3.14.1",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^6.4.0",
     "morgan": "1.10.0",
@@ -28,5 +26,8 @@
     "shelljs": "^0.8.4",
     "socket.io": "4.1.3",
     "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "@types/config": "0.0.41"
   }
 }

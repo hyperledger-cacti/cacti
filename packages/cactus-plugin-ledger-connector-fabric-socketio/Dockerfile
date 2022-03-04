@@ -12,4 +12,4 @@ COPY ./dist ./dist/
 
 EXPOSE 5040
 VOLUME ["/etc/cactus/"]
-ENTRYPOINT ["npm", "run", "start"]
+CMD ["npm", "run", "start"]
