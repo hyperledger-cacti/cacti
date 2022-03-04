@@ -345,32 +345,32 @@ single repo, instead of across multiple.
 ### Transfer or recover token (Corda fungible house-token) assets
 Assuming that the corDapp `fungible-house-token` has been deployed in two Corda networks `Corda_Network` and `Corda_Network2`, below are the steps to transfer tokens owned by `PartyA` (`CORDA_PORT=10006`) in `Corda_Network` to `PartyB` (`CORDA_PORT=30009`) in the other network `Corda_Network2`.
 - Navigate to `samples/corda/corda-simple-application` folder.
-- Create a `network-id` for each Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients transfer get-party-name` with `CORDA_PORT=10006`, or `CORDA_PORT=30006`, or `CORDA_PORT=30009` to fetch the name of the parties, `PartyA` of `Corda_Network`, or `PartyA` of `Corda_Network2`, or `PartyB` of `Corda_Network2` respectively).
+- Create a `network-id` for each Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients util get-party-name` with `CORDA_PORT=10006`, or `CORDA_PORT=10009`, or `CORDA_PORT=30006`, or `CORDA_PORT=30009` to fetch the name of the parties, `PartyA` of `Corda_Network`, `PartyB` of `Corda_Network`, `PartyB` of `Corda_Network`, or `PartyA` of `Corda_Network2`, or `PartyB` of `Corda_Network2` respectively).
   ```bash
-  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network" -m "O=PartyA,L=London,C=GB"
-  CORDA_PORT=30009 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network2" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
+  NETWORK_NAME='Corda_Network2' CORDA_PORT=30009 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network2" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
   ```
-  The above assumes that `Corda_Network` was started earlier with `1-node`, and `Corda_Network2` was started earlier with `2-nodes` (network state created in `Corda_Network` and `Corda_Network2` can be cross checked by running the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref` and `CORDA_PORT=30009 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref` respectively in these networks).
+  The above assumes that both `Corda_Network` and `Corda_Network2` were started earlier with `2-nodes` (network state created in `Corda_Network` and `Corda_Network2` can be cross checked by running the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref` and `CORDA_PORT=30009 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref` respectively in these networks).
 - Initialize Corda fungible house tokens in `Corda_Network` and `Corda_Network2`:
   ```bash
-  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token init
-  CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token init
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token init
+  NETWORK_NAME='Corda_Network2' CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token init
   ```
 - Issue `100` house-tokens to `PartyA` in `Corda_Network`:
   ```bash
-  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token issue -p "O=PartyA, L=London, C=GB" -a 100
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token issue -p "O=PartyA, L=London, C=GB" -a 100
   ```
-  (check token balance for `PartyA` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance`)
+  (check token balance for `PartyA` by running the command `NETWORK_NAME='Corda_Network'  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance`)
 - Let `PartyA` pledge these tokens in `Corda_Network` to be transferred to `PartyB` of `Corda_Network2` (pledge burns the tokens in the source/exporting network):
   ```bash
-  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer pledge-asset --fungible --timeout="3600" --import-network-id='Corda_Network2' --recipient='O=PartyB, L=London, C=GB' --param='house:5'
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer pledge-asset --fungible --timeout="3600" --import-network-id='Corda_Network2' --recipient='O=PartyB, L=London, C=GB' --param='house:5'
   ```
-  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer get-pledge-state -pid <pledge-id>`; moreover, check the token balance for `PartyA` in `Corda_Network` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance` which should output 95 house tokens).
+  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer is-asset-pledged -pid <pledge-id>` and `NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer get-pledge-state -pid <pledge-id>`; moreover, check the token balance for `PartyA` in `Corda_Network` by running the command `NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance` which should output 95 house tokens).
 - Let `PartyB` claim in `Corda_Network2` the tokens which are pledged in the Corda network `Corda_Network` by replacing `<pledge-id>` with the above hexadecimal value (claim issues the tokens in the destination/importing network):
   ```bash
-  NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='O=PartyA, L=London, C=GB' --transfer-category='house-token.corda' --export-network-id='Corda_Network' --param='house:5' --import-relay-address='localhost:9082'
+  NETWORK_NAME='Corda_Network2' CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='O=PartyA, L=London, C=GB' --transfer-category='house-token.corda' --export-network-id='Corda_Network' --param='house:5' --import-relay-address='localhost:9082'
   ```
-  (check the token balance for `PartyB` in `Corda_Network2` by running the command `CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token get-balance` which should output `5` house tokens)
+  (check the token balance for `PartyB` in `Corda_Network2` by running the command `NETWORK_NAME='Corda_Network2' CORDA_PORT=30009 ./clients/build/install/clients/bin/clients house-token get-balance` which should output `5` house tokens)
 
 The above steps complete a successful asset transfer from the Corda network `Corda_Network` to the Corda network `Corda_Network2`. In addition to the above commands, following is an extra option.
 

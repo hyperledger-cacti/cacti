@@ -92,7 +92,7 @@ object PledgeAsset {
         override fun call(): Either<Error, UniqueIdentifier> = try {
 
             val lockerCert: String
-            lockerCert = Base64.getEncoder().encodeToString(ourIdentityAndCert.certificate.toString().toByteArray())
+            lockerCert = Base64.getEncoder().encodeToString(x509CertToPem(ourIdentityAndCert.certificate).toByteArray())
             // 1. Create the asset pledge state
             val assetPledgeState = AssetPledgeState(
                 StaticPointer(assetStateRef.ref, assetStateRef.state.data.javaClass), // @property assetStatePointer

@@ -90,6 +90,11 @@ fun main(args: Array<String>) = App()
             GetLockStateCommand(),
             GetHTLCHashCommand(),
             GetHTLCPreImageCommand(),
+            AssetUtilsCommand().subcommands(
+                SaveUserCertToFileCommand(),
+                FetchPartyNameCommand(),
+                FetchCertBase64Command()
+            ),
             BondAssetCommand().subcommands(
                 IssueBondAssetStateCommand(),
                 IssueBondAssetStateFromStateRefCommand(),
@@ -106,10 +111,7 @@ fun main(args: Array<String>) = App()
                 ReclaimAssetCommand(),
                 ClaimRemoteAssetCommand(),
                 GetSimpleAssetPledgeStatusByPledgeIdCommand(),
-                GetSimpleAssetClaimStatusByPledgeIdCommand(),
-                FetchPartyNameCommand(),
-                FetchCertBase64Command(),
-                SaveUserCertToFileCommand()
+                GetSimpleAssetClaimStatusByPledgeIdCommand()
             ),
             ConfigureCommand().subcommands(
                 ConfigureDataCommand(),
@@ -135,10 +137,7 @@ fun main(args: Array<String>) = App()
                     ReclaimHouseTokenCommand(),
                     ClaimRemoteHouseTokenCommand(),
                     GetAssetClaimStatusByPledgeIdCommand(),
-                    GetAssetPledgeStatusByPledgeIdCommand(),
-                    FetchPartyNameHouseCommand(),
-                    FetchCertBase64HouseCommand(),
-                    SaveUserCertToFileHouseCommand()
+                    GetAssetPledgeStatusByPledgeIdCommand()
                 )
             ),
             NetworkIdCommand().subcommands(

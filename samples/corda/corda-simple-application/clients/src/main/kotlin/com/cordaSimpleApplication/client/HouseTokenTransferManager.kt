@@ -32,7 +32,6 @@ import com.cordaSimpleApplication.contract.AssetContract
 
 import net.corda.samples.tokenizedhouse.flows.GetAssetClaimStatusByPledgeId
 import net.corda.samples.tokenizedhouse.flows.GetAssetPledgeStatusByPledgeId
-import net.corda.samples.tokenizedhouse.flows.GetOurCertificateBase64
 import net.corda.samples.tokenizedhouse.flows.RetrieveStateAndRef
 import net.corda.samples.tokenizedhouse.flows.GetIssuedTokenType
 import net.corda.samples.tokenizedhouse.states.FungibleHouseTokenJson
@@ -141,117 +140,6 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge-asset",
             } finally {
                 rpc.close()
             }
-        }
-    }
-}
-
-/**
- * Command to fetch the certificate (in base64) of the party owning the node.
- */
-class FetchCertBase64HouseCommand : CliktCommand(name="get-cert-base64", help = "Obtain the certificate of the party owning a node in base64 format.") {
-    val config by requireObject<Map<String, String>>()
-    override fun run() = runBlocking {
-
-        val rpc = NodeRPCConnection(
-            host = config["CORDA_HOST"]!!,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = config["CORDA_PORT"]!!.toInt())
-        try {
-            val certBase64 = rpc.proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
-            println("Certificate in base64: $certBase64")
-            val certificate: X509Certificate = rpc.proxy.nodeInfo().legalIdentitiesAndCerts.get(0).certificate
-            val certBase64DoNotUse = Base64.getEncoder().encodeToString(certificate.toString().toByteArray())
-            println("certBase64DoNotUse: $certBase64DoNotUse rpc.proxy.nodeInfo().legalIdentitiesAndCerts.size: ${rpc.proxy.nodeInfo().legalIdentitiesAndCerts.size}")
-        } catch (e: Exception) {
-            println("Error: ${e.toString()}")
-        } finally {
-            rpc.close()
-        }
-    }
-}
-
-/**
- * Command to fetch the name of the party owning the node.
- */
-class FetchPartyNameHouseCommand : CliktCommand(name="get-party-name", help = "Obtain the name of the party owning a node in the Corda network.") {
-    val config by requireObject<Map<String, String>>()
-    override fun run() = runBlocking {
-
-        val rpc = NodeRPCConnection(
-            host = config["CORDA_HOST"]!!,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = config["CORDA_PORT"]!!.toInt())
-        try {
-            val partyName = rpc.proxy.nodeInfo().legalIdentities.get(0).name.toString()
-            println("Name of the party owning the Corda node: $partyName")
-            println("rpc.proxy.nodeInfo().legalIdentities.size = ${rpc.proxy.nodeInfo().legalIdentities.size}")
-        } catch (e: Exception) {
-            println("Error: ${e.toString()}")
-        } finally {
-            rpc.close()
-        }
-    }
-}
-
-/*
- * Populates the file 'networkID'+'_UsersAndCerts.json' with the users and their certificates.
- * This is used during Pledge to get the recipientCert, and during Claim to get the pledgerCert.
- */
-class SaveUserCertToFileHouseCommand : CliktCommand(name="save-cert", help = "Populates the file 'networkId' + '_UsersAndCerts.json' with the certificate of 'ourIdentity'")
-{
-    val config by requireObject<Map<String, String>>()
-    override fun run() {
-        println("Fetching base64 certificate of the user 'ourIdentity'.")
-        val rpc = NodeRPCConnection(
-            host = config["CORDA_HOST"]!!,
-            username = "clientUser1",
-            password = "test",
-            rpcPort = config["CORDA_PORT"]!!.toInt())
-        try {
-            val proxy = rpc.proxy
-            val userID: String = rpc.proxy.nodeInfo().legalIdentities.get(0).name.toString()
-            val certBase64: String = proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
-            var networkID: String
-            val cordaPort: Int = config["CORDA_PORT"]!!.toInt()
-            if (cordaPort == 30006) {
-                networkID = "Corda_Network2"
-            } else if (cordaPort == 10006) {
-                networkID = "Corda_Network"
-            } else {
-                println("CORDA_PORT $cordaPort is not a valid port.")
-                throw IllegalStateException("CORDA_PORT $cordaPort is not a valid port.")
-            }
-
-            val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
-            val dirPath: String = "${credentialPath}/../remoteNetworkUsers"
-            val filepath: String = "${dirPath}/${networkID + "_UsersAndCerts.json"}"
-
-            val folder: File = File(dirPath)
-            if (!folder.exists()) {
-                folder.mkdirs()
-            }
-            var usersAndCertsJSON: JSONObject
-            val usersAndCertsFile: File = File(filepath)
-            if (!usersAndCertsFile.exists()) {
-                // if file doesn't exits, create an empty JSON object
-                usersAndCertsJSON = JSONObject()
-            } else {
-                // if file exists, read the contents of the file
-                var usersOfNetwork = File(filepath).readText(Charsets.UTF_8)
-                usersAndCertsJSON = JSONObject(usersOfNetwork)
-            }
-
-            // add <userID, certBase64> to the JSON object; if the key userID exists already, overwrite the value
-            usersAndCertsJSON.put(userID, certBase64)
-
-            usersAndCertsFile.writeText(usersAndCertsJSON.toString())
-
-        } catch (e: Exception) {
-            println(e.toString())
-        } finally {
-            rpc.close()
         }
     }
 }
@@ -371,7 +259,7 @@ class ClaimRemoteHouseTokenCommand : CliktCommand(name="claim-remote-asset", hel
                 val issuer: Party = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
                 val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
                 println("TokenType: $issuedTokenType")
-                val recipientCert: String = rpc.proxy.startFlow(::GetOurCertificateBase64).returnValue.get()
+                val recipientCert: String = fetchCertBase64Helper(rpc.proxy)
                 println("param: ${param}")
                 val params = param!!.split(":").toTypedArray()
                 if (params.size != 2) {
