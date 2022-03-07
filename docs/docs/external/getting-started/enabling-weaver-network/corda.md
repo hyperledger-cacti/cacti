@@ -199,9 +199,10 @@ Typically, pre-configuration involves:
     }
     ```
 
-* _Copy Interoperation CorDapps_: After bootstrapping the nodes folder, copy the following two CorDapps in `build/nodes/PartyA/cordapps` and `build/nodes/PartyB/cordapps` folders (`PartyA` and `PartyB` node names are for example only):
+* _Install Interoperation CorDapp on Nodes_: After bootstrapping the nodes folder, copy the following two CorDapps in `build/nodes/PartyA/cordapps` and `build/nodes/PartyB/cordapps` folders (`PartyA` and `PartyB` node names are for example only):
     - [com.weaver.corda.app.interop.interop-contracts](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906215)
     - [com.weaver.corda.app.interop.interop-workflows](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906216)
+  _Note_: You can follow any installation process for this CorDapp, but make sure it is installed on all the nodes that maintain the states involved in cross-network operations in their vaults.
 
 ### Startup and Bootstrap Weaver components
 

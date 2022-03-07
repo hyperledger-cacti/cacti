@@ -35,7 +35,7 @@ The location segment of an address therefore represents a set of endpoints and a
 ```
 location-segment = gateway ["/" network-id]
 
-gateway = endpoint *(";" endpoint)
+gateway = endpoint *(";" endpoint) / name
 
 endpoint = host [":" port]
 
@@ -62,14 +62,14 @@ location-segment = relay1.example.com:7542;relay2.example.com:7542
 
 ## Ledgers
 
-The ledger-segment uniquely indentifies a distributed ledger maintained by a network. A distributed ledger is a collection of facts managed by a group of entities with a shared goal, often using a set of smart contracts. A network can contain one or more independent distributed ledgers. Ultimately, each ledger is maintained by a subgroup of nodes. In some DLTs, a well-known identifier can be used to name a ledger. In others, the set of nodes, which represent well-known stakeholders in the network, must be explicitly listed or an identifier representing, say a decentralized application spanning those nodes, must be specified. Identifiers for nodes maintaining a ledger can be separated using semicolons (`;`).
+The ledger-segment uniquely indentifies a ledger maintained by a distributed ledger network. A ledger is a collection of facts managed by a group of entities with a shared goal, often using a set of smart contracts. A network can contain one or more independent distributed ledgers. Ultimately, each ledger is maintained by a subgroup of nodes. In some DLTs, a well-known identifier can be used to name a ledger. In others, the set of nodes, which represent well-known stakeholders in the network, must be explicitly listed or an identifier representing, say a decentralized application spanning those nodes, must be specified. Identifiers for nodes maintaining a ledger can be separated using semicolons (`;`).
 
-The ledger-segment can be left blank if the network has only one ledger, which is the default in open networks like Bitcoin or the Ethereum Mainnet.
+The ledger-segment can be left blank if the network has only one ledger, which is the default in open networks like Bitcoin or the Ethereum Mainnet, or in private Ethereum-based systems like Quorum and Hyperledger Besu.
 
 The general specification of a ledger-segment is an alphanumeric string.
 
 ```
-ledger-segment = *1((ALPHA / "_") 1*(ALPHA / DIGIT / "_" / "-" / ";"))
+ledger-segment = *1((ALPHA / "_") 1*(ALPHA / DIGIT / "_" / "-" / ";" / ":"))
 ```
 
 ### Examples
@@ -82,10 +82,10 @@ ledger-segment = paymentsDappNode1:9005;paymentsDappNode2:9005
 
 ## Views
 
-The view-segment of an address uniquely identifies a view within a ledger. At this level, features particular to the DLT on which the network is built are necessary to identify and encode a view operator (or `getter`). But we can still draw out common abstractions from different DLTs. All such technologies offer a procedural interface to access and manipulate data, typically (but not always) in the form of a _smart contract_. The exposed interface offers multiple functions to generate views based on the provided input. Hence, we can specify the view-segment as being composed of a contract, a function, and a list of input arguments as follows. In the most general case, a default contract may be assumed and arguments may be unnecessary, and so these can be omitted. The function, which can either be a procedural identifier, or a direct reference to a data item or collection of data items, or a programming instruction, must be specified.
+The view-segment of an address uniquely identifies a view within a ledger. At this level, features particular to the DLT on which the network is built are necessary to identify and encode a view operator (or `getter`). But we can still draw out common abstractions from different DLTs. All such technologies offer a procedural interface to access and manipulate data, typically (but not always) in the form of a _smart contract_. The exposed interface offers multiple functions to generate views based on the provided input. Hence, we can specify the view-segment as being composed of a contract, a function, and a list of input arguments. In the most general case, a default contract may be assumed, and arguments may be unnecessary, and so these can be omitted. The function, which can either be a procedural identifier, or a direct reference to a data item or collection of data items, or a programming instruction, must be specified.
 
 ```
-ledger-segment = [contract-id] ":" function-spec *(":" input-argument)
+view-segment = [contract-id] ":" function-spec *(":" input-argument)
 
 contract-id = (ALPHA / "_") 1*(ALPHA / DIGIT / "_")
 
