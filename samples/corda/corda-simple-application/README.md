@@ -343,6 +343,9 @@ single repo, instead of across multiple.
 
 ## Asset Transfer
 ### Transfer or recover token (Corda fungible house-token) assets
+
+This assumes that the `ledger initialization` was already carried out. The `save-cert` command during ledger initialization fetches the certificate of the parties in base64 format and stores in the folder `clients/src/main/resources/config/credentials/remoteNetworkUsers` with filename `Corda_Network_UsersAndCerts.json` and `Corda_Network2_UsersAndCerts.json` corresponding to `Corda_Network` and `Corda_Network2` respectively. These files are referred during pledge to fetch the certificate of the recipient of the transferred asset, and during claim to fetch the certificate of the pledger of the asset. *This is because, asset transfer doesn't require both the parties being members of neither in the export nor in the import network. It's just sufficient that pledger is part of the asset export network and claimer is part of the asset import network*.
+
 Assuming that the corDapp `fungible-house-token` has been deployed in two Corda networks `Corda_Network` and `Corda_Network2`, below are the steps to transfer tokens owned by `PartyA` (`CORDA_PORT=10006`) in `Corda_Network` to `PartyB` (`CORDA_PORT=30009`) in the other network `Corda_Network2`.
 - Navigate to `samples/corda/corda-simple-application` folder.
 - Create a `network-id` for each Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients util get-party-name` with `CORDA_PORT=10006`, or `CORDA_PORT=10009`, or `CORDA_PORT=30006`, or `CORDA_PORT=30009` to fetch the name of the parties, `PartyA` of `Corda_Network`, `PartyB` of `Corda_Network`, `PartyB` of `Corda_Network`, or `PartyA` of `Corda_Network2`, or `PartyB` of `Corda_Network2` respectively).

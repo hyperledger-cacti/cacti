@@ -90,7 +90,7 @@ fun main(args: Array<String>) = App()
             GetLockStateCommand(),
             GetHTLCHashCommand(),
             GetHTLCPreImageCommand(),
-            AssetUtilsCommand().subcommands(
+            UtilsCommand().subcommands(
                 SaveUserCertToFileCommand(),
                 FetchPartyNameCommand(),
                 FetchCertBase64Command()

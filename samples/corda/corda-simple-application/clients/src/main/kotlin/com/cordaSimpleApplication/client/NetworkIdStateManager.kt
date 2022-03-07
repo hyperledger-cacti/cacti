@@ -33,11 +33,16 @@ class NetworkIdCommand : CliktCommand(name = "network-id", help ="Manages the ne
  * @property memberstring The ; delimeter string of network members for the [NetworkIdState].
  */
 class CreateNetworkIdStateCommand : CliktCommand(name="create-state", help = "Invokes the CreateNetworkIdState. Requires an id to be passed") {
-    private val networkId: String by argument()
-    private val memberstring: String? by option("-m", "--networkmembers", help="Names of Parities that are network members")
+    private val networkId: String? by option("-n", "--network-id", help="Network id to be created")
+    private val memberstring: String? by option("-m", "--members", help="Names of parities that are network members")
     val config by requireObject<Map<String, String>>()
     override fun run() {
-        createNetworkIdStateHelper(networkId, memberstring!!, config)
+        if (networkId == null) {
+            println("Arguments required: --network-id.")
+        } else if (memberstring == null) {
+            println("Arguments required: --members.")
+        }
+        createNetworkIdStateHelper(networkId!!, memberstring!!, config)
     }
 }
 
