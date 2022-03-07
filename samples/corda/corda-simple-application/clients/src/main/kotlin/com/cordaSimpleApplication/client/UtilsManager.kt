@@ -188,13 +188,14 @@ class SaveUserCertToFileCommand : CliktCommand(name="save-cert", help = "Populat
             val certBase64: String = fetchCertBase64Helper(rpc.proxy)
             var networkID: String
             val cordaPort: Int = config["CORDA_PORT"]!!.toInt()
-            if (cordaPort == 30006) {
+            val cordaNetwork: String? = config["NETWORK_NAME"]
+            if (cordaPort == 30006 || cordaPort == 30009 || cordaPort == 30012 || (cordaNetwork != null && cordaNetwork.equals("Corda_Network2"))) {
                 networkID = "Corda_Network2"
-            } else if (cordaPort == 10006) {
+            } else if (cordaPort == 10006 || cordaPort == 10009 || cordaPort == 10012 || (cordaNetwork != null && cordaNetwork.equals("Corda_Network"))) {
                 networkID = "Corda_Network"
             } else {
-                println("CORDA_PORT $cordaPort is not a valid port.")
-                throw IllegalStateException("CORDA_PORT $cordaPort is not a valid port.")
+                println("Either CORDA_PORT $cordaPort or NETWORK_NAME $cordaNetwork is not valid.")
+                throw IllegalStateException("Either CORDA_PORT $cordaPort or NETWORK_NAME $cordaNetwork is not valid")
             }
 
             val credentialPath: String = System.getenv("MEMBER_CREDENTIAL_FOLDER") ?: "clients/src/main/resources/config/credentials"
