@@ -24,7 +24,7 @@ import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import com.weaver.corda.app.interop.flows.x509CertToPem
 
-class AssetUtilsCommand : CliktCommand(name = "util", help ="Manages asset utilities") {
+class UtilsCommand : CliktCommand(name = "util", help ="Manages utilities") {
     override fun run() {
     }
 }
@@ -154,13 +154,14 @@ fun getUserCertFromFile(userID: String, networkID: String): String {
             usersAndCertsJSON = JSONObject(usersAndCertsFile.readText(Charsets.UTF_8))
         }
 
+        val x500NameOfuserID = CordaX500Name.parse(userID).toString()
         // throw exception if the userID is not present in the file
-        if (!usersAndCertsJSON.has(userID)) {
+        if (!usersAndCertsJSON.has(x500NameOfuserID)) {
             println("File $filepath doesn't contain the certificate of user $userID.")
             throw IllegalStateException("File $filepath doesn't contain the certificate of user $userID.")
         }
 
-        certBase64 = usersAndCertsJSON.getString(userID)
+        certBase64 = usersAndCertsJSON.getString(x500NameOfuserID)
     } catch (e: Exception) {
         println(e.toString())
         exitProcess(1)

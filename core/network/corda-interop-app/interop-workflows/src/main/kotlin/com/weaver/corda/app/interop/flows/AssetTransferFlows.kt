@@ -486,15 +486,15 @@ object ReclaimPledgedAsset {
                 val assetPledgeState = assetPledgeStateAndRef.state.data
                 println("Party: ${ourIdentity} ReclaimPledgeState: ${assetPledgeState}")
 
-                if (assetClaimStatus.claimStatus) {
+                if (assetClaimStatus.expiryTimeSecs != assetPledgeState.expiryTimeSecs) {
+                    println("Cannot perform reclaim for pledgeId $pledgeId as the expiration timestamps in the pledge and the claim don't match.")
+                    Left(Error("Cannot perform reclaim for pledged $pledgeId as the expiration timestamps in the pledge and the claim don't match."))
+                } else if (assetClaimStatus.claimStatus) {
                     println("Cannot perform reclaim for pledgeId $pledgeId as the asset was claimed in remote network.")
                     Left(Error("Cannot perform reclaim for pledged $pledgeId as the asset was claimed in remote network."))
                 } else if (!assetClaimStatus.expirationStatus) {
                     println("Cannot perform reclaim for pledgeId $pledgeId as the asset pledge has not yet expired.")
                     Left(Error("Cannot perform reclaim for pledged $pledgeId as the asset pledge has not yet expired."))
-                } else if (assetClaimStatus.expiryTimeSecs != assetPledgeState.expiryTimeSecs) {
-                    println("Cannot perform reclaim for pledgeId $pledgeId as the expiration timestamps in the pledge and the claim don't match.")
-                    Left(Error("Cannot perform reclaim for pledged $pledgeId as the expiration timestamps in the pledge and the claim don't match."))
                 } else {
                     val notary = assetPledgeStateAndRef.state.notary
                     val reclaimCmd = Command(AssetTransferContract.Commands.ReclaimPledgedAsset(),

@@ -199,12 +199,12 @@ The above steps complete a successful asset transfer from the Corda network `Cor
 ## 3. Fabric with Corda
 A Fabric network transfers some tokens owned by `Alice` to `PartyA` (`CORDA_PORT=10006`) in a Corda network.
 
-### **Transfer or recover token (fungible) assets**
+### Transfer or recover token (fungible) assets
 
 Assuming that the `simpleassettransfer` chaincode has been deployed in Fabric network `network1`, run the following steps related to Fabric by navigating to the `samples/fabric/fabric-cli` folder (_the Go CLI doesn't support asset transfer yet_).
 
 Similarly, assuming that the corDapp `cordaSimpleApplication` has been deployed in the Corda network `Corda_Network`, run the following steps related to Corda by navigating to the `samples/corda/corda-simple-application` folder.
-- Create a `network-id` for the Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients transfer get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` to fetch the name of the parties `PartyA` or `PartyB` respectively).
+- Create a `network-id` for the Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients util get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` to fetch the name of the parties `PartyA` or `PartyB` respectively).
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
   ```
@@ -261,13 +261,13 @@ The above steps complete a successful asset transfer from the Fabric network `ne
 ## 4. Corda with Fabric
 A Corda network transfers some tokens owned by `PartyA` (`CORDA_PORT=10006`) to `Alice` in a Fabric network.
 
-### **Transfer or recover token (fungible) assets**
+### Transfer or recover token (fungible) assets
 
 Assuming that the corDapp `cordaSimpleApplication` has been deployed in the Corda network `Corda_Network`, run the following steps related to Corda by navigating to the `samples/corda/corda-simple-application` folder.
 
 Similarly, assume that the `simpleassettransfer` chaincode has been deployed in Fabric network `network1`, run the following steps related to Fabric by navigating to the `samples/fabric/fabric-cli` folder (_the Go CLI doesn't support asset transfer yet_).
 
-- Create a `network-id` for the Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients transfer get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` to fetch the name of the parties `PartyA` or `PartyB` respectively).
+- Create a `network-id` for the Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients util get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` to fetch the name of the parties `PartyA` or `PartyB` respectively).
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state "Corda_Network" -m "O=PartyA,L=London,C=GB;O=PartyB,L=London,C=GB"
   ```
