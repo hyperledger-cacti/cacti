@@ -6,7 +6,7 @@
 
 # Hyperledger Cactus<br>Whitepaper <!-- omit in toc -->
 
-## Version 0.1 (Early Draft) <!-- omit in toc -->
+## Version 0.2<!-- omit in toc -->
 
 <img src="./pontus-wellgraf-agCzLSG4_gE-unsplash-cropped-compressed.jpg" width="700">
 Photo by Pontus Wellgraf on Unsplash
@@ -25,12 +25,13 @@ Photo by Pontus Wellgraf on Unsplash
 | Shingo Fujimoto                | shingo_fujimoto@fujitsu.com               |
 | Takuma Takeuchi                | takeuchi.takuma@fujitsu.com               |
 | Tracy Kuhrt                    | tracy.a.kuhrt@accenture.com               |
-| Rafael Belchior                | rafael.belchior@tecnico.ulisboa.pt        |
+| Rafael Belchior                | rbelchior@blockdaemon.com      |
 
 # Document Revisions <!-- omit in toc -->
 
 | Date of Revision      | Description of Changes Made                            |
 |-----------------------|--------------------------------------------------------|
+| March 2022         | Abstract, theoretical framework draft                                          |
 | February 2020         | Initial draft                                          |
 
 
@@ -38,11 +39,11 @@ Photo by Pontus Wellgraf on Unsplash
 
 - [1. Abstract](#1-abstract)
 - [2. Introduction to Blockchain Interoperability](#2-introduction-to-blockchain-interoperability)
-  - [2.1 Terminology of Blockchain Interoperability](#21-terminology-of-blockchain-interoperability)
-    - [2.1.1 Ledger Object Types](#211-ledger-object-types)
-    - [2.1.2 Blockchain Interoperability Types](#212-blockchain-interoperability-types)
-    - [2.1.3 Burning or Locking of Assets](#213-burning-or-locking-of-assets)
-  - [2.2 Footnotes (Introduction)](#22-footnotes-introduction)
+  - [2.2 Interoperability mode](#22-interoperability-mode)
+  - [2.3 Connection mode](#23-connection-mode)
+  - [2.4 Blockchain Interoperability Solution Types](#24-blockchain-interoperability-solution-types)
+  - [2.5 Blockchain Interoperability Design Patterns](#25-blockchain-interoperability-design-patterns)
+  - [2.6 General Workflow to Build a cross-chain decentralized application](#26-general-workflow-to-build-a-cross-chain-decentralized-application)
 - [3. Example Use Cases](#3-example-use-cases)
   - [3.1 Car Trade](#31-car-trade)
   - [3.2 Electricity Trade](#32-electricity-trade)
@@ -145,58 +146,80 @@ Photo by Pontus Wellgraf on Unsplash
 
 # 1. Abstract
 
-Blockchain technologies are growing in usage, but fragmentation is a big problem that may hinder reaching critical levels of adoption in the future.
+"Before a technology unlocks its full range of applications, it first undergoes underestimation. Distributed Ledger Technology (DLT), including blockchain, is no exception and is here to stay". 
+Hundreds of blockchains exist, supporting diverse use cases: from cryptocurrencies, to digital identity, supply chain, and education certification. The trends towards using blockchain for those are increasing. A recent report from Gartner predicts that by 2023, 35% of enterprise
+blockchain applications will integrate with decentralized applications and services. Many blockchain ecosystems. Blockchain is slowly but steadily becoming an infrastructure for global value exchange and distributed computation" [[6](#8-references)].
 
-We propose a protocol and it's implementation to connect as many of them as possible in an attempt to solve the fragmentation problem by creating a heterogeneous system architecture <sup>[1](#8-references)</sup>.
+
+
+It allows communication between systems to exchange data and digital assets, leading to more diverse and innovative solutions to real-world problems. It allows synergies across ecosystems and leverages network effects, leading to a similar boom that the rise of the Internet has seen. This way, no blockchain should become a single point of failure, and we contribute directly to the decentralization of the technology.
+
+However, most blockchains were not createed with interoperability in mind, being standalone networks. Connecting those efficiently and securely remains an open problem. 
+
+
+
+Hyperledger Cactus is an open-source project connecting distributed ledgers to enterprise systems via a set of plugins. Plugins can be  _business logic plugins_, _connector plugins_, _tooling plugins_, or _core packages_. Business logic plugins implement cross-chain use cases (e.g., asset exchange across DLTs). Connector plugins implement blockchain clients, allowing Cactus nodes to connect to blockchains (e.g., Hyperledger Fabric connector). Tooling plugins support the development of business logic plugins (e.g., cryptography plugins, storage plugins). Core packages support the creation of Cactus nodes and their consortia (e.g., cactus-core).  
+
+Cactus is blockchain-agnostic and provides a modular architecture for bespoke cross-chain business logic to be deployed on multiple heterogeneous blockchain infrastructures. Cactus then aims to be the foundation of mature blockchain ecosystems by directly supporting businessses that are inherently multi-system. By integrating blockchains with other systems in a systematic and unified approach, Cactus minimizes security risks.
+
+Cactus also introduces an innovation on the space: the possibility to run decentralized cross-chain use cases by leveraging a consortium Cactus nodes. Current efforts are on studying this scheme from an academic perspective.
 
 # 2. Introduction to Blockchain Interoperability
 
-There are two inherent problems<sup>[a](#22-footnotes-introduction)</sup> that have to be solved when connecting different blockchains:
-* How to provide a proof of the networkwide<sup>[b](#22-footnotes-introduction)</sup> ledger state of a connected blockchain from the outside?
-* How can other entities verify a given proof of the state of a connected blockchain
-from the outside?
+This section acts as a building block to describe the different key components of blockchain interoperability: the problem of interoperability, interoperability mode, connection mode, and solution type.
 
-The `Cactus` consortium operates for each connected blockchain a group of validator nodes, which as a group provides the proofs of the state of the connected ledger. The group of validator nodes runs a consensus algorithm to agree on the state of the underlying blockchain. Since a proof of the state of the blockchain is produced and signed by several validator nodes<sup>[c](#22-footnotes-introduction)</sup> with respect to the rules of the consensus algorithm, the state of the underlying blockchain is evaluated networkwide.
+Interoperating blockchains imply two fundamental problems:
+1) how to represent internal state to third-party blockchains, and 2) how to guarantee that business logic operating in multiple blockchains is sound.
 
-The validator nodes are ledger-specific plug-ins, hence a smart contract on the connected blockchain can enable the ledger-specific functionalities necessary for a validator node to observe the ledger state to finalize a proof. The validator nodes are easier discovered from the outside than the blockchain nodes. Hence, the benefit of operating the `Cactus` network to enable blockchain interoperability relies on the fact that for any cross-blockchain interaction the same type of validator node signatures can be used. That means, the cross-blockchain interaction can be done canonically with the validator node signatures in  `Cactus` rather than having to deal with many different ledger-specific types of blockchain node signatures.
-
-Outside entities (verifier nodes) can request and register the public keys of the validator
-nodes of a blockchain network that they want to connect to. Therefore, they can verify the signed proofs of the state of the blockchain since they have the public keys of the validator nodes. This implies that the verifier nodes trust the validator nodes as such they trust the `Cactus` consortium operating the validator nodes.
+The first point is important so the interoperation system can act upon reliable and up-to-date data. The second point depends on the specific cross-chain use case to be implemented. For instance, if the cross-chain use case is a bridge, then cross-chain double spend must be avoided.
 
 
+## 2.2 Interoperability mode
 
 
-<img src="./cactus_overview.png" width="400"><br>Figure description: V1, V2, and V3 are validator nodes which provide proofs of the underlying blockchain network through ledger-specific plug-ins. V1, V2, and V3 run a consensus algorithm which is independent of the consensus algorithm run by the blockchain network nodes N1, N2, N3, N4, and N5.</img>
-
-## 2.1 Terminology of Blockchain Interoperability
-
-
-This section acts as a building block to describe the different flavors of blockchain interoperability. Business use cases will be built on these simple foundation blocks leveraging a mix of them simultaneously and even expanding to several blockchains interacting concurrently.
+The interoperability mode answers the “what” question: what is the artifact managed by the blockchain
+interoperability solution. Modes are (based on [[6](#8-references)]):
 
 
-### 2.1.1 Ledger Object Types
+1. Data Transfer: data is copied from one DLT to another, with an optional intermediate processing step. For example, copying price information from one DLT into another. Data can be copied from one ledger to the other (typically no cross-chain conditions are implied in data transfers)
 
+2. Asset Transfer: unilateral or bilateral asset transfers. Assets are transferred from one DLT
+network to another (implies burning or locking the asset on the source DLT network). For example, locking Bitcoin to a multi-signature address on the bitcoin
+blockchain and minting a representative asset on the Ethereum blockchain.
 
-To describe typical interoperability patterns between different blockchains, the types of objects stored on a ledger have to be distinguished. The following three types of objects stored on a ledger are differentiated as follows:
+3. Asset Exchange: atomic asset transfers. Assets are exchanged in their respective DLT network,
+i.e., no transfers across DLT networks occur. Participants need to be present in both chains
+for this exchange to happen. For example, using hash time lock contracts.
 
-* FA: Fungible asset (value token/coin)  – cannot be duplicated on different ledgers
-* NFA: Non-fungible asset – cannot be duplicated on different ledgers<sup>[d](#22-footnotes-introduction)</sup>
-* D: Data – can be duplicated on different ledgers
-
-
-Difference between a fungible (FA) and a non-fungible asset (NFA)
-
-A fungible asset is an asset that can be used interchangeably with another asset of the same type, like a currency. For example, a 1 USD bill can be swapped for any other 1 USD bill. Cryptocurrencies, such as ETH (Ether) and BTC (Bitcoin), are FAs. A non-fungible asset is an asset that cannot be swapped as it is unique and has specific properties. For example, a car is a non-fungible asset as it has unique properties, such as color and price. CryptoKitties are NFAs as well. There are two standards for fungible and non-fungible assets on the Ethereum network (ERC-20 Fungible Token Standard and ERC-721 Non-Fungible Token Standard).
-
-Difference between an asset (FA or NFA) and data (D)
+Assets typically imply cross-chain logic to preserve their value in both source and target chains. Asset types include fungible assets (value token/coin) non-fungibles assets (non dividable assets).  A fungible asset is an asset that can be used interchangeably with another asset of the same type, like a currency. For example, a 1 USD bill can be swapped for any other 1 USD bill. Cryptocurrencies, such as ETH (Ether) and BTC (Bitcoin), are FAs. A non-fungible asset is an asset that cannot be swapped as it is unique and has specific properties. For example, a car is a non-fungible asset as it has unique properties, such as color and price. CryptoKitties are NFAs as well. There are two standards for fungible and non-fungible assets on the Ethereum network (ERC-20 Fungible Token Standard and ERC-721 Non-Fungible Token Standard).
 
 Unicity applies to FAs and NFAs meaning it guarantees that only one valid representation of a given asset exists in the system. It prevents double-spending of the same token/coin in different blockchains. The same data package can have several representations on different ledgers while an asset (FA or NFA) can have only one representation active at any time, i.e., an asset exists only on one blockchain while it is locked/burned on all other blockchains. If fundamental disagreement persists in the community about the purpose or operational upgrades of a blockchain, a hard fork can split a blockchain creating two representations of the same asset to coexist. For example, Bitcoin split into Bitcoin and Bitcoin Cash in 2017. Forks are not addressing blockchain interoperability so the definition of unicity applies in a blockchain interoperability context. A data package that was once created as a copy of another data package might divert from its original one over time because different blockchains might execute different state changes on their data packages.
 
 
-### 2.1.2 Blockchain Interoperability Types
+## 2.3 Connection mode
 
-Blockchain interoperability implementations can be classified into the following types:
+There are three methods for a dApp or mdApp to connect to a DLT.
+These mechanisms are called the connection modes. Those are:
 
+1. DLT Nodes: DLT nodes are the software systems that run a DLT protocol. 
+
+2. DLT Proxy: "a DLT node proxy manages the routing and load balancing issues between
+an application and one or more DLT nodes, creating logical separation. To an application,
+interacting with a DLT node proxy is nearly identical to interacting with a DLT node as the
+message requests and responses will be virtually the same. The only possible difference may
+be identifying metadata in the messages to track the DLT node proxy users (e.g., for rate
+limiting reasons)". [[6](#8-references)]
+
+3. DLT Gateways: Like a DLT node proxy, a DLT gateway also manages the routing and load
+balancing issues between an application and one or more DLT nodes, creating logical separation. Example: Polkadot’s block explorer; Self-hosted ODAP gateways; Quant Network’s
+Overledger. [[6](#8-references)]
+
+## 2.4 Blockchain Interoperability Solution Types
+
+Please refer to [[5](#8-references)] or [[6](#8-references)] for a comprehensive and systematic taxonomies.
+
+
+## 2.5 Blockchain Interoperability Design Patterns
 
 * Ledger transfer:
 
@@ -269,47 +292,25 @@ Legend:
 
 
 
-### 2.1.3 Burning or Locking of Assets
+* Burning or Locking of Assets
 
 
 To guarantee unicity, an asset (NFA or FA) has to be burned or locked before being transferred into another blockchain. Locked assets can be unlocked in case the asset is retransferred back to its original blockchain, whereas the burning of assets is an irreversible process. It is worth noting that locking/burning of assets is happening during a ledger transfer but can be avoided in use cases where both parties have wallets/accounts on both ledgers by using atomic swaps instead. Hence, most cryptocurrency exchange platforms rely on atomic swaps and do not burn FAs. For example, ordinary coins, such as Bitcoin or Ethereum, can only be generated by mining a block. Therefore, Bitcoin or Ethereum exchanges have to rely on atomic swaps rather than two-way ledger transfers because it is not possible to create BTC or ETH on the fly. In contrast, if the minting process of an FA token can be leveraged on during a ledger transfer, burning/locking of an asset becomes a possible implementation option, such as in the ETH token ledger transfer from the old PoW chain (Ethereum 1.0) to the PoS chain (aka Beacon Chain in Ethereum 2.0). Burning of assets usually applies more to tokens/coins (FAs) and can be seen as a donation to the community since the overall value of the cryptocurrency increases.
 
 Burning of assets can be implemented as follows:
 
-* Assets are sent to the address of the coinbase/generation transaction<sup>[h](#22-footnotes-introduction)</sup> in the genesis block. A coinbase/generation transaction is in every block of blockchains that rely on mining. It is the address where the reward for mining the block is sent to. Hence, this will burn the tokens/coins in the address of the miner that mined the genesis block. In many blockchain platforms, it is proven that nobody has the private key to this special address.
+1. Assets are sent to the address of the coinbase/generation transaction<sup>[h](#22-footnotes-introduction)</sup> in the genesis block. A coinbase/generation transaction is in every block of blockchains that rely on mining. It is the address where the reward for mining the block is sent to. Hence, this will burn the tokens/coins in the address of the miner that mined the genesis block. In many blockchain platforms, it is proven that nobody has the private key to this special address.
 
-* Tokens/Coins are subtracted from the user account as well as optionally from the total token/coin supply value.
-
-
+2. Tokens/Coins are subtracted from the user account as well as optionally from the total token/coin supply value.
 
 
+## 2.6 General Workflow to Build a cross-chain decentralized application 
+Cactus streamlines the development of cross-chain decentralized application, also known as multiple DLT apps (mDapps) by having three major pilars: 1) robust testing infrastructure (tooling plugins), 2) a modular architecture 
+enabling to combine plugins according to each use case necessity into a set of API servers encapsulated by a Cactus node. Cactus nodes can integrate innovative core plugins that combine them in different ways. Finally 3), business logic plugins that implement the core logic of a business utilizing infrastructure that Cactus provides access. 
 
-## 2.2 Footnotes (Introduction)
-a: There is an alternative approach for an outside entity A to verify the state of a connected blockchain if this connected blockchain uses Merkle Trees to store its blockchain state. An outside entity A can store the Merkle Tree roots from the headers of committed blocks of a connected blockchain locally to verify any state claims about the connected blockchain. Any untrusted entity can then provide a state of the connected blockchain, such as a specific account balance on the connected blockchain, because the outside entity A can act as a lightweight client and use concepts like simple payment verification (SPV) to verify that the state claim provided by the untrusted entity is valid. SPV can be done without checking the entire blockchain history. Polkadot uses this approach in its Relay Chain and the BTCRelay on the Ethereum blockchain uses this approach as well. Private blockchains do not always keep track of their state through Merkel trees and signatures produced by nodes participating in such private blockchains are rarely understood by outside parties not participating in the network. For that reason, the design principle of `Cactus` is to rely on the canonical validator node signatures for verifying proofs of blockchain states. Since `Cactus` should be able to incorporate any type of blockchain in the future, `Cactus` can not use the approach based on Merkle Trees.
+In more technical terms, a `ConfigService`object is initialized for each Cactus node (describing, for example, the private keys for that Cactus node, public keys of the members of the consortium, protocols supported). Then, multiple plugins that expose a REST API can be installed on the node.  Those plugins are accessible to the node via the plugin registry: an abstraction that allows one to easily manage and configure installed plugins, including business logic plugins.
 
-b: A networkwide ledger view means that all network nodes have to be considered to derive the state of the blockchain which means that it is not the state of just one single blockchain node.
-
-c: The validator nodes in `Cactus` have similarities with trusted third-party intermediaries. The terminology trusted third-party intermediaries, federation schemes, and notary schemes are used when a blockchain can retrieve the state of another blockchain through these intermediaries. In contrast, the terminology relay is used when a chain can retrieve the state of another blockchain through reading, writing, or event listening operations directly rather than relying on intermediaries. This terminology is used in the central Relay Chain in Polkadot and the BTCRelay on the Ethereum network.
-
-d: There might be use cases where it is desired to duplicate an NFA on different ledgers. Nonetheless, we stick to the terminology that an NFA cannot be duplicated on a different ledger because an NFA can be represented as data packages on different ledgers in such cases. Data is a superset of NFAs.
-
-e: In the case of data, the data can be copied from Blockchain A to Blockchain B. It is optional to lock/burn/delete the data object on Blockchain A after copying.
-
-
-f: The process in Blockchain A and the process in Blockchain B can be seen to happen concurrently, and consecutively, in atomic swaps, and ledger interactions, respectively.
-
-g: An action can be either a read transaction or a write transaction performed on Blockchain A or an event that is emitted by Blockchain A.
-Some examples of that type of ledger interoperability are as follows:
-* Cross-chain oracles which are smart contracts that read the state of another blockchain before acting on it.
-* Smart contracts that wait until an event happens on another blockchain before acting on it.
-* Asset encumbrance smart contracts which are smart contracts that lock up assets on Blockchain A with unlocking conditions depending on actions happening in Blockchain B.
-
-
-
-
-h: Alternatively, any address from that assets cannot be recovered anymore can be used. A verifiable proof for the irreversible property of that address should be given.
-
-
+Client applications can then be built to operate the Cactus nodes, manage deployments, and call business logic plugins.
 
 # 3. Example Use Cases
 
@@ -1669,16 +1670,24 @@ The blockchain migrator feature paves the way for building a solution that perfo
 
 4: H.M.N. Dilum Bandara, Xiwei Xu, and Ingo Weber. 2020. [Patterns for blockchain data migration](https://arxiv.org/abs/1906.00239). European Conf. on Pattern Languages of Programs 2020 (EuroPLoP 2020).
 
-5: Belchior,  A.  Vasconcelos,  S.  Guerreiro,  and  M.  Correia,  “A  Surveyon Blockchain Interoperability: Past, Present, and Future Trends,”arXiv,2020. [Online]. Available: http://arxiv.org/abs/2005.14282
+5: Rafael Belchior, André Vasconcelos, Sérgio Guerreiro, and Miguel Correia. 2021. A Survey on Blockchain Interoperability: Past, Present, and Future Trends. ACM Comput. Surv. 54, 8, Article 168 (November 2022), 41 pages. DOI:https://doi.org/10.1145/3471140
+
+6: Belchior, Rafael; Riley, Luke; Hardjono, Thomas; Vasconcelos, André; Correia, Miguel (2022): Do You Need a Distributed Ledger Technology Interoperability Solution?. TechRxiv. Preprint. https://doi.org/10.36227/techrxiv.18786527.v1 
+
+7: Rafael Belchior, André Vasconcelos, Miguel Correia, Thomas Hardjono, Hermes: Fault-tolerant middleware for blockchain interoperability,
+Future Generation Computer Systems,
+Volume 129, 2022, Pages 236-251
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
 # 10. Recommended Reference
 Please use the following BibTex entry to cite this whitepaper:
 
-@article{hyperledgercactus,
-  title={Hyperledger Cactus Whitepaper v0.1},
-  author={Montgomery, Hart and Borne-Pons, Hugo and Hamilton, Jonathan and Bowman, Mic and Somogyvari, Peter and Fujimoto, Shingo and Takeuchi, Takuma and Kuhrt, Tracy and Belchior, Rafael},
-  journal={URL: https://github. com/hyperledger/cactus/blob/main/whitepaper/whitepaper. md},
-  year={2020}
+@report{montgomery_hyperledger_2022,
+	title = {Hyperledger Cactus Whitepaper},
+	url = {https://github.com/hyperledger/cactus/blob/main/docs/whitepaper/whitepaper.md},
+	number = {2},
+	institution = {Hyperledger},
+	author = {Montgomery, Hart and Borne-Pons, Hugo and Hamilton, Jonathan and Bowman, Mic and Somogyvari, Peter and Fujimoto, Shingo and Takeuchi, Takuma and Kuhrt, Tracy and Belchior, Rafael},
+	date = {2022},
 }
