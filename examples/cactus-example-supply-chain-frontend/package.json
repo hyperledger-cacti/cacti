@@ -2,18 +2,50 @@
   "name": "@hyperledger/cactus-example-supply-chain-frontend",
   "version": "1.0.0-rc.3",
   "description": "The frontend component of an example project demonstrating how Cactus can be used for cross-chain dapp development.",
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Blockchain Integration",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    }
+  ],
   "files": [
     "www/*"
   ],
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
     "build": "ng build --verbose",
-    "serve": "ng serve",
-    "serve:proxy": "ng serve -- --proxy-config proxy.conf.json",
     "build:dev:frontend": "ng build",
     "build:prod:frontend": "ng build",
-    "prepublishOnly": "ng build"
+    "ng": "ng",
+    "prepublishOnly": "ng build",
+    "serve": "ng serve",
+    "serve:proxy": "ng serve -- --proxy-config proxy.conf.json",
+    "start": "ng serve"
   },
   "dependencies": {
     "@angular/common": "12.2.0",
@@ -61,43 +93,11 @@
     "tslint": "6.1.3",
     "typescript": "4.3.5"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "engines": {
     "node": ">=10",
     "npm": ">=6"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
-  },
-  "keywords": [
-    "Hyperledger",
-    "Cactus",
-    "Blockchain Integration",
-    "Distributed Ledger Technology"
-  ],
-  "author": {
-    "name": "Hyperledger Cactus Contributors",
-    "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
-  },
-  "contributors": [
-    {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
-    },
-    {
-      "name": "Peter Somogyvari",
-      "email": "peter.somogyvari@accenture.com",
-      "url": "https://accenture.com"
-    }
-  ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
-  },
-  "homepage": "https://github.com/hyperledger/cactus#readme"
+  "publishConfig": {
+    "access": "public"
+  }
 }
