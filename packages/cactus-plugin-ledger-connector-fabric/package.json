@@ -2,43 +2,6 @@
   "name": "@hyperledger/cactus-plugin-ledger-connector-fabric",
   "version": "1.0.0-rc.3",
   "description": "Allows Cactus nodes to connect to a Fabric ledger.",
-  "main": "dist/lib/main/typescript/index.js",
-  "mainMinified": "dist/cactus-plugin-ledger-connector-fabric.node.umd.min.js",
-  "browser": "dist/cactus-plugin-ledger-connector-fabric.web.umd.js",
-  "browserMinified": "dist/cactus-plugin-ledger-connector-fabric.web.umd.min.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
-    "codegen:openapi": "npm run generate-sdk",
-    "codegen": "run-p 'codegen:*'",
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js"
-  },
-  "watch": {
-    "codegen:openapi": {
-      "patterns": [
-        "./src/main/json/openapi.json"
-      ]
-    }
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=10",
-    "npm": ">=6"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
-  },
   "keywords": [
     "Hyperledger",
     "Cactus",
@@ -46,6 +9,15 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
@@ -63,11 +35,23 @@
       "url": "https://accenture.com"
     }
   ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-plugin-ledger-connector-fabric.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
-  "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "@fidm/x509": "1.2.1",
     "@hyperledger/cactus-common": "1.0.0-rc.3",
@@ -108,5 +92,21 @@
     "@types/uuid": "8.3.1",
     "fs-extra": "10.0.0",
     "ws-wallet": "1.1.5"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-plugin-ledger-connector-fabric.web.umd.min.js",
+  "mainMinified": "dist/cactus-plugin-ledger-connector-fabric.node.umd.min.js",
+  "watch": {
+    "codegen:openapi": {
+      "patterns": [
+        "./src/main/json/openapi.json"
+      ]
+    }
   }
 }

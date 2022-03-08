@@ -1,5 +1,6 @@
 import esMain from "es-main";
 import { checkOpenApiJsonSpecs } from "./check-open-api-json-specs";
+import { checkPackageJsonSort } from "./check-package-json-sort";
 import { checkSiblingDepVersionConsistency } from "./check-sibling-dep-version-consistency";
 
 export async function runCustomChecks(
@@ -27,6 +28,13 @@ export async function runCustomChecks(
   {
     const req = { argv, env };
     const [success, errors] = await checkSiblingDepVersionConsistency(req);
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
+
+  {
+    const req = { argv, env };
+    const [success, errors] = await checkPackageJsonSort(req);
     overallErrors = overallErrors.concat(errors);
     overallSuccess = overallSuccess && success;
   }
