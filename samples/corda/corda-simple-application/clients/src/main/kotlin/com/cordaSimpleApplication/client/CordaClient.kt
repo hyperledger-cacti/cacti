@@ -17,6 +17,7 @@ import com.github.ajalt.clikt.core.subcommands
 class App : CliktCommand() {
     val config by findOrSetObject { mutableMapOf<String, String>() }
     override fun run() {
+        config["NETWORK_NAME"] = System.getenv("NETWORK_NAME") ?: "Corda_Network"
         config["CORDA_HOST"] = System.getenv("CORDA_HOST") ?: "localhost"
         config["CORDA_PORT"] = System.getenv("CORDA_PORT") ?: "10006"
         config["RELAY_TLS"] = System.getenv("RELAY_TLS") ?: "false"

@@ -478,12 +478,15 @@ object ReclaimPledgedAsset {
             val assetClaimStatus = AssetTransfer.AssetClaimStatus.parseFrom(payloadDecoded)
             println("Asset claim status details obtained via interop query: ${assetClaimStatus}")
 
-            val assetPledgeStateAndRef = subFlow(GetAssetPledgeStateById(pledgeId))
-            if (assetPledgeStateAndRef == null) {
+            val assetPledgeStateAndRefs = serviceHub.vaultService.queryBy<AssetPledgeState>(
+                QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+            ).states
+            if (assetPledgeStateAndRefs.isEmpty()) {
                 println("AssetPledgeState for Id: ${linearId} not found.")
                 Left(Error("AssetPledgeState for Id: ${linearId} not found."))
             } else {
-                val assetPledgeState = assetPledgeStateAndRef.state.data
+                val assetPledgeStateAndRef: StateAndRef<AssetPledgeState> = assetPledgeStateAndRefs.first()
+                val assetPledgeState: AssetPledgeState = assetPledgeStateAndRef.state.data
                 println("Party: ${ourIdentity} ReclaimPledgeState: ${assetPledgeState}")
 
                 if (assetClaimStatus.expiryTimeSecs != assetPledgeState.expiryTimeSecs) {
