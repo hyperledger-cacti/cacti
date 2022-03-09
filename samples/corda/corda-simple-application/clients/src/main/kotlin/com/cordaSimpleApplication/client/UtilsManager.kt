@@ -39,6 +39,8 @@ fun fetchCertBase64Helper(proxy: CordaRPCOps) : String {
 
         val cert: X509Certificate = proxy.nodeInfo().identityAndCertFromX500Name(partyName).certificate
         val certPem: String = x509CertToPem(cert)
+        println("certPem: $certPem")
+        println("certPemBase64: ${Base64.getEncoder().encodeToString(certPem.toByteArray())}")
         certPemBase64 = Base64.getEncoder().encodeToString(certPem.toByteArray())
     } catch (e: Exception) {
         println(e.toString())

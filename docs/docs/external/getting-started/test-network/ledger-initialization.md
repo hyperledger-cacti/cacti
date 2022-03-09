@@ -204,7 +204,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
   * Update value for `relayEndpoint` for `Corda_Network` as `relay-corda:9081`.
   * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
   * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
-  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partyb_1:10003`.
+  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
 - Create `chaincode.json` file by copying `chaincode.json.template`. Keep the default values unchanged.
 - Create a `.env` file by copying `.env.template` and setting the following parameter values:
   * If Relays and Drivers are deployed in the host machine:
@@ -271,26 +271,34 @@ The Corda network ledger (or _vault_ on each node) must be initialized with acce
 Bootstrap the Corda networks and application states as follows (_the following instructions will initialize either or both Corda networks, depending on which of those are up and running_):
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following:
-    ```bash
-    ./configureCordaNetwork.sh
-    CORDA_PORT=10006 ./clients/build/install/clients/bin/clients util save-cert
-    ./configureCordaNetwork2.sh
-    NETWORK_NAME=Corda_Network2 CORDA_PORT=30009 ./clients/build/install/clients/bin/clients util save-cert
-    ```
+  ```bash
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients configure network
+  NETWORK_NAME="Corda_Network" CORDA_PORT=10006 ./clients/build/install/clients/bin/clients util save-cert
+  NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients configure network
+  NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients util save-cert
+  ```
 - Run the following, only after running `./scripts/initAssetsForTransfer.sh` on the Fabric networks.
   ```bash
   cp ../../fabric/fabric-cli/src/data/remoteNetworkUsers/network1_UsersAndCerts.json clients/src/main/resources/config/remoteNetworkUsers
   cp ../../fabric/fabric-cli/src/data/remoteNetworkUsers/network2_UsersAndCerts.json clients/src/main/resources/config/remoteNetworkUsers
   ```
-- Create `remote-network-config.json` file by copying `remote-network-config.json.template`. Use default values if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
+- Run the following:
+  ```bash
+  cp clients/src/main/resources/config/remote-network-config.json.template clients/src/main/resources/config/remote-network-config.json
+  ```
+  Use default values in `remote-network-config.json` if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
   * Update value for `relayEndpoint` for `network1` as `relay-network1:9080`.
   * Update value for `relayEndpoint` for `network2` as `relay-network2:9083`.
   * Update value for `relayEndpoint` for `Corda_Network` as `relay-corda:9081`.
   * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
   * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
-  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partyb_1:10003`.
-  * Update value for `flowPackage` as `net.corda.samples.tokenizedhouse.flows` for the networks `Corda_Network` and `Corda_Network2`, if the CorDapp `fungible-house-token` was deployed instead of `cordaSimpleApplication` on the networks.
-    - This update is required even if relays and drivers are deployed in the host machine.
+  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
+- Run the following:
+  ```bash
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
+  NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
+  ```
+   * To exercise Fabric-Corda (or Corda-Fabric) `asset-transfer`, don't need to run the above `network-id create-state` command for `Corda_Network2`.
 ### Next Steps
 
 The test networks are now configured and their ledgers are initialized. You can now run the [asset transfer flows](../interop/asset-transfer.md).
