@@ -39,8 +39,6 @@ fun fetchCertBase64Helper(proxy: CordaRPCOps) : String {
 
         val cert: X509Certificate = proxy.nodeInfo().identityAndCertFromX500Name(partyName).certificate
         val certPem: String = x509CertToPem(cert)
-        println("certPem: $certPem")
-        println("certPemBase64: ${Base64.getEncoder().encodeToString(certPem.toByteArray())}")
         certPemBase64 = Base64.getEncoder().encodeToString(certPem.toByteArray())
     } catch (e: Exception) {
         println(e.toString())
@@ -156,9 +154,8 @@ fun getUserCertFromFile(userID: String, networkID: String): String {
             usersAndCertsJSON = JSONObject(usersAndCertsFile.readText(Charsets.UTF_8))
         }
 
-        val x500NameOfuserID = CordaX500Name.parse(userID).toString()
         // throw exception if the userID is not present in the file
-        if (!usersAndCertsJSON.has(x500NameOfuserID)) {
+        if (!usersAndCertsJSON.has(userID)) {
             println("File $filepath doesn't contain the certificate of user $userID.")
             throw IllegalStateException("File $filepath doesn't contain the certificate of user $userID.")
         }
