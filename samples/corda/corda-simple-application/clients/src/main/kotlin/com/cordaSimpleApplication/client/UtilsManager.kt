@@ -160,7 +160,7 @@ fun getUserCertFromFile(userID: String, networkID: String): String {
             throw IllegalStateException("File $filepath doesn't contain the certificate of user $userID.")
         }
 
-        certBase64 = usersAndCertsJSON.getString(x500NameOfuserID)
+        certBase64 = usersAndCertsJSON.getString(userID)
     } catch (e: Exception) {
         println(e.toString())
         exitProcess(1)
