@@ -145,7 +145,7 @@ Assume that the CorDapp `cordaSimpleApplication` has been deployed in both netwo
   NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --fungible --timeout="3600" --import-network-id='Corda_Network2' --recipient='O=PartyA, L=London, C=GB' --param='t1:5'
   ```
   Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006  ./clients/build/install/clients/bin/clients transfer get-pledge-state -pid <pledge-id>`).
-- Check the token asset balance for `PartyA` in `Corda_Network` by running the command, and the output should not include the asset `t1:5` issued earlier.
+- Check the token asset balance for `PartyA` in `Corda_Network` by running the below command, and the output should not include the asset `t1:5` issued earlier.
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type t1
   ``` 
@@ -175,7 +175,7 @@ Assume that the CorDapp `cordaSimpleApplication` has been deployed in both netwo
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --timeout="3600" --import-network-id='Corda_Network2' --recipient='O=PartyA, L=London, C=GB' --param='bond01:a10'
   ```
   Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006  ./clients/build/install/clients/bin/clients transfer get-pledge-state -pid <pledge-id>`).
-- Check the bond asset balance for `PartyA` in `Corda_Network` by running the command, and the output should not include the asset `bond01:a10` issued earlier.
+- Check the bond asset balance for `PartyA` in `Corda_Network` by running the below command, and the output should not include the asset `bond01:a10` issued earlier.
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients bond get-assets-by-type 'bond01'`
   ``` 
@@ -266,7 +266,11 @@ Similarly, assume that the `simpleassettransfer` chaincode has been deployed in 
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --fungible --timeout="3600" --import-network-id='network1' --recipient='alice' --param='token1:5'
   ```
-  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006  ./clients/build/install/clients/bin/clients transfer get-pledge-state -pid <pledge-id>`; moreover, check the token asset balance for `PartyA` in `Corda_Network` by running the command `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type token1` which should not include the asset `token1:5` issued earlier).
+  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid <pledge-id>` and `CORDA_PORT=10006  ./clients/build/install/clients/bin/clients transfer get-pledge-state -pid <pledge-id>`).
+- Check the token asset balance for `PartyA` in `Corda_Network` by running the below command, and the output should not include the asset `token1:5` issued earlier.
+  ```
+  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type token1`
+  ``` 
 - Verify that `alice` in `network1` owns `10000` tokens as follows:
    ```bash
    ./scripts/getTokenBalance.sh network1 alice
