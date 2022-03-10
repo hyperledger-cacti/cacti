@@ -5,7 +5,7 @@
 - By default, it assumes that indy pool is available at `172.16.0.2`
 - You can modify this behavior by editing `Dockerfile` or by setting arg `pool_ip`
 ```
-docker build . -t indy-validator
+./setup_indy.sh
 ```
 
 ## Test

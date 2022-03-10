@@ -7,14 +7,13 @@ RUN apt-get update \
 
 USER indy
 WORKDIR /home/indy
-COPY --chown=indy:indy './validator-python' './validator-python'
-COPY --chown=indy:indy './config' '/etc/cactus'
-COPY --chown=indy 'supervisord.conf' '/etc/'
-RUN cp 'from-indy-sdk/utils.py' './validator-python/validator_socketio_module/'
+COPY --chown=indy:indy './dist/CactusValidatorSocketIOIndy-0.0.1-py3-none-any.whl' '/home/indy'
+RUN pip3 install /home/indy/CactusValidatorSocketIOIndy-0.0.1-py3-none-any.whl
 
-WORKDIR /home/indy/validator-python/
-RUN pip3 install -r requirements.txt
+user root
+RUN python3 /home/indy/.local/lib/python3.8/site-packages/other/post_install_script.py
 
+user indy
 ARG pool_ip=172.16.0.2
 ENV TEST_POOL_IP=$pool_ip
 
