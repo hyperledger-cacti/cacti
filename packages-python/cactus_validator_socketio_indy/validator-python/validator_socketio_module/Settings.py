@@ -1,12 +1,10 @@
 import dataclasses
 import yaml
 
-rootPath = "/"
-
-pathNodeSettings = rootPath + "/etc/cactus/validator_socketio_indy/node-settings.yaml"
-pathNodeValidatorRegistry = rootPath + "/etc/cactus/validator_socketio_indy/node-validator-registry.yaml"
-pathValidatorSettings = rootPath + "/etc/cactus/validator_socketio_indy/validator-001-settings.yaml"
-pathValidatorSecrets = rootPath + "/etc/cactus/validator_socketio_indy/validator-001-secrets.yaml"
+pathNodeSettings = "/etc/cactus-indy/node-settings.yaml"
+pathNodeValidatorRegistry = "/etc/cactus-indy/node-validator-registry.yaml"
+pathValidatorSettings = "/etc/cactus-indy/validator-001-settings.yaml"
+pathValidatorSecrets = "/etc/cactus-indy/validator-001-secrets.yaml"
 
 #dataclass for validator-<DLT id>-settings.yml
 #data members should be equal to yml

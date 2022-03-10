@@ -2,11 +2,12 @@
   "name": "discounted-cartrade",
   "private": true,
   "scripts": {
-    "start": "docker-compose build && docker-compose up",
+    "start": "npm run build_pip_indy_package && docker-compose build && docker-compose up",
     "build": "npm run build-ts && npm run prepare-docker-build",
     "build-ts": "tsc -p ./tsconfig.json",
     "tslint": "tslint -c tslint.json -p tsconfig.json './*.ts'",
-    "prepare-docker-build": "cp -f ../../yarn.lock ./dist/"
+    "prepare-docker-build": "cp -f ../../yarn.lock ./dist/",
+    "build_pip_indy_package": "cd ../../packages-python/cactus_validator_socketio_indy && python3 setup.py bdist_wheel"
   },
   "dependencies": {
     "axios": "0.24.0",
