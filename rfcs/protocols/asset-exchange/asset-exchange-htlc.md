@@ -21,7 +21,7 @@ Hash Time Locked Contracts (HTLCs) is a non-custodial approach to exchanging ass
 
 The following figure describes the flow of a two-party exchange.
 
-<img src="../resources/images/asset-exchange-htlc-example.png" width=80%>
+<img src="../../resources/images/asset-exchange-htlc-example.png" width=80%>
 
 Alice and Bob agree on a deal off-chain to exchange assets A for B. In practice assets A and B could be fungible or non-fungile and the deal is based on their fair value. Alice and Bob also agree on the refund period for the deal and decide who will go first. The process for exchanging the assets then proceeds as follows.
 
@@ -36,7 +36,7 @@ In the event Alice fails to claim Bob's asset before the refund period *t* elaps
 
 ## Overview of Protocol Flow
 
-<img src="../resources/images/asset-exchange-htlc-flow.png" width=95%>
+<img src="../../resources/images/asset-exchange-htlc-flow.png" width=95%>
 
 
 ## Protocol Messages

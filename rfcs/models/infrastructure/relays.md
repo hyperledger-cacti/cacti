@@ -15,5 +15,5 @@
 
 ## Relays for Cross-Ledger Communication
 
-<img src="../resources/images/relay-model-distributed-ledgers.png" width=100%>
+<img src="../../resources/images/relay-model-distributed-ledgers.png" width=100%>
 

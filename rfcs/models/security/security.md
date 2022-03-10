@@ -11,7 +11,7 @@ Security domains are defined on external entities such as a thing, person, organ
 
 A security domain is an abstract concept used to group a set of members to various policies. The relation between the various concepts is shown in the image below.
 
-<img src="../resources/images/security-group.png" width=100%>
+<img src="../../resources/images/security-group.png" width=100%>
 
 ### Members and Traits of Security Domains
 

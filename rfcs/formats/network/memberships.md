@@ -48,7 +48,7 @@ The `type` of a member can be one of the following:
 -   `certificate` - The member is indentified by a certificate chain, if `chain` has a value, otherwise just by `value`
 -   `any` - For use in permissionless networks (see below)
 
-<img src="../resources/images/membership.png" width=100%>
+<img src="../../resources/images/membership.png" width=100%>
 
 ## Examples
 

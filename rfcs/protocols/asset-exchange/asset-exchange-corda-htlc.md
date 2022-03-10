@@ -35,7 +35,7 @@ The procedures for setting up an HTLC one one Corda network, which would need to
 
 Both claiming and refunding transactions can be performed unilaterally because during the locking phase the asset is associated with a Composite key of the two parties.
 
-![Corda HTLC](../resources/images/cordapp-htlc.png)
+![Corda HTLC](../../resources/images/cordapp-htlc.png)
 
 ### Generalisability
 The hash lock encumbrance state and associated contract can be offered as reusable pieces as part of Weaver. These pieces are largely agnostic of the specifics of the application. They can further be instrumented to *emit* custom Weaver events making automation of the orchestration of cross-chain HTLCs possible.

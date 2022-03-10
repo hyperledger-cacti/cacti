@@ -16,7 +16,7 @@
 
 See specification on [events](../models/events.md) for event types.
 
-<img src="../resources/images/event-types.png" width=45%>
+<img src="../../resources/images/event-types.png" width=45%>
 
 ## Event Capture and Delivery
 
@@ -31,7 +31,7 @@ See specification on [events](../models/events.md) for event types.
   * Fine grained control of which application events are visible to drivers might be hard to achieve.
 * Drivers must maintain additional state locally in order to provide delivery guarantees (e.g at least once, sequencing, etc).
 
-<img src="../resources/images/event-capture-application-system.png" width=60%>
+<img src="../../resources/images/event-capture-application-system.png" width=60%>
 
 
 ### Weaver Events
@@ -43,7 +43,7 @@ See specification on [events](../models/events.md) for event types.
   * State for ensuring delivery guarantees, sequencing etc can be tracked on the ledger.
 * The data model for Weaver events are easier to enforce, which applications must comply with.
 
-<img src="../resources/images/event-capture-graphene.png" width=60%>
+<img src="../../resources/images/event-capture-graphene.png" width=60%>
 
 ## Event Proofs
 

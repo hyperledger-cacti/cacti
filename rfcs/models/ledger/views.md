@@ -21,11 +21,11 @@
 
 A view is an abstract representation of state projected from a ledger that is consumable by external clients. Views are uniquely addressable and can either be _static_ (based on a fixed snapshot of the ledger) or _dynamic_ (based on a "current" snaphot of the ledger).
 
-<img src="../resources/images/view-projection.png" width=60%>
+<img src="../../resources/images/view-projection.png" width=60%>
 
 The state represented by a view depends on the underlying ledger and the types of projections made available. Views can represent a single object on the ledger, a collection of objects or any arbitrary computation. The sematics of a view therefore depends on the specific instance of the ledger and the decisions made on what state is externally consumable and in what form.
 
-<img src="../resources/images/view-types.png" width=65%>
+<img src="../../resources/images/view-types.png" width=65%>
 
 
 ## Projecting Views
@@ -40,7 +40,7 @@ Views are manifested using operators called _getters_. View operators are implem
 The schematic representation of getters are dependent on the underlying distributed ledger protocol, but are conceptually abstrated away from clients consuming a view through the use of [_view addresses_](../formats/addressing.md). Although getters can be visible to external clients, their sematics and usage are transparent. This allows networks to use alternate representations for getters without requiring external clients to treat these in different ways. In other words, an external client is free from the understanding the implementation of an operator - the client is interested in the _what_ not the _how_.
 
 
-<img src="../resources/images/view-operator.png" width=65%>
+<img src="../../resources/images/view-operator.png" width=65%>
 
 ### Examples of Getters
 
@@ -83,7 +83,7 @@ See RFCs on specific ledger protocols for getter constructions.
 
 A view is composed of two segments. A segment that contains state from the underlying ledger, accompanied by a cryptographic proof, and a second segment that contains meta-data about the state. The structure of the data segment in a view depends on the underlying ledger protocol and the data schema of the ledger. The meta-data describes attributes of the state including type of proof, ledger protocol and serialization format. The meta-data enables consumers of views to recognize, parse and verify the integrity of views, including long after the view has been constructed.
 
-<img src="../resources/images/view-anatomy.png" width=55%>
+<img src="../../resources/images/view-anatomy.png" width=55%>
 
 
 ## Related Art
