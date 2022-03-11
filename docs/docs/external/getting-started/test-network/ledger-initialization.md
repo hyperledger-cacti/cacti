@@ -57,8 +57,8 @@ Prepare `fabric-cli` for configuration suitably as follows.
     CONFIG_PATH=./config.json
     CHAINCODE_PATH=./chaincode.json
     ```
-  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver and `<chaincode-name>` with the name of the deployed chaincode, either `simpleasset` or `simpleassetwithacl`.
-  * If `simplestate` is deployed, set `<function-name>` to `Create`, and if `simpleassetwithacl` if deployed, set `<function-name>` to `CreateFromRemote`.
+  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver and `<chaincode-name>` with the name of the deployed chaincode, either `simplestate` or `simplestatewithacl`.
+  * If `simplestate` is deployed, set `<function-name>` to `Create`, and if `simplestatewithacl` if deployed, set `<function-name>` to `CreateFromRemote`.
   * Leave the default values unchanged for the other parameters.
 - Run the following command:
   ```bash
@@ -267,11 +267,6 @@ Bootstrap the Corda networks and application states as follows (_the following i
 - Navigate to the `samples/corda/corda-simple-application` folder.
 - Run the following:
   ```bash
-  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients configure network
-  NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients configure network
-  ```
-- Run the following:
-  ```bash
   cp clients/src/main/resources/config/remote-network-config.json.template clients/src/main/resources/config/remote-network-config.json
   ```
   Use default values in `remote-network-config.json` if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
@@ -281,15 +276,14 @@ Bootstrap the Corda networks and application states as follows (_the following i
   * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
   * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
   * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
-- Run only one of the following:
-  * If you wish to test `Corda-Corda` asset-transfer, use the below command.
+- Run the following: 
+  * If Relays and Drivers are deployed in the host machine:
     ```bash
-    NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
-    NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
+    make initialise-vault-asset-transfer
     ```
-  * If you wish to test either `Fabric-Corda` or `Corda-Fabric` asset-transfer, use the below command.
+  * If Relays and Drivers are deployed in the Docker containers:
     ```bash
-    NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
+    make initialise-vault-asset-transfer-docker
     ```
 ### Next Steps
 
