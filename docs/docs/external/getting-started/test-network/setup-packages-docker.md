@@ -219,11 +219,10 @@ Navigate to the `core/relay` folder and run a relay for `Corda_Network` and/or `
   ```bash
   make convert-compose-method2
   ```
-* The `.env.corda` and `.env.corda.tls` files in the `docker/testnet-envs` directory contain environment variables used by the `Corda_Network` relay at startup and runtime. Edit either of these files (depending on whether you wish to start the relay with or without TLS), and update the following value:
-  ```
-  DOCKER_IMAGE_NAME=weaver-relay-server
-  ```
-* Repeat the above step for `.env.corda2` or `.env.corda2.tls` in `docker/testnet-envs` directory, which contain environment variables for the `Corda_Network2` relay.
+* (The `.env.corda` and `.env.corda.tls` files in the `docker/testnet-envs` directory contain environment variables used by the `Corda_Network` relay at startup and runtime.)
+
+* (The `.env.corda2` and `.env.corda2.tls` files in the `docker/testnet-envs` directory contain environment variables used by the `Corda_Network2` relay at startup and runtime.)
+
 * To deploy the relay server for `Corda_Network` without TLS, run:
   ```bash
   make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
