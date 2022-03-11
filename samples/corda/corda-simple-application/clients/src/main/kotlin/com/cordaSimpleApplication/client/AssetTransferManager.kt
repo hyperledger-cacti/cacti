@@ -82,7 +82,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
                 val params = param!!.split(":").toTypedArray()
-                var id: Any
+                var result: Either<Error, String>
                 
                 val localNetworkId = rpc.proxy.startFlow(::RetrieveNetworkId).returnValue.get()
                 println("localNetworkId: ${localNetworkId}")
@@ -101,7 +101,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                 val recipientCert: String = getUserCertFromFile(recipient!!, importNetworkId!!)
 
                 if (fungible) {
-                    id = AssetTransferSDK.createFungibleAssetPledge(
+                    result = AssetTransferSDK.createFungibleAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
                         importNetworkId!!,
@@ -115,7 +115,7 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                         obs
                     )
                 } else {
-                    id = AssetTransferSDK.createAssetPledge(
+                    result = AssetTransferSDK.createAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
                         importNetworkId!!,
@@ -129,7 +129,16 @@ class PledgeAssetCommand : CliktCommand(name="pledge-asset",
                         obs
                     )
                 }
-                println("Asset Pledge State created with pledge ID ${id}.")
+                
+                when (result) {
+                    is Either.Left -> {
+                        println("Corda Network Error: Error running PledgeAsset flow: ${result.a.message}\n")
+                        throw IllegalStateException("Corda Network Error: Error running PledgeAsset flow: ${result.a.message}\n")
+                    }
+                    is Either.Right -> {
+                        println("AssetPledgeState created with pledge-id '${result.b}'")
+                    }
+                }
             } catch (e: Exception) {
               println("Error: ${e.toString()}")
             } finally {

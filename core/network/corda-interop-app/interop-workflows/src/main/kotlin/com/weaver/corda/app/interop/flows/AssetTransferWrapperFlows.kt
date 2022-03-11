@@ -42,7 +42,7 @@ import com.weaver.protos.common.asset_transfer.AssetTransfer
 /**
  * The AssetTransferPledge flow is used to create a pledge for both fungible and non-fungible/bond assets.
  *
- * @property pledgeArgs The details of the non-fungible asset being pledged for transfer to remote network.
+ * @property pledgeArgs The details of the fungible/non-fungible asset being pledged for transfer to remote network.
  *                          Bleow properties are captured by this structure.
  * assetType -- The type of the fungible or non-fungible/bond asset to be pledged.
  * assetIdOrQuantity -- The identifier of the non-fungible/bond asset to be pledged;
@@ -111,8 +111,8 @@ constructor(
             ))
         })
     } catch (e: Exception) {
-        println("Error pledging non-fungible asset: ${e.message}\n")
-        Left(Error("Failed to pledge non-fungible asset: ${e.message}"))
+        println("Error pledging asset: ${e.message}\n")
+        Left(Error("Failed to pledge asset: ${e.message}"))
     }
 }
 

@@ -273,14 +273,7 @@ Bootstrap the Corda networks and application states as follows (_the following i
 - Run the following:
   ```bash
   NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients configure network
-  NETWORK_NAME="Corda_Network" CORDA_PORT=10006 ./clients/build/install/clients/bin/clients util save-cert
   NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients configure network
-  NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients util save-cert
-  ```
-- Run the following, only after running `./scripts/initAssetsForTransfer.sh` on the Fabric networks.
-  ```bash
-  cp ../../fabric/fabric-cli/src/data/remoteNetworkUsers/network1_UsersAndCerts.json clients/src/main/resources/config/remoteNetworkUsers
-  cp ../../fabric/fabric-cli/src/data/remoteNetworkUsers/network2_UsersAndCerts.json clients/src/main/resources/config/remoteNetworkUsers
   ```
 - Run the following:
   ```bash
@@ -293,12 +286,16 @@ Bootstrap the Corda networks and application states as follows (_the following i
   * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
   * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
   * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
-- Run the following:
-  ```bash
-  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
-  NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
-  ```
-   * To exercise Fabric-Corda (or Corda-Fabric) `asset-transfer`, don't need to run the above `network-id create-state` command for `Corda_Network2`.
+- Run only one of the following:
+  * If you wish to test `Corda-Corda` asset-transfer, use the below command.
+    ```bash
+    NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
+    NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
+    ```
+  * If you wish to test either `Fabric-Corda` or `Corda-Fabric` asset-transfer, use the below command.
+    ```bash
+    NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB"
+    ```
 ### Next Steps
 
 The test networks are now configured and their ledgers are initialized. You can now run the [asset transfer flows](../interop/asset-transfer.md).
