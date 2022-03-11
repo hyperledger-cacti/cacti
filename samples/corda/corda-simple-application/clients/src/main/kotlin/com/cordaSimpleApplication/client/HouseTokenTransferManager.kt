@@ -89,7 +89,7 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge-asset",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
                 val params = param!!.split(":").toTypedArray()
-                var id: Any
+                var result: Either<Error, String>
                 val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
                 val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
                 println("TokenType: $issuedTokenType")
@@ -106,7 +106,7 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge-asset",
                 val recipientCert: String = getUserCertFromFile(recipient!!, importNetworkId!!)
 
                 if (fungible) {
-                    id = AssetTransferSDK.createFungibleAssetPledge(
+                    result = AssetTransferSDK.createFungibleAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
                         importNetworkId!!,
@@ -120,7 +120,7 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge-asset",
                         obs
                     )
                 } else {
-                    id = AssetTransferSDK.createAssetPledge(
+                    result = AssetTransferSDK.createAssetPledge(
                         rpc.proxy,
                         localNetworkId!!,
                         importNetworkId!!,
@@ -134,7 +134,15 @@ class PledgeHouseTokenCommand : CliktCommand(name="pledge-asset",
                         obs
                     )
                 }
-                println("Asset Pledge State created with contract ID ${id}.")
+                when (result) {
+                    is Either.Left -> {
+                        println("Corda Network Error: Error running PledgeAsset flow: ${result.a.message}\n")
+                        throw IllegalStateException("Corda Network Error: Error running PledgeAsset flow: ${result.a.message}\n")
+                    }
+                    is Either.Right -> {
+                        println("AssetPledgeState created with pledge-id '${result.b}'")
+                    }
+                }
             } catch (e: Exception) {
               println("Error: ${e.toString()}")
             } finally {

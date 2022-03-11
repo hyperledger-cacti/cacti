@@ -10,7 +10,6 @@ tags
 .gradle
 
 # remote network user certificates needed for the asset-transfer context
-clients/src/main/resources/config/remoteNetworkUsers
 clients/src/main/resources/config/remote-network-config.json
 
 # General build files

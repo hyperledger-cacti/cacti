@@ -16,6 +16,5 @@ config.json
 package-lock.json
 src/wallet-network1
 src/wallet-network2
-src/data/remoteNetworkUsers
 chaincode.json
 remote-network-config.json
