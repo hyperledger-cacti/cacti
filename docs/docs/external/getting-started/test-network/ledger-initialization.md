@@ -255,11 +255,6 @@ Initialize bond and token asset states and ownerships on the `network1` ledger b
 ```bash
 ./scripts/initAssetsForTransfer.sh
 ```
-Run the following, only after running the `save-cert` command on the Corda networks.
-```bash
-cp ../../corda/corda-simple-application/clients/src/main/resources/config/remoteNetworkUsers/Corda_Network_UsersAndCerts.json src/data/remoteNetworkUsers
-cp ../../corda/corda-simple-application/clients/src/main/resources/config/remoteNetworkUsers/Corda_Network2_UsersAndCerts.json src/data/remoteNetworkUsers
-```
 
 ### Initializing the Corda Networks
 
