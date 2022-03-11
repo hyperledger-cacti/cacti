@@ -305,7 +305,7 @@ constructor(
 }
 
 /**
- * The resolveFlow function uses reflection to construct an instance of FlowLogic from the given
+ * The resolveStateAndRefFlow function uses reflection to construct an instance of FlowLogic from the given
  * flow name and arguments.
  *
  * @param flowName The name of the flow provided by the remote client.

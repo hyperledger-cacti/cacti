@@ -17,7 +17,12 @@ publish: github.properties
 publish-workflows: github.properties
 	echo "Publishing interop workflows to Github..."
 	./gradlew publishWorkflowsPublicationToMavenRepository
-	
+
+.PHONY: publish-contracts
+publish-contracts: github.properties
+	echo "Publishing interop contracts Github..."
+	./gradlew publishContractsPublicationToMavenRepository
+
 .PHONY: test
 test:
 	./gradlew test

@@ -57,8 +57,8 @@ Prepare `fabric-cli` for configuration suitably as follows.
     CONFIG_PATH=./config.json
     CHAINCODE_PATH=./chaincode.json
     ```
-  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver and `<chaincode-name>` with the name of the deployed chaincode, either `simpleasset` or `simpleassetwithacl`.
-  * If `simplestate` is deployed, set `<function-name>` to `Create`, and if `simpleassetwithacl` if deployed, set `<function-name>` to `CreateFromRemote`.
+  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver and `<chaincode-name>` with the name of the deployed chaincode, either `simplestate` or `simplestatewithacl`.
+  * If `simplestate` is deployed, set `<function-name>` to `Create`, and if `simplestatewithacl` if deployed, set `<function-name>` to `CreateFromRemote`.
   * Leave the default values unchanged for the other parameters.
 - Run the following command:
   ```bash
@@ -172,7 +172,7 @@ The test networks are now configured and their ledgers are initialized. You can 
 
 ## Preparation for Asset Transfer
 
-Follow the below instructions to prepare your networks for asset exchange tests.
+Follow the below instructions to prepare your networks for asset transfer tests.
 
 ### Initializing the Fabric Networks
 
@@ -256,6 +256,35 @@ Initialize bond and token asset states and ownerships on the `network1` ledger b
 ./scripts/initAssetsForTransfer.sh
 ```
 
+### Initializing the Corda Networks
+
+Once the Corda networks (`Corda_Network` and `Corda_Network2`) are launched, the client applications (built earlier) needs to be exercised to generate ledger state in both exporting/source and importing/destination networks in preparation to test asset transfer interoperation flows.
+
+#### Bootstrapping Networks and Application States
+The Corda network ledger (or _vault_ on each node) must be initialized with access control policies, verification policies, and security group information for the other networks (two Fabric networks and other Corda network).
+
+Bootstrap the Corda networks and application states as follows (_the following instructions will initialize either or both Corda networks, depending on which of those are up and running_):
+- Navigate to the `samples/corda/corda-simple-application` folder.
+- Run the following:
+  ```bash
+  cp clients/src/main/resources/config/remote-network-config.json.template clients/src/main/resources/config/remote-network-config.json
+  ```
+  Use default values in `remote-network-config.json` if relays and drivers are deployed in the host machine; else if they are deployed in Docker, update as follows:
+  * Update value for `relayEndpoint` for `network1` as `relay-network1:9080`.
+  * Update value for `relayEndpoint` for `network2` as `relay-network2:9083`.
+  * Update value for `relayEndpoint` for `Corda_Network` as `relay-corda:9081`.
+  * Update value for `relayEndpoint` for `Corda_Network2` as `relay-corda2:9082`.
+  * Update value for `partyEndPoint` for `Corda_Network` as `corda_partya_1:10003`.
+  * Update value for `partyEndPoint` for `Corda_Network2` as `corda_network2_partya_1:10003`.
+- Run the following: 
+  * If Relays and Drivers are deployed in the host machine:
+    ```bash
+    make initialise-vault-asset-transfer
+    ```
+  * If Relays and Drivers are deployed in the Docker containers:
+    ```bash
+    make initialise-vault-asset-transfer-docker
+    ```
 ### Next Steps
 
 The test networks are now configured and their ledgers are initialized. You can now run the [asset transfer flows](../interop/asset-transfer.md).

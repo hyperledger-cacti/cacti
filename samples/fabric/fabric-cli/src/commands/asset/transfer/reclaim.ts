@@ -104,7 +104,9 @@ const command: GluegunCommand = {
     }
     if (!options['type'])
     {
-      print.error('--type of network needs to be specified')
+      print.error('--type of asset transfer needs to be specified in the format: \'asset_type.remote_network_type\'.' +
+            ' \'asset_type\' can be either \'bond\', \'token\' or \'house-token\'.' +
+            ' \'remote_network_type\' can be either \'fabric\', \'corda\' or \'besu\'.')
       return
     }
     if (!options['param'])
@@ -115,25 +117,25 @@ const command: GluegunCommand = {
     
     const params = options['param'].split(':')
     const assetType = params[0]
-    const assetCategory = options['type']
+    const transferCategory = options['type']
     
-    if (assetCategory && !params[1])
+    if (transferCategory && !params[1])
     {
       print.error('assetId needs to be specified for "bond" type')
       return
     }
-    if (assetCategory && !params[1])
+    if (transferCategory && !params[1])
     {
       print.error('num of units needs to be specified for "token" type')
       return
     }
-    if (assetCategory === 'token' && isNaN(parseInt(params[1])))
+    if (transferCategory.includes('token') && isNaN(parseInt(params[1])))
     {
       print.error('num of units must be an integer for "token" type')
       return
     }
     
-    const assetIdOrQuantity = (assetCategory === 'token') ? parseInt(params[1]) : params[1]
+    const assetIdOrQuantity = (transferCategory.includes('token')) ? parseInt(params[1]) : params[1]
     
     const netConfig = getNetworkConfig(options['source-network'])
     if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
@@ -149,17 +151,17 @@ const command: GluegunCommand = {
         sourceNetworkName: options['source-network'],
         pledgeId: options['pledge-id'],
         caller: options['user'],
-        ccType: assetCategory,
+        ccType: transferCategory,
         logger: logger
       })
       
-      const viewAddress = getReclaimViewAddress(assetCategory, assetType, assetIdOrQuantity,
+      const viewAddress = getReclaimViewAddress(transferCategory, assetType, assetIdOrQuantity,
         options['pledge-id'], userCert, options['source-network'], pledgeAssetDetails.getRecipient(),
         pledgeAssetDetails.getRemotenetworkid(), pledgeAssetDetails.getExpirytimesecs()
       )
 
       const appChaincodeId = netConfig.chaincode
-      const applicationFunction = (assetCategory === 'token') ? 'ReclaimTokenAsset' : 'ReclaimAsset'
+      const applicationFunction = (transferCategory.includes('token')) ? 'ReclaimTokenAsset' : 'ReclaimAsset'
       var { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
       args[args.indexOf('<pledge-id>')] = options['pledge-id']
       args[args.indexOf('<recipient>')] = pledgeAssetDetails.getRecipient()
@@ -183,25 +185,27 @@ const command: GluegunCommand = {
 }
 
 
-function getReclaimViewAddress(assetCategory, assetType, assetIdOrQuantity, 
+function getReclaimViewAddress(transferCategory, assetType, assetIdOrQuantity, 
     pledgeId, pledgerCert, sourceNetwork, recipientCert,
     destNetwork, pledgeExpiryTimeSecs
 ) {
     let funcName = "", funcArgs = []
-    if (assetCategory == "cordaAsset") {
+    if (transferCategory == "token.corda") {
+        funcName = "GetAssetClaimStatusByPledgeId"
+        funcArgs = [pledgeId, pledgeExpiryTimeSecs]
+    } else if (transferCategory === "bond.fabric") {
         funcName = "GetAssetClaimStatus"
         funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
             pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
-    } else if (assetCategory === "bond") {
-        funcName = "GetAssetClaimStatus"
-        funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
-            pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
-    } else if (assetCategory === "token") {
+    } else if (transferCategory === "token.fabric") {
         funcName = "GetTokenAssetClaimStatus"
         funcArgs = [pledgeId, assetType, assetIdOrQuantity, recipientCert,
             pledgerCert, sourceNetwork, pledgeExpiryTimeSecs]
+    } else if (transferCategory.includes("house-token.corda")) {
+        funcName = "GetAssetClaimStatusByPledgeId"
+        funcArgs = [pledgeId, pledgeExpiryTimeSecs]
     } else {
-        throw new Error(`Unecognized asset category: ${assetCategory}`)
+        throw new Error(`Unecognized transfer category: ${transferCategory}`)
     }
     
     return generateViewAddressFromRemoteConfig(destNetwork, funcName, funcArgs)

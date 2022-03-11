@@ -15,6 +15,7 @@ import com.weaver.corda.app.interop.states.MembershipState
 import java.security.cert.X509Certificate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.util.Base64
 
 /**
  * The isCertificateWithinExpiry function checks whether the provided certificate is within its validity period.
@@ -116,4 +117,17 @@ fun verifyCertificateChain(
 } catch (e: Exception) {
     println("Error verifying the certificate chain: ${e.message}")
     Left(Error("Verification Error: Error verifying certificate chain: ${e.message}"))
+}
+
+/*
+ * The x509CertToPem function extracts the PEM (privacy enhanced mail) certificate from the input X509Certificate
+ */
+fun x509CertToPem(cert: X509Certificate): String {
+    val cert_begin = "-----BEGIN CERTIFICATE-----\n";
+    val end_cert = "\n-----END CERTIFICATE-----";
+
+    val derCert = cert.getEncoded();
+    val pemCertPre = Base64.getEncoder().encodeToString(derCert).replace("(.{64})".toRegex(), "$1\n")
+    val pemCert = cert_begin + pemCertPre + end_cert;
+    return pemCert;
 }

@@ -8,22 +8,21 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-
 const (
-	localNetworkIdKey   = "localNetworkID"
+	localNetworkIdKey = "localNetworkID"
 )
 
 type BondAsset struct {
-	Type          string      `json:"type"`
-	ID            string      `json:"id"`
-	Owner         string      `json:"owner"`
-	Issuer        string      `json:"issuer"`
-	FaceValue     int         `json:"facevalue"`
-	MaturityDate  time.Time   `json:"maturitydate"`
+	Type         string    `json:"type"`
+	ID           string    `json:"id"`
+	Owner        string    `json:"owner"`
+	Issuer       string    `json:"issuer"`
+	FaceValue    int       `json:"facevalue"`
+	MaturityDate time.Time `json:"maturitydate"`
 }
 
 func getBondAssetKey(assetType string, assetId string) string {
@@ -69,16 +68,16 @@ func getBondAsset(ctx contractapi.TransactionContextInterface, assetType, id str
 
 // InitBondAssetLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextInterface, localNetworkId string) error {
-    err := ctx.GetStub().PutState(localNetworkIdKey, []byte(localNetworkId))
+	err := ctx.GetStub().PutState(localNetworkIdKey, []byte(localNetworkId))
 	if err != nil {
 		return fmt.Errorf("failed to put to world state. %v", err)
 	}
 
 	assets := []BondAsset{
-		{Type: "t1", ID: "a01", Issuer: "Treasury" , Owner: "", FaceValue: 300,
-			 MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
-			 {Type: "t1", ID: "a02", Issuer: "Treasury" , Owner: "", FaceValue: 400,
-			 MaturityDate: time.Date(2022, time.July, 1, 12, 0, 0, 0, time.UTC)},
+		{Type: "t1", ID: "a01", Issuer: "Treasury", Owner: "", FaceValue: 300,
+			MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
+		{Type: "t1", ID: "a02", Issuer: "Treasury", Owner: "", FaceValue: 400,
+			MaturityDate: time.Date(2022, time.July, 1, 12, 0, 0, 0, time.UTC)},
 	}
 
 	for _, asset := range assets {
@@ -125,11 +124,11 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	asset := BondAsset{
-		Type: assetType,
-		ID: id,
-		Owner: owner,
-		Issuer: issuer,
-		FaceValue: faceValue,
+		Type:         assetType,
+		ID:           id,
+		Owner:        owner,
+		Issuer:       issuer,
+		FaceValue:    faceValue,
 		MaturityDate: md_time,
 	}
 	assetJSON, err := json.Marshal(asset)
@@ -169,10 +168,10 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 	bondAssetPledgeMap, err := getAssetPledgeIdMap(ctx, assetType, id)
 	if (err == nil) && (bondAssetPledgeMap.RemoteNetworkID == remoteNetworkId) && (bondAssetPledgeMap.Recipient == recipientCert) {
 		return bondAssetPledgeMap.PledgeID, nil
-	} else if (err == nil) {
+	} else if err == nil {
 		return bondAssetPledgeMap.PledgeID, fmt.Errorf("asset %s is already pledged with pledgeId %s for different recipient", id, bondAssetPledgeMap.PledgeID)
 	}
-	
+
 	// Read the asset (which internally checks access)
 	asset, err := s.ReadAsset(ctx, assetType, id)
 	if err != nil {
@@ -251,9 +250,9 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if err != nil {
 		return err
 	}
-	if (claimAsset.Type != "" &&
+	if claimAsset.Type != "" &&
 		claimAsset.ID != "" &&
-		claimAsset.Owner != "") {
+		claimAsset.Owner != "" {
 		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
 		if !matchClaimWithAssetPledge(pledgeAssetDetails, claimAssetDetails) {
 			return fmt.Errorf("claim info for asset with pledge id %s does not match pledged asset details on ledger: %s", pledgeId, pledgeAssetDetails)
@@ -280,11 +279,11 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 
 	// Create blank asset details using app-specific-logic
 	blankAsset := BondAsset{
-		Type: "",
-		ID: "",
-		Owner: "",
-		Issuer: "",
-		FaceValue: 0,
+		Type:         "",
+		ID:           "",
+		Owner:        "",
+		Issuer:       "",
+		FaceValue:    0,
 		MaturityDate: time.Unix(0, 0),
 	}
 	blankAssetJSON, err := json.Marshal(blankAsset)
@@ -308,7 +307,7 @@ func (s *SmartContract) GetAssetPledgeStatus(ctx contractapi.TransactionContextI
 		return blankPledgeBytes64, err
 	}
 	if lookupPledgeAsset.Owner != owner {
-		return blankPledgeBytes64, nil      // Return blank
+		return blankPledgeBytes64, nil // Return blank
 	}
 
 	return pledgeBytes64, nil
@@ -346,11 +345,11 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 
 	// Create blank asset details using app-specific-logic
 	blankAsset := BondAsset{
-		Type: "",
-		ID: "",
-		Owner: "",
-		Issuer: "",
-		FaceValue: 0,
+		Type:         "",
+		ID:           "",
+		Owner:        "",
+		Issuer:       "",
+		FaceValue:    0,
 		MaturityDate: time.Unix(0, 0),
 	}
 	blankAssetJSON, err := json.Marshal(blankAsset)
@@ -364,19 +363,12 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 		return blankClaimBytes64, err
 	}
 	if claimAssetDetails == nil {
-		return blankClaimBytes64, err
+		// represents the scenario that the asset was not claimed by the remote network
+		return blankClaimBytes64, nil
 	}
 
 	// Validate returned asset details using app-specific-logic
-
-	// The asset should be recorded if it has been claimed, so we should look that up first
-	asset, err := getBondAsset(ctx, assetType, id)
-	if err != nil {
-		return blankClaimBytes64, fmt.Errorf("failed to read asset record from world state: %v", err)
-	}
-	if asset.Owner != recipientCert {
-		return blankClaimBytes64, nil      // Return blank
-	}
+	// It's not possible to check for the existance of the claimed asset on the ledger, since that asset might got spent already.
 
 	// Match pledger identity in claim with request parameters
 	var lookupClaimAsset BondAsset
@@ -385,9 +377,14 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 		return blankClaimBytes64, err
 	}
 	if lookupClaimAsset.Owner != pledger {
-		return blankClaimBytes64, nil      // Return blank
+		return blankClaimBytes64, fmt.Errorf("asset was not pledged by %s", pledger)
+	} else if lookupClaimAsset.Type != assetType {
+		return blankClaimBytes64, fmt.Errorf("given asset type %s was not pledged", assetType)
+	} else if lookupClaimAsset.ID != id {
+		return blankClaimBytes64, fmt.Errorf("given asset id %s was not pledged", id)
 	}
 
+	// represents the scenario that the asset was claimed by the remote network
 	return claimBytes64, nil
 }
 
@@ -404,10 +401,10 @@ func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *Bond
 // isBondAssetLocked returns true only if the asset is presently locked
 func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
-		Type: asset.Type,
-		Id: asset.ID,
+		Type:      asset.Type,
+		Id:        asset.ID,
 		Recipient: "*",
-		Locker: asset.Owner,
+		Locker:    asset.Owner,
 	}
 	bondAssetAgreementProtoSerialized, err := proto.Marshal(bondAssetAgreement)
 	if err != nil {
@@ -426,10 +423,10 @@ func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInter
 // isBondAssetLockedForMe returns true only if the asset is presently locked for me
 func isBondAssetLockedForMe(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
-		Type: asset.Type,
-		Id: asset.ID,
+		Type:      asset.Type,
+		Id:        asset.ID,
 		Recipient: "",
-		Locker: asset.Owner,
+		Locker:    asset.Owner,
 	}
 	bondAssetAgreementProtoSerialized, err := proto.Marshal(bondAssetAgreement)
 	if err != nil {
@@ -479,7 +476,7 @@ func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterf
 		return false, err
 	}
 	currDate := time.Now()
-	if (currDate.After(asset.MaturityDate)) {
+	if currDate.After(asset.MaturityDate) {
 		return true, nil
 	}
 

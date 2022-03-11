@@ -7,7 +7,7 @@ build-local-weaver-dependencies:
 	
 .PHONY: build-local	
 build-local:
-	cd ../fungible-house-token && make build
+	cd ../fungible-house-token && rm -f github.properties && make build
 	./gradlew clean installDist jar
 
 .PHONY: build-refresh-dependencies-local
@@ -28,6 +28,7 @@ test-local: build-local-weaver-dependencies
 
 .PHONY: build
 build: github.properties
+	cp github.properties ../fungible-house-token/
 	cd ../fungible-house-token && make build
 	./gradlew clean installDist jar
 
@@ -41,6 +42,7 @@ build-cordapp: github.properties
 
 .PHONY: build-cli
 build-cli: github.properties
+	cp github.properties ../fungible-house-token/
 	cd ../fungible-house-token && make build
 	./gradlew installDist
 
@@ -57,6 +59,20 @@ initialise-vault:
 initialise-vault-docker:
 	(docker logs corda_partya_1 && MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" REMOTE_FLOW="corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" LOCAL_FLOW="corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all) || true
 	(docker logs corda_network2_partya_1 && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" REMOTE_FLOW="corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" LOCAL_FLOW="corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*" ./clients/build/install/clients/bin/clients configure all) || true
+
+.PHONY: initialise-vault-asset-transfer
+initialise-vault-asset-transfer:
+	(docker logs corda_partya_1 && ./clients/build/install/clients/bin/clients configure network) || true
+	(docker logs corda_partya_1 &&  ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB") || true
+	(docker logs corda_network2_partya_1 && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network) || true
+	(docker logs corda_network2_partya_1 && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB") || true
+
+.PHONY: initialise-vault-asset-transfer-docker
+initialise-vault-asset-transfer-docker:
+	(docker logs corda_partya_1 && MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" ./clients/build/install/clients/bin/clients configure network) || true
+	(docker logs corda_partya_1 && ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB") || true
+	(docker logs corda_network2_partya_1 && MEMBER_CREDENTIAL_FOLDER="clients/src/main/resources/config/credentials_docker" CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients configure network) || true
+	(docker logs corda_network2_partya_1 && CORDA_PORT=30006 NETWORK_NAME=Corda_Network2 ./clients/build/install/clients/bin/clients network-id create-state -m "O=PartyA, L=London, C=GB;O=PartyB, L=London, C=GB") || true
 
 .PHONY: get-access-control-policies
 get-access-control-policies:

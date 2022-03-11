@@ -8,6 +8,7 @@ package com.weaver.corda.sdk;
 
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.Right
 import org.slf4j.LoggerFactory
 
 import net.corda.core.messaging.CordaRPCOps
@@ -122,8 +123,6 @@ class AssetManager {
 
                     proxy.startFlow(::ClaimAsset, contractId, claimInfo, createAssetStateCommand, updateAssetStateOwnerFlow, issuer, observers)
                         .returnValue.get()
-                    //proxy.startFlow(::UnlockAsset, contractId, createAssetStateCommand, assetStateContractId, issuer, observers)
-                    //    .returnValue.get()
                 }.fold({
                     it.map { retSignedTx ->
                         AssetManager.logger.debug("Claim asset was successful.\n")
@@ -155,7 +154,7 @@ class AssetManager {
                         .returnValue.get()
                 }.fold({
                     it.map { retSignedTx ->
-                        AssetManager.logger.debug("Claim asset was successful.\n")
+                        AssetManager.logger.debug("Unlock asset was successful.\n")
                         retSignedTx
                     }
                 }, {
