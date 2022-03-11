@@ -281,7 +281,7 @@ Similarly, assume that the `simpleassettransfer` chaincode has been deployed in 
    ```
 - Verify that `alice` in `network` now owns `1050` tokens as follows:
    ```bash
-   ./scripts/getTokenBalance.sh network alice
+   ./scripts/getTokenBalance.sh network1 alice
    ```
 
 The above steps complete a successful asset transfer from the Corda network `Corda_Network` to the Fabric network `network1`. In addition to the above commands, following is an extra option.
