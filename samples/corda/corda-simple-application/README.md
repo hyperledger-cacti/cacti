@@ -341,6 +341,46 @@ consistent version of the files, and we don't need to worry about conflicting
 dependencies. When the proto files are updated, they need to be updated in a
 single repo, instead of across multiple.
 
+## Asset Transfer
+### Transfer or recover token (Corda fungible house-token) assets
+
+Assume that the `ledger initialization` of Corda networks was already carried out (refer to [Initialing the Corda Networks](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/docs/docs/external/getting-started/test-network/ledger-initialization.md#initializing-the-corda-networks-2)).
+- Update value for `flowPackage` as `net.corda.samples.tokenizedhouse.flows` for the networks `Corda_Network` and `Corda_Network2` (as the CorDapp `fungible-house-token` was deployed instead of `cordaSimpleApplication` on the networks).
+  * This update is required even if relays and drivers are deployed in the host machine.
+- The `save-cert` command during ledger initialization fetches the certificate of the parties in base64 format and stores in the folder `clients/src/main/resources/config/credentials/remoteNetworkUsers` with filename `Corda_Network_UsersAndCerts.json` and `Corda_Network2_UsersAndCerts.json` corresponding to `Corda_Network` and `Corda_Network2` respectively. These files are referred during pledge to fetch the certificate of the recipient of the transferred asset, and during claim to fetch the certificate of the pledger of the asset. *This is because, asset transfer doesn't require both the parties being members of neither in the export nor in the import network. It's just sufficient that pledger is part of the asset export network and claimer is part of the asset import network*.
+- The `network-id create-state` command during ledger initialization creates a `network-id` for each Corda network. This is a network state, and will be available in the vault of all the parties which are members of the network (if required, run the command `./clients/build/install/clients/bin/clients util get-party-name` with `CORDA_PORT=10006` or `CORDA_PORT=10009` or `CORDA_PORT=30006` or `CORDA_PORT=30009` to fetch the name of the parties `PartyA` in `Corda_Network` or `PartyB` in `Corda_Network` or `PartyA` in `Corda_Network2` or `PartyB` in `Corda_Network2` respectively).
+  * The above assumes that both the `Corda_Network` and `Corda_Network2` were started earlier with `2-nodes` (network state created in `Corda_Network` and `Corda_Network2` can be cross checked by running the commands `CORDA_PORT=10006 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref` and `CORDA_PORT=30006 ./clients/build/install/clients/bin/clients network-id retrieve-state-and-ref` respectively in these networks).
+
+Assuming that the CorDapp `fungible-house-token` has been deployed in two Corda networks `Corda_Network` and `Corda_Network2`, below are the steps to transfer tokens owned by `PartyA` (`CORDA_PORT=10006`) in `Corda_Network` to `PartyA` (`CORDA_PORT=30006`) in the other network `Corda_Network2`.
+- Navigate to `samples/corda/corda-simple-application` folder.
+- Initialize Corda fungible house tokens in `Corda_Network` and `Corda_Network2`:
+  ```bash
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token init
+  NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients house-token init
+  ```
+- Issue `100` house-tokens to `PartyA` in `Corda_Network`:
+  ```bash
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token issue -p "O=PartyA, L=London, C=GB" -a 100
+  ```
+  (check token balance for `PartyA` by running the command `NETWORK_NAME='Corda_Network'  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance`)
+- Let `PartyA` pledge these tokens in `Corda_Network` to be transferred to `PartyA` of `Corda_Network2` (pledge burns the tokens in the source/exporting network):
+  ```bash
+  NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer pledge-asset --fungible --timeout="3600" --import-network-id='Corda_Network2' --recipient='O=PartyA, L=London, C=GB' --param='house:5'
+  ```
+  Note the `pledge-id` displayed after successful execution of the command, which will be used in next steps. Let's denote it `<pledge-id>` which is a hexadecimal string (pledge details can be cross checked using the commands `NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer is-asset-pledged -pid <pledge-id>` and `NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer get-pledge-state -pid <pledge-id>`; moreover, check the token balance for `PartyA` in `Corda_Network` by running the command `NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token get-balance` which should output 95 house tokens).
+- Let `PartyA` claim in `Corda_Network2` the tokens which are pledged in the Corda network `Corda_Network` by replacing `<pledge-id>` with the above hexadecimal value (claim issues the tokens in the destination/importing network):
+  ```bash
+  NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients house-token transfer claim-remote-asset --pledge-id='<pledge-id>' --locker='O=PartyA, L=London, C=GB' --transfer-category='house-token.corda' --export-network-id='Corda_Network' --param='house:5' --import-relay-address='localhost:9082'
+  ```
+  (check the token balance for `PartyA` in `Corda_Network2` by running the command `NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients house-token get-balance` which should output `5` house tokens)
+
+The above steps complete a successful asset transfer from the Corda network `Corda_Network` to the Corda network `Corda_Network2`. In addition to the above commands, following is an extra option.
+
+- Let `PartyA` in `Corda_Network` try re-claim the token `house:5` asset, which will succeed only if the house-token asset was not claimed by `PartyA` in `Corda_Network2` and the pledge has expired:
+  ```bash
+  NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients house-token transfer reclaim-pledged-asset --pledge-id='<pledge-id>' --export-relay-address='localhost:9081' --transfer-category='house-token.corda' --import-network-id='Corda_Network2' --param='house:5'
+  ```
+
 ## TODO
 
 - Remove the `deployNodes` gradle task as the Corda network config is now done

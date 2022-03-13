@@ -196,8 +196,7 @@ const pledgeAsset = async ({
     userString: item['owner'],
     registerUser: false
   })
-  const recipientId = JSON.parse(fs.readFileSync(__dirname + '/../wallet-' + destNetworkName + '/' + recipient + '.id').toString())
-  const recipientCert = Buffer.from(recipientId.credentials.certificate).toString('base64')
+  const recipientCert = getUserCertFromFile(recipient, destNetworkName)
   const expirationTime = (Math.floor(Date.now()/1000 + expirySecs)).toString()
 
   if (ccType == 'bond') {
@@ -225,6 +224,77 @@ const pledgeAsset = async ({
   } catch (error) {
     console.error(`Failed to submit transaction: ${error}`)
     throw new Error(error)
+  }
+}
+
+// Used to obtain remote network user certificate from '${networkId}_UsersAndCerts.json' file.
+// This is called during Pledge to get the recipientCert, and during Claim to get the pledgerCert.
+const getUserCertFromFile = (
+  remoteUser: string,
+  remoteNetworkId: string
+) => {
+  const usersAndCertsFile = remoteNetworkId + '_UsersAndCerts.json'
+  const credentialsPath = process.env.MEMBER_CREDENTIAL_FOLDER
+    ? path.resolve(__dirname, process.env.MEMBER_CREDENTIAL_FOLDER, '..')
+    : path.join(__dirname, '../data', 'credentials', '..')
+  try {
+    const dirPath = path.resolve(credentialsPath, 'remoteNetworkUsers')
+    const filepath = path.resolve(dirPath, usersAndCertsFile)
+    const usersAndCertsJSON = JSON.parse(fs.readFileSync(filepath).toString())
+    logger.debug(`credentialsPath: ${credentialsPath} and usersAndCertsFile: ${usersAndCertsFile}`)
+
+    if (!usersAndCertsJSON[remoteUser]) {
+      logger.error(
+        `User: ${remoteUser} does not exist in the file ${usersAndCertsFile}.`
+      )
+      return ''
+    }
+    logger.debug(`remoteUser: ${remoteUser} and certificate: ${usersAndCertsJSON[remoteUser]}`)
+    return usersAndCertsJSON[remoteUser]
+  } catch (err) {
+    logger.error(`User: ${remoteUser} does not exist in the file ${usersAndCertsFile}.`)
+    return ''
+  }
+}
+
+// Used to store the network user certificate to the file '${networkId}_UsersAndCerts.json'.
+// This is used during Pledge to get the recipientCert, and during Claim to get the pledgerCert.
+const saveUserCertToFile = (
+  remoteUser: string,
+  remoteNetworkId: string
+) => {
+  const usersAndCertsFile = remoteNetworkId + '_UsersAndCerts.json'
+  let usersAndCertsJSON = {}
+  const credentialsPath = process.env.MEMBER_CREDENTIAL_FOLDER
+    ? path.resolve(__dirname, process.env.MEMBER_CREDENTIAL_FOLDER, '..')
+    : path.join(__dirname, '../data', 'credentials', '..')
+    // Don't create the directory 'remoteNetworkUsers' inside 'data/credentials' since each entry there represents
+    // a network. Instead, create this directory inside 'data' itself.
+  try {
+    const dirPath = path.resolve(credentialsPath, 'remoteNetworkUsers')
+    const filepath = path.resolve(dirPath, usersAndCertsFile)
+    logger.debug(`credentialsPath: ${credentialsPath} and usersAndCertsFile: ${usersAndCertsFile}`)
+
+    if (!fs.existsSync(dirPath)) {
+      logger.debug(`Creating directory ${dirPath}`)
+      fs.mkdirSync(dirPath, { recursive: true })
+    }
+
+    if (fs.existsSync(filepath)) {
+      logger.debug(`Reading contents of the file ${filepath}`)
+      usersAndCertsJSON = JSON.parse(fs.readFileSync(filepath).toString())
+    }
+
+    const remoteUserId = JSON.parse(fs.readFileSync(__dirname + '/../wallet-' + remoteNetworkId + '/' + remoteUser + '.id').toString())
+    const remoteUserCertBase64 = Buffer.from(remoteUserId.credentials.certificate).toString('base64')
+
+    usersAndCertsJSON[remoteUser] = remoteUserCertBase64
+    fs.writeFileSync(
+      path.resolve(filepath),
+      JSON.stringify(usersAndCertsJSON)
+    )
+  } catch (err) {
+    logger.error(`User: ${remoteUser} certificate cannot be saved to the file ${usersAndCertsFile}.`)
   }
 }
 
@@ -684,12 +754,13 @@ const generateViewAddressFromRemoteConfig = (
         address = address + '/' + remoteNetConfig.channelName + ':' +
             remoteNetConfig.chaincode + ':' + funcName + ':' + funcArgs.join(':')
     } else if (remoteNetConfig.type == "corda") {
-        address = address + '/' + remoteNetConfig.PartyAEndPoint + '#' +
+        address = address + '/' + remoteNetConfig.partyEndPoint + '#' +
             remoteNetConfig.flowPackage + "." + funcName + ":" + funcArgs.join(':')
     } else {
         logger.error(`Error: remote network ${remoteNetConfig.type} not supported.`)
         throw new Error(`Error: remote network ${remoteNetConfig.type} not supported.`)
     }
+    console.log(`Interop query, funcName: ${funcName} \n funcArgs: ${funcArgs} \n and address: ${address}`)
     
     return address
   } catch (err) {
@@ -792,6 +863,8 @@ export {
   readJSONFromFile,
   signMessage,
   getNetworkConfig,
+  getUserCertFromFile,
+  saveUserCertToFile,
   getChaincodeConfig,
   validKeys,
   configKeys,

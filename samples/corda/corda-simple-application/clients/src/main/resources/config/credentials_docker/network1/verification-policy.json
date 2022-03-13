@@ -9,6 +9,42 @@
           "Org1MSP"
         ]
       }
+    },
+    {
+      "pattern": "mychannel:simpleassettransfer:GetTokenAssetPledgeStatus:*",
+      "policy": {
+        "type": "Signature",
+        "criteria": [
+          "Org1MSP"
+        ]
+      }
+    },
+    {
+      "pattern": "mychannel:simpleassettransfer:GetTokenAssetClaimStatus:*",
+      "policy": {
+        "type": "Signature",
+        "criteria": [
+          "Org1MSP"
+        ]
+      }
+    },
+    {
+      "pattern": "mychannel:simpleassettransfer:GetAssetPledgeStatus:*",
+      "policy": {
+        "type": "Signature",
+        "criteria": [
+          "Org1MSP"
+        ]
+      }
+    },
+    {
+      "pattern": "mychannel:simpleassettransfer:GetAssetClaimStatus:*",
+      "policy": {
+        "type": "Signature",
+        "criteria": [
+          "Org1MSP"
+        ]
+      }
     }
   ]
 }

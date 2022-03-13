@@ -21,7 +21,7 @@ import net.corda.core.messaging.startFlow
 
 import net.corda.samples.tokenizedhouse.flows.*
 
-class HouseTokenCommand : CliktCommand(help ="Manages FungibleHouseTokens") {
+class HouseTokenCommand : CliktCommand(name = "house-token", help ="Manages FungibleHouseTokens") {
     override fun run() {
     }
 }

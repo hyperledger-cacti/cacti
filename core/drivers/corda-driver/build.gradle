@@ -10,7 +10,7 @@ buildscript {
     ext.corda_version = "4.8.4"
     ext.corda_core_version = "4.8.4"
     ext.arrow_version = "0.10.4"
-    ext.weaver_version = "1.2.4-alpha.+"
+    ext.weaver_version = "1.2.4-alpha.+" // works for any version 1.2.4-alpha.*
 
     repositories {
         mavenCentral()
