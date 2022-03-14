@@ -143,6 +143,7 @@
     "webpack-cli": "4.7.2"
   },
   "resolutions": {
+    "ansi-html": ">0.0.8",
     "glob-parent": "5.1.2",
     "underscore": "1.13.2"
   }
