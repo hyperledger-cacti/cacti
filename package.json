@@ -145,6 +145,7 @@
   "resolutions": {
     "ansi-html": ">0.0.8",
     "glob-parent": "5.1.2",
+    "lodash": "4.17.20",
     "underscore": "1.13.2"
   }
 }
