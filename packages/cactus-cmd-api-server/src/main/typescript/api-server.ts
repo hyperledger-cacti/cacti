@@ -732,14 +732,15 @@ export class ApiServer {
 
     this.wsApi.attach(this.httpServerApi, wsOptions);
 
-    const socketIoAuthorizer = authorizeSocket({
-      ...authzConf.socketIoJwtOptions,
-      onAuthentication: (decodedToken) => {
-        this.log.debug("Socket authorized OK: %o", decodedToken);
-      },
-    });
-
-    this.wsApi.use(socketIoAuthorizer as never);
+    if (authorizerO.isPresent()) {
+      const socketIoAuthorizer = authorizeSocket({
+        ...authzConf.socketIoJwtOptions,
+        onAuthentication: (decodedToken) => {
+          this.log.debug("Socket authorized OK: %o", decodedToken);
+        },
+      });
+      this.wsApi.use(socketIoAuthorizer as never);
+    }
 
     return addressInfo;
   }
