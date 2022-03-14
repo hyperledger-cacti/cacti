@@ -5,7 +5,7 @@ import { createServer } from "http";
 import KeyEncoder from "key-encoder";
 import { AddressInfo } from "net";
 import Web3 from "web3";
-import EEAClient, { IWeb3InstanceExtended } from "web3-eea";
+import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 
 import {
   ApiServer,
@@ -137,7 +137,7 @@ test(testCase, async (t: Test) => {
 
   const web3Provider = new Web3.providers.HttpProvider(rpcApiHttpHost);
   const web3 = new Web3(web3Provider);
-  const web3Eea: IWeb3InstanceExtended = EEAClient(web3, 2018);
+  const web3JsQuorum: IWeb3Quorum = Web3JsQuorum(web3);
 
   const orionKeyPair = await besuTestLedger.getOrionKeyPair();
   const besuKeyPair = await besuTestLedger.getBesuKeyPair();
@@ -156,7 +156,9 @@ test(testCase, async (t: Test) => {
     privateKey: besuPrivateKey,
   };
 
-  const transactionHash = await web3Eea.eea.sendRawTransaction(contractOptions);
+  const transactionHash = await web3JsQuorum.priv.generateAndSendRawTransaction(
+    contractOptions,
+  );
 
   const transaction = await web3.eth.getTransaction(transactionHash);
   const singData = jsObjectSigner.sign(transaction.input);

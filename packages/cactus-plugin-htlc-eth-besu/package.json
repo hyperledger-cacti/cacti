@@ -70,7 +70,7 @@
     "openapi-types": "9.1.0",
     "typescript-optional": "2.0.1",
     "web3": "1.5.2",
-    "web3-eea": "0.11.0"
+    "web3js-quorum": "21.7.0-rc1"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "1.0.0",
