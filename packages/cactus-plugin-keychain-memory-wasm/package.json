@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@types/express": "4.17.13",
-    "cpy-cli": "3.1.1",
+    "cpy-cli": "4.1.0",
     "del-cli": "4.0.1"
   },
   "engines": {
