@@ -21,6 +21,11 @@ export {
 } from "./quorum/quorum-test-ledger";
 
 export {
+  QuorumMultiPartyTestLedger,
+  IQuorumMultiPartyTestLedgerOptions,
+} from "./quorum/quorum-mp-test-ledger";
+
+export {
   CordaTestLedger,
   ICordaTestLedgerConstructorOptions,
   CORDA_TEST_LEDGER_DEFAULT_OPTIONS,
