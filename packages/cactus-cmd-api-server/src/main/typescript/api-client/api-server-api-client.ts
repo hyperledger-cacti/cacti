@@ -100,6 +100,11 @@ export class ApiServerApiClient extends DefaultApi {
         socket.auth = { token };
         this.options.baseOptions = { headers: { Authorization: token } };
         log.debug("Received fresh token from token provider OK");
+
+        // After upgrading to SocketIO 4.4.1 the automatic reconnection became
+        // flaky in this test so we are giving it a nudge in here manually to
+        // do the right thing and reconnect after the token has been updated.
+        socket.connect();
       } else {
         socket.disconnect();
         subject.error(err);
