@@ -59,6 +59,7 @@ import {
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-json-object-endpoint";
 import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-json-object-endpoint";
+import { RuntimeError } from "run-time-error";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.xdai.keychain_not_found";
 
@@ -227,6 +228,38 @@ export class PluginLedgerConnectorXdai
     return ConsensusAlgorithmFamily.Authority;
   }
 
+  /**
+   * Verifies that it is safe to call a specific method of a Web3 Contract.
+   *
+   * @param contract The Web3 Contract instance to check whether it has a method with a specific name or not.
+   * @param name The name of the method that will be checked if it's usable on `contract` or not.
+   * @returns Boolean `true` when it IS safe to call the method named `name` on the contract.
+   * @throws If the contract instance is falsy or it's methods object is falsy. Also throws if the method name is a blank string.
+   */
+  public async isSafeToCallContractMethod(
+    contract: InstanceType<typeof Contract>,
+    name: string,
+  ): Promise<boolean> {
+    Checks.truthy(
+      contract,
+      `${this.className}#isSafeToCallContractMethod():contract`,
+    );
+
+    Checks.truthy(
+      contract.methods,
+      `${this.className}#isSafeToCallContractMethod():contract.methods`,
+    );
+
+    Checks.nonBlankString(
+      name,
+      `${this.className}#isSafeToCallContractMethod():name`,
+    );
+
+    const { methods } = contract;
+
+    return Object.prototype.hasOwnProperty.call(methods, name);
+  }
+
   async runInvoke(req: InvokeRequestBaseV1): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#runInvoke()`;
 
@@ -247,6 +280,16 @@ export class PluginLedgerConnectorXdai
       abi,
       contractAddress,
     );
+
+    const isSafeToCall = await this.isSafeToCallContractMethod(
+      contractInstance,
+      req.methodName,
+    );
+    if (!isSafeToCall) {
+      throw new RuntimeError(
+        `Invalid method name provided in request. ${req.methodName} does not exist on the Web3 contract object's "methods" property.`,
+      );
+    }
 
     const methodRef = contractInstance.methods[req.methodName];
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
