@@ -1,81 +1,121 @@
-import { OdapGateway } from "../odap-gateway";
+import { OdapMessageType, PluginOdapGateway } from "../plugin-odap-gateway";
 import { SHA256 } from "crypto-js";
-import secp256k1 from "secp256k1";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import {
   TransferCompleteV1Request,
   TransferCompleteV1Response,
 } from "../../generated/openapi/typescript-axios";
+
 const log = LoggerProvider.getOrCreate({
   level: "INFO",
   label: "odap-transfer-complete-helper",
 });
-export async function TransferComplete(
-  req: TransferCompleteV1Request,
-  odap: OdapGateway,
+
+export async function transferComplete(
+  request: TransferCompleteV1Request,
+  odap: PluginOdapGateway,
 ): Promise<TransferCompleteV1Response> {
+  const fnTag = `${odap.className}#transferComplete()`;
   log.info(
-    `server gate way receive transfer complete request: ${JSON.stringify(req)}`,
+    `server gateway receives TransferCommenceMessage: ${JSON.stringify(
+      request,
+    )}`,
   );
-  await CheckValidTransferCompleteRequest(req, req.sessionID, odap);
-  log.info("transfer is complete");
+
+  const sessionData = odap.sessions.get(request.sessionID);
+  if (sessionData === undefined || sessionData.step == undefined) {
+    throw new Error(
+      `${fnTag}, session Id does not correspond to any open session`,
+    );
+  }
+
+  await odap.storeOdapLog(
+    {
+      phase: "p3",
+      step: sessionData.step.toString(),
+      type: "exec",
+      operation: "transfer-complete",
+      nodes: `${odap.pubKey}`,
+    },
+    `${sessionData.id}-${sessionData.step.toString()}`,
+  );
+
+  // Calculate the hash here to avoid changing the object and the hash
+  const transferCompleteMessageHash = SHA256(
+    JSON.stringify(request),
+  ).toString();
+
+  log.info(`TransferCommenceRequest hash is: ${transferCompleteMessageHash}`);
+
+  await checkValidTransferCompleteRequest(request, odap);
+
+  log.info("Transfer complete.");
+
+  await odap.storeOdapLog(
+    {
+      phase: "p3",
+      step: sessionData.step.toString(),
+      type: "ack",
+      operation: "transfer-complete",
+      nodes: `${odap.pubKey}->${request.clientIdentityPubkey}`,
+    },
+    `${sessionData.id}-${sessionData.step.toString()}`,
+  );
+
   return { ok: "true" };
 }
-async function CheckValidTransferCompleteRequest(
-  req: TransferCompleteV1Request,
-  sessionID: string,
-  odap: OdapGateway,
+
+async function checkValidTransferCompleteRequest(
+  request: TransferCompleteV1Request,
+  odap: PluginOdapGateway,
 ): Promise<void> {
   const fnTag = `${odap.className}#checkValidTransferCompleteRequest()`;
 
-  if (req.messageType != "urn:ietf:odap:msgtype:commit-transfer-complete-msg") {
-    await odap.Revert(req.sessionID);
-    throw new Error(`${fnTag}, wrong message type for transfer complete`);
+  if (request.messageType != OdapMessageType.TransferCompleteRequest) {
+    throw new Error(`${fnTag}, wrong message type for TransferCompleteRequest`);
   }
 
-  const clientSignature = new Uint8Array(
-    Buffer.from(req.clientSignature, "hex"),
+  const sourceClientSignature = new Uint8Array(
+    Buffer.from(request.clientSignature, "hex"),
   );
 
-  const clientPubkey = new Uint8Array(
-    Buffer.from(req.clientIdentityPubkey, "hex"),
+  const sourceClientPubkey = new Uint8Array(
+    Buffer.from(request.clientIdentityPubkey, "hex"),
   );
 
-  const reqForClientSignatureVerification = req;
-  reqForClientSignatureVerification.clientSignature = "";
+  const signature = request.clientSignature;
+  request.clientSignature = "";
   if (
-    !secp256k1.ecdsaVerify(
-      clientSignature,
-      Buffer.from(
-        SHA256(JSON.stringify(reqForClientSignatureVerification)).toString(),
-        `hex`,
-      ),
-      clientPubkey,
+    !odap.verifySignature(
+      JSON.stringify(request),
+      sourceClientSignature,
+      sourceClientPubkey,
     )
   ) {
-    await odap.Revert(req.sessionID);
-    throw new Error(`${fnTag}, signature verify failed`);
+    throw new Error(
+      `${fnTag}, TransferCommenceRequest message signature verification failed`,
+    );
   }
+  request.clientSignature = signature;
 
-  const sessionData = odap.sessions.get(sessionID);
+  const sessionData = odap.sessions.get(request.sessionID);
+
   if (sessionData === undefined) {
-    await odap.Revert(req.sessionID);
     throw new Error(`${fnTag}, sessionID non exist`);
   }
 
-  const isCommmitFinalAckHash: boolean =
-    sessionData.commitFinalAckHash !== undefined &&
-    sessionData.commitFinalAckHash == req.hashCommitFinalAck;
-  if (!isCommmitFinalAckHash) {
-    await odap.Revert(req.sessionID);
-    throw new Error(`${fnTag}, previous commit final ack hash not match`);
+  if (
+    sessionData.commitFinalResponseMessageHash != request.hashCommitFinalAck
+  ) {
+    throw new Error(`${fnTag}, previous message hash not match`);
   }
 
-  const isTransferCommenceHash: boolean =
-    sessionData.commenceReqHash !== undefined &&
-    sessionData.commenceReqHash == req.hashTransferCommence;
-  if (!isTransferCommenceHash) {
-    await odap.Revert(req.sessionID);
-    throw new Error(`${fnTag}, previous transfer commence hash not match`);
+  if (
+    sessionData.transferCommenceMessageRequestHash !=
+    request.hashTransferCommence
+  ) {
+    throw new Error(
+      `${fnTag}, previous TransferCommenceRequest hash not match`,
+    );
   }
 }

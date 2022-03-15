@@ -41,9 +41,9 @@ import {
   Constants,
 } from "@hyperledger/cactus-core-api";
 import {
-  OdapGateway,
-  OdapGatewayConstructorOptions,
-} from "../../../../main/typescript/gateway/odap-gateway";
+  IPluginOdapGatewayConstructorOptions,
+  PluginOdapGateway,
+} from "../../../../main/typescript/gateway/plugin-odap-gateway";
 import {
   ChainCodeProgrammingLanguage,
   DefaultEventHandlerStrategy,
@@ -548,11 +548,11 @@ test(testCase, async (t: Test) => {
   };
 
   test.onFinish(tearDown);
-  const odapClientGateWayPluginID = uuidv4();
-  const odapPluginOptions: OdapGatewayConstructorOptions = {
+  const odapClientGatewayPluginID = uuidv4();
+  const odapPluginOptions: IPluginOdapGatewayConstructorOptions = {
     name: "cactus-plugin#odapGateway",
     dltIDs: ["dummy"],
-    instanceId: odapClientGateWayPluginID,
+    instanceId: odapClientGatewayPluginID,
     ipfsPath: ipfsApiHost,
     fabricPath: fabricPath,
     fabricSigningCredential: fabricSigningCredential,
@@ -560,7 +560,7 @@ test(testCase, async (t: Test) => {
     fabricContractName: fabricContractName,
     fabricAssetID: fabricAssetID,
   };
-  const clientOdapGateway = new OdapGateway(odapPluginOptions);
+  const clientOdapGateway = new PluginOdapGateway(odapPluginOptions);
 
   const odapServerGatewayInstanceID = uuidv4();
   // the block below adds the server odap gateway to the plugin registry
@@ -579,7 +579,7 @@ test(testCase, async (t: Test) => {
     test.onFinish(async () => await Servers.shutdown(server));
     const { address, port } = addressInfo;
     odapServerGatewayApiHost = `http://${address}:${port}`;
-    const odapPluginOptions: OdapGatewayConstructorOptions = {
+    const odapPluginOptions: IPluginOdapGatewayConstructorOptions = {
       name: "cactus-plugin#odapGateway",
       dltIDs: ["dummy"],
       instanceId: odapServerGatewayInstanceID,
@@ -591,7 +591,7 @@ test(testCase, async (t: Test) => {
       besuKeychainId: besuKeychainId,
     };
 
-    const plugin = new OdapGateway(odapPluginOptions);
+    const plugin = new PluginOdapGateway(odapPluginOptions);
     odapServerGatewayPubKey = plugin.pubKey;
     await plugin.getOrCreateWebServices();
     await plugin.registerWebServices(expressApp);
@@ -629,7 +629,7 @@ test(testCase, async (t: Test) => {
       loggingProfile: "dummy",
       accessControlProfile: "dummy",
       applicationProfile: "dummy",
-      payLoadProfile: {
+      payloadProfile: {
         assetProfile: assetProfile,
         capabilities: "",
       },
@@ -639,11 +639,11 @@ test(testCase, async (t: Test) => {
       clientDltSystem: "dummy",
       clientIdentityPubkey: clientOdapGateway.pubKey,
       originatorPubkey: dummyPubKey,
-      recipientGateWayDltSystem: "dummy",
-      recipientGateWayPubkey: odapServerGatewayPubKey,
+      recipientGatewayDltSystem: "dummy",
+      recipientGatewayPubkey: odapServerGatewayPubKey,
       serverDltSystem: "dummy",
       serverIdentityPubkey: dummyPubKey,
-      sourceGateWayDltSystem: "dummy",
+      sourceGatewayDltSystem: "dummy",
     };
     const res = await apiClient.sendClientRequestV1(odapClientRequest);
     t.ok(res);

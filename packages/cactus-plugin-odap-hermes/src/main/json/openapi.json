@@ -168,6 +168,12 @@
             "TransferInitializationV1Request":{
                 "type":"object",
                 "properties":{
+                    "messageType":{
+                        "type": "string"
+                    },
+                    "sessionID":{
+                        "type":"string"
+                    },
                     "version":{
                         "type":"string"
                     },
@@ -189,19 +195,19 @@
                     "accessControlProfile":{
                         "type": "string"
                     },
-                    "initializationRequestMessageSignature":{
+                    "clientSignature":{
                         "type":"string"
                     },
                     "sourceGatewayPubkey":{
                         "type":"string"
                     },
-                    "sourceGateWayDltSystem":{
+                    "sourceGatewayDltSystem":{
                         "type":"string"
                     },
-                    "recipientGateWayPubkey":{
+                    "recipientGatewayPubkey":{
                         "type":"string"
                     },
-                    "recipientGateWayDltSystem":{
+                    "recipientGatewayDltSystem":{
                         "type":"string"
                     },
                     "escrowType":{
@@ -242,23 +248,32 @@
                         "items":{
                             "$ref":"#/components/schemas/History"
                         }
+                    },
+                    "sequenceNumber":{
+                        "type":"integer"
                     }
                 },
                 "required": [
+                    "messageType",
+                    "sessionID",
                     "loggingProfile",
                     "accessControlProfile",
                     "payloadProfile",
                     "applicationProfile",
-                    "initializationRequestMessageSignature",
+                    "clientSignature",
                     "sourceGatewayPubkey",
-                    "sourceGateWayDltSystem",
-                    "recipientGateWayPubkey",
-                    "recipientGateWayDltSystem"
+                    "sourceGatewayDltSystem",
+                    "recipientGatewayPubkey",
+                    "recipientGatewayDltSystem",
+                    "sequenceNumber"
                 ]
             },
             "TransferInitializationV1Response":{
                 "type":"object",
                 "properties": {
+                    "messageType":{
+                        "type": "string"
+                    },
                     "sessionID":{
                         "type":"string"
                     },
@@ -287,24 +302,36 @@
                     },
                     "serverIdentityPubkey":{
                         "type":"string"
+                    },
+                    "serverSignature":{
+                        "type":"string"
                     }
                 },
                 "required": [
+                    "messageType",
                     "initialRequestMessageHash",
                     "timeStamp",
                     "processedTimeStamp",
                     "sessionID",
-                    "serverIdentityPubkey"
+                    "serverIdentityPubkey",
+                    "sequenceNumber",
+                    "serverSignature"
                 ]
             },
             "SessionData":{
                 "type":"object",
                 "properties":{
+                    "id": {
+                        "type":"string"
+                    },
                     "step": {
                         "type":"number"
                     },
-                    "initializationMsgHash": {
+                    "version": {
                         "type":"string"
+                    },
+                    "lastSequenceNumber": {
+                        "type":"number"
                     },
                     "loggingProfile": {
                         "type":"string"
@@ -315,29 +342,11 @@
                     "applicationProfile": {
                         "type":"string"
                     },
+                    "payloadProfile":{
+                        "$ref":"#/components/schemas/PayloadProfile"
+                    },
                     "assetProfile": {
                         "$ref":"#/components/schemas/AssetProfile"
-                    },
-                    "initializationRequestMsgSignature": {
-                        "type":"string"
-                    },
-                    "sourceGateWayPubkey": {
-                        "type":"string"
-                    },
-                    "sourceGateWayDltSystem": {
-                        "type":"string"
-                    },
-                    "recipientGateWayPubkey": {
-                        "type":"string"
-                    },
-                    "recipientGateWayDltSystem": {
-                        "type":"string"
-                    },
-                    "initialMsgRcvTimeStamp": {
-                        "type":"string"
-                    },
-                    "initialMsgProcessedTimeStamp": {
-                        "type":"string"
                     },
                     "originatorPubkey": {
                         "type":"string"
@@ -345,70 +354,109 @@
                     "beneficiaryPubkey": {
                         "type":"string"
                     },
-                    "clientIdentityPubkey": {
+                    "sourceGatewayPubkey": {
                         "type":"string"
                     },
-                    "serverIdentityPubkey": {
+                    "sourceGatewayDltSystem": {
                         "type":"string"
                     },
-                    "clientDltSystem": {
+                    "recipientGatewayPubkey": {
                         "type":"string"
                     },
-                    "serverDltSystem": {
+                    "recipientGatewayDltSystem": {
                         "type":"string"
                     },
-                    "commenceReqHash": {
+                    "initializationRequestMessageHash": {
                         "type":"string"
                     },
-                    "commenceAckHash": {
+                    "initializationResponseMessageHash": {
                         "type":"string"
                     },
-                    "clientSignatureForCommenceReq": {
+                    "initializationRequestMessageRcvTimeStamp": {
                         "type":"string"
                     },
-                    "serverSignatureForCommenceAck": {
+                    "initializationRequestMessageProcessedTimeStamp": {
+                        "type":"string"
+                    },
+                    "clientSignatureInitializationRequestMessage": {
+                        "type":"string"
+                    },
+                    "serverSignatureInitializationResponseMessage": {
+                        "type":"string"
+                    },
+                    "transferCommenceMessageRequestHash": {
+                        "type":"string"
+                    },
+                    "transferCommenceMessageResponseHash": {
+                        "type":"string"
+                    },
+                    "clientSignatureTransferCommenceRequestMessage": {
+                        "type":"string"
+                    },
+                    "serverSignatureTransferCommenceResponseMessage": {
+                        "type":"string"
+                    },
+                    "lockEvidenceRequestMessageHash": {
+                        "type":"string"
+                    },
+                    "lockEvidenceResponseMessageHash": {
+                        "type":"string"
+                    },
+                    "clientSignatureLockEvidenceRequestMessage": {
+                        "type":"string"
+                    },
+                    "serverSignatureLockEvidenceResponseMessage": {
                         "type":"string"
                     },
                     "lockEvidenceClaim": {
                         "type":"string"
                     },
-                    "clientSignatureForLockEvidence": {
+                    "commitPrepareRequestMessageHash": {
                         "type":"string"
                     },
-                    "serverSignatureForLockEvidence": {
+                    "commitPrepareResponseMessageHash": {
                         "type":"string"
                     },
-                    "lockEvidenceAckHash": {
+                    "clientSignatureCommitPreparationRequestMessage": {
                         "type":"string"
                     },
-                    "clientSignatureForCommitPreparation": {
+                    "serverSignatureCommitPreparationResponseMessage": {
                         "type":"string"
                     },
-                    "commitPrepareReqHash": {
+                    "commitFinalRequestMessageHash": {
                         "type":"string"
                     },
-                    "commitPrepareAckHash": {
+                    "commitFinalResponseMessageHash": {
                         "type":"string"
                     },
-                    "serverSignatureForCommitPreparation": {
-                        "type":"string"
-                    },  
                     "commitFinalClaim": {
+                        "type": "string"
+                    },
+                    "commitFinalClaimFormat": {
+                        "type": "string"
+                    },
+                    "commitAcknowledgementClaim": {
+                        "type": "string"
+                    },
+                    "commitAcknowledgementClaimFormat": {
+                        "type": "string"
+                    },
+                    "clientSignatureCommitFinalRequestMessage": {
                         "type":"string"
                     },
-                    "clientSignatureForCommitFinal": {
+                    "serverSignatureCommitFinalResponseMessage": {
                         "type":"string"
                     },
-                    "commitAckClaim": {
+                    "transferCompleteMessageHash": {
                         "type":"string"
                     },
-                    "serverSignatureForCommitFinal": {
+                    "clientSignatureTransferCompleteMessage": {
                         "type":"string"
                     },
-                    "commitFinalReqHash": {
+                    "besuAssetID": {
                         "type":"string"
                     },
-                    "commitFinalAckHash": {
+                    "fabricAssetID": {
                         "type":"string"
                     },
                     "isFabricAssetDeleted": {
@@ -429,13 +477,7 @@
                     "isBesuAssetLocked": {
                         "type":"boolean"
                     },
-                    "fabricAssetID": {
-                        "type":"string"
-                    },
                     "fabricAssetSize": {
-                        "type":"number"
-                    },
-                    "besuAssetID": {
                         "type":"string"
                     }
                 }
@@ -482,6 +524,9 @@
                     },
                     "clientSignature":{
                         "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type":"integer"
                     }
                 },
                 "required": [
@@ -495,7 +540,8 @@
                     "serverIdentityPubkey",
                     "hashAssetProfile",
                     "hashPrevMessage",
-                    "clientSignature"
+                    "clientSignature",
+                    "sequenceNumber"
                 ]
             },
             "TransferCommenceV1Response":{
@@ -522,6 +568,9 @@
                     },
                     "messageHash":{
                         "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type":"number"
                     }
                 },
                 "required": [
@@ -529,7 +578,8 @@
                     "serverIdentityPubkey",
                     "clientIdentityPubkey",
                     "hashCommenceRequest",
-                    "serverSignature"
+                    "serverSignature",
+                    "sequenceNumber"
                 ]
             },
             "LockEvidenceV1Request":{
@@ -569,6 +619,9 @@
                     },
                     "messageHash":{
                         "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -579,7 +632,8 @@
                     "lockEvidenceClaim",
                     "lockEvidenceExpiration",
                     "hashCommenceAckRequest",
-                    "clientSignature"
+                    "clientSignature",
+                    "sequenceNumber"
                 ]
             },
             "LockEvidenceV1Response":{
@@ -603,6 +657,9 @@
                     },
                     "messageType":{
                         "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type":"number"
                     }
                 },
                 "required": [
@@ -610,7 +667,8 @@
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
                     "hashLockEvidenceRequest",
-                    "serverSignature"
+                    "serverSignature",
+                    "sequenceNumber"
                 ]
             },
             "CommitPreparationV1Request":{
@@ -636,6 +694,9 @@
                     },
                     "clientSignature":{
                         "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -644,7 +705,8 @@
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
                     "hashLockEvidenceAck",
-                    "clientSignature"
+                    "clientSignature",
+                    "sequenceNumber"
                 ]
             },
             "CommitPreparationV1Response":{
@@ -667,6 +729,9 @@
                     },
                     "serverSignature":{
                         "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -674,7 +739,8 @@
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
                     "hashCommitPrep",
-                    "serverSignature"
+                    "serverSignature",
+                    "sequenceNumber"
                 ]
             },
             "CommitFinalV1Request":{
@@ -707,6 +773,9 @@
                     },
                     "clientSignature":{
                         "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -716,7 +785,8 @@
                     "serverIdentityPubkey",
                     "commitFinalClaim",
                     "hashCommitPrepareAck",
-                    "clientSignature"
+                    "clientSignature",
+                    "sequenceNumber"
                 ]
             },
             "CommitFinalV1Response":{
@@ -745,6 +815,9 @@
                     },
                     "serverSignature":{
                         "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -753,7 +826,8 @@
                     "serverIdentityPubkey",
                     "commitAcknowledgementClaim",
                     "hashCommitFinal",
-                    "serverSignature"
+                    "serverSignature",
+                    "sequenceNumber"
                 ]
             },
             "TransferCompleteV1Request":{
@@ -783,7 +857,10 @@
                     },
                     "hashTransferCommence":{
                         "type": "string"
-                    }   
+                    },
+                    "sequenceNumber":{
+                        "type": "number"
+                    }
                 },
                 "required": [
                     "sessionID",
@@ -792,7 +869,8 @@
                     "serverIdentityPubkey",
                     "hashCommitFinalAck",
                     "clientSignature",
-                    "hashTransferCommence"
+                    "hashTransferCommence",
+                    "sequenceNumber"
                 ]
             },
             "TransferCompleteV1Response":{
@@ -827,16 +905,16 @@
                     "assetProfile":{
                         "$ref":"#/components/schemas/AssetProfile"
                     },
-                    "payLoadProfile":{
+                    "payloadProfile":{
                         "$ref":"#/components/schemas/PayloadProfile"
                     },
-                    "sourceGateWayDltSystem":{
+                    "sourceGatewayDltSystem":{
                         "type":"string"
                     },
-                    "recipientGateWayDltSystem":{
+                    "recipientGatewayDltSystem":{
                         "type":"string"
                     },
-                    "recipientGateWayPubkey":{
+                    "recipientGatewayPubkey":{
                         "type":"string"
                     },
                     "originatorPubkey": {
@@ -877,10 +955,10 @@
                     "assetControlProfile",
                     "applicationProfile",
                     "assetProfile",
-                    "payLoadProfile",
-                    "sourceGateWayDltSystem",
-                    "recipientGateWayDltSystem",
-                    "recipientGateWayPubkey",
+                    "payloadProfile",
+                    "sourceGatewayDltSystem",
+                    "recipientGatewayDltSystem",
+                    "recipientGatewayPubkey",
                     "originatorPubkey",
                     "beneficiaryPubkey",
                     "clientIdentityPubkey",

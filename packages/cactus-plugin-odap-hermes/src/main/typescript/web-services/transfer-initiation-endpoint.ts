@@ -15,13 +15,13 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { OdapGateway } from "../gateway/odap-gateway";
+import { PluginOdapGateway } from "../gateway/plugin-odap-gateway";
 import { TransferInitializationV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
 export interface ITransferInitiationEndpointOptions {
   logLevel?: LogLevelDesc;
-  gateway: OdapGateway;
+  gateway: PluginOdapGateway;
 }
 
 export class TransferInitiationEndpointV1 implements IWebServiceEndpoint {
@@ -79,7 +79,6 @@ export class TransferInitiationEndpointV1 implements IWebServiceEndpoint {
   public async registerExpress(
     expressApp: Express,
   ): Promise<IWebServiceEndpoint> {
-    console.log("registering express");
     await registerWebServiceEndpoint(expressApp, this);
     return this;
   }
@@ -93,8 +92,9 @@ export class TransferInitiationEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody: TransferInitializationV1Request = req.body;
     try {
-      console.log("try in handle request");
-      const resBody = await this.options.gateway.initiateTransfer(reqBody);
+      const resBody = await this.options.gateway.initiateTransferReceived(
+        reqBody,
+      );
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

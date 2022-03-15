@@ -15,25 +15,25 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { OdapGateway } from "../gateway/odap-gateway";
-import { TransferCommenceV1Request } from "../generated/openapi/typescript-axios";
+import { PluginOdapGateway } from "../gateway/plugin-odap-gateway";
+import { TransferCompleteV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
-export interface ILockEvidencePrepareEndpointOptions {
+export interface ITransferCompleteEndpointOptions {
   logLevel?: LogLevelDesc;
-  gateway: OdapGateway;
+  gateway: PluginOdapGateway;
 }
 
-export class LockEvidencePrepareEndpointV1 implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "LockEvidencePrepareEndpointV1";
+export class TransferCompleteEndpointV1 implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "TransferCompleteEndpointV1";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return LockEvidencePrepareEndpointV1.CLASS_NAME;
+    return TransferCompleteEndpointV1.CLASS_NAME;
   }
 
-  constructor(public readonly options: ILockEvidencePrepareEndpointOptions) {
+  constructor(public readonly options: ITransferCompleteEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.gateway, `${fnTag} arg options.connector`);
@@ -46,23 +46,23 @@ export class LockEvidencePrepareEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommence"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercomplete"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.get["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommence"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercomplete"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommence"
-    ].post.operationId;
+      "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercomplete"
+    ].get.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -89,9 +89,9 @@ export class LockEvidencePrepareEndpointV1 implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody: TransferCommenceV1Request = req.body;
+    const reqBody: TransferCompleteV1Request = req.body;
     try {
-      const resBody = await this.options.gateway.lockEvidenceTransferCommence(
+      const resBody = await this.options.gateway.transferCompleteReceived(
         reqBody,
       );
       res.json(resBody);

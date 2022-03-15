@@ -1,29 +1,30 @@
-import { LoggerProvider } from "@hyperledger/cactus-common";
-import {
-  LockEvidenceV1Request,
-  LockEvidenceV1Response,
-} from "../../generated/openapi/typescript-axios";
 import { OdapMessageType, PluginOdapGateway } from "../plugin-odap-gateway";
 import { SHA256 } from "crypto-js";
+import { LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  CommitPreparationV1Request,
+  CommitPreparationV1Response,
+} from "../../generated/openapi/typescript-axios";
 
 const log = LoggerProvider.getOrCreate({
   level: "INFO",
   label: "odap-lock-evidence-helper",
 });
 
-export async function lockEvidence(
-  request: LockEvidenceV1Request,
+export async function commitPrepare(
+  request: CommitPreparationV1Request,
   odap: PluginOdapGateway,
-): Promise<LockEvidenceV1Response> {
-  const fnTag = `${odap.className}#lockEvidence()`;
+): Promise<CommitPreparationV1Response> {
+  const fnTag = `${odap.className}#CommitPrepare()`;
   log.info(
-    `server gateway receives LockEvidenceRequestMessage: ${JSON.stringify(
+    `server gateway receives CommitPrepareRequestMessage: ${JSON.stringify(
       request,
     )}`,
   );
 
   const sessionData = odap.sessions.get(request.sessionID);
   if (sessionData == undefined || sessionData.step == undefined) {
+    await odap.Revert(request.sessionID);
     throw new Error(
       `${fnTag}, session Id does not correspond to any open session`,
     );
@@ -31,59 +32,58 @@ export async function lockEvidence(
 
   await odap.storeOdapLog(
     {
-      phase: "p2",
+      phase: "p3",
       step: sessionData.step.toString(),
       type: "exec",
-      operation: "lock",
+      operation: "commit-prepare",
       nodes: `${odap.pubKey}`,
     },
     `${sessionData.id}-${sessionData.step.toString()}`,
   );
 
   // Calculate the hash here to avoid changing the object and the hash
-  const lockEvidenceRequestMessageHash = SHA256(
+  const commitPrepareRequestMessageHash = SHA256(
     JSON.stringify(request),
   ).toString();
 
   log.info(
-    `LockEvidenceRequestMessage hash is: ${lockEvidenceRequestMessageHash}`,
+    `CommitPrepareRequestMessage hash is: ${commitPrepareRequestMessageHash}`,
   );
 
-  await checkValidLockEvidenceRequest(request, odap);
+  await checkValidCommitPreparationRequest(request, odap);
 
   await odap.storeOdapLog(
     {
-      phase: "p2",
+      phase: "p3",
       step: sessionData.step.toString(),
       type: "done",
-      operation: "lock",
-      nodes: `${odap.pubKey}`,
+      operation: "commit-prepare",
+      nodes: `${odap.pubKey}}`,
     },
     `${sessionData.id}-${sessionData.step.toString()}`,
   );
 
-  const lockEvidenceResponseMessage: LockEvidenceV1Response = {
-    messageType: OdapMessageType.LockEvidenceResponse,
+  const commitPreparationResponseMessage: CommitPreparationV1Response = {
+    messageType: OdapMessageType.CommitPreparationResponse,
     clientIdentityPubkey: request.clientIdentityPubkey,
     serverIdentityPubkey: request.serverIdentityPubkey,
-    hashLockEvidenceRequest: lockEvidenceRequestMessageHash,
-    // server transfer number
+    hashCommitPrep: commitPrepareRequestMessageHash,
     serverSignature: "",
     sequenceNumber: request.sequenceNumber,
   };
 
-  lockEvidenceResponseMessage.serverSignature = odap.bufArray2HexStr(
-    await odap.sign(JSON.stringify(lockEvidenceResponseMessage)),
+  commitPreparationResponseMessage.serverSignature = odap.bufArray2HexStr(
+    await odap.sign(JSON.stringify(commitPreparationResponseMessage)),
   );
 
-  storeSessionData(request, lockEvidenceResponseMessage, odap);
+  storeSessionData(request, commitPreparationResponseMessage, odap);
 
   await odap.storeOdapLog(
     {
-      phase: "p2",
+      phase: "p3",
       step: sessionData.step.toString(),
       type: "ack",
-      operation: "lock",
+      operation: "commit-prepare",
       nodes: `${odap.pubKey}->${request.clientIdentityPubkey}`,
     },
     `${sessionData.id}-${sessionData.step.toString()}`,
@@ -91,17 +91,20 @@ export async function lockEvidence(
 
   sessionData.step++;
 
-  return lockEvidenceResponseMessage;
+  return commitPreparationResponseMessage;
 }
 
-async function checkValidLockEvidenceRequest(
-  request: LockEvidenceV1Request,
+async function checkValidCommitPreparationRequest(
+  request: CommitPreparationV1Request,
   odap: PluginOdapGateway,
 ): Promise<void> {
-  const fnTag = `${odap.className}#checkValidLockEvidenceRequest()`;
+  const fnTag = `${odap.className}#checkValidCommitPreparationRequest()`;
 
-  if (request.messageType != OdapMessageType.LockEvidenceRequest) {
-    throw new Error(`${fnTag}, wrong message type for LockEvidenceRequest`);
+  if (request.messageType != OdapMessageType.CommitPreparationRequest) {
+    await odap.Revert(request.sessionID);
+    throw new Error(
+      `${fnTag}, wrong message type for CommitPreparationRequest`,
+    );
   }
 
   const sourceClientSignature = new Uint8Array(
@@ -123,18 +126,12 @@ async function checkValidLockEvidenceRequest(
   ) {
     await odap.Revert(request.sessionID);
     throw new Error(
-      `${fnTag}, LockEvidenceRequest message signature verification failed`,
+      `${fnTag}, CommitPreparationRequest message signature verification failed`,
     );
   }
   request.clientSignature = signature;
 
-  if (
-    request.lockEvidenceClaim == undefined ||
-    new Date() > new Date(request.lockEvidenceExpiration)
-  ) {
-    await odap.Revert(request.sessionID);
-    throw new Error(`${fnTag}, invalid or expired lock evidence claim`);
-  }
+  // We need to check somewhere if this phase is completed within the asset-lock duration.
 
   const sessionData = odap.sessions.get(request.sessionID);
   if (sessionData === undefined) {
@@ -142,8 +139,7 @@ async function checkValidLockEvidenceRequest(
   }
 
   if (
-    sessionData.transferCommenceMessageResponseHash !=
-    request.hashCommenceAckRequest
+    sessionData.lockEvidenceResponseMessageHash != request.hashLockEvidenceAck
   ) {
     await odap.Revert(request.sessionID);
     throw new Error(`${fnTag}, previous message hash does not match`);
@@ -151,27 +147,25 @@ async function checkValidLockEvidenceRequest(
 }
 
 function storeSessionData(
-  request: LockEvidenceV1Request,
-  response: LockEvidenceV1Response,
+  request: CommitPreparationV1Request,
+  response: CommitPreparationV1Response,
   odap: PluginOdapGateway,
 ): void {
-  const fnTag = `${odap.className}#()storeSessionData`;
+  const fnTag = `${odap.className}#()storeDataAfterCommitPreparationRequest`;
   const sessionData = odap.sessions.get(request.sessionID);
 
   if (sessionData == undefined) {
     throw new Error(`${fnTag}, session data is undefined`);
   }
 
-  sessionData.lockEvidenceResponseMessageHash = SHA256(
+  sessionData.commitPrepareRequestMessageHash = response.hashCommitPrep;
+  sessionData.commitPrepareResponseMessageHash = SHA256(
     JSON.stringify(response),
   ).toString();
-  sessionData.lockEvidenceRequestMessageHash = SHA256(
-    JSON.stringify(request),
-  ).toString();
 
-  sessionData.clientSignatureLockEvidenceRequestMessage =
+  sessionData.clientSignatureCommitPreparationRequestMessage =
     request.clientSignature;
-  sessionData.serverSignatureLockEvidenceResponseMessage =
+  sessionData.serverSignatureCommitPreparationResponseMessage =
     response.serverSignature;
 
   odap.sessions.set(request.sessionID, sessionData);

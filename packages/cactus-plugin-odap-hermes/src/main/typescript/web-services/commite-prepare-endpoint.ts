@@ -15,13 +15,13 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { OdapGateway } from "../gateway/odap-gateway";
+import { PluginOdapGateway } from "../gateway/plugin-odap-gateway";
 import { CommitPreparationV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
 export interface ICommitPrepareEndpointOptions {
   logLevel?: LogLevelDesc;
-  gateway: OdapGateway;
+  gateway: PluginOdapGateway;
 }
 
 export class CommitPrepareEndpointV1 implements IWebServiceEndpoint {
@@ -91,7 +91,7 @@ export class CommitPrepareEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody: CommitPreparationV1Request = req.body;
     try {
-      const resBody = await this.options.gateway.CommitPrepare(reqBody);
+      const resBody = await this.options.gateway.commitPrepareReceived(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
