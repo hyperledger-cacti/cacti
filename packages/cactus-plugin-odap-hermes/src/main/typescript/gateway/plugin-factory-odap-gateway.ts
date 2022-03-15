@@ -2,15 +2,18 @@ import {
   IPluginFactoryOptions,
   PluginFactory,
 } from "@hyperledger/cactus-core-api";
-import { OdapGateway, OdapGatewayConstructorOptions } from "./odap-gateway";
+import {
+  IPluginOdapGatewayConstructorOptions,
+  PluginOdapGateway,
+} from "./plugin-odap-gateway";
 export class PluginFactoryOdapGateway extends PluginFactory<
-  OdapGateway,
-  OdapGatewayConstructorOptions,
+  PluginOdapGateway,
+  IPluginOdapGatewayConstructorOptions,
   IPluginFactoryOptions
 > {
   async create(
-    pluginOptions: OdapGatewayConstructorOptions,
-  ): Promise<OdapGateway> {
-    return new OdapGateway(pluginOptions);
+    pluginOptions: IPluginOdapGatewayConstructorOptions,
+  ): Promise<PluginOdapGateway> {
+    return new PluginOdapGateway(pluginOptions);
   }
 }

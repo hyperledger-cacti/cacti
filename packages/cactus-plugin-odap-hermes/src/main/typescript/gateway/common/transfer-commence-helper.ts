@@ -1,7 +1,7 @@
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import {
-  LockEvidenceV1Request,
-  LockEvidenceV1Response,
+  TransferCommenceV1Request,
+  TransferCommenceV1Response,
 } from "../../generated/openapi/typescript-axios";
 import { OdapMessageType, PluginOdapGateway } from "../plugin-odap-gateway";
 import { SHA256 } from "crypto-js";
@@ -11,13 +11,13 @@ const log = LoggerProvider.getOrCreate({
   label: "odap-lock-evidence-helper",
 });
 
-export async function lockEvidence(
-  request: LockEvidenceV1Request,
+export async function transferCommence(
+  request: TransferCommenceV1Request,
   odap: PluginOdapGateway,
-): Promise<LockEvidenceV1Response> {
-  const fnTag = `${odap.className}#lockEvidence()`;
+): Promise<TransferCommenceV1Response> {
+  const fnTag = `${odap.className}#transferCommence()`;
   log.info(
-    `server gateway receives LockEvidenceRequestMessage: ${JSON.stringify(
+    `server gateway receives TransferCommenceMessage: ${JSON.stringify(
       request,
     )}`,
   );
@@ -34,74 +34,78 @@ export async function lockEvidence(
       phase: "p2",
       step: sessionData.step.toString(),
       type: "exec",
-      operation: "lock",
+      operation: "commence",
       nodes: `${odap.pubKey}`,
     },
     `${sessionData.id}-${sessionData.step.toString()}`,
   );
 
   // Calculate the hash here to avoid changing the object and the hash
-  const lockEvidenceRequestMessageHash = SHA256(
+  const transferCommenceRequestMessageHash = SHA256(
     JSON.stringify(request),
   ).toString();
 
   log.info(
-    `LockEvidenceRequestMessage hash is: ${lockEvidenceRequestMessageHash}`,
+    `TransferCommenceRequest hash is: ${transferCommenceRequestMessageHash}`,
   );
 
-  await checkValidLockEvidenceRequest(request, odap);
+  await checkValidtransferCommenceRequest(request, odap);
 
   await odap.storeOdapLog(
     {
       phase: "p2",
       step: sessionData.step.toString(),
       type: "done",
-      operation: "lock",
+      operation: "commence",
       nodes: `${odap.pubKey}`,
     },
     `${sessionData.id}-${sessionData.step.toString()}`,
   );
 
-  const lockEvidenceResponseMessage: LockEvidenceV1Response = {
-    messageType: OdapMessageType.LockEvidenceResponse,
+  const transferCommenceResponse: TransferCommenceV1Response = {
+    messageType: OdapMessageType.TransferCommenceResponse,
     clientIdentityPubkey: request.clientIdentityPubkey,
     serverIdentityPubkey: request.serverIdentityPubkey,
-    hashLockEvidenceRequest: lockEvidenceRequestMessageHash,
-    // server transfer number
+    hashCommenceRequest: transferCommenceRequestMessageHash,
+    // serverTransferNumber??
     serverSignature: "",
     sequenceNumber: request.sequenceNumber,
   };
 
-  lockEvidenceResponseMessage.serverSignature = odap.bufArray2HexStr(
-    await odap.sign(JSON.stringify(lockEvidenceResponseMessage)),
+  const serverSignature = await odap.sign(
+    JSON.stringify(transferCommenceResponse),
   );
 
-  storeSessionData(request, lockEvidenceResponseMessage, odap);
+  transferCommenceResponse.serverSignature = odap.bufArray2HexStr(
+    serverSignature,
+  );
+
+  await storeSessionData(request, transferCommenceResponse, odap);
 
   await odap.storeOdapLog(
     {
       phase: "p2",
       step: sessionData.step.toString(),
       type: "ack",
-      operation: "lock",
+      operation: "commence",
       nodes: `${odap.pubKey}->${request.clientIdentityPubkey}`,
     },
-    `${sessionData.id}-${sessionData.step.toString()}`,
+    `${request.sessionID}-${sessionData.step.toString()}`,
   );
 
   sessionData.step++;
 
-  return lockEvidenceResponseMessage;
+  return transferCommenceResponse;
 }
 
-async function checkValidLockEvidenceRequest(
-  request: LockEvidenceV1Request,
+async function checkValidtransferCommenceRequest(
+  request: TransferCommenceV1Request,
   odap: PluginOdapGateway,
 ): Promise<void> {
-  const fnTag = `${odap.className}#checkValidLockEvidenceRequest()`;
+  const fnTag = `${odap.className}#checkValidtransferCommenceRequest()`;
 
-  if (request.messageType != OdapMessageType.LockEvidenceRequest) {
-    throw new Error(`${fnTag}, wrong message type for LockEvidenceRequest`);
+  if (request.messageType != OdapMessageType.TransferCommenceRequest) {
+    throw new Error(`${fnTag}, wrong message type for TransferCommenceRequest`);
   }
 
   const sourceClientSignature = new Uint8Array(
@@ -121,40 +125,35 @@ async function checkValidLockEvidenceRequest(
       sourceClientPubkey,
     )
   ) {
-    await odap.Revert(request.sessionID);
     throw new Error(
-      `${fnTag}, LockEvidenceRequest message signature verification failed`,
+      `${fnTag}, TransferCommenceRequest message signature verification failed`,
     );
   }
   request.clientSignature = signature;
-
-  if (
-    request.lockEvidenceClaim == undefined ||
-    new Date() > new Date(request.lockEvidenceExpiration)
-  ) {
-    await odap.Revert(request.sessionID);
-    throw new Error(`${fnTag}, invalid or expired lock evidence claim`);
-  }
 
   const sessionData = odap.sessions.get(request.sessionID);
   if (sessionData === undefined) {
     throw new Error(`${fnTag}, sessionID non exist`);
   }
 
-  if (
-    sessionData.transferCommenceMessageResponseHash !=
-    request.hashCommenceAckRequest
-  ) {
-    await odap.Revert(request.sessionID);
-    throw new Error(`${fnTag}, previous message hash does not match`);
+  if (sessionData.initializationRequestMessageHash != request.hashPrevMessage) {
+    throw new Error(`${fnTag}, previous message hash not match`);
+  }
+
+  const assetProfileHash = SHA256(
+    JSON.stringify(sessionData.assetProfile),
+  ).toString();
+  const isAssetProfileHashMatch = assetProfileHash === request.hashAssetProfile;
+  if (!isAssetProfileHashMatch) {
+    throw new Error(`${fnTag}, assetProfile hash not match`);
   }
 }
 
-function storeSessionData(
-  request: LockEvidenceV1Request,
-  response: LockEvidenceV1Response,
+async function storeSessionData(
+  request: TransferCommenceV1Request,
+  response: TransferCommenceV1Response,
   odap: PluginOdapGateway,
-): void {
+): Promise<void> {
   const fnTag = `${odap.className}#()storeSessionData`;
   const sessionData = odap.sessions.get(request.sessionID);
 
@@ -162,17 +161,19 @@ function storeSessionData(
     throw new Error(`${fnTag}, session data is undefined`);
   }
 
-  sessionData.lockEvidenceResponseMessageHash = SHA256(
+  sessionData.transferCommenceMessageRequestHash = response.hashCommenceRequest;
+  sessionData.transferCommenceMessageResponseHash = SHA256(
     JSON.stringify(response),
   ).toString();
-  sessionData.lockEvidenceRequestMessageHash = SHA256(
-    JSON.stringify(request),
-  ).toString();
 
-  sessionData.clientSignatureLockEvidenceRequestMessage =
+  sessionData.clientSignatureTransferCommenceRequestMessage =
     request.clientSignature;
-  sessionData.serverSignatureLockEvidenceResponseMessage =
+
+  sessionData.serverSignatureTransferCommenceResponseMessage =
     response.serverSignature;
+
+  sessionData.originatorPubkey = request.originatorPubkey;
+  sessionData.beneficiaryPubkey = request.beneficiaryPubkey;
 
   odap.sessions.set(request.sessionID, sessionData);
 }

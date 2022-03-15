@@ -15,13 +15,13 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { OdapGateway } from "../gateway/odap-gateway";
+import { PluginOdapGateway } from "../gateway/plugin-odap-gateway";
 import { LockEvidenceV1Request } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 
 export interface ILockEvidenceEndpointOptions {
   logLevel?: LogLevelDesc;
-  gateway: OdapGateway;
+  gateway: PluginOdapGateway;
 }
 
 export class LockEvidenceEndpointV1 implements IWebServiceEndpoint {
@@ -95,7 +95,7 @@ export class LockEvidenceEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody: LockEvidenceV1Request = req.body;
     try {
-      const resBody = await this.options.gateway.lockEvidence(reqBody);
+      const resBody = await this.options.gateway.lockEvidenceReceived(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

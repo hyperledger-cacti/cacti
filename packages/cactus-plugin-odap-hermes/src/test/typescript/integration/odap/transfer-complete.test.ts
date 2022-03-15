@@ -1,51 +1,83 @@
-import "jest-extended";
-
-import { randomBytes } from "crypto";
-import secp256k1 from "secp256k1";
-import { OdapGateway } from "../../../../main/typescript/gateway/odap-gateway";
-import { TransferCompleteV1Request } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
+import {
+  IPluginOdapGatewayConstructorOptions,
+  OdapMessageType,
+  PluginOdapGateway,
+} from "../../../../main/typescript/gateway/plugin-odap-gateway";
+import {
+  SessionData,
+  TransferCompleteV1Request,
+} from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
+import { randomInt } from "crypto";
 
-test("dummy test for transfer complete flow", async () => {
-  const odapConstructor = {
-    name: "cactus-plugin#odapGateway",
-    dltIDs: ["dummy"],
+let sourceGatewayConstructor: IPluginOdapGatewayConstructorOptions;
+let recipientGatewayConstructor: IPluginOdapGatewayConstructorOptions;
+let pluginSourceGateway: PluginOdapGateway;
+let pluginRecipientGateway: PluginOdapGateway;
+let dummyCommitFinalResponseMessageHash: string;
+let dummyTransferCommenceResponseMessageHash: string;
+let sessionData: SessionData;
+let sessionID: string;
+let sequenceNumber: number;
+
+beforeEach(() => {
+  sourceGatewayConstructor = {
+    name: "plugin-odap-gateway#sourceGateway",
+    dltIDs: ["DLT2"],
     instanceId: uuidV4(),
   };
-  const odapGateWay = new OdapGateway(odapConstructor);
-
-  let dummyPrivKeyBytes = randomBytes(32);
-  while (!secp256k1.privateKeyVerify(dummyPrivKeyBytes)) {
-    dummyPrivKeyBytes = randomBytes(32);
-  }
-  const dummyPrivKeyStr = odapGateWay.bufArray2HexStr(dummyPrivKeyBytes);
-  const dummyPubKeyBytes = secp256k1.publicKeyCreate(dummyPrivKeyBytes);
-  const dummyPubKey = odapGateWay.bufArray2HexStr(dummyPubKeyBytes);
-  const dummyHash = SHA256("dummy").toString();
-  const sessionData = {
-    clientIdentityPubkey: dummyPubKey,
-    serverIdentityPubkey: dummyPubKey,
-    commitFinalAckHash: dummyHash,
-    commenceReqHash: dummyHash,
+  recipientGatewayConstructor = {
+    name: "plugin-odap-gateway#recipientGateway",
+    dltIDs: ["DLT1"],
+    instanceId: uuidV4(),
   };
-  const sessionID = uuidV4();
 
-  odapGateWay.sessions.set(sessionID, sessionData);
-  const transferCompleteReq: TransferCompleteV1Request = {
+  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+
+  dummyCommitFinalResponseMessageHash = SHA256(
+    "commitFinalResponseMessageData",
+  ).toString();
+
+  dummyTransferCommenceResponseMessageHash = SHA256(
+    "transferCommenceResponseMessageData",
+  ).toString();
+
+  sessionData = {
+    sourceGatewayPubkey: pluginSourceGateway.pubKey,
+    recipientGatewayPubkey: pluginRecipientGateway.pubKey,
+    commitFinalResponseMessageHash: dummyCommitFinalResponseMessageHash,
+    transferCommenceMessageRequestHash: dummyTransferCommenceResponseMessageHash,
+    step: 2,
+  };
+
+  sessionID = uuidV4();
+  sequenceNumber = randomInt(100);
+
+  pluginSourceGateway.sessions.set(sessionID, sessionData);
+  pluginRecipientGateway.sessions.set(sessionID, sessionData);
+});
+
+test("dummy test for transfer complete flow", async () => {
+  const transferCompleteRequestMessage: TransferCompleteV1Request = {
     sessionID: sessionID,
-    messageType: "urn:ietf:odap:msgtype:commit-transfer-complete-msg",
-    clientIdentityPubkey: dummyPubKey,
-    serverIdentityPubkey: dummyPubKey,
+    messageType: OdapMessageType.TransferCompleteRequest,
+    clientIdentityPubkey: pluginSourceGateway.pubKey,
+    serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientSignature: "",
-    hashTransferCommence: dummyHash,
-    hashCommitFinalAck: dummyHash,
+    hashTransferCommence: dummyTransferCommenceResponseMessageHash,
+    hashCommitFinalAck: dummyCommitFinalResponseMessageHash,
+    sequenceNumber: sequenceNumber,
   };
-  transferCompleteReq.clientSignature = await odapGateWay.sign(
-    JSON.stringify(transferCompleteReq),
-    dummyPrivKeyStr,
+
+  transferCompleteRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+    pluginSourceGateway.sign(JSON.stringify(transferCompleteRequestMessage)),
   );
-  await expect(
-    async () => await odapGateWay.TransferComplete(transferCompleteReq),
-  ).not.toThrow();
+
+  const response = await pluginRecipientGateway.transferCompleteReceived(
+    transferCompleteRequestMessage,
+  );
+
+  expect(response.ok).toBe("true");
 });

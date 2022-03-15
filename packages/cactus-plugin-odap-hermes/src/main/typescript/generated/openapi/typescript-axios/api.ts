@@ -160,6 +160,12 @@ export interface CommitFinalV1Request {
      * @memberof CommitFinalV1Request
      */
     clientSignature: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommitFinalV1Request
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -215,6 +221,12 @@ export interface CommitFinalV1Response {
      * @memberof CommitFinalV1Response
      */
     serverSignature: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommitFinalV1Response
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -264,6 +276,12 @@ export interface CommitPreparationV1Request {
      * @memberof CommitPreparationV1Request
      */
     clientSignature: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommitPreparationV1Request
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -307,6 +325,12 @@ export interface CommitPreparationV1Response {
      * @memberof CommitPreparationV1Response
      */
     serverSignature: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommitPreparationV1Response
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -441,6 +465,12 @@ export interface LockEvidenceV1Request {
      * @memberof LockEvidenceV1Request
      */
     messageHash?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof LockEvidenceV1Request
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -484,6 +514,12 @@ export interface LockEvidenceV1Response {
      * @memberof LockEvidenceV1Response
      */
     messageType: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof LockEvidenceV1Response
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -679,25 +715,25 @@ export interface SendClientV1Request {
      * @type {PayloadProfile}
      * @memberof SendClientV1Request
      */
-    payLoadProfile: PayloadProfile;
+    payloadProfile: PayloadProfile;
     /**
      * 
      * @type {string}
      * @memberof SendClientV1Request
      */
-    sourceGateWayDltSystem: string;
+    sourceGatewayDltSystem: string;
     /**
      * 
      * @type {string}
      * @memberof SendClientV1Request
      */
-    recipientGateWayDltSystem: string;
+    recipientGatewayDltSystem: string;
     /**
      * 
      * @type {string}
      * @memberof SendClientV1Request
      */
-    recipientGateWayPubkey: string;
+    recipientGatewayPubkey: string;
     /**
      * 
      * @type {string}
@@ -762,6 +798,12 @@ export interface SendClientV1RequestServerGatewayConfiguration {
 export interface SessionData {
     /**
      * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    id?: string;
+    /**
+     * 
      * @type {number}
      * @memberof SessionData
      */
@@ -771,7 +813,13 @@ export interface SessionData {
      * @type {string}
      * @memberof SessionData
      */
-    initializationMsgHash?: string;
+    version?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SessionData
+     */
+    lastSequenceNumber?: number;
     /**
      * 
      * @type {string}
@@ -792,52 +840,16 @@ export interface SessionData {
     applicationProfile?: string;
     /**
      * 
+     * @type {PayloadProfile}
+     * @memberof SessionData
+     */
+    payloadProfile?: PayloadProfile;
+    /**
+     * 
      * @type {AssetProfile}
      * @memberof SessionData
      */
     assetProfile?: AssetProfile;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    initializationRequestMsgSignature?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    sourceGateWayPubkey?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    sourceGateWayDltSystem?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    recipientGateWayPubkey?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    recipientGateWayDltSystem?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    initialMsgRcvTimeStamp?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    initialMsgProcessedTimeStamp?: string;
     /**
      * 
      * @type {string}
@@ -855,49 +867,109 @@ export interface SessionData {
      * @type {string}
      * @memberof SessionData
      */
-    clientIdentityPubkey?: string;
+    sourceGatewayPubkey?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverIdentityPubkey?: string;
+    sourceGatewayDltSystem?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientDltSystem?: string;
+    recipientGatewayPubkey?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverDltSystem?: string;
+    recipientGatewayDltSystem?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commenceReqHash?: string;
+    initializationRequestMessageHash?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commenceAckHash?: string;
+    initializationResponseMessageHash?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureForCommenceReq?: string;
+    initializationRequestMessageRcvTimeStamp?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverSignatureForCommenceAck?: string;
+    initializationRequestMessageProcessedTimeStamp?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    clientSignatureInitializationRequestMessage?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    serverSignatureInitializationResponseMessage?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    transferCommenceMessageRequestHash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    transferCommenceMessageResponseHash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    clientSignatureTransferCommenceRequestMessage?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    serverSignatureTransferCommenceResponseMessage?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    lockEvidenceRequestMessageHash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    lockEvidenceResponseMessageHash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    clientSignatureLockEvidenceRequestMessage?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    serverSignatureLockEvidenceResponseMessage?: string;
     /**
      * 
      * @type {string}
@@ -909,43 +981,37 @@ export interface SessionData {
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureForLockEvidence?: string;
+    commitPrepareRequestMessageHash?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverSignatureForLockEvidence?: string;
+    commitPrepareResponseMessageHash?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    lockEvidenceAckHash?: string;
+    clientSignatureCommitPreparationRequestMessage?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureForCommitPreparation?: string;
+    serverSignatureCommitPreparationResponseMessage?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitPrepareReqHash?: string;
+    commitFinalRequestMessageHash?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitPrepareAckHash?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    serverSignatureForCommitPreparation?: string;
+    commitFinalResponseMessageHash?: string;
     /**
      * 
      * @type {string}
@@ -957,31 +1023,55 @@ export interface SessionData {
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureForCommitFinal?: string;
+    commitFinalClaimFormat?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitAckClaim?: string;
+    commitAcknowledgementClaim?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverSignatureForCommitFinal?: string;
+    commitAcknowledgementClaimFormat?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitFinalReqHash?: string;
+    clientSignatureCommitFinalRequestMessage?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitFinalAckHash?: string;
+    serverSignatureCommitFinalResponseMessage?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    transferCompleteMessageHash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    clientSignatureTransferCompleteMessage?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    besuAssetID?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionData
+     */
+    fabricAssetID?: string;
     /**
      * 
      * @type {boolean}
@@ -1023,19 +1113,7 @@ export interface SessionData {
      * @type {string}
      * @memberof SessionData
      */
-    fabricAssetID?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SessionData
-     */
-    fabricAssetSize?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    besuAssetID?: string;
+    fabricAssetSize?: string;
 }
 /**
  * 
@@ -1121,6 +1199,12 @@ export interface TransferCommenceV1Request {
      * @memberof TransferCommenceV1Request
      */
     clientSignature: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof TransferCommenceV1Request
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -1170,6 +1254,12 @@ export interface TransferCommenceV1Response {
      * @memberof TransferCommenceV1Response
      */
     messageHash?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof TransferCommenceV1Response
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -1225,6 +1315,12 @@ export interface TransferCompleteV1Request {
      * @memberof TransferCompleteV1Request
      */
     hashTransferCommence: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof TransferCompleteV1Request
+     */
+    sequenceNumber: number;
 }
 /**
  * 
@@ -1245,6 +1341,18 @@ export interface TransferCompleteV1Response {
  * @interface TransferInitializationV1Request
  */
 export interface TransferInitializationV1Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferInitializationV1Request
+     */
+    messageType: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferInitializationV1Request
+     */
+    sessionID: string;
     /**
      * 
      * @type {string}
@@ -1292,7 +1400,7 @@ export interface TransferInitializationV1Request {
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    initializationRequestMessageSignature: string;
+    clientSignature: string;
     /**
      * 
      * @type {string}
@@ -1304,19 +1412,19 @@ export interface TransferInitializationV1Request {
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    sourceGateWayDltSystem: string;
+    sourceGatewayDltSystem: string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    recipientGateWayPubkey: string;
+    recipientGatewayPubkey: string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    recipientGateWayDltSystem: string;
+    recipientGatewayDltSystem: string;
     /**
      * 
      * @type {string}
@@ -1371,6 +1479,12 @@ export interface TransferInitializationV1Request {
      * @memberof TransferInitializationV1Request
      */
     histories?: Array<History>;
+    /**
+     * 
+     * @type {number}
+     * @memberof TransferInitializationV1Request
+     */
+    sequenceNumber: number;
 }
 
 /**
@@ -1398,13 +1512,19 @@ export interface TransferInitializationV1Response {
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
+    messageType: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferInitializationV1Response
+     */
     sessionID: string;
     /**
      * 
      * @type {number}
      * @memberof TransferInitializationV1Response
      */
-    sequenceNumber?: number;
+    sequenceNumber: number;
     /**
      * 
      * @type {string}
@@ -1441,6 +1561,12 @@ export interface TransferInitializationV1Response {
      * @memberof TransferInitializationV1Response
      */
     serverIdentityPubkey: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferInitializationV1Response
+     */
+    serverSignature: string;
 }
 
 /**

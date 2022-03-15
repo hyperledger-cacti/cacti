@@ -1,20 +1,36 @@
 {
   "name": "@hyperledger/cactus-plugin-odap-hermes",
   "version": "1.0.0",
-  "description": "proof of concept of odap",
+  "description": "Proof of concept of ODAP",
   "keywords": [
     "Hyperledger",
     "Cactus",
     "Integration",
     "Blockchain",
-    "Distributed Ledger Technology"
+    "Distributed Ledger Technology",
+    "Open Digital Asset Protocol"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hyperledger/cactus.git"
   },
   "license": "Apache-2.0",
-  "author": "Tzu-Shen, Wang",
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "André Augusto",
+      "email": "andre.augusto@tecnico.ulisboa.pt",
+      "url": "https://github.com/AndreAugusto11"
+    },
+    {
+      "name": "Tzu-Shen, Wang",
+      "url": "https://github.com/jscode017"
+    }
+  ],
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/lib/main/typescript/index.d.ts",
