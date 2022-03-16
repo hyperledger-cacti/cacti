@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "An example business logic plugin implementation for Cactus",
   "keywords": [
     "Hyperledger",
@@ -53,14 +53,14 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-api-client": "1.0.0-rc.3",
-    "@hyperledger/cactus-common": "1.0.0-rc.3",
-    "@hyperledger/cactus-core": "1.0.0-rc.3",
-    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
-    "@hyperledger/cactus-plugin-consortium-manual": "1.0.0-rc.3",
-    "@hyperledger/cactus-plugin-keychain-memory": "1.0.0-rc.3",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "1.0.0-rc.3",
-    "@hyperledger/cactus-plugin-ledger-connector-xdai": "1.0.0-rc.3",
+    "@hyperledger/cactus-api-client": "1.0.0",
+    "@hyperledger/cactus-common": "1.0.0",
+    "@hyperledger/cactus-core": "1.0.0",
+    "@hyperledger/cactus-core-api": "1.0.0",
+    "@hyperledger/cactus-plugin-consortium-manual": "1.0.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "1.0.0",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "1.0.0",
+    "@hyperledger/cactus-plugin-ledger-connector-xdai": "1.0.0",
     "async-exit-hook": "2.0.1",
     "axios": "0.21.4",
     "express": "4.17.1",

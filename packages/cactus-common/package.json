@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-common",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
   "keywords": [
     "Hyperledger",

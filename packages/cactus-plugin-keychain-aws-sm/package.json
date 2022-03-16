@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-aws-sm",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "A keychain implementation storing its entries in AWS Secret Manger.",
   "keywords": [
     "Hyperledger",
@@ -53,16 +53,16 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "1.0.0-rc.3",
-    "@hyperledger/cactus-core": "1.0.0-rc.3",
-    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
+    "@hyperledger/cactus-common": "1.0.0",
+    "@hyperledger/cactus-core": "1.0.0",
+    "@hyperledger/cactus-core-api": "1.0.0",
     "aws-sdk": "2.965.0",
     "axios": "0.21.4",
     "http-status-codes": "2.1.4",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "1.0.0-rc.3",
+    "@hyperledger/cactus-test-tooling": "1.0.0",
     "@types/express": "4.17.13",
     "@types/request": "2.48.7",
     "internal-ip": "6.2.0",
