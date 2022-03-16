@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-api-client",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
   "keywords": [
     "Hyperledger",
@@ -50,19 +50,19 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-api-client": "1.0.0-rc.3",
-    "@hyperledger/cactus-cmd-api-server": "1.0.0-rc.3",
-    "@hyperledger/cactus-common": "1.0.0-rc.3",
-    "@hyperledger/cactus-core": "1.0.0-rc.3",
-    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
-    "@hyperledger/cactus-plugin-consortium-manual": "1.0.0-rc.3",
-    "@hyperledger/cactus-plugin-ledger-connector-quorum": "1.0.0-rc.3",
-    "@hyperledger/cactus-verifier-client": "1.0.0-rc.3",
+    "@hyperledger/cactus-api-client": "1.0.0",
+    "@hyperledger/cactus-cmd-api-server": "1.0.0",
+    "@hyperledger/cactus-common": "1.0.0",
+    "@hyperledger/cactus-core": "1.0.0",
+    "@hyperledger/cactus-core-api": "1.0.0",
+    "@hyperledger/cactus-plugin-consortium-manual": "1.0.0",
+    "@hyperledger/cactus-plugin-ledger-connector-quorum": "1.0.0",
+    "@hyperledger/cactus-verifier-client": "1.0.0",
     "jose": "4.1.0",
     "web3": "1.5.2"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "1.0.0-rc.3"
+    "@hyperledger/cactus-test-tooling": "1.0.0"
   },
   "engines": {
     "node": ">=10",

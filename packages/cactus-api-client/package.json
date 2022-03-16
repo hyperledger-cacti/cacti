@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-api-client",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
   "keywords": [
     "Hyperledger",
@@ -50,14 +50,14 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "1.0.0-rc.3",
-    "@hyperledger/cactus-core": "1.0.0-rc.3",
-    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
-    "@hyperledger/cactus-plugin-consortium-manual": "1.0.0-rc.3",
+    "@hyperledger/cactus-common": "1.0.0",
+    "@hyperledger/cactus-core": "1.0.0",
+    "@hyperledger/cactus-core-api": "1.0.0",
+    "@hyperledger/cactus-plugin-consortium-manual": "1.0.0",
     "rxjs": "7.3.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "1.0.0-rc.3"
+    "@hyperledger/cactus-test-tooling": "1.0.0"
   },
   "engines": {
     "node": ">=10",

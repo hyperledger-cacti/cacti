@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
+
+
+### Bug Fixes
+
+* add optional auth token to api-client and consortium-manual ([c2feebf](https://github.com/hyperledger/cactus/commit/c2feebfec56f13d68c2ea1ec3a34ce67394d0720)), closes [#1579](https://github.com/hyperledger/cactus/issues/1579)
+
+
+
+
+
 # [1.0.0-rc.3](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2021-12-07)
 
 **Note:** Version bump only for package @hyperledger/cactus-example-supply-chain-frontend

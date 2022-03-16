@@ -1,6 +1,6 @@
 {
   "name": "check-connection-ethereum-validator",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",

@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core-api",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-core-api.node.umd.min.js",
@@ -12,18 +12,17 @@
     "dist/*"
   ],
   "scripts": {
-    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
+    "codegen:proto": "run-s proto:protoc-gen-ts",
+    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "preproto:protoc-gen-ts": "make-dir ./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/",
     "proto:protoc-gen-ts": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/.bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/ --proto_path ./src/main/proto/weaver/common/protos/ ./src/main/proto/weaver/common/protos/common/*.proto ./src/main/proto/weaver/common/protos/corda/*.proto ./src/main/proto/weaver/common/protos/driver/*.proto ./src/main/proto/weaver/common/protos/networks/*.proto ./src/main/proto/weaver/common/protos/relay/*.proto",
-    "proto:protoc-gen-rust": "cargo build",
-    "codegen:proto": "run-s proto:protoc-gen-ts",
-    "codegen": "run-p 'codegen:*'",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js"
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "watch": {
     "codegen:openapi": {
@@ -54,10 +53,6 @@
   "bugs": {
     "url": "https://github.com/hyperledger/cactus/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
-  },
   "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cactus Contributors",
@@ -76,28 +71,8 @@
       "url": "https://accenture.com"
     }
   ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "browser": "dist/cactus-core-api.web.umd.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "codegen": "run-p 'codegen:*'",
-    "codegen:openapi": "npm run generate-sdk",
-    "codegen:proto": "run-s proto:protoc-gen-ts",
-    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
-    "preproto:protoc-gen-ts": "make-dir ./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/",
-    "proto:protoc-gen-ts": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/.bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/ --proto_path ./src/main/proto/weaver/common/protos/ ./src/main/proto/weaver/common/protos/common/*.proto ./src/main/proto/weaver/common/protos/corda/*.proto ./src/main/proto/weaver/common/protos/driver/*.proto ./src/main/proto/weaver/common/protos/networks/*.proto ./src/main/proto/weaver/common/protos/relay/*.proto",
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
-  },
   "dependencies": {
-    "@hyperledger/cactus-common": "1.0.0-rc.3",
+    "@hyperledger/cactus-common": "1.0.0",
     "axios": "0.21.4"
   },
   "devDependencies": {
@@ -108,21 +83,5 @@
     "rxjs": "7.3.0",
     "socket.io": "4.4.1",
     "typescript-optional": "2.0.1"
-  },
-  "engines": {
-    "node": ">=10",
-    "npm": ">=6"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "browserMinified": "dist/cactus-core-api.web.umd.min.js",
-  "mainMinified": "dist/cactus-core-api.node.umd.min.js",
-  "watch": {
-    "codegen:openapi": {
-      "patterns": [
-        "./src/main/json/openapi.json"
-      ]
-    }
   }
 }
