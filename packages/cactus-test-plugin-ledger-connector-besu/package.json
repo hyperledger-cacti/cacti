@@ -56,6 +56,7 @@
     "@hyperledger/cactus-plugin-keychain-memory": "1.0.0",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "1.0.0",
     "@hyperledger/cactus-test-tooling": "1.0.0",
+    "@hyperledger/cactus-verifier-client": "1.0.0",
     "key-encoder": "2.0.3",
     "web3": "1.5.2",
     "web3js-quorum": "21.7.0-rc1"

@@ -151,6 +151,15 @@
                     "CALL"
                 ]
             },
+            "EthContractInvocationWeb3Method": {
+                "type": "string",
+                "enum": [
+                    "send",
+                    "call",
+                    "encodeABI",
+                    "estimateGas"
+                ]
+            },
             "SolidityContractJsonArtifact": {
                 "type": "object",
                 "required": [
@@ -507,7 +516,7 @@
                     }
                 }
             },
-            "DeployContractSolidityBytecodeJsonObjectV1Request": { 
+            "DeployContractSolidityBytecodeJsonObjectV1Request": {
                 "type": "object",
                 "required": [
                     "web3SigningCredential",
@@ -534,7 +543,7 @@
                         "default": 60000,
                         "nullable": false
                     },
-                    "contractJSON": { 
+                    "contractJSON": {
                         "$ref": "#/components/schemas/ContractJSON",
                         "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
@@ -713,7 +722,7 @@
                         "default": 60000,
                         "nullable": false
                     },
-                    "contractJSON": { 
+                    "contractJSON": {
                         "$ref": "#/components/schemas/ContractJSON",
                         "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
@@ -736,9 +745,385 @@
                     }
                 }
             },
+            "InvokeRawWeb3EthMethodV1Request": {
+                "type": "object",
+                "required": ["methodName"],
+                "additionalProperties": false,
+                "properties": {
+                    "methodName": {
+                        "description": "The name of the web3.eth method to invoke",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 2048
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass to web3.eth method specified in methodName",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    }
+                }
+            },
+            "InvokeRawWeb3EthMethodV1Response": {
+                "type": "object",
+                "required": [
+                    "status"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "status": {
+                        "type": "number",
+                        "nullable": false,
+                        "description": "Status code of the operation"
+                    },
+                    "data": {
+                        "description": "Output of requested web3.eth method"
+                    },
+                    "errorDetail": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Error details"
+                    }
+                }
+            },
+            "InvokeRawWeb3EthContractV1Request": {
+                "type": "object",
+                "required": [
+                    "abi",
+                    "address",
+                    "invocationType",
+                    "contractMethod"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "abi": {
+                        "description": "The application binary interface of the solidity contract",
+                        "type": "array",
+                        "items": {}
+                    },
+                    "address": {
+                        "description": "Deployed solidity contract address",
+                        "type": "string"
+                    },
+                    "invocationType": {
+                        "description": "Contract invocation method to be performed (send, call, etc...)",
+                        "$ref": "#/components/schemas/EthContractInvocationWeb3Method"
+                    },
+                    "invocationParams": {
+                        "description": "The list of arguments for contract invocation method (send, call, etc...)",
+                        "type": "object",
+                        "default": {}
+                    },
+                    "contractMethod": {
+                        "description": "Method of deployed solidity contract to execute",
+                        "type": "string"
+                    },
+                    "contractMethodArgs": {
+                        "description": "The list of arguments for deployed solidity contract method",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    }
+                }
+            },
+            "InvokeRawWeb3EthContractV1Response": {
+                "type": "object",
+                "required": [
+                    "status"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "status": {
+                        "description": "Status code of the operation",
+                        "type": "number"
+                    },
+                    "data": {
+                        "description": "Output of contract invocation method"
+                    },
+                    "errorDetail": {
+                        "description": "Error details",
+                        "type": "string"
+                    }
+                }
+            },
             "PrometheusExporterMetricsResponse": {
                 "type": "string",
                 "nullable": false
+            },
+            "WatchBlocksV1": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Next",
+                    "org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Error",
+                    "org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "WatchBlocksV1Options": {
+                "type": "object",
+                "properties": {
+                    "getBlockData": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "Web3BlockHeader": {
+                "type": "object",
+                "required": [
+                    "number",
+                    "hash",
+                    "parentHash",
+                    "nonce",
+                    "sha3Uncles",
+                    "logsBloom",
+                    "transactionRoot",
+                    "stateRoot",
+                    "receiptRoot",
+                    "miner",
+                    "extraData",
+                    "gasLimit",
+                    "gasUsed",
+                    "timestamp"
+                ],
+                "properties": {
+                    "number": {
+                        "type": "number"
+                    },
+                    "hash": {
+                        "type": "string"
+                    },
+                    "parentHash": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "sha3Uncles": {
+                        "type": "string"
+                    },
+                    "logsBloom": {
+                        "type": "string"
+                    },
+                    "transactionsRoot": {
+                        "type": "string"
+                    },
+                    "stateRoot": {
+                        "type": "string"
+                    },
+                    "receiptsRoot": {
+                        "type": "string"
+                    },
+                    "difficulty": {
+                        "type": "string"
+                    },
+                    "mixHash": {
+                        "type": "string"
+                    },
+                    "miner": {
+                        "type": "string"
+                    },
+                    "extraData": {
+                        "type": "string"
+                    },
+                    "gasLimit": {
+                        "type": "integer"
+                    },
+                    "gasUsed": {
+                        "type": "integer"
+                    },
+                    "timestamp": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    }
+                }
+            },
+            "Web3Transaction": {
+                "type": "object",
+                "required": [
+                    "hash",
+                    "nonce",
+                    "blockHash",
+                    "blockNumber",
+                    "transactionIndex",
+                    "from",
+                    "to",
+                    "value",
+                    "gasPrice",
+                    "gas",
+                    "input"
+                ],
+                "properties": {
+                    "hash": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "number"
+                    },
+                    "blockHash": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "blockNumber": {
+                        "type": "number",
+                        "nullable": true
+                    },
+                    "transactionIndex": {
+                        "type": "number",
+                        "nullable": true
+                    },
+                    "from": {
+                        "type": "string"
+                    },
+                    "to": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "gasPrice": {
+                        "type": "string"
+                    },
+                    "gas": {
+                        "type": "number"
+                    },
+                    "input": {
+                        "type": "string"
+                    },
+                    "v": {
+                        "type": "string"
+                    },
+                    "r": {
+                        "type": "string"
+                    },
+                    "s": {
+                        "type": "string"
+                    }
+                }
+            },
+            "WatchBlocksV1BlockData": {
+                "type": "object",
+                "required": [
+                    "number",
+                    "hash",
+                    "parentHash",
+                    "nonce",
+                    "sha3Uncles",
+                    "logsBloom",
+                    "transactionRoot",
+                    "stateRoot",
+                    "receiptRoot",
+                    "miner",
+                    "extraData",
+                    "gasLimit",
+                    "gasUsed",
+                    "timestamp",
+                    "size",
+                    "totalDifficulty",
+                    "uncles",
+                    "transactions"
+                ],
+                "properties": {
+                    "number": {
+                        "type": "number"
+                    },
+                    "hash": {
+                        "type": "string"
+                    },
+                    "parentHash": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "sha3Uncles": {
+                        "type": "string"
+                    },
+                    "logsBloom": {
+                        "type": "string"
+                    },
+                    "transactionsRoot": {
+                        "type": "string"
+                    },
+                    "stateRoot": {
+                        "type": "string"
+                    },
+                    "receiptsRoot": {
+                        "type": "string"
+                    },
+                    "difficulty": {
+                        "type": "string"
+                    },
+                    "mixHash": {
+                        "type": "string"
+                    },
+                    "miner": {
+                        "type": "string"
+                    },
+                    "extraData": {
+                        "type": "string"
+                    },
+                    "gasLimit": {
+                        "type": "integer"
+                    },
+                    "gasUsed": {
+                        "type": "integer"
+                    },
+                    "timestamp": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "size": {
+                        "type": "number"
+                    },
+                    "totalDifficulty": {
+                        "type": "string"
+                    },
+                    "uncles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "transactions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Web3Transaction"
+                        }
+                    }
+                }
+            },
+            "WatchBlocksV1Progress": {
+                "type": "object",
+                "properties": {
+                    "blockHeader": {
+                        "$ref": "#/components/schemas/Web3BlockHeader"
+                    },
+                    "blockData": {
+                        "$ref": "#/components/schemas/WatchBlocksV1BlockData"
+                    }
+                }
             }
         }
     },
@@ -931,6 +1316,74 @@
                             "text/plain": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-method": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-method"
+                    }
+                },
+                "operationId": "invokeWeb3EthMethodV1",
+                "summary": "Invoke any method from web3.eth (low-level)",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeRawWeb3EthMethodV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeRawWeb3EthMethodV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-contract": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-contract"
+                    }
+                },
+                "operationId": "invokeRawWeb3EthContractV1",
+                "summary": "Low-level endpoint to invoke a method on deployed contract.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeRawWeb3EthContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeRawWeb3EthContractV1Response"
                                 }
                             }
                         }

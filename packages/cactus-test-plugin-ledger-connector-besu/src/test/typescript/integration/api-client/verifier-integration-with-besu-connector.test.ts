@@ -1,3 +1,8 @@
+/*
+ * Copyright 2022 Hyperledger Cactus Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // Besu setup code based on:
 //  packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-deploy-contract-from-json.test.ts
 
@@ -53,7 +58,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 });
 log.info("Test started");
 
-describe("Verifier integration with openapi connectors tests", () => {
+describe("Verifier integration with besu connector tests", () => {
   let besuTestLedger: BesuTestLedger;
   let server: http.Server;
   let connector: PluginLedgerConnectorBesu;

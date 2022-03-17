@@ -1,4 +1,4 @@
-FROM cactus-api-server:latest
+FROM ghcr.io/hyperledger/cactus-cmd-api-server:v1.0.0
 
 ARG NPM_PKG_VERSION=latest
 
