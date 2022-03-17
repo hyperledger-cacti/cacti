@@ -33,7 +33,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+import { Server as SocketIoServer } from "socket.io";
 
 const testCase = "Quorum Ledger Connector Plugin";
 
@@ -63,6 +64,9 @@ describe(testCase, () => {
     keychainEntryValue: string,
     keychainPlugin: PluginKeychainMemory,
     firstHighNetWorthAccount: string;
+  const wsApi = new SocketIoServer(server, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
 
   afterAll(async () => await Servers.shutdown(server));
   beforeAll(async () => {
@@ -133,7 +137,7 @@ describe(testCase, () => {
     );
     // Instantiate connector with the keychain plugin that already has the
     // private key we want to use for one of our tests
-    await connector.registerWebServices(expressApp);
+    await connector.registerWebServices(expressApp, wsApi);
 
     await connector.transact({
       web3SigningCredential: {

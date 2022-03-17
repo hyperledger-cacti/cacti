@@ -24,14 +24,7 @@ your local machine for development and testing purposes.
 
 In the root of the project to install the dependencies execute the command:
 ```sh
-npm run comfigure
-```
-
-### Compiling
-
-In the projects root folder, run this command to compile the plugin and create the dist directory:
-```sh
-npm run tsc
+npm run configure
 ```
 
 ## Usage
@@ -47,12 +40,16 @@ To use this import public-api and create new **PluginLedgerConnectorQuorum**.
 You can make calls through the connector to the plugin API:
 
 ```typescript
-async invokeContract(req: InvokeContractV1Request):Promise<InvokeContractV1Response>;
+async invokeContract(req: InvokeContractJsonObjectV1Request):Promise<InvokeContractV1Response>;
+async transact(req: RunTransactionRequest): Promise<RunTransactionResponse>;
 async transactSigned(rawTransaction: string): Promise<RunTransactionResponse>;
+async transactGethKeychain(txIn: RunTransactionRequest): Promise<RunTransactionResponse>;
 async transactPrivateKey(req: RunTransactionRequest): Promise<RunTransactionResponse>;
 async transactCactusKeychainRef(req: RunTransactionRequest):Promise<RunTransactionResponse>;
-async deployContract(req: DeployContractSolidityBytecodeV1Request):Promise<RunTransactionResponse>;
-async signTransaction(req: SignTransactionRequest):Promise<Optional<SignTransactionResponse>>;
+async deployContract(req: DeployContractSolidityBytecodeV1Request :Promise<DeployContractSolidityBytecodeV1Response>;
+async deployContractJsonObject(req: DeployContractSolidityBytecodeJsonObjectV1Request): Promise<DeployContractSolidityBytecodeV1Response>
+async invokeRawWeb3EthMethod(req: InvokeRawWeb3EthMethodV1Request): Promise<any>;
+async invokeRawWeb3EthContract(req: InvokeRawWeb3EthContractV1Request): Promise<any>;
 ```
 
 Call example to deploy a contract:
@@ -77,6 +74,59 @@ enum Web3SigningCredentialType {
 }
 ```
 > Extensive documentation and examples in the [readthedocs](https://readthedocs.org/projects/hyperledger-cactus/) (WIP)
+
+## QuorumApiClient
+
+All connector API endpoints are defined in [open-api specification](./src/main/json/openapi.json). You can use [QuorumApiClient](./src/main/typescript/api-client) to call remote quorum connector functions. It also contain additional utility functions to ease integration.
+
+### REST Functions
+See [DefaultApi](./src/main/typescript/generated/openapi/typescript-axios/api.ts) for up-to-date listing of supported endpoints.
+- deployContractSolBytecodeJsonObjectV1
+- deployContractSolBytecodeV1
+- getPrometheusMetricsV1
+- invokeContractV1
+- invokeContractV1NoKeychain
+- invokeRawWeb3EthContractV1
+- invokeRawWeb3EthMethodV1
+- runTransactionV1
+
+### Asynchronous Functions (socket.io)
+- watchBlocksV1
+
+### Send Request Methods
+Both methods are deprecated, async version returns immediately while sync respond with Promise of a call results.
+- `sendAsyncRequest`
+- `sendSyncRequest`
+
+#### Supported Requests
+- `web3Eth`: Calls `invokeRawWeb3EthMethodV1`
+- `web3EthContract`: Calls  `invokeRawWeb3EthContractV1`
+
+#### Arguments
+- The same for both async and sync methods.
+- Arguments interpretation depends on `method.type` (i.e. request type)
+``` typescript
+// Contract definition for web3EthContract request, ignored otherwise
+contract: {
+  abi?: AbiItem[],
+  address?: string
+},
+
+// Request definition
+method: {
+  type: "web3Eth" | "web3EthContract",
+  command: string // web3 method
+  function?: string; // contract function
+  params?: any[]; // contract parameters
+}
+
+// web3 method arguments
+args: {
+  {
+    args?: any[] | Record<string, unknown>;
+  }
+},
+```
 
 ## Running the tests
 
@@ -108,6 +158,8 @@ docker run \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
   --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-quorum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-quorum-connector-instance-id"}}]' \
   cplcb
 ```
@@ -119,14 +171,16 @@ docker run \
   --publish 3000:3000 \
    --publish 4000:4000 \
   cplcb \
-    ./node_modules/.bin/cactusapi \
+    ./node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js \
+    --authorization-protocol='NONE' \
+    --authorization-config-json='{}' \
     --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-quorum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-quorum-connector-instance-id"}}]'
 ```
 
 Launch container with **configuration file** mounted from host machine:
 ```sh
 
-echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-quorum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-quorum-connector-instance-id"}}]' > cactus.json
+echo '{"authorizationProtocol":"NONE","authorizationConfigJson":{},"plugins":[{"packageName":"@hyperledger/cactus-plugin-ledger-connector-quorum","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"rpcApiHttpHost":"http://localhost:8545","instanceId":"some-unique-quorum-connector-instance-id"}}]}' > cactus.json
 
 docker run \
   --rm \
@@ -134,7 +188,7 @@ docker run \
   --publish 4000:4000 \
   --mount type=bind,source="$(pwd)"/cactus.json,target=/cactus.json \
   cplcb \
-    ./node_modules/.bin/cactusapi \
+    ./node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js \
     --config-file=/cactus.json
 ```
 
@@ -263,5 +317,5 @@ Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
 
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
 
-## Acknowledgments 
+## Acknowledgments
 ```

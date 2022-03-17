@@ -30,8 +30,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration, Constants } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import { Server as SocketIoServer } from "socket.io";
 
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import OAS from "../../../../../../main/json/openapi.json";
@@ -97,6 +98,10 @@ test(testCase, async (t: Test) => {
   const apiConfig = new Configuration({ basePath: apiHost });
   const apiClient = new QuorumApi(apiConfig);
 
+  const wsApi = new SocketIoServer(server, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+
   await installOpenapiValidationMiddleware({
     logLevel,
     app: expressApp,
@@ -104,7 +109,7 @@ test(testCase, async (t: Test) => {
   });
 
   await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp);
+  await connector.registerWebServices(expressApp, wsApi);
 
   const fDeploy = "deployContractSolBytecodeJsonObjectV1";
   const fInvoke = "invokeContractV1NoKeychain";
