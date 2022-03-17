@@ -95,7 +95,7 @@ const command: GluegunCommand = {
 		var recipientBalance = await tokenContract.balanceOf(recipient)
 		console.log(`Account balance of the recipient in Network ${options.network} before claiming: ${recipientBalance.toString()}`)
 
-		await interopContract.claimFungibleAsset(lockContractId, preimage_bytes32, {
+		await interopContract.claimFungibleAsset(lockContractId, options.preimage, {
 			from: recipient,
 		}).catch((error) => {
 			console.log("claimFungibleAsset threw an error:", error);
