@@ -1,13 +1,10 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { getLogger } from "log4js";
 import { TransactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TransactionManagement";
-import {
-  RIFError,
-  BadRequestError,
-} from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
+import { RIFError } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
 import { ConfigUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil";
 import { TestEthereumVerifier } from "./TestEthereumVerifier";
-import { request } from "http";
+import escapeHtml from "escape-html";
 
 const config: any = ConfigUtil.getConfig();
 const moduleName = "check-ethereum-validator";
@@ -21,7 +18,7 @@ function isRifError(err: any, res: Response): boolean {
   if (err instanceof RIFError) {
     logger.error(`RIFError caught, ${err.statusCode}, ${err.message}`);
     res.status(err.statusCode);
-    res.send(err.message);
+    res.send(escapeHtml(err.message));
     return true;
   }
   logger.error(`Error caught: ${err.statusCode}, ${err.message}`);

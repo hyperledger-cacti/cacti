@@ -15,6 +15,7 @@
     "body-parser": "1.19.2",
     "cookie-parser": "1.4.6",
     "debug": "2.6.9",
+    "escape-html": "1.0.3",
     "ethereumjs-common": "1.5.2",
     "ethereumjs-tx": "2.1.2",
     "express": "4.16.4",
@@ -35,11 +36,12 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
+    "@types/escape-html": "1.0.1",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.4.0",
     "eslint-plugin-prettier": "4.0.0",
     "prettier": "2.5.1",
     "tslint": "6.0.0",
-    "typescript": "3.9.10"
+    "typescript": "4.3.5"
   }
 }

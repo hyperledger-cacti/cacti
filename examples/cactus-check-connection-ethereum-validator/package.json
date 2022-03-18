@@ -14,7 +14,11 @@
     "init-check-connection-ethereum-validator": "ln -s ../examples/cactus-check-connection-ethereum-validator/node_modules ../../dist/node_modules"
   },
   "dependencies": {
+    "socket.io": "4.4.1",
+    "escape-html": "1.0.3"
+  },
+  "devDependencies": {
     "@types/node": "15.14.7",
-    "socket.io": "4.4.1"
+    "@types/escape-html": "1.0.1"
   }
 }
