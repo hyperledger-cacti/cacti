@@ -10,8 +10,7 @@ import { TransactionManagement } from "../../packages/cactus-cmd-socketio-server
 import { RIFError } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
 import { ConfigUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil";
 
-const fs = require("fs");
-const path = require("path");
+import escapeHtml from "escape-html";
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "test-run-transaction";
@@ -35,7 +34,7 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
-      res.send(err.message);
+      res.send(escapeHtml(err.message));
       return;
     }
 

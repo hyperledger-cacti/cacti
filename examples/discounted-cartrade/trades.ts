@@ -12,6 +12,7 @@ import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 
 const fs = require("fs");
 const path = require("path");
+import escapeHtml from "escape-html";
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "trades";
@@ -40,7 +41,7 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
-      res.send(err.message);
+      res.send(escapeHtml(err.message));
       return;
     }
 
@@ -60,7 +61,7 @@ router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
-      res.send(err.message);
+      res.send(escapeHtml(err.message));
       return;
     }
 

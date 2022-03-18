@@ -11,6 +11,7 @@ import {
   RIFError,
   ConfigUtil,
 } from "@hyperledger/cactus-cmd-socket-server";
+import escapeHtml from "escape-html";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -34,7 +35,7 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
-      res.send(err.message);
+      res.send(escapeHtml(err.message));
       return;
     }
 
@@ -61,7 +62,7 @@ router.post(
     } catch (err) {
       if (err instanceof RIFError) {
         res.status(err.statusCode);
-        res.send(err.message);
+        res.send(escapeHtml(err.message));
         return;
       }
 
