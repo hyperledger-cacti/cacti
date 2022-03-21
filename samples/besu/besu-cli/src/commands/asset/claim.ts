@@ -76,7 +76,7 @@ const command: GluegunCommand = {
 			print.error('Lock contract ID not provided.')
 			return
 		}
-		const lockContractId = options.lock_contract_id
+		const lockContractId = '0x' + options.lock_contract_id
 		if(!options.preimage){
 			print.error('Preimage not provided.')
 			return

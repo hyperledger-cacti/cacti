@@ -151,7 +151,7 @@ const command: GluegunCommand = {
 			console.log("lockFungibleAsset threw an error");
 		})
 		const lockContractId = lockTx.logs[0].args.lockContractId
-		console.log(`Lock contract ID: ${lockContractId}`)
+		console.log(`Lock contract ID: ${lockContractId.toString().substring(2)}`)
 
 		// Balances of sender and receiver after locking
 		console.log(`Account balances after locking`)
