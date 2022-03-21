@@ -251,6 +251,9 @@
                     },
                     "sequenceNumber":{
                         "type":"integer"
+                    },
+                    "sourceGatewayPath": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -347,6 +350,12 @@
                     },
                     "assetProfile": {
                         "$ref":"#/components/schemas/AssetProfile"
+                    },
+                    "sourceBasePath": {
+                        "type":"string"
+                    },
+                    "recipientBasePath": {
+                        "type":"string"
                     },
                     "originatorPubkey": {
                         "type":"string"
@@ -547,6 +556,9 @@
             "TransferCommenceV1Response":{
                 "type":"object",
                 "properties": {
+                    "sessionID": {
+                        "type":"string"
+                    },
                     "clientIdentityPubkey":{
                         "type":"string"
                     },
@@ -574,6 +586,7 @@
                     }
                 },
                 "required": [
+                    "sessionID",
                     "messageType",
                     "serverIdentityPubkey",
                     "clientIdentityPubkey",
@@ -639,6 +652,9 @@
             "LockEvidenceV1Response":{
                 "type":"object",
                 "properties": {
+                    "sessionID":{
+                        "type": "string"
+                    },
                     "clientIdentityPubkey":{
                         "type":"string"
                     },
@@ -663,6 +679,7 @@
                     }
                 },
                 "required": [
+                    "sessionID",
                     "messageType",
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
@@ -712,6 +729,9 @@
             "CommitPreparationV1Response":{
                 "type":"object",
                 "properties": {
+                    "sessionID":{
+                        "type": "string"
+                    },
                     "messageType":{
                         "type":"string"
                     },
@@ -735,6 +755,7 @@
                     }
                 },
                 "required": [
+                    "sessionID",
                     "messageType",
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
@@ -792,6 +813,9 @@
             "CommitFinalV1Response":{
                 "type":"object",
                 "properties": {
+                    "sessionID":{
+                        "type": "string"
+                    },
                     "messageType":{
                         "type":"string"
                     },
@@ -821,6 +845,7 @@
                     }
                 },
                 "required": [
+                    "sessionID",
                     "messageType",
                     "ClientIdentityPubkey",
                     "serverIdentityPubkey",
@@ -873,18 +898,7 @@
                     "sequenceNumber"
                 ]
             },
-            "TransferCompleteV1Response":{
-                "type":"object",
-                "properties": {
-                    "ok":{
-                        "type":"string"
-                    }
-                },
-                "required": [
-                    "ok"
-                ]
-            },
-            "SendClientV1Request":{
+            "ClientV1Request":{
                 "type":"object",
                 "properties": {
                     "version":{
@@ -935,6 +949,17 @@
                     "serverDltSystem": {
                         "type":"string"
                     },
+                    "clientGatewayConfiguration": {
+                        "type":"object",
+                        "properties": {
+                            "apiHost":{
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "apiHost"
+                        ]
+                    },
                     "serverGatewayConfiguration": {
                         "type":"object",
                         "properties": {
@@ -948,7 +973,6 @@
                     }
                 },
                 "required": [
-                    "serverGatewayConfiguration",
                     "version",
                     "loggingProfile",
                     "accessControlProfile",
@@ -965,7 +989,9 @@
                     "serverIdentityPubkey",
                     "clientDltSystem",
                     "serverDltSystem",
-                    "serverGatewayInstanceID"
+                    "serverGatewayInstanceID",
+                    "clientGatewayConfiguration",
+                    "serverGatewayConfiguration"
                 ]
             },
             "OdapMessage":{
@@ -1040,15 +1066,15 @@
         }
     },
     "paths": {
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiation":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationrequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiation"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationrequest"
                     }
                 },
-                "operationId": "phase1TransferInitiationV1",
+                "operationId": "phase1TransferInitiationRequestV1",
                 "description":"",
                 "requestBody":{
                     "content": {
@@ -1060,28 +1086,21 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TransferInitializationV1Response"
-                                }
-                            }
-                        }
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommence":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommencerequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommence"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommencerequest"
                     }
                 },
-                "operationId": "phase2TransferCommenceV1",
+                "operationId": "phase2TransferCommenceRequestV1",
                 "description":"",
                 "requestBody":{
                     "content": {
@@ -1093,28 +1112,21 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TransferCommenceV1Response"
-                                }
-                            }
-                        }
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidence":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidencerequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidence"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidencerequest"
                     }
                 },
-                "operationId": "phase2LockEvidenceV1",
+                "operationId": "phase2LockEvidenceRequestV1",
                 "description":"",
                 "requestBody":{
                     "content": {
@@ -1126,28 +1138,21 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LockEvidenceV1Response"
-                                }
-                            }
-                        }
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparation":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationrequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparation"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationrequest"
                     }
                 },
-                "operationId": "phase3CommitPreparationV1",
+                "operationId": "phase3CommitPreparationRequestV1",
                 "description":"",
                 "requestBody":{
                     "content": {
@@ -1159,28 +1164,21 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CommitPreparationV1Response"
-                                }
-                            }
-                        }
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinal":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinalrequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinal"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinalrequest"
                     }
                 },
-                "operationId": "phase3CommitFinalV1",
+                "operationId": "phase3CommitFinalRequestV1",
                 "description":"",
                 "requestBody":{
                     "content": {
@@ -1192,28 +1190,21 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CommitFinalV1Response"
-                                }
-                            }
-                        }
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercomplete":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercompleterequest":{
             "get":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "get",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercomplete"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercompleterequest"
                     }
                 },
-                "operationId": "phase3TransferCompleteV1",
+                "operationId": "phase3TransferCompleteRequestV1",
                 "description":"",
                 "requestBody":{
                     "content": {
@@ -1226,32 +1217,26 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                }
-                            }
-                        }
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/sendclientrequest":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/clientrequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/sendclientrequest"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/clientrequest"
                     }
                 },
-                "operationId": "sendClientRequestV1",
+                "operationId": "clientRequestV1",
                 "description":"",
                 "requestBody":{
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/SendClientV1Request"
+                                "$ref": "#/components/schemas/ClientV1Request"
                             }
                         }
                     }
@@ -1268,7 +1253,136 @@
                     }
                 }
             }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationresponse":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationresponse"
+                    }
+                },
+                "operationId": "phase1TransferInitiationResponseV1",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransferInitializationV1Response"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommenceresponse":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommenceresponse"
+                    }
+                },
+                "operationId": "phase2TransferCommenceResponseV1",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransferCommenceV1Response"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidenceresponse":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidenceresponse"
+                    }
+                },
+                "operationId": "phase2LockEvidenceResponseV1",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LockEvidenceV1Response"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationresponse":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationresponse"
+                    }
+                },
+                "operationId": "phase3CommitPreparationResponseV1",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CommitPreparationV1Response"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinalresponse":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinalresponse"
+                    }
+                },
+                "operationId": "phase3CommitFinalResponseV1",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref":  "#/components/schemas/CommitFinalV1Response"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
-
     }   
 }
