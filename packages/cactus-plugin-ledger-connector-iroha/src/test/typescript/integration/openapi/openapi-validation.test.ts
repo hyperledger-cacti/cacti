@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { v4 as internalIpV4 } from "internal-ip";
 import bodyParser from "body-parser";
 import express from "express";
+import { Server as SocketIoServer } from "socket.io";
 
 import {
   Containers,
@@ -38,6 +39,7 @@ import cryptoHelper from "iroha-helpers-ts/lib/cryptoHelper";
 
 import OAS from "../../../../main/json/openapi.json";
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
+import { Constants } from "@hyperledger/cactus-core-api";
 
 const testCase = "Iroha plugin openapi validation";
 const logLevel: LogLevelDesc = "INFO";
@@ -91,12 +93,14 @@ test(testCase, async (t: Test) => {
   await iroha.start();
   const irohaPort = await iroha.getRpcToriiPort();
   const rpcToriiPortHost = await iroha.getRpcToriiPortHost();
+  const rpcApiWsHost = await iroha.getRpcApiWsHost();
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
   });
 
   const connector: PluginLedgerConnectorIroha = await factory.create({
     rpcToriiPortHost,
+    rpcApiWsHost: rpcApiWsHost,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry(),
   });
@@ -104,6 +108,11 @@ test(testCase, async (t: Test) => {
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
+
+  const wsApi = new SocketIoServer(server, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+
   const listenOptions: IListenOptions = {
     hostname: "localhost",
     port: 0,
@@ -123,7 +132,7 @@ test(testCase, async (t: Test) => {
   });
 
   await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp);
+  await connector.registerWebServices(expressApp, wsApi);
 
   const admin = iroha.getDefaultAdminAccount();
   const domain = iroha.getDefaultDomain();

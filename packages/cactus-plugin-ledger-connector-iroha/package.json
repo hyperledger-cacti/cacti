@@ -64,6 +64,7 @@
     "iroha-helpers-ts": "0.9.25-ss",
     "openapi-types": "7.0.1",
     "prom-client": "13.1.0",
+    "rxjs": "7.3.0",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {

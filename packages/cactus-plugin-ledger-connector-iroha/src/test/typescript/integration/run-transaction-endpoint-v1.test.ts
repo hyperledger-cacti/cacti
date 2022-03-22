@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { v4 as internalIpV4 } from "internal-ip";
 import bodyParser from "body-parser";
 import express from "express";
-
+import { Server as SocketIoServer } from "socket.io";
 import {
   Containers,
   pruneDockerAllIfGithubAction,
@@ -35,6 +35,7 @@ import {
   KeyPair,
 } from "../../../main/typescript/generated/openapi/typescript-axios";
 import cryptoHelper from "iroha-helpers-ts/lib/cryptoHelper";
+import { Constants } from "@hyperledger/cactus-core-api";
 
 const testCase = "runs tx on an Iroha v1.2.0 ledger";
 const logLevel: LogLevelDesc = "INFO";
@@ -89,6 +90,7 @@ test.skip(testCase, async (t: Test) => {
   await iroha.start();
   const irohaPort = await iroha.getRpcToriiPort();
   const rpcToriiPortHost = await iroha.getRpcToriiPortHost();
+  const rpcApiWsHost = await iroha.getRpcApiWsHost();
   const internalAddr = iroha.getInternalAddr();
   const factory = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
@@ -96,6 +98,7 @@ test.skip(testCase, async (t: Test) => {
 
   const connector: PluginLedgerConnectorIroha = await factory.create({
     rpcToriiPortHost,
+    rpcApiWsHost: rpcApiWsHost,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry(),
   });
@@ -108,6 +111,11 @@ test.skip(testCase, async (t: Test) => {
     port: 0,
     server,
   };
+
+  const wsApi = new SocketIoServer(server, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+
   const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
   test.onFinish(async () => await Servers.shutdown(server));
   const { address, port } = addressInfo;
@@ -116,7 +124,7 @@ test.skip(testCase, async (t: Test) => {
   const apiClient = new IrohaApi(apiConfig);
 
   await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp);
+  await connector.registerWebServices(expressApp, wsApi);
 
   let firstTxHash;
   const admin = iroha.getDefaultAdminAccount();

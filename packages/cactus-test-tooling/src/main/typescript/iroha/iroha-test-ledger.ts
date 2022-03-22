@@ -31,6 +31,7 @@ export interface IIrohaTestLedgerOptions {
   readonly envVars?: string[];
   readonly logLevel?: LogLevelDesc;
   readonly emitContainerLogs?: boolean;
+  readonly rpcApiWsPort?: number;
 }
 
 /*
@@ -52,6 +53,7 @@ export const IROHA_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
     "IROHA_POSTGRES_PASSWORD=my-secret-password",
     "KEY=node0",
   ],
+  rpcApiWsPort: 50052,
 });
 
 /*
@@ -87,6 +89,7 @@ export class IrohaTestLedger implements ITestLedger {
   public readonly adminPub: string;
   public readonly nodePriv: string;
   public readonly nodePub: string;
+  public readonly rpcApiWsPort: number;
   public readonly tlsCert?: string;
   public readonly tlsKey?: string;
   public readonly toriiTlsPort?: number;
@@ -126,6 +129,8 @@ export class IrohaTestLedger implements ITestLedger {
     this.tlsKey = options.tlsKey || IROHA_TEST_LEDGER_DEFAULT_OPTIONS.tlsKey;
     this.toriiTlsPort =
       options.toriiTlsPort || IROHA_TEST_LEDGER_DEFAULT_OPTIONS.toriiTlsPort;
+    this.rpcApiWsPort =
+      options.rpcApiWsPort || IROHA_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort;
 
     this.envVars.push(`IROHA_POSTGRES_HOST=${this.postgresHost}`);
     this.envVars.push(`IROHA_POSTGRES_PORT=${this.postgresPort}`);
@@ -197,6 +202,14 @@ export class IrohaTestLedger implements ITestLedger {
    */
   public getDefaultDomain(): string {
     return "test";
+  }
+
+  public async getRpcApiWsHost(): Promise<string> {
+    const { rpcApiWsPort } = this;
+    const ipAddress = "127.0.0.1";
+    const containerInfo = await this.getContainerInfo();
+    const port = await Containers.getPublicPort(rpcApiWsPort, containerInfo);
+    return `ws://${ipAddress}:${port}`;
   }
 
   /**

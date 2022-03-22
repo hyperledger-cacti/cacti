@@ -206,6 +206,9 @@
             "type": "boolean",
             "nullable": false,
             "description": "Can only be set to false for an insecure grpc connection."
+          },
+          "monitorMode": {
+            "type": "boolean"
           }
         }
       },
@@ -231,6 +234,82 @@
       "PrometheusExporterMetricsResponse": {
         "type": "string",
         "nullable": false
+      },
+      "IrohaSocketSession": {
+        "type": "string",
+        "enum": [
+            "org.hyperledger.cactus.api.async.iroha.SocketSession.Subscribe",
+            "org.hyperledger.cactus.api.async.iroha.SocketSession.Next",
+            "org.hyperledger.cactus.api.async.iroha.SocketSession.Unsubscribe",
+            "org.hyperledger.cactus.api.async.iroha.SocketSession.Error",
+            "org.hyperledger.cactus.api.async.iroha.SocketSession.Complete",
+            "org.hyperledger.cactus.api.async.iroha.SocketSession.SendAsyncRequest",
+            "org.hyperledger.cactus.api.async.iroha.SocketSession.SendSyncRequest"
+        ],
+        "x-enum-varnames": [
+            "Subscribe",
+            "Next",
+            "Unsubscribe",
+            "Error",
+            "Complete",
+            "SendAsyncRequest",
+            "SendSyncRequest"
+        ]
+      },
+      "IrohaBlockResponse": {
+        "type": "object",
+        "required": [
+           "payload",
+           "signaturesList"
+        ],
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": [
+              "txNumber",
+              "transactionsList",
+              "height",
+              "prevBlockHash",
+              "createdTime",
+              "rejectedTransactionsHashesList"
+            ],
+            "properties": {
+              "transactionsList": {
+                "type": "array",
+                "items": {}
+              },
+              "txNumber": {
+                "type": "number"
+              },
+              "height": {
+                "type": "number"
+              },
+              "prevBlockHash": {
+                "type": "string"
+              },
+              "createdTime": {
+                "type": "number"
+              },
+              "rejectedTransactionsHashesList": {
+                "type": "array",
+                "items": {}
+              }
+            }
+          },
+          "signaturesList":{
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "IrohaBlockProgress": {
+        "type": "object",
+        "required": ["transactionReceipt"],
+        "properties": {
+            "transactionReceipt": {
+                "$ref": "#/components/schemas/IrohaBlockResponse"
+            } 
+        }
       }
     }
   },

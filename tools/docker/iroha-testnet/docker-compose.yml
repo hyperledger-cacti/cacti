@@ -4,7 +4,8 @@ services:
   node:
     image: ${IROHA_PRJ}/${IROHA_IMG}
     ports:
-      - "50051:50051"
+      - "50051:50051" # http
+      - "50052:50052" # ws
     environment:
       - IROHA_HOME=/opt/iroha
       - IROHA_CONF=config.docker

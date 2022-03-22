@@ -13,7 +13,7 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
-
+import { Server as SocketIoServer } from "socket.io";
 import {
   IListenOptions,
   LogLevelDesc,
@@ -34,6 +34,7 @@ import {
   KeyPair,
 } from "../../../main/typescript/generated/openapi/typescript-axios";
 import cryptoHelper from "iroha-helpers-ts/lib/cryptoHelper";
+import { Constants } from "@hyperledger/cactus-core-api";
 
 const testCase = "runs tx on an Iroha v1.2.0 ledger";
 const logLevel: LogLevelDesc = "ERROR";
@@ -111,16 +112,23 @@ test.skip(testCase, async (t: Test) => {
   const factory1 = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
   });
+
+  const rpcApiWsHost1 = await iroha1.getRpcApiWsHost();
+  const rpcApiWsHost2 = await iroha2.getRpcApiWsHost();
+
   const connector1: PluginLedgerConnectorIroha = await factory1.create({
     rpcToriiPortHost: rpcToriiPortHost1,
     instanceId: uuidv4(),
+    rpcApiWsHost: rpcApiWsHost1,
     pluginRegistry: new PluginRegistry(),
   });
   const factory2 = new PluginFactoryLedgerConnector({
     pluginImportType: PluginImportType.Local,
   });
+
   const connector2: PluginLedgerConnectorIroha = await factory2.create({
     rpcToriiPortHost: rpcToriiPortHost2,
+    rpcApiWsHost: rpcApiWsHost2,
     instanceId: uuidv4(),
     pluginRegistry: new PluginRegistry(),
   });
@@ -153,10 +161,18 @@ test.skip(testCase, async (t: Test) => {
   const apiConfig2 = new Configuration({ basePath: apiHost2 });
   const apiClient2 = new IrohaApi(apiConfig2);
 
+  const wsApi1 = new SocketIoServer(server1, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+
+  const wsApi2 = new SocketIoServer(server2, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+
   await connector1.getOrCreateWebServices();
-  await connector1.registerWebServices(expressApp1);
+  await connector1.registerWebServices(expressApp1, wsApi1);
   await connector2.getOrCreateWebServices();
-  await connector2.registerWebServices(expressApp2);
+  await connector2.registerWebServices(expressApp2, wsApi2);
 
   const adminPriv1 = await iroha1.getGenesisAccountPrivKey();
   const admin1 = iroha1.getDefaultAdminAccount();

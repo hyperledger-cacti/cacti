@@ -15,6 +15,11 @@ import {
   BesuApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
+import {
+  IrohaApiClient,
+  IrohaApiClientOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-iroha";
+
 /**
  * Configuration of ApiClients currently supported by Verifier and VerifierFactory
  * Each entry key defines the name of the connection type that has to be specified in VerifierFactory config.
@@ -33,6 +38,10 @@ export type ClientApiConfig = {
   BESU_2X: {
     in: BesuApiClientOptions;
     out: BesuApiClient;
+  };
+  IROHA: {
+    in: IrohaApiClientOptions;
+    out: IrohaApiClient;
   };
 };
 
@@ -55,6 +64,8 @@ export function getValidatorApiClient<K extends keyof ClientApiConfig>(
     case "BESU_1X":
     case "BESU_2X":
       return new BesuApiClient(options as BesuApiClientOptions);
+    case "IROHA":
+      return new IrohaApiClient(options as IrohaApiClientOptions);
     default:
       // Will not compile if any ClientApiConfig key was not handled by this switch
       const _: never = validatorType;
