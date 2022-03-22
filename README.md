@@ -84,7 +84,7 @@ Can be found here: [ROADMAP.md](./ROADMAP.md)
 
 ## Contact
 * mailing list: [cactus@lists.hyperledger.org](mailto:cactus@lists.hyperledger.org)
-* rocketchat channel: [https://chat.hyperledger.org/channel/cactus](https://chat.hyperledger.org/channel/cactus).
+* discord channel: [https://discord.com/invite/hyperledger](https://discord.com/invite/hyperledger)
 
 ## Build/Development Flow
 
