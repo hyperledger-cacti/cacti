@@ -66,6 +66,7 @@
     "openapi-types": "7.0.1",
     "prom-client": "13.1.0",
     "sanitize-html": "2.7.0",
+    "rxjs": "7.3.0",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
