@@ -32,7 +32,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@hyperledger-labs/weaver-protos-js": "^1.2.4-alpha.1",
+    "@hyperledger-labs/weaver-protos-js": "latest",
     "@hyperledger-labs/weaver-fabric-interop-sdk": "latest",
     "@fidm/x509": "^1.2.1",
     "crypto": "^1.0.1",

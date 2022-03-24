@@ -1,5 +1,5 @@
 DOCKER_IMAGE_NAME ?= weaver-relay
-DOCKER_TAG ?= 1.2.1
+DOCKER_TAG ?= 1.2.4
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 PROTOS_TAG ?= v0.7
 
