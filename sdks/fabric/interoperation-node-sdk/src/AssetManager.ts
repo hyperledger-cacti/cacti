@@ -152,7 +152,7 @@ const createHTLC = async (
         setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, assetType, assetID, recipientECert, hashPreimage, hashValue);
     }
 
-    return { preimage: hashPreimage, result: result };
+    return { preimage: hashPreimage, hash: hashValue, result: result };
 };
 
 /**
@@ -225,7 +225,7 @@ const createFungibleHTLC = async (
         setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, contractId, assetType, numUnits, recipientECert, hashPreimage, hashValue);
     }
 
-    return { preimage: hashPreimage, result: contractId };
+    return { preimage: hashPreimage, hash: hashValue, result: contractId };
 };
 
 /**
