@@ -181,7 +181,7 @@ func TestVerifyAccessToCC(t *testing.T) {
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturns(accessControlBytes, nil)
 	err = verifyAccessToCC(&interopcc, ctx, &validAddressStruct, viewAddressString, &query)
-	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the following request: %s", viewAddressString))
+	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the request '%s' from '%s:%s'", viewAddressString, query.RequestingNetwork, query.Certificate))
 
 	// Test: Invalid CA
 	invalidPrincipalRule = common.Rule{
@@ -195,7 +195,7 @@ func TestVerifyAccessToCC(t *testing.T) {
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturns(accessControlBytes, nil)
 	err = verifyAccessToCC(&interopcc, ctx, &validAddressStruct, viewAddressString, &query)
-	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the following request: %s", viewAddressString))
+	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the request '%s' from '%s:%s'", viewAddressString, query.RequestingNetwork, query.Certificate))
 
 	// Test: No rule for requested resource
 	differentResourceRule := common.Rule{
@@ -209,7 +209,7 @@ func TestVerifyAccessToCC(t *testing.T) {
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturns(accessControlBytes, nil)
 	err = verifyAccessToCC(&interopcc, ctx, &validAddressStruct, viewAddressString, &query)
-	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the following request: %s", viewAddressString))
+	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the request '%s' from '%s:%s'", viewAddressString, query.RequestingNetwork, query.Certificate))
 
 	differentResourceRule = common.Rule{
 		Principal:     "cert",
@@ -222,7 +222,7 @@ func TestVerifyAccessToCC(t *testing.T) {
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturns(accessControlBytes, nil)
 	err = verifyAccessToCC(&interopcc, ctx, &validAddressStruct, viewAddressString, &query)
-	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the following request: %s", viewAddressString))
+	require.EqualError(t, err, fmt.Sprintf("Access Control Policy DOES NOT PERMIT the request '%s' from '%s:%s'", viewAddressString, query.RequestingNetwork, query.Certificate))
 
 	// Test: No Rule for ID
 	chaincodeStub.GetStateReturns(nil, nil)

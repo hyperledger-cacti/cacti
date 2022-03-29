@@ -137,15 +137,27 @@ func verifyAccessToCC(s *SmartContract, ctx contractapi.TransactionContextInterf
 			// TODO: Check if these will be the same format (Or convert to matching formats at some point)
 			// TODO: Need to use principalType and perform different validation for type "certificate" and "ca".
 			// Code below assumes that requestor's membership has already been authenticated earlier if the type is "ca"
-			if (rule.PrincipalType == "certificate" && query.Certificate == rule.Principal) ||
-				(rule.PrincipalType == "ca" && query.RequestingOrg == rule.Principal) {
+			if (rule.PrincipalType == "certificate" && query.Certificate == rule.Principal) {
 				// Break loop as cert is valid.
+				log.Infof("Access Control Policy PERMITS the request '%s' from '%s:%s'", viewAddressString, query.RequestingNetwork, query.Certificate)
+				return nil
+			}
+			if (rule.PrincipalType == "ca" && query.RequestingOrg == rule.Principal) {
+				// Break loop as cert is valid.
+				log.Infof("Access Control Policy PERMITS the request '%s' from '%s:%s'", viewAddressString, query.RequestingNetwork, query.RequestingOrg)
 				return nil
 			}
 		}
 
 	}
-	errorMessage := fmt.Sprintf("Access Control Policy DOES NOT PERMIT the following request: %s", viewAddressString)
+	var errorMessage string
+	if (query.Certificate != "") {
+        errorMessage = fmt.Sprintf("Access Control Policy DOES NOT PERMIT the request '%s' from '%s:%s'", viewAddressString, query.RequestingNetwork, query.Certificate)
+	} else if (query.RequestingOrg != "") {
+        errorMessage = fmt.Sprintf("Access Control Policy DOES NOT PERMIT the request '%s' from '%s:%s'", viewAddressString, query.RequestingNetwork, query.RequestingOrg)
+	} else {
+		errorMessage = fmt.Sprintf("Access Control Policy DOES NOT PERMIT the request '%s' from a foreign entity", viewAddressString)
+	}
 	log.Error(errorMessage)
 	return errors.New(errorMessage)
 

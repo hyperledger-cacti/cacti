@@ -95,33 +95,33 @@ const createHTLC = async (
     hashValue: string,
     expiryTimeSecs: number,
     timeoutCallback: (c: Contract, t: string, i: string, r: string, p: string, v: string) => any,
-): Promise<{ preimage: any; result: any }> => {
+): Promise<{ preimage: any; hash: any; result: any }> => {
 
     if (!contract)
     {
         logger.error("Contract handle not supplied");
-        return { preimage: "", result: false };
+        return { preimage: "", hash: "", result: false };
     }
     if (!assetType)
     {
         logger.error("Asset type not supplied");
-        return { preimage: "", result: false };
+        return { preimage: "", hash: "", result: false };
     }
     if (!assetID)
     {
         logger.error("Asset ID not supplied");
-        return { preimage: "", result: false };
+        return { preimage: "", hash: "", result: false };
     }
     if (!recipientECert)
     {
         logger.error("Recipient ECert not supplied");
-        return { preimage: "", result: false };
+        return { preimage: "", hash: "", result: false };
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
     {
         logger.error("Supplied expiry time invalid or in the past: %s; current time: %s", new Date(expiryTimeSecs).toISOString(), new Date(currTimeSecs).toISOString());
-        return { preimage: "", result: false };
+        return { preimage: "", hash: "", result: false };
     }
 
     if (!hashValue || hashValue.length == 0)
@@ -152,7 +152,7 @@ const createHTLC = async (
         setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, assetType, assetID, recipientECert, hashPreimage, hashValue);
     }
 
-    return { preimage: hashPreimage, result: result };
+    return { preimage: hashPreimage, hash: hashValue, result: result };
 };
 
 /**
@@ -168,33 +168,33 @@ const createFungibleHTLC = async (
     hashValue: string,
     expiryTimeSecs: number,
     timeoutCallback: (c: Contract, i: string, t: string, n: number, r: string, p: string, v: string) => any,
-): Promise<{ preimage: any; result: any }> => {
+): Promise<{ preimage: any; hash:any; result: any }> => {
 
     if (!contract)
     {
         logger.error("Contract handle not supplied");
-        return { preimage: "", result: "" };
+        return { preimage: "", hash: "", result: "" };
     }
     if (!assetType)
     {
         logger.error("Asset type not supplied");
-        return { preimage: "", result: "" };
+        return { preimage: "", hash: "", result: "" };
     }
     if (numUnits <= 0)
     {
         logger.error("Asset count must be a positive integer");
-        return { preimage: "", result: "" };
+        return { preimage: "", hash: "", result: "" };
     }
     if (!recipientECert)
     {
         logger.error("Recipient ECert not supplied");
-        return { preimage: "", result: "" };
+        return { preimage: "", hash: "", result: "" };
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
     {
         logger.error("Supplied expiry time invalid or in the past: %s; current time: %s", new Date(expiryTimeSecs).toISOString(), new Date(currTimeSecs).toISOString());
-        return { preimage: "", result: "" };
+        return { preimage: "", hash: "", result: "" };
     }
 
     if (!hashValue || hashValue.length == 0)
@@ -225,7 +225,7 @@ const createFungibleHTLC = async (
         setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, contractId, assetType, numUnits, recipientECert, hashPreimage, hashValue);
     }
 
-    return { preimage: hashPreimage, result: contractId };
+    return { preimage: hashPreimage, hash: hashValue, result: contractId };
 };
 
 /**

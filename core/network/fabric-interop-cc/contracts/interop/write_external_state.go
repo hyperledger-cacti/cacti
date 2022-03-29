@@ -70,6 +70,7 @@ func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextI
 	// 1. Verify proof
 	err = s.VerifyView(ctx, b64ViewProto, address)
 	if err != nil {
+		log.Errorf("Proof obtained from foreign network for query '%s' is INVALID", address)
 		return nil, fmt.Errorf("VerifyView error: %s", err)
 	}
 
@@ -149,7 +150,7 @@ func (s *SmartContract) VerifyView(ctx contractapi.TransactionContextInterface, 
 	case common.Meta_CORDA:
 		switch view.Meta.ProofType {
 		case "Notarization":
-			return verifyCordaNotarization(s, ctx, view.Data, verificationPolicy, addressStruct.LedgerSegment)
+			return verifyCordaNotarization(s, ctx, view.Data, verificationPolicy, addressStruct.LedgerSegment, address)
 		default:
 			return fmt.Errorf("Proof type not supported: %s", view.Meta.ProofType)
 		}
@@ -180,7 +181,7 @@ func (s *SmartContract) VerifyView(ctx contractapi.TransactionContextInterface, 
 // 3. Verify each of the signatures in the Notarization array according to the data bytes and certificate.
 // 4. Check the certificates are valid according to the Membership.
 // 5. Check the notarizations fulfill the verification policy of the request.
-func verifyCordaNotarization(s *SmartContract, ctx contractapi.TransactionContextInterface, data []byte, verificationPolicy *common.Policy, securityDomain string) error {
+func verifyCordaNotarization(s *SmartContract, ctx contractapi.TransactionContextInterface, data []byte, verificationPolicy *common.Policy, securityDomain, address string) error {
 	var cordaViewData corda.ViewData
 	err := protoV2.Unmarshal(data, &cordaViewData)
 	if err != nil {
@@ -222,6 +223,7 @@ func verifyCordaNotarization(s *SmartContract, ctx contractapi.TransactionContex
 			return fmt.Errorf("Notarizations missing signer: %s", signer)
 		}
 	}
+	log.Infof("Proof associated with response '%s' from Corda network for query '%s' is VALID", string(cordaViewData.Payload), address)
 	return nil
 }
 
@@ -294,5 +296,6 @@ func verifyFabricNotarization(s *SmartContract, ctx contractapi.TransactionConte
 			return fmt.Errorf("Notarizations missing signer: %s", signer)
 		}
 	}
+	log.Infof("Proof associated with response '%s' from Fabric network for query '%s' is VALID", string(fabricViewData.Response.Payload), address)
 	return nil
 }
