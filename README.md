@@ -24,7 +24,9 @@ Weaver, in effect, allows smart contracts managing data and assets on their resp
 - Data-sharing across ledgers with proof of authenticity and provenance
 - Atomic asset transfers between networks
 - Atomic asset exchanges in multiple networks
+
 Each capability is implemented as a protocol with the endpoints being the respective peer networks that arrive at ledger state update decisions through consensus. See the [project overview](./OVERVIEW.md) for more information and references.
+
 With Weaver, limited-scope blockchain networks can be scaled up to a _network-of-networks_ where different DLT networks can interoperate using Weaver's protocols ad hoc, thereby creating an illusion of a worldwide distributed ledger (or blockchain) without requiring netowrks to sacrifice their independence. This is illustrated in the figure below.
 
 <img src="./resources/images/weaver-vision.png">
@@ -39,7 +41,16 @@ The framework offers common components that can be reused in networks built on a
   * Agents, consisting of both generic and DLT-specific features, that sync foreign networks' membership lists and identity provider credentials, using existing decentralized identity (DID) and verifiable credential (VC) infrastructure.
 - Apart from the core platform features listed above, we provide SDK extensions for network application users to adapt existing apps for interoperability.
 - We provide and maintain basic _testnets_ built on different DLTs (Fabric, Corda, Besu at present) for rapid prototyping and testing.
+
 For more details and illustrations, see the [project overview](./OVERVIEW.md).
+
+## Weaver Applications
+
+Weaver can be used to link business workflows (implemented as smart contracts or decentralized applications) spanning multiple independent permissioned ledgers, in effect scaling up the reach and impact of those processes without sacrificing decentralized operation and network sovereignty.
+
+Two popular categories of enterprise applications in which blockchain or distributed ledger technology play a major role today and which need interoperability support of the kind Weaver offers are:
+- [Global Trade](https://labs.hyperledger.org/weaver-dlt-interoperability/docs/external/user-stories/global-trade)
+- [Financial Markets](https://labs.hyperledger.org/weaver-dlt-interoperability/docs/external/user-stories/financial-markets)
 
 ## Weaver Support Status
 The table below shows what interoperation capabilities (or use cases) are presently supported by Weaver, and what DLTs the platform offers out-of-the-box components for.
