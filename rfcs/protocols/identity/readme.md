@@ -12,7 +12,7 @@
 
 ## Summary
 
-This is an identity plane protocol to exchange identity information between two interoperating blockchain networks. This establishes a basis (or trust anchor) for proof-based data transfer. For background and component information, start [here](../../models/identity/decentralized-network-identity-discovery-management.md).
+This is an identity plane protocol to exchange identity information between two interoperating blockchain networks. This establishes a basis (or trust anchor) for proof-based data transfer. For background and component information, start [here](../../models/identity/network-identity-management.md).
 
 The entire Network Identity Discovery and Management protocol involves the following protocols for different steps:
 
@@ -304,4 +304,4 @@ The IIN registry authenticates a Network DID updation request based on two condi
 
 ## Dataplane credentials update with changes in identity plane
 
-The idetntiy exchange and validation has to be done whenever there is a change in the identuty of any network. Thus, the identity exchange protocol steps explained in this document have to be triggered for a network for changes in identity of its interoperating network of their participant units. This is further explained [here](./identity-change-updates.md).
+The identity exchange and validation has to be done whenever there is a change in the identity of any network. Thus, the identity exchange protocol steps explained in this document must be triggered within a network whenever the identities of the participant units of any network it wishes to interoperate with change. This is further explained [here](./identity-change-updates.md).

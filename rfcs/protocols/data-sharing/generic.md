@@ -40,7 +40,7 @@ There are two roles in the `data-transfer` protocol: `requester` and `responder`
 
 This is a classic two-step request~response interaction, so it uses the predefined state machines for any `requester` and `responder`:
 
-<img src="data-transfer-states.png" height="550" width="700">
+<img src="../../resources/images/data-transfer-states.png" height="550" width="700">
 
 \*\* Should this state diagram include validation of messages?
 

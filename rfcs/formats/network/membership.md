@@ -14,7 +14,7 @@
 -   An external entity can represent a thing, person, organization or a group of entities such as a network.
 -   An external entity is known to the owners of a ledger by its identity.
 -   The set of identities representing the external entity is captured in a members list.
--   Members are part of the overall [security domain](../models/security.md#security-domains) defined on behalf of the external entity.
+-   Members are part of the overall [security domain](../models/security-domains.md#security-domains) defined on behalf of the external entity.
 
 ## Members of a Security Domain
 
@@ -22,7 +22,7 @@ There are multiple strategies for capturing the members list of an external enti
 
 The members list can also be a set of public keys or a set of certificates with a valid chain of trust. This allows for individual members of the external entity to be directly identfied by their public key or certificate. An example of the former is for identifying the set of validators running a BFT consensus protocol in a permissionless network using Proof of Stake for sybil resistance.
 
-Finally, the members map can be left empty ("\*"), indicating that any external entity is a valid member of the security domain. In these situations however, other approaches to authenticating the external entity (such as _traits_) can be used. See [security domains](../models/security.md#security-domains) for discussions on this.
+Finally, the members map can be left empty ("\*"), indicating that any external entity is a valid member of the security domain. In these situations however, other approaches to authenticating the external entity (such as _traits_) can be used. See [security domains](../models/security-domains.md#security-domains) for discussions on this.
 
 A members object has the following structure:
 

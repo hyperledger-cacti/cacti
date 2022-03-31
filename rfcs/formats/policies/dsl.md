@@ -5,13 +5,13 @@
  -->
 # Policy DSL
 
-A verification policy defines the proof criteria that a requesting network requires of a remote network (see [Proof Verification Policies](./policy-proof-verification.md) for more information).
+A verification policy defines the proof criteria that a requesting network requires of a remote network (see [Proof Verification Policies](./proof-verification.md) for more information).
 
 This DSL defines the language that can be used to express these proof requirements.
 
 ## Grammar
 
-The grammar for the DSL is defined in [an antlr4 grammar file](../../common/policy-dsl/parser/Policy.g4).
+The grammar for the DSL is defined in [an antlr4 grammar file](../../../common/policy-dsl/parser/Policy.g4).
 
 The main piece of the grammar is
 

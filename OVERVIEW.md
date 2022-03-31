@@ -22,9 +22,9 @@ The figure below illustrates our layered view of what a general-purpose interope
 <img src="./resources/images/layers-use-cases.png">
 
 Toward the right of the figure, you can see functions in the semantic layer called out as distinct use cases involving some exchange of information across two networks, leading to ledger record updates in those networks. The three scenarios are:
-- Data transfers
-- Asset transfers
-- Asset exchanges
+- Data sharing
+- Asset transfer
+- Asset exchange
 
 You can find details on these use cases (or _modes_ of interoperation) in [Interoperability Modes](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
 
@@ -38,7 +38,7 @@ Because DLTs can be highly divergent, it is difficult to create components that 
 
 In the middle, for cross-network communications, lie DLT-agnostic relays, which can have one or more DLT-specific _drivers_ to interpret requests and orchestrate response collection from the network. _Interoperation modules_ lie within the network and operate the way smart contracts for that platform natively do. Hence, in a Fabric network, these are implemented and deployed as _chaincode_ on all peers, whereas in a Corda network, they are implemented and deployed within a special _Interop Cordapp_ that can trigger flows across the network. Lastly, for applications that are already deployed on these networks to exercise interoperation capabilities, Weaver provides SDK extensions and libraries.
 
-For a data transfer use case, the following are the functions that are performed network-wide using the interoperation modules (i.e., through consensus):
+For a data sharing use case, the following are the functions that are performed network-wide using the interoperation modules (i.e., through consensus):
 - Access control of requests for data from another network
 - Proof of response data authenticity generated in the form of peers' digital signatures
 - Optionally, encryption of repsonse data and signatures to avoid confidentiality and integrity attacks mounted by relays

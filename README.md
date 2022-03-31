@@ -21,7 +21,7 @@ Weaver is a framework, with a family of protocols, to enable interoperation for 
 The framework allows two independent networks built on the same or different DLTs to interoperate on a need basis. Though presently, Weaver supports only permissioned DLTs (Hyperledger Fabric, Corda, and to some extent Hyperledger Besu), the design encompasses both permissioned and open DLTs. We expect to add support to the latter (e.g., Ethereum, Bitcoin) in due course.
 
 Weaver, in effect, allows smart contracts managing data and assets on their respective ledgers to interlink and thereby produce an augnmented business workflow that can span multiple shared ledgers and networks. The core capabilities (or use cases) in Weaver that are the building blocks for cross-network operations are:
-- Data-sharing across ledgers with proof of authenticity and provenance
+- Data sharing across ledgers with proof of authenticity and provenance
 - Atomic asset transfers between networks
 - Atomic asset exchanges in multiple networks
 
@@ -60,7 +60,7 @@ The table below shows what interoperation capabilities (or use cases) are presen
 <img src="./resources/images/weaver-support-table.png">
 
 Prominent features in our future roadmap are:
-- Make the protocols for data transfer, asset transfer, and asset exchanges, more robust and foolproof using techniques validated through research and experimentation.
+- Make the protocols for data sharing, asset transfers, and asset exchanges, more robust and foolproof using techniques validated through research and experimentation.
 - Support the use cases of cross-network transaction invocations (i.e., instructions) and event dissemination (publish/subscribe).
 
 ## Repository Structure
