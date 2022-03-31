@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-labs/weaver-protos-js",
-  "version": "1.2.4-alpha.1",
+  "version": "1.2.4",
   "description": "Interop protos for Node JS (Weaver)",
   "main": "index.js",
   "exports": {

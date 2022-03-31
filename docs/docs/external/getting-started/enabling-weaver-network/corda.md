@@ -219,7 +219,7 @@ You can start a relay within a Docker container using a [pre-built image](https:
   EXTERNAL_NETWORK=<docker-bridge-network>
   DOCKER_REGISTRY=ghcr.io/hyperledger-labs
   DOCKER_IMAGE_NAME=weaver-relay
-  DOCKER_TAG=1.2.1
+  DOCKER_TAG=1.2.4
   ```
   The `PATH_TO_CONFIG` variable should point to the `config.toml` (you can name this whatever you wish) specified below.
 
@@ -290,7 +290,7 @@ You can start a driver within a Docker container using a [pre-built image](https
   DRIVER_RPC_PASSWORD=<driver-rpc-username>
   EXTERNAL_NETWORK=<docker-bridge-network>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-corda-driver
-  DOCKER_TAG=1.2.3
+  DOCKER_TAG=1.2.4-alpha.7
   ```
   The `NETWORK_NAME` is only used as suffix for container and has no other significance.
   

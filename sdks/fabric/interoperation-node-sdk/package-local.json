@@ -6,7 +6,7 @@
     "blockchain",
     "interoperability"
   ],
-  "version": "1.2.1",
+  "version": "1.2.5",
   "author": "V. Ramakrishna",
   "tag": "latest",
   "main": "build/index.js",

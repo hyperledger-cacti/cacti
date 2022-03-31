@@ -20,7 +20,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@hyperledger-labs/weaver-protos-js": "^1.2.0",
+        "@hyperledger-labs/weaver-protos-js": "^1.2.4",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",
         "@typescript-eslint/eslint-plugin": "^3.5.0",
