@@ -26,48 +26,54 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 |    02    | Protocols and Mechanisms    |
 |    03    | Data Structures and Formats |
 
-| RFC #  | Title                            | Category | Status                                                        |
-|--------|----------------------------------|----------|---------------------------------------------------------------|
-| 01-001 | Views                            | Model    | [Proposed](./models/ledger/views.md)                          |
-| 01-002 | Cryptographic Proofs             | Model    | [Draft](./models/ledger/cryptographic-proofs.md)              |
-| 01-003 | Verifiable Observation of State  | Model    | [Draft](./models/ledger/observation-of-state.md)              |
-| 01-004 | Events                           | Model    | [Draft](./models/ledger/events.md)                            |
-| 01-005 | Cross-Ledger Operations          | Model    | [Draft](./models/ledger/resource-operations.md)               |
-| 01-006 | Atomic Cross-Ledger Transactions | Model    | [Draft](./models/ledger/atomic-cross-ledger-transactions.md)  |
-| 01-007 | Security Domains                 | Model    | [Draft](./models/security/security-domains.md)                |
-| 01-008 | End-to-End Confidentiality       | Model    | [Draft](./models/security/confidentiality.md)                 |
-| 01-009 | Relays                           | Model    | [Draft](./models/infrastructure/relays.md)                    |
-| 01-010 | Interoperation Modules           | Model    | [Draft](./models/infrastructure/interoperation-modules.md)    |
-| 01-011 | Identity                         | Model    | [Draft](./models/identity/network-identity-management.md)     |
-| 02-001 | Data Sharing                     | Protocol | [Draft](./protocols/data-sharing/generic.md)                  |
-| 02-002 | Data Sharing in Fabric           | Protocol | [Draft](./protocols/data-sharing/fabric.md)                   |
-| 02-003 | Data Sharing in Corda            | Protocol | [Draft](./protocols/data-sharing/corda.md)                    |
-| 02-004 | Asset Exchange through HTLC      | Protocol | [Draft](./protocols/asset-exchange/generic-htlc.md)           |
-| 02-005 | Asset Exchange in Fabric         | Protocol | [Draft](./protocols/asset-exchange/fabric-htlc.md)            |
-| 02-006 | Asset Exchange in Corda          | Protocol | [Draft](./protocols/asset-exchange/corda-htlc.md)             |
-| 02-007 | Asset Exchange in Besu           | Protocol | [Draft](./protocols/asset-exchange/besu-htlc.md)              |
-| 02-008 | Asset Transfer                   | Protocol | [Draft](./protocols/asset-transfer/generic.md)                |
-| 02-009 | Asset Transfer in Fabric         | Protocol | [Draft](./protocols/asset-transfer/fabric.md)                 |
-| 02-010 | Asset Transfer in Corda          | Protocol | [Draft](./protocols/asset-transfer/corda.md)                  |
-| 02-011 | Identity Syncing                 | Protocol | [Draft](./protocols/identity/readme.md)                       |
-| 02-012 | Discovery                        | Protocol | [Draft](./protocols/discovery/discovery.md)                   |
-| 02-012 | Negotiation                      | Protocol | [Draft](./protocols/discovery/negotiation.md)                 |
-| 02-014 | Transaction Invocation           | Protocol | [Draft](./protocols/contract-invocation/invocation.md)        |
-| 02-015 | Event Bus                        | Protocol | [Draft](./protocols/events/event-bus.md)                      |
-| 03-001 | View Address                     | Format   | [Proposed](./formats/views/addressing.md)                     |
-| 03-002 | Generic View                     | Format   | [Draft](./formats/views/view-definition.md)                   |
-| 03-003 | Fabric View                      | Format   | [Draft](./formats/views/views-fabric.md)                      |
-| 03-004 | Corda View                       | Format   | [Draft](./formats/views/views-corda.md)                       |
-| 03-005 | Besu View                        | Format   | [Draft](./formats/views/views-besu.md)                        |
-| 03-005 | Ethereum View                    | Format   | [Draft](./formats/views/views-ethereum.md)                    |
-| 03-006 | View Request                     | Format   | [Draft](./formats/views/request.md)                           |
-| 03-007 | Access Control Policy            | Format   | [Proposed](./formats/policies/access-control.md)              |
-| 03-008 | Proof Verification Policy        | Format   | [Proposed](./formats/policies/proof-verification.md)          |
-| 03-009 | Verification Policy DSL          | Format   | [Draft](./formats/policies/dsl.md)                            |
-| 03-010 | Membership                       | Format   | [Proposed](./formats/network/membership.md)                   |
-| 03-011 | Asset Exchange Units             | Format   | [Proposed](./formats/assets/exchange.md)                      |
-| 03-012 | Asset Transfer Units             | Format   | [Proposed](./formats/assets/transfer.md)                      |
-| 03-013 | Network Identities               | Format   | [Proposed](./formats/network/identity.md)                     |
+| RFC #  | Title                            | Category | Status                                                          |
+|--------|----------------------------------|----------|-----------------------------------------------------------------|
+| 01-001 | Views                            | Model    | [Proposed](./models/ledger/views.md)                            |
+| 01-002 | Cryptographic Proofs             | Model    | [Proposed](./models/ledger/cryptographic-proofs.md)             |
+| 01-003 | Verifiable Observation of State  | Model    | [Draft](./models/ledger/observation-of-state.md)                |
+| 01-004 | Events                           | Model    | [Draft](./models/ledger/events.md)                              |
+| 01-005 | Cross-Ledger Operations          | Model    | [Draft](./models/ledger/cross-ledger-operations.md)             |
+| 01-006 | Atomic Cross-Ledger Transactions | Model    | [Proposed](./models/ledger/atomic-cross-ledger-transactions.md) |
+| 01-007 | Security Domains                 | Model    | [Proposed](./models/security/security-domains.md)               |
+| 01-008 | End-to-End Confidentiality       | Model    | [Draft](./models/security/confidentiality.md)                   |
+| 01-009 | Relays                           | Model    | [Proposed](./models/infrastructure/relays.md)                   |
+| 01-010 | Interoperation Modules           | Model    | [Proposed](./models/infrastructure/interoperation-modules.md)   |
+| 01-011 | Identity Management              | Model    | [Proposed](./models/identity/network-identity-management.md)    |
+| 01-012 | Identity Registry                | Model    | [Proposed](./models/identity/iin.md)                            |
+| 01-013 | Identity Agent                   | Model    | [Proposed](./models/identity/iin-agent.md)                      |
+| 01-014 | Identity Trust Anchor Agent      | Model    | [Retired](./models/identity/iin-steward-agent.md)               |
+| 01-015 | Network Identity Updates         | Model    | [Proposed](./models/identity/identity-update-policy.md)         |
+| 02-001 | Data Sharing                     | Protocol | [Proposed](./protocols/data-sharing/generic.md)                 |
+| 02-002 | Data Sharing in Fabric           | Protocol | [Proposed](./protocols/data-sharing/fabric.md)                  |
+| 02-003 | Data Sharing in Corda            | Protocol | [Proposed](./protocols/data-sharing/corda.md)                   |
+| 02-004 | Asset Exchange through HTLC      | Protocol | [Proposed](./protocols/asset-exchange/generic-htlc.md)          |
+| 02-005 | Asset Exchange in Fabric         | Protocol | [Proposed](./protocols/asset-exchange/fabric-htlc.md)           |
+| 02-006 | Asset Exchange in Corda          | Protocol | [Proposed](./protocols/asset-exchange/corda-htlc.md)            |
+| 02-007 | Asset Exchange in Besu           | Protocol | [Draft](./protocols/asset-exchange/besu-htlc.md)                |
+| 02-008 | Asset Transfer                   | Protocol | [Proposed](./protocols/asset-transfer/generic.md)               |
+| 02-009 | Asset Transfer in Fabric         | Protocol | [Proposed](./protocols/asset-transfer/fabric.md)                |
+| 02-010 | Asset Transfer in Corda          | Protocol | [Proposed](./protocols/asset-transfer/corda.md)                 |
+| 02-011 | Identity Syncing                 | Protocol | [Draft](./protocols/identity/readme.md)                         |
+| 02-012 | Discovery                        | Protocol | [Draft](./protocols/discovery/discovery.md)                     |
+| 02-012 | Negotiation                      | Protocol | [Draft](./protocols/discovery/negotiation.md)                   |
+| 02-014 | Transaction Invocation           | Protocol | [Draft](./protocols/contract-invocation/invocation.md)          |
+| 02-015 | Event Bus                        | Protocol | [Draft](./protocols/events/event-bus.md)                        |
+| 03-001 | View Address                     | Format   | [Proposed](./formats/views/addressing.md)                       |
+| 03-002 | Generic View                     | Format   | [Proposed](./formats/views/view-definition.md)                  |
+| 03-003 | Fabric View                      | Format   | [Proposed](./formats/views/views-fabric.md)                     |
+| 03-004 | Corda View                       | Format   | [Proposed](./formats/views/views-corda.md)                      |
+| 03-005 | Besu View                        | Format   | [Draft](./formats/views/views-besu.md)                          |
+| 03-005 | Ethereum View                    | Format   | [Draft](./formats/views/views-ethereum.md)                      |
+| 03-006 | View Request                     | Format   | [Proposed](./formats/views/request.md)                          |
+| 03-007 | Access Control Policy            | Format   | [Proposed](./formats/policies/access-control.md)                |
+| 03-008 | Proof Verification Policy        | Format   | [Proposed](./formats/policies/proof-verification.md)            |
+| 03-009 | Verification Policy DSL          | Format   | [Draft](./formats/policies/dsl.md)                              |
+| 03-010 | Membership                       | Format   | [Proposed](./formats/network/membership.md)                     |
+| 03-011 | Asset Exchange Units             | Format   | [Proposed](./formats/assets/exchange.md)                        |
+| 03-012 | Asset Transfer Units             | Format   | [Proposed](./formats/assets/transfer.md)                        |
+| 03-013 | Relay Messages                   | Format   | [Proposed](./formats/communication/relay.md)                    |
+| 03-014 | Driver Messages                  | Format   | [Proposed](./formats/communication/driver.md)                   |
+| 03-015 | Network Identities               | Format   | [Proposed](./formats/network/identity.md)                       |
 
 
 ## RFC Process

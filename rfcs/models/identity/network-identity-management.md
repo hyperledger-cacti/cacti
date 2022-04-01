@@ -5,9 +5,10 @@
  -->
 # Decentralized Network-Identity Discovery and Management for Interoperation
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 01-011
+- Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+- Status: Proposed
+- Since: 24-September-2021
 
 
 # Overview
@@ -129,5 +130,5 @@ The DLT networks and its participant units must create and configure their ident
 
 To allow seamless interoperation across two different DLT networks, the identity of the counterparty networks have to be configured. But, even before that, some means of discovering the networks is required through which any identity protocol can start. Discovery of networks in the identity plane is facilitated by discovery of the Network Identities, which are represented as Network DIDs and registered in the IINs. Each Network thus has a unique Network DID which can be considered equivalent to a domain name in Internet parlance. Thus Network DID facilitates discovery of networks with the help of the IIN infrastructure.
 
-The network discovrery protocols specifications are elaborated [here](../../protocols/discovery/readme.md).
+The network discovery protocols specifications are elaborated [here](../../protocols/discovery/readme.md).
 

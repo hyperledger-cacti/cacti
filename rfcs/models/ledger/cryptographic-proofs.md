@@ -5,8 +5,10 @@
  -->
 # Proof Representation
 
+- RFC: 01-002
 - Authors: Ant Targett, Nick Waywood
-- Status: proposed
+- Status: Proosed
+- Since: 01-12-2020
 
 ## Summary
 

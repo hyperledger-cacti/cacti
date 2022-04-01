@@ -11,6 +11,8 @@ Views and view addressing formats are described in the [views](./views) folder.
 
 Structures used in cross-network asset exchange and transfer logic are described in the [assets](./assets) folder.
 
+Message structures used by communication modules like relays and drivers are described in the [communication](./communication) folder.
+
 Policy schemas are described in the [policies](./policies) folder.
 
 Network and network unit schemas are described in the [identities](./identities) folder.

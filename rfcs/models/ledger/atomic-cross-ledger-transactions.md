@@ -5,6 +5,7 @@
  -->
 # Atomic Cross-Ledger Transactions
 
+- RFC: 01-006
 - Authors: Venkatraman Ramakrishna, Ermyas Abebe, Sandeep Nishad, Krishnasuri Narayanam, Dhinakaran Vinayagamurthy
 - Status: Proposed
 - Since: 15-Jun-2021

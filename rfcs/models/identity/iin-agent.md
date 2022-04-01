@@ -5,9 +5,10 @@
  -->
 # IIN Agents in a DLT Network
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 01-013
+- Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+- Status: Proposed
+- Since: 24-September-2021
 
 
 # Summary
@@ -70,3 +71,11 @@ The IIN Agent interacts with other IIN Agents in the following ways:
 * With foreign network agents: to request/offer membership and security group presentations, prove membership within its network, and prove ownership of a security group
 
 Details of these protocols can be found [here](../../protocols/identity/readme.md).
+
+## IIN Agents for Trust Anchors
+Trust anchors associated with IINs, or DID registries in general, and which issue identity and membership VCs to individual network participants (see [IIN model](./iin.md)), also must run an agent to interact with network members' IIN agents. The model for an IIN agent specified earlier in this document can be used for trust anchor agents with some salient differences:
+* The trust anchor agent will need to be equipped with the capability to issue VCs, and return VPs when an IIN agent sends a valid request for one.
+* The trust anchor agent will not need to understand a DLT protocol for the purpose of recording identities to a network's ledger.
+
+(_Note_: If the IIN is built on Hyperledger Indy, where trust anchors are referred to as _stewards_, the corresponding agent will register the verinym (DID) for its steward along with key-generation seed values (generated using a random number generator) in the Indy ledger. This registration occurs at genesis (or bootstrap) time.)
+

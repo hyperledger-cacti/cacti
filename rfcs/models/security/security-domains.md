@@ -3,9 +3,14 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Security
+# Security Domains and Guards
 
-## Security Domains
+- RFC: 01-007
+- Authors: Allison Irvin, Antony Targett, Christian Vecchiola, Dileban Karunamoorthy, Ermyas Abebe, Nick Waywood, Venkatraman Ramakrishna
+- Status: Proposal
+- Since: 13-Aug-2020
+
+## Security Domains: Summary
 
 Security domains are defined on external entities such as a thing, person, organization or on groups of entities such as networks. Security domains assemble a set of policies that are applied to a variety of interactions with a given external entity. These can include access control policies that are applied on requests to read state on the ledger or verification policies applied on presentation of a proof of state by the external entity.
 

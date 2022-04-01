@@ -5,7 +5,10 @@
  -->
 # Inter-Network Operations on Resources
 
-* Status: Proposal for Thought
+- RFC: 01-005
+- Authors: Venkatraman Ramakrishna
+- Status: Draft
+- Since: 02-11-2020
 
 ## Summary
 

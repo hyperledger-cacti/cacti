@@ -5,9 +5,10 @@
  -->
 # Verifiable Observation of State
 
-* Authors: Allison Irvin, Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna
-* Status: Draft
-* Since: 13-Aug-2020
+- RFC: 01-003
+- Authors: Allison Irvin, Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna
+- Status: Draft
+- Since: 13-Aug-2020
 
 ## Summary
 

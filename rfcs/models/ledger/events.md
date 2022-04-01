@@ -5,9 +5,10 @@
  -->
 # Events
 
-- Authors: 
-- Status: [Draft](/README.md#draft)
-- Since: 2020-11-02 
+- RFC: 01-004
+- Authors: Ermyas Abebe, Dileban Karunamoorthy
+- Status: Draft
+- Since: 02-11-2020
 
 ## Summary
 
