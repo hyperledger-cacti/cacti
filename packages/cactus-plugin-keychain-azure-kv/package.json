@@ -33,6 +33,11 @@
       "name": "Peter Somogyvari",
       "email": "peter.somogyvari@accenture.com",
       "url": "https://accenture.com"
+    },
+    {
+      "name": "Jeffrey Ushry II",
+      "email": "ushryaspirant@gmail.com",
+      "url": "https://www.linkedin.com/in/jeffrey-ushry-ii-aa7ab8183"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",

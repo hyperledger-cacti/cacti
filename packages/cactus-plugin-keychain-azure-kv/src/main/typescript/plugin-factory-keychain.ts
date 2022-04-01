@@ -1,27 +1,29 @@
-import { v4 as uuidv4 } from "uuid";
+import { Checks } from "@hyperledger/cactus-common";
 import {
   IPluginFactoryOptions,
+  IPluginKeychain,
   PluginFactory,
+  PluginImportType,
 } from "@hyperledger/cactus-core-api";
-
 import {
   IPluginKeychainAzureKvOptions,
   PluginKeychainAzureKv,
 } from "./plugin-keychain-azure-kv";
 
 export class PluginFactoryKeychain extends PluginFactory<
-  PluginKeychainAzureKv,
+  IPluginKeychain,
   IPluginKeychainAzureKvOptions,
   IPluginFactoryOptions
 > {
-  async create(
-    pluginOptions: IPluginKeychainAzureKvOptions = {
-      instanceId: uuidv4(),
-      keychainId: uuidv4(),
-      azureEndpoint: "",
-      logLevel: "TRACE",
-    },
-  ): Promise<PluginKeychainAzureKv> {
-    return new PluginKeychainAzureKv(pluginOptions);
+  async create(options: any): Promise<IPluginKeychain> {
+    const fnTag = "PluginFactoryKeychain#create()";
+
+    const { pluginImportType } = this.options;
+    Checks.truthy(options, `${fnTag}:options`);
+    if (pluginImportType === PluginImportType.Local) {
+      return new PluginKeychainAzureKv(options);
+    } else {
+      throw new Error(`${fnTag} No PluginImportType: ${pluginImportType}`);
+    }
   }
 }
