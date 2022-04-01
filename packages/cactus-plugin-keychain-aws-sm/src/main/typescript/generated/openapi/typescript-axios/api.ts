@@ -230,6 +230,36 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPrometheusMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Checks that an entry exists under a key on the keychain backend
          * @param {HasKeychainEntryRequestV1} hasKeychainEntryRequestV1 Request body for checking a keychain entry via its key
          * @param {*} [options] Override http request option.
@@ -334,6 +364,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPrometheusMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusMetricsV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Checks that an entry exists under a key on the keychain backend
          * @param {HasKeychainEntryRequestV1} hasKeychainEntryRequestV1 Request body for checking a keychain entry via its key
          * @param {*} [options] Override http request option.
@@ -383,6 +423,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getKeychainEntryV1(getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options?: any): AxiosPromise<GetKeychainEntryResponseV1> {
             return localVarFp.getKeychainEntryV1(getKeychainEntryRequestV1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get the Prometheus Metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPrometheusMetricsV1(options?: any): AxiosPromise<string> {
+            return localVarFp.getPrometheusMetricsV1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -436,6 +485,17 @@ export class DefaultApi extends BaseAPI {
      */
     public getKeychainEntryV1(getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options?: any) {
         return DefaultApiFp(this.configuration).getKeychainEntryV1(getKeychainEntryRequestV1, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get the Prometheus Metrics
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getPrometheusMetricsV1(options?: any) {
+        return DefaultApiFp(this.configuration).getPrometheusMetricsV1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
