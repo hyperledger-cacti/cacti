@@ -295,6 +295,8 @@
             "QuorumPrivateTransactionConfig" : {
                 "type": "object",
                 "required" : [
+                    "privateKey",
+                    "privateFrom",
                     "privateFor"
                 ],
                 "properties" : {
@@ -313,11 +315,6 @@
                         "default": false,
                         "nullable": false
                     },
-                    "privacyFlag": {
-                        "type": "number",
-                        "nullable": false,
-                        "description": "See: https://consensys.net/docs/goquorum//en/latest/concepts/privacy/privacy-enhancements/"
-                    },
                     "gasPrice": {
                         "type": "number",
                         "nullable": false
@@ -325,7 +322,15 @@
                     "gasLimit": {
                         "type": "number",
                         "nullable": false
-                    }
+                    },
+                    "privateKey": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "privacyGroupId": {
+                        "type": "string",
+                        "nullable": false
+                    }  
 
                 }
             },
@@ -382,7 +387,33 @@
                     "to": {
                         "type": "string",
                         "nullable": false
-                    }
+                    },
+                    "logs": {
+                        "type": "array",
+                        "default": [],
+                        "items": {},
+                        "nullable": false
+                    },
+                    "logsBloom": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "revertReason": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "output": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "commitmentHash": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "cumulativeGasUSed": {
+                        "type": "number",
+                        "nullable": false
+                    } 
                 }
             },
             "ContractJSON": {

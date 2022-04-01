@@ -67,7 +67,8 @@
     "version": "npm ci && lerna clean --yes && lerna bootstrap && npm run build:dev && npm run build:prod && npm run test:unit",
     "lerna-publish-canary": "npm run run-ci && lerna publish --canary --force-publish --dist-tag $(git branch --show-current) --preid $(git branch --show-current).$(git rev-parse --short HEAD)",
     "lerna-publish": "lerna publish --conventional-commits --sign-git-commit --sign-git-tag",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:debug": "jest --runInBand"
   },
   "devDependencies": {
     "@commitlint/cli": "13.1.0",

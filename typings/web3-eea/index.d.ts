@@ -109,7 +109,7 @@ declare module "web3-eea" {
 
     export interface ISendGenericTransactionOptions {
         readonly privateKey: string;
-        readonly privateFrom: string;
+        readonly privateFrom: string | undefined;
         readonly privacyGroupId?: string;
         readonly privateFor: string[];
         /**

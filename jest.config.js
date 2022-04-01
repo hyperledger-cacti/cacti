@@ -6,7 +6,7 @@ module.exports = {
   setupFilesAfterEnv: ["jest-extended"],
   testTimeout: 60 * 60 * 1000,
   testMatch: [
-    `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
+    `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/**/*private.test.ts`,
   ],
   // Ignore the tests that are still using tap/tape for as their test runner
   testPathIgnorePatterns: [

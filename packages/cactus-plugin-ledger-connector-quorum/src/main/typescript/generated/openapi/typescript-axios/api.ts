@@ -450,13 +450,7 @@ export interface QuorumPrivateTransactionConfig {
      */
     isPrivate?: boolean;
     /**
-     * See: https://consensys.net/docs/goquorum//en/latest/concepts/privacy/privacy-enhancements/
-     * @type {number}
-     * @memberof QuorumPrivateTransactionConfig
-     */
-    privacyFlag?: number;
-    /**
-     * 
+     * * See: https://consensys.net/docs/goquorum//en/latest/concepts/privacy/privacy-enhancements/
      * @type {number}
      * @memberof QuorumPrivateTransactionConfig
      */
@@ -467,6 +461,18 @@ export interface QuorumPrivateTransactionConfig {
      * @memberof QuorumPrivateTransactionConfig
      */
     gasLimit?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateKey: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privacyGroupId?: string;
 }
 /**
  * 
@@ -811,6 +817,42 @@ export interface Web3TransactionReceipt {
      * @memberof Web3TransactionReceipt
      */
     to: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof Web3TransactionReceipt
+     */
+    logs?: Array<any>;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3TransactionReceipt
+     */
+    logsBloom?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3TransactionReceipt
+     */
+    revertReason?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3TransactionReceipt
+     */
+    output?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3TransactionReceipt
+     */
+    commitmentHash?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Web3TransactionReceipt
+     */
+    cumulativeGasUSed?: number;
 }
 
 /**

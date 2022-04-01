@@ -1,10 +1,12 @@
+/* eslint-disable prettier/prettier */
 import { Server } from "http";
 import { Server as SecureServer } from "https";
 
 import { Express } from "express";
 import Web3 from "web3";
-import Web3JsQuorum from "web3js-quorum";
-
+import Web3JsQuorum, { IWeb3Quorum, ISendRawTransaction, IPrivateTransactionReceipt } from "web3js-quorum";
+import path from "path";
+import fs from "fs";
 // The strange way of obtaining the contract class here is like this because
 // web3-eth internally sub-classes the Contract class at runtime
 // @see https://stackoverflow.com/a/63639280/698470
@@ -90,9 +92,8 @@ export class PluginLedgerConnectorQuorum
   private readonly privateUrl: string;
   private readonly log: Logger;
   private readonly web3Raw: Web3;
-  private readonly web3JsQ: any;
+  private readonly web3JsQ: IWeb3Quorum;
   private httpServer: Server | SecureServer | null = null;
-
   private endpoints: IWebServiceEndpoint[] | undefined;
   public static readonly CLASS_NAME = "PluginLedgerConnectorQuorum";
 
@@ -477,28 +478,35 @@ export class PluginLedgerConnectorQuorum
   ): Promise<RunTransactionResponse> {
     const { web3SigningCredential } = req;
     const {
+      ethAccount,
       secret,
     } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
-
-    const address = JSON.parse(req.transactionConfig.from as string).address;
-
-    const transactionReceipt = await this.web3JsQ.eth.sendTransaction({
-      from: address,
-      to: req.transactionConfig.to,
-      value: req.transactionConfig.value,
-      gasLimit: req.transactionConfig.gas,
-      gasPrice: req.transactionConfig.gasPrice,
-      data: req.transactionConfig.data?.startsWith("0x")
-        ? req.transactionConfig.data.slice(2)
-        : req.transactionConfig.data,
-      nonce: req.transactionConfig.nonce,
+    
+    const accountKeyPath = path.resolve(
+      __dirname,
+      "../../test/resources/network-files/member1",
+      "accountkey");
+    const accountKey = JSON.parse(fs.readFileSync(accountKeyPath, "utf8"));
+    const txCount = await this.web3JsQ.eth.getTransactionCount(ethAccount);
+    const signingAccount = this.web3JsQ.eth.accounts.decrypt(accountKey, "");
+    const txn = {
+      gasLimit: req.transactionConfig.gas, //max number of gas units the tx is allowed to use
+      gasPrice: req.transactionConfig.gasPrice, //ETH per unit of gas
+      data: req.transactionConfig.data, 
+      privateKey: secret,
       privateFrom: req.privateTransactionConfig?.privateFrom,
       privateFor: req.privateTransactionConfig?.privateFor,
-      privateKey: secret,
+      from: signingAccount,
       isPrivate: true,
-    });
+      nonce: txCount,
+      value: 0,
+    } as ISendRawTransaction;
 
-    return { transactionReceipt };
+    const block = await this.web3JsQ.priv.generateAndSendRawTransaction(txn) as unknown;
+    const { transactionHash } = block as IPrivateTransactionReceipt;
+    const transactionReceipt = await this.web3JsQ.priv.waitForTransactionReceipt(transactionHash);
+
+    return { transactionReceipt: transactionReceipt };
   }
 
   public async getPrivateTxReceipt(
@@ -588,70 +596,72 @@ export class PluginLedgerConnectorQuorum
   }
 
   private async generateBytecode(req: any): Promise<string> {
-    const tmpContract = new this.web3JsQ.eth.Contract(req.contractJSON.abi);
-    const deployment = tmpContract.deploy({
-      data: req.contractJSON.bytecode,
-      arguments: req.constructorArgs,
-    });
-    const abi = deployment.encodeABI();
-    return abi.startsWith("0x") ? abi : `0x${abi}`;
+    // const tmpContract = new this.web3JsQ.eth.Contract(req.contractJSON.abi);
+    // const deployment = tmpContract.deploy({
+    //   data: req.contractJSON.bytecode,
+    //   arguments: req.constructorArgs,
+    // });
+    // const abi = deployment.encodeABI();
+    // return abi.startsWith("0x") ? abi : `0x${abi}`;
+    const tmpContract = req.contractJSON.bytecode;
+    return tmpContract;
+
   }
 
   async runDeploy(req: any): Promise<DeployContractSolidityBytecodeV1Response> {
     const web3SigningCredential = req.web3SigningCredential as
       | Web3SigningCredentialGethKeychainPassword
       | Web3SigningCredentialPrivateKeyHex;
-
     const bytecode = await this.generateBytecode(req);
-
-    // const tx = await web3.priv.generateAndSendRawTransaction({
-    //   gasPrice: 0,
-    //   gasLimit: 4300000,
-    //   value: 0,
-    //   data: bytecodeWithInitParam,
-    //   from: signAcct,
-    //   isPrivate: true,
-    //   privateFrom: "BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=",
-    //   privateFor: ["QfeDAys9MPDs2XHExtc84jKGHxZg/aj52DTh0vtA3Xc="],
-    //   nonce: txCount,
-    //   privacyFlag: 1,
-    // });
 
     if (req.privateTransactionConfig) {
       const privacyGroupId =
         req.privateTransactionConfig.privacyGroupId ||
         this.web3JsQ.utils.generatePrivacyGroup(req.privateTransactionConfig);
       this.log.info("privacyGroupId=%o", privacyGroupId);
-
-      // const txCount1 = await this.web3JsQ.eth.getTransactionCount();
-      // this.log.info("txCount1=%o", txCount1);
-
-      // const txCount =
-      //   req.nonce ||
-      //   (await this.web3JsQ.priv.getTransactionCount(
-      //     req.privateTransactionConfig.privateFrom,
-      //     privacyGroupId,
-      //   ));
-
-      const txCount = 0; // FIXME this is the part
-      // that is not working the second time around
-
-      const tx = {
-        value: 0,
-        data: bytecode,
-        nonce: txCount,
-        from: {
-          privateKey: `0x${web3SigningCredential.secret}`,
+      const receipt = await this.transactPrivate({
+        privateTransactionConfig: req.privateTransactionConfig,
+        transactionConfig: {
+          data: "0x" + bytecode,
+          from: web3SigningCredential.ethAccount,
+          gas: req.gas,
+          gasPrice: req.gasPrice,
         },
-        privateKey: web3SigningCredential.secret,
-        ...req.privateTransactionConfig,
-      };
-      const block = await this.web3JsQ.priv.generateAndSendRawTransaction(tx);
-      const { transactionHash } = block;
-      const receipt = await this.web3JsQ.priv.waitForTransactionReceipt(
-        transactionHash,
-      );
+        web3SigningCredential,
+      });
       return receipt;
+
+      // const chainId = 1337;
+      // const accountAddress = "f0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5";
+      // const txCount = await this.web3JsQ.eth.getTransactionCount(`0x${accountAddress}`);
+      
+      // const contractConstructorInit = "000000000000000000000000000000000000000000000000000000000000002F";
+
+      // const accountKeyPath = path.resolve(
+      //   __dirname,
+      //   "../../test/resources/network-files/member1",
+      //   "accountkey");
+      // const accountKey = JSON.parse(fs.readFileSync(accountKeyPath, "utf8"));
+      // const signingAccounts = this.web3JsQ.eth.accounts.decrypt(accountKey, "");
+      // const tx = {
+      //   chainId,
+      //   nonce: txCount,
+      //   gasPrice: 0, //ETH per unit of gas
+      //   gasLimit: 10000000, //max number of gas units the tx is allowed to use
+      //   value: 0,
+      //   data: '0x'+bytecode+contractConstructorInit,
+      //   from: signingAccounts,
+      //   isPrivate: true,
+      //   privateKey: "b9a4bd1539c15bcc83fa9078fe89200b6e9e802ae992f13cd83c853f16e8bed4",
+      //   privateFrom: "BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=",
+      //   privateFor: ["1iTZde/ndBHvzhcl7V68x44Vx7pl8nwx9LqnM/AfJUg="],
+      // };
+      // const block = await this.web3JsQ.priv.generateAndSendRawTransaction(tx);
+      // const { transactionHash } = block;
+      // const receipt = await this.web3JsQ.priv.waitForTransactionReceipt(
+      //   transactionHash,
+      // );
+      // return { transactionReceipt: receipt };
     } else {
       const receipt = await this.transact({
         privateTransactionConfig: req.privateTransactionConfig,

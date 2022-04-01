@@ -10,7 +10,7 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 
-import Web3JsQuorum, { IWeb3InstanceExtended } from "web3js-quorum";
+import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 
 const keyStatic = {
   tessera: {
@@ -74,9 +74,9 @@ describe("PluginLedgerConnectorQuorum", () => {
 
   let keys: typeof keyStatic;
   let signingAccount;
-  let webQJsMember1: IWeb3InstanceExtended;
-  let webQJsMember2: IWeb3InstanceExtended;
-  let webQJsMember3: IWeb3InstanceExtended;
+  let webQJsMember1: IWeb3Quorum;
+  let webQJsMember2: IWeb3Quorum;
+  let webQJsMember3: IWeb3Quorum;
   let ledger: QuorumMpTestLedger;
   let connector1: PluginLedgerConnectorQuorum;
   let connector2: PluginLedgerConnectorQuorum;
@@ -117,23 +117,17 @@ describe("PluginLedgerConnectorQuorum", () => {
     const web3Member2 = new Web3(rpcApiHttpHostMember2);
     const web3Member3 = new Web3(rpcApiHttpHostMember3);
 
-    webQJsMember1 = Web3JsQuorum(web3Member1, {
-      privateUrl: keyStatic.quorum.member1.privateUrl,
-      tlsSettings: { allowInsecure: true },
-    });
+    webQJsMember1 = Web3JsQuorum(
+      web3Member1,
+      { privateUrl: keys.quorum.member1.privateUrl },
+      true,
+    );
     expect(webQJsMember1).toBeTruthy();
 
-    webQJsMember2 = Web3JsQuorum(web3Member2, {
-      privateUrl: keyStatic.quorum.member2.privateUrl,
-      tlsSettings: { allowInsecure: true },
-    });
+    webQJsMember2 = Web3JsQuorum(web3Member2);
     expect(webQJsMember2).toBeTruthy();
 
-    webQJsMember3 = Web3JsQuorum(web3Member3, {
-      privateUrl: keyStatic.quorum.member3.privateUrl,
-      tlsSettings: { allowInsecure: true },
-    });
-
+    webQJsMember3 = Web3JsQuorum(web3Member3);
     expect(webQJsMember3).toBeTruthy();
 
     const pluginRegistry1 = new PluginRegistry();
@@ -199,7 +193,7 @@ describe("PluginLedgerConnectorQuorum", () => {
     connector1 = await pluginFactoryLedgerConnector.create({
       instanceId: connectorInstanceId1,
       pluginRegistry: pluginRegistry1,
-      rpcApiHttpHost: "http://localhost:8545",
+      rpcApiHttpHost: rpcApiHttpHostMember1,
       privateUrl: keys.quorum.member1.privateUrl,
       logLevel,
     });
@@ -248,15 +242,35 @@ describe("PluginLedgerConnectorQuorum", () => {
       );
       signingAccount = webQJsMember1.eth.accounts.decrypt(accountKey, "");
     }
-
+    // const fnParams = {
+    //   to:
+    //   data:
+    //   privateFrom: keys.tessera.member1.publicKey,
+    //   privateFor: [
+    //     keys.tessera.member1.publicKey,
+    //     keys.tessera.member2.publicKey,
+    //   ],
+    //   privateKey: keys.quorum.member1.privateKey,
+    // };
+    //const privacyGroupId = webQJsMember1.utils.generatePrivacyGroup(fnParams);
     // const accountAddress = keys.quorum.member1.accountAddress;
-    const txCount = await webQJsMember1.eth.getTransactionCount(
-      `0x13a52aab892e1322e8b52506276363d4754c122e`,
-    );
+    // const txCount = await webQJsMember1.eth.getTransactionCount(
+    //   `0x13a52aab892e1322e8b52506276363d4754c122e`,
+    //   privacyGroupId,
+    // );
+    //const privacyGroupId = webQJsMember1.utils.generatePrivacyGroup(fnParams);
+    // const participantList = [
+    //   keys.tessera.member1.publicKey,
+    //   keys.tessera.member3.publicKey,
+    // ];
+    // const privacyGroupId = await webQJsMember1.priv.createPrivacyGroup(keys.quorum.member1.url, participantList);
+    const accountAddress = keys.quorum.member1.accountAddress;
+    const txCount = await webQJsMember1.eth.getTransactionCount(accountAddress);
 
     const deployRes = await connector1.deployContract({
       contractName: HelloWorldContractJson.contractName,
       privateTransactionConfig: {
+        privateKey: "",
         privateFrom: keys.tessera.member1.publicKey,
         privateFor: [
           keys.tessera.member1.publicKey,
@@ -265,7 +279,6 @@ describe("PluginLedgerConnectorQuorum", () => {
         isPrivate: true,
         gasLimit: 10000000,
         gasPrice: 0,
-        privacyFlag: 0,
       },
       web3SigningCredential: {
         secret: keys.quorum.member1.privateKey,
@@ -295,20 +308,20 @@ describe("PluginLedgerConnectorQuorum", () => {
     const mem1Response = await member1Contract.methods.getName().call();
     expect(mem1Response).toStrictEqual("CaptainCactus");
 
-    const member2Contract = new webQJsMember2.eth.Contract(
-      HelloWorldContractJson.abi as AbiItem[],
-      contractAddress,
-    );
-    const mem2Response = await member2Contract.methods.getName().call();
-    expect(mem2Response).toStrictEqual("CaptainCactus");
+    // const member2Contract = new webQJsMember2.eth.Contract(
+    //   HelloWorldContractJson.abi as AbiItem[],
+    //   contractAddress,
+    // );
+    // const mem2Response = await member2Contract.methods.getName().call();
+    // expect(mem2Response).toStrictEqual("CaptainCactus");
 
     const member3Contract = new webQJsMember3.eth.Contract(
       HelloWorldContractJson.abi as AbiItem[],
       contractAddress,
     );
 
-    // const output = await member3Contract.methods.getName().call();
-    // expect(output).toBeTruthy();
+    const output = await member3Contract.methods.getName().call();
+    expect(output).toBeTruthy();
     const invocationOfMember3 = member3Contract.methods.getName().call();
     await expect(invocationOfMember3).toReject();
   });
