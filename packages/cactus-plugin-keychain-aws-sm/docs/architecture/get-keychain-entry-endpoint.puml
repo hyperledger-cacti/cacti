@@ -1,0 +1,35 @@
+@startuml Sequence Diagram - Transaction
+
+title Hyperledger Cactus\nSequence Diagram\nGet Keychain Entry Endpoint
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+box "Users" #LightBlue
+actor "User A" as a
+end box
+
+box "Hyperledger Cactus" #LightGray
+entity "API Client" as apic
+entity "API Server" as apis
+end box
+
+box "AWS SM Connector" #LightGreen
+database "AWS SM" as awssm
+end box
+
+a --> apic : Tx GetKeychainEntryV1
+apic --> apis: Request
+apis --> awssm: get(key,value)
+awssm -> awssm: awsClient = getAwsClient()
+group #Yellow try { await awsClient.getSecretValue() }
+  awssm -> apis: True
+else #LightCoral catch(ex)
+  awssm -> apis: error= Invalid response received from AWS SecretsManager. Expected "response.SecretString" property chain to be truthy
+end
+awssm --> apis: Response
+apis --> apic: Formatted Response
+apic --> a: GetKeychainEntryResponse
+@enduml
