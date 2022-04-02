@@ -5,9 +5,10 @@
  -->
 # Asset Exchange - HTLC
 
-- Authors: 
-- Status: [Draft](/README.md#draft)
-- Since: 2020-11-25
+- RFC: 02-004
+- Authors: Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna, Sandeep Nishad, Krishnasuri Narayanam, Dhinakaran Vinayagamurthy
+- Status: Proposed
+- Since: 25-Nov-2020
 
 ## Summary
 

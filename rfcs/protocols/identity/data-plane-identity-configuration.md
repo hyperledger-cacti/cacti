@@ -1,16 +1,22 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Data Plane Identity Configuration
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 02-012-appendix-b
+- Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+- Status: Proposed
+- Since: 24-Sep-2021
 
-### Overview
+## Overview
 
 For interoperation in the data plane, the identities in terms of data plane certificates/credentials of the foreign network units have to be configured. Along with that, the relay endopint information has to be configured.
 
 The Network DID of a foreign network contains `relayEndpoints` and `DataplaneCredentials` verification method which are used to configure the realys and the data plane certidicates required for interoperation respectively.
 
-### Protocol
+## Protocol
 
 Considering two networks `NETWORK 1` and `NETWORK 2`, we specify a protocol where the IIN Agent of a participant unit, say `Org2` in `NETWORK 1`  is configuring the identity and relay for `NETWORK 2`.
 

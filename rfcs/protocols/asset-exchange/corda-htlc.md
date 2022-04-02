@@ -3,6 +3,15 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
+# Asset Exchange - HTLC Protocol Units in Corda Networks
+
+- RFC: 02-006
+- Authors: Ermyas Abebe, Venkatraman Ramakrishna, Sandeep Nishad, Krishnasuri Narayanam, Dhinakaran Vinayagamurthy
+- Status: Proposed
+- Since: 25-Nov-2020
+
+## Summary
+
 ## Fair Exchange using Hashed Time Locked Contracts in Corda
 Corda has a number of mechanisms built in to the protocol that make implementing HTLCs conceptually straight forward: 1) a general mechanism for conditionally locking assets 2) a mechanism for constraining the validity of certain actions to a time windows 3) a mechanism for trigger actions based on time events 4) Composite keys as a way of flexibly specifying which combination of parties owns and manages a state.
 

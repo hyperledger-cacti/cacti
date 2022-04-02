@@ -8,7 +8,7 @@
 - RFC: 01-002
 - Authors: Ant Targett, Nick Waywood
 - Status: Proosed
-- Since: 01-12-2020
+- Since: 01-Dec-2020
 
 ## Summary
 

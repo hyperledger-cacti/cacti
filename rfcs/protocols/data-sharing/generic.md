@@ -5,15 +5,14 @@
  -->
 # Data Transfer Protocol
 
--   Authors: Antony Targett, Nick Waywood
--   Status: Proposed
--   Tags: feature, protocol
+- RFC: 02-001
+- Authors: Antony Targett, Nick Waywood
+- Status: Proposed
+- Since: 01-Dec-2020
 
 ## Summary
 
-A protocol (request-response protocol) to request and receive data between two
-network relays. This specification details how one relay can formulate a request for
-data from another network's relay.
+A protocol (request-response protocol) to request and receive data between two network relays. This specification details how one relay can formulate a request for data from another network's relay.
 
 ## Motivation
 

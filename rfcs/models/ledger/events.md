@@ -8,7 +8,7 @@
 - RFC: 01-004
 - Authors: Ermyas Abebe, Dileban Karunamoorthy
 - Status: Draft
-- Since: 02-11-2020
+- Since: 02-Nov-2020
 
 ## Summary
 

@@ -53,11 +53,12 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 02-008 | Asset Transfer                   | Protocol | [Proposed](./protocols/asset-transfer/generic.md)               |
 | 02-009 | Asset Transfer in Fabric         | Protocol | [Proposed](./protocols/asset-transfer/fabric.md)                |
 | 02-010 | Asset Transfer in Corda          | Protocol | [Proposed](./protocols/asset-transfer/corda.md)                 |
-| 02-011 | Identity Syncing                 | Protocol | [Draft](./protocols/identity/readme.md)                         |
-| 02-012 | Discovery                        | Protocol | [Draft](./protocols/discovery/discovery.md)                     |
-| 02-012 | Negotiation                      | Protocol | [Draft](./protocols/discovery/negotiation.md)                   |
-| 02-014 | Transaction Invocation           | Protocol | [Draft](./protocols/contract-invocation/invocation.md)          |
-| 02-015 | Event Bus                        | Protocol | [Draft](./protocols/events/event-bus.md)                        |
+| 02-011 | Identity and Config Sharing      | Protocol | [Superseded](./protocols/identity/id-config-sharing.md)         |
+| 02-012 | Identity Syncing                 | Protocol | [Proposed](./protocols/identity/dentity-syncing.md)             |
+| 02-013 | Discovery                        | Protocol | [Draft](./protocols/discovery/discovery.md)                     |
+| 02-014 | Negotiation                      | Protocol | [Draft](./protocols/discovery/negotiation.md)                   |
+| 02-015 | Transaction Invocation           | Protocol | [Draft](./protocols/contract-invocation/invocation.md)          |
+| 02-016 | Event Bus                        | Protocol | [Draft](./protocols/events/event-bus.md)                        |
 | 03-001 | View Address                     | Format   | [Proposed](./formats/views/addressing.md)                       |
 | 03-002 | Generic View                     | Format   | [Proposed](./formats/views/view-definition.md)                  |
 | 03-003 | Fabric View                      | Format   | [Proposed](./formats/views/views-fabric.md)                     |

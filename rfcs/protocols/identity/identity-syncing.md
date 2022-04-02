@@ -5,9 +5,11 @@
  -->
 # Protocols for Decentralized Network-Identity Configuration, Exchannge and Validation, for Interoperation
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 02-012
+- Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+- Status: Proposed
+- Supersedes: 02-011
+- Since: 24-Sep-2021
 
 
 ## Summary

@@ -8,7 +8,7 @@
 - RFC: 01-012
 - Authors: Venkatraman Ramakrishna, Bishakh Chandra Ghosh, Krishnasuri Narayanam, Ermyas Abebe
 - Status: Proposed
-- Since: 24-September-2021
+- Since: 24-Sep-2021
 
 
 # Summary

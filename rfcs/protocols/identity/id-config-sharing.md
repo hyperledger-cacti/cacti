@@ -5,9 +5,10 @@
  -->
 # Protocol: Sharing of Identity and Configuration Information between Interoperating Networks
 
-* Authors: Venkatraman Ramakrishna
-* Status: Draft
-* Since: 22-Oct-2020
+- RFC: 02-011
+- Authors: Venkatraman Ramakrishna
+- Status: Superseded
+- Since: 22-Oct-2020
 
 
 # Background

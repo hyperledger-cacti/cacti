@@ -1,13 +1,19 @@
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
 # Credentials update with changes in identity plane
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 02-012-appendix-c
+- Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+- Status: Proposed
+- Since: 24-Sep-2021
 
 
 # Overview
 
-As mentioned in the [identity exchange protocol](../identity/readme.md) , there are three phases in the process between a network making itself known via an IIN to the point when its identity and certificates are accepted and recorded by a foreign network with which an interoperation (in the data plane) may occur in the future. These phases are separate protocol instances in themselves, though they must follow a particular chronological order. The full process is illustrated in the figure below:
+As mentioned in the [identity exchange protocol](./identity-syncing.md), there are three phases in the process between a network making itself known via an IIN to the point when its identity and certificates are accepted and recorded by a foreign network with which an interoperation (in the data plane) may occur in the future. These phases are separate protocol instances in themselves, though they must follow a particular chronological order. The full process is illustrated in the figure below:
 
 <img src="../../resources/images/protocol-identity-overview.jpg" width=60%>
 

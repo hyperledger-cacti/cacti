@@ -5,6 +5,11 @@
  -->
 # Event Bus
 
+- RFC: 02-016
+- Authors: Ermyas Abebe, Dileban Karunamoorthy
+- Status: Draft
+- Since: 01-Dec-2020
+
 ## Summary
 
 * The event bus is a protocol for end-to-end event delivery between distributed ledgers.

@@ -4,12 +4,14 @@
  SPDX-License-Identifier: CC-BY-4.0
  -->
 # Discovery Protocol
-* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
-* Status: Proposed
-* Since: 25-July-2021
+
+- RFC: 02-013
+- Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
+- Status: Draft
+- Since: 25-Jul-2021
 
 
-
+## Summary
 
 When a network ("local network" from here on) tries to configure the identity of another network ("foreign network" from here on) for interoperation, the broad steps involved are (i) Network Discovery (ii) Network Identity Validation. Both these steps are carried out by the IIN agent of the participants of the local network.
 
