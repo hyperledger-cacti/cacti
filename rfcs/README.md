@@ -54,7 +54,7 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 02-009 | Asset Transfer in Fabric         | Protocol | [Proposed](./protocols/asset-transfer/fabric.md)                |
 | 02-010 | Asset Transfer in Corda          | Protocol | [Proposed](./protocols/asset-transfer/corda.md)                 |
 | 02-011 | Identity and Config Sharing      | Protocol | [Superseded](./protocols/identity/id-config-sharing.md)         |
-| 02-012 | Identity Syncing                 | Protocol | [Proposed](./protocols/identity/dentity-syncing.md)             |
+| 02-012 | Identity Syncing                 | Protocol | [Proposed](./protocols/identity/identity-syncing.md)            |
 | 02-013 | Discovery                        | Protocol | [Draft](./protocols/discovery/discovery.md)                     |
 | 02-014 | Negotiation                      | Protocol | [Draft](./protocols/discovery/negotiation.md)                   |
 | 02-015 | Transaction Invocation           | Protocol | [Draft](./protocols/contract-invocation/invocation.md)          |
